@@ -1,4 +1,4 @@
 export type ThemeProps = {
-    lightColor?: string;
-    darkColor?: string;
+  lightColor?: string;
+  darkColor?: string;
 };

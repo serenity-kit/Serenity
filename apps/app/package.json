@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "expo start",
-    "dev:android": "expo start --android",
-    "dev:ios": "expo start --ios",
+    "dev:android": "cd ../../packages/editor && yarn build && cd - && expo start --android",
+    "dev:ios": "cd ../../packages/editor && yarn build && cd - && expo start --ios",
     "dev:web": "expo start --web",
     "dev:electron-web": "EXPO_ELECTRON_MODE=true expo start --web",
     "dev:electron-main": "electron ./electron/main/index.ts",

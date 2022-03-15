@@ -1,16 +1,11 @@
 import { Platform, StyleSheet, View } from "react-native";
-import { Text, TextProps } from '@serenity-tools/ui';
+import { Text, TextProps } from "@serenity-tools/ui";
 
 export function EditorButton(props: TextProps) {
+  const styles = StyleSheet.create({});
 
-  const styles = StyleSheet.create({
-
-  })
-
+  return <Button></Button>;
   return (
-    <Button>
-
-    </Button>
-  )
-  return <Text {...props} style={[props.style, { fontFamily: 'space-mono' }]} />;
+    <Text {...props} style={[props.style, { fontFamily: "space-mono" }]} />
+  );
 }
