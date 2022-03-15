@@ -1,4 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
+import { EditorWrapperView } from "@serenity-tools/ui";
 import StarterKit from "@tiptap/starter-kit";
 
 export const Tiptap = () => {
@@ -7,10 +8,8 @@ export const Tiptap = () => {
     content: "<p>EDITOR content!</p>",
   });
 
-  console.log(editor);
-
   return (
-    <div>
+    <EditorWrapperView>
       <div>
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -20,6 +19,6 @@ export const Tiptap = () => {
         </button>
       </div>
       <EditorContent editor={editor} />
-    </div>
+    </EditorWrapperView>
   );
 };

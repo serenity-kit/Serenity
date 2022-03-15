@@ -3,12 +3,16 @@ import { ThemeProps } from "../types";
 export type ViewProps = ThemeProps & DefaultView["props"];
 import { useThemeColor } from "../hooks/useThemeColor";
 
-export function View(props: ViewProps) {
+export function EditorWrapperView(props: ViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
   const backgroundColor = useThemeColor(
     { light: lightColor, dark: darkColor },
     "background"
   );
+  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
 
-  return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+  return (
+    // @ts-expect-error manually setting color for the editor
+    <DefaultView style={[{ backgroundColor, color }, style]} {...otherProps} />
+  );
 }
