@@ -7,6 +7,19 @@ export const Tiptap = () => {
     content: "<p>EDITOR content!</p>",
   });
 
-  return <EditorContent editor={editor} />
+  console.log(editor);
 
+  return (
+    <div>
+      <div>
+        <button
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          style={{ color: editor?.isActive("bold") ? "black" : "#ccc" }}
+        >
+          Bold
+        </button>
+      </div>
+      <EditorContent editor={editor} />
+    </div>
+  );
 };
