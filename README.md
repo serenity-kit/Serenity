@@ -19,11 +19,12 @@ cd apps/app
 yarn dev:web
 ```
 
-### App (iOS Simulator)
+### App (iOS Simulator or Android Emulator)
 
 ```sh
 cd apps/app
 yarn dev:ios
+yarn dev:android
 ```
 
 ### App (Electron)
