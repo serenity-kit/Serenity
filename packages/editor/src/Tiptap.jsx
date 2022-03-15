@@ -7,6 +7,5 @@ export const Tiptap = () => {
     content: "<p>EDITOR content!</p>",
   });
 
-  return <EditorContent editor={editor} />
-
+  return <EditorContent editor={editor} />;
 };

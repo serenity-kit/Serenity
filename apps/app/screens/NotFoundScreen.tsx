@@ -1,13 +1,18 @@
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from "react-native";
 
-import { Text, View } from '@serenity-tools/ui';
-import { RootStackScreenProps } from '../types';
+import { Text, View } from "@serenity-tools/ui";
+import { RootStackScreenProps } from "../types";
 
-export default function NotFoundScreen({ navigation }: RootStackScreenProps<'NotFound'>) {
+export default function NotFoundScreen({
+  navigation,
+}: RootStackScreenProps<"NotFound">) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>This screen doesn't exist.</Text>
-      <TouchableOpacity onPress={() => navigation.replace('Root')} style={styles.link}>
+      <TouchableOpacity
+        onPress={() => navigation.replace("EditorScreen")}
+        style={styles.link}
+      >
         <Text style={styles.linkText}>Go to home screen!</Text>
       </TouchableOpacity>
     </View>
@@ -17,13 +22,13 @@ export default function NotFoundScreen({ navigation }: RootStackScreenProps<'Not
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   link: {
     marginTop: 15,
@@ -31,6 +36,6 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 14,
-    color: '#2e78b7',
+    color: "#2e78b7",
   },
 });
