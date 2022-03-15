@@ -12,14 +12,6 @@ yarn
 
 ## Development
 
-### Editor (standalone)
-
-```sh
-cd packages/editor
-yarn dev
-# visit http://localhost:8080 in your browser
-```
-
 ### App (web)
 
 ```sh
@@ -41,4 +33,12 @@ cd apps/app
 yarn dev:electron-web
 # in another tab run
 yarn dev:electron-main
+```
+
+### Editor (standalone)
+
+```sh
+cd packages/editor
+yarn dev
+# visit http://localhost:8080 in your browser
 ```
