@@ -3,7 +3,7 @@ import { Platform, StyleSheet, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
-import { Text } from "../components/Themed";
+import { Text } from "@serenity-tools/ui";
 
 export async function loadEditorSourceForAndroid() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires

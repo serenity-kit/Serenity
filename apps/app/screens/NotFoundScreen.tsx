@@ -1,6 +1,6 @@
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
-import { Text, View } from '../components/Themed';
+import { Text, View } from '@serenity-tools/ui';
 import { RootStackScreenProps } from '../types';
 
 export default function NotFoundScreen({ navigation }: RootStackScreenProps<'NotFound'>) {

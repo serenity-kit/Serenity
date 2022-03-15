@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import useCachedResources from "./hooks/useCachedResources";
-import useColorScheme from "./hooks/useColorScheme";
+import { useColorScheme } from "@serenity-tools/ui";
 import Navigation from "./navigation";
 
 export default function App() {

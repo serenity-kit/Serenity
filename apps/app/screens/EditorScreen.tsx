@@ -1,11 +1,11 @@
 import Editor from "../components/Editor";
 
-import { View } from "../components/Themed";
+import { View } from "@serenity-tools/ui";
 import { RootTabScreenProps } from "../types";
 
 export default function TabOneScreen({
   navigation,
-}: RootTabScreenProps<"TabOne">) {
+}: RootTabScreenProps<"EditorScreen">) {
   return (
     <View>
       <Editor />
