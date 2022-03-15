@@ -2,6 +2,8 @@
 
 ## Setup
 
+Recommended node version: 16
+
 ```sh
 yarn global add expo-cli
 yarn global add eas-cli
