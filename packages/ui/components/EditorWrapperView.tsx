@@ -1,7 +1,6 @@
 import { View as DefaultView } from "react-native";
-import { ThemeProps } from "../types";
-export type ViewProps = ThemeProps & DefaultView["props"];
 import { useThemeColor } from "../hooks/useThemeColor";
+import { ViewProps } from "./View";
 
 export function EditorWrapperView(props: ViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
