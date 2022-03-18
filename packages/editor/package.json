@@ -4,7 +4,8 @@
   "main": "index",
   "scripts": {
     "build": "webpack --mode=production && cp dist/index.html ../../apps/app/assets/index.html",
-    "dev": "webpack-dev-server"
+    "dev": "webpack-dev-server",
+    "ts:check": "yarn tsc --noEmit"
   },
   "dependencies": {
     "@tiptap/react": "^2.0.0-beta.108",
