@@ -10,7 +10,8 @@
     "dev:electron-web": "EXPO_ELECTRON_MODE=true expo start --web",
     "dev:electron-main": "electron ./electron/main/index.ts",
     "eject": "expo eject",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "ts:check": "yarn tsc --noEmit"
   },
   "jest": {
     "preset": "jest-expo"

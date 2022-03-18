@@ -12,7 +12,8 @@
     "prettier": "2.5.1"
   },
   "scripts": {
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "ts:check": "yarn workspace serenity ts:check && yarn workspace @serenity-tools/ui ts:check && yarn workspace @serenity-tools/editor ts:check"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"

@@ -1,5 +1,4 @@
-"use strict";
-
+// @ts-ignore
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
 const { format: formatUrl } = require("url");
@@ -7,7 +6,6 @@ const { format: formatUrl } = require("url");
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
-// @ts-expect-error
 let mainWindow;
 
 function createMainWindow() {
