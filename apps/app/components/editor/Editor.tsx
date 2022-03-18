@@ -7,7 +7,7 @@ import { Text } from "@serenity-tools/ui";
 
 export async function loadEditorSourceForAndroid() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const indexHtml = Asset.fromModule(require("../assets/index.html"));
+  const indexHtml = Asset.fromModule(require("../../assets/index.html"));
   await indexHtml.downloadAsync();
   // @ts-expect-error
   const html = await FileSystem.readAsStringAsync(indexHtml.localUri);
@@ -26,7 +26,9 @@ const styles = StyleSheet.create({
 });
 
 let editorSource =
-  Platform.OS !== "android" ? require("../assets/index.html") : { html: null };
+  Platform.OS !== "android"
+    ? require("../../assets/index.html")
+    : { html: null };
 
 export default function Editor({}) {
   const webViewRef = useRef(null);

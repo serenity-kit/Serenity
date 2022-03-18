@@ -1,7 +1,7 @@
 import React from "react";
 import { Text as DefaultText } from "react-native";
-import { useThemeColor } from "../hooks/useThemeColor";
-import { ThemeProps } from "../types";
+import { useThemeColor } from "../../hooks/useThemeColor";
+import { ThemeProps } from "../../types";
 
 export type TextProps = ThemeProps & DefaultText["props"];
 
