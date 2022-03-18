@@ -14,7 +14,7 @@ import { ColorSchemeName } from "react-native";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import EditorScreen from "../screens/EditorScreen";
 import { RootStackParamList } from "../types";
-import LinkingConfiguration from "./LinkingConfiguration";
+import LinkingConfiguration from "./linkingConfiguration";
 
 export default function Navigation({
   colorScheme,

@@ -43,3 +43,10 @@ cd packages/editor
 yarn dev
 # visit http://localhost:8080 in your browser
 ```
+
+## Folder/File Naming Convention
+
+- Folder and file names use camelCase.
+- Folders start with a lower case character.
+- TypeScript, Json and other files start with a lower case character.
+  - React components are the only exception as they start with an upper case character.

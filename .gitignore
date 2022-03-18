@@ -1,4 +1,8 @@
 node_modules
 dist
 .expo
+yarn-error.log
+# editor built for the mobile editor web view
 apps/app/assets/index.html
+
+
