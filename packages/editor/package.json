@@ -1,7 +1,7 @@
 {
   "name": "@serenity-tools/editor",
   "version": "0.0.1",
-  "main": "src/index",
+  "main": "index",
   "scripts": {
     "build": "webpack --mode=production && cp dist/index.html ../../apps/app/assets/index.html",
     "dev": "webpack-dev-server"

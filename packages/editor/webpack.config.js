@@ -6,7 +6,7 @@ module.exports = {
   mode: "development",
   devtool: "source-map",
   entry: {
-    prosemirror: "./src/standalone",
+    prosemirror: "./standalone",
   },
   output: {
     globalObject: "self",
@@ -40,7 +40,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       title: "Serenity Editor",
-      template: "src/template.html",
+      template: "template.html",
       filename: "index.html",
       inlineSource: ".(js|css)$", // embed all javascript and css inline
     }),
