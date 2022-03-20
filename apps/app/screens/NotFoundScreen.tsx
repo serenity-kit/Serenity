@@ -5,12 +5,15 @@ import { RootStackScreenProps } from "../types";
 
 export default function NotFoundScreen({
   navigation,
-}: RootStackScreenProps<"NotFound">) {
+}: RootStackScreenProps<"notFound">) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>This screen doesn't exist.</Text>
-      <TouchableOpacity onPress={() => navigation.replace('EditorScreen')} style={styles.link}>
-        <Text style={styles.linkText}>Go to home screen!</Text>
+      <TouchableOpacity
+        onPress={() => navigation.replace("dashboard")}
+        style={styles.link}
+      >
+        <Text style={styles.linkText}>Go to dashboard!</Text>
       </TouchableOpacity>
     </View>
   );
