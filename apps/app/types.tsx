@@ -17,8 +17,9 @@ declare global {
 }
 
 export type RootStackParamList = {
-  EditorScreen: NavigatorScreenParams<RootTabParamList> | undefined;
-  NotFound: undefined;
+  dashboard: undefined;
+  editor: NavigatorScreenParams<RootTabParamList> | undefined;
+  notFound: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
