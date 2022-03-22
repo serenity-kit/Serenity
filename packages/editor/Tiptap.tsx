@@ -1,4 +1,4 @@
-// import "./editor-output.css";
+import "./editor-output.css";
 import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { EditorWrapperView, View } from "@serenity-tools/ui";

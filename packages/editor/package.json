@@ -6,7 +6,7 @@
     "build": "webpack --mode=production && cp dist/index.html ../../apps/app/assets/index.html",
     "dev": "webpack-dev-server",
     "ts:check": "yarn tsc --noEmit",
-    "style:editor": "yarn run tailwindcss --config ./tailwind.config.js -i ./editor-input.css -o ./dist/editor-output.css --watch"
+    "style:editor": "yarn run tailwindcss --config ./tailwind.config.js -i ./editor-input.css -o ./editor-output.css --watch"
   },
   "dependencies": {
     "@tiptap/react": "^2.0.0-beta.108",
@@ -24,7 +24,9 @@
     "@types/react-dom": "^17.0.13",
     "babel-loader": "^8.2.3",
     "css-loader": "^6.7.1",
+    "html-inline-css-webpack-plugin": "^1.11.1",
     "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.6.0",
     "react-dev-utils": "^12.0.0",
     "style-loader": "^3.3.1",
     "tailwindcss": "^3.0.23",

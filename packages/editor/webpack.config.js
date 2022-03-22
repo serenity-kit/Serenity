@@ -1,6 +1,9 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const InlineChunkHtmlPlugin = require("react-dev-utils/InlineChunkHtmlPlugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HTMLInlineCSSWebpackPlugin =
+  require("html-inline-css-webpack-plugin").default;
 
 module.exports = {
   mode: "development",
@@ -38,7 +41,7 @@ module.exports = {
       },
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
     ],
   },
@@ -47,8 +50,13 @@ module.exports = {
       title: "Serenity Editor",
       template: "template.html",
       filename: "index.html",
-      // inlineSource: ".(js|css)$", // embed all javascript and css inline
+      inject: "body",
     }),
-    // new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/.*/]),
+    new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/.*/]),
+    new MiniCssExtractPlugin({
+      filename: "[name].css",
+      chunkFilename: "[id].css",
+    }),
+    new HTMLInlineCSSWebpackPlugin(),
   ],
 };
