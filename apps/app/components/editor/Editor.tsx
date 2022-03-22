@@ -4,6 +4,7 @@ import { WebView } from "react-native-webview";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
 import { Text, View } from "@serenity-tools/ui";
+import * as Y from "yjs";
 
 export async function loadEditorSourceForAndroid() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -32,17 +33,17 @@ let editorSource =
 
 export default function Editor({}) {
   const webViewRef = useRef(null);
+  const ydocRef = useRef<Y.Doc | null>(null);
 
   useEffect(() => {
     const initDoc = async () => {
+      ydocRef.current = new Y.Doc();
       if (Platform.OS === "android") {
         editorSource = await loadEditorSourceForAndroid();
       }
     };
     initDoc();
   }, []);
-
-  console.log(editorSource);
 
   return (
     <View>
@@ -63,11 +64,38 @@ export default function Editor({}) {
           )}
           onMessage={async (event) => {
             // event.persist();
+            const message = JSON.parse(event.nativeEvent.data);
+            if (message.type === "update") {
+              const update = new Uint8Array(message.content);
+              if (ydocRef.current) {
+                Y.applyUpdate(ydocRef.current, update);
+                console.log("apply update");
+              }
+              // const serializedYDoc = Y.encodeStateAsUpdate(yDocRef.current);
+              // optimization: prevent update in case the content hasn't changed
+              // if (deepEqual(serializedYDoc, contentRef.current)) return;
+            }
           }}
           style={styles.webView}
           // Needed for .focus() to work
           keyboardDisplayRequiresUserAction={false}
-          onLoad={() => {}}
+          onLoad={() => {
+            // debug for the editor
+            // console.log(JSON.stringify(Array.apply([], contentRef.current)));
+            // if (isNew) {
+            //   webViewRef?.current.injectJavaScript(`
+            //     document.querySelector(".ProseMirror").focus();
+            //     true;
+            //   `);
+            // } else {
+            //   webViewRef.current.injectJavaScript(`
+            //     window.applyYjsUpdate(${JSON.stringify(
+            //       Array.apply([], contentRef.current)
+            //     )});
+            //     true;
+            //   `);
+            // }
+          }}
         />
       </View>
     </View>

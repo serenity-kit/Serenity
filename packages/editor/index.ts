@@ -1,1 +1,1 @@
-export { Tiptap } from "./Tiptap";
+export { Editor } from "./Editor";

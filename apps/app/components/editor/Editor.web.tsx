@@ -1,5 +1,8 @@
-import { Tiptap } from "@serenity-tools/editor";
+import { Editor as SerenityEditor } from "@serenity-tools/editor";
+import * as Y from "yjs";
+
+const ydoc = new Y.Doc();
 
 export default function Editor({}) {
-  return <Tiptap />;
+  return <SerenityEditor ydoc={ydoc} />;
 }

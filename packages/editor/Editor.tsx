@@ -6,18 +6,20 @@ import StarterKit from "@tiptap/starter-kit";
 import Collaboration from "@tiptap/extension-collaboration";
 import * as Y from "yjs";
 
-const ydoc = new Y.Doc();
+type EditorProps = {
+  ydoc: Y.Doc;
+};
 
-export const Tiptap = () => {
+export const Editor = (props: EditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // The Collaboration extension comes with its own history handling
+        // the Collaboration extension comes with its own history handling
         history: false,
       }),
-      // Register the document with Tiptap
+      // register the document with Tiptap
       Collaboration.configure({
-        document: ydoc,
+        document: props.ydoc,
       }),
     ],
     content: "<p>EDITOR content!</p>",
