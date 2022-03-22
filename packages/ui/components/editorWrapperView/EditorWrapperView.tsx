@@ -1,17 +1,15 @@
-import { View as DefaultView } from "react-native";
-import { useThemeColor } from "../../hooks/useThemeColor";
-import { ViewProps } from "../view/View";
+import React from "react";
+import { tw } from "../../tailwind";
+import { View, ViewProps } from "../view/View";
 
 export function EditorWrapperView(props: ViewProps) {
-  const { style, lightColor, darkColor, ...otherProps } = props;
-  const backgroundColor = useThemeColor(
-    { light: lightColor, dark: darkColor },
-    "background"
-  );
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
+  const { style, ...otherProps } = props;
 
   return (
-    // @ts-expect-error manually setting color for the editor
-    <DefaultView style={[{ backgroundColor, color }, style]} {...otherProps} />
+    <View
+      // @ts-expect-error allow style overwrite
+      style={tw.style(`text-md text-black dark:text-white`, style)}
+      {...otherProps}
+    />
   );
 }
