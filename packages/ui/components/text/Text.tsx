@@ -6,5 +6,11 @@ import { ThemeProps } from "../../types";
 export type TextProps = ThemeProps & RNText["props"];
 
 export function Text(props: TextProps) {
-  return <RNText style={tw`text-md text-black dark:text-white`} {...props} />;
+  return (
+    <RNText
+      {...props}
+      // @ts-expect-error allow style overwrite
+      style={tw.style(`text-black dark:text-white`, props.style)}
+    />
+  );
 }

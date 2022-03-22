@@ -5,13 +5,11 @@ export type ViewProps = ThemeProps & RNView["props"];
 import { tw } from "../../tailwind";
 
 export function View(props: ViewProps) {
-  const { style, ...otherProps } = props;
-
   return (
     <RNView
+      {...props}
       // @ts-expect-error allow style overwrite
-      style={tw.style(`bg-white dark:bg-black`, style)}
-      {...otherProps}
+      style={tw.style(`bg-white dark:bg-black`, props.style)}
     />
   );
 }
