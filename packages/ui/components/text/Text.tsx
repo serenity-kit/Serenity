@@ -1,13 +1,16 @@
 import React from "react";
-import { Text as DefaultText } from "react-native";
-import { useThemeColor } from "../../hooks/useThemeColor";
+import { Text as RNText } from "react-native";
+import { tw } from "../../tailwind";
 import { ThemeProps } from "../../types";
 
-export type TextProps = ThemeProps & DefaultText["props"];
+export type TextProps = ThemeProps & RNText["props"];
 
 export function Text(props: TextProps) {
-  const { style, lightColor, darkColor, ...otherProps } = props;
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
-
-  return <DefaultText style={[{ color }, style]} {...otherProps} />;
+  return (
+    <RNText
+      {...props}
+      // @ts-expect-error allow style overwrite
+      style={tw.style(`text-black dark:text-white`, props.style)}
+    />
+  );
 }

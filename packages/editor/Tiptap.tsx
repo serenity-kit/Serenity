@@ -1,6 +1,7 @@
+import "./editor-output.css";
 import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
-import { EditorWrapperView } from "@serenity-tools/ui";
+import { EditorWrapperView, View } from "@serenity-tools/ui";
 import StarterKit from "@tiptap/starter-kit";
 
 export const Tiptap = () => {
@@ -11,15 +12,17 @@ export const Tiptap = () => {
 
   return (
     <EditorWrapperView>
-      <div>
+      <View>
         <button
           onClick={() => editor?.chain().focus().toggleBold().run()}
           style={{ color: editor?.isActive("bold") ? "black" : "#ccc" }}
         >
           Bold
         </button>
+      </View>
+      <div className="prose">
+        <EditorContent editor={editor} />
       </div>
-      <EditorContent editor={editor} />
     </EditorWrapperView>
   );
 };

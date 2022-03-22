@@ -1,6 +1,9 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
+const InlineChunkHtmlPlugin = require("react-dev-utils/InlineChunkHtmlPlugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HTMLInlineCSSWebpackPlugin =
+  require("html-inline-css-webpack-plugin").default;
 
 module.exports = {
   mode: "development",
@@ -15,10 +18,11 @@ module.exports = {
     publicPath: "/prosemirror/dist/",
   },
   devServer: {
-    contentBase: path.join(__dirname),
-    compress: true,
-    publicPath: "/",
-    disableHostCheck: true,
+    static: {
+      directory: path.join(__dirname, "dist"),
+      publicPath: "/",
+    },
+    allowedHosts: "all",
   },
   resolve: {
     extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
@@ -35,6 +39,10 @@ module.exports = {
           loader: "babel-loader",
         },
       },
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },
     ],
   },
   plugins: [
@@ -42,8 +50,13 @@ module.exports = {
       title: "Serenity Editor",
       template: "template.html",
       filename: "index.html",
-      inlineSource: ".(js|css)$", // embed all javascript and css inline
+      inject: "body",
     }),
-    new HtmlWebpackInlineSourcePlugin(),
+    new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/.*/]),
+    new MiniCssExtractPlugin({
+      filename: "[name].css",
+      chunkFilename: "[id].css",
+    }),
+    new HTMLInlineCSSWebpackPlugin(),
   ],
 };
