@@ -40,6 +40,8 @@ yarn dev:electron-main
 
 ```sh
 cd packages/editor
+yarn style:editor --watch
+# in another tab run
 yarn dev
 # visit http://localhost:8080 in your browser
 ```
