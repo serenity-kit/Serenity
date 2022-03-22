@@ -5,7 +5,8 @@
   "scripts": {
     "build": "webpack --mode=production && cp dist/index.html ../../apps/app/assets/index.html",
     "dev": "webpack-dev-server",
-    "ts:check": "yarn tsc --noEmit"
+    "ts:check": "yarn tsc --noEmit",
+    "style:editor": "yarn run tailwindcss --config ./tailwind.config.js -i ./editor-input.css -o ./dist/editor-output.css --watch"
   },
   "dependencies": {
     "@tiptap/react": "^2.0.0-beta.108",
@@ -19,13 +20,17 @@
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
+    "@tailwindcss/typography": "^0.5.2",
     "@types/react-dom": "^17.0.13",
     "babel-loader": "^8.2.3",
-    "html-webpack-inline-source-plugin": "^0.0.10",
-    "html-webpack-plugin": "^3.2.0",
+    "css-loader": "^6.7.1",
+    "html-webpack-plugin": "^5.5.0",
+    "react-dev-utils": "^12.0.0",
+    "style-loader": "^3.3.1",
+    "tailwindcss": "^3.0.23",
     "typescript": "^4.3.5",
-    "webpack": "^4.41.6",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3"
+    "webpack": "^5.70.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.7.4"
   }
 }
