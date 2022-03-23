@@ -22,7 +22,6 @@ export const Editor = (props: EditorProps) => {
         document: props.ydoc,
       }),
     ],
-    content: "<p>EDITOR content!</p>",
   });
 
   return (

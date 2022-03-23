@@ -6,7 +6,7 @@ import * as Y from "yjs";
 window.applyYjsUpdate = function (updateArray) {
   if (updateArray) {
     const update = new Uint8Array(updateArray);
-    Y.applyUpdate(window.ydoc, update);
+    Y.applyUpdateV2(window.ydoc, update);
   }
 };
 
