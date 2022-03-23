@@ -3,10 +3,25 @@ import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { EditorWrapperView, View } from "@serenity-tools/ui";
 import StarterKit from "@tiptap/starter-kit";
+import Collaboration from "@tiptap/extension-collaboration";
+import * as Y from "yjs";
 
-export const Tiptap = () => {
+type EditorProps = {
+  ydoc: Y.Doc;
+};
+
+export const Editor = (props: EditorProps) => {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit.configure({
+        // the Collaboration extension comes with its own history handling
+        history: false,
+      }),
+      // register the document with Tiptap
+      Collaboration.configure({
+        document: props.ydoc,
+      }),
+    ],
     content: "<p>EDITOR content!</p>",
   });
 

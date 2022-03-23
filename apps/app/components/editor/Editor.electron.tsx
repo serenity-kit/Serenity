@@ -1,11 +1,14 @@
-import { Text } from "@serenity-tools/ui";
-import { Tiptap } from "@serenity-tools/editor";
+import { Text, View } from "@serenity-tools/ui";
+import { Editor as SerenityEditor } from "@serenity-tools/editor";
+import * as Y from "yjs";
+
+const ydoc = new Y.Doc();
 
 export default function Editor({}) {
   return (
-    <Text>
-      <Tiptap />
-      ELECTRON EDITOR
-    </Text>
+    <View>
+      <Text>Electron Editor</Text>
+      <SerenityEditor ydoc={ydoc} />
+    </View>
   );
 }

@@ -16,4 +16,7 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, "node_modules"),
 ];
 
+config.resolver.sourceExts.push("cjs", "mjs");
+console.log(config.resolver.sourceExts);
+
 module.exports = config;
