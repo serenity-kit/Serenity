@@ -5,6 +5,7 @@ import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
 import { Text, View } from "@serenity-tools/ui";
 import * as Y from "yjs";
+import { EditorProps } from "./types";
 
 export async function loadEditorSourceForAndroid() {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -31,13 +32,14 @@ let editorSource =
     ? require("../../assets/index.html")
     : { html: null };
 
-export default function Editor({}) {
+export default function Editor({ serializedYdoc }: EditorProps) {
   const webViewRef = useRef(null);
   const ydocRef = useRef<Y.Doc | null>(null);
 
   useEffect(() => {
     const initDoc = async () => {
       ydocRef.current = new Y.Doc();
+      Y.applyUpdateV2(ydocRef.current, serializedYdoc);
       if (Platform.OS === "android") {
         editorSource = await loadEditorSourceForAndroid();
       }
@@ -68,10 +70,12 @@ export default function Editor({}) {
             if (message.type === "update") {
               const update = new Uint8Array(message.content);
               if (ydocRef.current) {
+                // TODO switch to applyUpdateV2
                 Y.applyUpdate(ydocRef.current, update);
                 console.log("apply update");
+                const serializedYDoc = Y.encodeStateAsUpdateV2(ydocRef.current);
+                console.log(serializedYDoc);
               }
-              // const serializedYDoc = Y.encodeStateAsUpdate(yDocRef.current);
               // optimization: prevent update in case the content hasn't changed
               // if (deepEqual(serializedYDoc, contentRef.current)) return;
             }
@@ -88,13 +92,16 @@ export default function Editor({}) {
             //     true;
             //   `);
             // } else {
-            //   webViewRef.current.injectJavaScript(`
-            //     window.applyYjsUpdate(${JSON.stringify(
-            //       Array.apply([], contentRef.current)
-            //     )});
-            //     true;
-            //   `);
             // }
+
+            // @ts-expect-error
+            webViewRef?.current?.injectJavaScript(`
+              window.applyYjsUpdate(${JSON.stringify(
+                // @ts-expect-error
+                Array.apply([], Y.encodeStateAsUpdateV2(ydocRef.current))
+              )});
+              true;
+            `);
           }}
         />
       </View>

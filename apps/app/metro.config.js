@@ -16,7 +16,7 @@ config.resolver.nodeModulesPaths = [
   path.resolve(workspaceRoot, "node_modules"),
 ];
 
+// needed for yjs and lib0 since they use .cjs and .mjs files
 config.resolver.sourceExts.push("cjs", "mjs");
-console.log(config.resolver.sourceExts);
 
 module.exports = config;
