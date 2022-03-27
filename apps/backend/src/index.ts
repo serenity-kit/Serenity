@@ -19,11 +19,11 @@ import { retryAsyncFunction } from "./retryAsyncFunction";
 import {
   NaishoSnapshotMissesUpdatesError,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
+  UpdateWithServerData,
 } from "@naisho/core";
 
 async function main() {
   const apolloServer = new ApolloServer({
-    // @ts-expect-error
     schema,
     plugins: [
       process.env.NODE_ENV === "production"
@@ -102,6 +102,7 @@ async function main() {
           } catch (error) {
             if (error instanceof NaishoSnapshotBasedOnOutdatedSnapshotError) {
               let doc = await getDocument(documentId);
+              if (!doc) return; // should never be the case?
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
@@ -133,7 +134,7 @@ async function main() {
             }
           }
         } else if (data?.publicData?.refSnapshotId) {
-          let savedUpdate = null;
+          let savedUpdate: undefined | UpdateWithServerData = undefined;
           try {
             // const random = Math.floor(Math.random() * 10);
             // if (random < 8) {
@@ -142,7 +143,7 @@ async function main() {
 
             // TODO add a smart queue to create an offset based on the version?
             savedUpdate = await retryAsyncFunction(() => createUpdate(data));
-            if (!savedUpdate) {
+            if (savedUpdate === undefined) {
               throw new Error("Update could not be saved.");
             }
 
@@ -152,12 +153,14 @@ async function main() {
                 docId: data.publicData.docId,
                 snapshotId: data.publicData.refSnapshotId,
                 clock: data.publicData.clock,
+                // @ts-expect-error not sure why savedUpdate is "never"
                 serverVersion: savedUpdate.version,
               })
             );
             console.log("addUpdate update");
             addUpdate(
               documentId,
+              // @ts-expect-error not sure why savedUpdate is "never"
               { ...savedUpdate, type: "update" },
               connection
             );

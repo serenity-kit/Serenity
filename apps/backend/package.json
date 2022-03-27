@@ -1,7 +1,6 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "private": true,
   "devDependencies": {
     "@types/node": "16.11.9",
     "@types/uuid": "^8.3.3",
@@ -21,10 +20,11 @@
     "prisma:prod:migrate": "POSTGRES_URL=$POSTGRES_URL prisma migrate deploy",
     "prisma:prod:generate": "POSTGRES_URL=$POSTGRES_URL prisma generate",
     "prisma:prod:studio": "POSTGRES_URL=$POSTGRES_URL prisma studio",
-    "start:prod": "PORT=$PORT POSTGRES_URL=$POSTGRES_URL NODE_ENV=production node ./build"
+    "start:prod": "PORT=$PORT POSTGRES_URL=$POSTGRES_URL NODE_ENV=production node ./build",
+    "ts:check": "yarn tsc --noEmit"
   },
   "dependencies": {
-    "@naisho/core": "0.0.1",
+    "@naisho/core": "*",
     "@prisma/client": "3.5.0",
     "apollo-server-express": "^3.5.0",
     "express": "^4.17.1",
@@ -33,8 +33,5 @@
     "nexus": "^1.1.0",
     "uuid": "^8.3.2",
     "ws": "^8.3.0"
-  },
-  "engines": {
-    "node": ">=16"
   }
 }

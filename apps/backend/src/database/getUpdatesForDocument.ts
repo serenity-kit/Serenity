@@ -39,6 +39,7 @@ export async function getUpdatesForDocument(
     };
   } else if (
     document.activeSnapshot.id === knownSnapshotId &&
+    // @ts-expect-error knownUpdateVersion can not be undefined at this point
     document.activeSnapshot.latestVersion > knownUpdateVersion
   ) {
     const updates = await prisma.update.findMany({
