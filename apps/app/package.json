@@ -19,12 +19,12 @@
   "dependencies": {
     "@expo/vector-icons": "^12.0.0",
     "@mobily/stacks": "^2.0.0",
+    "@naisho/core": "*",
     "@react-navigation/bottom-tabs": "^6.0.5",
     "@react-navigation/native": "^6.0.2",
     "@react-navigation/native-stack": "^6.1.0",
     "@serenity-tools/editor": "*",
     "@serenity-tools/ui": "*",
-    "@naisho/core": "*",
     "expo": "~44.0.0",
     "expo-asset": "~8.4.4",
     "expo-constants": "~13.0.0",
@@ -41,6 +41,7 @@
     "react-native-web": "0.17.1",
     "react-native-webview": "11.15.0",
     "twrnc": "^3.0.2",
+    "y-protocols": "^1.0.5",
     "yjs": "^13.5.30"
   },
   "devDependencies": {

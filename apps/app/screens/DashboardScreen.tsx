@@ -5,6 +5,7 @@ export default function DashboardScreen() {
     <View style={tw`mt-20`}>
       <Text>Dashboard Screen</Text>
       <Link to={{ screen: "editor" }}>Link to Editor</Link>
+      <Link to={{ screen: "test-editor" }}>Link to Test-Editor</Link>
     </View>
   );
 }

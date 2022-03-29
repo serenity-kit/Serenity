@@ -11,6 +11,7 @@ import EditorScreen from "../screens/EditorScreen";
 import { RootStackParamList } from "../types";
 import LinkingConfiguration from "./linkingConfiguration";
 import DashboardScreen from "../screens/DashboardScreen";
+import TestEditorScreen from "../screens/TestEditorScreen";
 
 export default function Navigation({
   colorScheme,
@@ -42,6 +43,7 @@ function RootNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="editor" component={EditorScreen} />
+      <Stack.Screen name="test-editor" component={TestEditorScreen} />
       <Stack.Screen
         name="notFound"
         component={NotFoundScreen}
