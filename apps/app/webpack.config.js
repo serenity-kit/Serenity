@@ -14,6 +14,7 @@ module.exports = async function (env, argv) {
           // Ensure the shared packages are transpiled.
           resolveApp("../../packages/editor"),
           resolveApp("../../packages/ui"),
+          resolveApp("../../packages/naisho-core"),
         ],
       },
     },

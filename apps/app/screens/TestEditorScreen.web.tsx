@@ -1,4 +1,3 @@
-import Editor from "../components/editor/Editor";
 import * as Yjs from "yjs";
 import { Editor as SerenityEditor } from "@serenity-tools/editor";
 import {
@@ -31,7 +30,7 @@ import {
   applyAwarenessUpdate,
   removeAwarenessStates,
 } from "y-protocols/awareness";
-import { View } from "@serenity-tools/ui";
+import { View, Text } from "@serenity-tools/ui";
 import { RootTabScreenProps } from "../types";
 import { useEffect, useRef } from "react";
 
@@ -141,7 +140,11 @@ export default function TestEditorScreen({
         name: `User ${yDocRef.current.clientID}`,
       });
 
-      const key = sodium.from_base64(window.location.hash.slice(1));
+      // TODO get key from navigation
+      // const key = sodium.from_base64(window.location.hash.slice(1));
+      const key = sodium.from_hex(
+        "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
+      );
 
       signatureKeyPairRef.current = createSignatureKeyPair();
 
@@ -372,7 +375,9 @@ export default function TestEditorScreen({
 
   return (
     <View>
-      <View>{websocketState.connected ? "Connected" : "Disconnected"}</View>
+      <View>
+        <Text>{websocketState.connected ? "Connected" : "Disconnected"}</Text>
+      </View>
       <SerenityEditor ydoc={yDocRef.current} />
     </View>
   );
