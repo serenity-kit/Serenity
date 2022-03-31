@@ -1,13 +1,17 @@
 import "./editor-output.css";
+import "./awareness.css";
 import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { EditorWrapperView, View } from "@serenity-tools/ui";
 import StarterKit from "@tiptap/starter-kit";
 import Collaboration from "@tiptap/extension-collaboration";
 import * as Y from "yjs";
+import { Awareness } from "y-protocols/awareness";
+import { AwarnessExtension } from "./naisho-awareness-extension";
 
 type EditorProps = {
   ydoc: Y.Doc;
+  yAwareness?: Awareness;
 };
 
 export const Editor = (props: EditorProps) => {
@@ -17,10 +21,12 @@ export const Editor = (props: EditorProps) => {
         // the Collaboration extension comes with its own history handling
         history: false,
       }),
-      // register the document with Tiptap
+      // register the ydoc with Tiptap
       Collaboration.configure({
         document: props.ydoc,
+        field: "page",
       }),
+      AwarnessExtension.configure({ awareness: props.yAwareness }),
     ],
   });
 

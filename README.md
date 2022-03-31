@@ -8,9 +8,19 @@ Recommended node version: 16
 yarn global add expo-cli
 yarn global add eas-cli
 yarn
+cp apps/backend/.env.example apps/backend/.env
 ```
 
 ## Development
+
+### Backend
+
+```sh
+docker-compose up # to start the postgres instance
+# open another tab
+yarn workspace backend prisma migrate dev
+yarn workspace backend dev
+```
 
 ### App (web)
 

@@ -15,6 +15,7 @@ const linking: LinkingOptions<RootStackParamList> = {
     screens: {
       dashboard: "dashboard",
       editor: "editor",
+      ["test-editor"]: "test-editor",
       notFound: "*",
     },
   },
