@@ -2380,6 +2380,13 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-code/-/extension-code-2.0.0-beta.26.tgz#bbfa600a252ee2cded6947b56b6c4c33d998e53a"
   integrity sha512-QcFWdEFfbJ1n5UFFBD17QPPAJ3J5p/b7XV484u0shCzywO7aNPV32QeHy1z0eMoyZtCbOWf6hg/a7Ugv8IwpHw==
 
+"@tiptap/extension-collaboration-cursor@^2.0.0-beta.34":
+  version "2.0.0-beta.34"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-collaboration-cursor/-/extension-collaboration-cursor-2.0.0-beta.34.tgz#3b926f7fffe989612bd092019be4ec466b509b82"
+  integrity sha512-6jxM8jxOXEwRHv7rkWsacC8Q3km83opEK/2udiMEC7a/yFeMKpYjOP+sAvzdGBposlIof/VgjXhbIUBRBqmqLw==
+  dependencies:
+    y-prosemirror "^1.0.14"
+
 "@tiptap/extension-collaboration@^2.0.0-beta.33":
   version "2.0.0-beta.33"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-collaboration/-/extension-collaboration-2.0.0-beta.33.tgz#558db79d08d37de22ada46d9f036f9c81b75a95c"

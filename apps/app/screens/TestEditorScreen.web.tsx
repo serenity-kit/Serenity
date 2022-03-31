@@ -258,6 +258,7 @@ export default function TestEditorScreen({
               key,
               sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
             );
+            console.log("awarenessUpdate");
             applyAwarenessUpdate(
               yAwarenessRef.current,
               // @ts-expect-error TODO handle later
@@ -337,6 +338,7 @@ export default function TestEditorScreen({
           // @ts-expect-error TODO handle later
           signatureKeyPairRef.current
         );
+        console.log("send awarenessUpdate");
         // @ts-expect-error TODO handle later
         websocketConnectionRef.current.send(JSON.stringify(awarenessUpdate));
       });
@@ -378,7 +380,10 @@ export default function TestEditorScreen({
       <View>
         <Text>{websocketState.connected ? "Connected" : "Disconnected"}</Text>
       </View>
-      <SerenityEditor ydoc={yDocRef.current} />
+      <SerenityEditor
+        ydoc={yDocRef.current}
+        yAwareness={yAwarenessRef.current}
+      />
     </View>
   );
 }
