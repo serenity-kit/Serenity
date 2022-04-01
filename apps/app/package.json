@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "expo start",
+    "dev": "yarn && expo start",
     "dev:android": "cd ../../packages/editor && yarn build && cd - && expo start --android",
     "dev:ios": "cd ../../packages/editor && yarn build && cd - && expo start --ios",
     "dev:web": "expo start --web",
