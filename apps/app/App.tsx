@@ -1,3 +1,4 @@
+import "expo-dev-client";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 

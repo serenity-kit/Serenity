@@ -31,10 +31,20 @@ yarn dev:web
 
 ### App (iOS Simulator or Android Emulator)
 
+We are using the Expo dev client you need to download and install a dev build first.
+
+https://docs.expo.dev/build-reference/simulators/#installing-your-build-on-the-simulator
+
 ```sh
 cd apps/app
 yarn dev:ios
 yarn dev:android
+```
+
+Creating a dev build for iOS Simulator.
+
+```sh
+eas build --profile development-simulator --platform ios
 ```
 
 ### App (Electron)
