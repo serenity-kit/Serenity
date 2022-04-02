@@ -4,6 +4,7 @@
     "slug": "serenity",
     "version": "0.0.1",
     "orientation": "portrait",
+    "plugins": [["react-native-sodium-expo-plugin", {}]],
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",

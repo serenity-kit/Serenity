@@ -31,9 +31,7 @@ yarn dev:web
 
 ### App (iOS Simulator or Android Emulator)
 
-We are using the Expo dev client you need to download and install a dev build first.
-
-https://docs.expo.dev/build-reference/simulators/#installing-your-build-on-the-simulator
+We are using the Expo dev client you need to download and install a dev build first which can be found in [https://github.com/SerenityNotes/app-builds](https://github.com/SerenityNotes/app-builds).
 
 ```sh
 cd apps/app

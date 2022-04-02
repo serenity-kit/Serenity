@@ -11840,6 +11840,11 @@ react-native-screens@~3.10.1:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
 
+react-native-sodium-expo-plugin@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/react-native-sodium-expo-plugin/-/react-native-sodium-expo-plugin-0.4.0.tgz#638482769418b0d412ece177fe9dfa613ff6051a"
+  integrity sha512-LWXR41s500qEFTScB5MS1ItwRXiT3SmGAvG0CkbgzfbjuP0dBaNtRcgDgWg3dHjqVXXA4sHzfoerc+QprLHHTA==
+
 react-native-web@0.17.1:
   version "0.17.1"
   resolved "https://registry.yarnpkg.com/react-native-web/-/react-native-web-0.17.1.tgz#90d473c89dd99b88bc9830b2a9fcdd2fc5f04902"
