@@ -380,10 +380,7 @@ export default function TestEditorScreen({
       <View>
         <Text>{websocketState.connected ? "Connected" : "Disconnected"}</Text>
       </View>
-      <SerenityEditor
-        ydoc={yDocRef.current}
-        yAwareness={yAwarenessRef.current}
-      />
+      <SerenityEditor yDocRef={yDocRef} yAwarenessRef={yAwarenessRef} />
     </View>
   );
 }

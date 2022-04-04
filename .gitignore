@@ -6,6 +6,8 @@ dist
 yarn-error.log
 # editor built for the mobile editor web view
 apps/app/assets/index.html
+# editor build step output
+packages/editor/editor-output.css
 # prisma generated files
 apps/backend/prisma/generated/output
 apps/backend/src/generated

@@ -28,4 +28,4 @@ ydoc.on("update", (update: any) => {
 });
 
 const domContainer = document.querySelector("#editor");
-ReactDOM.render(<Editor ydoc={ydoc} />, domContainer);
+ReactDOM.render(<Editor yDocRef={{ current: ydoc }} />, domContainer);

@@ -10,8 +10,8 @@ import { Awareness } from "y-protocols/awareness";
 import { AwarnessExtension } from "./naisho-awareness-extension";
 
 type EditorProps = {
-  ydoc: Y.Doc;
-  yAwareness?: Awareness;
+  yDocRef: React.MutableRefObject<Y.Doc>;
+  yAwarenessRef?: React.MutableRefObject<Awareness>;
 };
 
 export const Editor = (props: EditorProps) => {
@@ -23,10 +23,10 @@ export const Editor = (props: EditorProps) => {
       }),
       // register the ydoc with Tiptap
       Collaboration.configure({
-        document: props.ydoc,
+        document: props.yDocRef.current,
         field: "page",
       }),
-      AwarnessExtension.configure({ awareness: props.yAwareness }),
+      AwarnessExtension.configure({ awareness: props.yAwarenessRef?.current }),
     ],
   });
 
