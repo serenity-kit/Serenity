@@ -1,3 +1,5 @@
+import * as Y from "yjs";
+
 export type EditorProps = {
-  serializedYdoc: Uint8Array;
+  yDocRef: React.MutableRefObject<Y.Doc>;
 };

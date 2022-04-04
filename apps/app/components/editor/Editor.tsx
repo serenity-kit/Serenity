@@ -32,19 +32,16 @@ let editorSource =
     ? require("../../assets/index.html")
     : { html: null };
 
-export default function Editor({ serializedYdoc }: EditorProps) {
+export default function Editor({ yDocRef }: EditorProps) {
   const webViewRef = useRef(null);
-  const ydocRef = useRef<Y.Doc | null>(null);
 
   useEffect(() => {
-    const initDoc = async () => {
-      ydocRef.current = new Y.Doc();
-      Y.applyUpdateV2(ydocRef.current, serializedYdoc);
+    const initEditor = async () => {
       if (Platform.OS === "android") {
         editorSource = await loadEditorSourceForAndroid();
       }
     };
-    initDoc();
+    initEditor();
   }, []);
 
   return (
@@ -69,11 +66,11 @@ export default function Editor({ serializedYdoc }: EditorProps) {
             const message = JSON.parse(event.nativeEvent.data);
             if (message.type === "update") {
               const update = new Uint8Array(message.content);
-              if (ydocRef.current) {
+              if (yDocRef.current) {
                 // TODO switch to applyUpdateV2
-                Y.applyUpdate(ydocRef.current, update);
+                Y.applyUpdate(yDocRef.current, update);
                 console.log("apply update");
-                const serializedYDoc = Y.encodeStateAsUpdateV2(ydocRef.current);
+                const serializedYDoc = Y.encodeStateAsUpdateV2(yDocRef.current);
                 console.log(serializedYDoc);
               }
               // optimization: prevent update in case the content hasn't changed
@@ -97,8 +94,7 @@ export default function Editor({ serializedYdoc }: EditorProps) {
             // @ts-expect-error
             webViewRef?.current?.injectJavaScript(`
               window.applyYjsUpdate(${JSON.stringify(
-                // @ts-expect-error
-                Array.apply([], Y.encodeStateAsUpdateV2(ydocRef.current))
+                Array.apply([], Y.encodeStateAsUpdateV2(yDocRef.current))
               )});
               true;
             `);
