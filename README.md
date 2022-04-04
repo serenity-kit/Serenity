@@ -31,10 +31,18 @@ yarn dev:web
 
 ### App (iOS Simulator or Android Emulator)
 
+We are using the Expo dev client you need to download and install a dev build first which can be found in [https://github.com/SerenityNotes/app-builds](https://github.com/SerenityNotes/app-builds).
+
 ```sh
 cd apps/app
 yarn dev:ios
 yarn dev:android
+```
+
+Creating a dev build for iOS Simulator.
+
+```sh
+eas build --profile development-simulator --platform ios
 ```
 
 ### App (Electron)
