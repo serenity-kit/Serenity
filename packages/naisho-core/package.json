@@ -9,6 +9,7 @@
     "ts:check": "yarn tsc --noEmit"
   },
   "dependencies": {
+    "@serenity-tools/libsodium": "*",
     "libsodium-wrappers": "^0.7.9",
     "uuid": "^8.3.2"
   },

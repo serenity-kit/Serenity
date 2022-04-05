@@ -5,3 +5,4 @@ export * from "./websocket";
 export * from "./crypto";
 export * from "./errors";
 export * from "./types";
+export const test = "test-default";

@@ -12,6 +12,7 @@ module.exports = async function (env, argv) {
       babel: {
         dangerouslyAddModulePathsToTranspile: [
           // Ensure the shared packages are transpiled.
+          resolveApp("../../packages/libsodium"),
           resolveApp("../../packages/editor"),
           resolveApp("../../packages/ui"),
           resolveApp("../../packages/naisho-core"),

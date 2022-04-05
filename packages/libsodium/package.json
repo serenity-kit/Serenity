@@ -1,0 +1,15 @@
+{
+  "name": "@serenity-tools/libsodium",
+  "version": "0.0.1",
+  "main": "src/index",
+  "types": "index.d.ts",
+  "scripts": {
+    "ts:check": "yarn tsc --noEmit"
+  },
+  "dependencies": {
+    "libsodium-wrappers": "^0.7.10"
+  },
+  "devDependencies": {
+    "@types/libsodium-wrappers": "^0.7.9"
+  }
+}

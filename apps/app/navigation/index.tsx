@@ -12,6 +12,7 @@ import { RootStackParamList } from "../types";
 import LinkingConfiguration from "./linkingConfiguration";
 import DashboardScreen from "../screens/DashboardScreen";
 import TestEditorScreen from "../screens/TestEditorScreen";
+import LibsodiumTestScreen from "../screens/LibsodiumTestScreen";
 
 export default function Navigation({
   colorScheme,
@@ -44,6 +45,7 @@ function RootNavigator() {
       />
       <Stack.Screen name="editor" component={EditorScreen} />
       <Stack.Screen name="test-editor" component={TestEditorScreen} />
+      <Stack.Screen name="test-libsodium" component={LibsodiumTestScreen} />
       <Stack.Screen
         name="notFound"
         component={NotFoundScreen}
