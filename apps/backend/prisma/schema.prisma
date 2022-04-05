@@ -54,8 +54,8 @@ model User {
   username           String  @id
   serverPrivateKey   String
   oprfPrivateKey     String
-  cipherText         String
-  nonce              String
+  oprfCipherText     String
+  oprfNonce          String
   clientPublicKey    String
   sessionPrivateKey  String?
   resetPasswordToken String?
