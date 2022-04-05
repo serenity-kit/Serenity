@@ -9,7 +9,7 @@ export function View(props: ViewProps) {
     <RNView
       {...props}
       // @ts-expect-error allow style overwrite
-      style={tw.style(`bg-white dark:bg-black`, props.style)}
+      style={tw.style(`bg-white dark:bg-gray-900`, props.style)}
     />
   );
 }
