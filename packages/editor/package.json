@@ -4,7 +4,7 @@
   "main": "index",
   "scripts": {
     "build": "yarn style:editor && webpack --mode=production && cp dist/index.html ../../apps/app/assets/index.html",
-    "dev": "webpack-dev-server",
+    "dev": "style:editor && webpack-dev-server",
     "ts:check": "yarn tsc --noEmit",
     "style:editor": "yarn run tailwindcss --config ./tailwind.config.js -i ./editor-input.css -o ./editor-output.css"
   },

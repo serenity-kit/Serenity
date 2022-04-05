@@ -1,14 +1,15 @@
 import "./editor-output.css";
 import "./awareness.css";
-import React from "react";
+import * as React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
-import { EditorWrapperView, tw, View } from "@serenity-tools/ui";
+import { EditorWrapperView, View } from "@serenity-tools/ui";
 import StarterKit from "@tiptap/starter-kit";
-import { Level } from "@tiptap/extension-heading"
+import { Level } from "@tiptap/extension-heading";
 import Collaboration from "@tiptap/extension-collaboration";
 import * as Y from "yjs";
 import { Awareness } from "y-protocols/awareness";
 import { AwarnessExtension } from "./naisho-awareness-extension";
+import EditorButton from "./components/editorButton/EditorButton";
 
 type EditorProps = {
   yDocRef: React.MutableRefObject<Y.Doc>;
@@ -16,8 +17,6 @@ type EditorProps = {
 };
 
 const headingLevels: Level[] = [1, 2, 3];
-const editorButtonClasses = 'flex-none items-center justify-center w-6 h-6 text-[12px] border-solid border-2 border-gray-200 rounded bg-gray-100 font-bold';
-const editorButtonClassesActive = 'bg-primary-400';
 
 export const Editor = (props: EditorProps) => {
   const editor = useEditor({
@@ -26,8 +25,8 @@ export const Editor = (props: EditorProps) => {
         // the Collaboration extension comes with its own history handling
         history: false,
         heading: {
-          levels: headingLevels
-        }
+          levels: headingLevels,
+        },
       }),
       // register the ydoc with Tiptap
       Collaboration.configure({
@@ -37,44 +36,37 @@ export const Editor = (props: EditorProps) => {
       AwarnessExtension.configure({ awareness: props.yAwarenessRef?.current }),
     ],
   });
-  
-  function buttonFoo(click: Function, isActive: Boolean, name: String) {
-    return (
-      <button
-         onClick={() => click()}
-         style={tw.style(editorButtonClasses, (isActive ? editorButtonClassesActive : ''))}
-         key={`${name}`}
-       >
-        {name}
-       </button>
-     )
-  }
-
-  const headingButtons = headingLevels.map( lvl => {
-    return (
-      buttonFoo(
-        () => editor?.chain().focus().toggleHeading({ level: lvl }).run(),
-        editor?.isActive('heading', { level: lvl }) || false,
-        `H${lvl}`
-      )
-    )
-  })
 
   return (
     <EditorWrapperView>
       <View>
         <div>
-          { headingButtons }
-          { buttonFoo(
-              () => editor?.chain().focus().toggleCode().run(),
-              editor?.isActive('code') || false,
-              'C'
-          )}
-          { buttonFoo(
-              () => editor?.chain().focus().toggleBold().run(),
-              editor?.isActive('bold') || false,
-              'B'
-          )}
+          {headingLevels.map((lvl) => {
+            return (
+              <EditorButton
+                key={lvl}
+                onClick={() =>
+                  editor?.chain().focus().toggleHeading({ level: lvl }).run()
+                }
+                isActive={editor?.isActive("heading", { level: lvl }) || false}
+              >
+                H{lvl}
+              </EditorButton>
+            );
+          })}
+
+          <EditorButton
+            onClick={() => editor?.chain().focus().toggleCode().run()}
+            isActive={editor?.isActive("code") || false}
+          >
+            C
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor?.chain().focus().toggleBold().run()}
+            isActive={editor?.isActive("bold") || false}
+          >
+            B
+          </EditorButton>
         </div>
       </View>
       <div className="prose">
