@@ -21,6 +21,7 @@ import {
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   UpdateWithServerData,
 } from "@naisho/core";
+import sodium from "libsodium-wrappers-sumo";
 
 async function main() {
   const apolloServer = new ApolloServer({
@@ -208,4 +209,6 @@ async function main() {
   });
 }
 
-main();
+sodium.ready.then(() => {
+  main();
+});
