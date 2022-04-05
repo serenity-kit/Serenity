@@ -64,6 +64,16 @@ yarn dev
 # visit http://localhost:8080 in your browser
 ```
 
+## Tests
+
+For backend:
+
+```sh
+docker-compose up # to start the postgres instance
+# in another tab
+yarn workspace backend test
+```
+
 ## Folder/File Naming Convention
 
 - Folder and file names use camelCase.
