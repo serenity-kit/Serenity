@@ -1,13 +1,16 @@
 # Testing registration of user 'abc123'
 
 ```graphql
-{
+mutation {
   initializeRegistration(
-    input: { username: "abc123", challenge: "blah blah blah" }
+    input: {
+      username: "abc123"
+      challenge: "lMFWgiRy4-sIVsB2MigzV4JuGTBNyUPT2v2pU-WZ8gg"
+    }
   ) {
-    serverPubKey
-    oprfPubKey
-    challengeResponse
+    serverPublicKey
+    oprfPublicKey
+    oprfChallengeResponse
   }
 }
 ```

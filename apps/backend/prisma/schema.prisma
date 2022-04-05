@@ -43,3 +43,20 @@ model Update {
   @@unique([snapshotId, version])
   @@unique([snapshotId, pubKey, snapshotVersion])
 }
+
+model Registration {
+  username         String @id
+  serverPrivateKey String
+  oprfPrivateKey   String
+}
+
+model User {
+  username           String  @id
+  serverPrivateKey   String
+  oprfPrivateKey     String
+  cipherText         String
+  nonce              String
+  clientPublicKey    String
+  sessionPrivateKey  String?
+  resetPasswordToken String?
+}

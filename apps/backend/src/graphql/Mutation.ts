@@ -7,6 +7,7 @@ import {
 } from "nexus";
 import { createOprfChallengeResponse, generateKeyPair } from "../utils/opaque";
 import sodium from "libsodium-wrappers-sumo";
+import { prisma } from "../database/prisma";
 
 // FIXME: move this to a database
 const registeredClients = {};
@@ -35,38 +36,40 @@ export const initializeRegistration = mutationField("initializeRegistration", {
       type: ClientOprfRegistrationChallengeInput,
     }),
   },
-  resolve(root, args, context) {
+  async resolve(root, args, context) {
     // input: { username: string, challenge: b64string }
     // output: { serverPubKey: b64string, oprfPubKey: b64string, challengeResponse: b64string }
     const username = args?.input?.username;
+    if (!username) {
+      throw Error('Missing parameter: "username" must be string');
+    }
     const b64ClientOprfChallenge = args?.input?.challenge || "";
     const serverKeyPairs = generateKeyPair();
     const serverPublicKey = serverKeyPairs.publicKey;
-
-    console.log(b64ClientOprfChallenge);
-
     let clientOprfChallenge = new Uint8Array(32);
     try {
       clientOprfChallenge = sodium.from_base64(b64ClientOprfChallenge);
     } catch (error) {
       throw Error("challenge must be a base64-encoded byte array");
     }
-
     const oprfKeyPair = generateKeyPair();
-    // Generate challeng response
     const oprfChallengeResponse = createOprfChallengeResponse(
       clientOprfChallenge,
       oprfKeyPair.privateKey
     );
-    // Store user data
-    registeredClients[username] = {
-      username: username,
-      serverPublicKey: serverPublicKey,
-      oprfPrivateKey: oprfKeyPair.privateKey,
-      oprfPublicKey: oprfKeyPair.publicKey,
-      clientOprfChallenge: clientOprfChallenge,
-    };
-    // return data to client
+    try {
+      await prisma.registration.create({
+        data: {
+          username,
+          serverPrivateKey: sodium.to_base64(serverKeyPairs.privateKey),
+          oprfPrivateKey: sodium.to_base64(oprfKeyPair.privateKey),
+        },
+      });
+    } catch (error) {
+      console.error("Error saving registration");
+      console.log(error);
+      throw Error("Internal server error");
+    }
     const result = {
       serverPublicKey: sodium.to_base64(serverPublicKey),
       oprfPublicKey: sodium.to_base64(oprfKeyPair.publicKey),
