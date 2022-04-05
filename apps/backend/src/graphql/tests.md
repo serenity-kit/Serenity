@@ -29,9 +29,7 @@ mutation {
       clientPublicKey: "hxLdSECgCz7hgwL0FqTj06jhSTMa-pLpCNN3NdZ__zw"
     }
   ) {
-    serverPublicKey
-    oprfPublicKey
-    oprfChallengeResponse
+    status
   }
 }
 ```
