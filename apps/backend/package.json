@@ -10,7 +10,7 @@
     "prisma": "3.5.0",
     "ts-node": "10.4.0",
     "ts-node-dev": "^1.1.8",
-    "typescript": "4.5.2"
+    "typescript": "^4.6.3"
   },
   "scripts": {
     "dev": "ts-node-dev --transpile-only --no-notify ./src/index.ts",
