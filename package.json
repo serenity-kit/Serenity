@@ -13,7 +13,8 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "ts:check": "yarn workspaces run ts:check"
+    "ts:check": "yarn workspaces run ts:check",
+    "test": "yarn workspaces run test"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
