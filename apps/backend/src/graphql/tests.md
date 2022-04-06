@@ -1,6 +1,6 @@
-# Testing registration of user 'abc123'
+## Testing registration of user 'abc123'
 
-## Initialize Registration
+### Initialize Registration
 
 ```graphql
 mutation {
@@ -17,7 +17,7 @@ mutation {
 }
 ```
 
-## Finalize Registration
+### Finalize Registration
 
 ```graphql
 mutation {
@@ -30,6 +30,45 @@ mutation {
     }
   ) {
     status
+  }
+}
+```
+
+## Testing login of user 'abc123'
+
+### Initialize Login
+
+```graphql
+mutation {
+  initializeLogin(
+    input: {
+      username: "abc123"
+      challenge: "lMFWgiRy4-sIVsB2MigzV4JuGTBNyUPT2v2pU-WZ8gg"
+    }
+  ) {
+    secret
+    nonce
+    oprfPublicKey
+    oprfChallengeResponse
+  }
+}
+```
+
+### Finalize Login
+
+```graphql
+mutation {
+  initializeLogin(
+    input: {
+      username: "abc123"
+      sharedTx: "lMFWgiRy4-sIVsB2MigzV4JuGTBNyUPT2v2pU-WZ8gg"
+      sharedRx: "lMFWgiRy4-sIVsB2MigzV4JuGTBNyUPT2v2pU-WZ8gg"
+    }
+  ) {
+    secret
+    nonce
+    oprfPublicKey
+    oprfChallengeResponse
   }
 }
 ```

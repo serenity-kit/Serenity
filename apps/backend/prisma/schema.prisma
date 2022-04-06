@@ -57,6 +57,7 @@ model User {
   oprfCipherText     String
   oprfNonce          String
   clientPublicKey    String
-  sessionPrivateKey  String?
+  sharedRx           String?
+  sharedTx           String?
   resetPasswordToken String?
 }

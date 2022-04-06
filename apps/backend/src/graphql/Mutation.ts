@@ -5,7 +5,11 @@ import {
   objectType,
   queryType,
 } from "nexus";
-import { createOprfChallengeResponse, generateKeyPair } from "../utils/opaque";
+import {
+  createOprfChallengeResponse,
+  generateKeyPair,
+  getPublicKeyFromPrivateKey,
+} from "../utils/opaque";
 import sodium from "libsodium-wrappers-sumo";
 import { prisma } from "../database/prisma";
 
@@ -41,6 +45,37 @@ const ClientOprfRegistrationFinalizeInput = inputObjectType({
 
 const ClientOprfRegistrationFinalizeResult = objectType({
   name: "ClientOprfRegistrationFinalizeResult",
+  definition(t) {
+    t.nonNull.string("status");
+  },
+});
+
+const ClientOprfLoginChallengeInput = inputObjectType({
+  name: "ClientOprfLoginChallengeInput",
+  definition(t) {
+    t.nonNull.string("username");
+    t.nonNull.string("challenge");
+  },
+});
+
+const ClientOprfLoginChallengeResult = objectType({
+  name: "ClientOprfLoginChallengeResult",
+  definition(t) {
+    t.nonNull.string("status");
+  },
+});
+
+const ClientOprfLoginFinalizeInput = inputObjectType({
+  name: "ClientOprfLoginFinalizeInput",
+  definition(t) {
+    t.nonNull.string("username");
+    t.nonNull.string("sharedTx");
+    t.nonNull.string("sharedRx");
+  },
+});
+
+const ClientOprfLoginFinalizeeResult = objectType({
+  name: "ClientOprfLoginFinalizeeResult",
   definition(t) {
     t.nonNull.string("status");
   },
@@ -160,6 +195,118 @@ export const finalizeRegistration = mutationField("finalizeRegistration", {
     }
     const result = {
       status: "success",
+    };
+    return result;
+  },
+});
+
+export const initializeLogin = mutationField("initializeLogin", {
+  type: ClientOprfLoginChallengeResult,
+  args: {
+    input: arg({
+      type: ClientOprfLoginChallengeInput,
+    }),
+  },
+  async resolve(root, args, context) {
+    const username = args?.input?.username;
+    if (!username) {
+      throw Error('Missing parameter: "username" must be string');
+    }
+    const b64ClientOprfChallenge = args?.input?.challenge || "";
+    const serverKeyPairs = generateKeyPair();
+    const serverPublicKey = serverKeyPairs.publicKey;
+    let clientOprfChallenge = new Uint8Array(32);
+    try {
+      clientOprfChallenge = sodium.from_base64(b64ClientOprfChallenge);
+    } catch (error) {
+      throw Error("challenge must be a base64-encoded byte array");
+    }
+    // if this user does not exist, we have a problem
+    const userData = await prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+    });
+    if (!userData) {
+      throw Error("User is not registered");
+    }
+    console.log(userData.oprfPrivateKey);
+    const oprfPrivateKey = sodium.from_base64(userData.oprfPrivateKey);
+    console.log(oprfPrivateKey);
+    console.log(clientOprfChallenge);
+    const oprfChallengeResponse = createOprfChallengeResponse(
+      clientOprfChallenge,
+      oprfPrivateKey
+    );
+    const oprfPublicKey = getPublicKeyFromPrivateKey(oprfPrivateKey);
+    console.log(oprfPublicKey);
+    const result = {
+      secret: sodium.to_base64(userData.oprfCipherText),
+      nonce: sodium.to_base64(userData.oprfNonce),
+      oprfPublicKey: sodium.to_base64(oprfPublicKey),
+      oprfChallengeResponse: sodium.to_base64(oprfChallengeResponse),
+    };
+    return result;
+  },
+});
+
+export const finalizeLogin = mutationField("finalizeLogin", {
+  type: ClientOprfLoginFinalizeeResult,
+  args: {
+    input: arg({
+      type: ClientOprfLoginFinalizeInput,
+    }),
+  },
+  async resolve(root, args, context) {
+    const username = args?.input?.username;
+    if (!username) {
+      throw Error('Missing parameter: "username" must be string');
+    }
+    const b64UserSharedRx = args?.input?.sharedRx || "";
+    const b64UserSharedTx = args?.input?.sharedTx || "";
+    let userSharedRx = new Uint8Array(32);
+    try {
+      userSharedRx = sodium.from_base64(b64UserSharedRx);
+    } catch (error) {
+      throw Error("sharedRx must be a base64-encoded byte array");
+    }
+    let userSharedTx = new Uint8Array(32);
+    try {
+      userSharedTx = sodium.from_base64(b64UserSharedTx);
+    } catch (error) {
+      throw Error("sharedTx must be a base64-encoded byte array");
+    }
+    // if this user does not exist, we have a problem
+    const userData = await prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+    });
+    if (!userData) {
+      throw Error("User is not registered");
+    }
+
+    const serverPrivateKey = sodium.from_base64(userData.serverPrivateKey);
+    const serverPublicKey = getPublicKeyFromPrivateKey(serverPrivateKey);
+    const clientPublicKey = sodium.from_base64(userData.clientPublicKey);
+
+    const serverSession = sodium.crypto_kx_server_session_keys(
+      serverPublicKey,
+      serverPrivateKey,
+      clientPublicKey
+    );
+    const b64ServerSharedRx = sodium.to_base64(serverSession.sharedRx);
+    const b64ServerSharedTx = sodium.to_base64(serverSession.sharedTx);
+    // verify the login works
+    let status = "fail";
+    if (
+      b64UserSharedRx == b64ServerSharedRx &&
+      b64UserSharedTx == b64ServerSharedTx
+    ) {
+      status = "success";
+    }
+    const result = {
+      status,
     };
     return result;
   },
