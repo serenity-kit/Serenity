@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { UpdatePublicData } from "./types";
 import { createUpdate, verifyAndDecryptUpdate } from "./update";
 
-test("createUpdate & verifyAndDecryptUpdate successfully", async () => {
+test.skip("createUpdate & verifyAndDecryptUpdate successfully", async () => {
   await sodium.ready;
 
   const key = sodium.from_hex(

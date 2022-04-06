@@ -1,0 +1,23 @@
+name: Test and Typecheck
+
+on: [push]
+
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Typecheck
+        run: yarn ts:check
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup .env
+        run: cp apps/backend/.env.example apps/backend/.env
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Test
+        run: yarn test
