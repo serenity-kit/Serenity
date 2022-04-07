@@ -7,7 +7,7 @@ export function EditorWrapperView(props: ViewProps) {
     <View
       {...props}
       // @ts-expect-error allow style overwrite
-      style={tw.style(`text-black dark:text-white`, props.style)}
+      style={tw.style(`text-gray-900 dark:text-white`, props.style)}
     />
   );
 }

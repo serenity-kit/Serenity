@@ -10,7 +10,7 @@
     "dev:electron-web": "yarn && EXPO_ELECTRON_MODE=true expo start --web --dev-client",
     "dev:electron-main": "yarn && electron ./electron/main/index.ts",
     "eject": "expo eject",
-    "test": "jest --watchAll",
+    "test": "echo TODO",
     "ts:check": "yarn tsc --noEmit"
   },
   "jest": {
@@ -56,7 +56,7 @@
     "jest": "^26.6.3",
     "jest-expo": "~44.0.1",
     "react-test-renderer": "17.0.1",
-    "typescript": "~4.3.5"
+    "typescript": "^4.6.3"
   },
   "private": true
 }
