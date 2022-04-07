@@ -9,7 +9,7 @@ import {
   createOprfChallengeResponse,
   generateKeyPair,
   getPublicKeyFromPrivateKey,
-} from "../utils/opaque";
+} from "@serenity-tools/opaque";
 import sodium from "libsodium-wrappers-sumo";
 import { prisma } from "../database/prisma";
 
@@ -164,7 +164,6 @@ export const finalizeRegistration = mutationField("finalizeRegistration", {
         username: username,
       },
     });
-    console.log(existingUserData);
     if (existingUserData) {
       throw Error("This username has already been registered");
     }
@@ -230,16 +229,12 @@ export const initializeLogin = mutationField("initializeLogin", {
     if (!userData) {
       throw Error("User is not registered");
     }
-    console.log(userData.oprfPrivateKey);
     const oprfPrivateKey = sodium.from_base64(userData.oprfPrivateKey);
-    console.log(oprfPrivateKey);
-    console.log(clientOprfChallenge);
     const oprfChallengeResponse = createOprfChallengeResponse(
       clientOprfChallenge,
       oprfPrivateKey
     );
     const oprfPublicKey = getPublicKeyFromPrivateKey(oprfPrivateKey);
-    console.log(oprfPublicKey);
     const result = {
       secret: sodium.to_base64(userData.oprfCipherText),
       nonce: sodium.to_base64(userData.oprfNonce),

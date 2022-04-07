@@ -1,46 +1,12 @@
 import { gql } from "graphql-request";
 import setupGraphql from "./helpers/setupGraphql";
 import sodium from "libsodium-wrappers-sumo";
-import {
-  generateKeyPair,
-  sodium_crypto_generichash_batch,
-} from "../src/utils/opaque";
 import deleteAllRecords from "./helpers/deleteAllRecords";
-
-const graphql = setupGraphql();
-const username = "user";
-const password = "password";
-let data: any = null;
-let randomScalar: Uint8Array = new Uint8Array(32);
-
-beforeAll(async () => {
-  await deleteAllRecords();
-  // seed DB if necessary
-});
-
-// later, this will move to a client class
-const generateClientOprfChallenge = (password: string) => {
-  // create a curve-mapped password
-  console.log({ password });
-  const passwordBytes = new Uint8Array(Buffer.from(password));
-  console.log({ passwordBytes });
-  const hashLength = sodium.crypto_generichash_BYTES;
-  console.log({ hashLength });
-  const hashedPassword = sodium.crypto_generichash(hashLength, passwordBytes);
-  const mappedPassword =
-    sodium.crypto_core_ed25519_from_uniform(hashedPassword);
-  // create a random scalar
-  const randomScalar = sodium.crypto_core_ed25519_scalar_random();
-  // create a random point on curve
-  const randomPointOnCurve =
-    sodium.crypto_scalarmult_ed25519_base_noclamp(randomScalar);
-  // create oprf challenge
-  const oprfChallenge = sodium.crypto_core_ed25519_add(
-    mappedPassword,
-    randomPointOnCurve
-  );
-  return { oprfChallenge, randomScalar };
-};
+import {
+  createRegistrationEnvelope,
+  generateClientOprfChallenge,
+  generateKeyPair,
+} from "@serenity-tools/opaque";
 
 const requestRegistrationChallengeResponse = async (
   username: string,
@@ -70,71 +36,16 @@ const requestRegistrationChallengeResponse = async (
   };
 };
 
-const createRegistrationEnvelope = (
-  clientPrivateKey: Uint8Array,
-  clientPublicKey: Uint8Array,
-  password: string,
-  serverChallengeResponse: Uint8Array,
-  oprfPublicKey: Uint8Array,
-  randomScalar: Uint8Array,
-  serverPublicKey: Uint8Array
-) => {
-  // create randomized password
-  const passwordBytes = new Uint8Array(Buffer.from(password));
-  const invertedRandomScalar =
-    sodium.crypto_core_ed25519_scalar_negate(randomScalar);
-  const exponentiatedPublicKey = sodium.crypto_scalarmult_ed25519_noclamp(
-    invertedRandomScalar,
-    oprfPublicKey
-  );
-  const challengeResponseResult = sodium.crypto_core_ed25519_add(
-    serverChallengeResponse,
-    exponentiatedPublicKey
-  );
-  const arr = [passwordBytes, oprfPublicKey, challengeResponseResult];
-  // combine hashes
-  const key = new Uint8Array(Buffer.alloc(sodium.crypto_generichash_KEYBYTES));
-  const state = sodium.crypto_generichash_init(
-    key,
-    sodium.crypto_generichash_BYTES
-  );
-  arr.forEach((item) => {
-    sodium.crypto_generichash_update(state, item);
-  });
-  const combinedHash = sodium.crypto_generichash_final(
-    state,
-    sodium.crypto_generichash_BYTES
-  );
-  const randomizedPassword = combinedHash;
+const graphql = setupGraphql();
+const username = "user";
+const password = "password";
+let data: any = null;
+let randomScalar: Uint8Array = new Uint8Array(32);
 
-  // derive key from randomized password
-  const hashSalt = new Uint8Array(Buffer.alloc(sodium.crypto_pwhash_SALTBYTES));
-  const hashOpsLimit = sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE;
-  const hashMemLimit = sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE;
-  const argon2DerivedKey = sodium.crypto_pwhash(
-    32,
-    randomizedPassword,
-    hashSalt,
-    hashOpsLimit,
-    hashMemLimit,
-    sodium.crypto_pwhash_ALG_DEFAULT
-  );
-  // generate nonce
-  const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
-  // generate cipher text
-  const messageData = {
-    userPublicKey: sodium.to_base64(clientPublicKey),
-    userPrivateKey: sodium.to_base64(clientPrivateKey),
-    serverPublicKey: sodium.to_base64(serverPublicKey),
-  };
-  const messageBytes = new Uint8Array(Buffer.from(JSON.stringify(messageData)));
-  const secret = sodium.crypto_secretbox_easy(
-    messageBytes,
-    nonce,
-    argon2DerivedKey
-  );
-  return { secret, nonce };
-};
+beforeAll(async () => {
+  await deleteAllRecords();
+  // seed DB if necessary
+});
 
 test("server should create a registration challenge response", async () => {
   // generate a challenge code

@@ -1,0 +1,9 @@
+{
+  "name": "@serenity-tools/opaque",
+  "version": "0.0.1",
+  "main": "index",
+  "scripts": {
+    "ts:check": "yarn tsc --noEmit",
+    "test": "echo TODO"
+  }
+}
