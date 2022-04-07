@@ -5,12 +5,16 @@ import {
   generateKeyPair,
   sodium_crypto_generichash_batch,
 } from "../src/utils/opaque";
+import deleteAllRecords from "./helpers/deleteAllRecords";
 
 const graphql = setupGraphql();
 const username = "user";
 const password = "password";
+let data: any = null;
+let randomScalar: Uint8Array = new Uint8Array(32);
 
-beforeEach(async () => {
+beforeAll(async () => {
+  await deleteAllRecords();
   // seed DB if necessary
 });
 
@@ -76,7 +80,7 @@ const createRegistrationEnvelope = (
   serverPublicKey: Uint8Array
 ) => {
   // create randomized password
-  const passwordBytes = Buffer.from(password);
+  const passwordBytes = new Uint8Array(Buffer.from(password));
   const invertedRandomScalar =
     sodium.crypto_core_ed25519_scalar_negate(randomScalar);
   const exponentiatedPublicKey = sodium.crypto_scalarmult_ed25519_noclamp(
@@ -89,7 +93,7 @@ const createRegistrationEnvelope = (
   );
   const arr = [passwordBytes, oprfPublicKey, challengeResponseResult];
   // combine hashes
-  const key = Buffer.alloc(sodium.crypto_generichash_KEYBYTES);
+  const key = new Uint8Array(Buffer.alloc(sodium.crypto_generichash_KEYBYTES));
   const state = sodium.crypto_generichash_init(
     key,
     sodium.crypto_generichash_BYTES
@@ -104,7 +108,7 @@ const createRegistrationEnvelope = (
   const randomizedPassword = combinedHash;
 
   // derive key from randomized password
-  const hashSalt = Buffer.alloc(sodium.crypto_pwhash_SALTBYTES);
+  const hashSalt = new Uint8Array(Buffer.alloc(sodium.crypto_pwhash_SALTBYTES));
   const hashOpsLimit = sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE;
   const hashMemLimit = sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE;
   const argon2DerivedKey = sodium.crypto_pwhash(
@@ -123,7 +127,7 @@ const createRegistrationEnvelope = (
     userPrivateKey: sodium.to_base64(clientPrivateKey),
     serverPublicKey: sodium.to_base64(serverPublicKey),
   };
-  const messageBytes = Buffer.from(JSON.stringify(messageData));
+  const messageBytes = new Uint8Array(Buffer.from(JSON.stringify(messageData)));
   const secret = sodium.crypto_secretbox_easy(
     messageBytes,
     nonce,
@@ -134,30 +138,30 @@ const createRegistrationEnvelope = (
 
 test("server should create a registration challenge response", async () => {
   // generate a challenge code
-  const { data } = await requestRegistrationChallengeResponse(
-    username,
-    password
-  );
+  const result = await requestRegistrationChallengeResponse(username, password);
+  data = result.data;
+  randomScalar = result.randomScalar;
   // expect serverPublicKey, oprfPublicKey, oprfChallengeResponse
   // all three should be base64-encoded 32-bit uint8 arrays
-  expect(data).toContain("serverPublicKey");
-  expect(data).toContain("oprfPublicKey");
-  expect(data).toContain("oprfChallengeResponse");
+  expect(typeof data.initializeRegistration.serverPublicKey).toBe("string");
+  expect(typeof data.initializeRegistration.oprfPublicKey).toBe("string");
+  expect(typeof data.initializeRegistration.oprfChallengeResponse).toBe(
+    "string"
+  );
 });
 
 test("server should register a user", async () => {
-  // generate a challenge code
-  const { data, randomScalar } = await requestRegistrationChallengeResponse(
-    username,
-    password
-  );
   // create client keys
   const clientKeys = generateKeyPair();
   // crate cipher text
-  const serverPublicKey = sodium.from_base64(data.serverPublicKey);
-  const oprfPublicKey = sodium.from_base64(data.oprfPublicKey);
+  const serverPublicKey = sodium.from_base64(
+    data.initializeRegistration.serverPublicKey
+  );
+  const oprfPublicKey = sodium.from_base64(
+    data.initializeRegistration.oprfPublicKey
+  );
   const serverChallengeResponse = sodium.from_base64(
-    data.oprfChallengeResponse
+    data.initializeRegistration.oprfChallengeResponse
   );
   const registrationEnvelopeData = createRegistrationEnvelope(
     clientKeys.privateKey,
@@ -173,11 +177,11 @@ test("server should register a user", async () => {
   const b64ClientPublicKey = sodium.to_base64(clientKeys.publicKey);
   const query = gql`
     mutation {
-      initializeRegistration(
+      finalizeRegistration(
         input: {
           username: "${username}"
           secret: "${b64Secret}"
-          secrnonceet: "${b64Nonce}"
+          nonce: "${b64Nonce}"
           clientPublicKey: "${b64ClientPublicKey}"
         }
       ) {
@@ -188,7 +192,9 @@ test("server should register a user", async () => {
   const registrationResponse = await graphql.client.request(query);
   expect(registrationResponse).toMatchInlineSnapshot(`
     Object {
-      "status": "success",
+      "finalizeRegistration": Object {
+        "status": "success",
+      },
     }
   `);
 });
