@@ -34,3 +34,19 @@ export const createOprfChallengeResponse = (
   );
   return beta;
 };
+
+export function sodium_crypto_generichash_batch(arr: Uint8Array) {
+  const key = Buffer.alloc(this.crypto_generichash_KEYBYTES);
+  const state = this.crypto_generichash_init(
+    key,
+    this.crypto_generichash_BYTES
+  );
+  arr.forEach((item) => {
+    this.crypto_generichash_update(state, item);
+  });
+  const combinedHash = this.crypto_generichash_final(
+    state,
+    this.crypto_generichash_BYTES
+  );
+  return combinedHash;
+}
