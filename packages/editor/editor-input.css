@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 .ProseMirror:focus {
-    outline: none;
+  outline: none;
 }
