@@ -1,10 +1,4 @@
-import {
-  arg,
-  inputObjectType,
-  mutationField,
-  objectType,
-  queryType,
-} from "nexus";
+import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import {
   createOprfChallengeResponse,
   generateKeyPair,
@@ -12,9 +6,6 @@ import {
 } from "@serenity-tools/opaque";
 import sodium from "libsodium-wrappers-sumo";
 import { prisma } from "../database/prisma";
-
-// FIXME: move this to a database
-const registeredClients = {};
 
 const ClientOprfRegistrationChallengeInput = inputObjectType({
   name: "ClientOprfRegistrationChallengeRequest",
