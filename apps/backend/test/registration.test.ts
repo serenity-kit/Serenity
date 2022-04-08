@@ -8,6 +8,16 @@ import {
   generateKeyPair,
 } from "@serenity-tools/opaque";
 
+const graphql = setupGraphql();
+const username = "user";
+const password = "password";
+let data: any = null;
+let randomScalar: Uint8Array = new Uint8Array(32);
+
+beforeAll(async () => {
+  await deleteAllRecords();
+});
+
 const requestRegistrationChallengeResponse = async (
   username: string,
   password: string
@@ -35,17 +45,6 @@ const requestRegistrationChallengeResponse = async (
     randomScalar,
   };
 };
-
-const graphql = setupGraphql();
-const username = "user";
-const password = "password";
-let data: any = null;
-let randomScalar: Uint8Array = new Uint8Array(32);
-
-beforeAll(async () => {
-  await deleteAllRecords();
-  // seed DB if necessary
-});
 
 test("server should create a registration challenge response", async () => {
   // generate a challenge code

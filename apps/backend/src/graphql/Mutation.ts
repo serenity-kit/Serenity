@@ -2,7 +2,7 @@ import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import {
   createOprfChallengeResponse,
   generateKeyPair,
-  getPublicKeyFromPrivateKey,
+  generateOprfKeyPair,
 } from "@serenity-tools/opaque";
 import sodium from "libsodium-wrappers-sumo";
 import { prisma } from "../database/prisma";
@@ -52,7 +52,10 @@ const ClientOprfLoginChallengeInput = inputObjectType({
 const ClientOprfLoginChallengeResult = objectType({
   name: "ClientOprfLoginChallengeResult",
   definition(t) {
-    t.nonNull.string("status");
+    t.nonNull.string("secret");
+    t.nonNull.string("nonce");
+    t.nonNull.string("oprfPublicKey");
+    t.nonNull.string("oprfChallengeResponse");
   },
 });
 
@@ -60,15 +63,14 @@ const ClientOprfLoginFinalizeInput = inputObjectType({
   name: "ClientOprfLoginFinalizeInput",
   definition(t) {
     t.nonNull.string("username");
-    t.nonNull.string("sharedTx");
-    t.nonNull.string("sharedRx");
   },
 });
 
 const ClientOprfLoginFinalizeeResult = objectType({
   name: "ClientOprfLoginFinalizeeResult",
   definition(t) {
-    t.nonNull.string("status");
+    t.nonNull.string("oauthData");
+    t.nonNull.string("nonce");
   },
 });
 
@@ -93,7 +95,7 @@ export const initializeRegistration = mutationField("initializeRegistration", {
     } catch (error) {
       throw Error("challenge must be a base64-encoded byte array");
     }
-    const oprfKeyPair = generateKeyPair();
+    const oprfKeyPair = generateOprfKeyPair();
     const oprfChallengeResponse = createOprfChallengeResponse(
       clientOprfChallenge,
       oprfKeyPair.privateKey
@@ -103,7 +105,9 @@ export const initializeRegistration = mutationField("initializeRegistration", {
         data: {
           username,
           serverPrivateKey: sodium.to_base64(serverKeyPairs.privateKey),
+          serverPublicKey: sodium.to_base64(serverKeyPairs.publicKey),
           oprfPrivateKey: sodium.to_base64(oprfKeyPair.privateKey),
+          oprfPublicKey: sodium.to_base64(oprfKeyPair.publicKey),
         },
       });
     } catch (error) {
@@ -171,8 +175,10 @@ export const finalizeRegistration = mutationField("finalizeRegistration", {
       await prisma.user.create({
         data: {
           username,
-          serverPrivateKey: sodium.to_base64(registrationData.serverPrivateKey),
-          oprfPrivateKey: sodium.to_base64(registrationData.oprfPrivateKey),
+          serverPrivateKey: registrationData.serverPrivateKey,
+          serverPublicKey: registrationData.serverPublicKey,
+          oprfPrivateKey: registrationData.oprfPrivateKey,
+          oprfPublicKey: registrationData.oprfPublicKey,
           oprfCipherText: secret,
           oprfNonce: nonce,
           clientPublicKey,
@@ -204,7 +210,7 @@ export const initializeLogin = mutationField("initializeLogin", {
     }
     const b64ClientOprfChallenge = args?.input?.challenge || "";
     const serverKeyPairs = generateKeyPair();
-    const serverPublicKey = serverKeyPairs.publicKey;
+
     let clientOprfChallenge = new Uint8Array(32);
     try {
       clientOprfChallenge = sodium.from_base64(b64ClientOprfChallenge);
@@ -225,10 +231,13 @@ export const initializeLogin = mutationField("initializeLogin", {
       clientOprfChallenge,
       oprfPrivateKey
     );
-    const oprfPublicKey = getPublicKeyFromPrivateKey(oprfPrivateKey);
+    // just in case the oprf key pair is not compatible with this method
+    // getPublicKeyFromPrivateKey(oprfPrivateKey);
+    // we can just store it in the database.
+    const oprfPublicKey = sodium.from_base64(userData.oprfPublicKey);
     const result = {
-      secret: sodium.to_base64(userData.oprfCipherText),
-      nonce: sodium.to_base64(userData.oprfNonce),
+      secret: userData.oprfCipherText,
+      nonce: userData.oprfNonce,
       oprfPublicKey: sodium.to_base64(oprfPublicKey),
       oprfChallengeResponse: sodium.to_base64(oprfChallengeResponse),
     };
@@ -248,20 +257,6 @@ export const finalizeLogin = mutationField("finalizeLogin", {
     if (!username) {
       throw Error('Missing parameter: "username" must be string');
     }
-    const b64UserSharedRx = args?.input?.sharedRx || "";
-    const b64UserSharedTx = args?.input?.sharedTx || "";
-    let userSharedRx = new Uint8Array(32);
-    try {
-      userSharedRx = sodium.from_base64(b64UserSharedRx);
-    } catch (error) {
-      throw Error("sharedRx must be a base64-encoded byte array");
-    }
-    let userSharedTx = new Uint8Array(32);
-    try {
-      userSharedTx = sodium.from_base64(b64UserSharedTx);
-    } catch (error) {
-      throw Error("sharedTx must be a base64-encoded byte array");
-    }
     // if this user does not exist, we have a problem
     const userData = await prisma.user.findUnique({
       where: {
@@ -273,27 +268,41 @@ export const finalizeLogin = mutationField("finalizeLogin", {
     }
 
     const serverPrivateKey = sodium.from_base64(userData.serverPrivateKey);
-    const serverPublicKey = getPublicKeyFromPrivateKey(serverPrivateKey);
+    // we used to use getPublicKeyFromPrivateKey(serverPrivateKey);
+    // to derive the server public key, but it turns out that
+    // the server pbulic key must be curve22519 but the method
+    // relies on ed22519
+    const serverPublicKey = sodium.from_base64(userData.serverPublicKey);
     const clientPublicKey = sodium.from_base64(userData.clientPublicKey);
 
-    const serverSession = sodium.crypto_kx_server_session_keys(
+    const serverSharedKeys = sodium.crypto_kx_server_session_keys(
       serverPublicKey,
       serverPrivateKey,
       clientPublicKey
     );
-    const b64ServerSharedRx = sodium.to_base64(serverSession.sharedRx);
-    const b64ServerSharedTx = sodium.to_base64(serverSession.sharedTx);
-    // verify the login works
-    let status = "fail";
-    if (
-      b64UserSharedRx == b64ServerSharedRx &&
-      b64UserSharedTx == b64ServerSharedTx
-    ) {
-      status = "success";
-    }
-    const result = {
-      status,
+
+    const accessToken = sodium.to_base64(
+      sodium.crypto_core_ed25519_scalar_random()
+    );
+    // create an access token
+    const oauthResponse = {
+      accessToken,
+      tokenType: "Bearer",
     };
-    return result;
+    // generate nonce
+    const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+    // encrypt the oauth response
+    const oauthResponseBytes = new Uint8Array(
+      Buffer.from(JSON.stringify(oauthResponse))
+    );
+    const encryptedOauthResponseBytes = sodium.crypto_secretbox_easy(
+      oauthResponseBytes,
+      nonce,
+      serverSharedKeys.sharedTx
+    );
+    return {
+      oauthData: sodium.to_base64(encryptedOauthResponseBytes),
+      nonce: sodium.to_base64(nonce),
+    };
   },
 });

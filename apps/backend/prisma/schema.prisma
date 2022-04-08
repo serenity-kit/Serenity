@@ -47,13 +47,17 @@ model Update {
 model Registration {
   username         String @id
   serverPrivateKey String
+  serverPublicKey  String @default("invalid")
   oprfPrivateKey   String
+  oprfPublicKey    String @default("invalid")
 }
 
 model User {
   username           String  @id
   serverPrivateKey   String
+  serverPublicKey    String  @default("invalid")
   oprfPrivateKey     String
+  oprfPublicKey      String  @default("invalid")
   oprfCipherText     String
   oprfNonce          String
   clientPublicKey    String

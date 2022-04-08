@@ -1,11 +1,13 @@
 import sodium from "libsodium-wrappers-sumo";
 
-export const getPublicKeyFromPrivateKey = (privateKey) => {
+export const getPublicKeyFromEd25519PrivateKey = (privateKey: Uint8Array) => {
   const publicKey = sodium.crypto_scalarmult_ed25519_base(privateKey);
   return publicKey;
 };
 
 export const generateKeyPair = () => {
+  // Method 1: manual key generation
+  /*
   const privateKey = sodium.randombytes_buf(
     sodium.crypto_core_ed25519_SCALARBYTES
   );
@@ -14,12 +16,34 @@ export const generateKeyPair = () => {
     publicKey: publicKey,
     privateKey: privateKey,
   };
+  // method 2: use crypto_kx_seed keypair, since we will
+  // be using the keys for
+  // crypto_kx_client_session_keys and
+  // crypto_kx_server_session_keys
+  /* */
+  // const seed = sodium.randombytes_buf(sodium.crypto_kx_SEEDBYTES);
+  // const keyPair = sodium.crypto_kx_seed_keypair(seed);
+  const keyPair = sodium.crypto_kx_keypair();
+  // return generateOprfKeyPair();
+  /* */
+  return keyPair;
+};
+
+export const generateOprfKeyPair = () => {
+  const privateKey = sodium.randombytes_buf(
+    sodium.crypto_core_ed25519_SCALARBYTES
+  );
+  const publicKey = getPublicKeyFromEd25519PrivateKey(privateKey);
+  const keyPair = {
+    publicKey: publicKey,
+    privateKey: privateKey,
+  };
   return keyPair;
 };
 
 export const createOprfChallengeResponse = (
-  clientOprfChallenge,
-  oprfPrivateKey
+  clientOprfChallenge: Uint8Array,
+  oprfPrivateKey: Uint8Array
 ) => {
   const requiredChallengeLength = sodium.crypto_scalarmult_ed25519_BYTES;
   if (clientOprfChallenge.length != requiredChallengeLength) {
@@ -137,3 +161,74 @@ export const createRegistrationEnvelope = (
   );
   return { secret, nonce };
 };
+
+export function createUserLoginSession(
+  password: string,
+  secret: Uint8Array,
+  nonce: Uint8Array,
+  oprfPublicKey: Uint8Array,
+  randomScalar: Uint8Array,
+  serverChallengeResponse: Uint8Array
+) {
+  // create randomized password
+  const passwordBytes = new Uint8Array(Buffer.from(password));
+  const invertedRandomScalar =
+    sodium.crypto_core_ed25519_scalar_negate(randomScalar);
+  const exponentiatedPublicKey = sodium.crypto_scalarmult_ed25519_noclamp(
+    invertedRandomScalar,
+    oprfPublicKey
+  );
+  const challengeResponseResult = sodium.crypto_core_ed25519_add(
+    serverChallengeResponse,
+    exponentiatedPublicKey
+  );
+  const arr = [passwordBytes, oprfPublicKey, challengeResponseResult];
+  // combine hashes
+  const key = new Uint8Array(Buffer.alloc(sodium.crypto_generichash_KEYBYTES));
+  const state = sodium.crypto_generichash_init(
+    key,
+    sodium.crypto_generichash_BYTES
+  );
+  arr.forEach((item) => {
+    sodium.crypto_generichash_update(state, item);
+  });
+  const combinedHash = sodium.crypto_generichash_final(
+    state,
+    sodium.crypto_generichash_BYTES
+  );
+  const randomizedPassword = combinedHash;
+
+  // derive key from randomized password
+  const hashSalt = new Uint8Array(Buffer.alloc(sodium.crypto_pwhash_SALTBYTES));
+  const hashOpsLimit = sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE;
+  const hashMemLimit = sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE;
+  const argon2DerivedKey = sodium.crypto_pwhash(
+    32,
+    randomizedPassword,
+    hashSalt,
+    hashOpsLimit,
+    hashMemLimit,
+    sodium.crypto_pwhash_ALG_DEFAULT
+  );
+  // open the encrypted envelope
+  try {
+    const messageBytes = sodium.crypto_secretbox_open_easy(
+      secret,
+      nonce,
+      argon2DerivedKey
+    );
+    const messageString = Buffer.from(messageBytes.buffer).toString("utf-8");
+    const messageData = JSON.parse(messageString);
+    const userPublicKey = sodium.from_base64(messageData.userPublicKey);
+    const userPrivateKey = sodium.from_base64(messageData.userPrivateKey);
+    const serverPublicKey = sodium.from_base64(messageData.serverPublicKey);
+    const clientSharedKeys = sodium.crypto_kx_client_session_keys(
+      userPublicKey,
+      userPrivateKey,
+      serverPublicKey
+    );
+    return clientSharedKeys;
+  } catch (error) {
+    throw Error("Invalid password");
+  }
+}
