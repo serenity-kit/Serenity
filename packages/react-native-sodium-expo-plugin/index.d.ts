@@ -375,10 +375,23 @@ declare module "react-native-sodium-expo-plugin" {
    */
   export const crypto_pwhash_ALG_ARGON2ID13: number;
 
+  export const crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
+
+  export const crypto_aead_xchacha20poly1305_ietf_NPUBBYTES: number;
+
+  export const crypto_aead_xchacha20poly1305_ietf_ABYTES: number;
+
   export function crypto_aead_xchacha20poly1305_ietf_keygen(): Promise<string>;
 
   export function crypto_aead_xchacha20poly1305_ietf_encrypt(
     message: string,
+    additional_data: string,
+    public_nonce: string,
+    key: string
+  ): Promise<string>;
+
+  export function crypto_aead_xchacha20poly1305_ietf_decrypt(
+    cipher: string,
     additional_data: string,
     public_nonce: string,
     key: string

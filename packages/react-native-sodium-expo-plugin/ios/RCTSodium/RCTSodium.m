@@ -70,6 +70,8 @@ RCT_EXPORT_MODULE();
     @"crypto_scalarmult_BYTES":@crypto_scalarmult_BYTES,
     @"crypto_scalarmult_SCALARBYTES":@crypto_scalarmult_SCALARBYTES,
     @"crypto_aead_xchacha20poly1305_ietf_KEYBYTES": @ crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
+    @"crypto_aead_xchacha20poly1305_ietf_NPUBBYTES": @ crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
+    @"crypto_aead_xchacha20poly1305_ietf_ABYTES": @ crypto_aead_xchacha20poly1305_ietf_ABYTES,
   };
 
 }
@@ -520,10 +522,10 @@ RCT_EXPORT_METHOD(crypto_aead_xchacha20poly1305_ietf_encrypt:(NSString*)m d:(NSS
   const NSData *dn = [[NSData alloc] initWithBase64EncodedString:n options:0];
   const NSData *dk = [[NSData alloc] initWithBase64EncodedString:k options:0];
   if (!dm || !dd || !dn || !dk) reject(ESODIUM,ERR_FAILURE,nil);
-  // else if (dk.length != crypto_secretbox_KEYBYTES) reject(ESODIUM,ERR_BAD_KEY,nil);
-  // else if (dn.length != crypto_secretbox_NONCEBYTES) reject(ESODIUM,ERR_BAD_NONCE,nil);
+  else if (dk.length != crypto_aead_xchacha20poly1305_ietf_KEYBYTES) reject(ESODIUM,ERR_BAD_KEY,nil);
+  else if (dn.length != crypto_aead_xchacha20poly1305_ietf_NPUBBYTES) reject(ESODIUM,ERR_BAD_NONCE,nil);
   else {
-    unsigned long clen = crypto_secretbox_MACBYTES + dm.length;
+    unsigned long clen = crypto_aead_xchacha20poly1305_ietf_ABYTES + dm.length;
     unsigned char *dc = (unsigned char *) sodium_malloc(clen);
     unsigned long long ciphertext_len;
     if (dc == NULL) reject(ESODIUM,ERR_FAILURE,nil);
@@ -532,27 +534,32 @@ RCT_EXPORT_METHOD(crypto_aead_xchacha20poly1305_ietf_encrypt:(NSString*)m d:(NSS
       if (result != 0)
         reject(ESODIUM,ERR_FAILURE,nil);
       else
-        resolve([[NSData dataWithBytesNoCopy:dc length:clen freeWhenDone:NO]  base64EncodedStringWithOptions:0]);
+        resolve([[NSData dataWithBytesNoCopy:dc length:ciphertext_len freeWhenDone:NO]  base64EncodedStringWithOptions:0]);
       sodium_free(dc);
     }
   }
 }
 
-
-// RCT_EXPORT_METHOD(crypto_aead_xchacha20poly1305_ietf_decrypt:(NSString*)c d:(NSString*)d n:(NSString*)n k:(NSString*)k resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
-// {
-//   const NSData *dc = [[NSData alloc] initWithBase64EncodedString:c options:0];
-//   const NSData *dd = [[NSData alloc] initWithBase64EncodedString:d options:0];
-//   const NSData *dn = [[NSData alloc] initWithBase64EncodedString:n options:0];
-//   const NSData *dk = [[NSData alloc] initWithBase64EncodedString:k options:0];
-//   if (!dc || !dd || !dn || !dk) reject(ESODIUM,ERR_FAILURE,nil);
-//   // else if (dk.length != crypto_secretbox_KEYBYTES) reject(ESODIUM,ERR_BAD_KEY,nil);
-//   // else if (dn.length != crypto_secretbox_NONCEBYTES) reject(ESODIUM,ERR_BAD_NONCE,nil);
-//   else if (crypto_aead_xchacha20poly1305_ietf_decrypt([dc bytes], [dc bytes], dc.length, [dn bytes], [dk bytes]) != 0)
-//     reject(ESODIUM,ERR_FAILURE,nil);
-//   else
-//     resolve([[NSData dataWithBytesNoCopy:[dc bytes] length:dc.length - crypto_secretbox_MACBYTES freeWhenDone:NO]  base64EncodedStringWithOptions:0]);
-// }
+RCT_EXPORT_METHOD(crypto_aead_xchacha20poly1305_ietf_decrypt:(NSString*)c d:(NSString*)d n:(NSString*)n k:(NSString*)k resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+{
+  const NSData *dc = [[NSData alloc] initWithBase64EncodedString:c options:0];
+  const NSData *dd = [[NSData alloc] initWithBase64EncodedString:d options:0];
+  const NSData *dn = [[NSData alloc] initWithBase64EncodedString:n options:0];
+  const NSData *dk = [[NSData alloc] initWithBase64EncodedString:k options:0];
+  if (!dc || !dd || !dn || !dk) reject(ESODIUM,ERR_FAILURE,nil);
+  else if (dk.length != crypto_aead_xchacha20poly1305_ietf_KEYBYTES) reject(ESODIUM,ERR_BAD_KEY,nil);
+  else if (dn.length != crypto_aead_xchacha20poly1305_ietf_NPUBBYTES) reject(ESODIUM,ERR_BAD_NONCE,nil);
+  else {
+    unsigned long mlen = dc.length;
+    unsigned char *dm = (unsigned char *) sodium_malloc(mlen);
+    unsigned long long message_len;
+    if (crypto_aead_xchacha20poly1305_ietf_decrypt(dm, &message_len, NULL, [dc bytes], dc.length, [dd bytes], dd.length, [dn bytes], [dk bytes]) != 0)
+      reject(ESODIUM,ERR_FAILURE,nil);
+    else
+      resolve([[NSData dataWithBytesNoCopy:dm length:message_len freeWhenDone:NO]  base64EncodedStringWithOptions:0]);
+    sodium_free(dm);
+  }
+}
 
 
 @end

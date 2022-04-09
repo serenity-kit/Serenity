@@ -9,6 +9,10 @@ const signingKeyPair = {
   publicKey: "wbsF+N6QWE5LLx31gst9y1zpHrMtTfTfbkOaCgSV590=",
 };
 
+const exitingCiphertext = "DtMWG6Jx9wAmLXh64enOwd6E7cFX";
+const key = "eL4FdkhTmU2F56ySJKKH+2ZVrzdsIIbbmvyz/N3Swb0=";
+const nonce = "5GDx6cP2/uToVP+UKhddEmUelpyKTJLZ";
+
 export default function TestEditorScreen() {
   const [data, setData] = useState({});
 
@@ -20,20 +24,41 @@ export default function TestEditorScreen() {
         "Hello",
         signingKeyPair.privateKey
       );
-      const key = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
-      const x = await sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-        "Hello",
-        "test",
+      const tmpKey = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
+      const ciphertext =
+        await sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+          "Hello",
+          "test",
+          null,
+          randombytes_buf,
+          tmpKey
+        );
+
+      const message = await sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
         null,
+        ciphertext,
+        "test",
         randombytes_buf,
-        key
+        tmpKey
       );
-      console.log(x);
+      const messageFromExistingCiphertext =
+        await sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
+          null,
+          exitingCiphertext,
+          "test",
+          nonce,
+          key
+        );
 
       setData({
         randombytes_buf,
         crypto_sign_keypair,
         crypto_sign_detached,
+        ciphertext,
+        message: sodium.from_base64_to_string(message),
+        messageFromExistingCiphertext: sodium.from_base64_to_string(
+          messageFromExistingCiphertext
+        ),
       });
     }
 
@@ -43,7 +68,13 @@ export default function TestEditorScreen() {
   return (
     <View>
       <Text>Libsodium Test Screen</Text>
-      <Text>{JSON.stringify(data)}</Text>
+      {Object.keys(data).map((key) => (
+        <View key={key}>
+          <Text>
+            {key}: {JSON.stringify(data[key], undefined, 2)}
+          </Text>
+        </View>
+      ))}
     </View>
   );
 }

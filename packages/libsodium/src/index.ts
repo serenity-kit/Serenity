@@ -1,6 +1,6 @@
 import sodium, { StringKeyPair } from "libsodium-wrappers";
 
-export { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers";
+export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers";
 
 export const to_base64 = (data: Uint8Array | string): string => {
   if (typeof data === "string") {
@@ -15,6 +15,10 @@ export const to_base64 = (data: Uint8Array | string): string => {
 // Uint8Array.from(window.atob(base64Url.replace(/-/g, "+").replace(/_/g, "/")), (v) => v.charCodeAt(0));
 export const from_base64 = (data: string): Uint8Array => {
   return Uint8Array.from(atob(data), (v) => v.charCodeAt(0));
+};
+
+export const from_base64_to_string = (data: string): string => {
+  return atob(data);
 };
 
 export const randombytes_buf = async (length: number): Promise<string> => {
@@ -83,6 +87,7 @@ export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
 export default {
   to_base64,
   from_base64,
+  from_base64_to_string,
   randombytes_buf,
   crypto_sign_keypair,
   crypto_sign_detached,
