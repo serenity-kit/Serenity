@@ -5,8 +5,8 @@ import sodium from "@serenity-tools/libsodium";
 const signingKeyPair = {
   keyType: "ed25519",
   privateKey:
-    "ReL7DknBDFcUwxBCZq6h4WN5afloIOkU0JGOi2IxxQsGL7NOP28f5sj/BMVisix3MxZhnDyI7mmTyGS+B1f1Lg==",
-  publicKey: "Bi+zTj9vH+bI/wTFYrIsdzMWYZw8iO5pk8hkvgdX9S4=",
+    "E7YwpvlfrtEMDiHRglSGl4sl3sxnkEzgMrS/1QngPwzBuwX43pBYTksvHfWCy33LXOkesy1N9N9uQ5oKBJXn3Q==",
+  publicKey: "wbsF+N6QWE5LLx31gst9y1zpHrMtTfTfbkOaCgSV590=",
 };
 
 export default function TestEditorScreen() {
@@ -16,18 +16,16 @@ export default function TestEditorScreen() {
     async function run() {
       const randombytes_buf = await sodium.randombytes_buf(32);
       const crypto_sign_keypair = await sodium.crypto_sign_keypair();
-      console.log(crypto_sign_keypair);
-      try {
-        const crypto_sign_detached = await sodium.crypto_sign_detached(
-          "Hello",
-          signingKeyPair.privateKey
-        );
-        console.log("crypto_sign_detached", crypto_sign_detached);
-      } catch (err) {
-        console.log(err);
-      }
+      const crypto_sign_detached = await sodium.crypto_sign_detached(
+        "Hello",
+        signingKeyPair.privateKey
+      );
 
-      setData({ randombytes_buf, crypto_sign_keypair });
+      setData({
+        randombytes_buf,
+        crypto_sign_keypair,
+        crypto_sign_detached,
+      });
     }
 
     run();
