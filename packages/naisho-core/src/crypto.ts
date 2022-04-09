@@ -1,4 +1,3 @@
-import sodiumWrappers from "libsodium-wrappers";
 import sodium from "@serenity-tools/libsodium";
 
 export async function encryptAead(
@@ -6,9 +5,11 @@ export async function encryptAead(
   additionalData: string,
   key: string
 ) {
-  const publicNonce = await sodium.randombytes_buf(
-    sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
-  );
+  // TODO
+  // const publicNonce = await sodium.randombytes_buf(
+  //   sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
+  // );
+  const publicNonce = await sodium.randombytes_buf(24);
   const result = {
     publicNonce,
     ciphertext: await sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
@@ -28,12 +29,6 @@ export async function decryptAead(
   key: string,
   publicNonce: string
 ) {
-  if (
-    ciphertext.length < sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_ABYTES
-  ) {
-    throw "The ciphertext was too short";
-  }
-
   return sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
     null,
     sodium.to_base64(ciphertext),
