@@ -41,7 +41,7 @@
     "react-native-get-random-values": "^1.7.2",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
-    "react-native-sodium-expo-plugin": "^0.4.0",
+    "react-native-sodium-expo-plugin": "*",
     "react-native-web": "0.17.1",
     "react-native-webview": "11.15.0",
     "twrnc": "^3.0.2",
