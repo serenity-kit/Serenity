@@ -146,7 +146,7 @@ export default function TestEditorScreen({
         "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
       );
 
-      signatureKeyPairRef.current = createSignatureKeyPair();
+      signatureKeyPairRef.current = await createSignatureKeyPair();
 
       const onWebsocketMessage = (event) => {
         const data = JSON.parse(event.data);

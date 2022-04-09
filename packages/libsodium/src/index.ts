@@ -2,6 +2,8 @@ import sodium, { StringKeyPair } from "libsodium-wrappers";
 
 export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers";
 
+export const ready = sodium.ready;
+
 export const to_base64 = (data: Uint8Array | string): string => {
   if (typeof data === "string") {
     return btoa(data);
@@ -85,6 +87,7 @@ export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
 };
 
 export default {
+  ready,
   to_base64,
   from_base64,
   from_base64_to_string,

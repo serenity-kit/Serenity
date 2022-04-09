@@ -7,7 +7,8 @@
   "scripts": {
     "postinstall": "tar -xzf precompiled.tgz",
     "rebuild": "./build.sh",
-    "ts:check": "tsc --noEmit"
+    "ts:check": "tsc --noEmit",
+    "test": "echo TODO"
   },
   "version": "0.4.1",
   "description": "The Sodium crypto library for React Native.",

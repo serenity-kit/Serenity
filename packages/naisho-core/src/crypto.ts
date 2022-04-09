@@ -1,15 +1,16 @@
-import sodium from "libsodium-wrappers";
+import sodiumWrappers from "libsodium-wrappers";
+import sodium from "@serenity-tools/libsodium";
 
 export function encryptAead(message, additionalData: string, key: Uint8Array) {
-  const secretNonce = sodium.randombytes_buf(
-    sodium.crypto_aead_xchacha20poly1305_ietf_NSECBYTES
+  const secretNonce = sodiumWrappers.randombytes_buf(
+    sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_NSECBYTES
   );
-  const publicNonce = sodium.randombytes_buf(
-    sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
+  const publicNonce = sodiumWrappers.randombytes_buf(
+    sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
   );
   return {
     publicNonce,
-    ciphertext: sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+    ciphertext: sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_encrypt(
       message,
       additionalData,
       secretNonce,
@@ -25,11 +26,13 @@ export function decryptAead(
   key: Uint8Array,
   publicNonce: Uint8Array
 ) {
-  if (ciphertext.length < sodium.crypto_aead_xchacha20poly1305_ietf_ABYTES) {
+  if (
+    ciphertext.length < sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_ABYTES
+  ) {
     throw "The ciphertext was too short";
   }
 
-  return sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
+  return sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_decrypt(
     new Uint8Array(0),
     ciphertext,
     additionalData,
@@ -38,14 +41,23 @@ export function decryptAead(
   );
 }
 
-export function createSignatureKeyPair() {
-  return sodium.crypto_sign_keypair();
+export async function createSignatureKeyPair() {
+  const keypair = await sodium.crypto_sign_keypair();
+  return {
+    publicKey: sodium.from_base64(keypair.publicKey),
+    privateKey: sodium.from_base64(keypair.privateKey),
+    keyType: keypair.keyType,
+  };
 }
 
 export function sign(message, privateKey) {
-  return sodium.crypto_sign_detached(message, privateKey);
+  return sodiumWrappers.crypto_sign_detached(message, privateKey);
 }
 
 export function verifySignature(message, signature, publicKey) {
-  return sodium.crypto_sign_verify_detached(signature, message, publicKey);
+  return sodiumWrappers.crypto_sign_verify_detached(
+    signature,
+    message,
+    publicKey
+  );
 }

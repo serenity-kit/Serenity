@@ -15,6 +15,8 @@ export interface StringKeyPair {
   publicKey: string;
 }
 
+export const ready = Promise.resolve();
+
 export const to_base64 = (data: Uint8Array | string): string =>
   Buffer.from(data).toString("base64");
 
@@ -131,6 +133,7 @@ export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
 };
 
 export default {
+  ready,
   to_base64,
   from_base64,
   from_base64_to_string,
