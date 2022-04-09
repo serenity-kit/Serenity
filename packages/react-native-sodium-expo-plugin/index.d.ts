@@ -374,4 +374,13 @@ declare module "react-native-sodium-expo-plugin" {
    * Version 1.3 of the Argon2id algorithm, available since libsodium 1.0.13.
    */
   export const crypto_pwhash_ALG_ARGON2ID13: number;
+
+  export function crypto_aead_xchacha20poly1305_ietf_keygen(): Promise<string>;
+
+  export function crypto_aead_xchacha20poly1305_ietf_encrypt(
+    message: string,
+    additional_data: string,
+    public_nonce: string,
+    key: string
+  ): Promise<string>;
 }

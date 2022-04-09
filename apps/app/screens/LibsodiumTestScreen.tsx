@@ -14,12 +14,21 @@ export default function TestEditorScreen() {
 
   useEffect(() => {
     async function run() {
-      const randombytes_buf = await sodium.randombytes_buf(32);
+      const randombytes_buf = await sodium.randombytes_buf(24);
       const crypto_sign_keypair = await sodium.crypto_sign_keypair();
       const crypto_sign_detached = await sodium.crypto_sign_detached(
         "Hello",
         signingKeyPair.privateKey
       );
+      const key = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
+      const x = await sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+        "Hello",
+        "test",
+        null,
+        randombytes_buf,
+        key
+      );
+      console.log(x);
 
       setData({
         randombytes_buf,
