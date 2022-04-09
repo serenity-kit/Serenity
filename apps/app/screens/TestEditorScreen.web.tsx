@@ -1,5 +1,5 @@
 import * as Yjs from "yjs";
-import { Editor as SerenityEditor } from "@serenity-tools/editor";
+import Editor from "../components/editor/Editor";
 import {
   createSnapshot,
   createUpdate,
@@ -24,7 +24,6 @@ import {
 } from "@naisho/core";
 import { v4 as uuidv4 } from "uuid";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
-import sodiumWrappers from "libsodium-wrappers";
 import {
   Awareness,
   encodeAwarenessUpdate,
@@ -150,8 +149,8 @@ export default function TestEditorScreen({
 
       // TODO get key from navigation
       // const key = sodium.from_base64(window.location.hash.slice(1));
-      const key = sodiumWrappers.from_hex(
-        "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
+      const key = sodium.from_base64(
+        "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM+0="
       );
 
       signatureKeyPairRef.current = await createSignatureKeyPair();
@@ -391,7 +390,7 @@ export default function TestEditorScreen({
       <View>
         <Text>{websocketState.connected ? "Connected" : "Disconnected"}</Text>
       </View>
-      <SerenityEditor yDocRef={yDocRef} yAwarenessRef={yAwarenessRef} />
+      <Editor yDocRef={yDocRef} yAwarenessRef={yAwarenessRef} />
     </View>
   );
 }
