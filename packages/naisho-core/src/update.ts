@@ -70,15 +70,14 @@ export async function createUpdate(
     publicDataAsBase64,
     sodium.to_base64(key)
   );
-  const nonceBase64 = sodium.to_base64(publicNonce);
-  const ciphertextBase64 = sodium.to_base64(ciphertext);
   const signature = await sign(
-    `${nonceBase64}${ciphertextBase64}${publicDataAsBase64}`,
+    `${publicNonce}${ciphertext}${publicDataAsBase64}`,
     sodium.to_base64(signatureKeyPair.privateKey)
   );
+
   const update: Update = {
-    nonce: nonceBase64,
-    ciphertext: ciphertextBase64,
+    nonce: publicNonce,
+    ciphertext: ciphertext,
     publicData: publicDataWithClock,
     signature,
   };
@@ -127,7 +126,7 @@ export async function verifyAndDecryptUpdate(update: Update, key, publicKey) {
   const result = decryptAead(
     sodium.from_base64(update.ciphertext),
     sodium.to_base64(JSON.stringify(update.publicData)),
-    key,
+    sodium.to_base64(key),
     update.nonce
   );
 

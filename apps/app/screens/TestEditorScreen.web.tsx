@@ -23,7 +23,8 @@ import {
   useWebsocketState,
 } from "@naisho/core";
 import { v4 as uuidv4 } from "uuid";
-import sodium from "libsodium-wrappers";
+import sodium, { KeyPair } from "@serenity-tools/libsodium";
+import sodiumWrappers from "libsodium-wrappers";
 import {
   Awareness,
   encodeAwarenessUpdate,
@@ -39,13 +40,13 @@ const reconnectTimeout = 2000;
 export default function TestEditorScreen({
   navigation,
 }: RootTabScreenProps<"EditorScreen">) {
-  const docId = "123ef252-c282-4e9d-a403-ad1481d2ad7o";
+  const docId = "12345678-1282-4e9d-a403-ad1481d2ad7o";
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
   const websocketConnectionRef = useRef<WebSocket>(null);
   const createSnapshotRef = useRef<boolean>(false); // only used for the UI
-  const signatureKeyPairRef = useRef<sodium.KeyPair | null>(null);
+  const signatureKeyPairRef = useRef<KeyPair | null>(null);
   const latestServerVersionRef = useRef<number | null>(null);
   const editorInitializedRef = useRef<boolean>(false);
   const websocketState = useWebsocketState();
@@ -57,8 +58,9 @@ export default function TestEditorScreen({
       key,
       sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
     );
-    // @ts-expect-error TODO handle later
-    Yjs.applyUpdate(yDocRef.current, initialResult, null);
+    if (initialResult) {
+      Yjs.applyUpdate(yDocRef.current, sodium.from_base64(initialResult), null);
+    }
   };
 
   const applyUpdates = async (updates, key) => {
@@ -76,7 +78,11 @@ export default function TestEditorScreen({
         );
         // when reconnecting the server might send already processed data updates. these then are ignored
         if (updateResult) {
-          Yjs.applyUpdate(yDocRef.current, updateResult, null);
+          Yjs.applyUpdate(
+            yDocRef.current,
+            sodium.from_base64(updateResult),
+            null
+          );
           latestServerVersionRef.current = update.serverData.version;
         }
       })
@@ -144,7 +150,7 @@ export default function TestEditorScreen({
 
       // TODO get key from navigation
       // const key = sodium.from_base64(window.location.hash.slice(1));
-      const key = sodium.from_hex(
+      const key = sodiumWrappers.from_hex(
         "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
       );
 

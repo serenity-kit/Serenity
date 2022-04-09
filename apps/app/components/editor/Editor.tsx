@@ -71,7 +71,6 @@ export default function Editor({ yDocRef }: EditorProps) {
                 Y.applyUpdate(yDocRef.current, update);
                 console.log("apply update");
                 const serializedYDoc = Y.encodeStateAsUpdateV2(yDocRef.current);
-                console.log(serializedYDoc);
               }
               // optimization: prevent update in case the content hasn't changed
               // if (deepEqual(serializedYDoc, contentRef.current)) return;
