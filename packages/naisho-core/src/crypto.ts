@@ -1,30 +1,32 @@
 import sodiumWrappers from "libsodium-wrappers";
 import sodium from "@serenity-tools/libsodium";
 
-export function encryptAead(message, additionalData: string, key: Uint8Array) {
-  const secretNonce = sodiumWrappers.randombytes_buf(
-    sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_NSECBYTES
-  );
-  const publicNonce = sodiumWrappers.randombytes_buf(
+export async function encryptAead(
+  message,
+  additionalData: string,
+  key: string
+) {
+  const publicNonce = await sodium.randombytes_buf(
     sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
   );
-  return {
+  const result = {
     publicNonce,
-    ciphertext: sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_encrypt(
+    ciphertext: await sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
       message,
       additionalData,
-      secretNonce,
+      null,
       publicNonce,
       key
     ),
   };
+  return result;
 }
 
-export function decryptAead(
-  ciphertext,
+export async function decryptAead(
+  ciphertext: Uint8Array,
   additionalData: string,
-  key: Uint8Array,
-  publicNonce: Uint8Array
+  key: string,
+  publicNonce: string
 ) {
   if (
     ciphertext.length < sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_ABYTES
@@ -32,9 +34,9 @@ export function decryptAead(
     throw "The ciphertext was too short";
   }
 
-  return sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_decrypt(
-    new Uint8Array(0),
-    ciphertext,
+  return sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
+    null,
+    sodium.to_base64(ciphertext),
     additionalData,
     publicNonce,
     key
@@ -50,12 +52,12 @@ export async function createSignatureKeyPair() {
   };
 }
 
-export function sign(message, privateKey) {
-  return sodiumWrappers.crypto_sign_detached(message, privateKey);
+export async function sign(message, privateKey) {
+  return await sodium.crypto_sign_detached(message, privateKey);
 }
 
-export function verifySignature(message, signature, publicKey) {
-  return sodiumWrappers.crypto_sign_verify_detached(
+export async function verifySignature(message, signature, publicKey) {
+  return await sodium.crypto_sign_verify_detached(
     signature,
     message,
     publicKey

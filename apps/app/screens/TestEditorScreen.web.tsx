@@ -39,7 +39,7 @@ const reconnectTimeout = 2000;
 export default function TestEditorScreen({
   navigation,
 }: RootTabScreenProps<"EditorScreen">) {
-  const docId = "eadef252-c282-4e9d-a403-ad1481d2ad78";
+  const docId = "123ef252-c282-4e9d-a403-ad1481d2ad7o";
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
@@ -50,9 +50,9 @@ export default function TestEditorScreen({
   const editorInitializedRef = useRef<boolean>(false);
   const websocketState = useWebsocketState();
 
-  const applySnapshot = (snapshot, key) => {
+  const applySnapshot = async (snapshot, key) => {
     activeSnapshotIdRef.current = snapshot.publicData.snapshotId;
-    const initialResult = verifyAndDecryptSnapshot(
+    const initialResult = await verifyAndDecryptSnapshot(
       snapshot,
       key,
       sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
@@ -61,27 +61,29 @@ export default function TestEditorScreen({
     Yjs.applyUpdate(yDocRef.current, initialResult, null);
   };
 
-  const applyUpdates = (updates, key) => {
-    updates.forEach((update) => {
-      console.log(
-        update.serverData.version,
-        update.publicData.pubKey,
-        update.publicData.clock
-      );
-      const updateResult = verifyAndDecryptUpdate(
-        update,
-        key,
-        sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-      );
-      // when reconnecting the server might send already processed data updates. these then are ignored
-      if (updateResult) {
-        Yjs.applyUpdate(yDocRef.current, updateResult, null);
-        latestServerVersionRef.current = update.serverData.version;
-      }
-    });
+  const applyUpdates = async (updates, key) => {
+    await Promise.all(
+      updates.map(async (update) => {
+        console.log(
+          update.serverData.version,
+          update.publicData.pubKey,
+          update.publicData.clock
+        );
+        const updateResult = await verifyAndDecryptUpdate(
+          update,
+          key,
+          sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+        );
+        // when reconnecting the server might send already processed data updates. these then are ignored
+        if (updateResult) {
+          Yjs.applyUpdate(yDocRef.current, updateResult, null);
+          latestServerVersionRef.current = update.serverData.version;
+        }
+      })
+    );
   };
 
-  const createAndSendSnapshot = (key) => {
+  const createAndSendSnapshot = async (key) => {
     const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
     const publicData = {
       snapshotId: uuidv4(),
@@ -89,7 +91,7 @@ export default function TestEditorScreen({
       // @ts-expect-error TODO handle later
       pubKey: sodium.to_base64(signatureKeyPairRef.current.publicKey),
     };
-    const snapshot = createSnapshot(
+    const snapshot = await createSnapshot(
       yDocState,
       publicData,
       key,
@@ -109,14 +111,14 @@ export default function TestEditorScreen({
     );
   };
 
-  const createAndSendUpdate = (update, key, clockOverwrite?: number) => {
+  const createAndSendUpdate = async (update, key, clockOverwrite?: number) => {
     const publicData = {
       refSnapshotId: activeSnapshotIdRef.current,
       docId,
       // @ts-expect-error TODO handle later
       pubKey: sodium.to_base64(signatureKeyPairRef.current.publicKey),
     };
-    const updateToSend = createUpdate(
+    const updateToSend = await createUpdate(
       update,
       // @ts-expect-error TODO handle later
       publicData,
@@ -148,14 +150,14 @@ export default function TestEditorScreen({
 
       signatureKeyPairRef.current = await createSignatureKeyPair();
 
-      const onWebsocketMessage = (event) => {
+      const onWebsocketMessage = async (event) => {
         const data = JSON.parse(event.data);
         switch (data.type) {
           case "document":
             if (data.snapshot) {
-              applySnapshot(data.snapshot, key);
+              await applySnapshot(data.snapshot, key);
             }
-            applyUpdates(data.updates, key);
+            await applyUpdates(data.updates, key);
             if (editorInitializedRef.current === false) {
               // TODO initiate editor
               editorInitializedRef.current = true;
@@ -164,19 +166,19 @@ export default function TestEditorScreen({
             // check for pending snapshots or pending updates and run them
             const pendingChanges = getPending(docId);
             if (pendingChanges.type === "snapshot") {
-              createAndSendSnapshot(key);
+              await createAndSendSnapshot(key);
               removePending(docId);
             } else if (pendingChanges.type === "updates") {
               // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
               removePending(docId);
-              pendingChanges.rawUpdates.forEach((rawUpdate) => {
-                createAndSendUpdate(rawUpdate, key);
+              pendingChanges.rawUpdates.forEach(async (rawUpdate) => {
+                await createAndSendUpdate(rawUpdate, key);
               });
             }
             break;
           case "snapshot":
             console.log("apply snapshot");
-            const snapshotResult = verifyAndDecryptSnapshot(
+            const snapshotResult = await verifyAndDecryptSnapshot(
               data,
               key,
               sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
@@ -196,23 +198,23 @@ export default function TestEditorScreen({
 
             const pending = getPending(data.docId);
             if (pending.type === "snapshot") {
-              createAndSendSnapshot(key);
+              await createAndSendSnapshot(key);
               removePending(data.docId);
             } else if (pending.type === "updates") {
               // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
               removePending(data.docId);
-              pending.rawUpdates.forEach((rawUpdate) => {
-                createAndSendUpdate(rawUpdate, key);
+              pending.rawUpdates.forEach(async (rawUpdate) => {
+                await createAndSendUpdate(rawUpdate, key);
               });
             }
             break;
           case "snapshotFailed":
             console.log("snapshot saving failed", data);
             if (data.snapshot) {
-              applySnapshot(data.snapshot, key);
+              await applySnapshot(data.snapshot, key);
             }
             if (data.updates) {
-              applyUpdates(data.updates, key);
+              await applyUpdates(data.updates, key);
             }
 
             // TODO add a backoff after multiple failed tries
@@ -221,10 +223,10 @@ export default function TestEditorScreen({
             removeSnapshotInProgress(data.docId);
             // all pending can be removed since a new snapshot will include all local changes
             removePending(data.docId);
-            createAndSendSnapshot(key);
+            await createAndSendSnapshot(key);
             break;
           case "update":
-            const updateResult = verifyAndDecryptUpdate(
+            const updateResult = await verifyAndDecryptUpdate(
               data,
               key,
               sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
@@ -250,10 +252,10 @@ export default function TestEditorScreen({
               data.snapshotId,
               data.clock
             );
-            createAndSendUpdate(rawUpdate, key, data.clock);
+            await createAndSendUpdate(rawUpdate, key, data.clock);
             break;
           case "awarenessUpdate":
-            const awarenessUpdateResult = verifyAndDecryptAwarenessUpdate(
+            const awarenessUpdateResult = await verifyAndDecryptAwarenessUpdate(
               data,
               key,
               sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
@@ -316,34 +318,37 @@ export default function TestEditorScreen({
         );
       });
 
-      yAwarenessRef.current.on("update", ({ added, updated, removed }) => {
-        if (!getWebsocketState().connected) {
-          return;
+      yAwarenessRef.current.on(
+        "update",
+        async ({ added, updated, removed }) => {
+          if (!getWebsocketState().connected) {
+            return;
+          }
+
+          const changedClients = added.concat(updated).concat(removed);
+          const yAwarenessUpdate = encodeAwarenessUpdate(
+            yAwarenessRef.current,
+            changedClients
+          );
+          const publicData = {
+            docId,
+            // @ts-expect-error TODO handle later
+            pubKey: sodium.to_base64(signatureKeyPairRef.current.publicKey),
+          };
+          const awarenessUpdate = await createAwarenessUpdate(
+            yAwarenessUpdate,
+            publicData,
+            key,
+            // @ts-expect-error TODO handle later
+            signatureKeyPairRef.current
+          );
+          console.log("send awarenessUpdate");
+          // @ts-expect-error TODO handle later
+          websocketConnectionRef.current.send(JSON.stringify(awarenessUpdate));
         }
+      );
 
-        const changedClients = added.concat(updated).concat(removed);
-        const yAwarenessUpdate = encodeAwarenessUpdate(
-          yAwarenessRef.current,
-          changedClients
-        );
-        const publicData = {
-          docId,
-          // @ts-expect-error TODO handle later
-          pubKey: sodium.to_base64(signatureKeyPairRef.current.publicKey),
-        };
-        const awarenessUpdate = createAwarenessUpdate(
-          yAwarenessUpdate,
-          publicData,
-          key,
-          // @ts-expect-error TODO handle later
-          signatureKeyPairRef.current
-        );
-        console.log("send awarenessUpdate");
-        // @ts-expect-error TODO handle later
-        websocketConnectionRef.current.send(JSON.stringify(awarenessUpdate));
-      });
-
-      yDocRef.current.on("update", (update, origin) => {
+      yDocRef.current.on("update", async (update, origin) => {
         if (origin?.key === "y-sync$") {
           if (!activeSnapshotIdRef.current || createSnapshotRef.current) {
             createSnapshotRef.current = false;
@@ -354,7 +359,7 @@ export default function TestEditorScreen({
             ) {
               addPendingSnapshot(docId);
             } else {
-              createAndSendSnapshot(key);
+              await createAndSendSnapshot(key);
             }
           } else {
             if (
@@ -365,7 +370,7 @@ export default function TestEditorScreen({
               // must be based on the new snapshot
               addPendingUpdate(docId, update);
             } else {
-              createAndSendUpdate(update, key);
+              await createAndSendUpdate(update, key);
             }
           }
         }

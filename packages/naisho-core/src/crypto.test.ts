@@ -14,17 +14,17 @@ test("encryptAead and decryptAead", async () => {
     snapshotId: uuidv4(),
   };
 
-  const encryptedResult = encryptAead(
+  const encryptedResult = await encryptAead(
     "Hallo",
     sodiumWrapper.to_base64(JSON.stringify(publicData)),
-    key
+    sodium.to_base64(key)
   );
 
-  const decryptedResult = decryptAead(
-    encryptedResult.ciphertext,
+  const decryptedResult = await decryptAead(
+    sodium.from_base64(encryptedResult.ciphertext),
     sodiumWrapper.to_base64(JSON.stringify(publicData)),
-    key,
+    sodium.to_base64(key),
     encryptedResult.publicNonce
   );
-  expect(sodiumWrapper.to_string(decryptedResult)).toEqual("Hallo");
+  expect(sodium.from_base64_to_string(decryptedResult)).toEqual("Hallo");
 });

@@ -48,6 +48,18 @@ export const crypto_sign_detached = async (
   return to_base64(result);
 };
 
+export const crypto_sign_verify_detached = async (
+  signature: string,
+  message: string,
+  privateKey: string
+): Promise<boolean> => {
+  return await sodium.crypto_sign_verify_detached(
+    from_base64(signature),
+    message,
+    from_base64(privateKey)
+  );
+};
+
 export const crypto_aead_xchacha20poly1305_ietf_keygen =
   async (): Promise<string> =>
     to_base64(sodium.crypto_aead_xchacha20poly1305_ietf_keygen());
@@ -94,6 +106,7 @@ export default {
   randombytes_buf,
   crypto_sign_keypair,
   crypto_sign_detached,
+  crypto_sign_verify_detached,
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
