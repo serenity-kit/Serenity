@@ -53,7 +53,7 @@ export async function verifyAndDecryptAwarenessUpdate(
   return await decryptAead(
     sodium.from_base64(update.ciphertext),
     sodium.to_base64(JSON.stringify(update.publicData)),
-    key,
+    sodium.to_base64(key),
     update.nonce
   );
 }

@@ -191,8 +191,12 @@ export default function TestEditorScreen({
             activeSnapshotIdRef.current = data.publicData.snapshotId;
             // @ts-expect-error TODO handle later
             latestServerVersionRef.current = undefined;
-            // @ts-expect-error TODO handle later
-            Yjs.applyUpdate(yDocRef.current, snapshotResult, null);
+            Yjs.applyUpdate(
+              yDocRef.current,
+              // @ts-expect-error TODO handle later
+              sodium.from_base64(snapshotResult),
+              null
+            );
             break;
           case "snapshotSaved":
             console.log("snapshot saving confirmed");
@@ -236,8 +240,12 @@ export default function TestEditorScreen({
               key,
               sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
             );
-            // @ts-expect-error TODO handle later
-            Yjs.applyUpdate(yDocRef.current, updateResult, null);
+            Yjs.applyUpdate(
+              yDocRef.current,
+              // @ts-expect-error TODO handle later
+              sodium.from_base64(updateResult),
+              null
+            );
             latestServerVersionRef.current = data.serverData.version;
             break;
           case "updateSaved":
@@ -269,7 +277,7 @@ export default function TestEditorScreen({
             applyAwarenessUpdate(
               yAwarenessRef.current,
               // @ts-expect-error TODO handle later
-              awarenessUpdateResult,
+              sodium.from_base64(awarenessUpdateResult),
               null
             );
             break;
