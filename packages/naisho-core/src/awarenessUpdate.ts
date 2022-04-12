@@ -1,11 +1,6 @@
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
-import {
-  decryptAead,
-  AwarenessUpdate,
-  AwarenessUpdatePublicData,
-  verifySignature,
-} from ".";
-import { encryptAead, sign } from "./crypto";
+import { AwarenessUpdate, AwarenessUpdatePublicData } from "./types";
+import { encryptAead, sign, decryptAead, verifySignature } from "./crypto";
 
 export async function createAwarenessUpdate(
   content,

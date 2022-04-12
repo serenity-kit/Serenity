@@ -1,6 +1,6 @@
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
-import { decryptAead, Snapshot, SnapshotPublicData, verifySignature } from ".";
-import { encryptAead, sign } from "./crypto";
+import { Snapshot, SnapshotPublicData } from "./types";
+import { encryptAead, sign, verifySignature, decryptAead } from "./crypto";
 
 type PendingResult =
   | { type: "snapshot" }

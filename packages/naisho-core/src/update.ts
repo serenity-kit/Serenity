@@ -1,6 +1,6 @@
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
-import { decryptAead, Update, UpdatePublicData, verifySignature } from ".";
-import { encryptAead, sign } from "./crypto";
+import { Update, UpdatePublicData } from "./types";
+import { encryptAead, sign, verifySignature, decryptAead } from "./crypto";
 
 const clocksPerSnapshot = {};
 const updatesInProgress = {};

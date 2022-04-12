@@ -44,18 +44,16 @@ export default function Editor({ yDocRef }: EditorProps) {
     initEditor();
   }, []);
 
-  yDocRef.current.on("update", (update: any, origin: string) => {
+  yDocRef.current.on("updateV2", (update: any, origin: string) => {
     if (origin === "naisho-remote") {
       // TODO invesitgate if the scripts need to be cleaned up to avoid polluting
       // the document with a lot of script tags
       // send to webview
       // @ts-expect-error not yet typed
-      webViewRef.current?.injectJavaScript(
-        `(function() {
-          window.applyYjsUpdate(${JSON.stringify(Array.apply([], update))});
-        })()`
-      );
-      console.log("INJECTED UPDATE");
+      webViewRef?.current?.injectJavaScript(`
+        window.applyYjsUpdate(${JSON.stringify(Array.apply([], update))});
+        true;
+      `);
     }
   });
 
