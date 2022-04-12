@@ -1,6 +1,4 @@
 // custom color scheme
-// ?? should we define all the shades -> yes and we name them
-// ?? are the overridden values still available ? (e.g. gray-500)
 module.exports = {
   theme: {
     colors: {
