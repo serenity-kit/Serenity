@@ -9,7 +9,7 @@
     "dev:web": "yarn && yarn dev --web --dev-client",
     "dev:electron-web": "yarn && EXPO_ELECTRON_MODE=true expo start --web --dev-client",
     "dev:electron-main": "yarn && electron ./electron/main/index.ts",
-    "build:web": "expo build:web --no-pwa",
+    "build:web": "cd ../../packages/editor && yarn style:editor && cd - && expo build:web --no-pwa && cp _redirects ./web-build/_redirects",
     "eject": "expo eject",
     "test": "echo TODO",
     "ts:check": "yarn tsc --noEmit"
@@ -55,6 +55,7 @@
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.64.12",
     "electron": "^17.1.0",
+    "expo-cli": "^5.3.1",
     "jest": "^26.6.3",
     "jest-expo": "~44.0.1",
     "prettier": "2.6.2",
