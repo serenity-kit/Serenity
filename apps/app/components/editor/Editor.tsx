@@ -44,6 +44,21 @@ export default function Editor({ yDocRef }: EditorProps) {
     initEditor();
   }, []);
 
+  yDocRef.current.on("update", (update: any, origin: string) => {
+    if (origin === "naisho-remote") {
+      // TODO invesitgate if the scripts need to be cleaned up to avoid polluting
+      // the document with a lot of script tags
+      // send to webview
+      // @ts-expect-error not yet typed
+      webViewRef.current?.injectJavaScript(
+        `(function() {
+          window.applyYjsUpdate(${JSON.stringify(Array.apply([], update))});
+        })()`
+      );
+      console.log("INJECTED UPDATE");
+    }
+  });
+
   return (
     <View>
       <View style={styles.container}>
@@ -68,12 +83,9 @@ export default function Editor({ yDocRef }: EditorProps) {
               const update = new Uint8Array(message.content);
               if (yDocRef.current) {
                 // TODO switch to applyUpdateV2
-                Y.applyUpdate(yDocRef.current, update);
-                console.log("apply update");
-                const serializedYDoc = Y.encodeStateAsUpdateV2(yDocRef.current);
+                Y.applyUpdate(yDocRef.current, update, "mobile-webview");
+                console.log("apply update", update);
               }
-              // optimization: prevent update in case the content hasn't changed
-              // if (deepEqual(serializedYDoc, contentRef.current)) return;
             }
           }}
           style={styles.webView}

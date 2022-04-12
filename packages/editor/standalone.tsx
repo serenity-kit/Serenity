@@ -4,6 +4,7 @@ import { Editor } from "./Editor";
 import * as Y from "yjs";
 
 window.applyYjsUpdate = function (updateArray) {
+  alert(updateArray);
   if (updateArray) {
     const update = new Uint8Array(updateArray);
     Y.applyUpdateV2(window.ydoc, update);

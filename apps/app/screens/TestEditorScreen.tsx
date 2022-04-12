@@ -58,7 +58,11 @@ export default function TestEditorScreen({
       sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
     );
     if (initialResult) {
-      Yjs.applyUpdate(yDocRef.current, sodium.from_base64(initialResult), null);
+      Yjs.applyUpdate(
+        yDocRef.current,
+        sodium.from_base64(initialResult),
+        "naisho-remote"
+      );
     }
   };
 
@@ -80,7 +84,7 @@ export default function TestEditorScreen({
           Yjs.applyUpdate(
             yDocRef.current,
             sodium.from_base64(updateResult),
-            null
+            "naisho-remote"
           );
           latestServerVersionRef.current = update.serverData.version;
         }
@@ -117,6 +121,7 @@ export default function TestEditorScreen({
   };
 
   const createAndSendUpdate = async (update, key, clockOverwrite?: number) => {
+    console.log("createAndSendUpdate");
     const publicData = {
       refSnapshotId: activeSnapshotIdRef.current,
       docId,
@@ -195,7 +200,7 @@ export default function TestEditorScreen({
               yDocRef.current,
               // @ts-expect-error TODO handle later
               sodium.from_base64(snapshotResult),
-              null
+              "naisho-remote"
             );
             break;
           case "snapshotSaved":
@@ -244,7 +249,7 @@ export default function TestEditorScreen({
               yDocRef.current,
               // @ts-expect-error TODO handle later
               sodium.from_base64(updateResult),
-              null
+              "naisho-remote"
             );
             latestServerVersionRef.current = data.serverData.version;
             break;
@@ -323,13 +328,14 @@ export default function TestEditorScreen({
       setupWebsocket();
 
       // remove awareness state when closing the window
-      window.addEventListener("beforeunload", () => {
-        removeAwarenessStates(
-          yAwarenessRef.current,
-          [yDocRef.current.clientID],
-          "window unload"
-        );
-      });
+      // TODO re-add
+      // window.addEventListener("beforeunload", () => {
+      //   removeAwarenessStates(
+      //     yAwarenessRef.current,
+      //     [yDocRef.current.clientID],
+      //     "window unload"
+      //   );
+      // });
 
       yAwarenessRef.current.on(
         "update",
@@ -361,6 +367,7 @@ export default function TestEditorScreen({
         }
       );
 
+      // TODO switch to v2 updates
       yDocRef.current.on("update", async (update, origin) => {
         if (origin?.key === "y-sync$") {
           if (!activeSnapshotIdRef.current || createSnapshotRef.current) {
