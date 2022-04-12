@@ -2,6 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Classes included via @layer will only be in the compiled CSS if we use them in code */
+@layer base {
+  h1 {
+    @apply mt-4 mb-6 text-3xl font-bold;
+  }
+  h2 {
+    @apply mt-2 mb-3 text-2xl font-bold;
+  }
+  h3 {
+    @apply mt-2 mb-3 text-xl font-bold;
+  }
+  p {
+    @apply my-2;
+  }
+  /* using py-0.5 so that code elements in adjacent lines don't overlap */
+  code {
+    @apply py-0.5 px-1.5 bg-gray-200 text-sm text-gray-800 rounded;
+  }
+}
+
+/* This will always be included in our compiled CSS */
 .ProseMirror:focus {
   outline: none;
+}
+
+/* --- ????????????? --- */
+/* should we work with a custom wrapper class or just use the ProseMirror as editor wrapper entry */
+.ProseMirror > *:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* ------------------------- */
+/* TODO remove after testing */
+/* ------------------------- */
+h1,
+h2,
+h3 {
+  /* background-color: rgba(109, 30, 255, 0.15); */
+}
+p {
+  /* background-color: rgba(109, 30, 255, 0.05); */
 }
