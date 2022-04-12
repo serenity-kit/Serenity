@@ -293,7 +293,7 @@ export default function TestEditorScreen({
         const host =
           process.env.NODE_ENV === "development"
             ? "ws://localhost:4000"
-            : "wss://api.naisho.org";
+            : "wss://serenity-staging-api.herokuapp.com";
         const connection = new WebSocket(`${host}/${docId}`);
         // @ts-expect-error TODO handle later
         websocketConnectionRef.current = connection;

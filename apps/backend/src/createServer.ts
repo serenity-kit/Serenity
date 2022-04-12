@@ -35,7 +35,7 @@ export default async function createServer() {
   const allowedOrigin =
     process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
       ? "http://localhost:3000"
-      : "https://www.naisho.org";
+      : "https://www.serenity.li";
   const corsOptions = { credentials: true, origin: allowedOrigin };
 
   const app = express();
