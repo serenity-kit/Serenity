@@ -14,7 +14,7 @@
     @apply mt-2 mb-3 text-xl font-bold;
   }
   p {
-    @apply my-2;
+    @apply my-2 text-[17px] sm:text-base;
   }
   /* using py-0.5 so that code elements in adjacent lines don't overlap */
   code {
