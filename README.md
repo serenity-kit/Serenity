@@ -74,6 +74,19 @@ docker-compose up # to start the postgres instance
 yarn workspace backend test
 ```
 
+For any package:
+
+```sh
+cd packages/libsodium
+yarn test
+```
+
+or
+
+```sh
+yarn workspace @serenity-tools/libsodium test
+```
+
 ## Folder/File Naming Convention
 
 - Folder and file names use camelCase.
