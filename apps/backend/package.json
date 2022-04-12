@@ -17,7 +17,7 @@
     "dev": "yarn && ts-node-dev --transpile-only --no-notify ./src/index.ts",
     "clean": "rm -rf build",
     "build": "yarn && yarn clean && yarn prisma:prod:generate && yarn ncc build ./src/index.ts -o build",
-    "deploy": "yarn build && DOCKER_DEFAULT_PLATFORM=linux/amd64 heroku container:push web --app TODO && heroku container:release web --app TODO",
+    "deploy": "yarn build && DOCKER_DEFAULT_PLATFORM=linux/amd64 heroku container:push web --app serenity-staging-api && heroku container:release web --app serenity-staging-api",
     "prisma:prod:migrate": "POSTGRES_URL=$POSTGRES_URL prisma migrate deploy",
     "prisma:prod:generate": "POSTGRES_URL=$POSTGRES_URL prisma generate",
     "prisma:prod:studio": "POSTGRES_URL=$POSTGRES_URL prisma studio",
