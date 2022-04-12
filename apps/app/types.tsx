@@ -20,6 +20,7 @@ export type RootStackParamList = {
   dashboard: undefined;
   editor: NavigatorScreenParams<RootTabParamList> | undefined;
   ["test-editor"]: NavigatorScreenParams<RootTabParamList> | undefined;
+  ["test-libsodium"]: NavigatorScreenParams<RootTabParamList> | undefined;
   notFound: undefined;
 };
 

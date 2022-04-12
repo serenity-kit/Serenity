@@ -1316,7 +1316,7 @@
     xcode "^3.0.1"
     xml2js "0.4.23"
 
-"@expo/config-plugins@^4.0.14":
+"@expo/config-plugins@^4.0.14", "@expo/config-plugins@^4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@expo/config-plugins/-/config-plugins-4.1.0.tgz#0365e2e51e2e3e3b4e7db1fbbada5be661798be6"
   integrity sha512-+Uq7kzi1StUZZZivnnqNV6+v8b+SMF6MDgH+cEZxCoM9uwLXOK0rTAURzBGtl+C6EEbKnoZmnKGuzABBGPRP7A==
@@ -9222,7 +9222,7 @@ lib0@^0.2.42, lib0@^0.2.47:
   dependencies:
     isomorphic.js "^0.2.4"
 
-libsodium-wrappers@^0.7.9:
+libsodium-wrappers@^0.7.10:
   version "0.7.10"
   resolved "https://registry.yarnpkg.com/libsodium-wrappers/-/libsodium-wrappers-0.7.10.tgz#13ced44cacb0fc44d6ac9ce67d725956089ce733"
   integrity sha512-pO3F1Q9NPLB/MWIhehim42b/Fwb30JNScCNh8TcQ/kIc+qGLQch8ag8wb0keK3EP5kbGakk1H8Wwo7v+36rNQg==
@@ -11853,11 +11853,6 @@ react-native-screens@~3.10.1:
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
-
-react-native-sodium-expo-plugin@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/react-native-sodium-expo-plugin/-/react-native-sodium-expo-plugin-0.4.0.tgz#638482769418b0d412ece177fe9dfa613ff6051a"
-  integrity sha512-LWXR41s500qEFTScB5MS1ItwRXiT3SmGAvG0CkbgzfbjuP0dBaNtRcgDgWg3dHjqVXXA4sHzfoerc+QprLHHTA==
 
 react-native-web@0.17.1:
   version "0.17.1"
