@@ -1,0 +1,29 @@
+{
+  "name": "react-native-sodium-expo-plugin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SerenityNotes/react-native-sodium-expo-plugin.git"
+  },
+  "scripts": {
+    "postinstall": "tar -xzf precompiled.tgz",
+    "rebuild": "./build.sh",
+    "ts:check": "tsc --noEmit",
+    "test": "echo TODO"
+  },
+  "version": "0.4.1",
+  "description": "The Sodium crypto library for React Native.",
+  "author": "Lyubomir Ivanov",
+  "main": "index.js",
+  "nativePackage": true,
+  "license": "ISC",
+  "homepage": "https://github.com/SerenityNotes/react-native-sodium-expo-plugin",
+  "keywords": [
+    "react-native",
+    "crypto",
+    "nacl",
+    "sodium"
+  ],
+  "devDependencies": {
+    "@expo/config-plugins": "^4.1.0"
+  }
+}

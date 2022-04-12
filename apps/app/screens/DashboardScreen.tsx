@@ -6,6 +6,9 @@ export default function DashboardScreen() {
       <Text>Dashboard Screen</Text>
       <Link to={{ screen: "editor" }}>Link to Editor</Link>
       <Link to={{ screen: "test-editor" }}>Link to Test-Editor</Link>
+      <Link to={{ screen: "test-libsodium" }}>
+        Link to Libsodium Test Screen
+      </Link>
     </View>
   );
 }
