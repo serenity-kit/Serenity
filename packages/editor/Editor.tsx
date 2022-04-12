@@ -69,7 +69,7 @@ export const Editor = (props: EditorProps) => {
           </EditorButton>
         </div>
       </View>
-      <div className="prose">
+      <div className="">
         <EditorContent editor={editor} />
       </div>
     </EditorWrapperView>
