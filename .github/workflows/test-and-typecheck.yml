@@ -1,4 +1,4 @@
-name: Test and Typecheck
+name: Test, Lint and Typecheck
 
 on: [push]
 
@@ -23,3 +23,11 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Test
         run: yarn test
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Test
+        run: yarn prettier:check
