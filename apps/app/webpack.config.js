@@ -16,6 +16,7 @@ module.exports = async function (env, argv) {
           resolveApp("../../packages/editor"),
           resolveApp("../../packages/ui"),
           resolveApp("../../packages/naisho-core"),
+          resolveApp("../../packages/opaque"),
         ],
       },
     },

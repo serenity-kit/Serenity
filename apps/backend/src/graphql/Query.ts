@@ -1,11 +1,8 @@
-import { queryType } from "nexus";
+import { queryField } from "nexus";
 
-export const Query = queryType({
-  definition(t) {
-    t.string("test", {
-      resolve() {
-        return "test";
-      },
-    });
+export const test = queryField("test", {
+  type: "String",
+  resolve(root, args, context) {
+    return "hello";
   },
 });

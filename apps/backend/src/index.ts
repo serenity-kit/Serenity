@@ -1,4 +1,5 @@
 require("make-promises-safe"); // installs an 'unhandledRejection' handler
+import sodium from "libsodium-wrappers-sumo";
 import createServer from "./createServer";
 
 async function main() {
@@ -12,4 +13,6 @@ async function main() {
   });
 }
 
-main();
+sodium.ready.then(() => {
+  main();
+});

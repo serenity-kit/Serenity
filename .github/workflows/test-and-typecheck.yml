@@ -17,6 +17,8 @@ jobs:
       - uses: actions/checkout@v1
       - name: Setup .env
         run: cp apps/backend/.env.example apps/backend/.env
+      - name: Run Database
+        run: docker-compose up -d
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Test

@@ -2,6 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "devDependencies": {
+    "@types/libsodium-wrappers-sumo": "^0.7.5",
     "@types/node": "16.11.9",
     "@types/uuid": "^8.3.3",
     "@types/ws": "^8.2.1",
@@ -20,16 +21,19 @@
     "prisma:prod:migrate": "POSTGRES_URL=$POSTGRES_URL prisma migrate deploy",
     "prisma:prod:generate": "POSTGRES_URL=$POSTGRES_URL prisma generate",
     "prisma:prod:studio": "POSTGRES_URL=$POSTGRES_URL prisma studio",
+    "prisma:test:studio": "POSTGRES_URL=postgres://prisma:prisma@localhost:5432/serenity_test prisma studio",
     "start:prod": "PORT=$PORT POSTGRES_URL=$POSTGRES_URL NODE_ENV=production node ./build",
     "ts:check": "yarn tsc --noEmit",
     "test": "jest --runInBand"
   },
   "dependencies": {
     "@naisho/core": "*",
+    "@serenity-tools/opaque": "*",
     "@prisma/client": "3.12.0",
     "apollo-server-express": "^3.5.0",
     "express": "^4.17.1",
     "graphql": "^16.0.1",
+    "libsodium-wrappers-sumo": "^0.7.10",
     "make-promises-safe": "^5.1.0",
     "nexus": "^1.1.0",
     "uuid": "^8.3.2",
