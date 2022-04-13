@@ -1,6 +1,8 @@
-// custom color scheme
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 module.exports = {
   theme: {
+    // custom color scheme
     colors: {
       transparent: "transparent",
       current: "currentColor",
@@ -21,6 +23,10 @@ module.exports = {
       emerald: "#48AD83",
       amber: "#F09334",
       red: "#EC3153",
+    },
+    screens: {
+      xs: "475px",
+      ...defaultTheme.screens,
     },
     extend: {},
   },

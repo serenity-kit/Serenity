@@ -20,6 +20,11 @@
   code {
     @apply py-0.5 px-1.5 bg-gray-200 text-sm text-gray-800 rounded;
   }
+
+  /* --- editor --- */
+  .ProseMirror {
+    @apply w-full max-w-prose mx-auto;
+  }
 }
 
 /* This will always be included in our compiled CSS */
@@ -44,4 +49,7 @@ h3 {
 }
 p {
   /* background-color: rgba(109, 30, 255, 0.05); */
+}
+.ProseMirror {
+  /* background-color: rgba(255, 230, 147, 0.5); */
 }
