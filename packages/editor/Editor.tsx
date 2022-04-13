@@ -72,6 +72,12 @@ export const Editor = (props: EditorProps) => {
           >
             C
           </EditorButton>
+          <EditorButton
+            onClick={() => editor?.chain().focus().toggleBlockquote().run()}
+            isActive={editor?.isActive("blockquote") || false}
+          >
+            Q
+          </EditorButton>
         </div>
       </View>
       <div className="py-10 md:py-14 px-4 xs:px-6 sm:px-10 lg:px-16">

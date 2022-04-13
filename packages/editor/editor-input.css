@@ -20,6 +20,9 @@
   code {
     @apply py-0.5 px-1.5 bg-gray-200 text-sm text-gray-800 rounded;
   }
+  blockquote {
+    @apply my-4 pl-4 border-solid border-l-4 border-primary-400;
+  }
 
   /* --- editor --- */
   .ProseMirror {
