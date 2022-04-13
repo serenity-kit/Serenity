@@ -40,7 +40,7 @@ export const Editor = (props: EditorProps) => {
   return (
     <EditorWrapperView>
       <View>
-        <div>
+        <div className="flex space-x-1 p-1">
           {headingLevels.map((lvl) => {
             return (
               <EditorButton
@@ -54,18 +54,23 @@ export const Editor = (props: EditorProps) => {
               </EditorButton>
             );
           })}
-
-          <EditorButton
-            onClick={() => editor?.chain().focus().toggleCode().run()}
-            isActive={editor?.isActive("code") || false}
-          >
-            C
-          </EditorButton>
           <EditorButton
             onClick={() => editor?.chain().focus().toggleBold().run()}
             isActive={editor?.isActive("bold") || false}
           >
             B
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor?.chain().focus().toggleItalic().run()}
+            isActive={editor?.isActive("italic") || false}
+          >
+            I
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor?.chain().focus().toggleCode().run()}
+            isActive={editor?.isActive("code") || false}
+          >
+            C
           </EditorButton>
         </div>
       </View>
