@@ -16,9 +16,9 @@
   p {
     @apply my-2 text-[17px] sm:text-base;
   }
-  /* using py-0.5 so that code elements in adjacent lines don't overlap */
+  /* used for inline- and blockcode */
   code {
-    @apply py-0.5 px-1.5 bg-gray-200 text-sm text-gray-800 rounded;
+    @apply text-sm text-gray-800;
   }
   blockquote {
     @apply my-4 pl-4 border-solid border-l-4 border-primary-400;

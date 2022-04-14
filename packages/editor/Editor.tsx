@@ -24,6 +24,12 @@ export const Editor = (props: EditorProps) => {
       StarterKit.configure({
         // the Collaboration extension comes with its own history handling
         history: false,
+        code: {
+          HTMLAttributes: {
+            // using py-0.5 so that code elements in adjacent lines don't overlap
+            class: "py-0.5 px-1.5 bg-gray-200 rounded",
+          },
+        },
         heading: {
           levels: headingLevels,
         },
