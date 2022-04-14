@@ -4,6 +4,13 @@
 
 /* Classes included via @layer will only be in the compiled CSS if we use them in code */
 @layer base {
+  /*
+    + use of opacity possible
+  */
+  ::selection {
+    @apply bg-primary-400/50;
+  }
+
   h1 {
     @apply mt-12 mb-3 text-3xl font-bold;
   }
@@ -32,6 +39,10 @@
     @apply w-full max-w-prose mx-auto;
   }
 }
+
+/* ::selection {
+  background-color: theme('colors.primary.400');
+} */
 
 /* This will always be included in our compiled CSS */
 .ProseMirror:focus {
