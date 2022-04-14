@@ -38,7 +38,7 @@ export const Editor = (props: EditorProps) => {
         },
         codeBlock: {
           HTMLAttributes: {
-            class: "p-4 bg-gray-100 rounded",
+            class: "my-4 p-4 bg-gray-100 rounded",
           },
         },
         heading: {
