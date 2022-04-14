@@ -1,9 +1,9 @@
-import sodiumWrapper from "libsodium-wrappers";
-// import sodium from "@serenity-tools/libsodium";
+// import sodiumWrapper from "libsodium-wrappers";
 import serenitySodium from "@serenity-tools/libsodium";
 import sodium from "libsodium-wrappers-sumo";
-import { v4 as uuidv4 } from "uuid";
-import { encryptAead, decryptAead } from "./crypto";
+// import { v4 as uuidv4 } from "uuid";
+// import { encryptAead, decryptAead } from "./crypto";
+declare const Buffer;
 
 /*
 test("encryptAead and decryptAead", async () => {
