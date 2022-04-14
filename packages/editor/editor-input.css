@@ -39,7 +39,6 @@
 /* should we work with a custom wrapper class or just use the ProseMirror as editor wrapper entry */
 .ProseMirror > *:first-child {
   margin-top: 0;
-  padding-top: 0;
 }
 
 /* ------------------------- */

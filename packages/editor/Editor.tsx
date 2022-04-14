@@ -30,6 +30,11 @@ export const Editor = (props: EditorProps) => {
             class: "py-0.5 px-1.5 bg-gray-200 rounded",
           },
         },
+        codeBlock: {
+          HTMLAttributes: {
+            class: "p-4 bg-gray-100 rounded",
+          },
+        },
         heading: {
           levels: headingLevels,
         },
@@ -77,6 +82,12 @@ export const Editor = (props: EditorProps) => {
             isActive={editor?.isActive("code") || false}
           >
             C
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+            isActive={editor?.isActive("codeBlock") || false}
+          >
+            K
           </EditorButton>
           <EditorButton
             onClick={() => editor?.chain().focus().toggleBlockquote().run()}
