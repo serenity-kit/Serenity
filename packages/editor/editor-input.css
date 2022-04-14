@@ -23,15 +23,38 @@
   p {
     @apply my-2 text-[17px] sm:text-base;
   }
+  a {
+    @apply text-primary-500 underline;
+  }
+
   /* used for inline- and blockcode */
   code {
     @apply text-sm text-gray-800;
   }
+
   blockquote {
     @apply my-4 pl-4 border-solid border-l-4 border-primary-400;
   }
-  a {
-    @apply text-primary-500 underline;
+
+  /* --- lists --- */
+  ul,
+  ol {
+    @apply my-4 pl-4;
+  }
+  ul {
+    @apply list-disc;
+  }
+  ol {
+    @apply list-decimal;
+  }
+  li {
+    /* to align text-indent of blockelements (list, quote, codeblock) */
+    @apply pl-1;
+  }
+  /* avoid jumping when initializing a list before any other element */
+  ul:first-child p:first-child,
+  ol:first-child p:first-child {
+    margin-top: 0;
   }
 
   /* --- editor --- */

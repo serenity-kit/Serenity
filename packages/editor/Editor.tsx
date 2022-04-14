@@ -74,6 +74,7 @@ export const Editor = (props: EditorProps) => {
               </EditorButton>
             );
           })}
+          <Divider></Divider>
           <EditorButton
             onClick={() => editor?.chain().focus().toggleBold().run()}
             isActive={editor?.isActive("bold") || false}
@@ -86,6 +87,16 @@ export const Editor = (props: EditorProps) => {
           >
             I
           </EditorButton>
+          {/* styling dummy */}
+          <EditorButton
+            onClick={() =>
+              editor?.chain().focus().toggleLink({ href: "#" }).run()
+            }
+            isActive={editor?.isActive("link") || false}
+          >
+            L
+          </EditorButton>
+          <Divider></Divider>
           <EditorButton
             onClick={() => editor?.chain().focus().toggleCode().run()}
             isActive={editor?.isActive("code") || false}
@@ -98,20 +109,25 @@ export const Editor = (props: EditorProps) => {
           >
             K
           </EditorButton>
+          <Divider></Divider>
           <EditorButton
             onClick={() => editor?.chain().focus().toggleBlockquote().run()}
             isActive={editor?.isActive("blockquote") || false}
           >
             Q
           </EditorButton>
-          {/* styling dummy */}
+          <Divider></Divider>
           <EditorButton
-            onClick={() =>
-              editor?.chain().focus().toggleLink({ href: "#" }).run()
-            }
-            isActive={editor?.isActive("link") || false}
+            onClick={() => editor?.chain().focus().toggleBulletList().run()}
+            isActive={editor?.isActive("bulletList") || false}
           >
-            L
+            &sdot;
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+            isActive={editor?.isActive("orderedList") || false}
+          >
+            1
           </EditorButton>
         </div>
       </View>
