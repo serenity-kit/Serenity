@@ -15,6 +15,3 @@ apps/backend/prisma/generated/output
 apps/backend/src/generated
 # backend build
 apps/backend/build
-
-# app graphql codegen generated output
-apps/app/generated
