@@ -1,0 +1,9 @@
+mutation initializeRegistration(
+  $input: ClientOprfRegistrationChallengeRequest!
+) {
+  initializeRegistration(input: $input) {
+    serverPublicKey
+    oprfPublicKey
+    oprfChallengeResponse
+  }
+}

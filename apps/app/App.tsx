@@ -6,6 +6,15 @@ import useCachedResources from "./hooks/useCachedResources";
 import { tw } from "@serenity-tools/ui";
 import Navigation from "./navigation";
 import { useDeviceContext, useAppColorScheme } from "twrnc";
+import { createClient, Provider } from "urql";
+
+const client = createClient({
+  url:
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:4000/graphql"
+      : "https://serenity-staging-api.herokuapp.com/graphql",
+  requestPolicy: "cache-and-network",
+});
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -16,10 +25,12 @@ export default function App() {
     return null;
   } else {
     return (
-      <SafeAreaProvider>
-        <Navigation colorScheme={colorScheme} />
-        <StatusBar />
-      </SafeAreaProvider>
+      <Provider value={client}>
+        <SafeAreaProvider>
+          <Navigation colorScheme={colorScheme} />
+          <StatusBar />
+        </SafeAreaProvider>
+      </Provider>
     );
   }
 }
