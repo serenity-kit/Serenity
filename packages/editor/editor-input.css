@@ -23,6 +23,9 @@
   blockquote {
     @apply my-4 pl-4 border-solid border-l-4 border-primary-400;
   }
+  a {
+    @apply text-primary-500 underline;
+  }
 
   /* --- editor --- */
   .ProseMirror {

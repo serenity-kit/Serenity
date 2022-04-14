@@ -4,6 +4,7 @@ import * as React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { EditorWrapperView, View } from "@serenity-tools/ui";
 import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
 import { Level } from "@tiptap/extension-heading";
 import Collaboration from "@tiptap/extension-collaboration";
 import * as Y from "yjs";
@@ -38,6 +39,9 @@ export const Editor = (props: EditorProps) => {
         heading: {
           levels: headingLevels,
         },
+      }),
+      Link.configure({
+        openOnClick: false,
       }),
       // register the ydoc with Tiptap
       Collaboration.configure({
@@ -94,6 +98,15 @@ export const Editor = (props: EditorProps) => {
             isActive={editor?.isActive("blockquote") || false}
           >
             Q
+          </EditorButton>
+          {/* styling dummy */}
+          <EditorButton
+            onClick={() =>
+              editor?.chain().focus().toggleLink({ href: "#" }).run()
+            }
+            isActive={editor?.isActive("link") || false}
+          >
+            L
           </EditorButton>
         </div>
       </View>
