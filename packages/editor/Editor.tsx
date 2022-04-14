@@ -19,6 +19,11 @@ type EditorProps = {
 
 const headingLevels: Level[] = [1, 2, 3];
 
+// dummy element - remove when using sidesheet
+const Divider = () => {
+  return <div className="w-0 border-solid border-gray-600 border-l"></div>;
+};
+
 export const Editor = (props: EditorProps) => {
   const editor = useEditor({
     extensions: [
