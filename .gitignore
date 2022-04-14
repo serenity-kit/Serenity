@@ -11,4 +11,7 @@ packages/editor/editor-output.css
 # prisma generated files
 apps/backend/prisma/generated/output
 apps/backend/src/generated
+# backend build
+apps/backend/build
+
 

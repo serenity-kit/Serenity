@@ -1,0 +1,25 @@
+name: "Deploy API to Heroku"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        working-directory: ./apps/backend
+        run: yarn build
+      - name: Run Migrations
+        working-directory: ./apps/backend
+        run: POSTGRES_URL=${{secrets.POSTGRES_URL}} yarn prisma:prod:migrate
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          usedocker: true
+          appdir: "apps/backend"

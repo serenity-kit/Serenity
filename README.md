@@ -87,6 +87,11 @@ or
 yarn workspace @serenity-tools/libsodium test
 ```
 
+## Deploy
+
+Backend deployment icluding running migrations is done via Github Actions.
+Frontend deployment is setup in Netlify.
+
 ## Folder/File Naming Convention
 
 - Folder and file names use camelCase.
