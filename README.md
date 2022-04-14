@@ -74,6 +74,19 @@ docker-compose up # to start the postgres instance
 yarn workspace backend test
 ```
 
+For any package:
+
+```sh
+cd packages/libsodium
+yarn test
+```
+
+or
+
+```sh
+yarn workspace @serenity-tools/libsodium test
+```
+
 ## Deploy
 
 Backend deployment icluding running migrations is done via Github Actions.
