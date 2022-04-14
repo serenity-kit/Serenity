@@ -1,22 +1,43 @@
 import sodium, { StringKeyPair } from "libsodium-wrappers";
-
 export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers";
-
+declare const Buffer;
 export const ready = sodium.ready;
 
-export const to_base64 = (data: Uint8Array | string): string => {
-  if (typeof data === "string") {
-    return btoa(data);
-  }
-  return btoa(String.fromCharCode(...new Uint8Array(data)));
+const to_base64 = (data: Uint8Array) => {
+  const base64Data = Buffer.from(new Uint8Array(data))
+    .toString("base64")
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replace(/=+$/, "");
+  return base64Data;
 };
 
-// sodium.crypto_aead_xchacha20poly1305_ietf_encrypt
-
-// https://gist.github.com/borismus/1032746?permalink_comment_id=3557109#gistcomment-3557109
-// Uint8Array.from(window.atob(base64Url.replace(/-/g, "+").replace(/_/g, "/")), (v) => v.charCodeAt(0));
-export const from_base64 = (data: string): Uint8Array => {
-  return Uint8Array.from(atob(data), (v) => v.charCodeAt(0));
+const from_base64 = (data: string) => {
+  const keyStr =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  for (let i = 0; i < data.length; i++) {
+    const char = data.charAt(i);
+    if (keyStr.indexOf(char) === -1) {
+      throw new Error("invalid input");
+    }
+  }
+  if (data.length === 0) {
+    return new Uint8Array([]);
+  } else {
+    let decodedBase64Str = data.replace("-", "+").replace("_", "/");
+    while (decodedBase64Str.length % 4) {
+      decodedBase64Str += "=";
+    }
+    if (decodedBase64Str.includes(" ")) {
+      throw Error("incomplete input");
+    }
+    const buffer = Buffer.from(decodedBase64Str, "base64");
+    const bytes = new Uint8Array(buffer);
+    if (bytes.length == 0) {
+      throw new Error("invalid input");
+    }
+    return bytes;
+  }
 };
 
 export const from_base64_to_string = (data: string): string => {
