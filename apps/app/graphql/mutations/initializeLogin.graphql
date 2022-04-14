@@ -1,0 +1,8 @@
+mutation initializeLogin($input: ClientOprfLoginChallengeInput!) {
+  initializeLogin(input: $input) {
+    secret
+    nonce
+    oprfPublicKey
+    oprfChallengeResponse
+  }
+}
