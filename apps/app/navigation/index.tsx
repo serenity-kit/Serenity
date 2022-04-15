@@ -13,6 +13,7 @@ import LinkingConfiguration from "./linkingConfiguration";
 import DashboardScreen from "../screens/DashboardScreen";
 import TestEditorScreen from "../screens/TestEditorScreen";
 import LibsodiumTestScreen from "../screens/LibsodiumTestScreen";
+import DesignSystemScreen from "../screens/DesignSystemScreen";
 
 export default function Navigation({
   colorScheme,
@@ -43,6 +44,7 @@ function RootNavigator() {
         component={DashboardScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen name="design-system" component={DesignSystemScreen} />
       <Stack.Screen name="editor" component={EditorScreen} />
       <Stack.Screen name="test-editor" component={TestEditorScreen} />
       <Stack.Screen name="test-libsodium" component={LibsodiumTestScreen} />

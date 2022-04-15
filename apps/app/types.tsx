@@ -18,6 +18,7 @@ declare global {
 
 export type RootStackParamList = {
   dashboard: undefined;
+  ["design-system"]: undefined;
   editor: NavigatorScreenParams<RootTabParamList> | undefined;
   ["test-editor"]: NavigatorScreenParams<RootTabParamList> | undefined;
   ["test-libsodium"]: NavigatorScreenParams<RootTabParamList> | undefined;

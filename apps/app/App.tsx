@@ -7,6 +7,7 @@ import { tw } from "@serenity-tools/ui";
 import Navigation from "./navigation";
 import { useDeviceContext, useAppColorScheme } from "twrnc";
 import { createClient, Provider } from "urql";
+import { NativeBaseProvider } from "native-base";
 
 const client = createClient({
   url:
@@ -27,8 +28,10 @@ export default function App() {
     return (
       <Provider value={client}>
         <SafeAreaProvider>
-          <Navigation colorScheme={colorScheme} />
-          <StatusBar />
+          <NativeBaseProvider>
+            <Navigation colorScheme={colorScheme} />
+            <StatusBar />
+          </NativeBaseProvider>
         </SafeAreaProvider>
       </Provider>
     );
