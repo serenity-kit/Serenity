@@ -15,7 +15,7 @@ type ComputeStyleParams = {
   isFocused: boolean;
 };
 
-const baseStyle = tw`rounded px-4 py-4`;
+const baseStyle = tw`rounded px-4 py-3`;
 
 const computeStyle = ({
   disabled,
