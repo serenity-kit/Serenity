@@ -1,11 +1,24 @@
-import sodium, { StringKeyPair } from "libsodium-wrappers";
-export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers";
+import sodium /* , { StringKeyPair } */ from "libsodium-wrappers-sumo";
+// export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers";
 declare const Buffer;
 export const ready = sodium.ready;
 
-const to_base64 = (data: Uint8Array) => {
-  const base64Data = Buffer.from(new Uint8Array(data))
-    .toString("base64")
+export type KeyType = "curve25519" | "ed25519" | "x25519";
+
+export interface StringKeyPair {
+  keyType: KeyType;
+  privateKey: string;
+  publicKey: string;
+}
+
+const to_base64 = (data: Uint8Array | string) => {
+  let base64Data = "";
+  if (typeof data === "string") {
+    base64Data = btoa(data);
+  } else {
+    base64Data = Buffer.from(data).toString("base64");
+  }
+  base64Data = base64Data
     .replaceAll("+", "-")
     .replaceAll("/", "_")
     .replace(/=+$/, "");
@@ -13,6 +26,7 @@ const to_base64 = (data: Uint8Array) => {
 };
 
 const from_base64 = (data: string) => {
+  console.log({ data });
   const keyStr =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   for (let i = 0; i < data.length; i++) {
@@ -119,16 +133,169 @@ export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
   return to_base64(result);
 };
 
-export default {
+export const crypto_core_ed25519_scalar_random = async (): Promise<string> => {
+  const result = sodium.crypto_core_ed25519_scalar_random();
+  return to_base64(result);
+};
+
+export const crypto_generichash = async (
+  hash_length: number,
+  b64_password: string
+): Promise<string> => {
+  const result = sodium.crypto_generichash(
+    hash_length,
+    from_base64(b64_password)
+  );
+  return to_base64(result);
+};
+
+export const crypto_core_ed25519_from_uniform = async (
+  uniform: string
+): Promise<string> => {
+  const result = sodium.crypto_core_ed25519_from_uniform(from_base64(uniform));
+  return to_base64(result);
+};
+
+export const crypto_scalarmult_ed25519_base_noclamp = async (
+  scalar: string
+): Promise<string> => {
+  const result = sodium.crypto_scalarmult_ed25519_base_noclamp(
+    from_base64(scalar)
+  );
+  return to_base64(result);
+};
+
+export const crypto_core_ed25519_add = async (
+  scalar1: string,
+  scalar2: string
+): Promise<string> => {
+  const result = sodium.crypto_core_ed25519_add(
+    from_base64(scalar1),
+    from_base64(scalar2)
+  );
+  return to_base64(result);
+};
+
+export const crypto_core_ed25519_scalar_negate = async (
+  scalar: string
+): Promise<string> => {
+  const result = sodium.crypto_core_ed25519_scalar_negate(from_base64(scalar));
+  return to_base64(result);
+};
+
+export const crypto_scalarmult_ed25519_noclamp = async (
+  scalar: string,
+  point: string
+): Promise<string> => {
+  const result = sodium.crypto_scalarmult_ed25519_noclamp(
+    from_base64(scalar),
+    from_base64(point)
+  );
+  return to_base64(result);
+};
+
+export const crypto_generichash_batch = async (
+  arr: Array<string>
+): Promise<string> => {
+  const key = Buffer.alloc(sodium.crypto_generichash_KEYBYTES);
+  const state = sodium.crypto_generichash_init(
+    key,
+    sodium.crypto_generichash_BYTES
+  );
+  arr.forEach((item) => {
+    sodium.crypto_generichash_update(state, item);
+  });
+  const combinedHash = sodium.crypto_generichash_final(
+    state,
+    sodium.crypto_generichash_BYTES
+  );
+  return to_base64(combinedHash);
+};
+
+export const crypto_kx_keypair = (): StringKeyPair => {
+  const result = sodium.crypto_kx_keypair();
+  return {
+    keyType: "curve25519",
+    privateKey: to_base64(result.privateKey),
+    publicKey: to_base64(result.publicKey),
+  };
+};
+
+export const crypto_pwhash = (
+  keyLength: number,
+  password: string,
+  salt: string,
+  opsLimit: number,
+  memLimit: number,
+  algorithm: number
+): string => {
+  const result = sodium.crypto_pwhash(
+    keyLength,
+    password,
+    from_base64(salt),
+    opsLimit,
+    memLimit,
+    algorithm
+  );
+  return to_base64(result);
+};
+
+export const crypto_secretbox_easy = (
+  message: string,
+  nonce: string,
+  key: string
+): string => {
+  const result = sodium.crypto_secretbox_easy(
+    message,
+    from_base64(nonce),
+    from_base64(key)
+  );
+  return to_base64(result);
+};
+
+const libsodiumExports = {
   ready,
   to_base64,
   from_base64,
   from_base64_to_string,
+  crypto_pwhash,
   randombytes_buf,
+  crypto_kx_keypair,
+  crypto_generichash,
   crypto_sign_keypair,
   crypto_sign_detached,
+  crypto_secretbox_easy,
+  crypto_core_ed25519_add,
+  crypto_generichash_batch,
   crypto_sign_verify_detached,
+  crypto_core_ed25519_from_uniform,
+  crypto_core_ed25519_scalar_random,
+  crypto_core_ed25519_scalar_negate,
+  crypto_scalarmult_ed25519_noclamp,
+  crypto_scalarmult_ed25519_base_noclamp,
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
 };
+
+const handler = {
+  get(_target: any, prop: string): any {
+    if (prop === "crypto_generichash_BYTES") {
+      return sodium.crypto_generichash_BYTES;
+    } else if (prop === "crypto_secretbox_NONCEBYTES") {
+      return sodium.crypto_secretbox_NONCEBYTES;
+    } else if (prop === "crypto_pwhash_SALTBYTES") {
+      return sodium.crypto_pwhash_SALTBYTES;
+    } else if (prop === "crypto_pwhash_OPSLIMIT_INTERACTIVE") {
+      return sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE;
+    } else if (prop === "crypto_pwhash_MEMLIMIT_INTERACTIVE") {
+      return sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE;
+    } else if (prop === "crypto_pwhash_ALG_DEFAULT") {
+      return sodium.crypto_pwhash_ALG_DEFAULT;
+    }
+    // @ts-ignore
+    return Reflect.get(...arguments);
+  },
+};
+
+export default new Proxy(libsodiumExports, handler);

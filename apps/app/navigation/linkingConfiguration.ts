@@ -15,6 +15,7 @@ const linking: LinkingOptions<RootStackParamList> = {
     screens: {
       dashboard: "dashboard",
       editor: "editor",
+      register: "register",
       ["test-editor"]: "test-editor",
       ["test-libsodium"]: "test-libsodium",
       notFound: "*",

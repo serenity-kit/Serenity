@@ -7,7 +7,7 @@ import {
   generateClientOprfChallenge,
   generateKeyPair,
   createUserLoginSession,
-} from "@serenity-tools/opaque";
+} from "@serenity-tools/opaque/server";
 
 const graphql = setupGraphql();
 const username = "user";

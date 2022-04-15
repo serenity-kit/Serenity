@@ -3,7 +3,7 @@ import {
   createOprfChallengeResponse,
   generateKeyPair,
   generateOprfKeyPair,
-} from "@serenity-tools/opaque";
+} from "@serenity-tools/opaque/server";
 import sodium from "libsodium-wrappers-sumo";
 import { prisma } from "../database/prisma";
 
@@ -113,7 +113,7 @@ export const initializeRegistration = mutationField("initializeRegistration", {
     } catch (error) {
       console.error("Error saving registration");
       console.log(error);
-      throw Error("Internal server error");
+      throw Error("Email already registered");
     }
     const result = {
       serverPublicKey: sodium.to_base64(serverPublicKey),

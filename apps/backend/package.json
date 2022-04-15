@@ -14,7 +14,7 @@
     "typescript": "^4.6.3"
   },
   "scripts": {
-    "dev": "yarn && ts-node-dev --transpile-only --no-notify ./src/index.ts",
+    "dev": "yarn && yarn prisma generate && ts-node-dev --transpile-only --no-notify ./src/index.ts",
     "clean": "rm -rf build",
     "build": "yarn && yarn clean && yarn prisma:prod:generate && yarn ncc build ./src/index.ts -o build",
     "deploy": "yarn build && DOCKER_DEFAULT_PLATFORM=linux/amd64 heroku container:push web --app serenity-staging-api && heroku container:release web --app serenity-staging-api",
