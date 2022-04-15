@@ -35,11 +35,12 @@ const computeStyle = ({
   return style;
 };
 
-export const Button = (props: Props) => {
+export const Button = forwardRef((props: Props, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
 
   return (
     <Pressable
+      ref={ref}
       {...props}
       accessibilityRole={props.accessibilityRole ?? "button"}
       // @ts-expect-error - web only
@@ -76,4 +77,4 @@ export const Button = (props: Props) => {
       }}
     </Pressable>
   );
-};
+});
