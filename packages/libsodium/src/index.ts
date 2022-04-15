@@ -26,7 +26,6 @@ const to_base64 = (data: Uint8Array | string) => {
 };
 
 const from_base64 = (data: string) => {
-  console.log({ data });
   const keyStr =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   for (let i = 0; i < data.length; i++) {
@@ -245,12 +244,38 @@ export const crypto_secretbox_easy = (
   nonce: string,
   key: string
 ): string => {
-  const result = sodium.crypto_secretbox_easy(
+  const cipherText = sodium.crypto_secretbox_easy(
     message,
     from_base64(nonce),
     from_base64(key)
   );
-  return to_base64(result);
+  return to_base64(cipherText);
+};
+
+export const crypto_secretbox_open_easy = (
+  cipherText: string,
+  nonce: string,
+  sessionRxKey: string
+): string => {
+  const message = sodium.crypto_secretbox_open_easy(
+    from_base64(cipherText),
+    from_base64(nonce),
+    from_base64(sessionRxKey)
+  );
+  return to_base64(message);
+};
+
+export const crypto_kx_client_session_keys = (
+  clientPublicKey: string,
+  clientPrivateKey: string,
+  serverPublicKey: string
+) => {
+  const clientSessionKeys = sodium.crypto_kx_client_session_keys(
+    from_base64(clientPublicKey),
+    from_base64(clientPrivateKey),
+    from_base64(serverPublicKey)
+  );
+  return clientSessionKeys;
 };
 
 const libsodiumExports = {
@@ -265,9 +290,11 @@ const libsodiumExports = {
   crypto_sign_keypair,
   crypto_sign_detached,
   crypto_secretbox_easy,
+  crypto_secretbox_open_easy,
   crypto_core_ed25519_add,
   crypto_generichash_batch,
   crypto_sign_verify_detached,
+  crypto_kx_client_session_keys,
   crypto_core_ed25519_from_uniform,
   crypto_core_ed25519_scalar_random,
   crypto_core_ed25519_scalar_negate,

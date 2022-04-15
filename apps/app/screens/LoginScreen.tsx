@@ -6,28 +6,27 @@ import { RootStackScreenProps } from "../types";
 import {
   createClientKeyPair,
   createOprfChallenge,
-  createOprfRegistrationEnvelope,
+  createUserSession,
+  decryptSessionJsonMessage,
 } from "@serenity-tools/opaque/client";
 import {
-  useFinalizeRegistrationMutation,
-  useInitializeRegistrationMutation,
+  useInitializeLoginMutation,
+  useFinalizeLoginMutation,
 } from "../generated/graphql";
 // import { StringKeyPair } from '@serenity-tools/libsodium';
 
-export default function RegisterScreen() {
-  const [username, setUsername] = useState("email@example.com");
+export default function LoginScreen() {
+  const [username, setUsername] = useState("email16@example.com");
   const [password, setPassword] = useState("password");
-  const [clientPublicKey, setClientPublicKey] = useState("");
-  const [clientPrivateKey, setClientPrivateKey] = useState("");
-  const [didRegistrationSucceed, setDidRegistrationSucceed] = useState(false);
-  const [, initializeRegistrationMutation] =
-    useInitializeRegistrationMutation();
-  const [, finalizeRegistrationMutation] = useFinalizeRegistrationMutation();
+  const [didLoginSucceed, setDidLoginSucceed] = useState(false);
+  const [, initializeLoginMutation] = useInitializeLoginMutation();
+  const [, finalizeLoginMutation] = useFinalizeLoginMutation();
   const [hasGqlError, setHasGqlError] = useState(false);
   const [gqlErrorMessage, setGqlErrorMessage] = useState("");
+  const [oauthAccessToken, setOauthAccessToken] = useState("");
+  const [accessTokenExpiresIn, setAccessTokenExpiresIn] = useState(0);
   const OPRF_CLIENT_KEYS_STORAGE_KEY = "oprf.clientKeys";
-  const OPRF_SECRET_STORAGE_KEY = "oprf.secret";
-  const OPRF_NONCE_STORAGE_KEY = "oprf.nonce";
+  const OPRF_CLIENT_SESSION_KEYS_STORAGE_KEY = "oprf.sessionKeys";
 
   useEffect(() => {
     getOrGenerateKeys();
@@ -37,14 +36,10 @@ export default function RegisterScreen() {
     let serializedKeyData = localStorage.getItem(OPRF_CLIENT_KEYS_STORAGE_KEY);
     if (serializedKeyData) {
       const keys = JSON.parse(serializedKeyData);
-      setClientPublicKey(keys.publicKey);
-      setClientPrivateKey(keys.privateKey);
       console.log("retrieved client keys");
       console.log({ keys });
     } else {
       const keys = createClientKeyPair();
-      setClientPublicKey(keys.publicKey);
-      setClientPrivateKey(keys.privateKey);
       localStorage.setItem(OPRF_CLIENT_KEYS_STORAGE_KEY, JSON.stringify(keys));
       console.log("generated client keys");
       console.log({ keys });
@@ -64,7 +59,7 @@ export default function RegisterScreen() {
     // * serverChallengeResponse
     // * serverPublicKey
     // * oprfPublicKey
-    const mutationResult = await initializeRegistrationMutation({
+    const mutationResult = await initializeLoginMutation({
       input: {
         username: username,
         challenge: oprfChallenge,
@@ -72,9 +67,8 @@ export default function RegisterScreen() {
     });
     console.log({ mutationResult });
     // check for an error
-    if (mutationResult.data && mutationResult.data.initializeRegistration) {
-      const serverChallengeResponse =
-        mutationResult.data.initializeRegistration;
+    if (mutationResult.data && mutationResult.data.initializeLogin) {
+      const serverChallengeResponse = mutationResult.data.initializeLogin;
       // setServerChallengeResponse(serverChallengeResponse.oprfChallengeResponse)
       // setServerPublicKey(serverChallengeResponse.serverPublicKey)
       // setOprfPublicKey(serverChallengeResponse.oprfPublicKey)
@@ -91,46 +85,41 @@ export default function RegisterScreen() {
     }
   };
 
-  const registerAccount = async (
+  const getEncryptedOauthToken = async (
     randomScalar: string,
     serverChallengeResponse: string,
-    serverPublicKey: string,
+    secret: string,
+    nonce: string,
     oprfPublicKey: string
   ) => {
-    console.log("Registering account");
+    console.log("Logging in");
     console.log({ randomScalar });
-    const { secret, nonce } = await createOprfRegistrationEnvelope(
+
+    const clientSessionKeys = await createUserSession(
       password,
-      clientPublicKey,
-      clientPrivateKey,
+      secret,
+      nonce,
+      oprfPublicKey,
       randomScalar,
-      serverChallengeResponse,
-      serverPublicKey,
-      oprfPublicKey
+      serverChallengeResponse
     );
-    console.log({ secret, nonce });
-    // ask the server to store the registration, send
+    localStorage.setItem(
+      OPRF_CLIENT_SESSION_KEYS_STORAGE_KEY,
+      JSON.stringify(clientSessionKeys)
+    );
+    // ask the server to store the login, send
     // * username,
-    // * secret (aka cipherText),
-    // * nonce
-    // * clientPublicKey
-    const mutationResult = await finalizeRegistrationMutation({
-      input: {
-        username,
-        secret,
-        nonce,
-        clientPublicKey,
-      },
+    const mutationResult = await finalizeLoginMutation({
+      input: { username },
     });
-    console.log({ mutationResult });
+    console.log({ clientSessionKeys });
     // check for an error
-    if (mutationResult.data && mutationResult.data.finalizeRegistration) {
-      const serverRegistrationResponse =
-        mutationResult.data.finalizeRegistration;
-      setDidRegistrationSucceed(
-        serverRegistrationResponse.status === "success"
-      );
-      return serverRegistrationResponse;
+    if (mutationResult.data && mutationResult.data.finalizeLogin) {
+      const serverLoginResponse = mutationResult.data.finalizeLogin;
+      return {
+        serverLoginResponse,
+        clientSessionKeys,
+      };
     } else if (mutationResult.error) {
       const errorMessage = mutationResult.error.message.substring(
         mutationResult.error.message.indexOf("] ") + 2
@@ -139,17 +128,30 @@ export default function RegisterScreen() {
       setGqlErrorMessage(errorMessage);
       throw Error(errorMessage);
     }
-    localStorage.setItem(OPRF_SECRET_STORAGE_KEY, secret);
-    localStorage.setItem(OPRF_NONCE_STORAGE_KEY, nonce);
   };
 
-  const onRegisterPress = async () => {
-    console.log("click");
-    console.log(`username: ${username}, password: ${password}`);
-    setDidRegistrationSucceed(false);
+  const decryptEncryptedOauthToken = (
+    encryptedOauthToken: string,
+    nonce: string,
+    clientSessionSharedRxKey: string
+  ) => {
+    const oauthTokenData = decryptSessionJsonMessage(
+      encryptedOauthToken,
+      nonce,
+      clientSessionSharedRxKey
+    );
+    console.log({ oauthTokenData });
+    return oauthTokenData;
+  };
+
+  const onLoginPress = async () => {
+    setDidLoginSucceed(false);
     setHasGqlError(false);
     setGqlErrorMessage("");
+    console.log("click");
+    console.log(`username: ${username}, password: ${password}`);
     let oprfChallengeResponse: any = null;
+    let encryptedOauthTokenData: any = null;
     try {
       oprfChallengeResponse = await getServerOprfChallenge();
       console.log({ oprfChallengeResponse });
@@ -161,20 +163,36 @@ export default function RegisterScreen() {
     }
     if (oprfChallengeResponse) {
       try {
-        await registerAccount(
+        encryptedOauthTokenData = await getEncryptedOauthToken(
           oprfChallengeResponse.randomScalar,
           oprfChallengeResponse.serverChallengeResponse.oprfChallengeResponse,
-          oprfChallengeResponse.serverChallengeResponse.serverPublicKey,
+          oprfChallengeResponse.serverChallengeResponse.secret,
+          oprfChallengeResponse.serverChallengeResponse.nonce,
           oprfChallengeResponse.serverChallengeResponse.oprfPublicKey
         );
       } catch (error) {
-        console.log("error registering account");
+        console.log("error logging in");
         console.log(error);
         setHasGqlError(true);
         setGqlErrorMessage(error.toString());
       }
     }
-    // const serverRegistrationResponse = await registerAccount()
+    if (encryptedOauthTokenData) {
+      console.log({ encryptedOauthTokenData });
+      try {
+        const oauthAccessData = decryptEncryptedOauthToken(
+          encryptedOauthTokenData.serverLoginResponse.oauthData,
+          encryptedOauthTokenData.serverLoginResponse.nonce,
+          encryptedOauthTokenData.clientSessionKeys.sharedRx
+        );
+        setDidLoginSucceed(true);
+        setOauthAccessToken(oauthAccessData.accessToken);
+        setAccessTokenExpiresIn(oauthAccessData.expiresIn);
+      } catch (error) {
+        setHasGqlError(true);
+        setGqlErrorMessage("Invalid email or password");
+      }
+    }
   };
 
   const onUsernameChangeText = (username: string) => {
@@ -194,9 +212,9 @@ export default function RegisterScreen() {
         </View>
       )}
 
-      {didRegistrationSucceed && (
+      {didLoginSucceed && (
         <View style={styles.infoAlert}>
-          <Text style={styles.alertText}>Registration Succeeded</Text>
+          <Text style={styles.alertText}>Login Succeeded</Text>
         </View>
       )}
 
@@ -220,7 +238,15 @@ export default function RegisterScreen() {
         />
       </View>
 
-      <Button color="#66a" onPress={onRegisterPress} title="Register" />
+      <View>
+        <Text style={styles.label}>OauthToken: {oauthAccessToken}</Text>
+        <Text style={styles.label}>
+          Token expires in: {Math.round(accessTokenExpiresIn / (24 * 60 * 60))}{" "}
+          days
+        </Text>
+      </View>
+
+      <Button color="#66a" onPress={onLoginPress} title="Log in" />
     </View>
   );
 }

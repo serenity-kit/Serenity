@@ -53,15 +53,23 @@ model Registration {
 }
 
 model User {
-  username           String  @id
-  serverPrivateKey   String
-  serverPublicKey    String  @default("invalid")
-  oprfPrivateKey     String
-  oprfPublicKey      String  @default("invalid")
-  oprfCipherText     String
-  oprfNonce          String
-  clientPublicKey    String
-  sharedRx           String?
-  sharedTx           String?
-  resetPasswordToken String?
+  username             String                 @id
+  serverPrivateKey     String
+  serverPublicKey      String                 @default("invalid")
+  oprfPrivateKey       String
+  oprfPublicKey        String                 @default("invalid")
+  oprfCipherText       String
+  oprfNonce            String
+  clientPublicKey      String
+  sharedRx             String?
+  sharedTx             String?
+  resetPasswordToken   String?
+  UserLoginAccessToken UserLoginAccessToken[]
+}
+
+model UserLoginAccessToken {
+  accessToken String    @id @unique
+  expiresAt   DateTime?
+  user        User      @relation(fields: [username], references: [username])
+  username    String
 }

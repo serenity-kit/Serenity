@@ -6,6 +6,8 @@ import {
 } from "@serenity-tools/opaque/server";
 import sodium from "libsodium-wrappers-sumo";
 import { prisma } from "../database/prisma";
+// two week expiration
+const USER_LOGIN_ACCESS_TOKEN_EXPIRATION_TIME_IN_SECONDS = 60 * 60 * 24 * 15;
 
 const ClientOprfRegistrationChallengeInput = inputObjectType({
   name: "ClientOprfRegistrationChallengeRequest",
@@ -284,10 +286,30 @@ export const finalizeLogin = mutationField("finalizeLogin", {
     const accessToken = sodium.to_base64(
       sodium.crypto_core_ed25519_scalar_random()
     );
-    // create an access token
+
+    const expiresAt = new Date(
+      Date.now() + USER_LOGIN_ACCESS_TOKEN_EXPIRATION_TIME_IN_SECONDS
+    );
+    try {
+      await prisma.userLoginAccessToken.create({
+        data: {
+          accessToken,
+          expiresAt,
+          user: {
+            connect: {
+              username,
+            },
+          },
+        },
+      });
+    } catch (error) {
+      throw Error("Internal server error");
+    }
+    const expiresIn = expiresAt.getTime() - Date.now();
     const oauthResponse = {
       accessToken,
       tokenType: "Bearer",
+      expiresIn,
     };
     // generate nonce
     const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
