@@ -1,20 +1,28 @@
 // inspired by https://github.com/GeekyAnts/NativeBase/blob/master/src/components/primitives/Button/Button.tsx
 
 import React, { forwardRef } from "react";
-import { Text as RnText, View as RnView } from "react-native";
+import { Text as RnText, View as RnView, PressableProps } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
 import { Pressable } from "native-base";
 import { tw } from "../../tailwind";
 
+interface Props extends PressableProps {}
+type ComputeStyleParams = {
+  disabled?: boolean | null;
+  isPressed: boolean;
+  isHovered: boolean;
+  isFocusVisible: boolean;
+  isFocused: boolean;
+};
+
 const baseStyle = tw`rounded px-4 py-4`;
 
-const computeStyle = (
-  disabled: boolean,
-  isPressed: boolean,
-  isHovered: boolean,
-  isFocusVisible: boolean,
-  isFocused: boolean
-) => {
+const computeStyle = ({
+  disabled,
+  isPressed,
+  isHovered,
+  isFocusVisible,
+}: ComputeStyleParams) => {
   if (disabled) return tw`bg-gray-400`;
 
   let style: any = isFocusVisible
@@ -27,24 +35,19 @@ const computeStyle = (
   return style;
 };
 
-type Props = {
-  children: React.ReactNode;
-  disabled?: boolean;
-};
-
-export const Button = (props) => {
+export const Button = (props: Props) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
 
   return (
     <Pressable
       {...props}
-      rounded
       accessibilityRole={props.accessibilityRole ?? "button"}
       // @ts-expect-error - web only
       onFocus={focusRingProps.onFocus}
       // @ts-expect-error - web only
       onBlur={focusRingProps.onBlur}
       // disable default outline styles
+      // @ts-expect-error - web only
       _focusVisible={{ _web: { style: { outlineWidth: 0 } } }}
     >
       {({ isPressed, isHovered, isFocused }) => {
@@ -53,14 +56,15 @@ export const Button = (props) => {
             style={tw.style(
               baseStyle,
               `bg-primary-500`,
-              computeStyle(
-                props.disabled,
+              computeStyle({
+                disabled: props.disabled,
                 isPressed,
                 isHovered,
                 isFocusVisible,
-                isFocused
-              ),
+                isFocused,
+              }),
               { cursor: props.disabled ? "not-allowed" : "pointer" }, // web only
+              // @ts-ignore
               props.style
             )}
           >
