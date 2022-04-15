@@ -5,5 +5,9 @@
   "scripts": {
     "ts:check": "yarn tsc --noEmit",
     "test": "echo TODO"
+  },
+  "dependencies": {
+    "native-base": "^3.4.1",
+    "react-native-svg": "12.1.1"
   }
 }

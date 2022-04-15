@@ -25,7 +25,18 @@ module.exports = {
     allowedHosts: "all",
   },
   resolve: {
-    extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
+    extensions: [
+      // adding .web.* files for react-native web optimized files
+      ".web.tsx",
+      ".web.ts",
+      ".web.jsx",
+      ".web.js",
+      ".tsx",
+      ".ts",
+      ".jsx",
+      ".js",
+      ".json",
+    ],
     alias: {
       "react-native$": "react-native-web",
     },
