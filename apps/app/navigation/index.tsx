@@ -13,6 +13,8 @@ import LinkingConfiguration from "./linkingConfiguration";
 import DashboardScreen from "../screens/DashboardScreen";
 import TestEditorScreen from "../screens/TestEditorScreen";
 import LibsodiumTestScreen from "../screens/LibsodiumTestScreen";
+import RegisterScreen from "../screens/RegisterScreen";
+import LoginScreen from "../screens/LoginScreen";
 import DesignSystemScreen from "../screens/DesignSystemScreen";
 
 export default function Navigation({
@@ -48,6 +50,8 @@ function RootNavigator() {
       <Stack.Screen name="editor" component={EditorScreen} />
       <Stack.Screen name="test-editor" component={TestEditorScreen} />
       <Stack.Screen name="test-libsodium" component={LibsodiumTestScreen} />
+      <Stack.Screen name="register" component={RegisterScreen} />
+      <Stack.Screen name="login" component={LoginScreen} />
       <Stack.Screen
         name="notFound"
         component={NotFoundScreen}

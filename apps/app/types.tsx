@@ -21,7 +21,9 @@ export type RootStackParamList = {
   ["design-system"]: undefined;
   editor: NavigatorScreenParams<RootTabParamList> | undefined;
   ["test-editor"]: NavigatorScreenParams<RootTabParamList> | undefined;
-  ["test-libsodium"]: NavigatorScreenParams<RootTabParamList> | undefined;
+  ["test-libsodium"]: undefined;
+  register: undefined;
+  login: undefined;
   notFound: undefined;
 };
 

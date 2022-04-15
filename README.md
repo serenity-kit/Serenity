@@ -22,6 +22,12 @@ yarn workspace backend prisma migrate dev
 yarn workspace backend dev
 ```
 
+Preview the database:
+
+```sh
+yarn prisma studio
+```
+
 ### App (web)
 
 ```sh

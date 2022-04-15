@@ -37,6 +37,7 @@ export const generateOprfKeyPair = () => {
   const keyPair = {
     publicKey: publicKey,
     privateKey: privateKey,
+    keyType: "oprf",
   };
   return keyPair;
 };
@@ -232,3 +233,8 @@ export function createUserLoginSession(
     throw Error("Invalid password");
   }
 }
+
+export const generateNonce = (): Uint8Array => {
+  const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+  return nonce;
+};
