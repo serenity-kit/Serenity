@@ -4,6 +4,13 @@
 
 /* Classes included via @layer will only be in the compiled CSS if we use them in code */
 @layer base {
+  /*
+    + use of opacity possible
+  */
+  ::selection {
+    @apply bg-primary-400/50;
+  }
+
   h1 {
     @apply mt-12 mb-3 text-3xl font-bold;
   }
@@ -16,12 +23,38 @@
   p {
     @apply my-2 text-[17px] sm:text-base;
   }
-  /* using py-0.5 so that code elements in adjacent lines don't overlap */
-  code {
-    @apply py-0.5 px-1.5 bg-gray-200 text-sm text-gray-800 rounded;
+  a {
+    @apply text-primary-500 underline;
   }
+
+  /* used for inline- and blockcode */
+  code {
+    @apply text-sm text-gray-800;
+  }
+
   blockquote {
     @apply my-4 pl-4 border-solid border-l-4 border-primary-400;
+  }
+
+  /* --- lists --- */
+  ul,
+  ol {
+    @apply my-4 pl-4;
+  }
+  ul {
+    @apply list-disc;
+  }
+  ol {
+    @apply list-decimal;
+  }
+  li {
+    /* to align text-indent of blockelements (list, quote, codeblock) */
+    @apply pl-1;
+  }
+  /* avoid jumping when initializing a list before any other element */
+  ul:first-child p:first-child,
+  ol:first-child p:first-child {
+    margin-top: 0;
   }
 
   /* --- editor --- */
@@ -29,6 +62,10 @@
     @apply w-full max-w-prose mx-auto;
   }
 }
+
+/* ::selection {
+  background-color: theme('colors.primary.400');
+} */
 
 /* This will always be included in our compiled CSS */
 .ProseMirror:focus {
@@ -39,7 +76,6 @@
 /* should we work with a custom wrapper class or just use the ProseMirror as editor wrapper entry */
 .ProseMirror > *:first-child {
   margin-top: 0;
-  padding-top: 0;
 }
 
 /* ------------------------- */
