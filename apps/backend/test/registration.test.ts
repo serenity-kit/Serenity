@@ -46,7 +46,7 @@ const requestRegistrationChallengeResponse = async (
   };
 };
 
-test("server should create a registration challenge response", async () => {
+test.only("server should create a registration challenge response", async () => {
   // generate a challenge code
   const result = await requestRegistrationChallengeResponse(username, password);
   data = result.data;

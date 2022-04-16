@@ -183,97 +183,38 @@ export default function RegisterScreen() {
     setPassword(password);
   };
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+    <View>
+      <Text>Register</Text>
 
       {hasGqlError && (
-        <View style={styles.errorAlert}>
-          <Text style={styles.alertText}>{gqlErrorMessage}</Text>
+        <View>
+          <Text>{gqlErrorMessage}</Text>
         </View>
       )}
 
       {didRegistrationSucceed && (
-        <View style={styles.infoAlert}>
-          <Text style={styles.alertText}>Registration Succeeded</Text>
+        <View>
+          <Text>Registration Succeeded</Text>
         </View>
       )}
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Email</Text>
-        <Input
-          keyboardType="email-address"
-          value={username}
-          onChangeText={onUsernameChangeText}
-        />
-      </View>
+      <Text>Email</Text>
+      <Input
+        keyboardType="email-address"
+        value={username}
+        onChangeText={onUsernameChangeText}
+        placeholder="Enter your email …"
+      />
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Password</Text>
-        <Input
-          secureTextEntry
-          value={password}
-          onChangeText={onPasswordChangeText}
-        />
-      </View>
+      <Text>Password</Text>
+      <Input
+        secureTextEntry
+        value={password}
+        onChangeText={onPasswordChangeText}
+        placeholder="Enter your password …"
+      />
 
       <Button onPress={onRegisterPress}>Register</Button>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  inputGroup: {
-    margin: 20,
-    borderWidth: 1,
-    borderColor: "#fff",
-  },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 40,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-  linkText: {
-    fontSize: 14,
-    color: "#2e78b7",
-  },
-  label: {
-    fontSize: 14,
-  },
-  input: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#2e78b7",
-    color: "#ccc",
-  },
-  button: {
-    padding: 20,
-    backgroundColor: "#a33",
-  },
-  alert: {
-    padding: 20,
-    borderWidth: 1,
-  },
-  errorAlert: {
-    padding: 20,
-    borderWidth: 1,
-    backgroundColor: "#a33",
-    borderColor: "#c66",
-  },
-  infoAlert: {
-    padding: 20,
-    borderWidth: 1,
-    backgroundColor: "#a33",
-    borderColor: "#cc6",
-  },
-  alertText: {},
-});
