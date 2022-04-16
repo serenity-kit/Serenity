@@ -1,4 +1,4 @@
-import { Text, tw, View, Button, Input } from "@serenity-tools/ui";
+import { Text, tw, View, Button, Input, Icon } from "@serenity-tools/ui";
 
 export default function DesignSystemScreen() {
   return (
@@ -17,6 +17,15 @@ export default function DesignSystemScreen() {
       <Input disabled value="jane@example.com" />
       <Text>Input Disabled</Text>
       <Input disabled placeholder="Enter your email …" />
+      <Text>Icons</Text>
+      <Icon name="bold" />
+      <Icon name="list-check-2" />
+      <Icon name="list-unordered" />
+      <Text>Icon resized</Text>
+      <Icon name="list-unordered" size={16} />
+      <Icon name="list-unordered" size={32} />
+      <Text>Icons coloured</Text>
+      <Icon name="list-check-2" color={tw.color("primary-500")} />
     </View>
   );
 }
