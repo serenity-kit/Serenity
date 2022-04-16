@@ -1,8 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
-import { StyleSheet, Button, TextInput } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet } from "react-native";
 
-import { Text, View } from "@serenity-tools/ui";
-import { RootStackScreenProps } from "../types";
+import { Text, View, Input, Button } from "@serenity-tools/ui";
 import {
   createClientKeyPair,
   createOprfChallenge,
@@ -12,11 +11,10 @@ import {
   useFinalizeRegistrationMutation,
   useInitializeRegistrationMutation,
 } from "../generated/graphql";
-// import { StringKeyPair } from '@serenity-tools/libsodium';
 
 export default function RegisterScreen() {
-  const [username, setUsername] = useState("email@example.com");
-  const [password, setPassword] = useState("password");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [clientPublicKey, setClientPublicKey] = useState("");
   const [clientPrivateKey, setClientPrivateKey] = useState("");
   const [didRegistrationSucceed, setDidRegistrationSucceed] = useState(false);
@@ -202,8 +200,7 @@ export default function RegisterScreen() {
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
+        <Input
           keyboardType="email-address"
           value={username}
           onChangeText={onUsernameChangeText}
@@ -212,15 +209,14 @@ export default function RegisterScreen() {
 
       <View style={styles.inputGroup}>
         <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
+        <Input
           secureTextEntry
           value={password}
           onChangeText={onPasswordChangeText}
         />
       </View>
 
-      <Button color="#66a" onPress={onRegisterPress} title="Register" />
+      <Button onPress={onRegisterPress}>Register</Button>
     </View>
   );
 }
