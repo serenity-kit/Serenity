@@ -32,7 +32,6 @@ export default async function createServer() {
   });
   await apolloServer.start();
 
-  console.log({ env: process.env.NODE_ENV });
   const allowedOrigin =
     process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
       ? "http://localhost:19006"
