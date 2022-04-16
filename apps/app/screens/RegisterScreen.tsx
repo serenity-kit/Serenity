@@ -1,8 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
-import { StyleSheet, Button, TextInput } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet } from "react-native";
 
-import { Text, View } from "@serenity-tools/ui";
-import { RootStackScreenProps } from "../types";
+import { Text, View, Input, Button } from "@serenity-tools/ui";
 import {
   createClientKeyPair,
   createOprfChallenge,
@@ -12,11 +11,10 @@ import {
   useFinalizeRegistrationMutation,
   useInitializeRegistrationMutation,
 } from "../generated/graphql";
-// import { StringKeyPair } from '@serenity-tools/libsodium';
 
 export default function RegisterScreen() {
-  const [username, setUsername] = useState("email@example.com");
-  const [password, setPassword] = useState("password");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [clientPublicKey, setClientPublicKey] = useState("");
   const [clientPrivateKey, setClientPrivateKey] = useState("");
   const [didRegistrationSucceed, setDidRegistrationSucceed] = useState(false);
@@ -185,99 +183,38 @@ export default function RegisterScreen() {
     setPassword(password);
   };
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+    <View>
+      <Text>Register</Text>
 
       {hasGqlError && (
-        <View style={styles.errorAlert}>
-          <Text style={styles.alertText}>{gqlErrorMessage}</Text>
+        <View>
+          <Text>{gqlErrorMessage}</Text>
         </View>
       )}
 
       {didRegistrationSucceed && (
-        <View style={styles.infoAlert}>
-          <Text style={styles.alertText}>Registration Succeeded</Text>
+        <View>
+          <Text>Registration Succeeded</Text>
         </View>
       )}
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          keyboardType="email-address"
-          value={username}
-          onChangeText={onUsernameChangeText}
-        />
-      </View>
+      <Text>Email</Text>
+      <Input
+        keyboardType="email-address"
+        value={username}
+        onChangeText={onUsernameChangeText}
+        placeholder="Enter your email …"
+      />
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          secureTextEntry
-          value={password}
-          onChangeText={onPasswordChangeText}
-        />
-      </View>
+      <Text>Password</Text>
+      <Input
+        secureTextEntry
+        value={password}
+        onChangeText={onPasswordChangeText}
+        placeholder="Enter your password …"
+      />
 
-      <Button color="#66a" onPress={onRegisterPress} title="Register" />
+      <Button onPress={onRegisterPress}>Register</Button>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  inputGroup: {
-    margin: 20,
-    borderWidth: 1,
-    borderColor: "#fff",
-  },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 40,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-  linkText: {
-    fontSize: 14,
-    color: "#2e78b7",
-  },
-  label: {
-    fontSize: 14,
-  },
-  input: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#2e78b7",
-    color: "#ccc",
-  },
-  button: {
-    padding: 20,
-    backgroundColor: "#a33",
-  },
-  alert: {
-    padding: 20,
-    borderWidth: 1,
-  },
-  errorAlert: {
-    padding: 20,
-    borderWidth: 1,
-    backgroundColor: "#a33",
-    borderColor: "#c66",
-  },
-  infoAlert: {
-    padding: 20,
-    borderWidth: 1,
-    backgroundColor: "#a33",
-    borderColor: "#cc6",
-  },
-  alertText: {},
-});
