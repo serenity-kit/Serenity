@@ -197,6 +197,9 @@ export const createOprfRegistrationEnvelope = async (
   };
   const messageBytes = Buffer.from(JSON.stringify(messageData));
   const secret = sodium.crypto_secretbox_easy(
+    // @ts-ignore this rather should be a base64 encoded string to avoid
+    // having the need for a Buffer polyfill in the browser
+    // TODO refactor also requires to change all the crypto_secretbox_open_easy code
     messageBytes,
     nonce,
     argon2DerivedKey
