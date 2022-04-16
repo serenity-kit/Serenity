@@ -5,11 +5,11 @@ export default function DashboardScreen() {
     <View style={tw`mt-20`}>
       <Text>Dashboard Screen</Text>
       <Link to={{ screen: "design-system" }}>Design System</Link>
-      <Link to={{ screen: "editor" }}>Link to Editor</Link>
-      <Link to={{ screen: "test-editor" }}>Link to Test-Editor</Link>
-      <Link to={{ screen: "test-libsodium" }}>
-        Link to Libsodium Test Screen
-      </Link>
+      <Link to={{ screen: "register" }}>Registration</Link>
+      <Link to={{ screen: "login" }}>Login</Link>
+      <Link to={{ screen: "editor" }}>Editor</Link>
+      <Link to={{ screen: "test-editor" }}>Test-Editor</Link>
+      <Link to={{ screen: "test-libsodium" }}>Libsodium Test Screen</Link>
     </View>
   );
 }
