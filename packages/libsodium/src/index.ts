@@ -1,28 +1,19 @@
-import sodium /* , { StringKeyPair } */ from "libsodium-wrappers-sumo";
-// export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers";
-declare const Buffer;
+import sodium, { StringKeyPair } from "libsodium-wrappers-sumo";
+export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers-sumo";
 export const ready = sodium.ready;
+declare const Buffer;
 
-export type KeyType = "curve25519" | "ed25519" | "x25519";
-
-export interface StringKeyPair {
-  keyType: KeyType;
-  privateKey: string;
-  publicKey: string;
-}
-
-const to_base64 = (data: Uint8Array | string) => {
-  let base64Data = "";
+export const to_base64 = (data: Uint8Array | string) => {
+  let base64String = "";
   if (typeof data === "string") {
-    base64Data = btoa(data);
+    base64String = btoa(data);
   } else {
-    base64Data = Buffer.from(data).toString("base64");
+    base64String = Buffer.from(data).toString("base64");
   }
-  base64Data = base64Data
+  return base64String
     .replaceAll("+", "-")
     .replaceAll("/", "_")
     .replace(/=+$/, "");
-  return base64Data;
 };
 
 const from_base64 = (data: string) => {
@@ -305,8 +296,17 @@ const libsodiumExports = {
   crypto_aead_xchacha20poly1305_ietf_decrypt,
 };
 
+type Libsodium = typeof libsodiumExports & {
+  crypto_generichash_BYTES: number;
+  crypto_secretbox_NONCEBYTES: number;
+  crypto_pwhash_SALTBYTES: number;
+  crypto_pwhash_OPSLIMIT_INTERACTIVE: number;
+  crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
+  crypto_pwhash_ALG_DEFAULT: number;
+};
+
 const handler = {
-  get(_target: any, prop: string): any {
+  get(_target: Libsodium, prop: keyof Libsodium): any {
     if (prop === "crypto_generichash_BYTES") {
       return sodium.crypto_generichash_BYTES;
     } else if (prop === "crypto_secretbox_NONCEBYTES") {
@@ -325,4 +325,4 @@ const handler = {
   },
 };
 
-export default new Proxy(libsodiumExports, handler);
+export default new Proxy(libsodiumExports, handler) as Libsodium;

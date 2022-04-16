@@ -1,5 +1,5 @@
 import sodium from "@serenity-tools/libsodium";
-import { base64_variants, to_base64 } from "libsodium-wrappers";
+import { to_base64 } from "libsodium-wrappers";
 export type { StringKeyPair } from "libsodium-wrappers";
 
 type OprfChallengeData = {
