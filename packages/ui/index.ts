@@ -4,4 +4,5 @@ export * from "./components/view/View";
 export * from "./components/link/Link";
 export * from "./components/button/Button";
 export * from "./components/input/Input";
+export * from "./components/icon/Icon";
 export * from "./components/editorWrapperView/EditorWrapperView";
