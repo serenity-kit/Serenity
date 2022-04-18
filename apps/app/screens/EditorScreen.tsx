@@ -36,7 +36,7 @@ const editorContentAsYjsUpdateV2 = Uint8Array.from([
 
 export default function EditorScreen({
   navigation,
-}: RootTabScreenProps<"EditorScreen">) {
+}: RootTabScreenProps<"Editor">) {
   const [yDoc] = useState(() => {
     const yDoc = new Y.Doc();
     Y.applyUpdateV2(yDoc, editorContentAsYjsUpdateV2);

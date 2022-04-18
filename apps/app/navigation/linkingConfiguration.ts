@@ -13,14 +13,20 @@ const linking: LinkingOptions<RootStackParamList> = {
   prefixes: [Linking.createURL("/")],
   config: {
     screens: {
-      dashboard: "dashboard",
-      ["design-system"]: "design-system",
-      editor: "editor",
-      register: "register",
-      login: "login",
-      ["test-editor"]: "test-editor",
-      ["test-libsodium"]: "test-libsodium",
-      notFound: "*",
+      App: {
+        path: "app",
+        screens: {
+          Dashboard: "dashboard",
+          Editor: "editor",
+          TestEditor: "test-editor",
+          TestLibsodium: "test-libsodium",
+        },
+      },
+      DevDashboard: "dev-dashboard",
+      DesignSystem: "design-system",
+      Register: "register",
+      Login: "login",
+      NotFound: "*",
     },
   },
 };

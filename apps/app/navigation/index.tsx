@@ -4,31 +4,35 @@ import {
   DarkTheme,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import { ColorSchemeName } from "react-native";
 
 import NotFoundScreen from "../screens/NotFoundScreen";
 import EditorScreen from "../screens/EditorScreen";
 import { RootStackParamList } from "../types";
-import LinkingConfiguration from "./linkingConfiguration";
+import linkingConfiguration from "./linkingConfiguration";
 import DashboardScreen from "../screens/DashboardScreen";
+import DevDashboardScreen from "../screens/DevDashboardScreen";
 import TestEditorScreen from "../screens/TestEditorScreen";
 import LibsodiumTestScreen from "../screens/LibsodiumTestScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import LoginScreen from "../screens/LoginScreen";
 import DesignSystemScreen from "../screens/DesignSystemScreen";
+import { DrawerContentScrollView } from "@react-navigation/drawer";
+import { Link } from "@serenity-tools/ui";
 
-export default function Navigation({
-  colorScheme,
-}: {
-  colorScheme: ColorSchemeName;
-}) {
+function CustomDrawerContent(props) {
   return (
-    <NavigationContainer
-      linking={LinkingConfiguration}
-      theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-    >
-      <RootNavigator />
-    </NavigationContainer>
+    <DrawerContentScrollView {...props}>
+      <Link to={{ screen: "DevDashboard" }}>Dev Dashboard</Link>
+      <Link to={{ screen: "App", params: { screen: "Editor" } }}>Editor</Link>
+      <Link to={{ screen: "App", params: { screen: "TestEditor" } }}>
+        Sync-Test-Editor
+      </Link>
+      <Link to={{ screen: "App", params: { screen: "TestLibsodium" } }}>
+        Libsodium Test Screen
+      </Link>
+    </DrawerContentScrollView>
   );
 }
 
@@ -37,26 +41,58 @@ export default function Navigation({
  * https://reactnavigation.org/docs/modal
  */
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const Drawer = createDrawerNavigator();
+
+function AuthorizedStackScreen() {
+  return (
+    <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={
+        {
+          // drawerType: "permanent",
+        }
+      }
+    >
+      <Drawer.Screen name="Dashboard" component={DashboardScreen} />
+      <Drawer.Screen name="Editor" component={EditorScreen} />
+      <Drawer.Screen name="TestEditor" component={TestEditorScreen} />
+      <Drawer.Screen name="TestLibsodium" component={LibsodiumTestScreen} />
+    </Drawer.Navigator>
+  );
+}
 
 function RootNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="dashboard"
-        component={DashboardScreen}
+        name="App"
+        component={AuthorizedStackScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="design-system" component={DesignSystemScreen} />
-      <Stack.Screen name="editor" component={EditorScreen} />
-      <Stack.Screen name="test-editor" component={TestEditorScreen} />
-      <Stack.Screen name="test-libsodium" component={LibsodiumTestScreen} />
-      <Stack.Screen name="register" component={RegisterScreen} />
-      <Stack.Screen name="login" component={LoginScreen} />
+      <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
+      <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen
-        name="notFound"
+        name="NotFound"
         component={NotFoundScreen}
         options={{ title: "Oops!" }}
       />
     </Stack.Navigator>
+  );
+}
+
+export default function Navigation({
+  colorScheme,
+}: {
+  colorScheme: ColorSchemeName;
+}) {
+  return (
+    <NavigationContainer
+      linking={linkingConfiguration}
+      theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+    >
+      <RootNavigator />
+    </NavigationContainer>
   );
 }
