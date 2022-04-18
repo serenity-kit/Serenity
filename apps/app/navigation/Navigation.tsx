@@ -72,7 +72,6 @@ const linking: LinkingOptions<RootStackParamList> = {
   config: {
     screens: {
       App: {
-        path: "app",
         screens: {
           Dashboard: "dashboard",
           Editor: "editor",
