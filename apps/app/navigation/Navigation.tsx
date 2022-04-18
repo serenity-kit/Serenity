@@ -6,35 +6,20 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { ColorSchemeName } from "react-native";
+import { LinkingOptions } from "@react-navigation/native";
+import * as Linking from "expo-linking";
 
-import NotFoundScreen from "../screens/NotFoundScreen";
-import EditorScreen from "../screens/EditorScreen";
+import NotFoundScreen from "./screens/NotFoundScreen";
+import EditorScreen from "./screens/EditorScreen";
 import { RootStackParamList } from "../types";
-import linkingConfiguration from "./linkingConfiguration";
-import DashboardScreen from "../screens/DashboardScreen";
-import DevDashboardScreen from "../screens/DevDashboardScreen";
-import TestEditorScreen from "../screens/TestEditorScreen";
-import LibsodiumTestScreen from "../screens/LibsodiumTestScreen";
-import RegisterScreen from "../screens/RegisterScreen";
-import LoginScreen from "../screens/LoginScreen";
-import DesignSystemScreen from "../screens/DesignSystemScreen";
-import { DrawerContentScrollView } from "@react-navigation/drawer";
-import { Link } from "@serenity-tools/ui";
-
-function CustomDrawerContent(props) {
-  return (
-    <DrawerContentScrollView {...props}>
-      <Link to={{ screen: "DevDashboard" }}>Dev Dashboard</Link>
-      <Link to={{ screen: "App", params: { screen: "Editor" } }}>Editor</Link>
-      <Link to={{ screen: "App", params: { screen: "TestEditor" } }}>
-        Sync-Test-Editor
-      </Link>
-      <Link to={{ screen: "App", params: { screen: "TestLibsodium" } }}>
-        Libsodium Test Screen
-      </Link>
-    </DrawerContentScrollView>
-  );
-}
+import DashboardScreen from "./screens/DashboardScreen";
+import DevDashboardScreen from "./screens/DevDashboardScreen";
+import TestEditorScreen from "./screens/TestEditorScreen";
+import LibsodiumTestScreen from "./screens/LibsodiumTestScreen";
+import RegisterScreen from "./screens/RegisterScreen";
+import LoginScreen from "./screens/LoginScreen";
+import DesignSystemScreen from "./screens/DesignSystemScreen";
+import Sidebar from "../components/sidebar/Sidebar";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -46,7 +31,7 @@ const Drawer = createDrawerNavigator();
 function AuthorizedStackScreen() {
   return (
     <Drawer.Navigator
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      drawerContent={(props) => <Sidebar {...props} />}
       screenOptions={
         {
           // drawerType: "permanent",
@@ -82,6 +67,28 @@ function RootNavigator() {
   );
 }
 
+const linking: LinkingOptions<RootStackParamList> = {
+  prefixes: [Linking.createURL("/")],
+  config: {
+    screens: {
+      App: {
+        path: "app",
+        screens: {
+          Dashboard: "dashboard",
+          Editor: "editor",
+          TestEditor: "test-editor",
+          TestLibsodium: "test-libsodium",
+        },
+      },
+      DevDashboard: "dev-dashboard",
+      DesignSystem: "design-system",
+      Register: "register",
+      Login: "login",
+      NotFound: "*",
+    },
+  },
+};
+
 export default function Navigation({
   colorScheme,
 }: {
@@ -89,7 +96,7 @@ export default function Navigation({
 }) {
   return (
     <NavigationContainer
-      linking={linkingConfiguration}
+      linking={linking}
       theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
     >
       <RootNavigator />

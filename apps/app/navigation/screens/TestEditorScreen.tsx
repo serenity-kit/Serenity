@@ -1,5 +1,5 @@
 import * as Yjs from "yjs";
-import Editor from "../components/editor/Editor";
+import Editor from "../../components/editor/Editor";
 import {
   createSnapshot,
   createUpdate,
@@ -31,7 +31,7 @@ import {
   removeAwarenessStates,
 } from "y-protocols/awareness";
 import { View, Text } from "@serenity-tools/ui";
-import { RootTabScreenProps } from "../types";
+import { RootTabScreenProps } from "../../types";
 import { useEffect, useRef } from "react";
 
 const reconnectTimeout = 2000;

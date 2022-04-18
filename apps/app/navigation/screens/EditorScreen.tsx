@@ -1,9 +1,9 @@
-import Editor from "../components/editor/Editor";
+import Editor from "../../components/editor/Editor";
 import { useRef, useState } from "react";
 import * as Y from "yjs";
 
 import { View } from "@serenity-tools/ui";
-import { RootTabScreenProps } from "../types";
+import { RootTabScreenProps } from "../../types";
 
 /*
 Hello World

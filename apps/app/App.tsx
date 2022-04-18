@@ -4,7 +4,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import useCachedResources from "./hooks/useCachedResources";
 import { tw } from "@serenity-tools/ui";
-import Navigation from "./navigation";
+import Navigation from "./navigation/Navigation";
 import { useDeviceContext, useAppColorScheme } from "twrnc";
 import { createClient, Provider } from "urql";
 import { NativeBaseProvider } from "native-base";
