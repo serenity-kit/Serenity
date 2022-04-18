@@ -39,7 +39,7 @@ const reconnectTimeout = 2000;
 export default function TestEditorScreen({
   navigation,
 }: RootTabScreenProps<"TestEditor">) {
-  const docId = "12345678-1282-4e9d-a403-ad1481d2ad7o";
+  const docId = "12345678-1282-459d-a403-ad1481d2ad7o";
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
@@ -155,7 +155,7 @@ export default function TestEditorScreen({
       // TODO get key from navigation
       // const key = sodium.from_base64(window.location.hash.slice(1));
       const key = sodium.from_base64(
-        "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM+0="
+        "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
       );
 
       signatureKeyPairRef.current = await createSignatureKeyPair();
