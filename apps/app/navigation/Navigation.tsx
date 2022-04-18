@@ -8,6 +8,7 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { ColorSchemeName } from "react-native";
 import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
+import { useWindowDimensions } from "react-native";
 
 import NotFoundScreen from "./screens/NotFoundScreen";
 import EditorScreen from "./screens/EditorScreen";
@@ -29,14 +30,14 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
 function AuthorizedStackScreen() {
+  const { width } = useWindowDimensions();
+
   return (
     <Drawer.Navigator
       drawerContent={(props) => <Sidebar {...props} />}
-      screenOptions={
-        {
-          // drawerType: "permanent",
-        }
-      }
+      screenOptions={{
+        drawerType: width > 800 ? "permanent" : "slide",
+      }}
     >
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
       <Drawer.Screen name="Editor" component={EditorScreen} />
