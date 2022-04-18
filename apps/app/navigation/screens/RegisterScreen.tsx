@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet } from "react-native";
 
 import { Text, View, Input, Button } from "@serenity-tools/ui";
 import {
@@ -10,7 +9,7 @@ import {
 import {
   useFinalizeRegistrationMutation,
   useInitializeRegistrationMutation,
-} from "../generated/graphql";
+} from "../../generated/graphql";
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState("");

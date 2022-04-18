@@ -9,7 +9,7 @@ import {
 import {
   useInitializeLoginMutation,
   useFinalizeLoginMutation,
-} from "../generated/graphql";
+} from "../../generated/graphql";
 
 export default function LoginScreen() {
   const [username, setUsername] = useState("");

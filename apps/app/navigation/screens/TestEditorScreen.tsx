@@ -1,5 +1,5 @@
 import * as Yjs from "yjs";
-import Editor from "../components/editor/Editor";
+import Editor from "../../components/editor/Editor";
 import {
   createSnapshot,
   createUpdate,
@@ -31,14 +31,14 @@ import {
   removeAwarenessStates,
 } from "y-protocols/awareness";
 import { View, Text } from "@serenity-tools/ui";
-import { RootTabScreenProps } from "../types";
+import { RootTabScreenProps } from "../../types";
 import { useEffect, useRef } from "react";
 
 const reconnectTimeout = 2000;
 
 export default function TestEditorScreen({
   navigation,
-}: RootTabScreenProps<"EditorScreen">) {
+}: RootTabScreenProps<"TestEditor">) {
   const docId = "12345678-1282-4e9d-a403-ad1481d2ad7o";
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
