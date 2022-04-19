@@ -20,8 +20,9 @@
   h3 {
     @apply mt-6 mb-1.5 text-xl font-bold;
   }
+  /* fixed leading needed for tasklist-icon alignment  */
   p {
-    @apply my-2 text-[17px] sm:text-base;
+    @apply my-2 leading-6 text-mobile sm:text-base;
   }
   a {
     @apply text-primary-500 underline;
