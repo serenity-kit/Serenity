@@ -13,5 +13,8 @@
   "devDependencies": {
     "@types/libsodium-wrappers": "^0.7.9",
     "@types/libsodium-wrappers-sumo": "^0.7.5"
+  },
+  "jest": {
+    "preset": "react-native"
   }
 }

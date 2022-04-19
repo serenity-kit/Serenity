@@ -1,52 +1,10 @@
 import sodium, { StringKeyPair } from "libsodium-wrappers-sumo";
+import { to_base64, from_base64, from_base64_to_string } from "./base64wasm";
+export { to_base64, from_base64, from_base64_to_string } from "./base64wasm";
 export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers-sumo";
 export const ready = sodium.ready;
-declare const Buffer;
 
-export const to_base64 = (data: Uint8Array | string) => {
-  let base64String = "";
-  if (typeof data === "string") {
-    base64String = btoa(data);
-  } else {
-    base64String = Buffer.from(data).toString("base64");
-  }
-  return base64String
-    .replaceAll("+", "-")
-    .replaceAll("/", "_")
-    .replace(/=+$/, "");
-};
-
-const from_base64 = (data: string) => {
-  const keyStr =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-  for (let i = 0; i < data.length; i++) {
-    const char = data.charAt(i);
-    if (keyStr.indexOf(char) === -1) {
-      throw new Error("invalid input");
-    }
-  }
-  if (data.length === 0) {
-    return new Uint8Array([]);
-  } else {
-    let decodedBase64Str = data.replace("-", "+").replace("_", "/");
-    while (decodedBase64Str.length % 4) {
-      decodedBase64Str += "=";
-    }
-    if (decodedBase64Str.includes(" ")) {
-      throw Error("incomplete input");
-    }
-    const buffer = Buffer.from(decodedBase64Str, "base64");
-    const bytes = new Uint8Array(buffer);
-    if (bytes.length == 0) {
-      throw new Error("invalid input");
-    }
-    return bytes;
-  }
-};
-
-export const from_base64_to_string = (data: string): string => {
-  return atob(data);
-};
+declare const Buffer: any;
 
 export const randombytes_buf = async (length: number): Promise<string> => {
   const result = await sodium.randombytes_buf(length);
@@ -187,6 +145,7 @@ export const crypto_scalarmult_ed25519_noclamp = async (
 export const crypto_generichash_batch = async (
   arr: Array<string>
 ): Promise<string> => {
+  // TODO remove/cleanup? Buffer should not be needed
   const key = Buffer.alloc(sodium.crypto_generichash_KEYBYTES);
   const state = sodium.crypto_generichash_init(
     key,

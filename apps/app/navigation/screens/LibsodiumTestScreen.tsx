@@ -5,13 +5,13 @@ import sodium from "@serenity-tools/libsodium";
 const signingKeyPair = {
   keyType: "ed25519",
   privateKey:
-    "E7YwpvlfrtEMDiHRglSGl4sl3sxnkEzgMrS/1QngPwzBuwX43pBYTksvHfWCy33LXOkesy1N9N9uQ5oKBJXn3Q==",
-  publicKey: "wbsF+N6QWE5LLx31gst9y1zpHrMtTfTfbkOaCgSV590=",
+    "E7YwpvlfrtEMDiHRglSGl4sl3sxnkEzgMrS_1QngPwzBuwX43pBYTksvHfWCy33LXOkesy1N9N9uQ5oKBJXn3Q",
+  publicKey: "wbsF-N6QWE5LLx31gst9y1zpHrMtTfTfbkOaCgSV590",
 };
 
 const exitingCiphertext = "DtMWG6Jx9wAmLXh64enOwd6E7cFX";
-const key = "eL4FdkhTmU2F56ySJKKH+2ZVrzdsIIbbmvyz/N3Swb0=";
-const nonce = "5GDx6cP2/uToVP+UKhddEmUelpyKTJLZ";
+const key = "eL4FdkhTmU2F56ySJKKH-2ZVrzdsIIbbmvyz_N3Swb0";
+const nonce = "5GDx6cP2_uToVP-UKhddEmUelpyKTJLZ";
 
 export default function TestEditorScreen() {
   const [data, setData] = useState({});
@@ -49,6 +49,8 @@ export default function TestEditorScreen() {
           nonce,
           key
         );
+
+      console.log(message);
 
       setData({
         randombytes_buf,

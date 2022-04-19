@@ -1,6 +1,4 @@
 import sodium from "@serenity-tools/libsodium";
-import { to_base64 } from "libsodium-wrappers";
-export type { StringKeyPair } from "libsodium-wrappers";
 
 type OprfChallengeData = {
   oprfChallenge: string;
@@ -240,8 +238,8 @@ const _openEnvelope = async (
     messageData.serverPublicKey
   );
   const b64EncodedClientSessionKeys = {
-    sharedRx: to_base64(clientSessionKeys.sharedRx),
-    sharedTx: to_base64(clientSessionKeys.sharedTx),
+    sharedRx: sodium.to_base64(clientSessionKeys.sharedRx),
+    sharedTx: sodium.to_base64(clientSessionKeys.sharedTx),
   };
   return b64EncodedClientSessionKeys;
 };
