@@ -77,6 +77,11 @@
     @apply flex;
     position: relative;
   }
+  ul[data-type="taskList"] li label {
+    margin-top: 0.25rem;
+    height: 1rem;
+  }
+
   ul[data-type="taskList"] label + div {
     padding-left: 0.5rem;
     flex-grow: 1;
@@ -89,6 +94,7 @@
   ul[data-type="taskList"] li input + span {
     position: relative;
     display: block;
+    height: 1rem;
     /* fixed width needed for absolute positioning of children */
     width: 1rem;
   }
@@ -103,7 +109,6 @@
     height: 1rem;
     border: 0.125rem solid theme("colors.gray.600");
     border-radius: 0.125rem;
-    margin-top: 0.25rem;
   }
   /* - css checkbox : checked - */
   ul[data-type="taskList"] li input:checked + span:before {
@@ -111,7 +116,7 @@
     background-color: theme("colors.primary.400");
   }
   ul[data-type="taskList"] li input:checked + span:after {
-    top: 0.5rem;
+    top: 0.25rem;
     left: 0.125rem;
     width: 0.75rem;
     height: 0.375rem;
