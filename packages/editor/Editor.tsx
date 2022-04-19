@@ -11,6 +11,8 @@ import * as Y from "yjs";
 import { Awareness } from "y-protocols/awareness";
 import { AwarnessExtension } from "./naisho-awareness-extension";
 import EditorButton from "./components/editorButton/EditorButton";
+import TaskList from "@tiptap/extension-task-list";
+import TaskItem from "@tiptap/extension-task-item";
 
 type EditorProps = {
   yDocRef: React.MutableRefObject<Y.Doc>;
@@ -48,6 +50,8 @@ export const Editor = (props: EditorProps) => {
       Link.configure({
         openOnClick: false,
       }),
+      TaskList,
+      TaskItem,
       // register the ydoc with Tiptap
       Collaboration.configure({
         document: props.yDocRef.current,
@@ -128,6 +132,12 @@ export const Editor = (props: EditorProps) => {
             isActive={editor?.isActive("orderedList") || false}
           >
             1
+          </EditorButton>
+          <EditorButton
+            onClick={() => editor?.chain().focus().toggleTaskList().run()}
+            isActive={editor?.isActive("taskList") || false}
+          >
+            T
           </EditorButton>
         </div>
       </View>
