@@ -4,6 +4,8 @@ export { to_base64, from_base64, from_base64_to_string } from "./base64wasm";
 export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers-sumo";
 export const ready = sodium.ready;
 
+declare const Buffer: any;
+
 export const randombytes_buf = async (length: number): Promise<string> => {
   const result = await sodium.randombytes_buf(length);
   return to_base64(result);
