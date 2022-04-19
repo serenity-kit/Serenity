@@ -1,5 +1,11 @@
 import sodium from "react-native-sodium-expo-plugin";
-import { to_base64, from_base64, from_base64_to_string } from "./base64native";
+import {
+  to_base64,
+  from_base64,
+  from_base64_to_string,
+  base64ToUrlSafeBase64,
+  urlSafeBase64ToBase64,
+} from "./base64native";
 export { to_base64, from_base64, from_base64_to_string } from "./base64native";
 
 export type KeyType = "curve25519" | "ed25519" | "x25519";
@@ -18,34 +24,47 @@ export interface StringKeyPair {
 
 export const ready = Promise.resolve();
 
-export const randombytes_buf = async (length: number): Promise<string> =>
-  sodium.randombytes_buf(length);
+export const randombytes_buf = async (length: number): Promise<string> => {
+  const result = await sodium.randombytes_buf(length);
+  return base64ToUrlSafeBase64(result);
+};
 
 export const crypto_sign_keypair = async (): Promise<StringKeyPair> => {
   const result = await sodium.crypto_sign_keypair();
   return {
     keyType: "ed25519",
-    privateKey: result.sk,
-    publicKey: result.pk,
+    privateKey: base64ToUrlSafeBase64(result.sk),
+    publicKey: base64ToUrlSafeBase64(result.pk),
   };
 };
 
 export const crypto_sign_detached = async (
   message: string,
   privateKey: string
-): Promise<string> =>
-  sodium.crypto_sign_detached(to_base64(message), privateKey);
+): Promise<string> => {
+  const result = await sodium.crypto_sign_detached(
+    urlSafeBase64ToBase64(to_base64(message)),
+    urlSafeBase64ToBase64(privateKey)
+  );
+  return base64ToUrlSafeBase64(result);
+};
 
 export const crypto_sign_verify_detached = async (
   signature: string,
   message: string,
   privateKey: string
 ): Promise<boolean> =>
-  sodium.crypto_sign_verify_detached(signature, to_base64(message), privateKey);
+  sodium.crypto_sign_verify_detached(
+    urlSafeBase64ToBase64(signature),
+    urlSafeBase64ToBase64(to_base64(message)),
+    urlSafeBase64ToBase64(privateKey)
+  );
 
 export const crypto_aead_xchacha20poly1305_ietf_keygen =
-  async (): Promise<string> =>
-    sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
+  async (): Promise<string> => {
+    const result = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
+    return base64ToUrlSafeBase64(result);
+  };
 
 export const crypto_aead_xchacha20poly1305_ietf_encrypt = async (
   message: string,
@@ -54,13 +73,13 @@ export const crypto_aead_xchacha20poly1305_ietf_encrypt = async (
   public_nonce: string,
   key: string
 ): Promise<string> => {
-  const result = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-    to_base64(message),
-    to_base64(additional_data),
-    public_nonce,
-    key
+  const result = await sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+    urlSafeBase64ToBase64(to_base64(message)),
+    urlSafeBase64ToBase64(to_base64(additional_data)),
+    urlSafeBase64ToBase64(public_nonce),
+    urlSafeBase64ToBase64(key)
   );
-  return result;
+  return base64ToUrlSafeBase64(result);
 };
 
 export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
@@ -71,12 +90,12 @@ export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
   key: string
 ): Promise<string> => {
   const result = await sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
-    ciphertext,
-    to_base64(additional_data),
-    public_nonce,
-    key
+    urlSafeBase64ToBase64(ciphertext),
+    urlSafeBase64ToBase64(to_base64(additional_data)),
+    urlSafeBase64ToBase64(public_nonce),
+    urlSafeBase64ToBase64(key)
   );
-  return result;
+  return base64ToUrlSafeBase64(result);
 };
 
 export default {
