@@ -1,16 +1,26 @@
 import { Buffer } from "buffer";
 
-export const to_base64 = (data: Uint8Array | string): string => {
-  const base64String = Buffer.from(data).toString("base64");
-  return base64String
-    .replaceAll("+", "-")
-    .replaceAll("/", "_")
-    .replace(/=+$/, "");
+export const base64ToUrlSafeBase64 = (value: string) => {
+  return value.replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
 };
 
+export const urlSafeBase64ToBase64 = (value: string) => {
+  let newValue = value.replace("-", "+").replace("_", "/");
+  while (newValue.length % 4) {
+    newValue += "=";
+  }
+  return newValue;
+};
+
+export const to_base64 = (data: Uint8Array | string): string => {
+  const base64String = Buffer.from(data).toString("base64");
+  return base64ToUrlSafeBase64(base64String);
+};
+
+const keyParseStr =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
 export const from_base64 = (data: string): Uint8Array => {
-  const keyParseStr =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   for (let i = 0; i < data.length; i++) {
     const char = data.charAt(i);
     if (keyParseStr.indexOf(char) === -1) {
@@ -20,10 +30,7 @@ export const from_base64 = (data: string): Uint8Array => {
   if (data.length === 0) {
     return new Uint8Array([]);
   } else {
-    let decodedBase64Str = data.replace("-", "+").replace("_", "/");
-    while (decodedBase64Str.length % 4) {
-      decodedBase64Str += "=";
-    }
+    const decodedBase64Str = urlSafeBase64ToBase64(data);
     if (decodedBase64Str.includes(" ")) {
       throw Error("incomplete input");
     }
@@ -32,8 +39,6 @@ export const from_base64 = (data: string): Uint8Array => {
 };
 
 export const from_base64_to_string = (data: string): string => {
-  const keyParseStr =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
   for (let i = 0; i < data.length; i++) {
     const char = data.charAt(i);
     if (keyParseStr.indexOf(char) === -1) {
@@ -43,10 +48,7 @@ export const from_base64_to_string = (data: string): string => {
   if (data.length === 0) {
     return "";
   } else {
-    let decodedBase64Str = data.replace("-", "+").replace("_", "/");
-    while (decodedBase64Str.length % 4) {
-      decodedBase64Str += "=";
-    }
+    const decodedBase64Str = urlSafeBase64ToBase64(data);
     if (decodedBase64Str.includes(" ")) {
       throw Error("incomplete input");
     }

@@ -50,8 +50,6 @@ export default function TestEditorScreen() {
           key
         );
 
-      console.log(message);
-
       setData({
         randombytes_buf,
         crypto_sign_keypair,
