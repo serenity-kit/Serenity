@@ -5,10 +5,9 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { ColorSchemeName } from "react-native";
+import { ColorSchemeName, useWindowDimensions } from "react-native";
 import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
-import { useWindowDimensions } from "react-native";
 
 import NotFoundScreen from "./screens/NotFoundScreen";
 import EditorScreen from "./screens/EditorScreen";
@@ -21,8 +20,7 @@ import RegisterScreen from "./screens/RegisterScreen";
 import LoginScreen from "./screens/LoginScreen";
 import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
-
-const sidebarBreakPoint = 800;
+import useIsPermanentSidebar from "../hooks/useIsPermanentSidebar";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -32,18 +30,19 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
 function AuthorizedStackScreen() {
+  const isPermanentSidebar = useIsPermanentSidebar();
   const { width } = useWindowDimensions();
-  const isSidebarVisible = width > sidebarBreakPoint;
 
   return (
     <Drawer.Navigator
       drawerContent={(props) => <Sidebar {...props} />}
       screenOptions={{
-        drawerType: isSidebarVisible ? "permanent" : "front",
+        drawerType: isPermanentSidebar ? "permanent" : "front",
         drawerStyle: {
-          width: isSidebarVisible ? 250 : width,
+          width: isPermanentSidebar ? 250 : width,
         },
-        headerLeft: isSidebarVisible ? () => null : undefined,
+        headerLeft: isPermanentSidebar ? () => null : undefined,
+        overlayColor: "transparent",
       }}
     >
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
