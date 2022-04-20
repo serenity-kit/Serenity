@@ -22,6 +22,8 @@ import LoginScreen from "./screens/LoginScreen";
 import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
 
+const sidebarBreakPoint = 800;
+
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
  * https://reactnavigation.org/docs/modal
@@ -31,12 +33,17 @@ const Drawer = createDrawerNavigator();
 
 function AuthorizedStackScreen() {
   const { width } = useWindowDimensions();
+  const isSidebarVisible = width > sidebarBreakPoint;
 
   return (
     <Drawer.Navigator
       drawerContent={(props) => <Sidebar {...props} />}
       screenOptions={{
-        drawerType: width > 800 ? "permanent" : "slide",
+        drawerType: isSidebarVisible ? "permanent" : "front",
+        drawerStyle: {
+          width: isSidebarVisible ? 250 : width,
+        },
+        headerLeft: isSidebarVisible ? () => null : undefined,
       }}
     >
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
