@@ -22,7 +22,10 @@
   }
   /* fixed leading needed for tasklist-icon alignment  */
   p {
-    @apply my-2 leading-6 text-mobile sm:text-base;
+    @apply leading-6 text-mobile sm:text-base;
+  }
+  * + p {
+    @apply mt-2;
   }
   a {
     @apply text-primary-500 underline;
@@ -42,28 +45,18 @@
   ul {
     @apply my-4;
   }
-  /* avoid jumping when initializing a list before any other element */
-  ol:first-child li,
-  ul:first-child li {
-    @apply mt-0;
-  }
   ol,
   ul:not([data-type="taskList"]) {
-    @apply pl-4;
-  }
-  ol li,
-  ul li {
-    @apply my-2;
+    @apply pl-4.5;
   }
   ol li,
   ul:not([data-type="taskList"]) li {
     /* to align text-indent of blockelements (list, quote, codeblock) */
-    @apply pl-1;
+    @apply pl-0.5;
   }
-  /* remove p margin as we use the spacing on list-elements */
-  ol p,
-  ul p {
-    margin: 0;
+  /* avoid jumping when initializing a list before any other element */
+  li + li {
+    @apply mt-2;
   }
   ol {
     @apply list-decimal;
@@ -81,7 +74,6 @@
     margin-top: 0.25rem;
     height: 1rem;
   }
-
   ul[data-type="taskList"] label + div {
     padding-left: 0.5rem;
     flex-grow: 1;
@@ -90,6 +82,7 @@
     opacity: 0;
     position: absolute;
   }
+
   /* - css checkbox - */
   ul[data-type="taskList"] li input + span {
     position: relative;

@@ -33,6 +33,9 @@ module.exports = {
       fontSize: {
         mobile: "1.0625rem",
       },
+      padding: {
+        4.5: "1.125rem",
+      },
     },
   },
   plugins: [],
