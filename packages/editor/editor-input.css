@@ -11,6 +11,7 @@
     @apply bg-primary-400/50;
   }
 
+  /* spacing calculatable via * + * ?? */
   h1 {
     @apply mt-12 mb-3 text-3xl font-bold;
   }
@@ -103,6 +104,7 @@
     border: 0.125rem solid theme("colors.gray.600");
     border-radius: 0.125rem;
   }
+
   /* - css checkbox : checked - */
   ul[data-type="taskList"] li input:checked + span:before {
     border-color: theme("colors.primary.400");
@@ -143,6 +145,7 @@
   margin-top: 0;
 }
 
+/* generate debug class to show this */
 /* ------------------------- */
 /* TODO remove after testing */
 /* ------------------------- */
