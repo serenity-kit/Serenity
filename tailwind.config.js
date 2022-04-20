@@ -31,10 +31,10 @@ module.exports = {
     extend: {
       // custom fontSize multiplier for better scalability (represents a default size of 17px)
       fontSize: {
-        mobile: "1.0625rem",
+        mobile: "1.0625rem", // editor specific
       },
       padding: {
-        4.5: "1.125rem",
+        4.5: "1.125rem", // editor specific
       },
     },
   },
