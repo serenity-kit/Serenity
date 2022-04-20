@@ -23,7 +23,7 @@
   }
   /* fixed leading needed for tasklist-icon alignment  */
   p {
-    @apply leading-6 text-mobile sm:text-base;
+    @apply text-mobile leading-6 sm:text-base;
   }
   * + p {
     @apply mt-2;
@@ -38,7 +38,7 @@
   }
 
   blockquote {
-    @apply my-4 pl-4 border-solid border-l-4 border-primary-400;
+    @apply my-4 border-l-4 border-solid border-primary-400 pl-4;
   }
 
   /* --- lists --- */
@@ -126,7 +126,7 @@
 
   /* --- editor --- */
   .ProseMirror {
-    @apply w-full max-w-prose mx-auto;
+    @apply mx-auto w-full max-w-prose;
   }
 }
 
