@@ -1,9 +1,12 @@
 import React, { forwardRef } from "react";
+import { StyleSheet } from "react-native";
 import { Input as NbInput, IInputProps } from "native-base";
 import { tw } from "../../tailwind";
 
-const wrapperBaseStyle = tw`rounded`;
-const inputBaseStyle = tw`text-base text-gray-900 px-4 py-3`;
+const styles = StyleSheet.create({
+  wrapper: tw`rounded`,
+  input: tw`text-base text-gray-900 px-4 py-3`,
+});
 
 export const Input = forwardRef((props: IInputProps, ref) => {
   return (
@@ -11,22 +14,27 @@ export const Input = forwardRef((props: IInputProps, ref) => {
       // @ts-ignore
       ref={ref}
       {...props}
-      style={tw.style(inputBaseStyle)}
+      style={styles.input}
       _stack={{
         style: props.disabled
-          ? tw.style(wrapperBaseStyle, `bg-gray-100 border-gray-400`)
-          : tw.style(wrapperBaseStyle, `bg-white border-gray-400`),
+          ? [styles.wrapper, tw`bg-gray-100 border-gray-400`]
+          : [styles.wrapper, tw`bg-white border-gray-400`],
       }}
       _hover={{
         _stack: {
           style: props.disabled
-            ? tw.style(wrapperBaseStyle, `bg-gray-100 border-gray-400`)
-            : tw.style(wrapperBaseStyle, `bg-white border-primary-500`),
+            ? [styles.wrapper, tw`bg-gray-100 border-gray-400`]
+            : [styles.wrapper, tw`bg-white border-gray-600`],
         },
       }}
       _focus={{
         _stack: {
-          style: tw.style(wrapperBaseStyle, `bg-white border-primary-500`),
+          style: [styles.wrapper, tw`bg-white border-primary-500`],
+        },
+        _hover: {
+          _stack: {
+            style: [styles.wrapper, tw`bg-white border-primary-500`],
+          },
         },
       }}
     />
