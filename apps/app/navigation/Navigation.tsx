@@ -37,6 +37,7 @@ function AuthorizedStackScreen() {
     <Drawer.Navigator
       drawerContent={(props) => <Sidebar {...props} />}
       screenOptions={{
+        headerShown: false,
         drawerType: isPermanentSidebar ? "permanent" : "front",
         drawerStyle: {
           width: isPermanentSidebar ? 250 : width,
@@ -63,8 +64,16 @@ function RootNavigator() {
       />
       <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
       <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen
+        name="Register"
+        component={RegisterScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}

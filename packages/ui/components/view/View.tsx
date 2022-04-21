@@ -1,15 +1,17 @@
 import React from "react";
-import { View as RNView } from "react-native";
+import { View as RNView, StyleSheet } from "react-native";
 import { ThemeProps } from "../../types";
 export type ViewProps = ThemeProps & RNView["props"];
 import { tw } from "../../tailwind";
 
-export function View(props: ViewProps) {
-  return (
-    <RNView
-      {...props}
-      // @ts-expect-error allow style overwrite
-      style={tw.style(`bg-white dark:bg-gray-900`, props.style)}
-    />
-  );
-}
+const styles = StyleSheet.create({
+  view: tw`bg-white dark:bg-gray-900`,
+});
+
+export const View = React.forwardRef(function View(
+  props: ViewProps,
+  ref: React.LegacyRef<RNView> | undefined
+) {
+  console.log("weee", props.style);
+  return <RNView ref={ref} {...props} style={[styles.view, props.style]} />;
+});
