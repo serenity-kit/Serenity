@@ -23,7 +23,7 @@ const headingLevels: Level[] = [1, 2, 3];
 
 // dummy element - remove when using sidesheet
 const Divider = () => {
-  return <div className="w-0 border-solid border-gray-600 border-l"></div>;
+  return <div className="w-0 border-l border-solid border-gray-600"></div>;
 };
 
 export const Editor = (props: EditorProps) => {
@@ -141,7 +141,7 @@ export const Editor = (props: EditorProps) => {
           </EditorButton>
         </div>
       </View>
-      <div className="py-10 md:py-14 px-4 xs:px-6 sm:px-10 lg:px-16">
+      <div className="py-10 px-4 xs:px-6 sm:px-10 md:py-14 lg:px-16">
         <EditorContent editor={editor} />
       </div>
     </EditorWrapperView>
