@@ -30,7 +30,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
 function AuthorizedStackScreen() {
-  const isPermanentSidebar = useIsPermanentLeftSidebar();
+  const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
 
   return (
@@ -38,11 +38,11 @@ function AuthorizedStackScreen() {
       drawerContent={(props) => <Sidebar {...props} />}
       screenOptions={{
         headerShown: false,
-        drawerType: isPermanentSidebar ? "permanent" : "front",
+        drawerType: isPermanentLeftSidebar ? "permanent" : "front",
         drawerStyle: {
-          width: isPermanentSidebar ? 250 : width,
+          width: isPermanentLeftSidebar ? 250 : width,
         },
-        headerLeft: isPermanentSidebar ? () => null : undefined,
+        headerLeft: isPermanentLeftSidebar ? () => null : undefined,
         overlayColor: "transparent",
       }}
     >

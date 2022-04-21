@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Platform } from "react-native";
+import { Platform, SafeAreaView } from "react-native";
 import { WebView } from "react-native-webview";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
@@ -47,7 +47,7 @@ export default function Editor({ yDocRef, openDrawer }: EditorProps) {
   });
 
   return (
-    <View style={tw`bg-white flex-auto`}>
+    <SafeAreaView style={tw`bg-white flex-auto`}>
       <WebView
         ref={webViewRef}
         originWhitelist={["*"]}
@@ -66,6 +66,9 @@ export default function Editor({ yDocRef, openDrawer }: EditorProps) {
         onMessage={async (event) => {
           // event.persist();
           const message = JSON.parse(event.nativeEvent.data);
+          if (message.type === "openDrawer") {
+            openDrawer();
+          }
           if (message.type === "update") {
             const update = new Uint8Array(message.content);
             if (yDocRef.current) {
@@ -98,6 +101,6 @@ export default function Editor({ yDocRef, openDrawer }: EditorProps) {
             `);
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 }
