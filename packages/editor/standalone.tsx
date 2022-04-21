@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { NativeBaseProvider } from "native-base";
 import { Editor } from "./Editor";
 import * as Y from "yjs";
 
@@ -21,8 +22,14 @@ ydoc.on("update", (update: any) => {
   }
 });
 
+const openDrawer = () => {
+  window.ReactNativeWebView.postMessage(JSON.stringify({ type: "openDrawer" }));
+};
+
 const domContainer = document.querySelector("#editor");
 ReactDOM.render(
-  <Editor yDocRef={{ current: ydoc }} openDrawer={() => undefined} />,
+  <NativeBaseProvider>
+    <Editor yDocRef={{ current: ydoc }} openDrawer={openDrawer} />
+  </NativeBaseProvider>,
   domContainer
 );
