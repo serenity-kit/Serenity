@@ -10,7 +10,6 @@ import Collaboration from "@tiptap/extension-collaboration";
 import * as Y from "yjs";
 import { Awareness } from "y-protocols/awareness";
 import { AwarnessExtension } from "./naisho-awareness-extension";
-import EditorButton from "./components/editorButton/EditorButton";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
@@ -23,11 +22,6 @@ type EditorProps = {
 };
 
 const headingLevels: Level[] = [1, 2, 3];
-
-// dummy element - remove when using sidesheet
-const Divider = () => {
-  return <div className="w-0 border-l border-solid border-gray-600"></div>;
-};
 
 export const Editor = (props: EditorProps) => {
   const hasEditorSidebar = useHasEditorSidebar();
@@ -72,91 +66,13 @@ export const Editor = (props: EditorProps) => {
         <CenterHeader openDrawer={props.openDrawer}>
           <Text>Page</Text>
         </CenterHeader>
-        <View>
-          <div className="flex space-x-1 p-1">
-            {headingLevels.map((lvl) => {
-              return (
-                <EditorButton
-                  key={lvl}
-                  onClick={() =>
-                    editor?.chain().focus().toggleHeading({ level: lvl }).run()
-                  }
-                  isActive={
-                    editor?.isActive("heading", { level: lvl }) || false
-                  }
-                >
-                  H{lvl}
-                </EditorButton>
-              );
-            })}
-            <Divider></Divider>
-            <EditorButton
-              onClick={() => editor?.chain().focus().toggleBold().run()}
-              isActive={editor?.isActive("bold") || false}
-            >
-              B
-            </EditorButton>
-            <EditorButton
-              onClick={() => editor?.chain().focus().toggleItalic().run()}
-              isActive={editor?.isActive("italic") || false}
-            >
-              I
-            </EditorButton>
-            {/* styling dummy */}
-            <EditorButton
-              onClick={() =>
-                editor?.chain().focus().toggleLink({ href: "#" }).run()
-              }
-              isActive={editor?.isActive("link") || false}
-            >
-              L
-            </EditorButton>
-            <Divider></Divider>
-            <EditorButton
-              onClick={() => editor?.chain().focus().toggleCode().run()}
-              isActive={editor?.isActive("code") || false}
-            >
-              C
-            </EditorButton>
-            <EditorButton
-              onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
-              isActive={editor?.isActive("codeBlock") || false}
-            >
-              K
-            </EditorButton>
-            <Divider></Divider>
-            <EditorButton
-              onClick={() => editor?.chain().focus().toggleBlockquote().run()}
-              isActive={editor?.isActive("blockquote") || false}
-            >
-              Q
-            </EditorButton>
-            <Divider></Divider>
-            <EditorButton
-              onClick={() => editor?.chain().focus().toggleBulletList().run()}
-              isActive={editor?.isActive("bulletList") || false}
-            >
-              &sdot;
-            </EditorButton>
-            <EditorButton
-              onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-              isActive={editor?.isActive("orderedList") || false}
-            >
-              1
-            </EditorButton>
-            <EditorButton
-              onClick={() => editor?.chain().focus().toggleTaskList().run()}
-              isActive={editor?.isActive("taskList") || false}
-            >
-              T
-            </EditorButton>
-          </div>
-        </View>
         <div className="flex-auto overflow-y-auto overflow-x-hidden px-4 py-10 xs:px-6 sm:px-10 md:py-14 lg:px-16">
           <EditorContent editor={editor} />
         </div>
       </View>
-      {hasEditorSidebar && <EditorSidebar />}
+      {hasEditorSidebar && (
+        <EditorSidebar editor={editor} headingLevels={headingLevels} />
+      )}
     </div>
   );
 };
