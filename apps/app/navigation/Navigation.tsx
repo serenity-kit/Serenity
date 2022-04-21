@@ -40,7 +40,7 @@ function AuthorizedStackScreen() {
         headerShown: false,
         drawerType: isPermanentLeftSidebar ? "permanent" : "front",
         drawerStyle: {
-          width: isPermanentLeftSidebar ? 250 : width,
+          width: isPermanentLeftSidebar ? 240 : width,
         },
         headerLeft: isPermanentLeftSidebar ? () => null : undefined,
         overlayColor: "transparent",
