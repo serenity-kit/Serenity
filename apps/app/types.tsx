@@ -29,6 +29,7 @@ export type RootStackParamList = {
   DevDashboard: undefined;
   Register: undefined;
   Login: undefined;
+  EncryptDecryptImageTest: undefined;
   NotFound: undefined;
 };
 

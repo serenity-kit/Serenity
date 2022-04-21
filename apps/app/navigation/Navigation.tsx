@@ -21,6 +21,7 @@ import RegisterScreen from "./screens/RegisterScreen";
 import LoginScreen from "./screens/LoginScreen";
 import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
+import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -59,6 +60,10 @@ function RootNavigator() {
       <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen
+        name="EncryptDecryptImageTest"
+        component={EncryptDecryptImageTestScreen}
+      />
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
