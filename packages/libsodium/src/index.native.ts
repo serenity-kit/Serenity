@@ -107,19 +107,6 @@ export const crypto_box_keypair = async (): Promise<StringKeyPair> => {
   };
 };
 
-/*
-export const crypto_kx_client_session_keys =
-  async (): Promise<StringKeyPair> => {
-    const result = await sodium.crypto_kx_client_session_keys();
-    return {
-      keyType: "curve25519",
-      privateKey: to_base64(result.sk),
-      publicKey: to_base64(result.pk),
-    };
-  };
-}
-/* */
-
 type Libsodium = typeof libsodiumExports & {
   crypto_generichash_BYTES: number;
   crypto_secretbox_NONCEBYTES: number;
