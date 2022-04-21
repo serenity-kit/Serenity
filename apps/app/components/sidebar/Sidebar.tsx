@@ -1,13 +1,12 @@
 import { DrawerContentScrollView } from "@react-navigation/drawer";
-import { Button, Link } from "@serenity-tools/ui";
-import useIsPermanentSidebar from "../../hooks/useIsPermanentSidebar";
+import { Button, Link, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 
 export default function Sidebar(props) {
-  const isPermanentSidebar = useIsPermanentSidebar();
+  const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
 
   return (
     <DrawerContentScrollView {...props}>
-      {!isPermanentSidebar && (
+      {!isPermanentLeftSidebar && (
         <Button
           onPress={() => {
             props.navigation.closeDrawer();

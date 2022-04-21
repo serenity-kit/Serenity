@@ -22,4 +22,7 @@ ydoc.on("update", (update: any) => {
 });
 
 const domContainer = document.querySelector("#editor");
-ReactDOM.render(<Editor yDocRef={{ current: ydoc }} />, domContainer);
+ReactDOM.render(
+  <Editor yDocRef={{ current: ydoc }} openDrawer={() => undefined} />,
+  domContainer
+);

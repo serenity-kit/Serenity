@@ -21,7 +21,7 @@ let editorSource =
     ? require("../../assets/index.html")
     : { html: null };
 
-export default function Editor({ yDocRef }: EditorProps) {
+export default function Editor({ yDocRef, openDrawer }: EditorProps) {
   const webViewRef = useRef(null);
 
   useEffect(() => {

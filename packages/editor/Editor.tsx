@@ -2,7 +2,7 @@ import "./editor-output.css";
 import "./awareness.css";
 import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
-import { tw, View } from "@serenity-tools/ui";
+import { CenterHeader, Text, tw, View } from "@serenity-tools/ui";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import { Level } from "@tiptap/extension-heading";
@@ -14,11 +14,12 @@ import EditorButton from "./components/editorButton/EditorButton";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
-import { useHasSidebar } from "./hooks/useHasSidebar";
+import { useHasEditorSidebar } from "./hooks/useHasEditorSidebar";
 
 type EditorProps = {
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef?: React.MutableRefObject<Awareness>;
+  openDrawer: () => void;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -29,7 +30,7 @@ const Divider = () => {
 };
 
 export const Editor = (props: EditorProps) => {
-  const [wrapperRef, hasSidebar] = useHasSidebar();
+  const hasEditorSidebar = useHasEditorSidebar();
 
   const editor = useEditor({
     extensions: [
@@ -66,8 +67,11 @@ export const Editor = (props: EditorProps) => {
   });
 
   return (
-    <div className="flex flex-auto flex-row" ref={wrapperRef}>
+    <div className="flex flex-auto flex-row">
       <View style={tw`flex-auto text-gray-900 dark:text-white`}>
+        <CenterHeader openDrawer={props.openDrawer}>
+          <Text>Page</Text>
+        </CenterHeader>
         <View>
           <div className="flex space-x-1 p-1">
             {headingLevels.map((lvl) => {
@@ -152,7 +156,7 @@ export const Editor = (props: EditorProps) => {
           <EditorContent editor={editor} />
         </div>
       </View>
-      {hasSidebar && <EditorSidebar />}
+      {hasEditorSidebar && <EditorSidebar />}
     </div>
   );
 };

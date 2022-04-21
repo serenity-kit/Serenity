@@ -49,5 +49,5 @@ export default function EditorScreen({
   const yDocRef = useRef(yDoc);
   console.log("yDocRef", yDocRef.current);
 
-  return <Editor yDocRef={yDocRef} />;
+  return <Editor yDocRef={yDocRef} openDrawer={navigation.openDrawer} />;
 }
