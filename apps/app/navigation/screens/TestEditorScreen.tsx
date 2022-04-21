@@ -405,7 +405,11 @@ export default function TestEditorScreen({
       <View>
         <Text>{websocketState.connected ? "Connected" : "Disconnected"}</Text>
       </View>
-      <Editor yDocRef={yDocRef} yAwarenessRef={yAwarenessRef} />
+      <Editor
+        yDocRef={yDocRef}
+        yAwarenessRef={yAwarenessRef}
+        openDrawer={navigation.openDrawer}
+      />
     </View>
   );
 }

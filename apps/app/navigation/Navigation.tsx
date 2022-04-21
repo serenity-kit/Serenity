@@ -20,7 +20,7 @@ import RegisterScreen from "./screens/RegisterScreen";
 import LoginScreen from "./screens/LoginScreen";
 import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
-import useIsPermanentSidebar from "../hooks/useIsPermanentSidebar";
+import { useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -30,13 +30,14 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
 function AuthorizedStackScreen() {
-  const isPermanentSidebar = useIsPermanentSidebar();
+  const isPermanentSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
 
   return (
     <Drawer.Navigator
       drawerContent={(props) => <Sidebar {...props} />}
       screenOptions={{
+        headerShown: false,
         drawerType: isPermanentSidebar ? "permanent" : "front",
         drawerStyle: {
           width: isPermanentSidebar ? 250 : width,
@@ -63,8 +64,16 @@ function RootNavigator() {
       />
       <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
       <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen
+        name="Register"
+        component={RegisterScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
