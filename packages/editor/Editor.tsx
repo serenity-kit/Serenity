@@ -62,7 +62,7 @@ export const Editor = (props: EditorProps) => {
   });
 
   return (
-    <View style={tw`flex-auto text-gray-900 dark:text-white pb-10 md:pb-14`}>
+    <View style={tw`flex-auto text-gray-900 dark:text-white`}>
       <View>
         <div className="flex space-x-1 p-1">
           {headingLevels.map((lvl) => {
@@ -141,7 +141,7 @@ export const Editor = (props: EditorProps) => {
           </EditorButton>
         </div>
       </View>
-      <div className="flex-auto overflow-y-auto overflow-x-hidden px-4 pt-10 xs:px-6 sm:px-10 md:pt-14 lg:px-16">
+      <div className="flex-auto overflow-y-auto overflow-x-hidden px-4 py-10 xs:px-6 sm:px-10 md:py-14 lg:px-16">
         <EditorContent editor={editor} />
       </div>
     </View>
