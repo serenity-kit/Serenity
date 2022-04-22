@@ -5,7 +5,7 @@ export const base64ToUrlSafeBase64 = (value: string) => {
 };
 
 export const urlSafeBase64ToBase64 = (value: string) => {
-  let newValue = value.replace("-", "+").replace("_", "/");
+  let newValue = value.replaceAll("-", "+").replaceAll("_", "/");
   while (newValue.length % 4) {
     newValue += "=";
   }
