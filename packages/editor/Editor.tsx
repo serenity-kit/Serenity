@@ -33,8 +33,8 @@ export const Editor = (props: EditorProps) => {
         history: false,
         code: {
           HTMLAttributes: {
-            // using py-0.5 so that code elements in adjacent lines don't overlap
-            class: "py-0.5 px-1.5 bg-gray-200 rounded",
+            // using pt-1/pb-0.5 so that code elements in adjacent lines don't overlap and the Text still looks centered
+            class: "pt-1 pb-0.5 px-1.5 bg-gray-200 rounded",
           },
         },
         codeBlock: {
