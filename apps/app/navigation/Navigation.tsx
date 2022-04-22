@@ -104,6 +104,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       DesignSystem: "design-system",
       Register: "register",
       Login: "login",
+      EncryptDecryptImageTest: "encrypt-decrypt-image-test",
       NotFound: "*",
     },
   },
