@@ -66,8 +66,9 @@ export const Editor = (props: EditorProps) => {
         <CenterHeader openDrawer={props.openDrawer}>
           <Text>Page</Text>
         </CenterHeader>
-        <div className="flex-auto overflow-y-auto overflow-x-hidden px-4 py-10 xs:px-6 sm:px-10 md:py-14 lg:px-16">
-          <EditorContent editor={editor} />
+        <div className="flex-auto overflow-y-auto overflow-x-hidden">
+          {/* h-full needed to expand the editor to it's full height even when empty */}
+          <EditorContent className="h-full" editor={editor} />
         </div>
       </View>
       {hasEditorSidebar && (
