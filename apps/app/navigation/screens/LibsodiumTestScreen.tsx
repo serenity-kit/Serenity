@@ -19,11 +19,29 @@ export default function TestEditorScreen() {
   useEffect(() => {
     async function run() {
       const randombytes_buf = await sodium.randombytes_buf(24);
-      const crypto_sign_keypair = await sodium.crypto_sign_keypair();
       const crypto_sign_detached = await sodium.crypto_sign_detached(
         "Hello",
         signingKeyPair.privateKey
       );
+      const crypto_sign_verify_detached =
+        await sodium.crypto_sign_verify_detached(
+          crypto_sign_detached,
+          "Hello",
+          signingKeyPair.publicKey
+        );
+
+      const crypto_sign_keypair = await sodium.crypto_sign_keypair();
+      const crypto_sign_detached2 = await sodium.crypto_sign_detached(
+        "Hello",
+        crypto_sign_keypair.privateKey
+      );
+      const crypto_sign_verify_detached2 =
+        await sodium.crypto_sign_verify_detached(
+          crypto_sign_detached2,
+          "Hello",
+          crypto_sign_keypair.publicKey
+        );
+
       const tmpKey = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
       const ciphertext =
         await sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
@@ -54,6 +72,9 @@ export default function TestEditorScreen() {
         randombytes_buf,
         crypto_sign_keypair,
         crypto_sign_detached,
+        crypto_sign_verify_detached,
+        crypto_sign_detached2,
+        crypto_sign_verify_detached2,
         ciphertext,
         message: sodium.from_base64_to_string(message),
         messageFromExistingCiphertext: sodium.from_base64_to_string(

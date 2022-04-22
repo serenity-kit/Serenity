@@ -19,6 +19,7 @@ export default function DesignSystemScreen() {
       <Input disabled placeholder="Enter your email …" />
       <Text>Icons</Text>
       <Icon name="bold" />
+      <Icon name="italic" />
       <Icon name="list-check-2" />
       <Icon name="list-unordered" />
       <Text>Icon resized</Text>

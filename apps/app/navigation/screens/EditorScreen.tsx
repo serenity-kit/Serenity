@@ -2,7 +2,7 @@ import Editor from "../../components/editor/Editor";
 import { useRef, useState } from "react";
 import * as Y from "yjs";
 
-import { View } from "@serenity-tools/ui";
+import { tw, View } from "@serenity-tools/ui";
 import { RootTabScreenProps } from "../../types";
 
 /*
@@ -49,9 +49,5 @@ export default function EditorScreen({
   const yDocRef = useRef(yDoc);
   console.log("yDocRef", yDocRef.current);
 
-  return (
-    <View>
-      <Editor yDocRef={yDocRef} />
-    </View>
-  );
+  return <Editor yDocRef={yDocRef} openDrawer={navigation.openDrawer} />;
 }

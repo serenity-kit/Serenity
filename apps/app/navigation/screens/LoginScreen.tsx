@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, Button, Input } from "@serenity-tools/ui";
+import { Text, View, Button, Input, tw } from "@serenity-tools/ui";
 import {
   createClientKeyPair,
   createOprfChallenge,
@@ -198,51 +198,54 @@ export default function LoginScreen() {
   const onPasswordChangeText = (password: string) => {
     setPassword(password);
   };
+
   return (
-    <View>
-      <Text>Register</Text>
+    <View style={tw`bg-gray-100 justify-center items-center flex-auto`}>
+      <View style={tw`max-w-md p-10`}>
+        <Text>Register</Text>
 
-      {hasGqlError && (
+        {hasGqlError && (
+          <View>
+            <Text>{gqlErrorMessage}</Text>
+          </View>
+        )}
+
+        {didLoginSucceed && (
+          <View>
+            <Text>Login Succeeded</Text>
+          </View>
+        )}
+
         <View>
-          <Text>{gqlErrorMessage}</Text>
+          <Text>Email</Text>
+          <Input
+            keyboardType="email-address"
+            value={username}
+            onChangeText={onUsernameChangeText}
+            placeholder="Enter your email …"
+          />
         </View>
-      )}
 
-      {didLoginSucceed && (
         <View>
-          <Text>Login Succeeded</Text>
+          <Text>Password</Text>
+          <Input
+            secureTextEntry
+            value={password}
+            onChangeText={onPasswordChangeText}
+            placeholder="Enter your password …"
+          />
         </View>
-      )}
 
-      <View>
-        <Text>Email</Text>
-        <Input
-          keyboardType="email-address"
-          value={username}
-          onChangeText={onUsernameChangeText}
-          placeholder="Enter your email …"
-        />
+        <View>
+          <Text>OauthToken: {oauthAccessToken}</Text>
+          <Text>
+            Token expires in:{" "}
+            {Math.round(accessTokenExpiresIn / (24 * 60 * 60))} days
+          </Text>
+        </View>
+
+        <Button onPress={onLoginPress}>Log in</Button>
       </View>
-
-      <View>
-        <Text>Password</Text>
-        <Input
-          secureTextEntry
-          value={password}
-          onChangeText={onPasswordChangeText}
-          placeholder="Enter your password …"
-        />
-      </View>
-
-      <View>
-        <Text>OauthToken: {oauthAccessToken}</Text>
-        <Text>
-          Token expires in: {Math.round(accessTokenExpiresIn / (24 * 60 * 60))}{" "}
-          days
-        </Text>
-      </View>
-
-      <Button onPress={onLoginPress}>Log in</Button>
     </View>
   );
 }

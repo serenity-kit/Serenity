@@ -1,7 +1,12 @@
 // inspired by https://github.com/GeekyAnts/NativeBase/blob/master/src/components/primitives/Button/Button.tsx
 
 import React, { forwardRef } from "react";
-import { Text as RnText, View as RnView, PressableProps } from "react-native";
+import {
+  Text as RnText,
+  View as RnView,
+  PressableProps,
+  StyleSheet,
+} from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
 import { Pressable } from "native-base";
 import { tw } from "../../tailwind";
@@ -15,7 +20,10 @@ type ComputeStyleParams = {
   isFocused: boolean;
 };
 
-const baseStyle = tw`rounded px-4 py-3`;
+const styles = StyleSheet.create({
+  wrapper: tw`rounded px-4 py-3 bg-primary-500`,
+  text: tw`text-base text-center text-gray-100`,
+});
 
 const computeStyle = ({
   disabled,
@@ -54,9 +62,8 @@ export const Button = forwardRef((props: Props, ref) => {
       {({ isPressed, isHovered, isFocused }) => {
         return (
           <RnView
-            style={tw.style(
-              baseStyle,
-              `bg-primary-500`,
+            style={[
+              styles.wrapper,
               computeStyle({
                 disabled: props.disabled,
                 isPressed,
@@ -65,13 +72,10 @@ export const Button = forwardRef((props: Props, ref) => {
                 isFocused,
               }),
               { cursor: props.disabled ? "not-allowed" : "pointer" }, // web only
-              // @ts-ignore
-              props.style
-            )}
+              props.style,
+            ]}
           >
-            <RnText style={tw`text-base text-center text-gray-100`}>
-              {props.children}
-            </RnText>
+            <RnText style={styles.text}>{props.children}</RnText>
           </RnView>
         );
       }}

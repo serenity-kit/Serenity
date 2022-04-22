@@ -30,7 +30,7 @@ import {
   applyAwarenessUpdate,
   removeAwarenessStates,
 } from "y-protocols/awareness";
-import { View, Text } from "@serenity-tools/ui";
+import { View, Text, tw } from "@serenity-tools/ui";
 import { RootTabScreenProps } from "../../types";
 import { useEffect, useRef } from "react";
 
@@ -401,11 +401,15 @@ export default function TestEditorScreen({
   }, []);
 
   return (
-    <View>
+    <View style={tw`bg-white flex-auto`}>
       <View>
         <Text>{websocketState.connected ? "Connected" : "Disconnected"}</Text>
       </View>
-      <Editor yDocRef={yDocRef} yAwarenessRef={yAwarenessRef} />
+      <Editor
+        yDocRef={yDocRef}
+        yAwarenessRef={yAwarenessRef}
+        openDrawer={navigation.openDrawer}
+      />
     </View>
   );
 }

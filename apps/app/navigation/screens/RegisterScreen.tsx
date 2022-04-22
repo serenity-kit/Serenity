@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { Text, View, Input, Button } from "@serenity-tools/ui";
+import { Text, View, Input, Button, tw } from "@serenity-tools/ui";
 import {
   createClientKeyPair,
   createOprfChallenge,
@@ -148,6 +148,8 @@ export default function RegisterScreen() {
     setGqlErrorMessage("");
     let oprfChallengeResponse: any = null;
     try {
+      // TODO the getServerOprfChallenge should include a signature of the challenge response and be verified that it belongs to
+      // the server public to make sure it wasn't tampered with
       oprfChallengeResponse = await getServerOprfChallenge();
       console.log({ oprfChallengeResponse });
     } catch (error) {
@@ -182,38 +184,40 @@ export default function RegisterScreen() {
     setPassword(password);
   };
   return (
-    <View>
-      <Text>Register</Text>
+    <View style={tw`bg-gray-100 justify-center items-center flex-auto`}>
+      <View style={tw`max-w-md p-10`}>
+        <Text>Register</Text>
 
-      {hasGqlError && (
-        <View>
-          <Text>{gqlErrorMessage}</Text>
-        </View>
-      )}
+        {hasGqlError && (
+          <View>
+            <Text>{gqlErrorMessage}</Text>
+          </View>
+        )}
 
-      {didRegistrationSucceed && (
-        <View>
-          <Text>Registration Succeeded</Text>
-        </View>
-      )}
+        {didRegistrationSucceed && (
+          <View>
+            <Text>Registration Succeeded</Text>
+          </View>
+        )}
 
-      <Text>Email</Text>
-      <Input
-        keyboardType="email-address"
-        value={username}
-        onChangeText={onUsernameChangeText}
-        placeholder="Enter your email …"
-      />
+        <Text>Email</Text>
+        <Input
+          keyboardType="email-address"
+          value={username}
+          onChangeText={onUsernameChangeText}
+          placeholder="Enter your email …"
+        />
 
-      <Text>Password</Text>
-      <Input
-        secureTextEntry
-        value={password}
-        onChangeText={onPasswordChangeText}
-        placeholder="Enter your password …"
-      />
+        <Text>Password</Text>
+        <Input
+          secureTextEntry
+          value={password}
+          onChangeText={onPasswordChangeText}
+          placeholder="Enter your password …"
+        />
 
-      <Button onPress={onRegisterPress}>Register</Button>
+        <Button onPress={onRegisterPress}>Register</Button>
+      </View>
     </View>
   );
 }

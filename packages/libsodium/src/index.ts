@@ -34,12 +34,12 @@ export const crypto_sign_detached = async (
 export const crypto_sign_verify_detached = async (
   signature: string,
   message: string,
-  privateKey: string
+  publicKey: string
 ): Promise<boolean> => {
   return await sodium.crypto_sign_verify_detached(
     from_base64(signature),
     message,
-    from_base64(privateKey)
+    from_base64(publicKey)
   );
 };
 

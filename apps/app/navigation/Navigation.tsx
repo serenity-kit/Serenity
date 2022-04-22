@@ -5,10 +5,9 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { ColorSchemeName } from "react-native";
+import { ColorSchemeName, useWindowDimensions } from "react-native";
 import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
-import { useWindowDimensions } from "react-native";
 
 import NotFoundScreen from "./screens/NotFoundScreen";
 import EditorScreen from "./screens/EditorScreen";
@@ -22,6 +21,7 @@ import LoginScreen from "./screens/LoginScreen";
 import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
+import { useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -31,13 +31,20 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
 function AuthorizedStackScreen() {
+  const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
 
   return (
     <Drawer.Navigator
       drawerContent={(props) => <Sidebar {...props} />}
       screenOptions={{
-        drawerType: width > 800 ? "permanent" : "slide",
+        headerShown: false,
+        drawerType: isPermanentLeftSidebar ? "permanent" : "front",
+        drawerStyle: {
+          width: isPermanentLeftSidebar ? 240 : width,
+        },
+        headerLeft: isPermanentLeftSidebar ? () => null : undefined,
+        overlayColor: "transparent",
       }}
     >
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
@@ -58,8 +65,16 @@ function RootNavigator() {
       />
       <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
       <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen
+        name="Register"
+        component={RegisterScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="EncryptDecryptImageTest"
         component={EncryptDecryptImageTestScreen}

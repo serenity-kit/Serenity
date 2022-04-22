@@ -46,19 +46,22 @@ export const crypto_sign_detached = async (
     urlSafeBase64ToBase64(to_base64(message)),
     urlSafeBase64ToBase64(privateKey)
   );
+
   return base64ToUrlSafeBase64(result);
 };
 
 export const crypto_sign_verify_detached = async (
   signature: string,
   message: string,
-  privateKey: string
-): Promise<boolean> =>
-  sodium.crypto_sign_verify_detached(
+  publicKey: string
+): Promise<boolean> => {
+  const result = (await sodium.crypto_sign_verify_detached(
     urlSafeBase64ToBase64(signature),
     urlSafeBase64ToBase64(to_base64(message)),
-    urlSafeBase64ToBase64(privateKey)
-  );
+    urlSafeBase64ToBase64(publicKey)
+  )) as unknown as number;
+  return result === 1;
+};
 
 export const crypto_aead_xchacha20poly1305_ietf_keygen =
   async (): Promise<string> => {
