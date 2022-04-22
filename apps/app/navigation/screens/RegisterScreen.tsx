@@ -148,6 +148,8 @@ export default function RegisterScreen() {
     setGqlErrorMessage("");
     let oprfChallengeResponse: any = null;
     try {
+      // TODO the getServerOprfChallenge should include a signature of the challenge response and be verified that it belongs to
+      // the server public to make sure it wasn't tampered with
       oprfChallengeResponse = await getServerOprfChallenge();
       console.log({ oprfChallengeResponse });
     } catch (error) {

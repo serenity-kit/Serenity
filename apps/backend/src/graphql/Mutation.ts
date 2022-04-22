@@ -210,8 +210,8 @@ export const initializeLogin = mutationField("initializeLogin", {
     if (!username) {
       throw Error('Missing parameter: "username" must be string');
     }
+    // TODO throw error if the challenge does not exist
     const b64ClientOprfChallenge = args?.input?.challenge || "";
-    const serverKeyPairs = generateKeyPair();
 
     let clientOprfChallenge = new Uint8Array(32);
     try {
