@@ -1,0 +1,19 @@
+{
+  documents(first: 100, after: "YWJj") {
+    nodes {
+      documentId
+    }
+    edges {
+      cursor
+      node {
+        documentId
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}

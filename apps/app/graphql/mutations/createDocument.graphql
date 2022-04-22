@@ -1,0 +1,5 @@
+mutation {
+  createDocument(input: { documentId: "cdeo" }) {
+    documentId
+  }
+}
