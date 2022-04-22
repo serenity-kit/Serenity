@@ -12,6 +12,7 @@ import { Awareness } from "y-protocols/awareness";
 import { AwarnessExtension } from "./naisho-awareness-extension";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
+import Placeholder from "@tiptap/extension-placeholder";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import { useHasEditorSidebar } from "./hooks/useHasEditorSidebar";
 
@@ -48,6 +49,9 @@ export const Editor = (props: EditorProps) => {
       }),
       Link.configure({
         openOnClick: false,
+      }),
+      Placeholder.configure({
+        placeholder: "Just start writing here …",
       }),
       TaskList,
       TaskItem,

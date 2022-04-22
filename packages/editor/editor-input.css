@@ -133,6 +133,15 @@
   .ProseMirror > * {
     @apply mx-auto w-full max-w-prose-rem;
   }
+
+  /* --- placeholder --- */
+  .ProseMirror *.is-editor-empty:first-child::before {
+    color: theme("colors.gray.400");
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
 }
 
 /* ::selection {
