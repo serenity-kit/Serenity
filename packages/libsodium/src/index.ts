@@ -277,7 +277,6 @@ type Libsodium = typeof libsodiumExports & {
 
 const handler = {
   get(_target: Libsodium, prop: keyof Libsodium): any {
-    console.log({ prop });
     if (prop === "crypto_generichash_BYTES") {
       return sodium.crypto_generichash_BYTES;
     } else if (prop === "crypto_secretbox_NONCEBYTES") {
@@ -291,8 +290,6 @@ const handler = {
     } else if (prop === "crypto_pwhash_ALG_DEFAULT") {
       return sodium.crypto_pwhash_ALG_DEFAULT;
     } else if (prop === "crypto_secretbox_KEYBYTES") {
-      console.log("hello!!!");
-      console.log({ KEYBYTTES: sodium.crypto_secretbox_KEYBYTES });
       return sodium.crypto_secretbox_KEYBYTES;
     }
     // @ts-ignore
