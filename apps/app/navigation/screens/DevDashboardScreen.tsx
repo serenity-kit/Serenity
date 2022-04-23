@@ -14,6 +14,9 @@ export default function DevDashboardScreen() {
       <Link to={{ screen: "App", params: { screen: "TestLibsodium" } }}>
         Libsodium Test Screen
       </Link>
+      <Link to={{ screen: "EncryptDecryptImageTest" }}>
+        Encrypt / Decrypt Image
+      </Link>
     </View>
   );
 }

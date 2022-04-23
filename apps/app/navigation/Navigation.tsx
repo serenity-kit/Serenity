@@ -20,6 +20,7 @@ import RegisterScreen from "./screens/RegisterScreen";
 import LoginScreen from "./screens/LoginScreen";
 import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
+import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
 import { useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 
 /**
@@ -75,6 +76,10 @@ function RootNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="EncryptDecryptImageTest"
+        component={EncryptDecryptImageTestScreen}
+      />
+      <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
         options={{ title: "Oops!" }}
@@ -99,6 +104,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       DesignSystem: "design-system",
       Register: "register",
       Login: "login",
+      EncryptDecryptImageTest: "encrypt-decrypt-image-test",
       NotFound: "*",
     },
   },

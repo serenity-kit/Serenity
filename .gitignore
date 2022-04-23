@@ -4,6 +4,8 @@ dist
 .env
 .vscode
 yarn-error.log
+# we are using yarn
+package-lock.json
 
 # editor built for the mobile editor web view
 apps/app/assets/index.html

@@ -101,16 +101,30 @@ export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
   return base64ToUrlSafeBase64(result);
 };
 
+export const crypto_box_keypair = async (): Promise<StringKeyPair> => {
+  const result = await sodium.crypto_box_keypair();
+  return {
+    keyType: "curve25519",
+    privateKey: urlSafeBase64ToBase64(result.sk),
+    publicKey: urlSafeBase64ToBase64(result.pk),
+  };
+};
+
 export default {
   ready,
   to_base64,
   from_base64,
   from_base64_to_string,
   randombytes_buf,
+  crypto_box_keypair,
   crypto_sign_keypair,
   crypto_sign_detached,
   crypto_sign_verify_detached,
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
+  crypto_secretbox_NONCEBYTES: sodium.crypto_secretbox_NONCEBYTES,
+  crypto_secretbox_KEYBYTES: sodium.crypto_secretbox_KEYBYTES,
+  crypto_pwhash_SALTBYTES: sodium.crypto_pwhash_SALTBYTES,
+  crypto_pwhash_ALG_DEFAULT: sodium.crypto_pwhash_ALG_DEFAULT,
 };

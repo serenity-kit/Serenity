@@ -228,6 +228,15 @@ export const crypto_kx_client_session_keys = (
   return clientSessionKeys;
 };
 
+export const crypto_box_keypair = (): StringKeyPair => {
+  const result = sodium.crypto_box_keypair();
+  return {
+    keyType: "curve25519",
+    privateKey: to_base64(result.privateKey),
+    publicKey: to_base64(result.publicKey),
+  };
+};
+
 const libsodiumExports = {
   ready,
   to_base64,
@@ -237,6 +246,7 @@ const libsodiumExports = {
   randombytes_buf,
   crypto_kx_keypair,
   crypto_generichash,
+  crypto_box_keypair,
   crypto_sign_keypair,
   crypto_sign_detached,
   crypto_secretbox_easy,
@@ -262,6 +272,7 @@ type Libsodium = typeof libsodiumExports & {
   crypto_pwhash_OPSLIMIT_INTERACTIVE: number;
   crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
   crypto_pwhash_ALG_DEFAULT: number;
+  crypto_secretbox_KEYBYTES: number;
 };
 
 const handler = {
@@ -278,6 +289,8 @@ const handler = {
       return sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE;
     } else if (prop === "crypto_pwhash_ALG_DEFAULT") {
       return sodium.crypto_pwhash_ALG_DEFAULT;
+    } else if (prop === "crypto_secretbox_KEYBYTES") {
+      return sodium.crypto_secretbox_KEYBYTES;
     }
     // @ts-ignore
     return Reflect.get(...arguments);
