@@ -145,7 +145,6 @@ export type PageInfo = {
 export type Query = {
   __typename?: "Query";
   documentPreviews?: Maybe<DocumentPreviewConnection>;
-  test?: Maybe<Scalars["String"]>;
 };
 
 export type QueryDocumentPreviewsArgs = {
@@ -243,10 +242,6 @@ export type DocumentPreviewsQuery = {
     };
   } | null;
 };
-
-export type TestQueryVariables = Exact<{ [key: string]: never }>;
-
-export type TestQuery = { __typename?: "Query"; test?: string | null };
 
 export const CreateDocumentDocument = gql`
   mutation createDocument($input: CreateDocumentInput!) {
@@ -355,15 +350,4 @@ export function useDocumentPreviewsQuery(
     query: DocumentPreviewsDocument,
     ...options,
   });
-}
-export const TestDocument = gql`
-  query test {
-    test
-  }
-`;
-
-export function useTestQuery(
-  options?: Omit<Urql.UseQueryArgs<TestQueryVariables>, "query">
-) {
-  return Urql.useQuery<TestQuery>({ query: TestDocument, ...options });
 }

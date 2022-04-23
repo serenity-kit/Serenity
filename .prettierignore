@@ -5,6 +5,7 @@ build
 coverage
 apps/app/assets/index.html
 apps/app/web-build
+apps/app/graphql/generated
 apps/backend/prisma/generated
 apps/backend/src/generated
 packages/editor/editor-output.css
