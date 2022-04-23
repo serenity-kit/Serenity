@@ -1,10 +1,10 @@
 import { queryField } from "nexus";
 import { getDocumentPreviews } from "../../database/getDocumentPreviews";
-import { Document } from "../types/document";
+import { DocumentPreview } from "../types/documentPreview";
 
 export const test = queryField((t) => {
-  t.connectionField("documents", {
-    type: Document,
+  t.connectionField("documentPreviews", {
+    type: DocumentPreview,
     disableBackwardPagination: true,
     cursorFromNode: (node) => node?.documentId ?? "",
     async nodes(root, args, ctx, info) {

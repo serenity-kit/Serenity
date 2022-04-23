@@ -1,5 +1,5 @@
-{
-  documents(first: 100, after: "YWJj") {
+query documentPreviews {
+  documentPreviews(first: 100) {
     nodes {
       documentId
     }

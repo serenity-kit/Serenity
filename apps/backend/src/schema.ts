@@ -2,9 +2,9 @@ import { makeSchema, connectionPlugin } from "nexus";
 import path from "path";
 import * as QueryTypes from "./graphql/Query";
 import * as MutationTypes from "./graphql/Mutation";
-import * as DocumentsQueryTypes from "./graphql/queries/documents";
+import * as DocumentPreviewsQueryTypes from "./graphql/queries/documentPreviews";
 import * as CreateDocumentMutationTypes from "./graphql/mutations/createDocument";
-import * as DocumentTypes from "./graphql/types/document";
+import * as DocumentTypes from "./graphql/types/documentPreview";
 
 export const schema = makeSchema({
   plugins: [
@@ -15,7 +15,7 @@ export const schema = makeSchema({
   types: [
     DocumentTypes,
     QueryTypes,
-    DocumentsQueryTypes,
+    DocumentPreviewsQueryTypes,
     MutationTypes,
     CreateDocumentMutationTypes,
   ],

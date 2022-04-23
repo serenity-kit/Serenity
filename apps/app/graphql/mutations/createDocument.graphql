@@ -1,5 +1,5 @@
-mutation {
-  createDocument(input: { documentId: "cdeo" }) {
+mutation createDocument($input: CreateDocumentInput!) {
+  createDocument(input: $input) {
     documentId
   }
 }
