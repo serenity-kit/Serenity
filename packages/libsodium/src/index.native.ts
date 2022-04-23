@@ -110,17 +110,7 @@ export const crypto_box_keypair = async (): Promise<StringKeyPair> => {
   };
 };
 
-type Libsodium = typeof libsodiumExports & {
-  crypto_generichash_BYTES: number;
-  crypto_secretbox_NONCEBYTES: number;
-  crypto_pwhash_SALTBYTES: number;
-  crypto_pwhash_OPSLIMIT_INTERACTIVE: number;
-  crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
-  crypto_pwhash_ALG_DEFAULT: number;
-  crypto_secretbox_KEYBYTES: number;
-};
-
-const libsodiumExports = {
+export default {
   ready,
   to_base64,
   from_base64,
@@ -133,22 +123,8 @@ const libsodiumExports = {
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
+  crypto_secretbox_NONCEBYTES: sodium.crypto_secretbox_NONCEBYTES,
+  crypto_secretbox_KEYBYTES: sodium.crypto_secretbox_KEYBYTES,
+  crypto_pwhash_SALTBYTES: sodium.crypto_pwhash_SALTBYTES,
+  crypto_pwhash_ALG_DEFAULT: sodium.crypto_pwhash_ALG_DEFAULT,
 };
-
-const handler = {
-  get(_target: Libsodium, prop: keyof Libsodium): any {
-    if (prop === "crypto_secretbox_NONCEBYTES") {
-      return sodium.crypto_secretbox_NONCEBYTES;
-    } else if (prop === "crypto_pwhash_SALTBYTES") {
-      return sodium.crypto_pwhash_SALTBYTES;
-    } else if (prop === "crypto_pwhash_ALG_DEFAULT") {
-      return sodium.crypto_pwhash_ALG_DEFAULT;
-    } else if (prop === "crypto_secretbox_KEYBYTES") {
-      return sodium.crypto_secretbox_KEYBYTES;
-    }
-    // @ts-ignore
-    return Reflect.get(...arguments);
-  },
-};
-
-export default new Proxy(libsodiumExports, handler) as Libsodium;
