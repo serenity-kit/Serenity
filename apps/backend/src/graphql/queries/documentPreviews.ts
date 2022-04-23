@@ -2,7 +2,8 @@ import { queryField } from "nexus";
 import { getDocumentPreviews } from "../../database/getDocumentPreviews";
 import { DocumentPreview } from "../types/documentPreview";
 
-export const test = queryField((t) => {
+export const documentPreviews = queryField((t) => {
+  // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("documentPreviews", {
     type: DocumentPreview,
     disableBackwardPagination: true,
