@@ -1,0 +1,19 @@
+query documentPreviews {
+  documentPreviews(first: 100) {
+    nodes {
+      documentId
+    }
+    edges {
+      cursor
+      node {
+        documentId
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}

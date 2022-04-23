@@ -9,7 +9,7 @@ import { prisma } from "../database/prisma";
 // two week expiration
 const USER_LOGIN_ACCESS_TOKEN_EXPIRATION_TIME_IN_SECONDS = 60 * 60 * 24 * 15;
 
-const ClientOprfRegistrationChallengeInput = inputObjectType({
+export const ClientOprfRegistrationChallengeInput = inputObjectType({
   name: "ClientOprfRegistrationChallengeRequest",
   definition(t) {
     t.nonNull.string("username");
@@ -17,7 +17,7 @@ const ClientOprfRegistrationChallengeInput = inputObjectType({
   },
 });
 
-const ClientOprfRegistrationChallengeResult = objectType({
+export const ClientOprfRegistrationChallengeResult = objectType({
   name: "ClientOprfRegistrationChallengeResult",
   definition(t) {
     t.nonNull.string("serverPublicKey");
@@ -26,7 +26,7 @@ const ClientOprfRegistrationChallengeResult = objectType({
   },
 });
 
-const ClientOprfRegistrationFinalizeInput = inputObjectType({
+export const ClientOprfRegistrationFinalizeInput = inputObjectType({
   name: "ClientOprfRegistrationFinalizeInput",
   definition(t) {
     t.nonNull.string("username");
@@ -36,14 +36,14 @@ const ClientOprfRegistrationFinalizeInput = inputObjectType({
   },
 });
 
-const ClientOprfRegistrationFinalizeResult = objectType({
+export const ClientOprfRegistrationFinalizeResult = objectType({
   name: "ClientOprfRegistrationFinalizeResult",
   definition(t) {
     t.nonNull.string("status");
   },
 });
 
-const ClientOprfLoginChallengeInput = inputObjectType({
+export const ClientOprfLoginChallengeInput = inputObjectType({
   name: "ClientOprfLoginChallengeInput",
   definition(t) {
     t.nonNull.string("username");
@@ -51,7 +51,7 @@ const ClientOprfLoginChallengeInput = inputObjectType({
   },
 });
 
-const ClientOprfLoginChallengeResult = objectType({
+export const ClientOprfLoginChallengeResult = objectType({
   name: "ClientOprfLoginChallengeResult",
   definition(t) {
     t.nonNull.string("secret");
@@ -61,14 +61,14 @@ const ClientOprfLoginChallengeResult = objectType({
   },
 });
 
-const ClientOprfLoginFinalizeInput = inputObjectType({
+export const ClientOprfLoginFinalizeInput = inputObjectType({
   name: "ClientOprfLoginFinalizeInput",
   definition(t) {
     t.nonNull.string("username");
   },
 });
 
-const ClientOprfLoginFinalizeeResult = objectType({
+export const ClientOprfLoginFinalizeeResult = objectType({
   name: "ClientOprfLoginFinalizeeResult",
   definition(t) {
     t.nonNull.string("oauthData");

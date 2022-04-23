@@ -68,12 +68,49 @@ export type ClientOprfRegistrationFinalizeResult = {
   status: Scalars["String"];
 };
 
+export type CreateDocumentInput = {
+  documentId: Scalars["String"];
+};
+
+export type CreateDocumentResult = {
+  __typename?: "CreateDocumentResult";
+  documentId: Scalars["String"];
+};
+
+export type DocumentPreview = {
+  __typename?: "DocumentPreview";
+  documentId: Scalars["String"];
+};
+
+export type DocumentPreviewConnection = {
+  __typename?: "DocumentPreviewConnection";
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<DocumentPreviewEdge>>>;
+  /** Flattened list of DocumentPreview type */
+  nodes?: Maybe<Array<Maybe<DocumentPreview>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type DocumentPreviewEdge = {
+  __typename?: "DocumentPreviewEdge";
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars["String"];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<DocumentPreview>;
+};
+
 export type Mutation = {
   __typename?: "Mutation";
+  createDocument?: Maybe<CreateDocumentResult>;
   finalizeLogin?: Maybe<ClientOprfLoginFinalizeeResult>;
   finalizeRegistration?: Maybe<ClientOprfRegistrationFinalizeResult>;
   initializeLogin?: Maybe<ClientOprfLoginChallengeResult>;
   initializeRegistration?: Maybe<ClientOprfRegistrationChallengeResult>;
+};
+
+export type MutationCreateDocumentArgs = {
+  input?: InputMaybe<CreateDocumentInput>;
 };
 
 export type MutationFinalizeLoginArgs = {
@@ -92,9 +129,40 @@ export type MutationInitializeRegistrationArgs = {
   input?: InputMaybe<ClientOprfRegistrationChallengeRequest>;
 };
 
+/** PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+export type PageInfo = {
+  __typename?: "PageInfo";
+  /** The cursor corresponding to the last nodes in edges. Null if the connection is empty. */
+  endCursor?: Maybe<Scalars["String"]>;
+  /** Used to indicate whether more edges exist following the set defined by the clients arguments. */
+  hasNextPage: Scalars["Boolean"];
+  /** Used to indicate whether more edges exist prior to the set defined by the clients arguments. */
+  hasPreviousPage: Scalars["Boolean"];
+  /** The cursor corresponding to the first nodes in edges. Null if the connection is empty. */
+  startCursor?: Maybe<Scalars["String"]>;
+};
+
 export type Query = {
   __typename?: "Query";
+  documentPreviews?: Maybe<DocumentPreviewConnection>;
   test?: Maybe<Scalars["String"]>;
+};
+
+export type QueryDocumentPreviewsArgs = {
+  after?: InputMaybe<Scalars["String"]>;
+  first: Scalars["Int"];
+};
+
+export type CreateDocumentMutationVariables = Exact<{
+  input: CreateDocumentInput;
+}>;
+
+export type CreateDocumentMutation = {
+  __typename?: "Mutation";
+  createDocument?: {
+    __typename?: "CreateDocumentResult";
+    documentId: string;
+  } | null;
 };
 
 export type FinalizeLoginMutationVariables = Exact<{
@@ -151,10 +219,49 @@ export type InitializeRegistrationMutation = {
   } | null;
 };
 
+export type DocumentPreviewsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type DocumentPreviewsQuery = {
+  __typename?: "Query";
+  documentPreviews?: {
+    __typename?: "DocumentPreviewConnection";
+    nodes?: Array<{
+      __typename?: "DocumentPreview";
+      documentId: string;
+    } | null> | null;
+    edges?: Array<{
+      __typename?: "DocumentPreviewEdge";
+      cursor: string;
+      node?: { __typename?: "DocumentPreview"; documentId: string } | null;
+    } | null> | null;
+    pageInfo: {
+      __typename?: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor?: string | null;
+      endCursor?: string | null;
+    };
+  } | null;
+};
+
 export type TestQueryVariables = Exact<{ [key: string]: never }>;
 
 export type TestQuery = { __typename?: "Query"; test?: string | null };
 
+export const CreateDocumentDocument = gql`
+  mutation createDocument($input: CreateDocumentInput!) {
+    createDocument(input: $input) {
+      documentId
+    }
+  }
+`;
+
+export function useCreateDocumentMutation() {
+  return Urql.useMutation<
+    CreateDocumentMutation,
+    CreateDocumentMutationVariables
+  >(CreateDocumentDocument);
+}
 export const FinalizeLoginDocument = gql`
   mutation finalizeLogin($input: ClientOprfLoginFinalizeInput!) {
     finalizeLogin(input: $input) {
@@ -218,6 +325,36 @@ export function useInitializeRegistrationMutation() {
     InitializeRegistrationMutation,
     InitializeRegistrationMutationVariables
   >(InitializeRegistrationDocument);
+}
+export const DocumentPreviewsDocument = gql`
+  query documentPreviews {
+    documentPreviews(first: 100) {
+      nodes {
+        documentId
+      }
+      edges {
+        cursor
+        node {
+          documentId
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+    }
+  }
+`;
+
+export function useDocumentPreviewsQuery(
+  options?: Omit<Urql.UseQueryArgs<DocumentPreviewsQueryVariables>, "query">
+) {
+  return Urql.useQuery<DocumentPreviewsQuery>({
+    query: DocumentPreviewsDocument,
+    ...options,
+  });
 }
 export const TestDocument = gql`
   query test {
