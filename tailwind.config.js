@@ -39,6 +39,9 @@ module.exports = {
       padding: {
         4.5: "1.125rem", // editor specific
       },
+      maxWidth: {
+        "prose-rem": "36.5rem", // editor specific .. needed as representation of a 65ch content-width as the "ch"-unit would only work on text-elements
+      },
     },
   },
   plugins: [],
