@@ -176,7 +176,7 @@ test("server should login a user", async () => {
     username,
     password
   );
-  // crate login session keys
+  // create login session keys
   const secret = sodium.from_base64(loginChallengeResponse.data.secret);
   const nonce = sodium.from_base64(loginChallengeResponse.data.nonce);
   const oprfPublicKey = sodium.from_base64(
