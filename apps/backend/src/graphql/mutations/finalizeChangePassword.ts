@@ -1,13 +1,12 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { finalizeRegistration } from "../../database/authentication/finalizeRegistration";
+import { finalizeChangePassword } from "../../database/authentication/finalizeChangePassword";
 
 export const ClientOprfRegistrationFinalizeInput = inputObjectType({
   name: "ClientOprfRegistrationFinalizeInput",
   definition(t) {
     t.nonNull.string("username");
-    t.nonNull.string("secret");
     t.nonNull.string("nonce");
-    t.nonNull.string("clientPublicKey");
+    t.nonNull.string("encryptedSecret");
   },
 });
 
@@ -18,8 +17,8 @@ export const ClientOprfRegistrationFinalizeResult = objectType({
   },
 });
 
-export const finalizeRegistrationMutation = mutationField(
-  "finalizeRegistration",
+export const finalizeChangePasswordMutation = mutationField(
+  "finalizeChangePassword",
   {
     type: ClientOprfRegistrationFinalizeResult,
     args: {
@@ -29,15 +28,14 @@ export const finalizeRegistrationMutation = mutationField(
     },
     async resolve(root, args, context) {
       const username = args?.input?.username;
-      const secret = args?.input?.secret;
       const nonce = args?.input?.nonce;
-      const clientPublicKey = args?.input?.clientPublicKey;
+      const encryptedSecret = args?.input?.encryptedSecretNonce;
       if (!username) {
-        throw Error('Missing parameter: "secret" must be a string');
+        throw Error('Missing parameter: "username" must be a string');
       }
-      if (!secret) {
+      if (!encryptedSecret) {
         throw Error(
-          'Missing parameter: "username" must be a base64-encoded string'
+          'Missing parameter: "encryptedSecret" must be a base64-encoded string'
         );
       }
       if (!nonce) {
@@ -45,12 +43,7 @@ export const finalizeRegistrationMutation = mutationField(
           'Missing parameter: "nonce" must be a base64-encoded string'
         );
       }
-      if (!clientPublicKey) {
-        throw Error(
-          'Missing parameter: "clientPublicKey" must be a base64-encoded string'
-        );
-      }
-      finalizeRegistration(username, secret, nonce, clientPublicKey);
+      finalizeChangePassword(username, nonce, encryptedSecret);
       const result = {
         status: "success",
       };

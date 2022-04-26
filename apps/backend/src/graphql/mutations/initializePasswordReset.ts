@@ -1,17 +1,17 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { initializeRegistration } from "../../database/authentication/initializeRegistration";
+import { initializePasswordReset } from "../../database/authentication/initializePasswordReset";
 import sodium from "libsodium-wrappers-sumo";
 
-export const ClientOprfRegistrationChallengeInput = inputObjectType({
-  name: "ClientOprfRegistrationChallengeRequest",
+export const ClientRequestResetPasswordRequest = inputObjectType({
+  name: "ClientRequestResetPasswordRequest",
   definition(t) {
     t.nonNull.string("username");
     t.nonNull.string("challenge");
   },
 });
 
-export const ClientOprfRegistrationChallengeResult = objectType({
-  name: "ClientOprfRegistrationChallengeResult",
+export const ClientRequestResetPasswordResult = objectType({
+  name: "ClientRequestResetPasswordResult",
   definition(t) {
     t.nonNull.string("serverPublicKey");
     t.nonNull.string("oprfPublicKey");
@@ -19,13 +19,13 @@ export const ClientOprfRegistrationChallengeResult = objectType({
   },
 });
 
-export const initializeRegistrationMutation = mutationField(
-  "initializeRegistration",
+export const initializePasswordResetMutation = mutationField(
+  "initializePasswordReset",
   {
-    type: ClientOprfRegistrationChallengeResult,
+    type: ClientRequestResetPasswordResult,
     args: {
       input: arg({
-        type: ClientOprfRegistrationChallengeInput,
+        type: ClientRequestResetPasswordRequest,
       }),
     },
     async resolve(root, args, context) {
@@ -41,7 +41,7 @@ export const initializeRegistrationMutation = mutationField(
         throw Error("challenge must be a base64-encoded byte array");
       }
       const { serverPublicKey, oprfPublicKey, oprfChallengeResponse } =
-        await initializeRegistration(username, clientOprfChallenge);
+        await initializePasswordReset(username, clientOprfChallenge);
       const result = {
         serverPublicKey: sodium.to_base64(serverPublicKey),
         oprfPublicKey: sodium.to_base64(oprfPublicKey),

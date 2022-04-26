@@ -1,10 +1,11 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { finalizeRegistration } from "../../database/authentication/finalizeRegistration";
+import { finalizePasswordReset } from "../../database/authentication/finalizePasswordReset";
 
 export const ClientOprfRegistrationFinalizeInput = inputObjectType({
   name: "ClientOprfRegistrationFinalizeInput",
   definition(t) {
     t.nonNull.string("username");
+    t.nonNull.string("token");
     t.nonNull.string("secret");
     t.nonNull.string("nonce");
     t.nonNull.string("clientPublicKey");
@@ -18,8 +19,8 @@ export const ClientOprfRegistrationFinalizeResult = objectType({
   },
 });
 
-export const finalizeRegistrationMutation = mutationField(
-  "finalizeRegistration",
+export const finalizePasswordResetMutation = mutationField(
+  "finalizePasswordReset",
   {
     type: ClientOprfRegistrationFinalizeResult,
     args: {
@@ -29,15 +30,21 @@ export const finalizeRegistrationMutation = mutationField(
     },
     async resolve(root, args, context) {
       const username = args?.input?.username;
+      const token = args?.input?.token;
       const secret = args?.input?.secret;
       const nonce = args?.input?.nonce;
       const clientPublicKey = args?.input?.clientPublicKey;
       if (!username) {
-        throw Error('Missing parameter: "secret" must be a string');
+        throw Error('Missing parameter: "username" must be a string');
       }
       if (!secret) {
         throw Error(
-          'Missing parameter: "username" must be a base64-encoded string'
+          'Missing parameter: "secret" must be a base64-encoded string'
+        );
+      }
+      if (!token) {
+        throw Error(
+          'Missing parameter: "token" must be a base64-encoded string'
         );
       }
       if (!nonce) {
@@ -50,7 +57,7 @@ export const finalizeRegistrationMutation = mutationField(
           'Missing parameter: "clientPublicKey" must be a base64-encoded string'
         );
       }
-      finalizeRegistration(username, secret, nonce, clientPublicKey);
+      finalizePasswordReset(username, token, secret, nonce, clientPublicKey);
       const result = {
         status: "success",
       };

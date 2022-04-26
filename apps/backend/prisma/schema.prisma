@@ -53,18 +53,23 @@ model Registration {
 }
 
 model User {
-  username             String                 @id
-  serverPrivateKey     String
-  serverPublicKey      String                 @default("invalid")
-  oprfPrivateKey       String
-  oprfPublicKey        String                 @default("invalid")
-  oprfCipherText       String
-  oprfNonce            String
-  clientPublicKey      String
-  sharedRx             String?
-  sharedTx             String?
-  resetPasswordToken   String?
-  UserLoginAccessToken UserLoginAccessToken[]
+  username                     String                 @id
+  serverPrivateKey             String
+  serverPublicKey              String                 @default("invalid")
+  oprfPrivateKey               String
+  oprfPublicKey                String                 @default("invalid")
+  oprfCipherText               String
+  oprfNonce                    String
+  clientPublicKey              String
+  sharedRx                     String?
+  sharedTx                     String?
+  resetPasswordToken           String?
+  UserLoginAccessToken         UserLoginAccessToken[]
+  OpaqueAuth                   OpaqueAuth?
+  VirtualMasterDevice          VirtualMasterDevice?
+  Device                       Device[]
+  VirtualRecoveryDevice        VirtualRecoveryDevice?
+  passwordResetOneTimePassword String?
 }
 
 model UserLoginAccessToken {
@@ -72,4 +77,44 @@ model UserLoginAccessToken {
   expiresAt   DateTime?
   user        User      @relation(fields: [username], references: [username])
   username    String
+}
+
+model OpaqueAuth {
+  key             String @id
+  serverPublicKey String
+  user            User   @relation(fields: [username], references: [username])
+  username        String @unique
+}
+
+model VirtualMasterDevice {
+  id                            String @id @default(uuid())
+  encryptionPrivateKey          String
+  encryptionPublicKey           String
+  signingPrivateKey             String
+  signingPublicKey              String
+  signedRecoverSigningPublicKey String
+  signedDeviceSignignPublicKey  String
+  user                          User   @relation(fields: [username], references: [username])
+  username                      String @unique
+}
+
+model Device {
+  id                   String @id @default(uuid())
+  encryptionPrivateKey String
+  encryptionPublicKey  String
+  signingPrivateKey    String
+  signingPublicKey     String
+  user                 User   @relation(fields: [username], references: [username])
+  username             String
+}
+
+model VirtualRecoveryDevice {
+  id                                  String @id @default(uuid())
+  encryptionPrivateKey                String
+  encryptionPublicKey                 String
+  signingPrivateKey                   String
+  signingPublicKey                    String
+  signedVirtualMasterSigningPublicKey String
+  user                                User   @relation(fields: [username], references: [username])
+  username                            String @unique
 }
