@@ -27,17 +27,26 @@ export default function DesignSystemScreen() {
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>Nodes</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
+        <Icon name="at-line" />
+        <Icon name="code-s-slash-line" />
         <Icon name="list-check-2" />
         <Icon name="list-ordered" />
         <Icon name="list-unordered" />
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>Extension</Text>
-      <Tiles style={tw`max-w-lg`} space={4} columns={10}></Tiles>
+      <Tiles style={tw`max-w-lg`} space={4} columns={10}>
+        <Icon name="font-color" />
+      </Tiles>
       <Text style={tw`mt-4 mb-1`}>UI</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="archive-line" />
-        <Icon name="at-line" />
+        <Icon name="book-open-line" />
         <Icon name="calendar-check-fill" />
+        <Icon name="chat-1-line" />
+        <Icon name="chat-4-line" />
+        <Icon name="file-search-line" />
+        <Icon name="file-transfer-line" />
+        <Icon name="folder-music-line" />
         <Icon name="printer-line" />
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>Icons resized</Text>
