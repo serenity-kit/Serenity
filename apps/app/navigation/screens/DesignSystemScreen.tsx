@@ -23,12 +23,18 @@ export default function DesignSystemScreen() {
       <Text style={tw`mb-1`}>Marks</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="bold" />
+        <Icon name="code-view" />
         <Icon name="italic" />
+        <Icon name="link" />
+        <Icon name="link-m" />
+        <Icon name="strikethrough" />
+        <Icon name="underline" />
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>Nodes</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="at-line" />
         <Icon name="code-s-slash-line" />
+        <Icon name="double-quotes-l" />
         <Icon name="heading" />
         <Icon name="h-1" />
         <Icon name="h-2" />
@@ -36,13 +42,27 @@ export default function DesignSystemScreen() {
         <Icon name="h-4" />
         <Icon name="h-5" />
         <Icon name="h-6" />
+        <Icon name="indent-decrease" />
+        <Icon name="indent-increase" />
         <Icon name="list-check-2" />
         <Icon name="list-ordered" />
         <Icon name="list-unordered" />
+        <Icon name="paragraph" />
+        <Icon name="table-2" />
+        <Icon name="text" />
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>Extension</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="font-color" />
+      </Tiles>
+      <Text style={tw`mt-4 mb-1`}>Editor Custom</Text>
+      <Tiles style={tw`max-w-lg`} space={4} columns={10}>
+        <Icon name="font-size-2" />
+        <Icon name="format-clear" />
+        <Icon name="functions" />
+        <Icon name="hashtag" />
+        <Icon name="page-separator" />
+        <Icon name="separator" />
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>UI</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
@@ -55,6 +75,7 @@ export default function DesignSystemScreen() {
         <Icon name="file-transfer-line" />
         <Icon name="folder-music-line" />
         <Icon name="printer-line" />
+        <Icon name="question-mark" />
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>Icons resized</Text>
       <Columns space={4} alignY="center" alignX="left">
