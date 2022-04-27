@@ -52,8 +52,16 @@ export const Editor = (props: EditorProps) => {
       Placeholder.configure({
         placeholder: "Just start writing here …",
       }),
-      TaskList,
-      TaskItem,
+      TaskList.configure({
+        HTMLAttributes: {
+          class: "task-list-extension",
+        },
+      }),
+      TaskItem.configure({
+        HTMLAttributes: {
+          class: "task-item-extension",
+        },
+      }),
       // register the ydoc with Tiptap
       Collaboration.configure({
         document: props.yDocRef.current,
