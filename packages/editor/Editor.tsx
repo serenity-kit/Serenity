@@ -34,13 +34,12 @@ export const Editor = (props: EditorProps) => {
         history: false,
         code: {
           HTMLAttributes: {
-            // using pt-1/pb-0.5 so that code elements in adjacent lines don't overlap and the Text still looks centered
-            class: "pt-1 pb-0.5 px-1.5 bg-gray-200 rounded",
+            class: "code-extension",
           },
         },
         codeBlock: {
           HTMLAttributes: {
-            class: "my-4 p-4 bg-gray-100 rounded",
+            class: "code-block-extension",
           },
         },
         heading: {
@@ -53,8 +52,16 @@ export const Editor = (props: EditorProps) => {
       Placeholder.configure({
         placeholder: "Just start writing here …",
       }),
-      TaskList,
-      TaskItem,
+      TaskList.configure({
+        HTMLAttributes: {
+          class: "task-list-extension",
+        },
+      }),
+      TaskItem.configure({
+        HTMLAttributes: {
+          class: "task-item-extension",
+        },
+      }),
       // register the ydoc with Tiptap
       Collaboration.configure({
         document: props.yDocRef.current,
