@@ -12,6 +12,13 @@ import { FileSearchLine } from "./icons/FileSearchLine";
 import { FileTransferLine } from "./icons/FileTransferLine";
 import { FolderMusicLine } from "./icons/FolderMusicLine";
 import { FontColor } from "./icons/FontColor";
+import { Heading } from "./icons/Heading";
+import { H1 } from "./icons/H1";
+import { H2 } from "./icons/H2";
+import { H3 } from "./icons/H3";
+import { H4 } from "./icons/H4";
+import { H5 } from "./icons/H5";
+import { H6 } from "./icons/H6";
 import { Italic } from "./icons/Italic";
 import { ListCheck2 } from "./icons/ListCheck2";
 import { ListOrdered } from "./icons/ListOrdered";
@@ -32,6 +39,13 @@ export type Props = {
     | "file-transfer-line"
     | "folder-music-line"
     | "font-color"
+    | "heading"
+    | "h-1"
+    | "h-2"
+    | "h-3"
+    | "h-4"
+    | "h-5"
+    | "h-6"
     | "italic"
     | "list-check-2"
     | "list-unordered"
@@ -63,6 +77,13 @@ export const Icon = (props: Props) => {
   if (name === "folder-music-line")
     return <FolderMusicLine color={color} size={size} />;
   if (name === "font-color") return <FontColor color={color} size={size} />;
+  if (name === "heading") return <Heading color={color} size={size} />;
+  if (name === "h-1") return <H1 color={color} size={size} />;
+  if (name === "h-2") return <H2 color={color} size={size} />;
+  if (name === "h-3") return <H3 color={color} size={size} />;
+  if (name === "h-4") return <H4 color={color} size={size} />;
+  if (name === "h-5") return <H5 color={color} size={size} />;
+  if (name === "h-6") return <H6 color={color} size={size} />;
   if (name === "italic") return <Italic color={color} size={size} />;
   if (name === "list-check-2") return <ListCheck2 color={color} size={size} />;
   if (name === "list-ordered") return <ListOrdered color={color} size={size} />;

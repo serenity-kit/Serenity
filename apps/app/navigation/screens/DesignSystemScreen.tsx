@@ -29,6 +29,13 @@ export default function DesignSystemScreen() {
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="at-line" />
         <Icon name="code-s-slash-line" />
+        <Icon name="heading" />
+        <Icon name="h-1" />
+        <Icon name="h-2" />
+        <Icon name="h-3" />
+        <Icon name="h-4" />
+        <Icon name="h-5" />
+        <Icon name="h-6" />
         <Icon name="list-check-2" />
         <Icon name="list-ordered" />
         <Icon name="list-unordered" />
