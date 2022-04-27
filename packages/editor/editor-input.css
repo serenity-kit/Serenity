@@ -144,6 +144,18 @@
   }
 }
 
+@layer components {
+  /* --- extensions --- */
+  .code-extension {
+    /* using pt-1/pb-0.5 so that code elements in adjacent lines don't overlap and the Text still looks centered */
+    @apply rounded bg-gray-200 px-1.5 pt-1 pb-0.5;
+  }
+
+  .code-block-extension {
+    @apply my-4 rounded bg-gray-100 p-4;
+  }
+}
+
 /* ::selection {
   background-color: theme('colors.primary.400');
 } */
