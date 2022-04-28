@@ -44,6 +44,7 @@ export default function DesignSystemScreen() {
         <Icon name="h-6" />
         <Icon name="indent-decrease" />
         <Icon name="indent-increase" />
+        <Icon name="list-check" />
         <Icon name="list-check-2" />
         <Icon name="list-ordered" />
         <Icon name="list-unordered" />
@@ -66,16 +67,39 @@ export default function DesignSystemScreen() {
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>UI</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
+        <Icon name="add-line" />
         <Icon name="archive-line" />
+        <Icon name="arrow-down-s-fill" />
+        <Icon name="arrow-down-s-line" />
+        <Icon name="arrow-go-back-fill" />
+        <Icon name="arrow-go-back-line" />
+        <Icon name="arrow-go-forward-fill" />
+        <Icon name="arrow-go-forward-line" />
+        <Icon name="arrow-right-s-fill" />
+        <Icon name="arrow-up-down-line" />
         <Icon name="book-open-line" />
         <Icon name="calendar-check-fill" />
         <Icon name="chat-1-line" />
         <Icon name="chat-4-line" />
+        <Icon name="cup" />
+        <Icon name="delete-bin-line" />
+        <Icon name="download-line" />
+        <Icon name="emotion-line" />
         <Icon name="file-search-line" />
         <Icon name="file-transfer-line" />
+        <Icon name="folder-line" />
         <Icon name="folder-music-line" />
+        <Icon name="history-line" />
+        <Icon name="image-2-line" />
+        <Icon name="image-line" />
+        <Icon name="more-2-line" />
+        <Icon name="more-line" />
+        <Icon name="movie-line" />
         <Icon name="printer-line" />
         <Icon name="question-mark" />
+        <Icon name="search-line" />
+        <Icon name="settings-4-line" />
+        <Icon name="stars-s-fill" />
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>Icons resized</Text>
       <Columns space={4} alignY="center" alignX="left">
