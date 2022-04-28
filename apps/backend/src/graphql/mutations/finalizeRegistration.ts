@@ -66,17 +66,36 @@ export const finalizeRegistration = mutationField("finalizeRegistration", {
       throw Error("This username has not yet been initialized");
     }
     try {
-      await prisma.user.create({
-        data: {
-          username,
-          serverPrivateKey: registrationData.serverPrivateKey,
-          serverPublicKey: registrationData.serverPublicKey,
-          oprfPrivateKey: registrationData.oprfPrivateKey,
-          oprfPublicKey: registrationData.oprfPublicKey,
-          oprfCipherText: secret,
-          oprfNonce: nonce,
-          clientPublicKey,
-        },
+      await prisma.$transaction(async (prisma) => {
+        const device = await prisma.device.create({
+          data: {
+            signingPublicKey: `TODO+${registrationData.username}`,
+            encryptionPublicKey: "TODO",
+            encryptionPublicKeySignature: "TODO",
+            username: null,
+          },
+        });
+        await prisma.user.create({
+          data: {
+            username,
+            serverPrivateKey: registrationData.serverPrivateKey,
+            serverPublicKey: registrationData.serverPublicKey,
+            oprfPrivateKey: registrationData.oprfPrivateKey,
+            oprfPublicKey: registrationData.oprfPublicKey,
+            oprfCipherText: secret,
+            oprfNonce: nonce,
+            clientPublicKey,
+            masterDeviceCiphertext: "TODO",
+            masterDeviceNonce: "TODO",
+            masterDevice: {
+              connect: { signingPublicKey: device.signingPublicKey },
+            },
+          },
+        });
+        await prisma.device.update({
+          where: { signingPublicKey: device.signingPublicKey },
+          data: { user: { connect: { username: username } } },
+        });
       });
     } catch (error) {
       console.error("Error saving user");

@@ -106,8 +106,9 @@ model Device {
   signingPublicKey             String          @id @unique
   encryptionPublicKey          String
   encryptionPublicKeySignature String
-  user                         User            @relation(fields: [username], references: [username])
-  username                     String
+  // can't be mandatory since we need to create the device
+  user                         User?           @relation(fields: [username], references: [username])
+  username                     String?
   recoveryDevice               RecoveryDevice?
   userForMaster                User?           @relation("masterDevice")
 }

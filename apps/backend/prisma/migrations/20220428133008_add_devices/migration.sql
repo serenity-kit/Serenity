@@ -29,7 +29,7 @@ CREATE TABLE "Device" (
     "signingPublicKey" TEXT NOT NULL,
     "encryptionPublicKey" TEXT NOT NULL,
     "encryptionPublicKeySignature" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
+    "username" TEXT,
 
     CONSTRAINT "Device_pkey" PRIMARY KEY ("signingPublicKey")
 );
@@ -53,4 +53,4 @@ ALTER TABLE "RecoveryDevice" ADD CONSTRAINT "RecoveryDevice_userUsername_fkey" F
 ALTER TABLE "RecoveryDevice" ADD CONSTRAINT "RecoveryDevice_deviceSigningPublicKey_fkey" FOREIGN KEY ("deviceSigningPublicKey") REFERENCES "Device"("signingPublicKey") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Device" ADD CONSTRAINT "Device_username_fkey" FOREIGN KEY ("username") REFERENCES "User"("username") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Device" ADD CONSTRAINT "Device_username_fkey" FOREIGN KEY ("username") REFERENCES "User"("username") ON DELETE SET NULL ON UPDATE CASCADE;
