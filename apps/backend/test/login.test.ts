@@ -1,95 +1,21 @@
 import { gql } from "graphql-request";
 import setupGraphql from "./helpers/setupGraphql";
-import sodium from "libsodium-wrappers-sumo";
 import deleteAllRecords from "./helpers/deleteAllRecords";
 import {
-  createRegistrationEnvelope,
-  generateClientOprfChallenge,
-  generateKeyPair,
-  createUserLoginSession,
-} from "@serenity-tools/opaque/server";
+  createClientKeyPair,
+  createOprfChallenge,
+  createUserSession,
+  createOprfRegistrationEnvelope,
+} from "@serenity-tools/opaque/client";
+import { decryptSessionJsonMessage } from "@serenity-tools/opaque/common";
+import { requestRegistrationChallengeResponse } from "./helpers/requestRegistrationChallengeResponse";
+import { completeRegistration } from "./helpers/completeRegistration";
 
 const graphql = setupGraphql();
 const username = "user";
 const password = "password";
 let data: any = null;
-let randomScalar: Uint8Array = new Uint8Array(32);
-let clientPublicKey: Uint8Array = new Uint8Array(32);
-let clientPrivateKey: Uint8Array = new Uint8Array(32);
-
-const requestRegistrationChallengeResponse = async (
-  username: string,
-  password: string
-) => {
-  const { oprfChallenge, randomScalar } = generateClientOprfChallenge(password);
-  const b64encodedChallenge = sodium.to_base64(oprfChallenge);
-  const query = gql`
-    mutation {
-      initializeRegistration(
-        input: {
-          username: "${username}"
-          challenge: "${b64encodedChallenge}"
-        }
-      ) {
-        serverPublicKey
-        oprfPublicKey
-        oprfChallengeResponse
-      }
-    }
-  `;
-  const data = await graphql.client.request(query);
-  return {
-    data: data.initializeRegistration,
-    oprfChallenge,
-    randomScalar,
-  };
-};
-
-const completeRegistration = async (
-  username: string,
-  password: string,
-  serverPublicKey: Uint8Array,
-  oprfPublicKey: Uint8Array,
-  serverChallengeResponse: Uint8Array,
-  randomScalar: Uint8Array
-) => {
-  const clientKeys = generateKeyPair();
-  // crate cipher text
-  const registrationEnvelopeData = createRegistrationEnvelope(
-    clientKeys.privateKey,
-    clientKeys.publicKey,
-    password,
-    serverChallengeResponse,
-    oprfPublicKey,
-    randomScalar,
-    serverPublicKey
-  );
-
-  const b64Secret = sodium.to_base64(registrationEnvelopeData.secret);
-  const b64Nonce = sodium.to_base64(registrationEnvelopeData.nonce);
-  const b64ClientPublicKey = sodium.to_base64(clientKeys.publicKey);
-  const query = gql`
-    mutation {
-      finalizeRegistration(
-        input: {
-          username: "${username}"
-          secret: "${b64Secret}"
-          nonce: "${b64Nonce}"
-          clientPublicKey: "${b64ClientPublicKey}"
-        }
-      ) {
-        status
-      }
-    }
-  `;
-  await graphql.client.request(query);
-  return {
-    clientPrivateKey: clientKeys.privateKey,
-    clientPublicKey: clientKeys.publicKey,
-    secret: registrationEnvelopeData.secret,
-    nonce: registrationEnvelopeData.nonce,
-  };
-};
+let randomScalar: string = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -99,14 +25,13 @@ const requestLoginChallengeResponse = async (
   username: string,
   password: string
 ) => {
-  const { oprfChallenge, randomScalar } = generateClientOprfChallenge(password);
-  const b64encodedChallenge = sodium.to_base64(oprfChallenge);
+  const { oprfChallenge, randomScalar } = await createOprfChallenge(password);
   const query = gql`
       mutation {
         initializeLogin(
           input: {
             username: "${username}"
-            challenge: "${b64encodedChallenge}"
+            challenge: "${oprfChallenge}"
           }
         ) {
           secret
@@ -129,27 +54,19 @@ test("server should register a user", async () => {
   // we can't run this in beforeAll() because `graphql` isnt' set up
   // generate registration challenge
   const registrationChallengeResult =
-    await requestRegistrationChallengeResponse(username, password);
-  // finalize registration
-  const serverPublicKey = sodium.from_base64(
-    registrationChallengeResult.data.serverPublicKey
-  );
-  const oprfPublicKey = sodium.from_base64(
-    registrationChallengeResult.data.oprfPublicKey
-  );
-  const serverChallengeResponse = sodium.from_base64(
-    registrationChallengeResult.data.oprfChallengeResponse
-  );
-  const registrationResponse = await completeRegistration(
+    await requestRegistrationChallengeResponse(graphql, username, password);
+  // complete registration
+  await completeRegistration(
+    graphql,
     username,
     password,
-    serverPublicKey,
-    oprfPublicKey,
-    serverChallengeResponse,
+    registrationChallengeResult.data.serverPublicKey,
+    registrationChallengeResult.data.oprfPublicKey,
+    registrationChallengeResult.data.oprfChallengeResponse,
     registrationChallengeResult.randomScalar
   );
-  clientPublicKey = registrationResponse.clientPublicKey;
-  clientPrivateKey = registrationResponse.clientPublicKey;
+  // clientPublicKey = registrationResponse.clientPublicKey;
+  // clientPrivateKey = registrationResponse.clientPublicKey;
   randomScalar = registrationChallengeResult.randomScalar;
   // assume this works
 });
@@ -171,30 +88,20 @@ test("server should create a login challenge response", async () => {
 });
 
 test("server should login a user", async () => {
-  // create client keys
+  // create keys on server side and return response
   const loginChallengeResponse = await requestLoginChallengeResponse(
     username,
     password
   );
-  // create login session keys
-  const secret = sodium.from_base64(loginChallengeResponse.data.secret);
-  const nonce = sodium.from_base64(loginChallengeResponse.data.nonce);
-  const oprfPublicKey = sodium.from_base64(
-    loginChallengeResponse.data.oprfPublicKey
-  );
-  const oprfChallengeResponse = sodium.from_base64(
+  // create login session keys on user side
+  const clientSessionKeys = await createUserSession(
+    password,
+    loginChallengeResponse.data.secret,
+    loginChallengeResponse.data.nonce,
+    loginChallengeResponse.data.oprfPublicKey,
+    loginChallengeResponse.randomScalar,
     loginChallengeResponse.data.oprfChallengeResponse
   );
-  const registrationEnvelopeData = createUserLoginSession(
-    password,
-    secret,
-    nonce,
-    oprfPublicKey,
-    loginChallengeResponse.randomScalar,
-    oprfChallengeResponse
-  );
-  const sharedRx = registrationEnvelopeData.sharedRx;
-
   const query = gql`
     mutation {
       finalizeLogin(
@@ -207,25 +114,15 @@ test("server should login a user", async () => {
       }
     }
   `;
+  // client gets login response from server, which contains encrypted data
   const loginResponse = await graphql.client.request(query);
-  const encryptedOauthResponseBytes = sodium.from_base64(
-    loginResponse.finalizeLogin.oauthData
-  );
-  // TODO: expect an oauth token
   expect(typeof loginResponse.finalizeLogin.nonce).toBe("string");
-  const oautResposeNonce = sodium.from_base64(
-    loginResponse.finalizeLogin.nonce
-  );
   // try to decrypt the oauth token
-  const oauthResponseBytes = sodium.crypto_secretbox_open_easy(
-    encryptedOauthResponseBytes,
-    oautResposeNonce,
-    sharedRx
+  const oauthResponseJson = decryptSessionJsonMessage(
+    loginResponse.finalizeLogin.oauthData,
+    loginResponse.finalizeLogin.nonce,
+    clientSessionKeys.sharedRx
   );
-  const oauthResponseString = Buffer.from(oauthResponseBytes.buffer).toString(
-    "utf-8"
-  );
-  const oauthResponse = JSON.parse(oauthResponseString);
-  expect(oauthResponse.tokenType).toBe("Bearer");
-  expect(typeof oauthResponse.accessToken).toBe("string");
+  expect(oauthResponseJson.tokenType).toBe("Bearer");
+  expect(typeof oauthResponseJson.accessToken).toBe("string");
 });

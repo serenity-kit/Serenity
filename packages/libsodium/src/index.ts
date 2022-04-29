@@ -142,17 +142,15 @@ export const crypto_scalarmult_ed25519_noclamp = async (
   return to_base64(result);
 };
 
-export const crypto_generichash_batch = async (
-  arr: Array<string>
-): Promise<string> => {
+export const crypto_generichash_batch = (arr: Array<string>): string => {
   // TODO remove/cleanup? Buffer should not be needed
-  const key = Buffer.alloc(sodium.crypto_generichash_KEYBYTES);
+  const key = new Uint8Array(Buffer.alloc(sodium.crypto_generichash_KEYBYTES));
   const state = sodium.crypto_generichash_init(
     key,
     sodium.crypto_generichash_BYTES
   );
   arr.forEach((item) => {
-    sodium.crypto_generichash_update(state, item);
+    sodium.crypto_generichash_update(state, sodium.from_base64(item));
   });
   const combinedHash = sodium.crypto_generichash_final(
     state,
@@ -180,7 +178,7 @@ export const crypto_pwhash = (
 ): string => {
   const result = sodium.crypto_pwhash(
     keyLength,
-    password,
+    from_base64(password),
     from_base64(salt),
     opsLimit,
     memLimit,
@@ -195,7 +193,7 @@ export const crypto_secretbox_easy = (
   key: string
 ): string => {
   const cipherText = sodium.crypto_secretbox_easy(
-    message,
+    from_base64(message),
     from_base64(nonce),
     from_base64(key)
   );
@@ -205,12 +203,12 @@ export const crypto_secretbox_easy = (
 export const crypto_secretbox_open_easy = (
   cipherText: string,
   nonce: string,
-  sessionRxKey: string
+  key: string
 ): string => {
   const message = sodium.crypto_secretbox_open_easy(
     from_base64(cipherText),
     from_base64(nonce),
-    from_base64(sessionRxKey)
+    from_base64(key)
   );
   return to_base64(message);
 };

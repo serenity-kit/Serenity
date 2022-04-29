@@ -1,6 +1,4 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import sodium from "libsodium-wrappers-sumo";
-import { prisma } from "../../database/prisma";
 import { finalizeLogin } from "../../database/authentication/finalizeLogin";
 
 export const ClientOprfLoginFinalizeInput = inputObjectType({
@@ -26,10 +24,10 @@ export const finalizeLoginMutation = mutationField("finalizeLogin", {
     }),
   },
   async resolve(root, args, context) {
-    const username = args?.input?.username;
-    if (!username) {
-      throw Error('Missing parameter: "username" must be string');
+    if (!args || !args.input) {
+      throw Error("Missing input");
     }
+    const username = args.input.username;
     const responseData = await finalizeLogin(username);
     return responseData;
   },

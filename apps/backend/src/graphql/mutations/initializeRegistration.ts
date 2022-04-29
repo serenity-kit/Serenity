@@ -29,11 +29,11 @@ export const initializeRegistrationMutation = mutationField(
       }),
     },
     async resolve(root, args, context) {
-      const username = args?.input?.username;
-      if (!username) {
-        throw Error('Missing parameter: "username" must be string');
+      if (!args || !args.input) {
+        throw Error("Missing input");
       }
-      const b64ClientOprfChallenge = args?.input?.challenge || "";
+      const username = args.input.username;
+      const b64ClientOprfChallenge = args.input.challenge;
       let clientOprfChallenge = new Uint8Array(32);
       try {
         clientOprfChallenge = sodium.from_base64(b64ClientOprfChallenge);

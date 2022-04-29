@@ -8,13 +8,28 @@ export async function finalizePasswordReset(
   clientPublicKey: string
 ) {
   // If we can't find the user with a matching OTP, we can't continue.
-  const user = await prisma.user.findUnique({
-    where: {
-      username: username,
-    },
-  });
-  if (!user || user.passwordResetOneTimePassword !== token) {
-    throw Error("Invalid one-time password");
+  const now = new Date();
+  console.log({ username, token, now });
+  const userData = await prisma.user.findMany({});
+  console.log({ userData });
+  let user: any = null;
+  try {
+    user = await prisma.user.findFirst({
+      where: {
+        username: username,
+        passwordResetOneTimePassword: token,
+        passwordResetOneTimePasswordExpireDateTime: {
+          gt: now,
+        },
+      },
+    });
+  } catch (error) {
+    console.log({ error });
+    throw Error("User is not registered");
+  }
+  console.log({ user });
+  if (!user) {
+    throw Error(`Invalid or expired one-time password`);
   }
   // try to get the overloaded registration
   const registrationData = await prisma.registration.findUnique({
@@ -26,6 +41,7 @@ export async function finalizePasswordReset(
     throw Error("This username has not yet been initialized");
   }
   try {
+    // TODO: reset other keys?
     await prisma.user.update({
       where: {
         username: username,
@@ -38,6 +54,8 @@ export async function finalizePasswordReset(
         oprfCipherText: secret,
         oprfNonce: nonce,
         clientPublicKey,
+        passwordResetOneTimePassword: null,
+        passwordResetOneTimePasswordExpireDateTime: now,
       },
     });
   } catch (error) {

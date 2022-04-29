@@ -4,6 +4,8 @@ import * as InitializeRegistrationTypes from "./graphql/mutations/initializeRegi
 import * as FinalizeRegistrationTypes from "./graphql/mutations/finalizeRegistration";
 import * as InitializeLoginTypes from "./graphql/mutations/initializeLogin";
 import * as FinalizeLoginTypes from "./graphql/mutations/finalizeLogin";
+import * as InitializePasswordResetTypes from "./graphql/mutations/initializePasswordReset";
+import * as FinalizePasswordResetTypes from "./graphql/mutations/finalizePasswordReset";
 import * as DocumentPreviewsQueryTypes from "./graphql/queries/documentPreviews";
 import * as CreateDocumentMutationTypes from "./graphql/mutations/createDocument";
 import * as DocumentTypes from "./graphql/types/documentPreview";
@@ -22,6 +24,8 @@ export const schema = makeSchema({
     FinalizeRegistrationTypes,
     InitializeLoginTypes,
     FinalizeLoginTypes,
+    InitializePasswordResetTypes,
+    FinalizePasswordResetTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),

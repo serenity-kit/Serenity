@@ -11,7 +11,6 @@ export async function initializeLogin(
   username: string,
   clientOprfChallenge: Uint8Array
 ): Promise<InitializeLoginResponseData> {
-  console.log(`initializeLogin: ${username}`);
   // if this user does not exist, we have a problem
   const userData = await prisma.user.findUnique({
     where: {

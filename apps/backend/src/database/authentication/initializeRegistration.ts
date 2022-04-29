@@ -43,7 +43,7 @@ export async function initializeRegistration(
 
   return {
     serverPrivateKey: serverKeyPairs.privateKey,
-    serverPublicKey: serverKeyPairs.privateKey,
+    serverPublicKey: serverKeyPairs.publicKey,
     oprfPrivateKey: oprfKeyPair.privateKey,
     oprfPublicKey: oprfKeyPair.publicKey,
     oprfChallengeResponse,

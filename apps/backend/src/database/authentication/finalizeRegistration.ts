@@ -31,7 +31,6 @@ export async function finalizeRegistration(
           signingPublicKey: `TODO+${registrationData.username}`,
           encryptionPublicKey: "TODO",
           encryptionPublicKeySignature: "TODO",
-          username: null,
         },
       });
       await prisma.user.create({

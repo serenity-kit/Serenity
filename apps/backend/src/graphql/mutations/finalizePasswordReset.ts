@@ -1,8 +1,8 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { finalizePasswordReset } from "../../database/authentication/finalizePasswordReset";
 
-export const ClientOprfRegistrationFinalizeInput = inputObjectType({
-  name: "ClientOprfRegistrationFinalizeInput",
+export const FinalizeResetPasswordInput = inputObjectType({
+  name: "FinalizeResetPasswordInput",
   definition(t) {
     t.nonNull.string("username");
     t.nonNull.string("token");
@@ -12,8 +12,8 @@ export const ClientOprfRegistrationFinalizeInput = inputObjectType({
   },
 });
 
-export const ClientOprfRegistrationFinalizeResult = objectType({
-  name: "ClientOprfRegistrationFinalizeResult",
+export const FinalizeResetPasswordResult = objectType({
+  name: "FinalizeResetPasswordResult",
   definition(t) {
     t.nonNull.string("status");
   },
@@ -22,41 +22,21 @@ export const ClientOprfRegistrationFinalizeResult = objectType({
 export const finalizePasswordResetMutation = mutationField(
   "finalizePasswordReset",
   {
-    type: ClientOprfRegistrationFinalizeResult,
+    type: FinalizeResetPasswordResult,
     args: {
       input: arg({
-        type: ClientOprfRegistrationFinalizeInput,
+        type: FinalizeResetPasswordInput,
       }),
     },
     async resolve(root, args, context) {
-      const username = args?.input?.username;
-      const token = args?.input?.token;
-      const secret = args?.input?.secret;
-      const nonce = args?.input?.nonce;
-      const clientPublicKey = args?.input?.clientPublicKey;
-      if (!username) {
-        throw Error('Missing parameter: "username" must be a string');
+      if (!args || !args.input) {
+        throw new Error("Missing input");
       }
-      if (!secret) {
-        throw Error(
-          'Missing parameter: "secret" must be a base64-encoded string'
-        );
-      }
-      if (!token) {
-        throw Error(
-          'Missing parameter: "token" must be a base64-encoded string'
-        );
-      }
-      if (!nonce) {
-        throw Error(
-          'Missing parameter: "nonce" must be a base64-encoded string'
-        );
-      }
-      if (!clientPublicKey) {
-        throw Error(
-          'Missing parameter: "clientPublicKey" must be a base64-encoded string'
-        );
-      }
+      const username = args.input.username;
+      const token = args.input.token;
+      const secret = args.input.secret;
+      const nonce = args.input.nonce;
+      const clientPublicKey = args.input.clientPublicKey;
       finalizePasswordReset(username, token, secret, nonce, clientPublicKey);
       const result = {
         status: "success",

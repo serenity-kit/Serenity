@@ -27,6 +27,7 @@ export const createClientKeyPair = () => {
  */
 const _createRandomScalar = async (): Promise<string> => {
   const randomScalar = await sodium.crypto_core_ed25519_scalar_random();
+  // const randomScalar = "JyUYBYuLMDevU6OY39v0L7qs7nCYw3pSzgnWti6GQQQ";
   return randomScalar;
 };
 
@@ -67,8 +68,9 @@ const _mapHashedPasswordToEllicpicCurve = async (
  * @returns Object containing password as bytes[], hashed password, password mapped to curve, and a random number
  */
 const _getCurveMappedPassword = async (password: string): Promise<string> => {
-  const passwordBytes = await sodium.to_base64(password);
-  const hashedPassword = await _hashPassword(passwordBytes);
+  const passwordBytes = new Uint8Array(Buffer.from(password));
+  const base64EncodedPasswordBytes = sodium.to_base64(passwordBytes);
+  const hashedPassword = await _hashPassword(base64EncodedPasswordBytes);
   const mappedPassword = await _mapHashedPasswordToEllicpicCurve(
     hashedPassword
   );
@@ -91,7 +93,6 @@ export const createOprfChallenge = async (
     mappedPassword,
     randomPointOnCurve
   );
-  console.log({ oprfChallenge, randomScalar });
   return { oprfChallenge, randomScalar };
 };
 
@@ -113,11 +114,8 @@ const _createRandomizedPassword = async (
     serverChallengeResponse,
     exponentiatedPublicKey
   );
-  const randomizedPassword = await sodium.crypto_generichash_batch([
-    passwordBytes,
-    oprfPublicKey,
-    challengeResponseResult,
-  ]);
+  const arr = [passwordBytes, oprfPublicKey, challengeResponseResult];
+  const randomizedPassword = sodium.crypto_generichash_batch(arr);
   return randomizedPassword;
 };
 
@@ -133,11 +131,11 @@ const _createArgon2RandomizedPaswordHash = async (
 ): Promise<string> => {
   // apply argon2 to rwd using the hardening params sent from the server
   const hashSalt = sodium.to_base64(
-    Buffer.alloc(sodium.crypto_pwhash_SALTBYTES)
+    new Uint8Array(Buffer.alloc(sodium.crypto_pwhash_SALTBYTES))
   );
   const hashOpsLimit = sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE;
   const hashMemLimit = sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE;
-  const argon2HashedRandomizedPassword = await sodium.crypto_pwhash(
+  const argon2HashedRandomizedPassword = sodium.crypto_pwhash(
     32, // TODO: replace with constant value
     randomizedPassword,
     hashSalt,
@@ -154,6 +152,7 @@ const _generateNonce = async (): Promise<string> => {
   const nonce = await sodium.randombytes_buf(
     sodium.crypto_secretbox_NONCEBYTES
   );
+  // const nonce = "6dMYpCk9kvqw0vFxyq5j_Xem7nNaEVNU";
   return nonce;
 };
 
@@ -193,12 +192,13 @@ export const createOprfRegistrationEnvelope = async (
     userPrivateKey: clientPrivateKey,
     serverPublicKey: serverPublicKey,
   };
-  const messageBytes = Buffer.from(JSON.stringify(messageData));
+  const messageBytes = new Uint8Array(Buffer.from(JSON.stringify(messageData)));
+  const messageBase64 = sodium.to_base64(messageBytes);
   const secret = sodium.crypto_secretbox_easy(
     // @ts-ignore this rather should be a base64 encoded string to avoid
     // having the need for a Buffer polyfill in the browser
     // TODO refactor also requires to change all the crypto_secretbox_open_easy code
-    messageBytes,
+    messageBase64,
     nonce,
     argon2DerivedKey
   );
@@ -219,9 +219,9 @@ export const createOprfRegistrationEnvelope = async (
  *                   and server public key
  */
 const _openEnvelope = async (
-  cipherText,
-  nonce,
-  argon2DerivedKey
+  cipherText: string,
+  nonce: string,
+  argon2DerivedKey: string
 ): Promise<StringOprfClientSessionKeys> => {
   // Note: expect that this will throw an error if it can't be decrypted
   const messageBase64 = sodium.crypto_secretbox_open_easy(
@@ -232,7 +232,7 @@ const _openEnvelope = async (
   const messageBytes = sodium.from_base64(messageBase64);
   const messageString = Buffer.from(messageBytes.buffer).toString("utf-8");
   const messageData = JSON.parse(messageString);
-  const clientSessionKeys = await sodium.crypto_kx_client_session_keys(
+  const clientSessionKeys = sodium.crypto_kx_client_session_keys(
     messageData.userPublicKey,
     messageData.userPrivateKey,
     messageData.serverPublicKey
@@ -261,7 +261,6 @@ export const createUserSession = async (
   const argon2DerivedKey = await _createArgon2RandomizedPaswordHash(
     randomizedPassword
   );
-  console.log({ cipherText });
   try {
     const clientSessionKeys = await _openEnvelope(
       cipherText,
@@ -279,9 +278,6 @@ export const decryptSessionJsonMessage = (
   nonce: string,
   clientSessionRxKey: string
 ) => {
-  console.log({ encryptedOauthResponse });
-  console.log({ nonce });
-  console.log({ clientSessionRxKey });
   const b64OauthResponse = sodium.crypto_secretbox_open_easy(
     encryptedOauthResponse,
     nonce,

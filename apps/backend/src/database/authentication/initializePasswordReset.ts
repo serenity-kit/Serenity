@@ -6,9 +6,9 @@ import {
 } from "@serenity-tools/opaque/server";
 import sodium from "libsodium-wrappers-sumo";
 import { prisma } from "../prisma";
-const TOTP_TIMEOUT_MINUTES = 60;
-const TOTP_KEY_SIZE = 128;
-const TOTP_NAME = "serenity";
+const HOTP_TIMEOUT_MINUTES = 60;
+const HOTP_KEY_SIZE = 128;
+const HOTP_NAME = "serenity";
 
 type InitializePasswordResetData = {
   serverPrivateKey: Uint8Array;
@@ -43,14 +43,21 @@ export async function initializePasswordReset(
   }
   // create otp
   const otp = new OTP({
-    name: TOTP_NAME,
-    keySize: TOTP_KEY_SIZE,
+    name: HOTP_NAME,
+    keySize: HOTP_KEY_SIZE,
     codeLength: 6,
-    epoch: Math.floor(Date.now() / 1000),
-    timeSlice: TOTP_TIMEOUT_MINUTES * 60,
+    // epoch: Math.floor(Date.now() / 1000),
+    timeSlice: HOTP_TIMEOUT_MINUTES * 60,
   });
-  otp.totp(Math.floor(Date.now() / 1000));
-  const token = otp.secret;
+  // otp.HOTP(Math.floor(Date.now() / 1000));
+  const now = Math.floor(Date.now() / 1000);
+  console.log({ now });
+  console.log({ otp: otp.hotp(now) });
+  const token = otp.hotp(now);
+  // set the expiration at 60 minutes from now as a Date Object
+  const expiresAtDatetime = new Date(
+    Date.now() + HOTP_TIMEOUT_MINUTES * 60 * 1000
+  );
   // reuse the registration object to load the key information
   try {
     await prisma.registration.update({
@@ -77,6 +84,7 @@ export async function initializePasswordReset(
       },
       data: {
         passwordResetOneTimePassword: token,
+        passwordResetOneTimePasswordExpireDateTime: expiresAtDatetime,
       },
     });
   } catch (error) {

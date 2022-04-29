@@ -4,8 +4,8 @@ import {
   createClientKeyPair,
   createOprfChallenge,
   createUserSession,
-  decryptSessionJsonMessage,
 } from "@serenity-tools/opaque/client";
+import { decryptSessionJsonMessage } from "@serenity-tools/opaque/common";
 import {
   useInitializeLoginMutation,
   useFinalizeLoginMutation,
