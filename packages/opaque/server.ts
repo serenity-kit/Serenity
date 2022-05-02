@@ -1,4 +1,6 @@
 import sodium from "libsodium-wrappers-sumo";
+// two-week expiry
+const USER_LOGIN_ACCESS_TOKEN_EXPIRATION_TIME_IN_SECONDS = 60 * 60 * 24 * 15;
 
 export const getPublicKeyFromEd25519PrivateKey = (privateKey: Uint8Array) => {
   const publicKey = sodium.crypto_scalarmult_ed25519_base(privateKey);
@@ -76,6 +78,26 @@ export function sodium_crypto_generichash_batch(arr: Uint8Array) {
   return combinedHash;
 }
 
+export const generateNonce = (): Uint8Array => {
+  const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+  // const nonce = sodium.from_base64("6dMYpCk9kvqw0vFxyq5j_Xem7nNaEVNU");
+  return nonce;
+};
+
+export const generateOauthAccessToken = () => {
+  const accessToken = sodium.to_base64(
+    sodium.crypto_core_ed25519_scalar_random()
+  );
+  const expiresAt = new Date(
+    Date.now() + USER_LOGIN_ACCESS_TOKEN_EXPIRATION_TIME_IN_SECONDS
+  );
+  return {
+    accessToken,
+    expiresAt,
+  };
+};
+
+/*
 // later, this will move to a client class
 export const generateClientOprfChallenge = (password: string) => {
   // create a curve-mapped password
@@ -85,7 +107,10 @@ export const generateClientOprfChallenge = (password: string) => {
   const mappedPassword =
     sodium.crypto_core_ed25519_from_uniform(hashedPassword);
   // create a random scalar
-  const randomScalar = sodium.crypto_core_ed25519_scalar_random();
+  // const randomScalar = sodium.crypto_core_ed25519_scalar_random();
+  const randomScalar = sodium.from_base64(
+    "JyUYBYuLMDevU6OY39v0L7qs7nCYw3pSzgnWti6GQQQ"
+  );
   // create a random point on curve
   const randomPointOnCurve =
     sodium.crypto_scalarmult_ed25519_base_noclamp(randomScalar);
@@ -96,7 +121,30 @@ export const generateClientOprfChallenge = (password: string) => {
   );
   return { oprfChallenge, randomScalar };
 };
+/* */
 
+/*
+export const crypto_generichash_batch = (
+  arr: Array<Uint8Array>
+): Uint8Array => {
+  // TODO remove/cleanup? Buffer should not be needed
+  const key = new Uint8Array(Buffer.alloc(sodium.crypto_generichash_KEYBYTES));
+  const state = sodium.crypto_generichash_init(
+    key,
+    sodium.crypto_generichash_BYTES
+  );
+  arr.forEach((item) => {
+    sodium.crypto_generichash_update(state, item);
+  });
+  const combinedHash = sodium.crypto_generichash_final(
+    state,
+    sodium.crypto_generichash_BYTES
+  );
+  return combinedHash;
+};
+/* */
+
+/*
 export const createRegistrationEnvelope = (
   clientPrivateKey: Uint8Array,
   clientPublicKey: Uint8Array,
@@ -120,20 +168,20 @@ export const createRegistrationEnvelope = (
   );
   const arr = [passwordBytes, oprfPublicKey, challengeResponseResult];
   // combine hashes
-  const key = new Uint8Array(Buffer.alloc(sodium.crypto_generichash_KEYBYTES));
-  const state = sodium.crypto_generichash_init(
-    key,
-    sodium.crypto_generichash_BYTES
-  );
-  arr.forEach((item) => {
-    sodium.crypto_generichash_update(state, item);
-  });
-  const combinedHash = sodium.crypto_generichash_final(
-    state,
-    sodium.crypto_generichash_BYTES
-  );
+  const combinedHash = crypto_generichash_batch(arr);
+  // const key = new Uint8Array(Buffer.alloc(sodium.crypto_generichash_KEYBYTES));
+  // const state = sodium.crypto_generichash_init(
+  //   key,
+  //   sodium.crypto_generichash_BYTES
+  // );
+  // arr.forEach((item) => {
+  //   sodium.crypto_generichash_update(state, item);
+  // });
+  // const combinedHash = sodium.crypto_generichash_final(
+  //   state,
+  //   sodium.crypto_generichash_BYTES
+  // );
   const randomizedPassword = combinedHash;
-
   // derive key from randomized password
   const hashSalt = new Uint8Array(Buffer.alloc(sodium.crypto_pwhash_SALTBYTES));
   const hashOpsLimit = sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE;
@@ -147,7 +195,8 @@ export const createRegistrationEnvelope = (
     sodium.crypto_pwhash_ALG_DEFAULT
   );
   // generate nonce
-  const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+  // const nonce = sodium.from_base64("6dMYpCk9kvqw0vFxyq5j_Xem7nNaEVNU"); // sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+  const nonce = generateNonce();
   // generate cipher text
   const messageData = {
     userPublicKey: sodium.to_base64(clientPublicKey),
@@ -162,7 +211,9 @@ export const createRegistrationEnvelope = (
   );
   return { secret, nonce };
 };
+/* */
 
+/*
 export function createUserLoginSession(
   password: string,
   secret: Uint8Array,
@@ -233,8 +284,4 @@ export function createUserLoginSession(
     throw Error("Invalid password");
   }
 }
-
-export const generateNonce = (): Uint8Array => {
-  const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
-  return nonce;
-};
+/* */

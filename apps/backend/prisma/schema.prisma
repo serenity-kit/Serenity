@@ -73,8 +73,10 @@ model User {
   masterDevice                 Device                 @relation(name: "masterDevice", fields: [masterDeviceSigningPublicKey], references: [signingPublicKey])
   masterDeviceSigningPublicKey String                 @unique
 
-  devices        Device[]
-  recoveryDevice RecoveryDevice?
+  devices                                    Device[]
+  recoveryDevice                             RecoveryDevice?
+  passwordResetOneTimePassword               String?
+  passwordResetOneTimePasswordExpireDateTime DateTime?
 }
 
 model UserLoginAccessToken {

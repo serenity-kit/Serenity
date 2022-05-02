@@ -1,7 +1,6 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { createOprfChallengeResponse } from "@serenity-tools/opaque/server";
 import sodium from "libsodium-wrappers-sumo";
-import { prisma } from "../../database/prisma";
+import { initializeLogin } from "../../database/authentication/initializeLogin";
 
 export const ClientOprfLoginChallengeInput = inputObjectType({
   name: "ClientOprfLoginChallengeInput",
@@ -21,7 +20,7 @@ export const ClientOprfLoginChallengeResult = objectType({
   },
 });
 
-export const initializeLogin = mutationField("initializeLogin", {
+export const initializeLoginMutation = mutationField("initializeLogin", {
   type: ClientOprfLoginChallengeResult,
   args: {
     input: arg({
@@ -29,32 +28,20 @@ export const initializeLogin = mutationField("initializeLogin", {
     }),
   },
   async resolve(root, args, context) {
-    const username = args?.input?.username;
-    if (!username) {
-      throw Error('Missing parameter: "username" must be string');
+    if (!args || !args.input) {
+      throw Error("Missing input");
     }
-    // TODO throw error if the challenge does not exist
-    const b64ClientOprfChallenge = args?.input?.challenge || "";
-
+    const username = args.input.username;
+    const b64ClientOprfChallenge = args.input.challenge;
     let clientOprfChallenge = new Uint8Array(32);
     try {
       clientOprfChallenge = sodium.from_base64(b64ClientOprfChallenge);
     } catch (error) {
       throw Error("challenge must be a base64-encoded byte array");
     }
-    // if this user does not exist, we have a problem
-    const userData = await prisma.user.findUnique({
-      where: {
-        username: username,
-      },
-    });
-    if (!userData) {
-      throw Error("User is not registered");
-    }
-    const oprfPrivateKey = sodium.from_base64(userData.oprfPrivateKey);
-    const oprfChallengeResponse = createOprfChallengeResponse(
-      clientOprfChallenge,
-      oprfPrivateKey
+    const { userData, oprfChallengeResponse } = await initializeLogin(
+      username,
+      clientOprfChallenge
     );
     // just in case the oprf key pair is not compatible with this method
     // getPublicKeyFromPrivateKey(oprfPrivateKey);

@@ -3,16 +3,16 @@ import setupGraphql from "./helpers/setupGraphql";
 import sodium from "libsodium-wrappers-sumo";
 import deleteAllRecords from "./helpers/deleteAllRecords";
 import {
-  createRegistrationEnvelope,
-  generateClientOprfChallenge,
-  generateKeyPair,
-} from "@serenity-tools/opaque/server";
+  createClientKeyPair,
+  createOprfChallenge,
+  createOprfRegistrationEnvelope,
+} from "@serenity-tools/opaque/client";
 
 const graphql = setupGraphql();
 const username = "user";
 const password = "password";
 let data: any = null;
-let randomScalar: Uint8Array = new Uint8Array(32);
+let randomScalar: string = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -22,14 +22,13 @@ const requestRegistrationChallengeResponse = async (
   username: string,
   password: string
 ) => {
-  const { oprfChallenge, randomScalar } = generateClientOprfChallenge(password);
-  const b64encodedChallenge = sodium.to_base64(oprfChallenge);
+  const { oprfChallenge, randomScalar } = await createOprfChallenge(password);
   const query = gql`
     mutation {
       initializeRegistration(
         input: {
           username: "${username}"
-          challenge: "${b64encodedChallenge}"
+          challenge: "${oprfChallenge}"
         }
       ) {
         serverPublicKey
@@ -46,7 +45,7 @@ const requestRegistrationChallengeResponse = async (
   };
 };
 
-test.only("server should create a registration challenge response", async () => {
+test("server should create a registration challenge response", async () => {
   // generate a challenge code
   const result = await requestRegistrationChallengeResponse(username, password);
   data = result.data;
@@ -62,37 +61,27 @@ test.only("server should create a registration challenge response", async () => 
 
 test("server should register a user", async () => {
   // create client keys
-  const clientKeys = generateKeyPair();
+  const clientKeys = createClientKeyPair();
   // crate cipher text
-  const serverPublicKey = sodium.from_base64(
-    data.initializeRegistration.serverPublicKey
-  );
-  const oprfPublicKey = sodium.from_base64(
+  const clientPublicKey = clientKeys.publicKey;
+  const clientPrivateKey = clientKeys.privateKey;
+  const registrationEnvelopeData = await createOprfRegistrationEnvelope(
+    password,
+    clientPublicKey,
+    clientPrivateKey,
+    randomScalar,
+    data.initializeRegistration.oprfChallengeResponse,
+    data.initializeRegistration.serverPublicKey,
     data.initializeRegistration.oprfPublicKey
   );
-  const serverChallengeResponse = sodium.from_base64(
-    data.initializeRegistration.oprfChallengeResponse
-  );
-  const registrationEnvelopeData = createRegistrationEnvelope(
-    clientKeys.privateKey,
-    clientKeys.publicKey,
-    password,
-    serverChallengeResponse,
-    oprfPublicKey,
-    randomScalar,
-    serverPublicKey
-  );
-  const b64Secret = sodium.to_base64(registrationEnvelopeData.secret);
-  const b64Nonce = sodium.to_base64(registrationEnvelopeData.nonce);
-  const b64ClientPublicKey = sodium.to_base64(clientKeys.publicKey);
   const query = gql`
     mutation {
       finalizeRegistration(
         input: {
           username: "${username}"
-          secret: "${b64Secret}"
-          nonce: "${b64Nonce}"
-          clientPublicKey: "${b64ClientPublicKey}"
+          secret: "${registrationEnvelopeData.secret}"
+          nonce: "${registrationEnvelopeData.nonce}"
+          clientPublicKey: "${clientKeys.publicKey}"
         }
       ) {
         status

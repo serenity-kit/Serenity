@@ -1,30 +1,31 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { finalizeRegistration } from "../../database/authentication/finalizeRegistration";
+import { finalizePasswordReset } from "../../database/authentication/finalizePasswordReset";
 
-export const ClientOprfRegistrationFinalizeInput = inputObjectType({
-  name: "ClientOprfRegistrationFinalizeInput",
+export const FinalizeResetPasswordInput = inputObjectType({
+  name: "FinalizeResetPasswordInput",
   definition(t) {
     t.nonNull.string("username");
+    t.nonNull.string("token");
     t.nonNull.string("secret");
     t.nonNull.string("nonce");
     t.nonNull.string("clientPublicKey");
   },
 });
 
-export const ClientOprfRegistrationFinalizeResult = objectType({
-  name: "ClientOprfRegistrationFinalizeResult",
+export const FinalizeResetPasswordResult = objectType({
+  name: "FinalizeResetPasswordResult",
   definition(t) {
     t.nonNull.string("status");
   },
 });
 
-export const finalizeRegistrationMutation = mutationField(
-  "finalizeRegistration",
+export const finalizePasswordResetMutation = mutationField(
+  "finalizePasswordReset",
   {
-    type: ClientOprfRegistrationFinalizeResult,
+    type: FinalizeResetPasswordResult,
     args: {
       input: arg({
-        type: ClientOprfRegistrationFinalizeInput,
+        type: FinalizeResetPasswordInput,
       }),
     },
     async resolve(root, args, context) {
@@ -32,10 +33,11 @@ export const finalizeRegistrationMutation = mutationField(
         throw new Error("Missing input");
       }
       const username = args.input.username;
+      const token = args.input.token;
       const secret = args.input.secret;
       const nonce = args.input.nonce;
       const clientPublicKey = args.input.clientPublicKey;
-      await finalizeRegistration(username, secret, nonce, clientPublicKey);
+      finalizePasswordReset(username, token, secret, nonce, clientPublicKey);
       const result = {
         status: "success",
       };
