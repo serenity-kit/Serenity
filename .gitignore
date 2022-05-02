@@ -17,3 +17,5 @@ apps/backend/prisma/generated/output
 apps/backend/src/generated
 # backend build
 apps/backend/build
+# ignore ejected react-native ios app
+apps/app/ios
