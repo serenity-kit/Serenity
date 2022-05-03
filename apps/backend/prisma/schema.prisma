@@ -81,7 +81,7 @@ model User {
   recoveryDevice                             RecoveryDevice?
   passwordResetOneTimePassword               String?
   passwordResetOneTimePasswordExpireDateTime DateTime?
-  workspaces                                 Workspace[]
+  usersToWorkspaces                          UsersToWorkspaces[]
 }
 
 model UserLoginAccessToken {
@@ -121,12 +121,22 @@ model Device {
 }
 
 model Workspace {
-  id          String     @id
-  idSignature String
-  name        String // TODO must be encrypted
-  folders     Folder[]
-  documents   Document[]
-  users       User[]
+  id                String              @id
+  idSignature       String
+  name              String // TODO must be encrypted
+  folders           Folder[]
+  documents         Document[]
+  usersToWorkspaces UsersToWorkspaces[]
+}
+
+model UsersToWorkspaces {
+  user        User      @relation(fields: [username], references: [username])
+  username    String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  isAdmin     Boolean
+
+  @@id([username, workspaceId])
 }
 
 model Folder {
