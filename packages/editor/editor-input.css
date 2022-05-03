@@ -11,15 +11,14 @@
     @apply bg-primary-400/50;
   }
 
-  /* spacing calculatable via * + * ?? */
   h1 {
-    @apply mt-12 mb-3 text-3xl font-bold;
+    @apply mt-12 mb-3 text-h1 font-bold;
   }
   h2 {
-    @apply mt-10 mb-2 text-2xl font-bold;
+    @apply mt-10 mb-2 text-h2 font-bold;
   }
   h3 {
-    @apply mt-6 mb-1.5 text-xl font-bold;
+    @apply mt-6 mb-1.5 text-h3 font-bold;
   }
   /* fixed leading needed for tasklist-icon alignment  */
   p {
@@ -70,7 +69,7 @@
   }
 
   .code-block-extension {
-    @apply my-4 rounded bg-gray-100 p-4;
+    @apply my-4 rounded border border-solid border-gray-200 bg-gray-100 p-4;
   }
 
   /* --- lists --- */
@@ -133,7 +132,8 @@
   .task-item-extension input + span:before {
     width: 1rem;
     height: 1rem;
-    border: 0.125rem solid theme("colors.gray.600");
+    /* as browsers interpret 1.5px - 1.9px mostly the same this is the best scalable option */
+    border: 0.1rem solid theme("colors.gray.800");
     border-radius: 0.125rem;
   }
 
@@ -157,33 +157,36 @@
   }
 }
 
+/* Code following this will always be included in our compiled CSS */
+
 /* ::selection {
   background-color: theme('colors.primary.400');
 } */
 
-/* This will always be included in our compiled CSS */
+/* --- ProseMirror --- */
+
 .ProseMirror:focus {
   outline: none;
 }
 
-/* --- ????????????? --- */
-/* should we work with a custom wrapper class or just use the ProseMirror as editor wrapper entry */
 .ProseMirror > *:first-child {
   margin-top: 0;
 }
 
-/* generate debug class to show this */
 /* ------------------------- */
-/* TODO remove after testing */
+/* ------- debugging ------- */
 /* ------------------------- */
-h1,
-h2,
-h3 {
-  /* background-color: rgba(109, 30, 255, 0.15); */
+
+/* howto: add show-sections class to EditorContent className */
+
+.show-sections .ProseMirror {
+  background-color: rgba(255, 230, 147, 0.5);
 }
-p {
-  /* background-color: rgba(109, 30, 255, 0.05); */
+.show-sections h1,
+.show-sections h2,
+.show-sections h3 {
+  background-color: rgba(109, 30, 255, 0.15);
 }
-.ProseMirror {
-  /* background-color: rgba(255, 230, 147, 0.5); */
+.show-sections p {
+  background-color: rgba(109, 30, 255, 0.05);
 }
