@@ -28,6 +28,12 @@ Preview the database:
 yarn prisma studio
 ```
 
+As an alternativ you can start the backend without a DB connection a mocked GraphQL setup:
+
+```sh
+yarn workspace backend dev:mock
+```
+
 ### App (web)
 
 ```sh

@@ -43,6 +43,7 @@ export default async function createServer() {
       }
       return {};
     },
+    mocks: process.env.MOCK_GRAPHQL ? true : false,
   });
   await apolloServer.start();
 
