@@ -3,6 +3,7 @@ import sodium from "libsodium-wrappers-sumo";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { registerUser } from "../../../../test/helpers/registerUser";
+import { createWorkspace } from "../../../../test/helpers/workspace/createWorkspace";
 
 const graphql = setupGraphql();
 const username = "user";
@@ -19,32 +20,20 @@ beforeEach(async () => {
 
 test("user should be able to create a workspace", async () => {
   // generate a challenge code
-  const authorizationHeader = {
-    authorization: `TODO+${username}`,
-  };
-  const workspaceName = "workspace";
-  const workspaceId = "abc";
-  const query = gql`
-    mutation {
-      createWorkspace(
-        input: {
-          name: "${workspaceName}"
-          id: "${workspaceId}"
-        }
-      ) {
-        workspace {
-          id
-          name
-        }
-      }
-    }
-  `;
-  const result = await graphql.client.request(query, null, authorizationHeader);
+  const authorizationHeader = `TODO+${username}`;
+  const name = "workspace";
+  const id = "abc";
+  const result = await createWorkspace({
+    name,
+    id,
+    graphql,
+    authorizationHeader,
+  });
   expect(result.createWorkspace).toMatchInlineSnapshot(`
     Object {
       "workspace": Object {
-        "id": "${workspaceId}",
-        "name": "${workspaceName}",
+        "id": "${id}",
+        "name": "${name}",
       },
     }
   `);
