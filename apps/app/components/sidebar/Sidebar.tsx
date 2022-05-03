@@ -11,8 +11,10 @@ import {
   useCreateWorkspaceMutation,
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
+import { useRoute } from "@react-navigation/native";
 
 export default function Sidebar(props) {
+  const route = useRoute();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
   const [, createWorkspaceResult] = useCreateWorkspaceMutation();
@@ -42,18 +44,49 @@ export default function Sidebar(props) {
         </Button>
       )}
       <Link to={{ screen: "DevDashboard" }}>Dev Dashboard</Link>
-      <Link to={{ screen: "App", params: { screen: "Editor" } }}>Editor</Link>
-      <Link to={{ screen: "App", params: { screen: "TestEditor" } }}>
+      <Link
+        to={{
+          screen: "Workspace",
+          params: { workspaceId: route.params.workspaceId, screen: "Editor" },
+        }}
+      >
+        Editor
+      </Link>
+      <Link
+        to={{
+          screen: "Workspace",
+          params: {
+            workspaceId: route.params.workspaceId,
+            screen: "TestEditor",
+          },
+        }}
+      >
         Sync-Test-Editor
       </Link>
-      <Link to={{ screen: "App", params: { screen: "TestLibsodium" } }}>
+      <Link
+        to={{
+          screen: "Workspace",
+          params: {
+            workspaceId: route.params.workspaceId,
+            screen: "TestLibsodium",
+          },
+        }}
+      >
         Libsodium Test Screen
       </Link>
       <View>
         {workspacesResult.fetching
           ? null
           : workspacesResult.data?.workspaces?.nodes?.map((workspace) => (
-              <Text key={workspace?.id}>{workspace?.name}</Text>
+              <Link
+                key={workspace?.id}
+                to={{
+                  screen: "Workspace",
+                  params: { workspaceId: workspace?.id, screen: "Dashboard" },
+                }}
+              >
+                {workspace?.name}
+              </Link>
             ))}
       </View>
       <View>

@@ -24,7 +24,7 @@ export type AppDrawerParamList = {
 };
 
 export type RootStackParamList = {
-  App: NavigatorScreenParams<AppDrawerParamList> | undefined;
+  Workspace: NavigatorScreenParams<AppDrawerParamList> | undefined;
   DesignSystem: undefined;
   DevDashboard: undefined;
   Register: undefined;

@@ -7,14 +7,42 @@ export default function DevDashboardScreen() {
       <Link to={{ screen: "DesignSystem" }}>Design System</Link>
       <Link to={{ screen: "Register" }}>Registration</Link>
       <Link to={{ screen: "Login" }}>Login</Link>
-      <Link to={{ screen: "App", params: { screen: "Editor" } }}>Editor</Link>
-      <Link to={{ screen: "App", params: { screen: "TestEditor" } }}>
+      <Link
+        to={{
+          screen: "Workspace",
+          params: {
+            workspaceId: "dummy",
+            screen: "Editor",
+          },
+        }}
+      >
+        Editor
+      </Link>
+      <Link
+        to={{
+          screen: "Workspace",
+          params: {
+            workspaceId: "dummy",
+            screen: "TestEditor",
+          },
+        }}
+      >
         Sync-Test-Editor
       </Link>
-      <Link to={{ screen: "App", params: { screen: "TestLibsodium" } }}>
+      <Link
+        to={{
+          screen: "Workspace",
+          params: { workspaceId: "dummy", screen: "TestLibsodium" },
+        }}
+      >
         Libsodium Test Screen
       </Link>
-      <Link to={{ screen: "EncryptDecryptImageTest" }}>
+      <Link
+        to={{
+          screen: "Workspace",
+          params: { workspaceId: "dummy", screen: "EncryptDecryptImageTest" },
+        }}
+      >
         Encrypt / Decrypt Image
       </Link>
     </View>

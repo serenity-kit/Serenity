@@ -30,7 +30,7 @@ import { useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
-function AuthorizedStackScreen() {
+function WorkspaceStackScreen() {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
 
@@ -59,8 +59,8 @@ function RootNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="App"
-        component={AuthorizedStackScreen}
+        name="Workspace"
+        component={WorkspaceStackScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
@@ -92,7 +92,8 @@ const linking: LinkingOptions<RootStackParamList> = {
   prefixes: [Linking.createURL("/")],
   config: {
     screens: {
-      App: {
+      Workspace: {
+        path: "/workspace/:workspaceId",
         screens: {
           Dashboard: "dashboard",
           Editor: "editor",
