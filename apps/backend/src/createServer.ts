@@ -56,12 +56,10 @@ export default async function createServer() {
 
       let doc = await getDocument(documentId);
       if (!doc) {
-        // connection.send(JSON.stringify({ error: "Document not found." }));
-        // TODO close connection
-        // return;
-        await createDocument(documentId);
-        doc = await getDocument(documentId);
-        console.log("created new doc");
+        // TODO close connection properly
+        connection.send(JSON.stringify({ type: "documentNotFound" }));
+        connection.close();
+        return;
       }
       addConnection(documentId, connection);
       connection.send(JSON.stringify({ type: "document", ...doc }));

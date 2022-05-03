@@ -16,6 +16,11 @@ model Document {
   activeSnapshotId String?    @unique
   snapshots        Snapshot[]
   createdAt        DateTime   @default(now())
+  workspace        Workspace  @relation(fields: [workspaceId], references: [id])
+  workspaceId      String
+  parentFolder     Folder?    @relation(fields: [parentFolderId], references: [id])
+  parentFolderId   String?
+  name             String // TODO must be encrypted
 }
 
 model Snapshot {
@@ -53,30 +58,30 @@ model Registration {
 }
 
 model User {
-  username                     String                 @id
-  serverPrivateKey             String
-  serverPublicKey              String                 @default("invalid")
-  oprfPrivateKey               String
-  oprfPublicKey                String                 @default("invalid")
-  oprfCipherText               String
-  oprfNonce                    String
-  clientPublicKey              String
-  sharedRx                     String?
-  sharedTx                     String?
-  resetPasswordToken           String?
-  UserLoginAccessToken         UserLoginAccessToken[]
+  username                                   String                 @id
+  serverPrivateKey                           String
+  serverPublicKey                            String                 @default("invalid")
+  oprfPrivateKey                             String
+  oprfPublicKey                              String                 @default("invalid")
+  oprfCipherText                             String
+  oprfNonce                                  String
+  clientPublicKey                            String
+  sharedRx                                   String?
+  sharedTx                                   String?
+  resetPasswordToken                         String?
+  UserLoginAccessToken                       UserLoginAccessToken[]
   // contains the device signingPrivateKey and encryptionPrivateKey
   // can be decrypted using the key storred in the OPAQUE envelope
-  masterDeviceCiphertext       String
+  masterDeviceCiphertext                     String
   // nonce to decrypt the masterDeviceCiphertext
-  masterDeviceNonce            String
-  masterDevice                 Device                 @relation(name: "masterDevice", fields: [masterDeviceSigningPublicKey], references: [signingPublicKey])
-  masterDeviceSigningPublicKey String                 @unique
-
+  masterDeviceNonce                          String
+  masterDevice                               Device                 @relation(name: "masterDevice", fields: [masterDeviceSigningPublicKey], references: [signingPublicKey])
+  masterDeviceSigningPublicKey               String                 @unique
   devices                                    Device[]
   recoveryDevice                             RecoveryDevice?
   passwordResetOneTimePassword               String?
   passwordResetOneTimePasswordExpireDateTime DateTime?
+  workspaces                                 Workspace[]
 }
 
 model UserLoginAccessToken {
@@ -113,4 +118,25 @@ model Device {
   username                     String?
   recoveryDevice               RecoveryDevice?
   userForMaster                User?           @relation("masterDevice")
+}
+
+model Workspace {
+  id          String     @id
+  idSignature String
+  name        String // TODO must be encrypted
+  folders     Folder[]
+  documents   Document[]
+  users       User[]
+}
+
+model Folder {
+  id             String     @id
+  idSignature    String
+  name           String // TODO must be encrypted
+  workspace      Workspace  @relation(fields: [workspaceId], references: [id])
+  workspaceId    String
+  parentFolder   Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id])
+  parentFolderId String?
+  childFolders   Folder[]   @relation("parentFolder")
+  documents      Document[]
 }
