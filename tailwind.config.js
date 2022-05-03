@@ -6,34 +6,58 @@ module.exports = {
     colors: {
       transparent: "transparent",
       current: "currentColor",
-      white: "#FFFFFF",
+      black: "#000000",
       gray: {
-        100: "#F8F8F8",
-        200: "#E4E5ED",
+        100: "#FDFDFD",
+        200: "#EDEDF0",
+        300: "#DCDDE5",
         400: "#CBCBD3",
+        500: "#B4B4BD",
         600: "#8A8B96",
+        700: "#666771",
         800: "#4F5057",
-        900: "#1F1F1F",
+        900: "#1F1F21",
       },
       primary: {
-        200: "#213AE0",
-        300: "#3049EA",
-        400: "#91A0FF",
+        100: "#ECEEFF",
+        200: "#CDD3FC",
+        300: "#9DAAFD",
+        400: "#7083FA",
         500: "#435BF8",
-        600: "#180177",
-        900: "#ECEEFF",
+        600: "#2B44E4",
+        700: "#172FC8",
+        800: "#0A1E9B",
+        900: "#000F70",
       },
-      emerald: "#48AD83",
-      amber: "#F09334",
-      red: "#EC3153",
+      white: "#FFFFFF",
     },
     screens: {
       xs: "475px",
       ...defaultTheme.screens,
     },
     extend: {
-      // custom fontSize multiplier for better scalability (represents a default size of 17px)
+      colors: {
+        collaboration: {
+          red: "#EF5245",
+          orange: "#FF7D2E",
+        },
+        error: {
+          100: "#FFEDEF",
+          200: "#FFCED4",
+          500: "#F84A56",
+        },
+        warning: {
+          500: "#F09334",
+        },
+        success: {
+          500: "#48AD83",
+        },
+      },
       fontSize: {
+        h1: ["2rem", "2.375rem"], // editor specific
+        h2: ["1.5rem", "1.75rem"], // editor specific
+        h3: ["1.125rem", "1.375rem"], // editor specific
+        // custom fontSize multiplier for better scalability (represents a default size of 17px)
         mobile: "1.0625rem", // editor specific
       },
       padding: {
