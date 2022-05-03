@@ -19,6 +19,7 @@ import {
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   UpdateWithServerData,
 } from "@naisho/core";
+import { getDeviceIncludingUser } from "./database/user/getDeviceIncludingUser";
 
 export default async function createServer() {
   const apolloServer = new ApolloServer({
@@ -28,10 +29,19 @@ export default async function createServer() {
         ? ApolloServerPluginLandingPageDisabled()
         : ApolloServerPluginLandingPageGraphQLPlayground(),
     ],
-    context: (request) => {
-      return {
-        deviceSigningPublicKey: request.req.headers.authorization,
-      };
+    context: async (request) => {
+      if (request.req.headers.authorization) {
+        const device = await getDeviceIncludingUser(
+          request.req.headers.authorization
+        );
+        if (device && device.user) {
+          return {
+            device,
+            user: device.user,
+          };
+        }
+      }
+      return {};
     },
   });
   await apolloServer.start();
