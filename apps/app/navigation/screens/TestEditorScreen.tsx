@@ -163,6 +163,9 @@ export default function TestEditorScreen({
       const onWebsocketMessage = async (event) => {
         const data = JSON.parse(event.data);
         switch (data.type) {
+          case "documentNotFound":
+            // TODO stop reconnecting
+            break;
           case "document":
             if (data.snapshot) {
               await applySnapshot(data.snapshot, key);
