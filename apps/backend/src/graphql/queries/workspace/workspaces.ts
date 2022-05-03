@@ -10,7 +10,9 @@ export const workspaces = queryField((t) => {
     cursorFromNode: (node) => node?.id ?? "",
     async nodes(root, args, context) {
       if (args.first > 50) {
-        throw new Error("Too many workspaces");
+        throw new Error(
+          "Requested too many workspaces. First value exceeds 50."
+        );
       }
       if (!context.user) {
         throw new Error("Unauthorized");

@@ -92,7 +92,9 @@ test("user cannot query more than 50 results", async () => {
   `;
   await expect(async () => {
     await graphql.client.request(query, null, authorizationHeader);
-  }).rejects.toThrowError("Too many workspaces");
+  }).rejects.toThrowError(
+    "Requested too many workspaces. First value exceeds 50."
+  );
 });
 
 test("user cannot query by paginating cursor", async () => {
