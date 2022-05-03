@@ -1,0 +1,8 @@
+query workspaces {
+  workspaces(first: 50) {
+    nodes {
+      id
+      name
+    }
+  }
+}
