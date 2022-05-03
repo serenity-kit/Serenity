@@ -54,6 +54,19 @@ export async function finalizeRegistration(
         where: { signingPublicKey: device.signingPublicKey },
         data: { user: { connect: { username: username } } },
       });
+      await prisma.workspace.create({
+        data: {
+          id: `${username}-my-workspace`,
+          name: "My Workspace",
+          idSignature: "TODO",
+          usersToWorkspaces: {
+            create: {
+              username: username,
+              isAdmin: true,
+            },
+          },
+        },
+      });
     });
   } catch (error) {
     console.error("Error saving user");

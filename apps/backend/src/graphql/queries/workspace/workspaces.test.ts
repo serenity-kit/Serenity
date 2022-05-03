@@ -56,6 +56,9 @@ test("user should be able to list workspaces", async () => {
     Object {
       "edges": Array [
         Object {
+          "cursor": "dXNlci1teS13b3Jrc3BhY2U=",
+        },
+        Object {
           "cursor": "YWJj",
         },
         Object {
@@ -63,6 +66,10 @@ test("user should be able to list workspaces", async () => {
         },
       ],
       "nodes": Array [
+        Object {
+          "id": "user-my-workspace",
+          "name": "My Workspace",
+        },
         Object {
           "id": "abc",
           "name": "workspace 1",
