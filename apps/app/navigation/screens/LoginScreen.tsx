@@ -184,6 +184,8 @@ export default function LoginScreen() {
         setDidLoginSucceed(true);
         setOauthAccessToken(oauthAccessData.accessToken);
         setAccessTokenExpiresIn(oauthAccessData.expiresIn);
+        // TODO replace with proper authentication
+        localStorage.setItem("deviceSigningPublicKey", `TODO+${username}`);
       } catch (error) {
         setHasGqlError(true);
         setGqlErrorMessage("Invalid email or password");
