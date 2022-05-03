@@ -246,6 +246,22 @@ export type CreateDocumentMutation = {
   } | null;
 };
 
+export type CreateWorkspaceMutationVariables = Exact<{
+  input: CreateWorkspaceInput;
+}>;
+
+export type CreateWorkspaceMutation = {
+  __typename?: "Mutation";
+  createWorkspace?: {
+    __typename?: "CreateWorkspaceResult";
+    workspace?: {
+      __typename?: "Workspace";
+      id: string;
+      name?: string | null;
+    } | null;
+  } | null;
+};
+
 export type FinalizeLoginMutationVariables = Exact<{
   input: ClientOprfLoginFinalizeInput;
 }>;
@@ -352,6 +368,23 @@ export function useCreateDocumentMutation() {
     CreateDocumentMutation,
     CreateDocumentMutationVariables
   >(CreateDocumentDocument);
+}
+export const CreateWorkspaceDocument = gql`
+  mutation createWorkspace($input: CreateWorkspaceInput!) {
+    createWorkspace(input: $input) {
+      workspace {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export function useCreateWorkspaceMutation() {
+  return Urql.useMutation<
+    CreateWorkspaceMutation,
+    CreateWorkspaceMutationVariables
+  >(CreateWorkspaceDocument);
 }
 export const FinalizeLoginDocument = gql`
   mutation finalizeLogin($input: ClientOprfLoginFinalizeInput!) {
