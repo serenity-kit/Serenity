@@ -7,6 +7,7 @@ import {
   createOprfChallenge,
   createOprfRegistrationEnvelope,
 } from "@serenity-tools/opaque/client";
+import { requestRegistrationChallengeResponse } from "./helpers/requestRegistrationChallengeResponse";
 
 const graphql = setupGraphql();
 const username = "user";
@@ -18,45 +19,20 @@ beforeAll(async () => {
   await deleteAllRecords();
 });
 
-const requestRegistrationChallengeResponse = async (
-  username: string,
-  password: string
-) => {
-  const { oprfChallenge, randomScalar } = await createOprfChallenge(password);
-  const query = gql`
-    mutation {
-      initializeRegistration(
-        input: {
-          username: "${username}"
-          challenge: "${oprfChallenge}"
-        }
-      ) {
-        serverPublicKey
-        oprfPublicKey
-        oprfChallengeResponse
-      }
-    }
-  `;
-  const data = await graphql.client.request(query);
-  return {
-    data,
-    oprfChallenge,
-    randomScalar,
-  };
-};
-
 test("server should create a registration challenge response", async () => {
   // generate a challenge code
-  const result = await requestRegistrationChallengeResponse(username, password);
+  const result = await requestRegistrationChallengeResponse(
+    graphql,
+    username,
+    password
+  );
   data = result.data;
   randomScalar = result.randomScalar;
   // expect serverPublicKey, oprfPublicKey, oprfChallengeResponse
   // all three should be base64-encoded 32-bit uint8 arrays
-  expect(typeof data.initializeRegistration.serverPublicKey).toBe("string");
-  expect(typeof data.initializeRegistration.oprfPublicKey).toBe("string");
-  expect(typeof data.initializeRegistration.oprfChallengeResponse).toBe(
-    "string"
-  );
+  expect(typeof data.serverPublicKey).toBe("string");
+  expect(typeof data.oprfPublicKey).toBe("string");
+  expect(typeof data.oprfChallengeResponse).toBe("string");
 });
 
 test("server should register a user", async () => {
@@ -70,9 +46,9 @@ test("server should register a user", async () => {
     clientPublicKey,
     clientPrivateKey,
     randomScalar,
-    data.initializeRegistration.oprfChallengeResponse,
-    data.initializeRegistration.serverPublicKey,
-    data.initializeRegistration.oprfPublicKey
+    data.oprfChallengeResponse,
+    data.serverPublicKey,
+    data.oprfPublicKey
   );
   const query = gql`
     mutation {

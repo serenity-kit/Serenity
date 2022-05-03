@@ -8,6 +8,8 @@ import * as InitializePasswordResetTypes from "./graphql/mutations/initializePas
 import * as FinalizePasswordResetTypes from "./graphql/mutations/finalizePasswordReset";
 import * as DocumentPreviewsQueryTypes from "./graphql/queries/documentPreviews";
 import * as CreateDocumentMutationTypes from "./graphql/mutations/createDocument";
+import * as CreateWorkspaceMutationTypes from "./graphql/mutations/workspace/createWorkspace";
+import * as WorkspaceTypes from "./graphql/types/workspace";
 import * as DocumentTypes from "./graphql/types/documentPreview";
 
 export const schema = makeSchema({
@@ -26,6 +28,8 @@ export const schema = makeSchema({
     FinalizeLoginTypes,
     InitializePasswordResetTypes,
     FinalizePasswordResetTypes,
+    CreateWorkspaceMutationTypes,
+    WorkspaceTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),
