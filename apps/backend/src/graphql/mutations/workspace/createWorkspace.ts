@@ -28,6 +28,9 @@ export const createWorkspaceMutation = mutationField("createWorkspace", {
     if (!context.user) {
       throw new Error("Unauthorized");
     }
+    if (!args.input) {
+      throw new Error("Invalid input");
+    }
     const workspace = await createWorkspace({
       id: args.input.id,
       name: args.input.name,
