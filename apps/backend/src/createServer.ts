@@ -10,7 +10,6 @@ import { createServer as httpCreateServer } from "http";
 import { schema } from "./schema";
 import { addUpdate, addConnection, removeConnection } from "./store";
 import { getDocument } from "./database/getDocument";
-import { createDocument } from "./database/createDocument";
 import { createSnapshot } from "./database/createSnapshot";
 import { createUpdate } from "./database/createUpdate";
 import { getUpdatesForDocument } from "./database/getUpdatesForDocument";
@@ -29,6 +28,11 @@ export default async function createServer() {
         ? ApolloServerPluginLandingPageDisabled()
         : ApolloServerPluginLandingPageGraphQLPlayground(),
     ],
+    context: (request) => {
+      return {
+        deviceSigningPublicKey: request.req.headers.authorization,
+      };
+    },
   });
   await apolloServer.start();
 
