@@ -31,11 +31,10 @@ export const deleteWorkspacesMutation = mutationField("deleteWorkspaces", {
     if (!args.input) {
       throw new Error("Invalid input");
     }
-    console.log({ input: args.input });
-    const workspace = await deleteWorkspaces({
+    await deleteWorkspaces({
       workspaceIds: args.input.ids,
       username: context.user.username,
     });
-    return { workspace };
+    return { status: "success" };
   },
 });

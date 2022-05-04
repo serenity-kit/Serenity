@@ -7,43 +7,38 @@ type Params = {
 
 export async function deleteWorkspaces({ workspaceIds, username }: Params) {
   try {
-    // await prisma.$transaction(async (prisma) => {
-    console.log({ workspaceIds });
-    // TODO: delete usersToWorkspace?
-    // can only delete workspaces where the user is the admin
-    const userWorkspaces = await prisma.usersToWorkspaces.findMany({
-      where: {
-        username: username,
-        isAdmin: true,
-        workspaceId: {
-          in: workspaceIds,
+    await prisma.$transaction(async (prisma) => {
+      // TODO: delete usersToWorkspace?
+      // can only delete workspaces where the user is the admin
+      const userWorkspaces = await prisma.usersToWorkspaces.findMany({
+        where: {
+          username: username,
+          isAdmin: true,
+          workspaceId: {
+            in: workspaceIds,
+          },
         },
-      },
-    });
-    console.log({ userWorkspaces });
-    let userWorkspaceIds: string[] = [];
-    for (const userWorkspace of userWorkspaces) {
-      userWorkspaceIds.push(userWorkspace.workspaceId);
-    }
-    console.log({ userWorkspaceIds });
-    await prisma.usersToWorkspace.deleteMany({
-      where: {
-        id: {
-          in: userWorkspaceIds,
+      });
+      let userWorkspaceIds: string[] = [];
+      for (const userWorkspace of userWorkspaces) {
+        userWorkspaceIds.push(userWorkspace.workspaceId);
+      }
+      await prisma.usersToWorkspaces.deleteMany({
+        where: {
+          workspaceId: {
+            in: userWorkspaceIds,
+          },
         },
-      },
-    });
-    await prisma.workspace.deleteMany({
-      where: {
-        id: {
-          in: userWorkspaceIds,
+      });
+      await prisma.workspace.deleteMany({
+        where: {
+          id: {
+            in: userWorkspaceIds,
+          },
         },
-      },
+      });
     });
-    // });
   } catch (error) {
-    console.log("ERROR deleteing workspaces");
-    console.log(error);
     throw Error("Invalid workspace IDs");
   }
 }

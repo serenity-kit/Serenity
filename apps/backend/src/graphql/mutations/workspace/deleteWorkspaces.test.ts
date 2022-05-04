@@ -27,7 +27,6 @@ beforeEach(async () => {
       authorizationHeader: `TODO+${username}`,
     });
     addedWorkspace = createWorkspaceResult.createWorkspace.workspace;
-    console.log({ addedWorkspace });
     isUserRegistered = true;
   }
 });
@@ -37,7 +36,7 @@ test.only("user should be able to delete a workspace", async () => {
   const authorizationHeader = `TODO+${username}`;
   const ids = [addedWorkspace.id];
   const result = await deleteWorkspaces({ graphql, ids, authorizationHeader });
-  expect(result.deleteWorkspace).toMatchInlineSnapshot();
+  expect(result.deleteWorkspace).toMatchInlineSnapshot(`undefined`);
 });
 
 test("Deleting nonexistent workspace does nothing", async () => {
