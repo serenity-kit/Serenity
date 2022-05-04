@@ -26,6 +26,13 @@ export async function deleteWorkspaces({ workspaceIds, username }: Params) {
       userWorkspaceIds.push(userWorkspace.workspaceId);
     }
     console.log({ userWorkspaceIds });
+    await prisma.usersToWorkspace.deleteMany({
+      where: {
+        id: {
+          in: userWorkspaceIds,
+        },
+      },
+    });
     await prisma.workspace.deleteMany({
       where: {
         id: {
