@@ -37,12 +37,7 @@ export default function DevDashboardScreen() {
       >
         Libsodium Test Screen
       </Link>
-      <Link
-        to={{
-          screen: "Workspace",
-          params: { workspaceId: "dummy", screen: "EncryptDecryptImageTest" },
-        }}
-      >
+      <Link to={{ screen: "EncryptDecryptImageTest" }}>
         Encrypt / Decrypt Image
       </Link>
     </View>

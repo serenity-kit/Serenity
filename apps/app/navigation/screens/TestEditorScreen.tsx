@@ -31,14 +31,14 @@ import {
   removeAwarenessStates,
 } from "y-protocols/awareness";
 import { View, Text, tw } from "@serenity-tools/ui";
-import { RootTabScreenProps } from "../../types";
+import { WorkspaceDrawerScreenProps } from "../../types";
 import { useEffect, useRef } from "react";
 
 const reconnectTimeout = 2000;
 
 export default function TestEditorScreen({
   navigation,
-}: RootTabScreenProps<"TestEditor">) {
+}: WorkspaceDrawerScreenProps<"TestEditor">) {
   const docId = "12345678-1282-459d-a403-ad1481d2ad7o";
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());

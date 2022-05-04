@@ -4,7 +4,6 @@ import {
   Link,
   useIsPermanentLeftSidebar,
   View,
-  Text,
 } from "@serenity-tools/ui";
 import {
   useWorkspacesQuery,
@@ -12,9 +11,10 @@ import {
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 import { useRoute } from "@react-navigation/native";
+import { RootStackScreenProps } from "../../types";
 
 export default function Sidebar(props) {
-  const route = useRoute();
+  const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
   const [, createWorkspaceResult] = useCreateWorkspaceMutation();
@@ -77,17 +77,19 @@ export default function Sidebar(props) {
       <View>
         {workspacesResult.fetching
           ? null
-          : workspacesResult.data?.workspaces?.nodes?.map((workspace) => (
-              <Link
-                key={workspace?.id}
-                to={{
-                  screen: "Workspace",
-                  params: { workspaceId: workspace?.id, screen: "Dashboard" },
-                }}
-              >
-                {workspace?.name}
-              </Link>
-            ))}
+          : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
+              workspace === null ? null : (
+                <Link
+                  key={workspace?.id}
+                  to={{
+                    screen: "Workspace",
+                    params: { workspaceId: workspace.id, screen: "Dashboard" },
+                  }}
+                >
+                  {workspace?.name}
+                </Link>
+              )
+            )}
       </View>
       <View>
         <Button
