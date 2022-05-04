@@ -204,7 +204,7 @@ export default function LoginScreen() {
   return (
     <View style={tw`bg-gray-100 justify-center items-center flex-auto`}>
       <View style={tw`max-w-md p-10`}>
-        <Text>Register</Text>
+        <Text>Login</Text>
 
         {hasGqlError && (
           <View>

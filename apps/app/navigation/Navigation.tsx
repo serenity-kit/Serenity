@@ -22,6 +22,7 @@ import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
 import { useIsPermanentLeftSidebar } from "@serenity-tools/ui";
+import { useEffect } from "react";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -30,9 +31,18 @@ import { useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
-function WorkspaceStackScreen() {
+function WorkspaceStackScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
+  useEffect(() => {
+    if (!props.route.params) {
+      props.navigation.navigate("Login");
+    }
+  }, [props.route.params]);
+
+  if (!props.route.params) {
+    return null;
+  }
 
   return (
     <Drawer.Navigator
