@@ -34,9 +34,7 @@ const computeStyle = ({
   if (disabled) return tw`bg-gray-400`;
 
   let style: any = isFocusVisible
-    ? {
-        boxShadow: `${tw.color("primary-900")} 0px 0px 0px 4px`,
-      }
+    ? tw.style("se-outline-focus") // web only
     : {};
   if (isPressed) return tw.style(`bg-primary-200`);
   if (isHovered) return tw.style(`bg-primary-300`, style);
