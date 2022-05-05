@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { Text, View, Input, Button, tw } from "@serenity-tools/ui";
+import { Text, View, Input, Button, tw, Link } from "@serenity-tools/ui";
 import {
   createClientKeyPair,
   createOprfChallenge,
@@ -217,6 +217,10 @@ export default function RegisterScreen() {
         />
 
         <Button onPress={onRegisterPress}>Register</Button>
+      </View>
+      <View>
+        Already have an account?{" "}
+        <Link to={{ screen: "Login" }}>Login here</Link>
       </View>
     </View>
   );

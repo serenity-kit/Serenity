@@ -22,7 +22,7 @@ import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
 import { useIsPermanentLeftSidebar } from "@serenity-tools/ui";
-import { useEffect } from "react";
+import RootScreen from "./screens/RootScreen";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -34,11 +34,6 @@ const Drawer = createDrawerNavigator();
 function WorkspaceStackScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
-  useEffect(() => {
-    if (!props.route.params) {
-      props.navigation.navigate("Login");
-    }
-  }, [props.route.params]);
 
   if (!props.route.params) {
     return null;
@@ -89,6 +84,7 @@ function RootNavigator() {
         name="EncryptDecryptImageTest"
         component={EncryptDecryptImageTestScreen}
       />
+      <Stack.Screen name="Root" component={RootScreen} />
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
@@ -116,6 +112,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       Register: "register",
       Login: "login",
       EncryptDecryptImageTest: "encrypt-decrypt-image-test",
+      Root: "",
       NotFound: "*",
     },
   },
