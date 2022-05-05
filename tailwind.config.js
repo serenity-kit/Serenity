@@ -60,6 +60,9 @@ module.exports = {
         // custom fontSize multiplier for better scalability (represents a default size of 17px)
         mobile: "1.0625rem", // editor specific
       },
+      height: {
+        "top-bar": "3rem",
+      },
       padding: {
         4.5: "1.125rem", // editor specific
       },

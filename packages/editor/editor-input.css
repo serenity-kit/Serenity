@@ -33,12 +33,24 @@
 
   /* --- editor --- */
   .ProseMirror {
-    @apply h-full px-4 py-10 xs:px-6 sm:px-10 md:py-14 lg:px-16;
+    @apply px-4 pt-10 xs:px-6 sm:px-10 md:pt-14 lg:px-16;
+    /* calculate container-height for seamless scrolling */
+    height: calc(100vh - theme("height-top-bar"));
+  }
+
+  /* needed so area actually scrolls to the end of the editor with some space left */
+  .ProseMirror > *:last-child {
+    @apply pb-10 md:pb-14;
   }
 
   /* needed to make all area of the editor clickable which enables activating the cursor on each written line */
   .ProseMirror > * {
     @apply mx-auto w-full max-w-prose-rem;
+  }
+
+  /* needed so margin of first element doesn't make content 'jump' */
+  .ProseMirror > *:first-child {
+    margin-top: 0;
   }
 
   /* --- placeholder --- */
@@ -177,10 +189,6 @@
 
 .ProseMirror:focus {
   outline: none;
-}
-
-.ProseMirror > *:first-child {
-  margin-top: 0;
 }
 
 /* ------------------------- */
