@@ -1,4 +1,5 @@
 import { prisma } from "../prisma";
+// import { Workspace } from "../../graphql/types/workspace";
 
 export type WorkspaceSharingParams = {
   username: string;
@@ -101,7 +102,25 @@ export async function updateWorkspace({
           idSignature: "TODO",
         },
       });
-      return updatedWorkspace;
+      const updatedPermissions = await prisma.usersToWorkspaces.findMany({
+        where: {
+          workspaceId: workspace.id,
+        },
+        select: {
+          username: true,
+          isAdmin: true,
+        },
+      });
+      const updatedWorkspaceData = {
+        id: updatedWorkspace.id,
+        name: updatedWorkspace.name,
+        idSignature: updatedWorkspace.idSignature,
+        permissions: updatedPermissions,
+      };
+      console.log({
+        updatedWorkspaceData: JSON.stringify(updatedWorkspaceData),
+      });
+      return updatedWorkspaceData;
     });
   } catch (error) {
     throw Error("Invalid workspace ID");

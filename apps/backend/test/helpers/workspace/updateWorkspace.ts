@@ -26,6 +26,10 @@ export const updateWorkspace = async ({
         workspace {
           id
           name
+          permissions {
+            username
+            isAdmin
+          }
         }
       }
     }

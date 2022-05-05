@@ -56,8 +56,18 @@ test("user should be able to update a workspace", async () => {
   expect(result.updateWorkspace).toMatchInlineSnapshot(`
     Object {
       "workspace": Object {
-        "id": "${id}",
-        "name": "${name}",
+        "id": "abc",
+        "name": "renamed workspace",
+        "permissions": Array [
+          Object {
+            "isAdmin": "false",
+            "username": "user",
+          },
+          Object {
+            "isAdmin": "true",
+            "username": "user1",
+          },
+        ],
       },
     }
   `);
