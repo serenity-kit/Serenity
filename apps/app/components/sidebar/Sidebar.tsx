@@ -100,6 +100,17 @@ export default function Sidebar(props) {
           Create workspace
         </Button>
       </View>
+      <View>
+        <Button
+          onPress={() => {
+            // TODO clear cache and wipe local data?
+            localStorage.removeItem("deviceSigningPublicKey");
+            props.navigation.navigate("Login");
+          }}
+        >
+          Logout
+        </Button>
+      </View>
     </DrawerContentScrollView>
   );
 }

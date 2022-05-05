@@ -11,7 +11,7 @@ import {
   useFinalizeLoginMutation,
 } from "../../generated/graphql";
 
-export default function LoginScreen() {
+export default function LoginScreen(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [didLoginSucceed, setDidLoginSucceed] = useState(false);
@@ -186,6 +186,7 @@ export default function LoginScreen() {
         setAccessTokenExpiresIn(oauthAccessData.expiresIn);
         // TODO replace with proper authentication
         localStorage.setItem("deviceSigningPublicKey", `TODO+${username}`);
+        props.navigation.navigate("Root");
       } catch (error) {
         setHasGqlError(true);
         setGqlErrorMessage("Invalid email or password");
@@ -248,7 +249,7 @@ export default function LoginScreen() {
 
         <Button onPress={onLoginPress}>Log in</Button>
         <View>
-          Don't have an account?{" "}
+          <Text>Don't have an account? </Text>
           <Link to={{ screen: "Register" }}>Register here</Link>
         </View>
       </View>
