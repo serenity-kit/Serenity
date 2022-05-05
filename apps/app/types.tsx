@@ -16,28 +16,34 @@ declare global {
   }
 }
 
-export type AppDrawerParamList = {
+export type WorkspaceDrawerParamList = {
   Dashboard: undefined;
   Editor: undefined;
   TestEditor: undefined;
   TestLibsodium: undefined;
 };
 
+type WorkspaceParams = NavigatorScreenParams<WorkspaceDrawerParamList> & {
+  workspaceId: string;
+};
+
 export type RootStackParamList = {
-  App: NavigatorScreenParams<AppDrawerParamList> | undefined;
+  Workspace: WorkspaceParams;
   DesignSystem: undefined;
   DevDashboard: undefined;
   Register: undefined;
   Login: undefined;
   EncryptDecryptImageTest: undefined;
+  Root: undefined;
   NotFound: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
   NativeStackScreenProps<RootStackParamList, Screen>;
 
-export type RootTabScreenProps<Screen extends keyof AppDrawerParamList> =
-  CompositeScreenProps<
-    DrawerScreenProps<AppDrawerParamList, Screen>,
-    NativeStackScreenProps<RootStackParamList>
-  >;
+export type WorkspaceDrawerScreenProps<
+  Screen extends keyof WorkspaceDrawerParamList
+> = CompositeScreenProps<
+  DrawerScreenProps<WorkspaceDrawerParamList, Screen>,
+  NativeStackScreenProps<RootStackParamList>
+>;

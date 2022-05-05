@@ -22,6 +22,7 @@ import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
 import { useIsPermanentLeftSidebar } from "@serenity-tools/ui";
+import RootScreen from "./screens/RootScreen";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -30,9 +31,13 @@ import { useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
-function AuthorizedStackScreen() {
+function WorkspaceStackScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
+
+  if (!props.route.params) {
+    return null;
+  }
 
   return (
     <Drawer.Navigator
@@ -59,8 +64,8 @@ function RootNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="App"
-        component={AuthorizedStackScreen}
+        name="Workspace"
+        component={WorkspaceStackScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
@@ -79,6 +84,7 @@ function RootNavigator() {
         name="EncryptDecryptImageTest"
         component={EncryptDecryptImageTestScreen}
       />
+      <Stack.Screen name="Root" component={RootScreen} />
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
@@ -92,7 +98,8 @@ const linking: LinkingOptions<RootStackParamList> = {
   prefixes: [Linking.createURL("/")],
   config: {
     screens: {
-      App: {
+      Workspace: {
+        path: "/workspace/:workspaceId",
         screens: {
           Dashboard: "dashboard",
           Editor: "editor",
@@ -105,6 +112,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       Register: "register",
       Login: "login",
       EncryptDecryptImageTest: "encrypt-decrypt-image-test",
+      Root: "",
       NotFound: "*",
     },
   },

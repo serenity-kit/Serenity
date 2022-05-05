@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, Button, Input, tw } from "@serenity-tools/ui";
+import { Text, View, Button, Input, tw, Link } from "@serenity-tools/ui";
 import {
   createClientKeyPair,
   createOprfChallenge,
@@ -11,7 +11,7 @@ import {
   useFinalizeLoginMutation,
 } from "../../generated/graphql";
 
-export default function LoginScreen() {
+export default function LoginScreen(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [didLoginSucceed, setDidLoginSucceed] = useState(false);
@@ -186,6 +186,7 @@ export default function LoginScreen() {
         setAccessTokenExpiresIn(oauthAccessData.expiresIn);
         // TODO replace with proper authentication
         localStorage.setItem("deviceSigningPublicKey", `TODO+${username}`);
+        props.navigation.navigate("Root");
       } catch (error) {
         setHasGqlError(true);
         setGqlErrorMessage("Invalid email or password");
@@ -204,7 +205,7 @@ export default function LoginScreen() {
   return (
     <View style={tw`bg-gray-100 justify-center items-center flex-auto`}>
       <View style={tw`max-w-md p-10`}>
-        <Text>Register</Text>
+        <Text>Login</Text>
 
         {hasGqlError && (
           <View>
@@ -247,6 +248,10 @@ export default function LoginScreen() {
         </View>
 
         <Button onPress={onLoginPress}>Log in</Button>
+        <View>
+          <Text>Don't have an account? </Text>
+          <Link to={{ screen: "Register" }}>Register here</Link>
+        </View>
       </View>
     </View>
   );

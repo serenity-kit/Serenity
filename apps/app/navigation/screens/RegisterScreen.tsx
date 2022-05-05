@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { Text, View, Input, Button, tw } from "@serenity-tools/ui";
+import { Text, View, Input, Button, tw, Link } from "@serenity-tools/ui";
 import {
   createClientKeyPair,
   createOprfChallenge,
@@ -11,7 +11,7 @@ import {
   useInitializeRegistrationMutation,
 } from "../../generated/graphql";
 
-export default function RegisterScreen() {
+export default function RegisterScreen(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [clientPublicKey, setClientPublicKey] = useState("");
@@ -127,7 +127,7 @@ export default function RegisterScreen() {
       setDidRegistrationSucceed(
         serverRegistrationResponse.status === "success"
       );
-      return serverRegistrationResponse;
+      props.navigation.navigate("Login");
     } else if (mutationResult.error) {
       const errorMessage = mutationResult.error.message.substring(
         mutationResult.error.message.indexOf("] ") + 2
@@ -217,6 +217,10 @@ export default function RegisterScreen() {
         />
 
         <Button onPress={onRegisterPress}>Register</Button>
+      </View>
+      <View>
+        <Text>Already have an account? </Text>
+        <Link to={{ screen: "Login" }}>Login here</Link>
       </View>
     </View>
   );

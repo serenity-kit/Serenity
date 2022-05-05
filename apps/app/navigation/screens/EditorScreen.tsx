@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 import * as Y from "yjs";
 
 import { tw, View } from "@serenity-tools/ui";
-import { RootTabScreenProps } from "../../types";
+import { WorkspaceDrawerScreenProps } from "../../types";
 
 /*
 Hello World
@@ -36,7 +36,7 @@ const editorContentAsYjsUpdateV2 = Uint8Array.from([
 
 export default function EditorScreen({
   navigation,
-}: RootTabScreenProps<"Editor">) {
+}: WorkspaceDrawerScreenProps<"Editor">) {
   const [yDoc] = useState(() => {
     const yDoc = new Y.Doc();
     Y.applyUpdateV2(yDoc, editorContentAsYjsUpdateV2);

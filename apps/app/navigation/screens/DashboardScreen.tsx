@@ -2,7 +2,7 @@ import { Text, View } from "@serenity-tools/ui";
 import { useDocumentPreviewsQuery } from "../../generated/graphql";
 import DevDashboardScreen from "./DevDashboardScreen";
 
-export default function DashboardScreen() {
+export default function DashboardScreen(props) {
   const [{ data, fetching, error }] = useDocumentPreviewsQuery();
   return (
     <View>
@@ -19,7 +19,7 @@ export default function DashboardScreen() {
         })
       ) : null}
 
-      <DevDashboardScreen />
+      <DevDashboardScreen {...props} />
     </View>
   );
 }
