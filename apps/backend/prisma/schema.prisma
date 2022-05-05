@@ -130,9 +130,9 @@ model Workspace {
 }
 
 model UsersToWorkspaces {
-  user        User      @relation(fields: [username], references: [username])
+  user        User      @relation(fields: [username], references: [username], onDelete: Cascade)
   username    String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId String
   isAdmin     Boolean
 
