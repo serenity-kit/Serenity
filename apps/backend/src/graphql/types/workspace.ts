@@ -1,10 +1,21 @@
 import { inputObjectType, list, objectType } from "nexus";
 
+export const WorkspacePermissionsOutput = objectType({
+  name: "WorkspacePermissionsOutput",
+  definition(t) {
+    t.nonNull.string("username");
+    t.nonNull.string("isAdmin");
+  },
+});
+
 export const Workspace = objectType({
   name: "Workspace",
   definition(t) {
     t.nonNull.string("id");
     t.string("name");
+    t.list.nonNull.field("permissions", {
+      type: WorkspacePermissionsOutput,
+    });
   },
 });
 
