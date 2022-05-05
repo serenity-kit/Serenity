@@ -43,7 +43,12 @@ export default async function createServer() {
       }
       return {};
     },
-    mocks: process.env.MOCK_GRAPHQL ? true : false,
+    mocks: process.env.MOCK_GRAPHQL
+      ? {
+          // should be unique for all the IDs and keys
+          String: () => (Math.random() + 1).toString(36).substring(2),
+        }
+      : false,
   });
   await apolloServer.start();
 
