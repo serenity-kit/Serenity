@@ -4,7 +4,7 @@ export const WorkspacePermissionsOutput = objectType({
   name: "WorkspacePermissionsOutput",
   definition(t) {
     t.nonNull.string("username");
-    t.nonNull.string("isAdmin");
+    t.nonNull.boolean("isAdmin");
   },
 });
 
