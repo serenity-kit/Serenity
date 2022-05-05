@@ -11,7 +11,7 @@ export type CenterHeaderProps = RNView["props"] & {
 };
 
 const styles = StyleSheet.create({
-  view: tw`bg-white dark:bg-gray-900 border-b border-gray-200`,
+  view: tw`bg-white dark:bg-gray-900 border-b border-gray-200 h-top-bar`,
 });
 
 export const CenterHeader = React.forwardRef(
@@ -23,7 +23,7 @@ export const CenterHeader = React.forwardRef(
 
     return (
       <View ref={ref} {...rest} style={[styles.view, rest.style]}>
-        <HStack alignItems="center" style={tw`h-top-bar`}>
+        <HStack alignItems="center">
           {isPermanentLeftSidebar ? null : (
             <Button onPress={openDrawer}>Open Menu</Button>
           )}

@@ -35,7 +35,7 @@
   .ProseMirror {
     @apply px-4 pt-10 xs:px-6 sm:px-10 md:pt-14 lg:px-16;
     /* calculate container-height for seamless scrolling */
-    height: calc(100vh - theme("height-top-bar"));
+    height: calc(100vh - theme("height.top-bar"));
   }
 
   /* needed so area actually scrolls to the end of the editor with some space left */
