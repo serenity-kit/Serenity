@@ -1,5 +1,5 @@
 import { prisma } from "../prisma";
-import { Workspace } from "../../graphql/types/workspace";
+import { Workspace } from "../../types/workspace";
 
 type Cursor = {
   id?: string;
@@ -39,7 +39,7 @@ export async function getWorkspaces({ username, cursor, skip, take }: Params) {
     },
   });
   // attach the .usersToWorkspaces as .members property
-  const workspaces: any = [];
+  const workspaces: Workspace[] = [];
   rawWorkspaces.forEach((rawWorkspace) => {
     const workspace = {
       id: rawWorkspace.id,

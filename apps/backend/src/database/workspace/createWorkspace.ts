@@ -1,4 +1,5 @@
 import { prisma } from "../prisma";
+import { Workspace } from "../../types/workspace";
 
 type Params = {
   id: string;
@@ -6,7 +7,11 @@ type Params = {
   username: string;
 };
 
-export async function createWorkspace({ id, name, username }: Params) {
+export async function createWorkspace({
+  id,
+  name,
+  username,
+}: Params): Promise<Workspace> {
   const rawWorkspace = await prisma.workspace.create({
     data: {
       id,
@@ -26,10 +31,11 @@ export async function createWorkspace({ id, name, username }: Params) {
       username,
     },
   });
-  const workspace: any = {};
-  workspace.id = rawWorkspace.id;
-  workspace.name = rawWorkspace.name;
-  workspace.idSignature = rawWorkspace.idSignature;
-  workspace.members = usersToWorkspaces;
+  const workspace: Workspace = {
+    id: rawWorkspace.id,
+    name: rawWorkspace.name,
+    idSignature: rawWorkspace.idSignature,
+    members: usersToWorkspaces,
+  };
   return workspace;
 }

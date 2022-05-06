@@ -1,5 +1,5 @@
 import { prisma } from "../prisma";
-// import { Workspace } from "../../graphql/types/workspace";
+import { Workspace } from "../../types/workspace";
 
 export type WorkspaceMemberParams = {
   username: string;
@@ -19,7 +19,12 @@ type UserToWorkspaceData = {
   isAdmin: boolean;
 };
 
-export async function updateWorkspace({ id, name, username, members }: Params) {
+export async function updateWorkspace({
+  id,
+  name,
+  username,
+  members,
+}: Params): Promise<Workspace> {
   const permissionsByUserName = {};
   members.forEach(({ username, isAdmin }) => {
     permissionsByUserName[username] = {
@@ -106,15 +111,12 @@ export async function updateWorkspace({ id, name, username, members }: Params) {
           isAdmin: true,
         },
       });
-      const updatedWorkspaceData = {
+      const updatedWorkspaceData: Workspace = {
         id: updatedWorkspace.id,
         name: updatedWorkspace.name,
         idSignature: updatedWorkspace.idSignature,
         members: updatedPermissions,
       };
-      console.log({
-        updatedWorkspaceData: JSON.stringify(updatedWorkspaceData),
-      });
       return updatedWorkspaceData;
     });
   } catch (error) {
