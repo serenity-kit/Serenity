@@ -1,0 +1,6 @@
+query workspace($id: ID) {
+  workspace(id: $id) {
+    id
+    name
+  }
+}
