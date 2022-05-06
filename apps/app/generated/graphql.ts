@@ -101,6 +101,15 @@ export type CreateWorkspaceResult = {
   workspace?: Maybe<Workspace>;
 };
 
+export type DeleteWorkspacesInput = {
+  ids: Array<Scalars["String"]>;
+};
+
+export type DeleteWorkspacesResult = {
+  __typename?: "DeleteWorkspacesResult";
+  status: Scalars["String"];
+};
+
 export type DocumentPreview = {
   __typename?: "DocumentPreview";
   documentId: Scalars["String"];
@@ -141,12 +150,14 @@ export type Mutation = {
   __typename?: "Mutation";
   createDocument?: Maybe<CreateDocumentResult>;
   createWorkspace?: Maybe<CreateWorkspaceResult>;
+  deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
   finalizeLogin?: Maybe<ClientOprfLoginFinalizeeResult>;
   finalizePasswordReset?: Maybe<FinalizeResetPasswordResult>;
   finalizeRegistration?: Maybe<ClientOprfRegistrationFinalizeResult>;
   initializeLogin?: Maybe<ClientOprfLoginChallengeResult>;
   initializePasswordReset?: Maybe<ClientRequestResetPasswordResult>;
   initializeRegistration?: Maybe<ClientOprfRegistrationChallengeResult>;
+  updateWorkspace?: Maybe<UpdateWorkspacesResult>;
 };
 
 export type MutationCreateDocumentArgs = {
@@ -155,6 +166,10 @@ export type MutationCreateDocumentArgs = {
 
 export type MutationCreateWorkspaceArgs = {
   input?: InputMaybe<CreateWorkspaceInput>;
+};
+
+export type MutationDeleteWorkspacesArgs = {
+  input?: InputMaybe<DeleteWorkspacesInput>;
 };
 
 export type MutationFinalizeLoginArgs = {
@@ -179,6 +194,10 @@ export type MutationInitializePasswordResetArgs = {
 
 export type MutationInitializeRegistrationArgs = {
   input?: InputMaybe<ClientOprfRegistrationChallengeRequest>;
+};
+
+export type MutationUpdateWorkspaceArgs = {
+  input?: InputMaybe<UpdateWorkspacesInput>;
 };
 
 /** PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
@@ -210,9 +229,21 @@ export type QueryWorkspacesArgs = {
   first: Scalars["Int"];
 };
 
+export type UpdateWorkspacesInput = {
+  id: Scalars["String"];
+  members: Array<WorkspaceMemberInput>;
+  name: Scalars["String"];
+};
+
+export type UpdateWorkspacesResult = {
+  __typename?: "UpdateWorkspacesResult";
+  workspace?: Maybe<Workspace>;
+};
+
 export type Workspace = {
   __typename?: "Workspace";
   id: Scalars["String"];
+  members?: Maybe<Array<WorkspacePermissionsOutput>>;
   name?: Maybe<Scalars["String"]>;
 };
 
@@ -232,6 +263,23 @@ export type WorkspaceEdge = {
   cursor: Scalars["String"];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Workspace>;
+};
+
+export type WorkspaceInput = {
+  id: Scalars["String"];
+  name: Scalars["String"];
+  sharing?: InputMaybe<Array<InputMaybe<WorkspaceMemberInput>>>;
+};
+
+export type WorkspaceMemberInput = {
+  isAdmin: Scalars["Boolean"];
+  username: Scalars["String"];
+};
+
+export type WorkspacePermissionsOutput = {
+  __typename?: "WorkspacePermissionsOutput";
+  isAdmin: Scalars["Boolean"];
+  username: Scalars["String"];
 };
 
 export type CreateDocumentMutationVariables = Exact<{
@@ -259,6 +307,18 @@ export type CreateWorkspaceMutation = {
       id: string;
       name?: string | null;
     } | null;
+  } | null;
+};
+
+export type DeleteWorkspacesMutationVariables = Exact<{
+  input: DeleteWorkspacesInput;
+}>;
+
+export type DeleteWorkspacesMutation = {
+  __typename?: "Mutation";
+  deleteWorkspaces?: {
+    __typename?: "DeleteWorkspacesResult";
+    status: string;
   } | null;
 };
 
@@ -385,6 +445,20 @@ export function useCreateWorkspaceMutation() {
     CreateWorkspaceMutation,
     CreateWorkspaceMutationVariables
   >(CreateWorkspaceDocument);
+}
+export const DeleteWorkspacesDocument = gql`
+  mutation deleteWorkspaces($input: DeleteWorkspacesInput!) {
+    deleteWorkspaces(input: $input) {
+      status
+    }
+  }
+`;
+
+export function useDeleteWorkspacesMutation() {
+  return Urql.useMutation<
+    DeleteWorkspacesMutation,
+    DeleteWorkspacesMutationVariables
+  >(DeleteWorkspacesDocument);
 }
 export const FinalizeLoginDocument = gql`
   mutation finalizeLogin($input: ClientOprfLoginFinalizeInput!) {

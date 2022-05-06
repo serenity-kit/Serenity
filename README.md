@@ -57,6 +57,12 @@ Creating a dev build for iOS Simulator.
 eas build --profile development-simulator --platform ios
 ```
 
+Build new graphql types
+
+```sh
+yarn build:graphql-types
+```
+
 ### App (Electron)
 
 ```sh

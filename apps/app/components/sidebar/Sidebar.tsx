@@ -1,4 +1,5 @@
 import { DrawerContentScrollView } from "@react-navigation/drawer";
+import { StyleSheet } from "react-native";
 import {
   Button,
   Link,
@@ -30,6 +31,14 @@ export default function Sidebar(props) {
       },
     });
     refetchWorkspacesResult();
+  };
+
+  const navigateToWorkspaceSettings = (workspaceId: string) => {
+    console.log(`navigateToWorkspaceSettings: ${workspaceId}`);
+    console.log(props.navigation.navigate);
+    props.navigation.navigate("WorkspaceSettingsScreen", {
+      workspaceId,
+    });
   };
 
   return (
@@ -79,15 +88,28 @@ export default function Sidebar(props) {
           ? null
           : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
               workspace === null ? null : (
-                <Link
-                  key={workspace?.id}
-                  to={{
-                    screen: "Workspace",
-                    params: { workspaceId: workspace.id, screen: "Dashboard" },
-                  }}
-                >
-                  {workspace?.name}
-                </Link>
+                <View style={styles.workspaceListItem}>
+                  <Link
+                    style={styles.workspaceListItemLabel}
+                    key={workspace?.id}
+                    to={{
+                      screen: "Workspace",
+                      params: {
+                        workspaceId: workspace.id,
+                        screen: "Dashboard",
+                      },
+                    }}
+                  >
+                    {workspace?.name}
+                  </Link>
+                  <Button
+                    onPressIn={() => {
+                      navigateToWorkspaceSettings(workspace.id);
+                    }}
+                  >
+                    Settings
+                  </Button>
+                </View>
               )
             )}
       </View>
@@ -114,3 +136,14 @@ export default function Sidebar(props) {
     </DrawerContentScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  workspaceListItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  workspaceListItemLabel: {
+    flexGrow: 1,
+  },
+});
