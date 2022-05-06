@@ -1,14 +1,14 @@
 import { arg, inputObjectType, list, mutationField, objectType } from "nexus";
 import { updateWorkspace } from "../../../database/workspace/updateWorkspace";
-import { Workspace, WorkspaceSharingInput } from "../../types/workspace";
+import { Workspace, WorkspaceMemberInput } from "../../types/workspace";
 
 export const UpdateWorkspacesInput = inputObjectType({
   name: "UpdateWorkspacesInput",
   definition(t) {
     t.nonNull.string("id");
     t.nonNull.string("name");
-    t.nonNull.list.nonNull.field("permissions", {
-      type: WorkspaceSharingInput,
+    t.nonNull.list.nonNull.field("members", {
+      type: WorkspaceMemberInput,
     });
   },
 });
@@ -37,7 +37,7 @@ export const updateWorkspaceMutation = mutationField("updateWorkspace", {
     const workspace = await updateWorkspace({
       id: args.input.id,
       name: args.input.name,
-      permissions: args.input.permissions,
+      members: args.input.members,
       username: context.user.username,
     });
     return { workspace };

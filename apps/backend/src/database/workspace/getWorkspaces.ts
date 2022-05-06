@@ -1,4 +1,5 @@
 import { prisma } from "../prisma";
+import { Workspace } from "../../graphql/types/workspace";
 
 type Cursor = {
   id?: string;
@@ -11,7 +12,7 @@ type Params = {
   take: number;
 };
 export async function getWorkspaces({ username, cursor, skip, take }: Params) {
-  return await prisma.workspace.findMany({
+  const rawWorkspaces = await prisma.workspace.findMany({
     where: {
       usersToWorkspaces: {
         every: {
@@ -25,5 +26,28 @@ export async function getWorkspaces({ username, cursor, skip, take }: Params) {
     orderBy: {
       name: "asc",
     },
+    select: {
+      id: true,
+      name: true,
+      idSignature: true,
+      usersToWorkspaces: {
+        select: {
+          username: true,
+          isAdmin: true,
+        },
+      },
+    },
   });
+  // attach the .usersToWorkspaces as .members property
+  const workspaces: any = [];
+  rawWorkspaces.forEach((rawWorkspace) => {
+    const workspace = {
+      id: rawWorkspace.id,
+      name: rawWorkspace.name,
+      idSignature: rawWorkspace.idSignature,
+      members: rawWorkspace.usersToWorkspaces,
+    };
+    workspaces.push(workspace);
+  });
+  return workspaces;
 }

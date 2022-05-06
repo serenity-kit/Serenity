@@ -7,7 +7,7 @@ type Params = {
 };
 
 export async function createWorkspace({ id, name, username }: Params) {
-  return await prisma.workspace.create({
+  const rawWorkspace = await prisma.workspace.create({
     data: {
       id,
       idSignature: "TODO",
@@ -20,4 +20,16 @@ export async function createWorkspace({ id, name, username }: Params) {
       },
     },
   });
+  const usersToWorkspaces = await prisma.usersToWorkspaces.findMany({
+    where: {
+      workspaceId: rawWorkspace.id,
+      username,
+    },
+  });
+  const workspace: any = {};
+  workspace.id = rawWorkspace.id;
+  workspace.name = rawWorkspace.name;
+  workspace.idSignature = rawWorkspace.idSignature;
+  workspace.members = usersToWorkspaces;
+  return workspace;
 }

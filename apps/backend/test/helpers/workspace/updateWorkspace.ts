@@ -1,11 +1,11 @@
 import { gql } from "graphql-request";
-import { WorkspaceSharingParams } from "../../../src/database/workspace/updateWorkspace";
+import { WorkspaceMemberParams } from "../../../src/database/workspace/updateWorkspace";
 
 type Params = {
   graphql: any;
   id: string;
   name: string;
-  permissions: WorkspaceSharingParams[];
+  members: WorkspaceMemberParams[];
   authorizationHeader: string;
 };
 
@@ -13,7 +13,7 @@ export const updateWorkspace = async ({
   graphql,
   id,
   name,
-  permissions,
+  members,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -26,7 +26,7 @@ export const updateWorkspace = async ({
         workspace {
           id
           name
-          permissions {
+          members {
             username
             isAdmin
           }
@@ -36,7 +36,7 @@ export const updateWorkspace = async ({
   `;
   const result = await graphql.client.request(
     query,
-    { input: { id, name, permissions } },
+    { input: { id, name, members } },
     authorizationHeaders
   );
   return result;
