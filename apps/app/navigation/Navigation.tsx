@@ -18,6 +18,7 @@ import TestEditorScreen from "./screens/TestEditorScreen";
 import LibsodiumTestScreen from "./screens/LibsodiumTestScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import LoginScreen from "./screens/LoginScreen";
+import WorkspaceSettingsScreen from "./screens/WorkspaceSettingsScreen";
 import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
@@ -86,6 +87,10 @@ function RootNavigator() {
       />
       <Stack.Screen name="Root" component={RootScreen} />
       <Stack.Screen
+        name="WorkspaceSettingsScreen"
+        component={WorkspaceSettingsScreen}
+      />
+      <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
         options={{ title: "Oops!" }}
@@ -113,6 +118,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       Login: "login",
       EncryptDecryptImageTest: "encrypt-decrypt-image-test",
       Root: "",
+      WorkspaceSettingsScreen: "settings",
       NotFound: "*",
     },
   },
