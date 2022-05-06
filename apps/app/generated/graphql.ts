@@ -216,12 +216,17 @@ export type PageInfo = {
 export type Query = {
   __typename?: "Query";
   documentPreviews?: Maybe<DocumentPreviewConnection>;
+  workspace?: Maybe<Workspace>;
   workspaces?: Maybe<WorkspaceConnection>;
 };
 
 export type QueryDocumentPreviewsArgs = {
   after?: InputMaybe<Scalars["String"]>;
   first: Scalars["Int"];
+};
+
+export type QueryWorkspaceArgs = {
+  id?: InputMaybe<Scalars["ID"]>;
 };
 
 export type QueryWorkspacesArgs = {
@@ -401,6 +406,19 @@ export type DocumentPreviewsQuery = {
   } | null;
 };
 
+export type WorkspaceQueryVariables = Exact<{
+  id?: InputMaybe<Scalars["ID"]>;
+}>;
+
+export type WorkspaceQuery = {
+  __typename?: "Query";
+  workspace?: {
+    __typename?: "Workspace";
+    id: string;
+    name?: string | null;
+  } | null;
+};
+
 export type WorkspacesQueryVariables = Exact<{ [key: string]: never }>;
 
 export type WorkspacesQuery = {
@@ -551,6 +569,23 @@ export function useDocumentPreviewsQuery(
 ) {
   return Urql.useQuery<DocumentPreviewsQuery>({
     query: DocumentPreviewsDocument,
+    ...options,
+  });
+}
+export const WorkspaceDocument = gql`
+  query workspace($id: ID) {
+    workspace(id: $id) {
+      id
+      name
+    }
+  }
+`;
+
+export function useWorkspaceQuery(
+  options?: Omit<Urql.UseQueryArgs<WorkspaceQueryVariables>, "query">
+) {
+  return Urql.useQuery<WorkspaceQuery>({
+    query: WorkspaceDocument,
     ...options,
   });
 }
