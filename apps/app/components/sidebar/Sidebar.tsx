@@ -76,17 +76,6 @@ export default function Sidebar(props) {
           screen: "Workspace",
           params: {
             workspaceId: route.params.workspaceId,
-            screen: "TestEditor",
-          },
-        }}
-      >
-        Sync-Test-Editor
-      </Link>
-      <Link
-        to={{
-          screen: "Workspace",
-          params: {
-            workspaceId: route.params.workspaceId,
             screen: "TestLibsodium",
           },
         }}

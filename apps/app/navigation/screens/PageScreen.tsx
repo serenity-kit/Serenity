@@ -36,10 +36,15 @@ import { useEffect, useRef } from "react";
 
 const reconnectTimeout = 2000;
 
-export default function TestEditorScreen({
+export default function PageScreen({
   navigation,
-}: WorkspaceDrawerScreenProps<"TestEditor">) {
-  const docId = "12345678-1282-459d-a403-ad1481d2ad7o";
+  route,
+}: WorkspaceDrawerScreenProps<"Page">) {
+  if (!route.params?.pageId) {
+    // should never happen
+    return null;
+  }
+  const docId = route.params.pageId;
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));

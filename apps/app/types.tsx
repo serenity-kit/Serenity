@@ -16,10 +16,14 @@ declare global {
   }
 }
 
+type PageParams = {
+  pageId: string;
+};
+
 export type WorkspaceDrawerParamList = {
   Dashboard: undefined;
   Editor: undefined;
-  TestEditor: undefined;
+  Page: PageParams;
   TestLibsodium: undefined;
   WorkspaceSettings: undefined;
 };
