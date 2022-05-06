@@ -9,6 +9,7 @@ import {
 import {
   useWorkspacesQuery,
   useCreateWorkspaceMutation,
+  useCreateDocumentMutation,
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 import { useRoute } from "@react-navigation/native";
@@ -18,19 +19,28 @@ export default function Sidebar(props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
-  const [, createWorkspaceResult] = useCreateWorkspaceMutation();
+  const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
+  const [, createDocumentMutation] = useCreateDocumentMutation();
 
   const createWorkspace = async () => {
     const name =
       window.prompt("Enter a workspace name") || uuidv4().substring(0, 8);
     const id = uuidv4();
-    await createWorkspaceResult({
+    await createWorkspaceMutation({
       input: {
         name,
         id,
       },
     });
     refetchWorkspacesResult();
+  };
+
+  const createDocument = async () => {
+    const id = uuidv4();
+    const result = await createDocumentMutation({
+      input: { id, workspaceId: route.params.workspaceId },
+    });
+    console.log("weeee", result);
   };
 
   const navigateToWorkspaceSettings = (workspaceId: string) => {
@@ -112,6 +122,9 @@ export default function Sidebar(props) {
                 </View>
               )
             )}
+      </View>
+      <View>
+        <Button onPress={createDocument}>Create Page</Button>
       </View>
       <View>
         <Button

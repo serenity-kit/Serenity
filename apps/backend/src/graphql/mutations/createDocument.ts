@@ -4,8 +4,7 @@ import { createDocument } from "../../database/createDocument";
 export const CreateDocumentInput = inputObjectType({
   name: "CreateDocumentInput",
   definition(t) {
-    t.nonNull.string("documentId");
-    t.nonNull.string("name");
+    t.nonNull.string("id");
     t.nonNull.string("workspaceId");
   },
 });
@@ -13,7 +12,7 @@ export const CreateDocumentInput = inputObjectType({
 export const CreateDocumentResult = objectType({
   name: "CreateDocumentResult",
   definition(t) {
-    t.nonNull.string("documentId");
+    t.nonNull.string("id");
   },
 });
 
@@ -25,14 +24,13 @@ export const createDocumentMutation = mutationField("createDocument", {
     }),
   },
   async resolve(root, args, context) {
-    if (!args?.input?.documentId) throw new Error("Missing documentId");
-    await createDocument({
-      documentId: args.input.documentId,
-      name: args.input.name,
+    if (!args?.input?.id) throw new Error("Missing documentId");
+    const document = await createDocument({
+      id: args.input.id,
       workspaceId: args.input.workspaceId,
     });
     return {
-      documentId: args.input.documentId,
+      id: document.id,
     };
   },
 });

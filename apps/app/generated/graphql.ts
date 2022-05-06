@@ -81,14 +81,13 @@ export type ClientRequestResetPasswordResult = {
 };
 
 export type CreateDocumentInput = {
-  documentId: Scalars["String"];
-  name: Scalars["String"];
+  id: Scalars["String"];
   workspaceId: Scalars["String"];
 };
 
 export type CreateDocumentResult = {
   __typename?: "CreateDocumentResult";
-  documentId: Scalars["String"];
+  id: Scalars["String"];
 };
 
 export type CreateWorkspaceInput = {
@@ -293,10 +292,7 @@ export type CreateDocumentMutationVariables = Exact<{
 
 export type CreateDocumentMutation = {
   __typename?: "Mutation";
-  createDocument?: {
-    __typename?: "CreateDocumentResult";
-    documentId: string;
-  } | null;
+  createDocument?: { __typename?: "CreateDocumentResult"; id: string } | null;
 };
 
 export type CreateWorkspaceMutationVariables = Exact<{
@@ -457,7 +453,7 @@ export type WorkspacesQuery = {
 export const CreateDocumentDocument = gql`
   mutation createDocument($input: CreateDocumentInput!) {
     createDocument(input: $input) {
-      documentId
+      id
     }
   }
 `;
