@@ -1,0 +1,8 @@
+mutation updateWorkspace($input: UpdateWorkspaceInput!) {
+  updateWorkspace(input: $input) {
+    workspace {
+      id
+      name
+    }
+  }
+}

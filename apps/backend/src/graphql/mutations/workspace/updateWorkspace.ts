@@ -2,29 +2,29 @@ import { arg, inputObjectType, list, mutationField, objectType } from "nexus";
 import { updateWorkspace } from "../../../database/workspace/updateWorkspace";
 import { Workspace, WorkspaceMemberInput } from "../../types/workspace";
 
-export const UpdateWorkspacesInput = inputObjectType({
-  name: "UpdateWorkspacesInput",
+export const UpdateWorkspaceInput = inputObjectType({
+  name: "UpdateWorkspaceInput",
   definition(t) {
     t.nonNull.string("id");
-    t.nonNull.string("name");
-    t.nonNull.list.nonNull.field("members", {
+    t.string("name");
+    t.list.nonNull.field("members", {
       type: WorkspaceMemberInput,
     });
   },
 });
 
-export const UpdateWorkspacesResult = objectType({
-  name: "UpdateWorkspacesResult",
+export const UpdateWorkspaceResult = objectType({
+  name: "UpdateWorkspaceResult",
   definition(t) {
     t.field("workspace", { type: Workspace });
   },
 });
 
 export const updateWorkspaceMutation = mutationField("updateWorkspace", {
-  type: UpdateWorkspacesResult,
+  type: UpdateWorkspaceResult,
   args: {
     input: arg({
-      type: UpdateWorkspacesInput,
+      type: UpdateWorkspaceInput,
     }),
   },
   async resolve(root, args, context) {
@@ -33,6 +33,12 @@ export const updateWorkspaceMutation = mutationField("updateWorkspace", {
     }
     if (!args.input) {
       throw new Error("Invalid input");
+    }
+    if (args.input.name === null) {
+      throw new Error("Invalid input: name cannot be null");
+    }
+    if (args.input.members === null) {
+      throw new Error("Invalid input: members cannot be null");
     }
     const workspace = await updateWorkspace({
       id: args.input.id,

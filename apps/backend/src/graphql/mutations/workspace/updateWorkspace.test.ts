@@ -31,6 +31,82 @@ beforeEach(async () => {
   }
 });
 
+test("user won't update the name when not set", async () => {
+  // generate a challenge code
+  const authorizationHeader = `TODO+${username}`;
+  const id = "abc";
+  const name = undefined;
+  const members = [
+    {
+      username: "user",
+      isAdmin: true,
+    },
+    {
+      username: "user1",
+      isAdmin: true,
+    },
+  ];
+  const result = await updateWorkspace({
+    graphql,
+    id,
+    name,
+    members,
+    authorizationHeader,
+  });
+  expect(result.updateWorkspace).toMatchInlineSnapshot(`
+    Object {
+      "workspace": Object {
+        "id": "abc",
+        "members": Array [
+          Object {
+            "isAdmin": true,
+            "username": "user",
+          },
+          Object {
+            "isAdmin": true,
+            "username": "user1",
+          },
+        ],
+        "name": "workspace 1",
+      },
+    }
+  `);
+});
+
+test("user won't update the members", async () => {
+  // generate a challenge code
+  const authorizationHeader = `TODO+${username}`;
+  const id = "abc";
+  const name = "workspace 2";
+  const members = undefined;
+  const result = await updateWorkspace({
+    graphql,
+    id,
+    name,
+    members,
+    authorizationHeader,
+  });
+  expect(result.updateWorkspace).toMatchInlineSnapshot(`
+    Object {
+      "workspace": Object {
+        "id": "abc",
+        "members": Array [
+          Object {
+            "isAdmin": true,
+            "username": "user",
+          },
+          Object {
+            "isAdmin": true,
+            "username": "user1",
+          },
+        ],
+        "name": "workspace 2",
+      },
+    }
+  `);
+});
+
+// WARNING: after this, user is no longer an admin on this workspace
 test("user should be able to update a workspace", async () => {
   // generate a challenge code
   const authorizationHeader = `TODO+${username}`;
@@ -81,7 +157,7 @@ test("user should not be able to update a workspace they don't own", async () =>
   const members = [
     {
       username: "user",
-      isAdmin: false,
+      isAdmin: true,
     },
     {
       username: "user1",
