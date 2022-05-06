@@ -8,9 +8,9 @@ export type WorkspaceMemberParams = {
 
 type Params = {
   id: string;
-  name: string;
+  name: string | undefined;
   username: string;
-  members: WorkspaceMemberParams[];
+  members: WorkspaceMemberParams[] | undefined;
 };
 
 type UserToWorkspaceData = {
@@ -25,12 +25,6 @@ export async function updateWorkspace({
   username,
   members,
 }: Params): Promise<Workspace> {
-  const permissionsByUserName = {};
-  members.forEach(({ username, isAdmin }) => {
-    permissionsByUserName[username] = {
-      isAdmin,
-    };
-  });
   try {
     return await prisma.$transaction(async (prisma) => {
       // 1. retrieve workspace if owned by user
@@ -57,51 +51,64 @@ export async function updateWorkspace({
       if (!workspace) {
         throw new Error("Invalid workspace ID");
       }
-      const searchingUsernames: string[] = [];
-      members.forEach((permission) => {
-        searchingUsernames.push(permission.username);
-      });
-      const actualUsers = await prisma.user.findMany({
-        where: {
-          username: {
-            in: searchingUsernames,
-          },
-        },
-        select: {
-          username: true,
-        },
-      });
-      const usernames: string[] = [];
-      actualUsers.forEach((actualUser) => {
-        usernames.push(actualUser.username);
-      });
-      await prisma.usersToWorkspaces.deleteMany({
-        where: {
-          workspaceId: workspace.id,
-        },
-      });
-      const usersToWorkspacesData: UserToWorkspaceData[] = [];
-      // loop through inbound data and format for database
-      usernames.forEach((username) => {
-        usersToWorkspacesData.push({
-          username: username,
-          isAdmin: permissionsByUserName[username].isAdmin,
-          workspaceId: workspace.id,
+      if (members != undefined) {
+        const permissionsByUserName = {};
+        members.forEach(({ username, isAdmin }) => {
+          permissionsByUserName[username] = {
+            isAdmin,
+          };
         });
-      });
-      await prisma.usersToWorkspaces.createMany({
-        data: usersToWorkspacesData,
-      });
-      const updatedWorkspace = await prisma.workspace.update({
-        where: {
-          id: workspace.id,
-        },
-        // TODO: update ID
-        data: {
-          name: name,
-          idSignature: "TODO",
-        },
-      });
+        const searchingUsernames: string[] = [];
+        members.forEach((permission) => {
+          searchingUsernames.push(permission.username);
+        });
+        const actualUsers = await prisma.user.findMany({
+          where: {
+            username: {
+              in: searchingUsernames,
+            },
+          },
+          select: {
+            username: true,
+          },
+        });
+        const usernames: string[] = [];
+        actualUsers.forEach((actualUser) => {
+          usernames.push(actualUser.username);
+        });
+        await prisma.usersToWorkspaces.deleteMany({
+          where: {
+            workspaceId: workspace.id,
+          },
+        });
+        const usersToWorkspacesData: UserToWorkspaceData[] = [];
+        // loop through inbound data and format for database
+        usernames.forEach((username) => {
+          usersToWorkspacesData.push({
+            username: username,
+            isAdmin: permissionsByUserName[username].isAdmin,
+            workspaceId: workspace.id,
+          });
+        });
+        await prisma.usersToWorkspaces.createMany({
+          data: usersToWorkspacesData,
+        });
+      }
+      let updatedWorkspace: any;
+      if (name != undefined) {
+        updatedWorkspace = await prisma.workspace.update({
+          where: {
+            id: workspace.id,
+          },
+          // TODO: update ID
+          data: {
+            name: name,
+            idSignature: "TODO",
+          },
+        });
+      } else {
+        updatedWorkspace = workspace;
+      }
       const updatedPermissions = await prisma.usersToWorkspaces.findMany({
         where: {
           workspaceId: workspace.id,

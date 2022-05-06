@@ -4,8 +4,8 @@ import { WorkspaceMemberParams } from "../../../src/database/workspace/updateWor
 type Params = {
   graphql: any;
   id: string;
-  name: string;
-  members: WorkspaceMemberParams[];
+  name: string | undefined;
+  members: WorkspaceMemberParams[] | undefined;
   authorizationHeader: string;
 };
 
@@ -21,7 +21,7 @@ export const updateWorkspace = async ({
   };
 
   const query = gql`
-    mutation updateWorkspace($input: UpdateWorkspacesInput!) {
+    mutation updateWorkspace($input: UpdateWorkspaceInput!) {
       updateWorkspace(input: $input) {
         workspace {
           id

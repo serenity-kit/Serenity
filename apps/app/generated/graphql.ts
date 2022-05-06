@@ -157,7 +157,7 @@ export type Mutation = {
   initializeLogin?: Maybe<ClientOprfLoginChallengeResult>;
   initializePasswordReset?: Maybe<ClientRequestResetPasswordResult>;
   initializeRegistration?: Maybe<ClientOprfRegistrationChallengeResult>;
-  updateWorkspace?: Maybe<UpdateWorkspacesResult>;
+  updateWorkspace?: Maybe<UpdateWorkspaceResult>;
 };
 
 export type MutationCreateDocumentArgs = {
@@ -197,7 +197,7 @@ export type MutationInitializeRegistrationArgs = {
 };
 
 export type MutationUpdateWorkspaceArgs = {
-  input?: InputMaybe<UpdateWorkspacesInput>;
+  input?: InputMaybe<UpdateWorkspaceInput>;
 };
 
 /** PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
@@ -234,14 +234,14 @@ export type QueryWorkspacesArgs = {
   first: Scalars["Int"];
 };
 
-export type UpdateWorkspacesInput = {
+export type UpdateWorkspaceInput = {
   id: Scalars["String"];
-  members: Array<WorkspaceMemberInput>;
-  name: Scalars["String"];
+  members?: InputMaybe<Array<WorkspaceMemberInput>>;
+  name?: InputMaybe<Scalars["String"]>;
 };
 
-export type UpdateWorkspacesResult = {
-  __typename?: "UpdateWorkspacesResult";
+export type UpdateWorkspaceResult = {
+  __typename?: "UpdateWorkspaceResult";
   workspace?: Maybe<Workspace>;
 };
 
@@ -381,6 +381,22 @@ export type InitializeRegistrationMutation = {
   } | null;
 };
 
+export type UpdateWorkspaceMutationVariables = Exact<{
+  input: UpdateWorkspaceInput;
+}>;
+
+export type UpdateWorkspaceMutation = {
+  __typename?: "Mutation";
+  updateWorkspace?: {
+    __typename?: "UpdateWorkspaceResult";
+    workspace?: {
+      __typename?: "Workspace";
+      id: string;
+      name?: string | null;
+    } | null;
+  } | null;
+};
+
 export type DocumentPreviewsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type DocumentPreviewsQuery = {
@@ -416,6 +432,11 @@ export type WorkspaceQuery = {
     __typename?: "Workspace";
     id: string;
     name?: string | null;
+    members?: Array<{
+      __typename?: "WorkspacePermissionsOutput";
+      username: string;
+      isAdmin: boolean;
+    }> | null;
   } | null;
 };
 
@@ -542,6 +563,23 @@ export function useInitializeRegistrationMutation() {
     InitializeRegistrationMutationVariables
   >(InitializeRegistrationDocument);
 }
+export const UpdateWorkspaceDocument = gql`
+  mutation updateWorkspace($input: UpdateWorkspaceInput!) {
+    updateWorkspace(input: $input) {
+      workspace {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export function useUpdateWorkspaceMutation() {
+  return Urql.useMutation<
+    UpdateWorkspaceMutation,
+    UpdateWorkspaceMutationVariables
+  >(UpdateWorkspaceDocument);
+}
 export const DocumentPreviewsDocument = gql`
   query documentPreviews {
     documentPreviews(first: 100) {
@@ -577,6 +615,10 @@ export const WorkspaceDocument = gql`
     workspace(id: $id) {
       id
       name
+      members {
+        username
+        isAdmin
+      }
     }
   }
 `;
