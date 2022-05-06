@@ -36,7 +36,7 @@ test("user should be able to update a workspace", async () => {
   const authorizationHeader = `TODO+${username}`;
   const id = "abc";
   const name = "renamed workspace";
-  const permissions = [
+  const members = [
     {
       username: "user",
       isAdmin: false,
@@ -50,24 +50,24 @@ test("user should be able to update a workspace", async () => {
     graphql,
     id,
     name,
-    permissions,
+    members,
     authorizationHeader,
   });
   expect(result.updateWorkspace).toMatchInlineSnapshot(`
     Object {
       "workspace": Object {
         "id": "abc",
-        "name": "renamed workspace",
-        "permissions": Array [
+        "members": Array [
           Object {
-            "isAdmin": "false",
+            "isAdmin": false,
             "username": "user",
           },
           Object {
-            "isAdmin": "true",
+            "isAdmin": true,
             "username": "user1",
           },
         ],
+        "name": "renamed workspace",
       },
     }
   `);
@@ -78,7 +78,7 @@ test("user should not be able to update a workspace they don't own", async () =>
   const authorizationHeader = `TODO+${username}`;
   const id = "abc";
   const name = "unauthorized workspace";
-  const permissions = [
+  const members = [
     {
       username: "user",
       isAdmin: false,
@@ -94,7 +94,7 @@ test("user should not be able to update a workspace they don't own", async () =>
         graphql,
         id,
         name,
-        permissions,
+        members,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Invalid workspace ID");
@@ -105,7 +105,7 @@ test("user should not be able to update a workspace for a workspace that doesn't
   const authorizationHeader = `TODO+${username}`;
   const id = "hahahaha";
   const name = "nonexistent workspace";
-  const permissions = [
+  const members = [
     {
       username: "user",
       isAdmin: false,
@@ -121,7 +121,7 @@ test("user should not be able to update a workspace for a workspace that doesn't
         graphql,
         id,
         name,
-        permissions,
+        members,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Invalid workspace ID");

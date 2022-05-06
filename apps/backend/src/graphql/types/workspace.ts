@@ -13,14 +13,14 @@ export const Workspace = objectType({
   definition(t) {
     t.nonNull.string("id");
     t.string("name");
-    t.list.nonNull.field("permissions", {
+    t.list.nonNull.field("members", {
       type: WorkspacePermissionsOutput,
     });
   },
 });
 
-export const WorkspaceSharingInput = inputObjectType({
-  name: "WorkspaceSharingInput",
+export const WorkspaceMemberInput = inputObjectType({
+  name: "WorkspaceMemberInput",
   definition(t) {
     t.nonNull.string("username");
     t.nonNull.boolean("isAdmin");
@@ -33,7 +33,7 @@ export const WorkspaceInput = inputObjectType({
     t.nonNull.string("id");
     t.nonNull.string("name");
     t.field("sharing", {
-      type: list(WorkspaceSharingInput),
+      type: list(WorkspaceMemberInput),
     });
   },
 });

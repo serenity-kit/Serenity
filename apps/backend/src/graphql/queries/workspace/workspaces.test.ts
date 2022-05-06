@@ -44,6 +44,10 @@ test("user should be able to list workspaces", async () => {
         nodes {
           id
           name
+          members {
+            username
+            isAdmin
+          }
         }
         edges {
           cursor
@@ -68,14 +72,32 @@ test("user should be able to list workspaces", async () => {
       "nodes": Array [
         Object {
           "id": "user-my-workspace",
+          "members": Array [
+            Object {
+              "isAdmin": true,
+              "username": "user",
+            },
+          ],
           "name": "My Workspace",
         },
         Object {
           "id": "abc",
+          "members": Array [
+            Object {
+              "isAdmin": true,
+              "username": "user",
+            },
+          ],
           "name": "workspace 1",
         },
         Object {
           "id": "123",
+          "members": Array [
+            Object {
+              "isAdmin": true,
+              "username": "user",
+            },
+          ],
           "name": "workspace 2",
         },
       ],

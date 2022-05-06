@@ -23,7 +23,7 @@ export const workspaces = queryField((t) => {
       // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#do-i-always-have-to-skip-1
       const skip = cursor ? 1 : undefined;
       // include one extra project to set hasNextPage value
-      const take = args.first ? args.first + 1 : undefined;
+      const take: any = args.first ? args.first + 1 : undefined;
 
       const workspaces = await getWorkspaces({
         username,

@@ -31,6 +31,12 @@ test("user should be able to create a workspace", async () => {
     Object {
       "workspace": Object {
         "id": "${id}",
+        "members": Array [
+          Object {
+            "isAdmin": true,
+            "username": "${username}",
+          },
+        ],
         "name": "${name}",
       },
     }

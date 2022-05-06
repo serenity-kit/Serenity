@@ -1,7 +1,7 @@
 import { prisma } from "../prisma";
 // import { Workspace } from "../../graphql/types/workspace";
 
-export type WorkspaceSharingParams = {
+export type WorkspaceMemberParams = {
   username: string;
   isAdmin: boolean;
 };
@@ -10,7 +10,7 @@ type Params = {
   id: string;
   name: string;
   username: string;
-  permissions: WorkspaceSharingParams[];
+  members: WorkspaceMemberParams[];
 };
 
 type UserToWorkspaceData = {
@@ -19,14 +19,9 @@ type UserToWorkspaceData = {
   isAdmin: boolean;
 };
 
-export async function updateWorkspace({
-  id,
-  name,
-  username,
-  permissions,
-}: Params) {
+export async function updateWorkspace({ id, name, username, members }: Params) {
   const permissionsByUserName = {};
-  permissions.forEach(({ username, isAdmin }) => {
+  members.forEach(({ username, isAdmin }) => {
     permissionsByUserName[username] = {
       isAdmin,
     };
@@ -58,7 +53,7 @@ export async function updateWorkspace({
         throw new Error("Invalid workspace ID");
       }
       const searchingUsernames: string[] = [];
-      permissions.forEach((permission) => {
+      members.forEach((permission) => {
         searchingUsernames.push(permission.username);
       });
       const actualUsers = await prisma.user.findMany({
@@ -115,7 +110,7 @@ export async function updateWorkspace({
         id: updatedWorkspace.id,
         name: updatedWorkspace.name,
         idSignature: updatedWorkspace.idSignature,
-        permissions: updatedPermissions,
+        members: updatedPermissions,
       };
       console.log({
         updatedWorkspaceData: JSON.stringify(updatedWorkspaceData),
