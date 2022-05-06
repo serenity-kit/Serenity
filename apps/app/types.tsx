@@ -30,6 +30,7 @@ type WorkspaceParams = NavigatorScreenParams<WorkspaceDrawerParamList> & {
 
 export type RootStackParamList = {
   Workspace: WorkspaceParams;
+  NoWorkspace: undefined;
   DesignSystem: undefined;
   DevDashboard: undefined;
   Register: undefined;

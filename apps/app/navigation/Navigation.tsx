@@ -24,6 +24,7 @@ import Sidebar from "../components/sidebar/Sidebar";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
 import { useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 import RootScreen from "./screens/RootScreen";
+import NoWorkspaceScreen from "./screens/NoWorkspaceScreen";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -71,6 +72,7 @@ function RootNavigator() {
       />
       <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
       <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
+      <Stack.Screen name="NoWorkspace" component={NoWorkspaceScreen} />
       <Stack.Screen
         name="Register"
         component={RegisterScreen}
@@ -112,6 +114,7 @@ const linking: LinkingOptions<RootStackParamList> = {
           TestLibsodium: "test-libsodium",
         },
       },
+      NoWorkspace: "no-workspace",
       DevDashboard: "dev-dashboard",
       DesignSystem: "design-system",
       Register: "register",

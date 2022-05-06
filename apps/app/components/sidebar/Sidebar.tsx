@@ -88,7 +88,7 @@ export default function Sidebar(props) {
           ? null
           : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
               workspace === null ? null : (
-                <View style={styles.workspaceListItem}>
+                <View style={styles.workspaceListItem} key={workspace.id}>
                   <Link
                     style={styles.workspaceListItemLabel}
                     key={workspace?.id}
