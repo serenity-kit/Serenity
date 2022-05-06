@@ -101,6 +101,15 @@ export type CreateWorkspaceResult = {
   workspace?: Maybe<Workspace>;
 };
 
+export type DeleteWorkspacesInput = {
+  ids: Array<Scalars["String"]>;
+};
+
+export type DeleteWorkspacesResult = {
+  __typename?: "DeleteWorkspacesResult";
+  status: Scalars["String"];
+};
+
 export type DocumentPreview = {
   __typename?: "DocumentPreview";
   documentId: Scalars["String"];
@@ -141,12 +150,14 @@ export type Mutation = {
   __typename?: "Mutation";
   createDocument?: Maybe<CreateDocumentResult>;
   createWorkspace?: Maybe<CreateWorkspaceResult>;
+  deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
   finalizeLogin?: Maybe<ClientOprfLoginFinalizeeResult>;
   finalizePasswordReset?: Maybe<FinalizeResetPasswordResult>;
   finalizeRegistration?: Maybe<ClientOprfRegistrationFinalizeResult>;
   initializeLogin?: Maybe<ClientOprfLoginChallengeResult>;
   initializePasswordReset?: Maybe<ClientRequestResetPasswordResult>;
   initializeRegistration?: Maybe<ClientOprfRegistrationChallengeResult>;
+  updateWorkspace?: Maybe<UpdateWorkspacesResult>;
 };
 
 export type MutationCreateDocumentArgs = {
@@ -155,6 +166,10 @@ export type MutationCreateDocumentArgs = {
 
 export type MutationCreateWorkspaceArgs = {
   input?: InputMaybe<CreateWorkspaceInput>;
+};
+
+export type MutationDeleteWorkspacesArgs = {
+  input?: InputMaybe<DeleteWorkspacesInput>;
 };
 
 export type MutationFinalizeLoginArgs = {
@@ -181,6 +196,10 @@ export type MutationInitializeRegistrationArgs = {
   input?: InputMaybe<ClientOprfRegistrationChallengeRequest>;
 };
 
+export type MutationUpdateWorkspaceArgs = {
+  input?: InputMaybe<UpdateWorkspacesInput>;
+};
+
 /** PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
 export type PageInfo = {
   __typename?: "PageInfo";
@@ -197,6 +216,7 @@ export type PageInfo = {
 export type Query = {
   __typename?: "Query";
   documentPreviews?: Maybe<DocumentPreviewConnection>;
+  workspace?: Maybe<Workspace>;
   workspaces?: Maybe<WorkspaceConnection>;
 };
 
@@ -205,14 +225,30 @@ export type QueryDocumentPreviewsArgs = {
   first: Scalars["Int"];
 };
 
+export type QueryWorkspaceArgs = {
+  id?: InputMaybe<Scalars["ID"]>;
+};
+
 export type QueryWorkspacesArgs = {
   after?: InputMaybe<Scalars["String"]>;
   first: Scalars["Int"];
 };
 
+export type UpdateWorkspacesInput = {
+  id: Scalars["String"];
+  members: Array<WorkspaceMemberInput>;
+  name: Scalars["String"];
+};
+
+export type UpdateWorkspacesResult = {
+  __typename?: "UpdateWorkspacesResult";
+  workspace?: Maybe<Workspace>;
+};
+
 export type Workspace = {
   __typename?: "Workspace";
   id: Scalars["String"];
+  members?: Maybe<Array<WorkspacePermissionsOutput>>;
   name?: Maybe<Scalars["String"]>;
 };
 
@@ -232,6 +268,23 @@ export type WorkspaceEdge = {
   cursor: Scalars["String"];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Workspace>;
+};
+
+export type WorkspaceInput = {
+  id: Scalars["String"];
+  name: Scalars["String"];
+  sharing?: InputMaybe<Array<InputMaybe<WorkspaceMemberInput>>>;
+};
+
+export type WorkspaceMemberInput = {
+  isAdmin: Scalars["Boolean"];
+  username: Scalars["String"];
+};
+
+export type WorkspacePermissionsOutput = {
+  __typename?: "WorkspacePermissionsOutput";
+  isAdmin: Scalars["Boolean"];
+  username: Scalars["String"];
 };
 
 export type CreateDocumentMutationVariables = Exact<{
@@ -338,6 +391,19 @@ export type DocumentPreviewsQuery = {
       startCursor?: string | null;
       endCursor?: string | null;
     };
+  } | null;
+};
+
+export type WorkspaceQueryVariables = Exact<{
+  id?: InputMaybe<Scalars["ID"]>;
+}>;
+
+export type WorkspaceQuery = {
+  __typename?: "Query";
+  workspace?: {
+    __typename?: "Workspace";
+    id: string;
+    name?: string | null;
   } | null;
 };
 
@@ -477,6 +543,23 @@ export function useDocumentPreviewsQuery(
 ) {
   return Urql.useQuery<DocumentPreviewsQuery>({
     query: DocumentPreviewsDocument,
+    ...options,
+  });
+}
+export const WorkspaceDocument = gql`
+  query workspace($id: ID) {
+    workspace(id: $id) {
+      id
+      name
+    }
+  }
+`;
+
+export function useWorkspaceQuery(
+  options?: Omit<Urql.UseQueryArgs<WorkspaceQueryVariables>, "query">
+) {
+  return Urql.useQuery<WorkspaceQuery>({
+    query: WorkspaceDocument,
     ...options,
   });
 }
