@@ -31,15 +31,14 @@ const computeStyle = ({
   isHovered,
   isFocusVisible,
 }: ComputeStyleParams) => {
-  if (disabled) return tw`bg-gray-400`;
+  if (disabled) return tw`bg-gray-300`;
 
   let style: any = isFocusVisible
-    ? {
-        boxShadow: `${tw.color("primary-900")} 0px 0px 0px 4px`,
-      }
+    ? tw.style("se-outline-focus") // web only
     : {};
-  if (isPressed) return tw.style(`bg-primary-200`);
-  if (isHovered) return tw.style(`bg-primary-300`, style);
+  if (isPressed) return tw.style(`bg-primary-600`);
+  // style is merged in to make sure a focused button that is hovered still has an outline
+  if (isHovered) return tw.style(`bg-primary-700`, style);
   return style;
 };
 
