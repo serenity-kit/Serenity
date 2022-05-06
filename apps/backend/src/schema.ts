@@ -1,6 +1,7 @@
 import { makeSchema, connectionPlugin } from "nexus";
 import path from "path";
 
+import * as WorkspaceQueryTypes from "./graphql/queries/workspace/workspace";
 import * as WorkspacesQueryTypes from "./graphql/queries/workspace/workspaces";
 import * as DocumentPreviewsQueryTypes from "./graphql/queries/documentPreviews";
 
@@ -38,6 +39,7 @@ export const schema = makeSchema({
     DeleteWorkspacesMutationTypes,
     UpdateWorkspaceMutationTypes,
     WorkspaceTypes,
+    WorkspaceQueryTypes,
     WorkspacesQueryTypes,
   ],
   outputs: {
