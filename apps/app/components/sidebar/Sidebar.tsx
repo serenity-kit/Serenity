@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import {
   Button,
   Link,
+  Text,
   useIsPermanentLeftSidebar,
   View,
 } from "@serenity-tools/ui";
@@ -10,6 +11,7 @@ import {
   useWorkspacesQuery,
   useCreateWorkspaceMutation,
   useCreateDocumentMutation,
+  useDocumentPreviewsQuery,
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 import { useRoute } from "@react-navigation/native";
@@ -21,6 +23,10 @@ export default function Sidebar(props) {
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
   const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
   const [, createDocumentMutation] = useCreateDocumentMutation();
+  const [documentPreviewsResult, refetchDocumentPreviews] =
+    useDocumentPreviewsQuery({
+      variables: { workspaceId: route.params.workspaceId },
+    });
 
   const createWorkspace = async () => {
     const name =
@@ -40,15 +46,11 @@ export default function Sidebar(props) {
     const result = await createDocumentMutation({
       input: { id, workspaceId: route.params.workspaceId },
     });
-    console.log("weeee", result);
+    refetchDocumentPreviews();
   };
 
   const navigateToWorkspaceSettings = (workspaceId: string) => {
-    console.log(`navigateToWorkspaceSettings: ${workspaceId}`);
-    console.log(props.navigation.navigate);
-    props.navigation.navigate("WorkspaceSettingsScreen", {
-      workspaceId,
-    });
+    props.navigation.navigate("WorkspaceSettingsScreen", { workspaceId });
   };
 
   return (
@@ -135,6 +137,35 @@ export default function Sidebar(props) {
           Logout
         </Button>
       </View>
+      <Text>Documents</Text>
+      {documentPreviewsResult.fetching ? (
+        <Text>Loading...</Text>
+      ) : documentPreviewsResult.data?.documentPreviews?.nodes ? (
+        documentPreviewsResult.data?.documentPreviews?.nodes.map(
+          (documentPreview) => {
+            if (documentPreview === null) {
+              return null;
+            }
+            return (
+              <Link
+                key={documentPreview.id}
+                to={{
+                  screen: "Workspace",
+                  params: {
+                    workspaceId: route.params.workspaceId,
+                    screen: "Page",
+                    params: {
+                      pageId: documentPreview.id,
+                    },
+                  },
+                }}
+              >
+                {documentPreview?.name}
+              </Link>
+            );
+          }
+        )
+      ) : null}
     </DrawerContentScrollView>
   );
 }

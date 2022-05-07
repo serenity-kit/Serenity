@@ -1,13 +1,8 @@
-query documentPreviews {
-  documentPreviews(first: 100) {
+query documentPreviews($workspaceId: ID!, $first: Int! = 100, $after: String) {
+  documentPreviews(workspaceId: $workspaceId, first: $first, after: $after) {
     nodes {
-      documentId
-    }
-    edges {
-      cursor
-      node {
-        documentId
-      }
+      id
+      name
     }
     pageInfo {
       hasNextPage

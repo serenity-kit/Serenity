@@ -46,7 +46,6 @@ const client = createClient({
         return null;
       },
       addAuthToOperation: ({ authState, operation }) => {
-        console.log("addAuthToOperation", authState, operation);
         if (!authState || !authState.deviceSigningPublicKey) {
           return operation;
         }
