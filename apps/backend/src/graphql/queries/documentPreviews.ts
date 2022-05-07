@@ -19,8 +19,6 @@ export const documentPreviews = queryField((t) => {
       // include one extra project to set hasNextPage value
       const take = args.first ? args.first + 1 : undefined;
 
-      console.log("ARGS", args);
-
       const documentPreviews = await getDocumentPreviews({
         workspaceId: args.workspaceId,
         cursor,
