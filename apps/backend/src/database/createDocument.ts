@@ -1,17 +1,12 @@
 import { prisma } from "./prisma";
 
 type Params = {
-  documentId: string;
-  name: string;
+  id: string;
   workspaceId: string;
 };
 
-export async function createDocument({
-  documentId,
-  name,
-  workspaceId,
-}: Params) {
-  return await prisma.document.create({
-    data: { id: documentId, name, workspaceId },
+export async function createDocument({ id, workspaceId }: Params) {
+  return prisma.document.create({
+    data: { id, name: "Untitled", workspaceId },
   });
 }

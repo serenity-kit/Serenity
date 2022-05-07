@@ -13,7 +13,7 @@ const exitingCiphertext = "DtMWG6Jx9wAmLXh64enOwd6E7cFX";
 const key = "eL4FdkhTmU2F56ySJKKH-2ZVrzdsIIbbmvyz_N3Swb0";
 const nonce = "5GDx6cP2_uToVP-UKhddEmUelpyKTJLZ";
 
-export default function TestEditorScreen() {
+export default function PageScreen() {
   const [data, setData] = useState({});
 
   useEffect(() => {

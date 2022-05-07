@@ -14,7 +14,7 @@ import EditorScreen from "./screens/EditorScreen";
 import { RootStackParamList } from "../types";
 import DashboardScreen from "./screens/DashboardScreen";
 import DevDashboardScreen from "./screens/DevDashboardScreen";
-import TestEditorScreen from "./screens/TestEditorScreen";
+import PageScreen from "./screens/PageScreen";
 import LibsodiumTestScreen from "./screens/LibsodiumTestScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import LoginScreen from "./screens/LoginScreen";
@@ -56,7 +56,7 @@ function WorkspaceStackScreen(props) {
     >
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
       <Drawer.Screen name="Editor" component={EditorScreen} />
-      <Drawer.Screen name="TestEditor" component={TestEditorScreen} />
+      <Drawer.Screen name="Page" component={PageScreen} />
       <Drawer.Screen name="TestLibsodium" component={LibsodiumTestScreen} />
     </Drawer.Navigator>
   );
@@ -110,7 +110,7 @@ const linking: LinkingOptions<RootStackParamList> = {
         screens: {
           Dashboard: "dashboard",
           Editor: "editor",
-          TestEditor: "test-editor",
+          Page: "page/:pageId",
           TestLibsodium: "test-libsodium",
         },
       },
