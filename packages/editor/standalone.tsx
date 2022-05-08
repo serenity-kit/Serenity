@@ -29,7 +29,11 @@ const openDrawer = () => {
 const domContainer = document.querySelector("#editor");
 ReactDOM.render(
   <NativeBaseProvider>
-    <Editor yDocRef={{ current: ydoc }} openDrawer={openDrawer} />
+    <Editor
+      documentId={"dummyDocumentId"}
+      yDocRef={{ current: ydoc }}
+      openDrawer={openDrawer}
+    />
   </NativeBaseProvider>,
   domContainer
 );
