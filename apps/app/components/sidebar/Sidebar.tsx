@@ -49,10 +49,6 @@ export default function Sidebar(props) {
     refetchDocumentPreviews();
   };
 
-  const navigateToWorkspaceSettings = (workspaceId: string) => {
-    props.navigation.navigate("WorkspaceSettingsScreen", { workspaceId });
-  };
-
   return (
     <DrawerContentScrollView {...props}>
       {!isPermanentLeftSidebar && (
@@ -105,7 +101,10 @@ export default function Sidebar(props) {
                   </Link>
                   <Button
                     onPressIn={() => {
-                      navigateToWorkspaceSettings(workspace.id);
+                      props.navigation.navigate("Workspace", {
+                        workspaceId: workspace.id,
+                        screen: "Settings",
+                      });
                     }}
                   >
                     Settings

@@ -25,7 +25,7 @@ export type WorkspaceDrawerParamList = {
   Editor: undefined;
   Page: PageParams;
   TestLibsodium: undefined;
-  WorkspaceSettings: undefined;
+  Settings: undefined;
 };
 
 type WorkspaceParams = NavigatorScreenParams<WorkspaceDrawerParamList> & {
@@ -41,7 +41,6 @@ export type RootStackParamList = {
   Login: undefined;
   EncryptDecryptImageTest: undefined;
   Root: undefined;
-  WorkspaceSettingsScreen: undefined;
   NotFound: undefined;
 };
 

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet } from "react-native";
 import { Text, View, Button, Input } from "@serenity-tools/ui";
-import { RootStackScreenProps } from "../../types";
+import { RootStackScreenProps, WorkspaceDrawerScreenProps } from "../../types";
 import { useDeleteWorkspacesMutation } from "../../generated/graphql";
-import { useRoute } from "@react-navigation/native";
 import {
   useWorkspaceQuery,
   useUpdateWorkspaceMutation,
@@ -14,15 +13,16 @@ type Member = {
   isAdmin: boolean;
 };
 
-export default function WorkspaceSettingsScreen(props) {
-  const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
+export default function WorkspaceSettingsScreen(
+  props: WorkspaceDrawerScreenProps<"Settings">
+) {
+  const workspaceId = props.route.path?.split("/")[2] || ""; // should never be undefined
   const [workspaceResult, refetchWorkspaceResult] = useWorkspaceQuery();
   const [, deleteWorkspacesMutation] = useDeleteWorkspacesMutation();
   const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [newMemberName, setNewMemberName] = useState<string>("");
   const [members, setMembers] = useState<Member[]>([]);
-  const workspaceId = route.params.workspaceId;
 
   useEffect(() => {
     if (
@@ -50,6 +50,7 @@ export default function WorkspaceSettingsScreen(props) {
     console.log({ deleteWorkspaceResult });
     if (deleteWorkspaceResult.data?.deleteWorkspaces?.status) {
       alert("Workspace deleted");
+      props.navigation.navigate("Root");
     }
   };
 
@@ -97,7 +98,7 @@ export default function WorkspaceSettingsScreen(props) {
                 value={newMemberName}
                 onChangeText={setNewMemberName}
               />
-              Admin
+              <Text>Admin</Text>
               <Button
                 onPress={() => {
                   addMember(newMemberName);

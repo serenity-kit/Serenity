@@ -1,5 +1,5 @@
 import { Text, View } from "@serenity-tools/ui";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useClient } from "urql";
 import { WorkspaceDocument, WorkspaceQuery } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types";
@@ -15,7 +15,10 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
     if (deviceSigningPublicKey) {
       (async () => {
         const workspaceResult = await urqlClient
-          .query<WorkspaceQuery>(WorkspaceDocument)
+          .query<WorkspaceQuery>(WorkspaceDocument, undefined, {
+            // better to be safe here and always refetch
+            requestPolicy: "network-only",
+          })
           .toPromise();
         console.log(workspaceResult);
         if (workspaceResult.data?.workspace?.id) {

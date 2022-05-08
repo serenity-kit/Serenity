@@ -57,6 +57,7 @@ function WorkspaceStackScreen(props) {
       <Drawer.Screen name="Dashboard" component={DashboardScreen} />
       <Drawer.Screen name="Editor" component={EditorScreen} />
       <Drawer.Screen name="Page" component={PageScreen} />
+      <Drawer.Screen name="Settings" component={WorkspaceSettingsScreen} />
       <Drawer.Screen name="TestLibsodium" component={LibsodiumTestScreen} />
     </Drawer.Navigator>
   );
@@ -89,10 +90,6 @@ function RootNavigator() {
       />
       <Stack.Screen name="Root" component={RootScreen} />
       <Stack.Screen
-        name="WorkspaceSettingsScreen"
-        component={WorkspaceSettingsScreen}
-      />
-      <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
         options={{ title: "Oops!" }}
@@ -112,6 +109,7 @@ const linking: LinkingOptions<RootStackParamList> = {
           Editor: "editor",
           Page: "page/:pageId",
           TestLibsodium: "test-libsodium",
+          Settings: "settings",
         },
       },
       NoWorkspace: "no-workspace",
@@ -121,7 +119,6 @@ const linking: LinkingOptions<RootStackParamList> = {
       Login: "login",
       EncryptDecryptImageTest: "encrypt-decrypt-image-test",
       Root: "",
-      WorkspaceSettingsScreen: "settings",
       NotFound: "*",
     },
   },
