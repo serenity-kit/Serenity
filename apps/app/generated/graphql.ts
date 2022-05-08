@@ -55,6 +55,7 @@ export type ClientOprfRegistrationFinalizeInput = {
   nonce: Scalars['String'];
   secret: Scalars['String'];
   username: Scalars['String'];
+  workspaceId: Scalars['String'];
 };
 
 export type ClientOprfRegistrationFinalizeResult = {

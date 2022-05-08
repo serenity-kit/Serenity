@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import { v4 as uuidv4 } from "uuid";
 import { Text, View, Input, Button, tw, Link } from "@serenity-tools/ui";
 import {
   createClientKeyPair,
@@ -117,6 +117,7 @@ export default function RegisterScreen(props) {
         secret,
         nonce,
         clientPublicKey,
+        workspaceId: uuidv4(),
       },
     });
     console.log({ mutationResult });

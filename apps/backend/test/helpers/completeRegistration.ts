@@ -11,7 +11,8 @@ export const completeRegistration = async (
   serverPublicKey: string,
   oprfPublicKey: string,
   serverChallengeResponse: string,
-  randomScalar: string
+  randomScalar: string,
+  workspaceId: string
 ) => {
   const clientKeys = createClientKeyPair();
   // crate cipher text
@@ -34,6 +35,7 @@ export const completeRegistration = async (
             secret: "${secret}"
             nonce: "${nonce}"
             clientPublicKey: "${clientPublicKey}"
+            workspaceId: "${workspaceId}"
           }
         ) {
           status

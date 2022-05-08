@@ -37,7 +37,8 @@ test("server should register a user", async () => {
     registrationChallengeResult.data.serverPublicKey,
     registrationChallengeResult.data.oprfPublicKey,
     registrationChallengeResult.data.oprfChallengeResponse,
-    registrationChallengeResult.randomScalar
+    registrationChallengeResult.randomScalar,
+    "f339c9b6-7bdb-48fe-8efa-ea0e4ea4c6f6"
   );
   // clientPublicKey = registrationResponse.clientPublicKey;
   // clientPrivateKey = registrationResponse.clientPublicKey;

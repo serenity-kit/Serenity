@@ -1,11 +1,11 @@
 import { prisma } from "../prisma";
-import { v4 as uuidv4 } from "uuid";
 
 export async function finalizeRegistration(
   username: string,
   secret: string,
   nonce: string,
-  clientPublicKey: string
+  clientPublicKey: string,
+  workspaceId: string
 ) {
   // if this user has already completed registration, throw an error
   const existingUserData = await prisma.user.findUnique({
@@ -57,9 +57,9 @@ export async function finalizeRegistration(
       });
       await prisma.workspace.create({
         data: {
-          id: uuidv4(),
-          name: "My Workspace",
+          id: workspaceId,
           idSignature: "TODO",
+          name: "My Workspace",
           usersToWorkspaces: {
             create: {
               username: username,
