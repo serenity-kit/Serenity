@@ -5,9 +5,11 @@ export default function Editor({
   yDocRef,
   yAwarenessRef,
   openDrawer,
+  documentId,
 }: EditorProps) {
   return (
     <SerenityEditor
+      documentId={documentId}
       yDocRef={yDocRef}
       yAwarenessRef={yAwarenessRef}
       openDrawer={openDrawer}

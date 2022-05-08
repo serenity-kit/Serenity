@@ -17,6 +17,7 @@ import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import { useHasEditorSidebar } from "./hooks/useHasEditorSidebar";
 
 type EditorProps = {
+  documentId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef?: React.MutableRefObject<Awareness>;
   openDrawer: () => void;
@@ -27,49 +28,54 @@ const headingLevels: Level[] = [1, 2, 3];
 export const Editor = (props: EditorProps) => {
   const hasEditorSidebar = useHasEditorSidebar();
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        // the Collaboration extension comes with its own history handling
-        history: false,
-        code: {
-          HTMLAttributes: {
-            class: "code-extension",
+  const editor = useEditor(
+    {
+      extensions: [
+        StarterKit.configure({
+          // the Collaboration extension comes with its own history handling
+          history: false,
+          code: {
+            HTMLAttributes: {
+              class: "code-extension",
+            },
           },
-        },
-        codeBlock: {
-          HTMLAttributes: {
-            class: "code-block-extension",
+          codeBlock: {
+            HTMLAttributes: {
+              class: "code-block-extension",
+            },
           },
-        },
-        heading: {
-          levels: headingLevels,
-        },
-      }),
-      Link.configure({
-        openOnClick: false,
-      }),
-      Placeholder.configure({
-        placeholder: "Just start writing here …",
-      }),
-      TaskList.configure({
-        HTMLAttributes: {
-          class: "task-list-extension",
-        },
-      }),
-      TaskItem.configure({
-        HTMLAttributes: {
-          class: "task-item-extension",
-        },
-      }),
-      // register the ydoc with Tiptap
-      Collaboration.configure({
-        document: props.yDocRef.current,
-        field: "page",
-      }),
-      AwarnessExtension.configure({ awareness: props.yAwarenessRef?.current }),
-    ],
-  });
+          heading: {
+            levels: headingLevels,
+          },
+        }),
+        Link.configure({
+          openOnClick: false,
+        }),
+        Placeholder.configure({
+          placeholder: "Just start writing here …",
+        }),
+        TaskList.configure({
+          HTMLAttributes: {
+            class: "task-list-extension",
+          },
+        }),
+        TaskItem.configure({
+          HTMLAttributes: {
+            class: "task-item-extension",
+          },
+        }),
+        // register the ydoc with Tiptap
+        Collaboration.configure({
+          document: props.yDocRef.current,
+          field: "page",
+        }),
+        AwarnessExtension.configure({
+          awareness: props.yAwarenessRef?.current,
+        }),
+      ],
+    },
+    [props.documentId]
+  );
 
   return (
     <div className="flex flex-auto flex-row">

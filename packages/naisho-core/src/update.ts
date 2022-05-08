@@ -134,3 +134,11 @@ export async function verifyAndDecryptUpdate(update: Update, key, publicKey) {
     update.publicData.clock;
   return result;
 }
+
+// TODO snapshot refs should be stored per document to allow per document cleanup
+// and ideally the documents should be cached for quick access
+export async function cleanupUpdates() {
+  Object.keys(clocksPerSnapshot).forEach((snapshotId) => {
+    delete clocksPerSnapshot[snapshotId];
+  });
+}
