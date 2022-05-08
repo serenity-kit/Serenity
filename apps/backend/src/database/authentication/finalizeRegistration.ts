@@ -1,4 +1,5 @@
 import { prisma } from "../prisma";
+import { v4 as uuidv4 } from "uuid";
 
 export async function finalizeRegistration(
   username: string,
@@ -56,7 +57,7 @@ export async function finalizeRegistration(
       });
       await prisma.workspace.create({
         data: {
-          id: `${username}-my-workspace`,
+          id: uuidv4(),
           name: "My Workspace",
           idSignature: "TODO",
           usersToWorkspaces: {
