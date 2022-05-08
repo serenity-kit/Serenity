@@ -239,14 +239,6 @@ export default function LoginScreen(props) {
           />
         </View>
 
-        <View>
-          <Text>OauthToken: {oauthAccessToken}</Text>
-          <Text>
-            Token expires in:{" "}
-            {Math.round(accessTokenExpiresIn / (24 * 60 * 60))} days
-          </Text>
-        </View>
-
         <Button onPress={onLoginPress}>Log in</Button>
         <View>
           <Text>Don't have an account? </Text>
