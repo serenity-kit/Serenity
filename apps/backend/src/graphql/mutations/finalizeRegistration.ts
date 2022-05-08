@@ -8,6 +8,7 @@ export const ClientOprfRegistrationFinalizeInput = inputObjectType({
     t.nonNull.string("secret");
     t.nonNull.string("nonce");
     t.nonNull.string("clientPublicKey");
+    t.nonNull.string("workspaceId");
   },
 });
 
@@ -35,7 +36,13 @@ export const finalizeRegistrationMutation = mutationField(
       const secret = args.input.secret;
       const nonce = args.input.nonce;
       const clientPublicKey = args.input.clientPublicKey;
-      await finalizeRegistration(username, secret, nonce, clientPublicKey);
+      await finalizeRegistration(
+        username,
+        secret,
+        nonce,
+        clientPublicKey,
+        args.input.workspaceId
+      );
       const result = {
         status: "success",
       };

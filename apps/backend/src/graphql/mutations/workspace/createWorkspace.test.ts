@@ -13,14 +13,19 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   // TODO: we don't want this before every test
-  await registerUser(graphql, username, password);
+  await registerUser(
+    graphql,
+    username,
+    password,
+    "31f63652-a995-41ff-b541-3ccdaaaac551"
+  );
 });
 
 test("user should be able to create a workspace", async () => {
   // generate a challenge code
   const authorizationHeader = `TODO+${username}`;
   const name = "workspace";
-  const id = "abc";
+  const id = "7154dda5-f237-455e-9a60-584b64fde8a9";
   const result = await createWorkspace({
     name,
     id,

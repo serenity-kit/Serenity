@@ -1,7 +1,4 @@
 import { gql } from "graphql-request";
-import setupGraphql from "./setupGraphql";
-import sodium from "libsodium-wrappers-sumo";
-import deleteAllRecords from "./deleteAllRecords";
 import {
   createClientKeyPair,
   createOprfRegistrationEnvelope,
@@ -11,7 +8,8 @@ import { requestRegistrationChallengeResponse } from "./requestRegistrationChall
 export const registerUser = async (
   graphql: any,
   username: string,
-  password: string
+  password: string,
+  workspaceId: string
 ) => {
   const result = await requestRegistrationChallengeResponse(
     graphql,
@@ -42,6 +40,7 @@ export const registerUser = async (
           secret: "${registrationEnvelopeData.secret}"
           nonce: "${registrationEnvelopeData.nonce}"
           clientPublicKey: "${clientKeys.publicKey}"
+          workspaceId: "${workspaceId}"
         }
       ) {
         status

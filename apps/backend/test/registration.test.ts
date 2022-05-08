@@ -58,6 +58,7 @@ test("server should register a user", async () => {
           secret: "${registrationEnvelopeData.secret}"
           nonce: "${registrationEnvelopeData.nonce}"
           clientPublicKey: "${clientKeys.publicKey}"
+          workspaceId: "297204d4-afcf-4ab6-b951-292b446d0b35"
         }
       ) {
         status
