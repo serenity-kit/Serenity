@@ -49,5 +49,11 @@ export default function EditorScreen({
   const yDocRef = useRef(yDoc);
   console.log("yDocRef", yDocRef.current);
 
-  return <Editor yDocRef={yDocRef} openDrawer={navigation.openDrawer} />;
+  return (
+    <Editor
+      documentId={"096f7289-d765-41ef-9f07-dc8252ced299"}
+      yDocRef={yDocRef}
+      openDrawer={navigation.openDrawer}
+    />
+  );
 }
