@@ -67,7 +67,7 @@
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.64.12",
     "electron": "^17.1.0",
-    "expo-cli": "^5.3.1",
+    "expo-cli": "^5.4.3",
     "jest": "^26.6.3",
     "jest-expo": "~44.0.1",
     "prettier": "2.6.2",
