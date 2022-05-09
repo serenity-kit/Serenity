@@ -1,10 +1,21 @@
-import { Text, tw, View, Button, Input, Icon } from "@serenity-tools/ui";
+import {
+  Text,
+  tw,
+  View,
+  Button,
+  Input,
+  Icon,
+  Menu,
+  MenuItem,
+  ScrollView,
+} from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React from "react";
+import { Pressable } from "native-base";
 
 export default function DesignSystemScreen() {
   return (
-    <View style={tw`mt-20 px-4`}>
+    <ScrollView style={tw`mt-20 px-4`}>
       <Text>Default Button</Text>
       <Button>Login</Button>
       <Text>Disabled Button</Text>
@@ -19,6 +30,30 @@ export default function DesignSystemScreen() {
       <Input disabled value="jane@example.com" />
       <Text>Input Disabled</Text>
       <Input disabled placeholder="Enter your email …" />
+      <Text>Menu</Text>
+      <View style={tw`flex flex-row`}>
+        <Menu
+          trigger={(triggerProps) => {
+            return (
+              <Pressable
+                accessibilityLabel="More options menu"
+                {...triggerProps}
+                style={tw`block`}
+              >
+                <Icon name="more-2-line" />
+              </Pressable>
+            );
+          }}
+        >
+          <MenuItem>Arial</MenuItem>
+          <MenuItem>Nunito Sans</MenuItem>
+          <MenuItem>SF Pro</MenuItem>
+          <MenuItem>Helvetica</MenuItem>
+          <MenuItem isDisabled>Sofia</MenuItem>
+          <MenuItem>Cookie</MenuItem>
+        </Menu>
+      </View>
+
       <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>Icons</Text>
       <Text style={tw`mb-1`}>Marks</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
@@ -112,6 +147,6 @@ export default function DesignSystemScreen() {
       </Columns>
       <Text style={tw`mt-4 mb-1`}>Icons coloured</Text>
       <Icon name="list-check-2" color={tw.color("primary-500")} />
-    </View>
+    </ScrollView>
   );
 }
