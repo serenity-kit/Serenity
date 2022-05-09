@@ -15,6 +15,7 @@ export const MenuItem = React.forwardRef(
       <NativeBaseMenu.Item
         ref={ref}
         {...rest}
+        // @ts-expect-error not worth fixing?
         style={[styles.menuItem, rest.style]}
       >
         {children}

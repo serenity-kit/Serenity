@@ -8,6 +8,7 @@ import {
   Menu,
   MenuItem,
   ScrollView,
+  Checkbox,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React from "react";
@@ -53,6 +54,25 @@ export default function DesignSystemScreen() {
           <MenuItem>Cookie</MenuItem>
         </Menu>
       </View>
+
+      <Text>Checkbox</Text>
+      <Checkbox value="test" accessibilityLabel="This is a dummy checkbox" />
+      <Checkbox
+        value="test"
+        accessibilityLabel="This is a dummy checkbox"
+        defaultIsChecked
+      />
+      <Checkbox
+        value="test"
+        accessibilityLabel="This is a dummy checkbox"
+        isDisabled
+      />
+      <Checkbox
+        value="test"
+        accessibilityLabel="This is a dummy checkbox"
+        isDisabled
+        isChecked
+      />
 
       <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>Icons</Text>
       <Text style={tw`mb-1`}>Marks</Text>
