@@ -2,7 +2,7 @@ import * as React from "react";
 import { tw } from "../../tailwind";
 import { Link as ReactNavigationLink } from "@react-navigation/native";
 import type { NavigationAction } from "@react-navigation/core";
-import { GestureResponderEvent, Text, TextProps } from "react-native";
+import { GestureResponderEvent, TextProps } from "react-native";
 import { To } from "@react-navigation/native/lib/typescript/src/useLinkTo";
 
 // copied from react-navigation type definitions

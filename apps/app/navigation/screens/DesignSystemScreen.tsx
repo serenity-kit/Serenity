@@ -8,6 +8,7 @@ import {
   Menu,
   MenuItem,
   ScrollView,
+  SidebarButton,
   Checkbox,
   Pressable,
   Link,
@@ -32,6 +33,8 @@ export default function DesignSystemScreen() {
       <Input disabled value="jane@example.com" />
       <Text>Input Disabled</Text>
       <Input disabled placeholder="Enter your email …" />
+      <SidebarButton>Hallo</SidebarButton>
+      <SidebarButton disabled>Hallo</SidebarButton>
       <Text>Menu</Text>
       <View style={tw`flex flex-row`}>
         <Menu
