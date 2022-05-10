@@ -5,7 +5,7 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { ColorSchemeName, useWindowDimensions } from "react-native";
+import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
 import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 
@@ -22,9 +22,16 @@ import WorkspaceSettingsScreen from "./screens/WorkspaceSettingsScreen";
 import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
-import { useIsPermanentLeftSidebar } from "@serenity-tools/ui";
+import {
+  Icon,
+  Pressable,
+  Text,
+  tw,
+  useIsPermanentLeftSidebar,
+} from "@serenity-tools/ui";
 import RootScreen from "./screens/RootScreen";
 import NoWorkspaceScreen from "./screens/NoWorkspaceScreen";
+import { DrawerActions } from "@react-navigation/native";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -32,6 +39,10 @@ import NoWorkspaceScreen from "./screens/NoWorkspaceScreen";
  */
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
+
+const styles = StyleSheet.create({
+  header: tw`bg-white dark:bg-gray-900 border-b border-gray-200 h-top-bar shadow-opacity-0`,
+});
 
 function WorkspaceStackScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
@@ -45,12 +56,27 @@ function WorkspaceStackScreen(props) {
     <Drawer.Navigator
       drawerContent={(props) => <Sidebar {...props} />}
       screenOptions={{
-        headerShown: false,
+        headerShown: true,
+        headerTitle: (props) => <Text>{props.children}</Text>,
+        headerStyle: styles.header,
         drawerType: isPermanentLeftSidebar ? "permanent" : "front",
         drawerStyle: {
           width: isPermanentLeftSidebar ? 240 : width,
         },
-        headerLeft: isPermanentLeftSidebar ? () => null : undefined,
+        headerLeft: isPermanentLeftSidebar
+          ? () => null
+          : () => {
+              return (
+                <Pressable
+                  style={tw`pl-6`}
+                  onPress={() => {
+                    props.navigation.dispatch(DrawerActions.openDrawer());
+                  }}
+                >
+                  <Icon name="menu" />
+                </Pressable>
+              );
+            },
         overlayColor: "transparent",
       }}
     >
