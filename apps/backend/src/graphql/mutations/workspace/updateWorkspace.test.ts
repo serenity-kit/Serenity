@@ -117,7 +117,7 @@ test("user won't update the members", async () => {
 });
 
 // WARNING: after this, user is no longer an admin on this workspace
-test("user should be able to update a workspace", async () => {
+test("user should be able to update a workspace, but not their own access level", async () => {
   // generate a challenge code
   const authorizationHeader = `TODO+${username}`;
   const id = "abc";
@@ -129,7 +129,7 @@ test("user should be able to update a workspace", async () => {
     },
     {
       username: "user1",
-      isAdmin: true,
+      isAdmin: false,
     },
   ];
   const result = await updateWorkspace({
@@ -145,11 +145,11 @@ test("user should be able to update a workspace", async () => {
         "id": "abc",
         "members": Array [
           Object {
-            "isAdmin": false,
+            "isAdmin": true,
             "username": "user",
           },
           Object {
-            "isAdmin": true,
+            "isAdmin": false,
             "username": "user1",
           },
         ],
@@ -161,7 +161,7 @@ test("user should be able to update a workspace", async () => {
 
 test("user should not be able to update a workspace they don't own", async () => {
   // generate a challenge code
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = `TODO+${username2}`;
   const id = "abc";
   const name = "unauthorized workspace";
   const members = [
@@ -183,7 +183,7 @@ test("user should not be able to update a workspace they don't own", async () =>
         members,
         authorizationHeader,
       }))()
-  ).rejects.toThrow("Invalid workspace ID");
+  ).rejects.toThrow("Unauthorized");
 });
 
 test("user should not be able to update a workspace for a workspace that doesn't exist", async () => {
@@ -210,5 +210,5 @@ test("user should not be able to update a workspace for a workspace that doesn't
         members,
         authorizationHeader,
       }))()
-  ).rejects.toThrow("Invalid workspace ID");
+  ).rejects.toThrow("Unauthorized");
 });

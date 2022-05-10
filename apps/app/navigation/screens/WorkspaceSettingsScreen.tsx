@@ -94,7 +94,6 @@ export default function WorkspaceSettingsScreen(
       workspaceResult.data &&
       workspaceResult.data.workspace
     ) {
-      console.log({ workspaceResult });
       updateWorkspaceData(workspaceResult.data.workspace);
     } else if (workspaceResult.error) {
       setHasGraphqlError(true);
@@ -103,7 +102,6 @@ export default function WorkspaceSettingsScreen(
   }, [workspaceResult.fetching]);
 
   const updateWorkspaceData = async (workspace: any) => {
-    console.log({ workspace });
     setIsLoadingWorkspaceData(true);
     const workspaceName = workspace.name || "";
     setWorkspaceName(workspaceName);
@@ -132,7 +130,6 @@ export default function WorkspaceSettingsScreen(
           ids: [workspaceId],
         },
       });
-      console.log({ deleteWorkspaceResult });
       if (deleteWorkspaceResult.data?.deleteWorkspaces?.status) {
         alert("Workspace deleted");
         props.navigation.navigate("Root");
@@ -154,7 +151,6 @@ export default function WorkspaceSettingsScreen(
         name: workspaceName,
       },
     });
-    console.log({ updateWorkspaceResult });
     if (workspaceResult.data && workspaceResult.data.workspace) {
       updateWorkspaceData(
         updateWorkspaceResult.data?.updateWorkspace?.workspace
@@ -189,7 +185,6 @@ export default function WorkspaceSettingsScreen(
         members: graphqlMembers,
       },
     });
-    console.log({ updateWorkspaceResult });
     if (updateWorkspaceResult.data?.updateWorkspace?.workspace) {
       updateWorkspaceData(
         updateWorkspaceResult.data?.updateWorkspace?.workspace
@@ -218,7 +213,6 @@ export default function WorkspaceSettingsScreen(
     const existingMemberRow = memberLookup[member.username];
     if (existingMemberRow >= 0) {
       members[existingMemberRow].isAdmin = isMemberAdmin;
-      console.log({ members });
       setMembers(members);
       await _updateWorkspaceMemberData(members);
     }
@@ -273,38 +267,40 @@ export default function WorkspaceSettingsScreen(
               <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
                 Members
               </Text>
-              <View>
-                <View style={styles.addMemberContainer}>
-                  <Input
-                    placeholder="New member name"
-                    value={newMemberName}
-                    onChangeText={setNewMemberName}
-                  />
-                  <Checkbox
-                    accessibilityLabel="Is member an admin"
-                    onChange={(isNewMemberAdmin) => {
-                      setIsNewMemberAdmin(isNewMemberAdmin);
-                    }}
-                    value={username}
-                  />
-                  <Text>Admin</Text>
-                  <Button
-                    onPress={() => {
-                      const member = {
-                        username: newMemberName,
-                        isAdmin: isNewMemberAdmin,
-                      };
-                      addMember(member);
-                    }}
-                    disabled={!newMemberName}
-                  >
-                    Add
-                  </Button>
+              {isAdmin && (
+                <View>
+                  <View style={styles.addMemberContainer}>
+                    <Input
+                      placeholder="New member name"
+                      value={newMemberName}
+                      onChangeText={setNewMemberName}
+                    />
+                    <Checkbox
+                      accessibilityLabel="Is member an admin"
+                      onChange={(isNewMemberAdmin) => {
+                        setIsNewMemberAdmin(isNewMemberAdmin);
+                      }}
+                      value={username}
+                    />
+                    <Text>Admin</Text>
+                    <Button
+                      onPress={() => {
+                        const member = {
+                          username: newMemberName,
+                          isAdmin: isNewMemberAdmin,
+                        };
+                        addMember(member);
+                      }}
+                      disabled={!newMemberName}
+                    >
+                      Add
+                    </Button>
+                  </View>
+                  {isInvalidUsernameError && (
+                    <Text style={styles.formError}>Invalid username</Text>
+                  )}
                 </View>
-                {isInvalidUsernameError && (
-                  <Text style={styles.formError}>Invalid username</Text>
-                )}
-              </View>
+              )}
               {members.map((member: any) => (
                 <WorkspaceMember
                   key={member.username}

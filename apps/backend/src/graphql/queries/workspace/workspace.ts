@@ -15,12 +15,21 @@ export const workspaces = queryField((t) => {
         throw new Error("Unauthorized");
       }
       const username = context.user.username;
-      console.log({ id: args.id });
       if (args.id) {
-        const workspace = await getWorkspace({
+        const rawWorkspace = await getWorkspace({
           username,
           id: args.id,
         });
+        if (!rawWorkspace) {
+          return null;
+        }
+        const workspace = {
+          id: rawWorkspace.id,
+          name: rawWorkspace.name,
+          idSignature: rawWorkspace.idSignature,
+          members: rawWorkspace.usersToWorkspaces,
+        };
+        return workspace;
       }
 
       const workspaces = await getWorkspaces({

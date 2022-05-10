@@ -25,13 +25,11 @@ export async function updateWorkspace({
   username,
   members,
 }: Params): Promise<Workspace> {
-  console.log("Updating workspace...");
   try {
     return await prisma.$transaction(async (prisma) => {
       // 1. retrieve workspace if owned by user
       // 2. update usersToWorkspaces with new permission structures
       // 3. update workspace
-      console.log({ id, name, username, members });
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
           username: username,
@@ -40,10 +38,10 @@ export async function updateWorkspace({
         },
         select: {
           workspaceId: true,
+          isAdmin: true,
         },
       });
-      console.log({ userToWorkspace });
-      if (!userToWorkspace) {
+      if (!userToWorkspace || !userToWorkspace.isAdmin) {
         throw new Error("Unauthorized");
       }
       const workspace = await prisma.workspace.findFirst({
@@ -51,7 +49,6 @@ export async function updateWorkspace({
           id: userToWorkspace.workspaceId,
         },
       });
-      console.log({ workspace });
       if (!workspace) {
         throw new Error("Invalid workspace ID");
       }
@@ -76,7 +73,6 @@ export async function updateWorkspace({
             username: true,
           },
         });
-        console.log({ actualUsers });
         const usernames: string[] = [];
         actualUsers.forEach((actualUser) => {
           // don't delete owner from permissions
@@ -84,12 +80,11 @@ export async function updateWorkspace({
             usernames.push(actualUser.username);
           }
         });
-        console.log({ usernames });
         await prisma.usersToWorkspaces.deleteMany({
           where: {
             workspaceId: workspace.id,
             username: {
-              in: usernames,
+              not: username,
             },
           },
         });
@@ -104,14 +99,12 @@ export async function updateWorkspace({
             workspaceId: workspace.id,
           });
         });
-        console.log({ usersToWorkspacesData });
         await prisma.usersToWorkspaces.createMany({
           data: usersToWorkspacesData,
         });
         /* */
       }
       let updatedWorkspace: any;
-      console.log({ name });
       if (name != undefined) {
         updatedWorkspace = await prisma.workspace.update({
           where: {
@@ -135,18 +128,15 @@ export async function updateWorkspace({
           isAdmin: true,
         },
       });
-      console.log({ updatedPermissions });
       const updatedWorkspaceData: Workspace = {
         id: updatedWorkspace.id,
         name: updatedWorkspace.name,
         idSignature: updatedWorkspace.idSignature,
         members: updatedPermissions,
       };
-      console.log({ updatedWorkspaceData });
-      console.log({ members: updatedWorkspaceData.members });
       return updatedWorkspaceData;
     });
   } catch (error) {
-    throw Error("Invalid workspace ID");
+    throw error;
   }
 }

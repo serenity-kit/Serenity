@@ -1,13 +1,13 @@
 import { gql } from "graphql-request";
-import setupGraphql from "./helpers/setupGraphql";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
 import sodium from "libsodium-wrappers-sumo";
-import deleteAllRecords from "./helpers/deleteAllRecords";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import {
   createClientKeyPair,
   createOprfChallenge,
   createOprfRegistrationEnvelope,
 } from "@serenity-tools/opaque/client";
-import { requestRegistrationChallengeResponse } from "./helpers/requestRegistrationChallengeResponse";
+import { requestRegistrationChallengeResponse } from "../../../../test/helpers/requestRegistrationChallengeResponse";
 
 const graphql = setupGraphql();
 const username = "user";

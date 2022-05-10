@@ -1,6 +1,6 @@
 import { gql } from "graphql-request";
-import setupGraphql from "./helpers/setupGraphql";
-import deleteAllRecords from "./helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import {
   createClientKeyPair,
   createOprfChallenge,
@@ -8,8 +8,8 @@ import {
   createOprfRegistrationEnvelope,
 } from "@serenity-tools/opaque/client";
 import { decryptSessionJsonMessage } from "@serenity-tools/opaque/common";
-import { requestRegistrationChallengeResponse } from "./helpers/requestRegistrationChallengeResponse";
-import { completeRegistration } from "./helpers/completeRegistration";
+import { requestRegistrationChallengeResponse } from "../../../../test/helpers/requestRegistrationChallengeResponse";
+import { completeRegistration } from "../../../../test/helpers/completeRegistration";
 
 const graphql = setupGraphql();
 const username = "user";

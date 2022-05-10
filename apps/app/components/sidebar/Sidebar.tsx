@@ -27,7 +27,11 @@ export default function Sidebar(props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
-  const [workspaceResult] = useWorkspaceQuery();
+  const [workspaceResult] = useWorkspaceQuery({
+    variables: {
+      id: route.params.workspaceId,
+    },
+  });
 
   const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
   const [, createDocumentMutation] = useCreateDocumentMutation();

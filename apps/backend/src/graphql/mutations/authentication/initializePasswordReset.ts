@@ -1,5 +1,5 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { initializePasswordReset } from "../../database/authentication/initializePasswordReset";
+import { initializePasswordReset } from "../../../database/authentication/initializePasswordReset";
 import sodium from "libsodium-wrappers-sumo";
 
 export const ClientRequestResetPasswordRequest = inputObjectType({

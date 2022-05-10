@@ -17,8 +17,6 @@ export async function getWorkspace({ username, id }: Params) {
       (connection) => connection.username === username
     )
   ) {
-    console.log({ workspace });
-    console.log({ usersToWorkspaces: workspace.usersToWorkspaces });
     return workspace;
   }
   return null;
