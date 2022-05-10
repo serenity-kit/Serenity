@@ -26,6 +26,10 @@ export const SidebarButton = React.forwardRef(
         _disabled={{
           style: styles.disabled,
         }}
+        _focusVisible={{
+          // disable default outline styles
+          _web: { style: [{ outlineWidth: 0 }, tw`se-inset-focus-mini`] },
+        }}
       >
         {children}
       </Pressable>
