@@ -79,8 +79,14 @@ module.exports = {
         "se-outline-focus": {
           boxShadow: `0px 0px 0px 0.25rem ${customTheme.colors.primary["200"]}`, // web-only
         },
+        "se-outline-focus-mini": {
+          boxShadow: `0px 0px 0px 0.125rem ${customTheme.colors.primary["200"]}`, // web-only
+        },
         "se-outline-error": {
           boxShadow: `0px 0px 0px 0.25rem ${customTheme.extend.colors.error["200"]}`, // web-only
+        },
+        "se-outline-error-mini": {
+          boxShadow: `0px 0px 0px 0.125rem ${customTheme.extend.colors.error["200"]}`, // web-only
         },
       });
     }),
