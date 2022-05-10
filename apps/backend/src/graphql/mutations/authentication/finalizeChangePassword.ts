@@ -1,5 +1,5 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { finalizeChangePassword } from "../../database/authentication/finalizeChangePassword";
+import { finalizeChangePassword } from "../../../database/authentication/finalizeChangePassword";
 
 export const ClientOprfRegistrationFinalizeInput = inputObjectType({
   name: "ClientOprfRegistrationFinalizeInput",

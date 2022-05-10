@@ -1,5 +1,5 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { initializeRegistration } from "../../database/authentication/initializeRegistration";
+import { initializeRegistration } from "../../../database/authentication/initializeRegistration";
 import sodium from "libsodium-wrappers-sumo";
 
 export const ClientOprfRegistrationChallengeInput = inputObjectType({

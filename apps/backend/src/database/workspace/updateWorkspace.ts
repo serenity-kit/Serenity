@@ -38,9 +38,10 @@ export async function updateWorkspace({
         },
         select: {
           workspaceId: true,
+          isAdmin: true,
         },
       });
-      if (!userToWorkspace) {
+      if (!userToWorkspace || !userToWorkspace.isAdmin) {
         throw new Error("Unauthorized");
       }
       const workspace = await prisma.workspace.findFirst({
@@ -74,25 +75,34 @@ export async function updateWorkspace({
         });
         const usernames: string[] = [];
         actualUsers.forEach((actualUser) => {
-          usernames.push(actualUser.username);
+          // don't delete owner from permissions
+          if (actualUser.username != username) {
+            usernames.push(actualUser.username);
+          }
         });
         await prisma.usersToWorkspaces.deleteMany({
           where: {
             workspaceId: workspace.id,
+            username: {
+              not: username,
+            },
           },
         });
+        /* */
         const usersToWorkspacesData: UserToWorkspaceData[] = [];
         // loop through inbound data and format for database
-        usernames.forEach((username) => {
+        usernames.forEach((memberUsername) => {
+          // don't alter owner's permissions
           usersToWorkspacesData.push({
-            username: username,
-            isAdmin: permissionsByUserName[username].isAdmin,
+            username: memberUsername,
+            isAdmin: permissionsByUserName[memberUsername].isAdmin,
             workspaceId: workspace.id,
           });
         });
         await prisma.usersToWorkspaces.createMany({
           data: usersToWorkspacesData,
         });
+        /* */
       }
       let updatedWorkspace: any;
       if (name != undefined) {
@@ -127,6 +137,6 @@ export async function updateWorkspace({
       return updatedWorkspaceData;
     });
   } catch (error) {
-    throw Error("Invalid workspace ID");
+    throw error;
   }
 }

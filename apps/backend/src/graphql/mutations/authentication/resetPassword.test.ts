@@ -1,14 +1,14 @@
 import { gql } from "graphql-request";
-import setupGraphql from "./helpers/setupGraphql";
-import deleteAllRecords from "./helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import {
   createClientKeyPair,
   createOprfChallenge,
   createOprfRegistrationEnvelope,
 } from "@serenity-tools/opaque/client";
-import { requestRegistrationChallengeResponse } from "./helpers/requestRegistrationChallengeResponse";
-import { completeRegistration } from "./helpers/completeRegistration";
-import { prisma } from "../src/database/prisma";
+import { requestRegistrationChallengeResponse } from "../../../../test/helpers/requestRegistrationChallengeResponse";
+import { completeRegistration } from "../../../../test/helpers/completeRegistration";
+import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 const username = "user";

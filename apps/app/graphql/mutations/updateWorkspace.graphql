@@ -3,6 +3,10 @@ mutation updateWorkspace($input: UpdateWorkspaceInput!) {
     workspace {
       id
       name
+      members {
+        username
+        isAdmin
+      }
     }
   }
 }

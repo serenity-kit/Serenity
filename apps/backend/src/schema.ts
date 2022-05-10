@@ -5,12 +5,12 @@ import * as WorkspaceQueryTypes from "./graphql/queries/workspace/workspace";
 import * as WorkspacesQueryTypes from "./graphql/queries/workspace/workspaces";
 import * as DocumentPreviewsQueryTypes from "./graphql/queries/documentPreviews";
 
-import * as InitializeRegistrationTypes from "./graphql/mutations/initializeRegistration";
-import * as FinalizeRegistrationTypes from "./graphql/mutations/finalizeRegistration";
-import * as InitializeLoginTypes from "./graphql/mutations/initializeLogin";
-import * as FinalizeLoginTypes from "./graphql/mutations/finalizeLogin";
-import * as InitializePasswordResetTypes from "./graphql/mutations/initializePasswordReset";
-import * as FinalizePasswordResetTypes from "./graphql/mutations/finalizePasswordReset";
+import * as InitializeRegistrationTypes from "./graphql/mutations/authentication/initializeRegistration";
+import * as FinalizeRegistrationTypes from "./graphql/mutations/authentication/finalizeRegistration";
+import * as InitializeLoginTypes from "./graphql/mutations/authentication/initializeLogin";
+import * as FinalizeLoginTypes from "./graphql/mutations/authentication/finalizeLogin";
+import * as InitializePasswordResetTypes from "./graphql/mutations/authentication/initializePasswordReset";
+import * as FinalizePasswordResetTypes from "./graphql/mutations/authentication/finalizePasswordReset";
 import * as CreateDocumentMutationTypes from "./graphql/mutations/createDocument";
 import * as CreateWorkspaceMutationTypes from "./graphql/mutations/workspace/createWorkspace";
 import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/deleteWorkspaces";

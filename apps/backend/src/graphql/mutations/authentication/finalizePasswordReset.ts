@@ -1,5 +1,5 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { finalizePasswordReset } from "../../database/authentication/finalizePasswordReset";
+import { finalizePasswordReset } from "../../../database/authentication/finalizePasswordReset";
 
 export const FinalizeResetPasswordInput = inputObjectType({
   name: "FinalizeResetPasswordInput",

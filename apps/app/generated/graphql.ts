@@ -308,7 +308,7 @@ export type CreateWorkspaceMutationVariables = Exact<{
 }>;
 
 
-export type CreateWorkspaceMutation = { __typename?: 'Mutation', createWorkspace?: { __typename?: 'CreateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null } | null } | null };
+export type CreateWorkspaceMutation = { __typename?: 'Mutation', createWorkspace?: { __typename?: 'CreateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', username: string, isAdmin: boolean }> | null } | null } | null };
 
 export type DeleteWorkspacesMutationVariables = Exact<{
   input: DeleteWorkspacesInput;
@@ -350,7 +350,7 @@ export type UpdateWorkspaceMutationVariables = Exact<{
 }>;
 
 
-export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null } | null } | null };
+export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', username: string, isAdmin: boolean }> | null } | null } | null };
 
 export type DocumentPreviewsQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -391,6 +391,10 @@ export const CreateWorkspaceDocument = gql`
     workspace {
       id
       name
+      members {
+        username
+        isAdmin
+      }
     }
   }
 }
@@ -466,6 +470,10 @@ export const UpdateWorkspaceDocument = gql`
     workspace {
       id
       name
+      members {
+        username
+        isAdmin
+      }
     }
   }
 }

@@ -12,12 +12,15 @@ type Params = {
   take: number;
 };
 export async function getWorkspaces({ username, cursor, skip, take }: Params) {
+  const userToWorkspaces = await prisma.usersToWorkspaces.findMany({
+    where: {
+      username,
+    },
+  });
   const rawWorkspaces = await prisma.workspace.findMany({
     where: {
-      usersToWorkspaces: {
-        every: {
-          username: username,
-        },
+      id: {
+        in: userToWorkspaces.map((u) => u.workspaceId),
       },
     },
     cursor,
@@ -26,17 +29,7 @@ export async function getWorkspaces({ username, cursor, skip, take }: Params) {
     orderBy: {
       name: "asc",
     },
-    select: {
-      id: true,
-      name: true,
-      idSignature: true,
-      usersToWorkspaces: {
-        select: {
-          username: true,
-          isAdmin: true,
-        },
-      },
-    },
+    include: { usersToWorkspaces: true },
   });
   // attach the .usersToWorkspaces as .members property
   const workspaces: Workspace[] = [];
