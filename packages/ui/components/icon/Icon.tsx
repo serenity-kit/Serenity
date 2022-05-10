@@ -51,6 +51,7 @@ import { ListCheck } from "./icons/ListCheck";
 import { ListCheck2 } from "./icons/ListCheck2";
 import { ListOrdered } from "./icons/ListOrdered";
 import { ListUnordered } from "./icons/ListUnordered";
+import { Menu } from "./icons/Menu";
 import { More2Line } from "./icons/More2Line";
 import { MoreLine } from "./icons/MoreLine";
 import { MovieLine } from "./icons/MovieLine";
@@ -120,6 +121,7 @@ export type Props = {
     | "list-check-2"
     | "list-unordered"
     | "list-ordered"
+    | "menu"
     | "more-2-line"
     | "more-line"
     | "movie-line"
@@ -214,6 +216,7 @@ export const Icon = (props: Props) => {
   if (name === "list-ordered") return <ListOrdered color={color} size={size} />;
   if (name === "list-unordered")
     return <ListUnordered color={color} size={size} />;
+  if (name === "menu") return <Menu color={color} size={size} />;
   if (name === "more-2-line") return <More2Line color={color} size={size} />;
   if (name === "more-line") return <MoreLine color={color} size={size} />;
   if (name === "movie-line") return <MovieLine color={color} size={size} />;

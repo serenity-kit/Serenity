@@ -2,7 +2,7 @@ import "./editor-output.css";
 import "./awareness.css";
 import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
-import { CenterHeader, Text, tw, View } from "@serenity-tools/ui";
+import { tw, View } from "@serenity-tools/ui";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import { Level } from "@tiptap/extension-heading";
@@ -80,9 +80,6 @@ export const Editor = (props: EditorProps) => {
   return (
     <div className="flex flex-auto flex-row">
       <View style={tw`flex-auto text-gray-900 dark:text-white`}>
-        <CenterHeader openDrawer={props.openDrawer}>
-          <Text>Page</Text>
-        </CenterHeader>
         <div className="flex-auto overflow-y-auto overflow-x-hidden">
           {/* h-full needed to expand the editor to it's full height even when empty */}
           <EditorContent className="h-full" editor={editor} />

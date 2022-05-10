@@ -427,16 +427,11 @@ export default function Page({ navigation, route, pageId }: Props) {
   }, []);
 
   return (
-    <View style={tw`bg-white flex-auto`}>
-      <View>
-        <Text>{websocketState.connected ? "Connected" : "Disconnected"}</Text>
-      </View>
-      <Editor
-        documentId={docId}
-        yDocRef={yDocRef}
-        yAwarenessRef={yAwarenessRef}
-        openDrawer={navigation.openDrawer}
-      />
-    </View>
+    <Editor
+      documentId={docId}
+      yDocRef={yDocRef}
+      yAwarenessRef={yAwarenessRef}
+      openDrawer={navigation.openDrawer}
+    />
   );
 }
