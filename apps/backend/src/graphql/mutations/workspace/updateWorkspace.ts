@@ -40,6 +40,8 @@ export const updateWorkspaceMutation = mutationField("updateWorkspace", {
     if (args.input.members === null) {
       throw new Error("Invalid input: members cannot be null");
     }
+    console.log({ input: args.input });
+    console.log({ inboundMembers: args.input.members });
     const workspace = await updateWorkspace({
       id: args.input.id,
       name: args.input.name,
