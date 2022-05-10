@@ -9,10 +9,10 @@ import {
   MenuItem,
   ScrollView,
   Checkbox,
+  Pressable,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React from "react";
-import { Pressable } from "native-base";
 
 export default function DesignSystemScreen() {
   return (
