@@ -10,6 +10,7 @@ import {
   ScrollView,
   Checkbox,
   Pressable,
+  Link,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React from "react";
@@ -55,13 +56,21 @@ export default function DesignSystemScreen() {
         </Menu>
       </View>
 
+      <Link to={{ screen: "EncryptDecryptImageTest" }}>
+        Encrypt / Decrypt Image
+      </Link>
       <Text>Checkbox</Text>
       <Checkbox value="test" accessibilityLabel="This is a dummy checkbox" />
       <Checkbox
         value="test"
         accessibilityLabel="This is a dummy checkbox"
         defaultIsChecked
-      />
+      >
+        Software Development{" "}
+        <Link to={{ screen: "EncryptDecryptImageTest" }}>
+          Encrypt / Decrypt Image
+        </Link>
+      </Checkbox>
       <Checkbox
         value="test"
         accessibilityLabel="This is a dummy checkbox"
