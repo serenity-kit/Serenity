@@ -2,8 +2,13 @@ import { DrawerContentScrollView } from "@react-navigation/drawer";
 import { StyleSheet } from "react-native";
 import {
   Button,
+  Icon,
   Link,
+  Menu,
+  MenuItem,
+  Pressable,
   Text,
+  tw,
   useIsPermanentLeftSidebar,
   View,
 } from "@serenity-tools/ui";
@@ -12,6 +17,7 @@ import {
   useCreateWorkspaceMutation,
   useCreateDocumentMutation,
   useDocumentPreviewsQuery,
+  useWorkspaceQuery,
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 import { useRoute } from "@react-navigation/native";
@@ -21,6 +27,8 @@ export default function Sidebar(props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
+  const [workspaceResult] = useWorkspaceQuery();
+
   const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [documentPreviewsResult, refetchDocumentPreviews] =
@@ -60,6 +68,72 @@ export default function Sidebar(props) {
           Close Sidebar
         </Button>
       )}
+      <View>
+        <Menu
+          trigger={(triggerProps) => {
+            return (
+              <Pressable
+                accessibilityLabel="More options menu"
+                {...triggerProps}
+                style={tw`flex flex-row`}
+              >
+                <Text>
+                  {workspaceResult.fetching
+                    ? " "
+                    : workspaceResult.data?.workspace?.name}
+                </Text>
+                <Icon name="arrow-down-s-fill" />
+              </Pressable>
+            );
+          }}
+        >
+          {workspacesResult.fetching
+            ? null
+            : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
+                workspace === null || workspace === undefined ? null : (
+                  <Link
+                    key={workspace.id}
+                    to={{
+                      screen: "Workspace",
+                      params: {
+                        workspaceId: workspace.id,
+                        screen: "Dashboard",
+                      },
+                    }}
+                  >
+                    {workspace.name}
+                  </Link>
+                )
+              )}
+        </Menu>
+        {workspacesResult.fetching
+          ? null
+          : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
+              workspace === null || workspace === undefined ? null : (
+                <Link
+                  key={workspace.id}
+                  to={{
+                    screen: "Workspace",
+                    params: {
+                      workspaceId: workspace.id,
+                      screen: "Dashboard",
+                    },
+                  }}
+                >
+                  {workspace.name}
+                </Link>
+              )
+            )}
+      </View>
+
+      <Link
+        to={{
+          screen: "Workspace",
+          params: { workspaceId: route.params.workspaceId, screen: "Settings" },
+        }}
+      >
+        Settings
+      </Link>
       <Link to={{ screen: "DevDashboard" }}>Dev Dashboard</Link>
       <Link
         to={{
@@ -80,39 +154,6 @@ export default function Sidebar(props) {
       >
         Libsodium Test Screen
       </Link>
-      <View>
-        {workspacesResult.fetching
-          ? null
-          : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
-              workspace === null ? null : (
-                <View style={styles.workspaceListItem} key={workspace.id}>
-                  <Link
-                    style={styles.workspaceListItemLabel}
-                    key={workspace?.id}
-                    to={{
-                      screen: "Workspace",
-                      params: {
-                        workspaceId: workspace.id,
-                        screen: "Dashboard",
-                      },
-                    }}
-                  >
-                    {workspace?.name}
-                  </Link>
-                  <Button
-                    onPressIn={() => {
-                      props.navigation.navigate("Workspace", {
-                        workspaceId: workspace.id,
-                        screen: "Settings",
-                      });
-                    }}
-                  >
-                    Settings
-                  </Button>
-                </View>
-              )
-            )}
-      </View>
       <View>
         <Button onPress={createDocument}>Create Page</Button>
       </View>
@@ -168,14 +209,3 @@ export default function Sidebar(props) {
     </DrawerContentScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  workspaceListItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  workspaceListItemLabel: {
-    flexGrow: 1,
-  },
-});

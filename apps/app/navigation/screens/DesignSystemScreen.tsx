@@ -9,10 +9,10 @@ import {
   MenuItem,
   ScrollView,
   Checkbox,
+  Pressable,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React from "react";
-import { Pressable } from "native-base";
 
 export default function DesignSystemScreen() {
   return (
@@ -39,7 +39,7 @@ export default function DesignSystemScreen() {
               <Pressable
                 accessibilityLabel="More options menu"
                 {...triggerProps}
-                style={tw`block`}
+                style={tw``}
               >
                 <Icon name="more-2-line" />
               </Pressable>
