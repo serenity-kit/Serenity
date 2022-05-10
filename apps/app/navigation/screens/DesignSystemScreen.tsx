@@ -39,7 +39,7 @@ export default function DesignSystemScreen() {
               <Pressable
                 accessibilityLabel="More options menu"
                 {...triggerProps}
-                style={tw`block`}
+                style={tw``}
               >
                 <Icon name="more-2-line" />
               </Pressable>
