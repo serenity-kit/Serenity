@@ -6,7 +6,7 @@ const classes =
 const activeClasses = "bg-primary-400";
 
 type ButtonProps = {
-  onClick: () => void;
+  onClick?: () => void;
   isActive: boolean;
   children: React.ReactNode;
 };

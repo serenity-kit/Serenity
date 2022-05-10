@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet } from "react-native";
+import { Stack } from "@mobily/stacks";
 import { tw } from "../../tailwind";
 import { Pressable, PressableProps } from "../pressable/Pressable";
 
@@ -31,7 +32,9 @@ export const SidebarButton = React.forwardRef(
           _web: { style: [{ outlineWidth: 0 }, tw`se-inset-focus-mini`] },
         }}
       >
-        {children}
+        <Stack space={2} horizontal={true} align="left">
+          {children}
+        </Stack>
       </Pressable>
     );
   }

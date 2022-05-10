@@ -1,5 +1,5 @@
 import React from "react";
-import { tw, View } from "@serenity-tools/ui";
+import { SidebarButton, tw, View } from "@serenity-tools/ui";
 import { Editor } from "@tiptap/react";
 import EditorButton from "../editorButton/EditorButton";
 import { Level } from "@tiptap/extension-heading";
@@ -18,74 +18,107 @@ export default function EditorSidebar({
       <div>
         {headingLevels.map((lvl) => {
           return (
-            <EditorButton
+            <SidebarButton
               key={lvl}
-              onClick={() =>
+              onPress={() =>
                 editor?.chain().focus().toggleHeading({ level: lvl }).run()
               }
-              isActive={editor?.isActive("heading", { level: lvl }) || false}
             >
-              H{lvl}
-            </EditorButton>
+              <EditorButton
+                isActive={editor?.isActive("heading", { level: lvl }) || false}
+              >
+                H{lvl}
+              </EditorButton>
+              Headline {lvl}
+            </SidebarButton>
           );
         })}
-        <EditorButton
-          onClick={() => editor?.chain().focus().toggleBold().run()}
-          isActive={editor?.isActive("bold") || false}
+        <SidebarButton
+          onPress={() => editor?.chain().focus().toggleBold().run()}
         >
-          B
-        </EditorButton>
-        <EditorButton
-          onClick={() => editor?.chain().focus().toggleItalic().run()}
-          isActive={editor?.isActive("italic") || false}
+          <EditorButton
+            onClick={() => undefined}
+            isActive={editor?.isActive("bold") || false}
+          >
+            B
+          </EditorButton>
+          Bold
+        </SidebarButton>
+
+        <SidebarButton
+          onPress={() => editor?.chain().focus().toggleItalic().run()}
         >
-          I
-        </EditorButton>
+          <EditorButton isActive={editor?.isActive("italic") || false}>
+            I
+          </EditorButton>
+          Italic
+        </SidebarButton>
+
         {/* styling dummy */}
-        <EditorButton
-          onClick={() =>
+        <SidebarButton
+          onPress={() =>
             editor?.chain().focus().toggleLink({ href: "#" }).run()
           }
-          isActive={editor?.isActive("link") || false}
         >
-          L
-        </EditorButton>
-        <EditorButton
-          onClick={() => editor?.chain().focus().toggleCode().run()}
-          isActive={editor?.isActive("code") || false}
+          <EditorButton isActive={editor?.isActive("link") || false}>
+            L
+          </EditorButton>
+          Link
+        </SidebarButton>
+
+        <SidebarButton
+          onPress={() => editor?.chain().focus().toggleCode().run()}
         >
-          C
-        </EditorButton>
-        <EditorButton
-          onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
-          isActive={editor?.isActive("codeBlock") || false}
+          <EditorButton isActive={editor?.isActive("code") || false}>
+            C
+          </EditorButton>
+          Code
+        </SidebarButton>
+
+        <SidebarButton
+          onPress={() => editor?.chain().focus().toggleCodeBlock().run()}
         >
-          K
-        </EditorButton>
-        <EditorButton
-          onClick={() => editor?.chain().focus().toggleBlockquote().run()}
-          isActive={editor?.isActive("blockquote") || false}
+          <EditorButton isActive={editor?.isActive("codeBlock") || false}>
+            K
+          </EditorButton>
+          Codeblock
+        </SidebarButton>
+
+        <SidebarButton
+          onPress={() => editor?.chain().focus().toggleBlockquote().run()}
         >
-          Q
-        </EditorButton>
-        <EditorButton
-          onClick={() => editor?.chain().focus().toggleBulletList().run()}
-          isActive={editor?.isActive("bulletList") || false}
+          <EditorButton isActive={editor?.isActive("blockquote") || false}>
+            Q
+          </EditorButton>
+          Blockquote
+        </SidebarButton>
+
+        <SidebarButton
+          onPress={() => editor?.chain().focus().toggleBulletList().run()}
         >
-          &sdot;
-        </EditorButton>
-        <EditorButton
-          onClick={() => editor?.chain().focus().toggleOrderedList().run()}
-          isActive={editor?.isActive("orderedList") || false}
+          <EditorButton isActive={editor?.isActive("bulletList") || false}>
+            &sdot;
+          </EditorButton>
+          Bullet-List
+        </SidebarButton>
+
+        <SidebarButton
+          onPress={() => editor?.chain().focus().toggleOrderedList().run()}
         >
-          1
-        </EditorButton>
-        <EditorButton
-          onClick={() => editor?.chain().focus().toggleTaskList().run()}
-          isActive={editor?.isActive("taskList") || false}
+          <EditorButton isActive={editor?.isActive("orderedList") || false}>
+            1
+          </EditorButton>
+          Numbered List
+        </SidebarButton>
+
+        <SidebarButton
+          onPress={() => editor?.chain().focus().toggleTaskList().run()}
         >
-          T
-        </EditorButton>
+          <EditorButton isActive={editor?.isActive("taskList") || false}>
+            T
+          </EditorButton>
+          Checklist
+        </SidebarButton>
       </div>
     </View>
   );
