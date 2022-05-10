@@ -342,13 +342,11 @@ export type InitializeRegistrationMutationVariables = Exact<{
   input: ClientOprfRegistrationChallengeRequest;
 }>;
 
-
 export type InitializeRegistrationMutation = { __typename?: 'Mutation', initializeRegistration?: { __typename?: 'ClientOprfRegistrationChallengeResult', serverPublicKey: string, oprfPublicKey: string, oprfChallengeResponse: string } | null };
 
 export type UpdateWorkspaceMutationVariables = Exact<{
   input: UpdateWorkspaceInput;
 }>;
-
 
 export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null } | null } | null };
 
@@ -364,7 +362,6 @@ export type DocumentPreviewsQuery = { __typename?: 'Query', documentPreviews?: {
 export type WorkspaceQueryVariables = Exact<{
   id?: InputMaybe<Scalars['ID']>;
 }>;
-
 
 export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', username: string, isAdmin: boolean }> | null } | null };
 
@@ -474,6 +471,7 @@ export const UpdateWorkspaceDocument = gql`
 export function useUpdateWorkspaceMutation() {
   return Urql.useMutation<UpdateWorkspaceMutation, UpdateWorkspaceMutationVariables>(UpdateWorkspaceDocument);
 };
+
 export const DocumentPreviewsDocument = gql`
     query documentPreviews($workspaceId: ID!, $first: Int! = 100, $after: String) {
   documentPreviews(workspaceId: $workspaceId, first: $first, after: $after) {
