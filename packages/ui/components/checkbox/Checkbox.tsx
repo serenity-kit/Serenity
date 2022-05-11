@@ -20,6 +20,7 @@ export const Checkbox = React.forwardRef(
         {...rest}
         style={[styles.default, rest.style]}
         borderWidth={1}
+        borderRadius={2}
         _disabled={{
           style: [tw`bg-white`, styles.disabled],
         }}
