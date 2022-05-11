@@ -48,7 +48,10 @@ export const Checkbox = React.forwardRef(
         }}
       >
         {/* needs to be wrapped in Text so it can handle multiple elements e.g. Text + Link */}
-        <Text>{rest.children}</Text>
+        {/* <Text>{rest.children}</Text> */}
+
+        {/* TODO use with Text wrapped or pass stylings to Checkbox-TextElement ??? */}
+        {rest.children}
       </NativeBaseCheckbox>
     );
   }

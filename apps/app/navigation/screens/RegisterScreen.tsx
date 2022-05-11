@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Text, View, Input, Button, tw, Link } from "@serenity-tools/ui";
+import {
+  Text,
+  View,
+  Input,
+  Box,
+  Button,
+  Checkbox,
+  tw,
+  Link,
+} from "@serenity-tools/ui";
 import {
   createClientKeyPair,
   createOprfChallenge,
@@ -185,9 +194,19 @@ export default function RegisterScreen(props) {
     setPassword(password);
   };
   return (
-    <View style={tw`bg-gray-100 justify-center items-center flex-auto`}>
-      <View style={tw`max-w-md p-10`}>
-        <Text>Register</Text>
+    <View
+      style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
+    >
+      {/* TODO use this as classes or default/variant ? */}
+      <Box style={tw`max-w-md w-full`}>
+        <View>
+          <Text style={tw`h1 text-center`}>Register</Text>
+          <Text style={tw`text-center text-muted`}>
+            Sign up and start your free trial!
+            <br />
+            No credit card required.
+          </Text>
+        </View>
 
         {hasGqlError && (
           <View>
@@ -201,28 +220,46 @@ export default function RegisterScreen(props) {
           </View>
         )}
 
-        <Text>Email</Text>
-        <Input
-          keyboardType="email-address"
-          value={username}
-          onChangeText={onUsernameChangeText}
-          placeholder="Enter your email …"
-        />
+        <View>
+          <Text>Email</Text>
+          <Input
+            keyboardType="email-address"
+            value={username}
+            onChangeText={onUsernameChangeText}
+            placeholder="Enter your email …"
+          />
+        </View>
 
-        <Text>Password</Text>
-        <Input
-          secureTextEntry
-          value={password}
-          onChangeText={onPasswordChangeText}
-          placeholder="Enter your password …"
-        />
+        <View>
+          <Text>Password</Text>
+          <Input
+            secureTextEntry
+            value={password}
+            onChangeText={onPasswordChangeText}
+            placeholder="Enter your password …"
+          />
+        </View>
+
+        <Checkbox
+          value="dummy"
+          accessibilityLabel="This is the terms and condition checkbox"
+        >
+          <Text style={tw`small text-muted`}>
+            Yes, I do agree to Serenity's{" "}
+            <Link to={{ screen: "NotFound" }}>terms of services</Link> and{" "}
+            <Link to={{ screen: "NotFound" }}>privacy policy</Link>.
+          </Text>
+        </Checkbox>
 
         <Button onPress={onRegisterPress}>Register</Button>
-      </View>
-      <View>
-        <Text>Already have an account? </Text>
-        <Link to={{ screen: "Login" }}>Login here</Link>
-      </View>
+
+        <View style={tw`text-center`}>
+          <Text style={tw`small text-muted`}>Already have an account? </Text>
+          <Link style={tw`small`} to={{ screen: "Login" }}>
+            Login here
+          </Link>
+        </View>
+      </Box>
     </View>
   );
 }
