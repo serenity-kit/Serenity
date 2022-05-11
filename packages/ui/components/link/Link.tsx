@@ -23,7 +23,8 @@ export function Link<ParamList extends ReactNavigation.RootParamList>(
   return (
     <ReactNavigationLink
       {...props}
-      // @ts-expect-error allow style overwrite
+      // @ts-expect-error - allow style overwrite
+      // prettier-ignore - otherwise code breaks
       style={tw.style(
         `text-primary-500 dark:text-primary-500 underline`,
         props.style
