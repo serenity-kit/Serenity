@@ -68,7 +68,7 @@ import { Table2 } from "./icons/Table2";
 import { Text } from "./icons/Text";
 import { Underline } from "./icons/Underline";
 
-export type Props = {
+export type IconProps = {
   name:
     | "add-line"
     | "archive-line"
@@ -141,7 +141,7 @@ export type Props = {
   size?: number;
 };
 
-export const Icon = (props: Props) => {
+export const Icon = (props: IconProps) => {
   const { name } = props;
   const color = props.color ?? (tw.color("gray-900") as string);
   const size = props.size ?? 24;
