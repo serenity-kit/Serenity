@@ -1,5 +1,11 @@
 import React from "react";
-import { EditorSidebarIcon, SidebarButton, tw, View } from "@serenity-tools/ui";
+import {
+  EditorSidebarIcon,
+  SidebarButton,
+  Text,
+  tw,
+  View,
+} from "@serenity-tools/ui";
 import { Editor } from "@tiptap/react";
 import { Level } from "@tiptap/extension-heading";
 
@@ -27,7 +33,7 @@ export default function EditorSidebar({
                 isActive={editor?.isActive("heading", { level: lvl }) || false}
                 name="heading"
               />
-              Headline {lvl}
+              <Text>Headline {lvl}</Text>
             </SidebarButton>
           );
         })}
@@ -38,7 +44,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("bold") || false}
             name="bold"
           />
-          Bold
+          <Text>Bold</Text>
         </SidebarButton>
 
         <SidebarButton
@@ -48,7 +54,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("italic") || false}
             name="italic"
           />
-          Italic
+          <Text>Italic</Text>
         </SidebarButton>
 
         {/* styling dummy */}
@@ -61,7 +67,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("link") || false}
             name="link"
           />
-          Link
+          <Text>Link</Text>
         </SidebarButton>
 
         <SidebarButton
@@ -71,7 +77,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("code") || false}
             name="code-view"
           />
-          Code
+          <Text>Code</Text>
         </SidebarButton>
 
         <SidebarButton
@@ -81,7 +87,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("codeBlock") || false}
             name="code-s-slash-line"
           />
-          Codeblock
+          <Text>Codeblock</Text>
         </SidebarButton>
 
         <SidebarButton
@@ -91,7 +97,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("blockquote") || false}
             name="question-mark"
           />
-          Blockquote
+          <Text>Blockquote</Text>
         </SidebarButton>
 
         <SidebarButton
@@ -101,7 +107,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("bulletList") || false}
             name="list-unordered"
           />
-          Bullet-List
+          <Text>Bullet-List</Text>
         </SidebarButton>
 
         <SidebarButton
@@ -111,7 +117,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("orderedList") || false}
             name="list-ordered"
           />
-          Numbered List
+          <Text>Numbered List</Text>
         </SidebarButton>
 
         <SidebarButton
@@ -121,7 +127,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("taskList") || false}
             name="list-check-2"
           />
-          Checklist
+          <Text>Checklist</Text>
         </SidebarButton>
       </div>
     </View>
