@@ -62,7 +62,7 @@ export default function Sidebar(props) {
   };
 
   return (
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView {...props} style={tw`bg-gray-100`}>
       {!isPermanentLeftSidebar && (
         <Button
           onPress={() => {

@@ -1,7 +1,6 @@
 import React from "react";
-import { SidebarButton, tw, View } from "@serenity-tools/ui";
+import { EditorSidebarIcon, SidebarButton, tw, View } from "@serenity-tools/ui";
 import { Editor } from "@tiptap/react";
-import EditorButton from "../editorButton/EditorButton";
 import { Level } from "@tiptap/extension-heading";
 
 type EditorSidebarProps = {
@@ -14,7 +13,7 @@ export default function EditorSidebar({
   headingLevels,
 }: EditorSidebarProps) {
   return (
-    <View style={tw`w-60 h-full border-l border-gray-200`}>
+    <View style={tw`w-60 h-full border-l border-gray-200 bg-gray-100`}>
       <div>
         {headingLevels.map((lvl) => {
           return (
@@ -24,11 +23,10 @@ export default function EditorSidebar({
                 editor?.chain().focus().toggleHeading({ level: lvl }).run()
               }
             >
-              <EditorButton
+              <EditorSidebarIcon
                 isActive={editor?.isActive("heading", { level: lvl }) || false}
-              >
-                H{lvl}
-              </EditorButton>
+                name="heading"
+              />
               Headline {lvl}
             </SidebarButton>
           );
@@ -36,21 +34,20 @@ export default function EditorSidebar({
         <SidebarButton
           onPress={() => editor?.chain().focus().toggleBold().run()}
         >
-          <EditorButton
-            onClick={() => undefined}
+          <EditorSidebarIcon
             isActive={editor?.isActive("bold") || false}
-          >
-            B
-          </EditorButton>
+            name="bold"
+          />
           Bold
         </SidebarButton>
 
         <SidebarButton
           onPress={() => editor?.chain().focus().toggleItalic().run()}
         >
-          <EditorButton isActive={editor?.isActive("italic") || false}>
-            I
-          </EditorButton>
+          <EditorSidebarIcon
+            isActive={editor?.isActive("italic") || false}
+            name="italic"
+          />
           Italic
         </SidebarButton>
 
@@ -60,63 +57,70 @@ export default function EditorSidebar({
             editor?.chain().focus().toggleLink({ href: "#" }).run()
           }
         >
-          <EditorButton isActive={editor?.isActive("link") || false}>
-            L
-          </EditorButton>
+          <EditorSidebarIcon
+            isActive={editor?.isActive("link") || false}
+            name="link"
+          />
           Link
         </SidebarButton>
 
         <SidebarButton
           onPress={() => editor?.chain().focus().toggleCode().run()}
         >
-          <EditorButton isActive={editor?.isActive("code") || false}>
-            C
-          </EditorButton>
+          <EditorSidebarIcon
+            isActive={editor?.isActive("code") || false}
+            name="code-view"
+          />
           Code
         </SidebarButton>
 
         <SidebarButton
           onPress={() => editor?.chain().focus().toggleCodeBlock().run()}
         >
-          <EditorButton isActive={editor?.isActive("codeBlock") || false}>
-            K
-          </EditorButton>
+          <EditorSidebarIcon
+            isActive={editor?.isActive("codeBlock") || false}
+            name="code-s-slash-line"
+          />
           Codeblock
         </SidebarButton>
 
         <SidebarButton
           onPress={() => editor?.chain().focus().toggleBlockquote().run()}
         >
-          <EditorButton isActive={editor?.isActive("blockquote") || false}>
-            Q
-          </EditorButton>
+          <EditorSidebarIcon
+            isActive={editor?.isActive("blockquote") || false}
+            name="question-mark"
+          />
           Blockquote
         </SidebarButton>
 
         <SidebarButton
           onPress={() => editor?.chain().focus().toggleBulletList().run()}
         >
-          <EditorButton isActive={editor?.isActive("bulletList") || false}>
-            &sdot;
-          </EditorButton>
+          <EditorSidebarIcon
+            isActive={editor?.isActive("bulletList") || false}
+            name="list-unordered"
+          />
           Bullet-List
         </SidebarButton>
 
         <SidebarButton
           onPress={() => editor?.chain().focus().toggleOrderedList().run()}
         >
-          <EditorButton isActive={editor?.isActive("orderedList") || false}>
-            1
-          </EditorButton>
+          <EditorSidebarIcon
+            isActive={editor?.isActive("orderedList") || false}
+            name="list-ordered"
+          />
           Numbered List
         </SidebarButton>
 
         <SidebarButton
           onPress={() => editor?.chain().focus().toggleTaskList().run()}
         >
-          <EditorButton isActive={editor?.isActive("taskList") || false}>
-            T
-          </EditorButton>
+          <EditorSidebarIcon
+            isActive={editor?.isActive("taskList") || false}
+            name="list-check-2"
+          />
           Checklist
         </SidebarButton>
       </div>

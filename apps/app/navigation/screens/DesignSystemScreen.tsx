@@ -12,6 +12,7 @@ import {
   Checkbox,
   Pressable,
   Link,
+  EditorSidebarIcon,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React from "react";
@@ -85,6 +86,12 @@ export default function DesignSystemScreen() {
         isDisabled
         isChecked
       />
+
+      <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
+        Editor Icons
+      </Text>
+      <EditorSidebarIcon name="bold" />
+      <EditorSidebarIcon name="bold" isActive />
 
       <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>Icons</Text>
       <Text style={tw`mb-1`}>Marks</Text>
