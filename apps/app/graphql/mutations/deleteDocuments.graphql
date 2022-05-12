@@ -1,0 +1,5 @@
+mutation deleteDocuments($input: DeleteDocumentsInput!) {
+  deleteDocuments(input: $input) {
+    status
+  }
+}

@@ -16,6 +16,8 @@ import {
   useWorkspacesQuery,
   useCreateWorkspaceMutation,
   useCreateDocumentMutation,
+  useDeleteDocumentsMutation,
+  useUpdateDocumentNameMutation,
   useDocumentPreviewsQuery,
   useWorkspaceQuery,
 } from "../../generated/graphql";
@@ -35,6 +37,8 @@ export default function Sidebar(props) {
 
   const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
   const [, createDocumentMutation] = useCreateDocumentMutation();
+  const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
+  const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const [documentPreviewsResult, refetchDocumentPreviews] =
     useDocumentPreviewsQuery({
       variables: { workspaceId: route.params.workspaceId },
@@ -59,6 +63,28 @@ export default function Sidebar(props) {
       input: { id, workspaceId: route.params.workspaceId },
     });
     refetchDocumentPreviews();
+  };
+
+  const deleteDocument = async (id: string) => {
+    await deleteDocumentsMutation({
+      input: {
+        ids: [id],
+      },
+    });
+    refetchDocumentPreviews();
+  };
+
+  const updateDocumentName = async (id: string) => {
+    const name = window.prompt("Enter a document name");
+    if (name && name.length > 0) {
+      const updatedDocument = await updateDocumentNameMutation({
+        input: {
+          id,
+          name,
+        },
+      });
+      refetchDocumentPreviews();
+    }
   };
 
   return (
@@ -191,21 +217,37 @@ export default function Sidebar(props) {
               return null;
             }
             return (
-              <Link
-                key={documentPreview.id}
-                to={{
-                  screen: "Workspace",
-                  params: {
-                    workspaceId: route.params.workspaceId,
-                    screen: "Page",
+              <View key={documentPreview.id} style={styles.documentPreviewItem}>
+                <Link
+                  style={styles.documentPreviewLabel}
+                  to={{
+                    screen: "Workspace",
                     params: {
-                      pageId: documentPreview.id,
+                      workspaceId: route.params.workspaceId,
+                      screen: "Page",
+                      params: {
+                        pageId: documentPreview.id,
+                      },
                     },
-                  },
-                }}
-              >
-                {documentPreview?.name}
-              </Link>
+                  }}
+                >
+                  {documentPreview?.name}
+                </Link>
+                <Button
+                  onPress={() => {
+                    updateDocumentName(documentPreview?.id);
+                  }}
+                >
+                  Change Name
+                </Button>
+                <Button
+                  onPress={() => {
+                    deleteDocument(documentPreview?.id);
+                  }}
+                >
+                  Delete
+                </Button>
+              </View>
             );
           }
         )
@@ -213,3 +255,16 @@ export default function Sidebar(props) {
     </DrawerContentScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  documentPreviewItem: {
+    flexDirection: "row",
+    border: "1px solid black",
+    alignItems: "center",
+  },
+  documentPreviewLabel: {
+    border: "1px solid black",
+    flexGrow: 1,
+    height: "100%",
+  },
+});
