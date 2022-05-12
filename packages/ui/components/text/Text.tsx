@@ -4,10 +4,10 @@ import { tw } from "../../tailwind";
 
 export type TextProps = RNText["props"];
 
-const styles = StyleSheet.create({
-  text: tw`text-base text-gray-900 dark:text-white`,
-});
-
 export function Text(props: TextProps) {
+  const styles = StyleSheet.create({
+    text: tw`text-base text-gray-900 dark:text-white`,
+  });
+
   return <RNText {...props} style={[styles.text, props.style]} />;
 }

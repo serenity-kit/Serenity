@@ -6,13 +6,13 @@ import { Pressable, PressableProps } from "../pressable/Pressable";
 
 export type SidebarButtonProps = PressableProps & {};
 
-const styles = StyleSheet.create({
-  hover: tw`bg-gray-200`,
-  disabled: tw`bg-transparent opacity-50`, // TODO opacity tbd
-});
-
 export const SidebarButton = React.forwardRef(
   ({ children, ...rest }: SidebarButtonProps, ref: any) => {
+    const styles = StyleSheet.create({
+      hover: tw`bg-gray-200`,
+      disabled: tw`bg-transparent opacity-50`, // TODO opacity tbd
+    });
+
     return (
       <Pressable
         ref={ref}

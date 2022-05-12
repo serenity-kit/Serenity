@@ -3,12 +3,12 @@ import { StyleSheet } from "react-native";
 import { Input as NbInput, IInputProps } from "native-base";
 import { tw } from "../../tailwind";
 
-const styles = StyleSheet.create({
-  wrapper: tw`rounded`,
-  input: tw`text-base text-gray-900 px-4 py-3`,
-});
-
 export const Input = forwardRef((props: IInputProps, ref) => {
+  const styles = StyleSheet.create({
+    wrapper: tw`rounded`,
+    input: tw`text-base text-gray-900 px-4 py-3`,
+  });
+
   return (
     <NbInput
       // @ts-ignore

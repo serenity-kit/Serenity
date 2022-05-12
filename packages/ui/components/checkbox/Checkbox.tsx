@@ -6,14 +6,13 @@ import { Checkbox as NativeBaseCheckbox, ICheckboxProps } from "native-base";
 
 type CheckboxProps = ICheckboxProps & {};
 
-const styles = StyleSheet.create({
-  default: tw`bg-white border-gray-800`,
-  // nb-override: opacity
-  disabled: tw`border-gray-300 opacity-100`,
-});
-
 export const Checkbox = React.forwardRef(
   ({ ...rest }: CheckboxProps, ref: any) => {
+    const styles = StyleSheet.create({
+      default: tw`bg-white border-gray-800`,
+      disabled: tw`border-gray-300 opacity-100`, // nb-override: opacity
+    });
+
     return (
       <NativeBaseCheckbox
         ref={ref}

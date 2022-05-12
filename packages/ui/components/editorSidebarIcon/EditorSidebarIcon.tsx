@@ -9,16 +9,17 @@ export type EditorSidebarIconProps = IconProps & {
   activeColor?: string;
 };
 
-const styles = StyleSheet.create({
-  // TODO change to hairline
-  default: tw`items-center justify-center bg-white w-6 h-6 border-solid border border-gray-300 rounded`,
-  active: tw`bg-primary-200 border-primary-200`,
-});
-
 export const EditorSidebarIcon = (props: EditorSidebarIconProps) => {
   const size = props.size || 16;
   const color = props.color || tw.color("gray-800");
   const activeColor = props.activeColor || tw.color("primary-500");
+
+  const styles = StyleSheet.create({
+    // TODO change to hairline
+    default: tw`items-center justify-center bg-white w-6 h-6 border-solid border border-gray-300 rounded`,
+    active: tw`bg-primary-200 border-primary-200`,
+  });
+
   return (
     <View style={[styles.default, props.isActive ? styles.active : undefined]}>
       <Icon

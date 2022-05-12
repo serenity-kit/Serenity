@@ -76,6 +76,7 @@ module.exports = {
   plugins: [
     plugin((params) => {
       params.addUtilities({
+        // Important: do not use prefixes here like md: -> they crash the build
         "se-outline-focus": {
           boxShadow: `0px 0px 0px 0.25rem ${customTheme.colors.primary["200"]}`, // web-only
         },

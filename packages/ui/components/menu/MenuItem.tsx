@@ -5,12 +5,12 @@ import { Menu as NativeBaseMenu, IMenuItemProps } from "native-base";
 
 type MenuItemProps = IMenuItemProps & {};
 
-const styles = StyleSheet.create({
-  menuItem: tw``,
-});
-
 export const MenuItem = React.forwardRef(
   ({ children, ...rest }: MenuItemProps, ref: any) => {
+    const styles = StyleSheet.create({
+      menuItem: tw``,
+    });
+
     return (
       <NativeBaseMenu.Item
         ref={ref}

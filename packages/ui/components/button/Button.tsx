@@ -20,11 +20,6 @@ type ComputeStyleParams = {
   isFocused: boolean;
 };
 
-const styles = StyleSheet.create({
-  wrapper: tw`rounded px-4 py-3 bg-primary-500`,
-  text: tw`text-base text-center text-gray-100`,
-});
-
 const computeStyle = ({
   disabled,
   isPressed,
@@ -44,6 +39,10 @@ const computeStyle = ({
 
 export const Button = forwardRef((props: Props, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
+  const styles = StyleSheet.create({
+    wrapper: tw`rounded px-4 py-3 bg-primary-500`,
+    text: tw`text-base text-center text-gray-100`,
+  });
 
   return (
     <Pressable
