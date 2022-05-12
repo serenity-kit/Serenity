@@ -9,6 +9,7 @@ import {
   Checkbox,
   tw,
   Link,
+  LabeledInput,
 } from "@serenity-tools/ui";
 import {
   createClientKeyPair,
@@ -222,29 +223,21 @@ export default function RegisterScreen(props) {
           </View>
         )}
 
-        <View>
-          <Text small muted>
-            Email
-          </Text>
-          <Input
-            keyboardType="email-address"
-            value={username}
-            onChangeText={onUsernameChangeText}
-            placeholder="Enter your email …"
-          />
-        </View>
+        <LabeledInput
+          label={"Email"}
+          keyboardType="email-address"
+          value={username}
+          onChangeText={onUsernameChangeText}
+          placeholder="Enter your email …"
+        />
 
-        <View>
-          <Text small muted>
-            Password
-          </Text>
-          <Input
-            secureTextEntry
-            value={password}
-            onChangeText={onPasswordChangeText}
-            placeholder="Enter your password …"
-          />
-        </View>
+        <LabeledInput
+          label={"Password"}
+          secureTextEntry
+          value={password}
+          onChangeText={onPasswordChangeText}
+          placeholder="Enter your password …"
+        />
 
         <Checkbox
           value="dummy"

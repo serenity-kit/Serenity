@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, Box, Button, Input, tw, Link } from "@serenity-tools/ui";
+import {
+  Text,
+  View,
+  Box,
+  Button,
+  Input,
+  tw,
+  Link,
+  LabeledInput,
+} from "@serenity-tools/ui";
 import {
   createClientKeyPair,
   createOprfChallenge,
@@ -229,29 +238,21 @@ export default function LoginScreen(props) {
           </View>
         )}
 
-        <View>
-          <Text small muted style={tw`mb-1`}>
-            Email
-          </Text>
-          <Input
-            keyboardType="email-address"
-            value={username}
-            onChangeText={onUsernameChangeText}
-            placeholder="Enter your email …"
-          />
-        </View>
+        <LabeledInput
+          label={"Email"}
+          keyboardType="email-address"
+          value={username}
+          onChangeText={onUsernameChangeText}
+          placeholder="Enter your email …"
+        />
 
-        <View>
-          <Text small muted style={tw`mb-1`}>
-            Password
-          </Text>
-          <Input
-            secureTextEntry
-            value={password}
-            onChangeText={onPasswordChangeText}
-            placeholder="Enter your password …"
-          />
-        </View>
+        <LabeledInput
+          label={"Password"}
+          secureTextEntry
+          value={password}
+          onChangeText={onPasswordChangeText}
+          placeholder="Enter your password …"
+        />
 
         <Button onPress={onLoginPress}>Log in</Button>
         <View style={tw`text-center`}>
