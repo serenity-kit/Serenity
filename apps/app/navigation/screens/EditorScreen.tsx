@@ -4,6 +4,7 @@ import * as Y from "yjs";
 
 import { tw, View } from "@serenity-tools/ui";
 import { WorkspaceDrawerScreenProps } from "../../types";
+import { useWindowDimensions } from "react-native";
 
 /*
 Hello World
@@ -37,6 +38,7 @@ const editorContentAsYjsUpdateV2 = Uint8Array.from([
 export default function EditorScreen({
   navigation,
 }: WorkspaceDrawerScreenProps<"Editor">) {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [yDoc] = useState(() => {
     const yDoc = new Y.Doc();
     Y.applyUpdateV2(yDoc, editorContentAsYjsUpdateV2);

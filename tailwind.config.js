@@ -76,6 +76,7 @@ module.exports = {
   plugins: [
     plugin((params) => {
       params.addUtilities({
+        // Important: do not use prefixes here like md: -> they crash the build
         "se-outline-focus": {
           boxShadow: `0px 0px 0px 0.25rem ${customTheme.colors.primary["200"]}`, // web-only
         },
@@ -91,6 +92,11 @@ module.exports = {
         "se-outline-error-mini": {
           boxShadow: `0px 0px 0px 0.125rem ${customTheme.extend.colors.error["200"]}`, // web-only
         },
+        h1: `text-h1 font-bold`,
+        h2: `text-h2 font-bold`,
+        h3: `text-h3 font-bold`,
+        small: `text-xs`,
+        "text-muted": `text-gray-600`,
       });
     }),
   ],

@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, Button, Input, tw, Link } from "@serenity-tools/ui";
+import {
+  Text,
+  View,
+  Box,
+  Button,
+  Input,
+  tw,
+  Link,
+  LabeledInput,
+} from "@serenity-tools/ui";
 import {
   createClientKeyPair,
   createOprfChallenge,
@@ -10,8 +19,10 @@ import {
   useInitializeLoginMutation,
   useFinalizeLoginMutation,
 } from "../../generated/graphql";
+import { useWindowDimensions } from "react-native";
 
 export default function LoginScreen(props) {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [didLoginSucceed, setDidLoginSucceed] = useState(false);
@@ -203,9 +214,17 @@ export default function LoginScreen(props) {
   };
 
   return (
-    <View style={tw`bg-gray-100 justify-center items-center flex-auto`}>
-      <View style={tw`max-w-md p-10`}>
-        <Text>Login</Text>
+    <View
+      style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
+    >
+      {/* TODO use this as classes or default/variant ? */}
+      <Box style={tw`max-w-md w-full`}>
+        <View>
+          <Text style={tw`h1 text-center`}>Welcome back!</Text>
+          <Text muted style={tw`text-center`}>
+            Log in to your Serenity Account
+          </Text>
+        </View>
 
         {hasGqlError && (
           <View>
@@ -219,32 +238,32 @@ export default function LoginScreen(props) {
           </View>
         )}
 
-        <View>
-          <Text>Email</Text>
-          <Input
-            keyboardType="email-address"
-            value={username}
-            onChangeText={onUsernameChangeText}
-            placeholder="Enter your email …"
-          />
-        </View>
+        <LabeledInput
+          label={"Email"}
+          keyboardType="email-address"
+          value={username}
+          onChangeText={onUsernameChangeText}
+          placeholder="Enter your email …"
+        />
 
-        <View>
-          <Text>Password</Text>
-          <Input
-            secureTextEntry
-            value={password}
-            onChangeText={onPasswordChangeText}
-            placeholder="Enter your password …"
-          />
-        </View>
+        <LabeledInput
+          label={"Password"}
+          secureTextEntry
+          value={password}
+          onChangeText={onPasswordChangeText}
+          placeholder="Enter your password …"
+        />
 
         <Button onPress={onLoginPress}>Log in</Button>
-        <View>
-          <Text>Don't have an account? </Text>
-          <Link to={{ screen: "Register" }}>Register here</Link>
+        <View style={tw`text-center`}>
+          <Text small muted>
+            Don't have an account?{" "}
+          </Text>
+          <Link small to={{ screen: "Register" }}>
+            Register here
+          </Link>
         </View>
-      </View>
+      </Box>
     </View>
   );
 }

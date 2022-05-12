@@ -8,12 +8,12 @@ import {
 
 export type ScrollViewProps = RNScrollViewProps & {};
 
-const styles = StyleSheet.create({
-  scrollView: tw`bg-white`,
-});
-
 export const ScrollView = React.forwardRef(
   ({ children, ...rest }: ScrollViewProps, ref: any) => {
+    const styles = StyleSheet.create({
+      scrollView: tw`bg-white`,
+    });
+
     return (
       <RNScrollView ref={ref} {...rest} style={[styles.scrollView, rest.style]}>
         {children}

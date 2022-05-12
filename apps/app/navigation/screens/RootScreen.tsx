@@ -1,10 +1,12 @@
 import { Text, View } from "@serenity-tools/ui";
 import { useEffect } from "react";
+import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import { WorkspaceDocument, WorkspaceQuery } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types";
 
 export default function RootScreen(props: RootStackScreenProps<"Root">) {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const urqlClient = useClient();
 
   useEffect(() => {

@@ -13,30 +13,58 @@ import {
   Pressable,
   Link,
   EditorSidebarIcon,
+  LabeledInput,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React from "react";
+import { useWindowDimensions } from "react-native";
+import { VStack } from "native-base";
 
 export default function DesignSystemScreen() {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+
   return (
-    <ScrollView style={tw`mt-20 px-4`}>
+    <ScrollView style={tw`px-4 py-6`}>
+      <Text style={tw`mb-4 h2`}>Text</Text>
+      <Text>regular Text</Text>
+      <Text small>small Text</Text>
+      <Text muted>muted Text</Text>
+      <Text small muted>
+        small + muted Text
+      </Text>
+
+      <Text style={tw`mt-6 mb-4 h2`}>Button</Text>
       <Text>Default Button</Text>
       <Button>Login</Button>
       <Text>Disabled Button</Text>
       <Button disabled>Login</Button>
-      <Text>Input</Text>
-      <Input />
-      <Text>Input w/ Value</Text>
-      <Input value="jane@example.com" />
-      <Text>Input w/ Placeholder</Text>
-      <Input placeholder="Enter your email …" />
-      <Text>Input Disabled</Text>
-      <Input disabled value="jane@example.com" />
-      <Text>Input Disabled</Text>
-      <Input disabled placeholder="Enter your email …" />
+
+      <Text style={tw`mt-6 mb-4 h2`}>Input</Text>
+      <VStack space={4}>
+        <Input />
+        <LabeledInput label={"Input"} />
+        <LabeledInput label={"Input w/ Value"} value="jane@example.com" />
+        <LabeledInput
+          label={"Input w/ Placeholder"}
+          placeholder="Enter your email …"
+        />
+        <LabeledInput
+          label={"Input Disabled"}
+          value="jane@example.com"
+          disabled
+        />
+        <LabeledInput
+          label={"Input Disabled"}
+          placeholder="Enter your email …"
+          disabled
+        />
+      </VStack>
+
+      <Text style={tw`mt-6 mb-4 h2`}>SidebarButton</Text>
       <SidebarButton>Hallo</SidebarButton>
       <SidebarButton disabled>Hallo</SidebarButton>
-      <Text>Menu</Text>
+
+      <Text style={tw`mt-6 mb-4 h2`}>Menu</Text>
       <View style={tw`flex flex-row`}>
         <Menu
           trigger={(triggerProps) => {
@@ -60,20 +88,24 @@ export default function DesignSystemScreen() {
         </Menu>
       </View>
 
+      <Text style={tw`mt-6 mb-4 h2`}>Link</Text>
       <Link to={{ screen: "EncryptDecryptImageTest" }}>
         Encrypt / Decrypt Image
       </Link>
-      <Text>Checkbox</Text>
+
+      <Text style={tw`mt-6 mb-4 h2`}>Checkbox</Text>
       <Checkbox value="test" accessibilityLabel="This is a dummy checkbox" />
       <Checkbox
         value="test"
         accessibilityLabel="This is a dummy checkbox"
         defaultIsChecked
       >
-        Software Development{" "}
-        <Link to={{ screen: "EncryptDecryptImageTest" }}>
-          Encrypt / Decrypt Image
-        </Link>
+        <Text>
+          Software Development{" "}
+          <Link to={{ screen: "EncryptDecryptImageTest" }}>
+            Encrypt / Decrypt Image
+          </Link>
+        </Text>
       </Checkbox>
       <Checkbox
         value="test"
@@ -87,13 +119,11 @@ export default function DesignSystemScreen() {
         isChecked
       />
 
-      <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
-        Editor Icons
-      </Text>
+      <Text style={tw`mt-6 mb-4 h2`}>Editor Icons</Text>
       <EditorSidebarIcon name="bold" />
       <EditorSidebarIcon name="bold" isActive />
 
-      <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>Icons</Text>
+      <Text style={tw`mt-6 mb-4 h2`}>Icons</Text>
       <Text style={tw`mb-1`}>Marks</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="bold" />

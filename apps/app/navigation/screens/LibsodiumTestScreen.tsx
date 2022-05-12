@@ -1,6 +1,7 @@
 import { Text, View } from "@serenity-tools/ui";
 import { useEffect, useState } from "react";
 import sodium from "@serenity-tools/libsodium";
+import { useWindowDimensions } from "react-native";
 
 const signingKeyPair = {
   keyType: "ed25519",
@@ -14,6 +15,7 @@ const key = "eL4FdkhTmU2F56ySJKKH-2ZVrzdsIIbbmvyz_N3Swb0";
 const nonce = "5GDx6cP2_uToVP-UKhddEmUelpyKTJLZ";
 
 export default function PageScreen() {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [data, setData] = useState({});
 
   useEffect(() => {
