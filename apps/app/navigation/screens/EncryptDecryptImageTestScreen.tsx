@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Image } from "react-native";
+import { Image, useWindowDimensions } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Text, View, Button } from "@serenity-tools/ui";
 import sodium from "@serenity-tools/libsodium";
 
 export default function EncryptDecryptImageTestScreen() {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [base64ImageData, setBase64ImageData] = useState<string>("");
   const [chaChaNonce, setChaChaNonce] = useState<string>("");
   const [chaChaKey, setChaChaKey] = useState<string>("");

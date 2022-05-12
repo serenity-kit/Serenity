@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useWindowDimensions } from "react-native";
 import { Text, View, Button, Input, Checkbox, tw } from "@serenity-tools/ui";
 import { RootStackScreenProps, WorkspaceDrawerScreenProps } from "../../types";
 import { useDeleteWorkspacesMutation } from "../../generated/graphql";
@@ -21,6 +21,8 @@ function WorkspaceMember({
   onAdminStatusChange,
   onDeletePress,
 }) {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+
   return (
     <View style={styles.memberListItem}>
       <Text style={styles.memberListItemLabel}>

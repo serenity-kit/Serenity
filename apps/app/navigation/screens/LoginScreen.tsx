@@ -10,8 +10,10 @@ import {
   useInitializeLoginMutation,
   useFinalizeLoginMutation,
 } from "../../generated/graphql";
+import { useWindowDimensions } from "react-native";
 
 export default function LoginScreen(props) {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [didLoginSucceed, setDidLoginSucceed] = useState(false);
@@ -228,7 +230,7 @@ export default function LoginScreen(props) {
         )}
 
         <View>
-          <Text>Email</Text>
+          <Text style={tw`small text-muted text-primary-500 mb-1`}>Email</Text>
           <Input
             keyboardType="email-address"
             value={username}
@@ -238,7 +240,7 @@ export default function LoginScreen(props) {
         </View>
 
         <View>
-          <Text>Password</Text>
+          <Text style={tw`small text-muted mb-1`}>Password</Text>
           <Input
             secureTextEntry
             value={password}

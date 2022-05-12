@@ -19,8 +19,10 @@ import {
   useFinalizeRegistrationMutation,
   useInitializeRegistrationMutation,
 } from "../../generated/graphql";
+import { useWindowDimensions } from "react-native";
 
 export default function RegisterScreen(props) {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [clientPublicKey, setClientPublicKey] = useState("");

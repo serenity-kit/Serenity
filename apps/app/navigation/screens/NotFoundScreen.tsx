@@ -1,4 +1,8 @@
-import { StyleSheet, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+} from "react-native";
 
 import { Text, View } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types";
@@ -6,6 +10,8 @@ import { RootStackScreenProps } from "../../types";
 export default function NotFoundScreen({
   navigation,
 }: RootStackScreenProps<"NotFound">) {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>This screen doesn't exist.</Text>

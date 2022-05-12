@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useWindowDimensions } from "react-native";
 import { Text, View, Button } from "@serenity-tools/ui";
 import { useCreateWorkspaceMutation } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 
 export default function NoWorkspaceScreen({ navigation }) {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");

@@ -16,8 +16,11 @@ import {
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React from "react";
+import { useWindowDimensions } from "react-native";
 
 export default function DesignSystemScreen() {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+
   return (
     <ScrollView style={tw`mt-20 px-4`}>
       <Text>Default Button</Text>

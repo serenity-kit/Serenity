@@ -1,7 +1,10 @@
 import { WorkspaceDrawerScreenProps } from "../../types";
 import Page from "../../components/page/Page";
+import { useWindowDimensions } from "react-native";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+
   if (!props.route.params?.pageId) {
     // should never happen
     return null;
