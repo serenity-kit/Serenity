@@ -1,5 +1,5 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { createDocument } from "../../database/createDocument";
+import { createDocument } from "../../../database/document/createDocument";
 
 export const CreateDocumentInput = inputObjectType({
   name: "CreateDocumentInput",
