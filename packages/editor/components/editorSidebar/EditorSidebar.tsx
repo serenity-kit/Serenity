@@ -2,6 +2,7 @@ import React from "react";
 import {
   EditorSidebarIcon,
   SidebarButton,
+  SidebarDivider,
   Text,
   tw,
   View,
@@ -57,6 +58,18 @@ export default function EditorSidebar({
           <Text>Italic</Text>
         </SidebarButton>
 
+        <SidebarButton
+          onPress={() => editor?.chain().focus().toggleCode().run()}
+        >
+          <EditorSidebarIcon
+            isActive={editor?.isActive("code") || false}
+            name="code-view"
+          />
+          <Text>Code</Text>
+        </SidebarButton>
+
+        <SidebarDivider />
+
         {/* styling dummy */}
         <SidebarButton
           onPress={() =>
@@ -68,16 +81,6 @@ export default function EditorSidebar({
             name="link"
           />
           <Text>Link</Text>
-        </SidebarButton>
-
-        <SidebarButton
-          onPress={() => editor?.chain().focus().toggleCode().run()}
-        >
-          <EditorSidebarIcon
-            isActive={editor?.isActive("code") || false}
-            name="code-view"
-          />
-          <Text>Code</Text>
         </SidebarButton>
 
         <SidebarButton
@@ -99,6 +102,8 @@ export default function EditorSidebar({
           />
           <Text>Blockquote</Text>
         </SidebarButton>
+
+        <SidebarDivider />
 
         <SidebarButton
           onPress={() => editor?.chain().focus().toggleBulletList().run()}
