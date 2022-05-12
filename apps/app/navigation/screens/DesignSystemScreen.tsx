@@ -26,12 +26,11 @@ export default function DesignSystemScreen() {
   return (
     <ScrollView style={tw`px-4 py-6`}>
       <Text style={tw`mb-4 h2`}>Text</Text>
+      <Text variant="large">large Text</Text>
       <Text>regular Text</Text>
-      <Text small>small Text</Text>
+      <Text variant="small">small Text</Text>
+      <Text variant="tiny">tiny Text</Text>
       <Text muted>muted Text</Text>
-      <Text small muted>
-        small + muted Text
-      </Text>
 
       <Text style={tw`mt-6 mb-4 h2`}>Button</Text>
       <Text>Default Button</Text>

@@ -256,7 +256,7 @@ export default function LoginScreen(props) {
 
         <Button onPress={onLoginPress}>Log in</Button>
         <View style={tw`text-center`}>
-          <Text small muted>
+          <Text variant="small" muted>
             Don't have an account?{" "}
           </Text>
           <Link small to={{ screen: "Register" }}>
