@@ -29,11 +29,17 @@ export const Input = forwardRef((props: IInputProps, ref) => {
       }}
       _focus={{
         _stack: {
-          style: [styles.wrapper, tw`bg-white se-outline-focus`],
+          style: [
+            styles.wrapper,
+            tw`bg-white border-primary-500 se-outline-focus`,
+          ],
         },
         _hover: {
           _stack: {
-            style: [styles.wrapper, tw`bg-white se-outline-focus`],
+            style: [
+              styles.wrapper,
+              tw`bg-white border-primary-500 se-outline-focus`,
+            ],
           },
         },
       }}
