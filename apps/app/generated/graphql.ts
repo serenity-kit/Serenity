@@ -95,6 +95,15 @@ export type CreateWorkspaceResult = {
   workspace?: Maybe<Workspace>;
 };
 
+export type DeleteDocumentsInput = {
+  ids: Array<Scalars['String']>;
+};
+
+export type DeleteDocumentsResult = {
+  __typename?: 'DeleteDocumentsResult';
+  status: Scalars['String'];
+};
+
 export type DeleteWorkspacesInput = {
   ids: Array<Scalars['String']>;
 };
@@ -145,6 +154,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createDocument?: Maybe<CreateDocumentResult>;
   createWorkspace?: Maybe<CreateWorkspaceResult>;
+  deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
   finalizeLogin?: Maybe<ClientOprfLoginFinalizeeResult>;
   finalizePasswordReset?: Maybe<FinalizeResetPasswordResult>;
@@ -152,6 +162,7 @@ export type Mutation = {
   initializeLogin?: Maybe<ClientOprfLoginChallengeResult>;
   initializePasswordReset?: Maybe<ClientRequestResetPasswordResult>;
   initializeRegistration?: Maybe<ClientOprfRegistrationChallengeResult>;
+  updateDocumentName?: Maybe<UpdateDocumentNameResult>;
   updateWorkspace?: Maybe<UpdateWorkspaceResult>;
 };
 
@@ -163,6 +174,11 @@ export type MutationCreateDocumentArgs = {
 
 export type MutationCreateWorkspaceArgs = {
   input?: InputMaybe<CreateWorkspaceInput>;
+};
+
+
+export type MutationDeleteDocumentsArgs = {
+  input?: InputMaybe<DeleteDocumentsInput>;
 };
 
 
@@ -198,6 +214,11 @@ export type MutationInitializePasswordResetArgs = {
 
 export type MutationInitializeRegistrationArgs = {
   input?: InputMaybe<ClientOprfRegistrationChallengeRequest>;
+};
+
+
+export type MutationUpdateDocumentNameArgs = {
+  input?: InputMaybe<UpdateDocumentNameInput>;
 };
 
 
@@ -241,6 +262,16 @@ export type QueryWorkspaceArgs = {
 export type QueryWorkspacesArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
+};
+
+export type UpdateDocumentNameInput = {
+  id: Scalars['String'];
+  name: Scalars['String'];
+};
+
+export type UpdateDocumentNameResult = {
+  __typename?: 'UpdateDocumentNameResult';
+  document?: Maybe<DocumentPreview>;
 };
 
 export type UpdateWorkspaceInput = {
@@ -310,6 +341,13 @@ export type CreateWorkspaceMutationVariables = Exact<{
 
 export type CreateWorkspaceMutation = { __typename?: 'Mutation', createWorkspace?: { __typename?: 'CreateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', username: string, isAdmin: boolean }> | null } | null } | null };
 
+export type DeleteDocumentsMutationVariables = Exact<{
+  input: DeleteDocumentsInput;
+}>;
+
+
+export type DeleteDocumentsMutation = { __typename?: 'Mutation', deleteDocuments?: { __typename?: 'DeleteDocumentsResult', status: string } | null };
+
 export type DeleteWorkspacesMutationVariables = Exact<{
   input: DeleteWorkspacesInput;
 }>;
@@ -344,6 +382,13 @@ export type InitializeRegistrationMutationVariables = Exact<{
 
 
 export type InitializeRegistrationMutation = { __typename?: 'Mutation', initializeRegistration?: { __typename?: 'ClientOprfRegistrationChallengeResult', serverPublicKey: string, oprfPublicKey: string, oprfChallengeResponse: string } | null };
+
+export type UpdateDocumentNameMutationVariables = Exact<{
+  input: UpdateDocumentNameInput;
+}>;
+
+
+export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'DocumentPreview', id: string, name?: string | null } | null } | null };
 
 export type UpdateWorkspaceMutationVariables = Exact<{
   input: UpdateWorkspaceInput;
@@ -402,6 +447,17 @@ export const CreateWorkspaceDocument = gql`
 
 export function useCreateWorkspaceMutation() {
   return Urql.useMutation<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>(CreateWorkspaceDocument);
+};
+export const DeleteDocumentsDocument = gql`
+    mutation deleteDocuments($input: DeleteDocumentsInput!) {
+  deleteDocuments(input: $input) {
+    status
+  }
+}
+    `;
+
+export function useDeleteDocumentsMutation() {
+  return Urql.useMutation<DeleteDocumentsMutation, DeleteDocumentsMutationVariables>(DeleteDocumentsDocument);
 };
 export const DeleteWorkspacesDocument = gql`
     mutation deleteWorkspaces($input: DeleteWorkspacesInput!) {
@@ -463,6 +519,20 @@ export const InitializeRegistrationDocument = gql`
 
 export function useInitializeRegistrationMutation() {
   return Urql.useMutation<InitializeRegistrationMutation, InitializeRegistrationMutationVariables>(InitializeRegistrationDocument);
+};
+export const UpdateDocumentNameDocument = gql`
+    mutation updateDocumentName($input: UpdateDocumentNameInput!) {
+  updateDocumentName(input: $input) {
+    document {
+      id
+      name
+    }
+  }
+}
+    `;
+
+export function useUpdateDocumentNameMutation() {
+  return Urql.useMutation<UpdateDocumentNameMutation, UpdateDocumentNameMutationVariables>(UpdateDocumentNameDocument);
 };
 export const UpdateWorkspaceDocument = gql`
     mutation updateWorkspace($input: UpdateWorkspaceInput!) {
