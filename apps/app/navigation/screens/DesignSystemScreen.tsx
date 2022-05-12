@@ -14,6 +14,7 @@ import {
   Link,
   EditorSidebarIcon,
   LabeledInput,
+  SidebarLink,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React from "react";
@@ -130,6 +131,11 @@ export default function DesignSystemScreen() {
           Encrypt / Decrypt Image
         </Link>
       </Text>
+
+      <Text style={tw`mt-6 mb-4 h2`}>SidebarLink</Text>
+      <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+        Encrypt / Decrypt Image
+      </SidebarLink>
 
       <Text style={tw`mt-6 mb-4 h2`}>Checkbox</Text>
       <Checkbox value="test" accessibilityLabel="This is a dummy checkbox" />
