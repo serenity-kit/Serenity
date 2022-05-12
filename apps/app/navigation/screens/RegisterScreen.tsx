@@ -203,7 +203,7 @@ export default function RegisterScreen(props) {
       <Box style={tw`max-w-md w-full`}>
         <View>
           <Text style={tw`h1 text-center`}>Register</Text>
-          <Text style={tw`text-center text-muted`}>
+          <Text muted style={tw`text-center`}>
             Sign up and start your free trial!
             <br />
             No credit card required.
@@ -223,7 +223,9 @@ export default function RegisterScreen(props) {
         )}
 
         <View>
-          <Text>Email</Text>
+          <Text small muted>
+            Email
+          </Text>
           <Input
             keyboardType="email-address"
             value={username}
@@ -233,7 +235,9 @@ export default function RegisterScreen(props) {
         </View>
 
         <View>
-          <Text>Password</Text>
+          <Text small muted>
+            Password
+          </Text>
           <Input
             secureTextEntry
             value={password}
@@ -246,7 +250,7 @@ export default function RegisterScreen(props) {
           value="dummy"
           accessibilityLabel="This is the terms and condition checkbox"
         >
-          <Text style={tw`small text-muted`}>
+          <Text small muted>
             Yes, I do agree to Serenity's{" "}
             <Link to={{ screen: "NotFound" }}>terms of services</Link> and{" "}
             <Link to={{ screen: "NotFound" }}>privacy policy</Link>.
@@ -256,8 +260,10 @@ export default function RegisterScreen(props) {
         <Button onPress={onRegisterPress}>Register</Button>
 
         <View style={tw`text-center`}>
-          <Text style={tw`small text-muted`}>Already have an account? </Text>
-          <Link style={tw`small`} to={{ screen: "Login" }}>
+          <Text small muted>
+            Already have an account?{" "}
+          </Text>
+          <Link small to={{ screen: "Login" }}>
             Login here
           </Link>
         </View>

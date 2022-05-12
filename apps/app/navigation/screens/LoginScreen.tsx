@@ -212,7 +212,7 @@ export default function LoginScreen(props) {
       <Box style={tw`max-w-md w-full`}>
         <View>
           <Text style={tw`h1 text-center`}>Welcome back!</Text>
-          <Text style={tw`text-center text-muted`}>
+          <Text muted style={tw`text-center`}>
             Log in to your Serenity Account
           </Text>
         </View>
@@ -230,7 +230,9 @@ export default function LoginScreen(props) {
         )}
 
         <View>
-          <Text style={tw`small text-muted text-primary-500 mb-1`}>Email</Text>
+          <Text small muted style={tw`mb-1`}>
+            Email
+          </Text>
           <Input
             keyboardType="email-address"
             value={username}
@@ -240,7 +242,9 @@ export default function LoginScreen(props) {
         </View>
 
         <View>
-          <Text style={tw`small text-muted mb-1`}>Password</Text>
+          <Text small muted style={tw`mb-1`}>
+            Password
+          </Text>
           <Input
             secureTextEntry
             value={password}
@@ -251,8 +255,10 @@ export default function LoginScreen(props) {
 
         <Button onPress={onLoginPress}>Log in</Button>
         <View style={tw`text-center`}>
-          <Text style={tw`small text-muted`}>Don't have an account? </Text>
-          <Link style={tw`small`} to={{ screen: "Register" }}>
+          <Text small muted>
+            Don't have an account?{" "}
+          </Text>
+          <Link small to={{ screen: "Register" }}>
             Register here
           </Link>
         </View>
