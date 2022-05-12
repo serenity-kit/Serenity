@@ -15,7 +15,6 @@ export const EditorSidebarIcon = (props: EditorSidebarIconProps) => {
   const activeColor = props.activeColor || tw.color("primary-500");
 
   const styles = StyleSheet.create({
-    // TODO change to hairline
     default: tw`items-center justify-center bg-white w-6 h-6 border-solid border border-gray-300 rounded`,
     active: tw`bg-primary-200 border-primary-200`,
   });

@@ -1,6 +1,7 @@
 import { WorkspaceDrawerScreenProps } from "../../types";
 import Page from "../../components/page/Page";
 import { useWindowDimensions } from "react-native";
+import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -9,6 +10,10 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     // should never happen
     return null;
   }
+
+  props.navigation.setOptions({
+    headerRight: PageHeaderRight,
+  });
 
   return (
     <Page
