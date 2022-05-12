@@ -243,7 +243,7 @@ export default function RegisterScreen(props) {
           value="dummy"
           accessibilityLabel="This is the terms and condition checkbox"
         >
-          <Text small muted>
+          <Text variant="small" muted>
             Yes, I do agree to Serenity's{" "}
             <Link to={{ screen: "NotFound" }}>terms of services</Link> and{" "}
             <Link to={{ screen: "NotFound" }}>privacy policy</Link>.
@@ -253,7 +253,7 @@ export default function RegisterScreen(props) {
         <Button onPress={onRegisterPress}>Register</Button>
 
         <View style={tw`text-center`}>
-          <Text small muted>
+          <Text variant="small" muted>
             Already have an account?{" "}
           </Text>
           <Link small to={{ screen: "Login" }}>

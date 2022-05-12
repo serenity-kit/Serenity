@@ -16,6 +16,13 @@ import {
 } from "urql";
 import { NativeBaseProvider } from "native-base";
 import { authExchange } from "@urql/exchange-auth";
+import {
+  useFonts,
+  // Inter options can be found here https://github.com/expo/google-fonts/tree/master/font-packages/inter
+  Inter_400Regular,
+  Inter_600SemiBold,
+  Inter_800ExtraBold,
+} from "@expo-google-fonts/inter";
 
 type AuthState = {
   deviceSigningPublicKey: string;
@@ -73,10 +80,15 @@ const client = createClient({
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
+  const [isFontLoadingComplete] = useFonts({
+    Inter_400Regular,
+    Inter_600SemiBold,
+    Inter_800ExtraBold,
+  });
   useDeviceContext(tw);
   const [colorScheme] = useAppColorScheme(tw);
 
-  if (!isLoadingComplete) {
+  if (!isLoadingComplete || !isFontLoadingComplete) {
     return null;
   } else {
     return (
