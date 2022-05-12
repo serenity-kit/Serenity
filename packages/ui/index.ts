@@ -8,6 +8,7 @@ export * from "./components/checkbox/Checkbox";
 export * from "./components/input/Input";
 export * from "./components/icon/Icon";
 export * from "./components/editorSidebarIcon/EditorSidebarIcon";
+export * from "./components/labeledInput/LabeledInput";
 export * from "./components/menu/Menu";
 export * from "./components/menu/MenuItem";
 export * from "./components/scrollView/ScrollView";
