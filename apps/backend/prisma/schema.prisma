@@ -147,6 +147,9 @@ model Folder {
   workspaceId    String
   parentFolder   Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id])
   parentFolderId String?
+  rootFolder     Folder?    @relation(name: "rootFolder", fields: [rootFolderId], references: [id])
+  rootFolderId   String?
   childFolders   Folder[]   @relation("parentFolder")
+  descendent     Folder[]   @relation("rootFolder")
   documents      Document[]
 }
