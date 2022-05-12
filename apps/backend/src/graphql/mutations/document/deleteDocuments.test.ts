@@ -44,7 +44,6 @@ beforeEach(async () => {
 });
 
 test("user should be able to delete a document", async () => {
-  // generate a challenge code
   const authorizationHeader = `TODO+${username}`;
   const ids = [addedDocumentId];
   const result = await deleteDocuments({ graphql, ids, authorizationHeader });
@@ -56,7 +55,6 @@ test("user should be able to delete a document", async () => {
 });
 
 test("Deleting nonexistent document does nothing", async () => {
-  // generate a challenge code
   const authorizationHeader = `TODO+${username}`;
   const ids = ["badthing"];
   const result = await deleteDocuments({ graphql, ids, authorizationHeader });

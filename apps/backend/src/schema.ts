@@ -6,6 +6,7 @@ import * as WorkspacesQueryTypes from "./graphql/queries/workspace/workspaces";
 
 import * as DocumentPreviewsQueryTypes from "./graphql/queries/documentPreviews";
 import * as CreateDocumentMutationTypes from "./graphql/mutations/document/createDocument";
+import * as UpdateDocumentNameMutationTypes from "./graphql/mutations/document/updateDocumentName";
 import * as DeleteDocumentsMutationTypes from "./graphql/mutations/document/deleteDocuments";
 
 import * as InitializeRegistrationTypes from "./graphql/mutations/authentication/initializeRegistration";
@@ -31,6 +32,7 @@ export const schema = makeSchema({
     DocumentTypes,
     DocumentPreviewsQueryTypes,
     CreateDocumentMutationTypes,
+    UpdateDocumentNameMutationTypes,
     DeleteDocumentsMutationTypes,
     InitializeRegistrationTypes,
     FinalizeRegistrationTypes,
