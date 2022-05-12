@@ -3,7 +3,9 @@ import { StyleSheet } from "react-native";
 import { Input as NbInput, IInputProps } from "native-base";
 import { tw } from "../../tailwind";
 
-export const Input = forwardRef((props: IInputProps, ref) => {
+export type InputProps = IInputProps & {};
+
+export const Input = forwardRef((props: InputProps, ref) => {
   const styles = StyleSheet.create({
     wrapper: tw`rounded`,
     input: tw`text-base text-gray-900 px-4 py-3`,
@@ -14,7 +16,7 @@ export const Input = forwardRef((props: IInputProps, ref) => {
       // @ts-ignore
       ref={ref}
       {...props}
-      style={styles.input}
+      style={[styles.input, props.disabled && tw`text-muted`]}
       _stack={{
         style: props.disabled
           ? [styles.wrapper, tw`bg-gray-100 border-gray-400`]
