@@ -30,8 +30,26 @@ export default function DesignSystemScreen() {
       <Text>regular Text</Text>
       <Text variant="small">small Text</Text>
       <Text variant="tiny">tiny Text</Text>
-      <Text muted>muted Text</Text>
-
+      <Text variant="large" bold>
+        bold large Text
+      </Text>
+      <Text bold>bold regular Text</Text>
+      <Text variant="small" bold>
+        bold small Text
+      </Text>
+      <Text variant="tiny" bold>
+        bold tiny Text
+      </Text>
+      <Text variant="large" muted>
+        muted large Text
+      </Text>
+      <Text muted>muted regular Text</Text>
+      <Text variant="small" muted>
+        muted small Text
+      </Text>
+      <Text variant="tiny" muted>
+        muted tiny Text
+      </Text>
       <Text style={tw`mt-6 mb-4 h2`}>Button</Text>
       <Text>Default Button</Text>
       <Button>Login</Button>
@@ -88,9 +106,30 @@ export default function DesignSystemScreen() {
       </View>
 
       <Text style={tw`mt-6 mb-4 h2`}>Link</Text>
-      <Link to={{ screen: "EncryptDecryptImageTest" }}>
-        Encrypt / Decrypt Image
-      </Link>
+      <Text>
+        This is a link to{" "}
+        <Link to={{ screen: "EncryptDecryptImageTest" }}>
+          Encrypt / Decrypt Image
+        </Link>
+      </Text>
+      <Text muted>
+        This is a link to{" "}
+        <Link to={{ screen: "EncryptDecryptImageTest" }}>
+          Encrypt / Decrypt Image
+        </Link>
+      </Text>
+      <Text bold>
+        This is a link to{" "}
+        <Link to={{ screen: "EncryptDecryptImageTest" }}>
+          Encrypt / Decrypt Image
+        </Link>
+      </Text>
+      <Text variant="tiny">
+        This is a link to{" "}
+        <Link to={{ screen: "EncryptDecryptImageTest" }}>
+          Encrypt / Decrypt Image
+        </Link>
+      </Text>
 
       <Text style={tw`mt-6 mb-4 h2`}>Checkbox</Text>
       <Checkbox value="test" accessibilityLabel="This is a dummy checkbox" />

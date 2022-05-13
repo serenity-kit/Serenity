@@ -259,9 +259,9 @@ export default function LoginScreen(props) {
           <Text variant="small" muted>
             Don't have an account?{" "}
           </Text>
-          <Link small to={{ screen: "Register" }}>
-            Register here
-          </Link>
+          <Text variant="small">
+            <Link to={{ screen: "Register" }}>Register here</Link>
+          </Text>
         </View>
       </Box>
     </View>
