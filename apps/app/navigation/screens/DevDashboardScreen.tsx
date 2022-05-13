@@ -8,6 +8,7 @@ export default function DevDashboardScreen(props) {
     <View style={tw`mt-20`}>
       <Text>Dev Dashboard Screen</Text>
       <Link to={{ screen: "DesignSystem" }}>Design System</Link>
+      <Link to={{ screen: "Root" }}>Root</Link>
       <Link to={{ screen: "EncryptDecryptImageTest" }}>
         Encrypt / Decrypt Image
       </Link>

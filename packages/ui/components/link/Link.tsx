@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Platform } from "react-native";
 import { tw } from "../../tailwind";
 import { Link as ReactNavigationLink } from "@react-navigation/native";
 import type { NavigationAction } from "@react-navigation/core";
@@ -25,8 +26,12 @@ export function Link<ParamList extends ReactNavigation.RootParamList>(
 
   const styles = StyleSheet.create({
     // reset outline for web focusVisible
-    default: tw.style(`text-primary-500 underline`, { outlineWidth: 0 }),
-    focusVisible: tw`se-outline-focus-mini rounded`,
+    default: tw.style(
+      `text-primary-500 underline`,
+      Platform.OS === "web" && { outlineWidth: 0 }
+    ),
+    focusVisible:
+      Platform.OS === "web" ? tw`se-outline-focus-mini rounded` : {},
   });
 
   return (
