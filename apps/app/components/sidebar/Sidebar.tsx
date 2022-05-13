@@ -5,8 +5,10 @@ import {
   Icon,
   Link,
   Menu,
-  MenuItem,
   Pressable,
+  SidebarButton,
+  SidebarDivider,
+  SidebarLink,
   Text,
   tw,
   useIsPermanentLeftSidebar,
@@ -140,7 +142,7 @@ export default function Sidebar(props) {
           ? null
           : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
               workspace === null || workspace === undefined ? null : (
-                <Link
+                <SidebarLink
                   key={workspace.id}
                   to={{
                     screen: "Workspace",
@@ -150,30 +152,32 @@ export default function Sidebar(props) {
                     },
                   }}
                 >
-                  {workspace.name}
-                </Link>
+                  <Text variant="small">{workspace.name}</Text>
+                </SidebarLink>
               )
             )}
       </View>
 
-      <Link
+      <SidebarDivider />
+
+      <SidebarLink
         to={{
           screen: "Workspace",
           params: { workspaceId: route.params.workspaceId, screen: "Settings" },
         }}
       >
         Settings
-      </Link>
-      <Link to={{ screen: "DevDashboard" }}>Dev Dashboard</Link>
-      <Link
+      </SidebarLink>
+      <SidebarLink to={{ screen: "DevDashboard" }}>Dev Dashboard</SidebarLink>
+      <SidebarLink
         to={{
           screen: "Workspace",
           params: { workspaceId: route.params.workspaceId, screen: "Editor" },
         }}
       >
         Editor
-      </Link>
-      <Link
+      </SidebarLink>
+      <SidebarLink
         to={{
           screen: "Workspace",
           params: {
@@ -183,31 +187,35 @@ export default function Sidebar(props) {
         }}
       >
         Libsodium Test Screen
-      </Link>
-      <View>
-        <Button onPress={createDocument}>Create Page</Button>
-      </View>
-      <View>
-        <Button
-          onPress={() => {
-            createWorkspace();
-          }}
-        >
-          Create workspace
-        </Button>
-      </View>
-      <View>
-        <Button
-          onPress={() => {
-            // TODO clear cache and wipe local data?
-            localStorage.removeItem("deviceSigningPublicKey");
-            props.navigation.navigate("Login");
-          }}
-        >
-          Logout
-        </Button>
-      </View>
-      <Text>Documents</Text>
+      </SidebarLink>
+
+      <SidebarDivider />
+
+      <SidebarButton onPress={createDocument}>
+        <Text variant="small">Create Page</Text>
+      </SidebarButton>
+      <SidebarButton
+        onPress={() => {
+          createWorkspace();
+        }}
+      >
+        <Text variant="small">Create workspace</Text>
+      </SidebarButton>
+      <SidebarButton
+        onPress={() => {
+          // TODO clear cache and wipe local data?
+          localStorage.removeItem("deviceSigningPublicKey");
+          props.navigation.navigate("Login");
+        }}
+      >
+        <Text variant="small">Logout</Text>
+      </SidebarButton>
+
+      <SidebarDivider />
+
+      <Text variant="tiny" style={tw`ml-4 mb-4`}>
+        Documents
+      </Text>
       {documentPreviewsResult.fetching ? (
         <Text>Loading...</Text>
       ) : documentPreviewsResult.data?.documentPreviews?.nodes ? (
