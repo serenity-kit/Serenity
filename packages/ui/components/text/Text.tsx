@@ -2,10 +2,12 @@ import React from "react";
 import { Text as RNText, StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
 
+export type TextVariants = "large" | "medium" | "small" | "tiny";
+
 export type TextProps = RNText["props"] & {
   bold?: boolean;
   muted?: boolean;
-  variant?: "large" | "medium" | "small" | "tiny";
+  variant?: TextVariants;
 };
 
 export function Text(props: TextProps) {

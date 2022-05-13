@@ -4,6 +4,7 @@ import { Link as ReactNavigationLink } from "@react-navigation/native";
 import type { NavigationAction } from "@react-navigation/core";
 import { GestureResponderEvent, TextProps, StyleSheet } from "react-native";
 import { To } from "@react-navigation/native/lib/typescript/src/useLinkTo";
+import { useFocusRing } from "@react-native-aria/focus";
 
 // copied from react-navigation type definitions
 declare type Props<ParamList extends ReactNavigation.RootParamList> = {
@@ -15,24 +16,27 @@ declare type Props<ParamList extends ReactNavigation.RootParamList> = {
   ) => void;
 } & (TextProps & {
   children: React.ReactNode;
-  small?: boolean;
 });
 
 export function Link<ParamList extends ReactNavigation.RootParamList>(
   props: Props<ParamList>
 ) {
+  const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
+
   const styles = StyleSheet.create({
-    default: tw`text-primary-500 dark:text-primary-500 underline`,
-    small: tw`small`,
+    // reset outline for web focusVisible
+    default: tw.style(`text-primary-500 underline`, { outlineWidth: 0 }),
+    focusVisible: tw`se-outline-focus-mini rounded`,
   });
 
   return (
     <ReactNavigationLink
       {...props}
+      {...focusRingProps} // sets onFocus and onBlur
       style={[
         styles.default,
-        props.small ? styles.small : undefined,
         props.style,
+        isFocusVisible && styles.focusVisible,
       ]}
     />
   );
