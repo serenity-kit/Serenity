@@ -6,7 +6,6 @@ import {
   Input,
   Icon,
   Menu,
-  MenuItem,
   ScrollView,
   SidebarButton,
   Checkbox,
@@ -15,6 +14,7 @@ import {
   EditorSidebarIcon,
   LabeledInput,
   SidebarLink,
+  SidebarDivider,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React from "react";
@@ -79,30 +79,43 @@ export default function DesignSystemScreen() {
       </VStack>
 
       <Text style={tw`mt-6 mb-4 h2`}>SidebarButton</Text>
-      <SidebarButton>Hallo</SidebarButton>
-      <SidebarButton disabled>Hallo</SidebarButton>
+      <SidebarButton>
+        <Text variant="small">Hallo</Text>
+      </SidebarButton>
+      <SidebarButton disabled>
+        <Text variant="small">Hallo</Text>
+      </SidebarButton>
 
       <Text style={tw`mt-6 mb-4 h2`}>Menu</Text>
       <View style={tw`flex flex-row`}>
         <Menu
-          trigger={(triggerProps) => {
-            return (
-              <Pressable
-                accessibilityLabel="More options menu"
-                {...triggerProps}
-                style={tw``}
-              >
-                <Icon name="more-2-line" />
-              </Pressable>
-            );
-          }}
+          placement="bottom"
+          style={tw`w-60`}
+          offset={8}
+          crossOffset={80}
+          trigger={
+            <Pressable
+              accessibilityLabel="More options menu"
+              style={tw`flex flex-row`}
+            >
+              <Text>Open Menu</Text>
+              <Icon name="arrow-down-s-fill" />
+            </Pressable>
+          }
         >
-          <MenuItem>Arial</MenuItem>
-          <MenuItem>Nunito Sans</MenuItem>
-          <MenuItem>SF Pro</MenuItem>
-          <MenuItem>Helvetica</MenuItem>
-          <MenuItem isDisabled>Sofia</MenuItem>
-          <MenuItem>Cookie</MenuItem>
+          <View style={tw`p-4`}>
+            <Text variant="small" muted>
+              jane@example.com
+            </Text>
+          </View>
+          <SidebarDivider collapsed />
+          <SidebarButton
+            onPress={() => {
+              alert("Hello");
+            }}
+          >
+            <Text variant="small">Hello</Text>
+          </SidebarButton>
         </Menu>
       </View>
 
@@ -134,7 +147,7 @@ export default function DesignSystemScreen() {
 
       <Text style={tw`mt-6 mb-4 h2`}>SidebarLink</Text>
       <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-        Encrypt / Decrypt Image
+        <Text>Encrypt / Decrypt Image</Text>
       </SidebarLink>
 
       <Text style={tw`mt-6 mb-4 h2`}>Checkbox</Text>

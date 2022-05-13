@@ -1,20 +1,30 @@
-import React from "react";
-import { StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, TouchableWithoutFeedback } from "react-native";
 import { tw } from "../../tailwind";
-import { Menu as NativeBaseMenu, IMenuProps } from "native-base";
+import { Popover } from "react-native-popper";
+import { IPopoverProps } from "react-native-popper/lib/typescript/types";
 
-export type MenuProps = IMenuProps & {};
+export type MenuProps = IPopoverProps & View["props"];
 
-export const Menu = React.forwardRef(
-  ({ children, ...rest }: MenuProps, ref: any) => {
-    const styles = StyleSheet.create({
-      menu: tw`bg-white`,
-    });
+export const Menu = ({ children, ...rest }: MenuProps) => {
+  const [isOpen, setIsOpen] = React.useState(false);
 
-    return (
-      <NativeBaseMenu ref={ref} {...rest} style={[styles.menu, rest.style]}>
-        {children}
-      </NativeBaseMenu>
-    );
-  }
-);
+  const styles = StyleSheet.create({
+    menu: tw`bg-white border border-gray-200 rounded`,
+  });
+
+  return (
+    <Popover {...rest} isOpen={isOpen} onOpenChange={setIsOpen}>
+      <Popover.Backdrop />
+      <Popover.Content>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setIsOpen(false);
+          }}
+        >
+          <View style={[styles.menu, rest.style]}>{children}</View>
+        </TouchableWithoutFeedback>
+      </Popover.Content>
+    </Popover>
+  );
+};
