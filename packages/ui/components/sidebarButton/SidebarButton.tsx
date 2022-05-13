@@ -32,7 +32,7 @@ export const SidebarButton = React.forwardRef(
           _web: { style: [{ outlineWidth: 0 }, tw`se-inset-focus-mini`] },
         }}
       >
-        <Stack space={2} horizontal={true} align="left">
+        <Stack space={2} horizontal={true} align="center">
           {children}
         </Stack>
       </Pressable>
