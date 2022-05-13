@@ -13,6 +13,7 @@ export * from "./components/menu/Menu";
 export * from "./components/menu/MenuItem";
 export * from "./components/scrollView/ScrollView";
 export * from "./components/sidebarButton/SidebarButton";
+export * from "./components/sidebarLink/SidebarLink";
 export * from "./components/sidebarDivider/SidebarDivider";
 export * from "./components/pressable/Pressable";
 
