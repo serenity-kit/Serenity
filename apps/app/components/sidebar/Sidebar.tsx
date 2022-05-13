@@ -258,11 +258,9 @@ export default function Sidebar(props) {
 const styles = StyleSheet.create({
   documentPreviewItem: {
     flexDirection: "row",
-    border: "1px solid black",
     alignItems: "center",
   },
   documentPreviewLabel: {
-    border: "1px solid black",
     flexGrow: 1,
     height: "100%",
   },

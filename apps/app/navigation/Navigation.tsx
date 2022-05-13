@@ -28,6 +28,7 @@ import {
   Text,
   tw,
   useIsPermanentLeftSidebar,
+  View,
 } from "@serenity-tools/ui";
 import RootScreen from "./screens/RootScreen";
 import NoWorkspaceScreen from "./screens/NoWorkspaceScreen";
@@ -92,12 +93,13 @@ function WorkspaceStackScreen(props) {
 function RootNavigator() {
   return (
     <Stack.Navigator>
+      <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
+      <Stack.Screen name="Root" component={RootScreen} />
       <Stack.Screen
         name="Workspace"
         component={WorkspaceStackScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
       <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
       <Stack.Screen name="NoWorkspace" component={NoWorkspaceScreen} />
       <Stack.Screen
@@ -114,7 +116,6 @@ function RootNavigator() {
         name="EncryptDecryptImageTest"
         component={EncryptDecryptImageTestScreen}
       />
-      <Stack.Screen name="Root" component={RootScreen} />
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
@@ -149,6 +150,14 @@ const linking: LinkingOptions<RootStackParamList> = {
     },
   },
 };
+
+function HomeScreen() {
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text>Home Screen</Text>
+    </View>
+  );
+}
 
 export default function Navigation({
   colorScheme,

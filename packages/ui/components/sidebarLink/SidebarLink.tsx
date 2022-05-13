@@ -1,4 +1,5 @@
 import * as React from "react";
+import { Platform } from "react-native";
 import { tw } from "../../tailwind";
 import { Link as ReactNavigationLink } from "@react-navigation/native";
 import type { NavigationAction } from "@react-navigation/core";
@@ -27,9 +28,12 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
 
   const styles = StyleSheet.create({
-    default: tw.style(`px-4 py-1`, { outlineWidth: 0 }),
+    default: tw.style(
+      `px-4 py-1`,
+      Platform.OS === "web" && { outlineWidth: 0 }
+    ),
     hover: tw`bg-gray-200`,
-    focusVisible: tw`se-inset-focus-mini`,
+    focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
 
   return (
