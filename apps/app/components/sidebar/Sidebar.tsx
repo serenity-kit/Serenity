@@ -100,44 +100,30 @@ export default function Sidebar(props) {
           Close Sidebar
         </Button>
       )}
-      <View>
-        <Menu
-          trigger={(triggerProps) => {
-            return (
-              <Pressable
-                accessibilityLabel="More options menu"
-                {...triggerProps}
-                style={tw`flex flex-row`}
-              >
-                <Text>
-                  {workspaceResult.fetching
-                    ? " "
-                    : workspaceResult.data?.workspace?.name}
-                </Text>
-                <Icon name="arrow-down-s-fill" />
-              </Pressable>
-            );
-          }}
-        >
-          {workspacesResult.fetching
-            ? null
-            : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
-                workspace === null || workspace === undefined ? null : (
-                  <Link
-                    key={workspace.id}
-                    to={{
-                      screen: "Workspace",
-                      params: {
-                        workspaceId: workspace.id,
-                        screen: "Dashboard",
-                      },
-                    }}
-                  >
-                    {workspace.name}
-                  </Link>
-                )
-              )}
-        </Menu>
+      <Menu
+        placement="bottom"
+        style={tw`w-60`}
+        offset={8}
+        crossOffset={80}
+        trigger={
+          <Pressable
+            accessibilityLabel="More options menu"
+            style={tw`flex flex-row`}
+          >
+            <Text>
+              {workspaceResult.fetching
+                ? " "
+                : workspaceResult.data?.workspace?.name}
+            </Text>
+            <Icon name="arrow-down-s-fill" />
+          </Pressable>
+        }
+      >
+        <View style={tw`p-4`}>
+          <Text variant="small" muted>
+            jane@example.com
+          </Text>
+        </View>
         {workspacesResult.fetching
           ? null
           : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
@@ -156,7 +142,26 @@ export default function Sidebar(props) {
                 </SidebarLink>
               )
             )}
-      </View>
+        <SidebarDivider collapsed />
+
+        <SidebarButton
+          onPress={() => {
+            createWorkspace();
+          }}
+        >
+          <Text variant="small">Create workspace</Text>
+        </SidebarButton>
+        <SidebarDivider collapsed />
+        <SidebarButton
+          onPress={() => {
+            // TODO clear cache and wipe local data?
+            localStorage.removeItem("deviceSigningPublicKey");
+            props.navigation.navigate("Login");
+          }}
+        >
+          <Text variant="small">Logout</Text>
+        </SidebarButton>
+      </Menu>
 
       <SidebarDivider />
 
@@ -166,16 +171,18 @@ export default function Sidebar(props) {
           params: { workspaceId: route.params.workspaceId, screen: "Settings" },
         }}
       >
-        Settings
+        <Text variant="small">Settings</Text>
       </SidebarLink>
-      <SidebarLink to={{ screen: "DevDashboard" }}>Dev Dashboard</SidebarLink>
+      <SidebarLink to={{ screen: "DevDashboard" }}>
+        <Text variant="small">Dev Dashboard</Text>
+      </SidebarLink>
       <SidebarLink
         to={{
           screen: "Workspace",
           params: { workspaceId: route.params.workspaceId, screen: "Editor" },
         }}
       >
-        Editor
+        <Text variant="small">Editor</Text>
       </SidebarLink>
       <SidebarLink
         to={{
@@ -186,29 +193,13 @@ export default function Sidebar(props) {
           },
         }}
       >
-        Libsodium Test Screen
+        <Text variant="small">Libsodium Test Screen</Text>
       </SidebarLink>
 
       <SidebarDivider />
 
       <SidebarButton onPress={createDocument}>
         <Text variant="small">Create Page</Text>
-      </SidebarButton>
-      <SidebarButton
-        onPress={() => {
-          createWorkspace();
-        }}
-      >
-        <Text variant="small">Create workspace</Text>
-      </SidebarButton>
-      <SidebarButton
-        onPress={() => {
-          // TODO clear cache and wipe local data?
-          localStorage.removeItem("deviceSigningPublicKey");
-          props.navigation.navigate("Login");
-        }}
-      >
-        <Text variant="small">Logout</Text>
       </SidebarButton>
 
       <SidebarDivider />

@@ -3180,7 +3180,7 @@
     "@react-native-aria/utils" "^0.2.6"
     "@react-types/button" "^3.3.1"
 
-"@react-native-aria/focus@^0.2.4":
+"@react-native-aria/focus@^0.2.4", "@react-native-aria/focus@^0.2.5":
   version "0.2.5"
   resolved "https://registry.yarnpkg.com/@react-native-aria/focus/-/focus-0.2.5.tgz#28ff752b28b7dfeb737147856aaf6669de3290f9"
   integrity sha512-PUTGNL5JMCWJ2dNAehpQqLuSUUdkXcLlFjl52Dv84XcIUTuXRvDl5+jr4OW0jyUSGUS6ooqDNRW/PSza35P+tw==
@@ -3219,6 +3219,18 @@
     "@react-aria/interactions" "^3.3.2"
     "@react-aria/overlays" "^3.7.0"
     "@react-native-aria/utils" "^0.2.8"
+    "@react-stately/overlays" "^3.1.1"
+    "@react-types/overlays" "^3.4.0"
+    dom-helpers "^5.0.0"
+
+"@react-native-aria/overlays@^0.3.1":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@react-native-aria/overlays/-/overlays-0.3.2.tgz#fe3fb983b197738237493c3e5af6b30f6da6be9d"
+  integrity sha512-sc2attCn+stKugBF8ZBz+EIdGoEHU/+NbJc5agS6lZWeemXL5LcgomNf6Tn7RUlpLfWOTEGBQOAiOZxjZnIQmQ==
+  dependencies:
+    "@react-aria/interactions" "^3.3.2"
+    "@react-aria/overlays" "^3.7.0"
+    "@react-native-aria/utils" "^0.2.6"
     "@react-stately/overlays" "^3.1.1"
     "@react-types/overlays" "^3.4.0"
     dom-helpers "^5.0.0"
@@ -15456,6 +15468,14 @@ react-native-keyboard-aware-scroll-view@^0.9.5:
   dependencies:
     prop-types "^15.6.2"
     react-native-iphone-x-helper "^1.0.3"
+
+react-native-popper@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/react-native-popper/-/react-native-popper-0.3.2.tgz#4582b3bccb85a043c2171c3326dce10f8f1e5c16"
+  integrity sha512-1zBHPZnXQjgKg1N+QvMjNrzV0A17+pkcV5GSzTLYjYJsxUH8fogduIc+FPxvkmedm7U/tb3YbhWNQUMXNhR84Q==
+  dependencies:
+    "@react-native-aria/focus" "^0.2.5"
+    "@react-native-aria/overlays" "^0.3.1"
 
 react-native-reanimated@~2.3.1:
   version "2.3.3"
