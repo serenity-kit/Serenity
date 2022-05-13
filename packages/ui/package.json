@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "native-base": "^3.4.1",
-    "react-native-svg": "12.1.1"
+    "react-native-svg": "12.3.0"
   }
 }
