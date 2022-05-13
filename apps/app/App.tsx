@@ -23,6 +23,7 @@ import {
   Inter_600SemiBold,
   Inter_800ExtraBold,
 } from "@expo-google-fonts/inter";
+import { Platform } from "react-native";
 
 type AuthState = {
   deviceSigningPublicKey: string;
@@ -40,9 +41,10 @@ const client = createClient({
     authExchange<AuthState>({
       getAuth: async ({ authState }) => {
         if (!authState) {
-          const deviceSigningPublicKey = localStorage.getItem(
-            "deviceSigningPublicKey"
-          );
+          const deviceSigningPublicKey =
+            Platform.OS === "web"
+              ? localStorage.getItem("deviceSigningPublicKey")
+              : "waaa";
 
           if (deviceSigningPublicKey) {
             return { deviceSigningPublicKey };
