@@ -9,6 +9,8 @@ import * as CreateDocumentMutationTypes from "./graphql/mutations/document/creat
 import * as UpdateDocumentNameMutationTypes from "./graphql/mutations/document/updateDocumentName";
 import * as DeleteDocumentsMutationTypes from "./graphql/mutations/document/deleteDocuments";
 
+import * as CreateFolderMutationTypes from "./graphql/mutations/folder/createFolder";
+
 import * as InitializeRegistrationTypes from "./graphql/mutations/authentication/initializeRegistration";
 import * as FinalizeRegistrationTypes from "./graphql/mutations/authentication/finalizeRegistration";
 import * as InitializeLoginTypes from "./graphql/mutations/authentication/initializeLogin";
@@ -34,6 +36,7 @@ export const schema = makeSchema({
     CreateDocumentMutationTypes,
     UpdateDocumentNameMutationTypes,
     DeleteDocumentsMutationTypes,
+    CreateFolderMutationTypes,
     InitializeRegistrationTypes,
     FinalizeRegistrationTypes,
     InitializeLoginTypes,
