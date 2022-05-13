@@ -47,7 +47,13 @@ test("user should be able to create a root folder", async () => {
   });
   expect(result.createFolder).toMatchInlineSnapshot(`
     Object {
-      "folder": null,
+      "folder": Object {
+        "id": "c103a784-35cb-4aee-b366-d10398b6dd95",
+        "name": "Untitled",
+        "parentFolderId": null,
+        "rootFolderId": null,
+        "workspaceId": "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+      },
     }
   `);
 });
@@ -65,7 +71,13 @@ test("user should be able to create a child folder", async () => {
   });
   expect(result.createFolder).toMatchInlineSnapshot(`
     Object {
-      "folder": null,
+      "folder": Object {
+        "id": "c3d28056-b619-41c4-be51-ce89ed5b8be4",
+        "name": "Untitled",
+        "parentFolderId": "c103a784-35cb-4aee-b366-d10398b6dd95",
+        "rootFolderId": null,
+        "workspaceId": "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+      },
     }
   `);
 });
