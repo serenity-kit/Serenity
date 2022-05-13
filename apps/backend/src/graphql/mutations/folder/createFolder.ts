@@ -32,10 +32,14 @@ export const createFolderMutation = mutationField("createFolder", {
     if (!args.input) {
       throw new Error("Invalid input");
     }
+    let parentFolderId: string | undefined = undefined;
+    if (args.input.parentFolderId) {
+      parentFolderId = args.input.parentFolderId;
+    }
     const folder = await createFolder({
       username: context.user.username,
       id: args.input.id,
-      parentFolderId: args.input.parentFolderId,
+      parentFolderId,
       workspaceId: args.input.workspaceId,
     });
     return { folder };
