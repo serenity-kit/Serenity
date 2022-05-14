@@ -1,18 +1,28 @@
 import React from "react";
-import { StyleSheet } from "react-native";
-import { tw } from "../../tailwind";
-import { Modal as RnModal } from "react-native";
+import {
+  ReactNativeModal,
+  ModalProps as ReactNativeModalProps,
+} from "react-native-modal";
 
-type ModalProps = RnModal["props"] & {};
+type ModalProps = Pick<
+  ReactNativeModalProps,
+  "isVisible" | "onBackdropPress" | "style" | "children"
+>;
 
 export const Modal = React.forwardRef(({ ...rest }: ModalProps, ref: any) => {
-  const styles = StyleSheet.create({
-    default: tw`bg-white border-gray-800`,
-  });
-
   return (
-    <RnModal ref={ref} {...rest} style={rest.style}>
+    <ReactNativeModal
+      ref={ref}
+      {...rest}
+      animationIn="fadeIn"
+      animationOut="fadeOut"
+      animationInTiming={150}
+      animationOutTiming={150}
+      backdropOpacity={0.5}
+      useNativeDriverForBackdrop
+      style={rest.style}
+    >
       {rest.children}
-    </RnModal>
+    </ReactNativeModal>
   );
 });

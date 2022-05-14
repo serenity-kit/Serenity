@@ -153,26 +153,8 @@ export default function DesignSystemScreen() {
       </SidebarLink>
 
       <Text style={tw`mt-6 mb-4 h2`}>Modal (work in progress)</Text>
-      <Modal
-        animationType="fade"
-        onRequestClose={() => setShowModal(false)}
-        visible={showModal}
-        transparent
-      >
-        <View
-          style={{
-            alignItems: "center",
-            backgroundColor: "white",
-            borderColor: "#eee",
-            borderRadius: 10,
-            borderWidth: 1,
-            justifyContent: "center",
-            height: 300,
-            margin: "auto",
-            padding: 30,
-            width: 300,
-          }}
-        >
+      <Modal isVisible={showModal} onBackdropPress={() => setShowModal(false)}>
+        <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
           <Text>Hello World</Text>
           <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
             <Text>Encrypt / Decrypt Image</Text>
