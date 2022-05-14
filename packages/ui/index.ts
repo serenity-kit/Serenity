@@ -10,6 +10,7 @@ export * from "./components/icon/Icon";
 export * from "./components/editorSidebarIcon/EditorSidebarIcon";
 export * from "./components/labeledInput/LabeledInput";
 export * from "./components/menu/Menu";
+export * from "./components/modal/Modal";
 export * from "./components/scrollView/ScrollView";
 export * from "./components/sidebarButton/SidebarButton";
 export * from "./components/sidebarLink/SidebarLink";
