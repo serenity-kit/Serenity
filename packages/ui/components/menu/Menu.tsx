@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { StyleSheet, View, TouchableWithoutFeedback } from "react-native";
 import { tw } from "../../tailwind";
 import { Popover } from "react-native-popper";
