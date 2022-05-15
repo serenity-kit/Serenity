@@ -1,0 +1,40 @@
+import { arg, inputObjectType, mutationField, objectType } from "nexus";
+import { deleteFolders } from "../../../database/folder/deleteFolders";
+
+export const DeleteFoldersInput = inputObjectType({
+  name: "DeleteFoldersInput",
+  definition(t) {
+    t.nonNull.list.nonNull.field("ids", {
+      type: "String",
+    });
+  },
+});
+
+export const DeleteFoldersResult = objectType({
+  name: "DeleteFoldersResult",
+  definition(t) {
+    t.nonNull.string("status");
+  },
+});
+
+export const deleteFoldersMutation = mutationField("deleteFolders", {
+  type: DeleteFoldersResult,
+  args: {
+    input: arg({
+      type: DeleteFoldersInput,
+    }),
+  },
+  async resolve(root, args, context) {
+    if (!context.user) {
+      throw new Error("Unauthorized");
+    }
+    if (!args.input) {
+      throw new Error("Invalid input");
+    }
+    await deleteFolders({
+      folderIds: args.input.ids,
+      username: context.user.username,
+    });
+    return { status: "success" };
+  },
+});
