@@ -249,20 +249,35 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 >
                   {documentPreview?.name}
                 </Link>
-                <Button
-                  onPress={() => {
-                    updateDocumentName(documentPreview?.id);
-                  }}
+                <Menu
+                  placement="bottom"
+                  style={tw`w-60`}
+                  offset={8}
+                  crossOffset={80}
+                  trigger={
+                    <Pressable
+                      accessibilityLabel="More options menu"
+                      style={tw`flex flex-row`}
+                    >
+                      <Icon name="more-line" />
+                    </Pressable>
+                  }
                 >
-                  Change Name
-                </Button>
-                <Button
-                  onPress={() => {
-                    deleteDocument(documentPreview?.id);
-                  }}
-                >
-                  Delete
-                </Button>
+                  <SidebarButton
+                    onPress={() => {
+                      updateDocumentName(documentPreview?.id);
+                    }}
+                  >
+                    <Text variant="small"> Change Name</Text>
+                  </SidebarButton>
+                  <SidebarButton
+                    onPress={() => {
+                      deleteDocument(documentPreview?.id);
+                    }}
+                  >
+                    <Text variant="small"> Delete </Text>
+                  </SidebarButton>
+                </Menu>
               </View>
             );
           }
