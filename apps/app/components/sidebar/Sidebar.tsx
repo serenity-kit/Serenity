@@ -74,7 +74,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         screen: "Page",
         params: {
           pageId: result.data?.createDocument?.id,
-          autofocus: true,
+          isNew: true,
         },
       });
     } else {

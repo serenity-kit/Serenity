@@ -44,7 +44,7 @@ export default function Page({ navigation, route }: Props) {
     return null;
   }
   const docId = route.params.pageId;
-  const autofocus = route.params.autofocus ?? false;
+  const isNew = route.params.isNew ?? false;
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
@@ -430,7 +430,7 @@ export default function Page({ navigation, route }: Props) {
       yDocRef={yDocRef}
       yAwarenessRef={yAwarenessRef}
       openDrawer={navigation.openDrawer}
-      autofocus={autofocus}
+      isNew={isNew}
     />
   );
 }

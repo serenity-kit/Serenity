@@ -56,7 +56,7 @@ export default function EditorScreen({
       documentId={"096f7289-d765-41ef-9f07-dc8252ced299"}
       yDocRef={yDocRef}
       openDrawer={navigation.openDrawer}
-      autofocus={false}
+      isNew={false}
     />
   );
 }
