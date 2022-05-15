@@ -21,7 +21,12 @@ let editorSource =
     ? require("../../assets/index.html")
     : { html: null };
 
-export default function Editor({ yDocRef, openDrawer, isNew }: EditorProps) {
+export default function Editor({
+  yDocRef,
+  openDrawer,
+  updateTitle,
+  isNew,
+}: EditorProps) {
   const webViewRef = useRef(null);
 
   useEffect(() => {
@@ -68,6 +73,9 @@ export default function Editor({ yDocRef, openDrawer, isNew }: EditorProps) {
           const message = JSON.parse(event.nativeEvent.data);
           if (message.type === "openDrawer") {
             openDrawer();
+          }
+          if (message.type === "updateTitle") {
+            updateTitle(message.title);
           }
           if (message.type === "update") {
             const update = new Uint8Array(message.content);

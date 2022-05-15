@@ -36,9 +36,11 @@ import { useEffect, useRef } from "react";
 
 const reconnectTimeout = 2000;
 
-type Props = WorkspaceDrawerScreenProps<"Page">;
+type Props = WorkspaceDrawerScreenProps<"Page"> & {
+  updateTitle: (title: string) => void;
+};
 
-export default function Page({ navigation, route }: Props) {
+export default function Page({ navigation, route, updateTitle }: Props) {
   if (!route.params?.pageId) {
     // should never happen
     return null;
@@ -430,6 +432,7 @@ export default function Page({ navigation, route }: Props) {
       yDocRef={yDocRef}
       yAwarenessRef={yAwarenessRef}
       openDrawer={navigation.openDrawer}
+      updateTitle={updateTitle}
       isNew={isNew}
     />
   );

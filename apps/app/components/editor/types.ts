@@ -7,4 +7,5 @@ export type EditorProps = {
   yAwarenessRef?: React.MutableRefObject<Awareness>;
   isNew: boolean;
   openDrawer: () => void;
+  updateTitle: (title: string) => void;
 };
