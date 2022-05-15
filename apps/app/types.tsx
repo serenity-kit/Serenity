@@ -18,6 +18,7 @@ declare global {
 
 type PageParams = {
   pageId: string;
+  autofocus?: boolean;
 };
 
 export type WorkspaceDrawerParamList = {

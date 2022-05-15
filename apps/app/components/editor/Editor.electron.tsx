@@ -7,6 +7,7 @@ export default function Editor({
   yDocRef,
   yAwarenessRef,
   openDrawer,
+  autofocus,
 }: EditorProps) {
   return (
     <View>
@@ -16,6 +17,7 @@ export default function Editor({
         yDocRef={yDocRef}
         yAwarenessRef={yAwarenessRef}
         openDrawer={openDrawer}
+        autofocus={autofocus}
       />
     </View>
   );

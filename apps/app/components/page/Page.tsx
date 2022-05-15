@@ -31,22 +31,20 @@ import {
   applyAwarenessUpdate,
   removeAwarenessStates,
 } from "y-protocols/awareness";
-import { View, Text, tw } from "@serenity-tools/ui";
 import { WorkspaceDrawerScreenProps } from "../../types";
 import { useEffect, useRef } from "react";
 
 const reconnectTimeout = 2000;
 
-type Props = WorkspaceDrawerScreenProps<"Page"> & {
-  pageId: string;
-};
+type Props = WorkspaceDrawerScreenProps<"Page">;
 
-export default function Page({ navigation, route, pageId }: Props) {
+export default function Page({ navigation, route }: Props) {
   if (!route.params?.pageId) {
     // should never happen
     return null;
   }
   const docId = route.params.pageId;
+  const autofocus = route.params.autofocus ?? false;
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
@@ -432,6 +430,7 @@ export default function Page({ navigation, route, pageId }: Props) {
       yDocRef={yDocRef}
       yAwarenessRef={yAwarenessRef}
       openDrawer={navigation.openDrawer}
+      autofocus={autofocus}
     />
   );
 }
