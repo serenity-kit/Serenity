@@ -33,6 +33,8 @@ ReactDOM.render(
       documentId={"dummyDocumentId"}
       yDocRef={{ current: ydoc }}
       openDrawer={openDrawer}
+      // TODO set autofocus on Mobile
+      autofocus={false}
     />
   </NativeBaseProvider>,
   domContainer

@@ -18,7 +18,6 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   return (
     <Page
       {...props}
-      pageId={props.route.params.pageId}
       // to force unmount and mount the page
       key={props.route.params.pageId}
     />

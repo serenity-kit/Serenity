@@ -21,7 +21,11 @@ let editorSource =
     ? require("../../assets/index.html")
     : { html: null };
 
-export default function Editor({ yDocRef, openDrawer }: EditorProps) {
+export default function Editor({
+  yDocRef,
+  openDrawer,
+  autofocus,
+}: EditorProps) {
   const webViewRef = useRef(null);
 
   useEffect(() => {
@@ -82,6 +86,8 @@ export default function Editor({ yDocRef, openDrawer }: EditorProps) {
         // Needed for .focus() to work
         keyboardDisplayRequiresUserAction={false}
         onLoad={() => {
+          // TODO apply autofocus for new documents
+
           // debug for the editor
           // console.log(JSON.stringify(Array.apply([], contentRef.current)));
           // if (isNew) {

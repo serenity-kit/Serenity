@@ -20,16 +20,19 @@ type EditorProps = {
   documentId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef?: React.MutableRefObject<Awareness>;
+  autofocus?: boolean;
   openDrawer: () => void;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
 
 export const Editor = (props: EditorProps) => {
+  const autofocus = props.autofocus ?? false;
   const hasEditorSidebar = useHasEditorSidebar();
 
   const editor = useEditor(
     {
+      autofocus,
       extensions: [
         StarterKit.configure({
           // the Collaboration extension comes with its own history handling
