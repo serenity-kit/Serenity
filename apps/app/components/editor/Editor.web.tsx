@@ -6,15 +6,17 @@ export default function Editor({
   yAwarenessRef,
   openDrawer,
   documentId,
-  autofocus,
+  isNew,
+  updateTitle,
 }: EditorProps) {
   return (
     <SerenityEditor
       documentId={documentId}
       yDocRef={yDocRef}
       yAwarenessRef={yAwarenessRef}
-      autofocus={autofocus}
+      isNew={isNew}
       openDrawer={openDrawer}
+      updateTitle={updateTitle}
     />
   );
 }

@@ -56,9 +56,28 @@
   /* --- placeholder --- */
   .ProseMirror *.is-editor-empty:first-child::before {
     color: theme("colors.gray.400");
-    content: attr(data-placeholder);
+    content: "Just start writing here …";
     float: left;
     height: 0;
+    pointer-events: none;
+  }
+
+  .ProseMirror h1:first-child.is-empty::before {
+    color: theme("colors.gray.400");
+    content: "Page Title";
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .ProseMirror h1:first-child.is-empty::after {
+    font-size: 1rem;
+    font-weight: normal;
+    color: theme("colors.gray.400");
+    content: "Just start writing here …";
+    float: left;
+    height: 0;
+    margin-bottom: 2.5rem;
     pointer-events: none;
   }
 }

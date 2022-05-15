@@ -3,6 +3,7 @@ import Page from "../../components/page/Page";
 import { useWindowDimensions } from "react-native";
 import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
 import { useLayoutEffect } from "react";
+import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -11,6 +12,16 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
       headerRight: PageHeaderRight,
     });
   }, []);
+
+  const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
+  const updateTitle = (title: string) => {
+    updateDocumentNameMutation({
+      input: {
+        id: props.route.params.pageId,
+        name: title,
+      },
+    });
+  };
 
   if (!props.route.params?.pageId) {
     // should never happen
@@ -22,6 +33,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
       {...props}
       // to force unmount and mount the page
       key={props.route.params.pageId}
+      updateTitle={updateTitle}
     />
   );
 }

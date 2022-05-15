@@ -1,10 +1,11 @@
 import Editor from "../../components/editor/Editor";
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import * as Y from "yjs";
 
 import { tw, View } from "@serenity-tools/ui";
 import { WorkspaceDrawerScreenProps } from "../../types";
 import { useWindowDimensions } from "react-native";
+import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
 
 /*
 Hello World
@@ -39,6 +40,12 @@ export default function EditorScreen({
   navigation,
 }: WorkspaceDrawerScreenProps<"Editor">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: PageHeaderRight,
+    });
+  }, []);
+
   const [yDoc] = useState(() => {
     const yDoc = new Y.Doc();
     Y.applyUpdateV2(yDoc, editorContentAsYjsUpdateV2);
@@ -56,7 +63,8 @@ export default function EditorScreen({
       documentId={"096f7289-d765-41ef-9f07-dc8252ced299"}
       yDocRef={yDocRef}
       openDrawer={navigation.openDrawer}
-      autofocus={false}
+      isNew={false}
+      updateTitle={() => undefined}
     />
   );
 }

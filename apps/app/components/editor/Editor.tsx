@@ -24,7 +24,8 @@ let editorSource =
 export default function Editor({
   yDocRef,
   openDrawer,
-  autofocus,
+  updateTitle,
+  isNew,
 }: EditorProps) {
   const webViewRef = useRef(null);
 
@@ -73,6 +74,9 @@ export default function Editor({
           if (message.type === "openDrawer") {
             openDrawer();
           }
+          if (message.type === "updateTitle") {
+            updateTitle(message.title);
+          }
           if (message.type === "update") {
             const update = new Uint8Array(message.content);
             if (yDocRef.current) {
@@ -86,7 +90,7 @@ export default function Editor({
         // Needed for .focus() to work
         keyboardDisplayRequiresUserAction={false}
         onLoad={() => {
-          // TODO apply autofocus for new documents
+          // TODO apply isNew for new documents
 
           // debug for the editor
           // console.log(JSON.stringify(Array.apply([], contentRef.current)));

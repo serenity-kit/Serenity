@@ -26,6 +26,12 @@ const openDrawer = () => {
   window.ReactNativeWebView.postMessage(JSON.stringify({ type: "openDrawer" }));
 };
 
+const updateTitle = (title: string) => {
+  window.ReactNativeWebView.postMessage(
+    JSON.stringify({ type: "openDrawer", title })
+  );
+};
+
 const domContainer = document.querySelector("#editor");
 ReactDOM.render(
   <NativeBaseProvider>
@@ -33,8 +39,9 @@ ReactDOM.render(
       documentId={"dummyDocumentId"}
       yDocRef={{ current: ydoc }}
       openDrawer={openDrawer}
-      // TODO set autofocus on Mobile
-      autofocus={false}
+      updateTitle={updateTitle}
+      // TODO set isNew on Mobile
+      isNew={false}
     />
   </NativeBaseProvider>,
   domContainer

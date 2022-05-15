@@ -1,6 +1,6 @@
 import "./editor-output.css";
 import "./awareness.css";
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { tw, View } from "@serenity-tools/ui";
 import StarterKit from "@tiptap/starter-kit";
@@ -20,19 +20,22 @@ type EditorProps = {
   documentId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef?: React.MutableRefObject<Awareness>;
-  autofocus?: boolean;
+  isNew?: boolean;
   openDrawer: () => void;
+  updateTitle: (title: string) => void;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
 
 export const Editor = (props: EditorProps) => {
-  const autofocus = props.autofocus ?? false;
+  const isNew = props.isNew ?? false;
   const hasEditorSidebar = useHasEditorSidebar();
+  const newTitleRef = useRef("");
+  const shouldCommitNewTitleRef = useRef(props.isNew);
 
   const editor = useEditor(
     {
-      autofocus,
+      autofocus: isNew,
       extensions: [
         StarterKit.configure({
           // the Collaboration extension comes with its own history handling
@@ -55,7 +58,13 @@ export const Editor = (props: EditorProps) => {
           openOnClick: false,
         }),
         Placeholder.configure({
-          placeholder: "Just start writing here …",
+          placeholder: ({ node }) => {
+            if (node.type.name === "heading") {
+              return ""; // hardcoded in the css
+            }
+
+            return ""; // hardcoded in the css
+          },
         }),
         TaskList.configure({
           HTMLAttributes: {
@@ -76,6 +85,25 @@ export const Editor = (props: EditorProps) => {
           awareness: props.yAwarenessRef?.current,
         }),
       ],
+      onCreate: (params) => {
+        if (isNew) {
+          params.editor.chain().toggleHeading({ level: 1 }).run();
+        }
+      },
+      onUpdate: (params) => {
+        if (isNew) {
+          // sets the title based on the first line exactly once
+          const json = params.editor.getJSON();
+          if (json.content?.length === 1) {
+            if (json.content[0].content?.length === 1) {
+              newTitleRef.current = json.content[0].content[0].text || "";
+            }
+          } else if (shouldCommitNewTitleRef.current) {
+            shouldCommitNewTitleRef.current = false;
+            props.updateTitle(newTitleRef.current);
+          }
+        }
+      },
     },
     [props.documentId]
   );

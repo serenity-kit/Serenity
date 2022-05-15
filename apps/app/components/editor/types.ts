@@ -5,6 +5,7 @@ export type EditorProps = {
   documentId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef?: React.MutableRefObject<Awareness>;
-  autofocus: boolean;
+  isNew: boolean;
   openDrawer: () => void;
+  updateTitle: (title: string) => void;
 };
