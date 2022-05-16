@@ -28,14 +28,14 @@ type EditorProps = {
 const headingLevels: Level[] = [1, 2, 3];
 
 export const Editor = (props: EditorProps) => {
-  const isNew = props.isNew ?? false;
   const hasEditorSidebar = useHasEditorSidebar();
+  // using the state here since it's only true on the first render
+  const [isNew] = useState(props.isNew ?? false);
   const newTitleRef = useRef("");
-  const shouldCommitNewTitleRef = useRef(props.isNew);
+  const shouldCommitNewTitleRef = useRef(isNew);
 
   const editor = useEditor(
     {
-      autofocus: isNew,
       extensions: [
         StarterKit.configure({
           // the Collaboration extension comes with its own history handling
@@ -87,7 +87,10 @@ export const Editor = (props: EditorProps) => {
       ],
       onCreate: (params) => {
         if (isNew) {
-          params.editor.chain().toggleHeading({ level: 1 }).run();
+          const json = params.editor.getJSON();
+          if (json.content?.length === 1) {
+            params.editor.chain().toggleHeading({ level: 1 }).focus().run();
+          }
         }
       },
       onUpdate: (params) => {
