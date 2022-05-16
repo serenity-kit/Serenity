@@ -2,7 +2,7 @@ import { WorkspaceDrawerScreenProps } from "../../types";
 import Page from "../../components/page/Page";
 import { useWindowDimensions } from "react-native";
 import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
@@ -22,6 +22,11 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
       },
     });
   };
+
+  useEffect(() => {
+    // removing the isNew param right after the first render so users don't have it after a refresh
+    props.navigation.setParams({ isNew: undefined });
+  }, [props.route.params.pageId]);
 
   if (!props.route.params?.pageId) {
     // should never happen

@@ -38,6 +38,7 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
       props.navigation.navigate("Register");
     }
   }, []);
+
   return (
     <View>
       <Text>Splash Screen (show loading indicator after 200ms)</Text>
