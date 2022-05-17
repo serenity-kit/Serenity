@@ -83,6 +83,9 @@ module.exports = {
         "se-outline-focus-mini": {
           boxShadow: `0px 0px 0px 0.125rem ${customTheme.colors.primary["200"]}`, // web-only
         },
+        "se-inset-focus": {
+          boxShadow: `inset 0px 0px 0px 0.25rem ${customTheme.colors.primary["200"]}`, // web-only
+        },
         "se-inset-focus-mini": {
           boxShadow: `inset 0px 0px 0px 0.125rem ${customTheme.colors.primary["200"]}`, // web-only
         },
