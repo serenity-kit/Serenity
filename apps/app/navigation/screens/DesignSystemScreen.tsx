@@ -58,6 +58,14 @@ export default function DesignSystemScreen() {
       <Button>Login</Button>
       <Text>Disabled Button</Text>
       <Button disabled>Login</Button>
+      <Text>Secondary Button</Text>
+      <Button variant="secondary">Login</Button>
+      <Text>Disabled Secondary Button</Text>
+      <Button variant="secondary" disabled>
+        Login
+      </Button>
+      <Text>Small Button</Text>
+      <Button size="small">Login</Button>
 
       <Text style={tw`mt-6 mb-4 h2`}>Input</Text>
       <VStack space={4}>
