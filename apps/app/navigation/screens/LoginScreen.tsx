@@ -20,8 +20,9 @@ import {
   useFinalizeLoginMutation,
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
+import { RootStackScreenProps } from "../../types";
 
-export default function LoginScreen(props) {
+export default function LoginScreen(props: RootStackScreenProps<"Login">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

@@ -29,6 +29,13 @@ type AuthState = {
   deviceSigningPublicKey: string;
 };
 
+const unauthenticatedOperation = [
+  "initializeRegistration",
+  "finalizeRegistration",
+  "initializeLogin",
+  "finalizeLogin",
+];
+
 const client = createClient({
   url:
     process.env.NODE_ENV === "development"
@@ -39,6 +46,28 @@ const client = createClient({
     dedupExchange,
     cacheExchange,
     authExchange<AuthState>({
+      // if it fails it will run getAuth again and see if the client already logged in in the meantime
+      willAuthError: ({ operation, authState }) => {
+        if (!authState) {
+          // detect the unauthenticated mutations and let this operations through
+          return !(
+            operation.kind === "mutation" &&
+            operation.query.definitions.some((definition) => {
+              return (
+                definition.kind === "OperationDefinition" &&
+                definition.selectionSet.selections.some((node) => {
+                  return (
+                    node.kind === "Field" &&
+                    unauthenticatedOperation.includes(node.name.value)
+                  );
+                })
+              );
+            })
+          );
+        }
+
+        return false;
+      },
       getAuth: async ({ authState }) => {
         if (!authState) {
           const deviceSigningPublicKey =
