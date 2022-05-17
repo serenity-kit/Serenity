@@ -1,6 +1,6 @@
 import "./editor-output.css";
 import "./awareness.css";
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { tw, View } from "@serenity-tools/ui";
 import StarterKit from "@tiptap/starter-kit";
@@ -20,13 +20,19 @@ type EditorProps = {
   documentId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef?: React.MutableRefObject<Awareness>;
+  isNew?: boolean;
   openDrawer: () => void;
+  updateTitle: (title: string) => void;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
 
 export const Editor = (props: EditorProps) => {
   const hasEditorSidebar = useHasEditorSidebar();
+  // using the state here since it's only true on the first render
+  const [isNew] = useState(props.isNew ?? false);
+  const newTitleRef = useRef("");
+  const shouldCommitNewTitleRef = useRef(isNew);
 
   const editor = useEditor(
     {
@@ -52,7 +58,13 @@ export const Editor = (props: EditorProps) => {
           openOnClick: false,
         }),
         Placeholder.configure({
-          placeholder: "Just start writing here …",
+          placeholder: ({ node }) => {
+            if (node.type.name === "heading") {
+              return ""; // hardcoded in the css
+            }
+
+            return ""; // hardcoded in the css
+          },
         }),
         TaskList.configure({
           HTMLAttributes: {
@@ -73,6 +85,28 @@ export const Editor = (props: EditorProps) => {
           awareness: props.yAwarenessRef?.current,
         }),
       ],
+      onCreate: (params) => {
+        if (isNew) {
+          const json = params.editor.getJSON();
+          if (json.content?.length === 1) {
+            params.editor.chain().toggleHeading({ level: 1 }).focus().run();
+          }
+        }
+      },
+      onUpdate: (params) => {
+        if (isNew) {
+          // sets the title based on the first line exactly once
+          const json = params.editor.getJSON();
+          if (json.content?.length === 1) {
+            if (json.content[0].content?.length === 1) {
+              newTitleRef.current = json.content[0].content[0].text || "";
+            }
+          } else if (shouldCommitNewTitleRef.current) {
+            shouldCommitNewTitleRef.current = false;
+            props.updateTitle(newTitleRef.current);
+          }
+        }
+      },
     },
     [props.documentId]
   );

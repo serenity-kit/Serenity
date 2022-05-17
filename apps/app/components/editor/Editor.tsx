@@ -21,7 +21,12 @@ let editorSource =
     ? require("../../assets/index.html")
     : { html: null };
 
-export default function Editor({ yDocRef, openDrawer }: EditorProps) {
+export default function Editor({
+  yDocRef,
+  openDrawer,
+  updateTitle,
+  isNew,
+}: EditorProps) {
   const webViewRef = useRef(null);
 
   useEffect(() => {
@@ -69,6 +74,9 @@ export default function Editor({ yDocRef, openDrawer }: EditorProps) {
           if (message.type === "openDrawer") {
             openDrawer();
           }
+          if (message.type === "updateTitle") {
+            updateTitle(message.title);
+          }
           if (message.type === "update") {
             const update = new Uint8Array(message.content);
             if (yDocRef.current) {
@@ -82,6 +90,8 @@ export default function Editor({ yDocRef, openDrawer }: EditorProps) {
         // Needed for .focus() to work
         keyboardDisplayRequiresUserAction={false}
         onLoad={() => {
+          // TODO apply isNew for new documents
+
           // debug for the editor
           // console.log(JSON.stringify(Array.apply([], contentRef.current)));
           // if (isNew) {

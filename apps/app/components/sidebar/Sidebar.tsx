@@ -1,4 +1,8 @@
-import { DrawerContentScrollView } from "@react-navigation/drawer";
+import {
+  DrawerContentScrollView,
+  DrawerContentComponentProps,
+} from "@react-navigation/drawer";
+
 import { StyleSheet } from "react-native";
 import {
   Button,
@@ -27,7 +31,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useRoute } from "@react-navigation/native";
 import { RootStackScreenProps } from "../../types";
 
-export default function Sidebar(props) {
+export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
@@ -64,6 +68,19 @@ export default function Sidebar(props) {
     const result = await createDocumentMutation({
       input: { id, workspaceId: route.params.workspaceId },
     });
+    if (result.data?.createDocument?.id) {
+      props.navigation.navigate("Workspace", {
+        workspaceId: route.params.workspaceId,
+        screen: "Page",
+        params: {
+          pageId: result.data?.createDocument?.id,
+          isNew: true,
+        },
+      });
+    } else {
+      console.error(result.error);
+      alert("Failed to create a page. Please try again.");
+    }
     refetchDocumentPreviews();
   };
 
@@ -232,20 +249,35 @@ export default function Sidebar(props) {
                 >
                   {documentPreview?.name}
                 </Link>
-                <Button
-                  onPress={() => {
-                    updateDocumentName(documentPreview?.id);
-                  }}
+                <Menu
+                  placement="bottom"
+                  style={tw`w-60`}
+                  offset={8}
+                  crossOffset={80}
+                  trigger={
+                    <Pressable
+                      accessibilityLabel="More options menu"
+                      style={tw`flex flex-row`}
+                    >
+                      <Icon name="more-line" />
+                    </Pressable>
+                  }
                 >
-                  Change Name
-                </Button>
-                <Button
-                  onPress={() => {
-                    deleteDocument(documentPreview?.id);
-                  }}
-                >
-                  Delete
-                </Button>
+                  <SidebarButton
+                    onPress={() => {
+                      updateDocumentName(documentPreview?.id);
+                    }}
+                  >
+                    <Text variant="small"> Change Name</Text>
+                  </SidebarButton>
+                  <SidebarButton
+                    onPress={() => {
+                      deleteDocument(documentPreview?.id);
+                    }}
+                  >
+                    <Text variant="small"> Delete </Text>
+                  </SidebarButton>
+                </Menu>
               </View>
             );
           }

@@ -50,6 +50,14 @@ module.exports = {
           loader: "babel-loader",
         },
       },
+      // react-native-animatable includes raw JSX and therefor needs to be compiled
+      {
+        test: /\.(js|jsx|ts|tsx)$/,
+        include: /node_modules\/react-native-animatable/,
+        use: {
+          loader: "babel-loader",
+        },
+      },
       {
         test: /\.css$/i,
         use: [MiniCssExtractPlugin.loader, "css-loader"],

@@ -18,6 +18,7 @@ declare global {
 
 type PageParams = {
   pageId: string;
+  isNew?: boolean;
 };
 
 export type WorkspaceDrawerParamList = {

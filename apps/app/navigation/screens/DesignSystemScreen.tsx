@@ -15,14 +15,16 @@ import {
   LabeledInput,
   SidebarLink,
   SidebarDivider,
+  Modal,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
-import React from "react";
+import React, { useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { VStack } from "native-base";
 
 export default function DesignSystemScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <ScrollView style={tw`px-4 py-6`}>
@@ -149,6 +151,23 @@ export default function DesignSystemScreen() {
       <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
         <Text>Encrypt / Decrypt Image</Text>
       </SidebarLink>
+
+      <Text style={tw`mt-6 mb-4 h2`}>Modal (work in progress)</Text>
+      <Modal isVisible={showModal} onBackdropPress={() => setShowModal(false)}>
+        <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
+          <Text>Hello World</Text>
+          <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+            <Text>Encrypt / Decrypt Image</Text>
+          </SidebarLink>
+        </View>
+      </Modal>
+      <Button
+        onPress={() => {
+          setShowModal(true);
+        }}
+      >
+        Open Modal
+      </Button>
 
       <Text style={tw`mt-6 mb-4 h2`}>Checkbox</Text>
       <Checkbox value="test" accessibilityLabel="This is a dummy checkbox" />

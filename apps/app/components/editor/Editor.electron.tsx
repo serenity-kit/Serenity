@@ -7,6 +7,8 @@ export default function Editor({
   yDocRef,
   yAwarenessRef,
   openDrawer,
+  updateTitle,
+  isNew,
 }: EditorProps) {
   return (
     <View>
@@ -16,6 +18,8 @@ export default function Editor({
         yDocRef={yDocRef}
         yAwarenessRef={yAwarenessRef}
         openDrawer={openDrawer}
+        updateTitle={updateTitle}
+        isNew={isNew}
       />
     </View>
   );
