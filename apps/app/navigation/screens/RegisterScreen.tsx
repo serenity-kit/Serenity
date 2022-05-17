@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import {
   Text,
   View,
-  Input,
   Box,
   Button,
   Checkbox,
@@ -21,19 +20,22 @@ import {
   useInitializeRegistrationMutation,
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
+import { RootStackScreenProps } from "../../types";
 
-export default function RegisterScreen(props) {
+export default function RegisterScreen(
+  props: RootStackScreenProps<"Register">
+) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [clientPublicKey, setClientPublicKey] = useState("");
   const [clientPrivateKey, setClientPrivateKey] = useState("");
   const [didRegistrationSucceed, setDidRegistrationSucceed] = useState(false);
   const [, initializeRegistrationMutation] =
     useInitializeRegistrationMutation();
   const [, finalizeRegistrationMutation] = useFinalizeRegistrationMutation();
-  const [hasGqlError, setHasGqlError] = useState(false);
-  const [gqlErrorMessage, setGqlErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const OPRF_CLIENT_KEYS_STORAGE_KEY = "oprf.clientKeys";
   const OPRF_SECRET_STORAGE_KEY = "oprf.secret";
   const OPRF_NONCE_STORAGE_KEY = "oprf.nonce";
@@ -79,7 +81,6 @@ export default function RegisterScreen(props) {
         challenge: oprfChallenge,
       },
     });
-    console.log({ mutationResult });
     // check for an error
     if (mutationResult.data && mutationResult.data.initializeRegistration) {
       const serverChallengeResponse =
@@ -140,13 +141,15 @@ export default function RegisterScreen(props) {
       setDidRegistrationSucceed(
         serverRegistrationResponse.status === "success"
       );
-      props.navigation.navigate("Login");
+      // reset since the user might end up on this screen again
+      setPassword("");
+      setUsername("");
+      props.navigation.push("Login");
     } else if (mutationResult.error) {
       const errorMessage = mutationResult.error.message.substring(
         mutationResult.error.message.indexOf("] ") + 2
       );
-      setHasGqlError(true);
-      setGqlErrorMessage(errorMessage);
+      setErrorMessage(errorMessage);
       throw Error(errorMessage);
     }
     localStorage.setItem(OPRF_SECRET_STORAGE_KEY, secret);
@@ -154,11 +157,12 @@ export default function RegisterScreen(props) {
   };
 
   const onRegisterPress = async () => {
-    console.log("click");
-    console.log(`username: ${username}, password: ${password}`);
+    if (!hasAcceptedTerms) {
+      setErrorMessage("Please accept the terms of service first.");
+      return;
+    }
     setDidRegistrationSucceed(false);
-    setHasGqlError(false);
-    setGqlErrorMessage("");
+    setErrorMessage("");
     let oprfChallengeResponse: any = null;
     try {
       // TODO the getServerOprfChallenge should include a signature of the challenge response and be verified that it belongs to
@@ -168,8 +172,7 @@ export default function RegisterScreen(props) {
     } catch (error) {
       console.log("error getting server challenge");
       console.log(error);
-      setHasGqlError(true);
-      setGqlErrorMessage(error.toString());
+      setErrorMessage(error.toString());
     }
     if (oprfChallengeResponse) {
       try {
@@ -182,8 +185,7 @@ export default function RegisterScreen(props) {
       } catch (error) {
         console.log("error registering account");
         console.log(error);
-        setHasGqlError(true);
-        setGqlErrorMessage(error.toString());
+        setErrorMessage(error.toString());
       }
     }
     // const serverRegistrationResponse = await registerAccount()
@@ -211,9 +213,9 @@ export default function RegisterScreen(props) {
           </Text>
         </View>
 
-        {hasGqlError && (
+        {errorMessage && (
           <View>
-            <Text>{gqlErrorMessage}</Text>
+            <Text>{errorMessage}</Text>
           </View>
         )}
 
@@ -240,7 +242,9 @@ export default function RegisterScreen(props) {
         />
 
         <Checkbox
-          value="dummy"
+          value={"hasAcceptedTerms"}
+          isChecked={hasAcceptedTerms}
+          onChange={setHasAcceptedTerms}
           accessibilityLabel="This is the terms and condition checkbox"
         >
           <Text variant="small" muted>

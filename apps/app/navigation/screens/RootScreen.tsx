@@ -2,19 +2,16 @@ import { Text, View } from "@serenity-tools/ui";
 import { useEffect } from "react";
 import { useWindowDimensions, Platform } from "react-native";
 import { useClient } from "urql";
+import { useAuthentication } from "../../context/AuthenticationContext";
 import { WorkspaceDocument, WorkspaceQuery } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types";
 
 export default function RootScreen(props: RootStackScreenProps<"Root">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const urqlClient = useClient();
+  const { deviceSigningPublicKey } = useAuthentication();
 
   useEffect(() => {
-    const deviceSigningPublicKey =
-      Platform.OS === "web"
-        ? localStorage.getItem("deviceSigningPublicKey")
-        : "weeee";
-
     if (deviceSigningPublicKey) {
       (async () => {
         const workspaceResult = await urqlClient
@@ -23,21 +20,20 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
             requestPolicy: "network-only",
           })
           .toPromise();
-        console.log(workspaceResult);
         if (workspaceResult.data?.workspace?.id) {
           // query first document on first workspace and go there
-          props.navigation.navigate("Workspace", {
+          props.navigation.replace("Workspace", {
             workspaceId: workspaceResult.data.workspace.id,
             screen: "Dashboard",
           });
         } else {
-          props.navigation.navigate("NoWorkspace");
+          props.navigation.replace("NoWorkspace");
         }
       })();
     } else {
-      props.navigation.navigate("Register");
+      props.navigation.replace("Register");
     }
-  }, []);
+  }, [deviceSigningPublicKey, urqlClient, props.navigation]);
 
   return (
     <View>
