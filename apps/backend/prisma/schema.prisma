@@ -12,13 +12,13 @@ generator client {
 
 model Document {
   id               String     @id
-  activeSnapshot   Snapshot?  @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id])
+  activeSnapshot   Snapshot?  @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
   activeSnapshotId String?    @unique
   snapshots        Snapshot[]
   createdAt        DateTime   @default(now())
-  workspace        Workspace  @relation(fields: [workspaceId], references: [id])
+  workspace        Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId      String
-  parentFolder     Folder?    @relation(fields: [parentFolderId], references: [id])
+  parentFolder     Folder?    @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
   parentFolderId   String?
   name             String // TODO must be encrypted
 }
@@ -28,7 +28,7 @@ model Snapshot {
   latestVersion          Int
   data                   String
   preview                String // title & icon
-  document               Document  @relation(fields: [documentId], references: [id])
+  document               Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
   documentId             String
   updates                Update[]
   activeSnapshotDocument Document? @relation("activeSnapshot")
@@ -40,7 +40,7 @@ model Update {
   id              String   @id @default(uuid())
   version         Int
   data            String
-  snapshot        Snapshot @relation(fields: [snapshotId], references: [id])
+  snapshot        Snapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
   snapshotId      String
   snapshotVersion Int
   pubKey          String
@@ -87,7 +87,7 @@ model User {
 model UserLoginAccessToken {
   accessToken String    @id @unique
   expiresAt   DateTime?
-  user        User      @relation(fields: [username], references: [username])
+  user        User      @relation(fields: [username], references: [username], onDelete: Cascade)
   username    String
 }
 
@@ -114,7 +114,7 @@ model Device {
   encryptionPublicKey          String
   encryptionPublicKeySignature String
   // can't be mandatory since we need to create the device
-  user                         User?           @relation(fields: [username], references: [username])
+  user                         User?           @relation(fields: [username], references: [username], onDelete: Cascade)
   username                     String?
   recoveryDevice               RecoveryDevice?
   userForMaster                User?           @relation("masterDevice")
@@ -143,11 +143,11 @@ model Folder {
   id             String     @id
   idSignature    String
   name           String // TODO must be encrypted
-  workspace      Workspace  @relation(fields: [workspaceId], references: [id])
+  workspace      Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId    String
-  parentFolder   Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id])
+  parentFolder   Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
   parentFolderId String?
-  rootFolder     Folder?    @relation(name: "rootFolder", fields: [rootFolderId], references: [id])
+  rootFolder     Folder?    @relation(name: "rootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
   rootFolderId   String?
   childFolders   Folder[]   @relation("parentFolder")
   descendent     Folder[]   @relation("rootFolder")
