@@ -1,4 +1,4 @@
-import { objectType } from "nexus";
+import { objectType, list } from "nexus";
 
 export const Folder = objectType({
   name: "Folder",
@@ -8,5 +8,8 @@ export const Folder = objectType({
     t.string("parentFolderId");
     t.string("rootFolderId");
     t.string("workspaceId");
+    t.list.nonNull.field("parentFolders", {
+      type: list(Folder),
+    });
   },
 });
