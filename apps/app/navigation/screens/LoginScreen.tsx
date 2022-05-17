@@ -21,6 +21,7 @@ import {
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
 import { RootStackScreenProps } from "../../types";
+import { useAuthentication } from "../../context/AuthenticationContext";
 
 export default function LoginScreen(props: RootStackScreenProps<"Login">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -33,6 +34,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
   const [gqlErrorMessage, setGqlErrorMessage] = useState("");
   const [oauthAccessToken, setOauthAccessToken] = useState("");
   const [accessTokenExpiresIn, setAccessTokenExpiresIn] = useState(0);
+  const { updateAuthentication } = useAuthentication();
   const OPRF_CLIENT_KEYS_STORAGE_KEY = "oprf.clientKeys";
   const OPRF_CLIENT_SESSION_KEYS_STORAGE_KEY = "oprf.sessionKeys";
 
@@ -44,13 +46,11 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
     let serializedKeyData = localStorage.getItem(OPRF_CLIENT_KEYS_STORAGE_KEY);
     if (serializedKeyData) {
       const keys = JSON.parse(serializedKeyData);
-      console.log("retrieved client keys");
-      console.log({ keys });
+      console.log("retrieved client keys", { keys });
     } else {
       const keys = createClientKeyPair();
       localStorage.setItem(OPRF_CLIENT_KEYS_STORAGE_KEY, JSON.stringify(keys));
-      console.log("generated client keys");
-      console.log({ keys });
+      console.log("generated client keys", { keys });
     }
   };
 
@@ -196,8 +196,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
         setDidLoginSucceed(true);
         setOauthAccessToken(oauthAccessData.accessToken);
         setAccessTokenExpiresIn(oauthAccessData.expiresIn);
-        // TODO replace with proper authentication
-        localStorage.setItem("deviceSigningPublicKey", `TODO+${username}`);
+        updateAuthentication(`TODO+${username}`);
         props.navigation.navigate("Root");
       } catch (error) {
         setHasGqlError(true);

@@ -138,6 +138,7 @@ export default function RegisterScreen(props) {
       setDidRegistrationSucceed(
         serverRegistrationResponse.status === "success"
       );
+      console.log("REGISTER SCREEEN, redirect to Login");
       props.navigation.navigate("Login");
     } else if (mutationResult.error) {
       const errorMessage = mutationResult.error.message.substring(
@@ -152,7 +153,6 @@ export default function RegisterScreen(props) {
 
   const onRegisterPress = async () => {
     if (!hasAcceptedTerms) {
-      console.log("weee");
       setErrorMessage("Please accept the terms of service first.");
       return;
     }

@@ -30,6 +30,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { useRoute } from "@react-navigation/native";
 import { RootStackScreenProps } from "../../types";
+import { useAuthentication } from "../../context/AuthenticationContext";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
@@ -49,6 +50,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     useDocumentPreviewsQuery({
       variables: { workspaceId: route.params.workspaceId },
     });
+  const { updateAuthentication } = useAuthentication();
 
   const createWorkspace = async () => {
     const name =
@@ -171,8 +173,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         <SidebarDivider collapsed />
         <SidebarButton
           onPress={() => {
-            // TODO clear cache and wipe local data?
-            localStorage.removeItem("deviceSigningPublicKey");
+            updateAuthentication(null);
             props.navigation.navigate("Login");
           }}
         >

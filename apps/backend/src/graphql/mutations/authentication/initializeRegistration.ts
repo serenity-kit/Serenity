@@ -33,6 +33,9 @@ export const initializeRegistrationMutation = mutationField(
         throw Error("Missing input");
       }
       const username = args.input.username;
+      if (username === "") {
+        throw Error("Username cannot be empty");
+      }
       const b64ClientOprfChallenge = args.input.challenge;
       let clientOprfChallenge = new Uint8Array(32);
       try {
