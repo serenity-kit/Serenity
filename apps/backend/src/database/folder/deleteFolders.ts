@@ -33,15 +33,20 @@ export async function deleteFolders({
 }: DeleteFolderParams) {
   try {
     return await prisma.$transaction(async (prisma) => {
-      // fetch all folders
-      // get workspace IDs from each folder, create a lookup
-      // grab workspaces where user is an admin
+      // 1. fetch all folders
+      // 2. get workspace IDs from each folder, create a lookup
+      // 3. grab workspaces where user is an admin
+      // 4. finally, delete folders where the workspace ids match
+      /*
       // then, prune folders by matching workspaces
       // find the root folders
       // find all folders with the same root folder
       // find all that are children of the deleting folder
       // delete folders that survived the pruning and are children
       // delete documents that have that folder
+      /* */
+
+      // 1. Fetch all folders
       const requestedFolders = await prisma.folder.findMany({
         where: {
           id: {
@@ -49,6 +54,8 @@ export async function deleteFolders({
           },
         },
       });
+
+      // 2. Get workspace IDs from each folder, create a lookup
       const workspaceFolderLookup = {};
       const rootFolderIds: string[] = [];
       requestedFolders.forEach((requestedFolder) => {
@@ -65,6 +72,7 @@ export async function deleteFolders({
       });
       const requestedWorkspaceIds = Object.keys(workspaceFolderLookup);
 
+      // 3. Grab workspaces where user is an admin
       const validWorkspaces = await prisma.usersToWorkspaces.findMany({
         where: {
           username,
@@ -79,6 +87,22 @@ export async function deleteFolders({
         validWorkspaceIds.push(validWorkspace.workspaceId);
       });
 
+      // 4. Finally, delete all folders where the the user is an admin
+      // of the workspace
+      // the database cascade should handle the rest
+      await prisma.folder.deleteMany({
+        where: {
+          id: {
+            in: folderIds,
+          },
+          workspaceId: {
+            in: validWorkspaceIds,
+          },
+        },
+      });
+
+      /*
+      // 4. Then, prune folders by matching workspaces
       // fetch all folders related to the roots, so we can delete
       // entire trees
       const relatedFolders = await prisma.folder.findMany({
@@ -145,8 +169,11 @@ export async function deleteFolders({
           },
         },
       });
+      /* */
     });
   } catch (error) {
+    console.log("ERROR");
+    console.log(error);
     throw Error("Invalid folder IDs");
   }
 }
