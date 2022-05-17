@@ -6,7 +6,7 @@ import type { NavigationAction } from "@react-navigation/core";
 import { GestureResponderEvent, TextProps, StyleSheet } from "react-native";
 import { To } from "@react-navigation/native/lib/typescript/src/useLinkTo";
 import { useFocusRing } from "@react-native-aria/focus";
-import { Stack } from "@mobily/stacks";
+import { HStack } from "native-base";
 
 // copied from react-navigation type definitions
 declare type SidebarLinkProps<ParamList extends ReactNavigation.RootParamList> =
@@ -49,9 +49,7 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Stack space={2} horizontal={true} align="left">
-        {props.children}
-      </Stack>
+      <HStack space={2}>{props.children}</HStack>
     </ReactNavigationLink>
   );
 }
