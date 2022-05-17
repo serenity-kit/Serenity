@@ -39,7 +39,11 @@ export async function createFolder({
         if (!parentFolder) {
           throw Error("Parent folder not found");
         }
-        rootFolderId = parentFolder.rootFolderId;
+        if (parentFolder.rootFolderId) {
+          rootFolderId = parentFolder.rootFolderId;
+        } else {
+          rootFolderId = parentFolder.id;
+        }
       }
       const rawFolder = await prisma.folder.create({
         data: {
@@ -58,6 +62,7 @@ export async function createFolder({
         parentFolderId: rawFolder.parentFolderId,
         rootFolderId: rawFolder.rootFolderId,
         workspaceId: rawFolder.workspaceId,
+        parentFolders: [],
       };
       return folder;
     });
