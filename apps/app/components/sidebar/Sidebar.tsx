@@ -174,7 +174,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         <SidebarButton
           onPress={() => {
             updateAuthentication(null);
-            props.navigation.navigate("Login");
+            // @ts-expect-error navigation ts issue
+            props.navigation.push("Login");
           }}
         >
           <Text variant="small">Logout</Text>

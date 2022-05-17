@@ -20,8 +20,11 @@ import {
   useInitializeRegistrationMutation,
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
+import { RootStackScreenProps } from "../../types";
 
-export default function RegisterScreen(props) {
+export default function RegisterScreen(
+  props: RootStackScreenProps<"Register">
+) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -138,8 +141,10 @@ export default function RegisterScreen(props) {
       setDidRegistrationSucceed(
         serverRegistrationResponse.status === "success"
       );
-      console.log("REGISTER SCREEEN, redirect to Login");
-      props.navigation.navigate("Login");
+      // reset since the user might end up on this screen again
+      setPassword("");
+      setUsername("");
+      props.navigation.push("Login");
     } else if (mutationResult.error) {
       const errorMessage = mutationResult.error.message.substring(
         mutationResult.error.message.indexOf("] ") + 2
