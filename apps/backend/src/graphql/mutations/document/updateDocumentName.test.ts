@@ -55,7 +55,10 @@ test("user should be able to change a document name", async () => {
   });
   expect(result.updateDocumentName).toMatchInlineSnapshot(`
     Object {
-      "document": null,
+      "document": Object {
+        "id": "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+        "name": "Updated Name",
+      },
     }
   `);
 });

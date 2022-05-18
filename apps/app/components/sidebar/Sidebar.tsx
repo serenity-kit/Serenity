@@ -98,13 +98,14 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const updateDocumentName = async (id: string) => {
     const name = window.prompt("Enter a document name");
     if (name && name.length > 0) {
-      const updatedDocument = await updateDocumentNameMutation({
+      // refetchDocumentPreviews no necessary since a document is returned
+      // and therefor the cache automatically updated
+      await updateDocumentNameMutation({
         input: {
           id,
           name,
         },
       });
-      refetchDocumentPreviews();
     }
   };
 
