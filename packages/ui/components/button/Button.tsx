@@ -42,7 +42,6 @@ const computeStyle = ({
       case "secondary":
         return tw`bg-gray-100 border-gray-300`;
       case "primary":
-      default:
         return tw`bg-gray-300 border-gray-300`;
     }
   }
@@ -56,7 +55,6 @@ const computeStyle = ({
       case "secondary":
         return tw`bg-primary-200 border-primary-200`;
       case "primary":
-      default:
         return tw`bg-primary-700 border-primary-700`;
     }
   }
@@ -67,7 +65,6 @@ const computeStyle = ({
       case "secondary":
         return tw.style(`bg-primary-100`, style);
       case "primary":
-      default:
         return tw.style(`bg-primary-600 border-primary-600`, style);
     }
   }
@@ -136,8 +133,8 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
                 isHovered,
                 isFocusVisible,
                 isFocused,
-                variant: props.variant,
-                size: props.size,
+                variant,
+                size,
               }),
               { cursor: props.disabled ? "not-allowed" : "pointer" }, // web only
               props.style,
