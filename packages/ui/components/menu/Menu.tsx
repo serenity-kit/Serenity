@@ -12,7 +12,8 @@ export type MenuProps = IPopoverProps &
 
 export const Menu = ({ children, isOpen, onChange, ...rest }: MenuProps) => {
   const styles = StyleSheet.create({
-    menu: tw`bg-white border border-gray-200 rounded`,
+    // overflow setting needed so children with a set background don't spill
+    menu: tw`bg-white rounded shadow-lg overflow-hidden`,
   });
 
   return (
