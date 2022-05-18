@@ -31,9 +31,13 @@ import { v4 as uuidv4 } from "uuid";
 import { useRoute } from "@react-navigation/native";
 import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
+import { useState } from "react";
+import DocumentMenu from "../documentMenu/DocumentMenu";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
+  const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
+  const [isOpenDocumentMenu, setIsOpenDocumentMenu] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
   const [workspaceResult] = useWorkspaceQuery({
@@ -125,6 +129,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         style={tw`w-60`}
         offset={8}
         crossOffset={80}
+        isOpen={isOpenWorkspaceSwitcher}
+        onChange={setIsOpenWorkspaceSwitcher}
         trigger={
           <Pressable
             accessibilityLabel="More options menu"
@@ -166,6 +172,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
         <SidebarButton
           onPress={() => {
+            setIsOpenWorkspaceSwitcher(false);
             createWorkspace();
           }}
         >
@@ -174,6 +181,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         <SidebarDivider collapsed />
         <SidebarButton
           onPress={() => {
+            setIsOpenWorkspaceSwitcher(false);
             updateAuthentication(null);
             // @ts-expect-error navigation ts issue
             props.navigation.push("Login");
@@ -252,35 +260,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 >
                   {documentPreview?.name}
                 </Link>
-                <Menu
-                  placement="bottom"
-                  style={tw`w-60`}
-                  offset={8}
-                  crossOffset={80}
-                  trigger={
-                    <Pressable
-                      accessibilityLabel="More options menu"
-                      style={tw`flex flex-row`}
-                    >
-                      <Icon name="more-line" />
-                    </Pressable>
-                  }
-                >
-                  <SidebarButton
-                    onPress={() => {
-                      updateDocumentName(documentPreview?.id);
-                    }}
-                  >
-                    <Text variant="small"> Change Name</Text>
-                  </SidebarButton>
-                  <SidebarButton
-                    onPress={() => {
-                      deleteDocument(documentPreview?.id);
-                    }}
-                  >
-                    <Text variant="small"> Delete </Text>
-                  </SidebarButton>
-                </Menu>
+                <DocumentMenu
+                  documentId={documentPreview.id}
+                  refetchDocumentPreviews={refetchDocumentPreviews}
+                />
               </View>
             );
           }

@@ -25,6 +25,7 @@ import { VStack } from "native-base";
 export default function DesignSystemScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [showModal, setShowModal] = useState(false);
+  const [isOpenPopover, setIsOpenPopover] = useState(false);
 
   return (
     <ScrollView style={tw`px-4 py-6`}>
@@ -95,6 +96,8 @@ export default function DesignSystemScreen() {
           style={tw`w-60`}
           offset={8}
           crossOffset={80}
+          isOpen={isOpenPopover}
+          onChange={setIsOpenPopover}
           trigger={
             <Pressable
               accessibilityLabel="More options menu"
@@ -113,6 +116,7 @@ export default function DesignSystemScreen() {
           <SidebarDivider collapsed />
           <SidebarButton
             onPress={() => {
+              setIsOpenPopover(false);
               alert("Hello");
             }}
           >
