@@ -122,9 +122,9 @@ export default function DesignSystemScreen() {
       </AvatarGroup>
       <Text style={tw`mt-4 mb-1`}>Avatar Group with max 3 shown</Text>
       <AvatarGroup max={3} _avatar={{ size: "sm" }}>
-        <Avatar bg="primary.700">SK</Avatar>
-        <Avatar bg="primary.500">AN</Avatar>
-        <Avatar bg="primary.300">NG</Avatar>
+        <Avatar bg="green.400">BE</Avatar>
+        <Avatar bg="yellow.400">AN</Avatar>
+        <Avatar bg="orange.400">NG</Avatar>
         <Avatar bg="yellow.300">NG</Avatar>
         <Avatar bg="green.300">NG</Avatar>
       </AvatarGroup>
