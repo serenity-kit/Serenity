@@ -29,38 +29,41 @@ const customTheme = {
       900: "#000F70",
     },
     white: "#FFFFFF",
+    collaboration: {
+      red: "#EF5245",
+      orange: "#FF7D2E",
+    },
+    error: {
+      100: "#FFEDEF",
+      200: "#FFCED4",
+      500: "#F84A56",
+    },
+    warning: {
+      500: "#F09334",
+    },
+    success: {
+      500: "#48AD83",
+    },
   },
   screens: {
     xs: "475px",
     ...defaultTheme.screens,
   },
   extend: {
-    colors: {
-      collaboration: {
-        red: "#EF5245",
-        orange: "#FF7D2E",
-      },
-      error: {
-        100: "#FFEDEF",
-        200: "#FFCED4",
-        500: "#F84A56",
-      },
-      warning: {
-        500: "#F09334",
-      },
-      success: {
-        500: "#48AD83",
-      },
-    },
     fontSize: {
       h1: ["2rem", "2.375rem"], // editor specific
       h2: ["1.5rem", "1.75rem"], // editor specific
       h3: ["1.125rem", "1.375rem"], // editor specific
       // custom fontSize multiplier for better scalability (represents a default size of 17px)
       mobile: "1.0625rem", // editor specific
+      xs: "0.8125rem",
+      xxs: "0.75rem"
     },
     height: {
       "top-bar": "3rem",
+    },
+    margin: {
+      4.5: "1.125rem",
     },
     padding: {
       4.5: "1.125rem", // editor specific
@@ -87,15 +90,15 @@ module.exports = {
           boxShadow: `inset 0px 0px 0px 0.125rem ${customTheme.colors.primary["200"]}`, // web-only
         },
         "se-outline-error": {
-          boxShadow: `0px 0px 0px 0.25rem ${customTheme.extend.colors.error["200"]}`, // web-only
+          boxShadow: `0px 0px 0px 0.25rem ${customTheme.colors.error["200"]}`, // web-only
         },
         "se-outline-error-mini": {
-          boxShadow: `0px 0px 0px 0.125rem ${customTheme.extend.colors.error["200"]}`, // web-only
+          boxShadow: `0px 0px 0px 0.125rem ${customTheme.colors.error["200"]}`, // web-only
         },
+        // TODO remove when heading declarations are done
         h1: `text-h1 font-bold`,
         h2: `text-h2 font-bold`,
         h3: `text-h3 font-bold`,
-        small: `text-xs`,
         "text-muted": `text-gray-600`,
       });
     }),
