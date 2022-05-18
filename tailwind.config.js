@@ -57,7 +57,7 @@ const customTheme = {
       // custom fontSize multiplier for better scalability (represents a default size of 17px)
       mobile: "1.0625rem", // editor specific
       xs: "0.8125rem",
-      xxs: "0.75rem"
+      xxs: "0.75rem",
     },
     height: {
       "top-bar": "3rem",
