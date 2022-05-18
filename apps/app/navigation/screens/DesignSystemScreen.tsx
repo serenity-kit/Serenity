@@ -16,11 +16,13 @@ import {
   SidebarLink,
   SidebarDivider,
   Modal,
+  Avatar,
+  AvatarGroup,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
 import { useWindowDimensions } from "react-native";
-import { VStack } from "native-base";
+import { VStack, HStack } from "native-base";
 
 export default function DesignSystemScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -88,6 +90,45 @@ export default function DesignSystemScreen() {
         />
       </VStack>
 
+      <Text style={tw`mt-6 mb-4 h2`}>Avatar</Text>
+      <Text style={tw`mt-4 mb-1`}>Sizing</Text>
+      <HStack space={2} alignItems="center">
+        <Avatar bg="primary.500" size={"xs"}>
+          XS
+        </Avatar>
+        <Avatar bg="primary.500" size={"sm"}>
+          SM
+        </Avatar>
+        <Avatar bg="primary.500" size={"md"}>
+          MD
+        </Avatar>
+        <Avatar bg="primary.500" size={"lg"}>
+          LG
+        </Avatar>
+        <Avatar bg="primary.500" size={"xl"}>
+          XL
+        </Avatar>
+        <Avatar bg="primary.500" size={"2xl"}>
+          2XL
+        </Avatar>
+      </HStack>
+      <Text style={tw`mt-4 mb-1`}>Avatar Group</Text>
+      <AvatarGroup max={8} _avatar={{ size: "sm" }}>
+        <Avatar bg="primary.700">SK</Avatar>
+        <Avatar bg="primary.500">AN</Avatar>
+        <Avatar bg="primary.300">NG</Avatar>
+        <Avatar bg="yellow.300">NG</Avatar>
+        <Avatar bg="green.300">NG</Avatar>
+      </AvatarGroup>
+      <Text style={tw`mt-4 mb-1`}>Avatar Group with max 3 shown</Text>
+      <AvatarGroup max={3} _avatar={{ size: "sm" }}>
+        <Avatar bg="primary.700">SK</Avatar>
+        <Avatar bg="primary.500">AN</Avatar>
+        <Avatar bg="primary.300">NG</Avatar>
+        <Avatar bg="yellow.300">NG</Avatar>
+        <Avatar bg="green.300">NG</Avatar>
+      </AvatarGroup>
+
       <Text style={tw`mt-6 mb-4 h2`}>SidebarButton</Text>
       <SidebarButton>
         <Text variant="small">Hallo</Text>
@@ -99,10 +140,9 @@ export default function DesignSystemScreen() {
       <Text style={tw`mt-6 mb-4 h2`}>Menu</Text>
       <View style={tw`flex flex-row`}>
         <Menu
-          placement="bottom"
+          placement="bottom left"
           style={tw`w-60`}
           offset={8}
-          crossOffset={80}
           isOpen={isOpenPopover}
           onChange={setIsOpenPopover}
           trigger={
@@ -115,7 +155,7 @@ export default function DesignSystemScreen() {
             </Pressable>
           }
         >
-          <View style={tw`p-4`}>
+          <View style={tw`py-1 px-4`}>
             <Text variant="small" muted>
               jane@example.com
             </Text>
