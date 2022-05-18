@@ -7,7 +7,7 @@ export type SidebarDividerProps = RNView["props"] & {
 };
 
 const styles = StyleSheet.create({
-  default: tw`border-b border-gray-200 my-6`,
+  default: tw`border-b border-gray-200 my-4.5`,
   collapsed: tw`my-0`,
 });
 

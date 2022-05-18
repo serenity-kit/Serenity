@@ -16,11 +16,13 @@ import {
   SidebarLink,
   SidebarDivider,
   Modal,
+  Avatar,
+  AvatarGroup,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
 import { useWindowDimensions } from "react-native";
-import { VStack } from "native-base";
+import { VStack, HStack } from "native-base";
 
 export default function DesignSystemScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -33,7 +35,8 @@ export default function DesignSystemScreen() {
       <Text variant="large">large Text</Text>
       <Text>regular Text</Text>
       <Text variant="small">small Text</Text>
-      <Text variant="tiny">tiny Text</Text>
+      <Text variant="xs">xs Text</Text>
+      <Text variant="xxs">xxs Text</Text>
       <Text variant="large" bold>
         bold large Text
       </Text>
@@ -41,8 +44,11 @@ export default function DesignSystemScreen() {
       <Text variant="small" bold>
         bold small Text
       </Text>
-      <Text variant="tiny" bold>
-        bold tiny Text
+      <Text variant="xs" bold>
+        bold xs Text
+      </Text>
+      <Text variant="xxs" bold>
+        bold xxs Text
       </Text>
       <Text variant="large" muted>
         muted large Text
@@ -51,8 +57,11 @@ export default function DesignSystemScreen() {
       <Text variant="small" muted>
         muted small Text
       </Text>
-      <Text variant="tiny" muted>
-        muted tiny Text
+      <Text variant="xs" muted>
+        muted xs Text
+      </Text>
+      <Text variant="xxs" muted>
+        muted xxs Text
       </Text>
       <Text style={tw`mt-6 mb-4 h2`}>Button</Text>
       <Text>Default Button</Text>
@@ -89,6 +98,45 @@ export default function DesignSystemScreen() {
         />
       </VStack>
 
+      <Text style={tw`mt-6 mb-4 h2`}>Avatar</Text>
+      <Text style={tw`mt-4 mb-1`}>Sizing</Text>
+      <HStack space={2} alignItems="center">
+        <Avatar bg="primary.500" size={"xs"}>
+          XS
+        </Avatar>
+        <Avatar bg="primary.500" size={"sm"}>
+          SM
+        </Avatar>
+        <Avatar bg="primary.500" size={"md"}>
+          MD
+        </Avatar>
+        <Avatar bg="primary.500" size={"lg"}>
+          LG
+        </Avatar>
+        <Avatar bg="primary.500" size={"xl"}>
+          XL
+        </Avatar>
+        <Avatar bg="primary.500" size={"2xl"}>
+          2XL
+        </Avatar>
+      </HStack>
+      <Text style={tw`mt-4 mb-1`}>Avatar Group</Text>
+      <AvatarGroup max={8} _avatar={{ size: "sm" }}>
+        <Avatar bg="primary.700">SK</Avatar>
+        <Avatar bg="primary.500">AN</Avatar>
+        <Avatar bg="primary.300">NG</Avatar>
+        <Avatar bg="yellow.300">NG</Avatar>
+        <Avatar bg="green.300">NG</Avatar>
+      </AvatarGroup>
+      <Text style={tw`mt-4 mb-1`}>Avatar Group with max 3 shown</Text>
+      <AvatarGroup max={3} _avatar={{ size: "sm" }}>
+        <Avatar bg="green.400">BE</Avatar>
+        <Avatar bg="yellow.400">AN</Avatar>
+        <Avatar bg="orange.400">NG</Avatar>
+        <Avatar bg="yellow.300">NG</Avatar>
+        <Avatar bg="green.300">NG</Avatar>
+      </AvatarGroup>
+
       <Text style={tw`mt-6 mb-4 h2`}>SidebarButton</Text>
       <SidebarButton>
         <Text variant="small">Hallo</Text>
@@ -100,10 +148,9 @@ export default function DesignSystemScreen() {
       <Text style={tw`mt-6 mb-4 h2`}>Menu</Text>
       <View style={tw`flex flex-row`}>
         <Menu
-          placement="bottom"
+          placement="bottom left"
           style={tw`w-60`}
           offset={8}
-          crossOffset={80}
           isOpen={isOpenPopover}
           onChange={setIsOpenPopover}
           trigger={
@@ -116,7 +163,7 @@ export default function DesignSystemScreen() {
             </Pressable>
           }
         >
-          <View style={tw`p-4`}>
+          <View style={tw`py-1 px-4`}>
             <Text variant="small" muted>
               jane@example.com
             </Text>
@@ -152,7 +199,7 @@ export default function DesignSystemScreen() {
           Encrypt / Decrypt Image
         </Link>
       </Text>
-      <Text variant="tiny">
+      <Text variant="xxs">
         This is a link to{" "}
         <Link to={{ screen: "EncryptDecryptImageTest" }}>
           Encrypt / Decrypt Image

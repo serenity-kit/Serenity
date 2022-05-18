@@ -21,7 +21,7 @@ export function LabeledInput(props: LabeledInputProps) {
   return (
     <View style={[styles.default, props.style]}>
       <Text
-        variant="small"
+        variant="xs"
         muted
         style={[
           tw`mb-1`,

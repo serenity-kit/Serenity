@@ -14,18 +14,21 @@ import {
   dedupExchange,
   cacheExchange,
 } from "urql";
-import { NativeBaseProvider } from "native-base";
+import { NativeBaseProvider, extendTheme } from "native-base";
 import { authExchange } from "@urql/exchange-auth";
 import {
   useFonts,
   // Inter options can be found here https://github.com/expo/google-fonts/tree/master/font-packages/inter
   Inter_400Regular,
+  Inter_500Medium,
   Inter_600SemiBold,
-  Inter_800ExtraBold,
+  Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import { Platform } from "react-native";
 import { AuthenticationProvider } from "./context/AuthenticationContext";
 import { useCallback, useMemo, useState } from "react";
+
+import { theme } from "../../tailwind.config";
 
 type AuthState = {
   deviceSigningPublicKey: string;
@@ -62,11 +65,17 @@ export default function App() {
   const isLoadingComplete = useCachedResources();
   const [isFontLoadingComplete] = useFonts({
     Inter_400Regular,
+    Inter_500Medium,
     Inter_600SemiBold,
-    Inter_800ExtraBold,
+    Inter_700Bold,
   });
   useDeviceContext(tw);
   const [colorScheme] = useAppColorScheme(tw);
+  const rnTheme = extendTheme({
+    colors: {
+      ...theme.colors,
+    },
+  });
 
   // recreate client and especially the internal cache every time the authentication state changes
   const client = useMemo(() => {
@@ -156,7 +165,7 @@ export default function App() {
       >
         <Provider value={client}>
           <SafeAreaProvider>
-            <NativeBaseProvider>
+            <NativeBaseProvider theme={rnTheme}>
               <Navigation colorScheme={colorScheme} />
               <StatusBar />
             </NativeBaseProvider>

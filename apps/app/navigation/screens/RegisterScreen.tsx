@@ -205,7 +205,9 @@ export default function RegisterScreen(
       {/* TODO use this as classes or default/variant ? */}
       <Box style={tw`max-w-md w-full`}>
         <View>
-          <Text style={tw`h1 text-center`}>Register</Text>
+          <Text variant="large" bold style={tw`text-center`}>
+            Register
+          </Text>
           <Text muted style={tw`text-center`}>
             Sign up and start your free trial!
             <br />
@@ -247,7 +249,7 @@ export default function RegisterScreen(
           onChange={setHasAcceptedTerms}
           accessibilityLabel="This is the terms and condition checkbox"
         >
-          <Text variant="small" muted>
+          <Text variant="xs" muted>
             Yes, I do agree to Serenity's{" "}
             <Link to={{ screen: "NotFound" }}>terms of services</Link> and{" "}
             <Link to={{ screen: "NotFound" }}>privacy policy</Link>.
@@ -257,10 +259,10 @@ export default function RegisterScreen(
         <Button onPress={onRegisterPress}>Register</Button>
 
         <View style={tw`text-center`}>
-          <Text variant="small" muted>
+          <Text variant="xs" muted>
             Already have an account?{" "}
           </Text>
-          <Text variant="small">
+          <Text variant="xs">
             <Link to={{ screen: "Login" }}>Login here</Link>
           </Text>
         </View>

@@ -232,7 +232,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
       <SidebarDivider />
 
-      <Text variant="tiny" style={tw`ml-4 mb-4`}>
+      <Text variant="xxs" bold style={tw`ml-4 mb-4`}>
         Documents
       </Text>
       {documentPreviewsResult.fetching ? (
