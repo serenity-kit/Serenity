@@ -23,7 +23,6 @@ export async function deleteDocuments({ documentIds, username }: Params) {
       const workspaceIds = userToWorkspaces.map(
         (userToWorkspace) => userToWorkspace.workspaceId
       );
-      console.log("DELETE MANY workspaceIds", workspaceIds, documentIds);
       await prisma.document.deleteMany({
         where: {
           id: {

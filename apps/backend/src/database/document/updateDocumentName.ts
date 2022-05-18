@@ -8,7 +8,7 @@ type Params = {
 
 export async function updateDocumentName({ id, name, username }: Params) {
   try {
-    await prisma.$transaction(async (prisma) => {
+    return await prisma.$transaction(async (prisma) => {
       // fetch the document
       // check if the user has access to the document
       // update the document
@@ -35,12 +35,8 @@ export async function updateDocumentName({ id, name, username }: Params) {
         throw Error("Unauthorized");
       }
       const updatedDocument = await prisma.document.update({
-        where: {
-          id,
-        },
-        data: {
-          name,
-        },
+        where: { id },
+        data: { name },
       });
       return updatedDocument;
     });
