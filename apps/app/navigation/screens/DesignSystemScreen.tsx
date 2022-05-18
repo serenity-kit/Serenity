@@ -33,7 +33,8 @@ export default function DesignSystemScreen() {
       <Text variant="large">large Text</Text>
       <Text>regular Text</Text>
       <Text variant="small">small Text</Text>
-      <Text variant="tiny">tiny Text</Text>
+      <Text variant="xs">xs Text</Text>
+      <Text variant="xxs">xxs Text</Text>
       <Text variant="large" bold>
         bold large Text
       </Text>
@@ -41,8 +42,11 @@ export default function DesignSystemScreen() {
       <Text variant="small" bold>
         bold small Text
       </Text>
-      <Text variant="tiny" bold>
-        bold tiny Text
+      <Text variant="xs" bold>
+        bold xs Text
+      </Text>
+      <Text variant="xxs" bold>
+        bold xxs Text
       </Text>
       <Text variant="large" muted>
         muted large Text
@@ -51,8 +55,11 @@ export default function DesignSystemScreen() {
       <Text variant="small" muted>
         muted small Text
       </Text>
-      <Text variant="tiny" muted>
-        muted tiny Text
+      <Text variant="xs" muted>
+        muted xs Text
+      </Text>
+      <Text variant="xxs" muted>
+        muted xxs Text
       </Text>
       <Text style={tw`mt-6 mb-4 h2`}>Button</Text>
       <Text>Default Button</Text>
@@ -144,7 +151,7 @@ export default function DesignSystemScreen() {
           Encrypt / Decrypt Image
         </Link>
       </Text>
-      <Text variant="tiny">
+      <Text variant="xxs">
         This is a link to{" "}
         <Link to={{ screen: "EncryptDecryptImageTest" }}>
           Encrypt / Decrypt Image

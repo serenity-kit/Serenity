@@ -22,7 +22,7 @@ export default function EditorSidebar({
   return (
     <View style={tw`w-60 h-full border-l border-gray-200 bg-gray-100 pt-4`}>
       <div>
-        <Text variant="tiny" style={tw`flex ml-4 mb-2`}>
+        <Text variant="xxs" bold style={tw`flex ml-4 mb-2`}>
           Decorations
         </Text>
 
@@ -71,7 +71,7 @@ export default function EditorSidebar({
 
         <SidebarDivider />
 
-        <Text variant="tiny" style={tw`flex ml-4 mb-2`}>
+        <Text variant="xxs" bold style={tw`flex ml-4 mb-2`}>
           Blocks
         </Text>
 
@@ -114,7 +114,7 @@ export default function EditorSidebar({
 
         <SidebarDivider />
 
-        <Text variant="tiny" style={tw`flex ml-4 mb-2`}>
+        <Text variant="xxs" bold style={tw`flex ml-4 mb-2`}>
           Lists
         </Text>
 

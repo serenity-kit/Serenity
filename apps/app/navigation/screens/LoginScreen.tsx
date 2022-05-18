@@ -220,7 +220,9 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
       {/* TODO use this as classes or default/variant ? */}
       <Box style={tw`max-w-md w-full`}>
         <View>
-          <Text style={tw`h1 text-center`}>Welcome back!</Text>
+          <Text variant="large" bold style={tw`text-center`}>
+            Welcome back!
+          </Text>
           <Text muted style={tw`text-center`}>
             Log in to your Serenity Account
           </Text>
@@ -256,10 +258,10 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
 
         <Button onPress={onLoginPress}>Log in</Button>
         <View style={tw`text-center`}>
-          <Text variant="small" muted>
+          <Text variant="xs" muted>
             Don't have an account?{" "}
           </Text>
-          <Text variant="small">
+          <Text variant="xs">
             <Link to={{ screen: "Register" }}>Register here</Link>
           </Text>
         </View>
