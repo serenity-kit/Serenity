@@ -45,6 +45,23 @@ export default function Folder(props: Props) {
     }
   };
 
+  const createDocument = async () => {
+    const id = uuidv4();
+    const result = await createDocumentMutation({
+      input: {
+        id,
+        workspaceId: props.workspaceId,
+        parentFolderId: props.folderId,
+      },
+    });
+    if (result.data?.createDocument?.id) {
+      console.log("created a document");
+    } else {
+      console.error(result.error);
+      alert("Failed to create a document. Please try again.");
+    }
+  };
+
   return (
     <>
       <Pressable
@@ -60,7 +77,10 @@ export default function Folder(props: Props) {
           )}
           <Text>{props.children}</Text>
           <Pressable onPress={createFolder}>
-            <Text>Create Folder</Text>
+            <Icon name="folder-line" />
+          </Pressable>
+          <Pressable onPress={createDocument}>
+            <Icon name="file-transfer-line" />
           </Pressable>
         </HStack>
       </Pressable>

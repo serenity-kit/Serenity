@@ -77,6 +77,7 @@ export type ClientRequestResetPasswordResult = {
 
 export type CreateDocumentInput = {
   id: Scalars['String'];
+  parentFolderId?: InputMaybe<Scalars['String']>;
   workspaceId: Scalars['String'];
 };
 
@@ -292,12 +293,18 @@ export type PageInfo = {
 
 export type Query = {
   __typename?: 'Query';
+  documentPath?: Maybe<Array<Maybe<Folder>>>;
   documentPreviews?: Maybe<DocumentPreviewConnection>;
-  folder?: Maybe<Folder>;
+  documents?: Maybe<FolderConnection>;
   folders?: Maybe<FolderConnection>;
   rootFolders?: Maybe<FolderConnection>;
   workspace?: Maybe<Workspace>;
   workspaces?: Maybe<WorkspaceConnection>;
+};
+
+
+export type QueryDocumentPathArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -308,8 +315,10 @@ export type QueryDocumentPreviewsArgs = {
 };
 
 
-export type QueryFolderArgs = {
-  id?: InputMaybe<Scalars['ID']>;
+export type QueryDocumentsArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
+  parentFolderId: Scalars['ID'];
 };
 
 
