@@ -191,17 +191,17 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         </SidebarButton>
       </Menu>
 
-      <SidebarDivider />
-
       <SidebarLink
         to={{
           screen: "Workspace",
           params: { workspaceId: route.params.workspaceId, screen: "Settings" },
         }}
       >
+        <Icon name="settings-4-line" size={18} color={tw.color("gray-800")} />
         <Text variant="small">Settings</Text>
       </SidebarLink>
       <SidebarLink to={{ screen: "DevDashboard" }}>
+        <Icon name="dashboard-line" size={18} color={tw.color("gray-800")} />
         <Text variant="small">Dev Dashboard</Text>
       </SidebarLink>
       <SidebarLink
@@ -210,6 +210,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           params: { workspaceId: route.params.workspaceId, screen: "Editor" },
         }}
       >
+        <Icon name="draft-line" size={18} color={tw.color("gray-800")} />
         <Text variant="small">Editor</Text>
       </SidebarLink>
       <SidebarLink
@@ -221,6 +222,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           },
         }}
       >
+        <Icon name="microscope-line" size={18} color={tw.color("gray-800")} />
         <Text variant="small">Libsodium Test Screen</Text>
       </SidebarLink>
 
