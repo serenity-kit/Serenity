@@ -65,6 +65,7 @@ import { PrinterLine } from "./icons/PrinterLine";
 import { QuestionMark } from "./icons/QuestionMark";
 import { SearchLine } from "./icons/SearchLine";
 import { Separator } from "./icons/Separator";
+import { SerenityFeather } from "./icons/SerenityFeather";
 import { Settings4Line } from "./icons/Settings4Line";
 import { StarSFill } from "./icons/StarSFill";
 import { Strikethrough } from "./icons/Strikethrough";
@@ -139,6 +140,7 @@ export type IconProps = {
     | "question-mark"
     | "search-line"
     | "separator"
+    | "serenity-feather"
     | "settings-4-line"
     | "stars-s-fill"
     | "strikethrough"
@@ -153,6 +155,7 @@ export const Icon = (props: IconProps) => {
   const { name } = props;
   const color = props.color ?? (tw.color("gray-900") as string);
   const size = props.size ?? 24;
+
   if (name === "add-line") return <AddLine color={color} size={size} />;
   if (name === "archive-line") return <ArchiveLine color={color} size={size} />;
   if (name === "arrow-down-s-fill")
@@ -245,6 +248,8 @@ export const Icon = (props: IconProps) => {
   if (name === "separator") return <Separator color={color} size={size} />;
   if (name === "settings-4-line")
     return <Settings4Line color={color} size={size} />;
+  if (name === "serenity-feather")
+    return <SerenityFeather color={color} size={size} />;
   if (name === "stars-s-fill") return <StarSFill color={color} size={size} />;
   if (name === "strikethrough")
     return <Strikethrough color={color} size={size} />;
