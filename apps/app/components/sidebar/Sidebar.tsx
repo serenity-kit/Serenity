@@ -145,7 +145,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             <Pressable accessibilityLabel="More options menu">
               <HStack space={2} alignItems="center">
                 <Avatar borderRadius={4} size="xs" bg={tw.color("primary-400")}>
-                  JE
+                  <Icon
+                    name="serenity-feather"
+                    color={tw.color("black/40")}
+                    size={20}
+                  />
                 </Avatar>
                 <Text
                   variant="xs"

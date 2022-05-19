@@ -339,6 +339,7 @@ export default function DesignSystemScreen() {
         <Icon name="search-line" />
         <Icon name="settings-4-line" />
         <Icon name="stars-s-fill" />
+        <Icon name="serenity-feather" />
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>Icons resized</Text>
       <Columns space={4} alignY="center" alignX="left">
