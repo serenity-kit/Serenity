@@ -1,5 +1,4 @@
 import { idArg, queryField } from "nexus";
-import { prisma } from "../../../database/prisma";
 import { getFolder } from "../../../database/folder/getFolder";
 import { Folder } from "../../types/folder";
 
