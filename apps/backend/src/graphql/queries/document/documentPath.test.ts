@@ -111,7 +111,7 @@ beforeEach(async () => {
 test("user should be able to get a document path", async () => {
   const authorizationHeader = { authorization: `TODO+${username}` };
   const query = gql`
-    query documentPath($id: ID) {
+    query documentPath($id: ID!) {
       documentPath(id: $id) {
         id
         name
@@ -142,7 +142,7 @@ test("user should be able to get a document path", async () => {
 test("user should be able to get a document path for a deep tree", async () => {
   const authorizationHeader = { authorization: `TODO+${username}` };
   const query = gql`
-    query documentPath($id: ID) {
+    query documentPath($id: ID!) {
       documentPath(id: $id) {
         id
         name
@@ -173,7 +173,7 @@ test("user should be able to get a document path for a deep tree", async () => {
 test("user should not be able to retrieve another user's folder", async () => {
   const authorizationHeader = { authorization: `TODO+${username}` };
   const query = gql`
-    query documentPath($id: ID) {
+    query documentPath($id: ID!) {
       documentPath(id: $id) {
         id
         name
@@ -196,7 +196,7 @@ test("user should not be able to retrieve another user's folder", async () => {
 test("retrieving a document that doesn't exist should throw an error", async () => {
   const authorizationHeader = { authorization: `TODO+${username}` };
   const query = gql`
-    query folder($id: ID) {
+    query folder($id: ID!) {
       folder(id: $id) {
         id
         name
