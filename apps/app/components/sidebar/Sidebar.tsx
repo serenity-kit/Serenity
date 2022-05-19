@@ -17,6 +17,7 @@ import {
   tw,
   useIsPermanentLeftSidebar,
   View,
+  Avatar,
 } from "@serenity-tools/ui";
 import {
   useWorkspacesQuery,
@@ -33,6 +34,7 @@ import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { useState } from "react";
 import DocumentMenu from "../documentMenu/DocumentMenu";
+import { HStack } from "native-base";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
@@ -114,7 +116,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   };
 
   return (
-    <DrawerContentScrollView {...props} style={tw`bg-gray-100`}>
+    // TODO override for now until we find out where the pt-1 comes from
+    <DrawerContentScrollView {...props} style={tw`bg-gray-100 -mt-1`}>
       {!isPermanentLeftSidebar && (
         <Button
           onPress={() => {
@@ -124,72 +127,93 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           Close Sidebar
         </Button>
       )}
-      <Menu
-        placement="bottom"
-        style={tw`w-60`}
-        offset={8}
-        crossOffset={80}
-        isOpen={isOpenWorkspaceSwitcher}
-        onChange={setIsOpenWorkspaceSwitcher}
-        trigger={
-          <Pressable
-            accessibilityLabel="More options menu"
-            style={tw`flex flex-row`}
-          >
-            <Text>
-              {workspaceResult.fetching
-                ? " "
-                : workspaceResult.data?.workspace?.name}
-            </Text>
-            <Icon name="arrow-down-s-fill" />
-          </Pressable>
-        }
+      <HStack
+        alignItems="center"
+        justifyContent="space-between"
+        style={tw`py-3 px-4`}
       >
-        <View style={tw`p-4`}>
-          <Text variant="small" muted>
-            jane@example.com
-          </Text>
-        </View>
-        {workspacesResult.fetching
-          ? null
-          : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
-              workspace === null || workspace === undefined ? null : (
-                <SidebarLink
-                  key={workspace.id}
-                  to={{
-                    screen: "Workspace",
-                    params: {
-                      workspaceId: workspace.id,
-                      screen: "Dashboard",
-                    },
-                  }}
+        <Menu
+          placement="bottom left"
+          style={tw`ml-4`} // we could solve this via additional margin but that's kinda hacky ...
+          offset={2}
+          // can never be more than half the trigger width !! should be something like 16+24+8+labellength*12-24
+          // or we only use the icon as the trigger (worsens ux)
+          crossOffset={120}
+          isOpen={isOpenWorkspaceSwitcher}
+          onChange={setIsOpenWorkspaceSwitcher}
+          trigger={
+            <Pressable accessibilityLabel="More options menu">
+              <HStack space={2} alignItems="center">
+                <Avatar borderRadius={4} size="xs" bg={tw.color("primary-400")}>
+                  JE
+                </Avatar>
+                <Text
+                  variant="xs"
+                  bold
+                  style={tw`-mr-1 max-w-30`} // -mr needed for icon spacing, max-w needed for ellipsis
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
                 >
-                  <Text variant="small">{workspace.name}</Text>
-                </SidebarLink>
-              )
-            )}
-        <SidebarDivider collapsed />
+                  {workspaceResult.fetching
+                    ? " "
+                    : workspaceResult.data?.workspace?.name}
+                </Text>
+                <Icon
+                  name="arrow-down-s-line"
+                  size={16}
+                  color={tw.color("gray-400")}
+                />
+              </HStack>
+            </Pressable>
+          }
+        >
+          <View style={tw`p-4`}>
+            <Text variant="small" muted>
+              jane@example.com
+            </Text>
+          </View>
+          {workspacesResult.fetching
+            ? null
+            : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
+                workspace === null || workspace === undefined ? null : (
+                  <SidebarLink
+                    key={workspace.id}
+                    to={{
+                      screen: "Workspace",
+                      params: {
+                        workspaceId: workspace.id,
+                        screen: "Dashboard",
+                      },
+                    }}
+                  >
+                    <Text variant="small">{workspace.name}</Text>
+                  </SidebarLink>
+                )
+              )}
+          <SidebarDivider collapsed />
 
-        <SidebarButton
-          onPress={() => {
-            setIsOpenWorkspaceSwitcher(false);
-            createWorkspace();
-          }}
-        >
-          <Text variant="small">Create workspace</Text>
-        </SidebarButton>
-        <SidebarDivider collapsed />
-        <SidebarButton
-          onPress={() => {
-            setIsOpenWorkspaceSwitcher(false);
-            updateAuthentication(null);
-            // @ts-expect-error navigation ts issue
-            props.navigation.push("Login");
-          }}
-        >
-          <Text variant="small">Logout</Text>
-        </SidebarButton>
-      </Menu>
+          <SidebarButton
+            onPress={() => {
+              setIsOpenWorkspaceSwitcher(false);
+              createWorkspace();
+            }}
+          >
+            <Text variant="small">Create workspace</Text>
+          </SidebarButton>
+          <SidebarDivider collapsed />
+          <SidebarButton
+            onPress={() => {
+              setIsOpenWorkspaceSwitcher(false);
+              updateAuthentication(null);
+              // @ts-expect-error navigation ts issue
+              props.navigation.push("Login");
+            }}
+          >
+            <Text variant="small">Logout</Text>
+          </SidebarButton>
+        </Menu>
+        <Icon size={16} name="arrow-left-s-line" color={tw.color("gray-400")} />
+      </HStack>
 
       <SidebarLink
         to={{
