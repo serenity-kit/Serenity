@@ -23,7 +23,7 @@ export default function EditorSidebar({
     <View style={tw`w-60 h-full border-l border-gray-200 bg-gray-100 pt-4`}>
       <div>
         <Text variant="xxs" bold style={tw`flex ml-4 mb-2`}>
-          Decorations
+          Formats
         </Text>
 
         <SidebarButton
@@ -155,7 +155,7 @@ export default function EditorSidebar({
             name="list-ordered"
           />
           <Text variant="small" bold={editor?.isActive("orderedList") || false}>
-            Numbered List
+            Numbered-List
           </Text>
         </SidebarButton>
 
@@ -167,7 +167,7 @@ export default function EditorSidebar({
             name="list-check-2"
           />
           <Text variant="small" bold={editor?.isActive("taskList") || false}>
-            Checklist
+            Check-List
           </Text>
         </SidebarButton>
       </div>
