@@ -3,11 +3,9 @@ import {
   DrawerContentComponentProps,
 } from "@react-navigation/drawer";
 
-import { StyleSheet } from "react-native";
 import {
   Button,
   Icon,
-  Link,
   Menu,
   Pressable,
   SidebarButton,
@@ -21,23 +19,20 @@ import {
 import {
   useWorkspacesQuery,
   useCreateWorkspaceMutation,
-  useCreateDocumentMutation,
-  useDeleteDocumentsMutation,
-  useUpdateDocumentNameMutation,
-  useDocumentPreviewsQuery,
   useWorkspaceQuery,
+  useCreateFolderMutation,
+  useRootFoldersQuery,
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 import { useRoute } from "@react-navigation/native";
 import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { useState } from "react";
-import DocumentMenu from "../documentMenu/DocumentMenu";
+import Folder from "../folder/Folder";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
-  const [isOpenDocumentMenu, setIsOpenDocumentMenu] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
   const [workspaceResult] = useWorkspaceQuery({
@@ -45,15 +40,15 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       id: route.params.workspaceId,
     },
   });
+  const [rootFoldersResult] = useRootFoldersQuery({
+    variables: {
+      workspaceId: route.params.workspaceId,
+      first: 20,
+    },
+  });
 
   const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
-  const [, createDocumentMutation] = useCreateDocumentMutation();
-  const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
-  const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
-  const [documentPreviewsResult, refetchDocumentPreviews] =
-    useDocumentPreviewsQuery({
-      variables: { workspaceId: route.params.workspaceId },
-    });
+  const [, createFolderMutation] = useCreateFolderMutation();
   const { updateAuthentication } = useAuthentication();
 
   const createWorkspace = async () => {
@@ -69,47 +64,16 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     refetchWorkspacesResult();
   };
 
-  const createDocument = async () => {
+  const createFolder = async () => {
     const id = uuidv4();
-    const result = await createDocumentMutation({
+    const result = await createFolderMutation({
       input: { id, workspaceId: route.params.workspaceId },
     });
-    if (result.data?.createDocument?.id) {
-      props.navigation.navigate("Workspace", {
-        workspaceId: route.params.workspaceId,
-        screen: "Page",
-        params: {
-          pageId: result.data?.createDocument?.id,
-          isNew: true,
-        },
-      });
+    if (result.data?.createFolder?.folder?.id) {
+      console.log("created a folder");
     } else {
       console.error(result.error);
-      alert("Failed to create a page. Please try again.");
-    }
-    refetchDocumentPreviews();
-  };
-
-  const deleteDocument = async (id: string) => {
-    await deleteDocumentsMutation({
-      input: {
-        ids: [id],
-      },
-    });
-    refetchDocumentPreviews();
-  };
-
-  const updateDocumentName = async (id: string) => {
-    const name = window.prompt("Enter a document name");
-    if (name && name.length > 0) {
-      // refetchDocumentPreviews no necessary since a document is returned
-      // and therefor the cache automatically updated
-      await updateDocumentNameMutation({
-        input: {
-          id,
-          name,
-        },
-      });
+      alert("Failed to create a folder. Please try again.");
     }
   };
 
@@ -226,8 +190,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
       <SidebarDivider />
 
-      <SidebarButton onPress={createDocument}>
-        <Text variant="small">Create Page</Text>
+      <SidebarButton onPress={createFolder}>
+        <Text variant="small">Create a Folder</Text>
       </SidebarButton>
 
       <SidebarDivider />
@@ -235,51 +199,25 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <Text variant="xxs" bold style={tw`ml-4 mb-4`}>
         Documents
       </Text>
-      {documentPreviewsResult.fetching ? (
-        <Text>Loading...</Text>
-      ) : documentPreviewsResult.data?.documentPreviews?.nodes ? (
-        documentPreviewsResult.data?.documentPreviews?.nodes.map(
-          (documentPreview) => {
-            if (documentPreview === null) {
-              return null;
-            }
-            return (
-              <View key={documentPreview.id} style={styles.documentPreviewItem}>
-                <Link
-                  style={styles.documentPreviewLabel}
-                  to={{
-                    screen: "Workspace",
-                    params: {
-                      workspaceId: route.params.workspaceId,
-                      screen: "Page",
-                      params: {
-                        pageId: documentPreview.id,
-                      },
-                    },
-                  }}
-                >
-                  {documentPreview?.name}
-                </Link>
-                <DocumentMenu
-                  documentId={documentPreview.id}
-                  refetchDocumentPreviews={refetchDocumentPreviews}
-                />
-              </View>
-            );
+
+      {rootFoldersResult.fetching ? (
+        <Text>Loading Folders…</Text>
+      ) : rootFoldersResult.data?.rootFolders?.nodes ? (
+        rootFoldersResult.data?.rootFolders?.nodes.map((folder) => {
+          if (folder === null) {
+            return null;
           }
-        )
+          return (
+            <Folder
+              key={folder.id}
+              folderId={folder.id}
+              workspaceId={route.params.workspaceId}
+            >
+              <Text>{folder.name}</Text>
+            </Folder>
+          );
+        })
       ) : null}
     </DrawerContentScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  documentPreviewItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  documentPreviewLabel: {
-    flexGrow: 1,
-    height: "100%",
-  },
-});

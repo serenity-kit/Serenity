@@ -1,6 +1,6 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { updateDocumentName } from "../../../database/document/updateDocumentName";
-import { DocumentPreview } from "../../types/documentPreview";
+import { Document } from "../../types/document";
 
 export const UpdateDocumentNameInput = inputObjectType({
   name: "UpdateDocumentNameInput",
@@ -13,7 +13,7 @@ export const UpdateDocumentNameInput = inputObjectType({
 export const UpdateDocumentNameResult = objectType({
   name: "UpdateDocumentNameResult",
   definition(t) {
-    t.field("document", { type: DocumentPreview });
+    t.field("document", { type: Document });
   },
 });
 

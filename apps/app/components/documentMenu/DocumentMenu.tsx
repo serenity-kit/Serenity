@@ -14,7 +14,7 @@ import { useState } from "react";
 
 type Props = {
   documentId: string;
-  refetchDocumentPreviews: () => void;
+  refetchDocuments: () => void;
 };
 
 export default function DocumentMenu(props: Props) {
@@ -28,13 +28,13 @@ export default function DocumentMenu(props: Props) {
         ids: [id],
       },
     });
-    props.refetchDocumentPreviews();
+    props.refetchDocuments();
   };
 
   const updateDocumentName = async (id: string) => {
     const name = window.prompt("Enter a document name");
     if (name && name.length > 0) {
-      // refetchDocumentPreviews no necessary since a document is returned
+      // refetchDocuments is not necessary since a document is returned
       // and therefor the cache automatically updated
       await updateDocumentNameMutation({
         input: {
