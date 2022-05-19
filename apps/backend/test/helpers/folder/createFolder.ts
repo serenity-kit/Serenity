@@ -3,6 +3,7 @@ import { gql } from "graphql-request";
 type Params = {
   graphql: any;
   id: string;
+  name: string | null;
   parentFolderId: string | null | undefined;
   workspaceId: string;
   authorizationHeader: string;
@@ -11,6 +12,7 @@ type Params = {
 export const createFolder = async ({
   graphql,
   id,
+  name,
   parentFolderId,
   workspaceId,
   authorizationHeader,
@@ -34,7 +36,7 @@ export const createFolder = async ({
   `;
   const result = await graphql.client.request(
     query,
-    { input: { id, parentFolderId, workspaceId } },
+    { input: { id, name, parentFolderId, workspaceId } },
     authorizationHeaders
   );
   return result;

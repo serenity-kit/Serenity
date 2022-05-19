@@ -6,6 +6,7 @@ export const CreateFolderInput = inputObjectType({
   name: "CreateFolderInput",
   definition(t) {
     t.nonNull.string("id");
+    t.string("name");
     t.string("parentFolderId");
     t.nonNull.string("workspaceId");
   },
@@ -36,9 +37,14 @@ export const createFolderMutation = mutationField("createFolder", {
     if (args.input.parentFolderId) {
       parentFolderId = args.input.parentFolderId;
     }
+    let name: string | undefined = undefined;
+    if (args.input.name) {
+      name = args.input.name;
+    }
     const folder = await createFolder({
       username: context.user.username,
       id: args.input.id,
+      name,
       parentFolderId,
       workspaceId: args.input.workspaceId,
     });

@@ -45,6 +45,7 @@ beforeEach(async () => {
     const createParentFolderResult = await createFolder({
       graphql,
       id: parentFolderId,
+      name: null,
       parentFolderId: null,
       authorizationHeader: `TODO+${username}`,
       workspaceId: workspaceId,
@@ -52,6 +53,7 @@ beforeEach(async () => {
     const createFolderResult = await createFolder({
       graphql,
       id: folderId,
+      name: null,
       parentFolderId: parentFolderId,
       authorizationHeader: `TODO+${username}`,
       workspaceId: workspaceId,
@@ -59,6 +61,7 @@ beforeEach(async () => {
     const createChildFolderResult = await createFolder({
       graphql,
       id: childFolderId,
+      name: null,
       parentFolderId: folderId,
       authorizationHeader: `TODO+${username}`,
       workspaceId: workspaceId,
@@ -80,6 +83,7 @@ beforeEach(async () => {
     const createOtherFolderResult = await createFolder({
       graphql,
       id: otherFolderId,
+      name: null,
       parentFolderId: null,
       authorizationHeader: `TODO+${username2}`,
       workspaceId: otherWorkspaceId,
