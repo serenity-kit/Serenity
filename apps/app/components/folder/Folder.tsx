@@ -1,12 +1,14 @@
-import { Icon, Pressable, Text, tw, View } from "@serenity-tools/ui";
+import { Icon, Link, Pressable, Text, tw, View } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateDocumentMutation,
   useCreateFolderMutation,
+  useDocumentsQuery,
   useFoldersQuery,
 } from "../../generated/graphql";
+import DocumentMenu from "../documentMenu/DocumentMenu";
 
 type Props = {
   children: React.ReactNode;
@@ -25,8 +27,13 @@ export default function Folder(props: Props) {
       first: 50,
     },
   });
-  // TODO fetch folders query + have a function fetch more automatically
-  // TODO fetch documents query + have a function fetch more automatically
+  const [documentsResult, refetchDocuments] = useDocumentsQuery({
+    pause: !isOpen,
+    variables: {
+      parentFolderId: props.folderId,
+      first: 50,
+    },
+  });
 
   const createFolder = async () => {
     const id = uuidv4();
@@ -98,6 +105,40 @@ export default function Folder(props: Props) {
                   <Folder folderId={folder.id} workspaceId={props.workspaceId}>
                     <Text>{folder.name}</Text>
                   </Folder>
+                </View>
+              );
+            })
+          ) : null}
+
+          {documentsResult.fetching ? (
+            <Text>Loading Documents…</Text>
+          ) : documentsResult.data?.documents?.nodes ? (
+            documentsResult.data?.documents?.nodes.map((document) => {
+              if (document === null) {
+                return null;
+              }
+              return (
+                <View style={tw`ml-4`} key={document.id}>
+                  <HStack>
+                    <Link
+                      to={{
+                        screen: "Workspace",
+                        params: {
+                          workspaceId: props.workspaceId,
+                          screen: "Page",
+                          params: {
+                            pageId: document.id,
+                          },
+                        },
+                      }}
+                    >
+                      {document?.name}
+                    </Link>
+                    <DocumentMenu
+                      documentId={document.id}
+                      refetchDocumentPreviews={refetchDocuments}
+                    />
+                  </HStack>
                 </View>
               );
             })

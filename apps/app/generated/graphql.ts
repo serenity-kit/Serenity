@@ -505,6 +505,15 @@ export type DocumentPreviewsQueryVariables = Exact<{
 
 export type DocumentPreviewsQuery = { __typename?: 'Query', documentPreviews?: { __typename?: 'DocumentPreviewConnection', nodes?: Array<{ __typename?: 'DocumentPreview', id: string, name?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
+export type DocumentsQueryVariables = Exact<{
+  parentFolderId: Scalars['ID'];
+  first?: Scalars['Int'];
+  after?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+
 export type FoldersQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
   first: Scalars['Int'];
@@ -705,6 +714,29 @@ export const DocumentPreviewsDocument = gql`
 
 export function useDocumentPreviewsQuery(options: Omit<Urql.UseQueryArgs<DocumentPreviewsQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentPreviewsQuery>({ query: DocumentPreviewsDocument, ...options });
+};
+export const DocumentsDocument = gql`
+    query documents($parentFolderId: ID!, $first: Int! = 100, $after: String) {
+  documents(parentFolderId: $parentFolderId, first: $first, after: $after) {
+    nodes {
+      id
+      name
+      parentFolderId
+      rootFolderId
+      workspaceId
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}
+    `;
+
+export function useDocumentsQuery(options: Omit<Urql.UseQueryArgs<DocumentsQueryVariables>, 'query'>) {
+  return Urql.useQuery<DocumentsQuery>({ query: DocumentsDocument, ...options });
 };
 export const FoldersDocument = gql`
     query folders($parentFolderId: ID!, $first: Int!, $after: String) {
