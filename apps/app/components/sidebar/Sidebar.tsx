@@ -303,7 +303,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             return null;
           }
           return (
-            <Folder key={folder.id}>
+            <Folder
+              key={folder.id}
+              folderId={folder.id}
+              workspaceId={route.params.workspaceId}
+            >
               <Text>{folder.name}</Text>
             </Folder>
           );

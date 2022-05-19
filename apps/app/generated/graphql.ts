@@ -496,6 +496,15 @@ export type DocumentPreviewsQueryVariables = Exact<{
 
 export type DocumentPreviewsQuery = { __typename?: 'Query', documentPreviews?: { __typename?: 'DocumentPreviewConnection', nodes?: Array<{ __typename?: 'DocumentPreview', id: string, name?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
+export type FoldersQueryVariables = Exact<{
+  parentFolderId: Scalars['ID'];
+  first: Scalars['Int'];
+  after?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+
 export type RootFoldersQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
   first: Scalars['Int'];
@@ -687,6 +696,27 @@ export const DocumentPreviewsDocument = gql`
 
 export function useDocumentPreviewsQuery(options: Omit<Urql.UseQueryArgs<DocumentPreviewsQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentPreviewsQuery>({ query: DocumentPreviewsDocument, ...options });
+};
+export const FoldersDocument = gql`
+    query folders($parentFolderId: ID!, $first: Int!, $after: String) {
+  folders(parentFolderId: $parentFolderId, first: $first, after: $after) {
+    nodes {
+      id
+      name
+      parentFolderId
+      rootFolderId
+      workspaceId
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    `;
+
+export function useFoldersQuery(options: Omit<Urql.UseQueryArgs<FoldersQueryVariables>, 'query'>) {
+  return Urql.useQuery<FoldersQuery>({ query: FoldersDocument, ...options });
 };
 export const RootFoldersDocument = gql`
     query rootFolders($workspaceId: ID!, $first: Int!, $after: String) {
