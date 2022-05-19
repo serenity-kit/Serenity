@@ -25,7 +25,7 @@ export default function Folder(props: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
-  const [foldersResult] = useFoldersQuery({
+  const [foldersResult, refetchFolders] = useFoldersQuery({
     pause: !isOpen,
     variables: {
       parentFolderId: props.folderId,
@@ -56,6 +56,8 @@ export default function Folder(props: Props) {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
     }
+    refetchDocuments();
+    refetchFolders();
   };
 
   const createDocument = async () => {
@@ -82,6 +84,7 @@ export default function Folder(props: Props) {
       alert("Failed to create a page. Please try again.");
     }
     refetchDocuments();
+    refetchFolders();
   };
 
   return (
