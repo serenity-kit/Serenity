@@ -45,6 +45,7 @@ beforeEach(async () => {
     const createParentFolderResult = await createFolder({
       graphql,
       id: parentFolderId,
+      name: null,
       parentFolderId: null,
       authorizationHeader: `TODO+${username}`,
       workspaceId: workspaceId,
@@ -52,6 +53,7 @@ beforeEach(async () => {
     const createFolderResult = await createFolder({
       graphql,
       id: folderId,
+      name: null,
       parentFolderId: null,
       authorizationHeader: `TODO+${username}`,
       workspaceId: workspaceId,
@@ -59,6 +61,7 @@ beforeEach(async () => {
     const createChildFolderResult = await createFolder({
       graphql,
       id: childFolderId,
+      name: null,
       parentFolderId: null,
       authorizationHeader: `TODO+${username}`,
       workspaceId: workspaceId,
@@ -94,6 +97,7 @@ beforeEach(async () => {
     const createOtherFolderResult = await createFolder({
       graphql,
       id: otherFolderId,
+      name: null,
       parentFolderId: null,
       authorizationHeader: `TODO+${username2}`,
       workspaceId: otherWorkspaceId,
@@ -196,8 +200,8 @@ test("user should not be able to retrieve another user's folder", async () => {
 test("retrieving a document that doesn't exist should throw an error", async () => {
   const authorizationHeader = { authorization: `TODO+${username}` };
   const query = gql`
-    query folder($id: ID!) {
-      folder(id: $id) {
+    query documentPath($id: ID!) {
+      documentPath(id: $id) {
         id
         name
         parentFolderId
@@ -213,5 +217,5 @@ test("retrieving a document that doesn't exist should throw an error", async () 
         { id: "2bd63f0b-66f4-491c-8808-0a1de192cb67" },
         authorizationHeader
       ))()
-  ).rejects.toThrow("Folder not found");
+  ).rejects.toThrow("Document not found");
 });

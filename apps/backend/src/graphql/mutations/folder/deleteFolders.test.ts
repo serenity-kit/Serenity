@@ -39,6 +39,7 @@ beforeEach(async () => {
     const createFolderResult = await createFolder({
       graphql,
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+      name: null,
       parentFolderId: null,
       authorizationHeader: `TODO+${username}`,
       workspaceId: addedWorkspace.id,
@@ -68,6 +69,7 @@ test("user can delete a folder", async () => {
   const createFolderResult = await createFolder({
     graphql,
     id: folderId,
+    name: null,
     parentFolderId: null,
     authorizationHeader: `TODO+${username}`,
     workspaceId: addedWorkspace.id,
@@ -90,6 +92,7 @@ test("deleting a parent folder will cascade to children", async () => {
   const createParentFolderResult = await createFolder({
     graphql,
     id: parentFolderId,
+    name: null,
     parentFolderId: null,
     authorizationHeader: `TODO+${username}`,
     workspaceId: addedWorkspace.id,
@@ -97,6 +100,7 @@ test("deleting a parent folder will cascade to children", async () => {
   const createChildFolderResult = await createFolder({
     graphql,
     id: childFolderId,
+    name: null,
     parentFolderId: parentFolderId,
     authorizationHeader: `TODO+${username}`,
     workspaceId: addedWorkspace.id,
@@ -125,6 +129,7 @@ test("user can delete multiple folders", async () => {
   const createFolderResult1 = await createFolder({
     graphql,
     id: folderId1,
+    name: null,
     parentFolderId: null,
     authorizationHeader: `TODO+${username}`,
     workspaceId: addedWorkspace.id,
@@ -132,6 +137,7 @@ test("user can delete multiple folders", async () => {
   const createFolderResult2 = await createFolder({
     graphql,
     id: folderId2,
+    name: null,
     parentFolderId: null,
     authorizationHeader: `TODO+${username}`,
     workspaceId: addedWorkspace.id,
@@ -161,6 +167,7 @@ test("user can delete multiple folders", async () => {
   const createParentFolderResult1 = await createFolder({
     graphql,
     id: parentFolderId1,
+    name: null,
     parentFolderId: null,
     authorizationHeader: `TODO+${username}`,
     workspaceId: addedWorkspace.id,
@@ -168,6 +175,7 @@ test("user can delete multiple folders", async () => {
   const createParentFolderResult2 = await createFolder({
     graphql,
     id: parentFolderId2,
+    name: null,
     parentFolderId: null,
     authorizationHeader: `TODO+${username}`,
     workspaceId: addedWorkspace.id,
@@ -175,6 +183,7 @@ test("user can delete multiple folders", async () => {
   const createChildFolderResult1 = await createFolder({
     graphql,
     id: childFolderId1,
+    name: null,
     parentFolderId: parentFolderId1,
     authorizationHeader: `TODO+${username}`,
     workspaceId: addedWorkspace.id,
@@ -182,6 +191,7 @@ test("user can delete multiple folders", async () => {
   const createChildFolderResult2 = await createFolder({
     graphql,
     id: childFolderId2,
+    name: null,
     parentFolderId: parentFolderId2,
     authorizationHeader: `TODO+${username}`,
     workspaceId: addedWorkspace.id,
@@ -214,6 +224,7 @@ test("user can't delete folders they don't own", async () => {
   const createFoldeResult = await createFolder({
     graphql,
     id: folderId,
+    name: null,
     parentFolderId: null,
     authorizationHeader: `TODO+${username2}`,
     workspaceId: otherUserWorkspaceId,

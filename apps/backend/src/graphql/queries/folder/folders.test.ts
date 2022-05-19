@@ -41,6 +41,7 @@ beforeEach(async () => {
     const createParentFolderResult = await createFolder({
       graphql,
       id: parentFolderId,
+      name: null,
       parentFolderId: null,
       authorizationHeader: `TODO+${username}`,
       workspaceId: workspaceId,
@@ -62,6 +63,7 @@ beforeEach(async () => {
     const createOtherFolderResult = await createFolder({
       graphql,
       id: otherFolderId,
+      name: null,
       parentFolderId: null,
       authorizationHeader: `TODO+${username2}`,
       workspaceId: otherWorkspaceId,
@@ -108,6 +110,7 @@ test("user should be able to list folders in a workspace with one item", async (
   const createParentFolderResult = await createFolder({
     graphql,
     id: folderId1,
+    name: null,
     parentFolderId: parentFolderId,
     authorizationHeader: `TODO+${username}`,
     workspaceId: workspaceId,
@@ -158,6 +161,7 @@ test("user should be able to list folders in a workspace with multiple items", a
   const createFolderResult = await createFolder({
     graphql,
     id: folderId2,
+    name: null,
     parentFolderId: parentFolderId,
     authorizationHeader: `TODO+${username}`,
     workspaceId: workspaceId,
@@ -217,6 +221,7 @@ test("user should be able to list without showing subfolders", async () => {
   const createFolderResult = await createFolder({
     graphql,
     id: childFolderId,
+    name: null,
     parentFolderId: folderId1,
     authorizationHeader: `TODO+${username}`,
     workspaceId: workspaceId,
