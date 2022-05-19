@@ -8,6 +8,7 @@ import { ArrowGoBackFill } from "./icons/ArrowGoBackFill";
 import { ArrowGoBackLine } from "./icons/ArrowGoBackLine";
 import { ArrowGoForwardLine } from "./icons/ArrowGoForwardLine";
 import { ArrowGoForwardFill } from "./icons/ArrowGoForwardFill";
+import { ArrowLeftSLine } from "./icons/ArrowLeftSLine";
 import { ArrowRightSFill } from "./icons/ArrowRightSFill";
 import { ArrowUpDownLine } from "./icons/ArrowUpDownLine";
 import { AtLine } from "./icons/AtLine";
@@ -81,6 +82,7 @@ export type IconProps = {
     | "arrow-go-back-line"
     | "arrow-go-forward-fill"
     | "arrow-go-forward-line"
+    | "arrow-left-s-line"
     | "arrow-right-s-fill"
     | "arrow-up-down-line"
     | "at-line"
@@ -165,6 +167,8 @@ export const Icon = (props: IconProps) => {
     return <ArrowGoForwardFill color={color} size={size} />;
   if (name === "arrow-go-forward-line")
     return <ArrowGoForwardLine color={color} size={size} />;
+  if (name === "arrow-left-s-line")
+    return <ArrowLeftSLine color={color} size={size} />;
   if (name === "arrow-right-s-fill")
     return <ArrowRightSFill color={color} size={size} />;
   if (name === "arrow-up-down-line")
