@@ -33,11 +33,11 @@ import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { useState } from "react";
 import DocumentMenu from "../documentMenu/DocumentMenu";
+import Folder from "../folder/Folder";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
-  const [isOpenDocumentMenu, setIsOpenDocumentMenu] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
   const [workspaceResult] = useWorkspaceQuery({
@@ -269,6 +269,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           }
         )
       ) : null}
+
+      <Folder />
     </DrawerContentScrollView>
   );
 }
