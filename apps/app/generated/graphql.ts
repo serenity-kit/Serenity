@@ -125,28 +125,10 @@ export type DeleteWorkspacesResult = {
   status: Scalars['String'];
 };
 
-export type DocumentPreview = {
-  __typename?: 'DocumentPreview';
+export type Document = {
+  __typename?: 'Document';
   id: Scalars['String'];
   name?: Maybe<Scalars['String']>;
-};
-
-export type DocumentPreviewConnection = {
-  __typename?: 'DocumentPreviewConnection';
-  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
-  edges?: Maybe<Array<Maybe<DocumentPreviewEdge>>>;
-  /** Flattened list of DocumentPreview type */
-  nodes?: Maybe<Array<Maybe<DocumentPreview>>>;
-  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
-  pageInfo: PageInfo;
-};
-
-export type DocumentPreviewEdge = {
-  __typename?: 'DocumentPreviewEdge';
-  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
-  cursor: Scalars['String'];
-  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
-  node?: Maybe<DocumentPreview>;
 };
 
 export type FinalizeResetPasswordInput = {
@@ -294,7 +276,6 @@ export type PageInfo = {
 export type Query = {
   __typename?: 'Query';
   documentPath?: Maybe<Array<Maybe<Folder>>>;
-  documentPreviews?: Maybe<DocumentPreviewConnection>;
   documents?: Maybe<FolderConnection>;
   folders?: Maybe<FolderConnection>;
   rootFolders?: Maybe<FolderConnection>;
@@ -305,13 +286,6 @@ export type Query = {
 
 export type QueryDocumentPathArgs = {
   id: Scalars['ID'];
-};
-
-
-export type QueryDocumentPreviewsArgs = {
-  after?: InputMaybe<Scalars['String']>;
-  first: Scalars['Int'];
-  workspaceId: Scalars['ID'];
 };
 
 
@@ -353,7 +327,7 @@ export type UpdateDocumentNameInput = {
 
 export type UpdateDocumentNameResult = {
   __typename?: 'UpdateDocumentNameResult';
-  document?: Maybe<DocumentPreview>;
+  document?: Maybe<Document>;
 };
 
 export type UpdateFolderNameInput = {
@@ -487,7 +461,7 @@ export type UpdateDocumentNameMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'DocumentPreview', id: string, name?: string | null } | null } | null };
+export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, name?: string | null } | null } | null };
 
 export type UpdateWorkspaceMutationVariables = Exact<{
   input: UpdateWorkspaceInput;
@@ -495,15 +469,6 @@ export type UpdateWorkspaceMutationVariables = Exact<{
 
 
 export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', username: string, isAdmin: boolean }> | null } | null } | null };
-
-export type DocumentPreviewsQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
-  first?: Scalars['Int'];
-  after?: InputMaybe<Scalars['String']>;
-}>;
-
-
-export type DocumentPreviewsQuery = { __typename?: 'Query', documentPreviews?: { __typename?: 'DocumentPreviewConnection', nodes?: Array<{ __typename?: 'DocumentPreview', id: string, name?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DocumentsQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -694,26 +659,6 @@ export const UpdateWorkspaceDocument = gql`
 
 export function useUpdateWorkspaceMutation() {
   return Urql.useMutation<UpdateWorkspaceMutation, UpdateWorkspaceMutationVariables>(UpdateWorkspaceDocument);
-};
-export const DocumentPreviewsDocument = gql`
-    query documentPreviews($workspaceId: ID!, $first: Int! = 100, $after: String) {
-  documentPreviews(workspaceId: $workspaceId, first: $first, after: $after) {
-    nodes {
-      id
-      name
-    }
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      startCursor
-      endCursor
-    }
-  }
-}
-    `;
-
-export function useDocumentPreviewsQuery(options: Omit<Urql.UseQueryArgs<DocumentPreviewsQueryVariables>, 'query'>) {
-  return Urql.useQuery<DocumentPreviewsQuery>({ query: DocumentPreviewsDocument, ...options });
 };
 export const DocumentsDocument = gql`
     query documents($parentFolderId: ID!, $first: Int! = 100, $after: String) {

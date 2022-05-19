@@ -1,3 +1,4 @@
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Icon, Link, Pressable, Text, tw, View } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";
@@ -8,6 +9,7 @@ import {
   useDocumentsQuery,
   useFoldersQuery,
 } from "../../generated/graphql";
+import { RootStackScreenProps } from "../../types";
 import DocumentMenu from "../documentMenu/DocumentMenu";
 
 type Props = {
@@ -17,6 +19,8 @@ type Props = {
 };
 
 export default function Folder(props: Props) {
+  const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
+  const navigation = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
@@ -36,6 +40,7 @@ export default function Folder(props: Props) {
   });
 
   const createFolder = async () => {
+    setIsOpen(true);
     const id = uuidv4();
     const result = await createFolderMutation({
       input: {
@@ -53,6 +58,7 @@ export default function Folder(props: Props) {
   };
 
   const createDocument = async () => {
+    setIsOpen(true);
     const id = uuidv4();
     const result = await createDocumentMutation({
       input: {
@@ -62,11 +68,19 @@ export default function Folder(props: Props) {
       },
     });
     if (result.data?.createDocument?.id) {
-      console.log("created a document");
+      navigation.navigate("Workspace", {
+        workspaceId: route.params.workspaceId,
+        screen: "Page",
+        params: {
+          pageId: result.data?.createDocument?.id,
+          isNew: true,
+        },
+      });
     } else {
       console.error(result.error);
-      alert("Failed to create a document. Please try again.");
+      alert("Failed to create a page. Please try again.");
     }
+    refetchDocuments();
   };
 
   return (
@@ -136,7 +150,7 @@ export default function Folder(props: Props) {
                     </Link>
                     <DocumentMenu
                       documentId={document.id}
-                      refetchDocumentPreviews={refetchDocuments}
+                      refetchDocuments={refetchDocuments}
                     />
                   </HStack>
                 </View>

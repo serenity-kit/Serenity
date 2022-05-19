@@ -1,7 +1,7 @@
 import { objectType } from "nexus";
 
-export const DocumentPreview = objectType({
-  name: "DocumentPreview",
+export const Document = objectType({
+  name: "Document",
   definition(t) {
     t.nonNull.string("id");
     t.string("name");

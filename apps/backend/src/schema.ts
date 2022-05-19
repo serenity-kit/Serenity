@@ -4,7 +4,6 @@ import path from "path";
 import * as WorkspaceQueryTypes from "./graphql/queries/workspace/workspace";
 import * as WorkspacesQueryTypes from "./graphql/queries/workspace/workspaces";
 
-import * as DocumentPreviewsQueryTypes from "./graphql/queries/documentPreviews";
 import * as CreateDocumentMutationTypes from "./graphql/mutations/document/createDocument";
 import * as UpdateDocumentNameMutationTypes from "./graphql/mutations/document/updateDocumentName";
 import * as DeleteDocumentsMutationTypes from "./graphql/mutations/document/deleteDocuments";
@@ -27,7 +26,7 @@ import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/de
 import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/updateWorkspace";
 
 import * as WorkspaceTypes from "./graphql/types/workspace";
-import * as DocumentTypes from "./graphql/types/documentPreview";
+import * as DocumentTypes from "./graphql/types/document";
 
 export const schema = makeSchema({
   plugins: [
@@ -37,7 +36,6 @@ export const schema = makeSchema({
   ],
   types: [
     DocumentTypes,
-    DocumentPreviewsQueryTypes,
     CreateDocumentMutationTypes,
     UpdateDocumentNameMutationTypes,
     DeleteDocumentsMutationTypes,

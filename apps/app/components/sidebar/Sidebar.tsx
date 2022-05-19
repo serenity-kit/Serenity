@@ -6,7 +6,6 @@ import {
 import {
   Button,
   Icon,
-  Link,
   Menu,
   Pressable,
   SidebarButton,
@@ -20,10 +19,6 @@ import {
 import {
   useWorkspacesQuery,
   useCreateWorkspaceMutation,
-  useCreateDocumentMutation,
-  useDeleteDocumentsMutation,
-  useUpdateDocumentNameMutation,
-  useDocumentPreviewsQuery,
   useWorkspaceQuery,
   useCreateFolderMutation,
   useRootFoldersQuery,
@@ -33,7 +28,6 @@ import { useRoute } from "@react-navigation/native";
 import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { useState } from "react";
-import DocumentMenu from "../documentMenu/DocumentMenu";
 import Folder from "../folder/Folder";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
@@ -54,14 +48,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   });
 
   const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
-  const [, createDocumentMutation] = useCreateDocumentMutation();
-  const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
-  const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
-  const [documentPreviewsResult, refetchDocumentPreviews] =
-    useDocumentPreviewsQuery({
-      variables: { workspaceId: route.params.workspaceId },
-    });
   const { updateAuthentication } = useAuthentication();
 
   const createWorkspace = async () => {
@@ -87,50 +74,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     } else {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
-    }
-  };
-
-  const createDocument = async () => {
-    const id = uuidv4();
-    const result = await createDocumentMutation({
-      input: { id, workspaceId: route.params.workspaceId },
-    });
-    if (result.data?.createDocument?.id) {
-      props.navigation.navigate("Workspace", {
-        workspaceId: route.params.workspaceId,
-        screen: "Page",
-        params: {
-          pageId: result.data?.createDocument?.id,
-          isNew: true,
-        },
-      });
-    } else {
-      console.error(result.error);
-      alert("Failed to create a page. Please try again.");
-    }
-    refetchDocumentPreviews();
-  };
-
-  const deleteDocument = async (id: string) => {
-    await deleteDocumentsMutation({
-      input: {
-        ids: [id],
-      },
-    });
-    refetchDocumentPreviews();
-  };
-
-  const updateDocumentName = async (id: string) => {
-    const name = window.prompt("Enter a document name");
-    if (name && name.length > 0) {
-      // refetchDocumentPreviews no necessary since a document is returned
-      // and therefor the cache automatically updated
-      await updateDocumentNameMutation({
-        input: {
-          id,
-          name,
-        },
-      });
     }
   };
 
@@ -248,11 +191,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <SidebarDivider />
 
       <SidebarButton onPress={createFolder}>
-        <Text variant="small">Create Folder</Text>
-      </SidebarButton>
-
-      <SidebarButton onPress={createDocument}>
-        <Text variant="small">Create Page</Text>
+        <Text variant="small">Create a Folder</Text>
       </SidebarButton>
 
       <SidebarDivider />
@@ -260,40 +199,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <Text variant="xxs" bold style={tw`ml-4 mb-4`}>
         Documents
       </Text>
-
-      {documentPreviewsResult.fetching ? (
-        <Text>Loading...</Text>
-      ) : documentPreviewsResult.data?.documentPreviews?.nodes ? (
-        documentPreviewsResult.data?.documentPreviews?.nodes.map(
-          (documentPreview) => {
-            if (documentPreview === null) {
-              return null;
-            }
-            return (
-              <View key={documentPreview.id}>
-                <Link
-                  to={{
-                    screen: "Workspace",
-                    params: {
-                      workspaceId: route.params.workspaceId,
-                      screen: "Page",
-                      params: {
-                        pageId: documentPreview.id,
-                      },
-                    },
-                  }}
-                >
-                  {documentPreview?.name}
-                </Link>
-                <DocumentMenu
-                  documentId={documentPreview.id}
-                  refetchDocumentPreviews={refetchDocumentPreviews}
-                />
-              </View>
-            );
-          }
-        )
-      ) : null}
 
       {rootFoldersResult.fetching ? (
         <Text>Loading Folders…</Text>
