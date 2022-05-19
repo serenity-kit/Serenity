@@ -47,14 +47,14 @@ beforeEach(async () => {
     const createFolderResult = await createFolder({
       graphql,
       id: folderId,
-      parentFolderId: null,
+      parentFolderId: parentFolderId,
       authorizationHeader: `TODO+${username}`,
       workspaceId: workspaceId,
     });
     const createChildFolderResult = await createFolder({
       graphql,
       id: childFolderId,
-      parentFolderId: null,
+      parentFolderId: folderId,
       authorizationHeader: `TODO+${username}`,
       workspaceId: workspaceId,
     });
@@ -107,7 +107,16 @@ test("user should be able to get a folder", async () => {
     { id: parentFolderId },
     authorizationHeader
   );
-  expect(result.workspace).toMatchInlineSnapshot(`undefined`);
+  expect(result.folder).toMatchInlineSnapshot(`
+    Object {
+      "id": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+      "name": "Untitled",
+      "parentFolderId": null,
+      "parentFolders": Array [],
+      "rootFolderId": null,
+      "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+    }
+  `);
 });
 
 test("user should be able to get a folder with its parents", async () => {
@@ -135,7 +144,31 @@ test("user should be able to get a folder with its parents", async () => {
     { id: childFolderId },
     authorizationHeader
   );
-  expect(result.workspace).toMatchInlineSnapshot(`undefined`);
+  expect(result.folder).toMatchInlineSnapshot(`
+    Object {
+      "id": "98b3f4d9-141a-4e11-a0f5-7437a6d1eb4b",
+      "name": "Untitled",
+      "parentFolderId": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
+      "parentFolders": Array [
+        Object {
+          "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
+          "name": "Untitled",
+          "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+          "rootFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+          "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+        },
+        Object {
+          "id": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+          "name": "Untitled",
+          "parentFolderId": null,
+          "rootFolderId": null,
+          "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+        },
+      ],
+      "rootFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+      "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+    }
+  `);
 });
 
 test("user should not be able to retrieve another user's folder", async () => {

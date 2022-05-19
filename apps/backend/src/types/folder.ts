@@ -5,4 +5,5 @@ export type Folder = {
   parentFolderId: string | null;
   rootFolderId: string | null;
   workspaceId: string;
+  parentFolders: Folder[] | null;
 };

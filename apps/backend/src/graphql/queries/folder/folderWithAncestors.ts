@@ -29,7 +29,7 @@ export const folders = queryField((t) => {
         workspaceId: rawFolder.workspaceId,
         parentFolderId: rawFolder.parentFolderId,
         rootFolderId: rawFolder.rootFolderId,
-        parentFolders: rawFolder["parentFolders"],
+        parentFolders: rawFolder.parentFolders,
       };
       return folder;
     },
