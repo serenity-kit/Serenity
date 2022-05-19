@@ -1,4 +1,4 @@
-import { idArg, list, queryField } from "nexus";
+import { idArg, list, nonNull, queryField } from "nexus";
 import { getDocumentPath } from "../../../database/document/getDocumentPath";
 import { Folder } from "../../types/folder";
 
@@ -6,7 +6,7 @@ export const folders = queryField((t) => {
   t.field("documentPath", {
     type: list(Folder),
     args: {
-      id: idArg(),
+      id: nonNull(idArg()),
     },
     async resolve(root, args, context) {
       if (!context.user) {
