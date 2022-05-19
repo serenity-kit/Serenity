@@ -1,7 +1,6 @@
 import { idArg, queryField } from "nexus";
 import { prisma } from "../../../database/prisma";
 import { getFolder } from "../../../database/folder/getFolder";
-// import { getFolders } from "../../../database/folder/getFolders";
 import { Folder } from "../../types/folder";
 
 export const folders = queryField((t) => {
