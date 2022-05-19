@@ -2,6 +2,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { Icon, Link, Pressable, Text, tw, View } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";
+import { ActivityIndicator } from "react-native";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateDocumentMutation,
@@ -103,60 +104,61 @@ export default function Folder(props: Props) {
           <Pressable onPress={createDocument}>
             <Icon name="file-transfer-line" />
           </Pressable>
+          {documentsResult.fetching ||
+            (foldersResult.fetching && <ActivityIndicator />)}
         </HStack>
       </Pressable>
       {isOpen && (
         <>
-          {foldersResult.fetching ? (
-            <Text>Loading Folders…</Text>
-          ) : foldersResult.data?.folders?.nodes ? (
-            foldersResult.data?.folders?.nodes.map((folder) => {
-              if (folder === null) {
-                return null;
-              }
-              return (
-                <View style={tw`ml-2`} key={folder.id}>
-                  <Folder folderId={folder.id} workspaceId={props.workspaceId}>
-                    <Text>{folder.name}</Text>
-                  </Folder>
-                </View>
-              );
-            })
-          ) : null}
-
-          {documentsResult.fetching ? (
-            <Text>Loading Documents…</Text>
-          ) : documentsResult.data?.documents?.nodes ? (
-            documentsResult.data?.documents?.nodes.map((document) => {
-              if (document === null) {
-                return null;
-              }
-              return (
-                <View style={tw`ml-4`} key={document.id}>
-                  <HStack>
-                    <Link
-                      to={{
-                        screen: "Workspace",
-                        params: {
-                          workspaceId: props.workspaceId,
-                          screen: "Page",
-                          params: {
-                            pageId: document.id,
-                          },
-                        },
-                      }}
+          {foldersResult.data?.folders?.nodes
+            ? foldersResult.data?.folders?.nodes.map((folder) => {
+                if (folder === null) {
+                  return null;
+                }
+                return (
+                  <View style={tw`ml-2`} key={folder.id}>
+                    <Folder
+                      folderId={folder.id}
+                      workspaceId={props.workspaceId}
                     >
-                      {document?.name}
-                    </Link>
-                    <DocumentMenu
-                      documentId={document.id}
-                      refetchDocuments={refetchDocuments}
-                    />
-                  </HStack>
-                </View>
-              );
-            })
-          ) : null}
+                      <Text>{folder.name}</Text>
+                    </Folder>
+                  </View>
+                );
+              })
+            : null}
+
+          {documentsResult.data?.documents?.nodes
+            ? documentsResult.data?.documents?.nodes.map((document) => {
+                if (document === null) {
+                  return null;
+                }
+                return (
+                  <View style={tw`ml-4`} key={document.id}>
+                    <HStack>
+                      <Link
+                        to={{
+                          screen: "Workspace",
+                          params: {
+                            workspaceId: props.workspaceId,
+                            screen: "Page",
+                            params: {
+                              pageId: document.id,
+                            },
+                          },
+                        }}
+                      >
+                        {document?.name}
+                      </Link>
+                      <DocumentMenu
+                        documentId={document.id}
+                        refetchDocuments={refetchDocuments}
+                      />
+                    </HStack>
+                  </View>
+                );
+              })
+            : null}
         </>
       )}
     </>
