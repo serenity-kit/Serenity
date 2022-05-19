@@ -85,6 +85,17 @@ export type CreateDocumentResult = {
   id: Scalars['String'];
 };
 
+export type CreateFolderInput = {
+  id: Scalars['String'];
+  parentFolderId?: InputMaybe<Scalars['String']>;
+  workspaceId: Scalars['String'];
+};
+
+export type CreateFolderResult = {
+  __typename?: 'CreateFolderResult';
+  folder?: Maybe<Folder>;
+};
+
 export type CreateWorkspaceInput = {
   id: Scalars['String'];
   name: Scalars['String'];
@@ -150,9 +161,38 @@ export type FinalizeResetPasswordResult = {
   status: Scalars['String'];
 };
 
+export type Folder = {
+  __typename?: 'Folder';
+  id: Scalars['String'];
+  name: Scalars['String'];
+  parentFolderId?: Maybe<Scalars['String']>;
+  parentFolders?: Maybe<Array<Folder>>;
+  rootFolderId?: Maybe<Scalars['String']>;
+  workspaceId?: Maybe<Scalars['String']>;
+};
+
+export type FolderConnection = {
+  __typename?: 'FolderConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<FolderEdge>>>;
+  /** Flattened list of Folder type */
+  nodes?: Maybe<Array<Maybe<Folder>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type FolderEdge = {
+  __typename?: 'FolderEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<Folder>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createDocument?: Maybe<CreateDocumentResult>;
+  createFolder?: Maybe<CreateFolderResult>;
   createWorkspace?: Maybe<CreateWorkspaceResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
@@ -163,12 +203,18 @@ export type Mutation = {
   initializePasswordReset?: Maybe<ClientRequestResetPasswordResult>;
   initializeRegistration?: Maybe<ClientOprfRegistrationChallengeResult>;
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
+  updateFolderName?: Maybe<UpdateFolderNameResult>;
   updateWorkspace?: Maybe<UpdateWorkspaceResult>;
 };
 
 
 export type MutationCreateDocumentArgs = {
   input?: InputMaybe<CreateDocumentInput>;
+};
+
+
+export type MutationCreateFolderArgs = {
+  input?: InputMaybe<CreateFolderInput>;
 };
 
 
@@ -222,6 +268,11 @@ export type MutationUpdateDocumentNameArgs = {
 };
 
 
+export type MutationUpdateFolderNameArgs = {
+  input?: InputMaybe<UpdateFolderNameInput>;
+};
+
+
 export type MutationUpdateWorkspaceArgs = {
   input?: InputMaybe<UpdateWorkspaceInput>;
 };
@@ -242,12 +293,34 @@ export type PageInfo = {
 export type Query = {
   __typename?: 'Query';
   documentPreviews?: Maybe<DocumentPreviewConnection>;
+  folder?: Maybe<Folder>;
+  folders?: Maybe<FolderConnection>;
+  rootFolders?: Maybe<FolderConnection>;
   workspace?: Maybe<Workspace>;
   workspaces?: Maybe<WorkspaceConnection>;
 };
 
 
 export type QueryDocumentPreviewsArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
+  workspaceId: Scalars['ID'];
+};
+
+
+export type QueryFolderArgs = {
+  id?: InputMaybe<Scalars['ID']>;
+};
+
+
+export type QueryFoldersArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
+  parentFolderId: Scalars['ID'];
+};
+
+
+export type QueryRootFoldersArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
   workspaceId: Scalars['ID'];
@@ -272,6 +345,16 @@ export type UpdateDocumentNameInput = {
 export type UpdateDocumentNameResult = {
   __typename?: 'UpdateDocumentNameResult';
   document?: Maybe<DocumentPreview>;
+};
+
+export type UpdateFolderNameInput = {
+  id: Scalars['String'];
+  name: Scalars['String'];
+};
+
+export type UpdateFolderNameResult = {
+  __typename?: 'UpdateFolderNameResult';
+  folder?: Maybe<Folder>;
 };
 
 export type UpdateWorkspaceInput = {
@@ -333,6 +416,13 @@ export type CreateDocumentMutationVariables = Exact<{
 
 
 export type CreateDocumentMutation = { __typename?: 'Mutation', createDocument?: { __typename?: 'CreateDocumentResult', id: string } | null };
+
+export type CreateFolderMutationVariables = Exact<{
+  input: CreateFolderInput;
+}>;
+
+
+export type CreateFolderMutation = { __typename?: 'Mutation', createFolder?: { __typename?: 'CreateFolderResult', folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
 
 export type CreateWorkspaceMutationVariables = Exact<{
   input: CreateWorkspaceInput;
@@ -406,6 +496,15 @@ export type DocumentPreviewsQueryVariables = Exact<{
 
 export type DocumentPreviewsQuery = { __typename?: 'Query', documentPreviews?: { __typename?: 'DocumentPreviewConnection', nodes?: Array<{ __typename?: 'DocumentPreview', id: string, name?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
+export type RootFoldersQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+  first: Scalars['Int'];
+  after?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+
 export type WorkspaceQueryVariables = Exact<{
   id?: InputMaybe<Scalars['ID']>;
 }>;
@@ -429,6 +528,23 @@ export const CreateDocumentDocument = gql`
 
 export function useCreateDocumentMutation() {
   return Urql.useMutation<CreateDocumentMutation, CreateDocumentMutationVariables>(CreateDocumentDocument);
+};
+export const CreateFolderDocument = gql`
+    mutation createFolder($input: CreateFolderInput!) {
+  createFolder(input: $input) {
+    folder {
+      id
+      name
+      parentFolderId
+      rootFolderId
+      workspaceId
+    }
+  }
+}
+    `;
+
+export function useCreateFolderMutation() {
+  return Urql.useMutation<CreateFolderMutation, CreateFolderMutationVariables>(CreateFolderDocument);
 };
 export const CreateWorkspaceDocument = gql`
     mutation createWorkspace($input: CreateWorkspaceInput!) {
@@ -571,6 +687,27 @@ export const DocumentPreviewsDocument = gql`
 
 export function useDocumentPreviewsQuery(options: Omit<Urql.UseQueryArgs<DocumentPreviewsQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentPreviewsQuery>({ query: DocumentPreviewsDocument, ...options });
+};
+export const RootFoldersDocument = gql`
+    query rootFolders($workspaceId: ID!, $first: Int!, $after: String) {
+  rootFolders(workspaceId: $workspaceId, first: $first, after: $after) {
+    nodes {
+      id
+      name
+      parentFolderId
+      rootFolderId
+      workspaceId
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    `;
+
+export function useRootFoldersQuery(options: Omit<Urql.UseQueryArgs<RootFoldersQueryVariables>, 'query'>) {
+  return Urql.useQuery<RootFoldersQuery>({ query: RootFoldersDocument, ...options });
 };
 export const WorkspaceDocument = gql`
     query workspace($id: ID) {

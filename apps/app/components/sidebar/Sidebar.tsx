@@ -3,7 +3,6 @@ import {
   DrawerContentComponentProps,
 } from "@react-navigation/drawer";
 
-import { StyleSheet } from "react-native";
 import {
   Button,
   Icon,
@@ -26,6 +25,8 @@ import {
   useUpdateDocumentNameMutation,
   useDocumentPreviewsQuery,
   useWorkspaceQuery,
+  useCreateFolderMutation,
+  useRootFoldersQuery,
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 import { useRoute } from "@react-navigation/native";
@@ -45,11 +46,18 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       id: route.params.workspaceId,
     },
   });
+  const [rootFoldersResult] = useRootFoldersQuery({
+    variables: {
+      workspaceId: route.params.workspaceId,
+      first: 20,
+    },
+  });
 
   const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
+  const [, createFolderMutation] = useCreateFolderMutation();
   const [documentPreviewsResult, refetchDocumentPreviews] =
     useDocumentPreviewsQuery({
       variables: { workspaceId: route.params.workspaceId },
@@ -67,6 +75,19 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       },
     });
     refetchWorkspacesResult();
+  };
+
+  const createFolder = async () => {
+    const id = uuidv4();
+    const result = await createFolderMutation({
+      input: { id, workspaceId: route.params.workspaceId },
+    });
+    if (result.data?.createFolder?.folder?.id) {
+      console.log("created a folder");
+    } else {
+      console.error(result.error);
+      alert("Failed to create a folder. Please try again.");
+    }
   };
 
   const createDocument = async () => {
@@ -226,6 +247,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
       <SidebarDivider />
 
+      <SidebarButton onPress={createFolder}>
+        <Text variant="small">Create Folder</Text>
+      </SidebarButton>
+
       <SidebarButton onPress={createDocument}>
         <Text variant="small">Create Page</Text>
       </SidebarButton>
@@ -235,6 +260,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <Text variant="xxs" bold style={tw`ml-4 mb-4`}>
         Documents
       </Text>
+
       {documentPreviewsResult.fetching ? (
         <Text>Loading...</Text>
       ) : documentPreviewsResult.data?.documentPreviews?.nodes ? (
@@ -244,9 +270,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               return null;
             }
             return (
-              <View key={documentPreview.id} style={styles.documentPreviewItem}>
+              <View key={documentPreview.id}>
                 <Link
-                  style={styles.documentPreviewLabel}
                   to={{
                     screen: "Workspace",
                     params: {
@@ -270,18 +295,20 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         )
       ) : null}
 
-      <Folder />
+      {rootFoldersResult.fetching ? (
+        <Text>Loading Folders…</Text>
+      ) : rootFoldersResult.data?.rootFolders?.nodes ? (
+        rootFoldersResult.data?.rootFolders?.nodes.map((folder) => {
+          if (folder === null) {
+            return null;
+          }
+          return (
+            <Folder key={folder.id}>
+              <Text>{folder.name}</Text>
+            </Folder>
+          );
+        })
+      ) : null}
     </DrawerContentScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  documentPreviewItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  documentPreviewLabel: {
-    flexGrow: 1,
-    height: "100%",
-  },
-});

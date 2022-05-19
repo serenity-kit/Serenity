@@ -3,7 +3,9 @@ import { HStack } from "native-base";
 import { useState } from "react";
 import { useCreateDocumentMutation } from "../../generated/graphql";
 
-type Props = {};
+type Props = {
+  children: React.ReactNode;
+};
 
 export default function Folder(props: Props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,10 +20,9 @@ export default function Folder(props: Props) {
           setIsOpen((currentIsOpen) => !currentIsOpen);
         }}
       >
-        {" "}
         <HStack>
           <Icon name="arrow-down-s-line" />
-          <Text>Folder</Text>
+          <Text>{props.children}</Text>
           <Pressable
             onPress={() => {
               console.log("lala");
@@ -31,7 +32,7 @@ export default function Folder(props: Props) {
           </Pressable>
         </HStack>
       </Pressable>
-      {isOpen && <>children</>}
+      {isOpen && <Text>children</Text>}
     </>
   );
 }
