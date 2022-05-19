@@ -19,9 +19,11 @@ import { Chat4Line } from "./icons/Chat4Line";
 import { CodeSSlashLine } from "./icons/CodeSSlashLine";
 import { CodeView } from "./icons/CodeView";
 import { Cup } from "./icons/Cup";
+import { DashboardLine } from "./icons/DashboardLine";
 import { DeleteBinLine } from "./icons/DeleteBinLine";
 import { DoubleQuotesL } from "./icons/DoubleQuotesL";
 import { DownloadLine } from "./icons/DownloadLine";
+import { DraftLine } from "./icons/DraftLine";
 import { EmotionLine } from "./icons/EmotionLine";
 import { FileSearchLine } from "./icons/FileSearchLine";
 import { FileTransferLine } from "./icons/FileTransferLine";
@@ -52,6 +54,7 @@ import { ListCheck2 } from "./icons/ListCheck2";
 import { ListOrdered } from "./icons/ListOrdered";
 import { ListUnordered } from "./icons/ListUnordered";
 import { Menu } from "./icons/Menu";
+import { MicroscopeLine } from "./icons/MicroscopeLine";
 import { More2Line } from "./icons/More2Line";
 import { MoreLine } from "./icons/MoreLine";
 import { MovieLine } from "./icons/MovieLine";
@@ -89,9 +92,11 @@ export type IconProps = {
     | "code-s-slash-line"
     | "code-view"
     | "cup"
+    | "dashboard-line"
     | "delete-bin-line"
     | "double-quotes-l"
     | "download-line"
+    | "draft-line"
     | "emotion-line"
     | "file-search-line"
     | "file-transfer-line"
@@ -122,6 +127,7 @@ export type IconProps = {
     | "list-unordered"
     | "list-ordered"
     | "menu"
+    | "microscope-line"
     | "more-2-line"
     | "more-line"
     | "movie-line"
@@ -175,12 +181,15 @@ export const Icon = (props: IconProps) => {
     return <CodeSSlashLine color={color} size={size} />;
   if (name === "code-view") return <CodeView color={color} size={size} />;
   if (name === "cup") return <Cup color={color} size={size} />;
+  if (name === "dashboard-line")
+    return <DashboardLine color={color} size={size} />;
   if (name === "delete-bin-line")
     return <DeleteBinLine color={color} size={size} />;
   if (name === "double-quotes-l")
     return <DoubleQuotesL color={color} size={size} />;
   if (name === "download-line")
     return <DownloadLine color={color} size={size} />;
+  if (name === "draft-line") return <DraftLine color={color} size={size} />;
   if (name === "emotion-line") return <EmotionLine color={color} size={size} />;
   if (name === "file-search-line")
     return <FileSearchLine color={color} size={size} />;
@@ -217,6 +226,8 @@ export const Icon = (props: IconProps) => {
   if (name === "list-unordered")
     return <ListUnordered color={color} size={size} />;
   if (name === "menu") return <Menu color={color} size={size} />;
+  if (name === "microscope-line")
+    return <MicroscopeLine color={color} size={size} />;
   if (name === "more-2-line") return <More2Line color={color} size={size} />;
   if (name === "more-line") return <MoreLine color={color} size={size} />;
   if (name === "movie-line") return <MovieLine color={color} size={size} />;
