@@ -6,21 +6,18 @@ import {
   Text,
   tw,
 } from "@serenity-tools/ui";
-import {
-  useDeleteDocumentsMutation,
-  useUpdateDocumentNameMutation,
-} from "../../generated/graphql";
+import { useDeleteDocumentsMutation } from "../../generated/graphql";
 import { useState } from "react";
 
 type Props = {
   documentId: string;
   refetchDocuments: () => void;
+  onUpdateNamePress: () => void;
 };
 
 export default function DocumentMenu(props: Props) {
   const [isOpenDocumentMenu, setIsOpenDocumentMenu] = useState(false);
   const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
-  const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
 
   const deleteDocument = async (id: string) => {
     await deleteDocumentsMutation({
@@ -29,20 +26,6 @@ export default function DocumentMenu(props: Props) {
       },
     });
     props.refetchDocuments();
-  };
-
-  const updateDocumentName = async (id: string) => {
-    const name = window.prompt("Enter a document name");
-    if (name && name.length > 0) {
-      // refetchDocuments is not necessary since a document is returned
-      // and therefor the cache automatically updated
-      await updateDocumentNameMutation({
-        input: {
-          id,
-          name,
-        },
-      });
-    }
   };
 
   return (
@@ -62,12 +45,7 @@ export default function DocumentMenu(props: Props) {
         </Pressable>
       }
     >
-      <SidebarButton
-        onPress={() => {
-          setIsOpenDocumentMenu(false);
-          updateDocumentName(props.documentId);
-        }}
-      >
+      <SidebarButton onPress={props.onUpdateNamePress}>
         <Text variant="small">Change Name</Text>
       </SidebarButton>
       <SidebarButton

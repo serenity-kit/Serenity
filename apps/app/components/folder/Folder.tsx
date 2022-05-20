@@ -21,6 +21,7 @@ import {
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types";
 import DocumentMenu from "../documentMenu/DocumentMenu";
+import DocumentInFolder from "../document/DocumentInFolder";
 
 type Props = {
   workspaceId: string;
@@ -214,28 +215,13 @@ export default function Folder(props: Props) {
                   return null;
                 }
                 return (
-                  <View style={tw`ml-4`} key={document.id}>
-                    <HStack>
-                      <Link
-                        to={{
-                          screen: "Workspace",
-                          params: {
-                            workspaceId: props.workspaceId,
-                            screen: "Page",
-                            params: {
-                              pageId: document.id,
-                            },
-                          },
-                        }}
-                      >
-                        {document?.name}
-                      </Link>
-                      <DocumentMenu
-                        documentId={document.id}
-                        refetchDocuments={refetchDocuments}
-                      />
-                    </HStack>
-                  </View>
+                  <DocumentInFolder
+                    key={document.id}
+                    documentId={document.id}
+                    documentName={document.name}
+                    workspaceId={props.workspaceId}
+                    onRefetchDocumentsPress={refetchDocuments}
+                  />
                 );
               })
             : null}
