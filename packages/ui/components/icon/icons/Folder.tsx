@@ -19,8 +19,8 @@ export const Folder = ({ size }: Props) => {
           y2="16"
           gradientUnits="userSpaceOnUse"
         >
-          <Stop offset="0.625" stop-color="#91A0FF" />
-          <Stop offset="1" stop-color="#7587FF" />
+          <Stop offset="0.625" stopColor="#91A0FF" />
+          <Stop offset="1" stopColor="#7587FF" />
         </LinearGradient>
       </Defs>
     </Svg>

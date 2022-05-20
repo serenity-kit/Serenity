@@ -9,7 +9,7 @@ import {
   Input,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -36,6 +36,7 @@ export default function SidebarFolder(props: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [folderName, setFolderName] = useState("");
   const [newFolderName, setNewFolderName] = useState("");
+  const inputRef = useRef(null);
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
   const [, updateFolderNameMutation] = useUpdateFolderNameMutation();
@@ -152,36 +153,33 @@ export default function SidebarFolder(props: Props) {
           )}
           <Icon name="folder" />
           {isEditing ? (
-            <Input onChangeText={setNewFolderName} value={newFolderName} />
+            <Input
+              ref={inputRef}
+              onChangeText={setNewFolderName}
+              value={newFolderName}
+              onBlur={updateFolderName}
+              onKeyPress={(evt) => {
+                if (evt.keyCode === 27) {
+                  evt.preventDefault();
+                  cancelEditFolderName();
+                }
+              }}
+            />
           ) : (
             <Text>{folderName}</Text>
           )}
-          {isEditing ? (
-            <>
-              <Pressable onPress={updateFolderName}>
-                <Icon name="question-mark" />
-                <Text>Commit</Text>
-              </Pressable>
-              <Pressable onPress={cancelEditFolderName}>
-                <Icon name="question-mark" />
-                <Text>Cancel</Text>
-              </Pressable>
-            </>
-          ) : (
-            <>
-              <SidebarFolderMenu
-                folderId={props.folderId}
-                refetchFolders={refetchFolders}
-                onUpdateNamePress={editFolderName}
-              />
-              <Pressable onPress={createFolder}>
-                <Icon name="folder-line" />
-              </Pressable>
-              <Pressable onPress={createDocument}>
-                <Icon name="file-transfer-line" />
-              </Pressable>
-            </>
-          )}
+          <SidebarFolderMenu
+            folderId={props.folderId}
+            refetchFolders={refetchFolders}
+            onUpdateNamePress={editFolderName}
+          />
+          <Pressable onPress={createFolder}>
+            <Icon name="folder-line" />
+          </Pressable>
+          <Pressable onPress={createDocument}>
+            <Icon name="file-transfer-line" />
+          </Pressable>
+
           {documentsResult.fetching ||
             (foldersResult.fetching && <ActivityIndicator />)}
         </HStack>
