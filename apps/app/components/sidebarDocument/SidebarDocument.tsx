@@ -9,7 +9,7 @@ import {
   Input,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
-import DocumentMenu from "../documentMenu/DocumentMenu";
+import SidebarDocumentMenu from "../sidebarDocumentMenu/SidebarDocumentMenu";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 
 type Props = {
@@ -95,7 +95,7 @@ export default function SidebarDocument(props: Props) {
             </Link>
           </>
         )}
-        <DocumentMenu
+        <SidebarDocumentMenu
           documentId={props.documentId}
           refetchDocuments={props.onRefetchDocumentsPress}
           onUpdateNamePress={editDocumentName}

@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function DocumentMenu(props: Props) {
-  const [isOpenDocumentMenu, setIsOpenDocumentMenu] = useState(false);
+  const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
 
   const deleteDocument = async (id: string) => {
@@ -34,8 +34,8 @@ export default function DocumentMenu(props: Props) {
       style={tw`w-60`}
       offset={8}
       crossOffset={80}
-      isOpen={isOpenDocumentMenu}
-      onChange={setIsOpenDocumentMenu}
+      isOpen={isOpenMenu}
+      onChange={setIsOpenMenu}
       trigger={
         <Pressable
           accessibilityLabel="More options menu"
@@ -50,7 +50,7 @@ export default function DocumentMenu(props: Props) {
       </SidebarButton>
       <SidebarButton
         onPress={() => {
-          setIsOpenDocumentMenu(false);
+          setIsOpenMenu(false);
           deleteDocument(props.documentId);
         }}
       >
