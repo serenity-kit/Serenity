@@ -15,7 +15,7 @@ type Props = {
   onUpdateNamePress: () => void;
 };
 
-export default function DocumentMenu(props: Props) {
+export default function SidebarPageMenu(props: Props) {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
 

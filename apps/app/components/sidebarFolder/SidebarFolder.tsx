@@ -20,7 +20,7 @@ import {
   useUpdateFolderNameMutation,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types";
-import SidebarDocument from "../sidebarDocument/SidebarDocument";
+import SidebarPage from "../sidebarPage/SidebarPage";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 
 type Props = {
@@ -211,7 +211,7 @@ export default function SidebarFolder(props: Props) {
                   return null;
                 }
                 return (
-                  <SidebarDocument
+                  <SidebarPage
                     key={document.id}
                     documentId={document.id}
                     documentName={document.name || "Untitled"}
