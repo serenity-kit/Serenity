@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
-import { Text, View, Button, Input, Checkbox, tw } from "@serenity-tools/ui";
+import {
+  Text,
+  View,
+  Button,
+  Input,
+  Checkbox,
+  LabeledInput,
+  Modal,
+  tw,
+} from "@serenity-tools/ui";
 import { RootStackScreenProps, WorkspaceDrawerScreenProps } from "../../types";
 import { useDeleteWorkspacesMutation } from "../../generated/graphql";
 import {
@@ -89,6 +98,10 @@ export default function WorkspaceSettingsScreen(
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
   const [username, setUsername] = useState<string>("");
+  const [showDeleteWorkspaceModal, setShowDeleteWorkspaceModal] =
+    useState<boolean>(false);
+  const [deletingWorkspaceName, setDeletingWorkspaceName] =
+    useState<string>("");
 
   useEffect(() => {
     if (
@@ -133,28 +146,26 @@ export default function WorkspaceSettingsScreen(
   };
 
   const deleteWorkspace = async () => {
-    const confirmedWorkspaceName = window.prompt(
-      `Type the name of this workspace: ${workspaceName}`
-    );
-    if (confirmedWorkspaceName === workspaceName) {
-      setIsLoadingWorkspaceData(true);
-      setHasGraphqlError(false);
-      const deleteWorkspaceResult = await deleteWorkspacesMutation({
-        input: {
-          ids: [workspaceId],
-        },
-      });
-      if (deleteWorkspaceResult.data?.deleteWorkspaces?.status) {
-        alert("Workspace deleted");
-        props.navigation.navigate("Root");
-      } else if (deleteWorkspaceResult?.error) {
-        setHasGraphqlError(true);
-        setGraphqlError(deleteWorkspaceResult?.error.message);
-      }
-      setIsLoadingWorkspaceData(false);
-    } else {
-      window.alert("Invalid workspace name");
+    if (deletingWorkspaceName !== workspaceName) {
+      // display an error
+      return;
     }
+    setIsLoadingWorkspaceData(true);
+    setHasGraphqlError(false);
+    const deleteWorkspaceResult = await deleteWorkspacesMutation({
+      input: {
+        ids: [workspaceId],
+      },
+    });
+    if (deleteWorkspaceResult.data?.deleteWorkspaces?.status) {
+      alert("Workspace deleted");
+      props.navigation.navigate("Root");
+    } else if (deleteWorkspaceResult?.error) {
+      setHasGraphqlError(true);
+      setGraphqlError(deleteWorkspaceResult?.error.message);
+    }
+    setIsLoadingWorkspaceData(false);
+    setShowDeleteWorkspaceModal(false);
   };
 
   const updateWorkspaceName = async () => {
@@ -345,7 +356,31 @@ export default function WorkspaceSettingsScreen(
               )}
             </View>
             {isAdmin && (
-              <Button onPress={deleteWorkspace}>Delete Workspace</Button>
+              <Button onPress={() => setShowDeleteWorkspaceModal(true)}>
+                Delete Workspace
+              </Button>
+            )}
+            {isAdmin && (
+              <Modal
+                isVisible={showDeleteWorkspaceModal}
+                onBackdropPress={() => setShowDeleteWorkspaceModal(false)}
+              >
+                <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
+                  <Text>Type the name of this workspace: {workspaceName}</Text>
+                  <LabeledInput
+                    label={"Workspace Name"}
+                    onChangeText={setDeletingWorkspaceName}
+                  />
+                  <Button
+                    disabled={deletingWorkspaceName !== workspaceName}
+                    onPress={() => {
+                      deleteWorkspace();
+                    }}
+                  >
+                    Delete Workspace
+                  </Button>
+                </View>
+              </Modal>
             )}
           </>
         )}

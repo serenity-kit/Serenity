@@ -23,9 +23,9 @@ import { RootStackScreenProps } from "../../types";
 import DocumentMenu from "../documentMenu/DocumentMenu";
 
 type Props = {
-  children: React.ReactNode;
   workspaceId: string;
   folderId: string;
+  folderName: string;
 };
 
 export default function Folder(props: Props) {
@@ -55,11 +55,10 @@ export default function Folder(props: Props) {
   });
 
   useEffect(() => {
-    console.log(props.folderId);
-    if (props.children) {
-      setFolderName(props.children.props.children);
+    if (props.folderName) {
+      setFolderName(props.folderName);
     }
-  }, [props.children]);
+  }, [props.folderName]);
 
   const createFolder = async () => {
     setIsOpen(true);
@@ -202,9 +201,8 @@ export default function Folder(props: Props) {
                     <Folder
                       folderId={folder.id}
                       workspaceId={props.workspaceId}
-                    >
-                      <Text>{folder.name}</Text>
-                    </Folder>
+                      folderName={folder.name}
+                    />
                   </View>
                 );
               })
