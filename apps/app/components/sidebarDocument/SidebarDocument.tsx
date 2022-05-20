@@ -19,11 +19,10 @@ type Props = {
   onRefetchDocumentsPress: () => void;
 };
 
-export default function DocumentInFolder(props: Props) {
-  const [isSyncingData, setIsSyncingData] = useState<boolean>(false);
-  const [newDocumentName, setNewDocumentName] = useState<string>("");
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [documentName, setDocumentName] = useState<string>("");
+export default function SidebarDocument(props: Props) {
+  const [newDocumentName, setNewDocumentName] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [documentName, setDocumentName] = useState("");
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
 
   useEffect(() => {
@@ -41,16 +40,12 @@ export default function DocumentInFolder(props: Props) {
   };
 
   const updateDocumentName = async () => {
-    console.log("UPDATING DOCUMENT NAME");
-    setIsSyncingData(true);
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
         id: props.documentId,
         name: newDocumentName,
       },
     });
-    console.log("UPDATED DOCUMENT NAME");
-    console.log({ updateDocumentNameResult });
     if (
       updateDocumentNameResult.data &&
       updateDocumentNameResult.data.updateDocumentName
@@ -61,9 +56,9 @@ export default function DocumentInFolder(props: Props) {
       setDocumentName(updatedDocumentName);
     } else {
       // TODO: show error: couldn't update folder name
+      // refetch to revert back to actual name
     }
     setIsEditing(false);
-    setIsSyncingData(false);
   };
 
   return (
@@ -98,10 +93,6 @@ export default function DocumentInFolder(props: Props) {
             >
               {documentName}
             </Link>
-            <Pressable onPress={editDocumentName}>
-              <Icon name="question-mark" />
-              <Text>Edit</Text>
-            </Pressable>
           </>
         )}
         <DocumentMenu

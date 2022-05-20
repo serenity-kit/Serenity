@@ -29,7 +29,7 @@ import { useRoute } from "@react-navigation/native";
 import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { useEffect, useState } from "react";
-import Folder from "../folder/Folder";
+import Folder from "../sidebarFolder/SidebarFolder";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
