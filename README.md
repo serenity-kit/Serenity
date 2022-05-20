@@ -38,7 +38,7 @@ yarn workspace backend dev:mock
 
 ```sh
 cd apps/app
-yarn dev:web
+yarn dev
 ```
 
 ### App (iOS Simulator or Android Emulator)

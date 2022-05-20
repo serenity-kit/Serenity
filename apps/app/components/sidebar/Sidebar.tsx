@@ -22,12 +22,13 @@ import {
   useWorkspaceQuery,
   useCreateFolderMutation,
   useRootFoldersQuery,
+  useMeQuery,
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 import { useRoute } from "@react-navigation/native";
 import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Folder from "../folder/Folder";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
@@ -35,6 +36,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
+  const [meResult] = useMeQuery();
+  const [username, setUsername] = useState<string>("");
   const [workspaceResult] = useWorkspaceQuery({
     variables: {
       id: route.params.workspaceId,
@@ -50,6 +53,19 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
   const { updateAuthentication } = useAuthentication();
+
+  useEffect(() => {
+    console.log(meResult.data);
+    if (meResult.data && meResult.data.me) {
+      if (meResult.data.me.username) {
+        setUsername(meResult.data.me.username);
+        console.log(meResult.data);
+        console.log(meResult.data.me.username);
+      } else {
+        // TODO: error! Could'nt fetch user
+      }
+    }
+  }, [meResult.fetching]);
 
   const createWorkspace = async () => {
     const name =
@@ -111,7 +127,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       >
         <View style={tw`p-4`}>
           <Text variant="small" muted>
-            jane@example.com
+            {username}
           </Text>
         </View>
         {workspacesResult.fetching

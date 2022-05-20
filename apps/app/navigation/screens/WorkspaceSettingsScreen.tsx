@@ -6,6 +6,7 @@ import { useDeleteWorkspacesMutation } from "../../generated/graphql";
 import {
   useWorkspaceQuery,
   useUpdateWorkspaceMutation,
+  useMeQuery,
 } from "../../generated/graphql";
 
 type Member = {
@@ -72,6 +73,7 @@ export default function WorkspaceSettingsScreen(
   });
   const [, deleteWorkspacesMutation] = useDeleteWorkspacesMutation();
   const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
+  const [meResult] = useMeQuery();
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [newMemberName, _setNewMemberName] = useState<string>("");
@@ -86,9 +88,7 @@ export default function WorkspaceSettingsScreen(
     useState<boolean>(false);
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
-
-  // TODO: get username from login data
-  const username = "user";
+  const [username, setUsername] = useState<string>("");
 
   useEffect(() => {
     if (
@@ -103,6 +103,18 @@ export default function WorkspaceSettingsScreen(
     }
   }, [workspaceResult.fetching]);
 
+  useEffect(() => {
+    console.log(meResult);
+    if (meResult.data && meResult.data.me) {
+      if (meResult.data.me.username) {
+        setUsername(meResult.data.me.username);
+        console.log(meResult.data.me.username);
+      } else {
+        // TODO: error! Could'nt fetch user
+      }
+    }
+  }, [meResult]);
+
   const updateWorkspaceData = async (workspace: any) => {
     setIsLoadingWorkspaceData(true);
     const workspaceName = workspace.name || "";
@@ -112,6 +124,8 @@ export default function WorkspaceSettingsScreen(
     const memberLookup = {} as { [username: string]: number };
     members.forEach((member: Member, row: number) => {
       memberLookup[member.username] = row;
+      console.log(username);
+      console.log(member.username);
       if (member.username === username) {
         setIsAdmin(member.isAdmin);
       }

@@ -37,7 +37,11 @@ test("user should be be able to get their username", async () => {
     }
   `;
   const result = await graphql.client.request(query, null, authorizationHeader);
-  expect(result.documents).toMatchInlineSnapshot(`undefined`);
+  expect(result.me).toMatchInlineSnapshot(`
+    Object {
+      "username": "${username}",
+    }
+  `);
 });
 
 test("listing documents that the user doesn't own throws an error", async () => {
