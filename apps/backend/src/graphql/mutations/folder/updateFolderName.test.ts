@@ -36,6 +36,7 @@ beforeEach(async () => {
     const createFolderResult = await createFolder({
       graphql,
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+      name: null,
       parentFolderId: null,
       authorizationHeader: `TODO+${username}`,
       workspaceId: addedWorkspace.id,
@@ -56,7 +57,13 @@ test("user should be able to change a folder name", async () => {
   });
   expect(result.updateFolderName).toMatchInlineSnapshot(`
     Object {
-      "folder": null,
+      "folder": Object {
+        "id": "${addedFolderId}",
+        "name": "${name}",
+        "parentFolderId": null,
+        "rootFolderId": null,
+        "workspaceId": "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+      },
     }
   `);
 });
@@ -96,6 +103,7 @@ test("throw error when user doesn't have access", async () => {
   const otherUserFolderResult = await createFolder({
     graphql,
     id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
+    name: null,
     parentFolderId: null,
     authorizationHeader: `TODO+${username2}`,
     workspaceId: addedWorkspace.id,
