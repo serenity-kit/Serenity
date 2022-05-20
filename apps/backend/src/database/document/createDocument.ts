@@ -2,8 +2,8 @@ import { prisma } from "../prisma";
 
 type Params = {
   id: string;
-  name: string | null;
-  parentFolderId: string | null;
+  name?: string | null;
+  parentFolderId?: string | null;
   workspaceId: string;
 };
 
