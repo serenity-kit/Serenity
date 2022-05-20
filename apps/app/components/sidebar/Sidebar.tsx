@@ -16,7 +16,7 @@ import {
   useIsPermanentLeftSidebar,
   View,
 } from "@serenity-tools/ui";
-import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
+import { CreateWorkspaceModal } from "../createWorkspaceModal/CreateWorkspaceModal";
 import {
   useWorkspacesQuery,
   useWorkspaceQuery,
@@ -25,14 +25,15 @@ import {
   useMeQuery,
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { useEffect, useState } from "react";
-import Folder from "../folder/Folder";
+import Folder from "../sidebarFolder/SidebarFolder";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
+  const navigation = useNavigation();
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
@@ -65,9 +66,13 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     }
   }, [meResult.fetching]);
 
-  const onWorkspaceCreated = (workspace: any) => {
+  const onWorkspaceCreated = (workspace: { id: string }) => {
     refetchWorkspacesResult();
     setShowCreateWorkspaceModal(false);
+    navigation.navigate("Workspace", {
+      workspaceId: workspace.id,
+      screen: "Dashboard",
+    });
   };
 
   const createFolder = async () => {

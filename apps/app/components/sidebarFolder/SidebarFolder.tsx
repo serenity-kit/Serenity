@@ -20,8 +20,8 @@ import {
   useUpdateFolderNameMutation,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types";
-import DocumentMenu from "../documentMenu/DocumentMenu";
-import DocumentInFolder from "../document/DocumentInFolder";
+import SidebarPage from "../sidebarPage/SidebarPage";
+import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 
 type Props = {
   workspaceId: string;
@@ -29,14 +29,13 @@ type Props = {
   folderName: string;
 };
 
-export default function Folder(props: Props) {
+export default function SidebarFolder(props: Props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [isSyncingData, setIsSyncingData] = useState<boolean>(false);
-  const [folderName, setFolderName] = useState<string>("");
-  const [newFolderName, setNewFolderName] = useState<string>("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [folderName, setFolderName] = useState("");
+  const [newFolderName, setNewFolderName] = useState("");
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
   const [, updateFolderNameMutation] = useUpdateFolderNameMutation();
@@ -119,7 +118,6 @@ export default function Folder(props: Props) {
   };
 
   const updateFolderName = async () => {
-    setIsSyncingData(true);
     const updateFolderNameResult = await updateFolderNameMutation({
       input: {
         id: props.folderId,
@@ -137,7 +135,6 @@ export default function Folder(props: Props) {
       // TODO: show error: couldn't update folder name
     }
     setIsEditing(false);
-    setIsSyncingData(false);
   };
 
   return (
@@ -172,15 +169,16 @@ export default function Folder(props: Props) {
             </>
           ) : (
             <>
+              <SidebarFolderMenu
+                folderId={props.folderId}
+                refetchFolders={refetchFolders}
+                onUpdateNamePress={editFolderName}
+              />
               <Pressable onPress={createFolder}>
                 <Icon name="folder-line" />
               </Pressable>
               <Pressable onPress={createDocument}>
                 <Icon name="file-transfer-line" />
-              </Pressable>
-              <Pressable onPress={editFolderName}>
-                <Icon name="question-mark" />
-                <Text>Edit</Text>
               </Pressable>
             </>
           )}
@@ -197,7 +195,7 @@ export default function Folder(props: Props) {
                 }
                 return (
                   <View style={tw`ml-2`} key={folder.id}>
-                    <Folder
+                    <SidebarFolder
                       folderId={folder.id}
                       workspaceId={props.workspaceId}
                       folderName={folder.name}
@@ -213,7 +211,7 @@ export default function Folder(props: Props) {
                   return null;
                 }
                 return (
-                  <DocumentInFolder
+                  <SidebarPage
                     key={document.id}
                     documentId={document.id}
                     documentName={document.name || "Untitled"}

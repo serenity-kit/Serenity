@@ -10,22 +10,22 @@ import { useDeleteDocumentsMutation } from "../../generated/graphql";
 import { useState } from "react";
 
 type Props = {
-  documentId: string;
-  refetchDocuments: () => void;
+  folderId: string;
+  refetchFolders: () => void;
   onUpdateNamePress: () => void;
 };
 
-export default function DocumentMenu(props: Props) {
-  const [isOpenDocumentMenu, setIsOpenDocumentMenu] = useState(false);
-  const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
+export default function SidebarFolderMenu(props: Props) {
+  const [isOpenMenu, setIsOpenMenu] = useState(false);
+  const [, deleteFoldersMutation] = useDeleteDocumentsMutation();
 
-  const deleteDocument = async (id: string) => {
-    await deleteDocumentsMutation({
+  const deleteFolder = async (id: string) => {
+    await deleteFoldersMutation({
       input: {
         ids: [id],
       },
     });
-    props.refetchDocuments();
+    props.refetchFolders();
   };
 
   return (
@@ -34,8 +34,8 @@ export default function DocumentMenu(props: Props) {
       style={tw`w-60`}
       offset={8}
       crossOffset={80}
-      isOpen={isOpenDocumentMenu}
-      onChange={setIsOpenDocumentMenu}
+      isOpen={isOpenMenu}
+      onChange={setIsOpenMenu}
       trigger={
         <Pressable
           accessibilityLabel="More options menu"
@@ -50,8 +50,8 @@ export default function DocumentMenu(props: Props) {
       </SidebarButton>
       <SidebarButton
         onPress={() => {
-          setIsOpenDocumentMenu(false);
-          deleteDocument(props.documentId);
+          setIsOpenMenu(false);
+          deleteFolder(props.folderId);
         }}
       >
         <Text variant="small">Delete</Text>
