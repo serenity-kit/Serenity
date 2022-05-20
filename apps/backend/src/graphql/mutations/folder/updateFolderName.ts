@@ -36,6 +36,7 @@ export const updateFolderNameMutation = mutationField("updateFolderName", {
       name: args.input.name,
       username: context.user.username,
     });
+    console.log({ folder });
     return { folder };
   },
 });
