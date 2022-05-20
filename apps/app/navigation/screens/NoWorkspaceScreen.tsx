@@ -5,7 +5,7 @@ import {
   useWorkspacesQuery,
   useCreateWorkspaceMutation,
 } from "../../generated/graphql";
-import { CreateWorkspaceModal } from "../../components/workspace/CreateWorkspaceModal";
+import { CreateWorkspaceModal } from "../../components/createWorkspaceModal/CreateWorkspaceModal";
 
 export default function NoWorkspaceScreen({ navigation }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -17,12 +17,11 @@ export default function NoWorkspaceScreen({ navigation }) {
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
 
-  const onWorkspaceCreated = (workspace: any) => {
-    if (workspace && workspace.id) {
-      navigation.navigate("Workspace", {
-        workspaceId: workspace.id,
-      });
-    }
+  const onWorkspaceCreated = (workspace: { id: string }) => {
+    navigation.navigate("Workspace", {
+      workspaceId: workspace.id,
+      screen: "Dashboard",
+    });
     setShowCreateWorkspaceModal(false);
   };
 
