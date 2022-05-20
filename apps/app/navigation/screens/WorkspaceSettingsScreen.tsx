@@ -104,13 +104,11 @@ export default function WorkspaceSettingsScreen(
   }, [workspaceResult.fetching]);
 
   useEffect(() => {
-    console.log(meResult);
     if (meResult.data && meResult.data.me) {
       if (meResult.data.me.username) {
         setUsername(meResult.data.me.username);
-        console.log(meResult.data.me.username);
       } else {
-        // TODO: error! Could'nt fetch user
+        // TODO: error! Couldn't fetch user
       }
     }
   }, [meResult]);

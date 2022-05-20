@@ -1,7 +1,15 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { Icon, Link, Pressable, Text, tw, View } from "@serenity-tools/ui";
+import {
+  Icon,
+  Link,
+  Pressable,
+  Text,
+  tw,
+  View,
+  Input,
+} from "@serenity-tools/ui";
 import { HStack } from "native-base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -9,6 +17,7 @@ import {
   useCreateFolderMutation,
   useDocumentsQuery,
   useFoldersQuery,
+  useUpdateFolderNameMutation,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types";
 import DocumentMenu from "../documentMenu/DocumentMenu";
@@ -23,8 +32,13 @@ export default function Folder(props: Props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isSyncingData, setIsSyncingData] = useState<boolean>(false);
+  const [folderName, setFolderName] = useState<string>("");
+  const [newFolderName, setNewFolderName] = useState<string>("");
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
+  const [, updateFolderNameMutation] = useUpdateFolderNameMutation();
   const [foldersResult, refetchFolders] = useFoldersQuery({
     pause: !isOpen,
     variables: {
@@ -39,6 +53,13 @@ export default function Folder(props: Props) {
       first: 50,
     },
   });
+
+  useEffect(() => {
+    console.log(props.folderId);
+    if (props.children) {
+      setFolderName(props.children.props.children);
+    }
+  }, [props.children]);
 
   const createFolder = async () => {
     setIsOpen(true);
@@ -87,6 +108,41 @@ export default function Folder(props: Props) {
     refetchFolders();
   };
 
+  const editFolderName = () => {
+    setNewFolderName(folderName);
+    setIsEditing(true);
+  };
+
+  const cancelEditFolderName = () => {
+    setIsEditing(false);
+    setNewFolderName(folderName);
+  };
+
+  const updateFolderName = async () => {
+    console.log("UPDATING FOLDER NAME");
+    setIsSyncingData(true);
+    const updateFolderNameResult = await updateFolderNameMutation({
+      input: {
+        id: props.folderId,
+        name: newFolderName,
+      },
+    });
+    console.log("UPDATED FOLDER NAME");
+    console.log({ updateFolderNameResult });
+    if (
+      updateFolderNameResult.data &&
+      updateFolderNameResult.data.updateFolderName
+    ) {
+      const updatedFolderName =
+        updateFolderNameResult.data.updateFolderName.folder?.name || "Untitled";
+      setFolderName(updatedFolderName);
+    } else {
+      // TODO: show error: couldn't update folder name
+    }
+    setIsEditing(false);
+    setIsSyncingData(false);
+  };
+
   return (
     <>
       <Pressable
@@ -100,13 +156,36 @@ export default function Folder(props: Props) {
           ) : (
             <Icon name="arrow-right-s-fill" />
           )}
-          <Text>{props.children}</Text>
-          <Pressable onPress={createFolder}>
-            <Icon name="folder-line" />
-          </Pressable>
-          <Pressable onPress={createDocument}>
-            <Icon name="file-transfer-line" />
-          </Pressable>
+          {isEditing ? (
+            <Input onChangeText={setNewFolderName} value={newFolderName} />
+          ) : (
+            <Text>{folderName}</Text>
+          )}
+          {isEditing ? (
+            <>
+              <Pressable onPress={updateFolderName}>
+                <Icon name="question-mark" />
+                <Text>Commit</Text>
+              </Pressable>
+              <Pressable onPress={cancelEditFolderName}>
+                <Icon name="question-mark" />
+                <Text>Cancel</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              <Pressable onPress={createFolder}>
+                <Icon name="folder-line" />
+              </Pressable>
+              <Pressable onPress={createDocument}>
+                <Icon name="file-transfer-line" />
+              </Pressable>
+              <Pressable onPress={editFolderName}>
+                <Icon name="question-mark" />
+                <Text>Edit</Text>
+              </Pressable>
+            </>
+          )}
           {documentsResult.fetching ||
             (foldersResult.fetching && <ActivityIndicator />)}
         </HStack>

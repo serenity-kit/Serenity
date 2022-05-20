@@ -15,6 +15,8 @@ import {
   tw,
   useIsPermanentLeftSidebar,
   View,
+  LabeledInput,
+  Modal,
 } from "@serenity-tools/ui";
 import {
   useWorkspacesQuery,
@@ -53,23 +55,34 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
   const { updateAuthentication } = useAuthentication();
+  const [showCreateWorkspaceModal, _setShowCreateWorkspaceModal] =
+    useState(false);
+  const [showCreateFolderModal, _setShowCreateFolderModal] = useState(false);
+  const [newWorkspaceName, setNewWorkspaceName] = useState<string>("");
+  const [newFolderName, setNewFolderName] = useState<string>("");
 
   useEffect(() => {
-    console.log(meResult.data);
     if (meResult.data && meResult.data.me) {
       if (meResult.data.me.username) {
         setUsername(meResult.data.me.username);
-        console.log(meResult.data);
-        console.log(meResult.data.me.username);
       } else {
-        // TODO: error! Could'nt fetch user
+        // TODO: error! Couldn't fetch user
       }
     }
   }, [meResult.fetching]);
 
-  const createWorkspace = async () => {
-    const name =
-      window.prompt("Enter a workspace name") || uuidv4().substring(0, 8);
+  const setShowCreateWorkspaceModal = (isVisible: boolean) => {
+    setNewWorkspaceName("");
+    _setShowCreateWorkspaceModal(isVisible);
+  };
+
+  const setShowCreateFolderModal = (isVisible: boolean) => {
+    setNewFolderName("");
+    _setShowCreateFolderModal(isVisible);
+  };
+
+  const createWorkspace = async (name: string) => {
+    // TODO: make sure the name doesn't already exist
     const id = uuidv4();
     await createWorkspaceMutation({
       input: {
@@ -153,7 +166,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         <SidebarButton
           onPress={() => {
             setIsOpenWorkspaceSwitcher(false);
-            createWorkspace();
+            setShowCreateWorkspaceModal(true);
           }}
         >
           <Text variant="small">Create workspace</Text>
@@ -234,6 +247,29 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           );
         })
       ) : null}
+
+      <Modal
+        isVisible={showCreateWorkspaceModal}
+        onBackdropPress={() => setShowCreateWorkspaceModal(false)}
+      >
+        <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
+          <Text>Create a Workspace</Text>
+          <LabeledInput
+            label={"Workspace Name"}
+            onChangeText={setNewWorkspaceName}
+          />
+          <Button
+            disabled={newWorkspaceName === ""}
+            onPress={() => {
+              createWorkspace(newWorkspaceName);
+              setShowCreateWorkspaceModal(false);
+              console.log("click!");
+            }}
+          >
+            Create
+          </Button>
+        </View>
+      </Modal>
     </DrawerContentScrollView>
   );
 }
