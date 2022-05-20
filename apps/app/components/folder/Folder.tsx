@@ -72,7 +72,7 @@ export default function Folder(props: Props) {
       },
     });
     if (result.data?.createFolder?.folder?.id) {
-      console.log("created a folder");
+      // show notification
     } else {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
@@ -119,7 +119,6 @@ export default function Folder(props: Props) {
   };
 
   const updateFolderName = async () => {
-    console.log("UPDATING FOLDER NAME");
     setIsSyncingData(true);
     const updateFolderNameResult = await updateFolderNameMutation({
       input: {
@@ -127,8 +126,6 @@ export default function Folder(props: Props) {
         name: newFolderName,
       },
     });
-    console.log("UPDATED FOLDER NAME");
-    console.log({ updateFolderNameResult });
     if (
       updateFolderNameResult.data &&
       updateFolderNameResult.data.updateFolderName
@@ -156,6 +153,7 @@ export default function Folder(props: Props) {
           ) : (
             <Icon name="arrow-right-s-fill" />
           )}
+          <Icon name="folder" />
           {isEditing ? (
             <Input onChangeText={setNewFolderName} value={newFolderName} />
           ) : (
@@ -218,7 +216,7 @@ export default function Folder(props: Props) {
                   <DocumentInFolder
                     key={document.id}
                     documentId={document.id}
-                    documentName={document.name}
+                    documentName={document.name || "Untitled"}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}
                   />

@@ -69,6 +69,7 @@ export default function DocumentInFolder(props: Props) {
   return (
     <View style={tw`ml-4`}>
       <HStack>
+        <Icon name="page" />
         {isEditing ? (
           <>
             <Input onChangeText={setNewDocumentName} value={newDocumentName} />
