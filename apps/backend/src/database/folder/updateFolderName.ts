@@ -8,7 +8,7 @@ type Params = {
 
 export async function updateFolderName({ id, name, username }: Params) {
   try {
-    return await prisma.$transaction(async (prisma) => {
+    await prisma.$transaction(async (prisma) => {
       // fetch the folder
       // check if the user has access to the workspace
       // update the folder
@@ -41,7 +41,6 @@ export async function updateFolderName({ id, name, username }: Params) {
           name,
         },
       });
-      console.log({ updatedFolder });
       return updatedFolder;
     });
   } catch (error) {

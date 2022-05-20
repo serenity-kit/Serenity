@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { Text, View, Button } from "@serenity-tools/ui";
-import {
-  useWorkspacesQuery,
-  useCreateWorkspaceMutation,
-} from "../../generated/graphql";
-import { CreateWorkspaceModal } from "../../components/workspace/CreateWorkspaceModal";
+import { useCreateWorkspaceMutation } from "../../generated/graphql";
+import { v4 as uuidv4 } from "uuid";
 
 export default function NoWorkspaceScreen({ navigation }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -13,17 +10,30 @@ export default function NoWorkspaceScreen({ navigation }) {
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
-  const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
-    useState(false);
 
-  const onWorkspaceCreated = (workspace: any) => {
-    if (workspace && workspace.id) {
-      navigation.navigate("Workspace", {
-        workspaceId: workspace.id,
+  const createWorkspace = async () => {
+    setIsLoading(true);
+    setHasGraphqlError(false);
+    const name =
+      window.prompt("Enter a workspace name") || uuidv4().substring(0, 8);
+    if (name && name.length > 0) {
+      const id = uuidv4();
+      const createWorkspaceResult = await createWorkspaceMutation({
+        input: {
+          name,
+          id,
+        },
       });
+      if (createWorkspaceResult.data?.createWorkspace?.workspace) {
+        navigation.navigate("Workspace", {
+          workspaceId: createWorkspaceResult.data.createWorkspace.workspace.id,
+        });
+      } else if (createWorkspaceResult.error) {
+        setHasGraphqlError(true);
+        setGraphqlError(createWorkspaceResult.error.message);
+      }
     }
-    setShowCreateWorkspaceModal(false);
+    setIsLoading(false);
   };
 
   return (
@@ -39,18 +49,13 @@ export default function NoWorkspaceScreen({ navigation }) {
         </Text>
         <Button
           onPress={() => {
-            setShowCreateWorkspaceModal(true);
+            createWorkspace();
           }}
           disabled={isLoading}
         >
           Create workspace
         </Button>
       </View>
-      <CreateWorkspaceModal
-        isVisible={showCreateWorkspaceModal}
-        onBackdropPress={() => setShowCreateWorkspaceModal(false)}
-        onWorkspaceCreated={onWorkspaceCreated}
-      />
     </>
   );
 }
