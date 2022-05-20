@@ -470,13 +470,6 @@ export type UpdateDocumentNameMutationVariables = Exact<{
 
 export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, name?: string | null } | null } | null };
 
-export type UpdateFolderNameMutationVariables = Exact<{
-  input: UpdateFolderNameInput;
-}>;
-
-
-export type UpdateFolderNameMutation = { __typename?: 'Mutation', updateFolderName?: { __typename?: 'UpdateFolderNameResult', folder?: { __typename?: 'Folder', id: string, name: string } | null } | null };
-
 export type UpdateWorkspaceMutationVariables = Exact<{
   input: UpdateWorkspaceInput;
 }>;
@@ -660,20 +653,6 @@ export const UpdateDocumentNameDocument = gql`
 
 export function useUpdateDocumentNameMutation() {
   return Urql.useMutation<UpdateDocumentNameMutation, UpdateDocumentNameMutationVariables>(UpdateDocumentNameDocument);
-};
-export const UpdateFolderNameDocument = gql`
-    mutation updateFolderName($input: UpdateFolderNameInput!) {
-  updateFolderName(input: $input) {
-    folder {
-      id
-      name
-    }
-  }
-}
-    `;
-
-export function useUpdateFolderNameMutation() {
-  return Urql.useMutation<UpdateFolderNameMutation, UpdateFolderNameMutationVariables>(UpdateFolderNameDocument);
 };
 export const UpdateWorkspaceDocument = gql`
     mutation updateWorkspace($input: UpdateWorkspaceInput!) {

@@ -16,9 +16,9 @@ import {
   useIsPermanentLeftSidebar,
   View,
 } from "@serenity-tools/ui";
-import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 import {
   useWorkspacesQuery,
+  useCreateWorkspaceMutation,
   useWorkspaceQuery,
   useCreateFolderMutation,
   useRootFoldersQuery,
@@ -50,24 +50,34 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     },
   });
 
+  const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
   const { updateAuthentication } = useAuthentication();
-  const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
-    useState(false);
 
   useEffect(() => {
+    console.log(meResult.data);
     if (meResult.data && meResult.data.me) {
       if (meResult.data.me.username) {
         setUsername(meResult.data.me.username);
+        console.log(meResult.data);
+        console.log(meResult.data.me.username);
       } else {
-        // TODO: error! Couldn't fetch user
+        // TODO: error! Could'nt fetch user
       }
     }
   }, [meResult.fetching]);
 
-  const onWorkspaceCreated = (workspace: any) => {
+  const createWorkspace = async () => {
+    const name =
+      window.prompt("Enter a workspace name") || uuidv4().substring(0, 8);
+    const id = uuidv4();
+    await createWorkspaceMutation({
+      input: {
+        name,
+        id,
+      },
+    });
     refetchWorkspacesResult();
-    setShowCreateWorkspaceModal(false);
   };
 
   const createFolder = async () => {
@@ -143,7 +153,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         <SidebarButton
           onPress={() => {
             setIsOpenWorkspaceSwitcher(false);
-            setShowCreateWorkspaceModal(true);
+            createWorkspace();
           }}
         >
           <Text variant="small">Create workspace</Text>
@@ -217,18 +227,13 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             <Folder
               key={folder.id}
               folderId={folder.id}
-              folderName={folder.name}
               workspaceId={route.params.workspaceId}
-            />
+            >
+              <Text>{folder.name}</Text>
+            </Folder>
           );
         })
       ) : null}
-
-      <CreateWorkspaceModal
-        isVisible={showCreateWorkspaceModal}
-        onBackdropPress={() => setShowCreateWorkspaceModal(false)}
-        onWorkspaceCreated={onWorkspaceCreated}
-      />
     </DrawerContentScrollView>
   );
 }
