@@ -12,8 +12,8 @@ import {
   Provider,
   fetchExchange,
   dedupExchange,
-  cacheExchange,
 } from "urql";
+import { cacheExchange } from "@urql/exchange-graphcache";
 import { NativeBaseProvider, extendTheme } from "native-base";
 import { authExchange } from "@urql/exchange-auth";
 import {
@@ -27,6 +27,7 @@ import {
 import { Platform } from "react-native";
 import { AuthenticationProvider } from "./context/AuthenticationContext";
 import { useCallback, useMemo, useState } from "react";
+import { devtoolsExchange } from "@urql/devtools";
 
 import { theme } from "../../tailwind.config";
 
@@ -39,6 +40,72 @@ const unauthenticatedOperation = [
   "finalizeRegistration",
   "initializeLogin",
   "finalizeLogin",
+];
+
+const exchanges = [
+  dedupExchange,
+  cacheExchange({}),
+  authExchange<AuthState>({
+    // if it fails it will run getAuth again and see if the client already logged in in the meantime
+    willAuthError: ({ operation, authState }) => {
+      if (!authState) {
+        // detect the unauthenticated mutations and let this operations through
+        return !(
+          operation.kind === "mutation" &&
+          operation.query.definitions.some((definition) => {
+            return (
+              definition.kind === "OperationDefinition" &&
+              definition.selectionSet.selections.some((node) => {
+                return (
+                  node.kind === "Field" &&
+                  unauthenticatedOperation.includes(node.name.value)
+                );
+              })
+            );
+          })
+        );
+      }
+
+      return false;
+    },
+    getAuth: async ({ authState }) => {
+      if (!authState) {
+        const deviceSigningPublicKey =
+          Platform.OS === "web"
+            ? localStorage.getItem("deviceSigningPublicKey")
+            : "mockedForMobile";
+
+        if (deviceSigningPublicKey) {
+          return { deviceSigningPublicKey };
+        }
+        return null;
+      }
+
+      return null;
+    },
+    addAuthToOperation: ({ authState, operation }) => {
+      if (!authState || !authState.deviceSigningPublicKey) {
+        return operation;
+      }
+
+      const fetchOptions =
+        typeof operation.context.fetchOptions === "function"
+          ? operation.context.fetchOptions()
+          : operation.context.fetchOptions || {};
+
+      return makeOperation(operation.kind, operation, {
+        ...operation.context,
+        fetchOptions: {
+          ...fetchOptions,
+          headers: {
+            ...fetchOptions.headers,
+            Authorization: authState.deviceSigningPublicKey,
+          },
+        },
+      });
+    },
+  }),
+  fetchExchange,
 ];
 
 export default function App() {
@@ -85,71 +152,10 @@ export default function App() {
           ? "http://localhost:4000/graphql"
           : "https://serenity-staging-api.herokuapp.com/graphql",
       requestPolicy: "cache-and-network",
-      exchanges: [
-        dedupExchange,
-        cacheExchange,
-        authExchange<AuthState>({
-          // if it fails it will run getAuth again and see if the client already logged in in the meantime
-          willAuthError: ({ operation, authState }) => {
-            if (!authState) {
-              // detect the unauthenticated mutations and let this operations through
-              return !(
-                operation.kind === "mutation" &&
-                operation.query.definitions.some((definition) => {
-                  return (
-                    definition.kind === "OperationDefinition" &&
-                    definition.selectionSet.selections.some((node) => {
-                      return (
-                        node.kind === "Field" &&
-                        unauthenticatedOperation.includes(node.name.value)
-                      );
-                    })
-                  );
-                })
-              );
-            }
-
-            return false;
-          },
-          getAuth: async ({ authState }) => {
-            if (!authState) {
-              const deviceSigningPublicKey =
-                Platform.OS === "web"
-                  ? localStorage.getItem("deviceSigningPublicKey")
-                  : "mockedForMobile";
-
-              if (deviceSigningPublicKey) {
-                return { deviceSigningPublicKey };
-              }
-              return null;
-            }
-
-            return null;
-          },
-          addAuthToOperation: ({ authState, operation }) => {
-            if (!authState || !authState.deviceSigningPublicKey) {
-              return operation;
-            }
-
-            const fetchOptions =
-              typeof operation.context.fetchOptions === "function"
-                ? operation.context.fetchOptions()
-                : operation.context.fetchOptions || {};
-
-            return makeOperation(operation.kind, operation, {
-              ...operation.context,
-              fetchOptions: {
-                ...fetchOptions,
-                headers: {
-                  ...fetchOptions.headers,
-                  Authorization: authState.deviceSigningPublicKey,
-                },
-              },
-            });
-          },
-        }),
-        fetchExchange,
-      ],
+      exchanges:
+        process.env.NODE_ENV === "development"
+          ? [devtoolsExchange, ...exchanges]
+          : exchanges,
     });
   }, [deviceSigningPublicKey]);
 

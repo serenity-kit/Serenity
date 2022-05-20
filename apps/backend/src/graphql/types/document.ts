@@ -5,5 +5,8 @@ export const Document = objectType({
   definition(t) {
     t.nonNull.string("id");
     t.string("name");
+    t.string("parentFolderId");
+    t.string("rootFolderId");
+    t.string("workspaceId");
   },
 });

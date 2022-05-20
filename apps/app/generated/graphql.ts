@@ -130,6 +130,27 @@ export type Document = {
   __typename?: 'Document';
   id: Scalars['String'];
   name?: Maybe<Scalars['String']>;
+  parentFolderId?: Maybe<Scalars['String']>;
+  rootFolderId?: Maybe<Scalars['String']>;
+  workspaceId?: Maybe<Scalars['String']>;
+};
+
+export type DocumentConnection = {
+  __typename?: 'DocumentConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<DocumentEdge>>>;
+  /** Flattened list of Document type */
+  nodes?: Maybe<Array<Maybe<Document>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type DocumentEdge = {
+  __typename?: 'DocumentEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<Document>;
 };
 
 export type FinalizeResetPasswordInput = {
@@ -150,7 +171,6 @@ export type Folder = {
   id: Scalars['String'];
   name: Scalars['String'];
   parentFolderId?: Maybe<Scalars['String']>;
-  parentFolders?: Maybe<Array<Folder>>;
   rootFolderId?: Maybe<Scalars['String']>;
   workspaceId?: Maybe<Scalars['String']>;
 };
@@ -282,7 +302,7 @@ export type PageInfo = {
 export type Query = {
   __typename?: 'Query';
   documentPath?: Maybe<Array<Maybe<Folder>>>;
-  documents?: Maybe<FolderConnection>;
+  documents?: Maybe<DocumentConnection>;
   folders?: Maybe<FolderConnection>;
   me?: Maybe<MeResult>;
   rootFolders?: Maybe<FolderConnection>;
@@ -468,7 +488,7 @@ export type UpdateDocumentNameMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, name?: string | null } | null } | null };
+export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, name?: string | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
 
 export type UpdateFolderNameMutationVariables = Exact<{
   input: UpdateFolderNameInput;
@@ -491,7 +511,7 @@ export type DocumentsQueryVariables = Exact<{
 }>;
 
 
-export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, name?: string | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type FoldersQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -653,6 +673,9 @@ export const UpdateDocumentNameDocument = gql`
     document {
       id
       name
+      parentFolderId
+      rootFolderId
+      workspaceId
     }
   }
 }

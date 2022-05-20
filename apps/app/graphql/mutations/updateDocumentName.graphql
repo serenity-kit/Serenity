@@ -3,6 +3,9 @@ mutation updateDocumentName($input: UpdateDocumentNameInput!) {
     document {
       id
       name
+      parentFolderId
+      rootFolderId
+      workspaceId
     }
   }
 }

@@ -1,11 +1,11 @@
 import { idArg, nonNull, queryField } from "nexus";
 import { getDocuments } from "../../../database/document/getDocuments";
-import { Folder } from "../../types/folder";
+import { Document } from "../../types/document";
 
 export const workspaces = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("documents", {
-    type: Folder,
+    type: Document,
     disableBackwardPagination: true,
     cursorFromNode: (node) => node?.id ?? "",
     additionalArgs: {
