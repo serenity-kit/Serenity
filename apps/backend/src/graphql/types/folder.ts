@@ -8,8 +8,5 @@ export const Folder = objectType({
     t.string("parentFolderId");
     t.string("rootFolderId");
     t.string("workspaceId");
-    t.list.nonNull.field("parentFolders", {
-      type: Folder,
-    });
   },
 });
