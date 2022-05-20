@@ -20,7 +20,8 @@ import {
   useUpdateFolderNameMutation,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types";
-import DocumentInFolder from "../sidebarDocument/SidebarDocument";
+import SidebarDocument from "../sidebarDocument/SidebarDocument";
+import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 
 type Props = {
   workspaceId: string;
@@ -168,15 +169,16 @@ export default function SidebarFolder(props: Props) {
             </>
           ) : (
             <>
+              <SidebarFolderMenu
+                folderId={props.folderId}
+                refetchFolders={refetchFolders}
+                onUpdateNamePress={editFolderName}
+              />
               <Pressable onPress={createFolder}>
                 <Icon name="folder-line" />
               </Pressable>
               <Pressable onPress={createDocument}>
                 <Icon name="file-transfer-line" />
-              </Pressable>
-              <Pressable onPress={editFolderName}>
-                <Icon name="question-mark" />
-                <Text>Edit</Text>
               </Pressable>
             </>
           )}
@@ -209,7 +211,7 @@ export default function SidebarFolder(props: Props) {
                   return null;
                 }
                 return (
-                  <DocumentInFolder
+                  <SidebarDocument
                     key={document.id}
                     documentId={document.id}
                     documentName={document.name || "Untitled"}
