@@ -88,6 +88,7 @@ export type CreateDocumentResult = {
 
 export type CreateFolderInput = {
   id: Scalars['String'];
+  name?: InputMaybe<Scalars['String']>;
   parentFolderId?: InputMaybe<Scalars['String']>;
   workspaceId: Scalars['String'];
 };
@@ -170,6 +171,11 @@ export type FolderEdge = {
   cursor: Scalars['String'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Folder>;
+};
+
+export type MeResult = {
+  __typename?: 'MeResult';
+  username?: Maybe<Scalars['String']>;
 };
 
 export type Mutation = {
@@ -278,6 +284,7 @@ export type Query = {
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documents?: Maybe<FolderConnection>;
   folders?: Maybe<FolderConnection>;
+  me?: Maybe<MeResult>;
   rootFolders?: Maybe<FolderConnection>;
   workspace?: Maybe<Workspace>;
   workspaces?: Maybe<WorkspaceConnection>;
@@ -487,6 +494,11 @@ export type FoldersQueryVariables = Exact<{
 
 
 export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', username?: string | null } | null };
 
 export type RootFoldersQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -703,6 +715,17 @@ export const FoldersDocument = gql`
 
 export function useFoldersQuery(options: Omit<Urql.UseQueryArgs<FoldersQueryVariables>, 'query'>) {
   return Urql.useQuery<FoldersQuery>({ query: FoldersDocument, ...options });
+};
+export const MeDocument = gql`
+    query me {
+  me {
+    username
+  }
+}
+    `;
+
+export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
+  return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
 export const RootFoldersDocument = gql`
     query rootFolders($workspaceId: ID!, $first: Int!, $after: String) {

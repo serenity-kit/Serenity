@@ -17,7 +17,7 @@ export const folders = queryField((t) => {
         throw new Error("Unauthorized");
       }
       const username = context.user.username;
-      return username;
+      return { username };
     },
   });
 });
