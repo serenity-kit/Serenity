@@ -1,13 +1,5 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
-import {
-  Icon,
-  Link,
-  Pressable,
-  Text,
-  tw,
-  View,
-  Input,
-} from "@serenity-tools/ui";
+import { Icon, Pressable, Text, tw, View, Input } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator } from "react-native";
@@ -33,10 +25,12 @@ export default function SidebarFolder(props: Props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
   const [folderName, setFolderName] = useState("");
-  const [newFolderName, setNewFolderName] = useState("");
+  const [editingFolderName, setEditingFolderName] = useState("");
+  const [editingNewFolderName, setEditingNewFolderName] = useState("");
   const inputRef = useRef(null);
+  const inputNewRef = useRef(null);
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
   const [, updateFolderNameMutation] = useUpdateFolderNameMutation();
@@ -67,12 +61,15 @@ export default function SidebarFolder(props: Props) {
     const result = await createFolderMutation({
       input: {
         id,
+        name: editingNewFolderName,
         workspaceId: props.workspaceId,
         parentFolderId: props.folderId,
       },
     });
     if (result.data?.createFolder?.folder?.id) {
       // show notification
+      setEditingNewFolderName("");
+      setIsEditing("none");
     } else {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
@@ -109,8 +106,8 @@ export default function SidebarFolder(props: Props) {
   };
 
   const editFolderName = () => {
-    setNewFolderName(folderName);
-    setIsEditing(true);
+    setEditingFolderName(folderName);
+    setIsEditing("name");
     // necessary hack due focus issues probably related to the Menu component
     setTimeout(() => {
       // @ts-expect-error ref not properly typed
@@ -119,15 +116,15 @@ export default function SidebarFolder(props: Props) {
   };
 
   const cancelEditFolderName = () => {
-    setIsEditing(false);
-    setNewFolderName(folderName);
+    setIsEditing("none");
+    setEditingFolderName(folderName);
   };
 
   const updateFolderName = async () => {
     const updateFolderNameResult = await updateFolderNameMutation({
       input: {
         id: props.folderId,
-        name: newFolderName,
+        name: editingFolderName,
       },
     });
     if (
@@ -140,7 +137,7 @@ export default function SidebarFolder(props: Props) {
     } else {
       // TODO: show error: couldn't update folder name
     }
-    setIsEditing(false);
+    setIsEditing("none");
   };
 
   return (
@@ -159,11 +156,10 @@ export default function SidebarFolder(props: Props) {
           <Icon name="folder" />
           <Input
             ref={inputRef}
-            autofocus={isEditing}
             // needed instead of a conditional for the ref to work
-            style={!isEditing && { display: "none" }}
-            onChangeText={setNewFolderName}
-            value={newFolderName}
+            style={isEditing !== "name" && { display: "none" }}
+            onChangeText={setEditingFolderName}
+            value={editingFolderName}
             onBlur={updateFolderName}
             onKeyPress={(evt) => {
               if (evt.nativeEvent.key === "Escape") {
@@ -173,13 +169,23 @@ export default function SidebarFolder(props: Props) {
               }
             }}
           />
-          {!isEditing && <Text>{folderName}</Text>}
+          {isEditing !== "name" && <Text>{folderName}</Text>}
           <SidebarFolderMenu
             folderId={props.folderId}
             refetchFolders={refetchFolders}
             onUpdateNamePress={editFolderName}
           />
-          <Pressable onPress={createFolder}>
+          <Pressable
+            onPress={() => {
+              setIsOpen(true);
+              setIsEditing("new");
+              // necessary hack due focus issues probably related to the Menu component
+              setTimeout(() => {
+                // @ts-expect-error ref not properly typed
+                inputNewRef.current?.focus();
+              }, 200);
+            }}
+          >
             <Icon name="folder-line" />
           </Pressable>
           <Pressable onPress={createDocument}>
@@ -190,6 +196,22 @@ export default function SidebarFolder(props: Props) {
             (foldersResult.fetching && <ActivityIndicator />)}
         </HStack>
       </Pressable>
+      <Input
+        ref={inputNewRef}
+        // needed instead of a conditional for the ref to work
+        style={isEditing !== "new" && { display: "none" }}
+        onChangeText={setEditingNewFolderName}
+        value={editingNewFolderName}
+        onBlur={createFolder}
+        onKeyPress={(evt) => {
+          if (evt.nativeEvent.key === "Escape") {
+            evt.preventDefault();
+            evt.stopPropagation(); // to avoid closing the drawer
+            setIsEditing("none");
+          }
+        }}
+      />
+
       {isOpen && (
         <>
           {foldersResult.data?.folders?.nodes
