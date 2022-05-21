@@ -1,13 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  Icon,
-  Link,
-  Pressable,
-  Text,
-  tw,
-  View,
-  Input,
-} from "@serenity-tools/ui";
+import React, { useEffect, useRef, useState } from "react";
+import { Icon, Link, tw, View, Input } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
@@ -24,6 +16,7 @@ export default function SidebarPage(props: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [documentName, setDocumentName] = useState("");
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
+  const inputRef = useRef(null);
 
   useEffect(() => {
     setDocumentName(props.documentName);
@@ -32,9 +25,14 @@ export default function SidebarPage(props: Props) {
   const editDocumentName = () => {
     setNewDocumentName(documentName);
     setIsEditing(true);
+    // necessary hack due focus issues probably related to the Menu component
+    setTimeout(() => {
+      // @ts-expect-error ref not properly typed
+      inputRef.current?.focus();
+    }, 200);
   };
 
-  const cancelEditFolderName = () => {
+  const cancelEditDocumentName = () => {
     setIsEditing(false);
     setNewDocumentName(documentName);
   };
@@ -65,35 +63,36 @@ export default function SidebarPage(props: Props) {
     <View style={tw`ml-4`}>
       <HStack>
         <Icon name="page" />
-        {isEditing ? (
-          <>
-            <Input onChangeText={setNewDocumentName} value={newDocumentName} />
-            <Pressable onPress={updateDocumentName}>
-              <Icon name="question-mark" />
-              <Text>Commit</Text>
-            </Pressable>
-            <Pressable onPress={cancelEditFolderName}>
-              <Icon name="question-mark" />
-              <Text>Cancel</Text>
-            </Pressable>
-          </>
-        ) : (
-          <>
-            <Link
-              to={{
-                screen: "Workspace",
+        <Input
+          ref={inputRef}
+          // needed instead of a conditional for the ref to work
+          style={!isEditing && { display: "none" }}
+          onChangeText={setNewDocumentName}
+          value={newDocumentName}
+          onBlur={updateDocumentName}
+          onKeyPress={(evt) => {
+            if (evt.nativeEvent.key === "Escape") {
+              evt.preventDefault();
+              evt.stopPropagation(); // to avoid closing the drawer
+              cancelEditDocumentName();
+            }
+          }}
+        />
+        {!isEditing && (
+          <Link
+            to={{
+              screen: "Workspace",
+              params: {
+                workspaceId: props.workspaceId,
+                screen: "Page",
                 params: {
-                  workspaceId: props.workspaceId,
-                  screen: "Page",
-                  params: {
-                    pageId: props.documentId,
-                  },
+                  pageId: props.documentId,
                 },
-              }}
-            >
-              {documentName}
-            </Link>
-          </>
+              },
+            }}
+          >
+            {documentName}
+          </Link>
         )}
         <SidebarPageMenu
           documentId={props.documentId}

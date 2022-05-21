@@ -111,6 +111,11 @@ export default function SidebarFolder(props: Props) {
   const editFolderName = () => {
     setNewFolderName(folderName);
     setIsEditing(true);
+    // necessary hack due focus issues probably related to the Menu component
+    setTimeout(() => {
+      // @ts-expect-error ref not properly typed
+      inputRef.current?.focus();
+    }, 200);
   };
 
   const cancelEditFolderName = () => {
@@ -152,22 +157,23 @@ export default function SidebarFolder(props: Props) {
             <Icon name="arrow-right-s-fill" />
           )}
           <Icon name="folder" />
-          {isEditing ? (
-            <Input
-              ref={inputRef}
-              onChangeText={setNewFolderName}
-              value={newFolderName}
-              onBlur={updateFolderName}
-              onKeyPress={(evt) => {
-                if (evt.keyCode === 27) {
-                  evt.preventDefault();
-                  cancelEditFolderName();
-                }
-              }}
-            />
-          ) : (
-            <Text>{folderName}</Text>
-          )}
+          <Input
+            ref={inputRef}
+            autofocus={isEditing}
+            // needed instead of a conditional for the ref to work
+            style={!isEditing && { display: "none" }}
+            onChangeText={setNewFolderName}
+            value={newFolderName}
+            onBlur={updateFolderName}
+            onKeyPress={(evt) => {
+              if (evt.nativeEvent.key === "Escape") {
+                evt.preventDefault();
+                evt.stopPropagation(); // to avoid closing the drawer
+                cancelEditFolderName();
+              }
+            }}
+          />
+          {!isEditing && <Text>{folderName}</Text>}
           <SidebarFolderMenu
             folderId={props.folderId}
             refetchFolders={refetchFolders}
