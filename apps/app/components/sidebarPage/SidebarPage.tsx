@@ -1,13 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  Icon,
-  Link,
-  Pressable,
-  Text,
-  tw,
-  View,
-  Input,
-} from "@serenity-tools/ui";
+import React, { useEffect, useRef, useState } from "react";
+import { Icon, Link, tw, View, InlineInput } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
@@ -20,40 +12,21 @@ type Props = {
 };
 
 export default function SidebarPage(props: Props) {
-  const [newDocumentName, setNewDocumentName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [documentName, setDocumentName] = useState("");
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
 
-  useEffect(() => {
-    setDocumentName(props.documentName);
-  }, [props.documentName]);
-
-  const editDocumentName = () => {
-    setNewDocumentName(documentName);
-    setIsEditing(true);
-  };
-
-  const cancelEditFolderName = () => {
-    setIsEditing(false);
-    setNewDocumentName(documentName);
-  };
-
-  const updateDocumentName = async () => {
+  const updateDocumentName = async (name) => {
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
         id: props.documentId,
-        name: newDocumentName,
+        name,
       },
     });
     if (
       updateDocumentNameResult.data &&
       updateDocumentNameResult.data.updateDocumentName
     ) {
-      const updatedDocumentName =
-        updateDocumentNameResult.data.updateDocumentName.document?.name ||
-        "Untitled";
-      setDocumentName(updatedDocumentName);
+      // TODO show notification
     } else {
       // TODO: show error: couldn't update folder name
       // refetch to revert back to actual name
@@ -66,39 +39,35 @@ export default function SidebarPage(props: Props) {
       <HStack>
         <Icon name="page" />
         {isEditing ? (
-          <>
-            <Input onChangeText={setNewDocumentName} value={newDocumentName} />
-            <Pressable onPress={updateDocumentName}>
-              <Icon name="question-mark" />
-              <Text>Commit</Text>
-            </Pressable>
-            <Pressable onPress={cancelEditFolderName}>
-              <Icon name="question-mark" />
-              <Text>Cancel</Text>
-            </Pressable>
-          </>
+          <InlineInput
+            onCancel={() => {
+              setIsEditing(false);
+            }}
+            onSubmit={updateDocumentName}
+            value={props.documentName}
+          />
         ) : (
-          <>
-            <Link
-              to={{
-                screen: "Workspace",
+          <Link
+            to={{
+              screen: "Workspace",
+              params: {
+                workspaceId: props.workspaceId,
+                screen: "Page",
                 params: {
-                  workspaceId: props.workspaceId,
-                  screen: "Page",
-                  params: {
-                    pageId: props.documentId,
-                  },
+                  pageId: props.documentId,
                 },
-              }}
-            >
-              {documentName}
-            </Link>
-          </>
+              },
+            }}
+          >
+            {props.documentName}
+          </Link>
         )}
         <SidebarPageMenu
           documentId={props.documentId}
           refetchDocuments={props.onRefetchDocumentsPress}
-          onUpdateNamePress={editDocumentName}
+          onUpdateNamePress={() => {
+            setIsEditing(true);
+          }}
         />
       </HStack>
     </View>

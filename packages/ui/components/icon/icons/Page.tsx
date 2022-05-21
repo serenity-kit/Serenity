@@ -16,7 +16,7 @@ export const Page = ({ size }: Props) => {
         x2="13.2308"
         y2="9.8125"
         stroke="#8A8B96"
-        stroke-width="1.5"
+        strokeWidth="1.5"
       />
       <Line
         x1="6.76929"
@@ -24,7 +24,7 @@ export const Page = ({ size }: Props) => {
         x2="11.3847"
         y2="13"
         stroke="#8A8B96"
-        stroke-width="1.5"
+        strokeWidth="1.5"
       />
       <Defs>
         <linearGradient
@@ -35,8 +35,8 @@ export const Page = ({ size }: Props) => {
           y2="18"
           gradientUnits="userSpaceOnUse"
         >
-          <Stop offset="0.786458" stop-color="#E4E5ED" />
-          <Stop offset="1" stop-color="#CBCBD3" />
+          <Stop offset="0.786458" stopColor="#E4E5ED" />
+          <Stop offset="1" stopColor="#CBCBD3" />
         </linearGradient>
       </Defs>
     </Svg>

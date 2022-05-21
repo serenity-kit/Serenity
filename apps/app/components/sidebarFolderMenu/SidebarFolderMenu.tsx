@@ -45,7 +45,12 @@ export default function SidebarFolderMenu(props: Props) {
         </Pressable>
       }
     >
-      <SidebarButton onPress={props.onUpdateNamePress}>
+      <SidebarButton
+        onPress={() => {
+          setIsOpenMenu(false);
+          props.onUpdateNamePress();
+        }}
+      >
         <Text variant="small">Change Name</Text>
       </SidebarButton>
       <SidebarButton
