@@ -6,6 +6,7 @@ import {
 import {
   Button,
   Icon,
+  InlineInput,
   Menu,
   Pressable,
   SidebarButton,
@@ -35,6 +36,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
+  const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
   const [meResult] = useMeQuery();
@@ -44,7 +46,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       id: route.params.workspaceId,
     },
   });
-  const [rootFoldersResult] = useRootFoldersQuery({
+  const [rootFoldersResult, refetchRootFolders] = useRootFoldersQuery({
     variables: {
       workspaceId: route.params.workspaceId,
       first: 20,
@@ -75,10 +77,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     });
   };
 
-  const createFolder = async () => {
+  const createFolder = async (name) => {
     const id = uuidv4();
     const result = await createFolderMutation({
-      input: { id, workspaceId: route.params.workspaceId },
+      input: { id, workspaceId: route.params.workspaceId, name },
     });
     if (result.data?.createFolder?.folder?.id) {
       console.log("created a folder");
@@ -86,6 +88,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
     }
+    setIsCreatingNewFolder(false);
+    await refetchRootFolders();
   };
 
   return (
@@ -201,7 +205,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
       <SidebarDivider />
 
-      <SidebarButton onPress={createFolder}>
+      <SidebarButton
+        onPress={() => {
+          setIsCreatingNewFolder(true);
+        }}
+      >
         <Text variant="small">Create a Folder</Text>
       </SidebarButton>
 
@@ -210,6 +218,16 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <Text variant="xxs" bold style={tw`ml-4 mb-4`}>
         Documents
       </Text>
+
+      {isCreatingNewFolder && (
+        <InlineInput
+          onCancel={() => {
+            setIsCreatingNewFolder(false);
+          }}
+          onSubmit={createFolder}
+          value=""
+        />
+      )}
 
       {rootFoldersResult.fetching ? (
         <Text>Loading Folders…</Text>
