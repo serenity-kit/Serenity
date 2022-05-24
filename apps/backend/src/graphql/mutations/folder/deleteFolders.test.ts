@@ -7,7 +7,9 @@ import { deleteFolders } from "../../../database/folder/deleteFolders";
 import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
+let userId = "";
 const username = "user1";
+let userId2 = "";
 const username2 = "user2";
 const password = "password";
 let isUserRegistered = false;
@@ -22,12 +24,13 @@ beforeAll(async () => {
 beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
-    await registerUser(
+    const registrationResponse = await registerUser(
       graphql,
       username,
       password,
       "9c22b47e-3d5e-4aae-a0b2-7e6f8974e7e2"
     );
+    userId = registrationResponse.registrationResponse.finalizeRegistration.id;
     isUserRegistered = true;
     const createWorkspaceResult = await createWorkspace({
       name: "workspace 1",
@@ -46,12 +49,14 @@ beforeEach(async () => {
     });
     addedFolderId = createFolderResult.createFolder.folder.id;
 
-    await registerUser(
+    const registrationResponse2 = await registerUser(
       graphql,
       username2,
       password,
       "2434ae43-1706-4df5-8c41-bda450557dc4"
     );
+    userId2 =
+      registrationResponse2.registrationResponse.finalizeRegistration.id;
     const createWorkspaceResult2 = await createWorkspace({
       name: "other user workspace",
       id: "e9f04512-8317-46e0-ae1b-64eddf70690d",
@@ -76,7 +81,7 @@ test("user can delete a folder", async () => {
   });
   expect(createFolderResult.createFolder.folder.id).toBe(folderId);
   const folderIds = [folderId];
-  await deleteFolders({ username, folderIds });
+  await deleteFolders({ userId, folderIds });
   // try to retrieve the folder. It should come back as null
   const folder = await prisma.folder.findFirst({
     where: { id: "43130abd-ffcc-4b6e-abb8-1eebb221dd5e" },
@@ -111,7 +116,7 @@ test("deleting a parent folder will cascade to children", async () => {
     parentFolderId
   );
   const folderIds = [parentFolderId];
-  await deleteFolders({ username, folderIds });
+  await deleteFolders({ userId, folderIds });
   // try to retrieve the folder.  It should come back as null
   const folder = await prisma.folder.findFirst({
     where: {
@@ -145,7 +150,7 @@ test("user can delete multiple folders", async () => {
   expect(createFolderResult1.createFolder.folder.id).toBe(folderId1);
   expect(createFolderResult2.createFolder.folder.id).toBe(folderId2);
   const folderIds = [folderId1, folderId2];
-  await deleteFolders({ username, folderIds });
+  await deleteFolders({ userId, folderIds });
   // try to retrieve the folder.  It should come back as null
   const folders = await prisma.folder.findMany({
     where: {
@@ -205,7 +210,7 @@ test("user can delete multiple folders", async () => {
   expect(createChildFolderResult1.createFolder.folder.id).toBe(childFolderId1);
   expect(createChildFolderResult2.createFolder.folder.id).toBe(childFolderId2);
   const folderIds = [parentFolderId1, parentFolderId2];
-  await deleteFolders({ username, folderIds });
+  await deleteFolders({ userId, folderIds });
   // try to retrieve the folder.  It should come back as null
   const folders = await prisma.folder.findMany({
     where: {
@@ -231,7 +236,7 @@ test("user can't delete folders they don't own", async () => {
   });
   expect(createFoldeResult.createFolder.folder.id).toBe(folderId);
   const folderIds = [folderId];
-  await deleteFolders({ username, folderIds });
+  await deleteFolders({ userId, folderIds });
   // try to retrieve the folder.  It should come back as null
   const folder = await prisma.folder.findFirst({
     where: { id: folderId },
@@ -243,13 +248,12 @@ test("user can't delete folders they don't own", async () => {
 // users can't delete folders that don't exist
 test("user can't delete folders that don't exist", async () => {
   // first, create a folder
-  const folderId = "43130abd-ffcc-4b6e-abb8-1eebb221dd5e";
+  const folderId = "5b5d0365-5e68-499d-bf50-b20665c2cb5e";
   const folderIds = [folderId];
-  await deleteFolders({ username, folderIds });
+  await deleteFolders({ userId, folderIds });
   // try to retrieve the folder.  It should come back as null
   const folder = await prisma.folder.findFirst({
     where: { id: folderId },
   });
-  expect(folder).not.toBe(null);
-  expect(folder?.id).toStrictEqual(folderId);
+  expect(folder).toBe(null);
 });

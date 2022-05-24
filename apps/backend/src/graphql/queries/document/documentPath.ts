@@ -12,9 +12,9 @@ export const folders = queryField((t) => {
       if (!context.user) {
         throw new Error("Unauthorized");
       }
-      const username = context.user.username;
+      const userId = context.user.id;
       const folderList = await getDocumentPath({
-        username,
+        userId,
         id: args.id,
       });
       return folderList;

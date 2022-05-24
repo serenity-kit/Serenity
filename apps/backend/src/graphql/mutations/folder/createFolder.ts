@@ -42,7 +42,7 @@ export const createFolderMutation = mutationField("createFolder", {
       name = args.input.name;
     }
     const folder = await createFolder({
-      username: context.user.username,
+      userId: context.user.id,
       id: args.input.id,
       name,
       parentFolderId,

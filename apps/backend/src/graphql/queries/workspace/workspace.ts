@@ -14,10 +14,10 @@ export const workspaces = queryField((t) => {
       if (!context.user) {
         throw new Error("Unauthorized");
       }
-      const username = context.user.username;
+      const userId = context.user.id;
       if (args.id) {
         const rawWorkspace = await getWorkspace({
-          username,
+          userId,
           id: args.id,
         });
         if (!rawWorkspace) {
@@ -33,7 +33,7 @@ export const workspaces = queryField((t) => {
       }
 
       const workspaces = await getWorkspaces({
-        username,
+        userId,
         cursor: undefined,
         skip: undefined,
         take: 1,
@@ -45,7 +45,7 @@ export const workspaces = queryField((t) => {
             workspaceId: workspace.id,
           },
           select: {
-            username: true,
+            userId: true,
             isAdmin: true,
           },
         });

@@ -26,7 +26,7 @@ export async function finalizeRegistration(
     throw Error("This username has not yet been initialized");
   }
   try {
-    await prisma.$transaction(async (prisma) => {
+    return await prisma.$transaction(async (prisma) => {
       const device = await prisma.device.create({
         data: {
           signingPublicKey: `TODO+${registrationData.username}`,
@@ -34,7 +34,7 @@ export async function finalizeRegistration(
           encryptionPublicKeySignature: "TODO",
         },
       });
-      await prisma.user.create({
+      const user = await prisma.user.create({
         data: {
           username,
           serverPrivateKey: registrationData.serverPrivateKey,
@@ -51,9 +51,10 @@ export async function finalizeRegistration(
           },
         },
       });
+      const userId = user.id;
       await prisma.device.update({
         where: { signingPublicKey: device.signingPublicKey },
-        data: { user: { connect: { username: username } } },
+        data: { user: { connect: { id: userId } } },
       });
       await prisma.workspace.create({
         data: {
@@ -62,12 +63,13 @@ export async function finalizeRegistration(
           name: "My Workspace",
           usersToWorkspaces: {
             create: {
-              username: username,
+              userId,
               isAdmin: true,
             },
           },
         },
       });
+      return user;
     });
   } catch (error) {
     console.error("Error saving user");

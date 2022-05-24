@@ -34,7 +34,7 @@ export const updateDocumentNameMutation = mutationField("updateDocumentName", {
     const document = await updateDocumentName({
       id: args.input.id,
       name: args.input.name,
-      username: context.user.username,
+      userId: context.user.id,
     });
     return { document };
   },

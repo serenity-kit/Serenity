@@ -3,10 +3,10 @@ import { prisma } from "../prisma";
 type Params = {
   id: string;
   name: string;
-  username: string;
+  userId: string;
 };
 
-export async function updateDocumentName({ id, name, username }: Params) {
+export async function updateDocumentName({ id, name, userId }: Params) {
   try {
     return await prisma.$transaction(async (prisma) => {
       // fetch the document
@@ -23,7 +23,7 @@ export async function updateDocumentName({ id, name, username }: Params) {
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
-          username,
+          userId,
           isAdmin: true,
           workspaceId: document.workspaceId,
         },

@@ -2,11 +2,18 @@ import { prisma } from "../prisma";
 
 type Params = {
   id: string;
-  username: string;
+  userId: string;
 };
-export async function getWorkspace({ username, id }: Params) {
+export async function getWorkspace({ userId, id }: Params) {
+  // include userstoworkspaces but in descending alphabetical order by userId
   const workspace = await prisma.workspace.findUnique({
-    include: { usersToWorkspaces: true },
+    include: {
+      usersToWorkspaces: {
+        orderBy: {
+          userId: "desc",
+        },
+      },
+    },
     where: { id },
   });
   if (!workspace) {
@@ -14,7 +21,7 @@ export async function getWorkspace({ username, id }: Params) {
   }
   if (
     workspace.usersToWorkspaces.some(
-      (connection) => connection.username === username
+      (connection) => connection.userId === userId
     )
   ) {
     return workspace;
