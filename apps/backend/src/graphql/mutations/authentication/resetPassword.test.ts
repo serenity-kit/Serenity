@@ -129,7 +129,7 @@ test.skip("user should not be able to reset password with bad token", async () =
                     clientPublicKey: "${clientPublicKey}"
                 }
               ) {
-                status
+                id
               }
           }
       `;
@@ -171,17 +171,20 @@ test.skip("user be able to reset password with correct token", async () => {
                       clientPublicKey: "${clientPublicKey}"
                   }
                 ) {
-                  status
+                  id
                 }
             }
         `;
   const resetPasswordResponse = await graphql.client.request(query);
   // expect serverPublicKey, oprfPublicKey, oprfChallengeResponse
   // all three should be base64-encoded 32-bit uint8 arrays
+  const registrationResponse = await graphql.client.request(query);
+  expect(typeof registrationResponse.finalizeRegistration.id).toBe("string");
+  const userId = registrationResponse.finalizeRegistration.id;
   expect(resetPasswordResponse).toMatchInlineSnapshot(`
         Object {
             "finalizePasswordReset": Object {
-                "status": "success",
+                "id": "${userId}",
             },
         }
     `);

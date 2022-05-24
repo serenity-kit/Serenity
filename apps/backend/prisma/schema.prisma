@@ -58,7 +58,8 @@ model Registration {
 }
 
 model User {
-  username                                   String                 @id
+  id                                         String                 @id @default(uuid())
+  username                                   String                 @unique
   serverPrivateKey                           String
   serverPublicKey                            String                 @default("invalid")
   oprfPrivateKey                             String
@@ -87,8 +88,8 @@ model User {
 model UserLoginAccessToken {
   accessToken String    @id @unique
   expiresAt   DateTime?
-  user        User      @relation(fields: [username], references: [username], onDelete: Cascade)
-  username    String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
 }
 
 model RecoveryDevice {
@@ -99,8 +100,8 @@ model RecoveryDevice {
   nonce                                      String
   device                                     Device @relation(fields: [deviceSigningPublicKey], references: [signingPublicKey])
   deviceSigningPublicKey                     String @id
-  user                                       User   @relation(fields: [userUsername], references: [username])
-  userUsername                               String @unique
+  user                                       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                                     String @unique
   // this cross signing makes sure that the master device and recovery device are linked and verifyable in both directions
   // signed by the user's recovery device
   signatureForMasterDeviceSigningPublicKey   String
@@ -114,8 +115,8 @@ model Device {
   encryptionPublicKey          String
   encryptionPublicKeySignature String
   // can't be mandatory since we need to create the device
-  user                         User?           @relation(fields: [username], references: [username], onDelete: Cascade)
-  username                     String?
+  user                         User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                       String?
   recoveryDevice               RecoveryDevice?
   userForMaster                User?           @relation("masterDevice")
 }
@@ -130,13 +131,13 @@ model Workspace {
 }
 
 model UsersToWorkspaces {
-  user        User      @relation(fields: [username], references: [username], onDelete: Cascade)
-  username    String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId String
   isAdmin     Boolean
 
-  @@id([username, workspaceId])
+  @@id([userId, workspaceId])
 }
 
 model Folder {

@@ -33,7 +33,7 @@ export const deleteWorkspacesMutation = mutationField("deleteWorkspaces", {
     }
     await deleteWorkspaces({
       workspaceIds: args.input.ids,
-      username: context.user.username,
+      userId: context.user.id,
     });
     return { status: "success" };
   },

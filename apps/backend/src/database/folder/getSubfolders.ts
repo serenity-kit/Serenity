@@ -6,14 +6,14 @@ type Cursor = {
 
 type Params = {
   parentFolderId: string;
-  username: string;
+  userId: string;
   cursor?: Cursor;
   skip?: number;
   take: number;
 };
 
 export async function getSubfolders({
-  username,
+  userId,
   parentFolderId,
   cursor,
   skip,
@@ -36,7 +36,7 @@ export async function getSubfolders({
       // then check if the user has access to the workspace
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
-          username,
+          userId,
           workspaceId: parentFolder.workspaceId,
         },
       });

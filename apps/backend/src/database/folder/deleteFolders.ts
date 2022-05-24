@@ -2,13 +2,10 @@ import { prisma } from "../prisma";
 
 type DeleteFolderParams = {
   folderIds: string[];
-  username: string;
+  userId: string;
 };
 
-export async function deleteFolders({
-  folderIds,
-  username,
-}: DeleteFolderParams) {
+export async function deleteFolders({ folderIds, userId }: DeleteFolderParams) {
   try {
     return await prisma.$transaction(async (prisma) => {
       // 1. fetch all folders
@@ -45,7 +42,7 @@ export async function deleteFolders({
       // 3. Grab workspaces where user is an admin
       const validWorkspaces = await prisma.usersToWorkspaces.findMany({
         where: {
-          username,
+          userId,
           isAdmin: true,
           workspaceId: {
             in: requestedWorkspaceIds,

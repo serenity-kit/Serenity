@@ -26,9 +26,12 @@ export const createDocumentMutation = mutationField("createDocument", {
   },
   async resolve(root, args, context) {
     if (!args?.input?.id) throw new Error("Missing documentId");
+    const parentFolderId = args.input.parentFolderId || null;
+    // FIXME: does this need a userId?
     const document = await createDocument({
       id: args.input.id,
-      parentFolderId: args.input.parentFolderId,
+      name: null,
+      parentFolderId,
       workspaceId: args.input.workspaceId,
     });
     return {

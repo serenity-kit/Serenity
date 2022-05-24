@@ -1,6 +1,9 @@
+import { userInfo } from "os";
 import deleteAllRecords from "../../../test/helpers/deleteAllRecords";
 import createUserWithWorkspace from "../testHelpers/createUserWithWorkspace";
 import { getWorkspace } from "./getWorkspace";
+
+let userId = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -9,10 +12,11 @@ beforeAll(async () => {
 test("user should be able to retreive their own workspace by id", async () => {
   const id = "getWorkspace1";
   const username = "jane@example.com";
-  await createUserWithWorkspace({ id, username });
+  const user = await createUserWithWorkspace({ id, username });
+  userId = user.id;
   const workspace = await getWorkspace({
     id,
-    username,
+    userId: user.id,
   });
   expect(workspace).toMatchInlineSnapshot(`
     Object {
@@ -22,7 +26,7 @@ test("user should be able to retreive their own workspace by id", async () => {
       "usersToWorkspaces": Array [
         Object {
           "isAdmin": true,
-          "username": "jane@example.com",
+          "userId": "${userId}",
           "workspaceId": "getWorkspace1",
         },
       ],
@@ -33,14 +37,14 @@ test("user should be able to retreive their own workspace by id", async () => {
 test("user should not be able to retreive someone elses workspace by id", async () => {
   const id = "getWorkspace2";
   const username = "jane2@example.com";
-  await createUserWithWorkspace({ id, username });
+  const user = await createUserWithWorkspace({ id, username });
   await createUserWithWorkspace({
     id: "getWorkspace2Joe",
     username: "joe@example.com",
   });
   const workspace = await getWorkspace({
     id: "getWorkspace2Joe",
-    username,
+    userId: user.id,
   });
   expect(workspace).toBeNull();
 });
@@ -48,10 +52,10 @@ test("user should not be able to retreive someone elses workspace by id", async 
 test("user should receive null in case the workspace doesn't exists", async () => {
   const id = "getWorkspace3";
   const username = "jane3@example.com";
-  await createUserWithWorkspace({ id, username });
+  const user = await createUserWithWorkspace({ id, username });
   const workspace = await getWorkspace({
     id: "getWorkspace3_DOES_NOT_EXIST",
-    username,
+    userId: user.id,
   });
   expect(workspace).toBeNull();
 });

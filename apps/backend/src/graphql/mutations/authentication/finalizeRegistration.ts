@@ -15,7 +15,7 @@ export const ClientOprfRegistrationFinalizeInput = inputObjectType({
 export const ClientOprfRegistrationFinalizeResult = objectType({
   name: "ClientOprfRegistrationFinalizeResult",
   definition(t) {
-    t.nonNull.string("status");
+    t.nonNull.string("id");
   },
 });
 
@@ -36,17 +36,14 @@ export const finalizeRegistrationMutation = mutationField(
       const secret = args.input.secret;
       const nonce = args.input.nonce;
       const clientPublicKey = args.input.clientPublicKey;
-      await finalizeRegistration(
+      const user = await finalizeRegistration(
         username,
         secret,
         nonce,
         clientPublicKey,
         args.input.workspaceId
       );
-      const result = {
-        status: "success",
-      };
-      return result;
+      return { id: user.id };
     },
   }
 );

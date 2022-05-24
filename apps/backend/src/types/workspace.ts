@@ -1,5 +1,5 @@
 type WorkspaceMember = {
-  username: string;
+  userId: string;
   isAdmin: boolean;
 };
 

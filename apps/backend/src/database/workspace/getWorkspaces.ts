@@ -6,15 +6,15 @@ type Cursor = {
 };
 
 type Params = {
-  username: string;
+  userId: string;
   cursor?: Cursor;
   skip?: number;
   take: number;
 };
-export async function getWorkspaces({ username, cursor, skip, take }: Params) {
+export async function getWorkspaces({ userId, cursor, skip, take }: Params) {
   const userToWorkspaces = await prisma.usersToWorkspaces.findMany({
     where: {
-      username,
+      userId,
     },
   });
   const rawWorkspaces = await prisma.workspace.findMany({
@@ -29,7 +29,13 @@ export async function getWorkspaces({ username, cursor, skip, take }: Params) {
     orderBy: {
       name: "asc",
     },
-    include: { usersToWorkspaces: true },
+    include: {
+      usersToWorkspaces: {
+        orderBy: {
+          userId: "asc",
+        },
+      },
+    },
   });
   // attach the .usersToWorkspaces as .members property
   const workspaces: Workspace[] = [];

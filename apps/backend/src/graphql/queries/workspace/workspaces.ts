@@ -17,7 +17,7 @@ export const workspaces = queryField((t) => {
       if (!context.user) {
         throw new Error("Unauthorized");
       }
-      const username = context.user.username;
+      const userId = context.user.id;
       const cursor = args.after ? { id: args.after } : undefined;
       // prisma will include the cursor if skip: 1 is not set
       // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#do-i-always-have-to-skip-1
@@ -26,7 +26,7 @@ export const workspaces = queryField((t) => {
       const take: any = args.first ? args.first + 1 : undefined;
 
       const workspaces = await getWorkspaces({
-        username,
+        userId,
         cursor,
         skip,
         take,
