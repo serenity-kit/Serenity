@@ -297,6 +297,7 @@ export default function DesignSystemScreen() {
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>Editor Custom</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
+        <Icon name="attachment-2" />
         <Icon name="font-size-2" />
         <Icon name="format-clear" />
         <Icon name="functions" />

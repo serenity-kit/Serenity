@@ -11,6 +11,7 @@ import { ArrowGoForwardFill } from "./icons/ArrowGoForwardFill";
 import { ArrowLeftSLine } from "./icons/ArrowLeftSLine";
 import { ArrowRightSFill } from "./icons/ArrowRightSFill";
 import { ArrowUpDownLine } from "./icons/ArrowUpDownLine";
+import { Attachment2 } from "./icons/Attachment2";
 import { AtLine } from "./icons/AtLine";
 import { Bold } from "./icons/Bold";
 import { BookOpenLine } from "./icons/BookOpenLine";
@@ -87,6 +88,7 @@ export type IconProps = {
     | "arrow-right-s-fill"
     | "arrow-up-down-line"
     | "at-line"
+    | "attachment-2"
     | "bold"
     | "book-open-line"
     | "calendar-check-fill"
@@ -176,6 +178,7 @@ export const Icon = (props: IconProps) => {
     return <ArrowRightSFill color={color} size={size} />;
   if (name === "arrow-up-down-line")
     return <ArrowUpDownLine color={color} size={size} />;
+  if (name === "attachment-2") return <Attachment2 color={color} size={size} />;
   if (name === "at-line") return <AtLine color={color} size={size} />;
   if (name === "bold") return <Bold color={color} size={size} />;
   if (name === "book-open-line")
