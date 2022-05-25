@@ -144,7 +144,13 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           trigger={
             <Pressable accessibilityLabel="More options menu">
               <HStack space={2} alignItems="center">
-                <Avatar borderRadius={4} size="xs" bg={tw.color("primary-400")}>
+                <Avatar
+                  borderRadius={4}
+                  size="xs"
+                  bg={tw.color("primary-400")}
+                  source={{}} // TODO add workspace image source here
+                >
+                  {/* TODO show conditionally when no image-source is set */}
                   <Icon
                     name="serenity-feather"
                     color={tw.color("black/40")}
