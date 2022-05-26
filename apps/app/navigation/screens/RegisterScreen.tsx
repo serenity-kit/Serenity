@@ -81,6 +81,7 @@ export default function RegisterScreen(
         challenge: oprfChallenge,
       },
     });
+    console.log({ mutationResult });
     // check for an error
     if (mutationResult.data && mutationResult.data.initializeRegistration) {
       const serverChallengeResponse =
@@ -138,9 +139,7 @@ export default function RegisterScreen(
     if (mutationResult.data && mutationResult.data.finalizeRegistration) {
       const serverRegistrationResponse =
         mutationResult.data.finalizeRegistration;
-      setDidRegistrationSucceed(
-        serverRegistrationResponse.status === "success"
-      );
+      setDidRegistrationSucceed(true);
       // reset since the user might end up on this screen again
       setPassword("");
       setUsername("");
