@@ -60,7 +60,7 @@ export type ClientOprfRegistrationFinalizeInput = {
 
 export type ClientOprfRegistrationFinalizeResult = {
   __typename?: 'ClientOprfRegistrationFinalizeResult';
-  status: Scalars['String'];
+  id: Scalars['String'];
 };
 
 export type ClientRequestResetPasswordRequest = {
@@ -417,7 +417,7 @@ export type WorkspaceMemberInput = {
 export type WorkspacePermissionsOutput = {
   __typename?: 'WorkspacePermissionsOutput';
   isAdmin: Scalars['Boolean'];
-  username: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 export type CreateDocumentMutationVariables = Exact<{
@@ -439,7 +439,7 @@ export type CreateWorkspaceMutationVariables = Exact<{
 }>;
 
 
-export type CreateWorkspaceMutation = { __typename?: 'Mutation', createWorkspace?: { __typename?: 'CreateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', username: string, isAdmin: boolean }> | null } | null } | null };
+export type CreateWorkspaceMutation = { __typename?: 'Mutation', createWorkspace?: { __typename?: 'CreateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', userId: string, isAdmin: boolean }> | null } | null } | null };
 
 export type DeleteDocumentsMutationVariables = Exact<{
   input: DeleteDocumentsInput;
@@ -467,7 +467,7 @@ export type FinalizeRegistrationMutationVariables = Exact<{
 }>;
 
 
-export type FinalizeRegistrationMutation = { __typename?: 'Mutation', finalizeRegistration?: { __typename?: 'ClientOprfRegistrationFinalizeResult', status: string } | null };
+export type FinalizeRegistrationMutation = { __typename?: 'Mutation', finalizeRegistration?: { __typename?: 'ClientOprfRegistrationFinalizeResult', id: string } | null };
 
 export type InitializeLoginMutationVariables = Exact<{
   input: ClientOprfLoginChallengeInput;
@@ -502,7 +502,7 @@ export type UpdateWorkspaceMutationVariables = Exact<{
 }>;
 
 
-export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', username: string, isAdmin: boolean }> | null } | null } | null };
+export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', userId: string, isAdmin: boolean }> | null } | null } | null };
 
 export type DocumentsQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -541,7 +541,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', username: string, isAdmin: boolean }> | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', userId: string, isAdmin: boolean }> | null } | null };
 
 export type WorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -584,7 +584,7 @@ export const CreateWorkspaceDocument = gql`
       id
       name
       members {
-        username
+        userId
         isAdmin
       }
     }
@@ -632,7 +632,7 @@ export function useFinalizeLoginMutation() {
 export const FinalizeRegistrationDocument = gql`
     mutation finalizeRegistration($input: ClientOprfRegistrationFinalizeInput!) {
   finalizeRegistration(input: $input) {
-    status
+    id
   }
 }
     `;
@@ -705,7 +705,7 @@ export const UpdateWorkspaceDocument = gql`
       id
       name
       members {
-        username
+        userId
         isAdmin
       }
     }
@@ -798,7 +798,7 @@ export const WorkspaceDocument = gql`
     id
     name
     members {
-      username
+      userId
       isAdmin
     }
   }

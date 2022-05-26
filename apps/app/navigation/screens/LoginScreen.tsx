@@ -84,6 +84,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
         randomScalar,
         serverChallengeResponse,
       };
+      console.log({ oprfChallenge });
       return oprfChallengeResponse;
     } else if (mutationResult.error) {
       const errorMessage = mutationResult.error.message.substring(
