@@ -1,0 +1,11 @@
+mutation createFolder($input: CreateFolderInput!) {
+  createFolder(input: $input) {
+    folder {
+      id
+      name
+      parentFolderId
+      rootFolderId
+      workspaceId
+    }
+  }
+}

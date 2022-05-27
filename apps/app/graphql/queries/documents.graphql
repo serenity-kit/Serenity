@@ -1,0 +1,17 @@
+query documents($parentFolderId: ID!, $first: Int! = 100, $after: String) {
+  documents(parentFolderId: $parentFolderId, first: $first, after: $after) {
+    nodes {
+      id
+      name
+      parentFolderId
+      rootFolderId
+      workspaceId
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}

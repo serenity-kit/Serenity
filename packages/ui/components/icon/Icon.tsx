@@ -42,6 +42,7 @@ import { FileCopyLine } from "./icons/FileCopyLine";
 import { FileLine } from "./icons/FileLine";
 import { FileSearchLine } from "./icons/FileSearchLine";
 import { FileTransferLine } from "./icons/FileTransferLine";
+import { Folder } from "./icons/Folder";
 import { FolderMusicLine } from "./icons/FolderMusicLine";
 import { FolderFill } from "./icons/FolderFill";
 import { FolderLine } from "./icons/FolderLine";
@@ -75,6 +76,7 @@ import { More } from "./icons/More";
 import { More2Line } from "./icons/More2Line";
 import { MoreLine } from "./icons/MoreLine";
 import { MovieLine } from "./icons/MovieLine";
+import { Page } from "./icons/Page";
 import { PageSeparator } from "./icons/PageSeparator";
 import { Paragraph } from "./icons/Paragraph";
 import { Plus } from "./icons/Plus";
@@ -135,6 +137,7 @@ export type IconProps = {
     | "file-search-line"
     | "file-transfer-line"
     | "folder-fill"
+    | "folder"
     | "folder-line"
     | "folder-music-line"
     | "font-color"
@@ -167,6 +170,7 @@ export type IconProps = {
     | "more-2-line"
     | "more-line"
     | "movie-line"
+    | "page"
     | "page-separator"
     | "paragraph"
     | "plus"
@@ -260,6 +264,7 @@ export const Icon = (props: IconProps) => {
   if (name === "file-transfer-line")
     return <FileTransferLine color={color} size={size} />;
   if (name === "folder-fill") return <FolderFill color={color} size={size} />;
+  if (name === "folder") return <Folder size={size} />;
   if (name === "folder-line") return <FolderLine color={color} size={size} />;
   if (name === "folder-music-line")
     return <FolderMusicLine color={color} size={size} />;
@@ -297,6 +302,7 @@ export const Icon = (props: IconProps) => {
   if (name === "more-2-line") return <More2Line color={color} size={size} />;
   if (name === "more-line") return <MoreLine color={color} size={size} />;
   if (name === "movie-line") return <MovieLine color={color} size={size} />;
+  if (name === "page") return <Page size={size} />;
   if (name === "page-separator")
     return <PageSeparator color={color} size={size} />;
   if (name === "paragraph") return <Paragraph color={color} size={size} />;

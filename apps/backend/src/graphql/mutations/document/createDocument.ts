@@ -5,6 +5,7 @@ export const CreateDocumentInput = inputObjectType({
   name: "CreateDocumentInput",
   definition(t) {
     t.nonNull.string("id");
+    t.string("parentFolderId");
     t.nonNull.string("workspaceId");
   },
 });
@@ -27,6 +28,7 @@ export const createDocumentMutation = mutationField("createDocument", {
     if (!args?.input?.id) throw new Error("Missing documentId");
     const document = await createDocument({
       id: args.input.id,
+      parentFolderId: args.input.parentFolderId,
       workspaceId: args.input.workspaceId,
     });
     return {

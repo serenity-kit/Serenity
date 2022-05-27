@@ -28,6 +28,12 @@ Preview the database:
 yarn prisma studio
 ```
 
+To reset the database:
+
+```sh
+yarn prisma migrate reset
+```
+
 As an alternativ you can start the backend without a DB connection a mocked GraphQL setup:
 
 ```sh
@@ -38,7 +44,7 @@ yarn workspace backend dev:mock
 
 ```sh
 cd apps/app
-yarn dev:web
+yarn dev
 ```
 
 ### App (iOS Simulator or Android Emulator)
@@ -47,8 +53,8 @@ We are using the Expo dev client you need to download and install a dev build fi
 
 ```sh
 cd apps/app
-yarn dev:ios
-yarn dev:android
+yarn dev
+# in the console press `i` for iOS or `a` for Android or use the Expo Web-interface
 ```
 
 Creating a dev build for iOS Simulator.

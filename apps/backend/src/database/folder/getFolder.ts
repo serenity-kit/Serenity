@@ -1,8 +1,21 @@
+import { Folder } from "../../types/folder";
 import { prisma } from "../prisma";
 
 type Params = {
   id: string;
   username: string;
+};
+
+const toFolderType = (folder: any): Folder => {
+  return {
+    id: folder.id,
+    name: folder.name,
+    idSignature: folder.idSignature,
+    parentFolderId: folder.parentFolderId,
+    rootFolderId: folder.rootFolderId,
+    workspaceId: folder.workspaceId,
+    parentFolders: [],
+  };
 };
 
 const reduceParentFolderTreeToList = (folder: any) => {
@@ -20,47 +33,56 @@ export async function getFolder({ username, id }: Params) {
     return await prisma.$transaction(async (prisma) => {
       // make sure the user has access to the workspace
       // by retrieving and verifying the workspace
-      const folder = await prisma.folder.findUnique({
+      const rawFolder = await prisma.folder.findUnique({
         where: {
           id,
         },
       });
-      if (!folder) {
+      if (!rawFolder) {
         throw Error("Folder not found");
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
           username,
-          workspaceId: folder.workspaceId,
+          workspaceId: rawFolder.workspaceId,
         },
       });
       if (!userToWorkspace) {
         throw Error("Unauthorized");
       }
-
       // next let's build the folder tree up to this folder
-      if (folder.rootFolderId) {
+      const folder = toFolderType(rawFolder);
+      folder.parentFolders = [];
+      if (rawFolder.rootFolderId) {
         const relatedFolders = await prisma.folder.findMany({
           where: {
-            id: {
-              in: [folder.rootFolderId],
+            rootFolderId: {
+              in: [rawFolder.rootFolderId],
             },
           },
         });
-        const relatedFoldersLookup = {};
-        relatedFolders.forEach((f) => {
-          f["parentFolder"] = null;
-          relatedFoldersLookup[f.id] = f;
+        const rootFolder = await prisma.folder.findUnique({
+          where: {
+            id: rawFolder.rootFolderId,
+          },
         });
-        relatedFolders.forEach((f) => {
-          if (f.parentFolderId) {
-            f["parentFolder"] = relatedFoldersLookup[f.parentFolderId];
-          }
+
+        const treeFolderLookup = {
+          [rawFolder.rootFolderId]: toFolderType(rootFolder),
+        };
+        relatedFolders.forEach((relatedFolder) => {
+          treeFolderLookup[relatedFolder.id] = toFolderType(relatedFolder);
         });
-        // go through parent folder tree and reduce it to a list
-        folder["parentFolders"] = reduceParentFolderTreeToList(
-          folder["parentFolder"]
-        );
+
+        // trace the parent folders back up to the root
+        let parentFolderId = folder.parentFolderId;
+        const parentFolderList: Folder[] = [];
+        while (parentFolderId) {
+          const parentFolder = treeFolderLookup[parentFolderId];
+          parentFolderList.push(parentFolder);
+          parentFolderId = parentFolder.parentFolderId;
+        }
+        folder.parentFolders = parentFolderList;
       }
       return folder;
     });

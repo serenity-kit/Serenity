@@ -4,6 +4,7 @@ import { Folder } from "../../types/folder";
 type Params = {
   username: string;
   id: string;
+  name?: string;
   parentFolderId?: string;
   workspaceId: string;
 };
@@ -11,9 +12,14 @@ type Params = {
 export async function createFolder({
   username,
   id,
+  name,
   parentFolderId,
   workspaceId,
 }: Params) {
+  let folderName = "Untitled";
+  if (name) {
+    folderName = name;
+  }
   try {
     return await prisma.$transaction(async (prisma) => {
       // make sure we have permissions to do stuff with this workspace
@@ -39,13 +45,17 @@ export async function createFolder({
         if (!parentFolder) {
           throw Error("Parent folder not found");
         }
-        rootFolderId = parentFolder.rootFolderId;
+        if (parentFolder.rootFolderId) {
+          rootFolderId = parentFolder.rootFolderId;
+        } else {
+          rootFolderId = parentFolder.id;
+        }
       }
       const rawFolder = await prisma.folder.create({
         data: {
           id,
           idSignature: "TODO",
-          name: "Untitled",
+          name: folderName,
           parentFolderId,
           rootFolderId,
           workspaceId,
@@ -58,6 +68,7 @@ export async function createFolder({
         parentFolderId: rawFolder.parentFolderId,
         rootFolderId: rawFolder.rootFolderId,
         workspaceId: rawFolder.workspaceId,
+        parentFolders: [],
       };
       return folder;
     });

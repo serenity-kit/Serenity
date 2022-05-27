@@ -1,6 +1,5 @@
 import { Button, Link, Text, tw, View } from "@serenity-tools/ui";
 import { Platform, useWindowDimensions } from "react-native";
-import { useAuthentication } from "../../context/AuthenticationContext";
 
 export default function DevDashboardScreen(props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing

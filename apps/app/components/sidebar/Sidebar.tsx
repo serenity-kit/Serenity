@@ -3,11 +3,10 @@ import {
   DrawerContentComponentProps,
 } from "@react-navigation/drawer";
 
-import { StyleSheet } from "react-native";
 import {
   Button,
   Icon,
-  Link,
+  InlineInput,
   Menu,
   Pressable,
   SidebarButton,
@@ -19,100 +18,80 @@ import {
   View,
   Avatar,
 } from "@serenity-tools/ui";
+import { CreateWorkspaceModal } from "../createWorkspaceModal/CreateWorkspaceModal";
 import {
   useWorkspacesQuery,
-  useCreateWorkspaceMutation,
-  useCreateDocumentMutation,
-  useDeleteDocumentsMutation,
-  useUpdateDocumentNameMutation,
-  useDocumentPreviewsQuery,
   useWorkspaceQuery,
+  useCreateFolderMutation,
+  useRootFoldersQuery,
+  useMeQuery,
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
-import { useState } from "react";
-import DocumentMenu from "../documentMenu/DocumentMenu";
 import { HStack } from "native-base";
+import { useEffect, useState } from "react";
+import Folder from "../sidebarFolder/SidebarFolder";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
+  const navigation = useNavigation();
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
-  const [isOpenDocumentMenu, setIsOpenDocumentMenu] = useState(false);
+  const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
+  const [meResult] = useMeQuery();
+  const [username, setUsername] = useState<string>("");
   const [workspaceResult] = useWorkspaceQuery({
     variables: {
       id: route.params.workspaceId,
     },
   });
+  const [rootFoldersResult, refetchRootFolders] = useRootFoldersQuery({
+    variables: {
+      workspaceId: route.params.workspaceId,
+      first: 20,
+    },
+  });
 
-  const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
-  const [, createDocumentMutation] = useCreateDocumentMutation();
-  const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
-  const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
-  const [documentPreviewsResult, refetchDocumentPreviews] =
-    useDocumentPreviewsQuery({
-      variables: { workspaceId: route.params.workspaceId },
-    });
+  const [, createFolderMutation] = useCreateFolderMutation();
   const { updateAuthentication } = useAuthentication();
+  const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
+    useState(false);
 
-  const createWorkspace = async () => {
-    const name =
-      window.prompt("Enter a workspace name") || uuidv4().substring(0, 8);
-    const id = uuidv4();
-    await createWorkspaceMutation({
-      input: {
-        name,
-        id,
-      },
-    });
+  useEffect(() => {
+    if (meResult.data && meResult.data.me) {
+      if (meResult.data.me.username) {
+        setUsername(meResult.data.me.username);
+      } else {
+        // TODO: error! Couldn't fetch user
+      }
+    }
+  }, [meResult.fetching]);
+
+  const onWorkspaceCreated = (workspace: { id: string }) => {
     refetchWorkspacesResult();
+    setShowCreateWorkspaceModal(false);
+    navigation.navigate("Workspace", {
+      workspaceId: workspace.id,
+      screen: "Dashboard",
+    });
   };
 
-  const createDocument = async () => {
+  const createFolder = async (name) => {
     const id = uuidv4();
-    const result = await createDocumentMutation({
-      input: { id, workspaceId: route.params.workspaceId },
+    const result = await createFolderMutation({
+      input: { id, workspaceId: route.params.workspaceId, name },
     });
-    if (result.data?.createDocument?.id) {
-      props.navigation.navigate("Workspace", {
-        workspaceId: route.params.workspaceId,
-        screen: "Page",
-        params: {
-          pageId: result.data?.createDocument?.id,
-          isNew: true,
-        },
-      });
+    if (result.data?.createFolder?.folder?.id) {
+      console.log("created a folder");
     } else {
       console.error(result.error);
-      alert("Failed to create a page. Please try again.");
+      alert("Failed to create a folder. Please try again.");
     }
-    refetchDocumentPreviews();
-  };
-
-  const deleteDocument = async (id: string) => {
-    await deleteDocumentsMutation({
-      input: {
-        ids: [id],
-      },
-    });
-    refetchDocumentPreviews();
-  };
-
-  const updateDocumentName = async (id: string) => {
-    const name = window.prompt("Enter a document name");
-    if (name && name.length > 0) {
-      // refetchDocumentPreviews no necessary since a document is returned
-      // and therefor the cache automatically updated
-      await updateDocumentNameMutation({
-        input: {
-          id,
-          name,
-        },
-      });
-    }
+    setIsCreatingNewFolder(false);
+    await refetchRootFolders();
   };
 
   return (
@@ -170,7 +149,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         >
           <View style={tw`p-4`}>
             <Text variant="small" muted>
-              jane@example.com
+              {username}
             </Text>
           </View>
           {workspacesResult.fetching
@@ -196,11 +175,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           <SidebarButton
             onPress={() => {
               setIsOpenWorkspaceSwitcher(false);
-              createWorkspace();
+              setShowCreateWorkspaceModal(true);
             }}
           >
             <Text variant="small">Create workspace</Text>
           </SidebarButton>
+
           <SidebarDivider collapsed />
           <SidebarButton
             onPress={() => {
@@ -266,8 +246,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
       <SidebarDivider />
 
-      <SidebarButton onPress={createDocument}>
-        <Text variant="small">Create Page</Text>
+      <SidebarButton
+        onPress={() => {
+          setIsCreatingNewFolder(true);
+        }}
+      >
+        <Text variant="small">Create a Folder</Text>
       </SidebarButton>
 
       <SidebarDivider />
@@ -275,51 +259,40 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <Text variant="xxs" bold style={tw`ml-4 mb-4`}>
         Documents
       </Text>
-      {documentPreviewsResult.fetching ? (
-        <Text>Loading...</Text>
-      ) : documentPreviewsResult.data?.documentPreviews?.nodes ? (
-        documentPreviewsResult.data?.documentPreviews?.nodes.map(
-          (documentPreview) => {
-            if (documentPreview === null) {
-              return null;
-            }
-            return (
-              <View key={documentPreview.id} style={styles.documentPreviewItem}>
-                <Link
-                  style={styles.documentPreviewLabel}
-                  to={{
-                    screen: "Workspace",
-                    params: {
-                      workspaceId: route.params.workspaceId,
-                      screen: "Page",
-                      params: {
-                        pageId: documentPreview.id,
-                      },
-                    },
-                  }}
-                >
-                  {documentPreview?.name}
-                </Link>
-                <DocumentMenu
-                  documentId={documentPreview.id}
-                  refetchDocumentPreviews={refetchDocumentPreviews}
-                />
-              </View>
-            );
+
+      {isCreatingNewFolder && (
+        <InlineInput
+          onCancel={() => {
+            setIsCreatingNewFolder(false);
+          }}
+          onSubmit={createFolder}
+          value=""
+        />
+      )}
+
+      {rootFoldersResult.fetching ? (
+        <Text>Loading Folders…</Text>
+      ) : rootFoldersResult.data?.rootFolders?.nodes ? (
+        rootFoldersResult.data?.rootFolders?.nodes.map((folder) => {
+          if (folder === null) {
+            return null;
           }
-        )
+          return (
+            <Folder
+              key={folder.id}
+              folderId={folder.id}
+              folderName={folder.name}
+              workspaceId={route.params.workspaceId}
+            />
+          );
+        })
       ) : null}
+
+      <CreateWorkspaceModal
+        isVisible={showCreateWorkspaceModal}
+        onBackdropPress={() => setShowCreateWorkspaceModal(false)}
+        onWorkspaceCreated={onWorkspaceCreated}
+      />
     </DrawerContentScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  documentPreviewItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  documentPreviewLabel: {
-    flexGrow: 1,
-    height: "100%",
-  },
-});

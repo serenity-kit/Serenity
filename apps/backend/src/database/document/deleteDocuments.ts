@@ -35,7 +35,6 @@ export async function deleteDocuments({ documentIds, username }: Params) {
       });
     });
   } catch (error) {
-    console.log("error", error);
     throw error;
   }
 }

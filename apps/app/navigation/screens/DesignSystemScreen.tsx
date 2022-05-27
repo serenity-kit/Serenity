@@ -358,6 +358,11 @@ export default function DesignSystemScreen() {
         <Icon name="stars-s-fill" />
         <Icon name="serenity-feather" />
       </Tiles>
+      <Text style={tw`mt-4 mb-1`}>Sidebar</Text>
+      <Tiles style={tw`max-w-lg`} space={4} columns={10}>
+        <Icon name="folder" />
+        <Icon name="page" />
+      </Tiles>
       <Text style={tw`mt-4 mb-1`}>Icons resized</Text>
       <Columns space={4} alignY="center" alignX="left">
         <Column width="content">

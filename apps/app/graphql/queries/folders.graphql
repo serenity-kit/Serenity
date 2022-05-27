@@ -1,0 +1,15 @@
+query folders($parentFolderId: ID!, $first: Int!, $after: String) {
+  folders(parentFolderId: $parentFolderId, first: $first, after: $after) {
+    nodes {
+      id
+      name
+      parentFolderId
+      rootFolderId
+      workspaceId
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

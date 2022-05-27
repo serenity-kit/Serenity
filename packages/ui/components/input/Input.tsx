@@ -16,7 +16,7 @@ export const Input = forwardRef((props: InputProps, ref) => {
       // @ts-ignore
       ref={ref}
       {...props}
-      style={[styles.input, props.disabled && tw`text-muted`]}
+      style={[styles.input, props.disabled && tw`text-muted`, props.style]}
       _stack={{
         style: props.disabled
           ? [styles.wrapper, tw`bg-gray-100 border-gray-400`]

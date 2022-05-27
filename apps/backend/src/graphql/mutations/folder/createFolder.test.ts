@@ -41,6 +41,7 @@ test("user should be able to create a root folder", async () => {
   const result = await createFolder({
     graphql,
     id,
+    name: null,
     parentFolderId,
     workspaceId: addedWorkspace.id,
     authorizationHeader,
@@ -58,6 +59,31 @@ test("user should be able to create a root folder", async () => {
   `);
 });
 
+test("user should be able to create a root folder with a name", async () => {
+  const authorizationHeader = `TODO+${username}`;
+  const id = "cb3e4195-40e2-45c0-8b87-8415abdc6b55";
+  const parentFolderId = null;
+  const result = await createFolder({
+    graphql,
+    id,
+    name: "Named Folder",
+    parentFolderId,
+    workspaceId: addedWorkspace.id,
+    authorizationHeader,
+  });
+  expect(result.createFolder).toMatchInlineSnapshot(`
+    Object {
+      "folder": Object {
+        "id": "cb3e4195-40e2-45c0-8b87-8415abdc6b55",
+        "name": "Named Folder",
+        "parentFolderId": null,
+        "rootFolderId": null,
+        "workspaceId": "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+      },
+    }
+  `);
+});
+
 test("user should be able to create a child folder", async () => {
   const authorizationHeader = `TODO+${username}`;
   const id = "c3d28056-b619-41c4-be51-ce89ed5b8be4";
@@ -65,6 +91,7 @@ test("user should be able to create a child folder", async () => {
   const result = await createFolder({
     graphql,
     id,
+    name: null,
     parentFolderId,
     workspaceId: addedWorkspace.id,
     authorizationHeader,
@@ -75,7 +102,7 @@ test("user should be able to create a child folder", async () => {
         "id": "c3d28056-b619-41c4-be51-ce89ed5b8be4",
         "name": "Untitled",
         "parentFolderId": "c103a784-35cb-4aee-b366-d10398b6dd95",
-        "rootFolderId": null,
+        "rootFolderId": "c103a784-35cb-4aee-b366-d10398b6dd95",
         "workspaceId": "5a3484e6-c46e-42ce-a285-088fc1fd6915",
       },
     }
@@ -89,6 +116,7 @@ test.skip("duplicate ID throws an error", async () => {
   const result = await createFolder({
     graphql,
     id,
+    name: null,
     parentFolderId,
     workspaceId: addedWorkspace.id,
     authorizationHeader,
@@ -99,6 +127,7 @@ test.skip("duplicate ID throws an error", async () => {
       await createFolder({
         graphql,
         id,
+        name: null,
         parentFolderId,
         workspaceId: addedWorkspace.id,
         authorizationHeader,
@@ -115,6 +144,7 @@ test("Throw error when the parent folder doesn't exist", async () => {
       await createFolder({
         graphql,
         id,
+        name: null,
         parentFolderId,
         workspaceId: addedWorkspace.id,
         authorizationHeader,
@@ -144,6 +174,7 @@ test("Throw error when user doesn't have access", async () => {
       await createFolder({
         graphql,
         id: "1d283506-9de4-426b-8a02-567f0645dc31",
+        name: null,
         parentFolderId: null,
         workspaceId: addedWorkspace.id,
         authorizationHeader: `TODO+${username}`,
