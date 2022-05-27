@@ -1,12 +1,30 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { View, Text, Pressable, Platform } from "react-native";
 import { WebView } from "react-native-webview";
 
 let editorSource =
   Platform.OS !== "android" ? require("../dist/index.html") : { html: null };
 
+let counter = 0;
+const resolveStorage = {};
+
 export default function OpaqueBridge() {
   const webViewRef = useRef(null);
+
+  useEffect(() => {
+    global._opaque = {};
+    global._opaque.registerInitialize = (password: string) => {
+      counter++;
+      const promise = new Promise((resolve) => {
+        resolveStorage[counter] = resolve;
+      });
+      webViewRef.current?.injectJavaScript(`
+        window.registerInitialize("${counter}", "${password}");
+        true;
+      `);
+      return promise;
+    };
+  }, []);
 
   return (
     <View>
@@ -14,19 +32,17 @@ export default function OpaqueBridge() {
         ref={webViewRef}
         originWhitelist={["*"]}
         source={editorSource}
-        onError={(e) => alert("ee")}
         onMessage={async (event) => {
           const message = JSON.parse(event.nativeEvent.data);
-          console.log(message);
-          alert("SUCCESS");
+          if (resolveStorage[message.id]) {
+            resolveStorage[message.id](message.result);
+          }
         }}
       />
       <Pressable
-        onPress={() => {
-          webViewRef.current?.injectJavaScript(`
-        window.registerInitialize("aa", "bb");
-        true;
-      `);
+        onPress={async () => {
+          const x = await global._opaque.registerInitialize("aa");
+          console.log(x);
         }}
       >
         <Text>RUN</Text>
