@@ -27,7 +27,7 @@ export default function Editor({
   updateTitle,
   isNew,
 }: EditorProps) {
-  const webViewRef = useRef(null);
+  const webViewRef = useRef<WebView>(null);
 
   useEffect(() => {
     const initEditor = async () => {
@@ -43,8 +43,8 @@ export default function Editor({
       // TODO invesitgate if the scripts need to be cleaned up to avoid polluting
       // the document with a lot of script tags
       // send to webview
-      // @ts-expect-error not yet typed
-      webViewRef?.current?.injectJavaScript(`
+
+      webViewRef.current?.injectJavaScript(`
         window.applyYjsUpdate(${JSON.stringify(Array.apply([], update))});
         true;
       `);
@@ -102,8 +102,7 @@ export default function Editor({
           // } else {
           // }
 
-          // @ts-expect-error
-          webViewRef?.current?.injectJavaScript(`
+          webViewRef.current?.injectJavaScript(`
               window.applyYjsUpdate(${JSON.stringify(
                 Array.apply([], Y.encodeStateAsUpdateV2(yDocRef.current))
               )});

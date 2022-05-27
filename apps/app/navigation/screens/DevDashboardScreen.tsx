@@ -1,17 +1,9 @@
-import { Button, Link, Text, tw, View } from "@serenity-tools/ui";
-import { useEffect } from "react";
+import { Button, Link, Pressable, Text, tw, View } from "@serenity-tools/ui";
 import { Platform, useWindowDimensions } from "react-native";
 import { registerInitialize, OpaqueBridge } from "@serenity-tools/opaque-se";
 
 export default function DevDashboardScreen(props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-
-  useEffect(() => {
-    (async () => {
-      const request = await registerInitialize("weee");
-      console.log(request);
-    })();
-  });
 
   return (
     <View style={tw`mt-20`}>
@@ -32,6 +24,15 @@ export default function DevDashboardScreen(props) {
         Mock Mode Login
       </Button>
       <OpaqueBridge />
+      <Pressable
+        onPress={async () => {
+          const request = await registerInitialize("weee");
+          alert("o");
+          console.log(request);
+        }}
+      >
+        <Text>test</Text>
+      </Pressable>
     </View>
   );
 }

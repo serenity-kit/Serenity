@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { View, Text, Pressable, Platform } from "react-native";
+import { Platform } from "react-native";
 import { WebView } from "react-native-webview";
 
 let editorSource =
@@ -9,7 +9,7 @@ let counter = 0;
 const resolveStorage = {};
 
 export default function OpaqueBridge() {
-  const webViewRef = useRef(null);
+  const webViewRef = useRef<WebView>(null);
 
   useEffect(() => {
     global._opaque = {};
@@ -27,26 +27,16 @@ export default function OpaqueBridge() {
   }, []);
 
   return (
-    <View>
-      <WebView
-        ref={webViewRef}
-        originWhitelist={["*"]}
-        source={editorSource}
-        onMessage={async (event) => {
-          const message = JSON.parse(event.nativeEvent.data);
-          if (resolveStorage[message.id]) {
-            resolveStorage[message.id](message.result);
-          }
-        }}
-      />
-      <Pressable
-        onPress={async () => {
-          const x = await global._opaque.registerInitialize("aa");
-          console.log(x);
-        }}
-      >
-        <Text>RUN</Text>
-      </Pressable>
-    </View>
+    <WebView
+      ref={webViewRef}
+      originWhitelist={["*"]}
+      source={editorSource}
+      onMessage={async (event) => {
+        const message = JSON.parse(event.nativeEvent.data);
+        if (resolveStorage[message.id]) {
+          resolveStorage[message.id](message.result);
+        }
+      }}
+    />
   );
 }
