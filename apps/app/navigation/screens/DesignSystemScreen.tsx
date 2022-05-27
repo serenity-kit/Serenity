@@ -315,6 +315,7 @@ export default function DesignSystemScreen() {
         <Icon name="arrow-go-back-line" />
         <Icon name="arrow-go-forward-fill" />
         <Icon name="arrow-go-forward-line" />
+        <Icon name="arrow-right-s-line" />
         <Icon name="arrow-right-s-fill" />
         <Icon name="arrow-up-down-line" />
         <Icon name="book-open-line" />
@@ -323,6 +324,8 @@ export default function DesignSystemScreen() {
         <Icon name="chat-4-line" />
         <Icon name="cup" />
         <Icon name="delete-bin-line" />
+        <Icon name="double-arrow-left" />
+        <Icon name="double-arrow-right" />
         <Icon name="download-line" />
         <Icon name="emotion-line" />
         <Icon name="file-search-line" />

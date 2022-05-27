@@ -10,6 +10,7 @@ import { ArrowGoForwardLine } from "./icons/ArrowGoForwardLine";
 import { ArrowGoForwardFill } from "./icons/ArrowGoForwardFill";
 import { ArrowLeftSLine } from "./icons/ArrowLeftSLine";
 import { ArrowRightSFill } from "./icons/ArrowRightSFill";
+import { ArrowRightSLine } from "./icons/ArrowRightSLine";
 import { ArrowUpDownLine } from "./icons/ArrowUpDownLine";
 import { Attachment2 } from "./icons/Attachment2";
 import { AtLine } from "./icons/AtLine";
@@ -23,6 +24,8 @@ import { CodeView } from "./icons/CodeView";
 import { Cup } from "./icons/Cup";
 import { DashboardLine } from "./icons/DashboardLine";
 import { DeleteBinLine } from "./icons/DeleteBinLine";
+import { DoubleArrowLeft } from "./icons/DoubleArrowLeft";
+import { DoubleArrowRight } from "./icons/DoubleArrowRight";
 import { DoubleQuotesL } from "./icons/DoubleQuotesL";
 import { DownloadLine } from "./icons/DownloadLine";
 import { DraftLine } from "./icons/DraftLine";
@@ -86,6 +89,7 @@ export type IconProps = {
     | "arrow-go-forward-line"
     | "arrow-left-s-line"
     | "arrow-right-s-fill"
+    | "arrow-right-s-line"
     | "arrow-up-down-line"
     | "at-line"
     | "attachment-2"
@@ -99,6 +103,8 @@ export type IconProps = {
     | "cup"
     | "dashboard-line"
     | "delete-bin-line"
+    | "double-arrow-right"
+    | "double-arrow-left"
     | "double-quotes-l"
     | "download-line"
     | "draft-line"
@@ -174,6 +180,8 @@ export const Icon = (props: IconProps) => {
     return <ArrowGoForwardLine color={color} size={size} />;
   if (name === "arrow-left-s-line")
     return <ArrowLeftSLine color={color} size={size} />;
+  if (name === "arrow-right-s-line")
+    return <ArrowRightSLine color={color} size={size} />;
   if (name === "arrow-right-s-fill")
     return <ArrowRightSFill color={color} size={size} />;
   if (name === "arrow-up-down-line")
@@ -195,6 +203,10 @@ export const Icon = (props: IconProps) => {
     return <DashboardLine color={color} size={size} />;
   if (name === "delete-bin-line")
     return <DeleteBinLine color={color} size={size} />;
+  if (name === "double-arrow-left")
+    return <DoubleArrowLeft color={color} size={size} />;
+  if (name === "double-arrow-right")
+    return <DoubleArrowRight color={color} size={size} />;
   if (name === "double-quotes-l")
     return <DoubleQuotesL color={color} size={size} />;
   if (name === "download-line")
