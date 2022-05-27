@@ -9,6 +9,9 @@ package-lock.json
 
 # editor built for the mobile editor web view
 apps/app/assets/index.html
+# opaque bridge built for mobile
+apps/app/assets/opaque.html
+
 # editor tailwind build step output
 packages/editor/editor-output.css
 

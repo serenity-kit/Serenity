@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@cloudflare/opaque-ts": "^0.7.5",
-    "opaque-wasm": "^1.1.0"
+    "@serenity-tools/libsodium": "*",
+    "core-js": "^3.22.7",
+    "regenerator-runtime": "^0.13.9"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",

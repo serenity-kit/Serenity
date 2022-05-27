@@ -1,19 +1,14 @@
-import { Registration, Login } from "opaque-wasm";
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 
-console.log("init opaque-se standalone | weee");
+alert("234");
 
-const password = "asdf123";
-const email = "myawesomeapp@seerv.dev";
-
-// import("opaque-wasm").then((x) => {
-//   console.log(x);
-// });
-
-try {
-  console.log("weee");
-  const registration = new Registration();
-  const firstMessage = registration.start(password);
-  console.log("first message:", firstMessage);
-} catch (e) {
-  console.error(e);
-}
+window.registerInitialize = async function (id: string, password: string) {
+  alert("registerInitialize called");
+  window.ReactNativeWebView.postMessage(
+    JSON.stringify({
+      id,
+      result: "lalalala",
+    })
+  );
+};

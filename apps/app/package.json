@@ -25,6 +25,7 @@
     "@react-navigation/native-stack": "^6.1.0",
     "@serenity-tools/editor": "*",
     "@serenity-tools/libsodium": "*",
+    "@serenity-tools/opaque-se": "*",
     "@serenity-tools/ui": "*",
     "@tiptap/extension-placeholder": "^2.0.0-beta.48",
     "@urql/devtools": "^2.0.3",

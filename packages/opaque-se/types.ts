@@ -8,7 +8,6 @@ type ReactNativeWebView = {
 declare global {
   interface Window {
     ReactNativeWebView: ReactNativeWebView;
-    ydoc: any;
-    applyYjsUpdate: (update: any) => void;
+    registerInitialize: (id: string, password: string) => void;
   }
 }

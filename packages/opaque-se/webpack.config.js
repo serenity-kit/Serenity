@@ -1,6 +1,7 @@
 const path = require("path");
+const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-// const InlineChunkHtmlPlugin = require("react-dev-utils/InlineChunkHtmlPlugin");
+const InlineChunkHtmlPlugin = require("react-dev-utils/InlineChunkHtmlPlugin");
 
 module.exports = {
   mode: "development",
@@ -10,9 +11,9 @@ module.exports = {
   },
   output: {
     globalObject: "self",
-    path: path.resolve(__dirname, "./dist/static/js"),
+    path: path.resolve(__dirname, "./dist/"),
     filename: "[name].bundle.js",
-    publicPath: "/static/js/",
+    publicPath: "/dist/",
   },
   devServer: {
     static: {
@@ -47,19 +48,18 @@ module.exports = {
     ],
   },
   plugins: [
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^crypto$/,
+    }),
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^path$/,
+    }),
     new HtmlWebpackPlugin({
       title: "Serenity Opaque",
       template: "template.html",
       filename: "index.html",
       inject: "body",
     }),
-    // new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/.*/]),
+    new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/.*/]),
   ],
-  experiments: {
-    asyncWebAssembly: true,
-    syncWebAssembly: true,
-  },
-  stats: {
-    errorDetails: true,
-  },
 };
