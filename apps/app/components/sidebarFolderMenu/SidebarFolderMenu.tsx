@@ -6,7 +6,6 @@ import {
   Text,
   tw,
 } from "@serenity-tools/ui";
-import { useDeleteDocumentsMutation } from "../../generated/graphql";
 import { useState } from "react";
 
 type Props = {
@@ -18,16 +17,6 @@ type Props = {
 
 export default function SidebarFolderMenu(props: Props) {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
-  const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
-
-  const deleteFolder = async (id: string) => {
-    await deleteDocumentsMutation({
-      input: {
-        ids: [id],
-      },
-    });
-    props.refetchFolders();
-  };
 
   return (
     <Menu
