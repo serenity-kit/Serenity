@@ -164,7 +164,6 @@ export default function WorkspaceSettingsScreen(
   };
 
   const updateWorkspaceData = async (workspace: any) => {
-    console.log(workspace);
     setIsLoadingWorkspaceData(true);
     const workspaceName = workspace.name || "";
     setWorkspaceName(workspaceName);
@@ -173,8 +172,6 @@ export default function WorkspaceSettingsScreen(
     const memberLookup = {} as { [username: string]: number };
     members.forEach((member: Member, row: number) => {
       memberLookup[member.userId] = row;
-      console.log(myUserId);
-      console.log(member.userId);
       if (member.userId === myUserId) {
         setIsAdmin(member.isAdmin);
       }
