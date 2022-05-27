@@ -1,5 +1,6 @@
-type WorkspaceMember = {
+export type WorkspaceMember = {
   userId: string;
+  username: string | undefined | null;
   isAdmin: boolean;
 };
 

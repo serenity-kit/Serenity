@@ -22,14 +22,14 @@ test("user should be able to retreive their own workspace by id", async () => {
     Object {
       "id": "getWorkspace1",
       "idSignature": "TODO",
-      "name": "My Workspace",
-      "usersToWorkspaces": Array [
+      "members": Array [
         Object {
           "isAdmin": true,
           "userId": "${userId}",
-          "workspaceId": "getWorkspace1",
+          "username": "${username}",
         },
       ],
+      "name": "My Workspace",
     }
   `);
 });

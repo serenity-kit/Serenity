@@ -2,7 +2,7 @@ import { idArg, nonNull, queryField } from "nexus";
 import { getDocuments } from "../../../database/document/getDocuments";
 import { Document } from "../../types/document";
 
-export const workspaces = queryField((t) => {
+export const documents = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("documents", {
     type: Document,
@@ -29,14 +29,14 @@ export const workspaces = queryField((t) => {
       const take: any = args.first ? args.first + 1 : undefined;
       const parentFolderId = args.parentFolderId;
 
-      const folders = await getDocuments({
+      const documents = await getDocuments({
         userId,
         parentFolderId,
         cursor,
         skip,
         take,
       });
-      return folders;
+      return documents;
     },
   });
 });

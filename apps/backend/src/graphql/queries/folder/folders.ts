@@ -2,7 +2,7 @@ import { idArg, nonNull, queryField } from "nexus";
 import { getSubfolders } from "../../../database/folder/getSubfolders";
 import { Folder } from "../../types/folder";
 
-export const workspaces = queryField((t) => {
+export const folders = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("folders", {
     type: Folder,

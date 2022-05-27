@@ -3,6 +3,7 @@ import { prisma } from "../../../database/prisma";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
 import { getWorkspaces } from "../../../database/workspace/getWorkspaces";
 import { Workspace } from "../../types/workspace";
+import { WorkspaceMember } from "../../../types/workspace";
 
 export const workspaces = queryField((t) => {
   t.field("workspace", {
@@ -16,19 +17,13 @@ export const workspaces = queryField((t) => {
       }
       const userId = context.user.id;
       if (args.id) {
-        const rawWorkspace = await getWorkspace({
+        const workspace = await getWorkspace({
           userId,
           id: args.id,
         });
-        if (!rawWorkspace) {
+        if (!workspace) {
           return null;
         }
-        const workspace = {
-          id: rawWorkspace.id,
-          name: rawWorkspace.name,
-          idSignature: rawWorkspace.idSignature,
-          members: rawWorkspace.usersToWorkspaces,
-        };
         return workspace;
       }
 
@@ -40,14 +35,27 @@ export const workspaces = queryField((t) => {
       });
       if (workspaces.length > 0) {
         const workspace = workspaces[0];
-        const members = await prisma.usersToWorkspaces.findMany({
+        const rawWorkspaceMembers = await prisma.usersToWorkspaces.findMany({
           where: {
             workspaceId: workspace.id,
           },
           select: {
             userId: true,
             isAdmin: true,
+            user: {
+              select: {
+                username: true,
+              },
+            },
           },
+        });
+        const members: WorkspaceMember[] = [];
+        rawWorkspaceMembers.forEach((workspaceMember) => {
+          members.push({
+            userId: workspaceMember.userId,
+            username: workspaceMember.user.username,
+            isAdmin: workspaceMember.isAdmin,
+          });
         });
         workspace.members = members;
         return workspace;

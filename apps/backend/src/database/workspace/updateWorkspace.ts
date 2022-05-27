@@ -1,5 +1,5 @@
 import { prisma } from "../prisma";
-import { Workspace } from "../../types/workspace";
+import { Workspace, WorkspaceMember } from "../../types/workspace";
 
 export type WorkspaceMemberParams = {
   userId: string;
@@ -119,14 +119,26 @@ export async function updateWorkspace({
       } else {
         updatedWorkspace = workspace;
       }
-      const updatedPermissions = await prisma.usersToWorkspaces.findMany({
+      const rawUpdatedPermissions = await prisma.usersToWorkspaces.findMany({
         where: {
           workspaceId: workspace.id,
         },
         select: {
           userId: true,
           isAdmin: true,
+          user: {
+            select: { username: true },
+          },
         },
+      });
+      const updatedPermissions: WorkspaceMember[] = [];
+      rawUpdatedPermissions.forEach((rawPermission) => {
+        const member = {
+          userId: rawPermission.userId,
+          username: rawPermission.user.username,
+          isAdmin: rawPermission.isAdmin,
+        };
+        updatedPermissions.push(member);
       });
       const updatedWorkspaceData: Workspace = {
         id: updatedWorkspace.id,

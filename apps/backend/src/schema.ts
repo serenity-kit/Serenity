@@ -25,6 +25,7 @@ import * as CreateWorkspaceMutationTypes from "./graphql/mutations/workspace/cre
 import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/deleteWorkspaces";
 import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/updateWorkspace";
 import * as MeQueryTypes from "./graphql/queries/authentication/me";
+import * as UserIdFromUsernameQueryTypes from "./graphql/queries/userIdFromUsername";
 
 import * as WorkspaceTypes from "./graphql/types/workspace";
 import * as DocumentTypes from "./graphql/types/document";
@@ -55,6 +56,7 @@ export const schema = makeSchema({
     InitializePasswordResetTypes,
     FinalizePasswordResetTypes,
     MeQueryTypes,
+    UserIdFromUsernameQueryTypes,
     CreateWorkspaceMutationTypes,
     DeleteWorkspacesMutationTypes,
     UpdateWorkspaceMutationTypes,
