@@ -27,6 +27,7 @@ test("user should be able to retreive their own workspace by id", async () => {
           "isAdmin": true,
           "userId": "${userId}",
           "username": "${username}",
+          "workspaceId": "getWorkspace1",
         },
       ],
       "name": "My Workspace",
