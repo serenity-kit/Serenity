@@ -5,9 +5,12 @@ export type Props = { color: string; size: number };
 
 export const AddLine = ({ color, size }: Props) => {
   return (
-    <Svg height={size} width={size} viewBox="0 0 24 24">
-      <Path fill="none" d="M0 0h24v24H0z" />
-      <Path fill={color} d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" />
+    <Svg height={size} width={size} viewBox="0 0 16 16">
+      <Path fill="none" d="M0 0h16v16H0z" />
+      <Path
+        fill={color}
+        d="M7.33331 7.33334V3.33334H8.66665V7.33334H12.6666V8.66668H8.66665V12.6667H7.33331V8.66668H3.33331V7.33334H7.33331Z"
+      />
     </Svg>
   );
 };

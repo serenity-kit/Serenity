@@ -5,11 +5,11 @@ export type Props = { color: string; size: number };
 
 export const DownloadLine = ({ color, size }: Props) => {
   return (
-    <Svg height={size} width={size} viewBox="0 0 24 24">
-      <Path fill="none" d="M0 0h24v24H0z" />
+    <Svg height={size} width={size} viewBox="0 0 16 16">
+      <Path fill="none" d="M0 0h16v16H0z" />
       <Path
         fill={color}
-        d="M3 19h18v2H3v-2zm10-5.828L19.071 7.1l1.414 1.414L12 17 3.515 8.515 4.929 7.1 11 13.17V2h2v11.172z"
+        d="M2 12.6667H14V14H2V12.6667ZM8.66667 8.78134L12.714 4.73334L13.6567 5.67601L8 11.3333L2.34333 5.67668L3.286 4.73334L7.33333 8.78001V1.33334H8.66667V8.78134Z"
       />
     </Svg>
   );

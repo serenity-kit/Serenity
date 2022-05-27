@@ -322,12 +322,15 @@ export default function DesignSystemScreen() {
         <Icon name="calendar-check-fill" />
         <Icon name="chat-1-line" />
         <Icon name="chat-4-line" />
-        <Icon name="cup" />
+        <Icon name="check-line" />
+        <Icon name="close-circle-fill" />
+        <Icon name="cup-line" />
         <Icon name="delete-bin-line" />
         <Icon name="double-arrow-left" />
         <Icon name="double-arrow-right" />
         <Icon name="download-line" />
         <Icon name="emotion-line" />
+        <Icon name="file-copy-line" />
         <Icon name="file-search-line" />
         <Icon name="file-transfer-line" />
         <Icon name="folder-line" />

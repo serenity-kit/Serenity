@@ -19,9 +19,11 @@ import { BookOpenLine } from "./icons/BookOpenLine";
 import { CalendarCheckFill } from "./icons/CalendarCheckFill";
 import { Chat1Line } from "./icons/Chat1Line";
 import { Chat4Line } from "./icons/Chat4Line";
+import { CheckLine } from "./icons/CheckLine";
+import { CloseCircleFill } from "./icons/CloseCircleFill";
 import { CodeSSlashLine } from "./icons/CodeSSlashLine";
 import { CodeView } from "./icons/CodeView";
-import { Cup } from "./icons/Cup";
+import { CupLine } from "./icons/CupLine";
 import { DashboardLine } from "./icons/DashboardLine";
 import { DeleteBinLine } from "./icons/DeleteBinLine";
 import { DoubleArrowLeft } from "./icons/DoubleArrowLeft";
@@ -30,6 +32,7 @@ import { DoubleQuotesL } from "./icons/DoubleQuotesL";
 import { DownloadLine } from "./icons/DownloadLine";
 import { DraftLine } from "./icons/DraftLine";
 import { EmotionLine } from "./icons/EmotionLine";
+import { FileCopyLine } from "./icons/FileCopyLine";
 import { FileSearchLine } from "./icons/FileSearchLine";
 import { FileTransferLine } from "./icons/FileTransferLine";
 import { FolderMusicLine } from "./icons/FolderMusicLine";
@@ -98,9 +101,11 @@ export type IconProps = {
     | "calendar-check-fill"
     | "chat-1-line"
     | "chat-4-line"
+    | "check-line"
+    | "close-circle-fill"
     | "code-s-slash-line"
     | "code-view"
-    | "cup"
+    | "cup-line"
     | "dashboard-line"
     | "delete-bin-line"
     | "double-arrow-right"
@@ -109,6 +114,7 @@ export type IconProps = {
     | "download-line"
     | "draft-line"
     | "emotion-line"
+    | "file-copy-line"
     | "file-search-line"
     | "file-transfer-line"
     | "folder-line"
@@ -195,10 +201,13 @@ export const Icon = (props: IconProps) => {
     return <CalendarCheckFill color={color} size={size} />;
   if (name === "chat-1-line") return <Chat1Line color={color} size={size} />;
   if (name === "chat-4-line") return <Chat4Line color={color} size={size} />;
+  if (name === "check-line") return <CheckLine color={color} size={size} />;
+  if (name === "close-circle-fill")
+    return <CloseCircleFill color={color} size={size} />;
   if (name === "code-s-slash-line")
     return <CodeSSlashLine color={color} size={size} />;
   if (name === "code-view") return <CodeView color={color} size={size} />;
-  if (name === "cup") return <Cup color={color} size={size} />;
+  if (name === "cup-line") return <CupLine color={color} size={size} />;
   if (name === "dashboard-line")
     return <DashboardLine color={color} size={size} />;
   if (name === "delete-bin-line")
@@ -213,6 +222,8 @@ export const Icon = (props: IconProps) => {
     return <DownloadLine color={color} size={size} />;
   if (name === "draft-line") return <DraftLine color={color} size={size} />;
   if (name === "emotion-line") return <EmotionLine color={color} size={size} />;
+  if (name === "file-copy-line")
+    return <FileCopyLine color={color} size={size} />;
   if (name === "file-search-line")
     return <FileSearchLine color={color} size={size} />;
   if (name === "file-transfer-line")
