@@ -9,37 +9,40 @@ export type LabeledInputProps = InputProps & {
   label: string;
 };
 
-export function LabeledInput(props: LabeledInputProps) {
-  const [isFocused, setIsFocused] = useState(false);
-  const styles = StyleSheet.create({
-    default: tw`text-base text-gray-900 dark:text-white`,
-    focus: tw`text-primary-500`,
-    disabled: tw`text-muted`,
-    error: tw`text-error-500`,
-  });
+export const LabeledInput = React.forwardRef(
+  ({ ...props }: LabeledInputProps, ref: any) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const styles = StyleSheet.create({
+      default: tw`text-base text-gray-900 dark:text-white`,
+      focus: tw`text-primary-500`,
+      disabled: tw`text-muted`,
+      error: tw`text-error-500`,
+    });
 
-  return (
-    <View style={[styles.default, props.style]}>
-      <Text
-        variant="xs"
-        muted
-        style={[
-          tw`mb-1`,
-          props.isDisabled && styles.disabled,
-          isFocused && styles.focus,
-        ]}
-      >
-        {props.label}
-      </Text>
-      <Input
-        {...props}
-        onFocus={() => {
-          setIsFocused(true);
-        }}
-        onBlur={() => {
-          setIsFocused(false);
-        }}
-      />
-    </View>
-  );
-}
+    return (
+      <View style={[styles.default, props.style]}>
+        <Text
+          variant="xs"
+          muted
+          style={[
+            tw`mb-1`,
+            props.isDisabled && styles.disabled,
+            isFocused && styles.focus,
+          ]}
+        >
+          {props.label}
+        </Text>
+        <Input
+          {...props}
+          ref={ref}
+          onFocus={() => {
+            setIsFocused(true);
+          }}
+          onBlur={() => {
+            setIsFocused(false);
+          }}
+        />
+      </View>
+    );
+  }
+);
