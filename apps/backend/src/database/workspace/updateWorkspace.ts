@@ -28,7 +28,7 @@ export async function updateWorkspace({
   try {
     return await prisma.$transaction(async (prisma) => {
       // 1. retrieve workspace if owned by user
-      // 2. update usersToWorkspaces with new permission structures
+      // 2. update usersToWorkspaces with new member structures
       // 3. update workspace
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
@@ -53,15 +53,15 @@ export async function updateWorkspace({
         throw new Error("Invalid workspace ID");
       }
       if (members != undefined) {
-        const permissionsByUserId = {};
+        const membersByUserId = {};
         members.forEach(({ userId, isAdmin }) => {
-          permissionsByUserId[userId] = {
+          membersByUserId[userId] = {
             isAdmin,
           };
         });
         const searchingUserIds: string[] = [];
-        members.forEach((permission) => {
-          searchingUserIds.push(permission.userId);
+        members.forEach((member) => {
+          searchingUserIds.push(member.userId);
         });
         const actualUsers = await prisma.user.findMany({
           where: {
@@ -75,7 +75,7 @@ export async function updateWorkspace({
         });
         const userIds: string[] = [];
         actualUsers.forEach((actualUser) => {
-          // don't delete owner from permissions
+          // don't delete owner from members
           if (actualUser.id != userId) {
             userIds.push(actualUser.id);
           }
@@ -92,10 +92,10 @@ export async function updateWorkspace({
         const usersToWorkspacesData: UserToWorkspaceData[] = [];
         // loop through inbound data and format for database
         userIds.forEach((memberUserId) => {
-          // don't alter owner's permissions
+          // don't alter owner's members
           usersToWorkspacesData.push({
             userId: memberUserId,
-            isAdmin: permissionsByUserId[memberUserId].isAdmin,
+            isAdmin: membersByUserId[memberUserId].isAdmin,
             workspaceId: workspace.id,
           });
         });
@@ -110,7 +110,7 @@ export async function updateWorkspace({
           where: {
             id: workspace.id,
           },
-          // TODO: update ID
+          // TODO: update IDs
           data: {
             name: name,
             idSignature: "TODO",
@@ -119,7 +119,7 @@ export async function updateWorkspace({
       } else {
         updatedWorkspace = workspace;
       }
-      const rawUpdatedPermissions = await prisma.usersToWorkspaces.findMany({
+      const rawUpdatedMembers = await prisma.usersToWorkspaces.findMany({
         where: {
           workspaceId: workspace.id,
         },
@@ -131,20 +131,20 @@ export async function updateWorkspace({
           },
         },
       });
-      const updatedPermissions: WorkspaceMember[] = [];
-      rawUpdatedPermissions.forEach((rawPermission) => {
+      const updatedMembers: WorkspaceMember[] = [];
+      rawUpdatedMembers.forEach((rawMember) => {
         const member = {
-          userId: rawPermission.userId,
-          username: rawPermission.user.username,
-          isAdmin: rawPermission.isAdmin,
+          userId: rawMember.userId,
+          username: rawMember.user.username,
+          isAdmin: rawMember.isAdmin,
         };
-        updatedPermissions.push(member);
+        updatedMembers.push(member);
       });
       const updatedWorkspaceData: Workspace = {
         id: updatedWorkspace.id,
         name: updatedWorkspace.name,
         idSignature: updatedWorkspace.idSignature,
-        members: updatedPermissions,
+        members: updatedMembers,
       };
       return updatedWorkspaceData;
     });

@@ -50,24 +50,18 @@ export default function RegisterScreen(
       const keys = JSON.parse(serializedKeyData);
       setClientPublicKey(keys.publicKey);
       setClientPrivateKey(keys.privateKey);
-      console.log("retrieved client keys");
-      console.log({ keys });
     } else {
       const keys = createClientKeyPair();
       setClientPublicKey(keys.publicKey);
       setClientPrivateKey(keys.privateKey);
       localStorage.setItem(OPRF_CLIENT_KEYS_STORAGE_KEY, JSON.stringify(keys));
-      console.log("generated client keys");
-      console.log({ keys });
     }
   };
 
   const getServerOprfChallenge = async () => {
-    console.log("Generating OPRF challenge");
     const { oprfChallenge, randomScalar } = await createOprfChallenge(password);
     // setOprfChallenge(oprfChallenge)
     // setRandomScalar(randomScalar)
-    console.log({ oprfChallenge, randomScalar });
     // do some graphql stuff here, including:
     // * username,
     // * oprfChallenge
@@ -81,7 +75,6 @@ export default function RegisterScreen(
         challenge: oprfChallenge,
       },
     });
-    console.log({ mutationResult });
     // check for an error
     if (mutationResult.data && mutationResult.data.initializeRegistration) {
       const serverChallengeResponse =
@@ -108,8 +101,6 @@ export default function RegisterScreen(
     serverPublicKey: string,
     oprfPublicKey: string
   ) => {
-    console.log("Registering account");
-    console.log({ randomScalar });
     const { secret, nonce } = await createOprfRegistrationEnvelope(
       password,
       clientPublicKey,
@@ -119,7 +110,6 @@ export default function RegisterScreen(
       serverPublicKey,
       oprfPublicKey
     );
-    console.log({ secret, nonce });
     // ask the server to store the registration, send
     // * username,
     // * secret (aka cipherText),
@@ -134,7 +124,6 @@ export default function RegisterScreen(
         workspaceId: uuidv4(),
       },
     });
-    console.log({ mutationResult });
     // check for an error
     if (mutationResult.data && mutationResult.data.finalizeRegistration) {
       const serverRegistrationResponse =
@@ -167,7 +156,6 @@ export default function RegisterScreen(
       // TODO the getServerOprfChallenge should include a signature of the challenge response and be verified that it belongs to
       // the server public to make sure it wasn't tampered with
       oprfChallengeResponse = await getServerOprfChallenge();
-      console.log({ oprfChallengeResponse });
     } catch (error) {
       console.log("error getting server challenge");
       console.log(error);

@@ -46,20 +46,16 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
     let serializedKeyData = localStorage.getItem(OPRF_CLIENT_KEYS_STORAGE_KEY);
     if (serializedKeyData) {
       const keys = JSON.parse(serializedKeyData);
-      console.log("retrieved client keys", { keys });
     } else {
       const keys = createClientKeyPair();
       localStorage.setItem(OPRF_CLIENT_KEYS_STORAGE_KEY, JSON.stringify(keys));
-      console.log("generated client keys", { keys });
     }
   };
 
   const getServerOprfChallenge = async () => {
-    console.log("Generating OPRF challenge");
     const { oprfChallenge, randomScalar } = await createOprfChallenge(password);
     // setOprfChallenge(oprfChallenge)
     // setRandomScalar(randomScalar)
-    console.log({ oprfChallenge, randomScalar });
     // do some graphql stuff here, including:
     // * username,
     // * oprfChallenge
@@ -73,7 +69,6 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
         challenge: oprfChallenge,
       },
     });
-    console.log({ mutationResult });
     // check for an error
     if (mutationResult.data && mutationResult.data.initializeLogin) {
       const serverChallengeResponse = mutationResult.data.initializeLogin;
@@ -84,7 +79,6 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
         randomScalar,
         serverChallengeResponse,
       };
-      console.log({ oprfChallenge });
       return oprfChallengeResponse;
     } else if (mutationResult.error) {
       const errorMessage = mutationResult.error.message.substring(
@@ -101,9 +95,6 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
     nonce: string,
     oprfPublicKey: string
   ) => {
-    console.log("Logging in");
-    console.log({ randomScalar });
-
     const clientSessionKeys = await createUserSession(
       password,
       secret,
@@ -121,7 +112,6 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
     const mutationResult = await finalizeLoginMutation({
       input: { username },
     });
-    console.log({ clientSessionKeys });
     // check for an error
     if (mutationResult.data && mutationResult.data.finalizeLogin) {
       const serverLoginResponse = mutationResult.data.finalizeLogin;
@@ -149,7 +139,6 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
       nonce,
       clientSessionSharedRxKey
     );
-    console.log({ oauthTokenData });
     return oauthTokenData;
   };
 
@@ -157,13 +146,10 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
     setDidLoginSucceed(false);
     setHasGqlError(false);
     setGqlErrorMessage("");
-    console.log("click");
-    console.log(`username: ${username}, password: ${password}`);
     let oprfChallengeResponse: any = null;
     let encryptedOauthTokenData: any = null;
     try {
       oprfChallengeResponse = await getServerOprfChallenge();
-      console.log({ oprfChallengeResponse });
     } catch (error) {
       console.log("error getting server challenge");
       console.log(error);
