@@ -1,9 +1,10 @@
 import { inputObjectType, list, objectType } from "nexus";
 
-export const WorkspacePermissionsOutput = objectType({
-  name: "WorkspacePermissionsOutput",
+export const WorkspaceMembersOutput = objectType({
+  name: "WorkspaceMembersOutput",
   definition(t) {
-    t.nonNull.string("username");
+    t.nonNull.string("userId");
+    t.string("username");
     t.nonNull.boolean("isAdmin");
   },
 });
@@ -14,7 +15,7 @@ export const Workspace = objectType({
     t.nonNull.string("id");
     t.string("name");
     t.list.nonNull.field("members", {
-      type: WorkspacePermissionsOutput,
+      type: WorkspaceMembersOutput,
     });
   },
 });
@@ -22,7 +23,7 @@ export const Workspace = objectType({
 export const WorkspaceMemberInput = inputObjectType({
   name: "WorkspaceMemberInput",
   definition(t) {
-    t.nonNull.string("username");
+    t.nonNull.string("userId");
     t.nonNull.boolean("isAdmin");
   },
 });

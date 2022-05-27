@@ -3,7 +3,7 @@ import { prisma } from "../prisma";
 
 type Params = {
   id: string;
-  username: string;
+  userId: string;
 };
 
 const toFolderType = (folder: any): Folder => {
@@ -28,7 +28,7 @@ const reduceParentFolderTreeToList = (folder: any) => {
   return parentFolderList;
 };
 
-export async function getFolder({ username, id }: Params) {
+export async function getFolder({ userId, id }: Params) {
   try {
     return await prisma.$transaction(async (prisma) => {
       // make sure the user has access to the workspace
@@ -43,7 +43,7 @@ export async function getFolder({ username, id }: Params) {
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
-          username,
+          userId,
           workspaceId: rawFolder.workspaceId,
         },
       });

@@ -38,7 +38,7 @@ export const completeRegistration = async (
             workspaceId: "${workspaceId}"
           }
         ) {
-          status
+          id
         }
       }
     `;

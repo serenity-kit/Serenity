@@ -44,7 +44,7 @@ export const updateWorkspaceMutation = mutationField("updateWorkspace", {
       id: args.input.id,
       name: args.input.name,
       members: args.input.members,
-      username: context.user.username,
+      userId: context.user.id,
     });
     return { workspace };
   },

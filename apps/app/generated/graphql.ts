@@ -60,7 +60,7 @@ export type ClientOprfRegistrationFinalizeInput = {
 
 export type ClientOprfRegistrationFinalizeResult = {
   __typename?: 'ClientOprfRegistrationFinalizeResult';
-  status: Scalars['String'];
+  id: Scalars['String'];
 };
 
 export type ClientRequestResetPasswordRequest = {
@@ -195,7 +195,8 @@ export type FolderEdge = {
 
 export type MeResult = {
   __typename?: 'MeResult';
-  username?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  username: Scalars['String'];
 };
 
 export type Mutation = {
@@ -306,6 +307,7 @@ export type Query = {
   folders?: Maybe<FolderConnection>;
   me?: Maybe<MeResult>;
   rootFolders?: Maybe<FolderConnection>;
+  userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
   workspace?: Maybe<Workspace>;
   workspaces?: Maybe<WorkspaceConnection>;
 };
@@ -334,6 +336,11 @@ export type QueryRootFoldersArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
   workspaceId: Scalars['ID'];
+};
+
+
+export type QueryUserIdFromUsernameArgs = {
+  username: Scalars['String'];
 };
 
 
@@ -378,10 +385,15 @@ export type UpdateWorkspaceResult = {
   workspace?: Maybe<Workspace>;
 };
 
+export type UserIdFromUsernameResult = {
+  __typename?: 'UserIdFromUsernameResult';
+  id: Scalars['String'];
+};
+
 export type Workspace = {
   __typename?: 'Workspace';
   id: Scalars['String'];
-  members?: Maybe<Array<WorkspacePermissionsOutput>>;
+  members?: Maybe<Array<WorkspaceMembersOutput>>;
   name?: Maybe<Scalars['String']>;
 };
 
@@ -411,13 +423,14 @@ export type WorkspaceInput = {
 
 export type WorkspaceMemberInput = {
   isAdmin: Scalars['Boolean'];
-  username: Scalars['String'];
+  userId: Scalars['String'];
 };
 
-export type WorkspacePermissionsOutput = {
-  __typename?: 'WorkspacePermissionsOutput';
+export type WorkspaceMembersOutput = {
+  __typename?: 'WorkspaceMembersOutput';
   isAdmin: Scalars['Boolean'];
-  username: Scalars['String'];
+  userId: Scalars['String'];
+  username?: Maybe<Scalars['String']>;
 };
 
 export type CreateDocumentMutationVariables = Exact<{
@@ -439,7 +452,7 @@ export type CreateWorkspaceMutationVariables = Exact<{
 }>;
 
 
-export type CreateWorkspaceMutation = { __typename?: 'Mutation', createWorkspace?: { __typename?: 'CreateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', username: string, isAdmin: boolean }> | null } | null } | null };
+export type CreateWorkspaceMutation = { __typename?: 'Mutation', createWorkspace?: { __typename?: 'CreateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null } | null };
 
 export type DeleteDocumentsMutationVariables = Exact<{
   input: DeleteDocumentsInput;
@@ -467,7 +480,7 @@ export type FinalizeRegistrationMutationVariables = Exact<{
 }>;
 
 
-export type FinalizeRegistrationMutation = { __typename?: 'Mutation', finalizeRegistration?: { __typename?: 'ClientOprfRegistrationFinalizeResult', status: string } | null };
+export type FinalizeRegistrationMutation = { __typename?: 'Mutation', finalizeRegistration?: { __typename?: 'ClientOprfRegistrationFinalizeResult', id: string } | null };
 
 export type InitializeLoginMutationVariables = Exact<{
   input: ClientOprfLoginChallengeInput;
@@ -502,7 +515,7 @@ export type UpdateWorkspaceMutationVariables = Exact<{
 }>;
 
 
-export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', username: string, isAdmin: boolean }> | null } | null } | null };
+export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, username?: string | null, isAdmin: boolean }> | null } | null } | null };
 
 export type DocumentsQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -525,7 +538,7 @@ export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'Fol
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', username?: string | null } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null };
 
 export type RootFoldersQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -536,12 +549,19 @@ export type RootFoldersQueryVariables = Exact<{
 
 export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
+export type UserIdFromUsernameQueryVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type UserIdFromUsernameQuery = { __typename?: 'Query', userIdFromUsername?: { __typename?: 'UserIdFromUsernameResult', id: string } | null };
+
 export type WorkspaceQueryVariables = Exact<{
   id?: InputMaybe<Scalars['ID']>;
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspacePermissionsOutput', username: string, isAdmin: boolean }> | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, username?: string | null, isAdmin: boolean }> | null } | null };
 
 export type WorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -584,7 +604,7 @@ export const CreateWorkspaceDocument = gql`
       id
       name
       members {
-        username
+        userId
         isAdmin
       }
     }
@@ -632,7 +652,7 @@ export function useFinalizeLoginMutation() {
 export const FinalizeRegistrationDocument = gql`
     mutation finalizeRegistration($input: ClientOprfRegistrationFinalizeInput!) {
   finalizeRegistration(input: $input) {
-    status
+    id
   }
 }
     `;
@@ -705,6 +725,7 @@ export const UpdateWorkspaceDocument = gql`
       id
       name
       members {
+        userId
         username
         isAdmin
       }
@@ -763,6 +784,7 @@ export function useFoldersQuery(options: Omit<Urql.UseQueryArgs<FoldersQueryVari
 export const MeDocument = gql`
     query me {
   me {
+    id
     username
   }
 }
@@ -792,12 +814,24 @@ export const RootFoldersDocument = gql`
 export function useRootFoldersQuery(options: Omit<Urql.UseQueryArgs<RootFoldersQueryVariables>, 'query'>) {
   return Urql.useQuery<RootFoldersQuery>({ query: RootFoldersDocument, ...options });
 };
+export const UserIdFromUsernameDocument = gql`
+    query userIdFromUsername($username: String!) {
+  userIdFromUsername(username: $username) {
+    id
+  }
+}
+    `;
+
+export function useUserIdFromUsernameQuery(options: Omit<Urql.UseQueryArgs<UserIdFromUsernameQueryVariables>, 'query'>) {
+  return Urql.useQuery<UserIdFromUsernameQuery>({ query: UserIdFromUsernameDocument, ...options });
+};
 export const WorkspaceDocument = gql`
     query workspace($id: ID) {
   workspace(id: $id) {
     id
     name
     members {
+      userId
       username
       isAdmin
     }

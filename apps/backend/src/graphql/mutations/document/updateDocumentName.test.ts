@@ -37,6 +37,7 @@ beforeEach(async () => {
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
       graphql,
       authorizationHeader: `TODO+${username}`,
+      parentFolderId: null,
       workspaceId: addedWorkspace.id,
     });
     addedDocumentId = createDocumentResult.createDocument.id;
@@ -99,6 +100,7 @@ test("Throw error when user doesn't have access", async () => {
     id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
     graphql,
     authorizationHeader: `TODO+${username2}`,
+    parentFolderId: null,
     workspaceId: addedWorkspace.id,
   });
   const authorizationHeader = `TODO+${username}`;

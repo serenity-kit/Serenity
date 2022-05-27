@@ -33,7 +33,7 @@ export const deleteDocumentsMutation = mutationField("deleteDocuments", {
     }
     await deleteDocuments({
       documentIds: args.input.ids,
-      username: context.user.username,
+      userId: context.user.id,
     });
     return { status: "success" };
   },

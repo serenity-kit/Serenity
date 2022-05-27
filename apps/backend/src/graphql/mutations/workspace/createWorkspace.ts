@@ -34,7 +34,7 @@ export const createWorkspaceMutation = mutationField("createWorkspace", {
     const workspace = await createWorkspace({
       id: args.input.id,
       name: args.input.name,
-      username: context.user.username,
+      userId: context.user.id,
     });
     return { workspace };
   },

@@ -13,7 +13,7 @@ export const ClientOprfRegistrationFinalizeInput = inputObjectType({
 export const ClientOprfRegistrationFinalizeResult = objectType({
   name: "ClientOprfRegistrationFinalizeResult",
   definition(t) {
-    t.nonNull.string("status");
+    t.nonNull.string("id");
   },
 });
 

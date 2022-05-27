@@ -61,15 +61,17 @@ test("server should register a user", async () => {
           workspaceId: "297204d4-afcf-4ab6-b951-292b446d0b35"
         }
       ) {
-        status
+        id
       }
     }
   `;
   const registrationResponse = await graphql.client.request(query);
+  expect(typeof registrationResponse.finalizeRegistration.id).toBe("string");
+  const userId = registrationResponse.finalizeRegistration.id;
   expect(registrationResponse).toMatchInlineSnapshot(`
     Object {
       "finalizeRegistration": Object {
-        "status": "success",
+        "id": "${userId}",
       },
     }
   `);

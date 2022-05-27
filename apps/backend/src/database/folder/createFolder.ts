@@ -2,7 +2,7 @@ import { prisma } from "../prisma";
 import { Folder } from "../../types/folder";
 
 type Params = {
-  username: string;
+  userId: string;
   id: string;
   name?: string;
   parentFolderId?: string;
@@ -10,7 +10,7 @@ type Params = {
 };
 
 export async function createFolder({
-  username,
+  userId,
   id,
   name,
   parentFolderId,
@@ -25,7 +25,7 @@ export async function createFolder({
       // make sure we have permissions to do stuff with this workspace
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
-          username,
+          userId,
           workspaceId,
           isAdmin: true,
         },

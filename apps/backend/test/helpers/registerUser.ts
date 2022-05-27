@@ -43,7 +43,7 @@ export const registerUser = async (
           workspaceId: "${workspaceId}"
         }
       ) {
-        status
+        id
       }
     }
   `;
