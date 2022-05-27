@@ -5,47 +5,21 @@ const InlineChunkHtmlPlugin = require("react-dev-utils/InlineChunkHtmlPlugin");
 
 module.exports = {
   mode: "development",
-  devtool: "source-map",
-  entry: {
-    opaque: "./standalone",
-  },
+  entry: "./src/index.js",
   output: {
-    globalObject: "self",
-    path: path.resolve(__dirname, "./dist/"),
-    filename: "[name].bundle.js",
-    publicPath: "/dist/",
+    filename: "main.js",
+    path: path.resolve(__dirname, "dist"),
+  },
+  experiments: {
+    asyncWebAssembly: true,
+    syncWebAssembly: true,
   },
   devServer: {
     static: {
       directory: path.join(__dirname, "dist"),
-      publicPath: "/",
     },
-    allowedHosts: "all",
-  },
-  resolve: {
-    extensions: [
-      // adding .web.* files for react-native web optimized files
-      ".web.tsx",
-      ".web.ts",
-      ".web.jsx",
-      ".web.js",
-      ".tsx",
-      ".ts",
-      ".jsx",
-      ".js",
-      ".json",
-    ],
-  },
-  module: {
-    rules: [
-      {
-        test: /\.(js|jsx|ts|tsx)$/,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-        },
-      },
-    ],
+    compress: true,
+    port: 9000,
   },
   plugins: [
     new webpack.IgnorePlugin({
