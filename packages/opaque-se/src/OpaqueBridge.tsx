@@ -16,6 +16,8 @@ export default function OpaqueBridge() {
         source={editorSource}
         onError={(e) => alert("ee")}
         onMessage={async (event) => {
+          const message = JSON.parse(event.nativeEvent.data);
+          console.log(message);
           alert("SUCCESS");
         }}
       />
