@@ -12,7 +12,7 @@ export function PageHeaderRight() {
 
   return (
     <HStack
-      style={tw`h-full w-60 px-3 border-l border-b border-gray-200 bg-gray-100`}
+      style={tw`h-full w-sidebar px-3 border-l border-b border-gray-200 bg-gray-100`}
       justifyContent="space-between"
       alignItems="center"
     >

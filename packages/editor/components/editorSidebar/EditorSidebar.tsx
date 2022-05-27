@@ -20,7 +20,9 @@ export default function EditorSidebar({
   headingLevels,
 }: EditorSidebarProps) {
   return (
-    <View style={tw`w-60 h-full border-l border-gray-200 bg-gray-100 pt-4`}>
+    <View
+      style={tw`w-sidebar h-full border-l border-gray-200 bg-gray-100 pt-4`}
+    >
       <div>
         <Text variant="xxs" bold style={tw`flex ml-4 mb-2`}>
           Formats
