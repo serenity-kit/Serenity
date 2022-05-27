@@ -14,6 +14,7 @@ import * as RootFoldersQueryTypes from "./graphql/queries/folder/rootFolders";
 import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
 import * as CreateFolderMutationTypes from "./graphql/mutations/folder/createFolder";
 import * as UpdateFolderNameMutationTypes from "./graphql/mutations/folder/updateFolderName";
+import * as DeleteFoldersMutationTypes from "./graphql/mutations/folder/deleteFolders";
 
 import * as InitializeRegistrationTypes from "./graphql/mutations/authentication/initializeRegistration";
 import * as FinalizeRegistrationTypes from "./graphql/mutations/authentication/finalizeRegistration";
@@ -48,6 +49,7 @@ export const schema = makeSchema({
     UpdateFolderNameMutationTypes,
     RootFoldersQueryTypes,
     FoldersQueryTypes,
+    DeleteFoldersMutationTypes,
 
     InitializeRegistrationTypes,
     FinalizeRegistrationTypes,

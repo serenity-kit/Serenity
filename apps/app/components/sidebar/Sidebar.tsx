@@ -79,7 +79,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     });
   };
 
-  const createFolder = async (name) => {
+  const createFolder = async (name: string) => {
     const id = uuidv4();
     const result = await createFolderMutation({
       input: { id, workspaceId: route.params.workspaceId, name },
@@ -91,7 +91,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       alert("Failed to create a folder. Please try again.");
     }
     setIsCreatingNewFolder(false);
-    await refetchRootFolders();
+    refetchRootFolders();
   };
 
   return (
@@ -283,6 +283,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               folderId={folder.id}
               folderName={folder.name}
               workspaceId={route.params.workspaceId}
+              onStructureChange={refetchRootFolders}
             />
           );
         })
