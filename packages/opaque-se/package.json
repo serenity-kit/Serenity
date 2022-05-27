@@ -9,6 +9,7 @@
     "test": "echo TODO"
   },
   "dependencies": {
+    "@cloudflare/opaque-ts": "^0.7.5",
     "opaque-wasm": "^1.1.0"
   },
   "devDependencies": {
