@@ -27,6 +27,7 @@ import { CloseCircleFill } from "./icons/CloseCircleFill";
 import { CodeSSlashLine } from "./icons/CodeSSlashLine";
 import { CodeView } from "./icons/CodeView";
 import { CupLine } from "./icons/CupLine";
+import { Cursor } from "./icons/Cursor";
 import { DashboardLine } from "./icons/DashboardLine";
 import { DeleteBinLine } from "./icons/DeleteBinLine";
 import { DoubleArrowLeft } from "./icons/DoubleArrowLeft";
@@ -70,11 +71,13 @@ import { ListOrdered } from "./icons/ListOrdered";
 import { ListUnordered } from "./icons/ListUnordered";
 import { Menu } from "./icons/Menu";
 import { MicroscopeLine } from "./icons/MicroscopeLine";
+import { More } from "./icons/More";
 import { More2Line } from "./icons/More2Line";
 import { MoreLine } from "./icons/MoreLine";
 import { MovieLine } from "./icons/MovieLine";
 import { PageSeparator } from "./icons/PageSeparator";
 import { Paragraph } from "./icons/Paragraph";
+import { Plus } from "./icons/Plus";
 import { PrinterLine } from "./icons/PrinterLine";
 import { QuestionMark } from "./icons/QuestionMark";
 import { SearchLine } from "./icons/SearchLine";
@@ -116,6 +119,7 @@ export type IconProps = {
     | "code-s-slash-line"
     | "code-view"
     | "cup-line"
+    | "cursor"
     | "dashboard-line"
     | "delete-bin-line"
     | "double-arrow-right"
@@ -159,11 +163,13 @@ export type IconProps = {
     | "list-ordered"
     | "menu"
     | "microscope-line"
+    | "more"
     | "more-2-line"
     | "more-line"
     | "movie-line"
     | "page-separator"
     | "paragraph"
+    | "plus"
     | "printer-line"
     | "question-mark"
     | "search-line"
@@ -227,6 +233,7 @@ export const Icon = (props: IconProps) => {
     return <CodeSSlashLine color={color} size={size} />;
   if (name === "code-view") return <CodeView color={color} size={size} />;
   if (name === "cup-line") return <CupLine color={color} size={size} />;
+  if (name === "cursor") return <Cursor color={color} size={size} />;
   if (name === "dashboard-line")
     return <DashboardLine color={color} size={size} />;
   if (name === "delete-bin-line")
@@ -286,12 +293,14 @@ export const Icon = (props: IconProps) => {
   if (name === "menu") return <Menu color={color} size={size} />;
   if (name === "microscope-line")
     return <MicroscopeLine color={color} size={size} />;
+  if (name === "more") return <More color={color} size={size} />;
   if (name === "more-2-line") return <More2Line color={color} size={size} />;
   if (name === "more-line") return <MoreLine color={color} size={size} />;
   if (name === "movie-line") return <MovieLine color={color} size={size} />;
   if (name === "page-separator")
     return <PageSeparator color={color} size={size} />;
   if (name === "paragraph") return <Paragraph color={color} size={size} />;
+  if (name === "plus") return <Plus color={color} size={size} />;
   if (name === "printer-line") return <PrinterLine color={color} size={size} />;
   if (name === "question-mark")
     return <QuestionMark color={color} size={size} />;

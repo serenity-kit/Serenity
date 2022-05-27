@@ -328,6 +328,7 @@ export default function DesignSystemScreen() {
         <Icon name="check-line" />
         <Icon name="close-circle-fill" />
         <Icon name="cup-line" />
+        <Icon name="cursor" />
         <Icon name="delete-bin-line" />
         <Icon name="double-arrow-left" />
         <Icon name="double-arrow-right" />
@@ -345,9 +346,11 @@ export default function DesignSystemScreen() {
         <Icon name="history-line" />
         <Icon name="image-2-line" />
         <Icon name="image-line" />
+        <Icon name="more" />
         <Icon name="more-2-line" />
         <Icon name="more-line" />
         <Icon name="movie-line" />
+        <Icon name="plus" />
         <Icon name="printer-line" />
         <Icon name="question-mark" />
         <Icon name="search-line" />
