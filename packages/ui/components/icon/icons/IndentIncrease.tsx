@@ -5,11 +5,11 @@ export type Props = { color: string; size: number };
 
 export const IndentIncrease = ({ color, size }: Props) => {
   return (
-    <Svg height={size} width={size} viewBox="0 0 24 24">
-      <Path fill="none" d="M0 0h24v24H0z" />
+    <Svg height={size} width={size} viewBox="0 0 16 16">
+      <Path fill="none" d="M0 0h16v16H0z" />
       <Path
         fill={color}
-        d="M3 4h18v2H3V4zm0 15h18v2H3v-2zm8-5h10v2H11v-2zm0-5h10v2H11V9zm-4 3.5L3 16V9l4 3.5z"
+        d="M2 2.66666H14V3.99999H2V2.66666ZM2 12.6667H14V14H2V12.6667ZM7.33333 9.33332H14V10.6667H7.33333V9.33332ZM7.33333 5.99999H14V7.33332H7.33333V5.99999ZM4.66667 8.33332L2 10.6667V5.99999L4.66667 8.33332Z"
       />
     </Svg>
   );

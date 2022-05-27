@@ -5,11 +5,11 @@ export type Props = { color: string; size: number };
 
 export const H4 = ({ color, size }: Props) => {
   return (
-    <Svg height={size} width={size} viewBox="0 0 24 24">
-      <Path fill="none" d="M0 0h24v24H0z" />
+    <Svg height={size} width={size} viewBox="0 0 16 16">
+      <Path fill="none" d="M0 0h16v16H0z" />
       <Path
         fill={color}
-        d="M13 20h-2v-7H4v7H2V4h2v7h7V4h2v16zm9-12v8h1.5v2H22v2h-2v-2h-5.5v-1.34l5-8.66H22zm-2 3.133L17.19 16H20v-4.867z"
+        d="M8.66668 13.3333H7.33334V8.66666H2.66668V13.3333H1.33334V2.66666H2.66668V7.33332H7.33334V2.66666H8.66668V13.3333ZM14.6667 5.33332V10.6667H15.6667V12H14.6667V13.3333H13.3333V12H9.66668V11.1067L13 5.33332H14.6667ZM13.3333 7.42199L11.46 10.6667H13.3333V7.42199Z"
       />
     </Svg>
   );

@@ -49,7 +49,9 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <HStack space={2}>{props.children}</HStack>
+      <HStack space={2} alignItems="center">
+        {props.children}
+      </HStack>
     </ReactNavigationLink>
   );
 }

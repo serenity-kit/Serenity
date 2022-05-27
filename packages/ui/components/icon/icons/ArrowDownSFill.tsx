@@ -5,9 +5,9 @@ export type Props = { color: string; size: number };
 
 export const ArrowDownSFill = ({ color, size }: Props) => {
   return (
-    <Svg height={size} width={size} viewBox="0 0 24 24">
-      <Path fill="none" d="M0 0h24v24H0z" />
-      <Path fill={color} d="M12 16l-6-6h12z" />
+    <Svg height={size} width={size} viewBox="0 0 16 16">
+      <Path fill="none" d="M0 0h16v16H0z" />
+      <Path fill={color} d="M8 10.6667L4 6.66666H12L8 10.6667Z" />
     </Svg>
   );
 };

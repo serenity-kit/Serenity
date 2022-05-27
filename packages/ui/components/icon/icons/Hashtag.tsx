@@ -5,11 +5,11 @@ export type Props = { color: string; size: number };
 
 export const Hashtag = ({ color, size }: Props) => {
   return (
-    <Svg height={size} width={size} viewBox="0 0 24 24">
-      <Path fill="none" d="M0 0h24v24H0z" />
+    <Svg height={size} width={size} viewBox="0 0 16 16">
+      <Path fill="none" d="M0 0h16v16H0z" />
       <Path
         fill={color}
-        d="M7.784 14l.42-4H4V8h4.415l.525-5h2.011l-.525 5h3.989l.525-5h2.011l-.525 5H20v2h-3.784l-.42 4H20v2h-4.415l-.525 5h-2.011l.525-5H9.585l-.525 5H7.049l.525-5H4v-2h3.784zm2.011 0h3.99l.42-4h-3.99l-.42 4z"
+        d="M5.18934 9.33333L5.46934 6.66667H2.66667V5.33333H5.61001L5.96 2H7.30067L6.95067 5.33333H9.61001L9.96 2H11.3007L10.9507 5.33333H13.3333V6.66667H10.8107L10.5307 9.33333H13.3333V10.6667H10.39L10.04 14H8.69934L9.04934 10.6667H6.39001L6.04001 14H4.69934L5.04934 10.6667H2.66667V9.33333H5.18934ZM6.53001 9.33333H9.19001L9.47001 6.66667H6.81001L6.53001 9.33333Z"
       />
     </Svg>
   );

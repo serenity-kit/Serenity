@@ -1,6 +1,7 @@
 import React from "react";
 import { tw } from "../../tailwind";
 import { AddLine } from "./icons/AddLine";
+import { ArchiveFill } from "./icons/ArchiveFill";
 import { ArchiveLine } from "./icons/ArchiveLine";
 import { ArrowDownSFill } from "./icons/ArrowDownSFill";
 import { ArrowDownSLine } from "./icons/ArrowDownSLine";
@@ -8,25 +9,42 @@ import { ArrowGoBackFill } from "./icons/ArrowGoBackFill";
 import { ArrowGoBackLine } from "./icons/ArrowGoBackLine";
 import { ArrowGoForwardLine } from "./icons/ArrowGoForwardLine";
 import { ArrowGoForwardFill } from "./icons/ArrowGoForwardFill";
+import { ArrowLeftSLine } from "./icons/ArrowLeftSLine";
 import { ArrowRightSFill } from "./icons/ArrowRightSFill";
+import { ArrowRightSLine } from "./icons/ArrowRightSLine";
 import { ArrowUpDownLine } from "./icons/ArrowUpDownLine";
+import { Attachment2 } from "./icons/Attachment2";
 import { AtLine } from "./icons/AtLine";
 import { Bold } from "./icons/Bold";
+import { BookmarkFill } from "./icons/BookmarkFill";
+import { BookmarkLine } from "./icons/BookmarkLine";
 import { BookOpenLine } from "./icons/BookOpenLine";
 import { CalendarCheckFill } from "./icons/CalendarCheckFill";
 import { Chat1Line } from "./icons/Chat1Line";
 import { Chat4Line } from "./icons/Chat4Line";
+import { CheckLine } from "./icons/CheckLine";
+import { CloseCircleFill } from "./icons/CloseCircleFill";
 import { CodeSSlashLine } from "./icons/CodeSSlashLine";
 import { CodeView } from "./icons/CodeView";
-import { Cup } from "./icons/Cup";
+import { CupLine } from "./icons/CupLine";
+import { Cursor } from "./icons/Cursor";
+import { DashboardLine } from "./icons/DashboardLine";
 import { DeleteBinLine } from "./icons/DeleteBinLine";
+import { DoubleArrowLeft } from "./icons/DoubleArrowLeft";
+import { DoubleArrowRight } from "./icons/DoubleArrowRight";
 import { DoubleQuotesL } from "./icons/DoubleQuotesL";
 import { DownloadLine } from "./icons/DownloadLine";
+import { DraftLine } from "./icons/DraftLine";
 import { EmotionLine } from "./icons/EmotionLine";
+import { FileAddFill } from "./icons/FileAddFill";
+import { FileAddLine } from "./icons/FileAddLine";
+import { FileCopyLine } from "./icons/FileCopyLine";
+import { FileLine } from "./icons/FileLine";
 import { FileSearchLine } from "./icons/FileSearchLine";
 import { FileTransferLine } from "./icons/FileTransferLine";
 import { Folder } from "./icons/Folder";
 import { FolderMusicLine } from "./icons/FolderMusicLine";
+import { FolderFill } from "./icons/FolderFill";
 import { FolderLine } from "./icons/FolderLine";
 import { FontColor } from "./icons/FontColor";
 import { FontSize2 } from "./icons/FontSize2";
@@ -53,16 +71,20 @@ import { ListCheck2 } from "./icons/ListCheck2";
 import { ListOrdered } from "./icons/ListOrdered";
 import { ListUnordered } from "./icons/ListUnordered";
 import { Menu } from "./icons/Menu";
+import { MicroscopeLine } from "./icons/MicroscopeLine";
+import { More } from "./icons/More";
 import { More2Line } from "./icons/More2Line";
 import { MoreLine } from "./icons/MoreLine";
 import { MovieLine } from "./icons/MovieLine";
 import { Page } from "./icons/Page";
 import { PageSeparator } from "./icons/PageSeparator";
 import { Paragraph } from "./icons/Paragraph";
+import { Plus } from "./icons/Plus";
 import { PrinterLine } from "./icons/PrinterLine";
 import { QuestionMark } from "./icons/QuestionMark";
 import { SearchLine } from "./icons/SearchLine";
 import { Separator } from "./icons/Separator";
+import { SerenityFeather } from "./icons/SerenityFeather";
 import { Settings4Line } from "./icons/Settings4Line";
 import { StarSFill } from "./icons/StarSFill";
 import { Strikethrough } from "./icons/Strikethrough";
@@ -73,6 +95,7 @@ import { Underline } from "./icons/Underline";
 export type IconProps = {
   name:
     | "add-line"
+    | "archive-fill"
     | "archive-line"
     | "arrow-down-s-fill"
     | "arrow-down-s-line"
@@ -80,23 +103,40 @@ export type IconProps = {
     | "arrow-go-back-line"
     | "arrow-go-forward-fill"
     | "arrow-go-forward-line"
+    | "arrow-left-s-line"
     | "arrow-right-s-fill"
+    | "arrow-right-s-line"
     | "arrow-up-down-line"
     | "at-line"
+    | "attachment-2"
     | "bold"
+    | "bookmark-fill"
+    | "bookmark-line"
     | "book-open-line"
     | "calendar-check-fill"
     | "chat-1-line"
     | "chat-4-line"
+    | "check-line"
+    | "close-circle-fill"
     | "code-s-slash-line"
     | "code-view"
-    | "cup"
+    | "cup-line"
+    | "cursor"
+    | "dashboard-line"
     | "delete-bin-line"
+    | "double-arrow-right"
+    | "double-arrow-left"
     | "double-quotes-l"
     | "download-line"
+    | "draft-line"
     | "emotion-line"
+    | "file-add-fill"
+    | "file-add-line"
+    | "file-copy-line"
+    | "file-line"
     | "file-search-line"
     | "file-transfer-line"
+    | "folder-fill"
     | "folder"
     | "folder-line"
     | "folder-music-line"
@@ -125,16 +165,20 @@ export type IconProps = {
     | "list-unordered"
     | "list-ordered"
     | "menu"
+    | "microscope-line"
+    | "more"
     | "more-2-line"
     | "more-line"
     | "movie-line"
     | "page"
     | "page-separator"
     | "paragraph"
+    | "plus"
     | "printer-line"
     | "question-mark"
     | "search-line"
     | "separator"
+    | "serenity-feather"
     | "settings-4-line"
     | "stars-s-fill"
     | "strikethrough"
@@ -149,7 +193,9 @@ export const Icon = (props: IconProps) => {
   const { name } = props;
   const color = props.color ?? (tw.color("gray-900") as string);
   const size = props.size ?? 24;
+
   if (name === "add-line") return <AddLine color={color} size={size} />;
+  if (name === "archive-fill") return <ArchiveFill color={color} size={size} />;
   if (name === "archive-line") return <ArchiveLine color={color} size={size} />;
   if (name === "arrow-down-s-fill")
     return <ArrowDownSFill color={color} size={size} />;
@@ -163,33 +209,61 @@ export const Icon = (props: IconProps) => {
     return <ArrowGoForwardFill color={color} size={size} />;
   if (name === "arrow-go-forward-line")
     return <ArrowGoForwardLine color={color} size={size} />;
+  if (name === "arrow-left-s-line")
+    return <ArrowLeftSLine color={color} size={size} />;
+  if (name === "arrow-right-s-line")
+    return <ArrowRightSLine color={color} size={size} />;
   if (name === "arrow-right-s-fill")
     return <ArrowRightSFill color={color} size={size} />;
   if (name === "arrow-up-down-line")
     return <ArrowUpDownLine color={color} size={size} />;
+  if (name === "attachment-2") return <Attachment2 color={color} size={size} />;
   if (name === "at-line") return <AtLine color={color} size={size} />;
   if (name === "bold") return <Bold color={color} size={size} />;
+  if (name === "bookmark-fill")
+    return <BookmarkFill color={color} size={size} />;
+  if (name === "bookmark-line")
+    return <BookmarkLine color={color} size={size} />;
   if (name === "book-open-line")
     return <BookOpenLine color={color} size={size} />;
   if (name === "calendar-check-fill")
     return <CalendarCheckFill color={color} size={size} />;
   if (name === "chat-1-line") return <Chat1Line color={color} size={size} />;
   if (name === "chat-4-line") return <Chat4Line color={color} size={size} />;
+  if (name === "check-line") return <CheckLine color={color} size={size} />;
+  if (name === "close-circle-fill")
+    return <CloseCircleFill color={color} size={size} />;
   if (name === "code-s-slash-line")
     return <CodeSSlashLine color={color} size={size} />;
   if (name === "code-view") return <CodeView color={color} size={size} />;
-  if (name === "cup") return <Cup color={color} size={size} />;
+  if (name === "cup-line") return <CupLine color={color} size={size} />;
+  if (name === "cursor") return <Cursor color={color} size={size} />;
+  if (name === "dashboard-line")
+    return <DashboardLine color={color} size={size} />;
   if (name === "delete-bin-line")
     return <DeleteBinLine color={color} size={size} />;
+  if (name === "double-arrow-left")
+    return <DoubleArrowLeft color={color} size={size} />;
+  if (name === "double-arrow-right")
+    return <DoubleArrowRight color={color} size={size} />;
   if (name === "double-quotes-l")
     return <DoubleQuotesL color={color} size={size} />;
   if (name === "download-line")
     return <DownloadLine color={color} size={size} />;
+  if (name === "draft-line") return <DraftLine color={color} size={size} />;
   if (name === "emotion-line") return <EmotionLine color={color} size={size} />;
+  if (name === "file-add-fill")
+    return <FileAddFill color={color} size={size} />;
+  if (name === "file-add-line")
+    return <FileAddLine color={color} size={size} />;
+  if (name === "file-copy-line")
+    return <FileCopyLine color={color} size={size} />;
+  if (name === "file-line") return <FileLine color={color} size={size} />;
   if (name === "file-search-line")
     return <FileSearchLine color={color} size={size} />;
   if (name === "file-transfer-line")
     return <FileTransferLine color={color} size={size} />;
+  if (name === "folder-fill") return <FolderFill color={color} size={size} />;
   if (name === "folder") return <Folder size={size} />;
   if (name === "folder-line") return <FolderLine color={color} size={size} />;
   if (name === "folder-music-line")
@@ -222,6 +296,9 @@ export const Icon = (props: IconProps) => {
   if (name === "list-unordered")
     return <ListUnordered color={color} size={size} />;
   if (name === "menu") return <Menu color={color} size={size} />;
+  if (name === "microscope-line")
+    return <MicroscopeLine color={color} size={size} />;
+  if (name === "more") return <More color={color} size={size} />;
   if (name === "more-2-line") return <More2Line color={color} size={size} />;
   if (name === "more-line") return <MoreLine color={color} size={size} />;
   if (name === "movie-line") return <MovieLine color={color} size={size} />;
@@ -229,6 +306,7 @@ export const Icon = (props: IconProps) => {
   if (name === "page-separator")
     return <PageSeparator color={color} size={size} />;
   if (name === "paragraph") return <Paragraph color={color} size={size} />;
+  if (name === "plus") return <Plus color={color} size={size} />;
   if (name === "printer-line") return <PrinterLine color={color} size={size} />;
   if (name === "question-mark")
     return <QuestionMark color={color} size={size} />;
@@ -236,6 +314,8 @@ export const Icon = (props: IconProps) => {
   if (name === "separator") return <Separator color={color} size={size} />;
   if (name === "settings-4-line")
     return <Settings4Line color={color} size={size} />;
+  if (name === "serenity-feather")
+    return <SerenityFeather color={color} size={size} />;
   if (name === "stars-s-fill") return <StarSFill color={color} size={size} />;
   if (name === "strikethrough")
     return <Strikethrough color={color} size={size} />;
