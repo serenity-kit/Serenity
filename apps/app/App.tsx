@@ -31,6 +31,9 @@ import { devtoolsExchange } from "@urql/devtools";
 
 import { theme } from "../../tailwind.config";
 
+// import icon from "./assets/opaque/x.dc9b246f.wasm.png";
+// console.log(icon);
+
 type AuthState = {
   deviceSigningPublicKey: string;
 };

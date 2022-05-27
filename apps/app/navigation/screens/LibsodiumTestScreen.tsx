@@ -2,6 +2,8 @@ import { Text, View } from "@serenity-tools/ui";
 import { useEffect, useState } from "react";
 import sodium from "@serenity-tools/libsodium";
 import { useWindowDimensions } from "react-native";
+// import * as opaque from "@serenity-tools/opaque-se/dist/static/js/opaque.bundle";
+// console.log(opaque);
 
 const signingKeyPair = {
   keyType: "ed25519",
