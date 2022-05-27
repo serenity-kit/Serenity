@@ -13,14 +13,15 @@ type Props = {
   folderId: string;
   refetchFolders: () => void;
   onUpdateNamePress: () => void;
+  onDeletePressed: () => void;
 };
 
 export default function SidebarFolderMenu(props: Props) {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
-  const [, deleteFoldersMutation] = useDeleteDocumentsMutation();
+  const [, deleteDocumentsMutation] = useDeleteDocumentsMutation();
 
   const deleteFolder = async (id: string) => {
-    await deleteFoldersMutation({
+    await deleteDocumentsMutation({
       input: {
         ids: [id],
       },
@@ -56,7 +57,7 @@ export default function SidebarFolderMenu(props: Props) {
       <SidebarButton
         onPress={() => {
           setIsOpenMenu(false);
-          deleteFolder(props.folderId);
+          props.onDeletePressed();
         }}
       >
         <Text variant="small">Delete</Text>

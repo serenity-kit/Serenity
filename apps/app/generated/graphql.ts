@@ -117,6 +117,15 @@ export type DeleteDocumentsResult = {
   status: Scalars['String'];
 };
 
+export type DeleteFoldersInput = {
+  ids: Array<Scalars['String']>;
+};
+
+export type DeleteFoldersResult = {
+  __typename?: 'DeleteFoldersResult';
+  status: Scalars['String'];
+};
+
 export type DeleteWorkspacesInput = {
   ids: Array<Scalars['String']>;
 };
@@ -205,6 +214,7 @@ export type Mutation = {
   createFolder?: Maybe<CreateFolderResult>;
   createWorkspace?: Maybe<CreateWorkspaceResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
+  deleteFolders?: Maybe<DeleteFoldersResult>;
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
   finalizeLogin?: Maybe<ClientOprfLoginFinalizeeResult>;
   finalizePasswordReset?: Maybe<FinalizeResetPasswordResult>;
@@ -235,6 +245,11 @@ export type MutationCreateWorkspaceArgs = {
 
 export type MutationDeleteDocumentsArgs = {
   input?: InputMaybe<DeleteDocumentsInput>;
+};
+
+
+export type MutationDeleteFoldersArgs = {
+  input?: InputMaybe<DeleteFoldersInput>;
 };
 
 
@@ -461,6 +476,13 @@ export type DeleteDocumentsMutationVariables = Exact<{
 
 export type DeleteDocumentsMutation = { __typename?: 'Mutation', deleteDocuments?: { __typename?: 'DeleteDocumentsResult', status: string } | null };
 
+export type DeleteFoldersMutationVariables = Exact<{
+  input: DeleteFoldersInput;
+}>;
+
+
+export type DeleteFoldersMutation = { __typename?: 'Mutation', deleteFolders?: { __typename?: 'DeleteFoldersResult', status: string } | null };
+
 export type DeleteWorkspacesMutationVariables = Exact<{
   input: DeleteWorkspacesInput;
 }>;
@@ -625,6 +647,17 @@ export const DeleteDocumentsDocument = gql`
 
 export function useDeleteDocumentsMutation() {
   return Urql.useMutation<DeleteDocumentsMutation, DeleteDocumentsMutationVariables>(DeleteDocumentsDocument);
+};
+export const DeleteFoldersDocument = gql`
+    mutation deleteFolders($input: DeleteFoldersInput!) {
+  deleteFolders(input: $input) {
+    status
+  }
+}
+    `;
+
+export function useDeleteFoldersMutation() {
+  return Urql.useMutation<DeleteFoldersMutation, DeleteFoldersMutationVariables>(DeleteFoldersDocument);
 };
 export const DeleteWorkspacesDocument = gql`
     mutation deleteWorkspaces($input: DeleteWorkspacesInput!) {
