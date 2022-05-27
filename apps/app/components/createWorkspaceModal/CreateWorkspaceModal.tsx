@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ModalProps as ReactNativeModalProps } from "react-native-modal";
 import {
   Button,
@@ -18,46 +18,52 @@ type ModalProps = Pick<
   onWorkspaceCreated: (workspace: { id: string }) => void;
 };
 
-export const CreateWorkspaceModal = React.forwardRef(
-  (props: ModalProps, ref: any) => {
-    const [name, setName] = useState<string>("");
-    const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
+export function CreateWorkspaceModal(props: ModalProps) {
+  const inputRef = useRef();
+  const [name, setName] = useState<string>("");
+  const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
 
-    useEffect(() => {
-      setName("");
-    }, [props.isVisible]);
-
-    const createWorkspace = async () => {
-      const id = uuidv4();
-      const createWorkspaceResult = await createWorkspaceMutation({
-        input: {
-          name,
-          id,
-        },
-      });
-      if (
-        createWorkspaceResult.data?.createWorkspace?.workspace &&
-        props.onWorkspaceCreated
-      ) {
-        const workspace = createWorkspaceResult.data.createWorkspace.workspace;
-        props.onWorkspaceCreated({ id: workspace.id });
+  useEffect(() => {
+    setName("");
+    setTimeout(() => {
+      if (props.isVisible && inputRef.current) {
+        // @ts-expect-error focus() not defined since .current can be undefined
+        inputRef.current.focus();
       }
-    };
+    }, 250);
+  }, [props.isVisible]);
 
-    return (
-      <Modal
-        ref={ref}
-        isVisible={props.isVisible}
-        onBackdropPress={props.onBackdropPress}
-      >
-        <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
-          <Text>Create a Workspace</Text>
-          <LabeledInput label={"Workspace Name"} onChangeText={setName} />
-          <Button disabled={name === ""} onPress={createWorkspace}>
-            Create
-          </Button>
-        </View>
-      </Modal>
-    );
-  }
-);
+  const createWorkspace = async () => {
+    const id = uuidv4();
+    const createWorkspaceResult = await createWorkspaceMutation({
+      input: {
+        name,
+        id,
+      },
+    });
+    if (
+      createWorkspaceResult.data?.createWorkspace?.workspace &&
+      props.onWorkspaceCreated
+    ) {
+      const workspace = createWorkspaceResult.data.createWorkspace.workspace;
+      props.onWorkspaceCreated({ id: workspace.id });
+    }
+  };
+
+  return (
+    <Modal isVisible={props.isVisible} onBackdropPress={props.onBackdropPress}>
+      <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
+        <Text>Create a Workspace</Text>
+        <LabeledInput
+          ref={inputRef}
+          label={"Workspace Name"}
+          onChangeText={setName}
+          autoFocus={true}
+        />
+        <Button disabled={name === ""} onPress={createWorkspace}>
+          Create
+        </Button>
+      </View>
+    </Modal>
+  );
+}
