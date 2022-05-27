@@ -21,6 +21,17 @@ module.exports = {
     compress: true,
     port: 9000,
   },
+  //   module: {
+  //     rules: [
+  //       {
+  //         test: /\.(js|jsx|ts|tsx)$/,
+  //         exclude: /node_modules/,
+  //         use: {
+  //           loader: "babel-loader",
+  //         },
+  //       },
+  //     ],
+  //   },
   plugins: [
     new webpack.IgnorePlugin({
       resourceRegExp: /^crypto$/,
