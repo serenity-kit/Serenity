@@ -308,6 +308,7 @@ export default function DesignSystemScreen() {
       <Text style={tw`mt-4 mb-1`}>UI</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="add-line" />
+        <Icon name="archive-fill" />
         <Icon name="archive-line" />
         <Icon name="arrow-down-s-fill" />
         <Icon name="arrow-down-s-line" />
@@ -318,6 +319,8 @@ export default function DesignSystemScreen() {
         <Icon name="arrow-right-s-line" />
         <Icon name="arrow-right-s-fill" />
         <Icon name="arrow-up-down-line" />
+        <Icon name="bookmark-fill" />
+        <Icon name="bookmark-line" />
         <Icon name="book-open-line" />
         <Icon name="calendar-check-fill" />
         <Icon name="chat-1-line" />
@@ -330,9 +333,13 @@ export default function DesignSystemScreen() {
         <Icon name="double-arrow-right" />
         <Icon name="download-line" />
         <Icon name="emotion-line" />
+        <Icon name="file-add-fill" />
+        <Icon name="file-add-line" />
         <Icon name="file-copy-line" />
+        <Icon name="file-line" />
         <Icon name="file-search-line" />
         <Icon name="file-transfer-line" />
+        <Icon name="folder-fill" />
         <Icon name="folder-line" />
         <Icon name="folder-music-line" />
         <Icon name="history-line" />

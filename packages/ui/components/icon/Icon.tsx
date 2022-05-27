@@ -1,6 +1,7 @@
 import React from "react";
 import { tw } from "../../tailwind";
 import { AddLine } from "./icons/AddLine";
+import { ArchiveFill } from "./icons/ArchiveFill";
 import { ArchiveLine } from "./icons/ArchiveLine";
 import { ArrowDownSFill } from "./icons/ArrowDownSFill";
 import { ArrowDownSLine } from "./icons/ArrowDownSLine";
@@ -15,6 +16,8 @@ import { ArrowUpDownLine } from "./icons/ArrowUpDownLine";
 import { Attachment2 } from "./icons/Attachment2";
 import { AtLine } from "./icons/AtLine";
 import { Bold } from "./icons/Bold";
+import { BookmarkFill } from "./icons/BookmarkFill";
+import { BookmarkLine } from "./icons/BookmarkLine";
 import { BookOpenLine } from "./icons/BookOpenLine";
 import { CalendarCheckFill } from "./icons/CalendarCheckFill";
 import { Chat1Line } from "./icons/Chat1Line";
@@ -32,10 +35,14 @@ import { DoubleQuotesL } from "./icons/DoubleQuotesL";
 import { DownloadLine } from "./icons/DownloadLine";
 import { DraftLine } from "./icons/DraftLine";
 import { EmotionLine } from "./icons/EmotionLine";
+import { FileAddFill } from "./icons/FileAddFill";
+import { FileAddLine } from "./icons/FileAddLine";
 import { FileCopyLine } from "./icons/FileCopyLine";
+import { FileLine } from "./icons/FileLine";
 import { FileSearchLine } from "./icons/FileSearchLine";
 import { FileTransferLine } from "./icons/FileTransferLine";
 import { FolderMusicLine } from "./icons/FolderMusicLine";
+import { FolderFill } from "./icons/FolderFill";
 import { FolderLine } from "./icons/FolderLine";
 import { FontColor } from "./icons/FontColor";
 import { FontSize2 } from "./icons/FontSize2";
@@ -83,6 +90,7 @@ import { Underline } from "./icons/Underline";
 export type IconProps = {
   name:
     | "add-line"
+    | "archive-fill"
     | "archive-line"
     | "arrow-down-s-fill"
     | "arrow-down-s-line"
@@ -97,6 +105,8 @@ export type IconProps = {
     | "at-line"
     | "attachment-2"
     | "bold"
+    | "bookmark-fill"
+    | "bookmark-line"
     | "book-open-line"
     | "calendar-check-fill"
     | "chat-1-line"
@@ -114,9 +124,13 @@ export type IconProps = {
     | "download-line"
     | "draft-line"
     | "emotion-line"
+    | "file-add-fill"
+    | "file-add-line"
     | "file-copy-line"
+    | "file-line"
     | "file-search-line"
     | "file-transfer-line"
+    | "folder-fill"
     | "folder-line"
     | "folder-music-line"
     | "font-color"
@@ -171,6 +185,7 @@ export const Icon = (props: IconProps) => {
   const size = props.size ?? 24;
 
   if (name === "add-line") return <AddLine color={color} size={size} />;
+  if (name === "archive-fill") return <ArchiveFill color={color} size={size} />;
   if (name === "archive-line") return <ArchiveLine color={color} size={size} />;
   if (name === "arrow-down-s-fill")
     return <ArrowDownSFill color={color} size={size} />;
@@ -195,6 +210,10 @@ export const Icon = (props: IconProps) => {
   if (name === "attachment-2") return <Attachment2 color={color} size={size} />;
   if (name === "at-line") return <AtLine color={color} size={size} />;
   if (name === "bold") return <Bold color={color} size={size} />;
+  if (name === "bookmark-fill")
+    return <BookmarkFill color={color} size={size} />;
+  if (name === "bookmark-line")
+    return <BookmarkLine color={color} size={size} />;
   if (name === "book-open-line")
     return <BookOpenLine color={color} size={size} />;
   if (name === "calendar-check-fill")
@@ -222,12 +241,18 @@ export const Icon = (props: IconProps) => {
     return <DownloadLine color={color} size={size} />;
   if (name === "draft-line") return <DraftLine color={color} size={size} />;
   if (name === "emotion-line") return <EmotionLine color={color} size={size} />;
+  if (name === "file-add-fill")
+    return <FileAddFill color={color} size={size} />;
+  if (name === "file-add-line")
+    return <FileAddLine color={color} size={size} />;
   if (name === "file-copy-line")
     return <FileCopyLine color={color} size={size} />;
+  if (name === "file-line") return <FileLine color={color} size={size} />;
   if (name === "file-search-line")
     return <FileSearchLine color={color} size={size} />;
   if (name === "file-transfer-line")
     return <FileTransferLine color={color} size={size} />;
+  if (name === "folder-fill") return <FolderFill color={color} size={size} />;
   if (name === "folder-line") return <FolderLine color={color} size={size} />;
   if (name === "folder-music-line")
     return <FolderMusicLine color={color} size={size} />;
