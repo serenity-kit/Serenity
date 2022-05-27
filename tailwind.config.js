@@ -106,6 +106,7 @@ module.exports = {
         h2: `text-h2 font-bold`,
         h3: `text-h3 font-bold`,
         "text-muted": `text-gray-600`,
+        "icon-button": `w-6 h-6 flex justify-center items-center`,
       });
     }),
   ],
