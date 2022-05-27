@@ -118,15 +118,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   return (
     // TODO override for now until we find out where the pt-1 comes from
     <DrawerContentScrollView {...props} style={tw`bg-gray-100 -mt-1`}>
-      {!isPermanentLeftSidebar && (
-        <Button
-          onPress={() => {
-            props.navigation.closeDrawer();
-          }}
-        >
-          Close Sidebar
-        </Button>
-      )}
       <HStack
         alignItems="center"
         justifyContent="space-between"
@@ -222,7 +213,20 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             <Text variant="small">Logout</Text>
           </SidebarButton>
         </Menu>
-        <Icon size={16} name="arrow-left-s-line" color={tw.color("gray-400")} />
+        {!isPermanentLeftSidebar && (
+          <Pressable
+            onPress={() => {
+              props.navigation.closeDrawer();
+            }}
+            style={tw`icon-button`}
+          >
+            <Icon
+              size={16}
+              name="double-arrow-left"
+              color={tw.color("gray-400")}
+            />
+          </Pressable>
+        )}
       </HStack>
 
       <SidebarLink
