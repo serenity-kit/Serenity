@@ -4,6 +4,7 @@
   "main": "index",
   "scripts": {
     "build": "webpack --mode=production",
+    "build:web": "webpack --config webpack.config.web.js --mode=production && cp -r dist/web ../../apps/app",
     "dev": "webpack serve",
     "ts:check": "yarn tsc --noEmit",
     "test": "echo TODO"

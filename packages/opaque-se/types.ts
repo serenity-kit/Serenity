@@ -7,6 +7,7 @@ type ReactNativeWebView = {
 
 declare global {
   interface Window {
+    _opaque: any;
     ReactNativeWebView: ReactNativeWebView;
     registerInitialize: (id: string, password: string) => void;
   }
