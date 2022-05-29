@@ -12,8 +12,8 @@
           try {
             t.d(n, {
               EB: () => X,
-              GS: () => Y,
-              GX: () => C,
+              GS: () => P,
+              GX: () => q,
               MF: () => M,
               Mz: () => $,
               Or: () => J,
@@ -21,7 +21,7 @@
               Ts: () => N,
               Wl: () => F,
               XP: () => z,
-              Y8: () => G,
+              Y8: () => C,
               YM: () => j,
               Yc: () => Z,
               Z4: () => W,
@@ -31,14 +31,14 @@
               bf: () => D,
               cF: () => U,
               cR: () => O,
-              eY: () => q,
+              eY: () => Y,
               h4: () => T,
               kC: () => Q,
               m_: () => V,
               oH: () => ee,
               rf: () => L,
               tL: () => I,
-              ug: () => P,
+              ug: () => G,
               vG: () => B,
             });
             var i = t(754);
@@ -101,7 +101,7 @@
                 ? (0, e.require)("util").TextEncoder
                 : TextEncoder
             )("utf-8");
-            const E =
+            const S =
               "function" == typeof x.encodeInto
                 ? function (e, n) {
                     return x.encodeInto(e, n);
@@ -110,7 +110,7 @@
                     const t = x.encode(e);
                     return n.set(t), { read: e.length, written: t.length };
                   };
-            function S(e, n, t) {
+            function E(e, n, t) {
               if (void 0 === t) {
                 const t = x.encode(e),
                   r = n(t.length);
@@ -135,7 +135,7 @@
                 0 !== _ && (e = e.slice(_)),
                   (o = t(o, r, (r = _ + 3 * e.length)));
                 const n = u().subarray(o + _, o + r);
-                _ += E(e, n).written;
+                _ += S(e, n).written;
               }
               return (p = _), o;
             }
@@ -166,7 +166,7 @@
               start(e) {
                 try {
                   const a = i.__wbindgen_add_to_stack_pointer(-16);
-                  var n = S(e, i.__wbindgen_malloc, i.__wbindgen_realloc),
+                  var n = E(e, i.__wbindgen_malloc, i.__wbindgen_realloc),
                     t = p;
                   i.registration_start(a, this.ptr, n, t);
                   var r = m()[a / 4 + 0],
@@ -230,19 +230,19 @@
               const n = b(e);
               return "object" == typeof n && null !== n;
             }
-            function G(e) {
+            function C(e) {
               return l(b(e).versions);
             }
-            function P(e) {
+            function G(e) {
               g(e);
             }
-            function Y(e) {
+            function P(e) {
               return l(b(e).node);
             }
-            function q(e) {
+            function Y(e) {
               return "string" == typeof b(e);
             }
-            function C() {
+            function q() {
               return k(function (e, n) {
                 return l(t(989)(f(e, n)));
               }, arguments);
@@ -333,7 +333,11 @@
             (r = (o.then ? (await o)() : o)[0]),
               (window._opaque = {}),
               (window._opaque.registerInitialize = function (e) {
-                return new r.YM().start(e);
+                var n;
+                return (
+                  (n = new r.YM().start(e)),
+                  btoa(String.fromCharCode.apply(null, n))
+                );
               }),
               n();
           } catch (e) {
