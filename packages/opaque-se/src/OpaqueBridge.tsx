@@ -2,11 +2,20 @@ import React, { useRef, useEffect } from "react";
 import { Platform } from "react-native";
 import { WebView } from "react-native-webview";
 
+type PromiseCallbacks = {
+  resolve: (value?: any) => void;
+  reject: (reason?: any) => void;
+};
+
+declare global {
+  var _opaque: any;
+}
+
 let editorSource =
   Platform.OS !== "android" ? require("../dist/index.html") : { html: null };
 
 let counter = 0;
-const resolveStorage = {};
+const promisesStorage: { [key: string]: PromiseCallbacks } = {};
 
 export default function OpaqueBridge() {
   const webViewRef = useRef<WebView>(null);
@@ -15,8 +24,8 @@ export default function OpaqueBridge() {
     global._opaque = {};
     global._opaque.registerInitialize = (password: string) => {
       counter++;
-      const promise = new Promise((resolve) => {
-        resolveStorage[counter] = resolve;
+      const promise = new Promise((resolve, reject) => {
+        promisesStorage[counter.toString()] = { resolve, reject };
       });
       webViewRef.current?.injectJavaScript(`
         window.registerInitialize("${counter}", "${password}");
@@ -33,8 +42,9 @@ export default function OpaqueBridge() {
       source={editorSource}
       onMessage={async (event) => {
         const message = JSON.parse(event.nativeEvent.data);
-        if (resolveStorage[message.id]) {
-          resolveStorage[message.id](message.result);
+        if (promisesStorage[message.id]) {
+          promisesStorage[message.id].resolve(message.result);
+          delete promisesStorage[message.id];
         }
       }}
     />
