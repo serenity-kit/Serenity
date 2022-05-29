@@ -1,14 +1,14 @@
 const path = require("path");
-const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const InlineChunkHtmlPlugin = require("react-dev-utils/InlineChunkHtmlPlugin");
 
 module.exports = {
   mode: "development",
-  entry: "./src/index",
+  entry: "./opaque-mobile-webview-script",
   output: {
-    filename: "main.js",
+    filename: "opaque-mobile-webview.js",
     path: path.resolve(__dirname, "dist"),
+    publicPath: "",
   },
   experiments: {
     asyncWebAssembly: true,
@@ -36,14 +36,8 @@ module.exports = {
     ],
   },
   plugins: [
-    new webpack.IgnorePlugin({
-      resourceRegExp: /^crypto$/,
-    }),
-    new webpack.IgnorePlugin({
-      resourceRegExp: /^path$/,
-    }),
     new HtmlWebpackPlugin({
-      title: "Serenity Opaque",
+      title: "Opaque",
       template: "template.html",
       filename: "index.html",
       inject: "body",
