@@ -4,6 +4,7 @@ import {
   generateOprfKeyPair,
 } from "@serenity-tools/opaque/server";
 import sodium from "libsodium-wrappers-sumo";
+import { HandleRegistration } from "../../vendor/opaque-wasm/opaque_wasm";
 import { prisma } from "../prisma";
 
 type InitializeRegistrationData = {

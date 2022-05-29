@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "scripts": {
-    "dev": "yarn && yarn prisma generate && ts-node-dev --transpile-only --no-notify ./src/index.ts",
+    "dev": "ts-node-dev --transpile-only --no-notify ./src/index.ts",
     "dev:mock": "yarn && yarn prisma generate && MOCK_GRAPHQL=true ts-node-dev --transpile-only --no-notify ./src/index.ts",
     "clean": "rm -rf build",
     "build": "yarn && yarn clean && yarn prisma:prod:generate && yarn ncc build ./src/index.ts -o build",
