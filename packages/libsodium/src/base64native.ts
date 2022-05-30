@@ -1,16 +1,8 @@
 import { Buffer } from "buffer";
-
-export const base64ToUrlSafeBase64 = (value: string) => {
-  return value.replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
-};
-
-export const urlSafeBase64ToBase64 = (value: string) => {
-  let newValue = value.replaceAll("-", "+").replaceAll("_", "/");
-  while (newValue.length % 4) {
-    newValue += "=";
-  }
-  return newValue;
-};
+import {
+  base64ToUrlSafeBase64,
+  urlSafeBase64ToBase64,
+} from "./base64Conversion";
 
 export const to_base64 = (data: Uint8Array | string): string => {
   const base64String = Buffer.from(data).toString("base64");
