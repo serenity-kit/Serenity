@@ -49,46 +49,22 @@ model Update {
   @@unique([snapshotId, pubKey, snapshotVersion])
 }
 
-model Registration {
-  username         String @id
-  serverPrivateKey String
-  serverPublicKey  String @default("invalid")
-  oprfPrivateKey   String
-  oprfPublicKey    String @default("invalid")
-}
-
 model User {
-  username                                   String                 @id
-  serverPrivateKey                           String
-  serverPublicKey                            String                 @default("invalid")
-  oprfPrivateKey                             String
-  oprfPublicKey                              String                 @default("invalid")
-  oprfCipherText                             String
-  oprfNonce                                  String
+  username                                   String              @id
   clientPublicKey                            String
-  sharedRx                                   String?
-  sharedTx                                   String?
-  resetPasswordToken                         String?
-  UserLoginAccessToken                       UserLoginAccessToken[]
+  opaqueEnvelope                             String
   // contains the device signingPrivateKey and encryptionPrivateKey
   // can be decrypted using the key storred in the OPAQUE envelope
   masterDeviceCiphertext                     String
   // nonce to decrypt the masterDeviceCiphertext
   masterDeviceNonce                          String
-  masterDevice                               Device                 @relation(name: "masterDevice", fields: [masterDeviceSigningPublicKey], references: [signingPublicKey])
-  masterDeviceSigningPublicKey               String                 @unique
+  masterDevice                               Device              @relation(name: "masterDevice", fields: [masterDeviceSigningPublicKey], references: [signingPublicKey])
+  masterDeviceSigningPublicKey               String              @unique
   devices                                    Device[]
   recoveryDevice                             RecoveryDevice?
   passwordResetOneTimePassword               String?
   passwordResetOneTimePasswordExpireDateTime DateTime?
   usersToWorkspaces                          UsersToWorkspaces[]
-}
-
-model UserLoginAccessToken {
-  accessToken String    @id @unique
-  expiresAt   DateTime?
-  user        User      @relation(fields: [username], references: [username], onDelete: Cascade)
-  username    String
 }
 
 model RecoveryDevice {

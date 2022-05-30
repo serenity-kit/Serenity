@@ -21,7 +21,10 @@ import {
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
 import { RootStackScreenProps } from "../../types";
-import { registerInitialize } from "@serenity-tools/opaque-se";
+import {
+  registerInitialize,
+  finishRegistration,
+} from "@serenity-tools/opaque-se";
 
 export default function RegisterScreen(
   props: RootStackScreenProps<"Register">
@@ -63,7 +66,7 @@ export default function RegisterScreen(
     }
   };
 
-  const getServerOprfChallenge = async () => {
+  const getServerChallenge = async () => {
     const challenge = await registerInitialize(password);
     const mutationResult = await initializeRegistrationMutation({
       input: {
@@ -74,39 +77,17 @@ export default function RegisterScreen(
     // check for an error
     if (mutationResult.data && mutationResult.data.initializeRegistration) {
       return mutationResult.data.initializeRegistration.challengeResponse;
-    } else if (mutationResult.error) {
+    } else {
+      console.error(mutationResult.error);
       throw Error("Failed to register.");
     }
   };
 
-  const registerAccount = async (
-    randomScalar: string,
-    serverChallengeResponse: string,
-    serverPublicKey: string,
-    oprfPublicKey: string
-  ) => {
-    console.log("Registering account");
-    console.log({ randomScalar });
-    const { secret, nonce } = await createOprfRegistrationEnvelope(
-      password,
-      clientPublicKey,
-      clientPrivateKey,
-      randomScalar,
-      serverChallengeResponse,
-      serverPublicKey,
-      oprfPublicKey
-    );
-    console.log({ secret, nonce });
-    // ask the server to store the registration, send
-    // * username,
-    // * secret (aka cipherText),
-    // * nonce
-    // * clientPublicKey
+  const registerAccount = async (message: string) => {
     const mutationResult = await finalizeRegistrationMutation({
       input: {
+        message,
         username,
-        secret,
-        nonce,
         clientPublicKey,
         workspaceId: uuidv4(),
       },
@@ -124,14 +105,9 @@ export default function RegisterScreen(
       setUsername("");
       props.navigation.push("Login");
     } else if (mutationResult.error) {
-      const errorMessage = mutationResult.error.message.substring(
-        mutationResult.error.message.indexOf("] ") + 2
-      );
-      setErrorMessage(errorMessage);
+      setErrorMessage("Failed to register.");
       throw Error(errorMessage);
     }
-    localStorage.setItem(OPRF_SECRET_STORAGE_KEY, secret);
-    localStorage.setItem(OPRF_NONCE_STORAGE_KEY, nonce);
   };
 
   const onRegisterPress = async () => {
@@ -142,16 +118,11 @@ export default function RegisterScreen(
     setDidRegistrationSucceed(false);
     setErrorMessage("");
     try {
-      // TODO the getServerOprfChallenge should include a signature of the challenge response and be verified that it belongs to
+      // TODO the getServerChallenge should include a signature of the challenge response and be verified that it belongs to
       // the server public to make sure it wasn't tampered with
-      const challengeResponse = await getServerOprfChallenge();
-      // TODO
-      await registerAccount(
-        oprfChallengeResponse.randomScalar,
-        oprfChallengeResponse.serverChallengeResponse.oprfChallengeResponse,
-        oprfChallengeResponse.serverChallengeResponse.serverPublicKey,
-        oprfChallengeResponse.serverChallengeResponse.oprfPublicKey
-      );
+      const challengeResponse = await getServerChallenge();
+      const message = await finishRegistration(challengeResponse);
+      await registerAccount(message);
     } catch (error) {
       console.error(error);
       setErrorMessage(error.toString());

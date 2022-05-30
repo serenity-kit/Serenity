@@ -19,8 +19,6 @@ import * as InitializeRegistrationTypes from "./graphql/mutations/authentication
 import * as FinalizeRegistrationTypes from "./graphql/mutations/authentication/finalizeRegistration";
 import * as InitializeLoginTypes from "./graphql/mutations/authentication/initializeLogin";
 import * as FinalizeLoginTypes from "./graphql/mutations/authentication/finalizeLogin";
-import * as InitializePasswordResetTypes from "./graphql/mutations/authentication/initializePasswordReset";
-import * as FinalizePasswordResetTypes from "./graphql/mutations/authentication/finalizePasswordReset";
 import * as CreateWorkspaceMutationTypes from "./graphql/mutations/workspace/createWorkspace";
 import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/deleteWorkspaces";
 import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/updateWorkspace";
@@ -52,8 +50,6 @@ export const schema = makeSchema({
     FinalizeRegistrationTypes,
     InitializeLoginTypes,
     FinalizeLoginTypes,
-    InitializePasswordResetTypes,
-    FinalizePasswordResetTypes,
     MeQueryTypes,
     CreateWorkspaceMutationTypes,
     DeleteWorkspacesMutationTypes,

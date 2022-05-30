@@ -1,17 +1,27 @@
 import { Registration, Login } from "opaque-wasm";
 
-const toText = (data: Uint8Array) => {
+const toBase64 = (data: Uint8Array) => {
   // @ts-expect-error automatic conversion just works
   return btoa(String.fromCharCode.apply(null, data));
 };
 
+const fromBase64 = (value: string) => {
+  return Uint8Array.from(atob(value), (c) => c.charCodeAt(0));
+};
+
+const registration = new Registration();
+
 window.registerInitialize = function (id: string, password: string) {
-  const registration = new Registration();
   const message = registration.start(password);
   window.ReactNativeWebView.postMessage(
     JSON.stringify({
       id,
-      result: toText(message),
+      result: toBase64(message),
     })
   );
+};
+
+window.finishRegistration = function (challengeResponse: string) {
+  const message = registration.finish(fromBase64(challengeResponse));
+  return toBase64(message);
 };

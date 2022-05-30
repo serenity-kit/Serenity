@@ -1,12 +1,12 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
+import { finishRegistration } from "../../../utils/opaque";
 import { finalizeRegistration } from "../../../database/authentication/finalizeRegistration";
 
 export const ClientOprfRegistrationFinalizeInput = inputObjectType({
   name: "ClientOprfRegistrationFinalizeInput",
   definition(t) {
+    t.nonNull.string("message");
     t.nonNull.string("username");
-    t.nonNull.string("secret");
-    t.nonNull.string("nonce");
     t.nonNull.string("clientPublicKey");
     t.nonNull.string("workspaceId");
   },
@@ -33,20 +33,9 @@ export const finalizeRegistrationMutation = mutationField(
         throw new Error("Missing input");
       }
       const username = args.input.username;
-      const secret = args.input.secret;
-      const nonce = args.input.nonce;
-      const clientPublicKey = args.input.clientPublicKey;
-      await finalizeRegistration(
-        username,
-        secret,
-        nonce,
-        clientPublicKey,
-        args.input.workspaceId
-      );
-      const result = {
-        status: "success",
-      };
-      return result;
+      const envelope = await finishRegistration(username, args.input.message);
+      await finalizeRegistration(username, envelope, args.input.workspaceId);
+      return { status: "success" };
     },
   }
 );

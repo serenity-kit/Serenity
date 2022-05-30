@@ -50,8 +50,7 @@ export type ClientOprfRegistrationChallengeResult = {
 
 export type ClientOprfRegistrationFinalizeInput = {
   clientPublicKey: Scalars['String'];
-  nonce: Scalars['String'];
-  secret: Scalars['String'];
+  message: Scalars['String'];
   username: Scalars['String'];
   workspaceId: Scalars['String'];
 };
