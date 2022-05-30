@@ -45,9 +45,7 @@ export type ClientOprfRegistrationChallengeRequest = {
 
 export type ClientOprfRegistrationChallengeResult = {
   __typename?: 'ClientOprfRegistrationChallengeResult';
-  oprfChallengeResponse: Scalars['String'];
-  oprfPublicKey: Scalars['String'];
-  serverPublicKey: Scalars['String'];
+  challengeResponse: Scalars['String'];
 };
 
 export type ClientOprfRegistrationFinalizeInput = {
@@ -481,7 +479,7 @@ export type InitializeRegistrationMutationVariables = Exact<{
 }>;
 
 
-export type InitializeRegistrationMutation = { __typename?: 'Mutation', initializeRegistration?: { __typename?: 'ClientOprfRegistrationChallengeResult', serverPublicKey: string, oprfPublicKey: string, oprfChallengeResponse: string } | null };
+export type InitializeRegistrationMutation = { __typename?: 'Mutation', initializeRegistration?: { __typename?: 'ClientOprfRegistrationChallengeResult', challengeResponse: string } | null };
 
 export type UpdateDocumentNameMutationVariables = Exact<{
   input: UpdateDocumentNameInput;
@@ -657,9 +655,7 @@ export function useInitializeLoginMutation() {
 export const InitializeRegistrationDocument = gql`
     mutation initializeRegistration($input: ClientOprfRegistrationChallengeRequest!) {
   initializeRegistration(input: $input) {
-    serverPublicKey
-    oprfPublicKey
-    oprfChallengeResponse
+    challengeResponse
   }
 }
     `;

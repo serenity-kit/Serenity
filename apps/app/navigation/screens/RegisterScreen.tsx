@@ -21,6 +21,7 @@ import {
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
 import { RootStackScreenProps } from "../../types";
+import { registerInitialize } from "@serenity-tools/opaque-se";
 
 export default function RegisterScreen(
   props: RootStackScreenProps<"Register">
@@ -63,41 +64,18 @@ export default function RegisterScreen(
   };
 
   const getServerOprfChallenge = async () => {
-    console.log("Generating OPRF challenge");
-    const { oprfChallenge, randomScalar } = await createOprfChallenge(password);
-    // setOprfChallenge(oprfChallenge)
-    // setRandomScalar(randomScalar)
-    console.log({ oprfChallenge, randomScalar });
-    // do some graphql stuff here, including:
-    // * username,
-    // * oprfChallenge
-    // server will respond with:
-    // * serverChallengeResponse
-    // * serverPublicKey
-    // * oprfPublicKey
+    const challenge = await registerInitialize(password);
     const mutationResult = await initializeRegistrationMutation({
       input: {
         username: username,
-        challenge: oprfChallenge,
+        challenge,
       },
     });
     // check for an error
     if (mutationResult.data && mutationResult.data.initializeRegistration) {
-      const serverChallengeResponse =
-        mutationResult.data.initializeRegistration;
-      // setServerChallengeResponse(serverChallengeResponse.oprfChallengeResponse)
-      // setServerPublicKey(serverChallengeResponse.serverPublicKey)
-      // setOprfPublicKey(serverChallengeResponse.oprfPublicKey)
-      const oprfChallengeResponse = {
-        randomScalar,
-        serverChallengeResponse,
-      };
-      return oprfChallengeResponse;
+      return mutationResult.data.initializeRegistration.challengeResponse;
     } else if (mutationResult.error) {
-      const errorMessage = mutationResult.error.message.substring(
-        mutationResult.error.message.indexOf("] ") + 2
-      );
-      throw Error(errorMessage);
+      throw Error("Failed to register.");
     }
   };
 
@@ -163,32 +141,21 @@ export default function RegisterScreen(
     }
     setDidRegistrationSucceed(false);
     setErrorMessage("");
-    let oprfChallengeResponse: any = null;
     try {
       // TODO the getServerOprfChallenge should include a signature of the challenge response and be verified that it belongs to
       // the server public to make sure it wasn't tampered with
-      oprfChallengeResponse = await getServerOprfChallenge();
-      console.log({ oprfChallengeResponse });
+      const challengeResponse = await getServerOprfChallenge();
+      // TODO
+      await registerAccount(
+        oprfChallengeResponse.randomScalar,
+        oprfChallengeResponse.serverChallengeResponse.oprfChallengeResponse,
+        oprfChallengeResponse.serverChallengeResponse.serverPublicKey,
+        oprfChallengeResponse.serverChallengeResponse.oprfPublicKey
+      );
     } catch (error) {
-      console.log("error getting server challenge");
-      console.log(error);
+      console.error(error);
       setErrorMessage(error.toString());
     }
-    if (oprfChallengeResponse) {
-      try {
-        await registerAccount(
-          oprfChallengeResponse.randomScalar,
-          oprfChallengeResponse.serverChallengeResponse.oprfChallengeResponse,
-          oprfChallengeResponse.serverChallengeResponse.serverPublicKey,
-          oprfChallengeResponse.serverChallengeResponse.oprfPublicKey
-        );
-      } catch (error) {
-        console.log("error registering account");
-        console.log(error);
-        setErrorMessage(error.toString());
-      }
-    }
-    // const serverRegistrationResponse = await registerAccount()
   };
 
   const onUsernameChangeText = (username: string) => {
