@@ -29,6 +29,7 @@ import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/de
 import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/updateWorkspace";
 import * as CreateWorkspaceInvitationTypes from "./graphql/mutations/workspace/createWorkspaceInvitation";
 import * as AcceptWorkspaceInvitationTypes from "./graphql/mutations/workspace/acceptWorkspaceInvitation";
+import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspaceInvitations";
 
 import * as DocumentTypes from "./graphql/types/document";
 
@@ -66,6 +67,7 @@ export const schema = makeSchema({
     WorkspacesQueryTypes,
     CreateWorkspaceInvitationTypes,
     AcceptWorkspaceInvitationTypes,
+    WorkspaceInvitationsTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),
