@@ -22,10 +22,7 @@ export type ClientOprfLoginChallengeInput = {
 
 export type ClientOprfLoginChallengeResult = {
   __typename?: 'ClientOprfLoginChallengeResult';
-  nonce: Scalars['String'];
-  oprfChallengeResponse: Scalars['String'];
-  oprfPublicKey: Scalars['String'];
-  secret: Scalars['String'];
+  challengeResponse: Scalars['String'];
 };
 
 export type ClientOprfLoginFinalizeInput = {
@@ -58,18 +55,6 @@ export type ClientOprfRegistrationFinalizeInput = {
 export type ClientOprfRegistrationFinalizeResult = {
   __typename?: 'ClientOprfRegistrationFinalizeResult';
   status: Scalars['String'];
-};
-
-export type ClientRequestResetPasswordRequest = {
-  challenge: Scalars['String'];
-  username: Scalars['String'];
-};
-
-export type ClientRequestResetPasswordResult = {
-  __typename?: 'ClientRequestResetPasswordResult';
-  oprfChallengeResponse: Scalars['String'];
-  oprfPublicKey: Scalars['String'];
-  serverPublicKey: Scalars['String'];
 };
 
 export type CreateDocumentInput = {
@@ -150,19 +135,6 @@ export type DocumentEdge = {
   node?: Maybe<Document>;
 };
 
-export type FinalizeResetPasswordInput = {
-  clientPublicKey: Scalars['String'];
-  nonce: Scalars['String'];
-  secret: Scalars['String'];
-  token: Scalars['String'];
-  username: Scalars['String'];
-};
-
-export type FinalizeResetPasswordResult = {
-  __typename?: 'FinalizeResetPasswordResult';
-  status: Scalars['String'];
-};
-
 export type Folder = {
   __typename?: 'Folder';
   id: Scalars['String'];
@@ -203,10 +175,8 @@ export type Mutation = {
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
   finalizeLogin?: Maybe<ClientOprfLoginFinalizeeResult>;
-  finalizePasswordReset?: Maybe<FinalizeResetPasswordResult>;
   finalizeRegistration?: Maybe<ClientOprfRegistrationFinalizeResult>;
   initializeLogin?: Maybe<ClientOprfLoginChallengeResult>;
-  initializePasswordReset?: Maybe<ClientRequestResetPasswordResult>;
   initializeRegistration?: Maybe<ClientOprfRegistrationChallengeResult>;
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
   updateFolderName?: Maybe<UpdateFolderNameResult>;
@@ -244,11 +214,6 @@ export type MutationFinalizeLoginArgs = {
 };
 
 
-export type MutationFinalizePasswordResetArgs = {
-  input?: InputMaybe<FinalizeResetPasswordInput>;
-};
-
-
 export type MutationFinalizeRegistrationArgs = {
   input?: InputMaybe<ClientOprfRegistrationFinalizeInput>;
 };
@@ -256,11 +221,6 @@ export type MutationFinalizeRegistrationArgs = {
 
 export type MutationInitializeLoginArgs = {
   input?: InputMaybe<ClientOprfLoginChallengeInput>;
-};
-
-
-export type MutationInitializePasswordResetArgs = {
-  input?: InputMaybe<ClientRequestResetPasswordRequest>;
 };
 
 
@@ -471,7 +431,7 @@ export type InitializeLoginMutationVariables = Exact<{
 }>;
 
 
-export type InitializeLoginMutation = { __typename?: 'Mutation', initializeLogin?: { __typename?: 'ClientOprfLoginChallengeResult', secret: string, nonce: string, oprfPublicKey: string, oprfChallengeResponse: string } | null };
+export type InitializeLoginMutation = { __typename?: 'Mutation', initializeLogin?: { __typename?: 'ClientOprfLoginChallengeResult', challengeResponse: string } | null };
 
 export type InitializeRegistrationMutationVariables = Exact<{
   input: ClientOprfRegistrationChallengeRequest;
@@ -640,10 +600,7 @@ export function useFinalizeRegistrationMutation() {
 export const InitializeLoginDocument = gql`
     mutation initializeLogin($input: ClientOprfLoginChallengeInput!) {
   initializeLogin(input: $input) {
-    secret
-    nonce
-    oprfPublicKey
-    oprfChallengeResponse
+    challengeResponse
   }
 }
     `;

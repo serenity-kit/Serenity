@@ -1,6 +1,7 @@
 import sodium from "libsodium-wrappers-sumo";
 import {
   HandleRegistration,
+  HandleLogin,
   ServerSetup,
 } from "../vendor/opaque-wasm/opaque_wasm";
 
@@ -9,6 +10,10 @@ import {
 // TODO let started registrations expire after a while
 const registrations: {
   [username: string]: HandleRegistration;
+} = {};
+
+const logins: {
+  [username: string]: HandleLogin;
 } = {};
 
 // Create a new private key using
@@ -37,8 +42,32 @@ export const startRegistration = async (
   return response;
 };
 
+// TODO use an registration ID generated in startRegistration instead of username
 export const finishRegistration = async (username: string, message: string) => {
   const response = registrations[username].finish(sodium.from_base64(message));
   delete registrations[username];
+  return sodium.to_base64(response);
+};
+
+export const startLogin = async (
+  envelope: string,
+  username: string,
+  challenge: string
+) => {
+  const serverLogin = new HandleLogin(opaqueServerSetup());
+  const response = serverLogin.start(
+    sodium.from_base64(envelope),
+    // @ts-expect-error string just works fine
+    username,
+    sodium.from_base64(challenge)
+  );
+  logins[username] = serverLogin;
+  return sodium.to_base64(response);
+};
+
+// TODO use an login ID generated in startLogin instead of username
+export const finishLogin = async (username: string, message: string) => {
+  const response = logins[username].finish(sodium.from_base64(message));
+  delete logins[username];
   return sodium.to_base64(response);
 };

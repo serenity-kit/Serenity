@@ -4,7 +4,6 @@ import {
   View,
   Box,
   Button,
-  Input,
   tw,
   Link,
   LabeledInput,
@@ -22,6 +21,7 @@ import {
 import { useWindowDimensions } from "react-native";
 import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
+import { startLogin, finishLogin } from "@serenity-tools/opaque-se";
 
 export default function LoginScreen(props: RootStackScreenProps<"Login">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -51,45 +51,6 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
       const keys = createClientKeyPair();
       localStorage.setItem(OPRF_CLIENT_KEYS_STORAGE_KEY, JSON.stringify(keys));
       console.log("generated client keys", { keys });
-    }
-  };
-
-  const getServerOprfChallenge = async () => {
-    console.log("Generating OPRF challenge");
-    const { oprfChallenge, randomScalar } = await createOprfChallenge(password);
-    // setOprfChallenge(oprfChallenge)
-    // setRandomScalar(randomScalar)
-    console.log({ oprfChallenge, randomScalar });
-    // do some graphql stuff here, including:
-    // * username,
-    // * oprfChallenge
-    // server will respond with:
-    // * serverChallengeResponse
-    // * serverPublicKey
-    // * oprfPublicKey
-    const mutationResult = await initializeLoginMutation({
-      input: {
-        username: username,
-        challenge: oprfChallenge,
-      },
-    });
-    console.log({ mutationResult });
-    // check for an error
-    if (mutationResult.data && mutationResult.data.initializeLogin) {
-      const serverChallengeResponse = mutationResult.data.initializeLogin;
-      // setServerChallengeResponse(serverChallengeResponse.oprfChallengeResponse)
-      // setServerPublicKey(serverChallengeResponse.serverPublicKey)
-      // setOprfPublicKey(serverChallengeResponse.oprfPublicKey)
-      const oprfChallengeResponse = {
-        randomScalar,
-        serverChallengeResponse,
-      };
-      return oprfChallengeResponse;
-    } else if (mutationResult.error) {
-      const errorMessage = mutationResult.error.message.substring(
-        mutationResult.error.message.indexOf("] ") + 2
-      );
-      throw Error(errorMessage);
     }
   };
 
@@ -156,12 +117,27 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
     setDidLoginSucceed(false);
     setHasGqlError(false);
     setGqlErrorMessage("");
-    console.log("click");
-    console.log(`username: ${username}, password: ${password}`);
     let oprfChallengeResponse: any = null;
     let encryptedOauthTokenData: any = null;
     try {
-      oprfChallengeResponse = await getServerOprfChallenge();
+      const message = await startLogin(password);
+      const mutationResult = await initializeLoginMutation({
+        input: {
+          username: username,
+          challenge: message,
+        },
+      });
+      // check for an error
+      if (mutationResult.data && mutationResult.data.initializeLogin) {
+        const challengeResponse =
+          mutationResult.data.initializeLogin.challengeResponse;
+
+        const result = await finishLogin(challengeResponse);
+        console.log(result);
+        return oprfChallengeResponse;
+      } else if (mutationResult.error) {
+        throw Error("Failed to Login");
+      }
       console.log({ oprfChallengeResponse });
     } catch (error) {
       console.log("error getting server challenge");
@@ -205,14 +181,6 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
     }
   };
 
-  const onUsernameChangeText = (username: string) => {
-    setUsername(username);
-  };
-
-  const onPasswordChangeText = (password: string) => {
-    setPassword(password);
-  };
-
   return (
     <View
       style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
@@ -244,7 +212,9 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
           label={"Email"}
           keyboardType="email-address"
           value={username}
-          onChangeText={onUsernameChangeText}
+          onChangeText={(username: string) => {
+            setUsername(username);
+          }}
           placeholder="Enter your email …"
         />
 
@@ -252,7 +222,9 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
           label={"Password"}
           secureTextEntry
           value={password}
-          onChangeText={onPasswordChangeText}
+          onChangeText={(password: string) => {
+            setPassword(password);
+          }}
           placeholder="Enter your password …"
         />
 

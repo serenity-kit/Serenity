@@ -10,6 +10,7 @@ const fromBase64 = (value: string) => {
 };
 
 const registration = new Registration();
+const login = new Login();
 
 window.registerInitialize = function (id: string, password: string) {
   const message = registration.start(password);
@@ -21,7 +22,36 @@ window.registerInitialize = function (id: string, password: string) {
   );
 };
 
-window.finishRegistration = function (challengeResponse: string) {
+window.finishRegistration = function (id: string, challengeResponse: string) {
   const message = registration.finish(fromBase64(challengeResponse));
-  return toBase64(message);
+  window.ReactNativeWebView.postMessage(
+    JSON.stringify({
+      id,
+      result: toBase64(message),
+    })
+  );
+};
+
+window.startLogin = function (id: string, password: string) {
+  const message = login.start(password);
+  window.ReactNativeWebView.postMessage(
+    JSON.stringify({
+      id,
+      result: toBase64(message),
+    })
+  );
+};
+
+window.finishLogin = function (id: string, response: string) {
+  const message = login.finish(fromBase64(response));
+  window.ReactNativeWebView.postMessage(
+    JSON.stringify({
+      id,
+      result: {
+        sessionKey: toBase64(login.getSessionKey()),
+        exportKey: toBase64(login.getExportKey()),
+        response: toBase64(message),
+      },
+    })
+  );
 };

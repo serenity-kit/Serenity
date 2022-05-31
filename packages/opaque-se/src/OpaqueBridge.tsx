@@ -46,6 +46,30 @@ export default function OpaqueBridge() {
       `);
       return promise;
     };
+
+    global._opaque.startLogin = (password: string) => {
+      counter++;
+      const promise = new Promise((resolve, reject) => {
+        promisesStorage[counter.toString()] = { resolve, reject };
+      });
+      webViewRef.current?.injectJavaScript(`
+        window.startLogin("${counter}", "${password}");
+        true;
+      `);
+      return promise;
+    };
+
+    global._opaque.finishLogin = (response: string) => {
+      counter++;
+      const promise = new Promise((resolve, reject) => {
+        promisesStorage[counter.toString()] = { resolve, reject };
+      });
+      webViewRef.current?.injectJavaScript(`
+        window.finishLogin("${counter}", "${response}");
+        true;
+      `);
+      return promise;
+    };
   }, []);
 
   return (

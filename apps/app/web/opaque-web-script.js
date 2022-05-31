@@ -1,89 +1,90 @@
 (() => {
-  var n,
+  var t,
+    n,
     e,
-    t,
     r,
     o,
     i,
     _ = {
-      950: (n, e, t) => {
+      950: (t, n, e) => {
         "use strict";
-        t.a(n, async (r, o) => {
+        e.a(t, async (r, o) => {
           try {
-            t.d(e, {
-              EB: () => X,
-              GS: () => P,
-              GX: () => q,
+            e.d(n, {
+              EB: () => I,
+              GS: () => G,
+              GX: () => Y,
               MF: () => M,
               Mz: () => $,
-              Or: () => J,
-              Qu: () => I,
-              Ts: () => N,
-              Wl: () => C,
-              XP: () => z,
-              Y8: () => F,
-              YM: () => j,
-              Yc: () => Z,
-              Z4: () => R,
+              Or: () => tt,
+              Qu: () => W,
+              Ts: () => z,
+              Wl: () => q,
+              XP: () => X,
+              Y8: () => C,
+              YM: () => O,
+              Yc: () => N,
+              Z4: () => L,
               Zu: () => H,
-              _8: () => A,
-              _G: () => K,
+              _8: () => K,
+              _G: () => Q,
               bf: () => D,
               cF: () => U,
-              cR: () => O,
-              eY: () => Y,
+              cR: () => A,
+              eY: () => P,
               h4: () => T,
-              kC: () => Q,
-              m_: () => V,
-              oH: () => nn,
-              rf: () => L,
-              tL: () => W,
-              ug: () => G,
+              kC: () => V,
+              m3: () => j,
+              m_: () => J,
+              oH: () => nt,
+              rf: () => Z,
+              tL: () => R,
+              ug: () => F,
               vG: () => B,
             });
-            var i = t(754);
-            n = t.hmd(n);
+            var i = e(754);
+            t = e.hmd(t);
             var _ = r([i]);
             i = (_.then ? (await _)() : _)[0];
             let a = new (
               "undefined" == typeof TextDecoder
-                ? (0, n.require)("util").TextDecoder
+                ? (0, t.require)("util").TextDecoder
                 : TextDecoder
             )("utf-8", { ignoreBOM: !0, fatal: !0 });
             a.decode();
             let c = null;
-            function u() {
+            function s() {
               return (
                 (null !== c && c.buffer === i.memory.buffer) ||
                   (c = new Uint8Array(i.memory.buffer)),
                 c
               );
             }
-            function f(n, e) {
-              return a.decode(u().subarray(n, n + e));
+            function u(t, n) {
+              return a.decode(s().subarray(t, t + n));
             }
-            const s = new Array(32).fill(void 0);
-            s.push(void 0, null, !0, !1);
-            let d = s.length;
-            function l(n) {
-              d === s.length && s.push(s.length + 1);
-              const e = d;
-              return (d = s[e]), (s[e] = n), e;
+            const f = new Array(32).fill(void 0);
+            f.push(void 0, null, !0, !1);
+            let d = f.length;
+            function l(t) {
+              d === f.length && f.push(f.length + 1);
+              const n = d;
+              return (d = f[n]), (f[n] = t), n;
             }
-            function b(n) {
-              return s[n];
+            function w(t) {
+              return f[t];
             }
-            function w(n) {
-              n < 36 || ((s[n] = d), (d = n));
+            function b(t) {
+              t < 36 || ((f[t] = d), (d = t));
             }
-            function g(n) {
-              const e = b(n);
-              return w(n), e;
+            function g(t) {
+              const n = w(t);
+              return b(t), n;
             }
             let p = 0;
-            function h(n, e) {
-              const t = e(1 * n.length);
-              return u().set(n, t / 1), (p = n.length), t;
+            function h(t, n) {
+              const e = n(1 * t.length);
+              return s().set(t, e / 1), (p = t.length), e;
             }
             let y = null;
             function m() {
@@ -93,82 +94,82 @@
                 y
               );
             }
-            function v(n, e) {
-              return u().subarray(n / 1, n / 1 + e);
+            function v(t, n) {
+              return s().subarray(t / 1, t / 1 + n);
             }
             let x = new (
               "undefined" == typeof TextEncoder
-                ? (0, n.require)("util").TextEncoder
+                ? (0, t.require)("util").TextEncoder
                 : TextEncoder
             )("utf-8");
-            const S =
+            const k =
               "function" == typeof x.encodeInto
-                ? function (n, e) {
-                    return x.encodeInto(n, e);
+                ? function (t, n) {
+                    return x.encodeInto(t, n);
                   }
-                : function (n, e) {
-                    const t = x.encode(n);
-                    return e.set(t), { read: n.length, written: t.length };
+                : function (t, n) {
+                    const e = x.encode(t);
+                    return n.set(e), { read: t.length, written: e.length };
                   };
-            function E(n, e, t) {
-              if (void 0 === t) {
-                const t = x.encode(n),
-                  r = e(t.length);
+            function S(t, n, e) {
+              if (void 0 === e) {
+                const e = x.encode(t),
+                  r = n(e.length);
                 return (
-                  u()
-                    .subarray(r, r + t.length)
-                    .set(t),
-                  (p = t.length),
+                  s()
+                    .subarray(r, r + e.length)
+                    .set(e),
+                  (p = e.length),
                   r
                 );
               }
-              let r = n.length,
-                o = e(r);
-              const i = u();
+              let r = t.length,
+                o = n(r);
+              const i = s();
               let _ = 0;
               for (; _ < r; _++) {
-                const e = n.charCodeAt(_);
-                if (e > 127) break;
-                i[o + _] = e;
+                const n = t.charCodeAt(_);
+                if (n > 127) break;
+                i[o + _] = n;
               }
               if (_ !== r) {
-                0 !== _ && (n = n.slice(_)),
-                  (o = t(o, r, (r = _ + 3 * n.length)));
-                const e = u().subarray(o + _, o + r);
-                _ += S(n, e).written;
+                0 !== _ && (t = t.slice(_)),
+                  (o = e(o, r, (r = _ + 3 * t.length)));
+                const n = s().subarray(o + _, o + r);
+                _ += k(t, n).written;
               }
               return (p = _), o;
             }
-            function k(n, e) {
+            function E(t, n) {
               try {
-                return n.apply(this, e);
-              } catch (n) {
-                i.__wbindgen_exn_store(l(n));
+                return t.apply(this, n);
+              } catch (t) {
+                i.__wbindgen_exn_store(l(t));
               }
             }
             class j {
-              static __wrap(n) {
-                const e = Object.create(j.prototype);
-                return (e.ptr = n), e;
+              static __wrap(t) {
+                const n = Object.create(j.prototype);
+                return (n.ptr = t), n;
               }
               __destroy_into_raw() {
-                const n = this.ptr;
-                return (this.ptr = 0), n;
+                const t = this.ptr;
+                return (this.ptr = 0), t;
               }
               free() {
-                const n = this.__destroy_into_raw();
-                i.__wbg_registration_free(n);
+                const t = this.__destroy_into_raw();
+                i.__wbg_login_free(t);
               }
               constructor() {
-                var n = i.registration_new();
-                return j.__wrap(n);
+                var t = i.login_new();
+                return j.__wrap(t);
               }
-              start(n) {
+              start(t) {
                 try {
                   const c = i.__wbindgen_add_to_stack_pointer(-16);
-                  var e = E(n, i.__wbindgen_malloc, i.__wbindgen_realloc),
-                    t = p;
-                  i.registration_start(c, this.ptr, e, t);
+                  var n = S(t, i.__wbindgen_malloc, i.__wbindgen_realloc),
+                    e = p;
+                  i.login_start(c, this.ptr, n, e);
                   var r = m()[c / 4 + 0],
                     o = m()[c / 4 + 1],
                     _ = m()[c / 4 + 2];
@@ -179,12 +180,90 @@
                   i.__wbindgen_add_to_stack_pointer(16);
                 }
               }
-              finish(n) {
+              finish(t) {
                 try {
                   const c = i.__wbindgen_add_to_stack_pointer(-16);
-                  var e = h(n, i.__wbindgen_malloc),
-                    t = p;
-                  i.registration_finish(c, this.ptr, e, t);
+                  var n = h(t, i.__wbindgen_malloc),
+                    e = p;
+                  i.login_finish(c, this.ptr, n, e);
+                  var r = m()[c / 4 + 0],
+                    o = m()[c / 4 + 1],
+                    _ = m()[c / 4 + 2];
+                  if (m()[c / 4 + 3]) throw g(_);
+                  var a = v(r, o).slice();
+                  return i.__wbindgen_free(r, 1 * o), a;
+                } finally {
+                  i.__wbindgen_add_to_stack_pointer(16);
+                }
+              }
+              getSessionKey() {
+                try {
+                  const o = i.__wbindgen_add_to_stack_pointer(-16);
+                  i.login_getSessionKey(o, this.ptr);
+                  var t = m()[o / 4 + 0],
+                    n = m()[o / 4 + 1],
+                    e = m()[o / 4 + 2];
+                  if (m()[o / 4 + 3]) throw g(e);
+                  var r = v(t, n).slice();
+                  return i.__wbindgen_free(t, 1 * n), r;
+                } finally {
+                  i.__wbindgen_add_to_stack_pointer(16);
+                }
+              }
+              getExportKey() {
+                try {
+                  const o = i.__wbindgen_add_to_stack_pointer(-16);
+                  i.login_getExportKey(o, this.ptr);
+                  var t = m()[o / 4 + 0],
+                    n = m()[o / 4 + 1],
+                    e = m()[o / 4 + 2];
+                  if (m()[o / 4 + 3]) throw g(e);
+                  var r = v(t, n).slice();
+                  return i.__wbindgen_free(t, 1 * n), r;
+                } finally {
+                  i.__wbindgen_add_to_stack_pointer(16);
+                }
+              }
+            }
+            class O {
+              static __wrap(t) {
+                const n = Object.create(O.prototype);
+                return (n.ptr = t), n;
+              }
+              __destroy_into_raw() {
+                const t = this.ptr;
+                return (this.ptr = 0), t;
+              }
+              free() {
+                const t = this.__destroy_into_raw();
+                i.__wbg_registration_free(t);
+              }
+              constructor() {
+                var t = i.registration_new();
+                return O.__wrap(t);
+              }
+              start(t) {
+                try {
+                  const c = i.__wbindgen_add_to_stack_pointer(-16);
+                  var n = S(t, i.__wbindgen_malloc, i.__wbindgen_realloc),
+                    e = p;
+                  i.registration_start(c, this.ptr, n, e);
+                  var r = m()[c / 4 + 0],
+                    o = m()[c / 4 + 1],
+                    _ = m()[c / 4 + 2];
+                  if (m()[c / 4 + 3]) throw g(_);
+                  var a = v(r, o).slice();
+                  return i.__wbindgen_free(r, 1 * o), a;
+                } finally {
+                  i.__wbindgen_add_to_stack_pointer(16);
+                }
+              }
+              finish(t) {
+                try {
+                  const c = i.__wbindgen_add_to_stack_pointer(-16);
+                  var n = h(t, i.__wbindgen_malloc),
+                    e = p;
+                  i.registration_finish(c, this.ptr, n, e);
                   var r = m()[c / 4 + 0],
                     o = m()[c / 4 + 1],
                     _ = m()[c / 4 + 2];
@@ -199,173 +278,185 @@
                 try {
                   const o = i.__wbindgen_add_to_stack_pointer(-16);
                   i.registration_getExportKey(o, this.ptr);
-                  var n = m()[o / 4 + 0],
-                    e = m()[o / 4 + 1],
-                    t = m()[o / 4 + 2];
-                  if (m()[o / 4 + 3]) throw g(t);
-                  var r = v(n, e).slice();
-                  return i.__wbindgen_free(n, 1 * e), r;
+                  var t = m()[o / 4 + 0],
+                    n = m()[o / 4 + 1],
+                    e = m()[o / 4 + 2];
+                  if (m()[o / 4 + 3]) throw g(e);
+                  var r = v(t, n).slice();
+                  return i.__wbindgen_free(t, 1 * n), r;
                 } finally {
                   i.__wbindgen_add_to_stack_pointer(16);
                 }
               }
             }
-            function T(n, e) {
-              return l(f(n, e));
-            }
-            function O() {
-              return k(function (n, e) {
-                b(n).getRandomValues(b(e));
-              }, arguments);
+            function T(t, n) {
+              return l(u(t, n));
             }
             function A() {
-              return k(function (n, e, t) {
-                b(n).randomFillSync(v(e, t));
+              return E(function (t, n) {
+                w(t).getRandomValues(w(n));
               }, arguments);
             }
-            function M(n) {
-              return l(b(n).process);
-            }
-            function C(n) {
-              const e = b(n);
-              return "object" == typeof e && null !== e;
-            }
-            function F(n) {
-              return l(b(n).versions);
-            }
-            function G(n) {
-              g(n);
-            }
-            function P(n) {
-              return l(b(n).node);
-            }
-            function Y(n) {
-              return "string" == typeof b(n);
-            }
-            function q() {
-              return k(function (n, e) {
-                return l(t(989)(f(n, e)));
+            function K() {
+              return E(function (t, n, e) {
+                w(t).randomFillSync(v(n, e));
               }, arguments);
             }
-            function U(n) {
-              return l(b(n).crypto);
+            function M(t) {
+              return l(w(t).process);
             }
-            function B(n) {
-              return l(b(n).msCrypto);
+            function q(t) {
+              const n = w(t);
+              return "object" == typeof n && null !== n;
             }
-            function D(n, e) {
-              return l(new Function(f(n, e)));
+            function C(t) {
+              return l(w(t).versions);
+            }
+            function F(t) {
+              g(t);
+            }
+            function G(t) {
+              return l(w(t).node);
+            }
+            function P(t) {
+              return "string" == typeof w(t);
+            }
+            function Y() {
+              return E(function (t, n) {
+                return l(e(989)(u(t, n)));
+              }, arguments);
+            }
+            function U(t) {
+              return l(w(t).crypto);
+            }
+            function B(t) {
+              return l(w(t).msCrypto);
+            }
+            function D(t, n) {
+              return l(new Function(u(t, n)));
+            }
+            function L() {
+              return E(function (t, n) {
+                return l(w(t).call(w(n)));
+              }, arguments);
             }
             function R() {
-              return k(function (n, e) {
-                return l(b(n).call(b(e)));
-              }, arguments);
-            }
-            function W() {
-              return k(function () {
+              return E(function () {
                 return l(self.self);
               }, arguments);
             }
-            function I() {
-              return k(function () {
+            function W() {
+              return E(function () {
                 return l(window.window);
               }, arguments);
             }
-            function X() {
-              return k(function () {
+            function I() {
+              return E(function () {
                 return l(globalThis.globalThis);
               }, arguments);
             }
-            function Z() {
-              return k(function () {
-                return l(t.g.global);
+            function N() {
+              return E(function () {
+                return l(e.g.global);
               }, arguments);
             }
-            function z(n) {
-              return void 0 === b(n);
+            function X(t) {
+              return void 0 === w(t);
             }
-            function L(n) {
-              return l(b(n).buffer);
+            function Z(t) {
+              return l(w(t).buffer);
             }
-            function N(n) {
-              return l(new Uint8Array(b(n)));
+            function z(t) {
+              return l(new Uint8Array(w(t)));
             }
-            function $(n, e, t) {
-              b(n).set(b(e), t >>> 0);
+            function $(t, n, e) {
+              w(t).set(w(n), e >>> 0);
             }
-            function H(n) {
-              return b(n).length;
+            function H(t) {
+              return w(t).length;
             }
-            function K(n) {
-              return l(new Uint8Array(n >>> 0));
+            function Q(t) {
+              return l(new Uint8Array(t >>> 0));
             }
-            function Q(n, e, t) {
-              return l(b(n).subarray(e >>> 0, t >>> 0));
+            function V(t, n, e) {
+              return l(w(t).subarray(n >>> 0, e >>> 0));
             }
-            function V(n) {
-              return l(b(n));
+            function J(t) {
+              return l(w(t));
             }
-            function J(n, e) {
-              throw new Error(f(n, e));
+            function tt(t, n) {
+              throw new Error(u(t, n));
             }
-            function nn() {
+            function nt() {
               return l(i.memory);
             }
             o();
-          } catch (en) {
-            o(en);
+          } catch (et) {
+            o(et);
           }
         });
       },
-      989: (n) => {
-        function e(n) {
-          var e = new Error("Cannot find module '" + n + "'");
-          throw ((e.code = "MODULE_NOT_FOUND"), e);
+      989: (t) => {
+        function n(t) {
+          var n = new Error("Cannot find module '" + t + "'");
+          throw ((n.code = "MODULE_NOT_FOUND"), n);
         }
-        (e.keys = () => []), (e.resolve = e), (e.id = 989), (n.exports = e);
+        (n.keys = () => []), (n.resolve = n), (n.id = 989), (t.exports = n);
       },
-      906: (n, e, t) => {
+      906: (t, n, e) => {
         "use strict";
-        t.a(n, async (n, e) => {
+        e.a(t, async (t, n) => {
           try {
-            var r = t(950),
-              o = n([r]);
+            var r = e(950),
+              o = t([r]);
             r = (o.then ? (await o)() : o)[0];
-            var i = function (n) {
-                return btoa(String.fromCharCode.apply(null, n));
+            var i = function (t) {
+                return btoa(String.fromCharCode.apply(null, t));
               },
-              _ = new r.YM();
+              _ = function (t) {
+                return Uint8Array.from(atob(t), function (t) {
+                  return t.charCodeAt(0);
+                });
+              },
+              a = new r.YM(),
+              c = new r.m3();
             (window._opaque = {}),
-              (window._opaque.registerInitialize = function (n) {
-                var e = _.start(n);
-                return i(e);
+              (window._opaque.registerInitialize = function (t) {
+                var n = a.start(t);
+                return i(n);
               }),
-              (window._opaque.finishRegistration = function (n) {
-                var e,
-                  t = _.finish(
-                    ((e = n),
-                    Uint8Array.from(atob(e), function (n) {
-                      return n.charCodeAt(0);
-                    }))
-                  );
-                return i(t);
+              (window._opaque.finishRegistration = function (t) {
+                var n = a.finish(_(t));
+                return i(n);
               }),
-              e();
-          } catch (n) {
-            e(n);
+              (window._opaque.startLogin = function (t) {
+                var n = c.start(t);
+                return i(n);
+              }),
+              (window._opaque.finishLogin = function (t) {
+                var n = c.finish(_(t));
+                return JSON.stringify({
+                  sessionKey: i(c.getSessionKey()),
+                  exportKey: i(c.getExportKey()),
+                  response: i(n),
+                });
+              }),
+              n();
+          } catch (t) {
+            n(t);
           }
         });
       },
-      754: (n, e, t) => {
+      754: (t, n, e) => {
         "use strict";
-        t.a(
-          n,
+        e.a(
+          t,
           async (r, o) => {
             try {
               var i,
-                _ = r([(i = t(950))]),
+                _ = r([(i = e(950))]),
                 [i] = _.then ? (await _)() : _;
-              await t.v(e, n.id, "8dc9b46238dd179ed49d", {
+              await e.v(n, t.id, "31e6924a2d41339527e6", {
                 "./opaque_wasm_bg.js": {
                   __wbindgen_string_new: i.h4,
                   __wbg_getRandomValues_3e46aa268da0fed1: i.cR,
@@ -398,8 +489,8 @@
                 },
               }),
                 o();
-            } catch (n) {
-              o(n);
+            } catch (t) {
+              o(t);
             }
           },
           1
@@ -407,145 +498,145 @@
       },
     },
     a = {};
-  function c(n) {
-    var e = a[n];
-    if (void 0 !== e) return e.exports;
-    var t = (a[n] = { id: n, loaded: !1, exports: {} });
-    return _[n](t, t.exports, c), (t.loaded = !0), t.exports;
+  function c(t) {
+    var n = a[t];
+    if (void 0 !== n) return n.exports;
+    var e = (a[t] = { id: t, loaded: !1, exports: {} });
+    return _[t](e, e.exports, c), (e.loaded = !0), e.exports;
   }
-  (n =
+  (t =
     "function" == typeof Symbol ? Symbol("webpack then") : "__webpack_then__"),
-    (e =
+    (n =
       "function" == typeof Symbol
         ? Symbol("webpack exports")
         : "__webpack_exports__"),
-    (t =
+    (e =
       "function" == typeof Symbol
         ? Symbol("webpack error")
         : "__webpack_error__"),
-    (r = (n) => {
-      n && (n.forEach((n) => n.r--), n.forEach((n) => (n.r-- ? n.r++ : n())));
+    (r = (t) => {
+      t && (t.forEach((t) => t.r--), t.forEach((t) => (t.r-- ? t.r++ : t())));
     }),
-    (o = (n) => !--n.r && n()),
-    (i = (n, e) => (n ? n.push(e) : o(e))),
+    (o = (t) => !--t.r && t()),
+    (i = (t, n) => (t ? t.push(n) : o(n))),
     (c.a = (_, a, c) => {
-      var u,
+      var s,
+        u,
         f,
-        s,
         d = c && [],
         l = _.exports,
-        b = !0,
-        w = !1,
-        g = (e, t, r) => {
-          w ||
-            ((w = !0),
-            (t.r += e.length),
-            e.map((e, o) => e[n](t, r)),
-            (w = !1));
+        w = !0,
+        b = !1,
+        g = (n, e, r) => {
+          b ||
+            ((b = !0),
+            (e.r += n.length),
+            n.map((n, o) => n[t](e, r)),
+            (b = !1));
         },
-        p = new Promise((n, e) => {
-          (s = e), (f = () => (n(l), r(d), (d = 0)));
+        p = new Promise((t, n) => {
+          (f = n), (u = () => (t(l), r(d), (d = 0)));
         });
-      (p[e] = l),
-        (p[n] = (n, e) => {
-          if (b) return o(n);
-          u && g(u, n, e), i(d, n), p.catch(e);
+      (p[n] = l),
+        (p[t] = (t, n) => {
+          if (w) return o(t);
+          s && g(s, t, n), i(d, t), p.catch(n);
         }),
         (_.exports = p),
         a(
           (_) => {
             var a;
-            u = ((_) =>
+            s = ((_) =>
               _.map((_) => {
                 if (null !== _ && "object" == typeof _) {
-                  if (_[n]) return _;
+                  if (_[t]) return _;
                   if (_.then) {
                     var a = [];
                     _.then(
-                      (n) => {
-                        (c[e] = n), r(a), (a = 0);
+                      (t) => {
+                        (c[n] = t), r(a), (a = 0);
                       },
-                      (n) => {
-                        (c[t] = n), r(a), (a = 0);
+                      (t) => {
+                        (c[e] = t), r(a), (a = 0);
                       }
                     );
                     var c = {};
-                    return (c[n] = (n, e) => (i(a, n), _.catch(e))), c;
+                    return (c[t] = (t, n) => (i(a, t), _.catch(n))), c;
                   }
                 }
-                var u = {};
-                return (u[n] = (n) => o(n)), (u[e] = _), u;
+                var s = {};
+                return (s[t] = (t) => o(t)), (s[n] = _), s;
               }))(_);
             var c = () =>
-                u.map((n) => {
-                  if (n[t]) throw n[t];
-                  return n[e];
+                s.map((t) => {
+                  if (t[e]) throw t[e];
+                  return t[n];
                 }),
-              f = new Promise((n, e) => {
-                ((a = () => n(c)).r = 0), g(u, a, e);
+              u = new Promise((t, n) => {
+                ((a = () => t(c)).r = 0), g(s, a, n);
               });
-            return a.r ? f : c();
+            return a.r ? u : c();
           },
-          (n) => (n && s((p[t] = n)), f())
+          (t) => (t && f((p[e] = t)), u())
         ),
-        (b = !1);
+        (w = !1);
     }),
-    (c.d = (n, e) => {
-      for (var t in e)
-        c.o(e, t) &&
-          !c.o(n, t) &&
-          Object.defineProperty(n, t, { enumerable: !0, get: e[t] });
+    (c.d = (t, n) => {
+      for (var e in n)
+        c.o(n, e) &&
+          !c.o(t, e) &&
+          Object.defineProperty(t, e, { enumerable: !0, get: n[e] });
     }),
     (c.g = (function () {
       if ("object" == typeof globalThis) return globalThis;
       try {
         return this || new Function("return this")();
-      } catch (n) {
+      } catch (t) {
         if ("object" == typeof window) return window;
       }
     })()),
-    (c.hmd = (n) => (
-      (n = Object.create(n)).children || (n.children = []),
-      Object.defineProperty(n, "exports", {
+    (c.hmd = (t) => (
+      (t = Object.create(t)).children || (t.children = []),
+      Object.defineProperty(t, "exports", {
         enumerable: !0,
         set: () => {
           throw new Error(
             "ES Modules may not assign module.exports or exports.*, Use ESM export syntax, instead: " +
-              n.id
+              t.id
           );
         },
       }),
-      n
+      t
     )),
-    (c.o = (n, e) => Object.prototype.hasOwnProperty.call(n, e)),
-    (c.v = (n, e, t, r) => {
-      var o = fetch(c.p + "" + t + ".module.wasm");
+    (c.o = (t, n) => Object.prototype.hasOwnProperty.call(t, n)),
+    (c.v = (t, n, e, r) => {
+      var o = fetch(c.p + "" + e + ".module.wasm");
       return "function" == typeof WebAssembly.instantiateStreaming
-        ? WebAssembly.instantiateStreaming(o, r).then((e) =>
-            Object.assign(n, e.instance.exports)
+        ? WebAssembly.instantiateStreaming(o, r).then((n) =>
+            Object.assign(t, n.instance.exports)
           )
         : o
-            .then((n) => n.arrayBuffer())
-            .then((n) => WebAssembly.instantiate(n, r))
-            .then((e) => Object.assign(n, e.instance.exports));
+            .then((t) => t.arrayBuffer())
+            .then((t) => WebAssembly.instantiate(t, r))
+            .then((n) => Object.assign(t, n.instance.exports));
     }),
     (() => {
-      var n;
-      c.g.importScripts && (n = c.g.location + "");
-      var e = c.g.document;
-      if (!n && e && (e.currentScript && (n = e.currentScript.src), !n)) {
-        var t = e.getElementsByTagName("script");
-        t.length && (n = t[t.length - 1].src);
+      var t;
+      c.g.importScripts && (t = c.g.location + "");
+      var n = c.g.document;
+      if (!t && n && (n.currentScript && (t = n.currentScript.src), !t)) {
+        var e = n.getElementsByTagName("script");
+        e.length && (t = e[e.length - 1].src);
       }
-      if (!n)
+      if (!t)
         throw new Error(
           "Automatic publicPath is not supported in this browser"
         );
-      (n = n
+      (t = t
         .replace(/#.*$/, "")
         .replace(/\?.*$/, "")
         .replace(/\/[^\/]+$/, "/")),
-        (c.p = n);
+        (c.p = t);
     })(),
     c(906);
 })();
