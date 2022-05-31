@@ -1,7 +1,5 @@
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/registerUser";
-import { createWorkspace } from "../../../../test/helpers/workspace/createWorkspace";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
