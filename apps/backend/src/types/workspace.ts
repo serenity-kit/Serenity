@@ -17,3 +17,21 @@ export type WorkspaceInvitation = {
   inviterUserId: string;
   expiresAt: Date;
 };
+
+export const formatWorkspace = (workspace: any): Workspace => {
+  const members: WorkspaceMember[] = [];
+  workspace.usersToWorkspaces.forEach(
+    (member: { userId: string; user: any; isAdmin: boolean }) => {
+      const workspaceMember: WorkspaceMember = {
+        userId: member.userId,
+        username: member.user.username,
+        isAdmin: member.isAdmin,
+      };
+      members.push(workspaceMember);
+    }
+  );
+  return {
+    ...workspace,
+    members: members,
+  };
+};
