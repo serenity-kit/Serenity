@@ -28,11 +28,8 @@ import { Platform } from "react-native";
 import { AuthenticationProvider } from "./context/AuthenticationContext";
 import { useCallback, useMemo, useState } from "react";
 import { devtoolsExchange } from "@urql/devtools";
-
 import { theme } from "../../tailwind.config";
-
-// import icon from "./assets/opaque/x.dc9b246f.wasm.png";
-// console.log(icon);
+import { OpaqueBridge } from "@serenity-tools/opaque-se";
 
 type AuthState = {
   deviceSigningPublicKey: string;
@@ -177,6 +174,7 @@ export default function App() {
             <NativeBaseProvider theme={rnTheme}>
               <Navigation colorScheme={colorScheme} />
               <StatusBar />
+              <OpaqueBridge />
             </NativeBaseProvider>
           </SafeAreaProvider>
         </Provider>

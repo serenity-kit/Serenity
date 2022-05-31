@@ -51,7 +51,6 @@ export const startRegistration = async (
   };
 };
 
-// TODO use an registration ID generated in startRegistration instead of username
 export const finishRegistration = async (
   registrationId: string,
   message: string
@@ -87,7 +86,6 @@ export const startLogin = async (
   };
 };
 
-// TODO use an login ID generated in startLogin instead of username
 export const finishLogin = async (loginId: string, message: string) => {
   const response = logins[loginId].finish(sodium.from_base64(message));
   delete logins[loginId];
