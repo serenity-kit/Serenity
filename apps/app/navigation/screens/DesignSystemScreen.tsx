@@ -81,7 +81,11 @@ export default function DesignSystemScreen() {
       <VStack space={4}>
         <Input />
         <LabeledInput label={"Input"} />
-        <LabeledInput label={"Input w/ Value"} value="jane@example.com" />
+        <LabeledInput
+          label={"Input w/ Value"}
+          value="jane@example.com"
+          hint="Here you can put information you want the user to have regarding this input."
+        />
         <LabeledInput
           label={"Input w/ Placeholder"}
           placeholder="Enter your email …"
