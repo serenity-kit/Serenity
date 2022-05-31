@@ -20,7 +20,7 @@ beforeEach(async () => {
     password,
     "31f63652-a995-41ff-b541-3ccdaaaac551"
   );
-  userId = createUserResponse.registrationResponse.finalizeRegistration.id;
+  userId = createUserResponse.registrationResponse.finishRegistration.id;
 });
 
 test("user should be able to create a workspace", async () => {

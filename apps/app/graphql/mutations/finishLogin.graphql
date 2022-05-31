@@ -1,0 +1,5 @@
+mutation finishLogin($input: FinishLoginInput!) {
+  finishLogin(input: $input) {
+    success
+  }
+}

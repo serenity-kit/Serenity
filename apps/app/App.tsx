@@ -28,18 +28,18 @@ import { Platform } from "react-native";
 import { AuthenticationProvider } from "./context/AuthenticationContext";
 import { useCallback, useMemo, useState } from "react";
 import { devtoolsExchange } from "@urql/devtools";
-
 import { theme } from "../../tailwind.config";
+import { OpaqueBridge } from "@serenity-tools/opaque-se";
 
 type AuthState = {
   deviceSigningPublicKey: string;
 };
 
 const unauthenticatedOperation = [
-  "initializeRegistration",
-  "finalizeRegistration",
-  "initializeLogin",
-  "finalizeLogin",
+  "startRegistration",
+  "finishRegistration",
+  "startLogin",
+  "finishLogin",
 ];
 
 const exchanges = [
@@ -174,6 +174,7 @@ export default function App() {
             <NativeBaseProvider theme={rnTheme}>
               <Navigation colorScheme={colorScheme} />
               <StatusBar />
+              <OpaqueBridge />
             </NativeBaseProvider>
           </SafeAreaProvider>
         </Provider>

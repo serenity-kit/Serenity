@@ -1,4 +1,3 @@
-import { ClientRequestResetPasswordRequest } from "../../graphql/mutations/authentication/initializeChangePassword";
 import { prisma } from "../prisma";
 
 type Params = {

@@ -30,7 +30,7 @@ beforeEach(async () => {
       password,
       "9c22b47e-3d5e-4aae-a0b2-7e6f8974e7e2"
     );
-    userId = registrationResponse.registrationResponse.finalizeRegistration.id;
+    userId = registrationResponse.registrationResponse.finishRegistration.id;
     isUserRegistered = true;
     const createWorkspaceResult = await createWorkspace({
       name: "workspace 1",
@@ -55,8 +55,7 @@ beforeEach(async () => {
       password,
       "2434ae43-1706-4df5-8c41-bda450557dc4"
     );
-    userId2 =
-      registrationResponse2.registrationResponse.finalizeRegistration.id;
+    userId2 = registrationResponse2.registrationResponse.finishRegistration.id;
     const createWorkspaceResult2 = await createWorkspace({
       name: "other user workspace",
       id: "e9f04512-8317-46e0-ae1b-64eddf70690d",

@@ -20,12 +20,7 @@ export default async function createUserWithWorkspace({
     const user = await prisma.user.create({
       data: {
         username,
-        serverPrivateKey: "abc",
-        serverPublicKey: "abc",
-        oprfPrivateKey: "abc",
-        oprfPublicKey: "abc",
-        oprfCipherText: "abc",
-        oprfNonce: "abc",
+        opaqueEnvelope: "TODO",
         clientPublicKey: "abc",
         masterDeviceCiphertext: "TODO",
         masterDeviceNonce: "TODO",

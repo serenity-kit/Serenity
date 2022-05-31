@@ -23,7 +23,7 @@ beforeEach(async () => {
       password,
       "17e17242-d86e-476b-af21-5dcfafa332cb"
     );
-    userId = registerUserResult.registrationResponse.finalizeRegistration.id;
+    userId = registerUserResult.registrationResponse.finishRegistration.id;
     didRegisterUser = true;
   }
 });

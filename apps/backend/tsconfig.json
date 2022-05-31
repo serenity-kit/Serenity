@@ -6,7 +6,8 @@
     "outDir": "dist",
     "strict": false,
     "lib": ["esnext", "dom"],
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowJs": true
   },
 
   "include": ["**/*"]

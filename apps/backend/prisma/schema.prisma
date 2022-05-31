@@ -49,28 +49,11 @@ model Update {
   @@unique([snapshotId, pubKey, snapshotVersion])
 }
 
-model Registration {
-  username         String @id
-  serverPrivateKey String
-  serverPublicKey  String @default("invalid")
-  oprfPrivateKey   String
-  oprfPublicKey    String @default("invalid")
-}
-
 model User {
   id                                         String                 @id @default(uuid())
   username                                   String                 @unique
-  serverPrivateKey                           String
-  serverPublicKey                            String                 @default("invalid")
-  oprfPrivateKey                             String
-  oprfPublicKey                              String                 @default("invalid")
-  oprfCipherText                             String
-  oprfNonce                                  String
   clientPublicKey                            String
-  sharedRx                                   String?
-  sharedTx                                   String?
-  resetPasswordToken                         String?
-  UserLoginAccessToken                       UserLoginAccessToken[]
+  opaqueEnvelope                             String
   // contains the device signingPrivateKey and encryptionPrivateKey
   // can be decrypted using the key storred in the OPAQUE envelope
   masterDeviceCiphertext                     String
@@ -94,13 +77,6 @@ model WorkspaceInvitations {
   workspaceId   String
   createdAt     DateTime  @default(now())
   expiresAt     DateTime
-}
-
-model UserLoginAccessToken {
-  accessToken String    @id @unique
-  expiresAt   DateTime?
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
 }
 
 model RecoveryDevice {

@@ -2,6 +2,10 @@ import sodium, { StringKeyPair } from "libsodium-wrappers-sumo";
 import { to_base64, from_base64, from_base64_to_string } from "./base64wasm";
 export { to_base64, from_base64, from_base64_to_string } from "./base64wasm";
 export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers-sumo";
+import {
+  base64ToUrlSafeBase64,
+  urlSafeBase64ToBase64,
+} from "./base64Conversion";
 export const ready = sodium.ready;
 
 declare const Buffer: any;
@@ -261,6 +265,8 @@ const libsodiumExports = {
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
+  base64_to_url_safe_base64: base64ToUrlSafeBase64,
+  url_safe_base64_to_base64: urlSafeBase64ToBase64,
 };
 
 type Libsodium = typeof libsodiumExports & {

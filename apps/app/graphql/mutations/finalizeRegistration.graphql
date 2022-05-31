@@ -1,5 +1,0 @@
-mutation finalizeRegistration($input: ClientOprfRegistrationFinalizeInput!) {
-  finalizeRegistration(input: $input) {
-    id
-  }
-}

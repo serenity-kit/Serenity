@@ -1,11 +1,9 @@
 import sodium from "react-native-sodium-expo-plugin";
+import { to_base64, from_base64, from_base64_to_string } from "./base64native";
 import {
-  to_base64,
-  from_base64,
-  from_base64_to_string,
   base64ToUrlSafeBase64,
   urlSafeBase64ToBase64,
-} from "./base64native";
+} from "./base64Conversion";
 export { to_base64, from_base64, from_base64_to_string } from "./base64native";
 
 export type KeyType = "curve25519" | "ed25519" | "x25519";
@@ -127,4 +125,6 @@ export default {
   crypto_secretbox_KEYBYTES: sodium.crypto_secretbox_KEYBYTES,
   crypto_pwhash_SALTBYTES: sodium.crypto_pwhash_SALTBYTES,
   crypto_pwhash_ALG_DEFAULT: sodium.crypto_pwhash_ALG_DEFAULT,
+  base64_to_url_safe_base64: base64ToUrlSafeBase64,
+  url_safe_base64_to_base64: urlSafeBase64ToBase64,
 };

@@ -24,7 +24,7 @@ beforeEach(async () => {
       password,
       "67bc33af-3467-43c1-83a1-f2487aad6b79"
     );
-    userId = registerUserResult.registrationResponse.finalizeRegistration.id;
+    userId = registerUserResult.registrationResponse.finishRegistration.id;
     await createWorkspace({
       name: "workspace 1",
       id: "abc",

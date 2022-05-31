@@ -13,66 +13,7 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-};
-
-export type ClientOprfLoginChallengeInput = {
-  challenge: Scalars['String'];
-  username: Scalars['String'];
-};
-
-export type ClientOprfLoginChallengeResult = {
-  __typename?: 'ClientOprfLoginChallengeResult';
-  nonce: Scalars['String'];
-  oprfChallengeResponse: Scalars['String'];
-  oprfPublicKey: Scalars['String'];
-  secret: Scalars['String'];
-};
-
-export type ClientOprfLoginFinalizeInput = {
-  username: Scalars['String'];
-};
-
-export type ClientOprfLoginFinalizeeResult = {
-  __typename?: 'ClientOprfLoginFinalizeeResult';
-  nonce: Scalars['String'];
-  oauthData: Scalars['String'];
-};
-
-export type ClientOprfRegistrationChallengeRequest = {
-  challenge: Scalars['String'];
-  username: Scalars['String'];
-};
-
-export type ClientOprfRegistrationChallengeResult = {
-  __typename?: 'ClientOprfRegistrationChallengeResult';
-  oprfChallengeResponse: Scalars['String'];
-  oprfPublicKey: Scalars['String'];
-  serverPublicKey: Scalars['String'];
-};
-
-export type ClientOprfRegistrationFinalizeInput = {
-  clientPublicKey: Scalars['String'];
-  nonce: Scalars['String'];
-  secret: Scalars['String'];
-  username: Scalars['String'];
-  workspaceId: Scalars['String'];
-};
-
-export type ClientOprfRegistrationFinalizeResult = {
-  __typename?: 'ClientOprfRegistrationFinalizeResult';
-  id: Scalars['String'];
-};
-
-export type ClientRequestResetPasswordRequest = {
-  challenge: Scalars['String'];
-  username: Scalars['String'];
-};
-
-export type ClientRequestResetPasswordResult = {
-  __typename?: 'ClientRequestResetPasswordResult';
-  oprfChallengeResponse: Scalars['String'];
-  oprfPublicKey: Scalars['String'];
-  serverPublicKey: Scalars['String'];
+  Date: any;
 };
 
 export type CreateDocumentInput = {
@@ -101,6 +42,15 @@ export type CreateFolderResult = {
 export type CreateWorkspaceInput = {
   id: Scalars['String'];
   name: Scalars['String'];
+};
+
+export type CreateWorkspaceInvitationInput = {
+  workspaceId: Scalars['String'];
+};
+
+export type CreateWorkspaceInvitationResult = {
+  __typename?: 'CreateWorkspaceInvitationResult';
+  workspaceInvitation?: Maybe<WorkspaceInvitation>;
 };
 
 export type CreateWorkspaceResult = {
@@ -162,17 +112,26 @@ export type DocumentEdge = {
   node?: Maybe<Document>;
 };
 
-export type FinalizeResetPasswordInput = {
-  clientPublicKey: Scalars['String'];
-  nonce: Scalars['String'];
-  secret: Scalars['String'];
-  token: Scalars['String'];
-  username: Scalars['String'];
+export type FinishLoginInput = {
+  loginId: Scalars['String'];
+  message: Scalars['String'];
 };
 
-export type FinalizeResetPasswordResult = {
-  __typename?: 'FinalizeResetPasswordResult';
-  status: Scalars['String'];
+export type FinishLoginResult = {
+  __typename?: 'FinishLoginResult';
+  success?: Maybe<Scalars['Boolean']>;
+};
+
+export type FinishRegistrationInput = {
+  clientPublicKey: Scalars['String'];
+  message: Scalars['String'];
+  registrationId: Scalars['String'];
+  workspaceId: Scalars['String'];
+};
+
+export type FinishRegistrationResult = {
+  __typename?: 'FinishRegistrationResult';
+  id: Scalars['String'];
 };
 
 export type Folder = {
@@ -213,15 +172,14 @@ export type Mutation = {
   createDocument?: Maybe<CreateDocumentResult>;
   createFolder?: Maybe<CreateFolderResult>;
   createWorkspace?: Maybe<CreateWorkspaceResult>;
+  createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteFolders?: Maybe<DeleteFoldersResult>;
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
-  finalizeLogin?: Maybe<ClientOprfLoginFinalizeeResult>;
-  finalizePasswordReset?: Maybe<FinalizeResetPasswordResult>;
-  finalizeRegistration?: Maybe<ClientOprfRegistrationFinalizeResult>;
-  initializeLogin?: Maybe<ClientOprfLoginChallengeResult>;
-  initializePasswordReset?: Maybe<ClientRequestResetPasswordResult>;
-  initializeRegistration?: Maybe<ClientOprfRegistrationChallengeResult>;
+  finishLogin?: Maybe<FinishLoginResult>;
+  finishRegistration?: Maybe<FinishRegistrationResult>;
+  startLogin?: Maybe<StartLoginResult>;
+  startRegistration?: Maybe<StartRegistrationResult>;
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
   updateFolderName?: Maybe<UpdateFolderNameResult>;
   updateWorkspace?: Maybe<UpdateWorkspaceResult>;
@@ -243,6 +201,11 @@ export type MutationCreateWorkspaceArgs = {
 };
 
 
+export type MutationCreateWorkspaceInvitationArgs = {
+  input?: InputMaybe<CreateWorkspaceInvitationInput>;
+};
+
+
 export type MutationDeleteDocumentsArgs = {
   input?: InputMaybe<DeleteDocumentsInput>;
 };
@@ -258,33 +221,23 @@ export type MutationDeleteWorkspacesArgs = {
 };
 
 
-export type MutationFinalizeLoginArgs = {
-  input?: InputMaybe<ClientOprfLoginFinalizeInput>;
+export type MutationFinishLoginArgs = {
+  input?: InputMaybe<FinishLoginInput>;
 };
 
 
-export type MutationFinalizePasswordResetArgs = {
-  input?: InputMaybe<FinalizeResetPasswordInput>;
+export type MutationFinishRegistrationArgs = {
+  input?: InputMaybe<FinishRegistrationInput>;
 };
 
 
-export type MutationFinalizeRegistrationArgs = {
-  input?: InputMaybe<ClientOprfRegistrationFinalizeInput>;
+export type MutationStartLoginArgs = {
+  input?: InputMaybe<StartLoginInput>;
 };
 
 
-export type MutationInitializeLoginArgs = {
-  input?: InputMaybe<ClientOprfLoginChallengeInput>;
-};
-
-
-export type MutationInitializePasswordResetArgs = {
-  input?: InputMaybe<ClientRequestResetPasswordRequest>;
-};
-
-
-export type MutationInitializeRegistrationArgs = {
-  input?: InputMaybe<ClientOprfRegistrationChallengeRequest>;
+export type MutationStartRegistrationArgs = {
+  input?: InputMaybe<StartRegistrationInput>;
 };
 
 
@@ -369,6 +322,28 @@ export type QueryWorkspacesArgs = {
   first: Scalars['Int'];
 };
 
+export type StartLoginInput = {
+  challenge: Scalars['String'];
+  username: Scalars['String'];
+};
+
+export type StartLoginResult = {
+  __typename?: 'StartLoginResult';
+  challengeResponse: Scalars['String'];
+  loginId: Scalars['String'];
+};
+
+export type StartRegistrationInput = {
+  challenge: Scalars['String'];
+  username: Scalars['String'];
+};
+
+export type StartRegistrationResult = {
+  __typename?: 'StartRegistrationResult';
+  challengeResponse: Scalars['String'];
+  registrationId: Scalars['String'];
+};
+
 export type UpdateDocumentNameInput = {
   id: Scalars['String'];
   name: Scalars['String'];
@@ -436,6 +411,14 @@ export type WorkspaceInput = {
   sharing?: InputMaybe<Array<InputMaybe<WorkspaceMemberInput>>>;
 };
 
+export type WorkspaceInvitation = {
+  __typename?: 'WorkspaceInvitation';
+  expiresAt: Scalars['Date'];
+  id: Scalars['String'];
+  inviterUserId: Scalars['String'];
+  workspaceId: Scalars['String'];
+};
+
 export type WorkspaceMemberInput = {
   isAdmin: Scalars['Boolean'];
   userId: Scalars['String'];
@@ -490,33 +473,33 @@ export type DeleteWorkspacesMutationVariables = Exact<{
 
 export type DeleteWorkspacesMutation = { __typename?: 'Mutation', deleteWorkspaces?: { __typename?: 'DeleteWorkspacesResult', status: string } | null };
 
-export type FinalizeLoginMutationVariables = Exact<{
-  input: ClientOprfLoginFinalizeInput;
+export type FinishLoginMutationVariables = Exact<{
+  input: FinishLoginInput;
 }>;
 
 
-export type FinalizeLoginMutation = { __typename?: 'Mutation', finalizeLogin?: { __typename?: 'ClientOprfLoginFinalizeeResult', oauthData: string, nonce: string } | null };
+export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', success?: boolean | null } | null };
 
-export type FinalizeRegistrationMutationVariables = Exact<{
-  input: ClientOprfRegistrationFinalizeInput;
+export type FinishRegistrationMutationVariables = Exact<{
+  input: FinishRegistrationInput;
 }>;
 
 
-export type FinalizeRegistrationMutation = { __typename?: 'Mutation', finalizeRegistration?: { __typename?: 'ClientOprfRegistrationFinalizeResult', id: string } | null };
+export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string } | null };
 
-export type InitializeLoginMutationVariables = Exact<{
-  input: ClientOprfLoginChallengeInput;
+export type StartLoginMutationVariables = Exact<{
+  input: StartLoginInput;
 }>;
 
 
-export type InitializeLoginMutation = { __typename?: 'Mutation', initializeLogin?: { __typename?: 'ClientOprfLoginChallengeResult', secret: string, nonce: string, oprfPublicKey: string, oprfChallengeResponse: string } | null };
+export type StartLoginMutation = { __typename?: 'Mutation', startLogin?: { __typename?: 'StartLoginResult', challengeResponse: string, loginId: string } | null };
 
-export type InitializeRegistrationMutationVariables = Exact<{
-  input: ClientOprfRegistrationChallengeRequest;
+export type StartRegistrationMutationVariables = Exact<{
+  input: StartRegistrationInput;
 }>;
 
 
-export type InitializeRegistrationMutation = { __typename?: 'Mutation', initializeRegistration?: { __typename?: 'ClientOprfRegistrationChallengeResult', serverPublicKey: string, oprfPublicKey: string, oprfChallengeResponse: string } | null };
+export type StartRegistrationMutation = { __typename?: 'Mutation', startRegistration?: { __typename?: 'StartRegistrationResult', challengeResponse: string, registrationId: string } | null };
 
 export type UpdateDocumentNameMutationVariables = Exact<{
   input: UpdateDocumentNameInput;
@@ -670,55 +653,51 @@ export const DeleteWorkspacesDocument = gql`
 export function useDeleteWorkspacesMutation() {
   return Urql.useMutation<DeleteWorkspacesMutation, DeleteWorkspacesMutationVariables>(DeleteWorkspacesDocument);
 };
-export const FinalizeLoginDocument = gql`
-    mutation finalizeLogin($input: ClientOprfLoginFinalizeInput!) {
-  finalizeLogin(input: $input) {
-    oauthData
-    nonce
+export const FinishLoginDocument = gql`
+    mutation finishLogin($input: FinishLoginInput!) {
+  finishLogin(input: $input) {
+    success
   }
 }
     `;
 
-export function useFinalizeLoginMutation() {
-  return Urql.useMutation<FinalizeLoginMutation, FinalizeLoginMutationVariables>(FinalizeLoginDocument);
+export function useFinishLoginMutation() {
+  return Urql.useMutation<FinishLoginMutation, FinishLoginMutationVariables>(FinishLoginDocument);
 };
-export const FinalizeRegistrationDocument = gql`
-    mutation finalizeRegistration($input: ClientOprfRegistrationFinalizeInput!) {
-  finalizeRegistration(input: $input) {
+export const FinishRegistrationDocument = gql`
+    mutation finishRegistration($input: FinishRegistrationInput!) {
+  finishRegistration(input: $input) {
     id
   }
 }
     `;
 
-export function useFinalizeRegistrationMutation() {
-  return Urql.useMutation<FinalizeRegistrationMutation, FinalizeRegistrationMutationVariables>(FinalizeRegistrationDocument);
+export function useFinishRegistrationMutation() {
+  return Urql.useMutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(FinishRegistrationDocument);
 };
-export const InitializeLoginDocument = gql`
-    mutation initializeLogin($input: ClientOprfLoginChallengeInput!) {
-  initializeLogin(input: $input) {
-    secret
-    nonce
-    oprfPublicKey
-    oprfChallengeResponse
+export const StartLoginDocument = gql`
+    mutation startLogin($input: StartLoginInput!) {
+  startLogin(input: $input) {
+    challengeResponse
+    loginId
   }
 }
     `;
 
-export function useInitializeLoginMutation() {
-  return Urql.useMutation<InitializeLoginMutation, InitializeLoginMutationVariables>(InitializeLoginDocument);
+export function useStartLoginMutation() {
+  return Urql.useMutation<StartLoginMutation, StartLoginMutationVariables>(StartLoginDocument);
 };
-export const InitializeRegistrationDocument = gql`
-    mutation initializeRegistration($input: ClientOprfRegistrationChallengeRequest!) {
-  initializeRegistration(input: $input) {
-    serverPublicKey
-    oprfPublicKey
-    oprfChallengeResponse
+export const StartRegistrationDocument = gql`
+    mutation startRegistration($input: StartRegistrationInput!) {
+  startRegistration(input: $input) {
+    challengeResponse
+    registrationId
   }
 }
     `;
 
-export function useInitializeRegistrationMutation() {
-  return Urql.useMutation<InitializeRegistrationMutation, InitializeRegistrationMutationVariables>(InitializeRegistrationDocument);
+export function useStartRegistrationMutation() {
+  return Urql.useMutation<StartRegistrationMutation, StartRegistrationMutationVariables>(StartRegistrationDocument);
 };
 export const UpdateDocumentNameDocument = gql`
     mutation updateDocumentName($input: UpdateDocumentNameInput!) {

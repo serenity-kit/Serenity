@@ -6,8 +6,11 @@ coverage
 apps/app/assets/index.html
 apps/app/web-build
 apps/app/generated/graphql.ts
+# ignore the static folder
+apps/app/web
 apps/backend/prisma/generated
 apps/backend/src/generated
 packages/editor/editor-output.css
 packages/editor/dist
+
 

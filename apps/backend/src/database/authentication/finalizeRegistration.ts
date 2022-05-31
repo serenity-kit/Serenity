@@ -2,9 +2,7 @@ import { prisma } from "../prisma";
 
 export async function finalizeRegistration(
   username: string,
-  secret: string,
-  nonce: string,
-  clientPublicKey: string,
+  opaqueEnvelope: string,
   workspaceId: string
 ) {
   // if this user has already completed registration, throw an error
@@ -16,20 +14,11 @@ export async function finalizeRegistration(
   if (existingUserData) {
     throw Error("This username has already been registered");
   }
-  // try to get the existing registration
-  const registrationData = await prisma.registration.findUnique({
-    where: {
-      username: username,
-    },
-  });
-  if (!registrationData) {
-    throw Error("This username has not yet been initialized");
-  }
   try {
     return await prisma.$transaction(async (prisma) => {
       const device = await prisma.device.create({
         data: {
-          signingPublicKey: `TODO+${registrationData.username}`,
+          signingPublicKey: `TODO+${username}`,
           encryptionPublicKey: "TODO",
           encryptionPublicKeySignature: "TODO",
         },
@@ -37,13 +26,8 @@ export async function finalizeRegistration(
       const user = await prisma.user.create({
         data: {
           username,
-          serverPrivateKey: registrationData.serverPrivateKey,
-          serverPublicKey: registrationData.serverPublicKey,
-          oprfPrivateKey: registrationData.oprfPrivateKey,
-          oprfPublicKey: registrationData.oprfPublicKey,
-          oprfCipherText: secret,
-          oprfNonce: nonce,
-          clientPublicKey,
+          opaqueEnvelope,
+          clientPublicKey: `TODO+${username}`,
           masterDeviceCiphertext: "TODO",
           masterDeviceNonce: "TODO",
           masterDevice: {
