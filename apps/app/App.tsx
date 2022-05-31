@@ -29,7 +29,7 @@ import { AuthenticationProvider } from "./context/AuthenticationContext";
 import { useCallback, useMemo, useState } from "react";
 import { devtoolsExchange } from "@urql/devtools";
 import { theme } from "../../tailwind.config";
-import { OpaqueBridge } from "@serenity-tools/opaque-se";
+import { OpaqueBridge } from "@serenity-tools/opaque";
 
 type AuthState = {
   deviceSigningPublicKey: string;

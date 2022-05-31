@@ -2,7 +2,6 @@ import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { createClientKeyPair } from "@serenity-tools/opaque/client";
 import { requestRegistrationChallengeResponse } from "../../../../test/helpers/requestRegistrationChallengeResponse";
 
 const graphql = setupGraphql();
@@ -27,10 +26,6 @@ test("server should create a registration challenge response", async () => {
 });
 
 test("server should register a user", async () => {
-  // create client keys
-  const clientKeys = createClientKeyPair();
-  // crate cipher text
-  const clientPublicKey = clientKeys.publicKey;
   const message = result.registration.finish(
     sodium.from_base64(result.data.challengeResponse)
   );
@@ -46,7 +41,7 @@ test("server should register a user", async () => {
     input: {
       registrationId: result.data.registrationId,
       message: sodium.to_base64(message),
-      clientPublicKey,
+      clientPublicKey: "TODO",
       workspaceId: "25ef3570-a7c8-4872-a3fb-9521842493ae",
     },
   });
