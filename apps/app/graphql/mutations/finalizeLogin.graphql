@@ -1,6 +1,5 @@
 mutation finalizeLogin($input: ClientOprfLoginFinalizeInput!) {
   finalizeLogin(input: $input) {
-    oauthData
-    nonce
+    success
   }
 }

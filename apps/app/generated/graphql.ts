@@ -26,13 +26,13 @@ export type ClientOprfLoginChallengeResult = {
 };
 
 export type ClientOprfLoginFinalizeInput = {
+  message: Scalars['String'];
   username: Scalars['String'];
 };
 
-export type ClientOprfLoginFinalizeeResult = {
-  __typename?: 'ClientOprfLoginFinalizeeResult';
-  nonce: Scalars['String'];
-  oauthData: Scalars['String'];
+export type ClientOprfLoginFinalizeResult = {
+  __typename?: 'ClientOprfLoginFinalizeResult';
+  success?: Maybe<Scalars['Boolean']>;
 };
 
 export type ClientOprfRegistrationChallengeRequest = {
@@ -174,7 +174,7 @@ export type Mutation = {
   createWorkspace?: Maybe<CreateWorkspaceResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
-  finalizeLogin?: Maybe<ClientOprfLoginFinalizeeResult>;
+  finalizeLogin?: Maybe<ClientOprfLoginFinalizeResult>;
   finalizeRegistration?: Maybe<ClientOprfRegistrationFinalizeResult>;
   initializeLogin?: Maybe<ClientOprfLoginChallengeResult>;
   initializeRegistration?: Maybe<ClientOprfRegistrationChallengeResult>;
@@ -417,7 +417,7 @@ export type FinalizeLoginMutationVariables = Exact<{
 }>;
 
 
-export type FinalizeLoginMutation = { __typename?: 'Mutation', finalizeLogin?: { __typename?: 'ClientOprfLoginFinalizeeResult', oauthData: string, nonce: string } | null };
+export type FinalizeLoginMutation = { __typename?: 'Mutation', finalizeLogin?: { __typename?: 'ClientOprfLoginFinalizeResult', success?: boolean | null } | null };
 
 export type FinalizeRegistrationMutationVariables = Exact<{
   input: ClientOprfRegistrationFinalizeInput;
@@ -577,8 +577,7 @@ export function useDeleteWorkspacesMutation() {
 export const FinalizeLoginDocument = gql`
     mutation finalizeLogin($input: ClientOprfLoginFinalizeInput!) {
   finalizeLogin(input: $input) {
-    oauthData
-    nonce
+    success
   }
 }
     `;

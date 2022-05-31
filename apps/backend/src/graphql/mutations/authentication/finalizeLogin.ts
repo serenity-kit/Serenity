@@ -1,23 +1,24 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { finalizeLogin } from "../../../database/authentication/finalizeLogin";
+import { finishLogin } from "../../../utils/opaque";
 
 export const ClientOprfLoginFinalizeInput = inputObjectType({
   name: "ClientOprfLoginFinalizeInput",
   definition(t) {
     t.nonNull.string("username");
+    t.nonNull.string("message");
   },
 });
 
-export const ClientOprfLoginFinalizeeResult = objectType({
-  name: "ClientOprfLoginFinalizeeResult",
+export const ClientOprfLoginFinalizeResult = objectType({
+  name: "ClientOprfLoginFinalizeResult",
   definition(t) {
-    t.nonNull.string("oauthData");
-    t.nonNull.string("nonce");
+    t.boolean("success");
   },
 });
 
 export const finalizeLoginMutation = mutationField("finalizeLogin", {
-  type: ClientOprfLoginFinalizeeResult,
+  type: ClientOprfLoginFinalizeResult,
   args: {
     input: arg({
       type: ClientOprfLoginFinalizeInput,
@@ -27,8 +28,13 @@ export const finalizeLoginMutation = mutationField("finalizeLogin", {
     if (!args || !args.input) {
       throw Error("Missing input");
     }
-    const username = args.input.username;
-    const responseData = await finalizeLogin(username);
-    return responseData;
+    const sessionKey = await finishLogin(
+      args.input.username,
+      args.input.message
+    );
+    console.log("SESSION KEY", sessionKey);
+    // const responseData = await finalizeLogin(username);
+
+    return { success: true };
   },
 });

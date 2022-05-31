@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -8,12 +8,6 @@ import {
   Link,
   LabeledInput,
 } from "@serenity-tools/ui";
-import {
-  createClientKeyPair,
-  createOprfChallenge,
-  createUserSession,
-} from "@serenity-tools/opaque/client";
-import { decryptSessionJsonMessage } from "@serenity-tools/opaque/common";
 import {
   useInitializeLoginMutation,
   useFinalizeLoginMutation,
@@ -32,93 +26,12 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
   const [, finalizeLoginMutation] = useFinalizeLoginMutation();
   const [hasGqlError, setHasGqlError] = useState(false);
   const [gqlErrorMessage, setGqlErrorMessage] = useState("");
-  const [oauthAccessToken, setOauthAccessToken] = useState("");
-  const [accessTokenExpiresIn, setAccessTokenExpiresIn] = useState(0);
   const { updateAuthentication } = useAuthentication();
-  const OPRF_CLIENT_KEYS_STORAGE_KEY = "oprf.clientKeys";
-  const OPRF_CLIENT_SESSION_KEYS_STORAGE_KEY = "oprf.sessionKeys";
-
-  useEffect(() => {
-    getOrGenerateKeys();
-  }, []);
-
-  const getOrGenerateKeys = () => {
-    let serializedKeyData = localStorage.getItem(OPRF_CLIENT_KEYS_STORAGE_KEY);
-    if (serializedKeyData) {
-      const keys = JSON.parse(serializedKeyData);
-      console.log("retrieved client keys", { keys });
-    } else {
-      const keys = createClientKeyPair();
-      localStorage.setItem(OPRF_CLIENT_KEYS_STORAGE_KEY, JSON.stringify(keys));
-      console.log("generated client keys", { keys });
-    }
-  };
-
-  const getEncryptedOauthToken = async (
-    randomScalar: string,
-    serverChallengeResponse: string,
-    secret: string,
-    nonce: string,
-    oprfPublicKey: string
-  ) => {
-    console.log("Logging in");
-    console.log({ randomScalar });
-
-    const clientSessionKeys = await createUserSession(
-      password,
-      secret,
-      nonce,
-      oprfPublicKey,
-      randomScalar,
-      serverChallengeResponse
-    );
-    localStorage.setItem(
-      OPRF_CLIENT_SESSION_KEYS_STORAGE_KEY,
-      JSON.stringify(clientSessionKeys)
-    );
-    // ask the server to store the login, send
-    // * username,
-    const mutationResult = await finalizeLoginMutation({
-      input: { username },
-    });
-    console.log({ clientSessionKeys });
-    // check for an error
-    if (mutationResult.data && mutationResult.data.finalizeLogin) {
-      const serverLoginResponse = mutationResult.data.finalizeLogin;
-      return {
-        serverLoginResponse,
-        clientSessionKeys,
-      };
-    } else if (mutationResult.error) {
-      const errorMessage = mutationResult.error.message.substring(
-        mutationResult.error.message.indexOf("] ") + 2
-      );
-      setHasGqlError(true);
-      setGqlErrorMessage(errorMessage);
-      throw Error(errorMessage);
-    }
-  };
-
-  const decryptEncryptedOauthToken = (
-    encryptedOauthToken: string,
-    nonce: string,
-    clientSessionSharedRxKey: string
-  ) => {
-    const oauthTokenData = decryptSessionJsonMessage(
-      encryptedOauthToken,
-      nonce,
-      clientSessionSharedRxKey
-    );
-    console.log({ oauthTokenData });
-    return oauthTokenData;
-  };
 
   const onLoginPress = async () => {
     setDidLoginSucceed(false);
     setHasGqlError(false);
     setGqlErrorMessage("");
-    let oprfChallengeResponse: any = null;
-    let encryptedOauthTokenData: any = null;
     try {
       const message = await startLogin(password);
       const mutationResult = await initializeLoginMutation({
@@ -133,51 +46,31 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
           mutationResult.data.initializeLogin.challengeResponse;
 
         const result = await finishLogin(challengeResponse);
-        console.log(result);
-        return oprfChallengeResponse;
+        console.log("sessionKey", result.sessionKey);
+        console.log("exportKey", result.exportKey);
+
+        const finalizeLoginResult = await finalizeLoginMutation({
+          input: { username, message: result.response },
+        });
+
+        if (
+          finalizeLoginResult.data &&
+          finalizeLoginResult.data.finalizeLogin
+        ) {
+          setDidLoginSucceed(true);
+          updateAuthentication(`TODO+${username}`);
+          props.navigation.navigate("Root");
+        } else if (finalizeLoginResult.error) {
+          throw Error("Failed to Login");
+        }
       } else if (mutationResult.error) {
         throw Error("Failed to Login");
       }
-      console.log({ oprfChallengeResponse });
     } catch (error) {
       console.log("error getting server challenge");
       console.log(error);
       setHasGqlError(true);
       setGqlErrorMessage(error.toString());
-    }
-    if (oprfChallengeResponse) {
-      try {
-        encryptedOauthTokenData = await getEncryptedOauthToken(
-          oprfChallengeResponse.randomScalar,
-          oprfChallengeResponse.serverChallengeResponse.oprfChallengeResponse,
-          oprfChallengeResponse.serverChallengeResponse.secret,
-          oprfChallengeResponse.serverChallengeResponse.nonce,
-          oprfChallengeResponse.serverChallengeResponse.oprfPublicKey
-        );
-      } catch (error) {
-        console.log("error logging in");
-        console.log(error);
-        setHasGqlError(true);
-        setGqlErrorMessage(error.toString());
-      }
-    }
-    if (encryptedOauthTokenData) {
-      console.log({ encryptedOauthTokenData });
-      try {
-        const oauthAccessData = decryptEncryptedOauthToken(
-          encryptedOauthTokenData.serverLoginResponse.oauthData,
-          encryptedOauthTokenData.serverLoginResponse.nonce,
-          encryptedOauthTokenData.clientSessionKeys.sharedRx
-        );
-        setDidLoginSucceed(true);
-        setOauthAccessToken(oauthAccessData.accessToken);
-        setAccessTokenExpiresIn(oauthAccessData.expiresIn);
-        updateAuthentication(`TODO+${username}`);
-        props.navigation.navigate("Root");
-      } catch (error) {
-        setHasGqlError(true);
-        setGqlErrorMessage("Invalid email or password");
-      }
     }
   };
 
