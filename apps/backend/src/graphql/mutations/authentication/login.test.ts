@@ -1,14 +1,9 @@
 import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import {
-  createOprfChallenge,
-  createUserSession,
-} from "@serenity-tools/opaque/client";
 import sodium from "libsodium-wrappers";
-import { decryptSessionJsonMessage } from "@serenity-tools/opaque/common";
 import { Login } from "../../../vendor/opaque-wasm/opaque_wasm";
-import { completeRegistration } from "../../../../test/helpers/completeRegistration";
+import { registerUser } from "../../../../test/helpers/registerUser";
 
 const graphql = setupGraphql();
 const username = "user";
@@ -48,7 +43,7 @@ test("server should register a user", async () => {
   // FIRST TEST ONLY: register a user.
   // we can't run this in beforeAll() because `graphql` isnt' set up
   // generate registration challenge
-  await completeRegistration(
+  await registerUser(
     graphql,
     username,
     password,
