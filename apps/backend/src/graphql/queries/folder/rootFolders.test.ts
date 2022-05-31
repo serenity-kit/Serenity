@@ -53,6 +53,7 @@ beforeEach(async () => {
     });
     const createOtherFolderResult = await createFolder({
       graphql,
+      name: null,
       id: otherFolderId,
       parentFolderId: null,
       authorizationHeader: `TODO+${username2}`,
@@ -98,6 +99,7 @@ test("user should be able to list folders in a workspace when empty", async () =
 test("user should be able to list folders in a workspace with one item", async () => {
   const createParentFolderResult = await createFolder({
     graphql,
+    name: null,
     id: parentFolderId,
     parentFolderId: null,
     authorizationHeader: `TODO+${username}`,
@@ -150,6 +152,7 @@ test("user should be able to list folders in a workspace with multiple items", a
   const authorizationHeader = { authorization: `TODO+${username}` };
   const createFolderResult = await createFolder({
     graphql,
+    name: null,
     id: folderId,
     parentFolderId: null,
     authorizationHeader: `TODO+${username}`,
@@ -209,6 +212,7 @@ test("user should be able to list without showing subfolders", async () => {
   const authorizationHeader = { authorization: `TODO+${username}` };
   const createFolderResult = await createFolder({
     graphql,
+    name: null,
     id: childFolderId,
     parentFolderId: folderId,
     authorizationHeader: `TODO+${username}`,

@@ -27,7 +27,7 @@ export const completeRegistration = async (
   const query = gql`
     mutation finishRegistration($input: FinishRegistrationInput!) {
       finishRegistration(input: $input) {
-        status
+        id
       }
     }
   `;

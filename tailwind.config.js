@@ -71,6 +71,9 @@ const customTheme = {
     maxWidth: {
       "prose-rem": "36.5rem", // editor specific .. needed as representation of a 65ch content-width as the "ch"-unit would only work on text-elements
     },
+    width: {
+      sidebar: "15rem",
+    },
   },
 };
 
@@ -103,6 +106,7 @@ module.exports = {
         h2: `text-h2 font-bold`,
         h3: `text-h3 font-bold`,
         "text-muted": `text-gray-600`,
+        "icon-button": `w-6 h-6 flex justify-center items-center`,
       });
     }),
   ],

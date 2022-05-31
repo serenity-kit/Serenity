@@ -17,13 +17,13 @@ beforeAll(async () => {
 beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
+    isUserRegistered = true;
     await registerUser(
       graphql,
       username,
       password,
       "9c22b47e-3d5e-4aae-a0b2-7e6f8974e7e2"
     );
-    isUserRegistered = true;
     const createWorkspaceResult = await createWorkspace({
       name: "workspace 1",
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",

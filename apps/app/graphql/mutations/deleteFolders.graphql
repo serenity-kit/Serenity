@@ -1,0 +1,5 @@
+mutation deleteFolders($input: DeleteFoldersInput!) {
+  deleteFolders(input: $input) {
+    status
+  }
+}

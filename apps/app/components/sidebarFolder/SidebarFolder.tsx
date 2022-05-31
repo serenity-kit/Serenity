@@ -17,6 +17,7 @@ import {
   useDocumentsQuery,
   useFoldersQuery,
   useUpdateFolderNameMutation,
+  useDeleteFoldersMutation,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types";
 import SidebarPage from "../sidebarPage/SidebarPage";
@@ -26,6 +27,7 @@ type Props = {
   workspaceId: string;
   folderId: string;
   folderName: string;
+  onStructureChange: () => void;
 };
 
 export default function SidebarFolder(props: Props) {
@@ -36,6 +38,7 @@ export default function SidebarFolder(props: Props) {
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
   const [, updateFolderNameMutation] = useUpdateFolderNameMutation();
+  const [, deleteFoldersMutation] = useDeleteFoldersMutation();
   const [foldersResult, refetchFolders] = useFoldersQuery({
     pause: !isOpen,
     variables: {
@@ -51,7 +54,7 @@ export default function SidebarFolder(props: Props) {
     },
   });
 
-  const createFolder = async (name) => {
+  const createFolder = async (name: string | null) => {
     setIsOpen(true);
     const id = uuidv4();
     const result = await createFolderMutation({
@@ -122,6 +125,19 @@ export default function SidebarFolder(props: Props) {
     setIsEditing("none");
   };
 
+  const deleteFolder = async (folderId: string) => {
+    const deleteFoldersResult = await deleteFoldersMutation({
+      input: {
+        ids: [folderId],
+      },
+    });
+    if (deleteFoldersResult.data && deleteFoldersResult.data.deleteFolders) {
+      props.onStructureChange();
+    } else {
+      // TODO: show error: couldn't delete folder
+    }
+  };
+
   return (
     <>
       <Pressable
@@ -151,19 +167,12 @@ export default function SidebarFolder(props: Props) {
             folderId={props.folderId}
             refetchFolders={refetchFolders}
             onUpdateNamePress={editFolderName}
-          />
-          <Pressable
-            onPress={() => {
-              setIsOpen(true);
-              setIsEditing("new");
+            onDeletePressed={() => deleteFolder(props.folderId)}
+            onCreateDocumentPress={createDocument}
+            onCreateFolderPress={() => {
+              createFolder(null);
             }}
-          >
-            <Icon name="folder-line" />
-          </Pressable>
-          <Pressable onPress={createDocument}>
-            <Icon name="file-transfer-line" />
-          </Pressable>
-
+          />
           {documentsResult.fetching ||
             (foldersResult.fetching && <ActivityIndicator />)}
         </HStack>
@@ -191,6 +200,7 @@ export default function SidebarFolder(props: Props) {
                       folderId={folder.id}
                       workspaceId={props.workspaceId}
                       folderName={folder.name}
+                      onStructureChange={props.onStructureChange}
                     />
                   </View>
                 );

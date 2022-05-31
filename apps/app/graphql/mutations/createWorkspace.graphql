@@ -4,7 +4,7 @@ mutation createWorkspace($input: CreateWorkspaceInput!) {
       id
       name
       members {
-        username
+        userId
         isAdmin
       }
     }

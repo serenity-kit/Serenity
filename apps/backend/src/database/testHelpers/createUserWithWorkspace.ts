@@ -9,7 +9,7 @@ export default async function createUserWithWorkspace({
   id,
   username,
 }: Params) {
-  await prisma.$transaction(async (prisma) => {
+  return await prisma.$transaction(async (prisma) => {
     const device = await prisma.device.create({
       data: {
         signingPublicKey: `TODO+${username}`,
@@ -17,7 +17,7 @@ export default async function createUserWithWorkspace({
         encryptionPublicKeySignature: "TODO",
       },
     });
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         username,
         serverPrivateKey: "abc",
@@ -45,11 +45,12 @@ export default async function createUserWithWorkspace({
         idSignature: "TODO",
         usersToWorkspaces: {
           create: {
-            username: username,
+            userId: user.id,
             isAdmin: true,
           },
         },
       },
     });
+    return user;
   });
 }

@@ -6,14 +6,14 @@ type Cursor = {
 
 type Params = {
   workspaceId: string;
-  username: string;
+  userId: string;
   cursor?: Cursor;
   skip?: number;
   take: number;
 };
 
 export async function getWorkspaceFolders({
-  username,
+  userId,
   workspaceId,
   cursor,
   skip,
@@ -24,7 +24,7 @@ export async function getWorkspaceFolders({
       // first make sure the user has access to the workspace
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
-          username,
+          userId,
           workspaceId,
         },
       });

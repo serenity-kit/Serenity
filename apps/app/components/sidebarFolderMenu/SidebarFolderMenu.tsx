@@ -6,27 +6,19 @@ import {
   Text,
   tw,
 } from "@serenity-tools/ui";
-import { useDeleteDocumentsMutation } from "../../generated/graphql";
 import { useState } from "react";
 
 type Props = {
   folderId: string;
   refetchFolders: () => void;
   onUpdateNamePress: () => void;
+  onDeletePressed: () => void;
+  onCreateDocumentPress: () => void;
+  onCreateFolderPress: () => void;
 };
 
 export default function SidebarFolderMenu(props: Props) {
   const [isOpenMenu, setIsOpenMenu] = useState(false);
-  const [, deleteFoldersMutation] = useDeleteDocumentsMutation();
-
-  const deleteFolder = async (id: string) => {
-    await deleteFoldersMutation({
-      input: {
-        ids: [id],
-      },
-    });
-    props.refetchFolders();
-  };
 
   return (
     <Menu
@@ -48,6 +40,22 @@ export default function SidebarFolderMenu(props: Props) {
       <SidebarButton
         onPress={() => {
           setIsOpenMenu(false);
+          props.onCreateDocumentPress();
+        }}
+      >
+        <Text variant="small">Create Document</Text>
+      </SidebarButton>
+      <SidebarButton
+        onPress={() => {
+          setIsOpenMenu(false);
+          props.onCreateFolderPress();
+        }}
+      >
+        <Text variant="small">Create Folder</Text>
+      </SidebarButton>
+      <SidebarButton
+        onPress={() => {
+          setIsOpenMenu(false);
           props.onUpdateNamePress();
         }}
       >
@@ -56,7 +64,7 @@ export default function SidebarFolderMenu(props: Props) {
       <SidebarButton
         onPress={() => {
           setIsOpenMenu(false);
-          deleteFolder(props.folderId);
+          props.onDeletePressed();
         }}
       >
         <Text variant="small">Delete</Text>

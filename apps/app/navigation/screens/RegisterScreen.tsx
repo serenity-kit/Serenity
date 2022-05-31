@@ -75,11 +75,8 @@ export default function RegisterScreen(
           },
         });
         // check for an error
-        if (finishRegistrationResult.data?.finishRegistration) {
-          setDidRegistrationSucceed(
-            finishRegistrationResult.data.finishRegistration.status ===
-              "success"
-          );
+        if (finishRegistrationResult.data?.finishRegistration?.id) {
+          setDidRegistrationSucceed(true);
           // reset since the user might end up on this screen again
           setPassword("");
           setUsername("");

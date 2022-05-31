@@ -37,7 +37,7 @@ test("server should register a user", async () => {
   const query = gql`
     mutation finishRegistration($input: FinishRegistrationInput!) {
       finishRegistration(input: $input) {
-        status
+        id
       }
     }
   `;
@@ -50,11 +50,5 @@ test("server should register a user", async () => {
       workspaceId: "25ef3570-a7c8-4872-a3fb-9521842493ae",
     },
   });
-  expect(registrationResponse).toMatchInlineSnapshot(`
-    Object {
-      "finishRegistration": Object {
-        "status": "success",
-      },
-    }
-  `);
+  expect(typeof registrationResponse.finishRegistration.id).toBe("string");
 });

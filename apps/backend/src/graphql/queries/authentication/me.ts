@@ -3,7 +3,8 @@ import { idArg, list, queryField, objectType } from "nexus";
 export const MeResult = objectType({
   name: "MeResult",
   definition(t) {
-    t.string("username");
+    t.nonNull.string("id");
+    t.nonNull.string("username");
   },
 });
 
@@ -16,8 +17,9 @@ export const folders = queryField((t) => {
       if (!context.user) {
         throw new Error("Unauthorized");
       }
+      const id = context.user.id;
       const username = context.user.username;
-      return { username };
+      return { id, username };
     },
   });
 });

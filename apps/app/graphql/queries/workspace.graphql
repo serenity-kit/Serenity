@@ -3,6 +3,7 @@ query workspace($id: ID) {
     id
     name
     members {
+      userId
       username
       isAdmin
     }

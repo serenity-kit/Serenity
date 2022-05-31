@@ -1,5 +1,5 @@
 mutation finishRegistration($input: FinishRegistrationInput!) {
   finishRegistration(input: $input) {
-    status
+    id
   }
 }

@@ -4,6 +4,7 @@ mutation updateWorkspace($input: UpdateWorkspaceInput!) {
       id
       name
       members {
+        userId
         username
         isAdmin
       }

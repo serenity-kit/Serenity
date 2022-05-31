@@ -33,7 +33,7 @@ export const deleteFoldersMutation = mutationField("deleteFolders", {
     }
     await deleteFolders({
       folderIds: args.input.ids,
-      username: context.user.username,
+      userId: context.user.id,
     });
     return { status: "success" };
   },

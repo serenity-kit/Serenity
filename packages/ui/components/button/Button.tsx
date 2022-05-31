@@ -91,7 +91,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
   // generic text-styles
   const textStyle = {
     size: {
-      small: tw`small font-semibold`,
+      small: tw`text-xxs font-semibold`,
       regular: tw`text-base`,
     },
     variant: {

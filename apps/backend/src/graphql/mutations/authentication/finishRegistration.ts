@@ -15,7 +15,7 @@ export const FinishRegistrationInput = inputObjectType({
 export const FinishRegistrationResult = objectType({
   name: "FinishRegistrationResult",
   definition(t) {
-    t.nonNull.string("status");
+    t.nonNull.string("id");
   },
 });
 
@@ -34,7 +34,11 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
       args.input.registrationId,
       args.input.message
     );
-    await finalizeRegistration(username, envelope, args.input.workspaceId);
-    return { status: "success" };
+    const user = await finalizeRegistration(
+      username,
+      envelope,
+      args.input.workspaceId
+    );
+    return { id: user.id };
   },
 });

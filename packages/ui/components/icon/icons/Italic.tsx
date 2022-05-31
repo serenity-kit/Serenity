@@ -5,11 +5,11 @@ export type Props = { color: string; size: number };
 
 export const Italic = ({ color, size }: Props) => {
   return (
-    <Svg height={size} width={size} viewBox="0 0 24 24">
-      <Path fill="none" d="M0 0h24v24H0z" />
+    <Svg height={size} width={size} viewBox="0 0 16 16">
+      <Path fill="none" d="M0 0h16v16H0z" />
       <Path
         fill={color}
-        d="M15 20H7v-2h2.927l2.116-12H9V4h8v2h-2.927l-2.116 12H15z"
+        d="M10 13.3333H4.66667V12H6.61801L8.02867 3.99999H6.00001V2.66666H11.3333V3.99999H9.382L7.97134 12H10V13.3333Z"
       />
     </Svg>
   );

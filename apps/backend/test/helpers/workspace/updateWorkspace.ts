@@ -27,7 +27,7 @@ export const updateWorkspace = async ({
           id
           name
           members {
-            username
+            userId
             isAdmin
           }
         }

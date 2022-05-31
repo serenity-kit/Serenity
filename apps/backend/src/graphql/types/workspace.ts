@@ -1,9 +1,10 @@
-import { inputObjectType, list, objectType } from "nexus";
+import { inputObjectType, list, nonNull, objectType, scalarType } from "nexus";
 
-export const WorkspacePermissionsOutput = objectType({
-  name: "WorkspacePermissionsOutput",
+export const WorkspaceMembersOutput = objectType({
+  name: "WorkspaceMembersOutput",
   definition(t) {
-    t.nonNull.string("username");
+    t.nonNull.string("userId");
+    t.string("username");
     t.nonNull.boolean("isAdmin");
   },
 });
@@ -14,7 +15,7 @@ export const Workspace = objectType({
     t.nonNull.string("id");
     t.string("name");
     t.list.nonNull.field("members", {
-      type: WorkspacePermissionsOutput,
+      type: WorkspaceMembersOutput,
     });
   },
 });
@@ -22,7 +23,7 @@ export const Workspace = objectType({
 export const WorkspaceMemberInput = inputObjectType({
   name: "WorkspaceMemberInput",
   definition(t) {
-    t.nonNull.string("username");
+    t.nonNull.string("userId");
     t.nonNull.boolean("isAdmin");
   },
 });
@@ -35,5 +36,32 @@ export const WorkspaceInput = inputObjectType({
     t.field("sharing", {
       type: list(WorkspaceMemberInput),
     });
+  },
+});
+
+export const DateScalar = scalarType({
+  name: "Date",
+  serialize: (value) => (value as Date).toISOString(),
+  parseValue: (value) => new Date(value as string | number),
+  parseLiteral: (ast) => {
+    if (ast.kind === "IntValue" || ast.kind === "StringValue") {
+      const d = new Date(ast.value);
+      if (!isNaN(d.valueOf())) {
+        return d;
+      }
+    }
+    throw new Error("Invalid date");
+  },
+  asNexusMethod: "date",
+  sourceType: "Date",
+});
+
+export const WorkspaceInvitation = objectType({
+  name: "WorkspaceInvitation",
+  definition(t) {
+    t.nonNull.string("id");
+    t.nonNull.string("workspaceId");
+    t.nonNull.string("inviterUserId");
+    t.field("expiresAt", { type: nonNull("Date") });
   },
 });

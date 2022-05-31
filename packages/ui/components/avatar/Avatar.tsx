@@ -3,7 +3,9 @@ import { StyleSheet } from "react-native";
 import { Avatar as NbAvatar, IAvatarProps } from "native-base";
 import { tw } from "../../tailwind";
 
-export const Avatar = forwardRef((props: IAvatarProps, ref) => {
+export type AvatarProps = IAvatarProps & {};
+
+export const Avatar = forwardRef((props: AvatarProps, ref) => {
   const { size = "sm" } = props;
   const styles = StyleSheet.create({
     avatar: tw``,

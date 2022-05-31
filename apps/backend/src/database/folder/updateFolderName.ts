@@ -3,10 +3,10 @@ import { prisma } from "../prisma";
 type Params = {
   id: string;
   name: string;
-  username: string;
+  userId: string;
 };
 
-export async function updateFolderName({ id, name, username }: Params) {
+export async function updateFolderName({ id, name, userId }: Params) {
   try {
     return await prisma.$transaction(async (prisma) => {
       // fetch the folder
@@ -22,7 +22,7 @@ export async function updateFolderName({ id, name, username }: Params) {
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
-          username,
+          userId,
           isAdmin: true,
           workspaceId: folder.workspaceId,
         },
@@ -41,7 +41,6 @@ export async function updateFolderName({ id, name, username }: Params) {
           name,
         },
       });
-      console.log({ updatedFolder });
       return updatedFolder;
     });
   } catch (error) {

@@ -2,10 +2,10 @@ import { prisma } from "../prisma";
 
 type Params = {
   documentIds: string[];
-  username: string;
+  userId: string;
 };
 
-export async function deleteDocuments({ documentIds, username }: Params) {
+export async function deleteDocuments({ documentIds, userId }: Params) {
   try {
     await prisma.$transaction(async (prisma) => {
       // get the workspace ids for the user
@@ -13,7 +13,7 @@ export async function deleteDocuments({ documentIds, username }: Params) {
       // delete these documents
       const userToWorkspaces = await prisma.usersToWorkspaces.findMany({
         where: {
-          username,
+          userId,
           isAdmin: true,
         },
       });

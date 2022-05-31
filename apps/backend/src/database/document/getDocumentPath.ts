@@ -1,9 +1,8 @@
-import { ClientRequestResetPasswordRequest } from "../../graphql/mutations/authentication/initializeChangePassword";
 import { prisma } from "../prisma";
 
 type Params = {
   id: string;
-  username: string;
+  userId: string;
 };
 
 const reduceParentFolderTreeToList = (folder: any) => {
@@ -16,7 +15,7 @@ const reduceParentFolderTreeToList = (folder: any) => {
   return parentFolderList;
 };
 
-export async function getDocumentPath({ username, id }: Params) {
+export async function getDocumentPath({ userId, id }: Params) {
   try {
     return await prisma.$transaction(async (prisma) => {
       // make sure the user has access to the workspace
@@ -31,7 +30,7 @@ export async function getDocumentPath({ username, id }: Params) {
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
-          username,
+          userId,
           workspaceId: document.workspaceId,
         },
       });

@@ -6,6 +6,7 @@ import { registerUser } from "../../../../test/helpers/registerUser";
 import { createWorkspace } from "../../../../test/helpers/workspace/createWorkspace";
 
 const graphql = setupGraphql();
+let userId = "";
 const username = "user";
 const password = "password";
 let didRegisterUser = false;
@@ -17,12 +18,13 @@ beforeAll(async () => {
 beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!didRegisterUser) {
-    await registerUser(
+    const registerUserResult = await registerUser(
       graphql,
       username,
       password,
       "67bc33af-3467-43c1-83a1-f2487aad6b79"
     );
+    userId = registerUserResult.registrationResponse.finalizeRegistration.id;
     await createWorkspace({
       name: "workspace 1",
       id: "abc",
@@ -50,7 +52,7 @@ test("user should be able to list workspaces", async () => {
           id
           name
           members {
-            username
+            userId
             isAdmin
           }
         }
@@ -80,7 +82,7 @@ test("user should be able to list workspaces", async () => {
           "members": Array [
             Object {
               "isAdmin": true,
-              "username": "user",
+              "userId": "${userId}",
             },
           ],
           "name": "My Workspace",
@@ -90,7 +92,7 @@ test("user should be able to list workspaces", async () => {
           "members": Array [
             Object {
               "isAdmin": true,
-              "username": "user",
+              "userId": "${userId}",
             },
           ],
           "name": "workspace 1",
@@ -100,7 +102,7 @@ test("user should be able to list workspaces", async () => {
           "members": Array [
             Object {
               "isAdmin": true,
-              "username": "user",
+              "userId": "${userId}",
             },
           ],
           "name": "workspace 2",

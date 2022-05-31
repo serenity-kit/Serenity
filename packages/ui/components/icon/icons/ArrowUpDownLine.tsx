@@ -5,11 +5,11 @@ export type Props = { color: string; size: number };
 
 export const ArrowUpDownLine = ({ color, size }: Props) => {
   return (
-    <Svg height={size} width={size} viewBox="0 0 24 24">
-      <Path fill="none" d="M0 0h24v24H0z" />
+    <Svg height={size} width={size} viewBox="0 0 16 16">
+      <Path fill="none" d="M0 0h16v16H0z" />
       <Path
         fill={color}
-        d="M11.95 7.95l-1.414 1.414L8 6.828 8 20H6V6.828L3.465 9.364 2.05 7.95 7 3l4.95 4.95zm10 8.1L17 21l-4.95-4.95 1.414-1.414 2.537 2.536L16 4h2v13.172l2.536-2.536 1.414 1.414z"
+        d="M7.96664 5.3L7.02397 6.24267L5.3333 4.552V13.3333H3.99997V4.552L2.30997 6.24267L1.36664 5.3L4.66664 2L7.96664 5.3ZM14.6333 10.7L11.3333 14L8.0333 10.7L8.97597 9.75733L10.6673 11.448L10.6666 2.66667H12V11.448L13.6906 9.75733L14.6333 10.7Z"
       />
     </Svg>
   );
