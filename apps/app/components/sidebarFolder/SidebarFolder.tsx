@@ -54,7 +54,7 @@ export default function SidebarFolder(props: Props) {
     },
   });
 
-  const createFolder = async (name) => {
+  const createFolder = async (name: string | null) => {
     setIsOpen(true);
     const id = uuidv4();
     const result = await createFolderMutation({
@@ -168,19 +168,11 @@ export default function SidebarFolder(props: Props) {
             refetchFolders={refetchFolders}
             onUpdateNamePress={editFolderName}
             onDeletePressed={() => deleteFolder(props.folderId)}
-          />
-          <Pressable
-            onPress={() => {
-              setIsOpen(true);
-              setIsEditing("new");
+            onCreateDocumentPress={createDocument}
+            onCreateFolderPress={() => {
+              createFolder(null);
             }}
-          >
-            <Icon name="folder-line" />
-          </Pressable>
-          <Pressable onPress={createDocument}>
-            <Icon name="file-transfer-line" />
-          </Pressable>
-
+          />
           {documentsResult.fetching ||
             (foldersResult.fetching && <ActivityIndicator />)}
         </HStack>
