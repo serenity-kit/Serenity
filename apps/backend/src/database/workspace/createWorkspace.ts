@@ -1,5 +1,5 @@
 import { prisma } from "../prisma";
-import { Workspace } from "../../types/workspace";
+import { Workspace, WorkspaceMember } from "../../types/workspace";
 
 type Params = {
   id: string;
@@ -31,12 +31,29 @@ export async function createWorkspace({
         workspaceId: rawWorkspace.id,
         userId,
       },
+      select: {
+        userId: true,
+        isAdmin: true,
+        user: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+    const members: WorkspaceMember[] = [];
+    usersToWorkspaces.forEach((userToWorkspace) => {
+      members.push({
+        userId: userToWorkspace.userId,
+        username: userToWorkspace.user.username,
+        isAdmin: userToWorkspace.isAdmin,
+      });
     });
     const workspace: Workspace = {
       id: rawWorkspace.id,
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
-      members: usersToWorkspaces,
+      members,
     };
     return workspace;
   });
