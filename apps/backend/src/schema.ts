@@ -15,10 +15,10 @@ import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
 import * as CreateFolderMutationTypes from "./graphql/mutations/folder/createFolder";
 import * as UpdateFolderNameMutationTypes from "./graphql/mutations/folder/updateFolderName";
 
-import * as InitializeRegistrationTypes from "./graphql/mutations/authentication/initializeRegistration";
-import * as FinalizeRegistrationTypes from "./graphql/mutations/authentication/finalizeRegistration";
-import * as InitializeLoginTypes from "./graphql/mutations/authentication/initializeLogin";
-import * as FinalizeLoginTypes from "./graphql/mutations/authentication/finalizeLogin";
+import * as StartRegistrationTypes from "./graphql/mutations/authentication/startRegistration";
+import * as FinishRegistrationTypes from "./graphql/mutations/authentication/finishRegistration";
+import * as StartLoginTypes from "./graphql/mutations/authentication/startLogin";
+import * as FinishLoginTypes from "./graphql/mutations/authentication/finishLogin";
 import * as CreateWorkspaceMutationTypes from "./graphql/mutations/workspace/createWorkspace";
 import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/deleteWorkspaces";
 import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/updateWorkspace";
@@ -46,10 +46,10 @@ export const schema = makeSchema({
     RootFoldersQueryTypes,
     FoldersQueryTypes,
 
-    InitializeRegistrationTypes,
-    FinalizeRegistrationTypes,
-    InitializeLoginTypes,
-    FinalizeLoginTypes,
+    StartRegistrationTypes,
+    FinishRegistrationTypes,
+    StartLoginTypes,
+    FinishLoginTypes,
     MeQueryTypes,
     CreateWorkspaceMutationTypes,
     DeleteWorkspacesMutationTypes,

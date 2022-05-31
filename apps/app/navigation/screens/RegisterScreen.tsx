@@ -10,14 +10,10 @@ import {
   Link,
   LabeledInput,
 } from "@serenity-tools/ui";
+import { createClientKeyPair } from "@serenity-tools/opaque/client";
 import {
-  createClientKeyPair,
-  createOprfChallenge,
-  createOprfRegistrationEnvelope,
-} from "@serenity-tools/opaque/client";
-import {
-  useFinalizeRegistrationMutation,
-  useInitializeRegistrationMutation,
+  useFinishRegistrationMutation,
+  useStartRegistrationMutation,
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
 import { RootStackScreenProps } from "../../types";
@@ -34,80 +30,18 @@ export default function RegisterScreen(
   const [password, setPassword] = useState("");
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [clientPublicKey, setClientPublicKey] = useState("");
-  const [clientPrivateKey, setClientPrivateKey] = useState("");
   const [didRegistrationSucceed, setDidRegistrationSucceed] = useState(false);
-  const [, initializeRegistrationMutation] =
-    useInitializeRegistrationMutation();
-  const [, finalizeRegistrationMutation] = useFinalizeRegistrationMutation();
+  const [, finishRegistrationMutation] = useFinishRegistrationMutation();
+  const [, startRegistrationMutation] = useStartRegistrationMutation();
   const [errorMessage, setErrorMessage] = useState("");
-  const OPRF_CLIENT_KEYS_STORAGE_KEY = "oprf.clientKeys";
-  const OPRF_SECRET_STORAGE_KEY = "oprf.secret";
-  const OPRF_NONCE_STORAGE_KEY = "oprf.nonce";
 
   useEffect(() => {
     getOrGenerateKeys();
   }, []);
 
   const getOrGenerateKeys = () => {
-    let serializedKeyData = localStorage.getItem(OPRF_CLIENT_KEYS_STORAGE_KEY);
-    if (serializedKeyData) {
-      const keys = JSON.parse(serializedKeyData);
-      setClientPublicKey(keys.publicKey);
-      setClientPrivateKey(keys.privateKey);
-      console.log("retrieved client keys");
-      console.log({ keys });
-    } else {
-      const keys = createClientKeyPair();
-      setClientPublicKey(keys.publicKey);
-      setClientPrivateKey(keys.privateKey);
-      localStorage.setItem(OPRF_CLIENT_KEYS_STORAGE_KEY, JSON.stringify(keys));
-      console.log("generated client keys");
-      console.log({ keys });
-    }
-  };
-
-  const getServerChallenge = async () => {
-    const challenge = await registerInitialize(password);
-    const mutationResult = await initializeRegistrationMutation({
-      input: {
-        username: username,
-        challenge,
-      },
-    });
-    // check for an error
-    if (mutationResult.data && mutationResult.data.initializeRegistration) {
-      return mutationResult.data.initializeRegistration.challengeResponse;
-    } else {
-      console.error(mutationResult.error);
-      throw Error("Failed to register.");
-    }
-  };
-
-  const registerAccount = async (message: string) => {
-    const mutationResult = await finalizeRegistrationMutation({
-      input: {
-        message,
-        username,
-        clientPublicKey,
-        workspaceId: uuidv4(),
-      },
-    });
-    console.log({ mutationResult });
-    // check for an error
-    if (mutationResult.data && mutationResult.data.finalizeRegistration) {
-      const serverRegistrationResponse =
-        mutationResult.data.finalizeRegistration;
-      setDidRegistrationSucceed(
-        serverRegistrationResponse.status === "success"
-      );
-      // reset since the user might end up on this screen again
-      setPassword("");
-      setUsername("");
-      props.navigation.push("Login");
-    } else if (mutationResult.error) {
-      setErrorMessage("Failed to register.");
-      throw Error(errorMessage);
-    }
+    const keys = createClientKeyPair();
+    setClientPublicKey(keys.publicKey);
   };
 
   const onRegisterPress = async () => {
@@ -120,22 +54,49 @@ export default function RegisterScreen(
     try {
       // TODO the getServerChallenge should include a signature of the challenge response and be verified that it belongs to
       // the server public to make sure it wasn't tampered with
-      const challengeResponse = await getServerChallenge();
-      const message = await finishRegistration(challengeResponse);
-      await registerAccount(message);
+      const challenge = await registerInitialize(password);
+      const startRegistrationResult = await startRegistrationMutation({
+        input: {
+          username,
+          challenge,
+        },
+      });
+      if (startRegistrationResult.data?.startRegistration) {
+        const message = await finishRegistration(
+          startRegistrationResult.data.startRegistration.challengeResponse
+        );
+        const finishRegistrationResult = await finishRegistrationMutation({
+          input: {
+            message,
+            registrationId:
+              startRegistrationResult.data.startRegistration.registrationId,
+            clientPublicKey,
+            workspaceId: uuidv4(),
+          },
+        });
+        // check for an error
+        if (finishRegistrationResult.data?.finishRegistration) {
+          setDidRegistrationSucceed(
+            finishRegistrationResult.data.finishRegistration.status ===
+              "success"
+          );
+          // reset since the user might end up on this screen again
+          setPassword("");
+          setUsername("");
+          props.navigation.push("Login");
+        } else if (finishRegistrationResult.error) {
+          setErrorMessage("Failed to register.");
+          throw Error(errorMessage);
+        }
+      } else {
+        console.error(startRegistrationResult.error);
+        throw Error("Failed to register.");
+      }
     } catch (error) {
-      console.error(error);
       setErrorMessage(error.toString());
     }
   };
 
-  const onUsernameChangeText = (username: string) => {
-    setUsername(username);
-  };
-
-  const onPasswordChangeText = (password: string) => {
-    setPassword(password);
-  };
   return (
     <View
       style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
@@ -169,7 +130,9 @@ export default function RegisterScreen(
           label={"Email"}
           keyboardType="email-address"
           value={username}
-          onChangeText={onUsernameChangeText}
+          onChangeText={(username: string) => {
+            setUsername(username);
+          }}
           placeholder="Enter your email …"
         />
 
@@ -177,7 +140,9 @@ export default function RegisterScreen(
           label={"Password"}
           secureTextEntry
           value={password}
-          onChangeText={onPasswordChangeText}
+          onChangeText={(password: string) => {
+            setPassword(password);
+          }}
           placeholder="Enter your password …"
         />
 

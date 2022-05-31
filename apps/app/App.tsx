@@ -39,10 +39,10 @@ type AuthState = {
 };
 
 const unauthenticatedOperation = [
-  "initializeRegistration",
-  "finalizeRegistration",
-  "initializeLogin",
-  "finalizeLogin",
+  "startRegistration",
+  "finishRegistration",
+  "startLogin",
+  "finishLogin",
 ];
 
 const exchanges = [

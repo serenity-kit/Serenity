@@ -9,8 +9,8 @@ import {
   LabeledInput,
 } from "@serenity-tools/ui";
 import {
-  useInitializeLoginMutation,
-  useFinalizeLoginMutation,
+  useStartLoginMutation,
+  useFinishLoginMutation,
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
 import { RootStackScreenProps } from "../../types";
@@ -22,8 +22,8 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [didLoginSucceed, setDidLoginSucceed] = useState(false);
-  const [, initializeLoginMutation] = useInitializeLoginMutation();
-  const [, finalizeLoginMutation] = useFinalizeLoginMutation();
+  const [, startLoginMutation] = useStartLoginMutation();
+  const [, finishLoginMutation] = useFinishLoginMutation();
   const [hasGqlError, setHasGqlError] = useState(false);
   const [gqlErrorMessage, setGqlErrorMessage] = useState("");
   const { updateAuthentication } = useAuthentication();
@@ -34,29 +34,28 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
     setGqlErrorMessage("");
     try {
       const message = await startLogin(password);
-      const mutationResult = await initializeLoginMutation({
+      const mutationResult = await startLoginMutation({
         input: {
           username: username,
           challenge: message,
         },
       });
       // check for an error
-      if (mutationResult.data && mutationResult.data.initializeLogin) {
-        const challengeResponse =
-          mutationResult.data.initializeLogin.challengeResponse;
-
-        const result = await finishLogin(challengeResponse);
+      if (mutationResult.data?.startLogin) {
+        const result = await finishLogin(
+          mutationResult.data.startLogin.challengeResponse
+        );
         console.log("sessionKey", result.sessionKey);
         console.log("exportKey", result.exportKey);
 
-        const finalizeLoginResult = await finalizeLoginMutation({
-          input: { username, message: result.response },
+        const finalizeLoginResult = await finishLoginMutation({
+          input: {
+            loginId: mutationResult.data.startLogin.loginId,
+            message: result.response,
+          },
         });
 
-        if (
-          finalizeLoginResult.data &&
-          finalizeLoginResult.data.finalizeLogin
-        ) {
+        if (finalizeLoginResult.data?.finishLogin) {
           setDidLoginSucceed(true);
           updateAuthentication(`TODO+${username}`);
           props.navigation.navigate("Root");

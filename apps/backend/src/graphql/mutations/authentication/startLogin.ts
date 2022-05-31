@@ -2,26 +2,27 @@ import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { startLogin } from "../../../utils/opaque";
 import { getEnvelope } from "../../../database/authentication/getEnvelope";
 
-export const ClientOprfLoginChallengeInput = inputObjectType({
-  name: "ClientOprfLoginChallengeInput",
+export const StartLoginInput = inputObjectType({
+  name: "StartLoginInput",
   definition(t) {
     t.nonNull.string("username");
     t.nonNull.string("challenge");
   },
 });
 
-export const ClientOprfLoginChallengeResult = objectType({
-  name: "ClientOprfLoginChallengeResult",
+export const StartLoginResult = objectType({
+  name: "StartLoginResult",
   definition(t) {
+    t.nonNull.string("loginId");
     t.nonNull.string("challengeResponse");
   },
 });
 
-export const initializeLoginMutation = mutationField("initializeLogin", {
-  type: ClientOprfLoginChallengeResult,
+export const startLoginMutation = mutationField("startLogin", {
+  type: StartLoginResult,
   args: {
     input: arg({
-      type: ClientOprfLoginChallengeInput,
+      type: StartLoginInput,
     }),
   },
   async resolve(root, args, context) {
@@ -29,19 +30,15 @@ export const initializeLoginMutation = mutationField("initializeLogin", {
       throw Error("Missing input");
     }
     const username = args.input.username;
-
     const result = await getEnvelope(username);
-
-    console.log(result);
-
     const challengeResponse = await startLogin(
       result.envelop,
       username,
       args.input.challenge
     );
-
     return {
-      challengeResponse,
+      loginId: challengeResponse.loginId,
+      challengeResponse: challengeResponse.message,
     };
   },
 });

@@ -1,4 +1,5 @@
 import sodium from "libsodium-wrappers-sumo";
+import { v4 as uuidv4 } from "uuid";
 import {
   HandleRegistration,
   HandleLogin,
@@ -9,12 +10,13 @@ import {
 // Currently there is no cleanup mechanism.
 // TODO let started registrations expire after a while
 const registrations: {
-  [username: string]: HandleRegistration;
+  [registrationId: string]: {
+    handleRegistration: HandleRegistration;
+    username: string;
+  };
 } = {};
 
-const logins: {
-  [username: string]: HandleLogin;
-} = {};
+const logins: { [loginId: string]: HandleLogin } = {};
 
 // Create a new private key using
 // const serverSetup = new ServerSetup();
@@ -32,21 +34,37 @@ export const startRegistration = async (
   username: string,
   challenge: string
 ) => {
+  const registrationId = uuidv4();
   const serverRegistration = new HandleRegistration(opaqueServerSetup());
   const response = serverRegistration.start(
     // @ts-expect-error string just works fine
     username,
     sodium.from_base64(challenge)
   );
-  registrations[username] = serverRegistration;
-  return response;
+  registrations[registrationId] = {
+    handleRegistration: serverRegistration,
+    username,
+  };
+  return {
+    registrationId,
+    response: sodium.to_base64(response),
+  };
 };
 
 // TODO use an registration ID generated in startRegistration instead of username
-export const finishRegistration = async (username: string, message: string) => {
-  const response = registrations[username].finish(sodium.from_base64(message));
-  delete registrations[username];
-  return sodium.to_base64(response);
+export const finishRegistration = async (
+  registrationId: string,
+  message: string
+) => {
+  const response = registrations[registrationId].handleRegistration.finish(
+    sodium.from_base64(message)
+  );
+  const username = registrations[registrationId].username;
+  delete registrations[registrationId];
+  return {
+    envelope: sodium.to_base64(response),
+    username,
+  };
 };
 
 export const startLogin = async (
@@ -54,6 +72,7 @@ export const startLogin = async (
   username: string,
   challenge: string
 ) => {
+  const loginId = uuidv4();
   const serverLogin = new HandleLogin(opaqueServerSetup());
   const response = serverLogin.start(
     sodium.from_base64(envelope),
@@ -61,13 +80,16 @@ export const startLogin = async (
     username,
     sodium.from_base64(challenge)
   );
-  logins[username] = serverLogin;
-  return sodium.to_base64(response);
+  logins[loginId] = serverLogin;
+  return {
+    loginId,
+    message: sodium.to_base64(response),
+  };
 };
 
 // TODO use an login ID generated in startLogin instead of username
-export const finishLogin = async (username: string, message: string) => {
-  const response = logins[username].finish(sodium.from_base64(message));
-  delete logins[username];
+export const finishLogin = async (loginId: string, message: string) => {
+  const response = logins[loginId].finish(sodium.from_base64(message));
+  delete logins[loginId];
   return sodium.to_base64(response);
 };

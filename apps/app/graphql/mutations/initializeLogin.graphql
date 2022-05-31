@@ -1,5 +1,0 @@
-mutation initializeLogin($input: ClientOprfLoginChallengeInput!) {
-  initializeLogin(input: $input) {
-    challengeResponse
-  }
-}

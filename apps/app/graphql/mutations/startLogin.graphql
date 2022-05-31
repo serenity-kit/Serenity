@@ -1,0 +1,6 @@
+mutation startLogin($input: StartLoginInput!) {
+  startLogin(input: $input) {
+    challengeResponse
+    loginId
+  }
+}

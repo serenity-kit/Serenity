@@ -1,7 +1,0 @@
-mutation initializeRegistration(
-  $input: ClientOprfRegistrationChallengeRequest!
-) {
-  initializeRegistration(input: $input) {
-    challengeResponse
-  }
-}
