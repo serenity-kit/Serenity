@@ -92,22 +92,22 @@ export default function RegisterScreen(
           </Text>
           <Text muted style={tw`text-center`}>
             Sign up and start your free trial!
-            <br />
+            {"\n"}
             No credit card required.
           </Text>
         </View>
 
-        {errorMessage && (
+        {errorMessage ? (
           <View>
             <Text>{errorMessage}</Text>
           </View>
-        )}
+        ) : null}
 
-        {didRegistrationSucceed && (
+        {didRegistrationSucceed ? (
           <View>
             <Text>Registration Succeeded</Text>
           </View>
-        )}
+        ) : null}
 
         <LabeledInput
           label={"Email"}
@@ -146,7 +146,7 @@ export default function RegisterScreen(
 
         <View style={tw`text-center`}>
           <Text variant="xs" muted>
-            Already have an account?{" "}
+            Already have an account?
           </Text>
           <Text variant="xs">
             <Link to={{ screen: "Login" }}>Login here</Link>
