@@ -1,19 +1,14 @@
 import { gql } from "graphql-request";
+import sodium from "libsodium-wrappers";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import sodium from "libsodium-wrappers-sumo";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import {
-  createClientKeyPair,
-  createOprfChallenge,
-  createOprfRegistrationEnvelope,
-} from "@serenity-tools/opaque/client";
+import { createClientKeyPair } from "@serenity-tools/opaque/client";
 import { requestRegistrationChallengeResponse } from "../../../../test/helpers/requestRegistrationChallengeResponse";
 
 const graphql = setupGraphql();
 const username = "user";
 const password = "password";
-let data: any = null;
-let randomScalar: string = "";
+let result: any = null;
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -21,18 +16,14 @@ beforeAll(async () => {
 
 test("server should create a registration challenge response", async () => {
   // generate a challenge code
-  const result = await requestRegistrationChallengeResponse(
+  result = await requestRegistrationChallengeResponse(
     graphql,
     username,
     password
   );
-  data = result.data;
-  randomScalar = result.randomScalar;
-  // expect serverPublicKey, oprfPublicKey, oprfChallengeResponse
-  // all three should be base64-encoded 32-bit uint8 arrays
-  expect(typeof data.serverPublicKey).toBe("string");
-  expect(typeof data.oprfPublicKey).toBe("string");
-  expect(typeof data.oprfChallengeResponse).toBe("string");
+  expect(result.data).toBeDefined();
+  expect(typeof result.data.registrationId).toBe("string");
+  expect(typeof result.data.challengeResponse).toBe("string");
 });
 
 test("server should register a user", async () => {
@@ -40,35 +31,28 @@ test("server should register a user", async () => {
   const clientKeys = createClientKeyPair();
   // crate cipher text
   const clientPublicKey = clientKeys.publicKey;
-  const clientPrivateKey = clientKeys.privateKey;
-  const registrationEnvelopeData = await createOprfRegistrationEnvelope(
-    password,
-    clientPublicKey,
-    clientPrivateKey,
-    randomScalar,
-    data.oprfChallengeResponse,
-    data.serverPublicKey,
-    data.oprfPublicKey
+  const message = result.registration.finish(
+    sodium.from_base64(result.data.challengeResponse)
   );
   const query = gql`
-    mutation {
-      finalizeRegistration(
-        input: {
-          username: "${username}"
-          secret: "${registrationEnvelopeData.secret}"
-          nonce: "${registrationEnvelopeData.nonce}"
-          clientPublicKey: "${clientKeys.publicKey}"
-          workspaceId: "297204d4-afcf-4ab6-b951-292b446d0b35"
-        }
-      ) {
+    mutation finishRegistration($input: FinishRegistrationInput!) {
+      finishRegistration(input: $input) {
         status
       }
     }
   `;
-  const registrationResponse = await graphql.client.request(query);
+
+  const registrationResponse = await graphql.client.request(query, {
+    input: {
+      registrationId: result.data.registrationId,
+      message: sodium.to_base64(message),
+      clientPublicKey,
+      workspaceId: "25ef3570-a7c8-4872-a3fb-9521842493ae",
+    },
+  });
   expect(registrationResponse).toMatchInlineSnapshot(`
     Object {
-      "finalizeRegistration": Object {
+      "finishRegistration": Object {
         "status": "success",
       },
     }

@@ -2,10 +2,8 @@ import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import {
-  createClientKeyPair,
   createOprfChallenge,
   createUserSession,
-  createOprfRegistrationEnvelope,
 } from "@serenity-tools/opaque/client";
 import { decryptSessionJsonMessage } from "@serenity-tools/opaque/common";
 import { requestRegistrationChallengeResponse } from "../../../../test/helpers/requestRegistrationChallengeResponse";

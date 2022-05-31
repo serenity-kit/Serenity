@@ -1,10 +1,10 @@
 import { gql } from "graphql-request";
-import { createOprfChallenge } from "@serenity-tools/opaque/client";
+import sodium from "libsodium-wrappers";
+import { Registration } from "../../src/vendor/opaque-wasm/opaque_wasm";
 
 export type RegistrationChallengeRepoonseType = {
   data: any;
-  oprfChallenge: string;
-  randomScalar: string;
+  registration: Registration;
 };
 
 export const requestRegistrationChallengeResponse = async (
@@ -12,25 +12,21 @@ export const requestRegistrationChallengeResponse = async (
   username: string,
   password: string
 ): Promise<RegistrationChallengeRepoonseType> => {
-  const { oprfChallenge, randomScalar } = await createOprfChallenge(password);
+  const registration = new Registration();
+  const challenge = registration.start(password);
   const query = gql`
-      mutation {
-        initializeRegistration(
-          input: {
-            username: "${username}"
-            challenge: "${oprfChallenge}"
-          }
-        ) {
-          serverPublicKey
-          oprfPublicKey
-          oprfChallengeResponse
-        }
+    mutation startRegistration($input: StartRegistrationInput!) {
+      startRegistration(input: $input) {
+        challengeResponse
+        registrationId
       }
-    `;
-  const data = await graphql.client.request(query);
+    }
+  `;
+  const data = await graphql.client.request(query, {
+    input: { username, challenge: sodium.to_base64(challenge) },
+  });
   return {
-    data: data.initializeRegistration,
-    oprfChallenge,
-    randomScalar,
+    data: data.startRegistration,
+    registration,
   };
 };
