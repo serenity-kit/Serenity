@@ -14,13 +14,13 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   // TODO: we don't want this before every test
-  const cerateUserResponse = await registerUser(
+  const createUserResponse = await registerUser(
     graphql,
     username,
     password,
     "31f63652-a995-41ff-b541-3ccdaaaac551"
   );
-  userId = cerateUserResponse.registrationResponse.finalizeRegistration.id;
+  userId = createUserResponse.registrationResponse.finalizeRegistration.id;
 });
 
 test("user should be able to create a workspace", async () => {

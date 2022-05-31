@@ -22,13 +22,15 @@ import * as InitializeLoginTypes from "./graphql/mutations/authentication/initia
 import * as FinalizeLoginTypes from "./graphql/mutations/authentication/finalizeLogin";
 import * as InitializePasswordResetTypes from "./graphql/mutations/authentication/initializePasswordReset";
 import * as FinalizePasswordResetTypes from "./graphql/mutations/authentication/finalizePasswordReset";
-import * as CreateWorkspaceMutationTypes from "./graphql/mutations/workspace/createWorkspace";
-import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/deleteWorkspaces";
-import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/updateWorkspace";
 import * as MeQueryTypes from "./graphql/queries/authentication/me";
 import * as UserIdFromUsernameQueryTypes from "./graphql/queries/userIdFromUsername";
 
 import * as WorkspaceTypes from "./graphql/types/workspace";
+import * as CreateWorkspaceMutationTypes from "./graphql/mutations/workspace/createWorkspace";
+import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/deleteWorkspaces";
+import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/updateWorkspace";
+import * as CreateWorkspaceInvitationTypes from "./graphql/mutations/workspace/createWorkspaceInvitation";
+
 import * as DocumentTypes from "./graphql/types/document";
 
 export const schema = makeSchema({
@@ -65,6 +67,7 @@ export const schema = makeSchema({
     WorkspaceTypes,
     WorkspaceQueryTypes,
     WorkspacesQueryTypes,
+    CreateWorkspaceInvitationTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),

@@ -83,6 +83,17 @@ model User {
   passwordResetOneTimePassword               String?
   passwordResetOneTimePasswordExpireDateTime DateTime?
   usersToWorkspaces                          UsersToWorkspaces[]
+  workspaceInvitations                       WorkspaceInvitations[]
+}
+
+model WorkspaceInvitations {
+  id            String    @id @default(uuid())
+  inviterUser   User      @relation(fields: [inviterUserId], references: [id], onDelete: Cascade)
+  inviterUserId String
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId   String
+  createdAt     DateTime  @default(now())
+  expiresAt     DateTime
 }
 
 model UserLoginAccessToken {
@@ -122,12 +133,13 @@ model Device {
 }
 
 model Workspace {
-  id                String              @id
+  id                String                 @id
   idSignature       String
   name              String // TODO must be encrypted
   folders           Folder[]
   documents         Document[]
   usersToWorkspaces UsersToWorkspaces[]
+  invitations       WorkspaceInvitations[]
 }
 
 model UsersToWorkspaces {

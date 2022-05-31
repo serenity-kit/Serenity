@@ -1,7 +1,7 @@
 import { userInfo } from "os";
-import deleteAllRecords from "../../../test/helpers/deleteAllRecords";
-import createUserWithWorkspace from "../testHelpers/createUserWithWorkspace";
-import { getWorkspace } from "./getWorkspace";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { getWorkspace } from "../../../database/workspace/getWorkspace";
 
 let userId = "";
 
@@ -27,7 +27,6 @@ test("user should be able to retreive their own workspace by id", async () => {
           "isAdmin": true,
           "userId": "${userId}",
           "username": "${username}",
-          "workspaceId": "getWorkspace1",
         },
       ],
       "name": "My Workspace",
