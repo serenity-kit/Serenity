@@ -18,6 +18,7 @@ import {
   useDeleteWorkspacesMutation,
   useUserIdFromUsernameQuery,
 } from "../../generated/graphql";
+import { HStack } from "native-base";
 
 type Member = {
   userId: string;
@@ -402,22 +403,23 @@ export default function WorkspaceSettingsScreen(
               <Modal
                 isVisible={showDeleteWorkspaceModal}
                 onBackdropPress={() => setShowDeleteWorkspaceModal(false)}
+                header="Delete Workspace?"
               >
-                <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
-                  <Text>Type the name of this workspace: {workspaceName}</Text>
-                  <LabeledInput
-                    label={"Workspace Name"}
-                    onChangeText={setDeletingWorkspaceName}
-                  />
+                <Text>Type the name of this workspace: {workspaceName}</Text>
+                <LabeledInput
+                  label={"Workspace Name"}
+                  onChangeText={setDeletingWorkspaceName}
+                />
+                <HStack justifyContent="flex-end" space={3}>
                   <Button
                     disabled={deletingWorkspaceName !== workspaceName}
                     onPress={() => {
                       deleteWorkspace();
                     }}
                   >
-                    Delete Workspace
+                    Delete
                   </Button>
-                </View>
+                </HStack>
               </Modal>
             )}
           </>

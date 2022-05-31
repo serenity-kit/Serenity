@@ -10,6 +10,7 @@ import {
 } from "@serenity-tools/ui";
 import { useCreateWorkspaceMutation } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
+import { HStack } from "native-base";
 
 type ModalProps = Pick<
   ReactNativeModalProps,
@@ -51,19 +52,23 @@ export function CreateWorkspaceModal(props: ModalProps) {
   };
 
   return (
-    <Modal isVisible={props.isVisible} onBackdropPress={props.onBackdropPress}>
-      <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
-        <Text>Create a Workspace</Text>
-        <LabeledInput
-          ref={inputRef}
-          label={"Workspace Name"}
-          onChangeText={setName}
-          autoFocus={true}
-        />
+    <Modal
+      isVisible={props.isVisible}
+      onBackdropPress={props.onBackdropPress}
+      header="Create a Workspace"
+    >
+      <LabeledInput
+        ref={inputRef}
+        label={"Workspace Name"}
+        onChangeText={setName}
+        autoFocus={true}
+        hint="This is the name of your organization, team or private notes. You can invite team members afterwards."
+      />
+      <HStack justifyContent="flex-end" space={3}>
         <Button disabled={name === ""} onPress={createWorkspace}>
           Create
         </Button>
-      </View>
+      </HStack>
     </Modal>
   );
 }
