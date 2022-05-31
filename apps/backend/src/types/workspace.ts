@@ -10,3 +10,10 @@ export type Workspace = {
   idSignature: string;
   members: WorkspaceMember[];
 };
+
+export type WorkspaceInvitation = {
+  id: string;
+  workspaceId: string;
+  inviterUserId: string;
+  expiresAt: Date;
+};

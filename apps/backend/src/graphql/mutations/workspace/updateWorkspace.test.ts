@@ -69,24 +69,12 @@ test("user won't update the name when not set", async () => {
     members,
     authorizationHeader,
   });
-  expect(result.updateWorkspace).toMatchInlineSnapshot(`
-    Object {
-      "workspace": Object {
-        "id": "abc",
-        "members": Array [
-          Object {
-            "isAdmin": true,
-            "userId": "${userId1}",
-          },
-          Object {
-            "isAdmin": true,
-            "userId": "${userId2}",
-          },
-        ],
-        "name": "workspace 1",
-      },
-    }
-  `);
+  const workspace = result.updateWorkspace.workspace;
+  expect(workspace.name).toBe(addedWorkspace.name);
+  expect(workspace.members.length).toBe(2);
+  workspace.members.forEach((member: { userId: string; isAdmin: any }) => {
+    expect(member.isAdmin).toBe(true);
+  });
 });
 
 test("user won't update the members", async () => {
@@ -102,24 +90,12 @@ test("user won't update the members", async () => {
     members,
     authorizationHeader,
   });
-  expect(result.updateWorkspace).toMatchInlineSnapshot(`
-    Object {
-      "workspace": Object {
-        "id": "abc",
-        "members": Array [
-          Object {
-            "isAdmin": true,
-            "userId": "${userId1}",
-          },
-          Object {
-            "isAdmin": true,
-            "userId": "${userId2}",
-          },
-        ],
-        "name": "workspace 2",
-      },
-    }
-  `);
+  const workspace = result.updateWorkspace.workspace;
+  expect(workspace.name).toBe(name);
+  expect(workspace.members.length).toBe(2);
+  workspace.members.forEach((member: { userId: string; isAdmin: any }) => {
+    expect(member.isAdmin).toBe(true);
+  });
 });
 
 // WARNING: after this, user is no longer an admin on this workspace
@@ -145,24 +121,16 @@ test("user should be able to update a workspace, but not their own access level"
     members,
     authorizationHeader,
   });
-  expect(result.updateWorkspace).toMatchInlineSnapshot(`
-    Object {
-      "workspace": Object {
-        "id": "abc",
-        "members": Array [
-          Object {
-            "isAdmin": true,
-            "userId": "${userId1}",
-          },
-          Object {
-            "isAdmin": false,
-            "userId": "${userId2}",
-          },
-        ],
-        "name": "renamed workspace",
-      },
+  const workspace = result.updateWorkspace.workspace;
+  expect(workspace.name).toBe(name);
+  expect(workspace.members.length).toBe(2);
+  workspace.members.forEach((member: { userId: string; isAdmin: any }) => {
+    if (member.userId === userId1) {
+      expect(member.isAdmin).toBe(true);
+    } else {
+      expect(member.isAdmin).toBe(false);
     }
-  `);
+  });
 });
 
 test("user should not be able to update a workspace they don't own", async () => {
