@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
   Text,
@@ -10,7 +10,6 @@ import {
   Link,
   LabeledInput,
 } from "@serenity-tools/ui";
-import { createClientKeyPair } from "@serenity-tools/opaque/client";
 import {
   useFinishRegistrationMutation,
   useStartRegistrationMutation,
@@ -29,20 +28,10 @@ export default function RegisterScreen(
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
-  const [clientPublicKey, setClientPublicKey] = useState("");
   const [didRegistrationSucceed, setDidRegistrationSucceed] = useState(false);
   const [, finishRegistrationMutation] = useFinishRegistrationMutation();
   const [, startRegistrationMutation] = useStartRegistrationMutation();
   const [errorMessage, setErrorMessage] = useState("");
-
-  useEffect(() => {
-    getOrGenerateKeys();
-  }, []);
-
-  const getOrGenerateKeys = () => {
-    const keys = createClientKeyPair();
-    setClientPublicKey(keys.publicKey);
-  };
 
   const onRegisterPress = async () => {
     if (!hasAcceptedTerms) {
@@ -70,7 +59,7 @@ export default function RegisterScreen(
             message,
             registrationId:
               startRegistrationResult.data.startRegistration.registrationId,
-            clientPublicKey,
+            clientPublicKey: `TODO+${uuidv4()}`,
             workspaceId: uuidv4(),
           },
         });
