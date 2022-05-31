@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build:editor": "cd ../../packages/editor && yarn build && cd -",
-    "build:opaque-client": "cd ../../packages/opaque-se && yarn build && cd -",
+    "build:opaque-client": "cd ../../packages/opaque && yarn build && cd -",
     "build:graphql-types": "graphql-codegen --config codegen.yml",
     "dev": "yarn && yarn build:editor && yarn build:opaque-client && expo start --dev-client",
     "dev:electron-web": "yarn && yarn build:editor && EXPO_ELECTRON_MODE=true expo start --web --dev-client",
@@ -26,7 +26,7 @@
     "@react-navigation/native-stack": "^6.1.0",
     "@serenity-tools/editor": "*",
     "@serenity-tools/libsodium": "*",
-    "@serenity-tools/opaque-se": "*",
+    "@serenity-tools/opaque": "*",
     "@serenity-tools/ui": "*",
     "@tiptap/extension-placeholder": "^2.0.0-beta.48",
     "@urql/devtools": "^2.0.3",

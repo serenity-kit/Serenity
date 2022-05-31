@@ -15,7 +15,7 @@ import {
 import { useWindowDimensions } from "react-native";
 import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
-import { startLogin, finishLogin } from "@serenity-tools/opaque-se";
+import { startLogin, finishLogin } from "@serenity-tools/opaque";
 
 export default function LoginScreen(props: RootStackScreenProps<"Login">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing

@@ -16,10 +16,7 @@ import {
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
 import { RootStackScreenProps } from "../../types";
-import {
-  registerInitialize,
-  finishRegistration,
-} from "@serenity-tools/opaque-se";
+import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
 
 export default function RegisterScreen(
   props: RootStackScreenProps<"Register">
