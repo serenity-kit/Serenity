@@ -1,7 +1,6 @@
 import { Registration, Login } from "opaque-wasm";
 
 const toBase64 = (data: Uint8Array) => {
-  // @ts-expect-error automatic conversion just works
   return btoa(String.fromCharCode.apply(null, data));
 };
 
