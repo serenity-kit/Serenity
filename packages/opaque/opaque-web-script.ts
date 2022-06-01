@@ -1,7 +1,7 @@
 import { Registration, Login } from "opaque-wasm";
 
 const toBase64 = (data: Uint8Array) => {
-  return btoa(String.fromCharCode.apply(null, data));
+  return btoa(String.fromCharCode.apply(null, [...data]));
 };
 
 const fromBase64 = (value: string) => {
