@@ -58,6 +58,10 @@ export default function SidebarPage(props: Props) {
                 },
               },
             }}
+            // TODO adjust the max-width depending on depth
+            style={tw`ml-1.5 max-w-32`}
+            numberOfLines={1}
+            ellipsizeMode="tail"
           >
             {props.documentName}
           </Link>

@@ -161,7 +161,15 @@ export default function SidebarFolder(props: Props) {
               value={props.folderName}
             />
           ) : (
-            <Text>{props.folderName}</Text>
+            <Text
+              variant="small"
+              // TODO adjust the max-width depending on depth
+              style={tw`ml-1.5 max-w-32`}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {props.folderName}
+            </Text>
           )}
           <SidebarFolderMenu
             folderId={props.folderId}
