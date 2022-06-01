@@ -84,8 +84,7 @@ export default function RegisterScreen(
     <View
       style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
     >
-      {/* TODO use this as classes or default/variant ? */}
-      <Box style={tw`max-w-md w-full`}>
+      <Box>
         <View>
           <Text variant="large" bold style={tw`text-center`}>
             Register

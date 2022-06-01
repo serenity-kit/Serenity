@@ -81,7 +81,11 @@ export default function DesignSystemScreen() {
       <VStack space={4}>
         <Input />
         <LabeledInput label={"Input"} />
-        <LabeledInput label={"Input w/ Value"} value="jane@example.com" />
+        <LabeledInput
+          label={"Input w/ Value"}
+          value="jane@example.com"
+          hint="Here you can put information you want the user to have regarding this input."
+        />
         <LabeledInput
           label={"Input w/ Placeholder"}
           placeholder="Enter your email …"
@@ -212,18 +216,28 @@ export default function DesignSystemScreen() {
       </SidebarLink>
 
       <Text style={tw`mt-6 mb-4 h2`}>Modal (work in progress)</Text>
-      <Modal isVisible={showModal} onBackdropPress={() => setShowModal(false)}>
-        <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
-          <Text>Hello World</Text>
-          <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-            <Text>Encrypt / Decrypt Image</Text>
-          </SidebarLink>
-        </View>
+      <Modal
+        header="This is the header"
+        isVisible={showModal}
+        onBackdropPress={() => setShowModal(false)}
+      >
+        <LabeledInput
+          label={"Label of the Input"}
+          value="While typi"
+          hint="Here you can put information you want the user to have regarding this input."
+        />
+        {/* TODO / tbd: could be extracted in a Modal.Footer kind of thing */}
+        <HStack justifyContent="flex-end" space={3}>
+          <Button variant="secondary">Decline</Button>
+          <Button variant="primary">Confirm this</Button>
+        </HStack>
       </Modal>
       <Button
         onPress={() => {
           setShowModal(true);
         }}
+        variant="primary"
+        size="small"
       >
         Open Modal
       </Button>

@@ -13,7 +13,7 @@ export const CupLine = ({ color, size }: Props) => {
       />
       <Path
         stroke={color}
-        stroke-width="1.5"
+        strokeWidth="1.5"
         d="M4.80005 1.60001V4.00001M7.20005 1.60001V4.00001M9.60005 1.60001V4.00001"
       />
     </Svg>
