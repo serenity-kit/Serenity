@@ -18,6 +18,8 @@ import {
   Modal,
   Avatar,
   AvatarGroup,
+  ModalHeader,
+  ModalButtonFooter,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -220,21 +222,21 @@ export default function DesignSystemScreen() {
       </SidebarLink>
 
       <Text style={tw`mt-6 mb-4 h2`}>Modal (work in progress)</Text>
-      <Modal
-        header="This is the header"
-        isVisible={showModal}
-        onBackdropPress={() => setShowModal(false)}
-      >
+      <Modal isVisible={showModal} onBackdropPress={() => setShowModal(false)}>
+        <ModalHeader>This is the header</ModalHeader>
         <LabeledInput
           label={"Label of the Input"}
           value="While typi"
           hint="Here you can put information you want the user to have regarding this input."
         />
-        {/* TODO / tbd: could be extracted in a Modal.Footer kind of thing */}
-        <HStack justifyContent="flex-end" space={3}>
-          <Button variant="secondary">Decline</Button>
-          <Button variant="primary">Confirm this</Button>
-        </HStack>
+        <ModalButtonFooter
+          cancel={
+            <Button variant="secondary" onPress={() => setShowModal(false)}>
+              Cancel
+            </Button>
+          }
+          confirm={<Button variant="primary">Confirm</Button>}
+        />
       </Modal>
       <Button
         onPress={() => {

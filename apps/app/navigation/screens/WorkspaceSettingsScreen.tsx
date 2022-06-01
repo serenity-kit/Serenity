@@ -9,6 +9,8 @@ import {
   LabeledInput,
   Modal,
   tw,
+  ModalHeader,
+  ModalButtonFooter,
 } from "@serenity-tools/ui";
 import { RootStackScreenProps, WorkspaceDrawerScreenProps } from "../../types";
 import {
@@ -18,7 +20,6 @@ import {
   useDeleteWorkspacesMutation,
   useUserIdFromUsernameQuery,
 } from "../../generated/graphql";
-import { HStack } from "native-base";
 
 type Member = {
   userId: string;
@@ -403,23 +404,25 @@ export default function WorkspaceSettingsScreen(
               <Modal
                 isVisible={showDeleteWorkspaceModal}
                 onBackdropPress={() => setShowDeleteWorkspaceModal(false)}
-                header="Delete Workspace?"
               >
+                <ModalHeader>Delete Workspace?</ModalHeader>
                 <Text>Type the name of this workspace: {workspaceName}</Text>
                 <LabeledInput
                   label={"Workspace Name"}
                   onChangeText={setDeletingWorkspaceName}
                 />
-                <HStack justifyContent="flex-end" space={3}>
-                  <Button
-                    disabled={deletingWorkspaceName !== workspaceName}
-                    onPress={() => {
-                      deleteWorkspace();
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </HStack>
+                <ModalButtonFooter
+                  confirm={
+                    <Button
+                      disabled={deletingWorkspaceName !== workspaceName}
+                      onPress={() => {
+                        deleteWorkspace();
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  }
+                />
               </Modal>
             )}
           </>
