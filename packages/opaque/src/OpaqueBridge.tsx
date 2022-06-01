@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
 import { WebView } from "react-native-webview";
 
 type PromiseCallbacks = {
@@ -73,17 +73,19 @@ export default function OpaqueBridge() {
   }, []);
 
   return (
-    <WebView
-      ref={webViewRef}
-      originWhitelist={["*"]}
-      source={editorSource}
-      onMessage={async (event) => {
-        const message = JSON.parse(event.nativeEvent.data);
-        if (promisesStorage[message.id]) {
-          promisesStorage[message.id].resolve(message.result);
-          delete promisesStorage[message.id];
-        }
-      }}
-    />
+    <View style={{ height: 0, width: 0, overflow: "hidden" }}>
+      <WebView
+        ref={webViewRef}
+        originWhitelist={["*"]}
+        source={editorSource}
+        onMessage={async (event) => {
+          const message = JSON.parse(event.nativeEvent.data);
+          if (promisesStorage[message.id]) {
+            promisesStorage[message.id].resolve(message.result);
+            delete promisesStorage[message.id];
+          }
+        }}
+      />
+    </View>
   );
 }
