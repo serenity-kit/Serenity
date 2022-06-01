@@ -3,6 +3,7 @@ import {
   Menu,
   Pressable,
   SidebarButton,
+  SidebarDivider,
   Text,
   tw,
 } from "@serenity-tools/ui";
@@ -41,7 +42,7 @@ export default function SidebarPageMenu(props: Props) {
           accessibilityLabel="More options menu"
           style={tw`flex flex-row`}
         >
-          <Icon name="more-line" />
+          <Icon name="more-line" color={tw.color("gray-600")} />
         </Pressable>
       }
     >
@@ -53,6 +54,7 @@ export default function SidebarPageMenu(props: Props) {
       >
         <Text variant="small">Change Name</Text>
       </SidebarButton>
+      <SidebarDivider collapsed />
       <SidebarButton
         onPress={() => {
           setIsOpenMenu(false);
