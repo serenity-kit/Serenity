@@ -176,11 +176,13 @@ export default function SidebarFolder(props: Props) {
             refetchFolders={refetchFolders}
             onUpdateNamePress={editFolderName}
             onDeletePressed={() => deleteFolder(props.folderId)}
-            onCreateDocumentPress={createDocument}
             onCreateFolderPress={() => {
               createFolder(null);
             }}
           />
+          <Pressable onPress={createDocument}>
+            <Icon name="file-add-line" color={tw.color("gray-600")} />
+          </Pressable>
           {documentsResult.fetching ||
             (foldersResult.fetching && <ActivityIndicator />)}
         </HStack>

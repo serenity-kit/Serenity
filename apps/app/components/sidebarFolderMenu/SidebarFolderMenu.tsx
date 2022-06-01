@@ -14,7 +14,6 @@ type Props = {
   refetchFolders: () => void;
   onUpdateNamePress: () => void;
   onDeletePressed: () => void;
-  onCreateDocumentPress: () => void;
   onCreateFolderPress: () => void;
 };
 
@@ -38,14 +37,6 @@ export default function SidebarFolderMenu(props: Props) {
         </Pressable>
       }
     >
-      <SidebarButton
-        onPress={() => {
-          setIsOpenMenu(false);
-          props.onCreateDocumentPress();
-        }}
-      >
-        <Text variant="small">Create Document</Text>
-      </SidebarButton>
       <SidebarButton
         onPress={() => {
           setIsOpenMenu(false);
