@@ -11,9 +11,7 @@ import { tw } from "../../tailwind";
 type ModalProps = Pick<
   ReactNativeModalProps,
   "isVisible" | "onBackdropPress" | "style" | "children"
-> & {
-  header?: string;
-};
+>;
 
 export const Modal = React.forwardRef(({ ...rest }: ModalProps, ref: any) => {
   const styles = StyleSheet.create({
@@ -33,15 +31,7 @@ export const Modal = React.forwardRef(({ ...rest }: ModalProps, ref: any) => {
       useNativeDriverForBackdrop
       style={[rest.style, styles.modal]}
     >
-      <Box style={styles.box}>
-        {rest.header && (
-          <Text variant="medium" bold>
-            {rest.header}
-          </Text>
-        )}
-
-        {rest.children}
-      </Box>
+      <Box style={styles.box}>{rest.children}</Box>
     </ReactNativeModal>
   );
 });

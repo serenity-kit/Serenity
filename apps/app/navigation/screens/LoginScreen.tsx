@@ -119,7 +119,9 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
           placeholder="Enter your password …"
         />
 
-        <Button onPress={onLoginPress}>Log in</Button>
+        <Button onPress={onLoginPress} size="large">
+          Log in
+        </Button>
         <View style={tw`text-center`}>
           <Text variant="xs" muted>
             Don't have an account?{" "}

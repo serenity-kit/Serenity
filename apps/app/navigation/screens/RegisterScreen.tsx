@@ -141,7 +141,9 @@ export default function RegisterScreen(
           </Text>
         </Checkbox>
 
-        <Button onPress={onRegisterPress}>Register</Button>
+        <Button onPress={onRegisterPress} size="large">
+          Register
+        </Button>
 
         <View style={tw`text-center`}>
           <Text variant="xs" muted>
