@@ -116,6 +116,7 @@ export default function RegisterScreen(
             setUsername(username);
           }}
           placeholder="Enter your email …"
+          autoCapitalize="none"
         />
 
         <LabeledInput

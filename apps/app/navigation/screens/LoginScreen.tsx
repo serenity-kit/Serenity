@@ -107,6 +107,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
             setUsername(username);
           }}
           placeholder="Enter your email …"
+          autoCapitalize="none"
         />
 
         <LabeledInput

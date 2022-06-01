@@ -76,7 +76,7 @@ const computeStyle = ({
 
 export const Button = forwardRef((props: ButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
-  const { variant = "primary", size = "medium" } = props;
+  const { variant = "primary", size = "medium", ...rest } = props;
 
   // generic wrapper-styles
   const wrapperStyle = {
@@ -117,7 +117,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
   return (
     <Pressable
       ref={ref}
-      {...props}
+      {...rest}
       accessibilityRole={props.accessibilityRole ?? "button"}
       // @ts-expect-error - web only
       onFocus={focusRingProps.onFocus}

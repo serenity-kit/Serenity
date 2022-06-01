@@ -1,8 +1,7 @@
 import { Registration, Login } from "opaque-wasm";
 
 const toBase64 = (data: Uint8Array) => {
-  // @ts-expect-error automatic conversion just works
-  return btoa(String.fromCharCode.apply(null, data));
+  return btoa(String.fromCharCode.apply(null, [...data]));
 };
 
 const fromBase64 = (value: string) => {
@@ -31,9 +30,9 @@ window._opaque.startLogin = function (password: string) {
 
 window._opaque.finishLogin = function (response: string) {
   const message = login.finish(fromBase64(response));
-  return JSON.stringify({
+  return {
     sessionKey: toBase64(login.getSessionKey()),
     exportKey: toBase64(login.getExportKey()),
     response: toBase64(message),
-  });
+  };
 };
