@@ -31,9 +31,9 @@ window._opaque.startLogin = function (password: string) {
 
 window._opaque.finishLogin = function (response: string) {
   const message = login.finish(fromBase64(response));
-  return JSON.stringify({
+  return {
     sessionKey: toBase64(login.getSessionKey()),
     exportKey: toBase64(login.getExportKey()),
     response: toBase64(message),
-  });
+  };
 };

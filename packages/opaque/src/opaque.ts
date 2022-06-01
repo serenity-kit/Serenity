@@ -21,10 +21,9 @@ export const finishLogin = async (response: string) => {
   const result = await global._opaque.finishLogin(
     sodium.url_safe_base64_to_base64(response)
   );
-  const parsedResult = JSON.parse(result);
   return {
-    sessionKey: sodium.base64_to_url_safe_base64(parsedResult.sessionKey),
-    exportKey: sodium.base64_to_url_safe_base64(parsedResult.exportKey),
-    response: sodium.base64_to_url_safe_base64(parsedResult.response),
+    sessionKey: sodium.base64_to_url_safe_base64(result.sessionKey),
+    exportKey: sodium.base64_to_url_safe_base64(result.exportKey),
+    response: sodium.base64_to_url_safe_base64(result.response),
   };
 };
