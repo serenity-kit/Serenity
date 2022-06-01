@@ -16,7 +16,7 @@ export const EditorSidebarIcon = (props: EditorSidebarIconProps) => {
 
   const styles = StyleSheet.create({
     default: tw`items-center justify-center bg-white w-6 h-6 border-solid border border-gray-300 rounded`,
-    active: tw`bg-primary-200 border-primary-200`,
+    active: tw`bg-primary-100 border-primary-500`,
   });
 
   return (
