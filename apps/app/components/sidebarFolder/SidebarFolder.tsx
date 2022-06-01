@@ -5,11 +5,12 @@ import {
   Text,
   tw,
   View,
+  ViewProps,
   InlineInput,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, StyleSheet } from "react-native";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateDocumentMutation,
@@ -23,7 +24,7 @@ import { RootStackScreenProps } from "../../types";
 import SidebarPage from "../sidebarPage/SidebarPage";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 
-type Props = {
+type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
   folderName: string;
@@ -138,53 +139,67 @@ export default function SidebarFolder(props: Props) {
     }
   };
 
+  const styles = StyleSheet.create({
+    folder: tw``,
+  });
+
   return (
-    <>
+    <View style={[styles.folder, props.style]}>
       <Pressable
         onPress={() => {
           setIsOpen((currentIsOpen) => !currentIsOpen);
         }}
+        style={tw`my-1.5 mx-2.5`}
       >
-        <HStack>
-          {isOpen ? (
-            <Icon name="arrow-down-s-fill" />
-          ) : (
-            <Icon name="arrow-right-s-fill" />
-          )}
-          <Icon name="folder" />
-          {isEditing === "name" ? (
-            <InlineInput
-              onSubmit={updateFolderName}
-              onCancel={() => {
-                setIsEditing("none");
+        <HStack justifyContent="space-between">
+          <HStack alignItems="center">
+            {/* TODO move style property to Icon ? */}
+            <div style={tw`ml-0.5 -mr-0.5`}>
+              <Icon
+                name={isOpen ? "arrow-down-s-fill" : "arrow-right-s-fill"}
+                color={tw.color("gray-600")}
+              />
+            </div>
+            <Icon name="folder" size={20} />
+            {isEditing === "name" ? (
+              <InlineInput
+                onSubmit={updateFolderName}
+                onCancel={() => {
+                  setIsEditing("none");
+                }}
+                value={props.folderName}
+                // TODO adjust width depending on depth
+                style={tw`w-32 ml-1.5`}
+              />
+            ) : (
+              <Text
+                variant="small"
+                // TODO adjust the max-width depending on depth
+                style={tw`ml-1.5 max-w-32`}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {props.folderName}
+              </Text>
+            )}
+          </HStack>
+
+          <HStack alignItems="center" space="1.5">
+            <SidebarFolderMenu
+              folderId={props.folderId}
+              refetchFolders={refetchFolders}
+              onUpdateNamePress={editFolderName}
+              onDeletePressed={() => deleteFolder(props.folderId)}
+              onCreateFolderPress={() => {
+                createFolder(null);
               }}
-              value={props.folderName}
             />
-          ) : (
-            <Text
-              variant="small"
-              // TODO adjust the max-width depending on depth
-              style={tw`ml-1.5 max-w-32`}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {props.folderName}
-            </Text>
-          )}
-          <SidebarFolderMenu
-            folderId={props.folderId}
-            refetchFolders={refetchFolders}
-            onUpdateNamePress={editFolderName}
-            onDeletePressed={() => deleteFolder(props.folderId)}
-            onCreateFolderPress={() => {
-              createFolder(null);
-            }}
-          />
-          <Pressable onPress={createDocument}>
-            <Icon name="file-add-line" color={tw.color("gray-600")} />
-          </Pressable>
-          {documentsResult.fetching ||
-            (foldersResult.fetching && <ActivityIndicator />)}
+            <Pressable onPress={createDocument}>
+              <Icon name="file-add-line" color={tw.color("gray-600")} />
+            </Pressable>
+            {documentsResult.fetching ||
+              (foldersResult.fetching && <ActivityIndicator />)}
+          </HStack>
         </HStack>
       </Pressable>
       {isEditing === "new" && (
@@ -194,6 +209,8 @@ export default function SidebarFolder(props: Props) {
           onCancel={() => {
             setIsEditing("none");
           }}
+          // TODO adjust width depending on depth
+          style={tw`w-32 ml-1.5`}
         />
       )}
 
@@ -205,7 +222,7 @@ export default function SidebarFolder(props: Props) {
                   return null;
                 }
                 return (
-                  <View style={tw`ml-2`} key={folder.id}>
+                  <View style={tw`ml-3`} key={folder.id}>
                     <SidebarFolder
                       folderId={folder.id}
                       workspaceId={props.workspaceId}
@@ -223,18 +240,19 @@ export default function SidebarFolder(props: Props) {
                   return null;
                 }
                 return (
-                  <SidebarPage
-                    key={document.id}
-                    documentId={document.id}
-                    documentName={document.name || "Untitled"}
-                    workspaceId={props.workspaceId}
-                    onRefetchDocumentsPress={refetchDocuments}
-                  />
+                  <View style={tw`ml-3`} key={document.id}>
+                    <SidebarPage
+                      documentId={document.id}
+                      documentName={document.name || "Untitled"}
+                      workspaceId={props.workspaceId}
+                      onRefetchDocumentsPress={refetchDocuments}
+                    />
+                  </View>
                 );
               })
             : null}
         </>
       )}
-    </>
+    </View>
   );
 }
