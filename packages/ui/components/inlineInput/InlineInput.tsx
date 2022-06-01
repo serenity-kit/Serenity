@@ -16,7 +16,7 @@ export type InlineInputProps = TextInput["props"] & {
 export const InlineInput = forwardRef<TextInput, InlineInputProps>(
   (props: InlineInputProps, ref) => {
     const styles = StyleSheet.create({
-      input: tw`text-base text-gray-900`,
+      input: tw`text-small text-gray-900`,
     });
 
     const [canceled, setCanceled] = React.useState(false);
