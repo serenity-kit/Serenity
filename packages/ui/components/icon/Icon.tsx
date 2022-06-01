@@ -192,7 +192,7 @@ export type IconProps = {
 export const Icon = (props: IconProps) => {
   const { name } = props;
   const color = props.color ?? (tw.color("gray-900") as string);
-  const size = props.size ?? 24;
+  const size = props.size ?? 16;
 
   if (name === "add-line") return <AddLine color={color} size={size} />;
   if (name === "archive-fill") return <ArchiveFill color={color} size={size} />;
