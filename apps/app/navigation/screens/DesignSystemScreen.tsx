@@ -74,8 +74,12 @@ export default function DesignSystemScreen() {
       <Button variant="secondary" disabled>
         Login
       </Button>
-      <Text>Small Button</Text>
-      <Button size="small">Login</Button>
+      <Text>Button sizes</Text>
+      <VStack space="2">
+        <Button size="small">Small</Button>
+        <Button size="medium">Medium</Button>
+        <Button size="large">Large</Button>
+      </VStack>
 
       <Text style={tw`mt-6 mb-4 h2`}>Input</Text>
       <VStack space={4}>
