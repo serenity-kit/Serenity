@@ -33,6 +33,7 @@ import {
 import RootScreen from "./screens/RootScreen";
 import NoWorkspaceScreen from "./screens/NoWorkspaceScreen";
 import { DrawerActions } from "@react-navigation/native";
+import AcceptWorkspaceInvitationScreen from "./screens/AcceptWorkspaceInvitationScreen";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -121,6 +122,11 @@ function RootNavigator() {
         component={NotFoundScreen}
         options={{ title: "Oops!" }}
       />
+      <Stack.Screen
+        name="AcceptInvitation"
+        component={AcceptWorkspaceInvitationScreen}
+        options={{ title: "Accept Workspace Invitation" }}
+      />
     </Stack.Navigator>
   );
 }
@@ -147,6 +153,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       EncryptDecryptImageTest: "encrypt-decrypt-image-test",
       Root: "",
       NotFound: "*",
+      AcceptInvitation: "accept-workspace-invitation/:workspaceInvitationId",
     },
   },
 };
