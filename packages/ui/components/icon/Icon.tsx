@@ -3,6 +3,7 @@ import { tw } from "../../tailwind";
 import { AddLine } from "./icons/AddLine";
 import { ArchiveFill } from "./icons/ArchiveFill";
 import { ArchiveLine } from "./icons/ArchiveLine";
+import { ArrowDownFilled } from "./icons/ArrowDownFilled";
 import { ArrowDownSFill } from "./icons/ArrowDownSFill";
 import { ArrowDownSLine } from "./icons/ArrowDownSLine";
 import { ArrowGoBackFill } from "./icons/ArrowGoBackFill";
@@ -11,6 +12,7 @@ import { ArrowGoForwardLine } from "./icons/ArrowGoForwardLine";
 import { ArrowGoForwardFill } from "./icons/ArrowGoForwardFill";
 import { ArrowLeftSLine } from "./icons/ArrowLeftSLine";
 import { ArrowRight } from "./icons/ArrowRight";
+import { ArrowRightFilled } from "./icons/ArrowRightFilled";
 import { ArrowRightSLine } from "./icons/ArrowRightSLine";
 import { ArrowUpDownLine } from "./icons/ArrowUpDownLine";
 import { Attachment2 } from "./icons/Attachment2";
@@ -97,6 +99,7 @@ export type IconProps = {
     | "add-line"
     | "archive-fill"
     | "archive-line"
+    | "arrow-down-filled"
     | "arrow-down-s-fill"
     | "arrow-down-s-line"
     | "arrow-go-back-fill"
@@ -105,6 +108,7 @@ export type IconProps = {
     | "arrow-go-forward-line"
     | "arrow-left-s-line"
     | "arrow-right"
+    | "arrow-right-filled"
     | "arrow-right-s-line"
     | "arrow-up-down-line"
     | "at-line"
@@ -197,6 +201,8 @@ export const Icon = (props: IconProps) => {
   if (name === "add-line") return <AddLine color={color} size={size} />;
   if (name === "archive-fill") return <ArchiveFill color={color} size={size} />;
   if (name === "archive-line") return <ArchiveLine color={color} size={size} />;
+  if (name === "arrow-down-filled")
+    return <ArrowDownFilled color={color} size={size} />;
   if (name === "arrow-down-s-fill")
     return <ArrowDownSFill color={color} size={size} />;
   if (name === "arrow-down-s-line")
@@ -213,6 +219,8 @@ export const Icon = (props: IconProps) => {
     return <ArrowLeftSLine color={color} size={size} />;
   if (name === "arrow-right-s-line")
     return <ArrowRightSLine color={color} size={size} />;
+  if (name === "arrow-right-filled")
+    return <ArrowRightFilled color={color} size={size} />;
   if (name === "arrow-right") return <ArrowRight color={color} size={size} />;
   if (name === "arrow-up-down-line")
     return <ArrowUpDownLine color={color} size={size} />;
