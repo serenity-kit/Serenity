@@ -156,7 +156,7 @@ export default function SidebarFolder(props: Props) {
             {/* TODO move style property to Icon ? */}
             <div style={tw`ml-0.5 -mr-0.5`}>
               <Icon
-                name={isOpen ? "arrow-down-s-fill" : "arrow-right"}
+                name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
                 color={tw.color("gray-600")}
               />
             </div>
