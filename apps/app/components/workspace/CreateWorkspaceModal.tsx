@@ -2,11 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import { ModalProps as ReactNativeModalProps } from "react-native-modal";
 import {
   Button,
-  Text,
-  tw,
-  View,
   LabeledInput,
   Modal,
+  ModalHeader,
+  ModalButtonFooter,
 } from "@serenity-tools/ui";
 import { useCreateWorkspaceMutation } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
@@ -52,18 +51,21 @@ export function CreateWorkspaceModal(props: ModalProps) {
 
   return (
     <Modal isVisible={props.isVisible} onBackdropPress={props.onBackdropPress}>
-      <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
-        <Text>Create a Workspace</Text>
-        <LabeledInput
-          ref={inputRef}
-          label={"Workspace Name"}
-          onChangeText={setName}
-          autoFocus={true}
-        />
-        <Button disabled={name === ""} onPress={createWorkspace}>
-          Create
-        </Button>
-      </View>
+      <ModalHeader>Create a Workspace</ModalHeader>
+      <LabeledInput
+        ref={inputRef}
+        label={"Workspace Name"}
+        onChangeText={setName}
+        autoFocus={true}
+        hint="This is the name of your organization, team or private notes. You can invite team members afterwards."
+      />
+      <ModalButtonFooter
+        confirm={
+          <Button disabled={name === ""} onPress={createWorkspace}>
+            Create
+          </Button>
+        }
+      />
     </Modal>
   );
 }

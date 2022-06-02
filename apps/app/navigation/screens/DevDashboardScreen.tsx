@@ -1,5 +1,6 @@
 import { Button, Link, Text, tw, View } from "@serenity-tools/ui";
-import { Platform, useWindowDimensions } from "react-native";
+import { useWindowDimensions } from "react-native";
+import * as storage from "../../utils/storage/storage";
 
 export default function DevDashboardScreen(props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -14,9 +15,7 @@ export default function DevDashboardScreen(props) {
       </Link>
       <Button
         onPress={() => {
-          if (Platform.OS === "web") {
-            localStorage.setItem("deviceSigningPublicKey", `TODO+jane`);
-          }
+          storage.setItem("deviceSigningPublicKey", `TODO+jane`);
           props.navigation.navigate("Root");
         }}
       >

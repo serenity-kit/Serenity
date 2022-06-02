@@ -1,18 +1,14 @@
 // inspired by https://github.com/GeekyAnts/NativeBase/blob/master/src/components/primitives/Button/Button.tsx
 
 import React, { forwardRef } from "react";
-import {
-  Text as RnText,
-  View as RnView,
-  PressableProps,
-  StyleSheet,
-} from "react-native";
+import { View as RnView, PressableProps, StyleSheet } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
 import { Pressable } from "native-base";
 import { tw } from "../../tailwind";
+import { Text, TextVariants } from "../text/Text";
 
 export type ButtonVariants = "primary" | "secondary";
-export type ButtonSizes = "small" | "regular";
+export type ButtonSizes = "small" | "medium" | "large";
 
 export type ButtonProps = PressableProps & {
   size?: ButtonSizes;
@@ -29,6 +25,8 @@ type ComputeStyleParams = {
   size?: ButtonSizes | null;
 };
 
+const textSizes: TextVariants[] = ["xxs", "small", "medium"];
+
 const computeStyle = ({
   disabled,
   isPressed,
@@ -40,20 +38,24 @@ const computeStyle = ({
   if (disabled) {
     switch (variant) {
       case "secondary":
-        return tw`bg-gray-100 border-gray-300`;
+        return tw`bg-gray-200 border-gray-200`;
       case "primary":
-        return tw`bg-gray-300 border-gray-300`;
+        return tw`bg-primary-100 border-primary-100`;
     }
   }
 
   let style: any = isFocusVisible
-    ? tw.style(size === "small" ? "se-inset-focus-mini" : "se-inset-focus") // web only
+    ? tw.style(
+        size === "large"
+          ? "border-3 border-primary-700"
+          : "border-2 border-primary-700"
+      ) // web only
     : {};
 
   if (isPressed) {
     switch (variant) {
       case "secondary":
-        return tw`bg-primary-200 border-primary-200`;
+        return tw`bg-gray-300 border-gray-300`;
       case "primary":
         return tw`bg-primary-700 border-primary-700`;
     }
@@ -63,7 +65,7 @@ const computeStyle = ({
   if (isHovered) {
     switch (variant) {
       case "secondary":
-        return tw.style(`bg-primary-100`, style);
+        return tw.style(`bg-gray-200 border-gray-200`, style);
       case "primary":
         return tw.style(`bg-primary-600 border-primary-600`, style);
     }
@@ -74,45 +76,48 @@ const computeStyle = ({
 
 export const Button = forwardRef((props: ButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
-  const { variant = "primary", size = "regular" } = props;
+  const { variant = "primary", size = "medium", ...rest } = props;
 
   // generic wrapper-styles
   const wrapperStyle = {
     size: {
-      small: tw`px-3 py-2`,
-      regular: tw`px-4 py-3`,
+      // no py as we v-align the text via flex
+      small: tw`h-8 px-4`,
+      medium: tw`h-10 px-4`,
+      large: tw`form-element-height px-6`,
     },
     variant: {
       primary: tw`bg-primary-500 border-primary-500`,
-      secondary: tw`bg-transparent border-primary-200`,
+      secondary: tw`bg-transparent border-gray-200`,
     },
   };
 
   // generic text-styles
   const textStyle = {
     size: {
-      small: tw`text-xxs font-semibold`,
-      regular: tw`text-base`,
+      small: textSizes[0],
+      medium: textSizes[1],
+      large: textSizes[2],
     },
     variant: {
-      primary: tw`text-gray-100`,
-      secondary: tw`text-primary-400`,
+      primary: props.disabled ? tw`text-primary-300` : tw`text-gray-100`,
+      secondary: props.disabled ? tw`text-gray-400` : tw`text-gray-800`,
     },
   };
 
   const styles = StyleSheet.create({
     wrapper: tw.style(
-      `rounded border-solid border-2`,
+      `flex justify-center border border-solid rounded`,
       wrapperStyle.size[size],
       wrapperStyle.variant[variant]
     ),
-    text: tw`text-center`,
+    text: tw`text-center font-button`,
   });
 
   return (
     <Pressable
       ref={ref}
-      {...props}
+      {...rest}
       accessibilityRole={props.accessibilityRole ?? "button"}
       // @ts-expect-error - web only
       onFocus={focusRingProps.onFocus}
@@ -140,16 +145,12 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
               props.style,
             ]}
           >
-            <RnText
-              style={[
-                styles.text,
-                textStyle.size[size],
-                textStyle.variant[variant],
-                props.disabled && variant === "secondary" && tw`text-gray-400`,
-              ]}
+            <Text
+              variant={textStyle.size[size]}
+              style={[styles.text, textStyle.variant[variant]]}
             >
               {props.children}
-            </RnText>
+            </Text>
           </RnView>
         );
       }}

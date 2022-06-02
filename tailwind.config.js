@@ -59,6 +59,9 @@ const customTheme = {
       xs: "0.8125rem",
       xxs: "0.75rem",
     },
+    fontFamily: {
+      button: "Inter_600SemiBold",
+    },
     height: {
       "top-bar": "3rem",
     },
@@ -73,6 +76,9 @@ const customTheme = {
     },
     width: {
       sidebar: "15rem",
+    },
+    borderWidth: {
+      3: "3px",
     },
   },
 };
@@ -107,6 +113,7 @@ module.exports = {
         h3: `text-h3 font-bold`,
         "text-muted": `text-gray-600`,
         "icon-button": `w-6 h-6 flex justify-center items-center`,
+        "form-element-height": "h-12",
       });
     }),
   ],

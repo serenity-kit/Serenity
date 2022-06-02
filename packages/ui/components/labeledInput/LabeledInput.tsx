@@ -7,6 +7,7 @@ import { View } from "../view/View";
 
 export type LabeledInputProps = InputProps & {
   label: string;
+  hint?: string;
 };
 
 export const LabeledInput = React.forwardRef(
@@ -17,6 +18,7 @@ export const LabeledInput = React.forwardRef(
       focus: tw`text-primary-500`,
       disabled: tw`text-muted`,
       error: tw`text-error-500`,
+      hint: tw`mt-3`,
     });
 
     return (
@@ -42,6 +44,11 @@ export const LabeledInput = React.forwardRef(
             setIsFocused(false);
           }}
         />
+        {props.hint && (
+          <Text variant="xxs" bold muted style={styles.hint}>
+            {props.hint}
+          </Text>
+        )}
       </View>
     );
   }

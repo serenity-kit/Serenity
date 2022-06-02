@@ -77,8 +77,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
     <View
       style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
     >
-      {/* TODO use this as classes or default/variant ? */}
-      <Box style={tw`max-w-md w-full`}>
+      <Box>
         <View>
           <Text variant="large" bold style={tw`text-center`}>
             Welcome back!
@@ -108,6 +107,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
             setUsername(username);
           }}
           placeholder="Enter your email …"
+          autoCapitalize="none"
         />
 
         <LabeledInput
@@ -120,7 +120,9 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
           placeholder="Enter your password …"
         />
 
-        <Button onPress={onLoginPress}>Log in</Button>
+        <Button onPress={onLoginPress} size="large">
+          Log in
+        </Button>
         <View style={tw`text-center`}>
           <Text variant="xs" muted>
             Don't have an account?{" "}

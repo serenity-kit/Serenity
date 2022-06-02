@@ -18,6 +18,8 @@ import {
   Modal,
   Avatar,
   AvatarGroup,
+  ModalHeader,
+  ModalButtonFooter,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -74,14 +76,22 @@ export default function DesignSystemScreen() {
       <Button variant="secondary" disabled>
         Login
       </Button>
-      <Text>Small Button</Text>
-      <Button size="small">Login</Button>
+      <Text>Button sizes</Text>
+      <VStack space="2">
+        <Button size="small">Small</Button>
+        <Button size="medium">Medium</Button>
+        <Button size="large">Large</Button>
+      </VStack>
 
       <Text style={tw`mt-6 mb-4 h2`}>Input</Text>
       <VStack space={4}>
         <Input />
         <LabeledInput label={"Input"} />
-        <LabeledInput label={"Input w/ Value"} value="jane@example.com" />
+        <LabeledInput
+          label={"Input w/ Value"}
+          value="jane@example.com"
+          hint="Here you can put information you want the user to have regarding this input."
+        />
         <LabeledInput
           label={"Input w/ Placeholder"}
           placeholder="Enter your email …"
@@ -213,17 +223,27 @@ export default function DesignSystemScreen() {
 
       <Text style={tw`mt-6 mb-4 h2`}>Modal (work in progress)</Text>
       <Modal isVisible={showModal} onBackdropPress={() => setShowModal(false)}>
-        <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
-          <Text>Hello World</Text>
-          <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-            <Text>Encrypt / Decrypt Image</Text>
-          </SidebarLink>
-        </View>
+        <ModalHeader>This is the header</ModalHeader>
+        <LabeledInput
+          label={"Label of the Input"}
+          value="While typi"
+          hint="Here you can put information you want the user to have regarding this input."
+        />
+        <ModalButtonFooter
+          cancel={
+            <Button variant="secondary" onPress={() => setShowModal(false)}>
+              Cancel
+            </Button>
+          }
+          confirm={<Button variant="primary">Confirm</Button>}
+        />
       </Modal>
       <Button
         onPress={() => {
           setShowModal(true);
         }}
+        variant="primary"
+        size="small"
       >
         Open Modal
       </Button>

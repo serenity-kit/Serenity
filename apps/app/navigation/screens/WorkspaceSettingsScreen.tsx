@@ -9,6 +9,8 @@ import {
   LabeledInput,
   Modal,
   tw,
+  ModalHeader,
+  ModalButtonFooter,
 } from "@serenity-tools/ui";
 import { RootStackScreenProps, WorkspaceDrawerScreenProps } from "../../types";
 import {
@@ -371,21 +373,24 @@ export default function WorkspaceSettingsScreen(
                 isVisible={showDeleteWorkspaceModal}
                 onBackdropPress={() => setShowDeleteWorkspaceModal(false)}
               >
-                <View style={tw`bg-white border-gray-800 max-w-60 m-auto`}>
-                  <Text>Type the name of this workspace: {workspaceName}</Text>
-                  <LabeledInput
-                    label={"Workspace Name"}
-                    onChangeText={setDeletingWorkspaceName}
-                  />
-                  <Button
-                    disabled={deletingWorkspaceName !== workspaceName}
-                    onPress={() => {
-                      deleteWorkspace();
-                    }}
-                  >
-                    Delete Workspace
-                  </Button>
-                </View>
+                <ModalHeader>Delete Workspace?</ModalHeader>
+                <Text>Type the name of this workspace: {workspaceName}</Text>
+                <LabeledInput
+                  label={"Workspace Name"}
+                  onChangeText={setDeletingWorkspaceName}
+                />
+                <ModalButtonFooter
+                  confirm={
+                    <Button
+                      disabled={deletingWorkspaceName !== workspaceName}
+                      onPress={() => {
+                        deleteWorkspace();
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  }
+                />
               </Modal>
             )}
           </>

@@ -30,6 +30,7 @@ import { useCallback, useMemo, useState } from "react";
 import { devtoolsExchange } from "@urql/devtools";
 import { theme } from "../../tailwind.config";
 import { OpaqueBridge } from "@serenity-tools/opaque";
+import * as storage from "./utils/storage/storage";
 
 type AuthState = {
   deviceSigningPublicKey: string;
@@ -70,10 +71,9 @@ const exchanges = [
     },
     getAuth: async ({ authState }) => {
       if (!authState) {
-        const deviceSigningPublicKey =
-          Platform.OS === "web"
-            ? localStorage.getItem("deviceSigningPublicKey")
-            : "mockedForMobile";
+        const deviceSigningPublicKey = storage.getItem(
+          "deviceSigningPublicKey"
+        );
 
         if (deviceSigningPublicKey) {
           return { deviceSigningPublicKey };
@@ -110,19 +110,15 @@ const exchanges = [
 
 export default function App() {
   const [deviceSigningPublicKey, setDeviceSigningPublicKey] = useState(() => {
-    // to mocked for the mobile dev
-    if (Platform.OS === "ios") {
-      return "mockedForMobile";
-    }
-    return localStorage.getItem("deviceSigningPublicKey");
+    return storage.getItem("deviceSigningPublicKey");
   });
   const updateAuthentication = useCallback(
     (deviceSigningPublicKey: string | null) => {
       if (deviceSigningPublicKey) {
-        localStorage.setItem("deviceSigningPublicKey", deviceSigningPublicKey);
+        storage.setItem("deviceSigningPublicKey", deviceSigningPublicKey);
         setDeviceSigningPublicKey(deviceSigningPublicKey);
       } else {
-        localStorage.removeItem("deviceSigningPublicKey");
+        storage.removeItem("deviceSigningPublicKey");
         setDeviceSigningPublicKey(null);
       }
     },
