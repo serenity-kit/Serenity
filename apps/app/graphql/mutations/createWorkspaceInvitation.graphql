@@ -1,0 +1,9 @@
+mutation createWorkspaceInvitation($input: CreateWorkspaceInvitationInput!) {
+  createWorkspaceInvitation(input: $input) {
+    workspaceInvitation {
+      id
+      workspaceId
+      expiresAt
+    }
+  }
+}

@@ -62,6 +62,7 @@ export const WorkspaceInvitation = objectType({
     t.nonNull.string("id");
     t.nonNull.string("workspaceId");
     t.nonNull.string("inviterUserId");
+    t.nonNull.string("inviterUsername");
     t.field("expiresAt", { type: nonNull("Date") });
   },
 });

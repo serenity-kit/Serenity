@@ -1,0 +1,15 @@
+query workspaceInvitations($workspaceId: ID!) {
+  workspaceInvitations(workspaceId: $workspaceId, first: 50) {
+    nodes {
+      id
+      workspaceId
+      inviterUserId
+      inviterUsername
+      expiresAt
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

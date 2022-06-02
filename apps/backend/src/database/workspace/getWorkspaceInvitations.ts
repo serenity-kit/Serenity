@@ -19,8 +19,6 @@ export async function getWorkspaceInvitations({
   skip,
   take,
 }: Params): Promise<WorkspaceInvitation[]> {
-  // check if this user is an admin of the workspace
-  // if so, grab all workspace invitations for that workspace
   const userToWorkspaces = await prisma.usersToWorkspaces.findFirst({
     where: {
       userId,
@@ -31,13 +29,38 @@ export async function getWorkspaceInvitations({
   if (!userToWorkspaces) {
     throw new Error("Unauthorized");
   }
-  const workspaceInvitations = await prisma.workspaceInvitations.findMany({
+  const rawWorkspaceInvitations = await prisma.workspaceInvitations.findMany({
     where: {
       workspaceId,
       expiresAt: {
         gt: new Date(),
       },
     },
+    select: {
+      id: true,
+      expiresAt: true,
+      createdAt: true,
+      workspaceId: true,
+      inviterUserId: true,
+      inviterUser: {
+        select: {
+          username: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  const workspaceInvitations: WorkspaceInvitation[] = [];
+  rawWorkspaceInvitations.forEach((rawWorkspaceInvitation) => {
+    workspaceInvitations.push({
+      id: rawWorkspaceInvitation.id,
+      workspaceId: rawWorkspaceInvitation.workspaceId,
+      expiresAt: rawWorkspaceInvitation.expiresAt,
+      inviterUserId: rawWorkspaceInvitation.inviterUserId,
+      inviterUsername: rawWorkspaceInvitation.inviterUser.username,
+    });
   });
   return workspaceInvitations;
 }

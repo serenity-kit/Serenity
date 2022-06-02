@@ -1,0 +1,5 @@
+mutation deleteWorkspaceInvitations($input: DeleteWorkspaceInvitationsInput!) {
+  deleteWorkspaceInvitations(input: $input) {
+    status
+  }
+}
