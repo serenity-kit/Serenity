@@ -330,6 +330,7 @@ export default function DesignSystemScreen() {
         <Icon name="add-line" />
         <Icon name="archive-fill" />
         <Icon name="archive-line" />
+        <Icon name="arrow-down-filled" />
         <Icon name="arrow-down-s-fill" />
         <Icon name="arrow-down-s-line" />
         <Icon name="arrow-go-back-fill" />
@@ -338,6 +339,7 @@ export default function DesignSystemScreen() {
         <Icon name="arrow-go-forward-line" />
         <Icon name="arrow-right-s-line" />
         <Icon name="arrow-right" />
+        <Icon name="arrow-right-filled" />
         <Icon name="arrow-up-down-line" />
         <Icon name="bookmark-fill" />
         <Icon name="bookmark-line" />
