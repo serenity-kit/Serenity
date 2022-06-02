@@ -16,6 +16,15 @@ export type Scalars = {
   Date: any;
 };
 
+export type AcceptWorkspaceInvitationInput = {
+  workspaceInvitationId: Scalars['String'];
+};
+
+export type AcceptWorkspaceInvitationResult = {
+  __typename?: 'AcceptWorkspaceInvitationResult';
+  workspace?: Maybe<Workspace>;
+};
+
 export type CreateDocumentInput = {
   id: Scalars['String'];
   parentFolderId?: InputMaybe<Scalars['String']>;
@@ -73,6 +82,15 @@ export type DeleteFoldersInput = {
 
 export type DeleteFoldersResult = {
   __typename?: 'DeleteFoldersResult';
+  status: Scalars['String'];
+};
+
+export type DeleteWorkspaceInvitationsInput = {
+  ids: Array<Scalars['String']>;
+};
+
+export type DeleteWorkspaceInvitationsResult = {
+  __typename?: 'DeleteWorkspaceInvitationsResult';
   status: Scalars['String'];
 };
 
@@ -169,12 +187,14 @@ export type MeResult = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  acceptWorkspaceInvitation?: Maybe<AcceptWorkspaceInvitationResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createFolder?: Maybe<CreateFolderResult>;
   createWorkspace?: Maybe<CreateWorkspaceResult>;
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteFolders?: Maybe<DeleteFoldersResult>;
+  deleteWorkspaceInvitations?: Maybe<DeleteWorkspaceInvitationsResult>;
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
   finishLogin?: Maybe<FinishLoginResult>;
   finishRegistration?: Maybe<FinishRegistrationResult>;
@@ -183,6 +203,11 @@ export type Mutation = {
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
   updateFolderName?: Maybe<UpdateFolderNameResult>;
   updateWorkspace?: Maybe<UpdateWorkspaceResult>;
+};
+
+
+export type MutationAcceptWorkspaceInvitationArgs = {
+  input?: InputMaybe<AcceptWorkspaceInvitationInput>;
 };
 
 
@@ -213,6 +238,11 @@ export type MutationDeleteDocumentsArgs = {
 
 export type MutationDeleteFoldersArgs = {
   input?: InputMaybe<DeleteFoldersInput>;
+};
+
+
+export type MutationDeleteWorkspaceInvitationsArgs = {
+  input?: InputMaybe<DeleteWorkspaceInvitationsInput>;
 };
 
 
@@ -277,6 +307,7 @@ export type Query = {
   rootFolders?: Maybe<FolderConnection>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
   workspace?: Maybe<Workspace>;
+  workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
   workspaces?: Maybe<WorkspaceConnection>;
 };
 
@@ -314,6 +345,13 @@ export type QueryUserIdFromUsernameArgs = {
 
 export type QueryWorkspaceArgs = {
   id?: InputMaybe<Scalars['ID']>;
+};
+
+
+export type QueryWorkspaceInvitationsArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
+  workspaceId: Scalars['ID'];
 };
 
 
@@ -416,7 +454,26 @@ export type WorkspaceInvitation = {
   expiresAt: Scalars['Date'];
   id: Scalars['String'];
   inviterUserId: Scalars['String'];
+  inviterUsername: Scalars['String'];
   workspaceId: Scalars['String'];
+};
+
+export type WorkspaceInvitationConnection = {
+  __typename?: 'WorkspaceInvitationConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<WorkspaceInvitationEdge>>>;
+  /** Flattened list of WorkspaceInvitation type */
+  nodes?: Maybe<Array<Maybe<WorkspaceInvitation>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type WorkspaceInvitationEdge = {
+  __typename?: 'WorkspaceInvitationEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<WorkspaceInvitation>;
 };
 
 export type WorkspaceMemberInput = {
@@ -430,6 +487,13 @@ export type WorkspaceMembersOutput = {
   userId: Scalars['String'];
   username?: Maybe<Scalars['String']>;
 };
+
+export type AcceptWorkspaceInvitationMutationVariables = Exact<{
+  input: AcceptWorkspaceInvitationInput;
+}>;
+
+
+export type AcceptWorkspaceInvitationMutation = { __typename?: 'Mutation', acceptWorkspaceInvitation?: { __typename?: 'AcceptWorkspaceInvitationResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, username?: string | null, isAdmin: boolean }> | null } | null } | null };
 
 export type CreateDocumentMutationVariables = Exact<{
   input: CreateDocumentInput;
@@ -452,6 +516,13 @@ export type CreateWorkspaceMutationVariables = Exact<{
 
 export type CreateWorkspaceMutation = { __typename?: 'Mutation', createWorkspace?: { __typename?: 'CreateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null } | null };
 
+export type CreateWorkspaceInvitationMutationVariables = Exact<{
+  input: CreateWorkspaceInvitationInput;
+}>;
+
+
+export type CreateWorkspaceInvitationMutation = { __typename?: 'Mutation', createWorkspaceInvitation?: { __typename?: 'CreateWorkspaceInvitationResult', workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, expiresAt: any } | null } | null };
+
 export type DeleteDocumentsMutationVariables = Exact<{
   input: DeleteDocumentsInput;
 }>;
@@ -465,6 +536,13 @@ export type DeleteFoldersMutationVariables = Exact<{
 
 
 export type DeleteFoldersMutation = { __typename?: 'Mutation', deleteFolders?: { __typename?: 'DeleteFoldersResult', status: string } | null };
+
+export type DeleteWorkspaceInvitationsMutationVariables = Exact<{
+  input: DeleteWorkspaceInvitationsInput;
+}>;
+
+
+export type DeleteWorkspaceInvitationsMutation = { __typename?: 'Mutation', deleteWorkspaceInvitations?: { __typename?: 'DeleteWorkspaceInvitationsResult', status: string } | null };
 
 export type DeleteWorkspacesMutationVariables = Exact<{
   input: DeleteWorkspacesInput;
@@ -568,12 +646,38 @@ export type WorkspaceQueryVariables = Exact<{
 
 export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, username?: string | null, isAdmin: boolean }> | null } | null };
 
+export type WorkspaceInvitationsQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+}>;
+
+
+export type WorkspaceInvitationsQuery = { __typename?: 'Query', workspaceInvitations?: { __typename?: 'WorkspaceInvitationConnection', nodes?: Array<{ __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, expiresAt: any } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+
 export type WorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null } | null> | null } | null };
 
 
+export const AcceptWorkspaceInvitationDocument = gql`
+    mutation acceptWorkspaceInvitation($input: AcceptWorkspaceInvitationInput!) {
+  acceptWorkspaceInvitation(input: $input) {
+    workspace {
+      id
+      name
+      members {
+        userId
+        username
+        isAdmin
+      }
+    }
+  }
+}
+    `;
+
+export function useAcceptWorkspaceInvitationMutation() {
+  return Urql.useMutation<AcceptWorkspaceInvitationMutation, AcceptWorkspaceInvitationMutationVariables>(AcceptWorkspaceInvitationDocument);
+};
 export const CreateDocumentDocument = gql`
     mutation createDocument($input: CreateDocumentInput!) {
   createDocument(input: $input) {
@@ -620,6 +724,21 @@ export const CreateWorkspaceDocument = gql`
 export function useCreateWorkspaceMutation() {
   return Urql.useMutation<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>(CreateWorkspaceDocument);
 };
+export const CreateWorkspaceInvitationDocument = gql`
+    mutation createWorkspaceInvitation($input: CreateWorkspaceInvitationInput!) {
+  createWorkspaceInvitation(input: $input) {
+    workspaceInvitation {
+      id
+      workspaceId
+      expiresAt
+    }
+  }
+}
+    `;
+
+export function useCreateWorkspaceInvitationMutation() {
+  return Urql.useMutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(CreateWorkspaceInvitationDocument);
+};
 export const DeleteDocumentsDocument = gql`
     mutation deleteDocuments($input: DeleteDocumentsInput!) {
   deleteDocuments(input: $input) {
@@ -641,6 +760,17 @@ export const DeleteFoldersDocument = gql`
 
 export function useDeleteFoldersMutation() {
   return Urql.useMutation<DeleteFoldersMutation, DeleteFoldersMutationVariables>(DeleteFoldersDocument);
+};
+export const DeleteWorkspaceInvitationsDocument = gql`
+    mutation deleteWorkspaceInvitations($input: DeleteWorkspaceInvitationsInput!) {
+  deleteWorkspaceInvitations(input: $input) {
+    status
+  }
+}
+    `;
+
+export function useDeleteWorkspaceInvitationsMutation() {
+  return Urql.useMutation<DeleteWorkspaceInvitationsMutation, DeleteWorkspaceInvitationsMutationVariables>(DeleteWorkspaceInvitationsDocument);
 };
 export const DeleteWorkspacesDocument = gql`
     mutation deleteWorkspaces($input: DeleteWorkspacesInput!) {
@@ -853,6 +983,27 @@ export const WorkspaceDocument = gql`
 
 export function useWorkspaceQuery(options?: Omit<Urql.UseQueryArgs<WorkspaceQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspaceQuery>({ query: WorkspaceDocument, ...options });
+};
+export const WorkspaceInvitationsDocument = gql`
+    query workspaceInvitations($workspaceId: ID!) {
+  workspaceInvitations(workspaceId: $workspaceId, first: 50) {
+    nodes {
+      id
+      workspaceId
+      inviterUserId
+      inviterUsername
+      expiresAt
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    `;
+
+export function useWorkspaceInvitationsQuery(options: Omit<Urql.UseQueryArgs<WorkspaceInvitationsQueryVariables>, 'query'>) {
+  return Urql.useQuery<WorkspaceInvitationsQuery>({ query: WorkspaceInvitationsDocument, ...options });
 };
 export const WorkspacesDocument = gql`
     query workspaces {

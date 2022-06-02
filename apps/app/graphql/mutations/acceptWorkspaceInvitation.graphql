@@ -1,0 +1,13 @@
+mutation acceptWorkspaceInvitation($input: AcceptWorkspaceInvitationInput!) {
+  acceptWorkspaceInvitation(input: $input) {
+    workspace {
+      id
+      name
+      members {
+        userId
+        username
+        isAdmin
+      }
+    }
+  }
+}

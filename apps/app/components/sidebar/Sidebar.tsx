@@ -18,7 +18,7 @@ import {
   View,
   Avatar,
 } from "@serenity-tools/ui";
-import { CreateWorkspaceModal } from "../createWorkspaceModal/CreateWorkspaceModal";
+import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 import {
   useWorkspacesQuery,
   useWorkspaceQuery,

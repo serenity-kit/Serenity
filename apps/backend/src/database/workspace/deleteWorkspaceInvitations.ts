@@ -45,6 +45,9 @@ export async function deleteWorkspaceInvitations({
           workspaceId: {
             in: userWorkspaceIds,
           },
+          id: {
+            in: workspaceInvitationIds,
+          },
           expiresAt: {
             gt: new Date(),
           },

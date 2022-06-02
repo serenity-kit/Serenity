@@ -20,6 +20,7 @@ import {
   useDeleteWorkspacesMutation,
   useUserIdFromUsernameQuery,
 } from "../../generated/graphql";
+import { CreateWorkspaceInvitation } from "../../components/workspace/CreateWorkspaceInvitation";
 
 type Member = {
   userId: string;
@@ -259,19 +260,6 @@ export default function WorkspaceSettingsScreen(
     setIsLoadingWorkspaceData(false);
   };
 
-  const addMember = async (member: Member) => {
-    const existingMemberRow = memberLookup[member.userId];
-    if (existingMemberRow >= 0) {
-      members.splice(existingMemberRow, 1);
-      delete memberLookup[member.userId];
-    }
-    members.push(member);
-    memberLookup[member.userId] = members.length - 1;
-    setMembers(members);
-    setMemberLookup(memberLookup);
-    await _updateWorkspaceMemberData(members);
-  };
-
   const updateMember = async (member: Member, isMemberAdmin: boolean) => {
     const existingMemberRow = memberLookup[member.userId];
     if (existingMemberRow >= 0) {
@@ -328,41 +316,21 @@ export default function WorkspaceSettingsScreen(
             </View>
             <View>
               <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
-                Members
+                Invitations
               </Text>
               {isAdmin && (
                 <View>
-                  <View style={styles.addMemberContainer}>
-                    <Input
-                      placeholder="New member name"
-                      value={newMemberName}
-                      onChangeText={setNewMemberName}
-                    />
-                    <Checkbox
-                      accessibilityLabel="Is member an admin"
-                      onChange={(isNewMemberAdmin) => {
-                        setIsNewMemberAdmin(isNewMemberAdmin);
-                      }}
-                      value={myUsername}
-                    />
-                    <Text>Admin</Text>
-                    <Button
-                      onPress={() => {
-                        const member = {
-                          userId: newMemberUserId,
-                          username: newMemberName,
-                          isAdmin: isNewMemberAdmin,
-                        };
-                        addMember(member);
-                      }}
-                      disabled={!newMemberName}
-                    >
-                      Add
-                    </Button>
-                  </View>
-                  {isInvalidUsernameError && (
-                    <Text style={styles.formError}>Invalid username</Text>
-                  )}
+                  <CreateWorkspaceInvitation
+                    workspaceId={workspaceId}
+                    onWorkspaceInvitationCreated={(
+                      workspaceInvitation: any
+                    ) => {
+                      // do nothing
+                    }}
+                  />
+                  <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
+                    Members
+                  </Text>
                 </View>
               )}
               {members.map((member: any) => (

@@ -5,7 +5,7 @@ import {
   useWorkspacesQuery,
   useCreateWorkspaceMutation,
 } from "../../generated/graphql";
-import { CreateWorkspaceModal } from "../../components/createWorkspaceModal/CreateWorkspaceModal";
+import { CreateWorkspaceModal } from "../../components/workspace/CreateWorkspaceModal";
 
 export default function NoWorkspaceScreen({ navigation }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
