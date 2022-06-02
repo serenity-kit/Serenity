@@ -39,6 +39,7 @@ export type RootStackParamList = {
   DesignSystem: undefined;
   DevDashboard: undefined;
   Register: undefined;
+  AcceptInvitation: undefined;
   Login: undefined;
   EncryptDecryptImageTest: undefined;
   Root: undefined;
