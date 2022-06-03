@@ -7,8 +7,7 @@ let result: any = null;
 export const registerUser = async (
   graphql: any,
   username: string,
-  password: string,
-  workspaceId: string
+  password: string
 ) => {
   result = await requestRegistrationChallengeResponse(
     graphql,
@@ -32,7 +31,6 @@ export const registerUser = async (
       registrationId: result.data.registrationId,
       message: sodium.to_base64(message),
       clientPublicKey: "TODO",
-      workspaceId,
     },
   });
   return {

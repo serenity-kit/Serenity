@@ -18,12 +18,7 @@ beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
     isUserRegistered = true;
-    await registerUser(
-      graphql,
-      username,
-      password,
-      "9c22b47e-3d5e-4aae-a0b2-7e6f8974e7e2"
-    );
+    await registerUser(graphql, username, password);
     const createWorkspaceResult = await createWorkspace({
       name: "workspace 1",
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
@@ -155,12 +150,7 @@ test("Throw error when the parent folder doesn't exist", async () => {
 test("Throw error when user doesn't have access", async () => {
   // create a new user with access to different documents
   const username2 = "user2";
-  await registerUser(
-    graphql,
-    username2,
-    password,
-    "7d84fd9b-cf52-4ab5-991e-b2b0a830c51b"
-  );
+  await registerUser(graphql, username2, password);
   isUserRegistered = true;
   const createWorkspaceResult = await createWorkspace({
     name: "workspace 1",

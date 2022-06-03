@@ -1,10 +1,15 @@
 import { prisma } from "../prisma";
 
-export async function finalizeRegistration(
-  username: string,
-  opaqueEnvelope: string,
-  workspaceId: string
-) {
+type Props = {
+  username: string;
+  opaqueEnvelope: string;
+  // workspaceId: string
+};
+
+export async function finalizeRegistration({
+  username,
+  opaqueEnvelope,
+}: Props) {
   // if this user has already completed registration, throw an error
   const existingUserData = await prisma.user.findUnique({
     where: {
@@ -39,19 +44,6 @@ export async function finalizeRegistration(
       await prisma.device.update({
         where: { signingPublicKey: device.signingPublicKey },
         data: { user: { connect: { id: userId } } },
-      });
-      await prisma.workspace.create({
-        data: {
-          id: workspaceId,
-          idSignature: "TODO",
-          name: "My Workspace",
-          usersToWorkspaces: {
-            create: {
-              userId,
-              isAdmin: true,
-            },
-          },
-        },
       });
       return user;
     });

@@ -144,7 +144,6 @@ export type FinishRegistrationInput = {
   clientPublicKey: Scalars['String'];
   message: Scalars['String'];
   registrationId: Scalars['String'];
-  workspaceId: Scalars['String'];
 };
 
 export type FinishRegistrationResult = {

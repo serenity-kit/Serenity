@@ -58,7 +58,6 @@ export default function RegisterForm(props: Props) {
             registrationId:
               startRegistrationResult.data.startRegistration.registrationId,
             clientPublicKey: `TODO+${uuidv4()}`,
-            workspaceId: uuidv4(),
           },
         });
         // check for an error
