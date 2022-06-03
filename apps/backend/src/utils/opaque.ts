@@ -4,8 +4,6 @@ import {
   HandleRegistration,
   HandleLogin,
   ServerSetup,
-  Registration,
-  Login,
 } from "../vendor/opaque-wasm/opaque_wasm";
 
 // Trade-off: by storing it in memory it means with a server restart registrations will be lost and fail

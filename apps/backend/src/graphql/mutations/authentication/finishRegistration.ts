@@ -8,7 +8,6 @@ export const FinishRegistrationInput = inputObjectType({
     t.nonNull.string("message");
     t.nonNull.string("registrationId");
     t.nonNull.string("clientPublicKey");
-    t.nonNull.string("workspaceId");
   },
 });
 
@@ -34,11 +33,10 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
       args.input.registrationId,
       args.input.message
     );
-    const user = await finalizeRegistration(
+    const user = await finalizeRegistration({
       username,
-      envelope,
-      args.input.workspaceId
-    );
+      opaqueEnvelope: envelope,
+    });
     return { id: user.id };
   },
 });
