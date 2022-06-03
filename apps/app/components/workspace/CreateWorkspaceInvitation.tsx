@@ -72,7 +72,7 @@ export function CreateWorkspaceInvitation(props: Props) {
     const rootUrl =
       process.env.NODE_ENV === "development"
         ? "http://localhost:19006"
-        : "https://serenity.le";
+        : "https://www.serenity.li";
     return `You are invited to a Serenity Workspace. To join, go to ${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}`;
   };
 
