@@ -69,7 +69,11 @@ export function CreateWorkspaceInvitation(props: Props) {
     if (!selectedWorkspaceInvitationId) {
       return;
     }
-    return `You are invited to a Serenity Workspace. To join, go to https://serenity.com/invitations/${selectedWorkspaceInvitationId}`;
+    const rootUrl =
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:19006"
+        : "https://serenity.le";
+    return `You are invited to a Serenity Workspace. To join, go to ${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}`;
   };
 
   const createWorkspaceInvitation = async () => {
