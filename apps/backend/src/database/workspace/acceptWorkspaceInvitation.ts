@@ -10,6 +10,7 @@ export async function acceptWorkspaceInvitation({
   workspaceInvitationId,
   userId,
 }: Params): Promise<Workspace> {
+  console.log({ workspaceInvitationId, userId });
   return await prisma.$transaction(async (prisma) => {
     // try to find this workspace invitation id
     const currentTime = new Date();

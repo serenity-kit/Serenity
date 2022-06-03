@@ -1,23 +1,44 @@
 import React, { useState } from "react";
-import { Text, View } from "@serenity-tools/ui";
+import { Text, View, tw, Box } from "@serenity-tools/ui";
 import { useEffect } from "react";
 import { useWindowDimensions, StyleSheet } from "react-native";
 import { useClient } from "urql";
 import { useAuthentication } from "../../context/AuthenticationContext";
-import { useAcceptWorkspaceInvitationMutation } from "../../generated/graphql";
+import {
+  useAcceptWorkspaceInvitationMutation,
+  useWorkspaceInvitationQuery,
+} from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types";
+import { LoginForm } from "../../components/login/LoginForm";
 
 export default function AcceptWorkspaceInvitationScreen(
-  props: RootStackScreenProps<"AcceptInvitation">
+  props: RootStackScreenProps<"AcceptWorkspaceInvitation">
 ) {
-  const workspaceInvitationId = props.route.path?.split("/")[2] || ""; // should never be undefined
+  const workspaceInvitationId = props.route.params?.workspaceInvitationId;
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const urqlClient = useClient();
   const { deviceSigningPublicKey } = useAuthentication();
+  const [workspaceInvitationQuery, refetchWorkspaceInvitationQuery] =
+    useWorkspaceInvitationQuery({
+      variables: {
+        id: workspaceInvitationId,
+      },
+    });
   const [, acceptWorkspaceInvitationMutation] =
     useAcceptWorkspaceInvitationMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
+  const [workspaceInvitation, setWorkspaceInvitation] = useState(null);
+  const [workspaceName, setWorkspaceName] = useState<string>("");
+  const [inviterUsername, setInviterUsername] = useState<string>("");
+
+  if (!workspaceInvitationId) {
+    return (
+      <View>
+        <Text>Invalid invitation.</Text>
+      </View>
+    );
+  }
 
   const isUserSignedIn = () => {
     return deviceSigningPublicKey !== null;
@@ -51,10 +72,23 @@ export default function AcceptWorkspaceInvitationScreen(
   useEffect(() => {
     if (isUserSignedIn()) {
       acceptWorkspaceInvitation();
-    } else {
-      props.navigation.replace("Root");
     }
   }, [deviceSigningPublicKey, urqlClient, props.navigation]);
+
+  useEffect(() => {
+    if (workspaceInvitationQuery.data?.workspaceInvitation) {
+      const workspaceInvitation =
+        workspaceInvitationQuery.data.workspaceInvitation;
+      setWorkspaceName(workspaceInvitation.workspaceName || "");
+      setInviterUsername(workspaceInvitation.inviterUsername);
+    }
+  }, [workspaceInvitationQuery.fetching]);
+
+  const onLoginSuccess = () => {
+    props.navigation.replace("AcceptWorkspaceInvitation", {
+      workspaceInvitationId,
+    });
+  };
 
   return (
     <>
@@ -63,14 +97,39 @@ export default function AcceptWorkspaceInvitationScreen(
           <Text style={styles.errorText}>{graphqlError}</Text>
         </View>
       )}
-      <View>
-        <Text>Splash Screen (show loading indicator after 200ms)</Text>
+      <View
+        style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
+      >
+        <Box>
+          {!workspaceInvitationQuery.fetching && (
+            <View style={styles.alertBanner}>
+              <Text style={styles.alertBannerText}>
+                You have been invited to join workspace <b>{workspaceName}</b>{" "}
+                by <b>{inviterUsername}</b>
+              </Text>
+
+              <Text style={styles.alertBannerText}>
+                Log in to accept the invitation.
+              </Text>
+            </View>
+          )}
+          <LoginForm />
+        </Box>
       </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  alertBanner: {
+    padding: 20,
+    backgroundColor: "#fff",
+    color: "#000",
+    marginBottom: 30,
+  },
+  alertBannerText: {
+    color: "#000",
+  },
   errorBanner: {
     backgroundColor: "red",
   },

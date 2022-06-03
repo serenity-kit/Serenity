@@ -16,6 +16,7 @@ export type WorkspaceInvitation = {
   workspaceId: string;
   inviterUserId: string;
   inviterUsername: string | undefined;
+  workspaceName: string | undefined;
   expiresAt: Date;
 };
 
