@@ -1,0 +1,10 @@
+query workspaceInvitation($id: ID!) {
+  workspaceInvitation(id: $id) {
+    id
+    workspaceId
+    inviterUserId
+    inviterUsername
+    workspaceName
+    expiresAt
+  }
+}

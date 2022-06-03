@@ -21,6 +21,10 @@ type PageParams = {
   isNew?: boolean;
 };
 
+type LoginParams = {
+  next?: string;
+};
+
 export type WorkspaceDrawerParamList = {
   Dashboard: undefined;
   Editor: undefined;
@@ -29,8 +33,13 @@ export type WorkspaceDrawerParamList = {
   Settings: undefined;
 };
 
-type WorkspaceParams = NavigatorScreenParams<WorkspaceDrawerParamList> & {
-  workspaceId: string;
+export type WorkspaceParams =
+  NavigatorScreenParams<WorkspaceDrawerParamList> & {
+    workspaceId: string;
+  };
+
+export type WorkspaceInvitationParams = {
+  workspaceInvitationId: string;
 };
 
 export type RootStackParamList = {
@@ -39,8 +48,8 @@ export type RootStackParamList = {
   DesignSystem: undefined;
   DevDashboard: undefined;
   Register: undefined;
-  AcceptInvitation: undefined;
-  Login: undefined;
+  AcceptWorkspaceInvitation: WorkspaceInvitationParams;
+  Login: LoginParams;
   EncryptDecryptImageTest: undefined;
   Root: undefined;
   NotFound: undefined;
@@ -55,3 +64,8 @@ export type WorkspaceDrawerScreenProps<
   DrawerScreenProps<WorkspaceDrawerParamList, Screen>,
   NativeStackScreenProps<RootStackParamList>
 >;
+
+export type RouteDescription = {
+  screen: keyof RootStackParamList;
+  params: LoginParams | WorkspaceParams | WorkspaceInvitationParams | undefined;
+};

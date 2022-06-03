@@ -307,6 +307,7 @@ export type Query = {
   rootFolders?: Maybe<FolderConnection>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
   workspace?: Maybe<Workspace>;
+  workspaceInvitation?: Maybe<WorkspaceInvitation>;
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
   workspaces?: Maybe<WorkspaceConnection>;
 };
@@ -345,6 +346,11 @@ export type QueryUserIdFromUsernameArgs = {
 
 export type QueryWorkspaceArgs = {
   id?: InputMaybe<Scalars['ID']>;
+};
+
+
+export type QueryWorkspaceInvitationArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -456,6 +462,7 @@ export type WorkspaceInvitation = {
   inviterUserId: Scalars['String'];
   inviterUsername: Scalars['String'];
   workspaceId: Scalars['String'];
+  workspaceName?: Maybe<Scalars['String']>;
 };
 
 export type WorkspaceInvitationConnection = {
@@ -645,6 +652,13 @@ export type WorkspaceQueryVariables = Exact<{
 
 
 export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, username?: string | null, isAdmin: boolean }> | null } | null };
+
+export type WorkspaceInvitationQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type WorkspaceInvitationQuery = { __typename?: 'Query', workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, workspaceName?: string | null, expiresAt: any } | null };
 
 export type WorkspaceInvitationsQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -983,6 +997,22 @@ export const WorkspaceDocument = gql`
 
 export function useWorkspaceQuery(options?: Omit<Urql.UseQueryArgs<WorkspaceQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspaceQuery>({ query: WorkspaceDocument, ...options });
+};
+export const WorkspaceInvitationDocument = gql`
+    query workspaceInvitation($id: ID!) {
+  workspaceInvitation(id: $id) {
+    id
+    workspaceId
+    inviterUserId
+    inviterUsername
+    workspaceName
+    expiresAt
+  }
+}
+    `;
+
+export function useWorkspaceInvitationQuery(options: Omit<Urql.UseQueryArgs<WorkspaceInvitationQueryVariables>, 'query'>) {
+  return Urql.useQuery<WorkspaceInvitationQuery>({ query: WorkspaceInvitationDocument, ...options });
 };
 export const WorkspaceInvitationsDocument = gql`
     query workspaceInvitations($workspaceId: ID!) {
