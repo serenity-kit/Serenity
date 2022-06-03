@@ -11,7 +11,7 @@ import {
   useCreateWorkspaceInvitationMutation,
   useDeleteWorkspaceInvitationsMutation,
 } from "../../generated/graphql";
-import Clipboard from "@react-native-clipboard/clipboard";
+import * as Clipboard from "expo-clipboard";
 import { WorkspaceInvitationList } from "./WorkspaceInvitationList";
 
 type WorkspaceInvitation = {
