@@ -20,7 +20,10 @@ window._opaque.registerInitialize = function (password: string) {
 
 window._opaque.finishRegistration = function (challengeResponse: string) {
   const message = registration.finish(fromBase64(challengeResponse));
-  return toBase64(message);
+  return {
+    exportKey: toBase64(registration.getExportKey()),
+    response: toBase64(message),
+  };
 };
 
 window._opaque.startLogin = function (password: string) {

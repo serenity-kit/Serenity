@@ -106,7 +106,7 @@ export function LoginForm(props: Props) {
         </Text>
       </View>
 
-      {gqlErrorMessage && (
+      {gqlErrorMessage !== "" && (
         <View>
           <Text>{gqlErrorMessage}</Text>
         </View>
