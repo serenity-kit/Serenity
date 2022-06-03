@@ -16,12 +16,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!didRegisterUser) {
-    await registerUser(
-      graphql,
-      username,
-      password,
-      "17e17242-d86e-476b-af21-5dcfafa332cb"
-    );
+    await registerUser(graphql, username, password);
     didRegisterUser = true;
   }
 });

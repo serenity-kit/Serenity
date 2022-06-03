@@ -30,10 +30,13 @@ export const opaqueServerSetup = () => {
   );
 };
 
-export const startRegistration = async (
-  username: string,
-  challenge: string
-) => {
+export const startRegistration = async ({
+  username,
+  challenge,
+}: {
+  username: string;
+  challenge: string;
+}) => {
   const registrationId = uuidv4();
   const serverRegistration = new HandleRegistration(opaqueServerSetup());
   const response = serverRegistration.start(
@@ -51,10 +54,13 @@ export const startRegistration = async (
   };
 };
 
-export const finishRegistration = async (
-  registrationId: string,
-  message: string
-) => {
+export const finishRegistration = async ({
+  registrationId,
+  message,
+}: {
+  registrationId: string;
+  message: string;
+}) => {
   const response = registrations[registrationId].handleRegistration.finish(
     sodium.from_base64(message)
   );
@@ -66,11 +72,15 @@ export const finishRegistration = async (
   };
 };
 
-export const startLogin = async (
-  envelope: string,
-  username: string,
-  challenge: string
-) => {
+export const startLogin = async ({
+  envelope,
+  username,
+  challenge,
+}: {
+  envelope: string;
+  username: string;
+  challenge: string;
+}) => {
   const loginId = uuidv4();
   const serverLogin = new HandleLogin(opaqueServerSetup());
   const response = serverLogin.start(
@@ -86,7 +96,13 @@ export const startLogin = async (
   };
 };
 
-export const finishLogin = async (loginId: string, message: string) => {
+export const finishLogin = async ({
+  loginId,
+  message,
+}: {
+  loginId: string;
+  message: string;
+}) => {
   const response = logins[loginId].finish(sodium.from_base64(message));
   delete logins[loginId];
   return sodium.to_base64(response);

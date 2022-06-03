@@ -27,8 +27,8 @@ beforeEach(async () => {
     const registrationResponse = await registerUser(
       graphql,
       username,
-      password,
-      "9c22b47e-3d5e-4aae-a0b2-7e6f8974e7e2"
+      password
+      // "9c22b47e-3d5e-4aae-a0b2-7e6f8974e7e2"
     );
     userId = registrationResponse.registrationResponse.finishRegistration.id;
     isUserRegistered = true;
@@ -52,8 +52,8 @@ beforeEach(async () => {
     const registrationResponse2 = await registerUser(
       graphql,
       username2,
-      password,
-      "2434ae43-1706-4df5-8c41-bda450557dc4"
+      password
+      // "2434ae43-1706-4df5-8c41-bda450557dc4"
     );
     userId2 = registrationResponse2.registrationResponse.finishRegistration.id;
     const createWorkspaceResult2 = await createWorkspace({

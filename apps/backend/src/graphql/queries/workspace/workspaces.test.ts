@@ -18,12 +18,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!didRegisterUser) {
-    const registerUserResult = await registerUser(
-      graphql,
-      username,
-      password,
-      "67bc33af-3467-43c1-83a1-f2487aad6b79"
-    );
+    const registerUserResult = await registerUser(graphql, username, password);
     userId = registerUserResult.registrationResponse.finishRegistration.id;
     await createWorkspace({
       name: "workspace 1",
@@ -67,9 +62,6 @@ test("user should be able to list workspaces", async () => {
     Object {
       "edges": Array [
         Object {
-          "cursor": "NjdiYzMzYWYtMzQ2Ny00M2MxLTgzYTEtZjI0ODdhYWQ2Yjc5",
-        },
-        Object {
           "cursor": "YWJj",
         },
         Object {
@@ -77,16 +69,6 @@ test("user should be able to list workspaces", async () => {
         },
       ],
       "nodes": Array [
-        Object {
-          "id": "67bc33af-3467-43c1-83a1-f2487aad6b79",
-          "members": Array [
-            Object {
-              "isAdmin": true,
-              "userId": "${userId}",
-            },
-          ],
-          "name": "My Workspace",
-        },
         Object {
           "id": "abc",
           "members": Array [

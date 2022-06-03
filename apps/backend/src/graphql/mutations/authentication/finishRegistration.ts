@@ -8,7 +8,6 @@ export const FinishRegistrationInput = inputObjectType({
     t.nonNull.string("message");
     t.nonNull.string("registrationId");
     t.nonNull.string("clientPublicKey");
-    t.nonNull.string("workspaceId");
   },
 });
 
@@ -30,15 +29,14 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
     if (!args || !args.input) {
       throw new Error("Missing input");
     }
-    const { envelope, username } = await finishRegistration(
-      args.input.registrationId,
-      args.input.message
-    );
-    const user = await finalizeRegistration(
+    const { envelope, username } = await finishRegistration({
+      registrationId: args.input.registrationId,
+      message: args.input.message,
+    });
+    const user = await finalizeRegistration({
       username,
-      envelope,
-      args.input.workspaceId
-    );
+      opaqueEnvelope: envelope,
+    });
     return { id: user.id };
   },
 });

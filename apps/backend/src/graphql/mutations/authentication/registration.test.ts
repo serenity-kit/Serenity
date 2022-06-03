@@ -42,7 +42,6 @@ test("server should register a user", async () => {
       registrationId: result.data.registrationId,
       message: sodium.to_base64(message),
       clientPublicKey: "TODO",
-      workspaceId: "25ef3570-a7c8-4872-a3fb-9521842493ae",
     },
   });
   expect(typeof registrationResponse.finishRegistration.id).toBe("string");

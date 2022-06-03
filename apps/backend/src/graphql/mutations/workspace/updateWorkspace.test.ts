@@ -23,15 +23,13 @@ beforeEach(async () => {
     const registerUserResponse1 = await registerUser(
       graphql,
       username,
-      password,
-      "c86ff7a9-0387-4702-896d-c01a5d49528a"
+      password
     );
     userId1 = registerUserResponse1.registrationResponse.finishRegistration.id;
     const registerUserResponse2 = await registerUser(
       graphql,
       username2,
-      password,
-      "317c49b5-b99e-4620-b355-b3f5a037e763"
+      password
     );
     userId2 = registerUserResponse2.registrationResponse.finishRegistration.id;
     const createWorkspaceResult = await createWorkspace({

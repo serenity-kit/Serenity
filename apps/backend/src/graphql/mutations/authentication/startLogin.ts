@@ -31,11 +31,11 @@ export const startLoginMutation = mutationField("startLogin", {
     }
     const username = args.input.username;
     const result = await getEnvelope(username);
-    const challengeResponse = await startLogin(
-      result.envelop,
+    const challengeResponse = await startLogin({
+      envelope: result.envelop,
       username,
-      args.input.challenge
-    );
+      challenge: args.input.challenge,
+    });
     return {
       loginId: challengeResponse.loginId,
       challengeResponse: challengeResponse.message,

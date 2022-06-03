@@ -20,22 +20,41 @@ export async function createWorkspaceInvitation({
       workspaceId,
       isAdmin: true,
     },
-    include: {
-      user: { select: { username: true } },
+    select: {
+      userId: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+        },
+      },
+      workspaceId: true,
+      workspace: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      isAdmin: true,
     },
   });
-  if (!userToWorkspace) {
+  if (!userToWorkspace || !userToWorkspace.isAdmin) {
     throw new Error("Unauthorized");
   }
-  const workspaceInvitation = await prisma.workspaceInvitations.create({
+  const rawWorkspaceInvitation = await prisma.workspaceInvitations.create({
     data: {
       workspaceId,
       inviterUserId,
       expiresAt: new Date(Date.now() + INVITATION_EXPIRATION_TIME),
     },
   });
-  return {
-    ...workspaceInvitation,
+  const workspaceInvitation: WorkspaceInvitation = {
+    id: rawWorkspaceInvitation.id,
+    workspaceId: rawWorkspaceInvitation.workspaceId,
+    inviterUserId: rawWorkspaceInvitation.inviterUserId,
+    expiresAt: rawWorkspaceInvitation.expiresAt,
     inviterUsername: userToWorkspace.user.username,
+    workspaceName: userToWorkspace.workspace.name,
   };
+  return workspaceInvitation;
 }

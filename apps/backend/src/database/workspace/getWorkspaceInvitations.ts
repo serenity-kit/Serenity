@@ -59,14 +59,16 @@ export async function getWorkspaceInvitations({
   });
   const workspaceInvitations: WorkspaceInvitation[] = [];
   rawWorkspaceInvitations.forEach((rawWorkspaceInvitation) => {
-    workspaceInvitations.push({
+    const workspaceInvitation: WorkspaceInvitation = {
       id: rawWorkspaceInvitation.id,
       workspaceId: rawWorkspaceInvitation.workspaceId,
       workspaceName: rawWorkspaceInvitation.workspace.name,
       expiresAt: rawWorkspaceInvitation.expiresAt,
       inviterUserId: rawWorkspaceInvitation.inviterUserId,
       inviterUsername: rawWorkspaceInvitation.inviterUser.username,
-    });
+      workspaceName: rawWorkspaceInvitation.workspace.name,
+    };
+    workspaceInvitations.push(workspaceInvitation);
   });
   return workspaceInvitations;
 }

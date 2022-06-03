@@ -19,12 +19,7 @@ const workspace2Id = "a0856379-ad08-4dc5-baf5-ab93c9f7b5e5";
 beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!didRegisterUser) {
-    await registerUser(
-      graphql,
-      username,
-      password,
-      "17e17242-d86e-476b-af21-5dcfafa332cb"
-    );
+    await registerUser(graphql, username, password);
     await createWorkspace({
       name: "workspace 1",
       id: workspace1Id,
@@ -77,8 +72,8 @@ test("user should get a workspace without providing an id", async () => {
   const result = await graphql.client.request(query, null, authorizationHeader);
   expect(result.workspace).toMatchInlineSnapshot(`
     Object {
-      "id": "17e17242-d86e-476b-af21-5dcfafa332cb",
-      "name": "My Workspace",
+      "id": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+      "name": "workspace 1",
     }
   `);
 });
