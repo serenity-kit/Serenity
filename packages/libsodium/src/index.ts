@@ -1,7 +1,7 @@
-import sodium, { StringKeyPair } from "libsodium-wrappers-sumo";
+import sodium, { StringKeyPair } from "libsodium-wrappers";
 import { to_base64, from_base64, from_base64_to_string } from "./base64wasm";
 export { to_base64, from_base64, from_base64_to_string } from "./base64wasm";
-export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers-sumo";
+export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers";
 import {
   base64ToUrlSafeBase64,
   urlSafeBase64ToBase64,
@@ -85,11 +85,6 @@ export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
   return to_base64(result);
 };
 
-export const crypto_core_ed25519_scalar_random = async (): Promise<string> => {
-  const result = sodium.crypto_core_ed25519_scalar_random();
-  return to_base64(result);
-};
-
 export const crypto_generichash = async (
   hash_length: number,
   b64_password: string
@@ -97,51 +92,6 @@ export const crypto_generichash = async (
   const result = sodium.crypto_generichash(
     hash_length,
     from_base64(b64_password)
-  );
-  return to_base64(result);
-};
-
-export const crypto_core_ed25519_from_uniform = async (
-  uniform: string
-): Promise<string> => {
-  const result = sodium.crypto_core_ed25519_from_uniform(from_base64(uniform));
-  return to_base64(result);
-};
-
-export const crypto_scalarmult_ed25519_base_noclamp = async (
-  scalar: string
-): Promise<string> => {
-  const result = sodium.crypto_scalarmult_ed25519_base_noclamp(
-    from_base64(scalar)
-  );
-  return to_base64(result);
-};
-
-export const crypto_core_ed25519_add = async (
-  scalar1: string,
-  scalar2: string
-): Promise<string> => {
-  const result = sodium.crypto_core_ed25519_add(
-    from_base64(scalar1),
-    from_base64(scalar2)
-  );
-  return to_base64(result);
-};
-
-export const crypto_core_ed25519_scalar_negate = async (
-  scalar: string
-): Promise<string> => {
-  const result = sodium.crypto_core_ed25519_scalar_negate(from_base64(scalar));
-  return to_base64(result);
-};
-
-export const crypto_scalarmult_ed25519_noclamp = async (
-  scalar: string,
-  point: string
-): Promise<string> => {
-  const result = sodium.crypto_scalarmult_ed25519_noclamp(
-    from_base64(scalar),
-    from_base64(point)
   );
   return to_base64(result);
 };
@@ -253,15 +203,9 @@ const libsodiumExports = {
   crypto_sign_detached,
   crypto_secretbox_easy,
   crypto_secretbox_open_easy,
-  crypto_core_ed25519_add,
   crypto_generichash_batch,
   crypto_sign_verify_detached,
   crypto_kx_client_session_keys,
-  crypto_core_ed25519_from_uniform,
-  crypto_core_ed25519_scalar_random,
-  crypto_core_ed25519_scalar_negate,
-  crypto_scalarmult_ed25519_noclamp,
-  crypto_scalarmult_ed25519_base_noclamp,
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_decrypt,

@@ -12,13 +12,16 @@ type Params = {
 export async function createWorkspaceInvitation({
   workspaceId,
   inviterUserId,
-}: Params): Promise<WorkspaceInvitation> {
+}: Params) {
   // check if the user has access to this workspace
   const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
     where: {
       userId: inviterUserId,
       workspaceId,
       isAdmin: true,
+    },
+    include: {
+      user: { select: { username: true } },
     },
   });
   if (!userToWorkspace) {
@@ -31,5 +34,8 @@ export async function createWorkspaceInvitation({
       expiresAt: new Date(Date.now() + INVITATION_EXPIRATION_TIME),
     },
   });
-  return workspaceInvitation;
+  return {
+    ...workspaceInvitation,
+    inviterUsername: userToWorkspace.user.username,
+  };
 }

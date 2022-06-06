@@ -47,6 +47,11 @@ export async function getWorkspaceInvitations({
           username: true,
         },
       },
+      workspace: {
+        select: {
+          name: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -57,6 +62,7 @@ export async function getWorkspaceInvitations({
     workspaceInvitations.push({
       id: rawWorkspaceInvitation.id,
       workspaceId: rawWorkspaceInvitation.workspaceId,
+      workspaceName: rawWorkspaceInvitation.workspace.name,
       expiresAt: rawWorkspaceInvitation.expiresAt,
       inviterUserId: rawWorkspaceInvitation.inviterUserId,
       inviterUsername: rawWorkspaceInvitation.inviterUser.username,

@@ -1,4 +1,4 @@
-import sodium from "libsodium-wrappers-sumo";
+import sodium from "libsodium-wrappers";
 import { v4 as uuidv4 } from "uuid";
 import {
   HandleRegistration,

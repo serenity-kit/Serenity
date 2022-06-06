@@ -1,6 +1,6 @@
 import * as base64wasm from "./base64wasm";
 import * as base64native from "./base64native";
-import sodium from "libsodium-wrappers-sumo";
+import sodium from "libsodium-wrappers";
 declare const Buffer: any;
 
 test("should encode libsodium-compatible base64", async () => {

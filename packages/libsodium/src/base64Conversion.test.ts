@@ -2,7 +2,7 @@ import {
   base64ToUrlSafeBase64,
   urlSafeBase64ToBase64,
 } from "./base64Conversion";
-import sodium from "libsodium-wrappers-sumo";
+import sodium from "libsodium-wrappers";
 
 test("should decode libsodium-compatible base64 to a string", async () => {
   await sodium.ready;

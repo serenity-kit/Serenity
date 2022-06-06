@@ -1,5 +1,5 @@
 import { gql } from "graphql-request";
-import sodium from "libsodium-wrappers-sumo";
+import sodium from "libsodium-wrappers";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { registerUser } from "../../../../test/helpers/registerUser";
