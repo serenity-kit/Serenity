@@ -11,7 +11,7 @@ declare global {
   var _opaque: any;
 }
 
-let editorSource =
+let source =
   Platform.OS !== "android" ? require("../dist/index.html") : { html: null };
 
 let counter = 0;
@@ -41,7 +41,7 @@ export default function OpaqueBridge() {
         promisesStorage[counter.toString()] = { resolve, reject };
       });
       webViewRef.current?.injectJavaScript(`
-        window.registerInitialize("${counter}", "${challengeResponse}");
+        window.finishRegistration("${counter}", "${challengeResponse}");
         true;
       `);
       return promise;
@@ -77,7 +77,7 @@ export default function OpaqueBridge() {
       <WebView
         ref={webViewRef}
         originWhitelist={["*"]}
-        source={editorSource}
+        source={source}
         onMessage={async (event) => {
           const message = JSON.parse(event.nativeEvent.data);
           if (promisesStorage[message.id]) {
