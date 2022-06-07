@@ -26,7 +26,10 @@ window.finishRegistration = function (id: string, challengeResponse: string) {
   window.ReactNativeWebView.postMessage(
     JSON.stringify({
       id,
-      result: toBase64(message),
+      result: {
+        exportKey: toBase64(registration.getExportKey()),
+        response: toBase64(message),
+      },
     })
   );
 };
