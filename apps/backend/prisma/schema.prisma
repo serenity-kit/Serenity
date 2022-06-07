@@ -49,6 +49,23 @@ model Update {
   @@unique([snapshotId, pubKey, snapshotVersion])
 }
 
+model UnconfirmedUser {
+  id                                   String          @id @default(uuid())
+  username                             String          @unique
+  clientPublicKey                      String
+  opaqueEnvelope                       String
+  // contains the device signingPrivateKey and encryptionPrivateKey
+  // can be decrypted using the key storred in the OPAQUE envelope
+  masterDeviceCiphertext               String
+  // nonce to decrypt the masterDeviceCiphertext
+  masterDeviceNonce                    String
+  masterDevice                         Device          @relation(name: "masterDevice", fields: [masterDeviceSigningPublicKey], references: [signingPublicKey])
+  masterDeviceSigningPublicKey         String          @unique
+  devices                              Device[]
+  recoveryDevice                       RecoveryDevice? @relation(fields: [recoveryDeviceDeviceSigningPublicKey], references: [deviceSigningPublicKey])
+  recoveryDeviceDeviceSigningPublicKey String?
+}
+
 model User {
   id                                         String                 @id @default(uuid())
   username                                   String                 @unique
@@ -85,29 +102,33 @@ model RecoveryDevice {
   ciphertext                                 String
   // nonce to decrypt the ciphertext
   nonce                                      String
-  device                                     Device @relation(fields: [deviceSigningPublicKey], references: [signingPublicKey])
-  deviceSigningPublicKey                     String @id
-  deviceSigningKeyType                       String @default("invalid")
-  user                                       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId                                     String @unique
+  device                                     Device            @relation(fields: [deviceSigningPublicKey], references: [signingPublicKey])
+  deviceSigningPublicKey                     String            @id
+  deviceSigningKeyType                       String            @default("invalid")
+  user                                       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                                     String            @unique
   // this cross signing makes sure that the master device and recovery device are linked and verifyable in both directions
   // signed by the user's recovery device
   signatureForMasterDeviceSigningPublicKey   String
   // signed by the user's master device
   signatureForRecoveryDeviceSigningPublicKey String
+  UnconfirmedUser                            UnconfirmedUser[]
 }
 
 model Device {
-  signingPublicKey             String          @id @unique
-  signingKeyType               String          @default("invalid")
+  signingPublicKey             String            @id @unique
+  signingKeyType               String            @default("invalid")
   encryptionPublicKey          String
-  encryptionKeyType            String          @default("invalid")
+  encryptionKeyType            String            @default("invalid")
   encryptionPublicKeySignature String
   // can't be mandatory since we need to create the device
-  user                         User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                         User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                       String?
   recoveryDevice               RecoveryDevice?
-  userForMaster                User?           @relation("masterDevice")
+  userForMaster                User?             @relation("masterDevice")
+  UnconfirmedUser              UnconfirmedUser[]
+  UnconfirmedUser              UnconfirmedUser?  @relation(fields: [unconfirmedUserId], references: [id])
+  unconfirmedUserId            String?
 }
 
 model Workspace {

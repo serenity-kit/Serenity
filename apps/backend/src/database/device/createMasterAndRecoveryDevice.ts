@@ -37,6 +37,10 @@ export async function createMasterAndRecoveryDevice({
     },
   });
   const masterDevice = await createDevice({ userId });
+  // TODO: update:
+  // user.masterDeviceCiphertext
+  // user.masterDeviceNonce
+  // user.masterDeviceSigningPublicKey
 
   // Note: The user should aleady be verified to exist by this point
   const signingKeyPair = await crypto_sign_keypair();
