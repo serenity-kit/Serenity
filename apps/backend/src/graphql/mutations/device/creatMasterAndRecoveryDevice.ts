@@ -1,25 +1,25 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { createMasterAndRecoveryDevice } from "../../../database/device/createMasterAndRecoveryDevice";
 
-export const CreateDeviceInput = inputObjectType({
-  name: "CreateDeviceInput",
+export const CreateMasterAndRecoveryDeviceInput = inputObjectType({
+  name: "CreateMasterAndRecoveryDeviceInput",
   definition(t) {},
 });
 
-export const CreateDeviceResult = objectType({
-  name: "CreateDeviceResult",
+export const CreateMasterAndRecoveryDeviceResult = objectType({
+  name: "CreateMasterAndRecoveryDeviceResult",
   definition(t) {
     t.nonNull.string("id");
   },
 });
 
-export const createMasterRecoveryDeviceMutation = mutationField(
-  "createMasterRecoveryDevice",
+export const createMasterAndRecoveryDeviceMutation = mutationField(
+  "createMasterAndRecoveryDevice",
   {
-    type: CreateDeviceResult,
+    type: CreateMasterAndRecoveryDeviceResult,
     args: {
       input: arg({
-        type: CreateDeviceInput,
+        type: CreateMasterAndRecoveryDeviceInput,
       }),
     },
     async resolve(root, args, context) {
