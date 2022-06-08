@@ -246,19 +246,18 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
       <SidebarDivider />
 
-      <SidebarButton
-        onPress={() => {
-          setIsCreatingNewFolder(true);
-        }}
-      >
-        <Text variant="small">Create a Folder</Text>
-      </SidebarButton>
-
-      <SidebarDivider />
-
-      <Text variant="xxs" bold style={tw`ml-4 mb-4`}>
-        Documents
-      </Text>
+      <HStack justifyContent={"space-between"} style={tw`ml-4 mr-2.5 mb-4`}>
+        <Text variant="xxs" bold>
+          Documents
+        </Text>
+        <Pressable
+          onPress={() => {
+            setIsCreatingNewFolder(true);
+          }}
+        >
+          <Icon name="plus" color={tw.color("gray-800")} />
+        </Pressable>
+      </HStack>
 
       {isCreatingNewFolder && (
         <InlineInput
