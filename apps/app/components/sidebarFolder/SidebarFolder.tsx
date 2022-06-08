@@ -28,6 +28,7 @@ type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
   folderName: string;
+  depth?: number;
   onStructureChange: () => void;
 };
 
@@ -35,6 +36,7 @@ export default function SidebarFolder(props: Props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
@@ -54,6 +56,7 @@ export default function SidebarFolder(props: Props) {
       first: 50,
     },
   });
+  const { depth = 0 } = props;
 
   const createFolder = async (name: string | null) => {
     setIsOpen(true);
@@ -141,78 +144,87 @@ export default function SidebarFolder(props: Props) {
 
   const styles = StyleSheet.create({
     folder: tw``,
+    hover: tw`bg-gray-200`,
   });
 
+  const maxWidth = 32 - depth * 2;
+
   return (
-    <View style={[styles.folder, props.style]}>
-      <Pressable
-        onPress={() => {
-          setIsOpen((currentIsOpen) => !currentIsOpen);
-        }}
-        style={tw`my-1.5 mx-2.5`}
+    <>
+      <View
+        style={[styles.folder, props.style, isHovered && styles.hover]}
+        // @ts-expect-error as Views usually shouldn't have mouse-events ()
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        <HStack justifyContent="space-between">
-          <HStack alignItems="center">
-            {/* TODO move style property to Icon ? */}
-            <div style={tw`ml-0.5 -mr-0.5`}>
-              <Icon
-                name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
-                color={tw.color("gray-600")}
-              />
-            </div>
-            <Icon name="folder" size={20} />
-            {isEditing === "name" ? (
-              <InlineInput
-                onSubmit={updateFolderName}
-                onCancel={() => {
-                  setIsEditing("none");
-                }}
-                value={props.folderName}
-                // TODO adjust width depending on depth
-                style={tw`w-32 ml-1.5`}
-              />
-            ) : (
-              <Text
-                variant="small"
-                // TODO adjust the max-width depending on depth
-                style={tw`ml-1.5 max-w-32`}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {props.folderName}
-              </Text>
+        <Pressable
+          onPress={() => {
+            setIsOpen((currentIsOpen) => !currentIsOpen);
+          }}
+          style={tw`py-1.5 px-2.5`}
+        >
+          <HStack justifyContent="space-between">
+            <HStack alignItems="center">
+              {/* not the best way but icons don't take styles (yet?) */}
+              <div style={tw`ml-0.5 -mr-0.5`}>
+                <Icon
+                  name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
+                  color={tw.color("gray-600")}
+                />
+              </div>
+              <Icon name="folder" size={20} />
+              {isEditing === "name" ? (
+                <InlineInput
+                  onSubmit={updateFolderName}
+                  onCancel={() => {
+                    setIsEditing("none");
+                  }}
+                  value={props.folderName}
+                  style={tw`w-${maxWidth} ml-1.5`}
+                />
+              ) : (
+                <Text
+                  variant="small"
+                  style={tw`ml-1.5 max-w-${maxWidth}`}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {props.folderName}
+                </Text>
+              )}
+            </HStack>
+
+            {isHovered && (
+              <HStack alignItems="center" space="1.5">
+                <SidebarFolderMenu
+                  folderId={props.folderId}
+                  refetchFolders={refetchFolders}
+                  onUpdateNamePress={editFolderName}
+                  onDeletePressed={() => deleteFolder(props.folderId)}
+                  onCreateFolderPress={() => {
+                    createFolder(null);
+                  }}
+                />
+                <Pressable onPress={createDocument}>
+                  <Icon name="file-add-line" color={tw.color("gray-600")} />
+                </Pressable>
+                {documentsResult.fetching ||
+                  (foldersResult.fetching && <ActivityIndicator />)}
+              </HStack>
             )}
           </HStack>
-
-          <HStack alignItems="center" space="1.5">
-            <SidebarFolderMenu
-              folderId={props.folderId}
-              refetchFolders={refetchFolders}
-              onUpdateNamePress={editFolderName}
-              onDeletePressed={() => deleteFolder(props.folderId)}
-              onCreateFolderPress={() => {
-                createFolder(null);
-              }}
-            />
-            <Pressable onPress={createDocument}>
-              <Icon name="file-add-line" color={tw.color("gray-600")} />
-            </Pressable>
-            {documentsResult.fetching ||
-              (foldersResult.fetching && <ActivityIndicator />)}
-          </HStack>
-        </HStack>
-      </Pressable>
-      {isEditing === "new" && (
-        <InlineInput
-          value=""
-          onSubmit={createFolder}
-          onCancel={() => {
-            setIsEditing("none");
-          }}
-          // TODO adjust width depending on depth
-          style={tw`w-32 ml-1.5`}
-        />
-      )}
+        </Pressable>
+        {isEditing === "new" && (
+          <InlineInput
+            value=""
+            onSubmit={createFolder}
+            onCancel={() => {
+              setIsEditing("none");
+            }}
+            style={tw`w-${maxWidth} ml-1.5`}
+          />
+        )}
+      </View>
 
       {isOpen && (
         <>
@@ -222,37 +234,40 @@ export default function SidebarFolder(props: Props) {
                   return null;
                 }
                 return (
-                  <View style={tw`ml-3`} key={folder.id}>
-                    <SidebarFolder
-                      folderId={folder.id}
-                      workspaceId={props.workspaceId}
-                      folderName={folder.name}
-                      onStructureChange={props.onStructureChange}
-                    />
-                  </View>
+                  <SidebarFolder
+                    key={folder.id}
+                    folderId={folder.id}
+                    workspaceId={props.workspaceId}
+                    folderName={folder.name}
+                    onStructureChange={props.onStructureChange}
+                    // needs to be here as a padding for hovering bg-color change
+                    style={tw`pl-${3 + depth * 3}`}
+                    depth={depth + 1}
+                  />
                 );
               })
             : null}
-
           {documentsResult.data?.documents?.nodes
             ? documentsResult.data?.documents?.nodes.map((document) => {
                 if (document === null) {
                   return null;
                 }
                 return (
-                  <View style={tw`ml-3`} key={document.id}>
-                    <SidebarPage
-                      documentId={document.id}
-                      documentName={document.name || "Untitled"}
-                      workspaceId={props.workspaceId}
-                      onRefetchDocumentsPress={refetchDocuments}
-                    />
-                  </View>
+                  <SidebarPage
+                    key={document.id}
+                    documentId={document.id}
+                    documentName={document.name || "Untitled"}
+                    workspaceId={props.workspaceId}
+                    onRefetchDocumentsPress={refetchDocuments}
+                    // needs to be here as a padding for hovering bg-color change
+                    style={tw`pl-${9.5 + depth * 3}`}
+                    depth={depth + 1}
+                  />
                 );
               })
             : null}
         </>
       )}
-    </View>
+    </>
   );
 }
