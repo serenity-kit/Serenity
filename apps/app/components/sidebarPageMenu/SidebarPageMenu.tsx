@@ -38,9 +38,10 @@ export default function SidebarPageMenu(props: Props) {
       isOpen={isOpenMenu}
       onChange={setIsOpenMenu}
       trigger={
+        // TODO make icon button
         <Pressable
           accessibilityLabel="More options menu"
-          style={tw`flex flex-row`}
+          style={tw`flex items-center justify-center w-5 h-5`}
         >
           <Icon name="more-line" color={tw.color("gray-600")} />
         </Pressable>

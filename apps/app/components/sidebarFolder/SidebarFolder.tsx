@@ -157,13 +157,13 @@ export default function SidebarFolder(props: Props) {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <Pressable
-          onPress={() => {
-            setIsOpen((currentIsOpen) => !currentIsOpen);
-          }}
-          style={tw`py-1.5 px-2.5`}
-        >
-          <HStack justifyContent="space-between">
+        <HStack>
+          <Pressable
+            onPress={() => {
+              setIsOpen((currentIsOpen) => !currentIsOpen);
+            }}
+            style={tw`py-1.5 pl-2.5 grow-1`}
+          >
             <HStack alignItems="center">
               {/* not the best way but icons don't take styles (yet?) */}
               <div style={tw`ml-0.5 -mr-0.5`}>
@@ -193,37 +193,42 @@ export default function SidebarFolder(props: Props) {
                 </Text>
               )}
             </HStack>
+          </Pressable>
 
-            {isHovered && (
-              <HStack alignItems="center" space="1.5">
-                <SidebarFolderMenu
-                  folderId={props.folderId}
-                  refetchFolders={refetchFolders}
-                  onUpdateNamePress={editFolderName}
-                  onDeletePressed={() => deleteFolder(props.folderId)}
-                  onCreateFolderPress={() => {
-                    createFolder(null);
-                  }}
-                />
-                <Pressable onPress={createDocument}>
-                  <Icon name="file-add-line" color={tw.color("gray-600")} />
-                </Pressable>
-                {documentsResult.fetching ||
-                  (foldersResult.fetching && <ActivityIndicator />)}
-              </HStack>
-            )}
-          </HStack>
-        </Pressable>
-        {isEditing === "new" && (
-          <InlineInput
-            value=""
-            onSubmit={createFolder}
-            onCancel={() => {
-              setIsEditing("none");
-            }}
-            style={tw`w-${maxWidth} ml-1.5`}
-          />
-        )}
+          {isEditing === "new" && (
+            <InlineInput
+              value=""
+              onSubmit={createFolder}
+              onCancel={() => {
+                setIsEditing("none");
+              }}
+              style={tw`w-${maxWidth} ml-1.5`}
+            />
+          )}
+
+          {isHovered && (
+            <HStack alignItems="center" space={1} style={tw`pr-2`}>
+              <SidebarFolderMenu
+                folderId={props.folderId}
+                refetchFolders={refetchFolders}
+                onUpdateNamePress={editFolderName}
+                onDeletePressed={() => deleteFolder(props.folderId)}
+                onCreateFolderPress={() => {
+                  createFolder(null);
+                }}
+              />
+              {/* TODO make icon button / hover colors */}
+              <Pressable
+                onPress={createDocument}
+                style={tw`w-5 h-5 flex items-center justify-center`}
+              >
+                <Icon name="file-add-line" color={tw.color("gray-600")} />
+              </Pressable>
+              {documentsResult.fetching ||
+                (foldersResult.fetching && <ActivityIndicator />)}
+            </HStack>
+          )}
+        </HStack>
       </View>
 
       {isOpen && (

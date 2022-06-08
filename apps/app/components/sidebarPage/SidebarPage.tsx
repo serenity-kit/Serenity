@@ -47,7 +47,7 @@ export default function SidebarPage(props: Props) {
   };
 
   const styles = StyleSheet.create({
-    page: tw`py-1.5 px-2.5`,
+    page: tw`px-2`,
     hover: tw`bg-gray-200`,
   });
 
@@ -60,18 +60,23 @@ export default function SidebarPage(props: Props) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <HStack justifyContent="space-between">
-        <HStack alignItems="center">
-          <Icon name="page" size={20} color={tw.color("gray-600")} />
+      <HStack>
+        <HStack alignItems="center" style={tw`grow-1`}>
           {isEditing ? (
-            <InlineInput
-              onCancel={() => {
-                setIsEditing(false);
-              }}
-              onSubmit={updateDocumentName}
-              value={props.documentName}
-              style={tw`w-${maxWidth} ml-1.5`}
-            />
+            <HStack style={tw`py-1.5`}>
+              {/* @icon : needs to be here in both versions (isEditing & not) as putting the 
+                          InlineInput inside the Link adds weird behaviour we don't want
+              */}
+              <Icon name="page" size={20} color={tw.color("gray-600")} />
+              <InlineInput
+                onCancel={() => {
+                  setIsEditing(false);
+                }}
+                onSubmit={updateDocumentName}
+                value={props.documentName}
+                style={tw`w-${maxWidth} ml-1.5`}
+              />
+            </HStack>
           ) : (
             <Link
               to={{
@@ -84,11 +89,22 @@ export default function SidebarPage(props: Props) {
                   },
                 },
               }}
-              style={tw`ml-1.5 max-w-${maxWidth} no-underline`}
-              numberOfLines={1}
-              ellipsizeMode="tail"
+              style={tw`flex w-full py-1.5 no-underline`}
             >
-              <Text variant="small">{props.documentName}</Text>
+              <HStack style={tw`grow-1`}>
+                {/* @icon : needs to be here in both versions (isEditing & not)
+                            as we want the clickable area as big as possible
+                */}
+                <Icon name="page" size={20} color={tw.color("gray-600")} />
+                <Text
+                  variant="small"
+                  style={tw`max-w-${maxWidth} pl-1.5`}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {props.documentName}
+                </Text>
+              </HStack>
             </Link>
           )}
         </HStack>

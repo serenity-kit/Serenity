@@ -29,9 +29,10 @@ export default function SidebarFolderMenu(props: Props) {
       isOpen={isOpenMenu}
       onChange={setIsOpenMenu}
       trigger={
+        // TODO make icon-button
         <Pressable
           accessibilityLabel="More options menu"
-          style={tw`flex flex-row`}
+          style={tw`flex w-5 h-5 items-center justify-center`}
         >
           <Icon name="more-line" color={tw.color("gray-600")} />
         </Pressable>
