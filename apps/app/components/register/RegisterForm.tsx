@@ -49,12 +49,13 @@ export default function RegisterForm(props: Props) {
         },
       });
       if (startRegistrationResult.data?.startRegistration) {
-        const message = await finishRegistration(
+        const { response, exportKey } = await finishRegistration(
           startRegistrationResult.data.startRegistration.challengeResponse
         );
+        console.log("exportKey", exportKey);
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
-            message,
+            message: response,
             registrationId:
               startRegistrationResult.data.startRegistration.registrationId,
             clientPublicKey: `TODO+${uuidv4()}`,

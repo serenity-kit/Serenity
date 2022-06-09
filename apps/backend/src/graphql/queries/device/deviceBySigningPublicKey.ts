@@ -1,10 +1,17 @@
-import { idArg, nonNull, queryField } from "nexus";
+import { idArg, nonNull, queryField, objectType } from "nexus";
 import { getDeviceBySigningPublicKey } from "../../../database/device/getDeviceBySigningPublicKey";
 import { Device } from "../../types/device";
 
+export const DeviceResult = objectType({
+  name: "DeviceResult",
+  definition(t) {
+    t.field("device", { type: Device });
+  },
+});
+
 export const deviceBySigningPublicKey = queryField((t) => {
   t.field("deviceBySigningPublicKey", {
-    type: Device,
+    type: DeviceResult,
     args: {
       signingPublicKey: nonNull(idArg()),
     },
@@ -17,7 +24,7 @@ export const deviceBySigningPublicKey = queryField((t) => {
         userId,
         signingPublicKey: args.signingPublicKey,
       });
-      return device;
+      return { device };
     },
   });
 });

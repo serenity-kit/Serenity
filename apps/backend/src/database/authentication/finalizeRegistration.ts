@@ -33,9 +33,9 @@ export async function finalizeRegistration({
           username,
           opaqueEnvelope,
           clientPublicKey: `TODO+${username}`,
-          masterDeviceCiphertext: "TODO",
-          masterDeviceNonce: "TODO",
-          masterDevice: {
+          mainDeviceCiphertext: "TODO",
+          mainDeviceNonce: "TODO",
+          mainDevice: {
             connect: { signingPublicKey: device.signingPublicKey },
           },
         },

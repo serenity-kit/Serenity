@@ -1,25 +1,18 @@
-import { arg, inputObjectType, mutationField, objectType } from "nexus";
+import { arg, mutationField, nonNull, objectType, idArg } from "nexus";
 import { deleteDevice } from "../../../database/device/deleteDevice";
 
-export const CreateDeviceInput = inputObjectType({
-  name: "CreateDeviceInput",
-  definition(t) {
-    t.nonNull.string("signingPublicKey");
-  },
-});
-
-export const CreateDeviceResult = objectType({
-  name: "CreateDeviceResult",
+export const DeleteDeviceResult = objectType({
+  name: "DeleteDeviceResult",
   definition(t) {
     t.nonNull.string("status");
   },
 });
 
-export const createDeviceMutation = mutationField("createDevice", {
-  type: CreateDeviceResult,
+export const deleteDeviceMutation = mutationField("deleteDevice", {
+  type: DeleteDeviceResult,
   args: {
     input: arg({
-      type: CreateDeviceInput,
+      type: nonNull(idArg()),
     }),
   },
   async resolve(root, args, context) {

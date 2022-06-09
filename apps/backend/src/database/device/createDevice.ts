@@ -3,23 +3,22 @@ import {
   crypto_sign_keypair,
   crypto_box_keypair,
   crypto_sign_detached,
-  StringKeyPair,
 } from "@serenity-tools/libsodium";
+import { Device } from "../../types/device";
 
+// TODO: provide browser/os/location identifiers
+// so user can look through devices later to know which ones
+// look sketching and which ones they feel safe deleting
+// os?: string; // eg android, ios, windows, mac, linux
+// osVersion?: string;
+// browser?: string; // eg chrome, firefox, safari
+// browserVersion?: string;
+// ipAddress: string; // to estimate the location
 type Params = {
   userId: string;
 };
 
-export type CreateDeviceResponseType = {
-  id: string;
-  signingKeyPair: StringKeyPair;
-  encryptionKeyPair: StringKeyPair;
-  keyPairSignature: string;
-};
-
-export async function createDevice({
-  userId,
-}: Params): Promise<CreateDeviceResponseType> {
+export async function createDevice({ userId }: Params): Promise<Device> {
   // Note: The user should aleady be verified to exist by this point
   const signingKeyPair = await crypto_sign_keypair();
   const encryptionKeyPair = await crypto_box_keypair();
@@ -36,43 +35,18 @@ export async function createDevice({
   const device = await prisma.device.create({
     data: {
       userId,
-      signingKeyType: signingKeyPair.keyType,
       signingPublicKey: signingKeyPair.publicKey,
+      signingKeyType: signingKeyPair.keyType,
       encryptionPublicKey: encryptionKeyPair.publicKey,
-      encryptionKeyType: signingKeyPair.keyType,
+      encryptionKeyType: encryptionKeyPair.keyType,
       encryptionPublicKeySignature: keyPairSignature,
-      // what is userForMaster?
+      // what is userForMain?
     },
   });
 
   return {
-    id: device.id,
-    signingKeyPair,
-    encryptionKeyPair,
-    keyPairSignature: keyPairSignature,
-  };
+    ...device,
+    signingPrivateKey: signingKeyPair.privateKey,
+    encryptionPrivateKey: encryptionKeyPair.privateKey,
+  } as Device;
 }
-
-/*
-note to self:
-
-* What device information do we want to store? Is it important?
-* How to we create a recovery device? Is there only one recovery device?
-* Should we store the key type? yes
-
-*/
-
-/*
-```prisma
-model Device {
-    signingPublicKey             String          @id @unique
-    encryptionPublicKey          String
-    encryptionPublicKeySignature String
-    // can't be mandatory since we need to create the device
-    user                         User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId                       String?
-    recoveryDevice               RecoveryDevice?
-    userForMaster                User?           @relation("masterDevice")
-  }
-```
-*/

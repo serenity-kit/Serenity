@@ -33,6 +33,11 @@ import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspac
 import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspaceInvitation";
 import * as DeleteWorkspaceInvitationsTypes from "./graphql/mutations/workspace/deleteWorkspaceInvitations";
 
+import * as CreateDeviceMutationTypes from "./graphql/mutations/device/createDevice";
+import * as CreateMainAndRecoveryDeviceMutation from "./graphql/mutations/device/createMainAndRecoveryDevice";
+import * as DevicesQueryTypes from "./graphql/queries/device/devices";
+import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
+
 import * as DocumentTypes from "./graphql/types/document";
 
 export const schema = makeSchema({
@@ -73,6 +78,11 @@ export const schema = makeSchema({
     WorkspaceInvitationsTypes,
     WorkspaceInvitationTypes,
     DeleteWorkspaceInvitationsTypes,
+
+    CreateDeviceMutationTypes,
+    CreateMainAndRecoveryDeviceMutation,
+    DevicesQueryTypes,
+    deviceBySigningPublicKeyQueryTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),

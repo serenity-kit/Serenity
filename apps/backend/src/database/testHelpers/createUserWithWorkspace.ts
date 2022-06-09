@@ -22,9 +22,9 @@ export default async function createUserWithWorkspace({
         username,
         opaqueEnvelope: "TODO",
         clientPublicKey: "abc",
-        masterDeviceCiphertext: "TODO",
-        masterDeviceNonce: "TODO",
-        masterDevice: {
+        mainDeviceCiphertext: "TODO",
+        mainDeviceNonce: "TODO",
+        mainDevice: {
           connect: { signingPublicKey: device.signingPublicKey },
         },
       },
