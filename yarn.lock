@@ -2903,10 +2903,10 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-"@mobily/stacks@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@mobily/stacks/-/stacks-2.0.0.tgz#02e67e420153e760df21f84aa09c60e48641525c"
-  integrity sha512-7Amopw38gmn61Bt+e9aNYBtDWaqqVxVHw3BReqBhOuV6e515NIqRpLWyyDs94MFMYkepvZyPlfcYo6cL8F8T5A==
+"@mobily/stacks@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@mobily/stacks/-/stacks-2.1.0.tgz#4a111a1f3938bf829746e845af7ad52215c1ab2e"
+  integrity sha512-JWHW7XT6J6Pwic5TgBIjZLfCfHvD9iZ/DQDZ2+2w+66Gi3viWlGhQL6OgNc9Q4ZNj6nipKkvxo7KLjYehywXVw==
   dependencies:
     wonka "~4.0.15"
 
