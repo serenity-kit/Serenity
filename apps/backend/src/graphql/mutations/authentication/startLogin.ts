@@ -26,11 +26,13 @@ export const startLoginMutation = mutationField("startLogin", {
     }),
   },
   async resolve(root, args, context) {
+    console.log("DEBUG: inside startLogin mutation");
     if (!args || !args.input) {
       throw Error("Missing input");
     }
     const username = args.input.username;
     const result = await getEnvelope(username);
+    console.log("DEBUG: envelope", result);
     const challengeResponse = await startLogin(
       result.envelop,
       username,

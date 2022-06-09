@@ -72,13 +72,16 @@ export const startLogin = async (
   challenge: string
 ) => {
   const loginId = uuidv4();
+  console.log("START LOGIN: before");
   const serverLogin = new HandleLogin(opaqueServerSetup());
+  console.log("START LOGIN: init");
   const response = serverLogin.start(
     sodium.from_base64(envelope),
     // @ts-expect-error string just works fine
     username,
     sodium.from_base64(challenge)
   );
+  console.log("START LOGIN: after");
   logins[loginId] = serverLogin;
   return {
     loginId,
