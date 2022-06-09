@@ -1,5 +1,5 @@
 import React from "react";
-import Svg, { Path, Line, Defs, Stop } from "react-native-svg";
+import Svg, { Path, Line, Defs, Stop, LinearGradient } from "react-native-svg";
 
 export type Props = { size: number };
 
@@ -27,7 +27,7 @@ export const Page = ({ size }: Props) => {
         strokeWidth="1.5"
       />
       <Defs>
-        <linearGradient
+        <LinearGradient
           id="paint0_linear_333_2185"
           x1="10"
           y1="2"
@@ -37,7 +37,7 @@ export const Page = ({ size }: Props) => {
         >
           <Stop offset="0.786458" stopColor="#E4E5ED" />
           <Stop offset="1" stopColor="#CBCBD3" />
-        </linearGradient>
+        </LinearGradient>
       </Defs>
     </Svg>
   );
