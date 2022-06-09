@@ -66,7 +66,6 @@ export async function getWorkspaceInvitations({
       expiresAt: rawWorkspaceInvitation.expiresAt,
       inviterUserId: rawWorkspaceInvitation.inviterUserId,
       inviterUsername: rawWorkspaceInvitation.inviterUser.username,
-      workspaceName: rawWorkspaceInvitation.workspace.name,
     };
     workspaceInvitations.push(workspaceInvitation);
   });
