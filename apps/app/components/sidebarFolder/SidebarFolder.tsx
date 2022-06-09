@@ -7,6 +7,7 @@ import {
   View,
   ViewProps,
   InlineInput,
+  IconButton,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";
@@ -217,13 +218,11 @@ export default function SidebarFolder(props: Props) {
                   createFolder(null);
                 }}
               />
-              {/* TODO make icon button / hover colors */}
-              <Pressable
+              <IconButton
                 onPress={createDocument}
-                style={tw`w-5 h-5 flex items-center justify-center`}
-              >
-                <Icon name="file-add-line" color={tw.color("gray-600")} />
-              </Pressable>
+                name="file-add-line"
+                color="gray-600"
+              ></IconButton>
               {documentsResult.fetching ||
                 (foldersResult.fetching && <ActivityIndicator />)}
             </HStack>

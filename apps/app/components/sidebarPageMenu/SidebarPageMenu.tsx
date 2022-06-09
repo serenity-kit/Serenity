@@ -1,7 +1,6 @@
 import {
-  Icon,
+  IconButton,
   Menu,
-  Pressable,
   SidebarButton,
   SidebarDivider,
   Text,
@@ -38,13 +37,11 @@ export default function SidebarPageMenu(props: Props) {
       isOpen={isOpenMenu}
       onChange={setIsOpenMenu}
       trigger={
-        // TODO make icon button
-        <Pressable
+        <IconButton
           accessibilityLabel="More options menu"
-          style={tw`flex items-center justify-center w-5 h-5`}
-        >
-          <Icon name="more-line" color={tw.color("gray-600")} />
-        </Pressable>
+          name="more-line"
+          color="gray-600"
+        ></IconButton>
       }
     >
       <SidebarButton

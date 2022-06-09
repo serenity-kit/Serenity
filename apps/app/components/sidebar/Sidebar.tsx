@@ -17,6 +17,7 @@ import {
   useIsPermanentLeftSidebar,
   View,
   Avatar,
+  IconButton,
 } from "@serenity-tools/ui";
 import { CreateWorkspaceModal } from "../createWorkspaceModal/CreateWorkspaceModal";
 import {
@@ -194,18 +195,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           </SidebarButton>
         </Menu>
         {!isPermanentLeftSidebar && (
-          <Pressable
+          <IconButton
             onPress={() => {
               props.navigation.closeDrawer();
             }}
-            style={tw`icon-button`}
-          >
-            <Icon
-              size={16}
-              name="double-arrow-left"
-              color={tw.color("gray-400")}
-            />
-          </Pressable>
+            name="double-arrow-left"
+          ></IconButton>
         )}
       </HStack>
 
@@ -246,17 +241,21 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
       <SidebarDivider />
 
-      <HStack justifyContent={"space-between"} style={tw`ml-4 mr-2.5 mb-4`}>
+      <HStack
+        justifyContent="space-between"
+        alignItems="center"
+        style={tw`ml-4 mr-2 mb-4`}
+      >
         <Text variant="xxs" bold>
           Documents
         </Text>
-        <Pressable
+        <IconButton
           onPress={() => {
             setIsCreatingNewFolder(true);
           }}
-        >
-          <Icon name="plus" color={tw.color("gray-800")} />
-        </Pressable>
+          name="plus"
+          hoverBgColor="gray-200"
+        ></IconButton>
       </HStack>
 
       {isCreatingNewFolder && (
