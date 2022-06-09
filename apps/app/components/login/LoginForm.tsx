@@ -101,11 +101,6 @@ export function LoginForm(props: Props) {
 
   return (
     <VStack space="5">
-      <View>
-        <Text muted style={tw`text-center`}>
-          Log in to your Serenity Account
-        </Text>
-      </View>
       {gqlErrorMessage !== "" && (
         <View>
           <Text>{gqlErrorMessage}</Text>
