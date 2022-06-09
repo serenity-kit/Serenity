@@ -87,6 +87,7 @@ export const startLogin = async (
 };
 
 export const finishLogin = async (loginId: string, message: string) => {
+  console.log("DEBUG LOGIN: ", loginId, logins[loginId]);
   const response = logins[loginId].finish(sodium.from_base64(message));
   delete logins[loginId];
   return sodium.to_base64(response);
