@@ -15,6 +15,7 @@ import {
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
 import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
+import { VStack } from "native-base";
 
 type Props = {
   onRegisterSuccess?: () => void;
@@ -94,7 +95,7 @@ export default function RegisterForm(props: Props) {
   };
 
   return (
-    <>
+    <VStack space="5">
       {errorMessage ? (
         <View>
           <Text>{errorMessage}</Text>
@@ -153,6 +154,6 @@ export default function RegisterForm(props: Props) {
           <Link to={{ screen: "Login" }}>Login here</Link>
         </Text>
       </View>
-    </>
+    </VStack>
   );
 }
