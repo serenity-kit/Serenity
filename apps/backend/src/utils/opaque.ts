@@ -4,6 +4,8 @@ import {
   HandleRegistration,
   HandleLogin,
   ServerSetup,
+  Registration,
+  Login,
 } from "../vendor/opaque-wasm/opaque_wasm";
 
 // Trade-off: by storing it in memory it means with a server restart registrations will be lost and fail
@@ -30,10 +32,7 @@ export const opaqueServerSetup = () => {
   );
 };
 
-export const startRegistration = async (
-  username: string,
-  challenge: string
-) => {
+export const startRegistration = (username: string, challenge: string) => {
   const registrationId = uuidv4();
   const serverRegistration = new HandleRegistration(opaqueServerSetup());
   const response = serverRegistration.start(
@@ -51,10 +50,7 @@ export const startRegistration = async (
   };
 };
 
-export const finishRegistration = async (
-  registrationId: string,
-  message: string
-) => {
+export const finishRegistration = (registrationId: string, message: string) => {
   const response = registrations[registrationId].handleRegistration.finish(
     sodium.from_base64(message)
   );
@@ -66,15 +62,13 @@ export const finishRegistration = async (
   };
 };
 
-export const startLogin = async (
+export const startLogin = (
   envelope: string,
   username: string,
   challenge: string
 ) => {
   const loginId = uuidv4();
-  console.log("START LOGIN: before");
   const serverLogin = new HandleLogin(opaqueServerSetup());
-  console.log("START LOGIN: init");
   const response = serverLogin.start(
     sodium.from_base64(envelope),
     // @ts-expect-error string just works fine
@@ -89,8 +83,7 @@ export const startLogin = async (
   };
 };
 
-export const finishLogin = async (loginId: string, message: string) => {
-  console.log("DEBUG LOGIN: ", loginId, logins[loginId]);
+export const finishLogin = (loginId: string, message: string) => {
   const response = logins[loginId].finish(sodium.from_base64(message));
   delete logins[loginId];
   return sodium.to_base64(response);
