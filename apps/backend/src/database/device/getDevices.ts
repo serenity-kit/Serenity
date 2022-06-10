@@ -1,7 +1,7 @@
 import { prisma } from "../prisma";
 
 type Cursor = {
-  id?: string;
+  signingPublicKey?: string;
 };
 
 type Params = {
