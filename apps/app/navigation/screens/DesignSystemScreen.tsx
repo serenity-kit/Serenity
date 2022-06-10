@@ -20,6 +20,7 @@ import {
   AvatarGroup,
   ModalHeader,
   ModalButtonFooter,
+  IconButton,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -67,6 +68,11 @@ export default function DesignSystemScreen() {
       <Text variant="xxs" muted>
         muted xxs Text
       </Text>
+      <Text style={tw`mt-6 mb-4 h2`}>Icon Button</Text>
+      <HStack alignItems="center" space={4}>
+        <IconButton name="add-line" color="gray-500" />
+        <IconButton name="menu" color="gray-800" large />
+      </HStack>
       <Text style={tw`mt-6 mb-4 h2`}>Button</Text>
       <Text>Default Button</Text>
       <Button>Login</Button>
