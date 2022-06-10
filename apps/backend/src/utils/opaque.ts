@@ -1,9 +1,11 @@
-import sodium from "libsodium-wrappers-sumo";
+import sodium from "libsodium-wrappers";
 import { v4 as uuidv4 } from "uuid";
 import {
   HandleRegistration,
   HandleLogin,
   ServerSetup,
+  Registration,
+  Login,
 } from "../vendor/opaque-wasm/opaque_wasm";
 
 // Trade-off: by storing it in memory it means with a server restart registrations will be lost and fail
@@ -89,6 +91,7 @@ export const startLogin = async ({
     username,
     sodium.from_base64(challenge)
   );
+  console.log("START LOGIN: after");
   logins[loginId] = serverLogin;
   return {
     loginId,

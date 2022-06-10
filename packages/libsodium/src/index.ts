@@ -1,14 +1,12 @@
-import sodium, { StringKeyPair } from "libsodium-wrappers-sumo";
+import sodium, { StringKeyPair } from "libsodium-wrappers";
 import { to_base64, from_base64, from_base64_to_string } from "./base64wasm";
 export { to_base64, from_base64, from_base64_to_string } from "./base64wasm";
-export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers-sumo";
+export type { StringKeyPair, KeyPair, KeyType } from "libsodium-wrappers";
 import {
   base64ToUrlSafeBase64,
   urlSafeBase64ToBase64,
 } from "./base64Conversion";
 export const ready = sodium.ready;
-
-declare const Buffer: any;
 
 export const randombytes_buf = async (length: number): Promise<string> => {
   const result = await sodium.randombytes_buf(length);
@@ -85,11 +83,6 @@ export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
   return to_base64(result);
 };
 
-export const crypto_core_ed25519_scalar_random = async (): Promise<string> => {
-  const result = sodium.crypto_core_ed25519_scalar_random();
-  return to_base64(result);
-};
-
 export const crypto_generichash = async (
   hash_length: number,
   b64_password: string
@@ -99,77 +92,6 @@ export const crypto_generichash = async (
     from_base64(b64_password)
   );
   return to_base64(result);
-};
-
-export const crypto_core_ed25519_from_uniform = async (
-  uniform: string
-): Promise<string> => {
-  const result = sodium.crypto_core_ed25519_from_uniform(from_base64(uniform));
-  return to_base64(result);
-};
-
-export const crypto_scalarmult_ed25519_base_noclamp = async (
-  scalar: string
-): Promise<string> => {
-  const result = sodium.crypto_scalarmult_ed25519_base_noclamp(
-    from_base64(scalar)
-  );
-  return to_base64(result);
-};
-
-export const crypto_core_ed25519_add = async (
-  scalar1: string,
-  scalar2: string
-): Promise<string> => {
-  const result = sodium.crypto_core_ed25519_add(
-    from_base64(scalar1),
-    from_base64(scalar2)
-  );
-  return to_base64(result);
-};
-
-export const crypto_core_ed25519_scalar_negate = async (
-  scalar: string
-): Promise<string> => {
-  const result = sodium.crypto_core_ed25519_scalar_negate(from_base64(scalar));
-  return to_base64(result);
-};
-
-export const crypto_scalarmult_ed25519_noclamp = async (
-  scalar: string,
-  point: string
-): Promise<string> => {
-  const result = sodium.crypto_scalarmult_ed25519_noclamp(
-    from_base64(scalar),
-    from_base64(point)
-  );
-  return to_base64(result);
-};
-
-export const crypto_generichash_batch = (arr: Array<string>): string => {
-  // TODO remove/cleanup? Buffer should not be needed
-  const key = new Uint8Array(Buffer.alloc(sodium.crypto_generichash_KEYBYTES));
-  const state = sodium.crypto_generichash_init(
-    key,
-    sodium.crypto_generichash_BYTES
-  );
-  arr.forEach((item) => {
-    sodium.crypto_generichash_update(state, sodium.from_base64(item));
-  });
-  const combinedHash = sodium.crypto_generichash_final(
-    state,
-    sodium.crypto_generichash_BYTES
-  );
-  return to_base64(combinedHash);
-};
-
-export const crypto_kx_keypair = (): StringKeyPair => {
-  const result = sodium.crypto_kx_keypair();
-  return {
-    keyType: "curve25519",
-    privateKey: to_base64(result.privateKey),
-    publicKey: to_base64(result.publicKey),
-  };
 };
 
 export const crypto_pwhash = (
@@ -217,19 +139,6 @@ export const crypto_secretbox_open_easy = (
   return to_base64(message);
 };
 
-export const crypto_kx_client_session_keys = (
-  clientPublicKey: string,
-  clientPrivateKey: string,
-  serverPublicKey: string
-) => {
-  const clientSessionKeys = sodium.crypto_kx_client_session_keys(
-    from_base64(clientPublicKey),
-    from_base64(clientPrivateKey),
-    from_base64(serverPublicKey)
-  );
-  return clientSessionKeys;
-};
-
 export const crypto_box_keypair = (): StringKeyPair => {
   const result = sodium.crypto_box_keypair();
   return {
@@ -246,22 +155,13 @@ const libsodiumExports = {
   from_base64_to_string,
   crypto_pwhash,
   randombytes_buf,
-  crypto_kx_keypair,
   crypto_generichash,
   crypto_box_keypair,
   crypto_sign_keypair,
   crypto_sign_detached,
   crypto_secretbox_easy,
   crypto_secretbox_open_easy,
-  crypto_core_ed25519_add,
-  crypto_generichash_batch,
   crypto_sign_verify_detached,
-  crypto_kx_client_session_keys,
-  crypto_core_ed25519_from_uniform,
-  crypto_core_ed25519_scalar_random,
-  crypto_core_ed25519_scalar_negate,
-  crypto_scalarmult_ed25519_noclamp,
-  crypto_scalarmult_ed25519_base_noclamp,
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_decrypt,

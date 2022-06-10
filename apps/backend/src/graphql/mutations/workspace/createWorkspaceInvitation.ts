@@ -34,7 +34,7 @@ export const createWorkspaceInvitationMutation = mutationField(
       }
       const workspaceInvitation = await createWorkspaceInvitation({
         workspaceId: args.input.workspaceId,
-        inviterUserId: context.user.id,
+        inviterUserId: context.user,
       });
       return { workspaceInvitation };
     },

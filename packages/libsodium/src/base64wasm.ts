@@ -1,4 +1,4 @@
-import sodium from "libsodium-wrappers-sumo";
+import sodium from "libsodium-wrappers";
 
 export const to_base64 = (data: Uint8Array | string) => {
   return sodium.to_base64(data);

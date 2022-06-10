@@ -12,7 +12,7 @@ type Params = {
 export async function createWorkspaceInvitation({
   workspaceId,
   inviterUserId,
-}: Params): Promise<WorkspaceInvitation> {
+}: Params) {
   // check if the user has access to this workspace
   const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
     where: {
@@ -20,41 +20,22 @@ export async function createWorkspaceInvitation({
       workspaceId,
       isAdmin: true,
     },
-    select: {
-      userId: true,
-      user: {
-        select: {
-          id: true,
-          username: true,
-        },
-      },
-      workspaceId: true,
-      workspace: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      isAdmin: true,
+    include: {
+      user: { select: { username: true } },
     },
   });
   if (!userToWorkspace || !userToWorkspace.isAdmin) {
     throw new Error("Unauthorized");
   }
-  const rawWorkspaceInvitation = await prisma.workspaceInvitations.create({
+  const workspaceInvitation = await prisma.workspaceInvitations.create({
     data: {
       workspaceId,
       inviterUserId,
       expiresAt: new Date(Date.now() + INVITATION_EXPIRATION_TIME),
     },
   });
-  const workspaceInvitation: WorkspaceInvitation = {
-    id: rawWorkspaceInvitation.id,
-    workspaceId: rawWorkspaceInvitation.workspaceId,
-    inviterUserId: rawWorkspaceInvitation.inviterUserId,
-    expiresAt: rawWorkspaceInvitation.expiresAt,
+  return {
+    ...workspaceInvitation,
     inviterUsername: userToWorkspace.user.username,
-    workspaceName: userToWorkspace.workspace.name,
   };
-  return workspaceInvitation;
 }

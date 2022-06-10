@@ -11,7 +11,7 @@ export const finishRegistration = async (challengeResponse: string) => {
   );
   return {
     exportKey: sodium.base64_to_url_safe_base64(result.exportKey),
-    response: sodium.base64_to_url_safe_base64(result),
+    response: sodium.base64_to_url_safe_base64(result.response),
   };
 };
 

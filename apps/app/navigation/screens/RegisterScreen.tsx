@@ -17,7 +17,7 @@ export default function RegisterScreen(
       <Box>
         <View>
           <Text variant="large" bold style={tw`text-center`}>
-            Register
+            Create your Account
           </Text>
           <Text muted style={tw`text-center`}>
             Sign up and start your free trial!

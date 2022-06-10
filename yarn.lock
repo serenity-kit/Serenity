@@ -2903,10 +2903,10 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-"@mobily/stacks@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@mobily/stacks/-/stacks-2.0.0.tgz#02e67e420153e760df21f84aa09c60e48641525c"
-  integrity sha512-7Amopw38gmn61Bt+e9aNYBtDWaqqVxVHw3BReqBhOuV6e515NIqRpLWyyDs94MFMYkepvZyPlfcYo6cL8F8T5A==
+"@mobily/stacks@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@mobily/stacks/-/stacks-2.1.0.tgz#4a111a1f3938bf829746e845af7ad52215c1ab2e"
+  integrity sha512-JWHW7XT6J6Pwic5TgBIjZLfCfHvD9iZ/DQDZ2+2w+66Gi3viWlGhQL6OgNc9Q4ZNj6nipKkvxo7KLjYehywXVw==
   dependencies:
     wonka "~4.0.15"
 
@@ -3518,10 +3518,6 @@
   dependencies:
     "@react-aria/ssr" "^3.0.1"
     "@react-aria/utils" "^3.3.0"
-
-"@react-native-clipboard/clipboard@https://github.com/react-native-clipboard/clipboard":
-  version "1.10.0"
-  resolved "https://github.com/react-native-clipboard/clipboard#2f336aaf9c09f83e698d3143abc9db3cc4e10f83"
 
 "@react-native-community/cli-debugger-ui@^5.0.1":
   version "5.0.1"
@@ -4609,14 +4605,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/libsodium-wrappers-sumo@^0.7.5":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@types/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.5.tgz#c5191fc28d44edd39583552bd1855f6b7b77ca88"
-  integrity sha512-CL7rmLxw28H/FpFUnMu5BzzRsE+ICxHBpRoaY8ks+3HMsCJdA/Vp809sj+qNhw64Ht0OEnfoN3BC1sHwagoVaw==
-  dependencies:
-    "@types/libsodium-wrappers" "*"
-
-"@types/libsodium-wrappers@*", "@types/libsodium-wrappers@^0.7.9":
+"@types/libsodium-wrappers@^0.7.9":
   version "0.7.9"
   resolved "https://registry.yarnpkg.com/@types/libsodium-wrappers/-/libsodium-wrappers-0.7.9.tgz#89c3ad2156d5143e64bce86cfeb0045a983aeccc"
   integrity sha512-LisgKLlYQk19baQwjkBZZXdJL0KbeTpdEnrAfz5hQACbklCY0gVFnsKUyjfNWF1UQsCSjw93Sj5jSbiO8RPfdw==
@@ -9073,6 +9062,11 @@ expo-cli@^5.4.3:
     wrap-ansi "^7.0.0"
     xdl "59.2.36"
 
+expo-clipboard@~2.1.0:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/expo-clipboard/-/expo-clipboard-2.1.1.tgz#77a506eb70918e6a4708760e6cfb0fafdc18192d"
+  integrity sha512-ay4zv7JGIWT/lqFsonWK8BQ4FuMLaSNFg5gaYJQcIZgZoCyF9f7GRh1HrV3tA0rCPA3i9T6Kt8/8vMMrraH9RQ==
+
 expo-constants@~13.0.0, expo-constants@~13.0.2:
   version "13.0.2"
   resolved "https://registry.yarnpkg.com/expo-constants/-/expo-constants-13.0.2.tgz#b489ecd575cc82a9a0b3dfbf2385d45a44300eb1"
@@ -9081,22 +9075,22 @@ expo-constants@~13.0.0, expo-constants@~13.0.2:
     "@expo/config" "^6.0.6"
     uuid "^3.3.2"
 
-expo-dev-client@~0.8.4:
-  version "0.8.4"
-  resolved "https://registry.yarnpkg.com/expo-dev-client/-/expo-dev-client-0.8.4.tgz#c521da0818ee846e24bfc96a901350342eba5ded"
-  integrity sha512-FB5ouz9dMyccnuYbuAi0EcTNdRh+5vPGuOuhYWo5Fq3SBTU8ZdKQmcMidAoHOrYgMzQWiT+S7ypt0AjxPSgHnA==
+expo-dev-client@~0.8.5:
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/expo-dev-client/-/expo-dev-client-0.8.5.tgz#2eba4081660e75c45847a2dfea08042eb565143c"
+  integrity sha512-sdqkAQAsGqqbTLStyK239qfWrDg+gBOmu59ow4yxv0kdNkp1pVmpNu5kFv/nL0n4ao9aClbY5AjmZwfiGC3rYQ==
   dependencies:
     "@expo/config-plugins" "^4.0.14"
-    expo-dev-launcher "0.10.4"
+    expo-dev-launcher "0.10.5"
     expo-dev-menu "0.9.3"
     expo-dev-menu-interface "0.5.3"
     expo-manifests "~0.2.2"
     expo-updates-interface "~0.5.0"
 
-expo-dev-launcher@0.10.4:
-  version "0.10.4"
-  resolved "https://registry.yarnpkg.com/expo-dev-launcher/-/expo-dev-launcher-0.10.4.tgz#b4a6f01b3aa10afa142fb6c91b18c6983433d8fd"
-  integrity sha512-ItqkxzzwgeK4+o9hyV3/YAvPxiVIXtcOWPcjpuPxYDtLigF4D4sMSqRb1aBA+7Nmxoc6EuLASZnvge0WPco+cA==
+expo-dev-launcher@0.10.5:
+  version "0.10.5"
+  resolved "https://registry.yarnpkg.com/expo-dev-launcher/-/expo-dev-launcher-0.10.5.tgz#4e99212ffb1c3cc10fe42781256d4442014a6eca"
+  integrity sha512-6E/Za439cbq0DtksQup8szLBw2pf9o9vdx8BcvlwyPGglbJICx+OqApAbhQUJTpefXLH0s/sbLuPCThmOYUp4g==
   dependencies:
     "@expo/config-plugins" "^4.0.14"
     expo-dev-menu "0.9.3"
@@ -9222,6 +9216,11 @@ expo-pwa@0.0.118:
     chalk "^4.0.0"
     commander "2.20.0"
     update-check "1.5.3"
+
+expo-secure-store@~11.1.0:
+  version "11.1.1"
+  resolved "https://registry.yarnpkg.com/expo-secure-store/-/expo-secure-store-11.1.1.tgz#16f727f56f5b0eef9817fc0d64d79be26f8a34a8"
+  integrity sha512-pCajYYoZbl8IORxXw83SLUsWlU6a+HmjJZP8oiSvkG1KnZ5gPepiAMRRmcFUApYXBgiOvKRGOBEUfVwmR7yO4A==
 
 expo-splash-screen@~0.14.0:
   version "0.14.2"
@@ -12840,18 +12839,6 @@ lib0@^0.2.42, lib0@^0.2.47:
   integrity sha512-RXprIyaflw7OmFNMpb8HmvDhuRVUFXYCXrmynQN8OGbGevgMx9u6tjQG/yB0dOoDcuB1XXgqFn8Oy3RlKF/Qhg==
   dependencies:
     isomorphic.js "^0.2.4"
-
-libsodium-sumo@^0.7.0:
-  version "0.7.10"
-  resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.10.tgz#169756dbf32088f42e30dfb0a7860074663fb0b4"
-  integrity sha512-xvYHwrTPvw9EFvX77x6gFiB7vdTv4+9xpM5DCkg9FJwysHoBO7sYXxXjy5L2gQSuWaINbtjBUry9eCg/+nYwCA==
-
-libsodium-wrappers-sumo@^0.7.10:
-  version "0.7.10"
-  resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.10.tgz#592b0cc714ddf3954f93e2292ff3aadebd2b282b"
-  integrity sha512-1noz8Mcl/LUzO/iSO/FJzoJyIaPwxl+/+E4CoTIXtsPiEEXQx2sxalmrVWxteLpynqgX0ASo28ChB9NEVRh0Pg==
-  dependencies:
-    libsodium-sumo "^0.7.0"
 
 libsodium-wrappers@^0.7.10:
   version "0.7.10"

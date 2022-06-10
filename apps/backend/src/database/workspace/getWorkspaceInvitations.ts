@@ -62,6 +62,7 @@ export async function getWorkspaceInvitations({
     const workspaceInvitation: WorkspaceInvitation = {
       id: rawWorkspaceInvitation.id,
       workspaceId: rawWorkspaceInvitation.workspaceId,
+      workspaceName: rawWorkspaceInvitation.workspace.name,
       expiresAt: rawWorkspaceInvitation.expiresAt,
       inviterUserId: rawWorkspaceInvitation.inviterUserId,
       inviterUsername: rawWorkspaceInvitation.inviterUser.username,

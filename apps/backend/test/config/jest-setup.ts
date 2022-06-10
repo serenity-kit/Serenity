@@ -1,5 +1,5 @@
 import { prisma } from "../../src/database/prisma";
-import sodium from "libsodium-wrappers-sumo";
+import sodium from "libsodium-wrappers";
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 

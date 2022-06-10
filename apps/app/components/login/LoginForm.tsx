@@ -7,6 +7,7 @@ import {
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { startLogin, finishLogin } from "@serenity-tools/opaque";
 import { useWindowDimensions } from "react-native";
+import { VStack } from "native-base";
 
 type Props = {
   defaultEmail?: string;
@@ -99,59 +100,49 @@ export function LoginForm(props: Props) {
   };
 
   return (
-    <>
-      <View>
-        <Text muted style={tw`text-center`}>
-          Log in to your Serenity Account
-        </Text>
-      </View>
-
+    <VStack space="5">
       {gqlErrorMessage !== "" && (
         <View>
           <Text>{gqlErrorMessage}</Text>
         </View>
       )}
-
       {didLoginSucceed && (
         <View>
           <Text>Login Succeeded</Text>
         </View>
       )}
+      <LabeledInput
+        label={"Email"}
+        keyboardType="email-address"
+        value={username}
+        onChangeText={(username: string) => {
+          setUsername(username);
+        }}
+        placeholder="Enter your email …"
+        autoCapitalize="none"
+      />
 
-      <View>
-        <LabeledInput
-          label={"Email"}
-          keyboardType="email-address"
-          value={username}
-          onChangeText={(username: string) => {
-            setUsername(username);
-          }}
-          placeholder="Enter your email …"
-          autoCapitalize="none"
-        />
+      <LabeledInput
+        label={"Password"}
+        secureTextEntry
+        value={password}
+        onChangeText={(password: string) => {
+          setPassword(password);
+        }}
+        placeholder="Enter your password …"
+      />
 
-        <LabeledInput
-          label={"Password"}
-          secureTextEntry
-          value={password}
-          onChangeText={(password: string) => {
-            setPassword(password);
-          }}
-          placeholder="Enter your password …"
-        />
-
-        <Button onPress={onLoginPress} size="large">
-          Log in
-        </Button>
-        <View style={tw`text-center`}>
-          <Text variant="xs" muted>
-            Don't have an account?{" "}
-          </Text>
-          <Text variant="xs">
-            <Link to={{ screen: "Register" }}>Register here</Link>
-          </Text>
-        </View>
+      <Button onPress={onLoginPress} size="large">
+        Log in
+      </Button>
+      <View style={tw`text-center`}>
+        <Text variant="xs" muted>
+          Don't have an account?{" "}
+        </Text>
+        <Text variant="xs">
+          <Link to={{ screen: "Register" }}>Register here</Link>
+        </Text>
       </View>
-    </>
+    </VStack>
   );
 }
