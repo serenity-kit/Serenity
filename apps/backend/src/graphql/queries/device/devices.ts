@@ -7,7 +7,7 @@ export const devices = queryField((t) => {
   t.connectionField("devices", {
     type: Device,
     disableBackwardPagination: true,
-    cursorFromNode: (node) => node?.id ?? "",
+    cursorFromNode: (node) => node?.signingPublicKey ?? "",
     async nodes(root, args, context) {
       if (args.first > 50) {
         throw new Error("Requested too many devices. First value exceeds 50.");

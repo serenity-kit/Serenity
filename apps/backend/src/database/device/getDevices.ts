@@ -10,7 +10,6 @@ type Params = {
   skip?: number;
   take: number;
 };
-
 export async function getDevices({ userId, cursor, skip, take }: Params) {
   // TODO: force the user to sign the keys?
   const devices = await prisma.device.findMany({
