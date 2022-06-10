@@ -269,7 +269,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       )}
 
       {rootFoldersResult.fetching ? (
-        <Text>Loading Folders…</Text>
+        <Text variant="xs" muted style={tw`py-1.5 pl-4`}>
+          Loading Folders…
+        </Text>
       ) : rootFoldersResult.data?.rootFolders?.nodes ? (
         rootFoldersResult.data?.rootFolders?.nodes.map((folder) => {
           if (folder === null) {
