@@ -40,8 +40,8 @@ export function Link<ParamList extends ReactNavigation.RootParamList>(
       {...focusRingProps} // sets onFocus and onBlur
       style={[
         styles.default,
-        props.style,
         isFocusVisible && styles.focusVisible,
+        props.style,
       ]}
     />
   );

@@ -4,7 +4,6 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { Link as ReactNavigationLink } from "@react-navigation/native";
 import {
   Icon,
-  Link,
   tw,
   View,
   Text,
