@@ -11,7 +11,8 @@ import {
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet, Platform } from "react-native";
+import { useFocusRing } from "@react-native-aria/focus";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateDocumentMutation,
@@ -38,6 +39,8 @@ export default function SidebarFolder(props: Props) {
   const navigation = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
+
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
@@ -146,6 +149,7 @@ export default function SidebarFolder(props: Props) {
   const styles = StyleSheet.create({
     folder: tw``,
     hover: tw`bg-gray-200`,
+    focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
 
   const maxWidth = 32 - depth * 2;
@@ -153,19 +157,32 @@ export default function SidebarFolder(props: Props) {
   return (
     <>
       <View
-        style={[styles.folder, props.style, isHovered && styles.hover]}
-        // @ts-expect-error as Views usually shouldn't have mouse-events ()
+        style={[
+          styles.folder,
+          isHovered && styles.hover,
+          isFocusVisible && styles.focusVisible,
+          props.style,
+        ]}
+        // as Views usually shouldn't have mouse-events ()
+        // @ts-expect-error as views usually don't have hover
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         <HStack>
           <Pressable
+            {...focusRingProps} // needed so focus is shown on view-wrapper
             onPress={() => {
               setIsOpen((currentIsOpen) => !currentIsOpen);
             }}
-            style={tw`py-1.5 pl-2.5 grow-1`}
+            style={[
+              tw`grow-1`, // needed so clickable area is as large as possible
+            ]}
+            // disable default outline styles and add 1 overridden style manually (grow)
+            _focusVisible={{
+              _web: { style: { outlineWidth: 0, flexGrow: 1 } },
+            }}
           >
-            <HStack alignItems="center">
+            <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
               {/* not the best way but icons don't take styles (yet?) */}
               <div style={tw`ml-0.5 -mr-0.5`}>
                 <Icon

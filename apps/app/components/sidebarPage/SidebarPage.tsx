@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
+import { useFocusRing } from "@react-native-aria/focus";
+import { Link as ReactNavigationLink } from "@react-navigation/native";
 import {
   Icon,
   Link,
@@ -24,6 +26,8 @@ type Props = ViewProps & {
 export default function SidebarPage(props: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
+
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const { depth = 0 } = props;
 
@@ -49,14 +53,20 @@ export default function SidebarPage(props: Props) {
   const styles = StyleSheet.create({
     page: tw`px-2`,
     hover: tw`bg-gray-200`,
+    focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
 
   const maxWidth = 32 - depth * 2;
 
   return (
     <View
-      style={[styles.page, props.style, isHovered && styles.hover]}
-      // @ts-expect-error views usually are not hovered
+      style={[
+        styles.page,
+        props.style,
+        isHovered && styles.hover,
+        isFocusVisible && styles.focusVisible,
+      ]}
+      // @ts-expect-error as views usually don't have hover
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -78,7 +88,8 @@ export default function SidebarPage(props: Props) {
               />
             </HStack>
           ) : (
-            <Link
+            <ReactNavigationLink
+              {...focusRingProps} // needed so focus is shown on view-wrapper
               to={{
                 screen: "Workspace",
                 params: {
@@ -89,13 +100,17 @@ export default function SidebarPage(props: Props) {
                   },
                 },
               }}
-              style={tw`flex w-full py-1.5 no-underline`}
+              style={[
+                tw`flex w-full py-1.5`,
+                Platform.OS === "web" && { outlineWidth: 0 }, // override default outline
+              ]}
             >
               <HStack style={tw`grow-1`}>
                 {/* @icon : needs to be here in both versions (isEditing & not)
                             as we want the clickable area as big as possible
                 */}
                 <Icon name="page" size={20} color={tw.color("gray-600")} />
+                {/* TODO check why ellipsis is broken */}
                 <Text
                   variant="small"
                   style={tw`max-w-${maxWidth} pl-1.5`}
@@ -105,7 +120,7 @@ export default function SidebarPage(props: Props) {
                   {props.documentName}
                 </Text>
               </HStack>
-            </Link>
+            </ReactNavigationLink>
           )}
         </HStack>
 
