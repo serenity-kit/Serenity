@@ -32,6 +32,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { HStack } from "native-base";
+import { useFocusRing } from "@react-native-aria/focus";
 import { useEffect, useState } from "react";
 import Folder from "../sidebarFolder/SidebarFolder";
 
@@ -40,6 +41,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const navigation = useNavigation();
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
+  const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
   const [meResult] = useMeQuery();
@@ -101,7 +103,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <HStack
         alignItems="center"
         justifyContent="space-between"
-        style={tw`py-3 px-4`}
+        style={tw`py-1.5 pl-2 pr-4`}
       >
         <Menu
           placement="bottom left"
@@ -113,8 +115,21 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           isOpen={isOpenWorkspaceSwitcher}
           onChange={setIsOpenWorkspaceSwitcher}
           trigger={
-            <Pressable accessibilityLabel="More options menu">
-              <HStack space={2} alignItems="center">
+            <Pressable
+              accessibilityLabel="More options menu"
+              {...focusRingProps}
+              // disable default outline styles
+              // @ts-expect-error - web only
+              _focusVisible={{ _web: { style: { outlineWidth: 0 } } }}
+            >
+              <HStack
+                space={2}
+                alignItems="center"
+                style={[
+                  tw`py-1.5 px-2`,
+                  isFocusVisible && tw`se-inset-focus-mini`,
+                ]}
+              >
                 <Avatar
                   borderRadius={4}
                   size="xs"
