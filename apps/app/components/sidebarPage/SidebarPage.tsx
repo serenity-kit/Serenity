@@ -109,10 +109,10 @@ export default function SidebarPage(props: Props) {
                             as we want the clickable area as big as possible
                 */}
                 <Icon name="page" size={20} color={tw.color("gray-600")} />
-                {/* TODO check why ellipsis is broken */}
+                {/* TODO check why ellipsis is broken => renders as span .. but why ?? */}
                 <Text
                   variant="small"
-                  style={tw`max-w-${maxWidth} pl-1.5`}
+                  style={[tw`pl-1.5 max-w-${maxWidth}`]}
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
