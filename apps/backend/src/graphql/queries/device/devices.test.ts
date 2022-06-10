@@ -3,6 +3,8 @@ import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { createDevice } from "../../../../test/helpers/device/createDevice";
+import { deleteDevice } from "../../../../test/helpers/device/deleteDevice";
+import { getDevices } from "../../../../test/helpers/device/getDevices";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
@@ -17,7 +19,6 @@ beforeAll(async () => {
 
 test("user should be able to list their devices", async () => {
   const authorizationHeader = `TODO+${username}`;
-  const authorizationHeaders = { authorization: authorizationHeader };
   await createDevice({
     graphql,
     authorizationHeader,
@@ -27,32 +28,11 @@ test("user should be able to list their devices", async () => {
     authorizationHeader,
   });
 
-  // get root folders from graphql
-  const query = gql`
-    {
-      devices(first: 50) {
-        edges {
-          node {
-            userId
-            signingPublicKey
-            signingKeyType
-            encryptionPublicKey
-            encryptionKeyType
-            encryptionPublicKeySignature
-          }
-        }
-        pageInfo {
-          hasNextPage
-          endCursor
-        }
-      }
-    }
-  `;
-  const result = await graphql.client.request(
-    query,
-    null,
-    authorizationHeaders
-  );
+  const result = await getDevices({
+    graphql,
+    authorizationHeader,
+  });
+
   const edges = result.devices.edges;
   expect(edges.length).toBe(3);
 });
