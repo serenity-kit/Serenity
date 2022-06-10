@@ -19,8 +19,29 @@ export async function finalizeRegistration({
   if (existingUserData) {
     throw Error("This username has already been registered");
   }
+  const existingUnconfirmedUserData = await prisma.unconfirmedUser.findUnique({
+    where: {
+      username: username,
+    },
+  });
+  if (existingUnconfirmedUserData) {
+    throw Error("This username has already been registered");
+  }
+
   try {
     return await prisma.$transaction(async (prisma) => {
+      const unconfirmedUser = await prisma.unconfirmedUser.create({
+        data: {
+          username: username,
+          opaqueEnvelope: opaqueEnvelope,
+          clientPublicKey: `TODO+${username}`,
+        },
+      });
+      // TODO: send an email to the user's email address
+      console.log(
+        `New user confirmation code: ${unconfirmedUser.confirmationCode}`
+      );
+      /*
       const device = await prisma.device.create({
         data: {
           signingPublicKey: `TODO+${username}`,
@@ -45,7 +66,8 @@ export async function finalizeRegistration({
         where: { signingPublicKey: device.signingPublicKey },
         data: { user: { connect: { id: userId } } },
       });
-      return user;
+      /* */
+      return unconfirmedUser;
     });
   } catch (error) {
     console.error("Error saving user");

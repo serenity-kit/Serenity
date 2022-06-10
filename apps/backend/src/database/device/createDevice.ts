@@ -3,8 +3,12 @@ import {
   crypto_sign_keypair,
   crypto_box_keypair,
   crypto_sign_detached,
+  to_base64,
+  crypto_secretbox_easy,
+  randombytes_buf,
 } from "@serenity-tools/libsodium";
 import { Device } from "../../types/device";
+import { crypto_secretbox_NONCEBYTES } from "libsodium-wrappers";
 
 // TODO: provide browser/os/location identifiers
 // so user can look through devices later to know which ones
@@ -44,9 +48,23 @@ export async function createDevice({ userId }: Params): Promise<Device> {
     },
   });
 
+  const nonce = await randombytes_buf(crypto_secretbox_NONCEBYTES);
+  const rawKeyPairData = JSON.stringify({
+    signingPublicKey: device.signingPublicKey,
+    encryptionPublicKey: device.encryptionPublicKey,
+  });
+  const base64EncodedPairData = to_base64(rawKeyPairData);
+  const cipherText = crypto_secretbox_easy(
+    base64EncodedPairData,
+    nonce,
+    encryptionKeyPair.privateKey!
+  );
+
   return {
     ...device,
     signingPrivateKey: signingKeyPair.privateKey,
     encryptionPrivateKey: encryptionKeyPair.privateKey,
+    ciphertext: cipherText,
+    nonce,
   } as Device;
 }

@@ -11,5 +11,8 @@ export const Device = objectType({
     t.nonNull.string("encryptionKeyType");
     t.string("encryptionPrivateKey");
     t.nonNull.string("encryptionPublicKeySignature");
+
+    t.string("ciphertext");
+    t.string("nonce");
   },
 });

@@ -58,6 +58,7 @@ model UnconfirmedUser {
   // can be decrypted using the key storred in the OPAQUE envelope
   passwordResetOneTimePassword               String?
   passwordResetOneTimePasswordExpireDateTime DateTime?
+  confirmationCode                           String    @default(uuid())
 }
 
 model User {
