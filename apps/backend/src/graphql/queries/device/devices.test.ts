@@ -3,7 +3,6 @@ import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { createDevice } from "../../../../test/helpers/device/createDevice";
-import { deleteDevice } from "../../../../test/helpers/device/deleteDevice";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
 
 const graphql = setupGraphql();
