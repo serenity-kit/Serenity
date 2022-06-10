@@ -8,17 +8,19 @@ import { Icon, IconNames, View } from "@serenity-tools/ui";
 export type IconButtonProps = PressableProps & {
   name: IconNames;
   color?: string;
+  large?: boolean;
 };
 
 export const IconButton = forwardRef((props: IconButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
+  const { name, large, color = "gray-400", ...rest } = props;
 
-  const { name, color = "gray-400", ...rest } = props;
+  const dimensions = large ? "w-8 h-8" : "w-5 h-5";
 
   const styles = StyleSheet.create({
-    pressable: tw.style(`w-5 h-5`), // defines clickable area
+    pressable: tw.style(dimensions), // defines clickable area
     view: tw.style(
-      `w-5 h-5 flex justify-center items-center bg-transparent rounded-sm`
+      `${dimensions} flex justify-center items-center bg-transparent rounded-sm`
     ),
     hover: tw`bg-gray-200`,
     pressed: tw`bg-gray-300`,
