@@ -198,7 +198,7 @@ export default function SidebarFolder(props: Props) {
                     setIsEditing("none");
                   }}
                   value={props.folderName}
-                  style={tw`w-${maxWidth} ml-1.5`}
+                  style={tw`ml-0.5 w-${maxWidth}`}
                 />
               ) : (
                 <Text

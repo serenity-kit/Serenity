@@ -83,7 +83,7 @@ export default function SidebarPage(props: Props) {
                 }}
                 onSubmit={updateDocumentName}
                 value={props.documentName}
-                style={tw`w-${maxWidth} ml-1.5`}
+                style={tw`ml-0.5 w-${maxWidth}`}
               />
             </HStack>
           ) : (
