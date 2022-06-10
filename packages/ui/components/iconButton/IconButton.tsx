@@ -8,26 +8,21 @@ import { Icon, IconNames, View } from "@serenity-tools/ui";
 export type IconButtonProps = PressableProps & {
   name: IconNames;
   color?: string;
-  hoverBgColor?: string;
 };
 
 export const IconButton = forwardRef((props: IconButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
 
-  const {
-    name,
-    color = "gray-400",
-    hoverBgColor = "transparent",
-    ...rest
-  } = props;
+  const { name, color = "gray-400", ...rest } = props;
 
   const styles = StyleSheet.create({
     pressable: tw.style(`w-5 h-5`), // defines clickable area
     view: tw.style(
-      `h-full flex justify-center items-center bg-transparent rounded-sm`
+      `w-5 h-5 flex justify-center items-center bg-transparent rounded-sm`
     ),
-    hover: tw`bg-${hoverBgColor}`,
-    focusVisible: Platform.OS === "web" ? tw`se-outline-focus-mini` : {},
+    hover: tw`bg-gray-200`,
+    pressed: tw`bg-gray-300`,
+    focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
 
   return (
@@ -50,6 +45,7 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
             style={[
               styles.view,
               isHovered && styles.hover,
+              isPressed && styles.pressed,
               isFocusVisible && styles.focusVisible,
             ]}
           >
