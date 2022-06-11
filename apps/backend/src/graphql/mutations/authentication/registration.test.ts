@@ -1,30 +1,30 @@
-// import { gql } from "graphql-request";
-// import sodium from "libsodium-wrappers";
-// import setupGraphql from "../../../../test/helpers/setupGraphql";
-// import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-// import { requestRegistrationChallengeResponse } from "../../../../test/helpers/requestRegistrationChallengeResponse";
+import { gql } from "graphql-request";
+import sodium from "libsodium-wrappers";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { requestRegistrationChallengeResponse } from "../../../../test/helpers/requestRegistrationChallengeResponse";
 
-// const graphql = setupGraphql();
-// const username = "user";
-// const password = "password";
-// let result: any = null;
+const graphql = setupGraphql();
+const username = "user";
+const password = "password";
+let result: any = null;
 
-// beforeAll(async () => {
-//   await deleteAllRecords();
-// });
+beforeAll(async () => {
+  await deleteAllRecords();
+});
 
-// test("server should create a registration challenge response", async () => {
-//   expect.assertions(3);
-//   // generate a challenge code
-//   result = await requestRegistrationChallengeResponse(
-//     graphql,
-//     username,
-//     password
-//   );
-//   expect(result.data).toBeDefined();
-//   expect(typeof result.data.registrationId).toBe("string");
-//   expect(typeof result.data.challengeResponse).toBe("string");
-// });
+test("server should create a registration challenge response", async () => {
+  expect.assertions(3);
+  // generate a challenge code
+  result = await requestRegistrationChallengeResponse(
+    graphql,
+    username,
+    password
+  );
+  expect(result.data).toBeDefined();
+  expect(typeof result.data.registrationId).toBe("string");
+  expect(typeof result.data.challengeResponse).toBe("string");
+});
 
 // test("server should register a user", async () => {
 //   expect.assertions(1);
