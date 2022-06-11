@@ -26,32 +26,26 @@ test("server should create a registration challenge response", async () => {
   expect(typeof result.data.challengeResponse).toBe("string");
 });
 
-// test("server should register a user", async () => {
-//   expect.assertions(1);
-//   const message = result.registration.finish(
-//     sodium.from_base64(result.data.challengeResponse)
-//   );
-//   const query = gql`
-//     mutation finishRegistration($input: FinishRegistrationInput!) {
-//       finishRegistration(input: $input) {
-//         id
-//       }
-//     }
-//   `;
-
-//   const registrationResponse = await graphql.client.request(query, {
-//     input: {
-//       registrationId: result.data.registrationId,
-//       message: sodium.to_base64(message),
-//       clientPublicKey: "TODO",
-//       workspaceId: "25ef3570-a7c8-4872-a3fb-9521842493ae",
-//     },
-//   });
-//   expect(typeof registrationResponse.finishRegistration.id).toBe("string");
-// });
-
-test("something", async () => {
+test("server should register a user", async () => {
   expect.assertions(1);
+  const message = result.registration.finish(
+    sodium.from_base64(result.data.challengeResponse)
+  );
+  const query = gql`
+    mutation finishRegistration($input: FinishRegistrationInput!) {
+      finishRegistration(input: $input) {
+        id
+      }
+    }
+  `;
 
-  expect(1).toBe(1);
+  const registrationResponse = await graphql.client.request(query, {
+    input: {
+      registrationId: result.data.registrationId,
+      message: sodium.to_base64(message),
+      clientPublicKey: "TODO",
+      workspaceId: "25ef3570-a7c8-4872-a3fb-9521842493ae",
+    },
+  });
+  expect(typeof registrationResponse.finishRegistration.id).toBe("string");
 });
