@@ -13,7 +13,7 @@
     "prisma:test:studio": "POSTGRES_URL=postgres://prisma:prisma@localhost:5432/serenity_test prisma studio",
     "start:prod": "PORT=$PORT POSTGRES_URL=$POSTGRES_URL NODE_ENV=production node ./build",
     "ts:check": "yarn tsc --noEmit",
-    "test": "jest --runInBand src/graphql/mutations/authentication/"
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "@naisho/core": "*",
