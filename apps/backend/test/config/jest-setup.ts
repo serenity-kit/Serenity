@@ -6,6 +6,8 @@ const exec = util.promisify(require("child_process").exec);
 // @ts-expect-error
 global.setImmediate = jest.useRealTimers;
 
+jest.setTimeout(15000);
+
 const databaseName = "serenity_test";
 const connectionString = `postgres://prisma:prisma@localhost:5432/${databaseName}`;
 const prismaBinary = "./node_modules/.bin/prisma";
@@ -16,13 +18,15 @@ global.process.env.POSTGRES_URL = connectionString;
 
 beforeAll(async () => {
   await sodium.ready;
-  // Run the migrations to ensure our schema has the required structure
+  console.log("A");
   await exec(
     `POSTGRES_URL=${connectionString} ${prismaBinary} migrate reset -f`
   );
+  console.log("B");
 
   // Run the migrations to ensure our schema has the required structure
   await exec(`POSTGRES_URL=${connectionString} ${prismaBinary} migrate deploy`);
+  console.log("C");
   // Regenerate client
   await exec(`POSTGRES_URL=${connectionString} ${prismaBinary} generate`);
 });
