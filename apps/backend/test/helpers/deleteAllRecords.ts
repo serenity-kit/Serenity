@@ -5,6 +5,8 @@ export default async function deleteAllRecords() {
     Array<{ tablename: string }>
   >`SELECT tablename FROM pg_tables WHERE schemaname='public'`;
 
+  console.log("tablenames", tablenames);
+
   for (const { tablename } of tablenames) {
     if (tablename !== "_prisma_migrations") {
       try {
@@ -14,6 +16,7 @@ export default async function deleteAllRecords() {
       } catch (error) {
         console.log({ error });
       }
+      console.log("DROPPED tables");
     }
   }
 }

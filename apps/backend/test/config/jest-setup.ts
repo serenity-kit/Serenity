@@ -16,7 +16,10 @@ global.process.env.POSTGRES_URL = connectionString;
 
 beforeAll(async () => {
   await sodium.ready;
-  prisma.$executeRawUnsafe(`DROP DATABASE IF EXISTS ${databaseName}`);
+  // Run the migrations to ensure our schema has the required structure
+  await exec(
+    `POSTGRES_URL=${connectionString} ${prismaBinary} migrate reset -f`
+  );
 
   // Run the migrations to ensure our schema has the required structure
   await exec(`POSTGRES_URL=${connectionString} ${prismaBinary} migrate deploy`);
