@@ -40,7 +40,6 @@ const requestLoginChallengeResponse = async (
 };
 
 test("server should register a user", async () => {
-  expect.assertions(1);
   // FIRST TEST ONLY: register a user.
   // we can't run this in beforeAll() because `graphql` isnt' set up
   // generate registration challenge
@@ -50,11 +49,9 @@ test("server should register a user", async () => {
     password,
     "ad350911-2c74-4bfb-8a5a-3910a9864be2"
   );
-  expect(1).toBe(1);
 });
 
 test("server should create a login challenge response", async () => {
-  expect.assertions(2);
   // generate a challenge code
   const result = await requestLoginChallengeResponse(username, password);
   expect(typeof result.data.loginId).toBe("string");
@@ -62,7 +59,6 @@ test("server should create a login challenge response", async () => {
 });
 
 test("server should login a user", async () => {
-  expect.assertions(1);
   // create keys on server side and return response
   const result = await requestLoginChallengeResponse(username, password);
 

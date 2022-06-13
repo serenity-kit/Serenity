@@ -14,7 +14,6 @@ beforeAll(async () => {
 });
 
 test("server should create a registration challenge response", async () => {
-  expect.assertions(3);
   // generate a challenge code
   result = await requestRegistrationChallengeResponse(
     graphql,
@@ -27,7 +26,6 @@ test("server should create a registration challenge response", async () => {
 });
 
 test("server should register a user", async () => {
-  expect.assertions(1);
   const message = result.registration.finish(
     sodium.from_base64(result.data.challengeResponse)
   );
