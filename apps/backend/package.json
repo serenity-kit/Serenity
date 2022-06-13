@@ -43,8 +43,9 @@
     "typescript": "^4.6.3"
   },
   "jest": {
+    "globalSetup": "<rootDir>/test/config/jestGlobalSetup.ts",
     "setupFilesAfterEnv": [
-      "./test/config/jest-setup.ts"
+      "<rootDir>/test/config/jestTestSetup.ts"
     ],
     "transform": {
       "\\.tsx?$": [
