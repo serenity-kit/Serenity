@@ -1,12 +1,10 @@
 import { prisma } from "../prisma";
 import * as sodium from "@serenity-tools/libsodium";
+import { Device } from "../../types/device";
 
-type DeviceInput = {
+type DeviceInput = Device & {
   ciphertext: string;
-  encryptionPublicKey: string;
-  encryptionPublicKeySignature: string;
   nonce: string;
-  signingPublicKey: string;
   encryptionKeySalt: string;
 };
 
@@ -54,6 +52,9 @@ export async function finalizeRegistration({
           mainDeviceNonce: mainDevice.nonce,
           mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
           mainDeviceEncryptionKeySalt: mainDevice.encryptionKeySalt,
+          mainDeviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
+          mainDeviceEncryptionPublicKeySignature:
+            mainDevice.encryptionPublicKeySignature,
         },
       });
       // TODO: send an email to the user's email address
