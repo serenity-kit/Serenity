@@ -29,7 +29,7 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
     if (!args || !args.input) {
       throw new Error("Missing input");
     }
-    const { envelope, username } = await finishRegistration({
+    const { envelope, username } = finishRegistration({
       registrationId: args.input.registrationId,
       message: args.input.message,
     });

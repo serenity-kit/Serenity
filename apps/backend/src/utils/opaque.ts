@@ -4,8 +4,6 @@ import {
   HandleRegistration,
   HandleLogin,
   ServerSetup,
-  Registration,
-  Login,
 } from "../vendor/opaque-wasm/opaque_wasm";
 
 // Trade-off: by storing it in memory it means with a server restart registrations will be lost and fail
@@ -32,7 +30,7 @@ export const opaqueServerSetup = () => {
   );
 };
 
-export const startRegistration = async ({
+export const startRegistration = ({
   username,
   challenge,
 }: {
@@ -56,7 +54,7 @@ export const startRegistration = async ({
   };
 };
 
-export const finishRegistration = async ({
+export const finishRegistration = ({
   registrationId,
   message,
 }: {
@@ -74,7 +72,7 @@ export const finishRegistration = async ({
   };
 };
 
-export const startLogin = async ({
+export const startLogin = ({
   envelope,
   username,
   challenge,
@@ -99,7 +97,7 @@ export const startLogin = async ({
   };
 };
 
-export const finishLogin = async ({
+export const finishLogin = ({
   loginId,
   message,
 }: {

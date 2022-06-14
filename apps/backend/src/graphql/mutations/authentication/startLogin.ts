@@ -32,7 +32,7 @@ export const startLoginMutation = mutationField("startLogin", {
     const username = args.input.username;
     const result = await getEnvelope(username);
     try {
-      const challengeResponse = await startLogin({
+      const challengeResponse = startLogin({
         envelope: result.envelop,
         username,
         challenge: args.input.challenge,

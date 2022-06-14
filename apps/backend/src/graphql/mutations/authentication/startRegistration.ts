@@ -35,7 +35,7 @@ export const startRegistrationMutation = mutationField("startRegistration", {
     if (args.input.challenge === "") {
       throw Error("Challenge cannot be empty.");
     }
-    const result = await startRegistration({
+    const result = startRegistration({
       username,
       challenge: args.input.challenge,
     });

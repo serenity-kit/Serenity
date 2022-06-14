@@ -6,7 +6,7 @@ import {
   randombytes_buf,
   to_base64,
 } from "@serenity-tools/libsodium";
-import { crypto_secretbox_NONCEBYTES } from "libsodium-wrappers-sumo";
+import { crypto_secretbox_NONCEBYTES } from "libsodium-wrappers";
 import { createDevice } from "./createDevice";
 import { Device } from "../../types/device";
 import { RecoveryDevice } from "../../types/recoveryDevice";

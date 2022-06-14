@@ -36,14 +36,16 @@
     "@types/ws": "^8.2.1",
     "@vercel/ncc": "^0.33.1",
     "graphql-request": "^4.2.0",
+    "jest": "^28.1.1",
     "prisma": "^3.13.0",
     "ts-node": "10.4.0",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.6.3"
   },
   "jest": {
+    "globalSetup": "<rootDir>/test/config/jestGlobalSetup.ts",
     "setupFilesAfterEnv": [
-      "./test/config/jest-setup.ts"
+      "<rootDir>/test/config/jestTestSetup.ts"
     ],
     "transform": {
       "\\.tsx?$": [
