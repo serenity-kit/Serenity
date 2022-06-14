@@ -27,7 +27,7 @@ export const finishLoginMutation = mutationField("finishLogin", {
     if (!args || !args.input) {
       throw Error("Missing input");
     }
-    const sessionKey = await finishLogin({
+    const sessionKey = finishLogin({
       loginId: args.input.loginId,
       message: args.input.message,
     });
