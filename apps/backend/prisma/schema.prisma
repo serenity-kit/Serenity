@@ -51,7 +51,7 @@ model Update {
 
 model UnconfirmedUser {
   id                                         String    @id @default(uuid())
-  username                                   String    @unique
+  username                                   String
   clientPublicKey                            String
   opaqueEnvelope                             String
   // contains the device signingPrivateKey and encryptionPrivateKey
@@ -59,6 +59,10 @@ model UnconfirmedUser {
   passwordResetOneTimePassword               String?
   passwordResetOneTimePasswordExpireDateTime DateTime?
   confirmationCode                           String    @default(uuid())
+  mainDeviceNonce                            String    @unique
+  mainDeviceCiphertext                       String
+  mainDeviceEncryptionKeySalt                String
+  mainDeviceSigningPublicKey                 String    @unique
 }
 
 model User {
@@ -68,11 +72,11 @@ model User {
   opaqueEnvelope                             String
   // contains the device signingPrivateKey and encryptionPrivateKey
   // can be decrypted using the key storred in the OPAQUE envelope
-  mainDeviceCiphertext                       String                 @default("invalid")
+  mainDeviceCiphertext                       String
   // nonce to decrypt the mainDeviceCiphertext
-  mainDeviceNonce                            String                 @default("invalid")
-  mainDevice                                 Device?                @relation(name: "mainDevice", fields: [mainDeviceSigningPublicKey], references: [signingPublicKey])
-  mainDeviceSigningPublicKey                 String?                @unique
+  mainDeviceNonce                            String                 @unique
+  mainDevice                                 Device                 @relation(name: "mainDevice", fields: [mainDeviceSigningPublicKey], references: [signingPublicKey])
+  mainDeviceSigningPublicKey                 String                 @unique
   devices                                    Device[]
   recoveryDevice                             RecoveryDevice?
   passwordResetOneTimePassword               String?
@@ -96,7 +100,7 @@ model RecoveryDevice {
   // can be decrypted using the key exposed to the user during recovery setup process
   ciphertext                                 String
   // nonce to decrypt the ciphertext
-  nonce                                      String
+  nonce                                      String @unique
   device                                     Device @relation(fields: [deviceSigningPublicKey], references: [signingPublicKey])
   deviceSigningPublicKey                     String @id
   deviceSigningKeyType                       String @default("invalid")

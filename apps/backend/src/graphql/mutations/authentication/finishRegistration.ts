@@ -2,12 +2,25 @@ import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { finishRegistration } from "../../../utils/opaque";
 import { finalizeRegistration } from "../../../database/authentication/finalizeRegistration";
 
+export const FinishRegistrationDeviceInput = inputObjectType({
+  name: "FinishRegistrationDeviceInput",
+  definition(t) {
+    t.nonNull.string("ciphertext");
+    t.nonNull.string("nonce");
+    t.nonNull.string("encryptionKeySalt");
+    t.nonNull.string("keyPairSignature");
+    t.nonNull.string("signingPublicKey");
+    t.nonNull.string("encryptionPublicKey");
+  },
+});
+
 export const FinishRegistrationInput = inputObjectType({
   name: "FinishRegistrationInput",
   definition(t) {
     t.nonNull.string("message");
     t.nonNull.string("registrationId");
     t.nonNull.string("clientPublicKey");
+    t.nonNull.field("mainDevice", { type: FinishRegistrationDeviceInput });
   },
 });
 
@@ -33,9 +46,11 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
       registrationId: args.input.registrationId,
       message: args.input.message,
     });
+
     const user = await finalizeRegistration({
       username,
       opaqueEnvelope: envelope,
+      mainDevice: args.input.mainDevice,
     });
     return { id: user.id };
   },

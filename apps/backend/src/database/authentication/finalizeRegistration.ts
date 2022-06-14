@@ -1,72 +1,73 @@
 import { prisma } from "../prisma";
+import * as sodium from "@serenity-tools/libsodium";
+import canonicalize from "canonicalize";
+
+type DeviceInput = {
+  ciphertext: string;
+  encryptionPublicKey: string;
+  keyPairSignature: string;
+  nonce: string;
+  signingPublicKey: string;
+  encryptionKeySalt: string;
+};
 
 type Props = {
   username: string;
   opaqueEnvelope: string;
-  // workspaceId: string
+  mainDevice: DeviceInput;
+};
+
+const verifyDevice = async (device: DeviceInput) => {
+  const keyPairSignatureString = canonicalize({
+    signingPublicKey: device.signingPublicKey,
+    encryptionPublicKey: device.encryptionPublicKey,
+  });
+  if (!keyPairSignatureString) {
+    throw new Error("Failed to canonicalize the keys.");
+  }
+  return await sodium.crypto_sign_verify_detached(
+    device.keyPairSignature,
+    keyPairSignatureString,
+    device.signingPublicKey
+  );
 };
 
 export async function finalizeRegistration({
   username,
   opaqueEnvelope,
+  mainDevice,
 }: Props) {
-  // if this user has already completed registration, throw an error
-  const existingUserData = await prisma.user.findUnique({
-    where: {
-      username: username,
-    },
-  });
-  if (existingUserData) {
-    throw Error("This username has already been registered");
-  }
-  const existingUnconfirmedUserData = await prisma.unconfirmedUser.findUnique({
-    where: {
-      username: username,
-    },
-  });
-  if (existingUnconfirmedUserData) {
-    throw Error("This username has already been registered");
+  if (!verifyDevice(mainDevice)) {
+    throw new Error("Failed to verify main device.");
   }
 
   try {
     return await prisma.$transaction(async (prisma) => {
+      // if this user has already completed registration, throw an error
+      const existingUserData = await prisma.user.findUnique({
+        where: {
+          username: username,
+        },
+      });
+      if (existingUserData) {
+        throw Error("This username has already been registered");
+      }
+
       const unconfirmedUser = await prisma.unconfirmedUser.create({
         data: {
-          username: username,
-          opaqueEnvelope: opaqueEnvelope,
+          username,
+          opaqueEnvelope,
           clientPublicKey: `TODO+${username}`,
+          mainDeviceCiphertext: mainDevice.ciphertext,
+          mainDeviceNonce: mainDevice.nonce,
+          mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+          mainDeviceEncryptionKeySalt: mainDevice.encryptionKeySalt,
         },
       });
       // TODO: send an email to the user's email address
       console.log(
         `New user confirmation code: ${unconfirmedUser.confirmationCode}`
       );
-      /*
-      const device = await prisma.device.create({
-        data: {
-          signingPublicKey: `TODO+${username}`,
-          encryptionPublicKey: "TODO",
-          encryptionPublicKeySignature: "TODO",
-        },
-      });
-      const user = await prisma.user.create({
-        data: {
-          username,
-          opaqueEnvelope,
-          clientPublicKey: `TODO+${username}`,
-          mainDeviceCiphertext: "TODO",
-          mainDeviceNonce: "TODO",
-          mainDevice: {
-            connect: { signingPublicKey: device.signingPublicKey },
-          },
-        },
-      });
-      const userId = user.id;
-      await prisma.device.update({
-        where: { signingPublicKey: device.signingPublicKey },
-        data: { user: { connect: { id: userId } } },
-      });
-      /* */
       return unconfirmedUser;
     });
   } catch (error) {

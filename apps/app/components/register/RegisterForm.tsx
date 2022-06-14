@@ -15,11 +15,49 @@ import {
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
 import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
+import sodium from "@serenity-tools/libsodium";
 import { VStack } from "native-base";
+import canonicalize from "canonicalize";
 
 type Props = {
   onRegisterSuccess?: () => void;
   onRegisterFail?: () => void;
+};
+
+const createDevice = async (encryptionKey: string) => {
+  const signingKeyPair = await sodium.crypto_sign_keypair();
+  const encryptionKeyPair = await sodium.crypto_box_keypair();
+  const keyPairSignatureString = canonicalize({
+    signingPublicKey: signingKeyPair.publicKey,
+    encryptionPublicKey: encryptionKeyPair.publicKey,
+  });
+  if (!keyPairSignatureString) {
+    throw new Error("Failed to create keys.");
+  }
+  const keyPairSignature = await sodium.crypto_sign_detached(
+    keyPairSignatureString,
+    signingKeyPair.privateKey
+  );
+  const nonce = await sodium.randombytes_buf(
+    sodium.crypto_secretbox_NONCEBYTES
+  );
+  const privateKeyPairString = JSON.stringify({
+    signingPrivateKey: signingKeyPair.privateKey,
+    encryptionPrivateKey: encryptionKeyPair.privateKey,
+  });
+  const privateKeyPairStringBase64 = sodium.to_base64(privateKeyPairString);
+  const cipherText = sodium.crypto_secretbox_easy(
+    privateKeyPairStringBase64,
+    nonce,
+    encryptionKey
+  );
+  return {
+    cipherText,
+    nonce,
+    keyPairSignature,
+    signingKeyPair,
+    encryptionKeyPair,
+  };
 };
 
 export default function RegisterForm(props: Props) {
@@ -53,13 +91,37 @@ export default function RegisterForm(props: Props) {
         const { response, exportKey } = await finishRegistration(
           startRegistrationResult.data.startRegistration.challengeResponse
         );
+
+        const encryptionKeySalt = await sodium.randombytes_buf(
+          sodium.crypto_pwhash_SALTBYTES
+        );
+        const encryptionKey = await sodium.crypto_pwhash(
+          sodium.crypto_secretbox_KEYBYTES,
+          exportKey,
+          encryptionKeySalt,
+          sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+          sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+          sodium.crypto_pwhash_ALG_DEFAULT
+        );
+
         console.log("exportKey", exportKey);
+
+        const mainDevice = await createDevice(encryptionKey);
+
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
             message: response,
             registrationId:
               startRegistrationResult.data.startRegistration.registrationId,
             clientPublicKey: `TODO+${uuidv4()}`,
+            mainDevice: {
+              ciphertext: mainDevice.cipherText,
+              nonce: mainDevice.nonce,
+              keyPairSignature: mainDevice.keyPairSignature,
+              encryptionPublicKey: mainDevice.encryptionKeyPair.publicKey,
+              signingPublicKey: mainDevice.signingKeyPair.publicKey,
+              encryptionKeySalt,
+            },
           },
         });
         // check for an error

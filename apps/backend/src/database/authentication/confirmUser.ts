@@ -36,16 +36,15 @@ export async function confirmUser({ username, confirmationCode }: Props) {
         throw new Error("Invalid user or confirmation code");
       }
 
-      // TODO: create keypair
-      // const signingKeyPair = await crypto_sign_keypair();
-
       const user = await prisma.user.create({
         data: {
           username: unconfirmedUser.username,
           opaqueEnvelope: unconfirmedUser.opaqueEnvelope,
-          clientPublicKey: `TODO+${username}`, // TODO: signingKeyPair.publicKey,
-          mainDeviceCiphertext: "invalid",
-          mainDeviceNonce: "invalid",
+          clientPublicKey: unconfirmedUser.clientPublicKey,
+          mainDeviceCiphertext: unconfirmedUser.mainDeviceCiphertext,
+          mainDeviceNonce: unconfirmedUser.mainDeviceNonce,
+          mainDeviceSigningPublicKey:
+            unconfirmedUser.mainDeviceSigningPublicKey,
         },
       });
       const devices = await createMainAndRecoveryDevice({
@@ -68,18 +67,6 @@ export async function confirmUser({ username, confirmationCode }: Props) {
       await prisma.device.update({
         where: {
           signingPublicKey: devices.recoveryDevice.deviceSigningPublicKey,
-        },
-        data: {
-          user: {
-            connect: {
-              id: user.id,
-            },
-          },
-        },
-      });
-      await prisma.device.update({
-        where: {
-          signingPublicKey: devices.mainDevice.signingPublicKey,
         },
         data: {
           user: {

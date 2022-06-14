@@ -25,6 +25,11 @@ export type AcceptWorkspaceInvitationResult = {
   workspace?: Maybe<Workspace>;
 };
 
+export type CreateDeviceResult = {
+  __typename?: 'CreateDeviceResult';
+  device?: Maybe<Device>;
+};
+
 export type CreateDocumentInput = {
   id: Scalars['String'];
   parentFolderId?: InputMaybe<Scalars['String']>;
@@ -48,6 +53,12 @@ export type CreateFolderResult = {
   folder?: Maybe<Folder>;
 };
 
+export type CreateMainAndRecoveryDeviceResult = {
+  __typename?: 'CreateMainAndRecoveryDeviceResult';
+  mainDevice?: Maybe<Device>;
+  recoveryDevice?: Maybe<RecoveryDevice>;
+};
+
 export type CreateWorkspaceInput = {
   id: Scalars['String'];
   name: Scalars['String'];
@@ -65,6 +76,15 @@ export type CreateWorkspaceInvitationResult = {
 export type CreateWorkspaceResult = {
   __typename?: 'CreateWorkspaceResult';
   workspace?: Maybe<Workspace>;
+};
+
+export type DeleteDevicesInput = {
+  signingPublicKeys: Array<Scalars['String']>;
+};
+
+export type DeleteDevicseResult = {
+  __typename?: 'DeleteDevicseResult';
+  status: Scalars['String'];
 };
 
 export type DeleteDocumentsInput = {
@@ -101,6 +121,43 @@ export type DeleteWorkspacesInput = {
 export type DeleteWorkspacesResult = {
   __typename?: 'DeleteWorkspacesResult';
   status: Scalars['String'];
+};
+
+export type Device = {
+  __typename?: 'Device';
+  ciphertext?: Maybe<Scalars['String']>;
+  encryptionKeyType: Scalars['String'];
+  encryptionPrivateKey?: Maybe<Scalars['String']>;
+  encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
+  nonce?: Maybe<Scalars['String']>;
+  signingKeyType: Scalars['String'];
+  signingPrivateKey?: Maybe<Scalars['String']>;
+  signingPublicKey: Scalars['String'];
+  userId: Scalars['String'];
+};
+
+export type DeviceConnection = {
+  __typename?: 'DeviceConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<DeviceEdge>>>;
+  /** Flattened list of Device type */
+  nodes?: Maybe<Array<Maybe<Device>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type DeviceEdge = {
+  __typename?: 'DeviceEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<Device>;
+};
+
+export type DeviceResult = {
+  __typename?: 'DeviceResult';
+  device?: Maybe<Device>;
 };
 
 export type Document = {
@@ -140,8 +197,18 @@ export type FinishLoginResult = {
   success?: Maybe<Scalars['Boolean']>;
 };
 
+export type FinishRegistrationDeviceInput = {
+  ciphertext: Scalars['String'];
+  encryptionKeySalt: Scalars['String'];
+  encryptionPublicKey: Scalars['String'];
+  keyPairSignature: Scalars['String'];
+  nonce: Scalars['String'];
+  signingPublicKey: Scalars['String'];
+};
+
 export type FinishRegistrationInput = {
   clientPublicKey: Scalars['String'];
+  mainDevice: FinishRegistrationDeviceInput;
   message: Scalars['String'];
   registrationId: Scalars['String'];
 };
@@ -187,10 +254,13 @@ export type MeResult = {
 export type Mutation = {
   __typename?: 'Mutation';
   acceptWorkspaceInvitation?: Maybe<AcceptWorkspaceInvitationResult>;
+  createDevice?: Maybe<CreateDeviceResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createFolder?: Maybe<CreateFolderResult>;
+  createMainAndRecoveryDevice?: Maybe<CreateMainAndRecoveryDeviceResult>;
   createWorkspace?: Maybe<CreateWorkspaceResult>;
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
+  deleteDevices?: Maybe<DeleteDevicseResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteFolders?: Maybe<DeleteFoldersResult>;
   deleteWorkspaceInvitations?: Maybe<DeleteWorkspaceInvitationsResult>;
@@ -227,6 +297,11 @@ export type MutationCreateWorkspaceArgs = {
 
 export type MutationCreateWorkspaceInvitationArgs = {
   input?: InputMaybe<CreateWorkspaceInvitationInput>;
+};
+
+
+export type MutationDeleteDevicesArgs = {
+  input?: InputMaybe<DeleteDevicesInput>;
 };
 
 
@@ -299,6 +374,8 @@ export type PageInfo = {
 
 export type Query = {
   __typename?: 'Query';
+  deviceBySigningPublicKey?: Maybe<DeviceResult>;
+  devices?: Maybe<DeviceConnection>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documents?: Maybe<DocumentConnection>;
   folders?: Maybe<FolderConnection>;
@@ -309,6 +386,17 @@ export type Query = {
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
   workspaces?: Maybe<WorkspaceConnection>;
+};
+
+
+export type QueryDeviceBySigningPublicKeyArgs = {
+  signingPublicKey: Scalars['ID'];
+};
+
+
+export type QueryDevicesArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
 };
 
 
@@ -363,6 +451,21 @@ export type QueryWorkspaceInvitationsArgs = {
 export type QueryWorkspacesArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
+};
+
+export type RecoveryDevice = {
+  __typename?: 'RecoveryDevice';
+  ciphertext: Scalars['String'];
+  deviceEncryptionKeyType: Scalars['String'];
+  deviceEncryptionPrivateKey?: Maybe<Scalars['String']>;
+  deviceEncryptionPublicKey: Scalars['String'];
+  deviceSigningKeyType: Scalars['String'];
+  deviceSigningPrivateKey?: Maybe<Scalars['String']>;
+  deviceSigningPublicKey: Scalars['String'];
+  nonce: Scalars['String'];
+  signatureForMainDeviceSigningPublicKey: Scalars['String'];
+  signatureForRecoveryDeviceSigningPublicKey: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 export type StartLoginInput = {
