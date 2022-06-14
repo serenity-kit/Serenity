@@ -14,12 +14,7 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   // TODO: we don't want this before every test
-  const createUserResponse = await registerUser(
-    graphql,
-    username,
-    password,
-    "31f63652-a995-41ff-b541-3ccdaaaac551"
-  );
+  const createUserResponse = await registerUser(graphql, username, password);
   userId = createUserResponse.registrationResponse.finishRegistration.id;
 });
 
