@@ -63,6 +63,8 @@ model UnconfirmedUser {
   mainDeviceCiphertext                       String
   mainDeviceEncryptionKeySalt                String
   mainDeviceSigningPublicKey                 String    @unique
+  mainDeviceEncryptionPublicKey              String    @unique
+  mainDeviceEncryptionPublicKeySignature     String    @unique
 }
 
 model User {
@@ -75,6 +77,7 @@ model User {
   mainDeviceCiphertext                       String
   // nonce to decrypt the mainDeviceCiphertext
   mainDeviceNonce                            String                 @unique
+  mainDeviceEncryptionKeySalt                String
   mainDevice                                 Device                 @relation(name: "mainDevice", fields: [mainDeviceSigningPublicKey], references: [signingPublicKey])
   mainDeviceSigningPublicKey                 String                 @unique
   devices                                    Device[]
@@ -103,7 +106,6 @@ model RecoveryDevice {
   nonce                                      String @unique
   device                                     Device @relation(fields: [deviceSigningPublicKey], references: [signingPublicKey])
   deviceSigningPublicKey                     String @id
-  deviceSigningKeyType                       String @default("invalid")
   user                                       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                                     String @unique
   // this cross signing makes sure that the main device and recovery device are linked and verifyable in both directions
@@ -115,9 +117,7 @@ model RecoveryDevice {
 
 model Device {
   signingPublicKey             String          @id @unique
-  signingKeyType               String          @default("invalid")
   encryptionPublicKey          String
-  encryptionKeyType            String          @default("invalid")
   encryptionPublicKeySignature String
   // can't be mandatory since we need to create the device
   user                         User?           @relation(fields: [userId], references: [id], onDelete: Cascade)

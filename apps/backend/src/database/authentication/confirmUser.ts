@@ -1,5 +1,3 @@
-import { crypto_sign_keypair } from "@serenity-tools/libsodium";
-import { createMainAndRecoveryDevice } from "../device/createMainAndRecoveryDevice";
 import { prisma } from "../prisma";
 
 type Props = {
@@ -21,11 +19,6 @@ export async function confirmUser({ username, confirmationCode }: Props) {
   }
   try {
     return await prisma.$transaction(async (prisma) => {
-      // find this unconfirmed user
-      // create a new user
-      // create main and recovery devices for this user
-      // delete the unconfirmed user
-      // return the new user
       const unconfirmedUser = await prisma.unconfirmedUser.findFirst({
         where: {
           username,
@@ -45,33 +38,14 @@ export async function confirmUser({ username, confirmationCode }: Props) {
           mainDeviceNonce: unconfirmedUser.mainDeviceNonce,
           mainDeviceSigningPublicKey:
             unconfirmedUser.mainDeviceSigningPublicKey,
-        },
-      });
-      const devices = await createMainAndRecoveryDevice({
-        userId: user.id,
-      });
-      await prisma.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          mainDeviceCiphertext: devices.mainDevice.ciphertext,
-          mainDeviceNonce: devices.mainDevice.nonce,
-          mainDevice: {
-            connect: {
-              signingPublicKey: devices.mainDevice.signingPublicKey,
-            },
-          },
-        },
-      });
-      await prisma.device.update({
-        where: {
-          signingPublicKey: devices.recoveryDevice.deviceSigningPublicKey,
-        },
-        data: {
-          user: {
-            connect: {
-              id: user.id,
+          mainDeviceEncryptionKeySalt:
+            unconfirmedUser.mainDeviceEncryptionKeySalt,
+          devices: {
+            create: {
+              encryptionPublicKey: unconfirmedUser.mainDeviceSigningPublicKey,
+              signingPublicKey: unconfirmedUser.mainDeviceSigningPublicKey,
+              encryptionPublicKeySignature:
+                unconfirmedUser.mainDeviceEncryptionPublicKeySignature,
             },
           },
         },

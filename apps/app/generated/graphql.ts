@@ -201,7 +201,7 @@ export type FinishRegistrationDeviceInput = {
   ciphertext: Scalars['String'];
   encryptionKeySalt: Scalars['String'];
   encryptionPublicKey: Scalars['String'];
-  keyPairSignature: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
   nonce: Scalars['String'];
   signingPublicKey: Scalars['String'];
 };

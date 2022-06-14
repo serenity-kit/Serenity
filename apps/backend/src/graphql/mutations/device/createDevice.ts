@@ -1,5 +1,4 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { createDevice } from "../../../database/device/createDevice";
 import { Device } from "../../types/device";
 
 export const CreateDeviceResult = objectType({
@@ -15,9 +14,10 @@ export const createDeviceMutation = mutationField("createDevice", {
     if (!context.user) {
       throw new Error("Unauthorized");
     }
-    const device = await createDevice({
-      userId: context.user.id,
-    });
-    return { device };
+    return null;
+    // const device = await createDevice({
+    //   userId: context.user.id,
+    // });
+    // return { device };
   },
 });

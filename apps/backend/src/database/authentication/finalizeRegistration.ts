@@ -1,11 +1,10 @@
 import { prisma } from "../prisma";
 import * as sodium from "@serenity-tools/libsodium";
-import canonicalize from "canonicalize";
 
 type DeviceInput = {
   ciphertext: string;
   encryptionPublicKey: string;
-  keyPairSignature: string;
+  encryptionPublicKeySignature: string;
   nonce: string;
   signingPublicKey: string;
   encryptionKeySalt: string;
@@ -18,16 +17,9 @@ type Props = {
 };
 
 const verifyDevice = async (device: DeviceInput) => {
-  const keyPairSignatureString = canonicalize({
-    signingPublicKey: device.signingPublicKey,
-    encryptionPublicKey: device.encryptionPublicKey,
-  });
-  if (!keyPairSignatureString) {
-    throw new Error("Failed to canonicalize the keys.");
-  }
   return await sodium.crypto_sign_verify_detached(
-    device.keyPairSignature,
-    keyPairSignatureString,
+    device.encryptionPublicKeySignature,
+    device.encryptionPublicKey,
     device.signingPublicKey
   );
 };

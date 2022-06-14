@@ -8,9 +8,9 @@ export const FinishRegistrationDeviceInput = inputObjectType({
     t.nonNull.string("ciphertext");
     t.nonNull.string("nonce");
     t.nonNull.string("encryptionKeySalt");
-    t.nonNull.string("keyPairSignature");
     t.nonNull.string("signingPublicKey");
     t.nonNull.string("encryptionPublicKey");
+    t.nonNull.string("encryptionPublicKeySignature");
   },
 });
 

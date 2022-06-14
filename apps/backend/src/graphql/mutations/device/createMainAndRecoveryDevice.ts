@@ -1,5 +1,4 @@
 import { mutationField, objectType } from "nexus";
-import { createMainAndRecoveryDevice } from "../../../database/device/createMainAndRecoveryDevice";
 import { Device } from "../../types/device";
 import { RecoveryDevice } from "../../types/recoveryDevice";
 
@@ -27,10 +26,11 @@ export const CreateMainAndRecoveryDeviceMutation = mutationField(
       if (!context.user) {
         throw new Error("Unauthorized");
       }
-      const devices = await createMainAndRecoveryDevice({
-        userId: context.user.id,
-      });
-      return devices;
+      return null;
+      // const devices = await createMainAndRecoveryDevice({
+      //   userId: context.user.id,
+      // });
+      // return devices;
     },
   }
 );

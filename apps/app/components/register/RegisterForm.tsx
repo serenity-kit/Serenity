@@ -27,15 +27,8 @@ type Props = {
 const createDevice = async (encryptionKey: string) => {
   const signingKeyPair = await sodium.crypto_sign_keypair();
   const encryptionKeyPair = await sodium.crypto_box_keypair();
-  const keyPairSignatureString = canonicalize({
-    signingPublicKey: signingKeyPair.publicKey,
-    encryptionPublicKey: encryptionKeyPair.publicKey,
-  });
-  if (!keyPairSignatureString) {
-    throw new Error("Failed to create keys.");
-  }
-  const keyPairSignature = await sodium.crypto_sign_detached(
-    keyPairSignatureString,
+  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+    encryptionKeyPair.publicKey,
     signingKeyPair.privateKey
   );
   const nonce = await sodium.randombytes_buf(
@@ -54,7 +47,7 @@ const createDevice = async (encryptionKey: string) => {
   return {
     cipherText,
     nonce,
-    keyPairSignature,
+    encryptionPublicKeySignature,
     signingKeyPair,
     encryptionKeyPair,
   };
@@ -117,7 +110,8 @@ export default function RegisterForm(props: Props) {
             mainDevice: {
               ciphertext: mainDevice.cipherText,
               nonce: mainDevice.nonce,
-              keyPairSignature: mainDevice.keyPairSignature,
+              encryptionPublicKeySignature:
+                mainDevice.encryptionPublicKeySignature,
               encryptionPublicKey: mainDevice.encryptionKeyPair.publicKey,
               signingPublicKey: mainDevice.signingKeyPair.publicKey,
               encryptionKeySalt,
