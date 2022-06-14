@@ -25,6 +25,7 @@ export async function confirmUser({ username, confirmationCode }: Props) {
           confirmationCode,
         },
       });
+      console.log({ unconfirmedUser });
       if (!unconfirmedUser) {
         throw new Error("Invalid user or confirmation code");
       }

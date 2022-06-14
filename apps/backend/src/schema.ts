@@ -18,6 +18,7 @@ import * as DeleteFoldersMutationTypes from "./graphql/mutations/folder/deleteFo
 
 import * as StartRegistrationTypes from "./graphql/mutations/authentication/startRegistration";
 import * as FinishRegistrationTypes from "./graphql/mutations/authentication/finishRegistration";
+import * as ConfirmUserMutationTypes from "./graphql/mutations/authentication/confirmUser";
 import * as StartLoginTypes from "./graphql/mutations/authentication/startLogin";
 import * as FinishLoginTypes from "./graphql/mutations/authentication/finishLogin";
 import * as MeQueryTypes from "./graphql/queries/authentication/me";
@@ -62,6 +63,7 @@ export const schema = makeSchema({
 
     StartRegistrationTypes,
     FinishRegistrationTypes,
+    ConfirmUserMutationTypes,
     StartLoginTypes,
     FinishLoginTypes,
     MeQueryTypes,

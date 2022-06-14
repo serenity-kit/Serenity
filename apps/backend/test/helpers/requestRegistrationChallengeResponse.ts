@@ -2,7 +2,7 @@ import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
 import { Registration } from "../../src/vendor/opaque-wasm/opaque_wasm";
 
-export type RegistrationChallengeRepoonseType = {
+export type RegistrationChallengeReponseType = {
   data: any;
   registration: Registration;
 };
@@ -11,7 +11,7 @@ export const requestRegistrationChallengeResponse = async (
   graphql: any,
   username: string,
   password: string
-): Promise<RegistrationChallengeRepoonseType> => {
+): Promise<RegistrationChallengeReponseType> => {
   const registration = new Registration();
   const challenge = registration.start(password);
   const query = gql`
