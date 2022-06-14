@@ -18,6 +18,7 @@ export default async function createUserWithWorkspace({
       },
     });
     const user = await prisma.user.create({
+      // @ts-ignore TO BE REMOVED
       data: {
         username,
         opaqueEnvelope: "TODO",
