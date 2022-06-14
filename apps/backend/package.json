@@ -20,6 +20,7 @@
     "@prisma/client": "^3.13.0",
     "@serenity-tools/opaque": "*",
     "apollo-server-express": "^3.5.0",
+    "canonicalize": "^1.0.8",
     "express": "^4.17.1",
     "graphql": "^16.0.1",
     "libsodium-wrappers": "^0.7.10",

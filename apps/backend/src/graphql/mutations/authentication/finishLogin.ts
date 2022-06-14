@@ -27,7 +27,10 @@ export const finishLoginMutation = mutationField("finishLogin", {
     if (!args || !args.input) {
       throw Error("Missing input");
     }
-    const sessionKey = finishLogin(args.input.loginId, args.input.message);
+    const sessionKey = finishLogin({
+      loginId: args.input.loginId,
+      message: args.input.message,
+    });
     console.log("SESSION KEY", sessionKey);
     // TODO store the session key in the database
 

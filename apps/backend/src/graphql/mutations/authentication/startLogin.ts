@@ -31,14 +31,19 @@ export const startLoginMutation = mutationField("startLogin", {
     }
     const username = args.input.username;
     const result = await getEnvelope(username);
-    const challengeResponse = startLogin(
-      result.envelop,
-      username,
-      args.input.challenge
-    );
-    return {
-      loginId: challengeResponse.loginId,
-      challengeResponse: challengeResponse.message,
-    };
+    try {
+      const challengeResponse = startLogin({
+        envelope: result.envelop,
+        username,
+        challenge: args.input.challenge,
+      });
+      return {
+        loginId: challengeResponse.loginId,
+        challengeResponse: challengeResponse.message,
+      };
+    } catch (err) {
+      console.error(err);
+      throw new Error("Failed to initiate login.");
+    }
   },
 });
