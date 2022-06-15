@@ -18,7 +18,7 @@ export type InlineInputProps = IInputProps & {
 export const InlineInput = forwardRef<TextInput, InlineInputProps>(
   (props: InlineInputProps, ref) => {
     const styles = StyleSheet.create({
-      input: tw`p-0 px-1 bg-white text-small text-gray-800`,
+      input: tw`p-0 px-1 bg-white text-sm leading-1.25 text-gray-800`,
     });
 
     const [canceled, setCanceled] = React.useState(false);
