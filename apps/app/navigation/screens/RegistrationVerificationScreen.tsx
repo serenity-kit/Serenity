@@ -7,7 +7,9 @@ export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
 ) {
   const [, verifyRegistrationMutation] = useVerifyRegistrationMutation();
-  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationCode, setVerificationCode] = useState(
+    props.route.params.verification || ""
+  );
   const [errorMessage, setErrorMessage] = useState("");
 
   const onSubmit = async () => {
@@ -54,13 +56,17 @@ export default function RegistrationVerificationScreen(
 
         <LabeledInput
           label={"Verification Code"}
-          secureTextEntry
           value={verificationCode}
           onChangeText={(verificationCode: string) => {
             setVerificationCode(verificationCode);
           }}
           placeholder="Enter the verification code …"
         />
+
+        <View>
+          <Text>Note: The verification code is prefilled on staging.</Text>
+        </View>
+
         <Button onPress={onSubmit} size="large">
           Register
         </Button>

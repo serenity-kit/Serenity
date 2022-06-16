@@ -204,6 +204,7 @@ export type FinishRegistrationInput = {
 export type FinishRegistrationResult = {
   __typename?: 'FinishRegistrationResult';
   id: Scalars['String'];
+  verificationCode: Scalars['String'];
 };
 
 export type Folder = {
@@ -660,7 +661,7 @@ export type FinishRegistrationMutationVariables = Exact<{
 }>;
 
 
-export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string } | null };
+export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode: string } | null };
 
 export type StartLoginMutationVariables = Exact<{
   input: StartLoginInput;
@@ -909,6 +910,7 @@ export const FinishRegistrationDocument = gql`
     mutation finishRegistration($input: FinishRegistrationInput!) {
   finishRegistration(input: $input) {
     id
+    verificationCode
   }
 }
     `;

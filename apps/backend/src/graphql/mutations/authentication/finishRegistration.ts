@@ -28,6 +28,7 @@ export const FinishRegistrationResult = objectType({
   name: "FinishRegistrationResult",
   definition(t) {
     t.nonNull.string("id");
+    t.nonNull.string("verificationCode"); // TODO remove once email verifiaction is implemented
   },
 });
 
@@ -47,11 +48,14 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
       message: args.input.message,
     });
 
-    const user = await finalizeRegistration({
+    const unconfirmedUser = await finalizeRegistration({
       username,
       opaqueEnvelope: envelope,
       mainDevice: args.input.mainDevice,
     });
-    return { id: user.id };
+    return {
+      id: unconfirmedUser.id,
+      verificationCode: unconfirmedUser.confirmationCode,
+    };
   },
 });

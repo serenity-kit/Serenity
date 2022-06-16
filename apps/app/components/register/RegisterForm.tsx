@@ -19,7 +19,7 @@ import sodium from "@serenity-tools/libsodium";
 import { VStack } from "native-base";
 
 type Props = {
-  onRegisterSuccess?: (username: string) => void;
+  onRegisterSuccess?: (username: string, verificationCode: string) => void;
   onRegisterFail?: () => void;
 };
 
@@ -118,7 +118,10 @@ export default function RegisterForm(props: Props) {
         // check for an error
         if (finishRegistrationResult.data?.finishRegistration?.id) {
           if (props.onRegisterSuccess) {
-            props.onRegisterSuccess(username);
+            props.onRegisterSuccess(
+              username,
+              finishRegistrationResult.data?.finishRegistration.verificationCode
+            );
           }
           // reset since the user might end up on this screen again
           setPassword("");

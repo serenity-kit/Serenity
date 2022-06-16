@@ -27,6 +27,7 @@ type LoginParams = {
 
 type RegistrationVerificationParams = {
   username?: string;
+  verification?: string;
 };
 
 export type WorkspaceDrawerParamList = {
