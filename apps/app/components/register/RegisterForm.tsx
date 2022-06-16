@@ -17,10 +17,9 @@ import { useWindowDimensions } from "react-native";
 import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
 import sodium from "@serenity-tools/libsodium";
 import { VStack } from "native-base";
-import canonicalize from "canonicalize";
 
 type Props = {
-  onRegisterSuccess?: () => void;
+  onRegisterSuccess?: (username: string) => void;
   onRegisterFail?: () => void;
 };
 
@@ -58,7 +57,6 @@ export default function RegisterForm(props: Props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
-  const [didRegistrationSucceed, setDidRegistrationSucceed] = useState(false);
   const [, finishRegistrationMutation] = useFinishRegistrationMutation();
   const [, startRegistrationMutation] = useStartRegistrationMutation();
   const [errorMessage, setErrorMessage] = useState("");
@@ -68,7 +66,6 @@ export default function RegisterForm(props: Props) {
       setErrorMessage("Please accept the terms of service first.");
       return;
     }
-    setDidRegistrationSucceed(false);
     setErrorMessage("");
     try {
       // TODO the getServerChallenge should include a signature of the challenge response and be verified that it belongs to
@@ -120,13 +117,12 @@ export default function RegisterForm(props: Props) {
         });
         // check for an error
         if (finishRegistrationResult.data?.finishRegistration?.id) {
-          setDidRegistrationSucceed(true);
+          if (props.onRegisterSuccess) {
+            props.onRegisterSuccess(username);
+          }
           // reset since the user might end up on this screen again
           setPassword("");
           setUsername("");
-          if (props.onRegisterSuccess) {
-            props.onRegisterSuccess();
-          }
         } else if (finishRegistrationResult.error) {
           setErrorMessage("Failed to register.");
           if (props.onRegisterFail) {
@@ -154,12 +150,6 @@ export default function RegisterForm(props: Props) {
       {errorMessage ? (
         <View>
           <Text>{errorMessage}</Text>
-        </View>
-      ) : null}
-
-      {didRegistrationSucceed ? (
-        <View>
-          <Text>Registration Succeeded</Text>
         </View>
       ) : null}
 

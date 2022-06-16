@@ -11,10 +11,14 @@ export default function RegistrationVerificationScreen(
   const [errorMessage, setErrorMessage] = useState("");
 
   const onSubmit = async () => {
+    if (!props.route.params.username) {
+      setErrorMessage("Something went wrong. Email is missing.");
+      return;
+    }
     try {
       const verifyRegistrationResult = await verifyRegistrationMutation({
         input: {
-          username: "ooo@ooo.com",
+          username: props.route.params.username,
           verificationCode,
         },
       });
