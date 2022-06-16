@@ -53,12 +53,6 @@ export type CreateFolderResult = {
   folder?: Maybe<Folder>;
 };
 
-export type CreateMainAndRecoveryDeviceResult = {
-  __typename?: 'CreateMainAndRecoveryDeviceResult';
-  mainDevice?: Maybe<Device>;
-  recoveryDevice?: Maybe<RecoveryDevice>;
-};
-
 export type CreateWorkspaceInput = {
   id: Scalars['String'];
   name: Scalars['String'];
@@ -125,14 +119,8 @@ export type DeleteWorkspacesResult = {
 
 export type Device = {
   __typename?: 'Device';
-  ciphertext?: Maybe<Scalars['String']>;
-  encryptionKeyType: Scalars['String'];
-  encryptionPrivateKey?: Maybe<Scalars['String']>;
   encryptionPublicKey: Scalars['String'];
   encryptionPublicKeySignature: Scalars['String'];
-  nonce?: Maybe<Scalars['String']>;
-  signingKeyType: Scalars['String'];
-  signingPrivateKey?: Maybe<Scalars['String']>;
   signingPublicKey: Scalars['String'];
   userId: Scalars['String'];
 };
@@ -257,7 +245,6 @@ export type Mutation = {
   createDevice?: Maybe<CreateDeviceResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createFolder?: Maybe<CreateFolderResult>;
-  createMainAndRecoveryDevice?: Maybe<CreateMainAndRecoveryDeviceResult>;
   createWorkspace?: Maybe<CreateWorkspaceResult>;
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
   deleteDevices?: Maybe<DeleteDevicseResult>;
@@ -451,21 +438,6 @@ export type QueryWorkspaceInvitationsArgs = {
 export type QueryWorkspacesArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
-};
-
-export type RecoveryDevice = {
-  __typename?: 'RecoveryDevice';
-  ciphertext: Scalars['String'];
-  deviceEncryptionKeyType: Scalars['String'];
-  deviceEncryptionPrivateKey?: Maybe<Scalars['String']>;
-  deviceEncryptionPublicKey: Scalars['String'];
-  deviceSigningKeyType: Scalars['String'];
-  deviceSigningPrivateKey?: Maybe<Scalars['String']>;
-  deviceSigningPublicKey: Scalars['String'];
-  nonce: Scalars['String'];
-  signatureForMainDeviceSigningPublicKey: Scalars['String'];
-  signatureForRecoveryDeviceSigningPublicKey: Scalars['String'];
-  userId: Scalars['String'];
 };
 
 export type StartLoginInput = {
