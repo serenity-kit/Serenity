@@ -48,6 +48,7 @@ export type RootStackParamList = {
   DesignSystem: undefined;
   DevDashboard: undefined;
   Register: undefined;
+  RegistrationVerification: undefined;
   AcceptWorkspaceInvitation: WorkspaceInvitationParams;
   Login: LoginParams;
   EncryptDecryptImageTest: undefined;

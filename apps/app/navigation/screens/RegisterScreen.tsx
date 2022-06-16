@@ -7,7 +7,7 @@ export default function RegisterScreen(
   props: RootStackScreenProps<"Register">
 ) {
   const onRegisterSuccess = () => {
-    props.navigation.push("Login", {});
+    props.navigation.push("RegistrationVerification");
   };
 
   return (

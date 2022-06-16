@@ -1,0 +1,5 @@
+mutation verifyRegistration($input: VerifyRegistrationInput!) {
+  verifyRegistration(input: $input) {
+    id
+  }
+}
