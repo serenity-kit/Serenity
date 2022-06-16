@@ -5,11 +5,14 @@ import {
   Text,
   tw,
   View,
+  ViewProps,
   InlineInput,
+  IconButton,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, StyleSheet, Platform } from "react-native";
+import { useFocusRing } from "@react-native-aria/focus";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateDocumentMutation,
@@ -23,10 +26,11 @@ import { RootStackScreenProps } from "../../types";
 import SidebarPage from "../sidebarPage/SidebarPage";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 
-type Props = {
+type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
   folderName: string;
+  depth?: number;
   onStructureChange: () => void;
 };
 
@@ -34,6 +38,9 @@ export default function SidebarFolder(props: Props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
+
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
@@ -53,6 +60,7 @@ export default function SidebarFolder(props: Props) {
       first: 50,
     },
   });
+  const { depth = 0 } = props;
 
   const createFolder = async (name: string | null) => {
     setIsOpen(true);
@@ -138,54 +146,106 @@ export default function SidebarFolder(props: Props) {
     }
   };
 
+  const styles = StyleSheet.create({
+    folder: tw``,
+    hover: tw`bg-gray-200`,
+    focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
+  });
+
+  const maxWidth = 32 - depth * 2;
+
   return (
     <>
-      <Pressable
-        onPress={() => {
-          setIsOpen((currentIsOpen) => !currentIsOpen);
-        }}
+      <View
+        style={[
+          styles.folder,
+          isHovered && styles.hover,
+          isFocusVisible && styles.focusVisible,
+          props.style,
+        ]}
+        // as Views usually shouldn't have mouse-events ()
+        // @ts-expect-error as views usually don't have hover
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         <HStack>
-          {isOpen ? (
-            <Icon name="arrow-down-s-fill" />
-          ) : (
-            <Icon name="arrow-right-s-fill" />
-          )}
-          <Icon name="folder" />
-          {isEditing === "name" ? (
+          <Pressable
+            {...focusRingProps} // needed so focus is shown on view-wrapper
+            onPress={() => {
+              setIsOpen((currentIsOpen) => !currentIsOpen);
+            }}
+            style={[
+              tw`grow-1`, // needed so clickable area is as large as possible
+            ]}
+            // disable default outline styles and add 1 overridden style manually (grow)
+            _focusVisible={{
+              _web: { style: { outlineWidth: 0, flexGrow: 1 } },
+            }}
+          >
+            <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
+              {/* not the best way but icons don't take styles (yet?) */}
+              <div style={tw`ml-0.5 -mr-0.5`}>
+                <Icon
+                  name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
+                  color={tw.color("gray-600")}
+                />
+              </div>
+              <Icon name="folder" size={20} />
+              {isEditing === "name" ? (
+                <InlineInput
+                  onSubmit={updateFolderName}
+                  onCancel={() => {
+                    setIsEditing("none");
+                  }}
+                  value={props.folderName}
+                  style={tw`ml-0.5 w-${maxWidth}`}
+                />
+              ) : (
+                <Text
+                  variant="small"
+                  style={tw`ml-1.5 max-w-${maxWidth}`}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {props.folderName}
+                </Text>
+              )}
+            </HStack>
+          </Pressable>
+
+          {isEditing === "new" && (
             <InlineInput
-              onSubmit={updateFolderName}
+              value=""
+              onSubmit={createFolder}
               onCancel={() => {
                 setIsEditing("none");
               }}
-              value={props.folderName}
+              style={tw`w-${maxWidth} ml-1.5`}
             />
-          ) : (
-            <Text>{props.folderName}</Text>
           )}
-          <SidebarFolderMenu
-            folderId={props.folderId}
-            refetchFolders={refetchFolders}
-            onUpdateNamePress={editFolderName}
-            onDeletePressed={() => deleteFolder(props.folderId)}
-            onCreateDocumentPress={createDocument}
-            onCreateFolderPress={() => {
-              createFolder(null);
-            }}
-          />
-          {documentsResult.fetching ||
-            (foldersResult.fetching && <ActivityIndicator />)}
+
+          {isHovered && (
+            <HStack alignItems="center" space={1} style={tw`pr-2`}>
+              <SidebarFolderMenu
+                folderId={props.folderId}
+                refetchFolders={refetchFolders}
+                onUpdateNamePress={editFolderName}
+                onDeletePressed={() => deleteFolder(props.folderId)}
+                onCreateFolderPress={() => {
+                  createFolder(null);
+                }}
+              />
+              <IconButton
+                onPress={createDocument}
+                name="file-add-line"
+                color="gray-600"
+              ></IconButton>
+              {documentsResult.fetching ||
+                (foldersResult.fetching && <ActivityIndicator />)}
+            </HStack>
+          )}
         </HStack>
-      </Pressable>
-      {isEditing === "new" && (
-        <InlineInput
-          value=""
-          onSubmit={createFolder}
-          onCancel={() => {
-            setIsEditing("none");
-          }}
-        />
-      )}
+      </View>
 
       {isOpen && (
         <>
@@ -195,18 +255,19 @@ export default function SidebarFolder(props: Props) {
                   return null;
                 }
                 return (
-                  <View style={tw`ml-2`} key={folder.id}>
-                    <SidebarFolder
-                      folderId={folder.id}
-                      workspaceId={props.workspaceId}
-                      folderName={folder.name}
-                      onStructureChange={props.onStructureChange}
-                    />
-                  </View>
+                  <SidebarFolder
+                    key={folder.id}
+                    folderId={folder.id}
+                    workspaceId={props.workspaceId}
+                    folderName={folder.name}
+                    onStructureChange={props.onStructureChange}
+                    // needs to be here as a padding for hovering bg-color change
+                    style={tw`pl-${3 + depth * 3}`}
+                    depth={depth + 1}
+                  />
                 );
               })
             : null}
-
           {documentsResult.data?.documents?.nodes
             ? documentsResult.data?.documents?.nodes.map((document) => {
                 if (document === null) {
@@ -219,6 +280,9 @@ export default function SidebarFolder(props: Props) {
                     documentName={document.name || "Untitled"}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}
+                    // needs to be here as a padding for hovering bg-color change
+                    style={tw`pl-${9.5 + depth * 3}`}
+                    depth={depth + 1}
                   />
                 );
               })

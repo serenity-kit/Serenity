@@ -3,6 +3,7 @@ import { tw } from "../../tailwind";
 import { AddLine } from "./icons/AddLine";
 import { ArchiveFill } from "./icons/ArchiveFill";
 import { ArchiveLine } from "./icons/ArchiveLine";
+import { ArrowDownFilled } from "./icons/ArrowDownFilled";
 import { ArrowDownSFill } from "./icons/ArrowDownSFill";
 import { ArrowDownSLine } from "./icons/ArrowDownSLine";
 import { ArrowGoBackFill } from "./icons/ArrowGoBackFill";
@@ -10,7 +11,8 @@ import { ArrowGoBackLine } from "./icons/ArrowGoBackLine";
 import { ArrowGoForwardLine } from "./icons/ArrowGoForwardLine";
 import { ArrowGoForwardFill } from "./icons/ArrowGoForwardFill";
 import { ArrowLeftSLine } from "./icons/ArrowLeftSLine";
-import { ArrowRightSFill } from "./icons/ArrowRightSFill";
+import { ArrowRight } from "./icons/ArrowRight";
+import { ArrowRightFilled } from "./icons/ArrowRightFilled";
 import { ArrowRightSLine } from "./icons/ArrowRightSLine";
 import { ArrowUpDownLine } from "./icons/ArrowUpDownLine";
 import { Attachment2 } from "./icons/Attachment2";
@@ -92,99 +94,103 @@ import { Table2 } from "./icons/Table2";
 import { Text } from "./icons/Text";
 import { Underline } from "./icons/Underline";
 
+export type IconNames =
+  | "add-line"
+  | "archive-fill"
+  | "archive-line"
+  | "arrow-down-filled"
+  | "arrow-down-s-fill"
+  | "arrow-down-s-line"
+  | "arrow-go-back-fill"
+  | "arrow-go-back-line"
+  | "arrow-go-forward-fill"
+  | "arrow-go-forward-line"
+  | "arrow-left-s-line"
+  | "arrow-right"
+  | "arrow-right-filled"
+  | "arrow-right-s-line"
+  | "arrow-up-down-line"
+  | "at-line"
+  | "attachment-2"
+  | "bold"
+  | "bookmark-fill"
+  | "bookmark-line"
+  | "book-open-line"
+  | "calendar-check-fill"
+  | "chat-1-line"
+  | "chat-4-line"
+  | "check-line"
+  | "close-circle-fill"
+  | "code-s-slash-line"
+  | "code-view"
+  | "cup-line"
+  | "cursor"
+  | "dashboard-line"
+  | "delete-bin-line"
+  | "double-arrow-right"
+  | "double-arrow-left"
+  | "double-quotes-l"
+  | "download-line"
+  | "draft-line"
+  | "emotion-line"
+  | "file-add-fill"
+  | "file-add-line"
+  | "file-copy-line"
+  | "file-line"
+  | "file-search-line"
+  | "file-transfer-line"
+  | "folder-fill"
+  | "folder"
+  | "folder-line"
+  | "folder-music-line"
+  | "font-color"
+  | "font-size-2"
+  | "format-clear"
+  | "functions"
+  | "hashtag"
+  | "heading"
+  | "history-line"
+  | "image-2-line"
+  | "image-line"
+  | "h-1"
+  | "h-2"
+  | "h-3"
+  | "h-4"
+  | "h-5"
+  | "h-6"
+  | "indent-decrease"
+  | "indent-increase"
+  | "italic"
+  | "link"
+  | "link-m"
+  | "list-check"
+  | "list-check-2"
+  | "list-unordered"
+  | "list-ordered"
+  | "menu"
+  | "microscope-line"
+  | "more"
+  | "more-2-line"
+  | "more-line"
+  | "movie-line"
+  | "page"
+  | "page-separator"
+  | "paragraph"
+  | "plus"
+  | "printer-line"
+  | "question-mark"
+  | "search-line"
+  | "separator"
+  | "serenity-feather"
+  | "settings-4-line"
+  | "stars-s-fill"
+  | "strikethrough"
+  | "table-2"
+  | "text"
+  | "underline";
+
 export type IconProps = {
-  name:
-    | "add-line"
-    | "archive-fill"
-    | "archive-line"
-    | "arrow-down-s-fill"
-    | "arrow-down-s-line"
-    | "arrow-go-back-fill"
-    | "arrow-go-back-line"
-    | "arrow-go-forward-fill"
-    | "arrow-go-forward-line"
-    | "arrow-left-s-line"
-    | "arrow-right-s-fill"
-    | "arrow-right-s-line"
-    | "arrow-up-down-line"
-    | "at-line"
-    | "attachment-2"
-    | "bold"
-    | "bookmark-fill"
-    | "bookmark-line"
-    | "book-open-line"
-    | "calendar-check-fill"
-    | "chat-1-line"
-    | "chat-4-line"
-    | "check-line"
-    | "close-circle-fill"
-    | "code-s-slash-line"
-    | "code-view"
-    | "cup-line"
-    | "cursor"
-    | "dashboard-line"
-    | "delete-bin-line"
-    | "double-arrow-right"
-    | "double-arrow-left"
-    | "double-quotes-l"
-    | "download-line"
-    | "draft-line"
-    | "emotion-line"
-    | "file-add-fill"
-    | "file-add-line"
-    | "file-copy-line"
-    | "file-line"
-    | "file-search-line"
-    | "file-transfer-line"
-    | "folder-fill"
-    | "folder"
-    | "folder-line"
-    | "folder-music-line"
-    | "font-color"
-    | "font-size-2"
-    | "format-clear"
-    | "functions"
-    | "hashtag"
-    | "heading"
-    | "history-line"
-    | "image-2-line"
-    | "image-line"
-    | "h-1"
-    | "h-2"
-    | "h-3"
-    | "h-4"
-    | "h-5"
-    | "h-6"
-    | "indent-decrease"
-    | "indent-increase"
-    | "italic"
-    | "link"
-    | "link-m"
-    | "list-check"
-    | "list-check-2"
-    | "list-unordered"
-    | "list-ordered"
-    | "menu"
-    | "microscope-line"
-    | "more"
-    | "more-2-line"
-    | "more-line"
-    | "movie-line"
-    | "page"
-    | "page-separator"
-    | "paragraph"
-    | "plus"
-    | "printer-line"
-    | "question-mark"
-    | "search-line"
-    | "separator"
-    | "serenity-feather"
-    | "settings-4-line"
-    | "stars-s-fill"
-    | "strikethrough"
-    | "table-2"
-    | "text"
-    | "underline";
+  name: IconNames;
   color?: string;
   size?: number;
 };
@@ -192,11 +198,13 @@ export type IconProps = {
 export const Icon = (props: IconProps) => {
   const { name } = props;
   const color = props.color ?? (tw.color("gray-900") as string);
-  const size = props.size ?? 24;
+  const size = props.size ?? 16;
 
   if (name === "add-line") return <AddLine color={color} size={size} />;
   if (name === "archive-fill") return <ArchiveFill color={color} size={size} />;
   if (name === "archive-line") return <ArchiveLine color={color} size={size} />;
+  if (name === "arrow-down-filled")
+    return <ArrowDownFilled color={color} size={size} />;
   if (name === "arrow-down-s-fill")
     return <ArrowDownSFill color={color} size={size} />;
   if (name === "arrow-down-s-line")
@@ -213,8 +221,9 @@ export const Icon = (props: IconProps) => {
     return <ArrowLeftSLine color={color} size={size} />;
   if (name === "arrow-right-s-line")
     return <ArrowRightSLine color={color} size={size} />;
-  if (name === "arrow-right-s-fill")
-    return <ArrowRightSFill color={color} size={size} />;
+  if (name === "arrow-right-filled")
+    return <ArrowRightFilled color={color} size={size} />;
+  if (name === "arrow-right") return <ArrowRight color={color} size={size} />;
   if (name === "arrow-up-down-line")
     return <ArrowUpDownLine color={color} size={size} />;
   if (name === "attachment-2") return <Attachment2 color={color} size={size} />;

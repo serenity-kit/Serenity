@@ -20,16 +20,19 @@ import {
   AvatarGroup,
   ModalHeader,
   ModalButtonFooter,
+  IconButton,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { VStack, HStack } from "native-base";
+import { theme } from "../../../../tailwind.config";
 
 export default function DesignSystemScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [showModal, setShowModal] = useState(false);
   const [isOpenPopover, setIsOpenPopover] = useState(false);
+  const collabColors = Object.keys(theme.colors.collaboration);
 
   return (
     <ScrollView style={tw`px-4 py-6`}>
@@ -65,6 +68,11 @@ export default function DesignSystemScreen() {
       <Text variant="xxs" muted>
         muted xxs Text
       </Text>
+      <Text style={tw`mt-6 mb-4 h2`}>Icon Button</Text>
+      <HStack alignItems="center" space={4}>
+        <IconButton name="add-line" color="gray-500" />
+        <IconButton name="menu" color="gray-800" large />
+      </HStack>
       <Text style={tw`mt-6 mb-4 h2`}>Button</Text>
       <Text>Default Button</Text>
       <Button>Login</Button>
@@ -132,20 +140,40 @@ export default function DesignSystemScreen() {
       </HStack>
       <Text style={tw`mt-4 mb-1`}>Avatar Group</Text>
       <AvatarGroup max={8} _avatar={{ size: "sm" }}>
-        <Avatar bg="primary.700">SK</Avatar>
-        <Avatar bg="primary.500">AN</Avatar>
-        <Avatar bg="primary.300">NG</Avatar>
-        <Avatar bg="yellow.300">NG</Avatar>
-        <Avatar bg="green.300">NG</Avatar>
+        <Avatar bg="collaboration.arctic">BE</Avatar>
+        <Avatar bg="collaboration.lavender">NG</Avatar>
+        <Avatar bg="collaboration.rose">AN</Avatar>
+        <Avatar bg="collaboration.honey">NG</Avatar>
+        <Avatar bg="collaboration.sky">NG</Avatar>
+        <Avatar bg={tw.color(`collaboration-terracotta`)}>NG</Avatar>
       </AvatarGroup>
       <Text style={tw`mt-4 mb-1`}>Avatar Group with max 3 shown</Text>
       <AvatarGroup max={3} _avatar={{ size: "sm" }}>
-        <Avatar bg="green.400">BE</Avatar>
-        <Avatar bg="yellow.400">AN</Avatar>
-        <Avatar bg="orange.400">NG</Avatar>
-        <Avatar bg="yellow.300">NG</Avatar>
-        <Avatar bg="green.300">NG</Avatar>
+        <Avatar bg="collaboration.arctic">SK</Avatar>
+        <Avatar bg="collaboration.lavender">NG</Avatar>
+        <Avatar bg="collaboration.rose">AN</Avatar>
+        <Avatar bg="collaboration.honey">NG</Avatar>
+        <Avatar bg="collaboration.sky">NG</Avatar>
       </AvatarGroup>
+      <Text style={tw`mt-4 mb-1`}>Collaboration Colors - Workspace Style</Text>
+      <HStack space={4}>
+        {collabColors.map((color) => {
+          return (
+            <Avatar
+              borderRadius={4}
+              size="xs"
+              bg={tw.color(`collaboration-${color}`)}
+              key={`avatar_${color}`}
+            >
+              <Icon
+                name="serenity-feather"
+                color={tw.color("black/40")}
+                size={20}
+              />
+            </Avatar>
+          );
+        })}
+      </HStack>
 
       <Text style={tw`mt-6 mb-4 h2`}>SidebarButton</Text>
       <SidebarButton>
@@ -330,6 +358,7 @@ export default function DesignSystemScreen() {
         <Icon name="add-line" />
         <Icon name="archive-fill" />
         <Icon name="archive-line" />
+        <Icon name="arrow-down-filled" />
         <Icon name="arrow-down-s-fill" />
         <Icon name="arrow-down-s-line" />
         <Icon name="arrow-go-back-fill" />
@@ -337,7 +366,8 @@ export default function DesignSystemScreen() {
         <Icon name="arrow-go-forward-fill" />
         <Icon name="arrow-go-forward-line" />
         <Icon name="arrow-right-s-line" />
-        <Icon name="arrow-right-s-fill" />
+        <Icon name="arrow-right" />
+        <Icon name="arrow-right-filled" />
         <Icon name="arrow-up-down-line" />
         <Icon name="bookmark-fill" />
         <Icon name="bookmark-line" />

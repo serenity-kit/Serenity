@@ -5,9 +5,11 @@ import React, {
   useImperativeHandle,
 } from "react";
 import { StyleSheet, TextInput } from "react-native";
+import { Input as NbInput, IInputProps } from "native-base";
+
 import { tw } from "../../tailwind";
 
-export type InlineInputProps = TextInput["props"] & {
+export type InlineInputProps = IInputProps & {
   onCancel: () => void;
   onSubmit: (text: string) => void;
   value: string;
@@ -16,7 +18,7 @@ export type InlineInputProps = TextInput["props"] & {
 export const InlineInput = forwardRef<TextInput, InlineInputProps>(
   (props: InlineInputProps, ref) => {
     const styles = StyleSheet.create({
-      input: tw`text-base text-gray-900`,
+      input: tw`p-0 px-1 bg-white text-sm leading-1.25 text-gray-800`,
     });
 
     const [canceled, setCanceled] = React.useState(false);
@@ -43,10 +45,10 @@ export const InlineInput = forwardRef<TextInput, InlineInputProps>(
     }, []);
 
     return (
-      <TextInput
+      <NbInput
         {...props}
         ref={innerRef}
-        style={[styles.input, props.style]}
+        style={[styles.input]}
         onChangeText={setValue}
         value={value}
         onFocus={() => setCanceled(false)}
@@ -64,6 +66,10 @@ export const InlineInput = forwardRef<TextInput, InlineInputProps>(
             setCanceled(true);
             props.onCancel();
           }
+        }}
+        selectTextOnFocus={true}
+        _stack={{
+          style: [tw`border-primary-300 rounded-sm`, props.style],
         }}
       />
     );

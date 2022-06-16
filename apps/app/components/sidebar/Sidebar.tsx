@@ -17,6 +17,7 @@ import {
   useIsPermanentLeftSidebar,
   View,
   Avatar,
+  IconButton,
 } from "@serenity-tools/ui";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 import {
@@ -31,6 +32,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { HStack } from "native-base";
+import { useFocusRing } from "@react-native-aria/focus";
 import { useEffect, useState } from "react";
 import Folder from "../sidebarFolder/SidebarFolder";
 
@@ -39,6 +41,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const navigation = useNavigation();
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
+  const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
   const [meResult] = useMeQuery();
@@ -100,7 +103,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <HStack
         alignItems="center"
         justifyContent="space-between"
-        style={tw`py-3 px-4`}
+        style={tw`py-1.5 pl-2 pr-4`}
       >
         <Menu
           placement="bottom left"
@@ -112,8 +115,21 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           isOpen={isOpenWorkspaceSwitcher}
           onChange={setIsOpenWorkspaceSwitcher}
           trigger={
-            <Pressable accessibilityLabel="More options menu">
-              <HStack space={2} alignItems="center">
+            <Pressable
+              accessibilityLabel="More options menu"
+              {...focusRingProps}
+              // disable default outline styles
+              // @ts-expect-error - web only
+              _focusVisible={{ _web: { style: { outlineWidth: 0 } } }}
+            >
+              <HStack
+                space={2}
+                alignItems="center"
+                style={[
+                  tw`py-1.5 px-2`,
+                  isFocusVisible && tw`se-inset-focus-mini`,
+                ]}
+              >
                 <Avatar
                   borderRadius={4}
                   size="xs"
@@ -194,18 +210,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           </SidebarButton>
         </Menu>
         {!isPermanentLeftSidebar && (
-          <Pressable
+          <IconButton
             onPress={() => {
               props.navigation.closeDrawer();
             }}
-            style={tw`icon-button`}
-          >
-            <Icon
-              size={16}
-              name="double-arrow-left"
-              color={tw.color("gray-400")}
-            />
-          </Pressable>
+            name="double-arrow-left"
+          ></IconButton>
         )}
       </HStack>
 
@@ -246,19 +256,21 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
       <SidebarDivider />
 
-      <SidebarButton
-        onPress={() => {
-          setIsCreatingNewFolder(true);
-        }}
+      <HStack
+        justifyContent="space-between"
+        alignItems="center"
+        style={tw`ml-4 mr-2 mb-4`}
       >
-        <Text variant="small">Create a Folder</Text>
-      </SidebarButton>
-
-      <SidebarDivider />
-
-      <Text variant="xxs" bold style={tw`ml-4 mb-4`}>
-        Documents
-      </Text>
+        <Text variant="xxs" bold>
+          Documents
+        </Text>
+        <IconButton
+          onPress={() => {
+            setIsCreatingNewFolder(true);
+          }}
+          name="plus"
+        ></IconButton>
+      </HStack>
 
       {isCreatingNewFolder && (
         <InlineInput
@@ -271,7 +283,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       )}
 
       {rootFoldersResult.fetching ? (
-        <Text>Loading Folders…</Text>
+        <Text variant="xs" muted style={tw`py-1.5 pl-4`}>
+          Loading Folders…
+        </Text>
       ) : rootFoldersResult.data?.rootFolders?.nodes ? (
         rootFoldersResult.data?.rootFolders?.nodes.map((folder) => {
           if (folder === null) {

@@ -1,8 +1,8 @@
 import {
-  Icon,
+  IconButton,
   Menu,
-  Pressable,
   SidebarButton,
+  SidebarDivider,
   Text,
   tw,
 } from "@serenity-tools/ui";
@@ -13,7 +13,6 @@ type Props = {
   refetchFolders: () => void;
   onUpdateNamePress: () => void;
   onDeletePressed: () => void;
-  onCreateDocumentPress: () => void;
   onCreateFolderPress: () => void;
 };
 
@@ -29,22 +28,13 @@ export default function SidebarFolderMenu(props: Props) {
       isOpen={isOpenMenu}
       onChange={setIsOpenMenu}
       trigger={
-        <Pressable
+        <IconButton
           accessibilityLabel="More options menu"
-          style={tw`flex flex-row`}
-        >
-          <Icon name="more-line" />
-        </Pressable>
+          name="more-line"
+          color="gray-600"
+        ></IconButton>
       }
     >
-      <SidebarButton
-        onPress={() => {
-          setIsOpenMenu(false);
-          props.onCreateDocumentPress();
-        }}
-      >
-        <Text variant="small">Create Document</Text>
-      </SidebarButton>
       <SidebarButton
         onPress={() => {
           setIsOpenMenu(false);
@@ -61,6 +51,7 @@ export default function SidebarFolderMenu(props: Props) {
       >
         <Text variant="small">Change Name</Text>
       </SidebarButton>
+      <SidebarDivider collapsed />
       <SidebarButton
         onPress={() => {
           setIsOpenMenu(false);

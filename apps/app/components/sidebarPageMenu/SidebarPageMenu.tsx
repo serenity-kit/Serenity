@@ -1,8 +1,8 @@
 import {
-  Icon,
+  IconButton,
   Menu,
-  Pressable,
   SidebarButton,
+  SidebarDivider,
   Text,
   tw,
 } from "@serenity-tools/ui";
@@ -37,12 +37,11 @@ export default function SidebarPageMenu(props: Props) {
       isOpen={isOpenMenu}
       onChange={setIsOpenMenu}
       trigger={
-        <Pressable
+        <IconButton
           accessibilityLabel="More options menu"
-          style={tw`flex flex-row`}
-        >
-          <Icon name="more-line" />
-        </Pressable>
+          name="more-line"
+          color="gray-600"
+        ></IconButton>
       }
     >
       <SidebarButton
@@ -53,6 +52,7 @@ export default function SidebarPageMenu(props: Props) {
       >
         <Text variant="small">Change Name</Text>
       </SidebarButton>
+      <SidebarDivider collapsed />
       <SidebarButton
         onPress={() => {
           setIsOpenMenu(false);
