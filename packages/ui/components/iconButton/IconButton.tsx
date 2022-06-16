@@ -3,7 +3,8 @@ import { StyleSheet, Platform } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
 import { tw } from "../../tailwind";
 import { Pressable, PressableProps } from "../pressable/Pressable";
-import { Icon, IconNames, View } from "@serenity-tools/ui";
+import { View } from "../view/View";
+import { Icon, IconNames } from "../icon/Icon";
 
 export type IconButtonProps = PressableProps & {
   name: IconNames;
