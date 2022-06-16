@@ -25,6 +25,11 @@ type LoginParams = {
   next?: string;
 };
 
+type RegistrationVerificationParams = {
+  username?: string;
+  verification?: string;
+};
+
 export type WorkspaceDrawerParamList = {
   Dashboard: undefined;
   Editor: undefined;
@@ -48,6 +53,7 @@ export type RootStackParamList = {
   DesignSystem: undefined;
   DevDashboard: undefined;
   Register: undefined;
+  RegistrationVerification: RegistrationVerificationParams;
   AcceptWorkspaceInvitation: WorkspaceInvitationParams;
   Login: LoginParams;
   EncryptDecryptImageTest: undefined;

@@ -29,6 +29,15 @@ export async function confirmUser({ username, confirmationCode }: Props) {
         throw new Error("Invalid user or confirmation code");
       }
 
+      const device = await prisma.device.create({
+        data: {
+          encryptionPublicKey: unconfirmedUser.mainDeviceSigningPublicKey,
+          signingPublicKey: unconfirmedUser.mainDeviceSigningPublicKey,
+          encryptionPublicKeySignature:
+            unconfirmedUser.mainDeviceEncryptionPublicKeySignature,
+        },
+      });
+
       const user = await prisma.user.create({
         data: {
           username: unconfirmedUser.username,
@@ -41,11 +50,8 @@ export async function confirmUser({ username, confirmationCode }: Props) {
           mainDeviceEncryptionKeySalt:
             unconfirmedUser.mainDeviceEncryptionKeySalt,
           devices: {
-            create: {
-              encryptionPublicKey: unconfirmedUser.mainDeviceSigningPublicKey,
-              signingPublicKey: unconfirmedUser.mainDeviceSigningPublicKey,
-              encryptionPublicKeySignature:
-                unconfirmedUser.mainDeviceEncryptionPublicKeySignature,
+            connect: {
+              signingPublicKey: device.signingPublicKey,
             },
           },
         },

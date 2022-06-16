@@ -204,6 +204,7 @@ export type FinishRegistrationInput = {
 export type FinishRegistrationResult = {
   __typename?: 'FinishRegistrationResult';
   id: Scalars['String'];
+  verificationCode: Scalars['String'];
 };
 
 export type Folder = {
@@ -259,6 +260,7 @@ export type Mutation = {
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
   updateFolderName?: Maybe<UpdateFolderNameResult>;
   updateWorkspace?: Maybe<UpdateWorkspaceResult>;
+  verifyRegistration?: Maybe<VerifyRegistrationResult>;
 };
 
 
@@ -344,6 +346,11 @@ export type MutationUpdateFolderNameArgs = {
 
 export type MutationUpdateWorkspaceArgs = {
   input?: InputMaybe<UpdateWorkspaceInput>;
+};
+
+
+export type MutationVerifyRegistrationArgs = {
+  input?: InputMaybe<VerifyRegistrationInput>;
 };
 
 /** PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
@@ -498,6 +505,16 @@ export type UserIdFromUsernameResult = {
   id: Scalars['String'];
 };
 
+export type VerifyRegistrationInput = {
+  username: Scalars['String'];
+  verificationCode: Scalars['String'];
+};
+
+export type VerifyRegistrationResult = {
+  __typename?: 'VerifyRegistrationResult';
+  id: Scalars['String'];
+};
+
 export type Workspace = {
   __typename?: 'Workspace';
   id: Scalars['String'];
@@ -644,7 +661,7 @@ export type FinishRegistrationMutationVariables = Exact<{
 }>;
 
 
-export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string } | null };
+export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode: string } | null };
 
 export type StartLoginMutationVariables = Exact<{
   input: StartLoginInput;
@@ -680,6 +697,13 @@ export type UpdateWorkspaceMutationVariables = Exact<{
 
 
 export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, username?: string | null, isAdmin: boolean }> | null } | null } | null };
+
+export type VerifyRegistrationMutationVariables = Exact<{
+  input: VerifyRegistrationInput;
+}>;
+
+
+export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegistration?: { __typename?: 'VerifyRegistrationResult', id: string } | null };
 
 export type DocumentsQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -886,6 +910,7 @@ export const FinishRegistrationDocument = gql`
     mutation finishRegistration($input: FinishRegistrationInput!) {
   finishRegistration(input: $input) {
     id
+    verificationCode
   }
 }
     `;
@@ -966,6 +991,17 @@ export const UpdateWorkspaceDocument = gql`
 
 export function useUpdateWorkspaceMutation() {
   return Urql.useMutation<UpdateWorkspaceMutation, UpdateWorkspaceMutationVariables>(UpdateWorkspaceDocument);
+};
+export const VerifyRegistrationDocument = gql`
+    mutation verifyRegistration($input: VerifyRegistrationInput!) {
+  verifyRegistration(input: $input) {
+    id
+  }
+}
+    `;
+
+export function useVerifyRegistrationMutation() {
+  return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
 };
 export const DocumentsDocument = gql`
     query documents($parentFolderId: ID!, $first: Int! = 100, $after: String) {

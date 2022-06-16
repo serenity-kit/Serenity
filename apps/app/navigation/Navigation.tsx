@@ -34,6 +34,7 @@ import {
 import RootScreen from "./screens/RootScreen";
 import NoWorkspaceScreen from "./screens/NoWorkspaceScreen";
 import { DrawerActions } from "@react-navigation/native";
+import RegistrationVerificationScreen from "./screens/RegistrationVerificationScreen";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -109,6 +110,11 @@ function RootNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="RegistrationVerification"
+        component={RegistrationVerificationScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="Login"
         component={LoginScreen}
         options={{ headerShown: false }}
@@ -149,12 +155,13 @@ const linking: LinkingOptions<RootStackParamList> = {
       DevDashboard: "dev-dashboard",
       DesignSystem: "design-system",
       Register: "register",
+      RegistrationVerification: "registration-verification",
       Login: "login",
       EncryptDecryptImageTest: "encrypt-decrypt-image-test",
-      Root: "",
-      NotFound: "*",
       AcceptWorkspaceInvitation:
         "accept-workspace-invitation/:workspaceInvitationId",
+      Root: "",
+      NotFound: "*",
     },
   },
 };
