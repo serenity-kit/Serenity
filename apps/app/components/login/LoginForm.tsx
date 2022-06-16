@@ -66,23 +66,25 @@ export function LoginForm(props: Props) {
         console.log("sessionKey", result.sessionKey);
         console.log("exportKey", result.exportKey);
 
-        const finalizeLoginResult = await finishLoginMutation({
+        const finishLoginResult = await finishLoginMutation({
           input: {
             loginId: mutationResult.data.startLogin.loginId,
             message: result.response,
           },
         });
 
-        if (finalizeLoginResult.data?.finishLogin) {
+        if (finishLoginResult.data?.finishLogin) {
           setDidLoginSucceed(true);
           // reset the password in case the user ends up on this screen again
           setPassword("");
           setUsername("");
-          updateAuthentication(`TODO+${username}`);
+          updateAuthentication(
+            finishLoginResult.data.finishLogin.mainDeviceSigningPublicKey
+          );
           if (props.onLoginSuccess) {
             props.onLoginSuccess();
           }
-        } else if (finalizeLoginResult.error) {
+        } else if (finishLoginResult.error) {
           if (props.onLoginFail) {
             props.onLoginFail();
           }
