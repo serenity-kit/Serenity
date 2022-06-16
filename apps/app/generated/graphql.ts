@@ -182,6 +182,7 @@ export type FinishLoginInput = {
 
 export type FinishLoginResult = {
   __typename?: 'FinishLoginResult';
+  mainDeviceSigningPublicKey: Scalars['String'];
   success?: Maybe<Scalars['Boolean']>;
 };
 
@@ -654,7 +655,7 @@ export type FinishLoginMutationVariables = Exact<{
 }>;
 
 
-export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', success?: boolean | null } | null };
+export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', success?: boolean | null, mainDeviceSigningPublicKey: string } | null };
 
 export type FinishRegistrationMutationVariables = Exact<{
   input: FinishRegistrationInput;
@@ -899,6 +900,7 @@ export const FinishLoginDocument = gql`
     mutation finishLogin($input: FinishLoginInput!) {
   finishLogin(input: $input) {
     success
+    mainDeviceSigningPublicKey
   }
 }
     `;

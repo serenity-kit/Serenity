@@ -16,7 +16,12 @@ const registrations: {
   };
 } = {};
 
-const logins: { [loginId: string]: HandleLogin } = {};
+const logins: {
+  [loginId: string]: {
+    handleLogin: HandleLogin;
+    username: string;
+  };
+} = {};
 
 // Create a new private key using
 // const serverSetup = new ServerSetup();
@@ -90,7 +95,10 @@ export const startLogin = ({
     sodium.from_base64(challenge)
   );
   console.log("START LOGIN: after");
-  logins[loginId] = serverLogin;
+  logins[loginId] = {
+    username,
+    handleLogin: serverLogin,
+  };
   return {
     loginId,
     message: sodium.to_base64(response),
@@ -104,7 +112,12 @@ export const finishLogin = ({
   loginId: string;
   message: string;
 }) => {
-  const response = logins[loginId].finish(sodium.from_base64(message));
+  const login = logins[loginId];
+  const response = login.handleLogin.finish(sodium.from_base64(message));
+  const username = login.username;
   delete logins[loginId];
-  return sodium.to_base64(response);
+  return {
+    username,
+    sessionKey: sodium.to_base64(response),
+  };
 };
