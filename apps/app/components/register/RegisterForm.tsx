@@ -17,7 +17,10 @@ import { useWindowDimensions } from "react-native";
 import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
 import sodium from "@serenity-tools/libsodium";
 import { VStack } from "native-base";
-import { createDevice } from "@serenity-tools/utils";
+import {
+  createDevice,
+  createEncryptionKeyFromOpaqueExportKey,
+} from "@serenity-tools/utils";
 
 type Props = {
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
@@ -54,20 +57,10 @@ export default function RegisterForm(props: Props) {
           startRegistrationResult.data.startRegistration.challengeResponse
         );
 
-        const encryptionKeySalt = await sodium.randombytes_buf(
-          sodium.crypto_pwhash_SALTBYTES
-        );
-        const encryptionKey = await sodium.crypto_pwhash(
-          sodium.crypto_secretbox_KEYBYTES,
-          exportKey,
-          encryptionKeySalt,
-          sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
-          sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
-          sodium.crypto_pwhash_ALG_DEFAULT
-        );
-
         console.log("exportKey", exportKey);
 
+        const { encryptionKey, encryptionKeySalt } =
+          await createEncryptionKeyFromOpaqueExportKey(exportKey);
         const mainDevice = await createDevice(encryptionKey);
 
         const finishRegistrationResult = await finishRegistrationMutation({
