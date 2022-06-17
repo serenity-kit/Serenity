@@ -18,9 +18,7 @@ export const getDevices = async ({ graphql, authorizationHeader }: Params) => {
           node {
             userId
             signingPublicKey
-            signingKeyType
             encryptionPublicKey
-            encryptionKeyType
             encryptionPublicKeySignature
           }
         }
