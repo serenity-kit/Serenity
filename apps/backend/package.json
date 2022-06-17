@@ -18,7 +18,7 @@
   "dependencies": {
     "@naisho/core": "*",
     "@prisma/client": "^3.13.0",
-    "@serenity-tools/opaque": "*",
+    "@serenity-tools/utils": "*",
     "apollo-server-express": "^3.5.0",
     "canonicalize": "^1.0.8",
     "express": "^4.17.1",
