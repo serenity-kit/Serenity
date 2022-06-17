@@ -11,6 +11,8 @@ const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 const username2 = "68776484-0e46-4027-a6f4-8bdeef185b73@example.com";
 const password = "password";
 let didRegisterUser = false;
+let mainDeviceSigningPublicKey = "";
+let mainDeviceSigningPublicKey2 = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -30,19 +32,21 @@ const otherDocumentId = "929ca262-f144-40f7-8fe2-d3147f415f26";
 beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!didRegisterUser) {
-    await registerUser(graphql, username, password);
+    const registerUserResult = await registerUser(graphql, username, password);
+    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+
     await createWorkspace({
       name: "workspace 1",
       id: workspaceId,
       graphql,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
     });
     const createParentFolderResult = await createFolder({
       graphql,
       id: parentFolderId,
       name: null,
       parentFolderId: null,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
       workspaceId: workspaceId,
     });
     const createFolderResult = await createFolder({
@@ -50,7 +54,7 @@ beforeEach(async () => {
       id: folderId,
       name: null,
       parentFolderId: null,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
       workspaceId: workspaceId,
     });
     const createChildFolderResult = await createFolder({
@@ -58,7 +62,7 @@ beforeEach(async () => {
       id: childFolderId,
       name: null,
       parentFolderId: null,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
       workspaceId: workspaceId,
     });
     await createDocument({
@@ -66,30 +70,37 @@ beforeEach(async () => {
       id: parentDocumentId,
       parentFolderId: parentFolderId,
       workspaceId,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
     });
     await createDocument({
       graphql,
       id: documentId,
       parentFolderId: folderId,
       workspaceId,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
     });
     didRegisterUser = true;
 
-    await registerUser(graphql, username2, password);
+    const registerUserResult2 = await registerUser(
+      graphql,
+      username2,
+      password
+    );
+    mainDeviceSigningPublicKey2 =
+      registerUserResult2.mainDeviceSigningPublicKey;
+
     await createWorkspace({
       name: "other user workspace",
       id: otherWorkspaceId,
       graphql,
-      authorizationHeader: `TODO+${username2}`,
+      authorizationHeader: mainDeviceSigningPublicKey2,
     });
     const createOtherFolderResult = await createFolder({
       graphql,
       id: otherFolderId,
       name: null,
       parentFolderId: null,
-      authorizationHeader: `TODO+${username2}`,
+      authorizationHeader: mainDeviceSigningPublicKey2,
       workspaceId: otherWorkspaceId,
     });
     await createDocument({
@@ -97,13 +108,13 @@ beforeEach(async () => {
       id: otherDocumentId,
       parentFolderId: otherFolderId,
       workspaceId: otherWorkspaceId,
-      authorizationHeader: `TODO+${username2}`,
+      authorizationHeader: mainDeviceSigningPublicKey2,
     });
   }
 });
 
 test("user should be able to get a document path", async () => {
-  const authorizationHeader = { authorization: `TODO+${username}` };
+  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
   const query = gql`
     query documentPath($id: ID!) {
       documentPath(id: $id) {
@@ -134,7 +145,7 @@ test("user should be able to get a document path", async () => {
 });
 
 test("user should be able to get a document path for a deep tree", async () => {
-  const authorizationHeader = { authorization: `TODO+${username}` };
+  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
   const query = gql`
     query documentPath($id: ID!) {
       documentPath(id: $id) {
@@ -165,7 +176,7 @@ test("user should be able to get a document path for a deep tree", async () => {
 });
 
 test("user should not be able to retrieve another user's folder", async () => {
-  const authorizationHeader = { authorization: `TODO+${username}` };
+  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
   const query = gql`
     query documentPath($id: ID!) {
       documentPath(id: $id) {
@@ -188,7 +199,7 @@ test("user should not be able to retrieve another user's folder", async () => {
 });
 
 test("retrieving a document that doesn't exist should throw an error", async () => {
-  const authorizationHeader = { authorization: `TODO+${username}` };
+  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
   const query = gql`
     query documentPath($id: ID!) {
       documentPath(id: $id) {

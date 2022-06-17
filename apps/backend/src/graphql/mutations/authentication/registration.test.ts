@@ -4,7 +4,7 @@ import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { requestRegistrationChallengeResponse } from "../../../../test/helpers/requestRegistrationChallengeResponse";
 import {
-  createDevice,
+  createAndEncryptDevice,
   createEncryptionKeyFromOpaqueExportKey,
 } from "@serenity-tools/utils";
 
@@ -44,7 +44,7 @@ test("server should register a user", async () => {
   const exportKey = result.registration.getExportKey();
   const { encryptionKey, encryptionKeySalt } =
     await createEncryptionKeyFromOpaqueExportKey(sodium.to_base64(exportKey));
-  const mainDevice = await createDevice(encryptionKey);
+  const mainDevice = await createAndEncryptDevice(encryptionKey);
 
   const registrationResponse = await graphql.client.request(query, {
     input: {

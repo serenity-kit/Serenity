@@ -4,9 +4,10 @@ import { registerUser } from "../../../../test/helpers/registerUser";
 import { createWorkspace } from "../../../../test/helpers/workspace/createWorkspace";
 
 const graphql = setupGraphql();
-let userId: string = "";
 const username = "user";
 const password = "password";
+let userId: string = "";
+let mainDeviceSigningPublicKey = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -15,12 +16,13 @@ beforeAll(async () => {
 beforeEach(async () => {
   // TODO: we don't want this before every test
   const createUserResponse = await registerUser(graphql, username, password);
-  userId = createUserResponse.registrationResponse.finishRegistration.id;
+  userId = createUserResponse.userId;
+  mainDeviceSigningPublicKey = createUserResponse.mainDeviceSigningPublicKey;
 });
 
 test("user should be able to create a workspace", async () => {
   // generate a challenge code
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   const name = "workspace";
   const id = "7154dda5-f237-455e-9a60-584b64fde8a9";
   const result = await createWorkspace({

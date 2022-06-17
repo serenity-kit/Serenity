@@ -1,8 +1,5 @@
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/registerUser";
-import { createWorkspace } from "../../../../test/helpers/workspace/createWorkspace";
-import { deleteWorkspaces } from "../../../../test/helpers/workspace/deleteWorkspaces";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { deleteWorkspaceInvitations } from "../../../../test/helpers/workspace/deleteWorkspaceInvitations";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
@@ -13,13 +10,15 @@ const username1 = "user1";
 const username2 = "user2";
 const workspace1 = "workspace1";
 const workspace2 = "workspace2";
+let userAndDevice1: any = null;
+let userAndDevice2: any = null;
 
 const initializeData = async () => {
-  const user1 = await createUserWithWorkspace({
+  userAndDevice1 = await createUserWithWorkspace({
     id: workspace1,
     username: username1,
   });
-  const user2 = await createUserWithWorkspace({
+  userAndDevice2 = await createUserWithWorkspace({
     id: workspace2,
     username: username2,
   });
@@ -34,7 +33,7 @@ test("user should be able to delete a workspace invitation they created", async 
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     workspaceId: workspace1,
-    authorizationHeader: `TODO+${username1}`,
+    authorizationHeader: userAndDevice1.device.signingPublicKey,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -42,7 +41,7 @@ test("user should be able to delete a workspace invitation they created", async 
   const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
     graphql,
     ids: workspaceInvitationIds,
-    authorizationHeader: `TODO+${username1}`,
+    authorizationHeader: userAndDevice1.device.signingPublicKey,
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
     .toMatchInlineSnapshot(`
@@ -72,7 +71,7 @@ test("user should be able to delete a workspace invitation they didn't create", 
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     workspaceId: workspace1,
-    authorizationHeader: `TODO+${username2}`,
+    authorizationHeader: userAndDevice2.device.signingPublicKey,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -80,7 +79,7 @@ test("user should be able to delete a workspace invitation they didn't create", 
   const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
     graphql,
     ids: workspaceInvitationIds,
-    authorizationHeader: `TODO+${username1}`,
+    authorizationHeader: userAndDevice1.device.signingPublicKey,
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
     .toMatchInlineSnapshot(`
@@ -111,7 +110,7 @@ test("user should not be able to delete a workspace invitation if they aren't ad
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     workspaceId: workspace2,
-    authorizationHeader: `TODO+${username2}`,
+    authorizationHeader: userAndDevice2.device.signingPublicKey,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -119,7 +118,7 @@ test("user should not be able to delete a workspace invitation if they aren't ad
   const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
     graphql,
     ids: workspaceInvitationIds,
-    authorizationHeader: `TODO+${username1}`,
+    authorizationHeader: userAndDevice1.device.signingPublicKey,
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
     .toMatchInlineSnapshot(`

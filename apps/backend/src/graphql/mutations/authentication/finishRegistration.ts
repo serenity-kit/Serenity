@@ -48,14 +48,14 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
       message: args.input.message,
     });
 
-    const unconfirmedUser = await finalizeRegistration({
+    const unverifiedUser = await finalizeRegistration({
       username,
       opaqueEnvelope: envelope,
       mainDevice: args.input.mainDevice,
     });
     return {
-      id: unconfirmedUser.id,
-      verificationCode: unconfirmedUser.confirmationCode,
+      id: unverifiedUser.id,
+      verificationCode: unverifiedUser.confirmationCode,
     };
   },
 });

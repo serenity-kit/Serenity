@@ -7,17 +7,19 @@ import { getDevices } from "../../../../test/helpers/device/getDevices";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
+let mainDeviceSigningPublicKey = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
-  await createUserWithWorkspace({
+  const result = await createUserWithWorkspace({
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     username,
   });
+  mainDeviceSigningPublicKey = result.device.signingPublicKey;
 });
 
 test("user should be able to list their devices", async () => {
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   await createDevice({
     graphql,
     authorizationHeader,

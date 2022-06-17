@@ -1,4 +1,5 @@
 import { gql } from "graphql-request";
+import { createDevice as createdDeviceHelper } from "@serenity-tools/utils";
 
 type Params = {
   graphql: any;
@@ -13,24 +14,29 @@ export const createDevice = async ({
     authorization: authorizationHeader,
   };
   const query = gql`
-    mutation createDevice {
-      createDevice {
+    mutation createDevice($input: CreateDeviceInput!) {
+      createDevice(input: $input) {
         device {
           userId
           signingPublicKey
-          signingPrivateKey
-          signingKeyType
           encryptionPublicKey
-          encryptionPrivateKey
-          encryptionKeyType
           encryptionPublicKeySignature
         }
       }
     }
   `;
+
+  const device = await createdDeviceHelper();
+
   const result = await graphql.client.request(
     query,
-    null,
+    {
+      input: {
+        encryptionPublicKeySignature: device.encryptionPublicKeySignature,
+        encryptionPublicKey: device.encryptionKeyPair.publicKey,
+        signingPublicKey: device.signingKeyPair.publicKey,
+      },
+    },
     authorizationHeaders
   );
   return result;

@@ -1,5 +1,5 @@
 import {
-  createDevice,
+  createAndEncryptDevice,
   createEncryptionKeyFromOpaqueExportKey,
 } from "@serenity-tools/utils";
 import { gql } from "graphql-request";
@@ -34,7 +34,7 @@ export const registerUser = async (
   const exportKey = result.registration.getExportKey();
   const { encryptionKey, encryptionKeySalt } =
     await createEncryptionKeyFromOpaqueExportKey(sodium.to_base64(exportKey));
-  const mainDevice = await createDevice(encryptionKey);
+  const mainDevice = await createAndEncryptDevice(encryptionKey);
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
@@ -72,8 +72,7 @@ export const registerUser = async (
   );
 
   return {
-    registrationResponse,
-    clientPrivateKey: "TODO",
-    clientPublicKey: "TODO",
+    userId: verifyRegistrationResponse.verifyRegistration.id,
+    mainDeviceSigningPublicKey: mainDevice.signingKeyPair.publicKey,
   };
 };
