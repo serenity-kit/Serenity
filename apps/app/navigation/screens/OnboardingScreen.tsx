@@ -7,7 +7,7 @@ import {
 } from "../../generated/graphql";
 import { CreateWorkspaceModal } from "../../components/workspace/CreateWorkspaceModal";
 
-export default function NoWorkspaceScreen({ navigation }) {
+export default function OnboardingScreen({ navigation }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);

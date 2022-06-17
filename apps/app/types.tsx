@@ -49,7 +49,7 @@ export type WorkspaceInvitationParams = {
 
 export type RootStackParamList = {
   Workspace: WorkspaceParams;
-  NoWorkspace: undefined;
+  Onboarding: undefined;
   DesignSystem: undefined;
   DevDashboard: undefined;
   Register: undefined;
