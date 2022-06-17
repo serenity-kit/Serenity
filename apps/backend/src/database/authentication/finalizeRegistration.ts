@@ -43,7 +43,7 @@ export async function finalizeRegistration({
         throw Error("This username has already been registered");
       }
 
-      const unconfirmedUser = await prisma.unconfirmedUser.create({
+      const unverifiedUser = await prisma.unverifiedUser.create({
         data: {
           username,
           opaqueEnvelope,
@@ -59,9 +59,9 @@ export async function finalizeRegistration({
       });
       // TODO: send an email to the user's email address
       console.log(
-        `New user confirmation code: ${unconfirmedUser.confirmationCode}`
+        `New user confirmation code: ${unverifiedUser.confirmationCode}`
       );
-      return unconfirmedUser;
+      return unverifiedUser;
     });
   } catch (error) {
     console.error("Error saving user");

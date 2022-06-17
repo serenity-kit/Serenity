@@ -49,7 +49,7 @@ model Update {
   @@unique([snapshotId, pubKey, snapshotVersion])
 }
 
-model UnconfirmedUser {
+model UnverifiedUser {
   id                                         String    @id @default(uuid())
   username                                   String
   clientPublicKey                            String

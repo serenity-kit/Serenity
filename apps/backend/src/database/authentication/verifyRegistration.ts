@@ -6,8 +6,11 @@ type Props = {
 };
 
 // NOTE: we can force a login for this user before they confirm their account
-// if we modify the login to check for unconfirmedUser
-export async function confirmUser({ username, confirmationCode }: Props) {
+// if we modify the login to check for unverifiedUser
+export async function verifyRegistration({
+  username,
+  confirmationCode,
+}: Props) {
   // if this user has already completed registration, throw an error
   const existingUserData = await prisma.user.findUnique({
     where: {
@@ -19,36 +22,35 @@ export async function confirmUser({ username, confirmationCode }: Props) {
   }
   try {
     return await prisma.$transaction(async (prisma) => {
-      const unconfirmedUser = await prisma.unconfirmedUser.findFirst({
+      const unverifiedUser = await prisma.unverifiedUser.findFirst({
         where: {
           username,
           confirmationCode,
         },
       });
-      if (!unconfirmedUser) {
+      if (!unverifiedUser) {
         throw new Error("Invalid user or confirmation code");
       }
 
       const device = await prisma.device.create({
         data: {
-          encryptionPublicKey: unconfirmedUser.mainDeviceSigningPublicKey,
-          signingPublicKey: unconfirmedUser.mainDeviceSigningPublicKey,
+          encryptionPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
+          signingPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
           encryptionPublicKeySignature:
-            unconfirmedUser.mainDeviceEncryptionPublicKeySignature,
+            unverifiedUser.mainDeviceEncryptionPublicKeySignature,
         },
       });
 
       const user = await prisma.user.create({
         data: {
-          username: unconfirmedUser.username,
-          opaqueEnvelope: unconfirmedUser.opaqueEnvelope,
-          clientPublicKey: unconfirmedUser.clientPublicKey,
-          mainDeviceCiphertext: unconfirmedUser.mainDeviceCiphertext,
-          mainDeviceNonce: unconfirmedUser.mainDeviceNonce,
-          mainDeviceSigningPublicKey:
-            unconfirmedUser.mainDeviceSigningPublicKey,
+          username: unverifiedUser.username,
+          opaqueEnvelope: unverifiedUser.opaqueEnvelope,
+          clientPublicKey: unverifiedUser.clientPublicKey,
+          mainDeviceCiphertext: unverifiedUser.mainDeviceCiphertext,
+          mainDeviceNonce: unverifiedUser.mainDeviceNonce,
+          mainDeviceSigningPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
           mainDeviceEncryptionKeySalt:
-            unconfirmedUser.mainDeviceEncryptionKeySalt,
+            unverifiedUser.mainDeviceEncryptionKeySalt,
           devices: {
             connect: {
               signingPublicKey: device.signingPublicKey,
@@ -56,9 +58,9 @@ export async function confirmUser({ username, confirmationCode }: Props) {
           },
         },
       });
-      await prisma.unconfirmedUser.delete({
+      await prisma.unverifiedUser.delete({
         where: {
-          id: unconfirmedUser.id,
+          id: unverifiedUser.id,
         },
       });
       return user;
