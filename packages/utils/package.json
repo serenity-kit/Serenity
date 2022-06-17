@@ -1,0 +1,12 @@
+{
+  "name": "@serenity-tools/utils",
+  "version": "0.0.1",
+  "main": "src/index",
+  "scripts": {
+    "ts:check": "yarn tsc --noEmit",
+    "test": "echo TODO"
+  },
+  "dependencies": {
+    "@serenity-tools/libsodium": "*"
+  }
+}
