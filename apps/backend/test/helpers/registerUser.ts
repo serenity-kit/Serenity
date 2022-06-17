@@ -72,8 +72,7 @@ export const registerUser = async (
   );
 
   return {
-    registrationResponse,
-    clientPrivateKey: "TODO",
-    clientPublicKey: "TODO",
+    userId: verifyRegistrationResponse.verifyRegistration.id,
+    mainDeviceSigningPublicKey: mainDevice.signingKeyPair.publicKey,
   };
 };
