@@ -11,24 +11,25 @@ const workspaceId = "workspace1";
 const otherWorkspaceId = "workspace2";
 let workspaceInvitationId = "";
 let inviteeUsername = "invitee@example.com";
+let inviteeUserAndDevice: any = null;
 
 beforeAll(async () => {
   await deleteAllRecords();
 });
 
 test("user should be able to accept an invitation", async () => {
-  const inviterUsername = "inviter@example.com";
-  const inviterUser = await createUserWithWorkspace({
+  const inviterUserName = "inviter@example.com";
+  const inviterUserAndDevice = await createUserWithWorkspace({
     id: workspaceId,
-    username: inviterUsername,
+    username: inviterUserName,
   });
-  const inviteeUser = await createUserWithWorkspace({
+  inviteeUserAndDevice = await createUserWithWorkspace({
     id: otherWorkspaceId,
     username: inviteeUsername,
   });
   const workspace = await getWorkspace({
     id: workspaceId,
-    userId: inviterUser.id,
+    userId: inviterUserAndDevice.user.id,
   });
   if (!workspace) {
     throw new Error("workspace not found");
@@ -36,14 +37,14 @@ test("user should be able to accept an invitation", async () => {
   const createWorkspaceResult = await createWorkspaceInvitation({
     graphql,
     workspaceId,
-    authorizationHeader: `TODO+${inviterUsername}`,
+    authorizationHeader: inviterUserAndDevice.device.signingPublicKey,
   });
   workspaceInvitationId =
     createWorkspaceResult.createWorkspaceInvitation.workspaceInvitation.id;
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId,
-    authorizationHeader: `TODO+${inviteeUsername}`,
+    authorizationHeader: inviteeUserAndDevice.device.signingPublicKey,
   });
   const sharedWorkspace =
     acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
@@ -54,7 +55,7 @@ test("user should be able to accept an invitation", async () => {
     (member: { username: string; isAdmin: any }) => {
       if (member.username === inviteeUsername) {
         expect(member.isAdmin).toBe(false);
-      } else if (member.username === inviterUsername) {
+      } else if (member.username === inviterUserName) {
         expect(member.isAdmin).toBe(true);
       }
     }
@@ -65,7 +66,7 @@ test("double-accepting invitation does nothing", async () => {
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId,
-    authorizationHeader: `TODO+${inviteeUsername}`,
+    authorizationHeader: inviteeUserAndDevice.device.signingPublicKey,
   });
   const sharedWorkspace =
     acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
@@ -87,7 +88,7 @@ test("invalid invitation id should throw error", async () => {
       await acceptWorkspaceInvitation({
         graphql,
         workspaceInvitationId: "invalid",
-        authorizationHeader: `TODO+${inviteeUsername}`,
+        authorizationHeader: inviteeUserAndDevice.device.signingPublicKey,
       }))()
   ).rejects.toThrow("Workspace invitation not found");
 });
@@ -106,7 +107,7 @@ test("expired invitation id should throw error", async () => {
       await acceptWorkspaceInvitation({
         graphql,
         workspaceInvitationId: "invalid",
-        authorizationHeader: `TODO+${inviteeUsername}`,
+        authorizationHeader: inviteeUserAndDevice.device.signingPublicKey,
       }))()
   ).rejects.toThrow("Workspace invitation not found");
 });
