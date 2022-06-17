@@ -9,6 +9,7 @@ const username = "user1";
 const password = "password";
 let isUserRegistered = false;
 let addedWorkspace: any = null;
+let mainDeviceSigningPublicKey = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -18,19 +19,21 @@ beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
     isUserRegistered = true;
-    await registerUser(graphql, username, password);
+    const registerUserResult = await registerUser(graphql, username, password);
+    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+
     const createWorkspaceResult = await createWorkspace({
       name: "workspace 1",
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
       graphql,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
     });
     addedWorkspace = createWorkspaceResult.createWorkspace.workspace;
   }
 });
 
 test("user should be able to create a root folder", async () => {
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   const id = "c103a784-35cb-4aee-b366-d10398b6dd95";
   const parentFolderId = null;
   const result = await createFolder({
@@ -55,7 +58,7 @@ test("user should be able to create a root folder", async () => {
 });
 
 test("user should be able to create a root folder with a name", async () => {
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   const id = "cb3e4195-40e2-45c0-8b87-8415abdc6b55";
   const parentFolderId = null;
   const result = await createFolder({
@@ -80,7 +83,7 @@ test("user should be able to create a root folder with a name", async () => {
 });
 
 test("user should be able to create a child folder", async () => {
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   const id = "c3d28056-b619-41c4-be51-ce89ed5b8be4";
   const parentFolderId = "c103a784-35cb-4aee-b366-d10398b6dd95";
   const result = await createFolder({
@@ -105,7 +108,7 @@ test("user should be able to create a child folder", async () => {
 });
 
 test.skip("duplicate ID throws an error", async () => {
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   const id = "c103a784-35cb-4aee-b366-d10398b6dd95";
   const parentFolderId = null;
   const result = await createFolder({
@@ -131,7 +134,7 @@ test.skip("duplicate ID throws an error", async () => {
 });
 
 test("Throw error when the parent folder doesn't exist", async () => {
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   const id = "92d85bfd-0970-48e2-80b0-f100789e1350";
   const parentFolderId = "badthing";
   await expect(
@@ -150,13 +153,13 @@ test("Throw error when the parent folder doesn't exist", async () => {
 test("Throw error when user doesn't have access", async () => {
   // create a new user with access to different documents
   const username2 = "user2";
-  await registerUser(graphql, username2, password);
+  const registerUserResult = await registerUser(graphql, username2, password);
   isUserRegistered = true;
   const createWorkspaceResult = await createWorkspace({
     name: "workspace 1",
     id: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
     graphql,
-    authorizationHeader: `TODO+${username2}`,
+    authorizationHeader: registerUserResult.mainDeviceSigningPublicKey,
   });
   addedWorkspace = createWorkspaceResult.createWorkspace.workspace;
   await expect(
@@ -167,7 +170,7 @@ test("Throw error when user doesn't have access", async () => {
         name: null,
         parentFolderId: null,
         workspaceId: addedWorkspace.id,
-        authorizationHeader: `TODO+${username}`,
+        authorizationHeader: mainDeviceSigningPublicKey,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
