@@ -6,7 +6,7 @@ import RegisterForm from "../../components/register/RegisterForm";
 export default function RegisterScreen(
   props: RootStackScreenProps<"Register">
 ) {
-  const onRegisterSuccess = (username, verificationCode) => {
+  const onRegisterSuccess = (username: string, verificationCode?: string) => {
     props.navigation.push("RegistrationVerification", {
       username,
       verification: verificationCode,

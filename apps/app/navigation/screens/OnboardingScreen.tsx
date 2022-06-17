@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { Text, View, Button } from "@serenity-tools/ui";
-import {
-  useWorkspacesQuery,
-  useCreateWorkspaceMutation,
-} from "../../generated/graphql";
 import { CreateWorkspaceModal } from "../../components/workspace/CreateWorkspaceModal";
 
 export default function OnboardingScreen({ navigation }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
 

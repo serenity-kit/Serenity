@@ -33,6 +33,7 @@ import {
 } from "y-protocols/awareness";
 import { WorkspaceDrawerScreenProps } from "../../types";
 import { useEffect, useRef } from "react";
+import { ControlledPropUpdatedSelectedItem } from "native-base/lib/typescript/components/composites/Typeahead/useTypeahead/types";
 
 const reconnectTimeout = 2000;
 
@@ -102,6 +103,8 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   };
 
   const createAndSendSnapshot = async (key) => {
+    console.log(" yDocRef: ");
+    console.log(yDocRef.current);
     const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
     const publicData = {
       snapshotId: uuidv4(),
@@ -170,6 +173,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       signatureKeyPairRef.current = await createSignatureKeyPair();
 
       const onWebsocketMessage = async (event) => {
+        console.log(`onWebsocketMessage: ${event.data.type}`);
         const data = JSON.parse(event.data);
         switch (data.type) {
           case "documentNotFound":
@@ -177,6 +181,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
             break;
           case "document":
             if (data.snapshot) {
+              console.log({ snapshot: data.snapshot });
               await applySnapshot(data.snapshot, key);
             }
             await applyUpdates(data.updates, key);

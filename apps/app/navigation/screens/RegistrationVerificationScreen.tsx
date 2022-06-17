@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, Box, tw, Button, LabeledInput } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types";
 import { useVerifyRegistrationMutation } from "../../generated/graphql";
@@ -11,6 +11,11 @@ export default function RegistrationVerificationScreen(
     props.route.params.verification || ""
   );
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    console.log({ props });
+    console.log({ username: props.route.params.username });
+  }, []);
 
   const onSubmit = async () => {
     if (!props.route.params.username) {

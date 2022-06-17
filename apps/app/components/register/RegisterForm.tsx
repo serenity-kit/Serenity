@@ -17,14 +17,39 @@ import { useWindowDimensions } from "react-native";
 import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
 import sodium from "@serenity-tools/libsodium";
 import { VStack } from "native-base";
-import {
-  createDevice,
-  createEncryptionKeyFromOpaqueExportKey,
-} from "@serenity-tools/utils";
 
 type Props = {
-  onRegisterSuccess?: (username: string, verificationCode: string) => void;
+  onRegisterSuccess?: (username: string, verificationCode?: string) => void;
   onRegisterFail?: () => void;
+};
+
+const createDevice = async (encryptionKey: string) => {
+  const signingKeyPair = await sodium.crypto_sign_keypair();
+  const encryptionKeyPair = await sodium.crypto_box_keypair();
+  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+    encryptionKeyPair.publicKey,
+    signingKeyPair.privateKey
+  );
+  const nonce = await sodium.randombytes_buf(
+    sodium.crypto_secretbox_NONCEBYTES
+  );
+  const privateKeyPairString = JSON.stringify({
+    signingPrivateKey: signingKeyPair.privateKey,
+    encryptionPrivateKey: encryptionKeyPair.privateKey,
+  });
+  const privateKeyPairStringBase64 = sodium.to_base64(privateKeyPairString);
+  const cipherText = sodium.crypto_secretbox_easy(
+    privateKeyPairStringBase64,
+    nonce,
+    encryptionKey
+  );
+  return {
+    cipherText,
+    nonce,
+    encryptionPublicKeySignature,
+    signingKeyPair,
+    encryptionKeyPair,
+  };
 };
 
 export default function RegisterForm(props: Props) {
@@ -32,6 +57,7 @@ export default function RegisterForm(props: Props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
+  const [didRegistrationSucceed, setDidRegistrationSucceed] = useState(false);
   const [, finishRegistrationMutation] = useFinishRegistrationMutation();
   const [, startRegistrationMutation] = useStartRegistrationMutation();
   const [errorMessage, setErrorMessage] = useState("");
@@ -41,6 +67,7 @@ export default function RegisterForm(props: Props) {
       setErrorMessage("Please accept the terms of service first.");
       return;
     }
+    setDidRegistrationSucceed(false);
     setErrorMessage("");
     try {
       // TODO the getServerChallenge should include a signature of the challenge response and be verified that it belongs to
@@ -57,10 +84,20 @@ export default function RegisterForm(props: Props) {
           startRegistrationResult.data.startRegistration.challengeResponse
         );
 
+        const encryptionKeySalt = await sodium.randombytes_buf(
+          sodium.crypto_pwhash_SALTBYTES
+        );
+        const encryptionKey = await sodium.crypto_pwhash(
+          sodium.crypto_secretbox_KEYBYTES,
+          exportKey,
+          encryptionKeySalt,
+          sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+          sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+          sodium.crypto_pwhash_ALG_DEFAULT
+        );
+
         console.log("exportKey", exportKey);
 
-        const { encryptionKey, encryptionKeySalt } =
-          await createEncryptionKeyFromOpaqueExportKey(exportKey);
         const mainDevice = await createDevice(encryptionKey);
 
         const finishRegistrationResult = await finishRegistrationMutation({
@@ -82,15 +119,13 @@ export default function RegisterForm(props: Props) {
         });
         // check for an error
         if (finishRegistrationResult.data?.finishRegistration?.id) {
-          if (props.onRegisterSuccess) {
-            props.onRegisterSuccess(
-              username,
-              finishRegistrationResult.data?.finishRegistration.verificationCode
-            );
-          }
+          setDidRegistrationSucceed(true);
           // reset since the user might end up on this screen again
           setPassword("");
           setUsername("");
+          if (props.onRegisterSuccess) {
+            props.onRegisterSuccess(username, undefined);
+          }
         } else if (finishRegistrationResult.error) {
           setErrorMessage("Failed to register.");
           if (props.onRegisterFail) {
@@ -118,6 +153,12 @@ export default function RegisterForm(props: Props) {
       {errorMessage ? (
         <View>
           <Text>{errorMessage}</Text>
+        </View>
+      ) : null}
+
+      {didRegistrationSucceed ? (
+        <View>
+          <Text>Registration Succeeded</Text>
         </View>
       ) : null}
 
