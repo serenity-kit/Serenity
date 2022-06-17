@@ -1,5 +1,5 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { confirmUser } from "../../../database/authentication/confirmUser";
+import { verifyRegistration } from "../../../database/authentication/verifyRegistration";
 
 export const VerifyRegistrationInput = inputObjectType({
   name: "VerifyRegistrationInput",
@@ -27,7 +27,7 @@ export const verifyRegistrationMutation = mutationField("verifyRegistration", {
     if (!args || !args.input) {
       throw new Error("Missing input");
     }
-    const user = await confirmUser({
+    const user = await verifyRegistration({
       username: args.input.username,
       confirmationCode: args.input.verificationCode,
     });
