@@ -45,8 +45,10 @@ test("user should be be able to get their username", async () => {
   `);
 });
 
-test("listing documents that the user doesn't own throws an error", async () => {
-  const authorizationHeader = { authorization: `TODO+${username2}` };
+test("unauthenticated user should not get any result", async () => {
+  const authorizationHeader = {
+    authorization: "lala",
+  };
   const query = gql`
     {
       me {
