@@ -11,6 +11,7 @@ const password = "password";
 let isUserRegistered = false;
 let addedWorkspace: any = null;
 let addedDocumentId: any = null;
+let mainDeviceSigningPublicKey = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -19,19 +20,20 @@ beforeAll(async () => {
 beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
-    await registerUser(graphql, username, password);
+    const registerUserResult = await registerUser(graphql, username, password);
+    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
     isUserRegistered = true;
     const createWorkspaceResult = await createWorkspace({
       name: "workspace 1",
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
       graphql,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
     });
     addedWorkspace = createWorkspaceResult.createWorkspace.workspace;
     const createDocumentResult = await createDocument({
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
       graphql,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
       parentFolderId: null,
       workspaceId: addedWorkspace.id,
     });
@@ -40,7 +42,7 @@ beforeEach(async () => {
 });
 
 test("user should be able to delete a document", async () => {
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   const ids = [addedDocumentId];
   const result = await deleteDocuments({ graphql, ids, authorizationHeader });
   expect(result.deleteDocuments).toMatchInlineSnapshot(`
@@ -51,7 +53,7 @@ test("user should be able to delete a document", async () => {
 });
 
 test("Deleting nonexistent document does nothing", async () => {
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   const ids = ["badthing"];
   const result = await deleteDocuments({ graphql, ids, authorizationHeader });
   expect(result.deleteDocuments).toMatchInlineSnapshot(`
