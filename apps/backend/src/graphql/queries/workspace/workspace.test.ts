@@ -7,6 +7,7 @@ import { createWorkspace } from "../../../../test/helpers/workspace/createWorksp
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 const password = "password";
+let mainDeviceSigningPublicKey = "";
 let didRegisterUser = false;
 
 beforeAll(async () => {
@@ -19,25 +20,26 @@ const workspace2Id = "a0856379-ad08-4dc5-baf5-ab93c9f7b5e5";
 beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!didRegisterUser) {
-    await registerUser(graphql, username, password);
+    const registerUserResult = await registerUser(graphql, username, password);
+    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
     await createWorkspace({
       name: "workspace 1",
       id: workspace1Id,
       graphql,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
     });
     await createWorkspace({
       name: "workspace 2",
       id: workspace2Id,
       graphql,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
     });
     didRegisterUser = true;
   }
 });
 
 test("user should be able to get a workspace by id", async () => {
-  const authorizationHeader = { authorization: `TODO+${username}` };
+  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
   const query = gql`
     query workspace($id: ID) {
       workspace(id: $id) {
@@ -60,7 +62,7 @@ test("user should be able to get a workspace by id", async () => {
 });
 
 test("user should get a workspace without providing an id", async () => {
-  const authorizationHeader = { authorization: `TODO+${username}` };
+  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
   const query = gql`
     query workspace {
       workspace {

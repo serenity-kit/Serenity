@@ -8,6 +8,7 @@ import { updateFolderName } from "../../../../test/helpers/folder/updateFolderNa
 const graphql = setupGraphql();
 const username = "user1";
 const password = "password";
+let mainDeviceSigningPublicKey = "";
 let isUserRegistered = false;
 let addedWorkspace: any = null;
 let addedFolderId: any = null;
@@ -19,13 +20,15 @@ beforeAll(async () => {
 beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
-    await registerUser(graphql, username, password);
+    const registerUserResult = await registerUser(graphql, username, password);
+    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+
     isUserRegistered = true;
     const createWorkspaceResult = await createWorkspace({
       name: "workspace 1",
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
       graphql,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
     });
     addedWorkspace = createWorkspaceResult.createWorkspace.workspace;
     const createFolderResult = await createFolder({
@@ -33,7 +36,7 @@ beforeEach(async () => {
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
       name: null,
       parentFolderId: null,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
       workspaceId: addedWorkspace.id,
     });
     addedFolderId = createFolderResult.createFolder.folder.id;
@@ -41,7 +44,7 @@ beforeEach(async () => {
 });
 
 test("user should be able to change a folder name", async () => {
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   const id = addedFolderId;
   const name = "Updated Name";
   const result = await updateFolderName({
@@ -64,7 +67,7 @@ test("user should be able to change a folder name", async () => {
 });
 
 test("throw error when folder doesn't exist", async () => {
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   const id = "badthing";
   const name = "Doesn't Exist Name";
   await expect(
@@ -81,13 +84,15 @@ test("throw error when folder doesn't exist", async () => {
 test("throw error when user doesn't have access", async () => {
   // create a new user with access to different folders
   const username2 = "user2";
-  await registerUser(graphql, username2, password);
+  const registerUserResult = await registerUser(graphql, username2, password);
+  mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+
   isUserRegistered = true;
   const createWorkspaceResult = await createWorkspace({
     name: "workspace 1",
     id: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
     graphql,
-    authorizationHeader: `TODO+${username2}`,
+    authorizationHeader: registerUserResult.mainDeviceSigningPublicKey,
   });
   addedWorkspace = createWorkspaceResult.createWorkspace.workspace;
   const otherUserFolderResult = await createFolder({
@@ -95,10 +100,10 @@ test("throw error when user doesn't have access", async () => {
     id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
     name: null,
     parentFolderId: null,
-    authorizationHeader: `TODO+${username2}`,
+    authorizationHeader: registerUserResult.mainDeviceSigningPublicKey,
     workspaceId: addedWorkspace.id,
   });
-  const authorizationHeader = `TODO+${username}`;
+  const authorizationHeader = mainDeviceSigningPublicKey;
   const id = otherUserFolderResult.createFolder.id;
   const name = "Unauthorized Name";
   await expect(

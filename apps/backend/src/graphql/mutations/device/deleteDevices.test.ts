@@ -9,24 +9,24 @@ import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/get
 const graphql = setupGraphql();
 const username1 = "user1";
 const username2 = "user2";
-let user1: any;
-let user2: any;
+let userAndDevice1: any;
+let userAndDevice2: any;
 
 beforeAll(async () => {
   await deleteAllRecords();
   // TODO: we don't want this before every test
-  user1 = await createUserWithWorkspace({
+  userAndDevice1 = await createUserWithWorkspace({
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     username: username1,
   });
-  user1 = await createUserWithWorkspace({
+  userAndDevice2 = await createUserWithWorkspace({
     id: "7adf9862-a72a-427e-8f7d-0db93f687a44",
     username: username2,
   });
 });
 
 test("create a device", async () => {
-  const authorizationHeader = `TODO+${username1}`;
+  const authorizationHeader = userAndDevice1.device.signingPublicKey;
   const createDeviceResult = await createDevice({
     graphql,
     authorizationHeader,
@@ -68,7 +68,7 @@ test("create a device", async () => {
 });
 
 test("user cannot delete a device that does'nt exist", async () => {
-  const authorizationHeader = `TODO+${username1}`;
+  const authorizationHeader = userAndDevice1.device.signingPublicKey;
   const signingPublicKeys = ["abc123"];
 
   const numDevicesBeforeDeleteResponse = await getDevices({
@@ -93,8 +93,8 @@ test("user cannot delete a device that does'nt exist", async () => {
 });
 
 test("user cannot delete a device they don't own", async () => {
-  const authorizationHeader1 = `TODO+${username1}`;
-  const authorizationHeader2 = `TODO+${username2}`;
+  const authorizationHeader1 = userAndDevice1.device.signingPublicKey;
+  const authorizationHeader2 = userAndDevice2.device.signingPublicKey;
   const createDeviceResult = await createDevice({
     graphql,
     authorizationHeader: authorizationHeader1,
