@@ -3,11 +3,16 @@ import { Button, LabeledInput, Text, View, Link, tw } from "@serenity-tools/ui";
 import {
   useStartLoginMutation,
   useFinishLoginMutation,
+  MainDeviceQuery,
+  MainDeviceDocument,
 } from "../../generated/graphql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { startLogin, finishLogin } from "@serenity-tools/opaque";
 import { useWindowDimensions } from "react-native";
 import { VStack } from "native-base";
+import { createEncryptionKeyFromOpaqueExportKey } from "@serenity-tools/utils";
+import { useClient } from "urql";
+import * as sodium from "@serenity-tools/libsodium";
 
 type Props = {
   defaultEmail?: string;
@@ -22,9 +27,9 @@ export function LoginForm(props: Props) {
   const [username, _setUsername] = useState("");
   const [password, _setPassword] = useState("");
 
-  const [didLoginSucceed, setDidLoginSucceed] = useState(false);
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
+  const urqlClient = useClient();
 
   const [gqlErrorMessage, setGqlErrorMessage] = useState("");
   const { updateAuthentication } = useAuthentication();
@@ -47,9 +52,7 @@ export function LoginForm(props: Props) {
     _setPassword(password);
   };
 
-  const onLoginPress = async () => {
-    setDidLoginSucceed(false);
-    setGqlErrorMessage("");
+  const login = async (username: string, password: string) => {
     try {
       const message = await startLogin(password);
       const mutationResult = await startLoginMutation({
@@ -63,8 +66,6 @@ export function LoginForm(props: Props) {
         const result = await finishLogin(
           mutationResult.data.startLogin.challengeResponse
         );
-        console.log("sessionKey", result.sessionKey);
-        console.log("exportKey", result.exportKey);
 
         const finishLoginResult = await finishLoginMutation({
           input: {
@@ -74,30 +75,69 @@ export function LoginForm(props: Props) {
         });
 
         if (finishLoginResult.data?.finishLogin) {
-          setDidLoginSucceed(true);
           // reset the password in case the user ends up on this screen again
           setPassword("");
           setUsername("");
           updateAuthentication(
             finishLoginResult.data.finishLogin.mainDeviceSigningPublicKey
           );
-          if (props.onLoginSuccess) {
-            props.onLoginSuccess();
-          }
+          return result;
         } else if (finishLoginResult.error) {
-          if (props.onLoginFail) {
-            props.onLoginFail();
-          }
+          return;
         }
       } else if (mutationResult.error) {
-        if (props.onLoginFail) {
-          props.onLoginFail();
-        }
+        return;
       }
     } catch (error) {
       console.log("error getting server challenge");
       console.log(error);
       setGqlErrorMessage(error.toString());
+      return;
+    }
+  };
+
+  const fetchMainDevice = async (exportKey: string) => {
+    const mainDeviceResult = await urqlClient
+      .query<MainDeviceQuery>(MainDeviceDocument, undefined, {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+      })
+      .toPromise();
+
+    if (mainDeviceResult.data?.mainDevice) {
+      const mainDevice = mainDeviceResult.data.mainDevice;
+      const { encryptionKey } = await createEncryptionKeyFromOpaqueExportKey(
+        exportKey,
+        mainDevice.encryptionKeySalt
+      );
+      const decryptedCiphertextBase64 = await sodium.crypto_secretbox_open_easy(
+        mainDevice.ciphertext,
+        mainDevice.nonce,
+        encryptionKey
+      );
+      const privateKeyPairString = sodium.from_base64_to_string(
+        decryptedCiphertextBase64
+      );
+      const privateKeyPairs = JSON.parse(privateKeyPairString);
+      console.log("privateKeyPairs", privateKeyPairs);
+      // TODO: store the keys in memory
+    } else {
+      throw new Error("Failed to fetch main device.");
+    }
+  };
+
+  const onLoginPress = async () => {
+    setGqlErrorMessage("");
+    const loginResult = await login(username, password);
+    if (!loginResult) {
+      if (props.onLoginFail) {
+        props.onLoginFail();
+      }
+    } else {
+      await fetchMainDevice(loginResult.exportKey);
+      if (props.onLoginSuccess) {
+        props.onLoginSuccess();
+      }
     }
   };
 
@@ -106,11 +146,6 @@ export function LoginForm(props: Props) {
       {gqlErrorMessage !== "" && (
         <View>
           <Text>{gqlErrorMessage}</Text>
-        </View>
-      )}
-      {didLoginSucceed && (
-        <View>
-          <Text>Login Succeeded</Text>
         </View>
       )}
       <LabeledInput

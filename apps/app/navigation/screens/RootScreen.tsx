@@ -27,7 +27,7 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
             screen: "Dashboard",
           });
         } else {
-          props.navigation.replace("NoWorkspace");
+          props.navigation.replace("Onboarding");
         }
       })();
     } else {

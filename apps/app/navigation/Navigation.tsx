@@ -32,7 +32,7 @@ import {
   View,
 } from "@serenity-tools/ui";
 import RootScreen from "./screens/RootScreen";
-import NoWorkspaceScreen from "./screens/NoWorkspaceScreen";
+import OnboardingScreen from "./screens/OnboardingScreen";
 import { DrawerActions } from "@react-navigation/native";
 import RegistrationVerificationScreen from "./screens/RegistrationVerificationScreen";
 
@@ -103,7 +103,7 @@ function RootNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
-      <Stack.Screen name="NoWorkspace" component={NoWorkspaceScreen} />
+      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen
         name="Register"
         component={RegisterScreen}
@@ -151,7 +151,7 @@ const linking: LinkingOptions<RootStackParamList> = {
           Settings: "settings",
         },
       },
-      NoWorkspace: "no-workspace",
+      Onboarding: "onboarding",
       DevDashboard: "dev-dashboard",
       DesignSystem: "design-system",
       Register: "register",

@@ -56,8 +56,6 @@ export default function RegisterForm(props: Props) {
           startRegistrationResult.data.startRegistration.challengeResponse
         );
 
-        console.log("exportKey", exportKey);
-
         const { encryptionKey, encryptionKeySalt } =
           await createEncryptionKeyFromOpaqueExportKey(exportKey);
         const mainDevice = await createAndEncryptDevice(encryptionKey);
