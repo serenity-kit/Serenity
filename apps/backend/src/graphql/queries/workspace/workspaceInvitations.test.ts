@@ -1,4 +1,3 @@
-import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { workspaceInvitations } from "../../../../test/helpers/workspace/workspaceInvitations";
@@ -19,17 +18,17 @@ beforeAll(async () => {
 beforeEach(async () => {});
 
 test("should return a list of workspace invitations if they are admin", async () => {
-  const inviterUser1 = await createUserWithWorkspace({
+  const inviterUserAndDevice1 = await createUserWithWorkspace({
     id: workspaceId,
     username: inviter1Username,
   });
-  const inviterUser2 = await createUserWithWorkspace({
+  const inviterUserAndDevice2 = await createUserWithWorkspace({
     id: otherWorkspaceId,
     username: inviter2Username,
   });
   const workspace = await getWorkspace({
     id: workspaceId,
-    userId: inviterUser1.id,
+    userId: inviterUserAndDevice1.user.id,
   });
   if (!workspace) {
     throw new Error("workspace not found");
@@ -37,7 +36,7 @@ test("should return a list of workspace invitations if they are admin", async ()
   await createWorkspaceInvitation({
     graphql,
     workspaceId,
-    authorizationHeader: `TODO+${inviter1Username}`,
+    authorizationHeader: inviterUserAndDevice1.device.signingPublicKey,
   });
   // add user2 as an admin
   await prisma.usersToWorkspaces.create({
@@ -58,12 +57,12 @@ test("should return a list of workspace invitations if they are admin", async ()
   await createWorkspaceInvitation({
     graphql,
     workspaceId,
-    authorizationHeader: `TODO+${inviter2Username}`,
+    authorizationHeader: inviterUserAndDevice2.device.signingPublicKey,
   });
   const workspaceInvitationsResult = await workspaceInvitations({
     graphql,
     workspaceId,
-    authorizationHeader: `TODO+${inviter1Username}`,
+    authorizationHeader: inviterUserAndDevice1.device.signingPublicKey,
   });
   const invitations = workspaceInvitationsResult.workspaceInvitations.edges;
   expect(invitations.length).toBe(2);
@@ -73,7 +72,7 @@ test("not admin should throw error", async () => {
   // add user2 as an non-admin
   const otherWorkspaceId2 = "otherWorkspace2";
   const username = "newuser@example.com";
-  const user = await createUserWithWorkspace({
+  const userAndDevice = await createUserWithWorkspace({
     id: otherWorkspaceId2,
     username: username,
   });
@@ -97,7 +96,7 @@ test("not admin should throw error", async () => {
       await workspaceInvitations({
         graphql,
         workspaceId,
-        authorizationHeader: `TODO+${username}`,
+        authorizationHeader: userAndDevice.device.signingPublicKey,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
