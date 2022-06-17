@@ -1,3 +1,8 @@
+import {
+  createAndEncryptDevice,
+  createEncryptionKeyFromOpaqueExportKey,
+} from "@serenity-tools/utils";
+import sodium from "libsodium-wrappers";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -10,30 +15,37 @@ export default async function createUserWithWorkspace({
   username,
 }: Params) {
   return await prisma.$transaction(async (prisma) => {
+    const exportKey = "12345689";
+
+    const { encryptionKey, encryptionKeySalt } =
+      await createEncryptionKeyFromOpaqueExportKey(sodium.to_base64(exportKey));
+    const mainDevice = await createAndEncryptDevice(encryptionKey);
+
     const device = await prisma.device.create({
       data: {
-        signingPublicKey: `TODO+${username}`,
-        encryptionPublicKey: "TODO",
-        encryptionPublicKeySignature: "TODO",
+        signingPublicKey: mainDevice.signingKeyPair.publicKey,
+        encryptionPublicKey: mainDevice.encryptionKeyPair.publicKey,
+        encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
       },
     });
+
     const user = await prisma.user.create({
-      // @ts-ignore TO BE REMOVED
       data: {
         username,
         opaqueEnvelope: "TODO",
         clientPublicKey: "abc",
-        mainDeviceCiphertext: "TODO",
-        mainDeviceNonce: "TODO",
-        mainDevice: {
-          connect: { signingPublicKey: device.signingPublicKey },
+        mainDeviceCiphertext: mainDevice.cipherText,
+        mainDeviceNonce: mainDevice.nonce,
+        mainDeviceSigningPublicKey: mainDevice.signingKeyPair.publicKey,
+        mainDeviceEncryptionKeySalt: encryptionKeySalt,
+        devices: {
+          connect: {
+            signingPublicKey: device.signingPublicKey,
+          },
         },
       },
     });
-    await prisma.device.update({
-      where: { signingPublicKey: device.signingPublicKey },
-      data: { user: { connect: { username: username } } },
-    });
+
     await prisma.workspace.create({
       data: {
         id,
@@ -47,6 +59,6 @@ export default async function createUserWithWorkspace({
         },
       },
     });
-    return user;
+    return { user, device };
   });
 }

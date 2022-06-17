@@ -15,10 +15,9 @@ import {
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
 import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
-import sodium from "@serenity-tools/libsodium";
 import { VStack } from "native-base";
 import {
-  createDevice,
+  createAndEncryptDevice,
   createEncryptionKeyFromOpaqueExportKey,
 } from "@serenity-tools/utils";
 
@@ -61,7 +60,7 @@ export default function RegisterForm(props: Props) {
 
         const { encryptionKey, encryptionKeySalt } =
           await createEncryptionKeyFromOpaqueExportKey(exportKey);
-        const mainDevice = await createDevice(encryptionKey);
+        const mainDevice = await createAndEncryptDevice(encryptionKey);
 
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {

@@ -21,9 +21,7 @@ export const getDeviceBySigningPublicKey = async ({
         device {
             userId
             signingPublicKey
-            signingKeyType
             encryptionPublicKey
-            encryptionKeyType
             encryptionPublicKeySignature
         }
       }
