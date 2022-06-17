@@ -235,6 +235,16 @@ export type FolderEdge = {
   node?: Maybe<Folder>;
 };
 
+export type MainDeviceResult = {
+  __typename?: 'MainDeviceResult';
+  ciphertext: Scalars['String'];
+  encryptionKeySalt: Scalars['String'];
+  encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
+  nonce: Scalars['String'];
+  signingPublicKey: Scalars['String'];
+};
+
 export type MeResult = {
   __typename?: 'MeResult';
   id: Scalars['String'];
@@ -374,6 +384,7 @@ export type Query = {
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documents?: Maybe<DocumentConnection>;
   folders?: Maybe<FolderConnection>;
+  mainDevice?: Maybe<MainDeviceResult>;
   me?: Maybe<MeResult>;
   rootFolders?: Maybe<FolderConnection>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
@@ -724,6 +735,11 @@ export type FoldersQueryVariables = Exact<{
 
 export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
+export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, nonce: string, ciphertext: string, encryptionKeySalt: string } | null };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1048,6 +1064,22 @@ export const FoldersDocument = gql`
 
 export function useFoldersQuery(options: Omit<Urql.UseQueryArgs<FoldersQueryVariables>, 'query'>) {
   return Urql.useQuery<FoldersQuery>({ query: FoldersDocument, ...options });
+};
+export const MainDeviceDocument = gql`
+    query mainDevice {
+  mainDevice {
+    signingPublicKey
+    encryptionPublicKey
+    encryptionPublicKeySignature
+    nonce
+    ciphertext
+    encryptionKeySalt
+  }
+}
+    `;
+
+export function useMainDeviceQuery(options?: Omit<Urql.UseQueryArgs<MainDeviceQueryVariables>, 'query'>) {
+  return Urql.useQuery<MainDeviceQuery>({ query: MainDeviceDocument, ...options });
 };
 export const MeDocument = gql`
     query me {

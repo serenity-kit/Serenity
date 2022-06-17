@@ -2,13 +2,11 @@ import { gql } from "graphql-request";
 
 type Params = {
   graphql: any;
-  signingPublicKey: string;
   authorizationHeader: string;
 };
 
-export const getDeviceBySigningPublicKey = async ({
+export const getMainDevice = async ({
   graphql,
-  signingPublicKey,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -17,13 +15,13 @@ export const getDeviceBySigningPublicKey = async ({
   // get root folders from graphql
   const query = gql`
     {
-      deviceBySigningPublicKey(signingPublicKey: "${signingPublicKey}") {
-        device {
-            userId
-            signingPublicKey
-            encryptionPublicKey
-            encryptionPublicKeySignature
-        }
+      mainDevice() {
+        signingPublicKey
+        encryptionPublicKey
+        encryptionPublicKeySignature
+        nonce
+        ciphertext
+        encryptionKeySalt
       }
     }
   `;

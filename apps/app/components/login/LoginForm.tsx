@@ -3,11 +3,13 @@ import { Button, LabeledInput, Text, View, Link, tw } from "@serenity-tools/ui";
 import {
   useStartLoginMutation,
   useFinishLoginMutation,
+  useMainDeviceQuery,
 } from "../../generated/graphql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { startLogin, finishLogin } from "@serenity-tools/opaque";
 import { useWindowDimensions } from "react-native";
 import { VStack } from "native-base";
+import * as sodium from "@serenity-tools/libsodium";
 
 type Props = {
   defaultEmail?: string;
@@ -47,9 +49,7 @@ export function LoginForm(props: Props) {
     _setPassword(password);
   };
 
-  const onLoginPress = async () => {
-    setDidLoginSucceed(false);
-    setGqlErrorMessage("");
+  const login = async (username: string, password: string) => {
     try {
       const message = await startLogin(password);
       const mutationResult = await startLoginMutation({
@@ -81,23 +81,56 @@ export function LoginForm(props: Props) {
           updateAuthentication(
             finishLoginResult.data.finishLogin.mainDeviceSigningPublicKey
           );
-          if (props.onLoginSuccess) {
-            props.onLoginSuccess();
-          }
+          return result;
         } else if (finishLoginResult.error) {
-          if (props.onLoginFail) {
-            props.onLoginFail();
-          }
+          return;
         }
       } else if (mutationResult.error) {
-        if (props.onLoginFail) {
-          props.onLoginFail();
-        }
+        return;
       }
     } catch (error) {
       console.log("error getting server challenge");
       console.log(error);
       setGqlErrorMessage(error.toString());
+      return;
+    }
+  };
+
+  const fetchMainDevice = async (exportKey: string) => {
+    const [mainDeviceResult] = useMainDeviceQuery();
+    if (mainDeviceResult.data?.mainDevice) {
+      const mainDevice = mainDeviceResult.data.mainDevice;
+      console.log({ mainDevice });
+      // mainDevice will include a ciphertext which can be decrypted
+      // using the exportKey we got during Login
+      const decryptedCiphertextBase64 = await sodium.crypto_secretbox_easy(
+        mainDevice.ciphertext,
+        mainDevice.nonce,
+        exportKey
+      );
+      const privateKeyPairString = sodium.from_base64_to_string(
+        decryptedCiphertextBase64
+      );
+      const privateKeyPairs = JSON.parse(privateKeyPairString);
+      // now we should have: privateKeyPairs = { signingPrivateKey, encryptionPrivateKey }
+      // TODO: store the keys in memory
+    }
+  };
+
+  const onLoginPress = async () => {
+    setDidLoginSucceed(false);
+    setGqlErrorMessage("");
+    const sessionKeys = await login(username, password);
+    if (!sessionKeys) {
+      if (props.onLoginFail) {
+        props.onLoginFail();
+      }
+    } else {
+      await fetchMainDevice(sessionKeys.exportKey);
+      if (props.onLoginSuccess) {
+        props.onLoginSuccess();
+        return true;
+      }
     }
   };
 

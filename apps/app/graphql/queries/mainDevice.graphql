@@ -1,0 +1,10 @@
+query mainDevice {
+  mainDevice {
+    signingPublicKey
+    encryptionPublicKey
+    encryptionPublicKeySignature
+    nonce
+    ciphertext
+    encryptionKeySalt
+  }
+}
