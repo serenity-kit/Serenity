@@ -57,7 +57,6 @@ export async function createSnapshot(
   key: Uint8Array,
   signatureKeyPair: KeyPair
 ) {
-  console.log({ content, publicData, key, signatureKeyPair });
   const publicDataAsBase64 = sodium.to_base64(JSON.stringify(publicData));
   const { ciphertext, publicNonce } = await encryptAead(
     content,

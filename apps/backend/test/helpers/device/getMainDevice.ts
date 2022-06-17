@@ -15,10 +15,8 @@ export const getMainDevice = async ({
   // get root folders from graphql
   const query = gql`
     {
-      mainDevice() {
+      mainDevice {
         signingPublicKey
-        encryptionPublicKey
-        encryptionPublicKeySignature
         nonce
         ciphertext
         encryptionKeySalt

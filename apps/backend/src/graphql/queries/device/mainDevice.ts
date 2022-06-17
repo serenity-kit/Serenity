@@ -1,6 +1,4 @@
-import { idArg, nonNull, queryField, objectType } from "nexus";
-import { getDeviceBySigningPublicKey } from "../../../database/device/getDeviceBySigningPublicKey";
-import { Device } from "../../types/device";
+import { queryField, objectType } from "nexus";
 
 export const MainDeviceResult = objectType({
   name: "MainDeviceResult",
@@ -8,8 +6,6 @@ export const MainDeviceResult = objectType({
     t.nonNull.string("ciphertext");
     t.nonNull.string("nonce");
     t.nonNull.string("signingPublicKey");
-    t.nonNull.string("encryptionPublicKey");
-    t.nonNull.string("encryptionPublicKeySignature");
     t.nonNull.string("encryptionKeySalt");
   },
 });
@@ -21,18 +17,11 @@ export const mainDeviceQuery = queryField((t) => {
       if (!context.user) {
         throw new Error("Unauthorized");
       }
-      const userId = context.user.id;
-      const device = await getDeviceBySigningPublicKey({
-        userId,
-        signingPublicKey: context.user.signingPublicKey,
-      });
 
       return {
-        mainDeviceCiphertext: context.user.mainDeviceCiphertext,
-        mainDeviceNonce: context.user.mainDeviceNonce,
-        signingPublicKey: device.signingPublicKey,
-        encryptionPublicKey: device.encryptionPublicKey,
-        encryptionPublicKeySignature: device.encryptionPublicKeySignature,
+        ciphertext: context.user.mainDeviceCiphertext,
+        nonce: context.user.mainDeviceNonce,
+        signingPublicKey: context.user.mainDeviceSigningPublicKey,
         encryptionKeySalt: context.user.mainDeviceEncryptionKeySalt,
       };
     },

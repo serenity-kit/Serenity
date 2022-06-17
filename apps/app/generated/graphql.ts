@@ -25,6 +25,12 @@ export type AcceptWorkspaceInvitationResult = {
   workspace?: Maybe<Workspace>;
 };
 
+export type CreateDeviceInput = {
+  encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
+  signingPublicKey: Scalars['String'];
+};
+
 export type CreateDeviceResult = {
   __typename?: 'CreateDeviceResult';
   device?: Maybe<Device>;
@@ -239,8 +245,6 @@ export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
   encryptionKeySalt: Scalars['String'];
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
   nonce: Scalars['String'];
   signingPublicKey: Scalars['String'];
 };
@@ -277,6 +281,11 @@ export type Mutation = {
 
 export type MutationAcceptWorkspaceInvitationArgs = {
   input?: InputMaybe<AcceptWorkspaceInvitationInput>;
+};
+
+
+export type MutationCreateDeviceArgs = {
+  input?: InputMaybe<CreateDeviceInput>;
 };
 
 
@@ -738,7 +747,7 @@ export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'Fol
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, nonce: string, ciphertext: string, encryptionKeySalt: string } | null };
+export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string } | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1069,8 +1078,6 @@ export const MainDeviceDocument = gql`
     query mainDevice {
   mainDevice {
     signingPublicKey
-    encryptionPublicKey
-    encryptionPublicKeySignature
     nonce
     ciphertext
     encryptionKeySalt
