@@ -1,5 +1,4 @@
 import { gql } from "graphql-request";
-import sodium from "libsodium-wrappers";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { registerUser } from "../../../../test/helpers/registerUser";
@@ -7,6 +6,7 @@ import { createWorkspace } from "../../../../test/helpers/workspace/createWorksp
 
 const graphql = setupGraphql();
 let userId = "";
+let mainDeviceSigningPublicKey = "";
 const username = "user";
 const password = "password";
 let didRegisterUser = false;
@@ -19,18 +19,19 @@ beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!didRegisterUser) {
     const registerUserResult = await registerUser(graphql, username, password);
-    userId = registerUserResult.registrationResponse.finishRegistration.id;
+    userId = registerUserResult.userId;
+    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
     await createWorkspace({
       name: "workspace 1",
       id: "abc",
       graphql,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
     });
     await createWorkspace({
       name: "workspace 2",
       id: "123",
       graphql,
-      authorizationHeader: `TODO+${username}`,
+      authorizationHeader: mainDeviceSigningPublicKey,
     });
     didRegisterUser = true;
   }
@@ -38,7 +39,7 @@ beforeEach(async () => {
 
 test("user should be able to list workspaces", async () => {
   const authorizationHeader = {
-    authorization: `TODO+${username}`,
+    authorization: mainDeviceSigningPublicKey,
   };
   const query = gql`
     {
@@ -96,7 +97,7 @@ test("user should be able to list workspaces", async () => {
 
 test("user cannot query more than 50 results", async () => {
   const authorizationHeader = {
-    authorization: `TODO+${username}`,
+    authorization: mainDeviceSigningPublicKey,
   };
   const query = gql`
     {
@@ -117,7 +118,7 @@ test("user cannot query more than 50 results", async () => {
 
 test("user cannot query by paginating cursor", async () => {
   const authorizationHeader = {
-    authorization: `TODO+${username}`,
+    authorization: mainDeviceSigningPublicKey,
   };
   const query = gql`
     {
