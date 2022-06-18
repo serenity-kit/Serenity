@@ -14,8 +14,10 @@ RUN apt install curl -y
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash
 # and install node 
 RUN apt install nodejs
+RUN apt install libssl-dev
 
-RUN openssl version
+RUN echo "WEEEEEE"
+RUN openssl version -a
 
 EXPOSE $PORT
 CMD ["npm", "run", "start:prod" ]
