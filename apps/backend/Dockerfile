@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:20.04
 
 # FROM node:18
 
@@ -14,10 +14,6 @@ RUN apt install curl -y
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash
 # and install node 
 RUN apt install nodejs
-RUN apt install libssl-dev
-
-RUN echo "WEEEEEE"
-RUN openssl version -a
 
 EXPOSE $PORT
 CMD ["npm", "run", "start:prod" ]
