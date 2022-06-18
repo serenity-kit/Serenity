@@ -1,9 +1,10 @@
 name: "Deploy API to Heroku"
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
+on: [push]
 
 jobs:
   deploy-staging:
@@ -13,9 +14,9 @@ jobs:
       - name: Build
         working-directory: ./apps/backend
         run: yarn build
-      - name: Run Migrations
-        working-directory: ./apps/backend
-        run: POSTGRES_URL=${{secrets.POSTGRES_URL}} yarn prisma:prod:migrate
+      # - name: Run Migrations
+      #   working-directory: ./apps/backend
+      #   run: POSTGRES_URL=${{secrets.POSTGRES_URL}} yarn prisma:prod:migrate
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
