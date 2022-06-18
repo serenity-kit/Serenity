@@ -7,13 +7,13 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-RUN apt-get update
+RUN apt update
 # install curl 
-RUN apt-get install curl
+RUN apt install curl -y
 # get install script and pass it to execute: 
-RUN curl -sL https://deb.nodesource.com/setup_4.x | bash
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash
 # and install node 
-RUN apt-get install nodejs
+RUN apt install nodejs
 
 EXPOSE $PORT
 CMD ["npm", "run", "start:prod" ]
