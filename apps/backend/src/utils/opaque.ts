@@ -1,24 +1,25 @@
 import sodium from "libsodium-wrappers";
 import { v4 as uuidv4 } from "uuid";
-import {
+
+const {
   HandleRegistration,
   HandleLogin,
   ServerSetup,
-} from "../vendor/opaque-wasm/opaque_wasm";
+} = require("./vendor/opaque-wasm/opaque_wasm");
 
 // Trade-off: by storing it in memory it means with a server restart registrations will be lost and fail
 // Currently there is no cleanup mechanism.
 // TODO let started registrations expire after a while
 const registrations: {
   [registrationId: string]: {
-    handleRegistration: HandleRegistration;
+    handleRegistration: any;
     username: string;
   };
 } = {};
 
 const logins: {
   [loginId: string]: {
-    handleLogin: HandleLogin;
+    handleLogin: any;
     username: string;
   };
 } = {};
@@ -45,7 +46,6 @@ export const startRegistration = ({
   const registrationId = uuidv4();
   const serverRegistration = new HandleRegistration(opaqueServerSetup());
   const response = serverRegistration.start(
-    // @ts-expect-error string just works fine
     username,
     sodium.from_base64(challenge)
   );
@@ -90,7 +90,6 @@ export const startLogin = ({
   const serverLogin = new HandleLogin(opaqueServerSetup());
   const response = serverLogin.start(
     sodium.from_base64(envelope),
-    // @ts-expect-error string just works fine
     username,
     sodium.from_base64(challenge)
   );
