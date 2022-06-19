@@ -108,12 +108,32 @@ export const crypto_box_keypair = async (): Promise<StringKeyPair> => {
   };
 };
 
+export const crypto_pwhash = async (
+  keyLength: number,
+  password: string,
+  salt: string,
+  opsLimit: number,
+  memLimit: number,
+  algorithm: number
+): Promise<string> => {
+  const result = await sodium.crypto_pwhash(
+    keyLength,
+    urlSafeBase64ToBase64(to_base64(password)),
+    urlSafeBase64ToBase64(to_base64(salt)),
+    opsLimit,
+    memLimit,
+    algorithm
+  );
+  return base64ToUrlSafeBase64(result);
+};
+
 export default {
   ready,
   to_base64,
   from_base64,
   from_base64_to_string,
   randombytes_buf,
+  crypto_pwhash,
   crypto_box_keypair,
   crypto_sign_keypair,
   crypto_sign_detached,

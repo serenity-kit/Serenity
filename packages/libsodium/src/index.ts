@@ -94,14 +94,14 @@ export const crypto_generichash = async (
   return to_base64(result);
 };
 
-export const crypto_pwhash = (
+export const crypto_pwhash = async (
   keyLength: number,
   password: string,
   salt: string,
   opsLimit: number,
   memLimit: number,
   algorithm: number
-): string => {
+): Promise<string> => {
   const result = sodium.crypto_pwhash(
     keyLength,
     from_base64(password),
@@ -153,8 +153,8 @@ const libsodiumExports = {
   to_base64,
   from_base64,
   from_base64_to_string,
-  crypto_pwhash,
   randombytes_buf,
+  crypto_pwhash,
   crypto_generichash,
   crypto_box_keypair,
   crypto_sign_keypair,

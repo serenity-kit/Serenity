@@ -134,6 +134,7 @@ export function LoginForm(props: Props) {
       setIsLoggingIn(false);
       props.onLoginSuccess();
     } catch (error) {
+      console.error(error);
       setGqlErrorMessage("Failed to login.");
       setIsLoggingIn(false);
       if (props.onLoginFail) {
