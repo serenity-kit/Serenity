@@ -1,6 +1,11 @@
 import sodium from "libsodium-wrappers";
 import { v4 as uuidv4 } from "uuid";
 
+// import type {
+//   HandleRegistration as HandleRegistrationType,
+//   HandleLogin as HandleLoginType,
+// } from "@serenity-tools/opaque-server";
+
 const {
   HandleRegistration,
   HandleLogin,

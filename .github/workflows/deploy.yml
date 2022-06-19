@@ -11,40 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install
-        working-directory: ./apps/backend
-        run: yarn
-      - name: InstallCheck
-        working-directory: ./apps/backend
-        run: ls ../../node_modules/@serenity-tools
-      - name: InstallCheck
-        working-directory: ./apps/backend
-        run: ls ../../node_modules/@serenity-tools/opaque-server
-      - name: InstallCheck
-        working-directory: ./apps/backend
-        run: ls -l ../../node_modules/@serenity-tools
       - name: Build
         working-directory: ./apps/backend
-        run: yarn build:copy-externals
-      - name: Check
+        run: yarn build
+      - name: Run Migrations
         working-directory: ./apps/backend
-        run: ls
-      - name: Checktwo
-        working-directory: ./apps/backend
-        run: ls node_modules
-      - name: Checkthree
-        working-directory: ./apps/backend
-        run: ls node_modules/@serenity-tools
-      - name: Checkfour
-        working-directory: ./apps/backend
-        run: ls node_modules/@serenity-tools/opaque-server
-      # - name: Run Migrations
-      #   working-directory: ./apps/backend
-      #   run: POSTGRES_URL=${{secrets.POSTGRES_URL}} yarn prisma:prod:migrate
-      # - uses: akhileshns/heroku-deploy@v3.12.12
-      #   with:
-      #     heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-      #     heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
-      #     heroku_email: ${{secrets.HEROKU_EMAIL}}
-      #     usedocker: true
-      #     appdir: "apps/backend"
+        run: POSTGRES_URL=${{secrets.POSTGRES_URL}} yarn prisma:prod:migrate
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          usedocker: true
+          appdir: "apps/backend"
