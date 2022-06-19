@@ -17,7 +17,7 @@ import * as sodium from "@serenity-tools/libsodium";
 type Props = {
   defaultEmail?: string;
   onLoginSuccess: () => void;
-  onLoginFail: () => void;
+  onLoginFail?: () => void;
   onEmailChangeText?: (username: string) => void;
   onFormFilled?: () => void;
 };
