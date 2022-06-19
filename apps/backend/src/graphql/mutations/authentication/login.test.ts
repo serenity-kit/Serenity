@@ -2,7 +2,7 @@ import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import sodium from "libsodium-wrappers";
-import { Login } from "../../../vendor/opaque-wasm/opaque_wasm";
+import { Login } from "@serenity-tools/opaque-server";
 import { registerUser } from "../../../../test/helpers/registerUser";
 
 const graphql = setupGraphql();

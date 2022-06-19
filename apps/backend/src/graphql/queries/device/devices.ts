@@ -29,7 +29,17 @@ export const devices = queryField((t) => {
         skip,
         take,
       });
-      return devices;
+      return devices.map((device) => {
+        if (!device.userId) {
+          throw new Error("Device without a userId");
+        }
+        return {
+          encryptionPublicKey: device.encryptionPublicKey,
+          encryptionPublicKeySignature: device.encryptionPublicKeySignature,
+          signingPublicKey: device.signingPublicKey,
+          userId: device.userId,
+        };
+      });
     },
   });
 });

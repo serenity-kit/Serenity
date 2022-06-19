@@ -1,6 +1,6 @@
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
-import { Registration } from "../../src/vendor/opaque-wasm/opaque_wasm";
+import { Registration } from "@serenity-tools/opaque-server";
 
 export type RegistrationChallengeReponseType = {
   data: any;

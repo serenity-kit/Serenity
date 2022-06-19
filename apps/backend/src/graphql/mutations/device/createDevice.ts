@@ -29,12 +29,25 @@ export const createDeviceMutation = mutationField("createDevice", {
     if (!context.user) {
       throw new Error("Unauthorized");
     }
+    if (!args.input) {
+      throw new Error("Input missing");
+    }
     const device = await createDevice({
       userId: context.user.id,
       signingPublicKey: args.input.signingPublicKey,
       encryptionPublicKey: args.input.encryptionPublicKey,
       encryptionPublicKeySignature: args.input.encryptionPublicKeySignature,
     });
-    return { device };
+    if (!device.userId) {
+      throw new Error("UserId missing");
+    }
+    return {
+      device: {
+        encryptionPublicKey: device.encryptionPublicKey,
+        encryptionPublicKeySignature: device.encryptionPublicKeySignature,
+        signingPublicKey: device.signingPublicKey,
+        userId: device.userId,
+      },
+    };
   },
 });
