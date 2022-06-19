@@ -14,6 +14,18 @@ jobs:
       - name: Build
         working-directory: ./apps/backend
         run: yarn build
+      - name: Check
+        working-directory: ./apps/backend
+        run: ls
+      - name: Checktwo
+        working-directory: ./apps/backend
+        run: ls node_modules
+      - name: Checkthree
+        working-directory: ./apps/backend
+        run: ls node_modules/@serenity-tools/
+      - name: Checkfour
+        working-directory: ./apps/backend
+        run: ls node_modules/@serenity-tools/opaque-server
       # - name: Run Migrations
       #   working-directory: ./apps/backend
       #   run: POSTGRES_URL=${{secrets.POSTGRES_URL}} yarn prisma:prod:migrate
