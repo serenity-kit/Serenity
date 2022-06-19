@@ -110,6 +110,10 @@ export function LoginForm(props: Props) {
         exportKey,
         mainDevice.encryptionKeySalt
       );
+      console.log("login exportKey", exportKey);
+      console.log("login encryptionKeySalt", mainDevice.encryptionKeySalt);
+      console.log("login encryptionKey", encryptionKey);
+
       const decryptedCiphertextBase64 = await sodium.crypto_secretbox_open_easy(
         mainDevice.ciphertext,
         mainDevice.nonce,

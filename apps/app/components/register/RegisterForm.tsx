@@ -60,6 +60,10 @@ export default function RegisterForm(props: Props) {
           await createEncryptionKeyFromOpaqueExportKey(exportKey);
         const mainDevice = await createAndEncryptDevice(encryptionKey);
 
+        console.log("register exportKey", exportKey);
+        console.log("register encryptionKeySalt", encryptionKeySalt);
+        console.log("register encryptionKey", encryptionKey);
+
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
             message: response,

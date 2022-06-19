@@ -5,7 +5,7 @@ const {
   HandleRegistration,
   HandleLogin,
   ServerSetup,
-} = require("./vendor/opaque-wasm/opaque_wasm");
+} = require("@serenity-tools/opaque-server");
 
 // Trade-off: by storing it in memory it means with a server restart registrations will be lost and fail
 // Currently there is no cleanup mechanism.
