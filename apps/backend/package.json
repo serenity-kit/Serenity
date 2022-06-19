@@ -6,7 +6,7 @@
     "dev:mock": "yarn && yarn prisma generate && MOCK_GRAPHQL=true ts-node-dev --transpile-only --no-notify ./src/index.ts",
     "clean": "rm -rf build",
     "build": "yarn && yarn clean && yarn prisma:prod:generate && yarn ncc build ./src/index.ts --no-cache -o build --external \"@serenity-tools/opaque-server\" && yarn build:copy-externals",
-    "build:copy-externals": "mkdir node_modules/@serenity-tools && cp -r ../../node_modules/@serenity-tools/opaque-server ./node_modules/@serenity-tools/opaque-server",
+    "build:copy-externals": "mkdir node_modules/@serenity-tools && cp -r ../../packages/opaque-server ./node_modules/@serenity-tools/opaque-server",
     "deploy": "yarn build && DOCKER_DEFAULT_PLATFORM=linux/amd64 heroku container:push web --app serenity-staging-api && heroku container:release web --app serenity-staging-api",
     "prisma:prod:migrate": "POSTGRES_URL=$POSTGRES_URL prisma migrate deploy",
     "prisma:prod:generate": "POSTGRES_URL=$POSTGRES_URL prisma generate",
