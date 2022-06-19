@@ -24,7 +24,17 @@ export const deviceBySigningPublicKey = queryField((t) => {
         userId,
         signingPublicKey: args.signingPublicKey,
       });
-      return { device };
+      if (!device.userId) {
+        throw new Error("UserId missing");
+      }
+      return {
+        device: {
+          encryptionPublicKey: device.encryptionPublicKey,
+          encryptionPublicKeySignature: device.encryptionPublicKeySignature,
+          signingPublicKey: device.signingPublicKey,
+          userId: device.userId,
+        },
+      };
     },
   });
 });

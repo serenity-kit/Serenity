@@ -42,7 +42,7 @@ export const finishLoginMutation = mutationField("finishLogin", {
     return {
       success: true,
       // temporarily until we replace it with a proper session
-      mainDeviceSigningPublicKey: user?.mainDeviceSigningPublicKey,
+      mainDeviceSigningPublicKey: user?.mainDeviceSigningPublicKey || "",
     };
   },
 });
