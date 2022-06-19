@@ -103,7 +103,11 @@ function RootNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
-      <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+      <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="Register"
         component={RegisterScreen}

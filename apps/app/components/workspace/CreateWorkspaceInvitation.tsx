@@ -1,11 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-import {
-  Button,
-  LabeledInput,
-  Text,
-  View,
-  ViewProps,
-} from "@serenity-tools/ui";
+import React, { useState } from "react";
+import { Button, LabeledInput, View } from "@serenity-tools/ui";
 import {
   useWorkspaceInvitationsQuery,
   useCreateWorkspaceInvitationMutation,

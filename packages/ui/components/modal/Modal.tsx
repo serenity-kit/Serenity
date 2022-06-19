@@ -5,7 +5,6 @@ import {
 } from "react-native-modal";
 import { StyleSheet } from "react-native";
 import { Box } from "../box/Box";
-import { Text } from "../text/Text";
 import { tw } from "../../tailwind";
 
 type ModalProps = Pick<
