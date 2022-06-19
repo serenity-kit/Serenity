@@ -1,10 +1,9 @@
 name: "Deploy API to Heroku"
 
-# on:
-#   push:
-#     branches:
-#       - main
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   deploy-staging:

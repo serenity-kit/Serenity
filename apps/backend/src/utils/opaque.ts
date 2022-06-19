@@ -49,8 +49,11 @@ export const startRegistration = ({
   challenge: string;
 }) => {
   const registrationId = uuidv4();
-  const serverRegistration = new HandleRegistration(opaqueServerSetup());
+  const serverRegistration: HandleRegistrationType = new HandleRegistration(
+    opaqueServerSetup()
+  );
   const response = serverRegistration.start(
+    // @ts-expect-error string just works fine
     username,
     sodium.from_base64(challenge)
   );
@@ -92,13 +95,13 @@ export const startLogin = ({
   challenge: string;
 }) => {
   const loginId = uuidv4();
-  const serverLogin = new HandleLogin(opaqueServerSetup());
+  const serverLogin: HandleLoginType = new HandleLogin(opaqueServerSetup());
   const response = serverLogin.start(
     sodium.from_base64(envelope),
+    // @ts-expect-error string just works fine
     username,
     sodium.from_base64(challenge)
   );
-  console.log("START LOGIN: after");
   logins[loginId] = {
     username,
     handleLogin: serverLogin,

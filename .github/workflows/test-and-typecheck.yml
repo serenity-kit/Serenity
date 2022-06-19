@@ -3,26 +3,26 @@ name: Test, Lint and Typecheck
 on: [push]
 
 jobs:
-  # typecheck:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Install dependencies
-  #       run: yarn install --frozen-lockfile
-  #     - name: Typecheck
-  #       run: yarn ts:check
-  # test:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Setup .env
-  #       run: cp apps/backend/.env.example apps/backend/.env
-  #     - name: Run Database
-  #       run: docker-compose up -d
-  #     - name: Install dependencies
-  #       run: yarn install --frozen-lockfile
-  #     - name: Test
-  #       run: yarn test
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Typecheck
+        run: yarn ts:check
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .env
+        run: cp apps/backend/.env.example apps/backend/.env
+      - name: Run Database
+        run: docker-compose up -d
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Test
+        run: yarn test
   prettier:
     runs-on: ubuntu-latest
     steps:
