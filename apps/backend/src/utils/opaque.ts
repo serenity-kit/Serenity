@@ -1,10 +1,10 @@
 import sodium from "libsodium-wrappers";
 import { v4 as uuidv4 } from "uuid";
 
-// import type {
-//   HandleRegistration as HandleRegistrationType,
-//   HandleLogin as HandleLoginType,
-// } from "@serenity-tools/opaque-server";
+import type {
+  HandleRegistration as HandleRegistrationType,
+  HandleLogin as HandleLoginType,
+} from "@serenity-tools/opaque-server";
 
 const {
   HandleRegistration,
@@ -17,14 +17,14 @@ const {
 // TODO let started registrations expire after a while
 const registrations: {
   [registrationId: string]: {
-    handleRegistration: any;
+    handleRegistration: HandleRegistrationType;
     username: string;
   };
 } = {};
 
 const logins: {
   [loginId: string]: {
-    handleLogin: any;
+    handleLogin: HandleLoginType;
     username: string;
   };
 } = {};
