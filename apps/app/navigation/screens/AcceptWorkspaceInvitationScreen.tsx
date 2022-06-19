@@ -85,9 +85,7 @@ export default function AcceptWorkspaceInvitationScreen(
   }, [workspaceInvitationQuery.fetching]);
 
   const onLoginSuccess = () => {
-    props.navigation.replace("AcceptWorkspaceInvitation", {
-      workspaceInvitationId,
-    });
+    // TODO
   };
 
   return (
@@ -113,7 +111,7 @@ export default function AcceptWorkspaceInvitationScreen(
               </Text>
             </View>
           )}
-          <LoginForm />
+          <LoginForm onLoginSuccess={onLoginSuccess} />
         </Box>
       </View>
     </>
