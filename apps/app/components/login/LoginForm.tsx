@@ -16,8 +16,8 @@ import * as sodium from "@serenity-tools/libsodium";
 
 type Props = {
   defaultEmail?: string;
-  onLoginSuccess?: () => void;
-  onLoginFail?: () => void;
+  onLoginSuccess: () => void;
+  onLoginFail: () => void;
   onEmailChangeText?: (username: string) => void;
   onFormFilled?: () => void;
 };
@@ -26,6 +26,7 @@ export function LoginForm(props: Props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [username, _setUsername] = useState("");
   const [password, _setPassword] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
@@ -53,47 +54,38 @@ export function LoginForm(props: Props) {
   };
 
   const login = async (username: string, password: string) => {
-    try {
-      const message = await startLogin(password);
-      const mutationResult = await startLoginMutation({
+    const message = await startLogin(password);
+    const startLoginResult = await startLoginMutation({
+      input: {
+        username: username,
+        challenge: message,
+      },
+    });
+    // check for an error
+    if (startLoginResult.data?.startLogin) {
+      const result = await finishLogin(
+        startLoginResult.data.startLogin.challengeResponse
+      );
+
+      const finishLoginResult = await finishLoginMutation({
         input: {
-          username: username,
-          challenge: message,
+          loginId: startLoginResult.data.startLogin.loginId,
+          message: result.response,
         },
       });
-      // check for an error
-      if (mutationResult.data?.startLogin) {
-        const result = await finishLogin(
-          mutationResult.data.startLogin.challengeResponse
+
+      if (finishLoginResult.data?.finishLogin) {
+        updateAuthentication(
+          finishLoginResult.data.finishLogin.mainDeviceSigningPublicKey
         );
-
-        const finishLoginResult = await finishLoginMutation({
-          input: {
-            loginId: mutationResult.data.startLogin.loginId,
-            message: result.response,
-          },
-        });
-
-        if (finishLoginResult.data?.finishLogin) {
-          // reset the password in case the user ends up on this screen again
-          setPassword("");
-          setUsername("");
-          updateAuthentication(
-            finishLoginResult.data.finishLogin.mainDeviceSigningPublicKey
-          );
-          return result;
-        } else if (finishLoginResult.error) {
-          return;
-        }
-      } else if (mutationResult.error) {
-        return;
+        return result;
+      } else if (finishLoginResult.error) {
+        throw new Error("Failed to finish login");
       }
-    } catch (error) {
-      console.log("error getting server challenge");
-      console.log(error);
-      setGqlErrorMessage(error.toString());
-      return;
+    } else if (startLoginResult.error) {
+      throw new Error("Failed to start login");
     }
+    throw new Error("Failed to login");
   };
 
   const fetchMainDevice = async (exportKey: string) => {
@@ -131,16 +123,21 @@ export function LoginForm(props: Props) {
   };
 
   const onLoginPress = async () => {
-    setGqlErrorMessage("");
-    const loginResult = await login(username, password);
-    if (!loginResult) {
+    try {
+      setGqlErrorMessage("");
+      setIsLoggingIn(true);
+      const loginResult = await login(username, password);
+      await fetchMainDevice(loginResult.exportKey);
+      // reset the password in case the user ends up on this screen again
+      setPassword("");
+      setUsername("");
+      setIsLoggingIn(false);
+      props.onLoginSuccess();
+    } catch (error) {
+      setGqlErrorMessage("Failed to login.");
+      setIsLoggingIn(false);
       if (props.onLoginFail) {
         props.onLoginFail();
-      }
-    } else {
-      await fetchMainDevice(loginResult.exportKey);
-      if (props.onLoginSuccess) {
-        props.onLoginSuccess();
       }
     }
   };
@@ -173,7 +170,7 @@ export function LoginForm(props: Props) {
         placeholder="Enter your password …"
       />
 
-      <Button onPress={onLoginPress} size="large">
+      <Button onPress={onLoginPress} size="large" disabled={isLoggingIn}>
         Log in
       </Button>
       <View style={tw`text-center`}>
