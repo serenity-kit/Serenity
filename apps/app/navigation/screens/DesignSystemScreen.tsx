@@ -21,6 +21,7 @@ import {
   ModalHeader,
   ModalButtonFooter,
   IconButton,
+  Tooltip,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -36,7 +37,11 @@ export default function DesignSystemScreen() {
 
   return (
     <ScrollView style={tw`px-4 py-6`}>
-      <Text style={tw`mb-4 h2`}>Text</Text>
+      <Text style={tw`mb-4 h2`}>Tooltip</Text>
+      <Tooltip label="This is a tip!" placement="right">
+        <IconButton name="arrow-right" color="gray-500" />
+      </Tooltip>
+      <Text style={tw`my-4 h2`}>Text</Text>
       <Text variant="large">large Text</Text>
       <Text>regular Text</Text>
       <Text variant="small">small Text</Text>
