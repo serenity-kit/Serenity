@@ -8,7 +8,7 @@ type TooltipProps = ITooltipProps & {};
 
 export const Tooltip = React.forwardRef((props: TooltipProps, ref) => {
   const styles = StyleSheet.create({
-    default: tw``,
+    default: tw`shadow-none`,
     text: tw`text-xxs font-inter-semi`,
   });
 
@@ -22,6 +22,7 @@ export const Tooltip = React.forwardRef((props: TooltipProps, ref) => {
       borderRadius={2}
       hasArrow={true}
       arrowSize={10}
+      isOpen={true}
       _text={{
         style: styles.text,
       }}
