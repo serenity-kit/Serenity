@@ -73,7 +73,7 @@ const customTheme = {
       button: "Inter_600SemiBold",
       input: "Inter_400Regular",
       "inter-regular": "Inter_400Regular",
-      "inter-semi": "Inter_600Semibold",
+      "inter-semi": "Inter_600SemiBold",
     },
     height: {
       "top-bar": "3rem",
