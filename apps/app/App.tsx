@@ -24,13 +24,13 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
-import { Platform } from "react-native";
 import { AuthenticationProvider } from "./context/AuthenticationContext";
 import { useCallback, useMemo, useState } from "react";
 import { devtoolsExchange } from "@urql/devtools";
 import { theme } from "../../tailwind.config";
 import { OpaqueBridge } from "@serenity-tools/opaque";
 import * as storage from "./utils/storage/storage";
+import { RootSiblingParent } from "react-native-root-siblings";
 
 type AuthState = {
   deviceSigningPublicKey: string;
@@ -159,22 +159,24 @@ export default function App() {
     return null;
   } else {
     return (
-      <AuthenticationProvider
-        value={{
-          updateAuthentication,
-          deviceSigningPublicKey,
-        }}
-      >
-        <Provider value={client}>
-          <SafeAreaProvider>
-            <NativeBaseProvider theme={rnTheme}>
-              <Navigation colorScheme={colorScheme} />
-              <StatusBar />
-              <OpaqueBridge />
-            </NativeBaseProvider>
-          </SafeAreaProvider>
-        </Provider>
-      </AuthenticationProvider>
+      <RootSiblingParent>
+        <AuthenticationProvider
+          value={{
+            updateAuthentication,
+            deviceSigningPublicKey,
+          }}
+        >
+          <Provider value={client}>
+            <SafeAreaProvider>
+              <NativeBaseProvider theme={rnTheme}>
+                <Navigation colorScheme={colorScheme} />
+                <StatusBar />
+                <OpaqueBridge />
+              </NativeBaseProvider>
+            </SafeAreaProvider>
+          </Provider>
+        </AuthenticationProvider>
+      </RootSiblingParent>
     );
   }
 }

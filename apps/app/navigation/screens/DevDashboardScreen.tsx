@@ -1,6 +1,5 @@
-import { Button, Link, Text, tw, View } from "@serenity-tools/ui";
+import { Link, Text, tw, View } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
-import * as storage from "../../utils/storage/storage";
 
 export default function DevDashboardScreen(props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -13,14 +12,6 @@ export default function DevDashboardScreen(props) {
       <Link to={{ screen: "EncryptDecryptImageTest" }}>
         Encrypt / Decrypt Image
       </Link>
-      <Button
-        onPress={() => {
-          storage.setItem("deviceSigningPublicKey", `TODO+jane`);
-          props.navigation.navigate("Root");
-        }}
-      >
-        Mock Mode Login
-      </Button>
     </View>
   );
 }

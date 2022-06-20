@@ -28,6 +28,7 @@ import React, { useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { VStack, HStack } from "native-base";
 import { theme } from "../../../../tailwind.config";
+import Toast from "react-native-root-toast";
 
 export default function DesignSystemScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -120,6 +121,22 @@ export default function DesignSystemScreen() {
           disabled
         />
       </VStack>
+
+      <Text style={tw`mb-4 h2`}>Toast</Text>
+      <Button
+        onPress={() => {
+          Toast.show("This is a message", {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+            shadow: true,
+            animation: true,
+            hideOnPress: true,
+            delay: 0,
+          });
+        }}
+      >
+        Add Toast
+      </Button>
 
       <Text style={tw`mt-6 mb-4 h2`}>Avatar</Text>
       <Text style={tw`mt-4 mb-1`}>Sizing</Text>
