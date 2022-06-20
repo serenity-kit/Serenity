@@ -83,6 +83,7 @@ export function LoginForm(props: Props) {
         throw new Error("Failed to finish login");
       }
     } else if (startLoginResult.error) {
+      console.error(startLoginResult.error);
       throw new Error("Failed to start login");
     }
     throw new Error("Failed to login");
@@ -134,6 +135,7 @@ export function LoginForm(props: Props) {
       setIsLoggingIn(false);
       props.onLoginSuccess();
     } catch (error) {
+      console.error(error);
       setGqlErrorMessage("Failed to login.");
       setIsLoggingIn(false);
       if (props.onLoginFail) {

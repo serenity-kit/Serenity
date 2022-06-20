@@ -12,7 +12,7 @@ export const createAndEncryptDevice = async (encryptionKey: string) => {
     encryptionPrivateKey: encryptionKeyPair.privateKey,
   });
   const privateKeyPairStringBase64 = sodium.to_base64(privateKeyPairString);
-  const cipherText = sodium.crypto_secretbox_easy(
+  const cipherText = await sodium.crypto_secretbox_easy(
     privateKeyPairStringBase64,
     nonce,
     encryptionKey
