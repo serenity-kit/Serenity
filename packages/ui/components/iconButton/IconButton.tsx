@@ -3,25 +3,35 @@ import { StyleSheet, Platform } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
 import { tw } from "../../tailwind";
 import { Pressable, PressableProps } from "../pressable/Pressable";
-import { View } from "../view/View";
+import { Text } from "../text/Text";
 import { Icon, IconNames } from "../icon/Icon";
+import { HStack } from "native-base";
 
 export type IconButtonProps = PressableProps & {
   name: IconNames;
   color?: string;
   large?: boolean;
+  label?: string;
 };
 
 export const IconButton = forwardRef((props: IconButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
-  const { name, large, color = "gray-400", ...rest } = props;
+  const { name, large, color, label, ...rest } = props;
 
-  const dimensions = large ? "w-8 h-8" : "w-5 h-5";
+  let dimensions = large ? "w-8 h-8" : "w-5 h-5";
+  let iconColor = color ?? "gray-400";
+
+  if (label) {
+    dimensions = "w-auto h-auto";
+    iconColor = color ?? "gray-600";
+  }
 
   const styles = StyleSheet.create({
     pressable: tw.style(dimensions), // defines clickable area
     view: tw.style(
-      `${dimensions} flex justify-center items-center bg-transparent rounded-sm`
+      `${dimensions} flex justify-center items-center bg-transparent rounded-sm ${
+        label && `p-1 rounded`
+      }`
     ),
     hover: tw`bg-gray-200`,
     pressed: tw`bg-gray-300`,
@@ -44,19 +54,28 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
     >
       {({ isPressed, isHovered, isFocused }) => {
         return (
-          <View
+          <HStack
             style={[
               styles.view,
               isHovered && styles.hover,
               isPressed && styles.pressed,
               isFocusVisible && styles.focusVisible,
             ]}
+            space={2}
           >
             <Icon
               name={name}
-              color={tw.color(isHovered ? "gray-800" : color)}
+              color={tw.color(isHovered ? "gray-800" : iconColor)}
             />
-          </View>
+            {label && (
+              <Text
+                variant="xs"
+                style={isHovered ? tw`text-gray-800` : tw`text-${iconColor}`}
+              >
+                {props.label}
+              </Text>
+            )}
+          </HStack>
         );
       }}
     </Pressable>
