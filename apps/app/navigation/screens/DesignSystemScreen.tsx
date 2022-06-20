@@ -30,6 +30,8 @@ import { VStack, HStack } from "native-base";
 import { theme } from "../../../../tailwind.config";
 import Toast from "react-native-root-toast";
 
+let counter = 0;
+
 export default function DesignSystemScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [showModal, setShowModal] = useState(false);
@@ -125,7 +127,8 @@ export default function DesignSystemScreen() {
       <Text style={tw`mb-4 h2`}>Toast</Text>
       <Button
         onPress={() => {
-          Toast.show("This is a message", {
+          counter = counter + 1;
+          Toast.show(`This is a message ${counter}`, {
             duration: Toast.durations.LONG,
             position: Toast.positions.BOTTOM,
             shadow: true,
