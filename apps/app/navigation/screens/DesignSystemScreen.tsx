@@ -235,7 +235,6 @@ export default function DesignSystemScreen() {
           <SidebarButton
             onPress={() => {
               setIsOpenPopover(false);
-              alert("Hello");
             }}
           >
             <Text variant="small">Hello</Text>
