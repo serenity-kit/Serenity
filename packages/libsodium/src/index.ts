@@ -104,7 +104,7 @@ export const crypto_pwhash = async (
 ): Promise<string> => {
   const result = sodium.crypto_pwhash(
     keyLength,
-    from_base64(password),
+    password,
     from_base64(salt),
     opsLimit,
     memLimit,
@@ -113,11 +113,11 @@ export const crypto_pwhash = async (
   return to_base64(result);
 };
 
-export const crypto_secretbox_easy = (
+export const crypto_secretbox_easy = async (
   message: string,
   nonce: string,
   key: string
-): string => {
+): Promise<string> => {
   const cipherText = sodium.crypto_secretbox_easy(
     from_base64(message),
     from_base64(nonce),
@@ -126,13 +126,13 @@ export const crypto_secretbox_easy = (
   return to_base64(cipherText);
 };
 
-export const crypto_secretbox_open_easy = (
-  cipherText: string,
+export const crypto_secretbox_open_easy = async (
+  ciphertext: string,
   nonce: string,
   key: string
-): string => {
+): Promise<string> => {
   const message = sodium.crypto_secretbox_open_easy(
-    from_base64(cipherText),
+    from_base64(ciphertext),
     from_base64(nonce),
     from_base64(key)
   );

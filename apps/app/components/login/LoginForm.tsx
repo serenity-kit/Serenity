@@ -83,6 +83,7 @@ export function LoginForm(props: Props) {
         throw new Error("Failed to finish login");
       }
     } else if (startLoginResult.error) {
+      console.error(startLoginResult.error);
       throw new Error("Failed to start login");
     }
     throw new Error("Failed to login");
