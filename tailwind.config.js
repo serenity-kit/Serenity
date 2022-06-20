@@ -72,6 +72,8 @@ const customTheme = {
     fontFamily: {
       button: "Inter_600SemiBold",
       input: "Inter_400Regular",
+      "inter-regular": "Inter_400Regular",
+      "inter-semi": "Inter_600Semibold",
     },
     height: {
       "top-bar": "3rem",
