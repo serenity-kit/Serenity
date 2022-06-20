@@ -118,6 +118,7 @@ module.exports = {
         "se-outline-error-mini": {
           boxShadow: `0px 0px 0px 0.125rem ${customTheme.colors.error["200"]}`, // web-only
         },
+        "se-shadow-lg": `shadow-black shadow-color-opacity-10 shadow-radius-2 shadow-offset-0/[1px]`,
         // TODO remove when heading declarations are done
         h1: `text-h1 font-bold`,
         h2: `text-h2 font-bold`,
