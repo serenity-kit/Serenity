@@ -7,7 +7,7 @@ import { Pressable, PressableProps } from "../pressable/Pressable";
 export type SidebarButtonProps = PressableProps & {};
 
 export const SidebarButton = React.forwardRef(
-  ({ children, ...rest }: SidebarButtonProps, ref: any) => {
+  ({ children, px = 4, py = 1, ...rest }: SidebarButtonProps, ref: any) => {
     const styles = StyleSheet.create({
       hover: tw`bg-gray-200`,
       disabled: tw`bg-transparent opacity-50`, // TODO opacity tbd
@@ -17,8 +17,8 @@ export const SidebarButton = React.forwardRef(
       <Pressable
         ref={ref}
         {...rest}
-        px={4}
-        py={1}
+        px={px}
+        py={py}
         // @ts-expect-error - native base style mismatch
         style={[rest.style]}
         _hover={{
