@@ -41,12 +41,19 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   }, []);
 
   const createWorkspace = async () => {
-    const id = uuidv4();
+    const workspaceId = uuidv4();
+    const folderId = uuidv4();
+    const documentId = uuidv4();
     const createInitialWorkspaceStructureResult =
       await createInitialWorkspaceStructure({
         input: {
           workspaceName: name,
-          workspaceId: id,
+          workspaceId,
+          folderName: "Getting started",
+          folderId,
+          folderIdSignature: `TODO+${folderId}`,
+          documentName: "Introduction",
+          documentId,
         },
       });
     if (

@@ -1,15 +1,18 @@
-import { createDocument } from "../document/createDocument";
 import { createWorkspace } from "./createWorkspace";
 import { createFolder } from "../folder/createFolder";
 import { Workspace } from "../../types/workspace";
 import { Document } from "../../types/document";
 import { Folder } from "../../types/folder";
-import { v4 as uuidv4 } from "uuid";
 
 export type Params = {
   userId: string;
   workspaceId: string;
   workspaceName: string;
+  folderId: string;
+  folderIdSignature: string;
+  folderName: string;
+  documentId: string;
+  documentName: string;
 };
 
 export type CreateWorkspaceResult = {
@@ -22,6 +25,8 @@ export async function createInitialWorkspaceStructure({
   userId,
   workspaceId,
   workspaceName,
+  folderId,
+  folderName,
 }: Params): Promise<CreateWorkspaceResult> {
   const workspace = await createWorkspace({
     id: workspaceId,
@@ -30,8 +35,8 @@ export async function createInitialWorkspaceStructure({
   });
   const folder = await createFolder({
     userId,
-    id: uuidv4(),
-    name: "Getting Started",
+    id: folderId,
+    name: folderName,
     parentFolderId: undefined,
     workspaceId: workspace.id,
   });

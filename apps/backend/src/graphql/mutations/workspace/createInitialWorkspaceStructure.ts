@@ -9,6 +9,11 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
   definition(t) {
     t.nonNull.string("workspaceId");
     t.nonNull.string("workspaceName");
+    t.nonNull.string("folderId");
+    t.nonNull.string("folderIdSignature");
+    t.nonNull.string("folderName");
+    t.nonNull.string("documentId");
+    t.nonNull.string("documentName");
   },
 });
 
@@ -41,6 +46,11 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         userId: context.user.id,
         workspaceId: args.input.workspaceId,
         workspaceName: args.input.workspaceName,
+        folderId: args.input.folderId,
+        folderIdSignature: args.input.folderIdSignature,
+        folderName: args.input.folderName,
+        documentId: args.input.documentId,
+        documentName: args.input.documentName,
       });
       return workspaceStructure;
     },

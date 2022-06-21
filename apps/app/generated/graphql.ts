@@ -60,6 +60,11 @@ export type CreateFolderResult = {
 };
 
 export type CreateInitialWorkspaceStructureInput = {
+  documentId: Scalars['String'];
+  documentName: Scalars['String'];
+  folderId: Scalars['String'];
+  folderIdSignature: Scalars['String'];
+  folderName: Scalars['String'];
   workspaceId: Scalars['String'];
   workspaceName: Scalars['String'];
 };

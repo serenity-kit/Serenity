@@ -4,6 +4,11 @@ type Params = {
   graphql: any;
   workspaceId: string;
   workspaceName: string;
+  folderId: string;
+  folderIdSignature: string;
+  folderName: string;
+  documentId: string;
+  documentName: string;
   authorizationHeader: string;
 };
 
@@ -11,6 +16,11 @@ export const createInitialWorkspaceStructure = async ({
   graphql,
   workspaceName,
   workspaceId,
+  folderId,
+  folderIdSignature,
+  folderName,
+  documentId,
+  documentName,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -22,6 +32,11 @@ export const createInitialWorkspaceStructure = async ({
         input: {
           workspaceName: "${workspaceName}"
           workspaceId: "${workspaceId}"
+          folderId: "${folderId}"
+          folderIdSignature: "${folderIdSignature}"
+          folderName: "${folderName}"
+          documentId: "${documentId}"
+          documentName: "${documentName}"
         }
       ) {
         workspace {
