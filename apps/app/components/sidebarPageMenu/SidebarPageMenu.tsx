@@ -1,11 +1,4 @@
-import {
-  IconButton,
-  Menu,
-  SidebarButton,
-  SidebarDivider,
-  Text,
-  tw,
-} from "@serenity-tools/ui";
+import { IconButton, Menu, MenuButton, Shortcut, tw } from "@serenity-tools/ui";
 import { useDeleteDocumentsMutation } from "../../generated/graphql";
 import { useState } from "react";
 
@@ -44,23 +37,26 @@ export default function SidebarPageMenu(props: Props) {
         ></IconButton>
       }
     >
-      <SidebarButton
+      <MenuButton
         onPress={() => {
           setIsOpenMenu(false);
           props.onUpdateNamePress();
         }}
+        icon="font-size-2"
+        shortcut={<Shortcut letter="R" />}
       >
-        <Text variant="small">Change Name</Text>
-      </SidebarButton>
-      <SidebarDivider collapsed />
-      <SidebarButton
+        Rename
+      </MenuButton>
+      <MenuButton
         onPress={() => {
           setIsOpenMenu(false);
           deleteDocument(props.documentId);
         }}
+        icon="delete-bin-line"
+        danger
       >
-        <Text variant="small">Delete</Text>
-      </SidebarButton>
+        Delete
+      </MenuButton>
     </Menu>
   );
 }
