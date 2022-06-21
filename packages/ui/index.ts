@@ -18,6 +18,7 @@ export * from "./components/modal/Modal";
 export * from "./components/modalButtonFooter/ModalButtonFooter";
 export * from "./components/modalHeader/ModalHeader";
 export * from "./components/scrollView/ScrollView";
+export * from "./components/shortcut/Shortcut";
 export * from "./components/sidebarButton/SidebarButton";
 export * from "./components/sidebarLink/SidebarLink";
 export * from "./components/sidebarDivider/SidebarDivider";
