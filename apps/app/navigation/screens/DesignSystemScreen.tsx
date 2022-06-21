@@ -21,6 +21,8 @@ import {
   ModalHeader,
   ModalButtonFooter,
   IconButton,
+  MenuButton,
+  Shortcut,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -201,20 +203,77 @@ export default function DesignSystemScreen() {
             </Pressable>
           }
         >
-          <View style={tw`py-1 px-4`}>
-            <Text variant="small" muted>
+          <View style={tw`p-menu-item`}>
+            <Text variant="xxs" muted bold>
               jane@example.com
             </Text>
           </View>
+          <SidebarLink
+            to={{ screen: "EncryptDecryptImageTest" }}
+            style={tw`p-menu-item`}
+          >
+            <Avatar
+              borderRadius={4}
+              size="xxs"
+              bg={tw.color(`collaboration-emerald`)}
+            >
+              <Icon
+                name="serenity-feather"
+                color={tw.color("black/35")}
+                size={16}
+              />
+            </Avatar>
+            <Text variant="xs">Happy Workspace</Text>
+          </SidebarLink>
+          <SidebarLink
+            to={{ screen: "EncryptDecryptImageTest" }}
+            style={tw`p-menu-item`}
+          >
+            <Avatar
+              borderRadius={4}
+              size="xxs"
+              bg={tw.color(`collaboration-arctic`)}
+            >
+              <Icon
+                name="serenity-feather"
+                color={tw.color("black/35")}
+                size={16}
+              />
+            </Avatar>
+            <Text variant="xs">Funny Bunny</Text>
+          </SidebarLink>
+          <View style={tw`pl-2 pr-3 py-1.5`}>
+            <IconButton
+              onPress={() => {
+                setIsOpenPopover(false);
+                alert("You are awesome !");
+              }}
+              name="plus"
+              label="Create awesomeness"
+            />
+          </View>
+
           <SidebarDivider collapsed />
-          <SidebarButton
+          <MenuButton
             onPress={() => {
               setIsOpenPopover(false);
               alert("Hello");
             }}
+            icon="emotion-line"
+            shortcut={<Shortcut letter="H" />}
           >
-            <Text variant="small">Hello</Text>
-          </SidebarButton>
+            Hello
+          </MenuButton>
+          <MenuButton
+            onPress={() => {
+              setIsOpenPopover(false);
+              alert("Danger !!");
+            }}
+            icon="delete-bin-line"
+            danger
+          >
+            Danger
+          </MenuButton>
         </Menu>
       </View>
 
