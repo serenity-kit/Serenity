@@ -40,7 +40,6 @@ export const registerUser = async (
     input: {
       registrationId: result.data.registrationId,
       message: sodium.to_base64(message),
-      clientPublicKey: "TODO",
       mainDevice: {
         ciphertext: mainDevice.cipherText,
         nonce: mainDevice.nonce,

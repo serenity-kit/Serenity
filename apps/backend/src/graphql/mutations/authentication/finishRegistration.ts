@@ -19,7 +19,6 @@ export const FinishRegistrationInput = inputObjectType({
   definition(t) {
     t.nonNull.string("message");
     t.nonNull.string("registrationId");
-    t.nonNull.string("clientPublicKey");
     t.nonNull.field("mainDevice", { type: FinishRegistrationDeviceInput });
   },
 });

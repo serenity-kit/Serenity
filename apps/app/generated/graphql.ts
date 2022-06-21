@@ -202,7 +202,6 @@ export type FinishRegistrationDeviceInput = {
 };
 
 export type FinishRegistrationInput = {
-  clientPublicKey: Scalars['String'];
   mainDevice: FinishRegistrationDeviceInput;
   message: Scalars['String'];
   registrationId: Scalars['String'];

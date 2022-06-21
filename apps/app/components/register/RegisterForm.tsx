@@ -69,7 +69,6 @@ export default function RegisterForm(props: Props) {
             message: response,
             registrationId:
               startRegistrationResult.data.startRegistration.registrationId,
-            clientPublicKey: `TODO+${uuidv4()}`,
             mainDevice: {
               ciphertext: mainDevice.cipherText,
               nonce: mainDevice.nonce,
