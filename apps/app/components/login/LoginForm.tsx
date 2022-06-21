@@ -133,7 +133,6 @@ export function LoginForm(props: Props) {
       setGqlErrorMessage("Failed to login.");
       setIsLoggingIn(false);
       if (props.onLoginFail) {
-        // test
         props.onLoginFail();
       }
     }

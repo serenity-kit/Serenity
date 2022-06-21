@@ -64,8 +64,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
 
-  console.log(getMainDevice());
-
   useEffect(() => {
     if (meResult.data && meResult.data.me) {
       if (meResult.data.me.username) {

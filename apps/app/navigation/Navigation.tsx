@@ -170,6 +170,15 @@ const linking: LinkingOptions<RootStackParamList> = {
   },
 };
 
+const LightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: tw.color("white") as string,
+    border: tw.color("gray-200") as string,
+  },
+};
+
 export default function Navigation({
   colorScheme,
 }: {
@@ -178,7 +187,7 @@ export default function Navigation({
   return (
     <NavigationContainer
       linking={linking}
-      theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+      theme={colorScheme === "dark" ? DarkTheme : LightTheme}
     >
       <RootNavigator />
     </NavigationContainer>
