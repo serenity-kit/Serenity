@@ -163,7 +163,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             </Pressable>
           }
         >
-          <View style={tw`py-2 px-3`}>
+          <View style={tw`p-menu-item`}>
             <Text variant="xxs" muted bold>
               {username}
             </Text>
@@ -181,7 +181,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                         screen: "Dashboard",
                       },
                     }}
-                    style={tw`py-2 px-3`}
+                    style={tw`p-menu-item`}
                   >
                     <Avatar
                       borderRadius={4}
