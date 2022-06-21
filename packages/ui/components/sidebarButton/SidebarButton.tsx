@@ -32,7 +32,7 @@ export const SidebarButton = React.forwardRef(
           _web: { style: [{ outlineWidth: 0 }, tw`se-inset-focus-mini`] },
         }}
       >
-        <HStack space={2} alignItems="center">
+        <HStack space={2} alignItems="center" style={tw`flex`}>
           {children}
         </HStack>
       </Pressable>
