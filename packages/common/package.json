@@ -7,6 +7,8 @@
     "test": "echo TODO"
   },
   "dependencies": {
-    "@serenity-tools/libsodium": "*"
+    "@serenity-tools/libsodium": "*",
+    "@naisho/core": "*",
+    "uuid": "^8.3.2"
   }
 }
