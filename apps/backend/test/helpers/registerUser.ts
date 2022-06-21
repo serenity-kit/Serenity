@@ -1,7 +1,4 @@
-import {
-  createAndEncryptDevice,
-  createEncryptionKeyFromOpaqueExportKey,
-} from "@serenity-tools/utils";
+import { createAndEncryptDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
 import { requestRegistrationChallengeResponse } from "./requestRegistrationChallengeResponse";
@@ -32,22 +29,14 @@ export const registerUser = async (
   `;
 
   const exportKey = result.registration.getExportKey();
-  const { encryptionKey, encryptionKeySalt } =
-    await createEncryptionKeyFromOpaqueExportKey(sodium.to_base64(exportKey));
-  const mainDevice = await createAndEncryptDevice(encryptionKey);
+  const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
+    await createAndEncryptDevice(sodium.to_base64(exportKey));
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
       registrationId: result.data.registrationId,
       message: sodium.to_base64(message),
-      mainDevice: {
-        ciphertext: mainDevice.cipherText,
-        nonce: mainDevice.nonce,
-        encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
-        encryptionPublicKey: mainDevice.encryptionKeyPair.publicKey,
-        signingPublicKey: mainDevice.signingKeyPair.publicKey,
-        encryptionKeySalt,
-      },
+      mainDevice,
     },
   });
 
@@ -72,6 +61,6 @@ export const registerUser = async (
 
   return {
     userId: verifyRegistrationResponse.verifyRegistration.id,
-    mainDeviceSigningPublicKey: mainDevice.signingKeyPair.publicKey,
+    mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
   };
 };

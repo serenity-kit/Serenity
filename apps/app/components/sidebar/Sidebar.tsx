@@ -35,6 +35,7 @@ import { HStack } from "native-base";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useEffect, useState } from "react";
 import Folder from "../sidebarFolder/SidebarFolder";
+import { getMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
@@ -62,6 +63,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const { updateAuthentication } = useAuthentication();
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
+
+  console.log(getMainDevice());
 
   useEffect(() => {
     if (meResult.data && meResult.data.me) {
