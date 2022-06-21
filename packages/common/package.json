@@ -1,5 +1,5 @@
 {
-  "name": "@serenity-tools/utils",
+  "name": "@serenity-tools/common",
   "version": "0.0.1",
   "main": "src/index",
   "scripts": {

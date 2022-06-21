@@ -10,9 +10,9 @@ import { useAuthentication } from "../../context/AuthenticationContext";
 import { startLogin, finishLogin } from "@serenity-tools/opaque";
 import { useWindowDimensions } from "react-native";
 import { VStack } from "native-base";
-import { createEncryptionKeyFromOpaqueExportKey } from "@serenity-tools/utils";
+import { decryptDevice } from "@serenity-tools/common";
 import { useClient } from "urql";
-import * as sodium from "@serenity-tools/libsodium";
+import { setMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
 
 type Props = {
   defaultEmail?: string;
@@ -99,25 +99,19 @@ export function LoginForm(props: Props) {
 
     if (mainDeviceResult.data?.mainDevice) {
       const mainDevice = mainDeviceResult.data.mainDevice;
-      const { encryptionKey } = await createEncryptionKeyFromOpaqueExportKey(
-        exportKey,
-        mainDevice.encryptionKeySalt
-      );
-      console.log("login exportKey", exportKey);
-      console.log("login encryptionKeySalt", mainDevice.encryptionKeySalt);
-      console.log("login encryptionKey", encryptionKey);
 
-      const decryptedCiphertextBase64 = await sodium.crypto_secretbox_open_easy(
-        mainDevice.ciphertext,
-        mainDevice.nonce,
-        encryptionKey
-      );
-      const privateKeyPairString = sodium.from_base64_to_string(
-        decryptedCiphertextBase64
-      );
-      const privateKeyPairs = JSON.parse(privateKeyPairString);
-      console.log("privateKeyPairs", privateKeyPairs);
-      // TODO: store the keys in memory
+      const privateKeys = await decryptDevice({
+        ciphertext: mainDevice.ciphertext,
+        encryptionKeySalt: mainDevice.encryptionKeySalt,
+        nonce: mainDevice.nonce,
+        exportKey,
+      });
+      setMainDevice({
+        encryptionPrivateKey: privateKeys.encryptionPrivateKey,
+        signingPrivateKey: privateKeys.signingPrivateKey,
+        signingPublicKey: mainDevice.signingPublicKey,
+        encryptionPublicKey: mainDevice.encryptionPublicKey,
+      });
     } else {
       throw new Error("Failed to fetch main device.");
     }
@@ -139,6 +133,7 @@ export function LoginForm(props: Props) {
       setGqlErrorMessage("Failed to login.");
       setIsLoggingIn(false);
       if (props.onLoginFail) {
+        // test
         props.onLoginFail();
       }
     }

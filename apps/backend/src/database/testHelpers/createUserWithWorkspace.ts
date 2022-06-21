@@ -1,7 +1,7 @@
 import {
   createAndEncryptDevice,
   createEncryptionKeyFromOpaqueExportKey,
-} from "@serenity-tools/utils";
+} from "@serenity-tools/common";
 import sodium from "libsodium-wrappers";
 import { prisma } from "../prisma";
 

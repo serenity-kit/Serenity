@@ -1,7 +1,7 @@
 import {
   createAndEncryptDevice,
   createEncryptionKeyFromOpaqueExportKey,
-} from "@serenity-tools/utils";
+} from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
 import { requestRegistrationChallengeResponse } from "./requestRegistrationChallengeResponse";

@@ -6,7 +6,7 @@ import { requestRegistrationChallengeResponse } from "../../../../test/helpers/r
 import {
   createAndEncryptDevice,
   createEncryptionKeyFromOpaqueExportKey,
-} from "@serenity-tools/utils";
+} from "@serenity-tools/common";
 
 const graphql = setupGraphql();
 const username = "user";

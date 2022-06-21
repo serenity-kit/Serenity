@@ -244,6 +244,7 @@ export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
   encryptionKeySalt: Scalars['String'];
+  encryptionPublicKey: Scalars['String'];
   nonce: Scalars['String'];
   signingPublicKey: Scalars['String'];
 };
@@ -746,7 +747,7 @@ export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'Fol
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string } | null };
+export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string } | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1080,6 +1081,7 @@ export const MainDeviceDocument = gql`
     nonce
     ciphertext
     encryptionKeySalt
+    encryptionPublicKey
   }
 }
     `;

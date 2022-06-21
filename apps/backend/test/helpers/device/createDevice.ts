@@ -1,5 +1,5 @@
 import { gql } from "graphql-request";
-import { createDevice as createdDeviceHelper } from "@serenity-tools/utils";
+import { createDevice as createdDeviceHelper } from "@serenity-tools/common";
 
 type Params = {
   graphql: any;

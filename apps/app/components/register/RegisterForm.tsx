@@ -19,7 +19,8 @@ import { VStack } from "native-base";
 import {
   createAndEncryptDevice,
   createEncryptionKeyFromOpaqueExportKey,
-} from "@serenity-tools/utils";
+} from "@serenity-tools/common";
+import { setMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
 
 type Props = {
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
@@ -56,28 +57,22 @@ export default function RegisterForm(props: Props) {
           startRegistrationResult.data.startRegistration.challengeResponse
         );
 
-        const { encryptionKey, encryptionKeySalt } =
-          await createEncryptionKeyFromOpaqueExportKey(exportKey);
-        const mainDevice = await createAndEncryptDevice(encryptionKey);
+        const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
+          await createAndEncryptDevice(exportKey);
 
-        console.log("register exportKey", exportKey);
-        console.log("register encryptionKeySalt", encryptionKeySalt);
-        console.log("register encryptionKey", encryptionKey);
+        setMainDevice({
+          encryptionPrivateKey: encryptionPrivateKey,
+          signingPrivateKey: signingPrivateKey,
+          signingPublicKey: mainDevice.signingPublicKey,
+          encryptionPublicKey: mainDevice.encryptionPublicKey,
+        });
 
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
             message: response,
             registrationId:
               startRegistrationResult.data.startRegistration.registrationId,
-            mainDevice: {
-              ciphertext: mainDevice.cipherText,
-              nonce: mainDevice.nonce,
-              encryptionPublicKeySignature:
-                mainDevice.encryptionPublicKeySignature,
-              encryptionPublicKey: mainDevice.encryptionKeyPair.publicKey,
-              signingPublicKey: mainDevice.signingKeyPair.publicKey,
-              encryptionKeySalt,
-            },
+            mainDevice,
           },
         });
         // check for an error
