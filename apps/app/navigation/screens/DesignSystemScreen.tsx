@@ -377,6 +377,7 @@ export default function DesignSystemScreen() {
         <Icon name="chat-4-line" />
         <Icon name="check-line" />
         <Icon name="close-circle-fill" />
+        <Icon name="command-line" />
         <Icon name="cup-line" />
         <Icon name="cursor" />
         <Icon name="delete-bin-line" />
