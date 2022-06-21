@@ -25,7 +25,6 @@ import * as MeQueryTypes from "./graphql/queries/authentication/me";
 import * as UserIdFromUsernameQueryTypes from "./graphql/queries/userIdFromUsername";
 
 import * as WorkspaceTypes from "./graphql/types/workspace";
-import * as CreateWorkspaceMutationTypes from "./graphql/mutations/workspace/createWorkspace";
 import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/deleteWorkspaces";
 import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/updateWorkspace";
 import * as CreateWorkspaceInvitationTypes from "./graphql/mutations/workspace/createWorkspaceInvitation";
@@ -71,7 +70,6 @@ export const schema = makeSchema({
     MeQueryTypes,
     UserIdFromUsernameQueryTypes,
 
-    CreateWorkspaceMutationTypes,
     DeleteWorkspacesMutationTypes,
     UpdateWorkspaceMutationTypes,
     WorkspaceTypes,
