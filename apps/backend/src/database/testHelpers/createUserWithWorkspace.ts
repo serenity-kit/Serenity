@@ -1,8 +1,4 @@
-import {
-  createAndEncryptDevice,
-  createEncryptionKeyFromOpaqueExportKey,
-} from "@serenity-tools/common";
-import sodium from "libsodium-wrappers";
+import { createAndEncryptDevice } from "@serenity-tools/common";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -17,14 +13,12 @@ export default async function createUserWithWorkspace({
   return await prisma.$transaction(async (prisma) => {
     const exportKey = "12345689";
 
-    const { encryptionKey, encryptionKeySalt } =
-      await createEncryptionKeyFromOpaqueExportKey(sodium.to_base64(exportKey));
-    const mainDevice = await createAndEncryptDevice(encryptionKey);
+    const mainDevice = await createAndEncryptDevice(exportKey);
 
     const device = await prisma.device.create({
       data: {
-        signingPublicKey: mainDevice.signingKeyPair.publicKey,
-        encryptionPublicKey: mainDevice.encryptionKeyPair.publicKey,
+        signingPublicKey: mainDevice.signingPublicKey,
+        encryptionPublicKey: mainDevice.encryptionPublicKey,
         encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
       },
     });
@@ -34,10 +28,10 @@ export default async function createUserWithWorkspace({
         username,
         opaqueEnvelope: "TODO",
         clientPublicKey: "abc",
-        mainDeviceCiphertext: mainDevice.cipherText,
+        mainDeviceCiphertext: mainDevice.ciphertext,
         mainDeviceNonce: mainDevice.nonce,
-        mainDeviceSigningPublicKey: mainDevice.signingKeyPair.publicKey,
-        mainDeviceEncryptionKeySalt: encryptionKeySalt,
+        mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+        mainDeviceEncryptionKeySalt: mainDevice.encryptionKeySalt,
         devices: {
           connect: {
             signingPublicKey: device.signingPublicKey,

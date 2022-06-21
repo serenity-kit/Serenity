@@ -3,10 +3,7 @@ import sodium from "libsodium-wrappers";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { requestRegistrationChallengeResponse } from "../../../../test/helpers/requestRegistrationChallengeResponse";
-import {
-  createAndEncryptDevice,
-  createEncryptionKeyFromOpaqueExportKey,
-} from "@serenity-tools/common";
+import { createAndEncryptDevice } from "@serenity-tools/common";
 
 const graphql = setupGraphql();
 const username = "user";
@@ -42,22 +39,14 @@ test("server should register a user", async () => {
   `;
 
   const exportKey = result.registration.getExportKey();
-  const { encryptionKey, encryptionKeySalt } =
-    await createEncryptionKeyFromOpaqueExportKey(sodium.to_base64(exportKey));
-  const mainDevice = await createAndEncryptDevice(encryptionKey);
+  const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
+    await createAndEncryptDevice(sodium.to_base64(exportKey));
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
       registrationId: result.data.registrationId,
       message: sodium.to_base64(message),
-      mainDevice: {
-        ciphertext: mainDevice.cipherText,
-        nonce: mainDevice.nonce,
-        encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
-        encryptionPublicKey: mainDevice.encryptionKeyPair.publicKey,
-        signingPublicKey: mainDevice.signingKeyPair.publicKey,
-        encryptionKeySalt,
-      },
+      mainDevice,
     },
   });
   expect(typeof registrationResponse.finishRegistration.id).toBe("string");

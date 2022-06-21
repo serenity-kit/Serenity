@@ -16,10 +16,7 @@ import {
 import { useWindowDimensions } from "react-native";
 import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
 import { VStack } from "native-base";
-import {
-  createAndEncryptDevice,
-  createEncryptionKeyFromOpaqueExportKey,
-} from "@serenity-tools/common";
+import { createAndEncryptDevice } from "@serenity-tools/common";
 import { setMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
 
 type Props = {
