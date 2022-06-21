@@ -50,7 +50,6 @@ test("server should register a user", async () => {
     input: {
       registrationId: result.data.registrationId,
       message: sodium.to_base64(message),
-      clientPublicKey: "TODO",
       mainDevice: {
         ciphertext: mainDevice.cipherText,
         nonce: mainDevice.nonce,
