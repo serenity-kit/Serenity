@@ -52,7 +52,6 @@ model Update {
 model UnverifiedUser {
   id                                         String    @id @default(uuid())
   username                                   String
-  clientPublicKey                            String
   opaqueEnvelope                             String
   // contains the device signingPrivateKey and encryptionPrivateKey
   // can be decrypted using the key storred in the OPAQUE envelope
@@ -70,7 +69,6 @@ model UnverifiedUser {
 model User {
   id                                         String                 @id @default(uuid())
   username                                   String                 @unique
-  clientPublicKey                            String
   opaqueEnvelope                             String
   // contains the device signingPrivateKey and encryptionPrivateKey
   // can be decrypted using the key storred in the OPAQUE envelope

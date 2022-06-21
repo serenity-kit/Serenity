@@ -27,7 +27,6 @@ export default async function createUserWithWorkspace({
       data: {
         username,
         opaqueEnvelope: "TODO",
-        clientPublicKey: "abc",
         mainDeviceCiphertext: mainDevice.ciphertext,
         mainDeviceNonce: mainDevice.nonce,
         mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
