@@ -1,0 +1,21 @@
+mutation createInitialWorkspaceStructure(
+  $input: CreateInitialWorkspaceStructureInput!
+) {
+  createInitialWorkspaceStructure(input: $input) {
+    workspace {
+      id
+      name
+      members {
+        userId
+        isAdmin
+      }
+    }
+    folder {
+      id
+      name
+      parentFolderId
+      rootFolderId
+      workspaceId
+    }
+  }
+}
