@@ -14,6 +14,7 @@ export * from "./components/icon/Icon";
 export * from "./components/editorSidebarIcon/EditorSidebarIcon";
 export * from "./components/labeledInput/LabeledInput";
 export * from "./components/menu/Menu";
+export * from "./components/menuButton/MenuButton";
 export * from "./components/modal/Modal";
 export * from "./components/modalButtonFooter/ModalButtonFooter";
 export * from "./components/modalHeader/ModalHeader";
