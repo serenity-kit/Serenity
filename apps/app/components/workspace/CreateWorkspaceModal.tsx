@@ -15,7 +15,9 @@ type ModalProps = Pick<
 export function CreateWorkspaceModal(props: ModalProps) {
   return (
     <Modal isVisible={props.isVisible} onBackdropPress={props.onBackdropPress}>
-      <CreateWorkspaceForm onWorkspaceCreated={props.onWorkspaceCreated} />
+      <CreateWorkspaceForm
+        onWorkspaceStructureCreated={props.onWorkspaceStructureCreated}
+      />
     </Modal>
   );
 }

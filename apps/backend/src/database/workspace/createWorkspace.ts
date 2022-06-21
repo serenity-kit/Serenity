@@ -1,5 +1,6 @@
 import { prisma } from "../prisma";
 import { Workspace, WorkspaceMember } from "../../types/workspace";
+import { v4 as uuidv4 } from "uuid";
 
 type Params = {
   id: string;
@@ -55,6 +56,8 @@ export async function createWorkspace({
       idSignature: rawWorkspace.idSignature,
       members,
     };
+
+    // TODO: insert a snapshot that includes basic title and text content to document
     return workspace;
   });
 }
