@@ -1,8 +1,9 @@
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { registerUser } from "../../../../test/helpers/registerUser";
-import { createWorkspace } from "../../../../test/helpers/workspace/createWorkspace";
+import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
+import { v4 as uuidv4 } from "uuid";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -22,13 +23,19 @@ beforeEach(async () => {
     const registerUserResult = await registerUser(graphql, username, password);
     mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
 
-    const createWorkspaceResult = await createWorkspace({
-      name: "workspace 1",
-      id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+    const createWorkspaceResult = await createInitialWorkspaceStructure({
+      workspaceName: "workspace 1",
+      workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+      folderName: "Getting started",
+      folderId: uuidv4(),
+      folderIdSignature: `TODO+${uuidv4()}`,
+      documentName: "Introduction",
+      documentId: uuidv4(),
       graphql,
       authorizationHeader: mainDeviceSigningPublicKey,
     });
-    addedWorkspace = createWorkspaceResult.createWorkspace.workspace;
+    addedWorkspace =
+      createWorkspaceResult.createInitialWorkspaceStructure.workspace;
   }
 });
 
@@ -155,13 +162,19 @@ test("Throw error when user doesn't have access", async () => {
   const username2 = "user2";
   const registerUserResult = await registerUser(graphql, username2, password);
   isUserRegistered = true;
-  const createWorkspaceResult = await createWorkspace({
-    name: "workspace 1",
-    id: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
+  const createWorkspaceResult = await createInitialWorkspaceStructure({
+    workspaceName: "workspace 1",
+    workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
+    folderName: "Getting started",
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    documentName: "Introduction",
+    documentId: uuidv4(),
     graphql,
     authorizationHeader: registerUserResult.mainDeviceSigningPublicKey,
   });
-  addedWorkspace = createWorkspaceResult.createWorkspace.workspace;
+  addedWorkspace =
+    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
   await expect(
     (async () =>
       await createFolder({

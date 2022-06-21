@@ -27,18 +27,10 @@ export const createInitialWorkspaceStructure = async ({
     authorization: authorizationHeader,
   };
   const query = gql`
-    mutation {
-        createInitialWorkspaceStructure(
-        input: {
-          workspaceName: "${workspaceName}"
-          workspaceId: "${workspaceId}"
-          folderId: "${folderId}"
-          folderIdSignature: "${folderIdSignature}"
-          folderName: "${folderName}"
-          documentId: "${documentId}"
-          documentName: "${documentName}"
-        }
-      ) {
+    mutation createInitialWorkspaceStructure(
+      $input: CreateInitialWorkspaceStructureInput!
+    ) {
+      createInitialWorkspaceStructure(input: $input) {
         workspace {
           id
           name
@@ -59,7 +51,17 @@ export const createInitialWorkspaceStructure = async ({
   `;
   const result = await graphql.client.request(
     query,
-    null,
+    {
+      input: {
+        workspaceName,
+        workspaceId,
+        folderId,
+        folderIdSignature,
+        folderName,
+        documentId,
+        documentName,
+      },
+    },
     authorizationHeaders
   );
   return result;

@@ -76,11 +76,6 @@ export type CreateInitialWorkspaceStructureResult = {
   workspace?: Maybe<Workspace>;
 };
 
-export type CreateWorkspaceInput = {
-  id: Scalars['String'];
-  name: Scalars['String'];
-};
-
 export type CreateWorkspaceInvitationInput = {
   workspaceId: Scalars['String'];
 };
@@ -88,11 +83,6 @@ export type CreateWorkspaceInvitationInput = {
 export type CreateWorkspaceInvitationResult = {
   __typename?: 'CreateWorkspaceInvitationResult';
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
-};
-
-export type CreateWorkspaceResult = {
-  __typename?: 'CreateWorkspaceResult';
-  workspace?: Maybe<Workspace>;
 };
 
 export type DeleteDevicesInput = {
@@ -279,7 +269,6 @@ export type Mutation = {
   createDocument?: Maybe<CreateDocumentResult>;
   createFolder?: Maybe<CreateFolderResult>;
   createInitialWorkspaceStructure?: Maybe<CreateInitialWorkspaceStructureResult>;
-  createWorkspace?: Maybe<CreateWorkspaceResult>;
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
   deleteDevices?: Maybe<DeleteDevicseResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
@@ -319,11 +308,6 @@ export type MutationCreateFolderArgs = {
 
 export type MutationCreateInitialWorkspaceStructureArgs = {
   input?: InputMaybe<CreateInitialWorkspaceStructureInput>;
-};
-
-
-export type MutationCreateWorkspaceArgs = {
-  input?: InputMaybe<CreateWorkspaceInput>;
 };
 
 
@@ -658,13 +642,6 @@ export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
 
 export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
 
-export type CreateWorkspaceMutationVariables = Exact<{
-  input: CreateWorkspaceInput;
-}>;
-
-
-export type CreateWorkspaceMutation = { __typename?: 'Mutation', createWorkspace?: { __typename?: 'CreateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null } | null };
-
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
 }>;
@@ -898,24 +875,6 @@ export const CreateInitialWorkspaceStructureDocument = gql`
 
 export function useCreateInitialWorkspaceStructureMutation() {
   return Urql.useMutation<CreateInitialWorkspaceStructureMutation, CreateInitialWorkspaceStructureMutationVariables>(CreateInitialWorkspaceStructureDocument);
-};
-export const CreateWorkspaceDocument = gql`
-    mutation createWorkspace($input: CreateWorkspaceInput!) {
-  createWorkspace(input: $input) {
-    workspace {
-      id
-      name
-      members {
-        userId
-        isAdmin
-      }
-    }
-  }
-}
-    `;
-
-export function useCreateWorkspaceMutation() {
-  return Urql.useMutation<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>(CreateWorkspaceDocument);
 };
 export const CreateWorkspaceInvitationDocument = gql`
     mutation createWorkspaceInvitation($input: CreateWorkspaceInvitationInput!) {
