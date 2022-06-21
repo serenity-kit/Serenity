@@ -62,6 +62,7 @@ export type CreateFolderResult = {
 export type CreateInitialWorkspaceStructureInput = {
   documentId: Scalars['String'];
   documentName: Scalars['String'];
+  documentSnapshot: DocumentSnapshotInput;
   folderId: Scalars['String'];
   folderIdSignature: Scalars['String'];
   folderName: Scalars['String'];
@@ -186,6 +187,19 @@ export type DocumentEdge = {
   cursor: Scalars['String'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Document>;
+};
+
+export type DocumentSnapshotInput = {
+  ciphertext: Scalars['String'];
+  nonce: Scalars['String'];
+  publicData: DocumentSnapshotPublicDataInput;
+  signature: Scalars['String'];
+};
+
+export type DocumentSnapshotPublicDataInput = {
+  docId: Scalars['String'];
+  pubKey: Scalars['String'];
+  snapshotId: Scalars['String'];
 };
 
 export type FinishLoginInput = {

@@ -91,6 +91,7 @@ export async function verifyAndDecryptSnapshot(
     snapshot.signature,
     sodium.to_base64(publicKey)
   );
+  console.log("IS VALID", isValid);
   if (!isValid) {
     return null;
   }

@@ -4,6 +4,25 @@ import { Document } from "../../types/document";
 import { Folder } from "../../types/folder";
 import { Workspace } from "../../types/workspace";
 
+export const DocumentSnapshotPublicDataInput = inputObjectType({
+  name: "DocumentSnapshotPublicDataInput",
+  definition(t) {
+    t.nonNull.string("docId");
+    t.nonNull.string("pubKey");
+    t.nonNull.string("snapshotId");
+  },
+});
+
+export const DocumentSnapshotInput = inputObjectType({
+  name: "DocumentSnapshotInput",
+  definition(t) {
+    t.nonNull.string("ciphertext");
+    t.nonNull.string("nonce");
+    t.nonNull.string("signature");
+    t.nonNull.field("publicData", { type: DocumentSnapshotPublicDataInput });
+  },
+});
+
 export const CreateInitialWorkspaceStructureInput = inputObjectType({
   name: "CreateInitialWorkspaceStructureInput",
   definition(t) {
@@ -14,6 +33,7 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
     t.nonNull.string("folderName");
     t.nonNull.string("documentId");
     t.nonNull.string("documentName");
+    t.nonNull.field("documentSnapshot", { type: DocumentSnapshotInput });
   },
 });
 
@@ -51,6 +71,7 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         folderName: args.input.folderName,
         documentId: args.input.documentId,
         documentName: args.input.documentName,
+        documentSnapshot: args.input.documentSnapshot,
       });
       return workspaceStructure;
     },
