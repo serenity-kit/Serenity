@@ -11,7 +11,12 @@ import {
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Platform } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Platform,
+  View as RNView,
+} from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -156,7 +161,7 @@ export default function SidebarFolder(props: Props) {
 
   return (
     <>
-      <View
+      <RNView
         style={[
           styles.folder,
           isHovered && styles.hover,
@@ -184,12 +189,12 @@ export default function SidebarFolder(props: Props) {
           >
             <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
               {/* not the best way but icons don't take styles (yet?) */}
-              <View style={tw`ml-0.5 -mr-0.5`}>
+              <RNView style={tw`ml-0.5 -mr-0.5`}>
                 <Icon
                   name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
                   color={tw.color("gray-600")}
                 />
-              </View>
+              </RNView>
               <Icon name="folder" size={20} />
               {isEditing === "name" ? (
                 <InlineInput
@@ -245,7 +250,7 @@ export default function SidebarFolder(props: Props) {
             </HStack>
           )}
         </HStack>
-      </View>
+      </RNView>
 
       {isOpen && (
         <>
