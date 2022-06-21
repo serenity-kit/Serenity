@@ -13,7 +13,6 @@ export const registerUser = async (
   username: string,
   password: string
 ) => {
-  console.log({ graphql });
   result = await requestRegistrationChallengeResponse(
     graphql,
     username,
