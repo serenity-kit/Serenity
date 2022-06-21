@@ -6,7 +6,8 @@ import { CreateWorkspaceForm } from "../../components/createWorkspaceForm/Create
 export default function OnboardingScreen({ navigation }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
-  const onWorkspaceCreated = (workspace: { id: string }) => {
+  const onWorkspaceStructureCreated = ({ workspace, folder, document }) => {
+    // TODO: navigate to document
     navigation.navigate("Workspace", {
       workspaceId: workspace.id,
       screen: "Dashboard",
@@ -16,7 +17,9 @@ export default function OnboardingScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={tw`max-w-sm`}>
-        <CreateWorkspaceForm onWorkspaceCreated={onWorkspaceCreated} />
+        <CreateWorkspaceForm
+          onWorkspaceStructureCreated={onWorkspaceStructureCreated}
+        />
       </View>
     </View>
   );

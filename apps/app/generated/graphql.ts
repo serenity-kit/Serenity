@@ -59,6 +59,23 @@ export type CreateFolderResult = {
   folder?: Maybe<Folder>;
 };
 
+export type CreateInitialWorkspaceStructureInput = {
+  documentId: Scalars['String'];
+  documentName: Scalars['String'];
+  folderId: Scalars['String'];
+  folderIdSignature: Scalars['String'];
+  folderName: Scalars['String'];
+  workspaceId: Scalars['String'];
+  workspaceName: Scalars['String'];
+};
+
+export type CreateInitialWorkspaceStructureResult = {
+  __typename?: 'CreateInitialWorkspaceStructureResult';
+  document?: Maybe<Document>;
+  folder?: Maybe<Folder>;
+  workspace?: Maybe<Workspace>;
+};
+
 export type CreateWorkspaceInput = {
   id: Scalars['String'];
   name: Scalars['String'];
@@ -244,6 +261,7 @@ export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
   encryptionKeySalt: Scalars['String'];
+  encryptionPublicKey: Scalars['String'];
   nonce: Scalars['String'];
   signingPublicKey: Scalars['String'];
 };
@@ -260,6 +278,7 @@ export type Mutation = {
   createDevice?: Maybe<CreateDeviceResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createFolder?: Maybe<CreateFolderResult>;
+  createInitialWorkspaceStructure?: Maybe<CreateInitialWorkspaceStructureResult>;
   createWorkspace?: Maybe<CreateWorkspaceResult>;
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
   deleteDevices?: Maybe<DeleteDevicseResult>;
@@ -295,6 +314,11 @@ export type MutationCreateDocumentArgs = {
 
 export type MutationCreateFolderArgs = {
   input?: InputMaybe<CreateFolderInput>;
+};
+
+
+export type MutationCreateInitialWorkspaceStructureArgs = {
+  input?: InputMaybe<CreateInitialWorkspaceStructureInput>;
 };
 
 
@@ -627,6 +651,13 @@ export type CreateFolderMutationVariables = Exact<{
 
 export type CreateFolderMutation = { __typename?: 'Mutation', createFolder?: { __typename?: 'CreateFolderResult', folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
 
+export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
+  input: CreateInitialWorkspaceStructureInput;
+}>;
+
+
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
+
 export type CreateWorkspaceMutationVariables = Exact<{
   input: CreateWorkspaceInput;
 }>;
@@ -746,7 +777,7 @@ export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'Fol
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string } | null };
+export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string } | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -842,6 +873,31 @@ export const CreateFolderDocument = gql`
 
 export function useCreateFolderMutation() {
   return Urql.useMutation<CreateFolderMutation, CreateFolderMutationVariables>(CreateFolderDocument);
+};
+export const CreateInitialWorkspaceStructureDocument = gql`
+    mutation createInitialWorkspaceStructure($input: CreateInitialWorkspaceStructureInput!) {
+  createInitialWorkspaceStructure(input: $input) {
+    workspace {
+      id
+      name
+      members {
+        userId
+        isAdmin
+      }
+    }
+    folder {
+      id
+      name
+      parentFolderId
+      rootFolderId
+      workspaceId
+    }
+  }
+}
+    `;
+
+export function useCreateInitialWorkspaceStructureMutation() {
+  return Urql.useMutation<CreateInitialWorkspaceStructureMutation, CreateInitialWorkspaceStructureMutationVariables>(CreateInitialWorkspaceStructureDocument);
 };
 export const CreateWorkspaceDocument = gql`
     mutation createWorkspace($input: CreateWorkspaceInput!) {
@@ -1080,6 +1136,7 @@ export const MainDeviceDocument = gql`
     nonce
     ciphertext
     encryptionKeySalt
+    encryptionPublicKey
   }
 }
     `;
