@@ -654,7 +654,7 @@ export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
 }>;
 
 
-export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
 
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
@@ -882,6 +882,9 @@ export const CreateInitialWorkspaceStructureDocument = gql`
       parentFolderId
       rootFolderId
       workspaceId
+    }
+    document {
+      id
     }
   }
 }

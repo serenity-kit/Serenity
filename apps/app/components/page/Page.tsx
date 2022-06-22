@@ -59,14 +59,12 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const websocketState = useWebsocketState();
 
   const applySnapshot = async (snapshot, key) => {
-    console.log("APPLY SNAPSHOT", snapshot);
     activeSnapshotIdRef.current = snapshot.publicData.snapshotId;
     const initialResult = await verifyAndDecryptSnapshot(
       snapshot,
       key,
       sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
     );
-    console.log("APPLY initialResult", initialResult);
     if (initialResult) {
       Yjs.applyUpdate(
         yDocRef.current,
@@ -275,8 +273,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
               data.snapshotId,
               data.clock
             );
-            const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
-            console.log(sodium.to_base64(yDocState));
 
             break;
           case "updateFailed":

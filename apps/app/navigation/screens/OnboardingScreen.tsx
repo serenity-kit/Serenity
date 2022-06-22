@@ -7,10 +7,12 @@ export default function OnboardingScreen({ navigation }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
   const onWorkspaceStructureCreated = ({ workspace, folder, document }) => {
-    // TODO: navigate to document
     navigation.navigate("Workspace", {
       workspaceId: workspace.id,
-      screen: "Dashboard",
+      screen: "Page",
+      params: {
+        pageId: document.id,
+      },
     });
   };
 

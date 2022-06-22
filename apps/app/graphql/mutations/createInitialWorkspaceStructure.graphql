@@ -17,5 +17,8 @@ mutation createInitialWorkspaceStructure(
       rootFolderId
       workspaceId
     }
+    document {
+      id
+    }
   }
 }

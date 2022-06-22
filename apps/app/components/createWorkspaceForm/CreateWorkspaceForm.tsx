@@ -82,7 +82,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     const folder =
       createInitialWorkspaceStructureResult.data.createInitialWorkspaceStructure
         .folder;
-    // TODO: we will have a document returned as part of this structure
     const document =
       createInitialWorkspaceStructureResult.data.createInitialWorkspaceStructure
         .document;

@@ -77,10 +77,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const onWorkspaceStructureCreated = ({ workspace, folder, document }) => {
     refetchWorkspacesResult();
     setShowCreateWorkspaceModal(false);
-    // TODO: navigate to document
     navigation.navigate("Workspace", {
       workspaceId: workspace.id,
-      screen: "Dashboard",
+      screen: "Page",
+      params: {
+        pageId: document.id,
+      },
     });
   };
 
