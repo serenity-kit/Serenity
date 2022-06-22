@@ -35,6 +35,7 @@ import { HStack } from "native-base";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useEffect, useState } from "react";
 import Folder from "../sidebarFolder/SidebarFolder";
+import { getMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
@@ -73,9 +74,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     }
   }, [meResult.fetching]);
 
-  const onWorkspaceCreated = (workspace: { id: string }) => {
+  const onWorkspaceStructureCreated = ({ workspace, folder, document }) => {
     refetchWorkspacesResult();
     setShowCreateWorkspaceModal(false);
+    // TODO: navigate to document
     navigation.navigate("Workspace", {
       workspaceId: workspace.id,
       screen: "Dashboard",
@@ -323,7 +325,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <CreateWorkspaceModal
         isVisible={showCreateWorkspaceModal}
         onBackdropPress={() => setShowCreateWorkspaceModal(false)}
-        onWorkspaceCreated={onWorkspaceCreated}
+        onWorkspaceStructureCreated={onWorkspaceStructureCreated}
       />
     </DrawerContentScrollView>
   );

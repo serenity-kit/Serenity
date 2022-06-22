@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "scripts": {
-    "dev": "ts-node-dev --transpile-only --no-notify ./src/index.ts",
+    "dev": "yarn prisma migrate dev && ts-node-dev --transpile-only --no-notify ./src/index.ts",
     "dev:mock": "yarn && yarn prisma generate && MOCK_GRAPHQL=true ts-node-dev --transpile-only --no-notify ./src/index.ts",
     "clean": "rm -rf build",
     "build": "yarn && yarn clean && yarn prisma:prod:generate && yarn ncc build ./src/index.ts -o build --external \"@serenity-tools/opaque-server\" && yarn build:copy-externals",
@@ -20,7 +20,7 @@
     "@naisho/core": "*",
     "@prisma/client": "^3.13.0",
     "@serenity-tools/opaque-server": "*",
-    "@serenity-tools/utils": "*",
+    "@serenity-tools/common": "*",
     "apollo-server-express": "^3.5.0",
     "canonicalize": "^1.0.8",
     "express": "^4.17.1",

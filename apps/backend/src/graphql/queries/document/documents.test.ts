@@ -2,9 +2,10 @@ import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { registerUser } from "../../../../test/helpers/registerUser";
-import { createWorkspace } from "../../../../test/helpers/workspace/createWorkspace";
+import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
+import { v4 as uuidv4 } from "uuid";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
@@ -35,9 +36,14 @@ beforeEach(async () => {
     const registerUserResult = await registerUser(graphql, username, password);
     mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
 
-    await createWorkspace({
-      name: "workspace 1",
-      id: workspaceId,
+    await createInitialWorkspaceStructure({
+      workspaceName: "workspace 1",
+      workspaceId: workspaceId,
+      folderName: "Getting started",
+      folderId: uuidv4(),
+      folderIdSignature: `TODO+${uuidv4()}`,
+      documentName: "Introduction",
+      documentId: uuidv4(),
       graphql,
       authorizationHeader: mainDeviceSigningPublicKey,
     });
@@ -75,9 +81,14 @@ beforeEach(async () => {
     mainDeviceSigningPublicKey2 =
       registerUserResult2.mainDeviceSigningPublicKey;
 
-    await createWorkspace({
-      name: "other user workspace",
-      id: otherWorkspaceId,
+    await createInitialWorkspaceStructure({
+      workspaceName: "other user workspace",
+      workspaceId: otherWorkspaceId,
+      folderName: "Getting started",
+      folderId: uuidv4(),
+      folderIdSignature: `TODO+${uuidv4()}`,
+      documentName: "Introduction",
+      documentId: uuidv4(),
       graphql,
       authorizationHeader: mainDeviceSigningPublicKey2,
     });

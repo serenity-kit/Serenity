@@ -5,17 +5,31 @@ import {
   ModalHeader,
   ModalButtonFooter,
 } from "@serenity-tools/ui";
-import { useCreateWorkspaceMutation } from "../../generated/graphql";
+import { useCreateInitialWorkspaceStructureMutation } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 
+type WorkspaceProps = {
+  id: string;
+};
+type FolderProps = {
+  id: string;
+};
+type DocumentProps = {
+  id: string;
+};
 export type CreateWorkspaceFormProps = {
-  onWorkspaceCreated: (workspace: { id: string }) => void;
+  onWorkspaceStructureCreated: ({
+    workspace: WorkspaceProps,
+    folder: FolderProps,
+    document: DocumentProps,
+  }) => void;
 };
 
 export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   const inputRef = useRef();
   const [name, setName] = useState<string>("");
-  const [, createWorkspaceMutation] = useCreateWorkspaceMutation();
+  const [, createInitialWorkspaceStructure] =
+    useCreateInitialWorkspaceStructureMutation();
 
   useEffect(() => {
     setTimeout(() => {
@@ -27,19 +41,45 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   }, []);
 
   const createWorkspace = async () => {
-    const id = uuidv4();
-    const createWorkspaceResult = await createWorkspaceMutation({
-      input: {
-        name,
-        id,
-      },
-    });
+    const workspaceId = uuidv4();
+    const folderId = uuidv4();
+    const documentId = uuidv4();
+    const createInitialWorkspaceStructureResult =
+      await createInitialWorkspaceStructure({
+        input: {
+          workspaceName: name,
+          workspaceId,
+          folderName: "Getting started",
+          folderId,
+          folderIdSignature: `TODO+${folderId}`,
+          documentName: "Introduction",
+          documentId,
+        },
+      });
     if (
-      createWorkspaceResult.data?.createWorkspace?.workspace &&
-      props.onWorkspaceCreated
+      !createInitialWorkspaceStructureResult.data
+        ?.createInitialWorkspaceStructure?.workspace
     ) {
-      const workspace = createWorkspaceResult.data.createWorkspace.workspace;
-      props.onWorkspaceCreated({ id: workspace.id });
+      // TODO: handle error
+      return;
+    }
+    const workspace =
+      createInitialWorkspaceStructureResult.data.createInitialWorkspaceStructure
+        .workspace;
+    const folder =
+      createInitialWorkspaceStructureResult.data.createInitialWorkspaceStructure
+        .folder;
+    const document = undefined;
+    // TODO: we will have a document returned as part of this structure
+    // const document =
+    //   createInitialWorkspaceStructureResult.data.createInitialWorkspaceStructure
+    //     .document;
+    if (props.onWorkspaceStructureCreated) {
+      props.onWorkspaceStructureCreated({
+        workspace,
+        folder,
+        document,
+      });
     }
   };
 

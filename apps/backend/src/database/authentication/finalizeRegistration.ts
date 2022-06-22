@@ -47,7 +47,6 @@ export async function finalizeRegistration({
         data: {
           username,
           opaqueEnvelope,
-          clientPublicKey: `TODO+${username}`,
           mainDeviceCiphertext: mainDevice.ciphertext,
           mainDeviceNonce: mainDevice.nonce,
           mainDeviceSigningPublicKey: mainDevice.signingPublicKey,

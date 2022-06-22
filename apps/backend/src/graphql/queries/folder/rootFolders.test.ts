@@ -2,8 +2,9 @@ import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { registerUser } from "../../../../test/helpers/registerUser";
-import { createWorkspace } from "../../../../test/helpers/workspace/createWorkspace";
+import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
+import { v4 as uuidv4 } from "uuid";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
@@ -31,9 +32,14 @@ beforeEach(async () => {
     const registerUserResult = await registerUser(graphql, username, password);
     mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
 
-    await createWorkspace({
-      name: "workspace 1",
-      id: workspaceId,
+    await createInitialWorkspaceStructure({
+      workspaceName: "workspace 1",
+      workspaceId: workspaceId,
+      folderId: uuidv4(),
+      folderIdSignature: `TODO+${uuidv4()}`,
+      folderName: "Getting started",
+      documentName: "Introduction",
+      documentId: uuidv4(),
       graphql,
       authorizationHeader: mainDeviceSigningPublicKey,
     });
@@ -47,9 +53,14 @@ beforeEach(async () => {
     mainDeviceSigningPublicKey2 =
       registerUserResult2.mainDeviceSigningPublicKey;
 
-    await createWorkspace({
-      name: "other user workspace",
-      id: otherWorkspaceId,
+    await createInitialWorkspaceStructure({
+      workspaceName: "other user workspace",
+      workspaceId: otherWorkspaceId,
+      folderId: uuidv4(),
+      folderIdSignature: `TODO+${uuidv4()}`,
+      folderName: "Getting started",
+      documentName: "Introduction",
+      documentId: uuidv4(),
       graphql,
       authorizationHeader: mainDeviceSigningPublicKey2,
     });
@@ -64,7 +75,7 @@ beforeEach(async () => {
   }
 });
 
-test("user should be able to list folders in a workspace when empty", async () => {
+test("user should be able to list folders in a workspace when preloaded with initial workspace", async () => {
   const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
   // get root folders from graphql
   const query = gql`
@@ -87,15 +98,7 @@ test("user should be able to list folders in a workspace when empty", async () =
     }
     `;
   const result = await graphql.client.request(query, null, authorizationHeader);
-  expect(result.rootFolders).toMatchInlineSnapshot(`
-    Object {
-      "edges": Array [],
-      "pageInfo": Object {
-        "endCursor": null,
-        "hasNextPage": false,
-      },
-    }
-  `);
+  expect(result.rootFolders.edges.length).toBe(1);
 });
 
 test("user should be able to list folders in a workspace with one item", async () => {
@@ -129,25 +132,13 @@ test("user should be able to list folders in a workspace with one item", async (
     }
     `;
   const result = await graphql.client.request(query, null, authorizationHeader);
-  expect(result.rootFolders).toMatchInlineSnapshot(`
-    Object {
-      "edges": Array [
-        Object {
-          "node": Object {
-            "id": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-            "name": "Untitled",
-            "parentFolderId": null,
-            "rootFolderId": null,
-            "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-          },
-        },
-      ],
-      "pageInfo": Object {
-        "endCursor": "NGU5YTRjMjktMjI5NS00NzFjLTg0YjUtNWJmNTUxNjlmZjhj",
-        "hasNextPage": false,
-      },
+  expect(result.rootFolders.edges.length).toBe(2);
+  result.rootFolders.edges.forEach(
+    (edge: { node: { workspaceId: any; parentFolderId: any } }) => {
+      expect(edge.node.workspaceId).toBe(workspaceId);
+      expect(edge.node.parentFolderId).toBe(null);
     }
-  `);
+  );
 });
 
 test("user should be able to list folders in a workspace with multiple items", async () => {
@@ -180,34 +171,13 @@ test("user should be able to list folders in a workspace with multiple items", a
     }
     `;
   const result = await graphql.client.request(query, null, authorizationHeader);
-  expect(result.rootFolders).toMatchInlineSnapshot(`
-    Object {
-      "edges": Array [
-        Object {
-          "node": Object {
-            "id": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-            "name": "Untitled",
-            "parentFolderId": null,
-            "rootFolderId": null,
-            "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-          },
-        },
-        Object {
-          "node": Object {
-            "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
-            "name": "Untitled",
-            "parentFolderId": null,
-            "rootFolderId": null,
-            "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-          },
-        },
-      ],
-      "pageInfo": Object {
-        "endCursor": "MzUzMGI5ZWQtMTFmMy00NGM3LTllMTYtN2RiYTFlMTQ4MTVm",
-        "hasNextPage": false,
-      },
+  expect(result.rootFolders.edges.length).toBe(3);
+  result.rootFolders.edges.forEach(
+    (edge: { node: { workspaceId: any; parentFolderId: any } }) => {
+      expect(edge.node.workspaceId).toBe(workspaceId);
+      expect(edge.node.parentFolderId).toBe(null);
     }
-  `);
+  );
 });
 
 test("user should be able to list without showing subfolders", async () => {
@@ -240,34 +210,7 @@ test("user should be able to list without showing subfolders", async () => {
   }
   `;
   const result = await graphql.client.request(query, null, authorizationHeader);
-  expect(result.rootFolders).toMatchInlineSnapshot(`
-    Object {
-      "edges": Array [
-        Object {
-          "node": Object {
-            "id": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-            "name": "Untitled",
-            "parentFolderId": null,
-            "rootFolderId": null,
-            "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-          },
-        },
-        Object {
-          "node": Object {
-            "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
-            "name": "Untitled",
-            "parentFolderId": null,
-            "rootFolderId": null,
-            "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-          },
-        },
-      ],
-      "pageInfo": Object {
-        "endCursor": "MzUzMGI5ZWQtMTFmMy00NGM3LTllMTYtN2RiYTFlMTQ4MTVm",
-        "hasNextPage": false,
-      },
-    }
-  `);
+  expect(result.rootFolders.edges.length).toBe(3);
 });
 
 test("retrieving a workspace that doesn't exist throws an error", async () => {

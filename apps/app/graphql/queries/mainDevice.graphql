@@ -4,5 +4,6 @@ query mainDevice {
     nonce
     ciphertext
     encryptionKeySalt
+    encryptionPublicKey
   }
 }

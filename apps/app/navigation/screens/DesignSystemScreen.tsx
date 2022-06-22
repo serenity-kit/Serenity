@@ -23,12 +23,16 @@ import {
   IconButton,
   MenuButton,
   Shortcut,
+  Tooltip,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { VStack, HStack } from "native-base";
 import { theme } from "../../../../tailwind.config";
+import Toast from "react-native-root-toast";
+
+let counter = 0;
 
 export default function DesignSystemScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -38,7 +42,11 @@ export default function DesignSystemScreen() {
 
   return (
     <ScrollView style={tw`px-4 py-6`}>
-      <Text style={tw`mb-4 h2`}>Text</Text>
+      <Text style={tw`mb-4 h2`}>Tooltip</Text>
+      <Tooltip label="This is a tip!" placement="right">
+        <IconButton name="arrow-right" color="gray-500" />
+      </Tooltip>
+      <Text style={tw`my-4 h2`}>Text</Text>
       <Text variant="large">large Text</Text>
       <Text>regular Text</Text>
       <Text variant="small">small Text</Text>
@@ -117,6 +125,23 @@ export default function DesignSystemScreen() {
           disabled
         />
       </VStack>
+
+      <Text style={tw`mb-4 h2`}>Toast</Text>
+      <Button
+        onPress={() => {
+          counter = counter + 1;
+          Toast.show(`This is a message ${counter}`, {
+            duration: Toast.durations.LONG,
+            position: Toast.positions.BOTTOM,
+            shadow: true,
+            animation: true,
+            hideOnPress: true,
+            delay: 0,
+          });
+        }}
+      >
+        Add Toast
+      </Button>
 
       <Text style={tw`mt-6 mb-4 h2`}>Avatar</Text>
       <Text style={tw`mt-4 mb-1`}>Sizing</Text>
@@ -257,7 +282,6 @@ export default function DesignSystemScreen() {
           <MenuButton
             onPress={() => {
               setIsOpenPopover(false);
-              alert("Hello");
             }}
             icon="emotion-line"
             shortcut={<Shortcut letter="H" />}

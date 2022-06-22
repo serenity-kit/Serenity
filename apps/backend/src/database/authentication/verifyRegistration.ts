@@ -45,7 +45,6 @@ export async function verifyRegistration({
         data: {
           username: unverifiedUser.username,
           opaqueEnvelope: unverifiedUser.opaqueEnvelope,
-          clientPublicKey: unverifiedUser.clientPublicKey,
           mainDeviceCiphertext: unverifiedUser.mainDeviceCiphertext,
           mainDeviceNonce: unverifiedUser.mainDeviceNonce,
           mainDeviceSigningPublicKey: unverifiedUser.mainDeviceSigningPublicKey,

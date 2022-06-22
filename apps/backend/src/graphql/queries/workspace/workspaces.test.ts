@@ -2,7 +2,8 @@ import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { registerUser } from "../../../../test/helpers/registerUser";
-import { createWorkspace } from "../../../../test/helpers/workspace/createWorkspace";
+import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import { v4 as uuidv4 } from "uuid";
 
 const graphql = setupGraphql();
 let userId = "";
@@ -21,15 +22,25 @@ beforeEach(async () => {
     const registerUserResult = await registerUser(graphql, username, password);
     userId = registerUserResult.userId;
     mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
-    await createWorkspace({
-      name: "workspace 1",
-      id: "abc",
+    await createInitialWorkspaceStructure({
+      workspaceName: "workspace 1",
+      workspaceId: "abc",
+      folderId: uuidv4(),
+      folderIdSignature: `TODO+${uuidv4()}`,
+      folderName: "Getting started",
+      documentName: "Introduction",
+      documentId: uuidv4(),
       graphql,
       authorizationHeader: mainDeviceSigningPublicKey,
     });
-    await createWorkspace({
-      name: "workspace 2",
-      id: "123",
+    await createInitialWorkspaceStructure({
+      workspaceName: "workspace 2",
+      workspaceId: "123",
+      folderId: uuidv4(),
+      folderIdSignature: `TODO+${uuidv4()}`,
+      folderName: "Getting started",
+      documentName: "Introduction",
+      documentId: uuidv4(),
       graphql,
       authorizationHeader: mainDeviceSigningPublicKey,
     });

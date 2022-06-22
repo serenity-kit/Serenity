@@ -59,9 +59,21 @@ export type CreateFolderResult = {
   folder?: Maybe<Folder>;
 };
 
-export type CreateWorkspaceInput = {
-  id: Scalars['String'];
-  name: Scalars['String'];
+export type CreateInitialWorkspaceStructureInput = {
+  documentId: Scalars['String'];
+  documentName: Scalars['String'];
+  folderId: Scalars['String'];
+  folderIdSignature: Scalars['String'];
+  folderName: Scalars['String'];
+  workspaceId: Scalars['String'];
+  workspaceName: Scalars['String'];
+};
+
+export type CreateInitialWorkspaceStructureResult = {
+  __typename?: 'CreateInitialWorkspaceStructureResult';
+  document?: Maybe<Document>;
+  folder?: Maybe<Folder>;
+  workspace?: Maybe<Workspace>;
 };
 
 export type CreateWorkspaceInvitationInput = {
@@ -71,11 +83,6 @@ export type CreateWorkspaceInvitationInput = {
 export type CreateWorkspaceInvitationResult = {
   __typename?: 'CreateWorkspaceInvitationResult';
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
-};
-
-export type CreateWorkspaceResult = {
-  __typename?: 'CreateWorkspaceResult';
-  workspace?: Maybe<Workspace>;
 };
 
 export type DeleteDevicesInput = {
@@ -202,7 +209,6 @@ export type FinishRegistrationDeviceInput = {
 };
 
 export type FinishRegistrationInput = {
-  clientPublicKey: Scalars['String'];
   mainDevice: FinishRegistrationDeviceInput;
   message: Scalars['String'];
   registrationId: Scalars['String'];
@@ -245,6 +251,7 @@ export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
   encryptionKeySalt: Scalars['String'];
+  encryptionPublicKey: Scalars['String'];
   nonce: Scalars['String'];
   signingPublicKey: Scalars['String'];
 };
@@ -261,7 +268,7 @@ export type Mutation = {
   createDevice?: Maybe<CreateDeviceResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createFolder?: Maybe<CreateFolderResult>;
-  createWorkspace?: Maybe<CreateWorkspaceResult>;
+  createInitialWorkspaceStructure?: Maybe<CreateInitialWorkspaceStructureResult>;
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
   deleteDevices?: Maybe<DeleteDevicseResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
@@ -299,8 +306,8 @@ export type MutationCreateFolderArgs = {
 };
 
 
-export type MutationCreateWorkspaceArgs = {
-  input?: InputMaybe<CreateWorkspaceInput>;
+export type MutationCreateInitialWorkspaceStructureArgs = {
+  input?: InputMaybe<CreateInitialWorkspaceStructureInput>;
 };
 
 
@@ -628,12 +635,12 @@ export type CreateFolderMutationVariables = Exact<{
 
 export type CreateFolderMutation = { __typename?: 'Mutation', createFolder?: { __typename?: 'CreateFolderResult', folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
 
-export type CreateWorkspaceMutationVariables = Exact<{
-  input: CreateWorkspaceInput;
+export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
+  input: CreateInitialWorkspaceStructureInput;
 }>;
 
 
-export type CreateWorkspaceMutation = { __typename?: 'Mutation', createWorkspace?: { __typename?: 'CreateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null } | null };
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
 
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
@@ -747,7 +754,7 @@ export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'Fol
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string } | null };
+export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string } | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -844,9 +851,9 @@ export const CreateFolderDocument = gql`
 export function useCreateFolderMutation() {
   return Urql.useMutation<CreateFolderMutation, CreateFolderMutationVariables>(CreateFolderDocument);
 };
-export const CreateWorkspaceDocument = gql`
-    mutation createWorkspace($input: CreateWorkspaceInput!) {
-  createWorkspace(input: $input) {
+export const CreateInitialWorkspaceStructureDocument = gql`
+    mutation createInitialWorkspaceStructure($input: CreateInitialWorkspaceStructureInput!) {
+  createInitialWorkspaceStructure(input: $input) {
     workspace {
       id
       name
@@ -855,12 +862,19 @@ export const CreateWorkspaceDocument = gql`
         isAdmin
       }
     }
+    folder {
+      id
+      name
+      parentFolderId
+      rootFolderId
+      workspaceId
+    }
   }
 }
     `;
 
-export function useCreateWorkspaceMutation() {
-  return Urql.useMutation<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>(CreateWorkspaceDocument);
+export function useCreateInitialWorkspaceStructureMutation() {
+  return Urql.useMutation<CreateInitialWorkspaceStructureMutation, CreateInitialWorkspaceStructureMutationVariables>(CreateInitialWorkspaceStructureDocument);
 };
 export const CreateWorkspaceInvitationDocument = gql`
     mutation createWorkspaceInvitation($input: CreateWorkspaceInvitationInput!) {
@@ -1081,6 +1095,7 @@ export const MainDeviceDocument = gql`
     nonce
     ciphertext
     encryptionKeySalt
+    encryptionPublicKey
   }
 }
     `;
