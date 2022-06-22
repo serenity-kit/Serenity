@@ -1,11 +1,4 @@
-import {
-  IconButton,
-  Menu,
-  SidebarButton,
-  SidebarDivider,
-  Text,
-  tw,
-} from "@serenity-tools/ui";
+import { IconButton, Menu, MenuButton, Shortcut, tw } from "@serenity-tools/ui";
 import { useState } from "react";
 
 type Props = {
@@ -35,31 +28,36 @@ export default function SidebarFolderMenu(props: Props) {
         ></IconButton>
       }
     >
-      <SidebarButton
+      <MenuButton
         onPress={() => {
           setIsOpenMenu(false);
           props.onCreateFolderPress();
         }}
+        icon="folder-line"
+        shortcut={<Shortcut letter="N" />}
       >
-        <Text variant="small">Create Folder</Text>
-      </SidebarButton>
-      <SidebarButton
+        Create Folder
+      </MenuButton>
+      <MenuButton
         onPress={() => {
           setIsOpenMenu(false);
           props.onUpdateNamePress();
         }}
+        icon="font-size-2"
+        shortcut={<Shortcut letter="R" />}
       >
-        <Text variant="small">Change Name</Text>
-      </SidebarButton>
-      <SidebarDivider collapsed />
-      <SidebarButton
+        Rename
+      </MenuButton>
+      <MenuButton
         onPress={() => {
           setIsOpenMenu(false);
           props.onDeletePressed();
         }}
+        icon="delete-bin-line"
+        danger
       >
-        <Text variant="small">Delete</Text>
-      </SidebarButton>
+        Delete
+      </MenuButton>
     </Menu>
   );
 }

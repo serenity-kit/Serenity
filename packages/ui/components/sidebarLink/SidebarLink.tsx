@@ -29,7 +29,7 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
 
   const styles = StyleSheet.create({
     default: tw.style(
-      `px-4 py-1`,
+      `px-4 py-1.5`,
       Platform.OS === "web" && { outlineWidth: 0 }
     ),
     hover: tw`bg-gray-200`,
@@ -49,7 +49,8 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <HStack space={2} alignItems="center">
+      {/* flex needed for correct height calculation */}
+      <HStack space={2} alignItems="center" style={tw`flex`}>
         {props.children}
       </HStack>
     </ReactNavigationLink>
