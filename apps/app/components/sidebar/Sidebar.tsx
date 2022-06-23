@@ -36,7 +36,6 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { useEffect, useState, useRef } from "react";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { getMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
-import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
@@ -64,7 +63,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const { updateAuthentication } = useAuthentication();
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
-  const openFolderIds = useOpenFolderStore((state) => state.folderIds);
 
   useEffect(() => {
     if (meResult.data && meResult.data.me) {
@@ -319,7 +317,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               folderName={folder.name}
               workspaceId={route.params.workspaceId}
               onStructureChange={refetchRootFolders}
-              openFolderIds={openFolderIds}
             />
           );
         })

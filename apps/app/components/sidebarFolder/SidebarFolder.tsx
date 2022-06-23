@@ -25,22 +25,20 @@ import {
 import { RootStackScreenProps } from "../../types";
 import SidebarPage from "../sidebarPage/SidebarPage";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
+import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 
 type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
   folderName: string;
   depth?: number;
-  openFolderIds: string[];
   onStructureChange: () => void;
 };
 
 export default function SidebarFolder(props: Props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
-  const [isOpen, setIsOpen] = useState(
-    props.openFolderIds.includes(props.folderId)
-  );
+  const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
 
@@ -64,10 +62,11 @@ export default function SidebarFolder(props: Props) {
     },
   });
   const { depth = 0 } = props;
+  const openFolderIds = useOpenFolderStore((state) => state.folderIds);
 
   useEffect(() => {
-    setIsOpen(props.openFolderIds.includes(props.folderId));
-  }, [props.openFolderIds]);
+    setIsOpen(openFolderIds.includes(props.folderId));
+  }, [openFolderIds]);
 
   const createFolder = async (name: string | null) => {
     setIsOpen(true);
@@ -271,7 +270,6 @@ export default function SidebarFolder(props: Props) {
                     // needs to be here as a padding for hovering bg-color change
                     style={tw`pl-${3 + depth * 3}`}
                     depth={depth + 1}
-                    openFolderIds={props.openFolderIds}
                   />
                 );
               })
