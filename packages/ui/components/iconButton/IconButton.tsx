@@ -30,8 +30,8 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
     pressable: tw.style(dimensions), // defines clickable area
     view: tw.style(
       `${dimensions} flex ${
-        !label && "justify-center"
-      } items-center bg-transparent rounded-sm ${label && `p-1 rounded`}`
+        !label ? "justify-center" : ""
+      } items-center bg-transparent rounded-sm ${label ? `p-1 rounded` : ""}`
     ),
     hover: tw`bg-gray-200`,
     pressed: tw`bg-gray-300`,
