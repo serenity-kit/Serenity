@@ -33,7 +33,7 @@ import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { HStack } from "native-base";
 import { useFocusRing } from "@react-native-aria/focus";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { getMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
 
@@ -91,9 +91,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     const result = await createFolderMutation({
       input: { id, workspaceId: route.params.workspaceId, name },
     });
-    if (result.data?.createFolder?.folder?.id) {
-      console.log("created a folder");
-    } else {
+    if (!result.data?.createFolder?.folder?.id) {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
     }

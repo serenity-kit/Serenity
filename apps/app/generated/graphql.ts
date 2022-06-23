@@ -747,6 +747,13 @@ export type VerifyRegistrationMutationVariables = Exact<{
 
 export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegistration?: { __typename?: 'VerifyRegistrationResult', id: string } | null };
 
+export type DocumentPathQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null };
+
 export type DocumentsQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
   first?: Scalars['Int'];
@@ -1060,6 +1067,21 @@ export const VerifyRegistrationDocument = gql`
 
 export function useVerifyRegistrationMutation() {
   return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
+};
+export const DocumentPathDocument = gql`
+    query documentPath($id: ID!) {
+  documentPath(id: $id) {
+    id
+    name
+    parentFolderId
+    rootFolderId
+    workspaceId
+  }
+}
+    `;
+
+export function useDocumentPathQuery(options: Omit<Urql.UseQueryArgs<DocumentPathQueryVariables>, 'query'>) {
+  return Urql.useQuery<DocumentPathQuery>({ query: DocumentPathDocument, ...options });
 };
 export const DocumentsDocument = gql`
     query documents($parentFolderId: ID!, $first: Int! = 100, $after: String) {

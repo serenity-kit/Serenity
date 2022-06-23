@@ -10,7 +10,7 @@ import {
   IconButton,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Platform } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
 import { v4 as uuidv4 } from "uuid";
@@ -25,6 +25,7 @@ import {
 import { RootStackScreenProps } from "../../types";
 import SidebarPage from "../sidebarPage/SidebarPage";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
+import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 
 type Props = ViewProps & {
   workspaceId: string;
@@ -37,7 +38,8 @@ type Props = ViewProps & {
 export default function SidebarFolder(props: Props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
-  const [isOpen, setIsOpen] = useState(false);
+  const openFolderIds = useOpenFolderStore((state) => state.folderIds);
+  const [isOpen, setIsOpen] = useState(openFolderIds.includes(props.folderId));
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
 
@@ -61,6 +63,10 @@ export default function SidebarFolder(props: Props) {
     },
   });
   const { depth = 0 } = props;
+
+  useEffect(() => {
+    setIsOpen(openFolderIds.includes(props.folderId));
+  }, [openFolderIds]);
 
   const createFolder = async (name: string | null) => {
     setIsOpen(true);

@@ -19828,6 +19828,11 @@ use-subscription@^1.0.0:
   dependencies:
     object-assign "^4.1.1"
 
+use-sync-external-store@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.1.0.tgz#3343c3fe7f7e404db70f8c687adf5c1652d34e82"
+  integrity sha512-SEnieB2FPKEVne66NpXPd1Np4R1lTNKfjuy3XdIoPQKYBAFdzbzSZlSn1KJZUiihQLQC5Znot4SBz1EOTBwQAQ==
+
 use@^3.1.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/use/-/use-3.1.1.tgz#d50c8cac79a19fbc20f2911f56eb973f4e10070f"
@@ -20903,3 +20908,10 @@ zen-observable@^0.8.0:
   version "0.8.15"
   resolved "https://registry.yarnpkg.com/zen-observable/-/zen-observable-0.8.15.tgz#96415c512d8e3ffd920afd3889604e30b9eaac15"
   integrity sha512-PQ2PC7R9rslx84ndNBZB/Dkv8V8fZEpk83RLgXtYd0fwUgEjseMn1Dgajh2x6S8QbZAFa9p2qVCEuYZNgve0dQ==
+
+zustand@^4.0.0-rc.1:
+  version "4.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-4.0.0-rc.1.tgz#ec30a3afc03728adec7e1bd7bcc3592176372201"
+  integrity sha512-qgcs7zLqBdHu0PuT3GW4WCIY5SgXdsv30GQMu9Qpp1BA2aS+sNS8l4x0hWuyEhjXkN+701aGWawhKDv6oWJAcw==
+  dependencies:
+    use-sync-external-store "1.1.0"

@@ -24,11 +24,11 @@
     "@react-navigation/drawer": "^6.4.1",
     "@react-navigation/native": "^6.0.2",
     "@react-navigation/native-stack": "^6.1.0",
+    "@serenity-tools/common": "*",
     "@serenity-tools/editor": "*",
     "@serenity-tools/libsodium": "*",
     "@serenity-tools/opaque": "*",
     "@serenity-tools/ui": "*",
-    "@serenity-tools/common": "*",
     "@tiptap/extension-placeholder": "^2.0.0-beta.48",
     "@urql/devtools": "^2.0.3",
     "@urql/exchange-auth": "^0.1.7",
@@ -69,7 +69,8 @@
     "urql": "^2.2.0",
     "uuid": "^8.3.2",
     "y-protocols": "^1.0.5",
-    "yjs": "^13.5.30"
+    "yjs": "^13.5.30",
+    "zustand": "^4.0.0-rc.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

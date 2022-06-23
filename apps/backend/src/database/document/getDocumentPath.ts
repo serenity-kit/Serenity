@@ -1,3 +1,4 @@
+import { Folder } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -5,13 +6,12 @@ type Params = {
   userId: string;
 };
 
-const reduceParentFolderTreeToList = (folder: any) => {
-  const parentFolderList = [folder];
+const reduceParentFolderTreeToList = (folder: any): Folder[] => {
+  let parentFolderList: Folder[] = [];
   if (folder["parentFolder"]) {
-    parentFolderList.concat(
-      reduceParentFolderTreeToList(folder["parentFolder"])
-    );
+    parentFolderList = reduceParentFolderTreeToList(folder["parentFolder"]);
   }
+  parentFolderList.unshift(folder);
   return parentFolderList;
 };
 
@@ -55,15 +55,29 @@ export async function getDocumentPath({ userId, id }: Params) {
       if (parentFolder.rootFolderId) {
         const relatedFolders = await prisma.folder.findMany({
           where: {
+            rootFolderId: {
+              in: [parentFolder.rootFolderId],
+            },
+          },
+        });
+        const rootFolder = await prisma.folder.findFirst({
+          where: {
             id: {
               in: [parentFolder.rootFolderId],
             },
           },
         });
+        if (rootFolder) {
+          relatedFolders.push(rootFolder);
+        }
+        let lastOpenFolder: Folder = parentFolder;
         const relatedFoldersLookup = {};
         relatedFolders.forEach((f) => {
           f["parentFolder"] = null;
           relatedFoldersLookup[f.id] = f;
+          if (f.id === parentFolder.id) {
+            lastOpenFolder = f;
+          }
         });
         relatedFolders.forEach((f) => {
           if (f.parentFolderId) {
@@ -71,7 +85,8 @@ export async function getDocumentPath({ userId, id }: Params) {
           }
         });
         // go through parent folder tree and reduce it to a list
-        return reduceParentFolderTreeToList(parentFolder);
+        const relatedFolderList = reduceParentFolderTreeToList(lastOpenFolder);
+        return relatedFolderList;
       }
       return [parentFolder];
     });
