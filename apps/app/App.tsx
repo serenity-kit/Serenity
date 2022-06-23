@@ -132,8 +132,10 @@ export default function App() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
-  useDeviceContext(tw);
-  const [colorScheme] = useAppColorScheme(tw);
+  // 1️opt out of listening to device color scheme events until we support dark mode
+  useDeviceContext(tw, { withDeviceColorScheme: false });
+  // hard-coding the colorScheme to light until we support dark mode
+  const [colorScheme] = useAppColorScheme(tw, "light");
   const rnTheme = extendTheme({
     colors: {
       ...theme.colors,
