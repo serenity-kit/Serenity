@@ -24,7 +24,7 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
           // query first document on first workspace and go there
           props.navigation.replace("Workspace", {
             workspaceId: workspaceResult.data.workspace.id,
-            screen: "Dashboard",
+            screen: "NoPageExists",
           });
         } else {
           props.navigation.replace("Onboarding");

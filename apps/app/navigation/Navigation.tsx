@@ -12,7 +12,7 @@ import * as Linking from "expo-linking";
 import NotFoundScreen from "./screens/NotFoundScreen";
 import EditorScreen from "./screens/EditorScreen";
 import { RootStackParamList } from "../types";
-import DashboardScreen from "./screens/DashboardScreen";
+import NoPageExistsScreen from "./screens/NoPageExistsScreen";
 import DevDashboardScreen from "./screens/DevDashboardScreen";
 import PageScreen from "./screens/PageScreen";
 import LibsodiumTestScreen from "./screens/LibsodiumTestScreen";
@@ -83,7 +83,11 @@ function WorkspaceStackScreen(props) {
         overlayColor: "transparent",
       }}
     >
-      <Drawer.Screen name="Dashboard" component={DashboardScreen} />
+      <Drawer.Screen
+        name="NoPageExists"
+        component={NoPageExistsScreen}
+        options={{ headerShown: false }}
+      />
       <Drawer.Screen name="Editor" component={EditorScreen} />
       <Drawer.Screen name="Page" component={PageScreen} />
       <Drawer.Screen name="Settings" component={WorkspaceSettingsScreen} />
@@ -148,7 +152,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       Workspace: {
         path: "/workspace/:workspaceId",
         screens: {
-          Dashboard: "dashboard",
+          NoPageExists: "no-page-exits",
           Editor: "editor",
           Page: "page/:pageId",
           TestLibsodium: "test-libsodium",
