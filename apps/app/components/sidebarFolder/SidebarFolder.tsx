@@ -184,7 +184,6 @@ export default function SidebarFolder(props: Props) {
             }}
           >
             <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
-              {/* not the best way but icons don't take styles (yet?) */}
               <View style={tw`ml-0.5 -mr-0.5`}>
                 <Icon
                   name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}

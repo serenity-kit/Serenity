@@ -298,13 +298,20 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       </HStack>
 
       {isCreatingNewFolder && (
-        <InlineInput
-          onCancel={() => {
-            setIsCreatingNewFolder(false);
-          }}
-          onSubmit={createFolder}
-          value=""
-        />
+        <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
+          <View style={tw`ml-0.5 -mr-0.5`}>
+            <Icon name={"arrow-right-filled"} color={tw.color("gray-600")} />
+          </View>
+          <Icon name="folder" size={20} />
+          <InlineInput
+            onCancel={() => {
+              setIsCreatingNewFolder(false);
+            }}
+            onSubmit={createFolder}
+            value=""
+            style={tw`ml-0.5`}
+          />
+        </HStack>
       )}
 
       {rootFoldersResult.fetching ? (
