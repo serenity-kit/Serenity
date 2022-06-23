@@ -103,7 +103,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
   return (
     // TODO override for now until we find out where the pt-1 comes from
-    <DrawerContentScrollView {...props} style={tw`bg-gray-100 -mt-1`}>
+    <DrawerContentScrollView {...props} style={tw`bg-gray-100 -mt-1 pb-4`}>
       <HStack
         alignItems="center"
         justifyContent="space-between"
