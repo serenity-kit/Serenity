@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, LabeledInput, Text, View, Link, tw } from "@serenity-tools/ui";
+import { useWindowDimensions } from "react-native";
+import { VStack } from "native-base";
 import {
   useStartLoginMutation,
   useFinishLoginMutation,
@@ -7,12 +9,8 @@ import {
   MainDeviceDocument,
 } from "../../generated/graphql";
 import { useAuthentication } from "../../context/AuthenticationContext";
-import { startLogin, finishLogin } from "@serenity-tools/opaque";
-import { useWindowDimensions } from "react-native";
-import { VStack } from "native-base";
-import { decryptDevice } from "@serenity-tools/common";
+import { login, fetchMainDevice } from "../../utils/login/loginHelper";
 import { useClient } from "urql";
-import { setMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
 
 type Props = {
   defaultEmail?: string;
@@ -28,12 +26,12 @@ export function LoginForm(props: Props) {
   const [password, _setPassword] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
+  const [gqlErrorMessage, setGqlErrorMessage] = useState("");
+
+  const { updateAuthentication } = useAuthentication();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
   const urqlClient = useClient();
-
-  const [gqlErrorMessage, setGqlErrorMessage] = useState("");
-  const { updateAuthentication } = useAuthentication();
 
   const onFormFilled = (username: string, password: string) => {
     if (props.onFormFilled) {
@@ -53,76 +51,18 @@ export function LoginForm(props: Props) {
     _setPassword(password);
   };
 
-  const login = async (username: string, password: string) => {
-    const message = await startLogin(password);
-    const startLoginResult = await startLoginMutation({
-      input: {
-        username: username,
-        challenge: message,
-      },
-    });
-    // check for an error
-    if (startLoginResult.data?.startLogin) {
-      const result = await finishLogin(
-        startLoginResult.data.startLogin.challengeResponse
-      );
-
-      const finishLoginResult = await finishLoginMutation({
-        input: {
-          loginId: startLoginResult.data.startLogin.loginId,
-          message: result.response,
-        },
-      });
-
-      if (finishLoginResult.data?.finishLogin) {
-        updateAuthentication(
-          finishLoginResult.data.finishLogin.mainDeviceSigningPublicKey
-        );
-        return result;
-      } else if (finishLoginResult.error) {
-        throw new Error("Failed to finish login");
-      }
-    } else if (startLoginResult.error) {
-      console.error(startLoginResult.error);
-      throw new Error("Failed to start login");
-    }
-    throw new Error("Failed to login");
-  };
-
-  const fetchMainDevice = async (exportKey: string) => {
-    const mainDeviceResult = await urqlClient
-      .query<MainDeviceQuery>(MainDeviceDocument, undefined, {
-        // better to be safe here and always refetch
-        requestPolicy: "network-only",
-      })
-      .toPromise();
-
-    if (mainDeviceResult.data?.mainDevice) {
-      const mainDevice = mainDeviceResult.data.mainDevice;
-
-      const privateKeys = await decryptDevice({
-        ciphertext: mainDevice.ciphertext,
-        encryptionKeySalt: mainDevice.encryptionKeySalt,
-        nonce: mainDevice.nonce,
-        exportKey,
-      });
-      setMainDevice({
-        encryptionPrivateKey: privateKeys.encryptionPrivateKey,
-        signingPrivateKey: privateKeys.signingPrivateKey,
-        signingPublicKey: mainDevice.signingPublicKey,
-        encryptionPublicKey: mainDevice.encryptionPublicKey,
-      });
-    } else {
-      throw new Error("Failed to fetch main device.");
-    }
-  };
-
   const onLoginPress = async () => {
     try {
       setGqlErrorMessage("");
       setIsLoggingIn(true);
-      const loginResult = await login(username, password);
-      await fetchMainDevice(loginResult.exportKey);
+      const loginResult = await login({
+        username,
+        password,
+        startLoginMutation,
+        finishLoginMutation,
+        updateAuthentication,
+      });
+      await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
       // reset the password in case the user ends up on this screen again
       setPassword("");
       setUsername("");

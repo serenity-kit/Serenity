@@ -87,7 +87,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
     documentPath?.forEach((folder: Folder) => {
       documentPathIds.push(folder.id);
     });
-    console.log({ documentPath });
     folderStore.update(documentPathIds);
   };
 
