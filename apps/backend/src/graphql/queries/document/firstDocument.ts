@@ -1,0 +1,23 @@
+import { idArg, nonNull, queryField } from "nexus";
+import { getFirstDocument } from "../../../database/document/getFirstDocument";
+import { Document } from "../../types/document";
+
+export const firstDocument = queryField((t) => {
+  t.field("firstDocument", {
+    type: Document,
+    args: {
+      workspaceId: nonNull(idArg()),
+    },
+    async resolve(root, args, context) {
+      if (!context.user) {
+        throw new Error("Unauthorized");
+      }
+      const userId = context.user.id;
+      const document = await getFirstDocument({
+        userId,
+        workspaceId: args.workspaceId,
+      });
+      return document;
+    },
+  });
+});

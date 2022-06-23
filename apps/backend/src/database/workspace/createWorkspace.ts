@@ -1,6 +1,5 @@
 import { prisma } from "../prisma";
 import { Workspace, WorkspaceMember } from "../../types/workspace";
-import { v4 as uuidv4 } from "uuid";
 
 type Params = {
   id: string;

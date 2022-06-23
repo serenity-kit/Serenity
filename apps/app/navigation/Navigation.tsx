@@ -35,6 +35,8 @@ import RootScreen from "./screens/RootScreen";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import { DrawerActions } from "@react-navigation/native";
 import RegistrationVerificationScreen from "./screens/RegistrationVerificationScreen";
+import WorkspaceRootScreen from "./screens/WorkspaceRootScreen";
+import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -56,43 +58,50 @@ function WorkspaceStackScreen(props) {
   }
 
   return (
-    <Drawer.Navigator
-      drawerContent={(props) => <Sidebar {...props} />}
-      screenOptions={{
-        headerShown: true,
-        headerTitle: (props) => <Text>{props.children}</Text>,
-        headerStyle: styles.header,
-        drawerType: isPermanentLeftSidebar ? "permanent" : "front",
-        drawerStyle: {
-          width: isPermanentLeftSidebar ? 240 : width,
-        },
-        headerLeft: isPermanentLeftSidebar
-          ? () => null
-          : () => {
-              return (
-                <Pressable
-                  style={tw`pl-6`}
-                  onPress={() => {
-                    props.navigation.dispatch(DrawerActions.openDrawer());
-                  }}
-                >
-                  <Icon name="menu" />
-                </Pressable>
-              );
-            },
-        overlayColor: "transparent",
-      }}
-    >
-      <Drawer.Screen
-        name="NoPageExists"
-        component={NoPageExistsScreen}
-        options={{ headerShown: false }}
-      />
-      <Drawer.Screen name="Editor" component={EditorScreen} />
-      <Drawer.Screen name="Page" component={PageScreen} />
-      <Drawer.Screen name="Settings" component={WorkspaceSettingsScreen} />
-      <Drawer.Screen name="TestLibsodium" component={LibsodiumTestScreen} />
-    </Drawer.Navigator>
+    <WorkspaceIdProvider value={props.route.params.workspaceId}>
+      <Drawer.Navigator
+        drawerContent={(props) => <Sidebar {...props} />}
+        screenOptions={{
+          headerShown: true,
+          headerTitle: (props) => <Text>{props.children}</Text>,
+          headerStyle: styles.header,
+          drawerType: isPermanentLeftSidebar ? "permanent" : "front",
+          drawerStyle: {
+            width: isPermanentLeftSidebar ? 240 : width,
+          },
+          headerLeft: isPermanentLeftSidebar
+            ? () => null
+            : () => {
+                return (
+                  <Pressable
+                    style={tw`pl-6`}
+                    onPress={() => {
+                      props.navigation.dispatch(DrawerActions.openDrawer());
+                    }}
+                  >
+                    <Icon name="menu" />
+                  </Pressable>
+                );
+              },
+          overlayColor: "transparent",
+        }}
+      >
+        <Drawer.Screen
+          name="NoPageExists"
+          component={NoPageExistsScreen}
+          options={{ headerShown: false }}
+        />
+        <Drawer.Screen name="Editor" component={EditorScreen} />
+        <Drawer.Screen name="Page" component={PageScreen} />
+        <Drawer.Screen name="Settings" component={WorkspaceSettingsScreen} />
+        <Drawer.Screen name="TestLibsodium" component={LibsodiumTestScreen} />
+        <Drawer.Screen
+          name="WorkspaceRoot"
+          component={WorkspaceRootScreen}
+          options={{ headerShown: false }}
+        />
+      </Drawer.Navigator>
+    </WorkspaceIdProvider>
   );
 }
 
@@ -161,6 +170,7 @@ const linking: LinkingOptions<RootStackParamList> = {
           Page: "page/:pageId",
           TestLibsodium: "test-libsodium",
           Settings: "settings",
+          WorkspaceRoot: "",
         },
       },
       Onboarding: "onboarding",

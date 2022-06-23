@@ -413,6 +413,7 @@ export type Query = {
   devices?: Maybe<DeviceConnection>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documents?: Maybe<DocumentConnection>;
+  firstDocument?: Maybe<Document>;
   folders?: Maybe<FolderConnection>;
   mainDevice?: Maybe<MainDeviceResult>;
   me?: Maybe<MeResult>;
@@ -445,6 +446,11 @@ export type QueryDocumentsArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
   parentFolderId: Scalars['ID'];
+};
+
+
+export type QueryFirstDocumentArgs = {
+  workspaceId: Scalars['ID'];
 };
 
 
@@ -762,6 +768,13 @@ export type DocumentsQueryVariables = Exact<{
 
 
 export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, name?: string | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+
+export type FirstDocumentQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+}>;
+
+
+export type FirstDocumentQuery = { __typename?: 'Query', firstDocument?: { __typename?: 'Document', id: string } | null };
 
 export type FoldersQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -1105,6 +1118,17 @@ export const DocumentsDocument = gql`
 
 export function useDocumentsQuery(options: Omit<Urql.UseQueryArgs<DocumentsQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentsQuery>({ query: DocumentsDocument, ...options });
+};
+export const FirstDocumentDocument = gql`
+    query firstDocument($workspaceId: ID!) {
+  firstDocument(workspaceId: $workspaceId) {
+    id
+  }
+}
+    `;
+
+export function useFirstDocumentQuery(options: Omit<Urql.UseQueryArgs<FirstDocumentQueryVariables>, 'query'>) {
+  return Urql.useQuery<FirstDocumentQuery>({ query: FirstDocumentDocument, ...options });
 };
 export const FoldersDocument = gql`
     query folders($parentFolderId: ID!, $first: Int!, $after: String) {

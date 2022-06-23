@@ -2,7 +2,7 @@ import { idArg, list, nonNull, queryField } from "nexus";
 import { getDocumentPath } from "../../../database/document/getDocumentPath";
 import { Folder } from "../../types/folder";
 
-export const folders = queryField((t) => {
+export const documentPath = queryField((t) => {
   t.field("documentPath", {
     type: list(Folder),
     args: {
