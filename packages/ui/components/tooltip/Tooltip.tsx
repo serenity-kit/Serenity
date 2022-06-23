@@ -22,7 +22,6 @@ export const Tooltip = React.forwardRef((props: TooltipProps, ref) => {
       borderRadius={2}
       hasArrow={true}
       arrowSize={10}
-      isOpen={true}
       _text={{
         style: styles.text,
       }}
