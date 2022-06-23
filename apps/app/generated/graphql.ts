@@ -62,6 +62,7 @@ export type CreateFolderResult = {
 export type CreateInitialWorkspaceStructureInput = {
   documentId: Scalars['String'];
   documentName: Scalars['String'];
+  documentSnapshot: DocumentSnapshotInput;
   folderId: Scalars['String'];
   folderIdSignature: Scalars['String'];
   folderName: Scalars['String'];
@@ -186,6 +187,19 @@ export type DocumentEdge = {
   cursor: Scalars['String'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Document>;
+};
+
+export type DocumentSnapshotInput = {
+  ciphertext: Scalars['String'];
+  nonce: Scalars['String'];
+  publicData: DocumentSnapshotPublicDataInput;
+  signature: Scalars['String'];
+};
+
+export type DocumentSnapshotPublicDataInput = {
+  docId: Scalars['String'];
+  pubKey: Scalars['String'];
+  snapshotId: Scalars['String'];
 };
 
 export type FinishLoginInput = {
@@ -640,7 +654,7 @@ export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
 }>;
 
 
-export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
 
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
@@ -868,6 +882,9 @@ export const CreateInitialWorkspaceStructureDocument = gql`
       parentFolderId
       rootFolderId
       workspaceId
+    }
+    document {
+      id
     }
   }
 }

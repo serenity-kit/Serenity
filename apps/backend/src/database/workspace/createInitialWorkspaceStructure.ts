@@ -3,6 +3,9 @@ import { createFolder } from "../folder/createFolder";
 import { Workspace } from "../../types/workspace";
 import { Document } from "../../types/document";
 import { Folder } from "../../types/folder";
+import { Snapshot } from "@naisho/core";
+import { createDocument } from "../document/createDocument";
+import { createSnapshot } from "../createSnapshot";
 
 export type Params = {
   userId: string;
@@ -13,11 +16,12 @@ export type Params = {
   folderName: string;
   documentId: string;
   documentName: string;
+  documentSnapshot: Snapshot;
 };
 
 export type CreateWorkspaceResult = {
   workspace: Workspace;
-  document?: Document;
+  document: Document;
   folder: Folder;
 };
 
@@ -27,6 +31,9 @@ export async function createInitialWorkspaceStructure({
   workspaceName,
   folderId,
   folderName,
+  documentId,
+  documentName,
+  documentSnapshot,
 }: Params): Promise<CreateWorkspaceResult> {
   const workspace = await createWorkspace({
     id: workspaceId,
@@ -40,14 +47,13 @@ export async function createInitialWorkspaceStructure({
     parentFolderId: undefined,
     workspaceId: workspace.id,
   });
-  const document = undefined;
-  // const document = await createDocument({
-  //   id: uuidv4(),
-  //   name: "Introduction",
-  //   parentFolderId: folder.id,
-  //   workspaceId: workspaceId,
-  // });
-  // TODO: insert document snapshot to include title and text content
+  const document = await createDocument({
+    id: documentId,
+    name: documentName,
+    parentFolderId: folder.id,
+    workspaceId: workspaceId,
+  });
+  await createSnapshot(documentSnapshot);
   return {
     workspace,
     document,

@@ -1,6 +1,7 @@
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { Snapshot, SnapshotPublicData } from "./types";
 import { encryptAead, sign, verifySignature, decryptAead } from "./crypto";
+import canonicalize from "canonicalize";
 
 type PendingResult =
   | { type: "snapshot" }
@@ -57,7 +58,10 @@ export async function createSnapshot(
   key: Uint8Array,
   signatureKeyPair: KeyPair
 ) {
-  const publicDataAsBase64 = sodium.to_base64(JSON.stringify(publicData));
+  const publicDataAsBase64 = sodium.to_base64(
+    canonicalize(publicData) as string
+  );
+
   const { ciphertext, publicNonce } = await encryptAead(
     content,
     publicDataAsBase64,
@@ -83,7 +87,7 @@ export async function verifyAndDecryptSnapshot(
   publicKey: Uint8Array
 ) {
   const publicDataAsBase64 = sodium.to_base64(
-    JSON.stringify(snapshot.publicData)
+    canonicalize(snapshot.publicData) as string
   );
 
   const isValid = await verifySignature(
@@ -96,7 +100,7 @@ export async function verifyAndDecryptSnapshot(
   }
   return await decryptAead(
     sodium.from_base64(snapshot.ciphertext),
-    sodium.to_base64(JSON.stringify(snapshot.publicData)),
+    publicDataAsBase64,
     sodium.to_base64(key),
     snapshot.nonce
   );

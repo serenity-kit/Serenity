@@ -1,4 +1,6 @@
 import { gql } from "graphql-request";
+import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
+import sodium from "@serenity-tools/libsodium";
 
 type Params = {
   graphql: any;
@@ -49,6 +51,16 @@ export const createInitialWorkspaceStructure = async ({
       }
     }
   `;
+
+  // currently hard-coded until we enable e2e encryption per workspace
+  const documentEncryptionKey = sodium.from_base64(
+    "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
+  );
+  const documentSnapshot = await createIntroductionDocumentSnapshot({
+    documentId,
+    documentEncryptionKey,
+  });
+
   const result = await graphql.client.request(
     query,
     {
@@ -60,6 +72,7 @@ export const createInitialWorkspaceStructure = async ({
         folderName,
         documentId,
         documentName,
+        documentSnapshot,
       },
     },
     authorizationHeaders

@@ -71,7 +71,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
         sodium.from_base64(initialResult),
         "naisho-remote"
       );
-      console.log("YJS Snapshot", yDocRef.current.get("page").toString());
     }
   };
 
@@ -273,6 +272,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
               data.snapshotId,
               data.clock
             );
+
             break;
           case "updateFailed":
             console.log("update saving failed", data.snapshotId, data.clock);

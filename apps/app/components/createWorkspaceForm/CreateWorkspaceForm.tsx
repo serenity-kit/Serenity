@@ -7,6 +7,8 @@ import {
 } from "@serenity-tools/ui";
 import { useCreateInitialWorkspaceStructureMutation } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
+import sodium from "@serenity-tools/libsodium";
+import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
 
 type WorkspaceProps = {
   id: string;
@@ -17,6 +19,7 @@ type FolderProps = {
 type DocumentProps = {
   id: string;
 };
+
 export type CreateWorkspaceFormProps = {
   onWorkspaceStructureCreated: ({
     workspace: WorkspaceProps,
@@ -44,6 +47,15 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     const workspaceId = uuidv4();
     const folderId = uuidv4();
     const documentId = uuidv4();
+    // currently hard-coded until we enable e2e encryption per workspace
+    const documentEncryptionKey = sodium.from_base64(
+      "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
+    );
+    const snapshot = await createIntroductionDocumentSnapshot({
+      documentId,
+      documentEncryptionKey,
+    });
+
     const createInitialWorkspaceStructureResult =
       await createInitialWorkspaceStructure({
         input: {
@@ -54,6 +66,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           folderIdSignature: `TODO+${folderId}`,
           documentName: "Introduction",
           documentId,
+          documentSnapshot: snapshot,
         },
       });
     if (
@@ -69,11 +82,9 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     const folder =
       createInitialWorkspaceStructureResult.data.createInitialWorkspaceStructure
         .folder;
-    const document = undefined;
-    // TODO: we will have a document returned as part of this structure
-    // const document =
-    //   createInitialWorkspaceStructureResult.data.createInitialWorkspaceStructure
-    //     .document;
+    const document =
+      createInitialWorkspaceStructureResult.data.createInitialWorkspaceStructure
+        .document;
     if (props.onWorkspaceStructureCreated) {
       props.onWorkspaceStructureCreated({
         workspace,
