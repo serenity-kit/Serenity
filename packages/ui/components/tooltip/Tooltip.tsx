@@ -15,14 +15,13 @@ export const Tooltip = React.forwardRef((props: TooltipProps, ref) => {
   return (
     <NBTooltip
       {...props}
-      openDelay={400}
+      openDelay={600}
       style={[styles.default, props.style]}
       backgroundColor={"gray.800"} // needed here so arrow-color is set accordingly
       borderWidth={0}
       borderRadius={2}
       hasArrow={true}
       arrowSize={10}
-      isOpen={true}
       _text={{
         style: styles.text,
       }}

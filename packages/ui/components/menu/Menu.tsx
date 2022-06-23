@@ -3,6 +3,7 @@ import { StyleSheet, View, TouchableWithoutFeedback } from "react-native";
 import { tw } from "../../tailwind";
 import { Popover } from "react-native-popper";
 import { IPopoverProps } from "react-native-popper/lib/typescript/types";
+import { BoxShadow } from "../boxShadow/BoxShadow";
 
 export type MenuProps = IPopoverProps &
   View["props"] & {
@@ -13,7 +14,7 @@ export type MenuProps = IPopoverProps &
 export const Menu = ({ children, isOpen, onChange, ...rest }: MenuProps) => {
   const styles = StyleSheet.create({
     // overflow setting needed so children with a set background don't spill
-    menu: tw`py-1.5 bg-white rounded overflow-hidden se-shadow-lg`,
+    menu: tw`py-1.5 bg-white rounded overflow-hidden`,
   });
 
   return (
@@ -25,7 +26,9 @@ export const Menu = ({ children, isOpen, onChange, ...rest }: MenuProps) => {
             onChange(false);
           }}
         >
-          <View style={[styles.menu, rest.style]}>{children}</View>
+          <BoxShadow elevation={2} rounded>
+            <View style={[styles.menu, rest.style]}>{children}</View>
+          </BoxShadow>
         </TouchableWithoutFeedback>
       </Popover.Content>
     </Popover>

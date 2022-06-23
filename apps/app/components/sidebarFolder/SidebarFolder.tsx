@@ -8,6 +8,7 @@ import {
   ViewProps,
   InlineInput,
   IconButton,
+  Tooltip,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
@@ -189,7 +190,6 @@ export default function SidebarFolder(props: Props) {
             }}
           >
             <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
-              {/* not the best way but icons don't take styles (yet?) */}
               <View style={tw`ml-0.5 -mr-0.5`}>
                 <Icon
                   name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
@@ -241,11 +241,14 @@ export default function SidebarFolder(props: Props) {
                   createFolder(null);
                 }}
               />
-              <IconButton
-                onPress={createDocument}
-                name="file-add-line"
-                color="gray-600"
-              ></IconButton>
+              {/* offset not working yet as NB has a no-no in their component */}
+              <Tooltip label="New Page" placement="right" offset={8}>
+                <IconButton
+                  onPress={createDocument}
+                  name="file-add-line"
+                  color="gray-600"
+                ></IconButton>
+              </Tooltip>
               {documentsResult.fetching ||
                 (foldersResult.fetching && <ActivityIndicator />)}
             </HStack>

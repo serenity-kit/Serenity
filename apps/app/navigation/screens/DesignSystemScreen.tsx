@@ -25,6 +25,8 @@ import {
   Shortcut,
   Tooltip,
   Spinner,
+  BoxShadow,
+  BoxShadowLevels,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -40,6 +42,7 @@ export default function DesignSystemScreen() {
   const [showModal, setShowModal] = useState(false);
   const [isOpenPopover, setIsOpenPopover] = useState(false);
   const collabColors = Object.keys(theme.colors.collaboration);
+  const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
 
   return (
     <ScrollView style={tw`px-4 py-6`}>
@@ -47,6 +50,26 @@ export default function DesignSystemScreen() {
       <Tooltip label="This is a tip!" placement="right">
         <IconButton name="arrow-right" color="gray-500" />
       </Tooltip>
+
+      <Text style={tw`my-4 h2`}>Elevation</Text>
+      <HStack space={3}>
+        {elevationLevels.map((level) => {
+          return (
+            <BoxShadow elevation={level} rounded>
+              <HStack
+                style={tw`h-24 w-24 bg-white rounded`}
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Text variant="xxs" muted>
+                  elevation {level}
+                </Text>
+              </HStack>
+            </BoxShadow>
+          );
+        })}
+      </HStack>
+
       <Text style={tw`my-4 h2`}>Text</Text>
       <Text variant="large">large Text</Text>
       <Text>regular Text</Text>

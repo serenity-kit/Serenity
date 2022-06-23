@@ -18,6 +18,7 @@ import {
   View,
   Avatar,
   IconButton,
+  Tooltip,
 } from "@serenity-tools/ui";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 import {
@@ -109,7 +110,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       >
         <Menu
           placement="bottom left"
-          style={tw`ml-4`} // we could solve this via additional margin but that's kinda hacky ...
+          // we could solve this via additional margin but that's kinda hacky and messes with the BoxShadow component
+          // style={tw`ml-4`}
           offset={2}
           // can never be more than half the trigger width !! should be something like 16+24+8+labellength*12-24
           // or we only use the icon as the trigger (worsens ux)
@@ -283,22 +285,32 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         <Text variant="xxs" bold>
           Documents
         </Text>
-        <IconButton
-          onPress={() => {
-            setIsCreatingNewFolder(true);
-          }}
-          name="plus"
-        ></IconButton>
+        {/* offset not working yet as NB has a no-no in their component */}
+        <Tooltip label="Create Folder" placement="right" offset={8}>
+          <IconButton
+            onPress={() => {
+              setIsCreatingNewFolder(true);
+            }}
+            name="plus"
+          ></IconButton>
+        </Tooltip>
       </HStack>
 
       {isCreatingNewFolder && (
-        <InlineInput
-          onCancel={() => {
-            setIsCreatingNewFolder(false);
-          }}
-          onSubmit={createFolder}
-          value=""
-        />
+        <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
+          <View style={tw`ml-0.5 -mr-0.5`}>
+            <Icon name={"arrow-right-filled"} color={tw.color("gray-600")} />
+          </View>
+          <Icon name="folder" size={20} />
+          <InlineInput
+            onCancel={() => {
+              setIsCreatingNewFolder(false);
+            }}
+            onSubmit={createFolder}
+            value=""
+            style={tw`ml-0.5`}
+          />
+        </HStack>
       )}
 
       {rootFoldersResult.fetching ? (
