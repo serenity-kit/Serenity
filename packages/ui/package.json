@@ -7,7 +7,7 @@
     "test": "echo TODO"
   },
   "dependencies": {
-    "native-base": "^3.4.1",
+    "native-base": "^3.4.7",
     "react-native-svg": "12.3.0"
   }
 }
