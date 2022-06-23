@@ -10,6 +10,7 @@ import {
   FirstDocumentQueryVariables,
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types";
+import { getLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceRootScreen(
   props: WorkspaceDrawerScreenProps<"WorkspaceRoot">
@@ -20,6 +21,18 @@ export default function WorkspaceRootScreen(
 
   useEffect(() => {
     (async () => {
+      const lastUsedDocumentId = await getLastUsedDocumentId(workspaceId);
+      if (lastUsedDocumentId) {
+        props.navigation.replace("Workspace", {
+          workspaceId,
+          screen: "Page",
+          params: {
+            pageId: lastUsedDocumentId,
+          },
+        });
+        return;
+      }
+
       // query first folder and then the first document to navigate there
       const firstDocumentResult = await urqlClient
         .query<FirstDocumentQuery, FirstDocumentQueryVariables>(

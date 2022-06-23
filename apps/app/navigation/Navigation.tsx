@@ -37,6 +37,8 @@ import { DrawerActions } from "@react-navigation/native";
 import RegistrationVerificationScreen from "./screens/RegistrationVerificationScreen";
 import WorkspaceRootScreen from "./screens/WorkspaceRootScreen";
 import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
+import { useEffect } from "react";
+import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -56,6 +58,10 @@ function WorkspaceStackScreen(props) {
   if (!props.route.params) {
     return null;
   }
+
+  useEffect(() => {
+    setLastUsedWorkspaceId(props.route.params.workspaceId);
+  });
 
   return (
     <WorkspaceIdProvider value={props.route.params.workspaceId}>

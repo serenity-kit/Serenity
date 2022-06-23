@@ -5,9 +5,13 @@ import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRigh
 import { useEffect, useLayoutEffect } from "react";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { PageHeader } from "../../components/page/PageHeader";
+import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+  const workspaceId = useWorkspaceId();
+
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: PageHeaderRight,
@@ -26,14 +30,11 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   };
 
   useEffect(() => {
+    setLastUsedDocumentId(props.route.params.pageId, workspaceId);
+
     // removing the isNew param right after the first render so users don't have it after a refresh
     props.navigation.setParams({ isNew: undefined });
   }, [props.route.params.pageId]);
-
-  if (!props.route.params?.pageId) {
-    // should never happen
-    return null;
-  }
 
   return (
     <Page
