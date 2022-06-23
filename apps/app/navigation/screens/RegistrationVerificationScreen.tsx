@@ -2,6 +2,25 @@ import React, { useState } from "react";
 import { Text, View, Box, tw, Button, LabeledInput } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types";
 import { useVerifyRegistrationMutation } from "../../generated/graphql";
+import {
+  isUsernamePasswordStored,
+  getStoredUsername,
+  getStoredPassword,
+  deleteStoredUsernamePassword,
+} from "../../utils/registrationMemoryStore/registrationMemoryStore";
+import {
+  useStartLoginMutation,
+  useFinishLoginMutation,
+  MainDeviceQuery,
+  MainDeviceDocument,
+} from "../../generated/graphql";
+import { useAuthentication } from "../../context/AuthenticationContext";
+import {
+  login,
+  fetchMainDevice,
+  navigateToNextAuthenticatedPage,
+} from "../../utils/login/loginHelper";
+import { useClient } from "urql";
 
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
@@ -11,6 +30,45 @@ export default function RegistrationVerificationScreen(
     props.route.params.verification || ""
   );
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
+  const { updateAuthentication } = useAuthentication();
+  const [, startLoginMutation] = useStartLoginMutation();
+  const [, finishLoginMutation] = useFinishLoginMutation();
+  const urqlClient = useClient();
+
+  const navigateToLoginScreen = () => {
+    props.navigation.push("Login", {});
+  };
+
+  const loginWithStoredUsernamePassword = async () => {
+    const username = getStoredUsername();
+    const password = getStoredPassword();
+    deleteStoredUsernamePassword();
+    if (!username || !password) {
+      navigateToLoginScreen();
+      return;
+    }
+
+    try {
+      setErrorMessage("");
+      setIsLoggingIn(true);
+      const loginResult = await login({
+        username,
+        password,
+        startLoginMutation,
+        finishLoginMutation,
+        updateAuthentication,
+      });
+      await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
+      setIsLoggingIn(false);
+      navigateToNextAuthenticatedPage(props.navigation);
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Failed to login.");
+      setIsLoggingIn(false);
+    }
+  };
 
   const onSubmit = async () => {
     if (!props.route.params.username) {
@@ -25,7 +83,11 @@ export default function RegistrationVerificationScreen(
         },
       });
       if (verifyRegistrationResult.data?.verifyRegistration) {
-        props.navigation.push("Login", {});
+        if (isUsernamePasswordStored()) {
+          await loginWithStoredUsernamePassword();
+        } else {
+          navigateToLoginScreen();
+        }
       } else {
         setErrorMessage("Verification failed.");
       }

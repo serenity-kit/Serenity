@@ -18,6 +18,7 @@ import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
 import { VStack } from "native-base";
 import { createAndEncryptDevice } from "@serenity-tools/common";
 import { setMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
+import { storeUsernamePassword } from "../../utils/registrationMemoryStore/registrationMemoryStore";
 
 type Props = {
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
@@ -81,6 +82,7 @@ export default function RegisterForm(props: Props) {
             );
           }
           // reset since the user might end up on this screen again
+          storeUsernamePassword(username, password);
           setPassword("");
           setUsername("");
         } else if (finishRegistrationResult.error) {
