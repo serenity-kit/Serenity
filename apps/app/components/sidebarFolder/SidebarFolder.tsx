@@ -38,7 +38,8 @@ type Props = ViewProps & {
 export default function SidebarFolder(props: Props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
-  const [isOpen, setIsOpen] = useState(false);
+  const openFolderIds = useOpenFolderStore((state) => state.folderIds);
+  const [isOpen, setIsOpen] = useState(openFolderIds.includes(props.folderId));
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
 
@@ -62,7 +63,6 @@ export default function SidebarFolder(props: Props) {
     },
   });
   const { depth = 0 } = props;
-  const openFolderIds = useOpenFolderStore((state) => state.folderIds);
 
   useEffect(() => {
     setIsOpen(openFolderIds.includes(props.folderId));
