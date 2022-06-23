@@ -112,7 +112,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       >
         <Menu
           placement="bottom left"
-          style={tw`ml-4`} // we could solve this via additional margin but that's kinda hacky ...
+          // we could solve this via additional margin but that's kinda hacky and messes with the BoxShadow component
+          // style={tw`ml-4`}
           offset={2}
           // can never be more than half the trigger width !! should be something like 16+24+8+labellength*12-24
           // or we only use the icon as the trigger (worsens ux)
