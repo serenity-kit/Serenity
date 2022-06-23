@@ -189,6 +189,11 @@ export type DocumentEdge = {
   node?: Maybe<Document>;
 };
 
+export type DocumentResult = {
+  __typename?: 'DocumentResult';
+  document?: Maybe<Document>;
+};
+
 export type DocumentSnapshotInput = {
   ciphertext: Scalars['String'];
   nonce: Scalars['String'];
@@ -411,6 +416,7 @@ export type Query = {
   __typename?: 'Query';
   deviceBySigningPublicKey?: Maybe<DeviceResult>;
   devices?: Maybe<DeviceConnection>;
+  document?: Maybe<DocumentResult>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documents?: Maybe<DocumentConnection>;
   firstDocument?: Maybe<Document>;
@@ -434,6 +440,11 @@ export type QueryDeviceBySigningPublicKeyArgs = {
 export type QueryDevicesArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
+};
+
+
+export type QueryDocumentArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -752,6 +763,13 @@ export type VerifyRegistrationMutationVariables = Exact<{
 
 
 export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegistration?: { __typename?: 'VerifyRegistrationResult', id: string } | null };
+
+export type DocumentQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'DocumentResult', document?: { __typename?: 'Document', id: string, name?: string | null, parentFolderId?: string | null, workspaceId?: string | null } | null } | null };
 
 export type DocumentPathQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1080,6 +1098,22 @@ export const VerifyRegistrationDocument = gql`
 
 export function useVerifyRegistrationMutation() {
   return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
+};
+export const DocumentDocument = gql`
+    query document($id: ID!) {
+  document(id: $id) {
+    document {
+      id
+      name
+      parentFolderId
+      workspaceId
+    }
+  }
+}
+    `;
+
+export function useDocumentQuery(options: Omit<Urql.UseQueryArgs<DocumentQueryVariables>, 'query'>) {
+  return Urql.useQuery<DocumentQuery>({ query: DocumentDocument, ...options });
 };
 export const DocumentPathDocument = gql`
     query documentPath($id: ID!) {

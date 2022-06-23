@@ -11,7 +11,8 @@ const reduceParentFolderTreeToList = (folder: any): Folder[] => {
   if (folder["parentFolder"]) {
     parentFolderList = reduceParentFolderTreeToList(folder["parentFolder"]);
   }
-  parentFolderList.unshift(folder);
+  // this should present the folders in increasing order of specificity
+  parentFolderList.push(folder);
   return parentFolderList;
 };
 

@@ -4,12 +4,14 @@ import { useWindowDimensions } from "react-native";
 import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
 import { useEffect, useLayoutEffect } from "react";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
+import { PageHeader } from "../../components/page/PageHeader";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: PageHeaderRight,
+      headerTitle: PageHeader,
     });
   }, []);
 

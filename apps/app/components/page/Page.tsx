@@ -34,12 +34,19 @@ import {
 import { WorkspaceDrawerScreenProps } from "../../types";
 import { useEffect, useRef } from "react";
 import {
+  Document,
   DocumentPathDocument,
   DocumentPathQuery,
   DocumentPathQueryVariables,
+  DocumentQuery,
+  DocumentQueryVariables,
+  DocumentDocument,
   useDocumentPathQuery,
+  useDocumentsQuery,
 } from "../../generated/graphql";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { useDocumentPathStore } from "../../utils/document/documentPathStore";
+import { useDocumentNameStore } from "../../utils/document/documentNameStore";
 import { Folder } from "../../types/Folder";
 import { useClient } from "urql";
 
@@ -70,6 +77,17 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const docIdRef = useRef<string | null>(null);
   const urqlClient = useClient();
   const folderStore = useOpenFolderStore();
+  const documentPathStore = useDocumentPathStore();
+  const documentNameStore = useDocumentNameStore();
+
+  // const buildDocumentPathTree = (folders: Folder[]) => {
+  //   const lookup: { [id: string]: number } = {};
+  //   folders.forEach((folder: Folder, row: number) => {
+  //     lookup[folder.id] = row;
+  //   });
+  //   const organizedFolders: Folder[] = [];
+  //   return organizedFolders;
+  // };
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPathResult = await urqlClient
@@ -82,16 +100,36 @@ export default function Page({ navigation, route, updateTitle }: Props) {
         }
       )
       .toPromise();
-    const documentPath = documentPathResult.data?.documentPath;
+    const documentPath = documentPathResult.data?.documentPath as Folder[];
     const documentPathIds: string[] = [];
-    documentPath?.forEach((folder: Folder) => {
+    if (!documentPath) {
+      return;
+    }
+    documentPath.forEach((folder: Folder) => {
       documentPathIds.push(folder.id);
     });
     folderStore.update(documentPathIds);
+    documentPathStore.update(documentPath);
+  };
+
+  const updateDocumentName = async (docId: string) => {
+    const documentResult = await urqlClient
+      .query<DocumentQuery, DocumentQueryVariables>(
+        DocumentDocument,
+        { id: docId },
+        {
+          // better to be safe here and always refetch
+          requestPolicy: "network-only",
+        }
+      )
+      .toPromise();
+    const document = documentResult.data?.document?.document as Document;
+    documentNameStore.update(document.name);
   };
 
   useEffect(() => {
     if (docIdRef.current !== docId) {
+      updateDocumentName(docId);
       updateDocumentFolderPath(docId);
     }
     docIdRef.current = docId;
