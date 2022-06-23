@@ -18,6 +18,7 @@ import {
   View,
   Avatar,
   IconButton,
+  Tooltip,
 } from "@serenity-tools/ui";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 import {
@@ -285,12 +286,15 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         <Text variant="xxs" bold>
           Documents
         </Text>
-        <IconButton
-          onPress={() => {
-            setIsCreatingNewFolder(true);
-          }}
-          name="plus"
-        ></IconButton>
+        {/* offset not working yet as NB has a no-no in their component */}
+        <Tooltip label="Create Folder" placement="right" offset={8}>
+          <IconButton
+            onPress={() => {
+              setIsCreatingNewFolder(true);
+            }}
+            name="plus"
+          ></IconButton>
+        </Tooltip>
       </HStack>
 
       {isCreatingNewFolder && (
