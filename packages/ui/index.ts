@@ -23,6 +23,7 @@ export * from "./components/shortcut/Shortcut";
 export * from "./components/sidebarButton/SidebarButton";
 export * from "./components/sidebarLink/SidebarLink";
 export * from "./components/sidebarDivider/SidebarDivider";
+export * from "./components/spinner/Spinner";
 export * from "./components/pressable/Pressable";
 export * from "./components/tooltip/Tooltip";
 

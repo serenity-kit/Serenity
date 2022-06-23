@@ -31,7 +31,7 @@ type RegistrationVerificationParams = {
 };
 
 export type WorkspaceDrawerParamList = {
-  Dashboard: undefined;
+  NoPageExists: undefined;
   Editor: undefined;
   Page: PageParams;
   TestLibsodium: undefined;

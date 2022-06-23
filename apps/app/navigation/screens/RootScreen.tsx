@@ -1,6 +1,6 @@
-import { Text, View } from "@serenity-tools/ui";
+import { Spinner, tw, View } from "@serenity-tools/ui";
 import { useEffect } from "react";
-import { useWindowDimensions, Platform } from "react-native";
+import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { WorkspaceDocument, WorkspaceQuery } from "../../generated/graphql";
@@ -24,7 +24,7 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
           // query first document on first workspace and go there
           props.navigation.replace("Workspace", {
             workspaceId: workspaceResult.data.workspace.id,
-            screen: "Dashboard",
+            screen: "NoPageExists",
           });
         } else {
           props.navigation.replace("Onboarding");
@@ -36,8 +36,8 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
   }, [deviceSigningPublicKey, urqlClient, props.navigation]);
 
   return (
-    <View>
-      <Text>Splash Screen (show loading indicator after 200ms)</Text>
+    <View style={tw`justify-center items-center flex-auto`}>
+      <Spinner fadeIn size="lg" />
     </View>
   );
 }

@@ -182,7 +182,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                       screen: "Workspace",
                       params: {
                         workspaceId: workspace.id,
-                        screen: "Dashboard",
+                        screen: "NoPageExists",
                       },
                     }}
                     style={tw`p-menu-item`}

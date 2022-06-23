@@ -12,7 +12,7 @@ import * as Linking from "expo-linking";
 import NotFoundScreen from "./screens/NotFoundScreen";
 import EditorScreen from "./screens/EditorScreen";
 import { RootStackParamList } from "../types";
-import DashboardScreen from "./screens/DashboardScreen";
+import NoPageExistsScreen from "./screens/NoPageExistsScreen";
 import DevDashboardScreen from "./screens/DevDashboardScreen";
 import PageScreen from "./screens/PageScreen";
 import LibsodiumTestScreen from "./screens/LibsodiumTestScreen";
@@ -83,7 +83,11 @@ function WorkspaceStackScreen(props) {
         overlayColor: "transparent",
       }}
     >
-      <Drawer.Screen name="Dashboard" component={DashboardScreen} />
+      <Drawer.Screen
+        name="NoPageExists"
+        component={NoPageExistsScreen}
+        options={{ headerShown: false }}
+      />
       <Drawer.Screen name="Editor" component={EditorScreen} />
       <Drawer.Screen name="Page" component={PageScreen} />
       <Drawer.Screen name="Settings" component={WorkspaceSettingsScreen} />
@@ -96,7 +100,11 @@ function RootNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
-      <Stack.Screen name="Root" component={RootScreen} />
+      <Stack.Screen
+        name="Root"
+        component={RootScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="Workspace"
         component={WorkspaceStackScreen}
@@ -130,12 +138,12 @@ function RootNavigator() {
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
-        options={{ title: "Oops!" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="AcceptWorkspaceInvitation"
         component={AcceptWorkspaceInvitationScreen}
-        options={{ title: "Accept Workspace Invitation" }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
@@ -148,7 +156,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       Workspace: {
         path: "/workspace/:workspaceId",
         screens: {
-          Dashboard: "dashboard",
+          NoPageExists: "no-page-exits",
           Editor: "editor",
           Page: "page/:pageId",
           TestLibsodium: "test-libsodium",
