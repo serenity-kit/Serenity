@@ -94,6 +94,16 @@ export const fetchMainDevice = async ({
   }
 };
 
+/**
+ * This function is designed to handle post-login routing logic
+ * The reason is that maybe a user clicks a link to a document
+ * but then isn't logged in, so they have to pass through the login
+ * screen, then get forwarded by the login screen to the document.
+ *
+ * This function will abstract that use case.
+ *
+ * @param navigation
+ */
 export const navigateToNextAuthenticatedPage = (navigation) => {
   navigation.navigate("Root");
 };
