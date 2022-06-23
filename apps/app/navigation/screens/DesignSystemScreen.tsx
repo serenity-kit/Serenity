@@ -22,6 +22,7 @@ import {
   ModalButtonFooter,
   IconButton,
   Tooltip,
+  Spinner,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -299,6 +300,11 @@ export default function DesignSystemScreen() {
       >
         Open Modal
       </Button>
+
+      <Text style={tw`mt-6 mb-4 h2`}>Spinner</Text>
+      <Spinner />
+      <Spinner size="lg" />
+      <Spinner fadeIn size="lg" />
 
       <Text style={tw`mt-6 mb-4 h2`}>Checkbox</Text>
       <Checkbox value="test" accessibilityLabel="This is a dummy checkbox" />

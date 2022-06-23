@@ -100,7 +100,11 @@ function RootNavigator() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
-      <Stack.Screen name="Root" component={RootScreen} />
+      <Stack.Screen
+        name="Root"
+        component={RootScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="Workspace"
         component={WorkspaceStackScreen}
@@ -134,12 +138,12 @@ function RootNavigator() {
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
-        options={{ title: "Oops!" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="AcceptWorkspaceInvitation"
         component={AcceptWorkspaceInvitationScreen}
-        options={{ title: "Accept Workspace Invitation" }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
