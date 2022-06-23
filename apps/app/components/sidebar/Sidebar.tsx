@@ -167,8 +167,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             </Pressable>
           }
         >
-          <View style={tw`p-4`}>
-            <Text variant="small" muted>
+          <View style={tw`p-menu-item`}>
+            <Text variant="xxs" muted bold>
               {username}
             </Text>
           </View>
@@ -185,21 +185,36 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                         screen: "NoPageExists",
                       },
                     }}
+                    style={tw`p-menu-item`}
                   >
-                    <Text variant="small">{workspace.name}</Text>
+                    <Avatar
+                      borderRadius={4}
+                      size="xxs"
+                      // TODO adjust color for each workspace if no image is set
+                      bg={tw.color(`collaboration-honey`)}
+                      key={`avatar_${workspace.id}`}
+                    >
+                      <Icon
+                        name="serenity-feather"
+                        color={tw.color("black/35")}
+                        size={16}
+                      />
+                    </Avatar>
+                    <Text variant="xs">{workspace.name}</Text>
                   </SidebarLink>
                 )
               )}
-          <SidebarDivider collapsed />
 
-          <SidebarButton
-            onPress={() => {
-              setIsOpenWorkspaceSwitcher(false);
-              setShowCreateWorkspaceModal(true);
-            }}
-          >
-            <Text variant="small">Create workspace</Text>
-          </SidebarButton>
+          <View style={tw`pl-2 pr-3 py-1.5`}>
+            <IconButton
+              onPress={() => {
+                setIsOpenWorkspaceSwitcher(false);
+                setShowCreateWorkspaceModal(true);
+              }}
+              name="plus"
+              label="Create workspace"
+            />
+          </View>
 
           <SidebarDivider collapsed />
           <SidebarButton
@@ -209,8 +224,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               // @ts-expect-error navigation ts issue
               props.navigation.push("Login");
             }}
+            px={3}
+            py={2}
           >
-            <Text variant="small">Logout</Text>
+            <Text variant="xs">Logout</Text>
           </SidebarButton>
         </Menu>
         {!isPermanentLeftSidebar && (
