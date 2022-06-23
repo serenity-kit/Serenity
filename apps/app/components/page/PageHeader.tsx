@@ -2,7 +2,7 @@ import { DrawerHeaderProps } from "@react-navigation/drawer";
 import { Text, View } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useDocumentPathStore } from "../../utils/document/documentPathStore";
-import { useDocumentNameStore } from "../../utils/document/documentNameStore";
+import { useDocumentStore } from "../../utils/document/documentStore";
 
 type Props = DrawerHeaderProps & {
   children: any;
@@ -10,7 +10,7 @@ type Props = DrawerHeaderProps & {
 
 export function PageHeader(props: Props) {
   const documentPathList = useDocumentPathStore((state) => state.folders);
-  const documentName = useDocumentNameStore((state) => state.name);
+  const document = useDocumentStore((state) => state.document);
 
   return (
     <HStack space={2} alignItems="center">
@@ -21,7 +21,7 @@ export function PageHeader(props: Props) {
           <Text> &gt;</Text>
         </Text>
       ))}
-      <Text bold>{documentName}</Text>
+      {document && <Text bold>{document.name}</Text>}
     </HStack>
   );
 }

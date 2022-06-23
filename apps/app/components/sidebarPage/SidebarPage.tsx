@@ -13,6 +13,7 @@ import {
 import { HStack } from "native-base";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
+import { useDocumentStore } from "../../utils/document/documentStore";
 
 type Props = ViewProps & {
   documentId: string;
@@ -26,6 +27,7 @@ export default function SidebarPage(props: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
+  const document = useDocumentStore((state) => state.document);
 
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const { depth = 0 } = props;
@@ -115,6 +117,7 @@ export default function SidebarPage(props: Props) {
                   style={[tw`pl-1.5 max-w-${maxWidth}`]}
                   numberOfLines={1}
                   ellipsizeMode="tail"
+                  bold={document?.id === props.documentId}
                 >
                   {props.documentName}
                 </Text>

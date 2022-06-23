@@ -46,7 +46,7 @@ import {
 } from "../../generated/graphql";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 import { useDocumentPathStore } from "../../utils/document/documentPathStore";
-import { useDocumentNameStore } from "../../utils/document/documentNameStore";
+import { useDocumentStore } from "../../utils/document/documentStore";
 import { Folder } from "../../types/Folder";
 import { useClient } from "urql";
 
@@ -78,16 +78,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const urqlClient = useClient();
   const folderStore = useOpenFolderStore();
   const documentPathStore = useDocumentPathStore();
-  const documentNameStore = useDocumentNameStore();
-
-  // const buildDocumentPathTree = (folders: Folder[]) => {
-  //   const lookup: { [id: string]: number } = {};
-  //   folders.forEach((folder: Folder, row: number) => {
-  //     lookup[folder.id] = row;
-  //   });
-  //   const organizedFolders: Folder[] = [];
-  //   return organizedFolders;
-  // };
+  const documentStore = useDocumentStore();
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPathResult = await urqlClient
@@ -124,7 +115,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       )
       .toPromise();
     const document = documentResult.data?.document?.document as Document;
-    documentNameStore.update(document.name);
+    documentStore.update(document);
   };
 
   useEffect(() => {
