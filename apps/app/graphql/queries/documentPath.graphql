@@ -1,0 +1,9 @@
+query documentPath($id: ID!) {
+  documentPath(id: $id) {
+    id
+    name
+    parentFolderId
+    rootFolderId
+    workspaceId
+  }
+}

@@ -10,7 +10,7 @@ import {
   IconButton,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Platform } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
 import { v4 as uuidv4 } from "uuid";
@@ -31,13 +31,16 @@ type Props = ViewProps & {
   folderId: string;
   folderName: string;
   depth?: number;
+  openFolderIds: string[];
   onStructureChange: () => void;
 };
 
 export default function SidebarFolder(props: Props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(
+    props.openFolderIds.includes(props.folderId)
+  );
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
 
@@ -61,6 +64,10 @@ export default function SidebarFolder(props: Props) {
     },
   });
   const { depth = 0 } = props;
+
+  useEffect(() => {
+    setIsOpen(props.openFolderIds.includes(props.folderId));
+  }, [props.openFolderIds]);
 
   const createFolder = async (name: string | null) => {
     setIsOpen(true);
@@ -264,6 +271,7 @@ export default function SidebarFolder(props: Props) {
                     // needs to be here as a padding for hovering bg-color change
                     style={tw`pl-${3 + depth * 3}`}
                     depth={depth + 1}
+                    openFolderIds={props.openFolderIds}
                   />
                 );
               })

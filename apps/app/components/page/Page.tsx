@@ -33,6 +33,15 @@ import {
 } from "y-protocols/awareness";
 import { WorkspaceDrawerScreenProps } from "../../types";
 import { useEffect, useRef } from "react";
+import {
+  DocumentPathDocument,
+  DocumentPathQuery,
+  DocumentPathQueryVariables,
+  useDocumentPathQuery,
+} from "../../generated/graphql";
+import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { Folder } from "../../types/Folder";
+import { useClient } from "urql";
 
 const reconnectTimeout = 2000;
 
@@ -57,6 +66,36 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const latestServerVersionRef = useRef<number | null>(null);
   const editorInitializedRef = useRef<boolean>(false);
   const websocketState = useWebsocketState();
+
+  const docIdRef = useRef<string | null>(null);
+  const urqlClient = useClient();
+  const folderStore = useOpenFolderStore();
+
+  const updateDocumentFolderPath = async (docId: string) => {
+    const documentPathResult = await urqlClient
+      .query<DocumentPathQuery, DocumentPathQueryVariables>(
+        DocumentPathDocument,
+        { id: docId },
+        {
+          // better to be safe here and always refetch
+          requestPolicy: "network-only",
+        }
+      )
+      .toPromise();
+    const documentPath = documentPathResult.data?.documentPath;
+    const documentPathIds: string[] = [];
+    documentPath?.forEach((folder: Folder) => {
+      documentPathIds.push(folder.id);
+    });
+    folderStore.update(documentPathIds);
+  };
+
+  useEffect(() => {
+    if (docIdRef.current !== docId) {
+      updateDocumentFolderPath(docId);
+    }
+    docIdRef.current = docId;
+  });
 
   const applySnapshot = async (snapshot, key) => {
     activeSnapshotIdRef.current = snapshot.publicData.snapshotId;
