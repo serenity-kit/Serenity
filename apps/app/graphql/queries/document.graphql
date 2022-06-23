@@ -1,0 +1,10 @@
+query document($id: ID!) {
+  document(id: $id) {
+    document {
+      id
+      name
+      parentFolderId
+      workspaceId
+    }
+  }
+}
