@@ -36,6 +36,7 @@ export type WorkspaceDrawerParamList = {
   Page: PageParams;
   TestLibsodium: undefined;
   Settings: undefined;
+  WorkspaceRoot: undefined;
 };
 
 export type WorkspaceParams =

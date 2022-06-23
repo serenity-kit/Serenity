@@ -9,6 +9,7 @@ import * as UpdateDocumentNameMutationTypes from "./graphql/mutations/document/u
 import * as DeleteDocumentsMutationTypes from "./graphql/mutations/document/deleteDocuments";
 import * as DocumentsQueryTypes from "./graphql/queries/document/documents";
 import * as DocumentPathQueryTypes from "./graphql/queries/document/documentPath";
+import * as FirstDocumentQueryTypes from "./graphql/queries/document/firstDocument";
 
 import * as RootFoldersQueryTypes from "./graphql/queries/folder/rootFolders";
 import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
@@ -55,6 +56,7 @@ export const schema = makeSchema({
     DeleteDocumentsMutationTypes,
     DocumentsQueryTypes,
     DocumentPathQueryTypes,
+    FirstDocumentQueryTypes,
 
     CreateFolderMutationTypes,
     UpdateFolderNameMutationTypes,

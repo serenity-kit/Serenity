@@ -1,0 +1,5 @@
+query firstDocument($workspaceId: ID!) {
+  firstDocument(workspaceId: $workspaceId) {
+    id
+  }
+}
