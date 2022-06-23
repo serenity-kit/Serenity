@@ -44,6 +44,7 @@ export default function RegistrationVerificationScreen(
   const loginWithStoredUsernamePassword = async () => {
     const username = getStoredUsername();
     const password = getStoredPassword();
+    deleteStoredUsernamePassword();
     if (!username || !password) {
       navigateToLoginScreen();
       return;
@@ -60,7 +61,6 @@ export default function RegistrationVerificationScreen(
         updateAuthentication,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
-      deleteStoredUsernamePassword();
       setIsLoggingIn(false);
       navigateToNextAuthenticatedPage(props.navigation);
     } catch (error) {
