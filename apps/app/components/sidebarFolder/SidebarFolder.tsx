@@ -27,6 +27,12 @@ import { RootStackScreenProps } from "../../types";
 import SidebarPage from "../sidebarPage/SidebarPage";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import {
+  useDocumentPathStore,
+  getDocumentPath,
+} from "../../utils/document/documentPathStore";
+import { useDocumentStore } from "../../utils/document/documentStore";
+import { useClient } from "urql";
 
 type Props = ViewProps & {
   workspaceId: string;
@@ -64,6 +70,10 @@ export default function SidebarFolder(props: Props) {
     },
   });
   const { depth = 0 } = props;
+  const urqlClient = useClient();
+  const documentPathStore = useDocumentPathStore();
+  const document = useDocumentStore((state) => state.document);
+  const documentPathIds = useDocumentPathStore((state) => state.folderIds);
 
   useEffect(() => {
     setIsOpen(openFolderIds.includes(props.folderId));
@@ -129,11 +139,13 @@ export default function SidebarFolder(props: Props) {
         name: newFolderName,
       },
     });
-    if (
-      updateFolderNameResult.data &&
-      updateFolderNameResult.data.updateFolderName
-    ) {
-      // TODO show notification
+    if (updateFolderNameResult.data?.updateFolderName?.folder) {
+      // refetch the document path
+      // TODO: Optimize by checking if the current folder is in the document path
+      if (document && documentPathIds.includes(props.folderId)) {
+        const documentPath = await getDocumentPath(urqlClient, document.id);
+        documentPathStore.update(documentPath);
+      }
     } else {
       // TODO: show error: couldn't update folder name
     }
