@@ -43,5 +43,7 @@ export const getDocumentPath = async (
     )
     .toPromise();
   const documentPath = documentPathResult.data?.documentPath as Folder[];
+  const documentPathStore = useDocumentPathStore();
+  documentPathStore.update(documentPath);
   return documentPath;
 };

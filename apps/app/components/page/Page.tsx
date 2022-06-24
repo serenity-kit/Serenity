@@ -80,7 +80,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const docIdRef = useRef<string | null>(null);
   const urqlClient = useClient();
   const folderStore = useOpenFolderStore();
-  const documentPathStore = useDocumentPathStore();
   const documentStore = useDocumentStore();
 
   const updateDocumentFolderPath = async (docId: string) => {
@@ -93,7 +92,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       documentPathIds.push(folder.id);
     });
     folderStore.update(documentPathIds);
-    documentPathStore.update(documentPath);
   };
 
   const updateDocumentName = async (docId: string) => {
