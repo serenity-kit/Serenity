@@ -25,12 +25,13 @@ import {
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import { AuthenticationProvider } from "./context/AuthenticationContext";
-import { useCallback, useMemo, useState } from "react";
+import { useEffect, useCallback, useMemo, useState } from "react";
 import { devtoolsExchange } from "@urql/devtools";
 import { theme } from "../../tailwind.config";
 import { OpaqueBridge } from "@serenity-tools/opaque";
 import * as storage from "./utils/storage/storage";
 import { RootSiblingParent } from "react-native-root-siblings";
+import { Device } from "./generated/graphql";
 
 type AuthState = {
   deviceSigningPublicKey: string;
@@ -109,11 +110,11 @@ const exchanges = [
 ];
 
 export default function App() {
-  const [deviceSigningPublicKey, setDeviceSigningPublicKey] = useState(() => {
-    return storage.getItem("deviceSigningPublicKey");
-  });
+  const [deviceSigningPublicKey, setDeviceSigningPublicKey] = useState<
+    string | null
+  >(null);
   const updateAuthentication = useCallback(
-    (deviceSigningPublicKey: string | null) => {
+    async (deviceSigningPublicKey: string | null) => {
       if (deviceSigningPublicKey) {
         // TODO: storage.setItem is an async/await method
         storage.setItem("deviceSigningPublicKey", deviceSigningPublicKey);
@@ -125,6 +126,15 @@ export default function App() {
     },
     [setDeviceSigningPublicKey]
   );
+
+  useEffect(() => {
+    (async () => {
+      const deviceSigningPublicKey = await storage.getItem(
+        "deviceSigningPublicKey"
+      );
+      setDeviceSigningPublicKey(deviceSigningPublicKey);
+    })();
+  });
 
   const isLoadingComplete = useCachedResources();
   const [isFontLoadingComplete] = useFonts({
