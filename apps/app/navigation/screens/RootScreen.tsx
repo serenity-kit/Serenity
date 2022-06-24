@@ -5,6 +5,7 @@ import { useClient } from "urql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { WorkspaceDocument, WorkspaceQuery } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types";
+import { getLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function RootScreen(props: RootStackScreenProps<"Root">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -14,6 +15,15 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
   useEffect(() => {
     if (deviceSigningPublicKey) {
       (async () => {
+        const lastUsedWorkspaceId = await getLastUsedWorkspaceId();
+        if (lastUsedWorkspaceId) {
+          props.navigation.replace("Workspace", {
+            workspaceId: lastUsedWorkspaceId,
+            screen: "WorkspaceRoot",
+          });
+          return;
+        }
+
         const workspaceResult = await urqlClient
           .query<WorkspaceQuery>(WorkspaceDocument, undefined, {
             // better to be safe here and always refetch

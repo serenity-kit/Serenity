@@ -21,6 +21,7 @@
     "@expo/vector-icons": "^12.0.0",
     "@mobily/stacks": "^2.1.0",
     "@naisho/core": "*",
+    "@react-native-async-storage/async-storage": "~1.15.0",
     "@react-navigation/drawer": "^6.4.1",
     "@react-navigation/native": "^6.0.2",
     "@react-navigation/native-stack": "^6.1.0",
