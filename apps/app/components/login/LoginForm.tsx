@@ -72,8 +72,6 @@ export function LoginForm(props: Props) {
         finishLoginMutation,
         updateAuthentication,
       });
-      setPassword("");
-      setUsername("");
       const exportKey = loginResult.exportKey;
       await fetchMainDevice({ urqlClient, exportKey });
       // reset the password in case the user ends up on this screen again
@@ -90,6 +88,8 @@ export function LoginForm(props: Props) {
           input: webDevice,
         });
       }
+      setPassword("");
+      setUsername("");
       setIsLoggingIn(false);
       props.onLoginSuccess();
     } catch (error) {
