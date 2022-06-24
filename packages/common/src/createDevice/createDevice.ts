@@ -8,8 +8,10 @@ export const createDevice = async () => {
     signingKeyPair.privateKey
   );
   return {
-    signingKeyPair,
-    encryptionKeyPair,
+    signingPublicKey: signingKeyPair.publicKey,
+    signingPrivateKey: signingKeyPair.privateKey,
+    encryptionPublicKey: encryptionKeyPair.publicKey,
+    encryptionPrivateKey: encryptionKeyPair.privateKey,
     encryptionPublicKeySignature,
   };
 };

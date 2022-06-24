@@ -1,10 +1,4 @@
-import {
-  useStartLoginMutation,
-  useFinishLoginMutation,
-  MainDeviceQuery,
-  MainDeviceDocument,
-} from "../../generated/graphql";
-import { useAuthentication } from "../../context/AuthenticationContext";
+import { MainDeviceQuery, MainDeviceDocument } from "../../generated/graphql";
 import { startLogin, finishLogin } from "@serenity-tools/opaque";
 import { decryptDevice } from "@serenity-tools/common";
 import { setMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
@@ -32,31 +26,26 @@ export const login = async ({
     },
   });
   // check for an error
-  if (startLoginResult.data?.startLogin) {
-    const result = await finishLogin(
-      startLoginResult.data.startLogin.challengeResponse
-    );
-
-    const finishLoginResult = await finishLoginMutation({
-      input: {
-        loginId: startLoginResult.data.startLogin.loginId,
-        message: result.response,
-      },
-    });
-
-    if (finishLoginResult.data?.finishLogin) {
-      updateAuthentication(
-        finishLoginResult.data.finishLogin.mainDeviceSigningPublicKey
-      );
-      return result;
-    } else if (finishLoginResult.error) {
-      throw new Error("Failed to finish login");
-    }
-  } else if (startLoginResult.error) {
+  if (!startLoginResult.data?.startLogin) {
     console.error(startLoginResult.error);
     throw new Error("Failed to start login");
   }
-  throw new Error("Failed to login");
+  const result = await finishLogin(
+    startLoginResult.data.startLogin.challengeResponse
+  );
+  const finishLoginResult = await finishLoginMutation({
+    input: {
+      loginId: startLoginResult.data.startLogin.loginId,
+      message: result.response,
+    },
+  });
+  if (!finishLoginResult.data?.finishLogin) {
+    throw new Error("Failed to finish login");
+  }
+  updateAuthentication(
+    finishLoginResult.data.finishLogin.mainDeviceSigningPublicKey
+  );
+  return result;
 };
 
 export type FetchMainDeviceParams = {

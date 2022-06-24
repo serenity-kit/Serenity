@@ -652,6 +652,13 @@ export type AcceptWorkspaceInvitationMutationVariables = Exact<{
 
 export type AcceptWorkspaceInvitationMutation = { __typename?: 'Mutation', acceptWorkspaceInvitation?: { __typename?: 'AcceptWorkspaceInvitationResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, username?: string | null, isAdmin: boolean }> | null } | null } | null };
 
+export type CreateDeviceMutationVariables = Exact<{
+  input: CreateDeviceInput;
+}>;
+
+
+export type CreateDeviceMutation = { __typename?: 'Mutation', createDevice?: { __typename?: 'CreateDeviceResult', device?: { __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string } | null } | null };
+
 export type CreateDocumentMutationVariables = Exact<{
   input: CreateDocumentInput;
 }>;
@@ -874,6 +881,22 @@ export const AcceptWorkspaceInvitationDocument = gql`
 
 export function useAcceptWorkspaceInvitationMutation() {
   return Urql.useMutation<AcceptWorkspaceInvitationMutation, AcceptWorkspaceInvitationMutationVariables>(AcceptWorkspaceInvitationDocument);
+};
+export const CreateDeviceDocument = gql`
+    mutation createDevice($input: CreateDeviceInput!) {
+  createDevice(input: $input) {
+    device {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      encryptionPublicKeySignature
+    }
+  }
+}
+    `;
+
+export function useCreateDeviceMutation() {
+  return Urql.useMutation<CreateDeviceMutation, CreateDeviceMutationVariables>(CreateDeviceDocument);
 };
 export const CreateDocumentDocument = gql`
     mutation createDocument($input: CreateDocumentInput!) {

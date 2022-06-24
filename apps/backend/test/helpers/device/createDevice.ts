@@ -33,8 +33,8 @@ export const createDevice = async ({
     {
       input: {
         encryptionPublicKeySignature: device.encryptionPublicKeySignature,
-        encryptionPublicKey: device.encryptionKeyPair.publicKey,
-        signingPublicKey: device.signingKeyPair.publicKey,
+        encryptionPublicKey: device.encryptionPublicKey,
+        signingPublicKey: device.signingPublicKey,
       },
     },
     authorizationHeaders
