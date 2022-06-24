@@ -47,3 +47,12 @@ export const removeLastUsedDocumentId = async (workspaceId: string) => {
     return null;
   }
 };
+
+export const removeLastUsedWorkspaceId = async () => {
+  try {
+    return await removeItem(`lastUsedWorkspaceId`);
+  } catch (e) {
+    // error reading value
+    return null;
+  }
+};
