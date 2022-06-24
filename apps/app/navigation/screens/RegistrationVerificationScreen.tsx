@@ -7,7 +7,7 @@ import {
   getStoredUsername,
   getStoredPassword,
   deleteStoredUsernamePassword,
-} from "../../utils/registrationMemoryStore/registrationMemoryStore";
+} from "../../utils/authentication/registrationMemoryStore";
 import {
   useStartLoginMutation,
   useFinishLoginMutation,
@@ -19,7 +19,7 @@ import {
   login,
   fetchMainDevice,
   navigateToNextAuthenticatedPage,
-} from "../../utils/login/loginHelper";
+} from "../../utils/authentication/loginHelper";
 import { useClient } from "urql";
 
 export default function RegistrationVerificationScreen(
@@ -82,14 +82,14 @@ export default function RegistrationVerificationScreen(
           verificationCode,
         },
       });
-      if (verifyRegistrationResult.data?.verifyRegistration) {
-        if (isUsernamePasswordStored()) {
-          await loginWithStoredUsernamePassword();
-        } else {
-          navigateToLoginScreen();
-        }
-      } else {
+      if (!verifyRegistrationResult.data?.verifyRegistration) {
         setErrorMessage("Verification failed.");
+        return;
+      }
+      if (isUsernamePasswordStored()) {
+        await loginWithStoredUsernamePassword();
+      } else {
+        navigateToLoginScreen();
       }
     } catch (err) {
       setErrorMessage("Verification failed.");

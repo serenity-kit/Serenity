@@ -25,12 +25,14 @@ import {
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import { AuthenticationProvider } from "./context/AuthenticationContext";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { devtoolsExchange } from "@urql/devtools";
 import { theme } from "../../tailwind.config";
 import { OpaqueBridge } from "@serenity-tools/opaque";
 import * as storage from "./utils/storage/storage";
 import { RootSiblingParent } from "react-native-root-siblings";
+import { getWebDevice } from "./utils/device/webDeviceStore";
+import { getMainDevice } from "./utils/device/mainDeviceMemoryStore";
 
 type AuthState = {
   deviceSigningPublicKey: string;
@@ -71,16 +73,28 @@ const exchanges = [
     },
     getAuth: async ({ authState }) => {
       if (!authState) {
-        const deviceSigningPublicKey = storage.getItem(
-          "deviceSigningPublicKey"
-        );
-
-        if (deviceSigningPublicKey) {
-          return { deviceSigningPublicKey };
+        try {
+          const webDevice = await getWebDevice();
+          if (webDevice) {
+            const deviceSigningPublicKey = webDevice.signingPublicKey;
+            return { deviceSigningPublicKey };
+          }
+          const mainDevice = getMainDevice();
+          if (mainDevice) {
+            const deviceSigningPublicKey = mainDevice?.signingPublicKey;
+            return { deviceSigningPublicKey };
+          }
+          const mainDeviceSigningPublicKey = await storage.getItem(
+            "mainDeviceSigningPublicKey"
+          );
+          if (mainDeviceSigningPublicKey) {
+            return { deviceSigningPublicKey: mainDeviceSigningPublicKey };
+          }
+        } catch (err) {
+          // TODO: explain why fetching the webdevice failed
+          console.error(err);
         }
-        return null;
       }
-
       return null;
     },
     addAuthToOperation: ({ authState, operation }) => {
@@ -109,23 +123,28 @@ const exchanges = [
 ];
 
 export default function App() {
-  const [deviceSigningPublicKey, setDeviceSigningPublicKey] = useState(() => {
-    return storage.getItem("deviceSigningPublicKey");
-  });
+  const {
+    isLoadingComplete,
+    deviceSigningPublicKey,
+    setDeviceSigningPublicKey,
+  } = useCachedResources();
+
   const updateAuthentication = useCallback(
-    (deviceSigningPublicKey: string | null) => {
+    async (deviceSigningPublicKey: string | null) => {
       if (deviceSigningPublicKey) {
-        storage.setItem("deviceSigningPublicKey", deviceSigningPublicKey);
+        await storage.setItem(
+          "mainDeviceSigningPublicKey",
+          deviceSigningPublicKey
+        );
         setDeviceSigningPublicKey(deviceSigningPublicKey);
       } else {
-        storage.removeItem("deviceSigningPublicKey");
+        await storage.removeItem("mainDeviceSigningPublicKey");
         setDeviceSigningPublicKey(null);
       }
     },
     [setDeviceSigningPublicKey]
   );
 
-  const isLoadingComplete = useCachedResources();
   const [isFontLoadingComplete] = useFonts({
     Inter_400Regular,
     Inter_500Medium,

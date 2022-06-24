@@ -16,10 +16,13 @@ import {
   useCreateDeviceMutation,
 } from "../../generated/graphql";
 import { useAuthentication } from "../../context/AuthenticationContext";
-import { login, fetchMainDevice } from "../../utils/login/loginHelper";
-import { createWebDevice } from "../../utils/webDevice/createWebDevice";
+import { login, fetchMainDevice } from "../../utils/authentication/loginHelper";
+import {
+  createWebDevice,
+  removeWebDevice,
+} from "../../utils/device/webDeviceStore";
 import { useClient } from "urql";
-import { removeLocalWebDevice } from "../../utils/webDevice/removeLocalWebDevice";
+import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
 
 type Props = {
   defaultEmail?: string;
@@ -66,6 +69,7 @@ export function LoginForm(props: Props) {
     try {
       setGqlErrorMessage("");
       setIsLoggingIn(true);
+      await clearLocalSessionData();
       const loginResult = await login({
         username,
         password,
@@ -74,8 +78,8 @@ export function LoginForm(props: Props) {
         updateAuthentication,
       });
       const exportKey = loginResult.exportKey;
-      await fetchMainDevice({ urqlClient, exportKey });
       // reset the password in case the user ends up on this screen again
+      await fetchMainDevice({ urqlClient, exportKey });
       if (Platform.OS === "web") {
         if (useExtendedLogin) {
           const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
@@ -84,7 +88,7 @@ export function LoginForm(props: Props) {
             input: webDevice,
           });
         } else {
-          removeLocalWebDevice();
+          await removeWebDevice();
         }
       }
       setPassword("");
