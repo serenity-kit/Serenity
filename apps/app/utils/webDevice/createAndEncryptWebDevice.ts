@@ -8,7 +8,10 @@ export const createAndEncryptWebDevice = async (exportKey: string) => {
   const webDeviceStorageKey = "webDevice";
   const webDeviceExpirationStorageKey = "webDeviceExpiration";
   if (Platform.OS === "web") {
-    localStorage.setItem(webDeviceExpirationStorageKey, expiration.toJSON());
+    localStorage.setItem(
+      webDeviceExpirationStorageKey,
+      expiration.toISOString()
+    );
     localStorage.setItem(webDeviceStorageKey, JSON.stringify(webDevice));
   }
   return webDevice;
