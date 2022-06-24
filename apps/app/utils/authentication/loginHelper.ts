@@ -1,7 +1,7 @@
 import { MainDeviceQuery, MainDeviceDocument } from "../../generated/graphql";
 import { startLogin, finishLogin } from "@serenity-tools/opaque";
 import { decryptDevice } from "@serenity-tools/common";
-import { setMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
+import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { Client } from "urql";
 
 export type LoginParams = {

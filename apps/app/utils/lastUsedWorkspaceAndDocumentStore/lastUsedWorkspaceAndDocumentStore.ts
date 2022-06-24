@@ -1,8 +1,8 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getItem, setItem, removeItem } from "../storage/storage";
 
 export const setLastUsedWorkspaceId = async (workspaceId: string) => {
   try {
-    await AsyncStorage.setItem("lastUsedWorkspaceId", workspaceId);
+    await setItem("lastUsedWorkspaceId", workspaceId);
   } catch (e) {
     // ignore the error
   }
@@ -10,7 +10,7 @@ export const setLastUsedWorkspaceId = async (workspaceId: string) => {
 
 export const getLastUsedWorkspaceId = async (): Promise<string | null> => {
   try {
-    return await AsyncStorage.getItem("lastUsedWorkspaceId");
+    return await getItem("lastUsedWorkspaceId");
   } catch (e) {
     // error reading value
     return null;
@@ -22,7 +22,7 @@ export const setLastUsedDocumentId = async (
   workspaceId: string
 ) => {
   try {
-    await AsyncStorage.setItem(`lastUsedDocumentId:${workspaceId}`, documentId);
+    await setItem(`lastUsedDocumentId:${workspaceId}`, documentId);
   } catch (e) {
     // ignore the error
   }
@@ -32,7 +32,16 @@ export const getLastUsedDocumentId = async (
   workspaceId: string
 ): Promise<string | null> => {
   try {
-    return await AsyncStorage.getItem(`lastUsedDocumentId:${workspaceId}`);
+    return await getItem(`lastUsedDocumentId:${workspaceId}`);
+  } catch (e) {
+    // error reading value
+    return null;
+  }
+};
+
+export const removeLastUsedDocumentId = async (workspaceId: string) => {
+  try {
+    return await removeItem(`lastUsedDocumentId:${workspaceId}`);
   } catch (e) {
     // error reading value
     return null;

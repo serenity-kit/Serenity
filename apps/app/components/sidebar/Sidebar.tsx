@@ -36,11 +36,12 @@ import { HStack } from "native-base";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useEffect, useState, useRef } from "react";
 import Folder from "../sidebarFolder/SidebarFolder";
-import { getMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
+import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
+  const workspaceId = route.params.workspaceId;
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
@@ -50,12 +51,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [username, setUsername] = useState<string>("");
   const [workspaceResult] = useWorkspaceQuery({
     variables: {
-      id: route.params.workspaceId,
+      id: workspaceId,
     },
   });
   const [rootFoldersResult, refetchRootFolders] = useRootFoldersQuery({
     variables: {
-      workspaceId: route.params.workspaceId,
+      workspaceId,
       first: 20,
     },
   });
@@ -221,6 +222,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             onPress={() => {
               setIsOpenWorkspaceSwitcher(false);
               updateAuthentication(null);
+              clearLocalSessionData(workspaceId);
               // @ts-expect-error navigation ts issue
               props.navigation.push("Login");
             }}

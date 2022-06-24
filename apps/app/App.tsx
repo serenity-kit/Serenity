@@ -71,7 +71,7 @@ const exchanges = [
     },
     getAuth: async ({ authState }) => {
       if (!authState) {
-        const deviceSigningPublicKey = storage.getItem(
+        const deviceSigningPublicKey = await storage.getItem(
           "deviceSigningPublicKey"
         );
 
@@ -115,6 +115,7 @@ export default function App() {
   const updateAuthentication = useCallback(
     (deviceSigningPublicKey: string | null) => {
       if (deviceSigningPublicKey) {
+        // TODO: storage.setItem is an async/await method
         storage.setItem("deviceSigningPublicKey", deviceSigningPublicKey);
         setDeviceSigningPublicKey(deviceSigningPublicKey);
       } else {

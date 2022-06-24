@@ -2,7 +2,7 @@ import React from "react";
 import { View, tw, Box, Text } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types";
 import { LoginForm } from "../../components/login/LoginForm";
-import { navigateToNextAuthenticatedPage } from "../../utils/login/loginHelper";
+import { navigateToNextAuthenticatedPage } from "../../utils/authentication/loginHelper";
 
 export default function LoginScreen(props: RootStackScreenProps<"Login">) {
   const onLoginSuccess = () => {

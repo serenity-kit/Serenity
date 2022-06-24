@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import {
   Text,
   View,
@@ -17,8 +16,8 @@ import { useWindowDimensions } from "react-native";
 import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
 import { VStack } from "native-base";
 import { createAndEncryptDevice } from "@serenity-tools/common";
-import { setMainDevice } from "../../utils/mainDeviceMemoryStore/mainDeviceMemoryStore";
-import { storeUsernamePassword } from "../../utils/registrationMemoryStore/registrationMemoryStore";
+import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { storeUsernamePassword } from "../../utils/authentication/registrationMemoryStore";
 
 type Props = {
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
