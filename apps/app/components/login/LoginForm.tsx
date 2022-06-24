@@ -78,8 +78,8 @@ export function LoginForm(props: Props) {
         updateAuthentication,
       });
       const exportKey = loginResult.exportKey;
-      await fetchMainDevice({ urqlClient, exportKey });
       // reset the password in case the user ends up on this screen again
+      await fetchMainDevice({ urqlClient, exportKey });
       if (Platform.OS === "web") {
         if (useExtendedLogin) {
           const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =

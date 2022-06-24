@@ -222,7 +222,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             onPress={() => {
               setIsOpenWorkspaceSwitcher(false);
               updateAuthentication(null);
-              clearLocalSessionData(workspaceId);
+              clearLocalSessionData();
               // @ts-expect-error navigation ts issue
               props.navigation.push("Login");
             }}

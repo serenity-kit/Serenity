@@ -62,25 +62,23 @@ export const fetchMainDevice = async ({
       requestPolicy: "network-only",
     })
     .toPromise();
-
-  if (mainDeviceResult.data?.mainDevice) {
-    const mainDevice = mainDeviceResult.data.mainDevice;
-
-    const privateKeys = await decryptDevice({
-      ciphertext: mainDevice.ciphertext,
-      encryptionKeySalt: mainDevice.encryptionKeySalt,
-      nonce: mainDevice.nonce,
-      exportKey,
-    });
-    setMainDevice({
-      encryptionPrivateKey: privateKeys.encryptionPrivateKey,
-      signingPrivateKey: privateKeys.signingPrivateKey,
-      signingPublicKey: mainDevice.signingPublicKey,
-      encryptionPublicKey: mainDevice.encryptionPublicKey,
-    });
-  } else {
+  console.log({ mainDeviceResult });
+  if (!mainDeviceResult.data?.mainDevice) {
     throw new Error("Failed to fetch main device.");
   }
+  const mainDevice = mainDeviceResult.data.mainDevice;
+  const privateKeys = await decryptDevice({
+    ciphertext: mainDevice.ciphertext,
+    encryptionKeySalt: mainDevice.encryptionKeySalt,
+    nonce: mainDevice.nonce,
+    exportKey,
+  });
+  setMainDevice({
+    encryptionPrivateKey: privateKeys.encryptionPrivateKey,
+    signingPrivateKey: privateKeys.signingPrivateKey,
+    signingPublicKey: mainDevice.signingPublicKey,
+    encryptionPublicKey: mainDevice.encryptionPublicKey,
+  });
 };
 
 /**

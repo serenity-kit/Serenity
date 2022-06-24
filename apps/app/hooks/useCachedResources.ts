@@ -2,6 +2,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
+import { getWebDevice } from "../utils/device/webDeviceStore";
 import * as storage from "../utils/storage/storage";
 
 export default function useCachedResources() {
@@ -21,10 +22,17 @@ export default function useCachedResources() {
           ...FontAwesome.font,
           "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
         });
-        const deviceSigningPublicKey = await storage.getItem(
-          "deviceSigningPublicKey"
-        );
-        setDeviceSigningPublicKey(deviceSigningPublicKey);
+        const webDevice = await getWebDevice();
+        const deviceSigningPublicKey = webDevice?.signingPublicKey;
+        // await storage.getItem(
+        //   "deviceSigningPublicKey"
+        // );
+        if (deviceSigningPublicKey) {
+          setDeviceSigningPublicKey(deviceSigningPublicKey);
+        } else {
+          setDeviceSigningPublicKey(null);
+        }
+        console.log(deviceSigningPublicKey);
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);

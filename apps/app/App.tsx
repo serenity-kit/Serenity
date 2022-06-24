@@ -31,6 +31,8 @@ import { theme } from "../../tailwind.config";
 import { OpaqueBridge } from "@serenity-tools/opaque";
 import * as storage from "./utils/storage/storage";
 import { RootSiblingParent } from "react-native-root-siblings";
+import { getWebDevice } from "./utils/device/webDeviceStore";
+import { getMainDevice } from "./utils/device/mainDeviceMemoryStore";
 
 type AuthState = {
   deviceSigningPublicKey: string;
@@ -71,16 +73,28 @@ const exchanges = [
     },
     getAuth: async ({ authState }) => {
       if (!authState) {
-        const deviceSigningPublicKey = await storage.getItem(
-          "deviceSigningPublicKey"
-        );
-
-        if (deviceSigningPublicKey) {
-          return { deviceSigningPublicKey };
+        try {
+          const webDevice = await getWebDevice();
+          if (webDevice) {
+            const deviceSigningPublicKey = webDevice.signingPublicKey;
+            return { deviceSigningPublicKey };
+          }
+          const mainDevice = getMainDevice();
+          if (mainDevice) {
+            const deviceSigningPublicKey = mainDevice?.signingPublicKey;
+            return { deviceSigningPublicKey };
+          }
+          const mainDeviceSigningPublicKey = await storage.getItem(
+            "mainDeviceSigningPublicKey"
+          );
+          if (mainDeviceSigningPublicKey) {
+            return { deviceSigningPublicKey: mainDeviceSigningPublicKey };
+          }
+        } catch (err) {
+          // TODO: explain why fetching the webdevice failed
+          console.error(err);
         }
-        return null;
       }
-
       return null;
     },
     addAuthToOperation: ({ authState, operation }) => {
@@ -118,8 +132,13 @@ export default function App() {
   const updateAuthentication = useCallback(
     async (deviceSigningPublicKey: string | null) => {
       if (deviceSigningPublicKey) {
+        await storage.setItem(
+          "mainDeviceSigningPublicKey",
+          deviceSigningPublicKey
+        );
         setDeviceSigningPublicKey(deviceSigningPublicKey);
       } else {
+        await storage.removeItem("mainDeviceSigningPublicKey");
         setDeviceSigningPublicKey(null);
       }
     },
