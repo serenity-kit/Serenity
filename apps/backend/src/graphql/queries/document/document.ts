@@ -6,7 +6,6 @@ export const DocumentResult = objectType({
   name: "DocumentResult",
   definition(t) {
     t.field("document", { type: Document });
-    t.nonNull;
   },
 });
 

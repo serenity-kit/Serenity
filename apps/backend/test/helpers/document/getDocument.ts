@@ -14,7 +14,6 @@ export const getDocument = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  // get root folders from graphql
   const query = gql`
     {
       document(id: "${id}") {
