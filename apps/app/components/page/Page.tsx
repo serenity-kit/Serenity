@@ -45,7 +45,10 @@ import {
   useDocumentsQuery,
 } from "../../generated/graphql";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
-import { useDocumentPathStore } from "../../utils/document/documentPathStore";
+import {
+  getDocumentPath,
+  useDocumentPathStore,
+} from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { Folder } from "../../types/Folder";
 import { useClient } from "urql";
@@ -81,17 +84,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const documentStore = useDocumentStore();
 
   const updateDocumentFolderPath = async (docId: string) => {
-    const documentPathResult = await urqlClient
-      .query<DocumentPathQuery, DocumentPathQueryVariables>(
-        DocumentPathDocument,
-        { id: docId },
-        {
-          // better to be safe here and always refetch
-          requestPolicy: "network-only",
-        }
-      )
-      .toPromise();
-    const documentPath = documentPathResult.data?.documentPath as Folder[];
+    const documentPath = await getDocumentPath(urqlClient, docId);
     const documentPathIds: string[] = [];
     if (!documentPath) {
       return;

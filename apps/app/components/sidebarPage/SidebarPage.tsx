@@ -28,6 +28,7 @@ export default function SidebarPage(props: Props) {
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const document = useDocumentStore((state) => state.document);
+  const documentStore = useDocumentStore();
 
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const { depth = 0 } = props;
@@ -39,11 +40,11 @@ export default function SidebarPage(props: Props) {
         name,
       },
     });
-    if (
-      updateDocumentNameResult.data &&
-      updateDocumentNameResult.data.updateDocumentName
-    ) {
+    if (updateDocumentNameResult.data?.updateDocumentName?.document) {
       // TODO show notification
+      const document =
+        updateDocumentNameResult.data.updateDocumentName.document;
+      documentStore.update(document);
     } else {
       // TODO: show error: couldn't update folder name
       // refetch to revert back to actual name
