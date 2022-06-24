@@ -1,0 +1,10 @@
+mutation createDevice($input: CreateDeviceInput!) {
+  createDevice(input: $input) {
+    device {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      encryptionPublicKeySignature
+    }
+  }
+}
