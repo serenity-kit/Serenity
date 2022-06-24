@@ -25,7 +25,7 @@ import {
   Inter_700Bold,
 } from "@expo-google-fonts/inter";
 import { AuthenticationProvider } from "./context/AuthenticationContext";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { devtoolsExchange } from "@urql/devtools";
 import { theme } from "../../tailwind.config";
 import { OpaqueBridge } from "@serenity-tools/opaque";
@@ -144,6 +144,17 @@ export default function App() {
     },
     [setDeviceSigningPublicKey]
   );
+
+  const checkForWebDevice = async () => {
+    const webDevice = await getWebDevice();
+    console.log({ webDevice });
+  };
+
+  useEffect(() => {
+    (async () => {
+      await checkForWebDevice();
+    })();
+  }, []);
 
   const [isFontLoadingComplete] = useFonts({
     Inter_400Regular,
