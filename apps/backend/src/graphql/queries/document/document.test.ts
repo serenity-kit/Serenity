@@ -47,7 +47,7 @@ test("user should be retrieve a document", async () => {
     id: documentId,
     authorizationHeader,
   });
-  const retrievedDocument = result.document.document;
+  const retrievedDocument = result.document;
   expect(retrievedDocument).toMatchInlineSnapshot(`
     Object {
       "id": "${documentId}",
