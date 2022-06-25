@@ -11,7 +11,8 @@
     "dev:electron-main": "yarn && electron ./electron/main/index.ts",
     "build:web": "yarn build:editor && yarn build:opaque-client && expo build:web --no-pwa && cp _redirects ./web-build/_redirects",
     "test": "echo TODO",
-    "ts:check": "yarn tsc --noEmit"
+    "ts:check": "yarn tsc --noEmit",
+    "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "jest": {
     "preset": "jest-expo"
@@ -82,6 +83,7 @@
     "@graphql-codegen/typescript-urql": "^3.5.7",
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.64.12",
+    "@typescript-eslint/parser": "^5.29.0",
     "eas-cli": "^0.54.1",
     "electron": "^17.1.0",
     "expo-cli": "^5.4.11",
