@@ -189,11 +189,6 @@ export type DocumentEdge = {
   node?: Maybe<Document>;
 };
 
-export type DocumentResult = {
-  __typename?: 'DocumentResult';
-  document?: Maybe<Document>;
-};
-
 export type DocumentSnapshotInput = {
   ciphertext: Scalars['String'];
   nonce: Scalars['String'];
@@ -416,7 +411,7 @@ export type Query = {
   __typename?: 'Query';
   deviceBySigningPublicKey?: Maybe<DeviceResult>;
   devices?: Maybe<DeviceConnection>;
-  document?: Maybe<DocumentResult>;
+  document?: Maybe<Document>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documents?: Maybe<DocumentConnection>;
   firstDocument?: Maybe<Document>;
@@ -577,7 +572,7 @@ export type VerifyRegistrationResult = {
 export type Workspace = {
   __typename?: 'Workspace';
   id: Scalars['String'];
-  members?: Maybe<Array<WorkspaceMembersOutput>>;
+  members?: Maybe<Array<WorkspaceMember>>;
   name?: Maybe<Scalars['String']>;
 };
 
@@ -633,16 +628,16 @@ export type WorkspaceInvitationEdge = {
   node?: Maybe<WorkspaceInvitation>;
 };
 
-export type WorkspaceMemberInput = {
-  isAdmin: Scalars['Boolean'];
-  userId: Scalars['String'];
-};
-
-export type WorkspaceMembersOutput = {
-  __typename?: 'WorkspaceMembersOutput';
+export type WorkspaceMember = {
+  __typename?: 'WorkspaceMember';
   isAdmin: Scalars['Boolean'];
   userId: Scalars['String'];
   username?: Maybe<Scalars['String']>;
+};
+
+export type WorkspaceMemberInput = {
+  isAdmin: Scalars['Boolean'];
+  userId: Scalars['String'];
 };
 
 export type AcceptWorkspaceInvitationMutationVariables = Exact<{
@@ -650,7 +645,7 @@ export type AcceptWorkspaceInvitationMutationVariables = Exact<{
 }>;
 
 
-export type AcceptWorkspaceInvitationMutation = { __typename?: 'Mutation', acceptWorkspaceInvitation?: { __typename?: 'AcceptWorkspaceInvitationResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, username?: string | null, isAdmin: boolean }> | null } | null } | null };
+export type AcceptWorkspaceInvitationMutation = { __typename?: 'Mutation', acceptWorkspaceInvitation?: { __typename?: 'AcceptWorkspaceInvitationResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null } | null } | null };
 
 export type CreateDeviceMutationVariables = Exact<{
   input: CreateDeviceInput;
@@ -678,7 +673,7 @@ export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
 }>;
 
 
-export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, isAdmin: boolean }> | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
 
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
@@ -762,7 +757,7 @@ export type UpdateWorkspaceMutationVariables = Exact<{
 }>;
 
 
-export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, username?: string | null, isAdmin: boolean }> | null } | null } | null };
+export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null } | null } | null };
 
 export type VerifyRegistrationMutationVariables = Exact<{
   input: VerifyRegistrationInput;
@@ -776,7 +771,7 @@ export type DocumentQueryVariables = Exact<{
 }>;
 
 
-export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'DocumentResult', document?: { __typename?: 'Document', id: string, name?: string | null, parentFolderId?: string | null, workspaceId?: string | null } | null } | null };
+export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, name?: string | null, parentFolderId?: string | null, workspaceId?: string | null } | null };
 
 export type DocumentPathQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -841,7 +836,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMembersOutput', userId: string, username?: string | null, isAdmin: boolean }> | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null } | null };
 
 export type WorkspaceInvitationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1125,12 +1120,10 @@ export function useVerifyRegistrationMutation() {
 export const DocumentDocument = gql`
     query document($id: ID!) {
   document(id: $id) {
-    document {
-      id
-      name
-      parentFolderId
-      workspaceId
-    }
+    id
+    name
+    parentFolderId
+    workspaceId
   }
 }
     `;

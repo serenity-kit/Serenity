@@ -53,8 +53,10 @@ function WorkspaceMember({
           isDisabled={!allowEditing}
           onChange={onAdminStatusChange}
           value={username}
-        />
-        <Text>Admin</Text>
+        >
+          <Text>Admin</Text>
+        </Checkbox>
+
         {allowEditing && <Button onPress={onDeletePress}>Remove</Button>}
       </View>
     </View>

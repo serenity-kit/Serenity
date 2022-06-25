@@ -15,8 +15,8 @@ export function PageHeader(props: Props) {
   return (
     <HStack space={2} alignItems="center">
       {documentPathList.map((folder) => (
-        <Text>
-          <Text key={folder.id}>{folder.name}</Text>
+        <Text key={folder.id}>
+          <Text>{folder.name}</Text>
           {/* TOOD: use a right chevron icon */}
           <Text> &gt;</Text>
         </Text>

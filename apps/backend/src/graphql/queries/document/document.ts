@@ -1,17 +1,10 @@
-import { idArg, nonNull, queryField, objectType } from "nexus";
+import { idArg, nonNull, queryField } from "nexus";
 import { getDocument } from "../../../database/document/getDocument";
 import { Document } from "../../types/document";
 
-export const DocumentResult = objectType({
-  name: "DocumentResult",
-  definition(t) {
-    t.field("document", { type: Document });
-  },
-});
-
 export const documentQuery = queryField((t) => {
   t.field("document", {
-    type: DocumentResult,
+    type: Document,
     args: {
       id: nonNull(idArg()),
     },
@@ -24,7 +17,7 @@ export const documentQuery = queryField((t) => {
         userId,
         id: args.id,
       });
-      return { document };
+      return document;
     },
   });
 });
