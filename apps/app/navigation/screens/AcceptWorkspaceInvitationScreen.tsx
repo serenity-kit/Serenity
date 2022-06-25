@@ -32,6 +32,21 @@ export default function AcceptWorkspaceInvitationScreen(
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [inviterUsername, setInviterUsername] = useState<string>("");
 
+  useEffect(() => {
+    if (workspaceInvitationId && isUserSignedIn()) {
+      acceptWorkspaceInvitation();
+    }
+  }, [deviceSigningPublicKey, urqlClient, props.navigation]);
+
+  useEffect(() => {
+    if (workspaceInvitationQuery.data?.workspaceInvitation) {
+      const workspaceInvitation =
+        workspaceInvitationQuery.data.workspaceInvitation;
+      setWorkspaceName(workspaceInvitation.workspaceName || "");
+      setInviterUsername(workspaceInvitation.inviterUsername);
+    }
+  }, [workspaceInvitationQuery.fetching]);
+
   if (!workspaceInvitationId) {
     return (
       <View>
@@ -68,21 +83,6 @@ export default function AcceptWorkspaceInvitationScreen(
       });
     }
   };
-
-  useEffect(() => {
-    if (isUserSignedIn()) {
-      acceptWorkspaceInvitation();
-    }
-  }, [deviceSigningPublicKey, urqlClient, props.navigation]);
-
-  useEffect(() => {
-    if (workspaceInvitationQuery.data?.workspaceInvitation) {
-      const workspaceInvitation =
-        workspaceInvitationQuery.data.workspaceInvitation;
-      setWorkspaceName(workspaceInvitation.workspaceName || "");
-      setInviterUsername(workspaceInvitation.inviterUsername);
-    }
-  }, [workspaceInvitationQuery.fetching]);
 
   const onLoginSuccess = () => {
     // TODO

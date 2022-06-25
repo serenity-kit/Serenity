@@ -81,6 +81,7 @@
     "@graphql-codegen/typescript": "2.4.8",
     "@graphql-codegen/typescript-operations": "2.3.5",
     "@graphql-codegen/typescript-urql": "^3.5.7",
+    "@serenity-tools/eslint-config": "*",
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.64.12",
     "@typescript-eslint/parser": "^5.29.0",
