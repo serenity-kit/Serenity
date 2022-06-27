@@ -7,7 +7,8 @@
     "dev": "style:editor && webpack-dev-server",
     "ts:check": "yarn tsc --noEmit",
     "style:editor": "yarn run tailwindcss --config ./tailwind.config.js -i ./editor-input.css -o ./editor-output.css",
-    "test": "echo TODO"
+    "test": "echo TODO",
+    "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "dependencies": {
     "@tiptap/core": "^2.0.0-beta.174",

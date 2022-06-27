@@ -185,7 +185,7 @@ export default function App() {
           ? [devtoolsExchange, ...exchanges]
           : exchanges,
     });
-  }, [deviceSigningPublicKey]);
+  }, [deviceSigningPublicKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isLoadingComplete || !isFontLoadingComplete) {
     return null;

@@ -8,7 +8,8 @@
     "build:web": "webpack --config webpack.config.web.js --mode=production && cp -r dist/web ../../apps/app",
     "dev:mobile": "webpack serve --config webpack.config.mobile-webview.js",
     "ts:check": "yarn tsc --noEmit",
-    "test": "echo TODO"
+    "test": "echo TODO",
+    "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "dependencies": {
     "opaque-wasm": "^1.1.0",

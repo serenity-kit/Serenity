@@ -4,6 +4,7 @@
   "main": "opaque_wasm",
   "scripts": {
     "ts:check": "echo 'No types to check'",
-    "test": "echo 'No tests to run'"
+    "test": "echo 'No tests to run'",
+    "lint": "echo 'Nothing to lint'"
   }
 }

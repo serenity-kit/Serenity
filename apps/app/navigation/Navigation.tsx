@@ -55,13 +55,15 @@ function WorkspaceStackScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
 
+  useEffect(() => {
+    if (props.route.params?.workspaceId) {
+      setLastUsedWorkspaceId(props.route.params.workspaceId);
+    }
+  });
+
   if (!props.route.params) {
     return null;
   }
-
-  useEffect(() => {
-    setLastUsedWorkspaceId(props.route.params.workspaceId);
-  });
 
   return (
     <WorkspaceIdProvider value={props.route.params.workspaceId}>

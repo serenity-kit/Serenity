@@ -7,6 +7,8 @@
     "packages/*"
   ],
   "devDependencies": {
+    "eslint": "^8.18.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.3.5",
     "prettier": "2.5.1",
@@ -16,6 +18,7 @@
     "prepare": "husky install",
     "ts:check": "yarn workspaces run ts:check",
     "test": "yarn workspaces run test",
+    "lint": "yarn workspaces run lint",
     "prettier:write": "yarn prettier --write '**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css,html,graphql,gql}'",
     "prettier:check": "yarn prettier --check '**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css,html,graphql,gql}'"
   },
