@@ -129,8 +129,6 @@ export default function App() {
     [setSessionKey]
   );
 
-  console.log("sessionKey", sessionKey);
-
   const checkForWebDevice = async () => {
     const webDevice = await getWebDevice();
     console.log({ webDevice });

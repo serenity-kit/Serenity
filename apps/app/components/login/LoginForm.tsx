@@ -107,7 +107,6 @@ export function LoginForm(props: Props) {
       setPassword("");
       setUsername("");
       setIsLoggingIn(false);
-      console.log("ON LOGIN SUCCESS");
       props.onLoginSuccess();
     } catch (error) {
       console.error(error);

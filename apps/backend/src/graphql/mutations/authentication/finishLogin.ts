@@ -1,6 +1,6 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { createSession } from "../../../database/authentication/createSession";
-import { getUserByUsername } from "../../../database/user/getUserByUsername";
+import { addDays } from "../../../utils/addDays/addDays";
 import { finishLogin } from "../../../utils/opaque";
 
 export const FinishLoginInput = inputObjectType({
@@ -17,12 +17,6 @@ export const FinishLoginResult = objectType({
     t.date("expiresAt");
   },
 });
-
-export const addDays = (date, days) => {
-  var result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-};
 
 export const finishLoginMutation = mutationField("finishLogin", {
   type: FinishLoginResult,

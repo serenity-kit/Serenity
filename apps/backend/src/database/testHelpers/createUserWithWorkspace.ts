@@ -9,7 +9,7 @@ import {
 } from "../../utils/opaque";
 import { prisma } from "../prisma";
 import { createSession } from "../authentication/createSession";
-import { addDays } from "../../graphql/mutations/authentication/finishLogin";
+import { addDays } from "../../utils/addDays/addDays";
 
 type Params = {
   id: string;
