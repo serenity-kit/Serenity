@@ -50,6 +50,10 @@ const exchanges = [
   cacheExchange({
     keys: {
       WorkspaceMember: () => null, // since it has no unique key
+      // @ts-expect-error the type seems to be wrong
+      MainDeviceResult: (mainDevice) => {
+        return mainDevice.signingPublicKey;
+      },
     },
   }),
   authExchange<AuthState>({
