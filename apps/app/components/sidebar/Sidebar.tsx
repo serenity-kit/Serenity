@@ -285,7 +285,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         style={tw`ml-4 mr-2 mb-4`}
       >
         <Text variant="xxs" bold>
-          Documents
+          Folders
         </Text>
         {/* offset not working yet as NB has a no-no in their component */}
         <Tooltip label="Create Folder" placement="right" offset={8}>
