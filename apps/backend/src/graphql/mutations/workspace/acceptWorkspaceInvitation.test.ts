@@ -37,14 +37,14 @@ test("user should be able to accept an invitation", async () => {
   const createWorkspaceResult = await createWorkspaceInvitation({
     graphql,
     workspaceId,
-    authorizationHeader: inviterUserAndDevice.device.signingPublicKey,
+    authorizationHeader: inviterUserAndDevice.sessionKey,
   });
   workspaceInvitationId =
     createWorkspaceResult.createWorkspaceInvitation.workspaceInvitation.id;
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId,
-    authorizationHeader: inviteeUserAndDevice.device.signingPublicKey,
+    authorizationHeader: inviteeUserAndDevice.sessionKey,
   });
   const sharedWorkspace =
     acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
@@ -66,7 +66,7 @@ test("double-accepting invitation does nothing", async () => {
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId,
-    authorizationHeader: inviteeUserAndDevice.device.signingPublicKey,
+    authorizationHeader: inviteeUserAndDevice.sessionKey,
   });
   const sharedWorkspace =
     acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
@@ -88,7 +88,7 @@ test("invalid invitation id should throw error", async () => {
       await acceptWorkspaceInvitation({
         graphql,
         workspaceInvitationId: "invalid",
-        authorizationHeader: inviteeUserAndDevice.device.signingPublicKey,
+        authorizationHeader: inviteeUserAndDevice.sessionKey,
       }))()
   ).rejects.toThrow("Workspace invitation not found");
 });
@@ -107,7 +107,7 @@ test("expired invitation id should throw error", async () => {
       await acceptWorkspaceInvitation({
         graphql,
         workspaceInvitationId: "invalid",
-        authorizationHeader: inviteeUserAndDevice.device.signingPublicKey,
+        authorizationHeader: inviteeUserAndDevice.sessionKey,
       }))()
   ).rejects.toThrow("Workspace invitation not found");
 });

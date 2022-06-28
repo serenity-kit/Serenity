@@ -11,7 +11,7 @@ const graphql = setupGraphql();
 const username = "591e6e60-8a85-41fa-9ec8-33fdca675a2a@example.com";
 const password = "password";
 let didRegisterUser = false;
-let mainDeviceSigningPublicKey = "";
+let sessionKey = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -37,7 +37,7 @@ beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!didRegisterUser) {
     const registerUserResult = await registerUser(graphql, username, password);
-    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+    sessionKey = registerUserResult.sessionKey;
 
     await createInitialWorkspaceStructure({
       workspaceName: "workspace 1",
@@ -48,14 +48,14 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
     });
     const createParentFolderResult = await createFolder({
       graphql,
       id: parentFolderId,
       name: null,
       parentFolderId: null,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
       workspaceId: workspaceId,
     });
     const createFolderResult = await createFolder({
@@ -63,7 +63,7 @@ beforeEach(async () => {
       id: folderId,
       name: null,
       parentFolderId: parentFolderId,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
       workspaceId: workspaceId,
     });
     didRegisterUser = true;
@@ -71,7 +71,7 @@ beforeEach(async () => {
 });
 
 test("user should be able to retrieve the first document", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   const result = await graphql.client.request(
     query,
     { workspaceId },
@@ -88,7 +88,7 @@ test("user should not be able to retreive the first document from another worksp
   );
 
   const authorizationHeader = {
-    authorization: registerUserResult2.mainDeviceSigningPublicKey,
+    authorization: registerUserResult2.sessionKey,
   };
   await expect(
     (async () =>

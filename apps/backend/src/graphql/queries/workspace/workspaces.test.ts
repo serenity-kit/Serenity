@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const graphql = setupGraphql();
 let userId = "";
-let mainDeviceSigningPublicKey = "";
+let sessionKey = "";
 const username = "user";
 const password = "password";
 let didRegisterUser = false;
@@ -21,7 +21,7 @@ beforeEach(async () => {
   if (!didRegisterUser) {
     const registerUserResult = await registerUser(graphql, username, password);
     userId = registerUserResult.userId;
-    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+    sessionKey = registerUserResult.sessionKey;
     await createInitialWorkspaceStructure({
       workspaceName: "workspace 1",
       workspaceId: "abc",
@@ -31,7 +31,7 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
     });
     await createInitialWorkspaceStructure({
       workspaceName: "workspace 2",
@@ -42,7 +42,7 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
     });
     didRegisterUser = true;
   }
@@ -50,7 +50,7 @@ beforeEach(async () => {
 
 test("user should be able to list workspaces", async () => {
   const authorizationHeader = {
-    authorization: mainDeviceSigningPublicKey,
+    authorization: sessionKey,
   };
   const query = gql`
     {
@@ -108,7 +108,7 @@ test("user should be able to list workspaces", async () => {
 
 test("user cannot query more than 50 results", async () => {
   const authorizationHeader = {
-    authorization: mainDeviceSigningPublicKey,
+    authorization: sessionKey,
   };
   const query = gql`
     {
@@ -129,7 +129,7 @@ test("user cannot query more than 50 results", async () => {
 
 test("user cannot query by paginating cursor", async () => {
   const authorizationHeader = {
-    authorization: mainDeviceSigningPublicKey,
+    authorization: sessionKey,
   };
   const query = gql`
     {

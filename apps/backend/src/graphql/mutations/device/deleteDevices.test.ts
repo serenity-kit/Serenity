@@ -5,6 +5,7 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
 import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
+import { loginUser } from "../../../../test/helpers/loginUser";
 
 const graphql = setupGraphql();
 const username1 = "user1";
@@ -26,7 +27,7 @@ beforeAll(async () => {
 });
 
 test("create a device", async () => {
-  const authorizationHeader = userAndDevice1.device.signingPublicKey;
+  const authorizationHeader = userAndDevice1.sessionKey;
   const createDeviceResult = await createDevice({
     graphql,
     authorizationHeader,
@@ -68,7 +69,7 @@ test("create a device", async () => {
 });
 
 test("user cannot delete a device that does'nt exist", async () => {
-  const authorizationHeader = userAndDevice1.device.signingPublicKey;
+  const authorizationHeader = userAndDevice1.sessionKey;
   const signingPublicKeys = ["abc123"];
 
   const numDevicesBeforeDeleteResponse = await getDevices({
@@ -93,8 +94,8 @@ test("user cannot delete a device that does'nt exist", async () => {
 });
 
 test("user cannot delete a device they don't own", async () => {
-  const authorizationHeader1 = userAndDevice1.device.signingPublicKey;
-  const authorizationHeader2 = userAndDevice2.device.signingPublicKey;
+  const authorizationHeader1 = userAndDevice1.sessionKey;
+  const authorizationHeader2 = userAndDevice2.sessionKey;
   const createDeviceResult = await createDevice({
     graphql,
     authorizationHeader: authorizationHeader1,

@@ -23,14 +23,14 @@ const folderId = "3530b9ed-11f3-44c7-9e16-7dba1e14815f";
 const childFolderId = "98b3f4d9-141a-4e11-a0f5-7437a6d1eb4b";
 const otherFolderId = "c1c65251-7471-4893-a1b5-e3df937caf66";
 
-let mainDeviceSigningPublicKey = "";
-let mainDeviceSigningPublicKey2 = "";
+let sessionKey = "";
+let sessionKey2 = "";
 
 beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!didRegisterUser) {
     const registerUserResult = await registerUser(graphql, username, password);
-    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+    sessionKey = registerUserResult.sessionKey;
 
     await createInitialWorkspaceStructure({
       workspaceName: "workspace 1",
@@ -41,7 +41,7 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
     });
     didRegisterUser = true;
 
@@ -50,8 +50,7 @@ beforeEach(async () => {
       username2,
       password
     );
-    mainDeviceSigningPublicKey2 =
-      registerUserResult2.mainDeviceSigningPublicKey;
+    sessionKey2 = registerUserResult2.sessionKey;
 
     await createInitialWorkspaceStructure({
       workspaceName: "other user workspace",
@@ -62,21 +61,21 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey2,
+      authorizationHeader: sessionKey2,
     });
     const createOtherFolderResult = await createFolder({
       graphql,
       name: null,
       id: otherFolderId,
       parentFolderId: null,
-      authorizationHeader: mainDeviceSigningPublicKey2,
+      authorizationHeader: sessionKey2,
       workspaceId: otherWorkspaceId,
     });
   }
 });
 
 test("user should be able to list folders in a workspace when preloaded with initial workspace", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   // get root folders from graphql
   const query = gql`
     {
@@ -107,10 +106,10 @@ test("user should be able to list folders in a workspace with one item", async (
     name: null,
     id: parentFolderId,
     parentFolderId: null,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: workspaceId,
   });
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
 
   const query = gql`
     {
@@ -142,13 +141,13 @@ test("user should be able to list folders in a workspace with one item", async (
 });
 
 test("user should be able to list folders in a workspace with multiple items", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   const createFolderResult = await createFolder({
     graphql,
     name: null,
     id: folderId,
     parentFolderId: null,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: workspaceId,
   });
   const query = gql`
@@ -181,13 +180,13 @@ test("user should be able to list folders in a workspace with multiple items", a
 });
 
 test("user should be able to list without showing subfolders", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   const createFolderResult = await createFolder({
     graphql,
     name: null,
     id: childFolderId,
     parentFolderId: folderId,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: workspaceId,
   });
   const query = gql`
@@ -214,7 +213,7 @@ test("user should be able to list without showing subfolders", async () => {
 });
 
 test("retrieving a workspace that doesn't exist throws an error", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   const fakeWorkspaceId = "2bd63f0b-66f4-491c-8808-0a1de192cb67";
   const query = gql`
   {
@@ -242,7 +241,7 @@ test("retrieving a workspace that doesn't exist throws an error", async () => {
 });
 
 test("listing folders that the user doesn't own throws an error", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   const query = gql`
   {
       rootFolders(workspaceId: "${otherWorkspaceId}", first: 50) {

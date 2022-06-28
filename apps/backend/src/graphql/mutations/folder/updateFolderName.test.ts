@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 const graphql = setupGraphql();
 const username = "user1";
 const password = "password";
-let mainDeviceSigningPublicKey = "";
+let sessionKey = "";
 let isUserRegistered = false;
 let addedWorkspace: any = null;
 let addedFolderId: any = null;
@@ -22,7 +22,7 @@ beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
     const registerUserResult = await registerUser(graphql, username, password);
-    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+    sessionKey = registerUserResult.sessionKey;
 
     isUserRegistered = true;
     const createWorkspaceResult = await createInitialWorkspaceStructure({
@@ -34,7 +34,7 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
     });
     addedWorkspace =
       createWorkspaceResult.createInitialWorkspaceStructure.workspace;
@@ -43,7 +43,7 @@ beforeEach(async () => {
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
       name: null,
       parentFolderId: null,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
       workspaceId: addedWorkspace.id,
     });
     addedFolderId = createFolderResult.createFolder.folder.id;
@@ -51,7 +51,7 @@ beforeEach(async () => {
 });
 
 test("user should be able to change a folder name", async () => {
-  const authorizationHeader = mainDeviceSigningPublicKey;
+  const authorizationHeader = sessionKey;
   const id = addedFolderId;
   const name = "Updated Name";
   const result = await updateFolderName({
@@ -74,7 +74,7 @@ test("user should be able to change a folder name", async () => {
 });
 
 test("throw error when folder doesn't exist", async () => {
-  const authorizationHeader = mainDeviceSigningPublicKey;
+  const authorizationHeader = sessionKey;
   const id = "badthing";
   const name = "Doesn't Exist Name";
   await expect(
@@ -92,7 +92,7 @@ test("throw error when user doesn't have access", async () => {
   // create a new user with access to different folders
   const username2 = "user2";
   const registerUserResult = await registerUser(graphql, username2, password);
-  mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+  sessionKey = registerUserResult.sessionKey;
 
   isUserRegistered = true;
   const createWorkspaceResult = await createInitialWorkspaceStructure({
@@ -104,7 +104,7 @@ test("throw error when user doesn't have access", async () => {
     documentName: "Introduction",
     documentId: uuidv4(),
     graphql,
-    authorizationHeader: registerUserResult.mainDeviceSigningPublicKey,
+    authorizationHeader: registerUserResult.sessionKey,
   });
   addedWorkspace =
     createWorkspaceResult.createInitialWorkspaceStructure.workspace;
@@ -113,10 +113,10 @@ test("throw error when user doesn't have access", async () => {
     id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
     name: null,
     parentFolderId: null,
-    authorizationHeader: registerUserResult.mainDeviceSigningPublicKey,
+    authorizationHeader: registerUserResult.sessionKey,
     workspaceId: addedWorkspace.id,
   });
-  const authorizationHeader = mainDeviceSigningPublicKey;
+  const authorizationHeader = sessionKey;
   const id = otherUserFolderResult.createFolder.id;
   const name = "Unauthorized Name";
   await expect(

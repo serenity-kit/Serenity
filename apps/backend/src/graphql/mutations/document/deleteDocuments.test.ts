@@ -12,7 +12,7 @@ const password = "password";
 let isUserRegistered = false;
 let addedWorkspace: any = null;
 let addedDocumentId: any = null;
-let mainDeviceSigningPublicKey = "";
+let sessionKey = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -22,7 +22,7 @@ beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
     const registerUserResult = await registerUser(graphql, username, password);
-    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+    sessionKey = registerUserResult.sessionKey;
     isUserRegistered = true;
     const createWorkspaceResult = await createInitialWorkspaceStructure({
       workspaceName: "workspace 1",
@@ -33,14 +33,14 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
     });
     addedWorkspace =
       createWorkspaceResult.createInitialWorkspaceStructure.workspace;
     const createDocumentResult = await createDocument({
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
       parentFolderId: null,
       workspaceId: addedWorkspace.id,
     });
@@ -49,7 +49,7 @@ beforeEach(async () => {
 });
 
 test("user should be able to delete a document", async () => {
-  const authorizationHeader = mainDeviceSigningPublicKey;
+  const authorizationHeader = sessionKey;
   const ids = [addedDocumentId];
   const result = await deleteDocuments({ graphql, ids, authorizationHeader });
   expect(result.deleteDocuments).toMatchInlineSnapshot(`
@@ -60,7 +60,7 @@ test("user should be able to delete a document", async () => {
 });
 
 test("Deleting nonexistent document does nothing", async () => {
-  const authorizationHeader = mainDeviceSigningPublicKey;
+  const authorizationHeader = sessionKey;
   const ids = ["badthing"];
   const result = await deleteDocuments({ graphql, ids, authorizationHeader });
   expect(result.deleteDocuments).toMatchInlineSnapshot(`
