@@ -28,6 +28,7 @@ export type AcceptWorkspaceInvitationResult = {
 export type CreateDeviceInput = {
   encryptionPublicKey: Scalars['String'];
   encryptionPublicKeySignature: Scalars['String'];
+  info: Scalars['String'];
   signingPublicKey: Scalars['String'];
 };
 
@@ -133,8 +134,10 @@ export type DeleteWorkspacesResult = {
 
 export type Device = {
   __typename?: 'Device';
+  createdAt: Scalars['Date'];
   encryptionPublicKey: Scalars['String'];
   encryptionPublicKeySignature: Scalars['String'];
+  info?: Maybe<Scalars['String']>;
   signingPublicKey: Scalars['String'];
   userId: Scalars['String'];
 };
@@ -264,8 +267,10 @@ export type FolderEdge = {
 export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
+  createdAt: Scalars['Date'];
   encryptionKeySalt: Scalars['String'];
   encryptionPublicKey: Scalars['String'];
+  info?: Maybe<Scalars['String']>;
   nonce: Scalars['String'];
   signingPublicKey: Scalars['String'];
 };
@@ -652,7 +657,7 @@ export type CreateDeviceMutationVariables = Exact<{
 }>;
 
 
-export type CreateDeviceMutation = { __typename?: 'Mutation', createDevice?: { __typename?: 'CreateDeviceResult', device?: { __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string } | null } | null };
+export type CreateDeviceMutation = { __typename?: 'Mutation', createDevice?: { __typename?: 'CreateDeviceResult', device?: { __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null } | null } | null };
 
 export type CreateDocumentMutationVariables = Exact<{
   input: CreateDocumentInput;
@@ -766,6 +771,14 @@ export type VerifyRegistrationMutationVariables = Exact<{
 
 export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegistration?: { __typename?: 'VerifyRegistrationResult', id: string } | null };
 
+export type DevicesQueryVariables = Exact<{
+  first: Scalars['Int'];
+  after?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type DevicesQuery = { __typename?: 'Query', devices?: { __typename?: 'DeviceConnection', nodes?: Array<{ __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt: any } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+
 export type DocumentQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
@@ -808,7 +821,7 @@ export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'Fol
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string } | null };
+export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string, createdAt: any } | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -885,6 +898,7 @@ export const CreateDeviceDocument = gql`
       signingPublicKey
       encryptionPublicKey
       encryptionPublicKeySignature
+      info
     }
   }
 }
@@ -1117,6 +1131,28 @@ export const VerifyRegistrationDocument = gql`
 export function useVerifyRegistrationMutation() {
   return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
 };
+export const DevicesDocument = gql`
+    query devices($first: Int!, $after: String) {
+  devices(first: $first, after: $after) {
+    nodes {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      encryptionPublicKeySignature
+      info
+      createdAt
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    `;
+
+export function useDevicesQuery(options: Omit<Urql.UseQueryArgs<DevicesQueryVariables>, 'query'>) {
+  return Urql.useQuery<DevicesQuery>({ query: DevicesDocument, ...options });
+};
 export const DocumentDocument = gql`
     query document($id: ID!) {
   document(id: $id) {
@@ -1209,6 +1245,7 @@ export const MainDeviceDocument = gql`
     ciphertext
     encryptionKeySalt
     encryptionPublicKey
+    createdAt
   }
 }
     `;

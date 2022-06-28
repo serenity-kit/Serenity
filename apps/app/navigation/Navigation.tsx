@@ -23,6 +23,7 @@ import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
 import AcceptWorkspaceInvitationScreen from "./screens/AcceptWorkspaceInvitationScreen";
+import DeviceManagerScreen from "./screens/DeviceManagerScreen";
 import {
   Icon,
   Pressable,
@@ -108,6 +109,7 @@ function WorkspaceStackScreen(props) {
           component={WorkspaceRootScreen}
           options={{ headerShown: false }}
         />
+        <Drawer.Screen name="DeviceManager" component={DeviceManagerScreen} />
       </Drawer.Navigator>
     </WorkspaceIdProvider>
   );
@@ -183,6 +185,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       },
       Onboarding: "onboarding",
       DevDashboard: "dev-dashboard",
+      DeviceManager: "devices",
       DesignSystem: "design-system",
       Register: "register",
       RegistrationVerification: "registration-verification",

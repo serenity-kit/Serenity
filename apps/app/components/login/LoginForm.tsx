@@ -87,6 +87,7 @@ export function LoginForm(props: Props) {
           const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
             await createWebDevice();
           const deviceInfoJson = {
+            type: "web",
             os: browser?.os,
             osVersion: null,
             browser: browser?.name,

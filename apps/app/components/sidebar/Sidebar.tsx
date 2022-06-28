@@ -255,6 +255,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         <Icon name="dashboard-line" size={18} color={tw.color("gray-800")} />
         <Text variant="small">Dev Dashboard</Text>
       </SidebarLink>
+      <SidebarLink to={{ screen: "DeviceManager" }}>
+        <Icon name="dashboard-line" size={18} color={tw.color("gray-800")} />
+        <Text variant="small">Device Manager</Text>
+      </SidebarLink>
       <SidebarLink
         to={{
           screen: "Workspace",

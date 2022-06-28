@@ -20,6 +20,7 @@ export const getDevices = async ({ graphql, authorizationHeader }: Params) => {
             signingPublicKey
             encryptionPublicKey
             encryptionPublicKeySignature
+            info
           }
         }
         pageInfo {

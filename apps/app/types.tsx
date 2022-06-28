@@ -60,6 +60,7 @@ export type RootStackParamList = {
   EncryptDecryptImageTest: undefined;
   Root: undefined;
   NotFound: undefined;
+  DeviceManager: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =

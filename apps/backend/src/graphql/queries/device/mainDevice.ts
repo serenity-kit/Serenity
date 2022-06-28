@@ -9,6 +9,8 @@ export const MainDeviceResult = objectType({
     t.nonNull.string("signingPublicKey");
     t.nonNull.string("encryptionPublicKey");
     t.nonNull.string("encryptionKeySalt");
+    t.nonNull.date("createdAt");
+    t.string("info");
   },
 });
 
@@ -31,6 +33,8 @@ export const mainDeviceQuery = queryField((t) => {
         signingPublicKey: context.user.mainDeviceSigningPublicKey,
         encryptionPublicKey: device.encryptionPublicKey,
         encryptionKeySalt: context.user.mainDeviceEncryptionKeySalt,
+        info: device.info,
+        createdAt: device.createdAt,
       };
     },
   });

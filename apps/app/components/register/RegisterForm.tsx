@@ -62,6 +62,7 @@ export default function RegisterForm(props: Props) {
           signingPrivateKey: signingPrivateKey,
           signingPublicKey: mainDevice.signingPublicKey,
           encryptionPublicKey: mainDevice.encryptionPublicKey,
+          info: JSON.stringify({ type: "main" }),
         });
 
         const finishRegistrationResult = await finishRegistrationMutation({

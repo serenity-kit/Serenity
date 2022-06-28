@@ -1,6 +1,9 @@
 export type Device = {
-  encryptionPrivateKey: string;
+  encryptionPrivateKey?: string;
   encryptionPublicKey: string;
-  signingPrivateKey: string;
+  signingPrivateKey?: string;
   signingPublicKey: string;
+  encryptionPublicKeySignature?: string;
+  createdAt?: Date;
+  info: string | null | undefined;
 };
