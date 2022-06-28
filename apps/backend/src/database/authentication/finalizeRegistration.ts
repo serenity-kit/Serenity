@@ -14,6 +14,7 @@ type Props = {
   mainDevice: DeviceInput;
 };
 
+// TODO: move this into a helper function that is accessible to the ui
 const createConfirmationCode = async (): Promise<string> => {
   const length = 6;
   const confirmationCode: number[] = new Array(length);
