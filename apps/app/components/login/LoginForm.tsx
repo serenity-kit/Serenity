@@ -23,6 +23,8 @@ import {
 } from "../../utils/device/webDeviceStore";
 import { useClient } from "urql";
 import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
+import { detect } from "detect-browser";
+const browser = detect();
 
 type Props = {
   defaultEmail?: string;
@@ -84,8 +86,19 @@ export function LoginForm(props: Props) {
         if (useExtendedLogin) {
           const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
             await createWebDevice();
+          const deviceInfoJson = {
+            os: browser?.os,
+            osVersion: null,
+            browser: browser?.name,
+            browserVersion: browser?.version,
+          };
+          const deviceInfo = JSON.stringify(deviceInfoJson);
+          const newDeviceInfo = {
+            ...webDevice,
+            info: deviceInfo,
+          };
           await createDeviceMutation({
-            input: webDevice,
+            input: newDeviceInfo,
           });
         } else {
           await removeWebDevice();
