@@ -5,6 +5,7 @@ mutation createDevice($input: CreateDeviceInput!) {
       signingPublicKey
       encryptionPublicKey
       encryptionPublicKeySignature
+      info
     }
   }
 }

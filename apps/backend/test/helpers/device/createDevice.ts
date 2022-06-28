@@ -21,6 +21,7 @@ export const createDevice = async ({
           signingPublicKey
           encryptionPublicKey
           encryptionPublicKeySignature
+          info
         }
       }
     }
@@ -43,7 +44,7 @@ export const createDevice = async ({
         encryptionPublicKeySignature: device.encryptionPublicKeySignature,
         encryptionPublicKey: device.encryptionPublicKey,
         signingPublicKey: device.signingPublicKey,
-        deviceInfo,
+        info: deviceInfo,
       },
     },
     authorizationHeaders

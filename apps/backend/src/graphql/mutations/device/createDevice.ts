@@ -8,7 +8,7 @@ export const CreateDeviceInput = inputObjectType({
     t.nonNull.string("signingPublicKey");
     t.nonNull.string("encryptionPublicKey");
     t.nonNull.string("encryptionPublicKeySignature");
-    t.nonNull.string("deviceInfo");
+    t.nonNull.string("info");
   },
 });
 
@@ -38,7 +38,7 @@ export const createDeviceMutation = mutationField("createDevice", {
       signingPublicKey: args.input.signingPublicKey,
       encryptionPublicKey: args.input.encryptionPublicKey,
       encryptionPublicKeySignature: args.input.encryptionPublicKeySignature,
-      info: args.input.deviceInfo,
+      info: args.input.info,
     });
     if (!device.userId) {
       throw new Error("UserId missing");

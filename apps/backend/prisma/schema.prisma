@@ -123,7 +123,7 @@ model Device {
   recoveryDevice               RecoveryDevice?
   userForMain                  User?           @relation("mainDevice")
   // TODO: add a createTime and lastUsed so users can identify which ones they use
-  info                         String          @default("invalid")
+  info                         String?
 }
 
 model Workspace {
