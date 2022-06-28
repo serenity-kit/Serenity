@@ -14,6 +14,15 @@ type Props = {
   mainDevice: DeviceInput;
 };
 
+const createConfirmationCode = async (): Promise<string> => {
+  const length = 6;
+  const confirmationCode: number[] = new Array(length);
+  for (let i = 0; i < length; i++) {
+    confirmationCode[i] = await sodium.randombytes_uniform(10);
+  }
+  return confirmationCode.join("");
+};
+
 const verifyDevice = async (device: DeviceInput) => {
   return await sodium.crypto_sign_verify_detached(
     device.encryptionPublicKeySignature,
@@ -36,16 +45,19 @@ export async function finalizeRegistration({
       // if this user has already completed registration, throw an error
       const existingUserData = await prisma.user.findUnique({
         where: {
-          username: username,
+          username,
         },
       });
       if (existingUserData) {
         throw Error("This username has already been registered");
       }
 
+      const confirmationCode = await createConfirmationCode();
+
       const unverifiedUser = await prisma.unverifiedUser.create({
         data: {
           username,
+          confirmationCode,
           opaqueEnvelope,
           mainDeviceCiphertext: mainDevice.ciphertext,
           mainDeviceNonce: mainDevice.nonce,
