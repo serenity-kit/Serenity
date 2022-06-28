@@ -2,5 +2,5 @@ export type Device = {
   signingPublicKey: string;
   encryptionPublicKey: string;
   encryptionPublicKeySignature: string;
-  info?: string;
+  info?: string | null;
 };
