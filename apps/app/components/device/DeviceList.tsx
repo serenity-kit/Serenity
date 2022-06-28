@@ -1,6 +1,5 @@
 import { ViewProps, View, Text, Icon, tw } from "@serenity-tools/ui";
-import { StyleSheet } from "react-native";
-import { FlatList } from "native-base";
+import { StyleSheet, FlatList } from "react-native";
 import { Device } from "../../types/Device";
 import DeviceListItem from "./DeviceListItem";
 

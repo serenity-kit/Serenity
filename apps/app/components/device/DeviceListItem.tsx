@@ -15,8 +15,6 @@ type Props = ViewProps & {
 export default function DeviceListItem(props: Props) {
   const deviceInfoJson = JSON.parse(props.info!);
 
-  console.log({ deviceInfoJson });
-
   return (
     <View style={styles.listItem}>
       {deviceInfoJson && (
