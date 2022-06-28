@@ -19,6 +19,9 @@ export async function getDevices({ userId, cursor, skip, take }: Params) {
     cursor,
     skip,
     take,
+    orderBy: {
+      createdAt: "asc",
+    },
   });
   return devices;
 }

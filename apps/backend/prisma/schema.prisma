@@ -135,6 +135,7 @@ model Device {
   userForMain                  User?           @relation("mainDevice")
   // TODO: add a createTime and lastUsed so users can identify which ones they use
   info                         String?
+  createdAt                    DateTime        @default(now())
   session                      Session[]
 }
 

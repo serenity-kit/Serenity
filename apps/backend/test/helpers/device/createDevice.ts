@@ -30,6 +30,7 @@ export const createDevice = async ({
   const device = await createdDeviceHelper();
 
   const deviceInfoJson = {
+    type: "web",
     OS: "MacOS",
     OsVersion: null,
     Browser: "chrome",

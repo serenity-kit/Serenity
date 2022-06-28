@@ -1,0 +1,16 @@
+query devices($first: Int!, $after: String) {
+  devices(first: $first, after: $after) {
+    nodes {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      encryptionPublicKeySignature
+      info
+      createdAt
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

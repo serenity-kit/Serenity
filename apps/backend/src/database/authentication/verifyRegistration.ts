@@ -38,6 +38,7 @@ export async function verifyRegistration({
           signingPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
           encryptionPublicKeySignature:
             unverifiedUser.mainDeviceEncryptionPublicKeySignature,
+          info: JSON.stringify({ type: "main" }),
         },
       });
 

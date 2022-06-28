@@ -20,6 +20,7 @@ export const getMainDevice = async ({
         nonce
         ciphertext
         encryptionKeySalt
+        info
       }
     }
   `;

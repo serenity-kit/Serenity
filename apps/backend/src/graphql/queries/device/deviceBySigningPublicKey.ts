@@ -33,6 +33,8 @@ export const deviceBySigningPublicKey = queryField((t) => {
           encryptionPublicKeySignature: device.encryptionPublicKeySignature,
           signingPublicKey: device.signingPublicKey,
           userId: device.userId,
+          info: device.info,
+          createdAt: device.createdAt,
         },
       };
     },
