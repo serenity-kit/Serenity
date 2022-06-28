@@ -49,6 +49,7 @@ export const createDeviceMutation = mutationField("createDevice", {
         encryptionPublicKeySignature: device.encryptionPublicKeySignature,
         signingPublicKey: device.signingPublicKey,
         userId: device.userId,
+        createdAt: device.createdAt,
         info: device.info,
       },
     };
