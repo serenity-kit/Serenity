@@ -5,5 +5,5 @@ export type Device = {
   signingPublicKey: string;
   encryptionPublicKeySignature?: string;
   createdAt?: Date;
-  info: string | null | undefined;
+  info?: string | null;
 };
