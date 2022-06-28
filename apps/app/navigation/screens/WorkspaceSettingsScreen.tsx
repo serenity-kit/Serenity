@@ -58,7 +58,7 @@ function WorkspaceMember({
           onChange={onAdminStatusChange}
           value={username}
         >
-          Admin
+          <Text>Admin</Text>
         </Checkbox>
         {allowEditing && <Button onPress={onDeletePress}>Remove</Button>}
       </View>

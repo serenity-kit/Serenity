@@ -35,14 +35,9 @@ import { WorkspaceDrawerScreenProps } from "../../types";
 import { useEffect, useRef } from "react";
 import {
   Document,
-  DocumentPathDocument,
-  DocumentPathQuery,
-  DocumentPathQueryVariables,
   DocumentQuery,
   DocumentQueryVariables,
   DocumentDocument,
-  useDocumentPathQuery,
-  useDocumentsQuery,
 } from "../../generated/graphql";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 import {
@@ -107,7 +102,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
         }
       )
       .toPromise();
-    const document = documentResult.data?.document?.document as Document;
+    const document = documentResult.data?.document as Document;
     documentStore.update(document);
   };
 

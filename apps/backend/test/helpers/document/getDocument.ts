@@ -15,20 +15,18 @@ export const getDocument = async ({
     authorization: authorizationHeader,
   };
   const query = gql`
-    {
-      document(id: "${id}") {
-        document {
-            id
-            name
-            workspaceId
-            parentFolderId
-        }
+    query document($id: ID!) {
+      document(id: $id) {
+        id
+        name
+        parentFolderId
+        workspaceId
       }
     }
   `;
   const result = await graphql.client.request(
     query,
-    null,
+    { id },
     authorizationHeaders
   );
   return result;

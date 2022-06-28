@@ -47,7 +47,11 @@ const unauthenticatedOperation = [
 
 const exchanges = [
   dedupExchange,
-  cacheExchange({}),
+  cacheExchange({
+    keys: {
+      WorkspaceMember: () => null, // since it has no unique key
+    },
+  }),
   authExchange<AuthState>({
     // if it fails it will run getAuth again and see if the client already logged in in the meantime
     willAuthError: ({ operation, authState }) => {

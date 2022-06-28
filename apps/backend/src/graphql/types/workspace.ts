@@ -1,7 +1,7 @@
 import { inputObjectType, list, nonNull, objectType, scalarType } from "nexus";
 
-export const WorkspaceMembersOutput = objectType({
-  name: "WorkspaceMembersOutput",
+export const WorkspaceMember = objectType({
+  name: "WorkspaceMember",
   definition(t) {
     t.nonNull.string("userId");
     t.string("username");
@@ -15,7 +15,7 @@ export const Workspace = objectType({
     t.nonNull.string("id");
     t.string("name");
     t.list.nonNull.field("members", {
-      type: WorkspaceMembersOutput,
+      type: WorkspaceMember,
     });
   },
 });
