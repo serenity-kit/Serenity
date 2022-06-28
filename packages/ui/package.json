@@ -4,7 +4,8 @@
   "main": "index",
   "scripts": {
     "ts:check": "yarn tsc --noEmit",
-    "test": "echo TODO"
+    "test": "echo TODO",
+    "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "dependencies": {
     "native-base": "^3.4.7",

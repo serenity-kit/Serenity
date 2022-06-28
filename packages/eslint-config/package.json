@@ -1,0 +1,10 @@
+{
+  "name": "@serenity-tools/eslint-config",
+  "version": "0.0.1",
+  "main": "src/index",
+  "scripts": {
+    "ts:check": "echo 'Nothing to check'",
+    "test": "echo 'Nothing to test'",
+    "lint": "echo 'Nothing to lint'"
+  }
+}

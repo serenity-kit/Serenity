@@ -12,15 +12,19 @@ import {
   ModalHeader,
   ModalButtonFooter,
 } from "@serenity-tools/ui";
-import { RootStackScreenProps, WorkspaceDrawerScreenProps } from "../../types";
+import { WorkspaceDrawerScreenProps } from "../../types";
 import {
   useWorkspaceQuery,
   useUpdateWorkspaceMutation,
   useMeQuery,
   useDeleteWorkspacesMutation,
-  useUserIdFromUsernameQuery,
 } from "../../generated/graphql";
 import { CreateWorkspaceInvitation } from "../../components/workspace/CreateWorkspaceInvitation";
+import { useWorkspaceId } from "../../context/WorkspaceIdContext";
+import {
+  removeLastUsedDocumentId,
+  removeLastUsedWorkspaceId,
+} from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 type Member = {
   userId: string;
@@ -56,7 +60,6 @@ function WorkspaceMember({
         >
           <Text>Admin</Text>
         </Checkbox>
-
         {allowEditing && <Button onPress={onDeletePress}>Remove</Button>}
       </View>
     </View>
@@ -82,7 +85,7 @@ const workspaceMemberStyles = StyleSheet.create({
 export default function WorkspaceSettingsScreen(
   props: WorkspaceDrawerScreenProps<"Settings">
 ) {
-  const workspaceId = props.route.path?.split("/")[2] || ""; // should never be undefined
+  const workspaceId = useWorkspaceId();
   const [workspaceResult, refetchWorkspaceResult] = useWorkspaceQuery({
     variables: {
       id: workspaceId,
@@ -91,29 +94,16 @@ export default function WorkspaceSettingsScreen(
   const [, deleteWorkspacesMutation] = useDeleteWorkspacesMutation();
   const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
   const [meResult] = useMeQuery();
-  const [newMemberName, _setNewMemberName] = useState<string>("");
-  const [userIdFromUsernameResult, refetchUserIdFromUsernameResult] =
-    useUserIdFromUsernameQuery({
-      variables: {
-        username: newMemberName,
-      },
-    });
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [newMemberUserId, _setNewMemberUserId] = useState<string>("");
-  const [isNewMemberAdmin, setIsNewMemberAdmin] = useState<boolean>(false);
   const [members, setMembers] = useState<Member[]>([]);
   const [memberLookup, setMemberLookup] = useState<{
     [username: string]: number;
   }>({});
-  const [isInvalidUsernameError, setIsInvalidUsernameError] =
-    useState<boolean>(false);
   const [isLoadingWorkspaceData, setIsLoadingWorkspaceData] =
     useState<boolean>(false);
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
-  const [myUserId, setMyUserId] = useState<string>("");
-  const [myUsername, setMyUsername] = useState<string>("");
   const [showDeleteWorkspaceModal, setShowDeleteWorkspaceModal] =
     useState<boolean>(false);
   const [deletingWorkspaceName, setDeletingWorkspaceName] =
@@ -132,42 +122,6 @@ export default function WorkspaceSettingsScreen(
     }
   }, [workspaceResult.fetching]);
 
-  useEffect(() => {
-    if (meResult.data && meResult.data.me) {
-      if (meResult.data.me) {
-        setMyUserId(meResult.data.me.id);
-        setMyUsername(meResult.data.me.username);
-      } else {
-        // TODO: error! Couldn't fetch user
-      }
-    }
-  }, [meResult]);
-
-  useEffect(() => {
-    updateNewMemberNameInput(userIdFromUsernameResult);
-  }, [userIdFromUsernameResult]);
-
-  const updateNewMemberNameInput = (userIdFromUsernameResult: any) => {
-    if (newMemberName.length === 0) {
-      setIsInvalidUsernameError(false);
-      return;
-    }
-    if (newMemberName === myUsername) {
-      setIsInvalidUsernameError(true);
-      return;
-    }
-    if (
-      userIdFromUsernameResult.data &&
-      userIdFromUsernameResult.data.userIdFromUsername
-    ) {
-      _setNewMemberUserId(userIdFromUsernameResult.data.userIdFromUsername.id);
-      setIsInvalidUsernameError(false);
-    } else if (userIdFromUsernameResult.error) {
-      setIsInvalidUsernameError(true);
-      _setNewMemberUserId("");
-    }
-  };
-
   const updateWorkspaceData = async (workspace: any) => {
     setIsLoadingWorkspaceData(true);
     const workspaceName = workspace.name || "";
@@ -177,7 +131,7 @@ export default function WorkspaceSettingsScreen(
     const memberLookup = {} as { [username: string]: number };
     members.forEach((member: Member, row: number) => {
       memberLookup[member.userId] = row;
-      if (member.userId === myUserId) {
+      if (member.userId === meResult.data?.me?.id) {
         setIsAdmin(member.isAdmin);
       }
     });
@@ -198,7 +152,8 @@ export default function WorkspaceSettingsScreen(
       },
     });
     if (deleteWorkspaceResult.data?.deleteWorkspaces?.status) {
-      alert("Workspace deleted");
+      removeLastUsedDocumentId(workspaceId);
+      removeLastUsedWorkspaceId();
       props.navigation.navigate("Root");
     } else if (deleteWorkspaceResult?.error) {
       setHasGraphqlError(true);
@@ -222,17 +177,6 @@ export default function WorkspaceSettingsScreen(
       );
     }
     setIsLoadingWorkspaceData(false);
-  };
-
-  const setNewMemberName = (newMemberName: string) => {
-    // try to find the userId for the new member
-    // if the query returns an error, set the invalid username error
-
-    _setNewMemberName(newMemberName);
-    if (newMemberName.length === 0) {
-      setIsInvalidUsernameError(true);
-      return;
-    }
   };
 
   const _updateWorkspaceMemberData = async (members: Member[]) => {
@@ -341,8 +285,10 @@ export default function WorkspaceSettingsScreen(
                   userId={member.userId}
                   username={member.username}
                   isAdmin={member.isAdmin}
-                  adminUserId={myUserId}
-                  allowEditing={isAdmin && member.userId !== myUserId}
+                  adminUserId={meResult.data?.me?.id}
+                  allowEditing={
+                    isAdmin && member.userId !== meResult.data?.me?.id
+                  }
                   onAdminStatusChange={(isMemberAdmin: boolean) => {
                     updateMember(member, isMemberAdmin);
                   }}

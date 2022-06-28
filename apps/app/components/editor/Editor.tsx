@@ -9,7 +9,6 @@ import { EditorProps } from "./types";
 
 // TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
 export async function loadEditorSourceForAndroid() {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const indexHtml = Asset.fromModule(require("../../assets/index.html"));
   await indexHtml.downloadAsync();
   // @ts-expect-error
