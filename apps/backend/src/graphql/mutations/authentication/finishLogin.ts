@@ -1,4 +1,10 @@
-import { arg, inputObjectType, mutationField, objectType } from "nexus";
+import {
+  arg,
+  inputObjectType,
+  mutationField,
+  nonNull,
+  objectType,
+} from "nexus";
 import { createSession } from "../../../database/authentication/createSession";
 import { addDays } from "../../../utils/addDays/addDays";
 import { finishLogin } from "../../../utils/opaque";
@@ -14,7 +20,7 @@ export const FinishLoginInput = inputObjectType({
 export const FinishLoginResult = objectType({
   name: "FinishLoginResult",
   definition(t) {
-    t.date("expiresAt");
+    t.field("expiresAt", { type: nonNull("Date") });
   },
 });
 
