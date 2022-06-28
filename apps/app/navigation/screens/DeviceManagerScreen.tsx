@@ -9,14 +9,14 @@ import {
   DevicesDocument,
   DevicesQuery,
   DevicesQueryVariables,
-  useDevicesQuery,
+  useDeleteDevicesMutation,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 
 export default function DeviceManagerScreen(props) {
   useWindowDimensions();
   const urqlClient = useClient();
-
+  const [, deleteDevicesMutation] = useDeleteDevicesMutation();
   const [devices, setDevices] = useState<Device[]>([]);
 
   useEffect(() => {
@@ -40,14 +40,24 @@ export default function DeviceManagerScreen(props) {
     setDevices(devices);
   };
 
-  const onDeviceDeleted = async (device: Device) => {
+  const deleteDevice = async (deviceSigningPublicKey: string) => {
     // TODO: delete device and refresh device list
+    const deleteDevicesResult = await deleteDevicesMutation({
+      input: {
+        signingPublicKeys: [deviceSigningPublicKey],
+      },
+    });
+    if (deleteDevicesResult.data?.deleteDevices) {
+      await getDevices();
+    } else {
+      // TODO: show error: couldn't delete folder
+    }
   };
 
   return (
     <View style={tw`mt-20`}>
       <Text bold>Devices</Text>
-      <DeviceList devices={devices} onDeviceDeleted={onDeviceDeleted} />
+      <DeviceList devices={devices} onDeletePress={deleteDevice} />
     </View>
   );
 }

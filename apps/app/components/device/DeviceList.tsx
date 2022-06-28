@@ -6,17 +6,17 @@ import DeviceListItem from "./DeviceListItem";
 
 type Props = ViewProps & {
   devices: Device[] | null;
-  onDeviceDeleted: (device: Device) => void;
+  onDeletePress: (deviceSigningPublicKey: string) => void;
 };
 
-export default function DeviceList({ devices, onDeviceDeleted }: Props) {
+export default function DeviceList(props: Props) {
   const deleteDevice = async (device: Device) => {
     // TODO: delete device
   };
 
   return (
     <FlatList
-      data={devices}
+      data={props.devices}
       renderItem={({ item }) => (
         <DeviceListItem
           signingPublicKey={item.signingPublicKey}
@@ -24,7 +24,7 @@ export default function DeviceList({ devices, onDeviceDeleted }: Props) {
           encryptionPublicKeySignature={item.encryptionPublicKeySignature}
           createdAt={item.createdAt}
           info={item.info}
-          onDeletePress={() => deleteDevice(item)}
+          onDeletePress={() => props.onDeletePress(item.signingPublicKey)}
         />
       )}
       ListEmptyComponent={() => (

@@ -1,0 +1,5 @@
+mutation deleteDevices($input: DeleteDevicesInput!) {
+  deleteDevices(input: $input) {
+    status
+  }
+}

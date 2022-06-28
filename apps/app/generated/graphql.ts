@@ -687,6 +687,13 @@ export type CreateWorkspaceInvitationMutationVariables = Exact<{
 
 export type CreateWorkspaceInvitationMutation = { __typename?: 'Mutation', createWorkspaceInvitation?: { __typename?: 'CreateWorkspaceInvitationResult', workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, expiresAt: any } | null } | null };
 
+export type DeleteDevicesMutationVariables = Exact<{
+  input: DeleteDevicesInput;
+}>;
+
+
+export type DeleteDevicesMutation = { __typename?: 'Mutation', deleteDevices?: { __typename?: 'DeleteDevicseResult', status: string } | null };
+
 export type DeleteDocumentsMutationVariables = Exact<{
   input: DeleteDocumentsInput;
 }>;
@@ -977,6 +984,17 @@ export const CreateWorkspaceInvitationDocument = gql`
 
 export function useCreateWorkspaceInvitationMutation() {
   return Urql.useMutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(CreateWorkspaceInvitationDocument);
+};
+export const DeleteDevicesDocument = gql`
+    mutation deleteDevices($input: DeleteDevicesInput!) {
+  deleteDevices(input: $input) {
+    status
+  }
+}
+    `;
+
+export function useDeleteDevicesMutation() {
+  return Urql.useMutation<DeleteDevicesMutation, DeleteDevicesMutationVariables>(DeleteDevicesDocument);
 };
 export const DeleteDocumentsDocument = gql`
     mutation deleteDocuments($input: DeleteDocumentsInput!) {
