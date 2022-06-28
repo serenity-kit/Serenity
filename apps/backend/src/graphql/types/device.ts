@@ -7,5 +7,6 @@ export const Device = objectType({
     t.nonNull.string("signingPublicKey");
     t.nonNull.string("encryptionPublicKey");
     t.nonNull.string("encryptionPublicKeySignature");
+    t.string("info");
   },
 });

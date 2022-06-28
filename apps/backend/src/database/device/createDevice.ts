@@ -5,6 +5,7 @@ type Params = {
   signingPublicKey: string;
   encryptionPublicKey: string;
   encryptionPublicKeySignature: string;
+  info: string;
 };
 
 export async function createDevice({
@@ -12,6 +13,7 @@ export async function createDevice({
   signingPublicKey,
   encryptionPublicKey,
   encryptionPublicKeySignature,
+  info,
 }: Params) {
   try {
     return await prisma.$transaction(async (prisma) => {
@@ -20,6 +22,7 @@ export async function createDevice({
           signingPublicKey,
           encryptionPublicKey,
           encryptionPublicKeySignature,
+          info,
           user: { connect: { id: userId } },
         },
       });

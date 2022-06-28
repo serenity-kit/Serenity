@@ -8,6 +8,7 @@ export const CreateDeviceInput = inputObjectType({
     t.nonNull.string("signingPublicKey");
     t.nonNull.string("encryptionPublicKey");
     t.nonNull.string("encryptionPublicKeySignature");
+    t.nonNull.string("deviceInfo");
   },
 });
 
@@ -37,6 +38,7 @@ export const createDeviceMutation = mutationField("createDevice", {
       signingPublicKey: args.input.signingPublicKey,
       encryptionPublicKey: args.input.encryptionPublicKey,
       encryptionPublicKeySignature: args.input.encryptionPublicKeySignature,
+      info: args.input.deviceInfo,
     });
     if (!device.userId) {
       throw new Error("UserId missing");
@@ -47,6 +49,7 @@ export const createDeviceMutation = mutationField("createDevice", {
         encryptionPublicKeySignature: device.encryptionPublicKeySignature,
         signingPublicKey: device.signingPublicKey,
         userId: device.userId,
+        info: device.info,
       },
     };
   },

@@ -28,6 +28,14 @@ export const createDevice = async ({
 
   const device = await createdDeviceHelper();
 
+  const deviceInfoJson = {
+    OS: "MacOS",
+    OsVersion: null,
+    Browser: "chrome",
+    BrowserVersion: "100.0.1",
+  };
+  const deviceInfo = JSON.stringify(deviceInfoJson);
+
   const result = await graphql.client.request(
     query,
     {
@@ -35,6 +43,7 @@ export const createDevice = async ({
         encryptionPublicKeySignature: device.encryptionPublicKeySignature,
         encryptionPublicKey: device.encryptionPublicKey,
         signingPublicKey: device.signingPublicKey,
+        deviceInfo,
       },
     },
     authorizationHeaders
