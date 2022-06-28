@@ -1,6 +1,7 @@
 import { createAndEncryptDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
+import { loginUser } from "./loginUser";
 import { requestRegistrationChallengeResponse } from "./requestRegistrationChallengeResponse";
 
 let result: any = null;
@@ -59,8 +60,10 @@ export const registerUser = async (
     }
   );
 
+  const { sessionKey } = await loginUser({ graphql, username, password });
   return {
     userId: verifyRegistrationResponse.verifyRegistration.id,
     mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+    sessionKey,
   };
 };

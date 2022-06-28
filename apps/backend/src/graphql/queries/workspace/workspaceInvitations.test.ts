@@ -36,7 +36,7 @@ test("should return a list of workspace invitations if they are admin", async ()
   await createWorkspaceInvitation({
     graphql,
     workspaceId,
-    authorizationHeader: inviterUserAndDevice1.device.signingPublicKey,
+    authorizationHeader: inviterUserAndDevice1.sessionKey,
   });
   // add user2 as an admin
   await prisma.usersToWorkspaces.create({
@@ -57,12 +57,12 @@ test("should return a list of workspace invitations if they are admin", async ()
   await createWorkspaceInvitation({
     graphql,
     workspaceId,
-    authorizationHeader: inviterUserAndDevice2.device.signingPublicKey,
+    authorizationHeader: inviterUserAndDevice2.sessionKey,
   });
   const workspaceInvitationsResult = await workspaceInvitations({
     graphql,
     workspaceId,
-    authorizationHeader: inviterUserAndDevice1.device.signingPublicKey,
+    authorizationHeader: inviterUserAndDevice1.sessionKey,
   });
   const invitations = workspaceInvitationsResult.workspaceInvitations.edges;
   expect(invitations.length).toBe(2);
@@ -96,7 +96,7 @@ test("not admin should throw error", async () => {
       await workspaceInvitations({
         graphql,
         workspaceId,
-        authorizationHeader: userAndDevice.device.signingPublicKey,
+        authorizationHeader: userAndDevice.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
 });

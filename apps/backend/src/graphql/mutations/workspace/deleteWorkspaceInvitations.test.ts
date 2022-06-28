@@ -33,7 +33,7 @@ test("user should be able to delete a workspace invitation they created", async 
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     workspaceId: workspace1,
-    authorizationHeader: userAndDevice1.device.signingPublicKey,
+    authorizationHeader: userAndDevice1.sessionKey,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -41,7 +41,7 @@ test("user should be able to delete a workspace invitation they created", async 
   const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
     graphql,
     ids: workspaceInvitationIds,
-    authorizationHeader: userAndDevice1.device.signingPublicKey,
+    authorizationHeader: userAndDevice1.sessionKey,
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
     .toMatchInlineSnapshot(`
@@ -71,7 +71,7 @@ test("user should be able to delete a workspace invitation they didn't create", 
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     workspaceId: workspace1,
-    authorizationHeader: userAndDevice2.device.signingPublicKey,
+    authorizationHeader: userAndDevice2.sessionKey,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -79,7 +79,7 @@ test("user should be able to delete a workspace invitation they didn't create", 
   const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
     graphql,
     ids: workspaceInvitationIds,
-    authorizationHeader: userAndDevice1.device.signingPublicKey,
+    authorizationHeader: userAndDevice1.sessionKey,
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
     .toMatchInlineSnapshot(`
@@ -110,7 +110,7 @@ test("user should not be able to delete a workspace invitation if they aren't ad
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     workspaceId: workspace2,
-    authorizationHeader: userAndDevice2.device.signingPublicKey,
+    authorizationHeader: userAndDevice2.sessionKey,
   });
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
@@ -118,7 +118,7 @@ test("user should not be able to delete a workspace invitation if they aren't ad
   const deleteWorkspaceInvitationResult = await deleteWorkspaceInvitations({
     graphql,
     ids: workspaceInvitationIds,
-    authorizationHeader: userAndDevice1.device.signingPublicKey,
+    authorizationHeader: userAndDevice1.sessionKey,
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
     .toMatchInlineSnapshot(`

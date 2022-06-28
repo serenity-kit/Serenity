@@ -1,4 +1,4 @@
-import { inputObjectType, list, nonNull, objectType, scalarType } from "nexus";
+import { inputObjectType, list, nonNull, objectType } from "nexus";
 
 export const WorkspaceMember = objectType({
   name: "WorkspaceMember",
@@ -37,23 +37,6 @@ export const WorkspaceInput = inputObjectType({
       type: list(WorkspaceMemberInput),
     });
   },
-});
-
-export const DateScalar = scalarType({
-  name: "Date",
-  serialize: (value) => (value as Date).toISOString(),
-  parseValue: (value) => new Date(value as string | number),
-  parseLiteral: (ast) => {
-    if (ast.kind === "IntValue" || ast.kind === "StringValue") {
-      const d = new Date(ast.value);
-      if (!isNaN(d.valueOf())) {
-        return d;
-      }
-    }
-    throw new Error("Invalid date");
-  },
-  asNexusMethod: "date",
-  sourceType: "Date",
 });
 
 export const WorkspaceInvitation = objectType({

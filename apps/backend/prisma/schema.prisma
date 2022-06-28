@@ -84,6 +84,17 @@ model User {
   passwordResetOneTimePasswordExpireDateTime DateTime?
   usersToWorkspaces                          UsersToWorkspaces[]
   workspaceInvitations                       WorkspaceInvitations[]
+  sessions                                   Session[]
+}
+
+model Session {
+  sessionKey             String   @id
+  expiresAt              DateTime
+  createdAt              DateTime @default(now())
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                 String
+  device                 Device?  @relation(fields: [deviceSigningPublicKey], references: [signingPublicKey], onDelete: Cascade)
+  deviceSigningPublicKey String?
 }
 
 model WorkspaceInvitations {
@@ -124,6 +135,7 @@ model Device {
   userForMain                  User?           @relation("mainDevice")
   // TODO: add a createTime and lastUsed so users can identify which ones they use
   info                         String?
+  session                      Session[]
 }
 
 model Workspace {

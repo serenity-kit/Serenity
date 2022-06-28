@@ -2,6 +2,7 @@ import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { getMainDevice } from "../../../../test/helpers/device/getMainDevice";
+import { loginUser } from "../../../../test/helpers/loginUser";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
@@ -16,7 +17,12 @@ beforeAll(async () => {
 });
 
 test("user should be retrieve the mainDevice", async () => {
-  const authorizationHeader = userAndDevice.device.signingPublicKey;
+  const { sessionKey } = await loginUser({
+    graphql,
+    username,
+    password: "12345689",
+  });
+  const authorizationHeader = sessionKey;
   const result = await getMainDevice({
     graphql,
     authorizationHeader,

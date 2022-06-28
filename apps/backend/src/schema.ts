@@ -44,6 +44,8 @@ import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
 
 import * as DocumentTypes from "./graphql/types/document";
 
+import * as DateTypes from "./graphql/types/date";
+
 export const schema = makeSchema({
   plugins: [
     connectionPlugin({
@@ -51,6 +53,8 @@ export const schema = makeSchema({
     }),
   ],
   types: [
+    DateTypes,
+
     DocumentTypes,
     CreateDocumentMutationTypes,
     UpdateDocumentNameMutationTypes,

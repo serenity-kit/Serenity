@@ -29,7 +29,7 @@ test("user should be able to create an invitation", async () => {
   const result = await createWorkspaceInvitation({
     graphql,
     workspaceId,
-    authorizationHeader: userAndDevice.device.signingPublicKey,
+    authorizationHeader: userAndDevice.sessionKey,
   });
   const workspaceInvitation =
     result.createWorkspaceInvitation.workspaceInvitation;
@@ -57,7 +57,7 @@ test("user should not be able to invite from a workspace they don't own", async 
       await createWorkspaceInvitation({
         graphql,
         workspaceId: workspaceId2,
-        authorizationHeader: userAndDevice1.device.signingPublicKey,
+        authorizationHeader: userAndDevice1.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -69,7 +69,7 @@ test("user should not be able to invite from a workspace that doesn't exist", as
       await createWorkspaceInvitation({
         graphql,
         workspaceId: "nonexistantWorkspace",
-        authorizationHeader: userAndDevice2.device.signingPublicKey,
+        authorizationHeader: userAndDevice2.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
 });

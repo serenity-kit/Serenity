@@ -10,10 +10,10 @@ import { getLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocument
 export default function RootScreen(props: RootStackScreenProps<"Root">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const urqlClient = useClient();
-  const { deviceSigningPublicKey } = useAuthentication();
+  const { sessionKey } = useAuthentication();
 
   useEffect(() => {
-    if (deviceSigningPublicKey) {
+    if (sessionKey) {
       (async () => {
         const lastUsedWorkspaceId = await getLastUsedWorkspaceId();
         if (lastUsedWorkspaceId) {
@@ -43,7 +43,7 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
     } else {
       props.navigation.replace("Register");
     }
-  }, [deviceSigningPublicKey, urqlClient, props.navigation]);
+  }, [sessionKey, urqlClient, props.navigation]);
 
   return (
     <View style={tw`justify-center items-center flex-auto`}>

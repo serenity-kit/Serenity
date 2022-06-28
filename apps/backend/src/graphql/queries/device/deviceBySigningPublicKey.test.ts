@@ -3,11 +3,10 @@ import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { createDevice } from "../../../../test/helpers/device/createDevice";
 import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
-import { Device } from "../../../../prisma/generated/output";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
-let device: Device | null = null;
+let sessionKey = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -15,11 +14,11 @@ beforeAll(async () => {
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     username,
   });
-  device = result.device;
+  sessionKey = result.sessionKey;
 });
 
 test("user should be retrieve a device by signingPublicKey", async () => {
-  const authorizationHeader = device?.signingPublicKey || "";
+  const authorizationHeader = sessionKey;
   const createDeviceResponse = await createDevice({
     graphql,
     authorizationHeader,

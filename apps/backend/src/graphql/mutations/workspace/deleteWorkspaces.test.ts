@@ -10,7 +10,7 @@ const username = "user1";
 const password = "password";
 let isUserRegistered = false;
 let addedWorkspace: any = null;
-let mainDeviceSigningPublicKey = "";
+let sessionKey = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -20,7 +20,7 @@ beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
     const registerUserResult = await registerUser(graphql, username, password);
-    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+    sessionKey = registerUserResult.sessionKey;
     const createWorkspaceResult = await createInitialWorkspaceStructure({
       workspaceName: "workspace 1",
       workspaceId: "abc",
@@ -30,7 +30,7 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
     });
     addedWorkspace =
       createWorkspaceResult.createInitialWorkspaceStructure.workspace;
@@ -40,7 +40,7 @@ beforeEach(async () => {
 
 test.only("user should be able to delete a workspace", async () => {
   // generate a challenge code
-  const authorizationHeader = mainDeviceSigningPublicKey;
+  const authorizationHeader = sessionKey;
   const ids = [addedWorkspace.id];
   const result = await deleteWorkspaces({ graphql, ids, authorizationHeader });
   expect(result.deleteWorkspace).toMatchInlineSnapshot(`undefined`);
@@ -48,7 +48,7 @@ test.only("user should be able to delete a workspace", async () => {
 
 test("Deleting nonexistent workspace does nothing", async () => {
   // generate a challenge code
-  const authorizationHeader = mainDeviceSigningPublicKey;
+  const authorizationHeader = sessionKey;
   const ids = ["badthing"];
   await expect(
     await deleteWorkspaces({ graphql, ids, authorizationHeader })

@@ -1,5 +1,12 @@
-import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { getUserByUsername } from "../../../database/user/getUserByUsername";
+import {
+  arg,
+  inputObjectType,
+  mutationField,
+  nonNull,
+  objectType,
+} from "nexus";
+import { createSession } from "../../../database/authentication/createSession";
+import { addDays } from "../../../utils/addDays/addDays";
 import { finishLogin } from "../../../utils/opaque";
 
 export const FinishLoginInput = inputObjectType({
@@ -13,8 +20,7 @@ export const FinishLoginInput = inputObjectType({
 export const FinishLoginResult = objectType({
   name: "FinishLoginResult",
   definition(t) {
-    t.boolean("success");
-    t.nonNull.string("mainDeviceSigningPublicKey");
+    t.field("expiresAt", { type: nonNull("Date") });
   },
 });
 
@@ -34,15 +40,14 @@ export const finishLoginMutation = mutationField("finishLogin", {
       message: args.input.message,
     });
 
-    console.log("SESSION KEY", finishLoginResult.sessionKey);
-    // TODO store the session key in the database
-
-    const user = await getUserByUsername(finishLoginResult.username);
+    const session = await createSession({
+      username: finishLoginResult.username,
+      sessionKey: finishLoginResult.sessionKey,
+      expiresAt: addDays(new Date(), 30),
+    });
 
     return {
-      success: true,
-      // temporarily until we replace it with a proper session
-      mainDeviceSigningPublicKey: user?.mainDeviceSigningPublicKey || "",
+      expiresAt: session.expiresAt,
     };
   },
 });

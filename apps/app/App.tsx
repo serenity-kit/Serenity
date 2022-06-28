@@ -32,10 +32,9 @@ import { OpaqueBridge } from "@serenity-tools/opaque";
 import * as storage from "./utils/storage/storage";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { getWebDevice } from "./utils/device/webDeviceStore";
-import { getMainDevice } from "./utils/device/mainDeviceMemoryStore";
 
 type AuthState = {
-  deviceSigningPublicKey: string;
+  sessionKey: string;
 };
 
 const unauthenticatedOperation = [
@@ -78,21 +77,9 @@ const exchanges = [
     getAuth: async ({ authState }) => {
       if (!authState) {
         try {
-          const webDevice = await getWebDevice();
-          if (webDevice) {
-            const deviceSigningPublicKey = webDevice.signingPublicKey;
-            return { deviceSigningPublicKey };
-          }
-          const mainDevice = getMainDevice();
-          if (mainDevice) {
-            const deviceSigningPublicKey = mainDevice?.signingPublicKey;
-            return { deviceSigningPublicKey };
-          }
-          const mainDeviceSigningPublicKey = await storage.getItem(
-            "mainDeviceSigningPublicKey"
-          );
-          if (mainDeviceSigningPublicKey) {
-            return { deviceSigningPublicKey: mainDeviceSigningPublicKey };
+          const sessionKey = await storage.getItem("sessionKey");
+          if (sessionKey) {
+            return { sessionKey };
           }
         } catch (err) {
           // TODO: explain why fetching the webdevice failed
@@ -102,7 +89,7 @@ const exchanges = [
       return null;
     },
     addAuthToOperation: ({ authState, operation }) => {
-      if (!authState || !authState.deviceSigningPublicKey) {
+      if (!authState || !authState.sessionKey) {
         return operation;
       }
 
@@ -117,7 +104,7 @@ const exchanges = [
           ...fetchOptions,
           headers: {
             ...fetchOptions.headers,
-            Authorization: authState.deviceSigningPublicKey,
+            Authorization: authState.sessionKey,
           },
         },
       });
@@ -127,26 +114,19 @@ const exchanges = [
 ];
 
 export default function App() {
-  const {
-    isLoadingComplete,
-    deviceSigningPublicKey,
-    setDeviceSigningPublicKey,
-  } = useCachedResources();
+  const { isLoadingComplete, sessionKey, setSessionKey } = useCachedResources();
 
   const updateAuthentication = useCallback(
-    async (deviceSigningPublicKey: string | null) => {
-      if (deviceSigningPublicKey) {
-        await storage.setItem(
-          "mainDeviceSigningPublicKey",
-          deviceSigningPublicKey
-        );
-        setDeviceSigningPublicKey(deviceSigningPublicKey);
+    async (session: { sessionKey: string; expiresAt: string } | null) => {
+      if (session) {
+        setSessionKey(session.sessionKey);
+        await storage.setItem("sessionKey", session.sessionKey);
       } else {
-        await storage.removeItem("mainDeviceSigningPublicKey");
-        setDeviceSigningPublicKey(null);
+        setSessionKey(null);
+        await storage.removeItem("sessionKey");
       }
     },
-    [setDeviceSigningPublicKey]
+    [setSessionKey]
   );
 
   const checkForWebDevice = async () => {
@@ -189,7 +169,7 @@ export default function App() {
           ? [devtoolsExchange, ...exchanges]
           : exchanges,
     });
-  }, [deviceSigningPublicKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [sessionKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isLoadingComplete || !isFontLoadingComplete) {
     return null;
@@ -199,7 +179,7 @@ export default function App() {
         <AuthenticationProvider
           value={{
             updateAuthentication,
-            deviceSigningPublicKey,
+            sessionKey,
           }}
         >
           <Provider value={client}>
