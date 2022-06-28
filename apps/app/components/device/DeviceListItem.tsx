@@ -13,66 +13,53 @@ type Props = ViewProps & {
 };
 
 export default function DeviceListItem(props: Props) {
-  const [type, setType] = useState("");
-  const [osName, setOsName] = useState("");
-  const [osVersion, setOsVersion] = useState("");
-  const [browserName, setBrowseerName] = useState("");
-  const [browserVersion, setBrowserVersion] = useState("");
+  const deviceInfoJson = JSON.parse(props.info!);
 
-  useEffect(() => {
-    if (props.info) {
-      try {
-        const deviceInfoJson = JSON.parse(props.info);
-        setType(deviceInfoJson.type);
-        setOsName(deviceInfoJson.os);
-        setOsVersion(deviceInfoJson.osVersion);
-        setBrowseerName(deviceInfoJson.browser);
-        setBrowserVersion(deviceInfoJson.browserVersion);
-      } catch (err) {
-        // TODO: handle device info parse error
-        console.error(err);
-      }
-    }
-  }, []);
+  console.log({ deviceInfoJson });
 
   return (
     <View style={styles.listItem}>
-      {type === "main" && (
-        <View>
-          <Text>Type: Main</Text>
-          <Text>Created At {props.createdAt}</Text>
-          <Text>Signing Public Key: {props.signingPublicKey}</Text>
-        </View>
-      )}
-      {type === "web" && (
-        <View>
-          <Text>Type: {type}</Text>
-          <Text>OS: {osName}</Text>
-          <Text>Browser: {browserName}</Text>
-          <Text>Version: {browserVersion}</Text>
-          <Text>Created At {props.createdAt}</Text>
-          <Text>Signing Public Key: {props.signingPublicKey}</Text>
-        </View>
-      )}
-      {type == "device" && (
-        <View>
-          <Text>Type: {type}</Text>
-          <Text>OS: {osName}</Text>
-          <Text>Version: {osVersion}</Text>
-          <Text>Created At {props.createdAt}</Text>
-          <Text>Signing Public Key: {props.signingPublicKey}</Text>
-        </View>
-      )}
-      {(type === "web" || type === "device") && (
-        <View>
-          <TouchableOpacity onPress={props.onDeletePress}>
-            <Icon
-              name="close-circle-fill"
-              size={18}
-              color={tw.color("gray-800")}
-            />
-          </TouchableOpacity>
-        </View>
+      {deviceInfoJson && (
+        <>
+          {deviceInfoJson.type === "main" && (
+            <View>
+              <Text>Type: Main</Text>
+              <Text>Created At {props.createdAt}</Text>
+              <Text>Signing Public Key: {props.signingPublicKey}</Text>
+            </View>
+          )}
+          {deviceInfoJson.type === "web" && (
+            <View>
+              <Text>Type: {deviceInfoJson.type}</Text>
+              <Text>OS: {deviceInfoJson.os}</Text>
+              <Text>Browser: {deviceInfoJson.browser}</Text>
+              <Text>Version: {deviceInfoJson.browserVersion}</Text>
+              <Text>Created At {props.createdAt}</Text>
+              <Text>Signing Public Key: {props.signingPublicKey}</Text>
+            </View>
+          )}
+          {deviceInfoJson.type == "device" && (
+            <View>
+              <Text>Type: {deviceInfoJson.type}</Text>
+              <Text>OS: {deviceInfoJson.os}</Text>
+              <Text>Version: {deviceInfoJson.osVersion}</Text>
+              <Text>Created At {props.createdAt}</Text>
+              <Text>Signing Public Key: {props.signingPublicKey}</Text>
+            </View>
+          )}
+          {(deviceInfoJson.type === "web" ||
+            deviceInfoJson.type === "device") && (
+            <View>
+              <TouchableOpacity onPress={props.onDeletePress}>
+                <Icon
+                  name="close-circle-fill"
+                  size={18}
+                  color={tw.color("gray-800")}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
+        </>
       )}
     </View>
   );

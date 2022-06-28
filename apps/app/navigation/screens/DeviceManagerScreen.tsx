@@ -1,44 +1,17 @@
-import { Link, Text, tw, View } from "@serenity-tools/ui";
-import { FlatList } from "native-base";
-import { useEffect, useState } from "react";
+import { Text, tw, View } from "@serenity-tools/ui";
 import { StyleSheet, useWindowDimensions } from "react-native";
-import { useClient } from "urql";
 import DeviceList from "../../components/device/DeviceList";
-import DeviceListItem from "../../components/device/DeviceListItem";
-import {
-  DevicesDocument,
-  DevicesQuery,
-  DevicesQueryVariables,
-  useDevicesQuery,
-} from "../../generated/graphql";
+import { useDevicesQuery } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 
 export default function DeviceManagerScreen(props) {
   useWindowDimensions();
-  const urqlClient = useClient();
 
-  const [devices, setDevices] = useState<Device[]>([]);
-
-  useEffect(() => {
-    getDevices();
-  }, []);
-
-  const getDevices = async () => {
-    const devicesResult = await urqlClient
-      .query<DevicesQuery, DevicesQueryVariables>(
-        DevicesDocument,
-        {
-          first: 50,
-        },
-        {
-          // better to be safe here and always refetch
-          requestPolicy: "network-only",
-        }
-      )
-      .toPromise();
-    const devices = devicesResult.data?.devices?.nodes as Device[];
-    setDevices(devices);
-  };
+  const [devicesResult] = useDevicesQuery({
+    variables: {
+      first: 50,
+    },
+  });
 
   const onDeviceDeleted = async (device: Device) => {
     // TODO: delete device and refresh device list
@@ -47,7 +20,16 @@ export default function DeviceManagerScreen(props) {
   return (
     <View style={tw`mt-20`}>
       <Text bold>Devices</Text>
-      <DeviceList devices={devices} onDeviceDeleted={onDeviceDeleted} />
+      {devicesResult.data?.devices?.nodes ? (
+        <DeviceList
+          devices={devicesResult.data?.devices?.nodes as Device[]}
+          onDeviceDeleted={onDeviceDeleted}
+        />
+      ) : (
+        <View style={styles.listItem}>
+          <Text>No devices</Text>
+        </View>
+      )}
     </View>
   );
 }
