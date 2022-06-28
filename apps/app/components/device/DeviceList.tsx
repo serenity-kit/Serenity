@@ -1,21 +1,17 @@
-import { ViewProps, View, Text, Icon, tw } from "@serenity-tools/ui";
+import { View, Text } from "@serenity-tools/ui";
 import { StyleSheet, FlatList } from "react-native";
 import { Device } from "../../types/Device";
 import DeviceListItem from "./DeviceListItem";
 
-type Props = ViewProps & {
+type Props = {
   devices: Device[] | null;
-  onDeviceDeleted: (device: Device) => void;
+  onDeletePress: (deviceSigningPublicKey: string) => void;
 };
 
-export default function DeviceList({ devices, onDeviceDeleted }: Props) {
-  const deleteDevice = async (device: Device) => {
-    // TODO: delete device
-  };
-
+export default function DeviceList(props: Props) {
   return (
     <FlatList
-      data={devices}
+      data={props.devices}
       renderItem={({ item }) => (
         <DeviceListItem
           signingPublicKey={item.signingPublicKey}
@@ -23,7 +19,7 @@ export default function DeviceList({ devices, onDeviceDeleted }: Props) {
           encryptionPublicKeySignature={item.encryptionPublicKeySignature}
           createdAt={item.createdAt}
           info={item.info}
-          onDeletePress={() => deleteDevice(item)}
+          onDeletePress={() => props.onDeletePress(item.signingPublicKey)}
         />
       )}
       ListEmptyComponent={() => (
