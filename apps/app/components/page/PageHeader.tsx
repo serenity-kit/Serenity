@@ -15,8 +15,8 @@ export function PageHeader(props: Props) {
   return (
     <HStack space={0.5} alignItems="center">
       {documentPathList.map((folder) => (
-        <HStack alignItems="center" space={0.5}>
-          <Text key={folder.id} variant="xxs" muted>
+        <HStack key={folder.id} alignItems="center" space={0.5}>
+          <Text variant="xxs" muted>
             {folder.name}
           </Text>
           <Icon name="arrow-right-s-line" color={tw.color("gray-600")} />
