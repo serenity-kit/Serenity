@@ -15980,11 +15980,6 @@ osenv@^0.1.5:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
 
-otp@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/otp/-/otp-1.0.1.tgz#d3612e7a8ba049526a7d52755b58ea9f7144d611"
-  integrity sha512-yNP9OWZQUIWoDu+G+xSmW1a+jcGSBcIH1MUBBfFKc7i3TBIEvbT/OrrFYcek/Tdr8UJQ3AOSjUHE38imcWYs8w==
-
 p-any@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/p-any/-/p-any-2.1.0.tgz#719489408e14f5f941a748f1e817f5c71cab35cb"
