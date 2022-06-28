@@ -1,4 +1,4 @@
-import { queryField, objectType } from "nexus";
+import { queryField, objectType, nonNull } from "nexus";
 import { getDeviceBySigningPublicKey } from "../../../database/device/getDeviceBySigningPublicKey";
 
 export const MainDeviceResult = objectType({
@@ -9,7 +9,7 @@ export const MainDeviceResult = objectType({
     t.nonNull.string("signingPublicKey");
     t.nonNull.string("encryptionPublicKey");
     t.nonNull.string("encryptionKeySalt");
-    t.nonNull.date("createdAt");
+    t.field("createdAt", { type: nonNull("Date") });
     t.string("info");
   },
 });

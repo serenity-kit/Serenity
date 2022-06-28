@@ -1,4 +1,4 @@
-import { objectType } from "nexus";
+import { nonNull, objectType } from "nexus";
 
 export const Device = objectType({
   name: "Device",
@@ -7,7 +7,7 @@ export const Device = objectType({
     t.nonNull.string("signingPublicKey");
     t.nonNull.string("encryptionPublicKey");
     t.nonNull.string("encryptionPublicKeySignature");
-    t.nonNull.date("createdAt");
+    t.field("createdAt", { type: nonNull("Date") });
     t.string("info");
   },
 });
