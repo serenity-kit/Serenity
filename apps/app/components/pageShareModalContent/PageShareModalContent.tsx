@@ -1,4 +1,4 @@
-import { Button, Checkbox, Text } from "@serenity-tools/ui";
+import { Button, Checkbox, LabeledInput, Text } from "@serenity-tools/ui";
 import React, { useState } from "react";
 
 export function PageShareModalContent() {
@@ -17,7 +17,22 @@ export function PageShareModalContent() {
       </Checkbox>
       {isLinkSharing ? (
         <>
-          <Text>https://example.com/dummy/link</Text>
+          <Checkbox value={"canComment"} isChecked={true} isDisabled>
+            <Text variant="xs" muted>
+              Can comment
+            </Text>
+          </Checkbox>
+          <Checkbox value={"canEdit"} isChecked={true} isDisabled>
+            <Text variant="xs" muted>
+              Can edit
+            </Text>
+          </Checkbox>
+          <Text></Text>
+          <LabeledInput
+            label={"Link"}
+            value={"https://example.com/dummy/link"}
+            isDisabled
+          />
           <Button size="small">Copy</Button>
         </>
       ) : null}
