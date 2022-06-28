@@ -13,9 +13,9 @@ const username2 = "user1";
 const password = "password";
 let isUserRegistered = false;
 let addedWorkspace: any = null;
-let mainDeviceSigningPublicKey1 = "";
-let mainDeviceSigningPublicKey2 = "";
-let mainDeviceSigningPublicKey3 = "";
+let sessionKey1 = "";
+let sessionKey2 = "";
+let sessionKey3 = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -25,8 +25,7 @@ beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
     const registerUserResult1 = await registerUser(graphql, username, password);
-    mainDeviceSigningPublicKey1 =
-      registerUserResult1.mainDeviceSigningPublicKey;
+    sessionKey1 = registerUserResult1.sessionKey;
     userId1 = registerUserResult1.userId;
 
     const registerUserResult2 = await registerUser(
@@ -34,8 +33,7 @@ beforeEach(async () => {
       username2,
       password
     );
-    mainDeviceSigningPublicKey2 =
-      registerUserResult2.mainDeviceSigningPublicKey;
+    sessionKey2 = registerUserResult2.sessionKey;
     userId2 = registerUserResult2.userId;
 
     const createWorkspaceResult = await createInitialWorkspaceStructure({
@@ -47,7 +45,7 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey1,
+      authorizationHeader: sessionKey1,
     });
     addedWorkspace =
       createWorkspaceResult.createInitialWorkspaceStructure.workspace;
@@ -57,7 +55,7 @@ beforeEach(async () => {
 
 test("user won't update the name when not set", async () => {
   // generate a challenge code
-  const authorizationHeader = mainDeviceSigningPublicKey1;
+  const authorizationHeader = sessionKey1;
   const id = "abc";
   const name = undefined;
   const members = [
@@ -87,7 +85,7 @@ test("user won't update the name when not set", async () => {
 
 test("user won't update the members", async () => {
   // generate a challenge code
-  const authorizationHeader = mainDeviceSigningPublicKey1;
+  const authorizationHeader = sessionKey1;
   const id = "abc";
   const name = "workspace 2";
   const members = undefined;
@@ -109,7 +107,7 @@ test("user won't update the members", async () => {
 // WARNING: after this, user is no longer an admin on this workspace
 test("user should be able to update a workspace, but not their own access level", async () => {
   // generate a challenge code
-  const authorizationHeader = mainDeviceSigningPublicKey1;
+  const authorizationHeader = sessionKey1;
   const id = "abc";
   const name = "renamed workspace";
   const members = [
@@ -143,7 +141,7 @@ test("user should be able to update a workspace, but not their own access level"
 
 test("user should not be able to update a workspace they don't own", async () => {
   // generate a challenge code
-  const authorizationHeader = mainDeviceSigningPublicKey2;
+  const authorizationHeader = sessionKey2;
   const id = "abc";
   const name = "unauthorized workspace";
   const members = [
@@ -170,7 +168,7 @@ test("user should not be able to update a workspace they don't own", async () =>
 
 test("user should not be able to update a workspace for a workspace that doesn't exist", async () => {
   // generate a challenge code
-  const authorizationHeader = mainDeviceSigningPublicKey1;
+  const authorizationHeader = sessionKey1;
   const id = "hahahaha";
   const name = "nonexistent workspace";
   const members = [

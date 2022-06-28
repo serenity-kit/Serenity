@@ -8,7 +8,7 @@ const graphql = setupGraphql();
 let userId1 = "";
 const username = "user";
 const password = "password";
-let mainDeviceSigningPublicKey1 = "";
+let sessionKey1 = "";
 let isSetupComplete = false;
 
 beforeAll(async () => {
@@ -19,8 +19,7 @@ beforeAll(async () => {
 beforeEach(async () => {
   if (!isSetupComplete) {
     const registerUserResult1 = await registerUser(graphql, username, password);
-    mainDeviceSigningPublicKey1 =
-      registerUserResult1.mainDeviceSigningPublicKey;
+    sessionKey1 = registerUserResult1.sessionKey;
     userId1 = registerUserResult1.userId;
     isSetupComplete = true;
   }
@@ -28,7 +27,7 @@ beforeEach(async () => {
 
 test("user can create initial workspace structure", async () => {
   // generate a challenge code
-  const authorizationHeader = mainDeviceSigningPublicKey1;
+  const authorizationHeader = sessionKey1;
   const workspaceId = uuidv4();
   const workspaceName = "New Workspace";
   const folderId = uuidv4();

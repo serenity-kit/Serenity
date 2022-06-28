@@ -12,7 +12,7 @@ const password = "password";
 let isUserRegistered = false;
 let addedWorkspace: any = null;
 let addedDocumentId: any = null;
-let mainDeviceSigningPublicKey = "";
+let sessionKey = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -22,7 +22,7 @@ beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
     const registerUserResult = await registerUser(graphql, username, password);
-    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+    sessionKey = registerUserResult.sessionKey;
     isUserRegistered = true;
     const createWorkspaceResult = await createInitialWorkspaceStructure({
       workspaceName: "workspace 1",
@@ -33,14 +33,14 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
     });
     addedWorkspace =
       createWorkspaceResult.createInitialWorkspaceStructure.workspace;
     const createDocumentResult = await createDocument({
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
       parentFolderId: null,
       workspaceId: addedWorkspace.id,
     });
@@ -49,7 +49,7 @@ beforeEach(async () => {
 });
 
 test("user should be able to change a document name", async () => {
-  const authorizationHeader = mainDeviceSigningPublicKey;
+  const authorizationHeader = sessionKey;
   const id = addedDocumentId;
   const name = "Updated Name";
   const result = await updateDocumentName({
@@ -69,7 +69,7 @@ test("user should be able to change a document name", async () => {
 });
 
 test("Throw error when document doesn't exist", async () => {
-  const authorizationHeader = mainDeviceSigningPublicKey;
+  const authorizationHeader = sessionKey;
   const id = "badthing";
   const name = "Doesn't Exist Name";
   await expect(
@@ -98,18 +98,18 @@ test("Throw error when user doesn't have access", async () => {
     documentName: "Introduction",
     documentId: uuidv4(),
     graphql,
-    authorizationHeader: registerUserResult.mainDeviceSigningPublicKey,
+    authorizationHeader: registerUserResult.sessionKey,
   });
   addedWorkspace =
     createWorkspaceResult.createInitialWorkspaceStructure.workspace;
   const otherUserDocumentResult = await createDocument({
     id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
     graphql,
-    authorizationHeader: registerUserResult.mainDeviceSigningPublicKey,
+    authorizationHeader: registerUserResult.sessionKey,
     parentFolderId: null,
     workspaceId: addedWorkspace.id,
   });
-  const authorizationHeader = mainDeviceSigningPublicKey;
+  const authorizationHeader = sessionKey;
   const id = otherUserDocumentResult.createDocument.id;
   const name = "Unauthorized Name";
   await expect(

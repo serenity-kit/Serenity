@@ -1,13 +1,17 @@
 import React, { useContext } from "react";
 
+export type UpdateAuthenticationFunction = (
+  params: { sessionKey: string; expiresAt: string } | null
+) => Promise<void>;
+
 export type AuthenticationContext = {
-  deviceSigningPublicKey: string | null;
-  updateAuthentication: (params: string | null) => void;
+  sessionKey: string | null;
+  updateAuthentication: UpdateAuthenticationFunction;
 };
 
 const authenticationContext = React.createContext<AuthenticationContext>({
-  deviceSigningPublicKey: null,
-  updateAuthentication: () => undefined,
+  sessionKey: null,
+  updateAuthentication: async () => undefined,
 });
 
 export const AuthenticationProvider = authenticationContext.Provider;

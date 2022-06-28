@@ -212,8 +212,7 @@ export type FinishLoginInput = {
 
 export type FinishLoginResult = {
   __typename?: 'FinishLoginResult';
-  mainDeviceSigningPublicKey: Scalars['String'];
-  success?: Maybe<Scalars['Boolean']>;
+  expiresAt?: Maybe<Scalars['Date']>;
 };
 
 export type FinishRegistrationDeviceInput = {
@@ -720,7 +719,7 @@ export type FinishLoginMutationVariables = Exact<{
 }>;
 
 
-export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', success?: boolean | null, mainDeviceSigningPublicKey: string } | null };
+export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', expiresAt?: any | null } | null };
 
 export type FinishRegistrationMutationVariables = Exact<{
   input: FinishRegistrationInput;
@@ -1025,8 +1024,7 @@ export function useDeleteWorkspacesMutation() {
 export const FinishLoginDocument = gql`
     mutation finishLogin($input: FinishLoginInput!) {
   finishLogin(input: $input) {
-    success
-    mainDeviceSigningPublicKey
+    expiresAt
   }
 }
     `;

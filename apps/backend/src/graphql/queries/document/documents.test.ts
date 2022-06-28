@@ -12,8 +12,8 @@ const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 const username2 = "68776484-0e46-4027-a6f4-8bdeef185b73@example.com";
 const password = "password";
 let didRegisterUser = false;
-let mainDeviceSigningPublicKey = "";
-let mainDeviceSigningPublicKey2 = "";
+let sessionKey = "";
+let sessionKey2 = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -34,7 +34,7 @@ beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!didRegisterUser) {
     const registerUserResult = await registerUser(graphql, username, password);
-    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+    sessionKey = registerUserResult.sessionKey;
 
     await createInitialWorkspaceStructure({
       workspaceName: "workspace 1",
@@ -45,14 +45,14 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
     });
     const createParentFolderResult = await createFolder({
       graphql,
       id: parentFolderId,
       name: null,
       parentFolderId: null,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
       workspaceId: workspaceId,
     });
     const createFolderResult = await createFolder({
@@ -60,7 +60,7 @@ beforeEach(async () => {
       id: folderId,
       name: null,
       parentFolderId: parentFolderId,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
       workspaceId: workspaceId,
     });
     const createChildFolderResult = await createFolder({
@@ -68,7 +68,7 @@ beforeEach(async () => {
       id: childFolderId,
       name: null,
       parentFolderId: folderId,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
       workspaceId: workspaceId,
     });
     didRegisterUser = true;
@@ -78,8 +78,7 @@ beforeEach(async () => {
       username2,
       password
     );
-    mainDeviceSigningPublicKey2 =
-      registerUserResult2.mainDeviceSigningPublicKey;
+    sessionKey2 = registerUserResult2.sessionKey;
 
     await createInitialWorkspaceStructure({
       workspaceName: "other user workspace",
@@ -90,21 +89,21 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey2,
+      authorizationHeader: sessionKey2,
     });
     const createOtherFolderResult = await createFolder({
       graphql,
       id: otherFolderId,
       name: null,
       parentFolderId: null,
-      authorizationHeader: mainDeviceSigningPublicKey2,
+      authorizationHeader: sessionKey2,
       workspaceId: otherWorkspaceId,
     });
   }
 });
 
 test("user should be able to list documents in a folder when empty", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   // get root folders from graphql
   const query = gql`
     {
@@ -138,7 +137,7 @@ test("user should be able to list documents in a folder when empty", async () =>
 });
 
 test("user should be able to list documents in a folder with one item", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   await createDocument({
     graphql,
     id: documentId1,
@@ -188,7 +187,7 @@ test("user should be able to list documents in a folder with one item", async ()
 });
 
 test("user should be able to list documents in a folder with multiple items", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   await createDocument({
     graphql,
     id: documentId2,
@@ -247,7 +246,7 @@ test("user should be able to list documents in a folder with multiple items", as
 });
 
 test("user should be able to list without showing subfolder documents", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   await createDocument({
     graphql,
     id: childDocumentId,
@@ -306,7 +305,7 @@ test("user should be able to list without showing subfolder documents", async ()
 });
 
 test("retrieving a folder that doesn't exist throws an error", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   const fakeFolderId = "2bd63f0b-66f4-491c-8808-0a1de192cb67";
   const query = gql`
   {
@@ -334,7 +333,7 @@ test("retrieving a folder that doesn't exist throws an error", async () => {
 });
 
 test("listing documents that the user doesn't own throws an error", async () => {
-  const authorizationHeader = { authorization: mainDeviceSigningPublicKey };
+  const authorizationHeader = { authorization: sessionKey };
   const query = gql`
   {
       documents(parentFolderId: "${otherFolderId}", first: 50) {

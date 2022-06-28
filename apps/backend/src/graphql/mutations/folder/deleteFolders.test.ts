@@ -9,8 +9,8 @@ import { v4 as uuidv4 } from "uuid";
 
 const graphql = setupGraphql();
 let userId = "";
-let mainDeviceSigningPublicKey = "";
-let mainDeviceSigningPublicKey2 = "";
+let sessionKey = "";
+let sessionKey2 = "";
 const username = "user1";
 const username2 = "user2";
 const password = "password";
@@ -27,7 +27,7 @@ beforeEach(async () => {
   // TODO: we don't want this before every test
   if (!isUserRegistered) {
     const registerUserResult = await registerUser(graphql, username, password);
-    mainDeviceSigningPublicKey = registerUserResult.mainDeviceSigningPublicKey;
+    sessionKey = registerUserResult.sessionKey;
     userId = registerUserResult.userId;
     const createWorkspaceResult = await createInitialWorkspaceStructure({
       workspaceName: "workspace 1",
@@ -38,7 +38,7 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
     });
     addedWorkspace =
       createWorkspaceResult.createInitialWorkspaceStructure.workspace;
@@ -47,7 +47,7 @@ beforeEach(async () => {
       id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
       name: null,
       parentFolderId: null,
-      authorizationHeader: mainDeviceSigningPublicKey,
+      authorizationHeader: sessionKey,
       workspaceId: addedWorkspace.id,
     });
     addedFolderId = createFolderResult.createFolder.folder.id;
@@ -57,8 +57,7 @@ beforeEach(async () => {
       username2,
       password
     );
-    mainDeviceSigningPublicKey2 =
-      registrationResponse.mainDeviceSigningPublicKey;
+    sessionKey2 = registrationResponse.sessionKey;
     const createWorkspaceResult2 = await createInitialWorkspaceStructure({
       workspaceName: "other user workspace",
       workspaceId: "e9f04512-8317-46e0-ae1b-64eddf70690d",
@@ -68,7 +67,7 @@ beforeEach(async () => {
       documentName: "Introduction",
       documentId: uuidv4(),
       graphql,
-      authorizationHeader: mainDeviceSigningPublicKey2,
+      authorizationHeader: sessionKey2,
     });
     otherUserWorkspaceId =
       createWorkspaceResult2.createInitialWorkspaceStructure.workspace.id;
@@ -85,7 +84,7 @@ test("user can delete a folder", async () => {
     id: folderId,
     name: null,
     parentFolderId: null,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   expect(createFolderResult.createFolder.folder.id).toBe(folderId);
@@ -108,7 +107,7 @@ test("deleting a parent folder will cascade to children", async () => {
     id: parentFolderId,
     name: null,
     parentFolderId: null,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   const createChildFolderResult = await createFolder({
@@ -116,7 +115,7 @@ test("deleting a parent folder will cascade to children", async () => {
     id: childFolderId,
     name: null,
     parentFolderId: parentFolderId,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   expect(createParentFolderResult.createFolder.folder.id).toBe(parentFolderId);
@@ -145,7 +144,7 @@ test("user can delete multiple folders", async () => {
     id: folderId1,
     name: null,
     parentFolderId: null,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   const createFolderResult2 = await createFolder({
@@ -153,7 +152,7 @@ test("user can delete multiple folders", async () => {
     id: folderId2,
     name: null,
     parentFolderId: null,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   expect(createFolderResult1.createFolder.folder.id).toBe(folderId1);
@@ -183,7 +182,7 @@ test("user can delete multiple folders", async () => {
     id: parentFolderId1,
     name: null,
     parentFolderId: null,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   const createParentFolderResult2 = await createFolder({
@@ -191,7 +190,7 @@ test("user can delete multiple folders", async () => {
     id: parentFolderId2,
     name: null,
     parentFolderId: null,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   const createChildFolderResult1 = await createFolder({
@@ -199,7 +198,7 @@ test("user can delete multiple folders", async () => {
     id: childFolderId1,
     name: null,
     parentFolderId: parentFolderId1,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   const createChildFolderResult2 = await createFolder({
@@ -207,7 +206,7 @@ test("user can delete multiple folders", async () => {
     id: childFolderId2,
     name: null,
     parentFolderId: parentFolderId2,
-    authorizationHeader: mainDeviceSigningPublicKey,
+    authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   expect(createParentFolderResult1.createFolder.folder.id).toBe(
@@ -240,7 +239,7 @@ test("user can't delete folders they don't own", async () => {
     id: folderId,
     name: null,
     parentFolderId: null,
-    authorizationHeader: mainDeviceSigningPublicKey2,
+    authorizationHeader: sessionKey2,
     workspaceId: otherUserWorkspaceId,
   });
   expect(createFoldeResult.createFolder.folder.id).toBe(folderId);

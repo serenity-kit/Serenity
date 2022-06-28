@@ -7,9 +7,7 @@ import * as storage from "../utils/storage/storage";
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
-  const [deviceSigningPublicKey, setDeviceSigningPublicKey] = useState<
-    null | string
-  >(null);
+  const [sessionKey, setSessionKey] = useState<null | string>(null);
 
   // Load any resources or data that we need prior to rendering the app
   useEffect(() => {
@@ -21,29 +19,8 @@ export default function useCachedResources() {
         await Font.loadAsync({
           "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
         });
-        try {
-          const webDevice = await getWebDevice();
-          if (webDevice) {
-            const deviceSigningPublicKey = webDevice.signingPublicKey;
-            setDeviceSigningPublicKey(deviceSigningPublicKey);
-          } else {
-            const mainDevice = getMainDevice();
-            if (mainDevice) {
-              const deviceSigningPublicKey = mainDevice?.signingPublicKey;
-              setDeviceSigningPublicKey(deviceSigningPublicKey);
-            } else {
-              const mainDeviceSigningPublicKey = await storage.getItem(
-                "mainDeviceSigningPublicKey"
-              );
-              if (mainDeviceSigningPublicKey) {
-                return { deviceSigningPublicKey: mainDeviceSigningPublicKey };
-              }
-            }
-          }
-        } catch (err) {
-          // TODO: explain why fetching the webdevice failed
-          console.error(err);
-        }
+        const sessionKey = await storage.getItem("sessionKey");
+        setSessionKey(sessionKey);
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);
@@ -58,7 +35,7 @@ export default function useCachedResources() {
 
   return {
     isLoadingComplete,
-    deviceSigningPublicKey,
-    setDeviceSigningPublicKey,
+    sessionKey,
+    setSessionKey,
   };
 }

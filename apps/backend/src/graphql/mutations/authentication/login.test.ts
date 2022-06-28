@@ -2,42 +2,16 @@ import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import sodium from "libsodium-wrappers";
-import { Login } from "@serenity-tools/opaque-server";
 import { registerUser } from "../../../../test/helpers/registerUser";
+import { requestLoginChallengeResponse } from "../../../../test/helpers/requestLoginChallengeResponse";
 
 const graphql = setupGraphql();
 const username = "user";
 const password = "password";
-let login: any = null;
 
 beforeAll(async () => {
   await deleteAllRecords();
 });
-
-const requestLoginChallengeResponse = async (
-  username: string,
-  password: string
-) => {
-  login = new Login();
-  const challenge = sodium.to_base64(login.start(password));
-  const query = gql`
-      mutation {
-        startLogin(
-          input: {
-            username: "${username}"
-            challenge: "${challenge}"
-          }
-        ) {
-          loginId
-          challengeResponse
-        }
-      }
-    `;
-  const data = await graphql.client.request(query);
-  return {
-    data: data.startLogin,
-  };
-};
 
 test("server should register a user", async () => {
   // FIRST TEST ONLY: register a user.
@@ -48,17 +22,25 @@ test("server should register a user", async () => {
 
 test("server should create a login challenge response", async () => {
   // generate a challenge code
-  const result = await requestLoginChallengeResponse(username, password);
+  const result = await requestLoginChallengeResponse({
+    graphql,
+    username,
+    password,
+  });
   expect(typeof result.data.loginId).toBe("string");
   expect(typeof result.data.challengeResponse).toBe("string");
 });
 
 test("server should login a user", async () => {
   // create keys on server side and return response
-  const result = await requestLoginChallengeResponse(username, password);
+  const result = await requestLoginChallengeResponse({
+    graphql,
+    username,
+    password,
+  });
 
   const finishMessage = sodium.to_base64(
-    login.finish(sodium.from_base64(result.data.challengeResponse))
+    result.login.finish(sodium.from_base64(result.data.challengeResponse))
   );
   const query = gql`
     mutation {
@@ -68,11 +50,11 @@ test("server should login a user", async () => {
           message: "${finishMessage}"
         }
       ) {
-        success
+        expiresAt
       }
     }
   `;
   // client gets login response from server, which contains encrypted data
   const loginResponse = await graphql.client.request(query);
-  expect(loginResponse.finishLogin.success).toBe(true);
+  expect(loginResponse.finishLogin.expiresAt).toBeDefined();
 });
