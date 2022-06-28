@@ -3,13 +3,14 @@ import { startLogin, finishLogin } from "@serenity-tools/opaque";
 import { decryptDevice } from "@serenity-tools/common";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { Client } from "urql";
+import { UpdateAuthenticationFunction } from "../../context/AuthenticationContext";
 
 export type LoginParams = {
   username: string;
   password: string;
   startLoginMutation: any;
   finishLoginMutation: any;
-  updateAuthentication: any;
+  updateAuthentication: UpdateAuthenticationFunction;
 };
 export const login = async ({
   username,
@@ -42,9 +43,10 @@ export const login = async ({
   if (!finishLoginResult.data?.finishLogin) {
     throw new Error("Failed to finish login");
   }
-  updateAuthentication(
-    finishLoginResult.data.finishLogin.mainDeviceSigningPublicKey
-  );
+  await updateAuthentication({
+    sessionKey: result.sessionKey,
+    expiresAt: finishLoginResult.data.finishLogin.expiresAt,
+  });
   return result;
 };
 

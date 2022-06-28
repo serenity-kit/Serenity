@@ -17,7 +17,7 @@ export default function AcceptWorkspaceInvitationScreen(
   const workspaceInvitationId = props.route.params?.workspaceInvitationId;
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const urqlClient = useClient();
-  const { deviceSigningPublicKey } = useAuthentication();
+  const { sessionKey } = useAuthentication();
   const [workspaceInvitationQuery, refetchWorkspaceInvitationQuery] =
     useWorkspaceInvitationQuery({
       variables: {
@@ -28,15 +28,14 @@ export default function AcceptWorkspaceInvitationScreen(
     useAcceptWorkspaceInvitationMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
-  const [workspaceInvitation, setWorkspaceInvitation] = useState(null);
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [inviterUsername, setInviterUsername] = useState<string>("");
 
   useEffect(() => {
-    if (workspaceInvitationId && isUserSignedIn()) {
+    if (workspaceInvitationId && sessionKey !== null) {
       acceptWorkspaceInvitation();
     }
-  }, [deviceSigningPublicKey, urqlClient, props.navigation]);
+  }, [sessionKey, urqlClient, props.navigation]);
 
   useEffect(() => {
     if (workspaceInvitationQuery.data?.workspaceInvitation) {
@@ -54,10 +53,6 @@ export default function AcceptWorkspaceInvitationScreen(
       </View>
     );
   }
-
-  const isUserSignedIn = () => {
-    return deviceSigningPublicKey !== null;
-  };
 
   const acceptWorkspaceInvitation = async () => {
     const result = await acceptWorkspaceInvitationMutation({

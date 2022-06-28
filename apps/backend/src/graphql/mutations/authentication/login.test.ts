@@ -68,11 +68,11 @@ test("server should login a user", async () => {
           message: "${finishMessage}"
         }
       ) {
-        success
+        expiresAt
       }
     }
   `;
   // client gets login response from server, which contains encrypted data
   const loginResponse = await graphql.client.request(query);
-  expect(loginResponse.finishLogin.success).toBe(true);
+  expect(loginResponse.finishLogin.expiresAt).toBeDefined();
 });

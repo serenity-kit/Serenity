@@ -34,7 +34,7 @@ import { RootStackScreenProps } from "../../types";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { HStack } from "native-base";
 import { useFocusRing } from "@react-native-aria/focus";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
 
@@ -219,9 +219,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
           <SidebarDivider collapsed />
           <SidebarButton
-            onPress={() => {
+            onPress={async () => {
               setIsOpenWorkspaceSwitcher(false);
-              updateAuthentication(null);
+              await updateAuthentication(null);
               clearLocalSessionData();
               // @ts-expect-error navigation ts issue
               props.navigation.push("Login");
