@@ -157,7 +157,7 @@ export type IconNames =
   | "history-line"
   | "image-2-line"
   | "image-line"
-  | "information-full"
+  | "information-fill"
   | "information-line"
   | "h-1"
   | "h-2"
@@ -301,7 +301,7 @@ export const Icon = (props: IconProps) => {
   if (name === "history-line") return <HistoryLine color={color} size={size} />;
   if (name === "image-2-line") return <Image2Line color={color} size={size} />;
   if (name === "image-line") return <ImageLine color={color} size={size} />;
-  if (name === "information-full")
+  if (name === "information-fill")
     return <InformationFill color={color} size={size} />;
   if (name === "information-line")
     return <InformationLine color={color} size={size} />;
