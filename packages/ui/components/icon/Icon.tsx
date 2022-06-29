@@ -66,6 +66,8 @@ import { Image2Line } from "./icons/Image2Line";
 import { ImageLine } from "./icons/ImageLine";
 import { IndentDecrease } from "./icons/IndentDecrease";
 import { IndentIncrease } from "./icons/IndentIncrease";
+import { InformationFill } from "./icons/InformationFill";
+import { InformationLine } from "./icons/InformationLine";
 import { Italic } from "./icons/Italic";
 import { Link } from "./icons/Link";
 import { LinkM } from "./icons/LinkM";
@@ -94,6 +96,7 @@ import { Strikethrough } from "./icons/Strikethrough";
 import { Table2 } from "./icons/Table2";
 import { Text } from "./icons/Text";
 import { Underline } from "./icons/Underline";
+import { WarningFill } from "./icons/WarningFill";
 
 export type IconNames =
   | "add-line"
@@ -154,6 +157,8 @@ export type IconNames =
   | "history-line"
   | "image-2-line"
   | "image-line"
+  | "information-fill"
+  | "information-line"
   | "h-1"
   | "h-2"
   | "h-3"
@@ -189,7 +194,8 @@ export type IconNames =
   | "strikethrough"
   | "table-2"
   | "text"
-  | "underline";
+  | "underline"
+  | "warning-fill";
 
 export type IconProps = {
   name: IconNames;
@@ -295,6 +301,10 @@ export const Icon = (props: IconProps) => {
   if (name === "history-line") return <HistoryLine color={color} size={size} />;
   if (name === "image-2-line") return <Image2Line color={color} size={size} />;
   if (name === "image-line") return <ImageLine color={color} size={size} />;
+  if (name === "information-fill")
+    return <InformationFill color={color} size={size} />;
+  if (name === "information-line")
+    return <InformationLine color={color} size={size} />;
   if (name === "indent-decrease")
     return <IndentDecrease color={color} size={size} />;
   if (name === "indent-increase")
@@ -334,5 +344,6 @@ export const Icon = (props: IconProps) => {
   if (name === "table-2") return <Table2 color={color} size={size} />;
   if (name === "text") return <Text color={color} size={size} />;
   if (name === "underline") return <Underline color={color} size={size} />;
+  if (name === "warning-fill") return <WarningFill color={color} size={size} />;
   return null;
 };

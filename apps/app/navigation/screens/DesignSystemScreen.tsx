@@ -27,6 +27,7 @@ import {
   Spinner,
   BoxShadow,
   BoxShadowLevels,
+  InfoMessage,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -46,7 +47,29 @@ export default function DesignSystemScreen() {
 
   return (
     <ScrollView style={tw`px-4 py-6`}>
-      <Text style={tw`mb-4 h2`}>Tooltip</Text>
+      <Text style={tw`mb-4 h2`}>Info Messages</Text>
+      <Text>Info</Text>
+      <VStack space={4} style={tw`max-w-90`}>
+        <InfoMessage>
+          The verification code is prefilled on staging.
+        </InfoMessage>
+        <InfoMessage icon>
+          The verification code is prefilled on staging.
+        </InfoMessage>
+      </VStack>
+      <Text style={tw`mt-4`}>Error</Text>
+      <VStack space={4} style={tw`max-w-90`}>
+        <InfoMessage variant="error">
+          Unfortunately your registration request failed due a network error.
+          Please try again later.
+        </InfoMessage>
+        <InfoMessage variant="error" icon>
+          Unfortunately your registration request failed due a network error.
+          Please try again later.
+        </InfoMessage>
+      </VStack>
+
+      <Text style={tw`my-4 h2`}>Tooltip</Text>
       <Tooltip label="This is a tip!" placement="right">
         <IconButton name="arrow-right" color="gray-500" />
       </Tooltip>
@@ -509,6 +532,8 @@ export default function DesignSystemScreen() {
         <Icon name="history-line" />
         <Icon name="image-2-line" />
         <Icon name="image-line" />
+        <Icon name="information-fill" />
+        <Icon name="information-line" />
         <Icon name="more" />
         <Icon name="more-2-line" />
         <Icon name="more-line" />
@@ -520,6 +545,7 @@ export default function DesignSystemScreen() {
         <Icon name="settings-4-line" />
         <Icon name="stars-s-fill" />
         <Icon name="serenity-feather" />
+        <Icon name="warning-fill" />
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>Sidebar</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
