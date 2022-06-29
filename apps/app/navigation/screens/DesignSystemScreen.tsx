@@ -27,6 +27,7 @@ import {
   Spinner,
   BoxShadow,
   BoxShadowLevels,
+  InfoMessage,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -46,7 +47,29 @@ export default function DesignSystemScreen() {
 
   return (
     <ScrollView style={tw`px-4 py-6`}>
-      <Text style={tw`mb-4 h2`}>Tooltip</Text>
+      <Text style={tw`mb-4 h2`}>Info Messages</Text>
+      <Text>Info</Text>
+      <VStack space={4} style={tw`max-w-90`}>
+        <InfoMessage>
+          The verification code is prefilled on staging.
+        </InfoMessage>
+        <InfoMessage icon>
+          The verification code is prefilled on staging.
+        </InfoMessage>
+      </VStack>
+      <Text style={tw`mt-4`}>Error</Text>
+      <VStack space={4} style={tw`max-w-90`}>
+        <InfoMessage variant="error">
+          Unfortunately your registration request failed due a network error.
+          Please try again later.
+        </InfoMessage>
+        <InfoMessage variant="error" icon>
+          Unfortunately your registration request failed due a network error.
+          Please try again later.
+        </InfoMessage>
+      </VStack>
+
+      <Text style={tw`my-4 h2`}>Tooltip</Text>
       <Tooltip label="This is a tip!" placement="right">
         <IconButton name="arrow-right" color="gray-500" />
       </Tooltip>
