@@ -509,6 +509,8 @@ export default function DesignSystemScreen() {
         <Icon name="history-line" />
         <Icon name="image-2-line" />
         <Icon name="image-line" />
+        <Icon name="information-fill" />
+        <Icon name="information-line" />
         <Icon name="more" />
         <Icon name="more-2-line" />
         <Icon name="more-line" />
@@ -520,6 +522,7 @@ export default function DesignSystemScreen() {
         <Icon name="settings-4-line" />
         <Icon name="stars-s-fill" />
         <Icon name="serenity-feather" />
+        <Icon name="warning-fill" />
       </Tiles>
       <Text style={tw`mt-4 mb-1`}>Sidebar</Text>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
