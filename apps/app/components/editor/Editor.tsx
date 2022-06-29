@@ -7,19 +7,19 @@ import { Text, tw, View } from "@serenity-tools/ui";
 import * as Y from "yjs";
 import { EditorProps } from "./types";
 
-// TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
-export async function loadEditorSourceForAndroid() {
-  const indexHtml = Asset.fromModule(require("../../assets/index.html"));
-  await indexHtml.downloadAsync();
-  // @ts-expect-error
-  const html = await FileSystem.readAsStringAsync(indexHtml.localUri);
-  return { html };
-}
+// // TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
+// export async function loadEditorSourceForAndroid() {
+//   const indexHtml = Asset.fromModule(require("../../assets/index.html"));
+//   await indexHtml.downloadAsync();
+//   // @ts-expect-error
+//   const html = await FileSystem.readAsStringAsync(indexHtml.localUri);
+//   return { html };
+// }
 
-let editorSource =
-  Platform.OS !== "android"
-    ? require("../../assets/index.html")
-    : { html: null };
+// let editorSource =
+//   Platform.OS !== "android"
+//     ? require("../../assets/index.html")
+//     : { html: null };
 
 export default function Editor({
   yDocRef,
@@ -29,14 +29,14 @@ export default function Editor({
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
 
-  useEffect(() => {
-    const initEditor = async () => {
-      if (Platform.OS === "android") {
-        editorSource = await loadEditorSourceForAndroid();
-      }
-    };
-    initEditor();
-  }, []);
+  // useEffect(() => {
+  //   const initEditor = async () => {
+  //     if (Platform.OS === "android") {
+  //       editorSource = await loadEditorSourceForAndroid();
+  //     }
+  //   };
+  //   initEditor();
+  // }, []);
 
   yDocRef.current.on("updateV2", (update: any, origin: string) => {
     if (origin === "naisho-remote") {
@@ -53,7 +53,7 @@ export default function Editor({
 
   return (
     <SafeAreaView style={tw`bg-white flex-auto`}>
-      <WebView
+      {/* <WebView
         ref={webViewRef}
         originWhitelist={["*"]}
         source={editorSource}
@@ -109,7 +109,7 @@ export default function Editor({
               true;
             `);
         }}
-      />
+      /> */}
     </SafeAreaView>
   );
 }

@@ -28,7 +28,7 @@ import { AuthenticationProvider } from "./context/AuthenticationContext";
 import { useCallback, useEffect, useMemo } from "react";
 import { devtoolsExchange } from "@urql/devtools";
 import { theme } from "../../tailwind.config";
-import { OpaqueBridge } from "@serenity-tools/opaque";
+// import { OpaqueBridge } from "@serenity-tools/opaque";
 import * as storage from "./utils/storage/storage";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { getWebDevice } from "./utils/device/webDeviceStore";
@@ -196,7 +196,7 @@ export default function App() {
               <NativeBaseProvider theme={rnTheme}>
                 <Navigation colorScheme={colorScheme} />
                 <StatusBar />
-                <OpaqueBridge />
+                {/* <OpaqueBridge /> */}
               </NativeBaseProvider>
             </SafeAreaProvider>
           </Provider>
