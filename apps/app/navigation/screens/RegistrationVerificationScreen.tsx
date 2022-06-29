@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Text, View, Box, tw, Button, LabeledInput } from "@serenity-tools/ui";
+import {
+  Text,
+  View,
+  Box,
+  tw,
+  Button,
+  LabeledInput,
+  InfoMessage,
+} from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types";
 import { useVerifyRegistrationMutation } from "../../generated/graphql";
 import {
@@ -111,9 +119,9 @@ export default function RegistrationVerificationScreen(
         </View>
 
         {errorMessage ? (
-          <View>
+          <InfoMessage variant="error" icon>
             <Text>{errorMessage}</Text>
-          </View>
+          </InfoMessage>
         ) : null}
 
         <LabeledInput
@@ -125,9 +133,9 @@ export default function RegistrationVerificationScreen(
           placeholder="Enter the verification code …"
         />
 
-        <View>
-          <Text>Note: The verification code is prefilled on staging.</Text>
-        </View>
+        <InfoMessage>
+          Note: The verification code is prefilled on staging.
+        </InfoMessage>
 
         <Button onPress={onSubmit} size="large">
           Register
