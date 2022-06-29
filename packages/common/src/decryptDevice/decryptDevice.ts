@@ -29,7 +29,6 @@ export const decryptDevice = async ({
     decryptedCiphertextBase64
   );
   const privateKeyPairs = JSON.parse(privateKeyPairString);
-  console.log("privateKeyPairs", privateKeyPairs);
   return {
     encryptionPrivateKey: privateKeyPairs.encryptionPrivateKey,
     signingPrivateKey: privateKeyPairs.signingPrivateKey,

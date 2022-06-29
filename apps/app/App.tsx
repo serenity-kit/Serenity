@@ -33,6 +33,9 @@ import * as storage from "./utils/storage/storage";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { getWebDevice } from "./utils/device/webDeviceStore";
 
+// import { clearLocalSessionData } from "./utils/authentication/clearLocalSessionData";
+// clearLocalSessionData();
+
 type AuthState = {
   sessionKey: string;
 };

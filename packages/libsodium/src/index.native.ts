@@ -133,7 +133,7 @@ export const crypto_secretbox_easy = async (
   key: string
 ): Promise<string> => {
   const result = await sodium.crypto_secretbox_easy(
-    urlSafeBase64ToBase64(to_base64(message)),
+    urlSafeBase64ToBase64(message),
     urlSafeBase64ToBase64(nonce),
     urlSafeBase64ToBase64(key)
   );

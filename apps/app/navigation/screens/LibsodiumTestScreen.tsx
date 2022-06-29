@@ -70,6 +70,33 @@ export default function PageScreen() {
           key
         );
 
+      const secretBoxNonce = await sodium.randombytes_buf(
+        sodium.crypto_secretbox_NONCEBYTES
+      );
+      const secretBoxKey = await sodium.randombytes_buf(
+        sodium.crypto_secretbox_KEYBYTES
+      );
+      console.log(secretBoxNonce);
+      console.log(secretBoxKey);
+      const ciphertextSecretBox = await sodium.crypto_secretbox_easy(
+        sodium.to_base64("Hello World"),
+        secretBoxNonce,
+        secretBoxKey
+      );
+
+      console.log("ciphertextSecretBox", ciphertextSecretBox);
+
+      const decryptedSecretBox = await sodium.crypto_secretbox_open_easy(
+        ciphertextSecretBox,
+        secretBoxNonce,
+        secretBoxKey
+      );
+
+      console.log(
+        "decryptedSecretBox",
+        sodium.from_base64_to_string(decryptedSecretBox)
+      );
+
       setData({
         randombytes_buf,
         crypto_sign_keypair,
