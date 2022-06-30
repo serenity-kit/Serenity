@@ -8,7 +8,7 @@ export type InputProps = IInputProps & {};
 export const Input = forwardRef((props: InputProps, ref) => {
   const styles = StyleSheet.create({
     wrapper: tw`form-element-height rounded`,
-    input: tw`px-4 flex justify-center text-base text-gray-900`,
+    input: tw`px-4 flex justify-center text-input font-input text-gray-900 `,
   });
 
   return (
