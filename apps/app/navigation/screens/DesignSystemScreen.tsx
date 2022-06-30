@@ -286,7 +286,7 @@ export default function DesignSystemScreen() {
           >
             <Avatar
               borderRadius={4}
-              size="xxs"
+              size="xs"
               bg={tw.color(`collaboration-emerald`)}
             >
               <Icon
@@ -303,7 +303,7 @@ export default function DesignSystemScreen() {
           >
             <Avatar
               borderRadius={4}
-              size="xxs"
+              size="xs"
               bg={tw.color(`collaboration-arctic`)}
             >
               <Icon

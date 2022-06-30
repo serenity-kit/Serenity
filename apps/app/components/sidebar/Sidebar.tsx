@@ -190,7 +190,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   >
                     <Avatar
                       borderRadius={4}
-                      size="xxs"
+                      size="xs"
                       // TODO adjust color for each workspace if no image is set
                       bg={tw.color(`collaboration-honey`)}
                       key={`avatar_${workspace.id}`}
