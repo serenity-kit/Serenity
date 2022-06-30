@@ -32,6 +32,7 @@ import { OpaqueBridge } from "@serenity-tools/opaque";
 import * as storage from "./utils/storage/storage";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { getWebDevice } from "./utils/device/webDeviceStore";
+import Constants from "expo-constants";
 
 // import { clearLocalSessionData } from "./utils/authentication/clearLocalSessionData";
 // clearLocalSessionData();
@@ -166,10 +167,7 @@ export default function App() {
   // recreate client and especially the internal cache every time the authentication state changes
   const client = useMemo(() => {
     return createClient({
-      url:
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:4000/graphql"
-          : "https://serenity-staging-api.herokuapp.com/graphql",
+      url: Constants.manifest?.extra?.apiUrl,
       requestPolicy: "cache-and-network",
       exchanges:
         process.env.NODE_ENV === "development"

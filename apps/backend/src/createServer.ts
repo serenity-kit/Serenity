@@ -52,10 +52,15 @@ export default async function createServer() {
   });
   await apolloServer.start();
 
-  const allowedOrigin =
-    process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
-      ? "http://localhost:19006"
-      : "https://www.serenity.li";
+  // on staging we also want the dev setup to be able to connect
+  const allowedList = ["http://localhost:19006", "https://www.serenity.li"];
+  const allowedOrigin = (origin, callback) => {
+    if (allowedList.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  };
   const corsOptions = { credentials: true, origin: allowedOrigin };
 
   const app = express();
