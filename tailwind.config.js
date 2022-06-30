@@ -64,6 +64,7 @@ const customTheme = {
       h1: ["2rem", "2.375rem"], // editor specific
       h2: ["1.5rem", "1.75rem"], // editor specific
       h3: ["1.125rem", "1.375rem"], // editor specific
+      input: ["1rem", "1.25rem"], // iOS specific fix for vertical Alignment of Text inside input
       // custom fontSize multiplier for better scalability (represents a default size of 17px)
       mobile: "1.0625rem", // editor specific
       xs: "0.8125rem",
