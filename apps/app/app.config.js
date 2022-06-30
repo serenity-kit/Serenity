@@ -1,6 +1,7 @@
 export default {
   expo: {
     name: "serenity",
+    owner: "serenity-app",
     slug: "serenity",
     version: "0.0.1",
     orientation: "portrait",

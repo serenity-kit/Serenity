@@ -60,7 +60,15 @@ yarn dev
 Creating a dev build for iOS Simulator.
 
 ```sh
+cd apps/app
 yarn eas build --profile development-simulator --platform ios
+```
+
+Creating a dev build for iOS.
+
+```sh
+cd apps/app
+yarn eas build --profile development --platform ios
 ```
 
 Build new graphql types
