@@ -19,4 +19,6 @@ config.resolver.nodeModulesPaths = [
 // needed for yjs and lib0 since they use .cjs and .mjs files
 config.resolver.sourceExts.push("cjs", "mjs");
 
+config.resolver.assetExts.push("wasm");
+
 module.exports = config;

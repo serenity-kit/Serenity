@@ -28,15 +28,23 @@ import { AuthenticationProvider } from "./context/AuthenticationContext";
 import { useCallback, useEffect, useMemo } from "react";
 import { devtoolsExchange } from "@urql/devtools";
 import { theme } from "../../tailwind.config";
-// import { OpaqueBridge } from "@serenity-tools/opaque";
+import { OpaqueBridge } from "@serenity-tools/opaque";
 import * as storage from "./utils/storage/storage";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { getWebDevice } from "./utils/device/webDeviceStore";
 import Constants from "expo-constants";
 import WebViewTest from "./components/webViewTest/WebViewTest";
+import { Platform } from "react-native";
 
 // import { clearLocalSessionData } from "./utils/authentication/clearLocalSessionData";
 // clearLocalSessionData();
+
+let opaqueBridgeSource =
+  Platform.OS === "ios"
+    ? require("./webviews/opaque/index.html")
+    : { html: null };
+
+// let opaqueBridgeSource = { html: null };
 
 type AuthState = {
   sessionKey: string;
@@ -197,7 +205,7 @@ export default function App() {
               <NativeBaseProvider theme={rnTheme}>
                 <Navigation colorScheme={colorScheme} />
                 <StatusBar />
-                {/* <OpaqueBridge /> */}
+                <OpaqueBridge source={opaqueBridgeSource} />
                 <WebViewTest />
               </NativeBaseProvider>
             </SafeAreaProvider>
