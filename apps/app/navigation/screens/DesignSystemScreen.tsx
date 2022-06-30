@@ -297,10 +297,7 @@ export default function DesignSystemScreen() {
             </Avatar>
             <Text variant="xs">Happy Workspace</Text>
           </SidebarLink>
-          <SidebarLink
-            to={{ screen: "EncryptDecryptImageTest" }}
-            style={tw`p-menu-item`}
-          >
+          <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
             <Avatar
               borderRadius={4}
               size="xs"
@@ -376,6 +373,17 @@ export default function DesignSystemScreen() {
 
       <Text style={tw`mt-6 mb-4 h2`}>SidebarLink</Text>
       <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+        <Avatar
+          borderRadius={4}
+          size="xs"
+          bg={tw.color(`collaboration-arctic`)}
+        >
+          <Icon
+            name="serenity-feather"
+            color={tw.color("black/35")}
+            size={16}
+          />
+        </Avatar>
         <Text>Encrypt / Decrypt Image</Text>
       </SidebarLink>
 
