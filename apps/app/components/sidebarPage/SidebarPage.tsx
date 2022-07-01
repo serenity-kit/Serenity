@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet, Platform } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
-import { Link as ReactNavigationLink } from "@react-navigation/native";
 import {
   Icon,
   tw,
@@ -9,11 +8,13 @@ import {
   Text,
   ViewProps,
   InlineInput,
+  Pressable,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useDocumentStore } from "../../utils/document/documentStore";
+import { useLinkProps } from "@react-navigation/native";
 
 type Props = ViewProps & {
   documentId: string;
@@ -29,6 +30,18 @@ export default function SidebarPage(props: Props) {
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const document = useDocumentStore((state) => state.document);
   const documentStore = useDocumentStore();
+  const linkProps = useLinkProps({
+    to: {
+      screen: "Workspace",
+      params: {
+        workspaceId: props.workspaceId,
+        screen: "Page",
+        params: {
+          pageId: props.documentId,
+        },
+      },
+    },
+  });
 
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const { depth = 0 } = props;
@@ -95,24 +108,15 @@ export default function SidebarPage(props: Props) {
               />
             </HStack>
           ) : (
-            <ReactNavigationLink
+            <Pressable
+              {...linkProps}
               {...focusRingProps} // needed so focus is shown on view-wrapper
-              to={{
-                screen: "Workspace",
-                params: {
-                  workspaceId: props.workspaceId,
-                  screen: "Page",
-                  params: {
-                    pageId: props.documentId,
-                  },
-                },
-              }}
               style={[
                 tw`flex w-full py-1.5`,
                 Platform.OS === "web" && { outlineWidth: 0 }, // override default outline
               ]}
             >
-              <HStack style={tw`grow-1`}>
+              <HStack style={tw`grow-1`} alignItems="center">
                 {/* @icon : needs to be here in both versions (isEditing & not)
                             as we want the clickable area as big as possible
                 */}
@@ -133,7 +137,7 @@ export default function SidebarPage(props: Props) {
                   {props.documentName}
                 </Text>
               </HStack>
-            </ReactNavigationLink>
+            </Pressable>
           )}
         </HStack>
 
