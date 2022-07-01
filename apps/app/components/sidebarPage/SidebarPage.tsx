@@ -15,6 +15,7 @@ import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { useLinkProps } from "@react-navigation/native";
+import { useIsDesktopDevice } from "@serenity-tools/common";
 
 type Props = ViewProps & {
   documentId: string;
@@ -25,6 +26,7 @@ type Props = ViewProps & {
 };
 
 export default function SidebarPage(props: Props) {
+  const isDesktopDevice = useIsDesktopDevice();
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
@@ -141,7 +143,7 @@ export default function SidebarPage(props: Props) {
           )}
         </HStack>
 
-        {isHovered && (
+        {(isHovered || !isDesktopDevice) && (
           <HStack alignItems="center">
             <SidebarPageMenu
               documentId={props.documentId}

@@ -33,6 +33,7 @@ import {
 } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { useClient } from "urql";
+import { useIsDesktopDevice } from "@serenity-tools/common";
 
 type Props = ViewProps & {
   workspaceId: string;
@@ -46,6 +47,7 @@ export default function SidebarFolder(props: Props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const openFolderIds = useOpenFolderStore((state) => state.folderIds);
+  const isDesktopDevice = useIsDesktopDevice();
   const [isOpen, setIsOpen] = useState(openFolderIds.includes(props.folderId));
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
@@ -242,7 +244,7 @@ export default function SidebarFolder(props: Props) {
             />
           )}
 
-          {isHovered && (
+          {(isHovered || !isDesktopDevice) && (
             <HStack alignItems="center" space={1} style={tw`pr-2`}>
               <SidebarFolderMenu
                 folderId={props.folderId}
