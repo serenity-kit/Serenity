@@ -216,6 +216,7 @@ export const Icon = (props: IconProps) => {
   const actualMobileSize = props.mobileSize ?? 5;
 
   const size =
+    // TODO fix using @serenity-tools/common in editor and then migrate to useIsSmallerThanBreakpoint
     width < parseInt(theme.screens.md.replace("px"), 10)
       ? actualMobileSize
       : actualSize;
