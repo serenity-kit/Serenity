@@ -24,22 +24,16 @@ import Sidebar from "../components/sidebar/Sidebar";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
 import AcceptWorkspaceInvitationScreen from "./screens/AcceptWorkspaceInvitationScreen";
 import DeviceManagerScreen from "./screens/DeviceManagerScreen";
-import {
-  Icon,
-  Pressable,
-  Text,
-  tw,
-  useIsPermanentLeftSidebar,
-  View,
-} from "@serenity-tools/ui";
+import { Text, tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 import RootScreen from "./screens/RootScreen";
 import OnboardingScreen from "./screens/OnboardingScreen";
-import { DrawerActions } from "@react-navigation/native";
 import RegistrationVerificationScreen from "./screens/RegistrationVerificationScreen";
 import WorkspaceRootScreen from "./screens/WorkspaceRootScreen";
 import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
 import { useEffect } from "react";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -49,11 +43,13 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
 const styles = StyleSheet.create({
-  header: tw`bg-white dark:bg-gray-900 border-b border-gray-200 h-top-bar shadow-opacity-0`,
+  // web prefix needed as this otherwise messes with the height-calculation for mobile
+  header: tw`web:h-top-bar bg-white dark:bg-gray-900 border-b border-gray-200 shadow-opacity-0`,
 });
 
 function WorkspaceStackScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
   useEffect(() => {
@@ -73,25 +69,14 @@ function WorkspaceStackScreen(props) {
         screenOptions={{
           headerShown: true,
           headerTitle: (props) => <Text>{props.children}</Text>,
-          headerStyle: styles.header,
+          headerStyle: [styles.header],
           drawerType: isPermanentLeftSidebar ? "permanent" : "front",
           drawerStyle: {
             width: isPermanentLeftSidebar ? 240 : width,
           },
           headerLeft: isPermanentLeftSidebar
             ? () => null
-            : () => {
-                return (
-                  <Pressable
-                    style={tw`pl-6`}
-                    onPress={() => {
-                      props.navigation.dispatch(DrawerActions.openDrawer());
-                    }}
-                  >
-                    <Icon name="menu" />
-                  </Pressable>
-                );
-              },
+            : () => <PageHeaderLeft navigation={props.navigation} />,
           overlayColor: "transparent",
         }}
       >
