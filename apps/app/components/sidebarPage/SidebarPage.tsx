@@ -79,7 +79,12 @@ export default function SidebarPage(props: Props) {
               {/* @icon : needs to be here in both versions (isEditing & not) as putting the 
                           InlineInput inside the Link adds weird behaviour we don't want
               */}
-              <Icon name="page" size={20} color={tw.color("gray-600")} />
+              <Icon
+                name="page"
+                size={5}
+                mobileSize={8}
+                color={tw.color("gray-600")}
+              />
               <InlineInput
                 onCancel={() => {
                   setIsEditing(false);
@@ -111,7 +116,12 @@ export default function SidebarPage(props: Props) {
                 {/* @icon : needs to be here in both versions (isEditing & not)
                             as we want the clickable area as big as possible
                 */}
-                <Icon name="page" size={20} color={tw.color("gray-600")} />
+                <Icon
+                  name="page"
+                  size={5}
+                  mobileSize={8}
+                  color={tw.color("gray-600")}
+                />
                 {/* TODO check why ellipsis is broken => renders as span .. but why ?? */}
                 <Text
                   variant="small"

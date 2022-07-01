@@ -208,7 +208,7 @@ export default function SidebarFolder(props: Props) {
                   color={tw.color("gray-600")}
                 />
               </View>
-              <Icon name="folder" size={20} />
+              <Icon name="folder" size={5} mobileSize={8} />
               {isEditing === "name" ? (
                 <InlineInput
                   onSubmit={updateFolderName}

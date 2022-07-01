@@ -242,7 +242,8 @@ export default function DesignSystemScreen() {
               <Icon
                 name="serenity-feather"
                 color={tw.color("black/40")}
-                size={20}
+                size={5}
+                mobileSize={6}
               />
             </Avatar>
           );
@@ -292,7 +293,8 @@ export default function DesignSystemScreen() {
               <Icon
                 name="serenity-feather"
                 color={tw.color("black/35")}
-                size={16}
+                size={5}
+                mobileSize={6}
               />
             </Avatar>
             <Text variant="xs">Happy Workspace</Text>
@@ -306,7 +308,8 @@ export default function DesignSystemScreen() {
               <Icon
                 name="serenity-feather"
                 color={tw.color("black/35")}
-                size={16}
+                size={5}
+                mobileSize={6}
               />
             </Avatar>
             <Text variant="xs">Funny Bunny</Text>
@@ -378,11 +381,7 @@ export default function DesignSystemScreen() {
           size="xs"
           bg={tw.color(`collaboration-arctic`)}
         >
-          <Icon
-            name="serenity-feather"
-            color={tw.color("black/35")}
-            size={16}
-          />
+          <Icon name="serenity-feather" color={tw.color("black/35")} />
         </Avatar>
         <Text>Encrypt / Decrypt Image</Text>
       </SidebarLink>
@@ -563,10 +562,10 @@ export default function DesignSystemScreen() {
       <Text style={tw`mt-4 mb-1`}>Icons resized</Text>
       <Columns space={4} alignY="center" alignX="left">
         <Column width="content">
-          <Icon name="list-unordered" size={16} />
+          <Icon name="list-unordered" />
         </Column>
         <Column width="content">
-          <Icon name="list-unordered" size={32} />
+          <Icon name="list-unordered" size={8} mobileSize={9} />
         </Column>
       </Columns>
       <Text style={tw`mt-4 mb-1`}>Icons coloured</Text>

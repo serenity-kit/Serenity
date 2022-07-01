@@ -135,17 +135,13 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   isFocusVisible && tw`se-inset-focus-mini`,
                 ]}
               >
-                <Avatar
-                  borderRadius={4}
-                  size="xs"
-                  bg={tw.color("primary-400")}
-                  source={{}} // TODO add workspace image source here
-                >
+                <Avatar borderRadius={4} size="xs" bg={tw.color("primary-400")}>
                   {/* TODO show conditionally when no image-source is set */}
                   <Icon
                     name="serenity-feather"
-                    color={tw.color("black/40")}
-                    size={20}
+                    color={tw.color("black/35")}
+                    size={5}
+                    mobileSize={5}
                   />
                 </Avatar>
                 <Text
@@ -159,11 +155,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                     ? " "
                     : workspaceResult.data?.workspace?.name}
                 </Text>
-                <Icon
-                  name="arrow-down-s-line"
-                  size={16}
-                  color={tw.color("gray-400")}
-                />
+                <Icon name="arrow-down-s-line" color={tw.color("gray-400")} />
               </HStack>
             </Pressable>
           }
@@ -198,7 +190,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                       <Icon
                         name="serenity-feather"
                         color={tw.color("black/35")}
-                        size={16}
+                        size={5}
+                        mobileSize={5}
                       />
                     </Avatar>
                     <Text variant="xs">{workspace.name}</Text>
@@ -248,15 +241,30 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           params: { workspaceId: route.params.workspaceId, screen: "Settings" },
         }}
       >
-        <Icon name="settings-4-line" size={18} color={tw.color("gray-800")} />
+        <Icon
+          name="settings-4-line"
+          size={4.5}
+          mobileSize={5.5}
+          color={tw.color("gray-800")}
+        />
         <Text variant="small">Settings</Text>
       </SidebarLink>
       <SidebarLink to={{ screen: "DevDashboard" }}>
-        <Icon name="dashboard-line" size={18} color={tw.color("gray-800")} />
+        <Icon
+          name="dashboard-line"
+          size={4.5}
+          mobileSize={5.5}
+          color={tw.color("gray-800")}
+        />
         <Text variant="small">Dev Dashboard</Text>
       </SidebarLink>
       <SidebarLink to={{ screen: "DeviceManager" }}>
-        <Icon name="dashboard-line" size={18} color={tw.color("gray-800")} />
+        <Icon
+          name="dashboard-line"
+          size={4.5}
+          mobileSize={5.5}
+          color={tw.color("gray-800")}
+        />
         <Text variant="small">Device Manager</Text>
       </SidebarLink>
       <SidebarLink
@@ -265,7 +273,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           params: { workspaceId: route.params.workspaceId, screen: "Editor" },
         }}
       >
-        <Icon name="draft-line" size={18} color={tw.color("gray-800")} />
+        <Icon
+          name="draft-line"
+          size={4.5}
+          mobileSize={5.5}
+          color={tw.color("gray-800")}
+        />
         <Text variant="small">Editor</Text>
       </SidebarLink>
       <SidebarLink
@@ -277,7 +290,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           },
         }}
       >
-        <Icon name="microscope-line" size={18} color={tw.color("gray-800")} />
+        <Icon
+          name="microscope-line"
+          size={4.5}
+          mobileSize={5.5}
+          color={tw.color("gray-800")}
+        />
         <Text variant="small">Libsodium Test Screen</Text>
       </SidebarLink>
 
@@ -307,7 +325,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           <View style={tw`ml-0.5 -mr-0.5`}>
             <Icon name={"arrow-right-filled"} color={tw.color("gray-600")} />
           </View>
-          <Icon name="folder" size={20} />
+          <Icon name="folder" size={5} mobileSize={8} />
           <InlineInput
             onCancel={() => {
               setIsCreatingNewFolder(false);

@@ -10,7 +10,6 @@ export type EditorSidebarIconProps = IconProps & {
 };
 
 export const EditorSidebarIcon = (props: EditorSidebarIconProps) => {
-  const size = props.size || 16;
   const color = props.color || tw.color("gray-800");
   const activeColor = props.activeColor || tw.color("primary-500");
 
@@ -21,11 +20,7 @@ export const EditorSidebarIcon = (props: EditorSidebarIconProps) => {
 
   return (
     <View style={[styles.default, props.isActive ? styles.active : undefined]}>
-      <Icon
-        {...props}
-        size={size}
-        color={props.isActive ? activeColor : color}
-      />
+      <Icon {...props} color={props.isActive ? activeColor : color} />
     </View>
   );
 };
