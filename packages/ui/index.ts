@@ -21,6 +21,7 @@ export * from "./components/modal/Modal";
 export * from "./components/modalButtonFooter/ModalButtonFooter";
 export * from "./components/modalHeader/ModalHeader";
 export * from "./components/safeAreaBottomSpacer/SafeAreaBottomSpacer";
+export * from "./components/scrollSafeAreaView/ScrollSafeAreaView";
 export * from "./components/scrollView/ScrollView";
 export * from "./components/shortcut/Shortcut";
 export * from "./components/sidebarButton/SidebarButton";
