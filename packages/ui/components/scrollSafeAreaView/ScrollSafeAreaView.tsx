@@ -1,10 +1,8 @@
 import React from "react";
 import { ScrollView, ScrollViewProps } from "../scrollView/ScrollView";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
-import {
-  SafeAreaBottomSpacer,
-  tw,
-} from "../SaafeAreaBottomSpacer/SafeAreaBottomSpacer";
+import { SafeAreaBottomSpacer } from "../safeAreaBottomSpacer/SafeAreaBottomSpacer";
+import { tw } from "../../tailwind";
 
 export type ScrollSafeAreaViewProps = ScrollViewProps & {
   customHeader?: boolean;
