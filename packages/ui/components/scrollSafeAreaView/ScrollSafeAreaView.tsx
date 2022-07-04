@@ -1,7 +1,10 @@
 import React from "react";
 import { ScrollView, ScrollViewProps } from "../scrollView/ScrollView";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
-import { SafeAreaBottomSpacer, tw } from "@serenity-tools/ui";
+import {
+  SafeAreaBottomSpacer,
+  tw,
+} from "../SaafeAreaBottomSpacer/SafeAreaBottomSpacer";
 
 export type ScrollSafeAreaViewProps = ScrollViewProps & {
   customHeader?: boolean;
