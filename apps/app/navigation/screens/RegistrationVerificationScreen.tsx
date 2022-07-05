@@ -8,7 +8,7 @@ import {
   LabeledInput,
   InfoMessage,
 } from "@serenity-tools/ui";
-import { RootStackScreenProps } from "../../types";
+import { RootStackScreenProps } from "../../types/navigation";
 import { useVerifyRegistrationMutation } from "../../generated/graphql";
 import {
   isUsernamePasswordStored,

@@ -29,7 +29,7 @@ import {
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { RootStackScreenProps } from "../../types";
+import { RootStackScreenProps } from "../../types/navigation";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { HStack } from "native-base";
 import { useFocusRing } from "@react-native-aria/focus";

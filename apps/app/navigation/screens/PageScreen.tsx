@@ -1,4 +1,4 @@
-import { WorkspaceDrawerScreenProps } from "../../types";
+import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import Page from "../../components/page/Page";
 import { useWindowDimensions } from "react-native";
 import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";

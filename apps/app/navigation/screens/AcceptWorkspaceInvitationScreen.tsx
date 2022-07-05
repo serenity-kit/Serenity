@@ -8,7 +8,7 @@ import {
   useAcceptWorkspaceInvitationMutation,
   useWorkspaceInvitationQuery,
 } from "../../generated/graphql";
-import { RootStackScreenProps } from "../../types";
+import { RootStackScreenProps } from "../../types/navigation";
 import { LoginForm } from "../../components/login/LoginForm";
 
 export default function AcceptWorkspaceInvitationScreen(

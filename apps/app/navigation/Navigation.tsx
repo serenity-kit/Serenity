@@ -10,7 +10,7 @@ import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 
 import NotFoundScreen from "./screens/NotFoundScreen";
-import { RootStackParamList } from "../types";
+import { RootStackParamList } from "../types/navigation";
 import NoPageExistsScreen from "./screens/NoPageExistsScreen";
 import DevDashboardScreen from "./screens/DevDashboardScreen";
 import PageScreen from "./screens/PageScreen";

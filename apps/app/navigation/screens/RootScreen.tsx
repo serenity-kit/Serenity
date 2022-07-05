@@ -4,7 +4,7 @@ import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { WorkspaceDocument, WorkspaceQuery } from "../../generated/graphql";
-import { RootStackScreenProps } from "../../types";
+import { RootStackScreenProps } from "../../types/navigation";
 import { getLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function RootScreen(props: RootStackScreenProps<"Root">) {
