@@ -15,7 +15,7 @@ import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { useLinkProps } from "@react-navigation/native";
-import { useIsDesktopDevice } from "@serenity-tools/common";
+import { useIsDesktopDevice } from "@serenity-tools/ui";
 
 type Props = ViewProps & {
   documentId: string;

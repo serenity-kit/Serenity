@@ -33,7 +33,7 @@ import {
 } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { useClient } from "urql";
-import { useIsDesktopDevice } from "@serenity-tools/common";
+import { useIsDesktopDevice } from "@serenity-tools/ui";
 
 type Props = ViewProps & {
   workspaceId: string;

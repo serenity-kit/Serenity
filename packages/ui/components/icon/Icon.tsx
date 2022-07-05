@@ -97,10 +97,9 @@ import { Table2 } from "./icons/Table2";
 import { Text } from "./icons/Text";
 import { Underline } from "./icons/Underline";
 import { WarningFill } from "./icons/WarningFill";
-import { theme } from "../../../../tailwind.config";
-import { useWindowDimensions } from "react-native";
 
 import { View } from "react-native";
+import { useIsSmallerThanBreakpoint } from "../../hooks/useIsSmallerThanBreakpoint/useIsSmallerThanBreakpoint";
 
 export type IconNames =
   | "add-line"
@@ -209,17 +208,12 @@ export type IconProps = {
 };
 
 export const Icon = (props: IconProps) => {
-  const { width } = useWindowDimensions();
   const { name } = props;
   const color = props.color ?? (tw.color("gray-900") as string);
   const actualSize = props.size ?? 4;
   const actualMobileSize = props.mobileSize ?? 5;
 
-  const size =
-    // TODO fix using @serenity-tools/common in editor and then migrate to useIsSmallerThanBreakpoint
-    width < parseInt(theme.screens.md.replace("px"), 10)
-      ? actualMobileSize
-      : actualSize;
+  const size = useIsSmallerThanBreakpoint("md") ? actualMobileSize : actualSize;
   const iconSize = "100%";
 
   let icon: React.ReactNode = null;

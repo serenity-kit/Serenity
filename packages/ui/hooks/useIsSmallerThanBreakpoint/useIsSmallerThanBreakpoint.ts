@@ -1,6 +1,6 @@
 import { useWindowDimensions } from "react-native";
 import { theme } from "../../../../tailwind.config";
-import { Breakpoint } from "../types";
+import { Breakpoint } from "../../types";
 
 export const useIsSmallerThanBreakpoint = (breakpoint: Breakpoint) => {
   const { width } = useWindowDimensions();
