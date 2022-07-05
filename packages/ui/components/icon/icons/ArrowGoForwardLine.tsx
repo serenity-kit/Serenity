@@ -1,7 +1,7 @@
 import React from "react";
 import Svg, { Path } from "react-native-svg";
 
-export type Props = { color: string; size: number };
+export type Props = { color: string; size: string };
 
 export const ArrowGoForwardLine = ({ color, size }: Props) => {
   return (

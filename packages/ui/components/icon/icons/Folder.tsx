@@ -1,7 +1,7 @@
 import React from "react";
 import Svg, { LinearGradient, Path, Defs, Stop } from "react-native-svg";
 
-export type Props = { size: number };
+export type Props = { size: string };
 
 export const Folder = ({ size }: Props) => {
   return (

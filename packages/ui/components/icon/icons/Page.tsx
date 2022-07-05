@@ -1,7 +1,7 @@
 import React from "react";
 import Svg, { Path, Line, Defs, Stop, LinearGradient } from "react-native-svg";
 
-export type Props = { size: number };
+export type Props = { size: string };
 
 export const Page = ({ size }: Props) => {
   return (

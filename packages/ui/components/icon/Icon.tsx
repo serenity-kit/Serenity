@@ -98,6 +98,9 @@ import { Text } from "./icons/Text";
 import { Underline } from "./icons/Underline";
 import { WarningFill } from "./icons/WarningFill";
 
+import { View } from "react-native";
+import { useIsSmallerThanBreakpoint } from "../../hooks/useIsSmallerThanBreakpoint/useIsSmallerThanBreakpoint";
+
 export type IconNames =
   | "add-line"
   | "archive-fill"
@@ -201,149 +204,313 @@ export type IconProps = {
   name: IconNames;
   color?: string;
   size?: number;
+  mobileSize?: number;
 };
 
 export const Icon = (props: IconProps) => {
   const { name } = props;
   const color = props.color ?? (tw.color("gray-900") as string);
-  const size = props.size ?? 16;
+  const actualSize = props.size ?? 4;
+  const actualMobileSize = props.mobileSize ?? 5;
 
-  if (name === "add-line") return <AddLine color={color} size={size} />;
-  if (name === "archive-fill") return <ArchiveFill color={color} size={size} />;
-  if (name === "archive-line") return <ArchiveLine color={color} size={size} />;
-  if (name === "arrow-down-filled")
-    return <ArrowDownFilled color={color} size={size} />;
-  if (name === "arrow-down-s-fill")
-    return <ArrowDownSFill color={color} size={size} />;
-  if (name === "arrow-down-s-line")
-    return <ArrowDownSLine color={color} size={size} />;
-  if (name === "arrow-go-back-fill")
-    return <ArrowGoBackFill color={color} size={size} />;
-  if (name === "arrow-go-back-line")
-    return <ArrowGoBackLine color={color} size={size} />;
-  if (name === "arrow-go-forward-fill")
-    return <ArrowGoForwardFill color={color} size={size} />;
-  if (name === "arrow-go-forward-line")
-    return <ArrowGoForwardLine color={color} size={size} />;
-  if (name === "arrow-left-s-line")
-    return <ArrowLeftSLine color={color} size={size} />;
-  if (name === "arrow-right-s-line")
-    return <ArrowRightSLine color={color} size={size} />;
-  if (name === "arrow-right-filled")
-    return <ArrowRightFilled color={color} size={size} />;
-  if (name === "arrow-right") return <ArrowRight color={color} size={size} />;
-  if (name === "arrow-up-down-line")
-    return <ArrowUpDownLine color={color} size={size} />;
-  if (name === "attachment-2") return <Attachment2 color={color} size={size} />;
-  if (name === "at-line") return <AtLine color={color} size={size} />;
-  if (name === "bold") return <Bold color={color} size={size} />;
-  if (name === "bookmark-fill")
-    return <BookmarkFill color={color} size={size} />;
-  if (name === "bookmark-line")
-    return <BookmarkLine color={color} size={size} />;
-  if (name === "book-open-line")
-    return <BookOpenLine color={color} size={size} />;
-  if (name === "calendar-check-fill")
-    return <CalendarCheckFill color={color} size={size} />;
-  if (name === "chat-1-line") return <Chat1Line color={color} size={size} />;
-  if (name === "chat-4-line") return <Chat4Line color={color} size={size} />;
-  if (name === "check-line") return <CheckLine color={color} size={size} />;
-  if (name === "close-circle-fill")
-    return <CloseCircleFill color={color} size={size} />;
-  if (name === "code-s-slash-line")
-    return <CodeSSlashLine color={color} size={size} />;
-  if (name === "code-view") return <CodeView color={color} size={size} />;
-  if (name === "command-line") return <CommandLine color={color} size={size} />;
-  if (name === "cup-line") return <CupLine color={color} size={size} />;
-  if (name === "cursor") return <Cursor color={color} size={size} />;
-  if (name === "dashboard-line")
-    return <DashboardLine color={color} size={size} />;
-  if (name === "delete-bin-line")
-    return <DeleteBinLine color={color} size={size} />;
-  if (name === "double-arrow-left")
-    return <DoubleArrowLeft color={color} size={size} />;
-  if (name === "double-arrow-right")
-    return <DoubleArrowRight color={color} size={size} />;
-  if (name === "double-quotes-l")
-    return <DoubleQuotesL color={color} size={size} />;
-  if (name === "download-line")
-    return <DownloadLine color={color} size={size} />;
-  if (name === "draft-line") return <DraftLine color={color} size={size} />;
-  if (name === "emotion-line") return <EmotionLine color={color} size={size} />;
-  if (name === "file-add-fill")
-    return <FileAddFill color={color} size={size} />;
-  if (name === "file-add-line")
-    return <FileAddLine color={color} size={size} />;
-  if (name === "file-copy-line")
-    return <FileCopyLine color={color} size={size} />;
-  if (name === "file-line") return <FileLine color={color} size={size} />;
-  if (name === "file-search-line")
-    return <FileSearchLine color={color} size={size} />;
-  if (name === "file-transfer-line")
-    return <FileTransferLine color={color} size={size} />;
-  if (name === "folder-fill") return <FolderFill color={color} size={size} />;
-  if (name === "folder") return <Folder size={size} />;
-  if (name === "folder-line") return <FolderLine color={color} size={size} />;
-  if (name === "folder-music-line")
-    return <FolderMusicLine color={color} size={size} />;
-  if (name === "font-color") return <FontColor color={color} size={size} />;
-  if (name === "font-size-2") return <FontSize2 color={color} size={size} />;
-  if (name === "format-clear") return <FormatClear color={color} size={size} />;
-  if (name === "functions") return <Functions color={color} size={size} />;
-  if (name === "h-1") return <H1 color={color} size={size} />;
-  if (name === "h-2") return <H2 color={color} size={size} />;
-  if (name === "h-3") return <H3 color={color} size={size} />;
-  if (name === "h-4") return <H4 color={color} size={size} />;
-  if (name === "h-5") return <H5 color={color} size={size} />;
-  if (name === "h-6") return <H6 color={color} size={size} />;
-  if (name === "hashtag") return <Hashtag color={color} size={size} />;
-  if (name === "heading") return <Heading color={color} size={size} />;
-  if (name === "history-line") return <HistoryLine color={color} size={size} />;
-  if (name === "image-2-line") return <Image2Line color={color} size={size} />;
-  if (name === "image-line") return <ImageLine color={color} size={size} />;
-  if (name === "information-fill")
-    return <InformationFill color={color} size={size} />;
-  if (name === "information-line")
-    return <InformationLine color={color} size={size} />;
-  if (name === "indent-decrease")
-    return <IndentDecrease color={color} size={size} />;
-  if (name === "indent-increase")
-    return <IndentIncrease color={color} size={size} />;
-  if (name === "italic") return <Italic color={color} size={size} />;
-  if (name === "link") return <Link color={color} size={size} />;
-  if (name === "link-m") return <LinkM color={color} size={size} />;
-  if (name === "list-check") return <ListCheck color={color} size={size} />;
-  if (name === "list-check-2") return <ListCheck2 color={color} size={size} />;
-  if (name === "list-ordered") return <ListOrdered color={color} size={size} />;
-  if (name === "list-unordered")
-    return <ListUnordered color={color} size={size} />;
-  if (name === "menu") return <Menu color={color} size={size} />;
-  if (name === "microscope-line")
-    return <MicroscopeLine color={color} size={size} />;
-  if (name === "more") return <More color={color} size={size} />;
-  if (name === "more-2-line") return <More2Line color={color} size={size} />;
-  if (name === "more-line") return <MoreLine color={color} size={size} />;
-  if (name === "movie-line") return <MovieLine color={color} size={size} />;
-  if (name === "page") return <Page size={size} />;
-  if (name === "page-separator")
-    return <PageSeparator color={color} size={size} />;
-  if (name === "paragraph") return <Paragraph color={color} size={size} />;
-  if (name === "plus") return <Plus color={color} size={size} />;
-  if (name === "printer-line") return <PrinterLine color={color} size={size} />;
-  if (name === "question-mark")
-    return <QuestionMark color={color} size={size} />;
-  if (name === "search-line") return <SearchLine color={color} size={size} />;
-  if (name === "separator") return <Separator color={color} size={size} />;
-  if (name === "settings-4-line")
-    return <Settings4Line color={color} size={size} />;
-  if (name === "serenity-feather")
-    return <SerenityFeather color={color} size={size} />;
-  if (name === "stars-s-fill") return <StarSFill color={color} size={size} />;
-  if (name === "strikethrough")
-    return <Strikethrough color={color} size={size} />;
-  if (name === "table-2") return <Table2 color={color} size={size} />;
-  if (name === "text") return <Text color={color} size={size} />;
-  if (name === "underline") return <Underline color={color} size={size} />;
-  if (name === "warning-fill") return <WarningFill color={color} size={size} />;
-  return null;
+  const size = useIsSmallerThanBreakpoint("md") ? actualMobileSize : actualSize;
+  const iconSize = "100%";
+
+  let icon: React.ReactNode = null;
+
+  if (name === "add-line") {
+    icon = <AddLine color={color} size={iconSize} />;
+  }
+  if (name === "archive-fill") {
+    icon = <ArchiveFill color={color} size={iconSize} />;
+  }
+  if (name === "archive-line") {
+    icon = <ArchiveLine color={color} size={iconSize} />;
+  }
+  if (name === "arrow-down-filled") {
+    icon = <ArrowDownFilled color={color} size={iconSize} />;
+  }
+  if (name === "arrow-down-s-fill") {
+    icon = <ArrowDownSFill color={color} size={iconSize} />;
+  }
+  if (name === "arrow-down-s-line") {
+    icon = <ArrowDownSLine color={color} size={iconSize} />;
+  }
+  if (name === "arrow-go-back-fill") {
+    icon = <ArrowGoBackFill color={color} size={iconSize} />;
+  }
+  if (name === "arrow-go-back-line") {
+    icon = <ArrowGoBackLine color={color} size={iconSize} />;
+  }
+  if (name === "arrow-go-forward-fill") {
+    icon = <ArrowGoForwardFill color={color} size={iconSize} />;
+  }
+  if (name === "arrow-go-forward-line") {
+    icon = <ArrowGoForwardLine color={color} size={iconSize} />;
+  }
+  if (name === "arrow-left-s-line") {
+    icon = <ArrowLeftSLine color={color} size={iconSize} />;
+  }
+  if (name === "arrow-right-s-line") {
+    icon = <ArrowRightSLine color={color} size={iconSize} />;
+  }
+  if (name === "arrow-right-filled") {
+    icon = <ArrowRightFilled color={color} size={iconSize} />;
+  }
+  if (name === "arrow-right") {
+    icon = <ArrowRight color={color} size={iconSize} />;
+  }
+  if (name === "arrow-up-down-line") {
+    icon = <ArrowUpDownLine color={color} size={iconSize} />;
+  }
+  if (name === "attachment-2") {
+    icon = <Attachment2 color={color} size={iconSize} />;
+  }
+  if (name === "at-line") {
+    icon = <AtLine color={color} size={iconSize} />;
+  }
+  if (name === "bold") {
+    icon = <Bold color={color} size={iconSize} />;
+  }
+  if (name === "bookmark-fill") {
+    icon = <BookmarkFill color={color} size={iconSize} />;
+  }
+  if (name === "bookmark-line") {
+    icon = <BookmarkLine color={color} size={iconSize} />;
+  }
+  if (name === "book-open-line") {
+    icon = <BookOpenLine color={color} size={iconSize} />;
+  }
+  if (name === "calendar-check-fill") {
+    icon = <CalendarCheckFill color={color} size={iconSize} />;
+  }
+  if (name === "chat-1-line") {
+    icon = <Chat1Line color={color} size={iconSize} />;
+  }
+  if (name === "chat-4-line") {
+    icon = <Chat4Line color={color} size={iconSize} />;
+  }
+  if (name === "check-line") {
+    icon = <CheckLine color={color} size={iconSize} />;
+  }
+  if (name === "close-circle-fill") {
+    icon = <CloseCircleFill color={color} size={iconSize} />;
+  }
+  if (name === "code-s-slash-line") {
+    icon = <CodeSSlashLine color={color} size={iconSize} />;
+  }
+  if (name === "code-view") {
+    icon = <CodeView color={color} size={iconSize} />;
+  }
+  if (name === "command-line") {
+    icon = <CommandLine color={color} size={iconSize} />;
+  }
+  if (name === "cup-line") {
+    icon = <CupLine color={color} size={iconSize} />;
+  }
+  if (name === "cursor") {
+    icon = <Cursor color={color} size={iconSize} />;
+  }
+  if (name === "dashboard-line") {
+    icon = <DashboardLine color={color} size={iconSize} />;
+  }
+  if (name === "delete-bin-line") {
+    icon = <DeleteBinLine color={color} size={iconSize} />;
+  }
+  if (name === "double-arrow-left") {
+    icon = <DoubleArrowLeft color={color} size={iconSize} />;
+  }
+  if (name === "double-arrow-right") {
+    icon = <DoubleArrowRight color={color} size={iconSize} />;
+  }
+  if (name === "double-quotes-l") {
+    icon = <DoubleQuotesL color={color} size={iconSize} />;
+  }
+  if (name === "download-line") {
+    icon = <DownloadLine color={color} size={iconSize} />;
+  }
+  if (name === "draft-line") {
+    icon = <DraftLine color={color} size={iconSize} />;
+  }
+  if (name === "emotion-line") {
+    icon = <EmotionLine color={color} size={iconSize} />;
+  }
+  if (name === "file-add-fill") {
+    icon = <FileAddFill color={color} size={iconSize} />;
+  }
+  if (name === "file-add-line") {
+    icon = <FileAddLine color={color} size={iconSize} />;
+  }
+  if (name === "file-copy-line") {
+    icon = <FileCopyLine color={color} size={iconSize} />;
+  }
+  if (name === "file-line") {
+    icon = <FileLine color={color} size={iconSize} />;
+  }
+  if (name === "file-search-line") {
+    icon = <FileSearchLine color={color} size={iconSize} />;
+  }
+  if (name === "file-transfer-line") {
+    icon = <FileTransferLine color={color} size={iconSize} />;
+  }
+  if (name === "folder-fill") {
+    icon = <FolderFill color={color} size={iconSize} />;
+  }
+  if (name === "folder") {
+    icon = <Folder size={iconSize} />;
+  }
+  if (name === "folder-line") {
+    icon = <FolderLine color={color} size={iconSize} />;
+  }
+  if (name === "folder-music-line") {
+    icon = <FolderMusicLine color={color} size={iconSize} />;
+  }
+  if (name === "font-color") {
+    icon = <FontColor color={color} size={iconSize} />;
+  }
+  if (name === "font-size-2") {
+    icon = <FontSize2 color={color} size={iconSize} />;
+  }
+  if (name === "format-clear") {
+    icon = <FormatClear color={color} size={iconSize} />;
+  }
+  if (name === "functions") {
+    icon = <Functions color={color} size={iconSize} />;
+  }
+  if (name === "h-1") {
+    icon = <H1 color={color} size={iconSize} />;
+  }
+  if (name === "h-2") {
+    icon = <H2 color={color} size={iconSize} />;
+  }
+  if (name === "h-3") {
+    icon = <H3 color={color} size={iconSize} />;
+  }
+  if (name === "h-4") {
+    icon = <H4 color={color} size={iconSize} />;
+  }
+  if (name === "h-5") {
+    icon = <H5 color={color} size={iconSize} />;
+  }
+  if (name === "h-6") {
+    icon = <H6 color={color} size={iconSize} />;
+  }
+  if (name === "hashtag") {
+    icon = <Hashtag color={color} size={iconSize} />;
+  }
+  if (name === "heading") {
+    icon = <Heading color={color} size={iconSize} />;
+  }
+  if (name === "history-line") {
+    icon = <HistoryLine color={color} size={iconSize} />;
+  }
+  if (name === "image-2-line") {
+    icon = <Image2Line color={color} size={iconSize} />;
+  }
+  if (name === "image-line") {
+    icon = <ImageLine color={color} size={iconSize} />;
+  }
+  if (name === "information-fill") {
+    icon = <InformationFill color={color} size={iconSize} />;
+  }
+  if (name === "information-line") {
+    icon = <InformationLine color={color} size={iconSize} />;
+  }
+  if (name === "indent-decrease") {
+    icon = <IndentDecrease color={color} size={iconSize} />;
+  }
+  if (name === "indent-increase") {
+    icon = <IndentIncrease color={color} size={iconSize} />;
+  }
+  if (name === "italic") {
+    icon = <Italic color={color} size={iconSize} />;
+  }
+  if (name === "link") {
+    icon = <Link color={color} size={iconSize} />;
+  }
+  if (name === "link-m") {
+    icon = <LinkM color={color} size={iconSize} />;
+  }
+  if (name === "list-check") {
+    icon = <ListCheck color={color} size={iconSize} />;
+  }
+  if (name === "list-check-2") {
+    icon = <ListCheck2 color={color} size={iconSize} />;
+  }
+  if (name === "list-ordered") {
+    icon = <ListOrdered color={color} size={iconSize} />;
+  }
+  if (name === "list-unordered") {
+    icon = <ListUnordered color={color} size={iconSize} />;
+  }
+  if (name === "menu") {
+    icon = <Menu color={color} size={iconSize} />;
+  }
+  if (name === "microscope-line") {
+    icon = <MicroscopeLine color={color} size={iconSize} />;
+  }
+  if (name === "more") {
+    icon = <More color={color} size={iconSize} />;
+  }
+  if (name === "more-2-line") {
+    icon = <More2Line color={color} size={iconSize} />;
+  }
+  if (name === "more-line") {
+    icon = <MoreLine color={color} size={iconSize} />;
+  }
+  if (name === "movie-line") {
+    icon = <MovieLine color={color} size={iconSize} />;
+  }
+  if (name === "page") {
+    icon = <Page size={iconSize} />;
+  }
+  if (name === "page-separator") {
+    icon = <PageSeparator color={color} size={iconSize} />;
+  }
+  if (name === "paragraph") {
+    icon = <Paragraph color={color} size={iconSize} />;
+  }
+  if (name === "plus") {
+    icon = <Plus color={color} size={iconSize} />;
+  }
+  if (name === "printer-line") {
+    icon = <PrinterLine color={color} size={iconSize} />;
+  }
+  if (name === "question-mark") {
+    icon = <QuestionMark color={color} size={iconSize} />;
+  }
+  if (name === "search-line") {
+    icon = <SearchLine color={color} size={iconSize} />;
+  }
+  if (name === "separator") {
+    icon = <Separator color={color} size={iconSize} />;
+  }
+  if (name === "settings-4-line") {
+    icon = <Settings4Line color={color} size={iconSize} />;
+  }
+  if (name === "serenity-feather") {
+    icon = <SerenityFeather color={color} size={iconSize} />;
+  }
+  if (name === "stars-s-fill") {
+    icon = <StarSFill color={color} size={iconSize} />;
+  }
+  if (name === "strikethrough") {
+    icon = <Strikethrough color={color} size={iconSize} />;
+  }
+  if (name === "table-2") {
+    icon = <Table2 color={color} size={iconSize} />;
+  }
+  if (name === "text") {
+    icon = <Text color={color} size={iconSize} />;
+  }
+  if (name === "underline") {
+    icon = <Underline color={color} size={iconSize} />;
+  }
+  if (name === "warning-fill") {
+    icon = <WarningFill color={color} size={iconSize} />;
+  }
+
+  if (!icon) return null;
+
+  return <View style={tw`w-${size} h-${size}`}>{icon}</View>;
 };

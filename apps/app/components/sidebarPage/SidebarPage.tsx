@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { StyleSheet, Platform } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
-import { Link as ReactNavigationLink } from "@react-navigation/native";
 import {
   Icon,
   tw,
@@ -9,11 +8,14 @@ import {
   Text,
   ViewProps,
   InlineInput,
+  Pressable,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useDocumentStore } from "../../utils/document/documentStore";
+import { useLinkProps } from "@react-navigation/native";
+import { useIsDesktopDevice } from "@serenity-tools/ui";
 
 type Props = ViewProps & {
   documentId: string;
@@ -24,11 +26,24 @@ type Props = ViewProps & {
 };
 
 export default function SidebarPage(props: Props) {
+  const isDesktopDevice = useIsDesktopDevice();
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const document = useDocumentStore((state) => state.document);
   const documentStore = useDocumentStore();
+  const linkProps = useLinkProps({
+    to: {
+      screen: "Workspace",
+      params: {
+        workspaceId: props.workspaceId,
+        screen: "Page",
+        params: {
+          pageId: props.documentId,
+        },
+      },
+    },
+  });
 
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const { depth = 0 } = props;
@@ -79,7 +94,12 @@ export default function SidebarPage(props: Props) {
               {/* @icon : needs to be here in both versions (isEditing & not) as putting the 
                           InlineInput inside the Link adds weird behaviour we don't want
               */}
-              <Icon name="page" size={20} color={tw.color("gray-600")} />
+              <Icon
+                name="page"
+                size={5}
+                mobileSize={8}
+                color={tw.color("gray-600")}
+              />
               <InlineInput
                 onCancel={() => {
                   setIsEditing(false);
@@ -90,28 +110,24 @@ export default function SidebarPage(props: Props) {
               />
             </HStack>
           ) : (
-            <ReactNavigationLink
+            <Pressable
+              {...linkProps}
               {...focusRingProps} // needed so focus is shown on view-wrapper
-              to={{
-                screen: "Workspace",
-                params: {
-                  workspaceId: props.workspaceId,
-                  screen: "Page",
-                  params: {
-                    pageId: props.documentId,
-                  },
-                },
-              }}
               style={[
                 tw`flex w-full py-1.5`,
                 Platform.OS === "web" && { outlineWidth: 0 }, // override default outline
               ]}
             >
-              <HStack style={tw`grow-1`}>
+              <HStack style={tw`grow-1`} alignItems="center">
                 {/* @icon : needs to be here in both versions (isEditing & not)
                             as we want the clickable area as big as possible
                 */}
-                <Icon name="page" size={20} color={tw.color("gray-600")} />
+                <Icon
+                  name="page"
+                  size={5}
+                  mobileSize={8}
+                  color={tw.color("gray-600")}
+                />
                 {/* TODO check why ellipsis is broken => renders as span .. but why ?? */}
                 <Text
                   variant="small"
@@ -123,11 +139,11 @@ export default function SidebarPage(props: Props) {
                   {props.documentName}
                 </Text>
               </HStack>
-            </ReactNavigationLink>
+            </Pressable>
           )}
         </HStack>
 
-        {isHovered && (
+        {(isHovered || !isDesktopDevice) && (
           <HStack alignItems="center">
             <SidebarPageMenu
               documentId={props.documentId}

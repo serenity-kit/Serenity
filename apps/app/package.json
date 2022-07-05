@@ -7,6 +7,7 @@
     "setup:opaque-client": "cd ../../packages/opaque && yarn build && cd -",
     "setup": "yarn && yarn setup:editor && yarn setup:opaque-client",
     "dev": "yarn setup && API_URL=http://localhost:4000/graphql expo start --dev-client",
+    "dev:speed": "API_URL=http://localhost:4000/graphql expo start --dev-client",
     "dev:staging": "yarn setup && expo start --dev-client",
     "dev:electron-web": "yarn && yarn build:editor && EXPO_ELECTRON_MODE=true expo start --web --dev-client",
     "dev:electron-main": "yarn && electron ./electron/main/index.ts",

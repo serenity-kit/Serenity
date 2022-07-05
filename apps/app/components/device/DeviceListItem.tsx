@@ -49,11 +49,7 @@ export default function DeviceListItem(props: Props) {
             deviceInfoJson.type === "device") && (
             <View>
               <TouchableOpacity onPress={props.onDeletePress}>
-                <Icon
-                  name="close-circle-fill"
-                  size={18}
-                  color={tw.color("gray-800")}
-                />
+                <Icon name="close-circle-fill" color={tw.color("gray-800")} />
               </TouchableOpacity>
             </View>
           )}

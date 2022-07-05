@@ -31,7 +31,8 @@ export function WorkspaceInvitationListItem(props: Props) {
         <TouchableOpacity onPress={props.onDeletePress}>
           <Icon
             name="close-circle-fill"
-            size={18}
+            size={4.5}
+            mobileSize={5.5}
             color={tw.color("gray-800")}
           />
         </TouchableOpacity>

@@ -28,6 +28,7 @@ import {
   BoxShadow,
   BoxShadowLevels,
   InfoMessage,
+  ScrollSafeAreaView,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -35,6 +36,7 @@ import { useWindowDimensions } from "react-native";
 import { VStack, HStack } from "native-base";
 import { theme } from "../../../../tailwind.config";
 import Toast from "react-native-root-toast";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 let counter = 0;
 
@@ -46,7 +48,7 @@ export default function DesignSystemScreen() {
   const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
 
   return (
-    <ScrollView style={tw`px-4 py-6`}>
+    <ScrollSafeAreaView style={tw`px-4 py-6`}>
       <Text style={tw`mb-4 h2`}>Info Messages</Text>
       <Text>Info</Text>
       <VStack space={4} style={tw`max-w-90`}>
@@ -242,7 +244,8 @@ export default function DesignSystemScreen() {
               <Icon
                 name="serenity-feather"
                 color={tw.color("black/40")}
-                size={20}
+                size={5}
+                mobileSize={6}
               />
             </Avatar>
           );
@@ -286,30 +289,29 @@ export default function DesignSystemScreen() {
           >
             <Avatar
               borderRadius={4}
-              size="xxs"
+              size="xs"
               bg={tw.color(`collaboration-emerald`)}
             >
               <Icon
                 name="serenity-feather"
                 color={tw.color("black/35")}
-                size={16}
+                size={5}
+                mobileSize={6}
               />
             </Avatar>
             <Text variant="xs">Happy Workspace</Text>
           </SidebarLink>
-          <SidebarLink
-            to={{ screen: "EncryptDecryptImageTest" }}
-            style={tw`p-menu-item`}
-          >
+          <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
             <Avatar
               borderRadius={4}
-              size="xxs"
+              size="xs"
               bg={tw.color(`collaboration-arctic`)}
             >
               <Icon
                 name="serenity-feather"
                 color={tw.color("black/35")}
-                size={16}
+                size={5}
+                mobileSize={6}
               />
             </Avatar>
             <Text variant="xs">Funny Bunny</Text>
@@ -376,6 +378,13 @@ export default function DesignSystemScreen() {
 
       <Text style={tw`mt-6 mb-4 h2`}>SidebarLink</Text>
       <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+        <Avatar
+          borderRadius={4}
+          size="xs"
+          bg={tw.color(`collaboration-arctic`)}
+        >
+          <Icon name="serenity-feather" color={tw.color("black/35")} />
+        </Avatar>
         <Text>Encrypt / Decrypt Image</Text>
       </SidebarLink>
 
@@ -555,14 +564,14 @@ export default function DesignSystemScreen() {
       <Text style={tw`mt-4 mb-1`}>Icons resized</Text>
       <Columns space={4} alignY="center" alignX="left">
         <Column width="content">
-          <Icon name="list-unordered" size={16} />
+          <Icon name="list-unordered" />
         </Column>
         <Column width="content">
-          <Icon name="list-unordered" size={32} />
+          <Icon name="list-unordered" size={8} mobileSize={9} />
         </Column>
       </Columns>
       <Text style={tw`mt-4 mb-1`}>Icons coloured</Text>
       <Icon name="list-check-2" color={tw.color("primary-500")} />
-    </ScrollView>
+    </ScrollSafeAreaView>
   );
 }
