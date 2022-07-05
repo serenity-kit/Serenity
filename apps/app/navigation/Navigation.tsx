@@ -10,7 +10,6 @@ import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 
 import NotFoundScreen from "./screens/NotFoundScreen";
-import EditorScreen from "./screens/EditorScreen";
 import { RootStackParamList } from "../types";
 import NoPageExistsScreen from "./screens/NoPageExistsScreen";
 import DevDashboardScreen from "./screens/DevDashboardScreen";
@@ -85,10 +84,8 @@ function WorkspaceStackScreen(props) {
           component={NoPageExistsScreen}
           options={{ headerShown: false }}
         />
-        <Drawer.Screen name="Editor" component={EditorScreen} />
         <Drawer.Screen name="Page" component={PageScreen} />
         <Drawer.Screen name="Settings" component={WorkspaceSettingsScreen} />
-        <Drawer.Screen name="TestLibsodium" component={LibsodiumTestScreen} />
         <Drawer.Screen
           name="WorkspaceRoot"
           component={WorkspaceRootScreen}
@@ -139,6 +136,7 @@ function RootNavigator() {
         name="EncryptDecryptImageTest"
         component={EncryptDecryptImageTestScreen}
       />
+      <Stack.Screen name="TestLibsodium" component={LibsodiumTestScreen} />
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
@@ -161,16 +159,14 @@ const linking: LinkingOptions<RootStackParamList> = {
         path: "/workspace/:workspaceId",
         screens: {
           NoPageExists: "no-page-exits",
-          Editor: "editor",
           Page: "page/:pageId",
-          TestLibsodium: "test-libsodium",
           Settings: "settings",
+          DeviceManager: "devices",
           WorkspaceRoot: "",
         },
       },
       Onboarding: "onboarding",
       DevDashboard: "dev-dashboard",
-      DeviceManager: "devices",
       DesignSystem: "design-system",
       Register: "register",
       RegistrationVerification: "registration-verification",
@@ -178,6 +174,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       EncryptDecryptImageTest: "encrypt-decrypt-image-test",
       AcceptWorkspaceInvitation:
         "accept-workspace-invitation/:workspaceInvitationId",
+      TestLibsodium: "test-libsodium",
       Root: "",
       NotFound: "*",
     },

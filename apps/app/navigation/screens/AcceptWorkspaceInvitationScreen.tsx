@@ -74,7 +74,7 @@ export default function AcceptWorkspaceInvitationScreen(
       }
       props.navigation.navigate("Workspace", {
         workspaceId: workspace.id,
-        screen: "Editor",
+        screen: "WorkspaceRoot",
       });
     }
   };
