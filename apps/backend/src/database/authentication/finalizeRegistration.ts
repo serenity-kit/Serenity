@@ -14,9 +14,8 @@ type Props = {
   mainDevice: DeviceInput;
 };
 
-// TODO: move this into a helper function that is accessible to the ui
 const createConfirmationCode = async (): Promise<string> => {
-  const length = 6;
+  const length = 8;
   const confirmationCode: number[] = new Array(length);
   for (let i = 0; i < length; i++) {
     confirmationCode[i] = await sodium.randombytes_uniform(10);
