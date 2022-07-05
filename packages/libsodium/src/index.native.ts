@@ -27,6 +27,13 @@ export const randombytes_buf = async (length: number): Promise<string> => {
   return base64ToUrlSafeBase64(result);
 };
 
+export const randombytes_uniform = async (
+  upperBound: number
+): Promise<number> => {
+  const result = await sodium.randombytes_uniform(upperBound);
+  return result;
+};
+
 export const crypto_sign_keypair = async (): Promise<StringKeyPair> => {
   const result = await sodium.crypto_sign_keypair();
   return {
@@ -159,6 +166,7 @@ export default {
   from_base64,
   from_base64_to_string,
   randombytes_buf,
+  randombytes_uniform,
   crypto_pwhash,
   crypto_box_keypair,
   crypto_sign_keypair,
