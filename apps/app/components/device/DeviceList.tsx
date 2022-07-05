@@ -12,6 +12,7 @@ export default function DeviceList(props: Props) {
   return (
     <FlatList
       data={props.devices}
+      keyExtractor={(item) => item.signingPublicKey}
       renderItem={({ item }) => (
         <DeviceListItem
           signingPublicKey={item.signingPublicKey}

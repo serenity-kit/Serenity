@@ -37,6 +37,7 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { useEffect, useState } from "react";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
+import { Platform } from "react-native";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
@@ -203,7 +204,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             <IconButton
               onPress={() => {
                 setIsOpenWorkspaceSwitcher(false);
-                setShowCreateWorkspaceModal(true);
+                // on mobile Modals can't be open at the same time
+                // and closing the workspace switcher takes a bit of time
+                const timeout = Platform.OS === "web" ? 0 : 400;
+                setTimeout(() => {
+                  setShowCreateWorkspaceModal(true);
+                }, timeout);
               }}
               name="plus"
               label="Create workspace"
