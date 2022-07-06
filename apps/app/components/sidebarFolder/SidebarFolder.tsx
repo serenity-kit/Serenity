@@ -203,14 +203,21 @@ export default function SidebarFolder(props: Props) {
               _web: { style: { outlineWidth: 0, flexGrow: 1 } },
             }}
           >
-            <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
-              <View style={tw`ml-0.5 -mr-0.5`}>
+            <HStack
+              alignItems="center"
+              style={tw`py-3 md:py-1.5 pl-3.5 md:pl-2.5`}
+            >
+              <View style={tw`ml-${depth} md:ml-0`}>
                 <Icon
                   name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
-                  color={tw.color("gray-600")}
+                  color={tw.color(isDesktopDevice ? "gray-600" : "gray-400")}
+                  mobileSize={5}
                 />
               </View>
-              <Icon name="folder" size={5} mobileSize={8} />
+              <View style={tw`-ml-0.5`}>
+                <Icon name="folder" size={5} mobileSize={8} />
+              </View>
+
               {isEditing === "name" ? (
                 <InlineInput
                   onSubmit={updateFolderName}
@@ -245,7 +252,7 @@ export default function SidebarFolder(props: Props) {
           )}
 
           {(isHovered || !isDesktopDevice) && (
-            <HStack alignItems="center" space={1} style={tw`pr-2`}>
+            <HStack alignItems="center" space={1} style={tw`pr-3 md:pr-2`}>
               <SidebarFolderMenu
                 folderId={props.folderId}
                 refetchFolders={refetchFolders}
@@ -261,6 +268,7 @@ export default function SidebarFolder(props: Props) {
                   onPress={createDocument}
                   name="file-add-line"
                   color="gray-600"
+                  style={tw`p-2 md:p-0`}
                 ></IconButton>
               </Tooltip>
               {documentsResult.fetching ||

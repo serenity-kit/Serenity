@@ -99,7 +99,10 @@ export default function SidebarPage(props: Props) {
             _web: { style: { outlineWidth: 0, flexGrow: 1 } },
           }}
         >
-          <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
+          <HStack
+            alignItems="center"
+            style={tw`py-3 md:py-1.5 pl-${5 + depth} md:pl-2.5`}
+          >
             <Icon
               name="page"
               size={5}
@@ -130,7 +133,7 @@ export default function SidebarPage(props: Props) {
         </Pressable>
 
         {(isHovered || !isDesktopDevice) && (
-          <HStack alignItems="center" space={1} style={tw`pr-2`}>
+          <HStack alignItems="center" space={1} style={tw`pr-3 md:pr-2`}>
             <SidebarPageMenu
               documentId={props.documentId}
               refetchDocuments={props.onRefetchDocumentsPress}
