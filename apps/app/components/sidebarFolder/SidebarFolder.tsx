@@ -196,7 +196,7 @@ export default function SidebarFolder(props: Props) {
               setIsOpen((currentIsOpen) => !currentIsOpen);
             }}
             style={[
-              tw`grow-1`, // needed so clickable area is as large as possible
+              tw`grow-1 pl-${depth * 3}`, // needed so clickable area is as large as possible
             ]}
             // disable default outline styles and add 1 overridden style manually (grow)
             _focusVisible={{
@@ -284,8 +284,6 @@ export default function SidebarFolder(props: Props) {
                     workspaceId={props.workspaceId}
                     folderName={folder.name}
                     onStructureChange={props.onStructureChange}
-                    // needs to be here as a padding for hovering bg-color change
-                    style={tw`pl-${3 + depth * 3}`}
                     depth={depth + 1}
                   />
                 );
@@ -303,9 +301,7 @@ export default function SidebarFolder(props: Props) {
                     documentName={document.name || "Untitled"}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}
-                    // needs to be here as a padding for hovering bg-color change
-                    style={tw`pl-${9.5 + depth * 3}`}
-                    depth={depth + 1}
+                    depth={depth}
                   />
                 );
               })
