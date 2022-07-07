@@ -3,7 +3,7 @@ import {
   ReactNativeModal,
   ModalProps as ReactNativeModalProps,
 } from "react-native-modal";
-import { StyleSheet, Platform } from "react-native";
+import { StyleSheet } from "react-native";
 import { Box } from "../box/Box";
 import { tw } from "../../tailwind";
 
