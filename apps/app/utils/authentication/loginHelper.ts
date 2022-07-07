@@ -96,10 +96,14 @@ export const fetchMainDevice = async ({
  *          and stringified JSON device info
  */
 export const createSetAndRegisterDevice = async (): Promise<any> => {
+  let type = "device";
+  if (Platform.OS === "web") {
+    type = "web";
+  }
   const { signingPrivateKey, encryptionPrivateKey, ...platformDevice } =
     await createAndSetDevice();
   const deviceInfoJson = {
-    type: "device",
+    type,
     os: browser?.os,
     osVersion: Platform.Version,
     browser: null,
