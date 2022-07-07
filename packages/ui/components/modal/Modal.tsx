@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useCallback } from "react";
 import {
   ReactNativeModal,
   ModalProps as ReactNativeModalProps,
@@ -13,8 +13,6 @@ type ModalProps = Pick<
 >;
 
 export const Modal = React.forwardRef(({ ...rest }: ModalProps, ref: any) => {
-  const [isVisible, setIsVisible] = useState(rest.isVisible);
-
   const styles = StyleSheet.create({
     modal: tw`items-center`, // needed to horizontally center the box
     box: tw`p-6`,
@@ -32,10 +30,6 @@ export const Modal = React.forwardRef(({ ...rest }: ModalProps, ref: any) => {
       document.removeEventListener("keydown", closeModalOnEscape);
     };
   }, [closeModalOnEscape]);
-
-  useEffect(() => {
-    setIsVisible(rest.isVisible);
-  }, [rest.isVisible]);
 
   return (
     <ReactNativeModal
