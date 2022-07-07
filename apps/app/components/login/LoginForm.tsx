@@ -24,6 +24,10 @@ import {
 import { useClient } from "urql";
 import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
 import { detect } from "detect-browser";
+import {
+  createAndSetDevice,
+  removeDevice,
+} from "../../utils/device/deviceStore";
 const browser = detect();
 
 type Props = {
@@ -36,9 +40,15 @@ type Props = {
 
 export function LoginForm(props: Props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+  let defaultUseExtendedLogin = false;
+  if (Platform.OS === "ios") {
+    defaultUseExtendedLogin = true;
+  }
   const [username, _setUsername] = useState("");
   const [password, _setPassword] = useState("");
-  const [useExtendedLogin, setUseExtendedLogin] = useState(false);
+  const [useExtendedLogin, setUseExtendedLogin] = useState(
+    defaultUseExtendedLogin
+  );
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const [gqlErrorMessage, setGqlErrorMessage] = useState("");
@@ -103,6 +113,28 @@ export function LoginForm(props: Props) {
           });
         } else {
           await removeWebDevice();
+        }
+      } else if (Platform.OS === "ios") {
+        if (useExtendedLogin) {
+          const { signingPrivateKey, encryptionPrivateKey, ...iosDevice } =
+            await createAndSetDevice();
+          const deviceInfoJson = {
+            type: "device",
+            os: browser?.os,
+            osVersion: Platform.Version,
+            browser: null,
+            browserVersion: null,
+          };
+          const deviceInfo = JSON.stringify(deviceInfoJson);
+          const newDeviceInfo = {
+            ...iosDevice,
+            info: deviceInfo,
+          };
+          await createDeviceMutation({
+            input: newDeviceInfo,
+          });
+        } else {
+          removeDevice();
         }
       }
       setPassword("");

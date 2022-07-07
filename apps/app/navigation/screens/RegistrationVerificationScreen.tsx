@@ -9,7 +9,10 @@ import {
   InfoMessage,
 } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types/navigation";
-import { useVerifyRegistrationMutation } from "../../generated/graphql";
+import {
+  useCreateDeviceMutation,
+  useVerifyRegistrationMutation,
+} from "../../generated/graphql";
 import {
   isUsernamePasswordStored,
   getStoredUsername,
@@ -29,6 +32,11 @@ import {
   navigateToNextAuthenticatedPage,
 } from "../../utils/authentication/loginHelper";
 import { useClient } from "urql";
+import { Platform } from "react-native";
+import { createDevice } from "@serenity-tools/common";
+import { detect } from "detect-browser";
+import { createAndSetDevice } from "../../utils/device/deviceStore";
+const browser = detect();
 
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
@@ -43,10 +51,33 @@ export default function RegistrationVerificationScreen(
   const { updateAuthentication } = useAuthentication();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
+  const [, createDeviceMutation] = useCreateDeviceMutation();
   const urqlClient = useClient();
 
   const navigateToLoginScreen = () => {
     props.navigation.push("Login", {});
+  };
+
+  const registerNewDevice = async () => {
+    if (Platform.OS == "ios") {
+      const { signingPrivateKey, encryptionPrivateKey, ...iosDevice } =
+        await createAndSetDevice();
+      const deviceInfoJson = {
+        type: "device",
+        os: browser?.os,
+        osVersion: Platform.Version,
+        browser: null,
+        browserVersion: null,
+      };
+      const deviceInfo = JSON.stringify(deviceInfoJson);
+      const newDeviceInfo = {
+        ...iosDevice,
+        info: deviceInfo,
+      };
+      await createDeviceMutation({
+        input: newDeviceInfo,
+      });
+    }
   };
 
   const loginWithStoredUsernamePassword = async () => {
@@ -97,6 +128,7 @@ export default function RegistrationVerificationScreen(
       if (isUsernamePasswordStored()) {
         await loginWithStoredUsernamePassword();
       } else {
+        await registerNewDevice();
         navigateToLoginScreen();
       }
     } catch (err) {

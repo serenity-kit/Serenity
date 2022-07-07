@@ -29,10 +29,13 @@ import { useCallback, useEffect, useMemo } from "react";
 import { devtoolsExchange } from "@urql/devtools";
 import { theme } from "../../tailwind.config";
 import { OpaqueBridge } from "@serenity-tools/opaque";
-import * as storage from "./utils/storage/storage";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { getWebDevice } from "./utils/device/webDeviceStore";
 import Constants from "expo-constants";
+import {
+  deleteSessionKey,
+  getSessionKey,
+} from "./utils/authentication/sessionKeyStore";
 
 // import { clearLocalSessionData } from "./utils/authentication/clearLocalSessionData";
 // clearLocalSessionData();
@@ -88,13 +91,14 @@ const exchanges = [
     },
     getAuth: async ({ authState }) => {
       if (!authState) {
+        // check for login
         try {
-          const sessionKey = await storage.getItem("sessionKey");
+          const sessionKey = await getSessionKey();
           if (sessionKey) {
             return { sessionKey };
           }
         } catch (err) {
-          // TODO: explain why fetching the webdevice failed
+          // TODO: explain why fetching the sessionKey failed
           console.error(err);
         }
       }
@@ -132,10 +136,10 @@ export default function App() {
     async (session: { sessionKey: string; expiresAt: string } | null) => {
       if (session) {
         setSessionKey(session.sessionKey);
-        await storage.setItem("sessionKey", session.sessionKey);
+        await setSessionKey(session.sessionKey);
       } else {
         setSessionKey(null);
-        await storage.removeItem("sessionKey");
+        await deleteSessionKey();
       }
     },
     [setSessionKey]

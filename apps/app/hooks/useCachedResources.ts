@@ -1,9 +1,7 @@
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
-import { getMainDevice } from "../utils/device/mainDeviceMemoryStore";
-import { getWebDevice } from "../utils/device/webDeviceStore";
-import * as storage from "../utils/storage/storage";
+import { getSessionKey } from "../utils/authentication/sessionKeyStore";
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
@@ -14,12 +12,11 @@ export default function useCachedResources() {
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHideAsync();
-
         // Load fonts
         await Font.loadAsync({
           "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
         });
-        const sessionKey = await storage.getItem("sessionKey");
+        const sessionKey = await getSessionKey();
         setSessionKey(sessionKey);
       } catch (e) {
         // We might want to provide this error information to an error reporting service
