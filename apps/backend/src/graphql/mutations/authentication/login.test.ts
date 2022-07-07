@@ -14,9 +14,6 @@ beforeAll(async () => {
 });
 
 test("server should register a user", async () => {
-  // FIRST TEST ONLY: register a user.
-  // we can't run this in beforeAll() because `graphql` isnt' set up
-  // generate registration challenge
   await registerUser(graphql, username, password);
 });
 

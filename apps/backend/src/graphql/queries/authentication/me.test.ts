@@ -8,21 +8,17 @@ let userId = "";
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 const username2 = "08844f05-ef88-4ac0-acf8-1e5163c2dcdb@example.com";
 const password = "password";
-let didRegisterUser = false;
 let sessionKey = "";
+
+const setup = async () => {
+  const registerUserResult = await registerUser(graphql, username, password);
+  userId = registerUserResult.userId;
+  sessionKey = registerUserResult.sessionKey;
+};
 
 beforeAll(async () => {
   await deleteAllRecords();
-});
-
-beforeEach(async () => {
-  // TODO: we don't want this before every test
-  if (!didRegisterUser) {
-    const registerUserResult = await registerUser(graphql, username, password);
-    userId = registerUserResult.userId;
-    sessionKey = registerUserResult.sessionKey;
-    didRegisterUser = true;
-  }
+  await setup();
 });
 
 test("user should be be able to get their username", async () => {

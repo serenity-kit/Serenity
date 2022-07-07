@@ -10,44 +10,40 @@ const graphql = setupGraphql();
 const username = "user1";
 const password = "password";
 let sessionKey = "";
-let isUserRegistered = false;
 let addedWorkspace: any = null;
 let addedFolderId: any = null;
 
+const setup = async () => {
+  const registerUserResult = await registerUser(graphql, username, password);
+  sessionKey = registerUserResult.sessionKey;
+
+  const createWorkspaceResult = await createInitialWorkspaceStructure({
+    workspaceName: "workspace 1",
+    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+    folderName: "Getting started",
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey,
+  });
+  addedWorkspace =
+    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  const createFolderResult = await createFolder({
+    graphql,
+    id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+    name: null,
+    parentFolderId: null,
+    authorizationHeader: sessionKey,
+    workspaceId: addedWorkspace.id,
+  });
+  addedFolderId = createFolderResult.createFolder.folder.id;
+};
+
 beforeAll(async () => {
   await deleteAllRecords();
-});
-
-beforeEach(async () => {
-  // TODO: we don't want this before every test
-  if (!isUserRegistered) {
-    const registerUserResult = await registerUser(graphql, username, password);
-    sessionKey = registerUserResult.sessionKey;
-
-    isUserRegistered = true;
-    const createWorkspaceResult = await createInitialWorkspaceStructure({
-      workspaceName: "workspace 1",
-      workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-      folderName: "Getting started",
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey,
-    });
-    addedWorkspace =
-      createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-    const createFolderResult = await createFolder({
-      graphql,
-      id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-      name: null,
-      parentFolderId: null,
-      authorizationHeader: sessionKey,
-      workspaceId: addedWorkspace.id,
-    });
-    addedFolderId = createFolderResult.createFolder.folder.id;
-  }
+  await setup();
 });
 
 test("user should be able to change a folder name", async () => {
@@ -93,8 +89,6 @@ test("throw error when user doesn't have access", async () => {
   const username2 = "user2";
   const registerUserResult = await registerUser(graphql, username2, password);
   sessionKey = registerUserResult.sessionKey;
-
-  isUserRegistered = true;
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     workspaceName: "workspace 1",
     workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",

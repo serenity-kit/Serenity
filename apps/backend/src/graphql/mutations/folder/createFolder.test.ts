@@ -8,35 +8,31 @@ import { v4 as uuidv4 } from "uuid";
 const graphql = setupGraphql();
 const username = "user1";
 const password = "password";
-let isUserRegistered = false;
 let addedWorkspace: any = null;
 let sessionKey = "";
 
+const setup = async () => {
+  const registerUserResult = await registerUser(graphql, username, password);
+  sessionKey = registerUserResult.sessionKey;
+
+  const createWorkspaceResult = await createInitialWorkspaceStructure({
+    workspaceName: "workspace 1",
+    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+    folderName: "Getting started",
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey,
+  });
+  addedWorkspace =
+    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+};
+
 beforeAll(async () => {
   await deleteAllRecords();
-});
-
-beforeEach(async () => {
-  // TODO: we don't want this before every test
-  if (!isUserRegistered) {
-    isUserRegistered = true;
-    const registerUserResult = await registerUser(graphql, username, password);
-    sessionKey = registerUserResult.sessionKey;
-
-    const createWorkspaceResult = await createInitialWorkspaceStructure({
-      workspaceName: "workspace 1",
-      workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-      folderName: "Getting started",
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey,
-    });
-    addedWorkspace =
-      createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-  }
+  await setup();
 });
 
 test("user should be able to create a root folder", async () => {
@@ -161,7 +157,6 @@ test("Throw error when user doesn't have access", async () => {
   // create a new user with access to different documents
   const username2 = "user2";
   const registerUserResult = await registerUser(graphql, username2, password);
-  isUserRegistered = true;
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     workspaceName: "workspace 1",
     workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",

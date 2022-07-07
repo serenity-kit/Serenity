@@ -11,46 +11,37 @@ const username = "user";
 let userId2 = "";
 const username2 = "user1";
 const password = "password";
-let isUserRegistered = false;
 let addedWorkspace: any = null;
 let sessionKey1 = "";
 let sessionKey2 = "";
-let sessionKey3 = "";
+
+const setup = async () => {
+  const registerUserResult1 = await registerUser(graphql, username, password);
+  sessionKey1 = registerUserResult1.sessionKey;
+  userId1 = registerUserResult1.userId;
+
+  const registerUserResult2 = await registerUser(graphql, username2, password);
+  sessionKey2 = registerUserResult2.sessionKey;
+  userId2 = registerUserResult2.userId;
+
+  const createWorkspaceResult = await createInitialWorkspaceStructure({
+    workspaceName: "workspace 1",
+    workspaceId: "abc",
+    folderName: "Getting started",
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey1,
+  });
+  addedWorkspace =
+    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+};
 
 beforeAll(async () => {
   await deleteAllRecords();
-});
-
-beforeEach(async () => {
-  // TODO: we don't want this before every test
-  if (!isUserRegistered) {
-    const registerUserResult1 = await registerUser(graphql, username, password);
-    sessionKey1 = registerUserResult1.sessionKey;
-    userId1 = registerUserResult1.userId;
-
-    const registerUserResult2 = await registerUser(
-      graphql,
-      username2,
-      password
-    );
-    sessionKey2 = registerUserResult2.sessionKey;
-    userId2 = registerUserResult2.userId;
-
-    const createWorkspaceResult = await createInitialWorkspaceStructure({
-      workspaceName: "workspace 1",
-      workspaceId: "abc",
-      folderName: "Getting started",
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey1,
-    });
-    addedWorkspace =
-      createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-    isUserRegistered = true;
-  }
+  await setup();
 });
 
 test("user won't update the name when not set", async () => {

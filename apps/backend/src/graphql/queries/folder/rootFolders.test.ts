@@ -10,11 +10,6 @@ const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 const username2 = "68776484-0e46-4027-a6f4-8bdeef185b73@example.com";
 const password = "password";
-let didRegisterUser = false;
-
-beforeAll(async () => {
-  await deleteAllRecords();
-});
 
 const workspaceId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
 const otherWorkspaceId = "929ca262-f144-40f7-8fe2-d3147f415f26";
@@ -26,52 +21,49 @@ const otherFolderId = "c1c65251-7471-4893-a1b5-e3df937caf66";
 let sessionKey = "";
 let sessionKey2 = "";
 
-beforeEach(async () => {
-  // TODO: we don't want this before every test
-  if (!didRegisterUser) {
-    const registerUserResult = await registerUser(graphql, username, password);
-    sessionKey = registerUserResult.sessionKey;
+const setup = async () => {
+  const registerUserResult = await registerUser(graphql, username, password);
+  sessionKey = registerUserResult.sessionKey;
 
-    await createInitialWorkspaceStructure({
-      workspaceName: "workspace 1",
-      workspaceId: workspaceId,
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      folderName: "Getting started",
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey,
-    });
-    didRegisterUser = true;
+  await createInitialWorkspaceStructure({
+    workspaceName: "workspace 1",
+    workspaceId: workspaceId,
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    folderName: "Getting started",
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey,
+  });
 
-    const registerUserResult2 = await registerUser(
-      graphql,
-      username2,
-      password
-    );
-    sessionKey2 = registerUserResult2.sessionKey;
+  const registerUserResult2 = await registerUser(graphql, username2, password);
+  sessionKey2 = registerUserResult2.sessionKey;
 
-    await createInitialWorkspaceStructure({
-      workspaceName: "other user workspace",
-      workspaceId: otherWorkspaceId,
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      folderName: "Getting started",
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey2,
-    });
-    const createOtherFolderResult = await createFolder({
-      graphql,
-      name: null,
-      id: otherFolderId,
-      parentFolderId: null,
-      authorizationHeader: sessionKey2,
-      workspaceId: otherWorkspaceId,
-    });
-  }
+  await createInitialWorkspaceStructure({
+    workspaceName: "other user workspace",
+    workspaceId: otherWorkspaceId,
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    folderName: "Getting started",
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey2,
+  });
+  const createOtherFolderResult = await createFolder({
+    graphql,
+    name: null,
+    id: otherFolderId,
+    parentFolderId: null,
+    authorizationHeader: sessionKey2,
+    workspaceId: otherWorkspaceId,
+  });
+};
+
+beforeAll(async () => {
+  await deleteAllRecords();
+  await setup();
 });
 
 test("user should be able to list folders in a workspace when preloaded with initial workspace", async () => {

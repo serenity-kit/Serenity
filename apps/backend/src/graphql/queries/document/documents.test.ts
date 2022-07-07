@@ -11,13 +11,8 @@ const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 const username2 = "68776484-0e46-4027-a6f4-8bdeef185b73@example.com";
 const password = "password";
-let didRegisterUser = false;
 let sessionKey = "";
 let sessionKey2 = "";
-
-beforeAll(async () => {
-  await deleteAllRecords();
-});
 
 const workspaceId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
 const otherWorkspaceId = "929ca262-f144-40f7-8fe2-d3147f415f26";
@@ -28,80 +23,74 @@ const otherFolderId = "c1c65251-7471-4893-a1b5-e3df937caf66";
 const documentId1 = "3530b9ed-11f3-44c7-9e16-7dba1e14815f";
 const documentId2 = "9e911f29-7a86-480b-89d7-5c647f21317f";
 const childDocumentId = "929ca262-f144-40f7-8fe2-d3147f415f26";
-const otherDocumentId = "c1c65251-7471-4893-a1b5-e3df937caf66";
 
-beforeEach(async () => {
-  // TODO: we don't want this before every test
-  if (!didRegisterUser) {
-    const registerUserResult = await registerUser(graphql, username, password);
-    sessionKey = registerUserResult.sessionKey;
+const setup = async () => {
+  const registerUserResult = await registerUser(graphql, username, password);
+  sessionKey = registerUserResult.sessionKey;
 
-    await createInitialWorkspaceStructure({
-      workspaceName: "workspace 1",
-      workspaceId: workspaceId,
-      folderName: "Getting started",
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey,
-    });
-    const createParentFolderResult = await createFolder({
-      graphql,
-      id: parentFolderId,
-      name: null,
-      parentFolderId: null,
-      authorizationHeader: sessionKey,
-      workspaceId: workspaceId,
-    });
-    const createFolderResult = await createFolder({
-      graphql,
-      id: folderId,
-      name: null,
-      parentFolderId: parentFolderId,
-      authorizationHeader: sessionKey,
-      workspaceId: workspaceId,
-    });
-    const createChildFolderResult = await createFolder({
-      graphql,
-      id: childFolderId,
-      name: null,
-      parentFolderId: folderId,
-      authorizationHeader: sessionKey,
-      workspaceId: workspaceId,
-    });
-    didRegisterUser = true;
+  await createInitialWorkspaceStructure({
+    workspaceName: "workspace 1",
+    workspaceId: workspaceId,
+    folderName: "Getting started",
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey,
+  });
+  const createParentFolderResult = await createFolder({
+    graphql,
+    id: parentFolderId,
+    name: null,
+    parentFolderId: null,
+    authorizationHeader: sessionKey,
+    workspaceId: workspaceId,
+  });
+  const createFolderResult = await createFolder({
+    graphql,
+    id: folderId,
+    name: null,
+    parentFolderId: parentFolderId,
+    authorizationHeader: sessionKey,
+    workspaceId: workspaceId,
+  });
+  const createChildFolderResult = await createFolder({
+    graphql,
+    id: childFolderId,
+    name: null,
+    parentFolderId: folderId,
+    authorizationHeader: sessionKey,
+    workspaceId: workspaceId,
+  });
+  const registerUserResult2 = await registerUser(graphql, username2, password);
+  sessionKey2 = registerUserResult2.sessionKey;
 
-    const registerUserResult2 = await registerUser(
-      graphql,
-      username2,
-      password
-    );
-    sessionKey2 = registerUserResult2.sessionKey;
+  await createInitialWorkspaceStructure({
+    workspaceName: "other user workspace",
+    workspaceId: otherWorkspaceId,
+    folderName: "Getting started",
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey2,
+  });
+  const createOtherFolderResult = await createFolder({
+    graphql,
+    id: otherFolderId,
+    name: null,
+    parentFolderId: null,
+    authorizationHeader: sessionKey2,
+    workspaceId: otherWorkspaceId,
+  });
+};
 
-    await createInitialWorkspaceStructure({
-      workspaceName: "other user workspace",
-      workspaceId: otherWorkspaceId,
-      folderName: "Getting started",
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey2,
-    });
-    const createOtherFolderResult = await createFolder({
-      graphql,
-      id: otherFolderId,
-      name: null,
-      parentFolderId: null,
-      authorizationHeader: sessionKey2,
-      workspaceId: otherWorkspaceId,
-    });
-  }
+beforeAll(async () => {
+  await deleteAllRecords();
+  await setup();
 });
-
 test("user should be able to list documents in a folder when empty", async () => {
   const authorizationHeader = { authorization: sessionKey };
   // get root folders from graphql

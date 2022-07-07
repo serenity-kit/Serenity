@@ -15,7 +15,6 @@ const inviter2Username = "inviter2@example.com";
 beforeAll(async () => {
   await deleteAllRecords();
 });
-beforeEach(async () => {});
 
 test("should return a list of workspace invitations if they are admin", async () => {
   const inviterUserAndDevice1 = await createUserWithWorkspace({
