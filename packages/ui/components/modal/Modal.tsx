@@ -35,7 +35,6 @@ export const Modal = React.forwardRef(({ ...rest }: ModalProps, ref: any) => {
     <ReactNativeModal
       ref={ref}
       {...rest}
-      isVisible={isVisible}
       animationIn="fadeIn"
       animationOut="fadeOut"
       animationInTiming={150}
