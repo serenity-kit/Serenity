@@ -1,4 +1,3 @@
-import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";

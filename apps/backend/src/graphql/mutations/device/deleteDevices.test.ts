@@ -5,7 +5,6 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
 import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
-import { loginUser } from "../../../../test/helpers/loginUser";
 
 const graphql = setupGraphql();
 const username1 = "user1";

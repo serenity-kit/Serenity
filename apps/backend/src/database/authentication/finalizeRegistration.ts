@@ -1,5 +1,6 @@
 import { prisma } from "../prisma";
 import * as sodium from "@serenity-tools/libsodium";
+import { createConfirmationCode } from "../../utils/confirmationCode";
 import { Device } from "../../types/device";
 
 type DeviceInput = Device & {
@@ -12,15 +13,6 @@ type Props = {
   username: string;
   opaqueEnvelope: string;
   mainDevice: DeviceInput;
-};
-
-const createConfirmationCode = async (): Promise<string> => {
-  const length = 8;
-  const confirmationCode: number[] = new Array(length);
-  for (let i = 0; i < length; i++) {
-    confirmationCode[i] = await sodium.randombytes_uniform(10);
-  }
-  return confirmationCode.join("");
 };
 
 const verifyDevice = async (device: DeviceInput) => {

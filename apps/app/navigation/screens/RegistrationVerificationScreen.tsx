@@ -43,6 +43,10 @@ export default function RegistrationVerificationScreen(
   const { updateAuthentication } = useAuthentication();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
+
+  const [invalidCodeError, setInvalidCodeError] = useState(false);
+  const [maxRetriesError, setMaxRetriesError] = useState(false);
+  const [invalidUserError, setInvalidUserError] = useState(false);
   const urqlClient = useClient();
 
   const navigateToLoginScreen = () => {
@@ -90,9 +94,31 @@ export default function RegistrationVerificationScreen(
           verificationCode,
         },
       });
-      if (!verifyRegistrationResult.data?.verifyRegistration) {
-        setErrorMessage("Verification failed.");
+      console.log({ verifyRegistrationResult });
+      if (verifyRegistrationResult.error?.message) {
+        console.log({ message: verifyRegistrationResult.error.message });
+        const errorMessage = verifyRegistrationResult.error.message;
+        setErrorMessage("");
+        if (errorMessage === "[GraphQL] Invalid user") {
+          setInvalidCodeError(false);
+          setMaxRetriesError(false);
+          setInvalidUserError(true);
+        } else if (
+          errorMessage === "[GraphQL] Invalid confirmation code. Code reset."
+        ) {
+          setInvalidCodeError(false);
+          setMaxRetriesError(true);
+          setInvalidUserError(false);
+        } else {
+          setInvalidCodeError(true);
+          setMaxRetriesError(false);
+          setInvalidUserError(false);
+        }
         return;
+      } else {
+        setInvalidCodeError(false);
+        setMaxRetriesError(false);
+        setInvalidUserError(false);
       }
       if (isUsernamePasswordStored()) {
         await loginWithStoredUsernamePassword();
@@ -100,6 +126,7 @@ export default function RegistrationVerificationScreen(
         navigateToLoginScreen();
       }
     } catch (err) {
+      console.log(err);
       setErrorMessage("Verification failed.");
     }
   };
@@ -121,6 +148,27 @@ export default function RegistrationVerificationScreen(
         {errorMessage ? (
           <InfoMessage variant="error" icon>
             <Text>{errorMessage}</Text>
+          </InfoMessage>
+        ) : null}
+
+        {invalidUserError ? (
+          <InfoMessage variant="error" icon>
+            <Text>The username you provided wasn't registered.</Text>
+          </InfoMessage>
+        ) : null}
+
+        {invalidCodeError ? (
+          <InfoMessage variant="error" icon>
+            <Text>The verification code was wrong.</Text>
+          </InfoMessage>
+        ) : null}
+
+        {maxRetriesError ? (
+          <InfoMessage variant="error" icon>
+            <Text>
+              The code was wrong. We reset your confirmation code and sent you a
+              new email. Please try again with the new code.
+            </Text>
           </InfoMessage>
         ) : null}
 

@@ -2,7 +2,7 @@ import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { requestRegistrationChallengeResponse } from "../../../../test/helpers/requestRegistrationChallengeResponse";
+import { requestRegistrationChallengeResponse } from "../../../../test/helpers/authentication/requestRegistrationChallengeResponse";
 import { createAndEncryptDevice } from "@serenity-tools/common";
 
 const graphql = setupGraphql();

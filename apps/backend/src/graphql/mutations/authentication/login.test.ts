@@ -2,8 +2,8 @@ import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import sodium from "libsodium-wrappers";
-import { registerUser } from "../../../../test/helpers/registerUser";
-import { requestLoginChallengeResponse } from "../../../../test/helpers/requestLoginChallengeResponse";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
+import { requestLoginChallengeResponse } from "../../../../test/helpers/authentication/requestLoginChallengeResponse";
 
 const graphql = setupGraphql();
 const username = "user";
