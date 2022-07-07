@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   ReactNativeModal,
   ModalProps as ReactNativeModalProps,
 } from "react-native-modal";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { Box } from "../box/Box";
 import { tw } from "../../tailwind";
 
@@ -13,15 +13,35 @@ type ModalProps = Pick<
 >;
 
 export const Modal = React.forwardRef(({ ...rest }: ModalProps, ref: any) => {
+  const [isVisible, setIsVisible] = useState(rest.isVisible);
+
   const styles = StyleSheet.create({
     modal: tw`items-center`, // needed to horizontally center the box
     box: tw`p-6`,
   });
 
+  const closeModalOnEscape = useCallback((event) => {
+    if (Platform.OS === "web" && event.keyCode === 27) {
+      rest.onBackdropPress();
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("keydown", closeModalOnEscape);
+    return () => {
+      document.removeEventListener("keydown", closeModalOnEscape);
+    };
+  }, [closeModalOnEscape]);
+
+  useEffect(() => {
+    setIsVisible(rest.isVisible);
+  }, [rest.isVisible]);
+
   return (
     <ReactNativeModal
       ref={ref}
       {...rest}
+      isVisible={isVisible}
       animationIn="fadeIn"
       animationOut="fadeOut"
       animationInTiming={150}
