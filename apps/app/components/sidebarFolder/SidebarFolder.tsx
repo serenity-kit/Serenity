@@ -226,6 +226,7 @@ export default function SidebarFolder(props: Props) {
                   style={tw`ml-1.5 max-w-${maxWidth}`}
                   numberOfLines={1}
                   ellipsizeMode="tail"
+                  bold={documentPathIds.includes(props.folderId)}
                 >
                   {props.folderName}
                 </Text>
