@@ -1,6 +1,6 @@
 import React from "react";
 import { View, tw, Box, Text } from "@serenity-tools/ui";
-import { RootStackScreenProps } from "../../types";
+import { RootStackScreenProps } from "../../types/navigation";
 import { LoginForm } from "../../components/login/LoginForm";
 import { navigateToNextAuthenticatedPage } from "../../utils/authentication/loginHelper";
 import { KeyboardAvoidingView } from "react-native";

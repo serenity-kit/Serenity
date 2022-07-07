@@ -4,7 +4,6 @@ import {
 } from "@react-navigation/drawer";
 
 import {
-  Button,
   Icon,
   InlineInput,
   Menu,
@@ -30,7 +29,7 @@ import {
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { RootStackScreenProps } from "../../types";
+import { RootStackScreenProps } from "../../types/navigation";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { HStack } from "native-base";
 import { useFocusRing } from "@react-native-aria/focus";
@@ -264,7 +263,15 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         />
         <Text variant="small">Dev Dashboard</Text>
       </SidebarLink>
-      <SidebarLink to={{ screen: "DeviceManager" }}>
+      <SidebarLink
+        to={{
+          screen: "Workspace",
+          params: {
+            workspaceId: route.params.workspaceId,
+            screen: "DeviceManager",
+          },
+        }}
+      >
         <Icon
           name="dashboard-line"
           size={4.5}
@@ -272,37 +279,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           color={tw.color("gray-800")}
         />
         <Text variant="small">Device Manager</Text>
-      </SidebarLink>
-      <SidebarLink
-        to={{
-          screen: "Workspace",
-          params: { workspaceId: route.params.workspaceId, screen: "Editor" },
-        }}
-      >
-        <Icon
-          name="draft-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={tw.color("gray-800")}
-        />
-        <Text variant="small">Editor</Text>
-      </SidebarLink>
-      <SidebarLink
-        to={{
-          screen: "Workspace",
-          params: {
-            workspaceId: route.params.workspaceId,
-            screen: "TestLibsodium",
-          },
-        }}
-      >
-        <Icon
-          name="microscope-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={tw.color("gray-800")}
-        />
-        <Text variant="small">Libsodium Test Screen</Text>
       </SidebarLink>
 
       <SidebarDivider />

@@ -12,7 +12,7 @@ import {
   ModalHeader,
   ModalButtonFooter,
 } from "@serenity-tools/ui";
-import { WorkspaceDrawerScreenProps } from "../../types";
+import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import {
   useWorkspaceQuery,
   useUpdateWorkspaceMutation,

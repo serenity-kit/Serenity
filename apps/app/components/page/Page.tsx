@@ -31,7 +31,7 @@ import {
   applyAwarenessUpdate,
   removeAwarenessStates,
 } from "y-protocols/awareness";
-import { WorkspaceDrawerScreenProps } from "../../types";
+import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { useEffect, useRef } from "react";
 import {
   Document,

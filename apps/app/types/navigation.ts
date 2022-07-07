@@ -32,10 +32,9 @@ type RegistrationVerificationParams = {
 
 export type WorkspaceDrawerParamList = {
   NoPageExists: undefined;
-  Editor: undefined;
   Page: PageParams;
-  TestLibsodium: undefined;
   Settings: undefined;
+  DeviceManager: undefined;
   WorkspaceRoot: undefined;
 };
 
@@ -58,9 +57,9 @@ export type RootStackParamList = {
   AcceptWorkspaceInvitation: WorkspaceInvitationParams;
   Login: LoginParams;
   EncryptDecryptImageTest: undefined;
+  TestLibsodium: undefined;
   Root: undefined;
   NotFound: undefined;
-  DeviceManager: undefined;
 };
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> =

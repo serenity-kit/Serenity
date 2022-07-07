@@ -5,7 +5,7 @@ import {
 } from "react-native";
 
 import { Text, View } from "@serenity-tools/ui";
-import { RootStackScreenProps } from "../../types";
+import { RootStackScreenProps } from "../../types/navigation";
 
 export default function NotFoundScreen({
   navigation,

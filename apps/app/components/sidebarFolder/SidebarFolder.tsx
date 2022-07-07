@@ -23,7 +23,7 @@ import {
   useUpdateFolderNameMutation,
   useDeleteFoldersMutation,
 } from "../../generated/graphql";
-import { RootStackScreenProps } from "../../types";
+import { RootStackScreenProps } from "../../types/navigation";
 import SidebarPage from "../sidebarPage/SidebarPage";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";

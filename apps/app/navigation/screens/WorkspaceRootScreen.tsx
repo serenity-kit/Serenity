@@ -9,7 +9,7 @@ import {
   FirstDocumentQuery,
   FirstDocumentQueryVariables,
 } from "../../generated/graphql";
-import { WorkspaceDrawerScreenProps } from "../../types";
+import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { getLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceRootScreen(

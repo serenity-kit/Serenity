@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View, Box, tw } from "@serenity-tools/ui";
-import { RootStackScreenProps } from "../../types";
+import { RootStackScreenProps } from "../../types/navigation";
 import RegisterForm from "../../components/register/RegisterForm";
 import { KeyboardAvoidingView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
