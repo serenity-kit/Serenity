@@ -4,6 +4,10 @@ import { decryptDevice } from "@serenity-tools/common";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { Client } from "urql";
 import { UpdateAuthenticationFunction } from "../../context/AuthenticationContext";
+import { createAndSetDevice } from "../device/deviceStore";
+import { Platform } from "react-native";
+import { detect } from "detect-browser";
+const browser = detect();
 
 export type LoginParams = {
   username: string;
@@ -81,6 +85,32 @@ export const fetchMainDevice = async ({
     signingPublicKey: mainDevice.signingPublicKey,
     encryptionPublicKey: mainDevice.encryptionPublicKey,
   });
+};
+
+/**
+ * This method creates a new device, stores it in secure storage,
+ * creates the JSON device info, and prepares it for registering
+ * with graphql.
+ *
+ * @returns the device information including signing and encryption private keys
+ *          and stringified JSON device info
+ */
+export const createSetAndRegisterDevice = async (): Promise<any> => {
+  const { signingPrivateKey, encryptionPrivateKey, ...platformDevice } =
+    await createAndSetDevice();
+  const deviceInfoJson = {
+    type: "device",
+    os: browser?.os,
+    osVersion: Platform.Version,
+    browser: null,
+    browserVersion: null,
+  };
+  const deviceInfo = JSON.stringify(deviceInfoJson);
+  const newDeviceInfo = {
+    ...platformDevice,
+    info: deviceInfo,
+  };
+  return newDeviceInfo;
 };
 
 /**

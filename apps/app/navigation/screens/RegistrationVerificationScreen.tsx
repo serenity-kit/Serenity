@@ -30,10 +30,10 @@ import {
   login,
   fetchMainDevice,
   navigateToNextAuthenticatedPage,
+  createSetAndRegisterDevice,
 } from "../../utils/authentication/loginHelper";
 import { useClient } from "urql";
 import { Platform } from "react-native";
-import { createDevice } from "@serenity-tools/common";
 import { detect } from "detect-browser";
 import { createAndSetDevice } from "../../utils/device/deviceStore";
 const browser = detect();
@@ -60,20 +60,7 @@ export default function RegistrationVerificationScreen(
 
   const registerNewDevice = async () => {
     if (Platform.OS == "ios") {
-      const { signingPrivateKey, encryptionPrivateKey, ...iosDevice } =
-        await createAndSetDevice();
-      const deviceInfoJson = {
-        type: "device",
-        os: browser?.os,
-        osVersion: Platform.Version,
-        browser: null,
-        browserVersion: null,
-      };
-      const deviceInfo = JSON.stringify(deviceInfoJson);
-      const newDeviceInfo = {
-        ...iosDevice,
-        info: deviceInfo,
-      };
+      const newDeviceInfo = await createSetAndRegisterDevice();
       await createDeviceMutation({
         input: newDeviceInfo,
       });
@@ -88,7 +75,6 @@ export default function RegistrationVerificationScreen(
       navigateToLoginScreen();
       return;
     }
-
     try {
       setErrorMessage("");
       setIsLoggingIn(true);

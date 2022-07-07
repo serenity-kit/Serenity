@@ -16,7 +16,11 @@ import {
   useCreateDeviceMutation,
 } from "../../generated/graphql";
 import { useAuthentication } from "../../context/AuthenticationContext";
-import { login, fetchMainDevice } from "../../utils/authentication/loginHelper";
+import {
+  login,
+  fetchMainDevice,
+  createSetAndRegisterDevice,
+} from "../../utils/authentication/loginHelper";
 import {
   createWebDevice,
   removeWebDevice,
@@ -24,10 +28,7 @@ import {
 import { useClient } from "urql";
 import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
 import { detect } from "detect-browser";
-import {
-  createAndSetDevice,
-  removeDevice,
-} from "../../utils/device/deviceStore";
+import { removeDevice } from "../../utils/device/deviceStore";
 const browser = detect();
 
 type Props = {
@@ -116,20 +117,7 @@ export function LoginForm(props: Props) {
         }
       } else if (Platform.OS === "ios") {
         if (useExtendedLogin) {
-          const { signingPrivateKey, encryptionPrivateKey, ...iosDevice } =
-            await createAndSetDevice();
-          const deviceInfoJson = {
-            type: "device",
-            os: browser?.os,
-            osVersion: Platform.Version,
-            browser: null,
-            browserVersion: null,
-          };
-          const deviceInfo = JSON.stringify(deviceInfoJson);
-          const newDeviceInfo = {
-            ...iosDevice,
-            info: deviceInfo,
-          };
+          const newDeviceInfo = await createSetAndRegisterDevice();
           await createDeviceMutation({
             input: newDeviceInfo,
           });
