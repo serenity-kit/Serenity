@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React from "react";
 import {
   ReactNativeModal,
   ModalProps as ReactNativeModalProps,
@@ -17,19 +17,6 @@ export const Modal = React.forwardRef(({ ...rest }: ModalProps, ref: any) => {
     modal: tw`items-center`, // needed to horizontally center the box
     box: tw`p-6`,
   });
-
-  const closeModalOnEscape = useCallback((event) => {
-    if (Platform.OS === "web" && event.keyCode === 27) {
-      rest.onBackdropPress();
-    }
-  }, []);
-
-  useEffect(() => {
-    document.addEventListener("keydown", closeModalOnEscape);
-    return () => {
-      document.removeEventListener("keydown", closeModalOnEscape);
-    };
-  }, [closeModalOnEscape]);
 
   return (
     <ReactNativeModal
