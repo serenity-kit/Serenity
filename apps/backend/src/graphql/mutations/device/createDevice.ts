@@ -33,25 +33,23 @@ export const createDeviceMutation = mutationField("createDevice", {
     if (!args.input) {
       throw new Error("Input missing");
     }
-    const createdDevice = await createDevice({
+    const device = await createDevice({
       userId: context.user.id,
       signingPublicKey: args.input.signingPublicKey,
       encryptionPublicKey: args.input.encryptionPublicKey,
       encryptionPublicKeySignature: args.input.encryptionPublicKeySignature,
       info: args.input.info,
     });
-    if (!createdDevice.userId) {
+    if (!device.userId) {
       throw new Error("UserId missing");
     }
     return {
       device: {
-        encryptionPublicKey: createdDevice.encryptionPublicKey,
-        encryptionPublicKeySignature:
-          createdDevice.encryptionPublicKeySignature,
-        signingPublicKey: createdDevice.signingPublicKey,
-        userId: createdDevice.userId,
-        createdAt: createdDevice.createdAt,
-        info: createdDevice.info,
+        encryptionPublicKey: device.encryptionPublicKey,
+        encryptionPublicKeySignature: device.encryptionPublicKeySignature,
+        signingPublicKey: device.signingPublicKey,
+        userId: device.userId,
+        info: device.info,
       },
     };
   },
