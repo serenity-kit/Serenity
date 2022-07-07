@@ -94,9 +94,7 @@ export default function RegistrationVerificationScreen(
           verificationCode,
         },
       });
-      console.log({ verifyRegistrationResult });
       if (verifyRegistrationResult.error?.message) {
-        console.log({ message: verifyRegistrationResult.error.message });
         const errorMessage = verifyRegistrationResult.error.message;
         setErrorMessage("");
         if (errorMessage === "[GraphQL] Invalid user") {
