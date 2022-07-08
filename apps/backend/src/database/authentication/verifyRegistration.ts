@@ -1,6 +1,10 @@
 import { prisma } from "../prisma";
 import { createConfirmationCode } from "../../utils/confirmationCode";
-import { Prisma } from "../../../prisma/generated/output";
+import {
+  Prisma,
+  UnverifiedUser,
+  PrismaClient,
+} from "../../../prisma/generated/output";
 
 export const MAX_UNVERIFIED_USER_CONFIRMATION_ATTEMPTS = 5;
 
@@ -9,7 +13,10 @@ type Props = {
   confirmationCode: string;
 };
 
-const resetConfirmationCode = async (username: string) => {
+const resetConfirmationCode = async (
+  prisma: PrismaClient,
+  username: string
+) => {
   const confirmationCode = await createConfirmationCode();
   await prisma.unverifiedUser.updateMany({
     where: {
@@ -26,7 +33,11 @@ const resetConfirmationCode = async (username: string) => {
   return updatedUnverifiedUser;
 };
 
-const setConfirmationTryCounter = async (username: string, count: number) => {
+const setConfirmationTryCounter = async (
+  prisma: PrismaClient,
+  username: string,
+  count: number
+) => {
   await prisma.unverifiedUser.updateMany({
     where: {
       username,
@@ -37,7 +48,10 @@ const setConfirmationTryCounter = async (username: string, count: number) => {
   });
 };
 
-const createDevicesAndUser = async (unverifiedUser) => {
+const createDevicesAndUser = async (
+  prisma: Prisma.TransactionClient,
+  unverifiedUser: UnverifiedUser
+) => {
   const device = await prisma.device.create({
     data: {
       encryptionPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
@@ -89,47 +103,55 @@ export async function verifyRegistration({
   if (existingUserData) {
     throw Error("This username has already been registered");
   }
-  return await prisma.$transaction(async (prisma) => {
-    const unverifiedUser = await prisma.unverifiedUser.findFirst({
+  const unverifiedUser = await prisma.unverifiedUser.findFirst({
+    where: {
+      username,
+      confirmationCode,
+    },
+  });
+  if (unverifiedUser) {
+    return await prisma.$transaction(async (prisma) => {
+      const { user } = await createDevicesAndUser(prisma, unverifiedUser);
+      return user;
+    });
+  } else {
+    const anyUnverifiedUser = await prisma.unverifiedUser.findFirst({
       where: {
         username,
-        confirmationCode,
       },
     });
-    if (unverifiedUser) {
-      const { user } = await createDevicesAndUser(unverifiedUser);
-      return user;
-    } else {
-      const anyUnverifiedUser = await prisma.unverifiedUser.findFirst({
-        where: {
-          username,
-        },
-      });
-      if (!anyUnverifiedUser) {
-        throw new Error("Invalid user");
-      }
-      if (
-        anyUnverifiedUser.confirmationTryCounter >=
-        MAX_UNVERIFIED_USER_CONFIRMATION_ATTEMPTS - 1
-      ) {
-        const updatedUnverifiedUser = await resetConfirmationCode(username);
-        // TODO: send an email to the user's email address
-        console.log(
-          `New user confirmation code: ${
-            updatedUnverifiedUser!.confirmationCode
-          }`
-        );
-        throw new Error("Invalid confirmation code. Code reset.");
-      } else {
-        const newConfirmationTryCounter =
-          anyUnverifiedUser.confirmationTryCounter + 1;
-        await setConfirmationTryCounter(username, newConfirmationTryCounter);
-        const numAttemptsRemaining =
-          MAX_UNVERIFIED_USER_CONFIRMATION_ATTEMPTS - newConfirmationTryCounter;
-        throw new Error(
-          `Invalid confirmation code. ${numAttemptsRemaining} attempts remaining`
-        );
-      }
+    if (!anyUnverifiedUser) {
+      throw new Error("Invalid user");
     }
-  });
+    if (
+      anyUnverifiedUser.confirmationTryCounter >=
+      MAX_UNVERIFIED_USER_CONFIRMATION_ATTEMPTS - 1
+    ) {
+      const updatedUnverifiedUser = await resetConfirmationCode(
+        prisma,
+        username
+      );
+      // TODO: send an email to the user's email address
+      console.log(
+        `New user confirmation code: ${updatedUnverifiedUser!.confirmationCode}`
+      );
+      throw new Error("Invalid confirmation code. Code reset.");
+    } else {
+      const newConfirmationTryCounter =
+        anyUnverifiedUser.confirmationTryCounter + 1;
+      await setConfirmationTryCounter(
+        prisma,
+        username,
+        newConfirmationTryCounter
+      );
+      const updatedUnverifiedUser = await prisma.unverifiedUser.findFirst({
+        where: { username },
+      });
+      const numAttemptsRemaining =
+        MAX_UNVERIFIED_USER_CONFIRMATION_ATTEMPTS - newConfirmationTryCounter;
+      throw new Error(
+        `Invalid confirmation code. ${numAttemptsRemaining} attempts remaining`
+      );
+    }
+  }
 }

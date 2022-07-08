@@ -60,9 +60,7 @@ test("verify registration fails throws error", async () => {
     `Invalid confirmation code. ${numAttemptsRemaining} attempts remaining`
   );
   const updatedUnverifiedUser = await prisma.unverifiedUser.findFirst({
-    where: {
-      username,
-    },
+    where: { username },
   });
   expect(updatedUnverifiedUser!.confirmationTryCounter).toBe(
     confirmationTryCounter + 1
