@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, View, tw, Box } from "@serenity-tools/ui";
+import { Text, View, tw, Box, Button } from "@serenity-tools/ui";
 import { useEffect } from "react";
 import { useWindowDimensions, StyleSheet } from "react-native";
 import { useClient } from "urql";
@@ -30,12 +30,6 @@ export default function AcceptWorkspaceInvitationScreen(
   const [graphqlError, setGraphqlError] = useState<string>("");
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [inviterUsername, setInviterUsername] = useState<string>("");
-
-  useEffect(() => {
-    if (workspaceInvitationId && sessionKey !== null) {
-      acceptWorkspaceInvitation();
-    }
-  }, [sessionKey, urqlClient, props.navigation]);
 
   useEffect(() => {
     if (workspaceInvitationQuery.data?.workspaceInvitation) {
@@ -79,10 +73,6 @@ export default function AcceptWorkspaceInvitationScreen(
     }
   };
 
-  const onLoginSuccess = () => {
-    // TODO
-  };
-
   return (
     <>
       {hasGraphqlError && (
@@ -100,13 +90,20 @@ export default function AcceptWorkspaceInvitationScreen(
                 You have been invited to join workspace <b>{workspaceName}</b>{" "}
                 by <b>{inviterUsername}</b>
               </Text>
-
-              <Text style={styles.alertBannerText}>
-                Log in to accept the invitation.
-              </Text>
+              {!sessionKey && (
+                <Text style={styles.alertBannerText}>
+                  Log in to accept the invitation.
+                </Text>
+              )}
             </View>
           )}
-          <LoginForm onLoginSuccess={onLoginSuccess} />
+          {sessionKey ? (
+            <Button onPress={acceptWorkspaceInvitation} size="large">
+              Accept
+            </Button>
+          ) : (
+            <LoginForm />
+          )}
         </Box>
       </View>
     </>
@@ -114,12 +111,7 @@ export default function AcceptWorkspaceInvitationScreen(
 }
 
 const styles = StyleSheet.create({
-  alertBanner: {
-    padding: 20,
-    backgroundColor: "#fff",
-    color: "#000",
-    marginBottom: 30,
-  },
+  alertBanner: {},
   alertBannerText: {
     color: "#000",
   },
