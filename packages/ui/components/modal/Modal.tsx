@@ -18,12 +18,6 @@ export const Modal = React.forwardRef(({ ...rest }: ModalProps, ref: any) => {
     box: tw`p-6`,
   });
 
-  const closeModalOnEscape = useCallback((event) => {
-    if (Platform.OS === "web" && event.keyCode === 27) {
-      rest.onBackdropPress();
-    }
-  }, []);
-
   useEffect(() => {
     let escapeKeyListener: any = null;
     if (Platform.OS === "web") {
