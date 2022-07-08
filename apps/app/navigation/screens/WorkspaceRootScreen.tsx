@@ -68,10 +68,6 @@ export default function WorkspaceRootScreen(
           },
         });
       } else {
-        // props.navigation.replace("Workspace", {
-        //   workspaceId: workspaceId,
-        //   screen: "NoPageExists",
-        // });
         props.navigation.replace("WorkspaceNotFound");
       }
     })();
