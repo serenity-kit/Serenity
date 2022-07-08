@@ -24,11 +24,11 @@ function graphqlTestContext() {
 export default function setupGraphql(): TestContext {
   let testContext = {} as TestContext;
   const graphqlCtx = graphqlTestContext();
-  beforeEach(async () => {
+  beforeAll(async () => {
     const client = await graphqlCtx.before();
     Object.assign(testContext, { client });
   });
-  afterEach(async () => {
+  afterAll(async () => {
     await graphqlCtx.after();
   });
   return testContext;

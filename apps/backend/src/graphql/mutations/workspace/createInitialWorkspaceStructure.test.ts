@@ -9,20 +9,16 @@ let userId1 = "";
 const username = "user";
 const password = "password";
 let sessionKey1 = "";
-let isSetupComplete = false;
+
+const setup = async () => {
+  const registerUserResult1 = await registerUser(graphql, username, password);
+  sessionKey1 = registerUserResult1.sessionKey;
+  userId1 = registerUserResult1.userId;
+};
 
 beforeAll(async () => {
   await deleteAllRecords();
-});
-
-// we have to run registerUser here because graphql isn't setup in beforeAll()
-beforeEach(async () => {
-  if (!isSetupComplete) {
-    const registerUserResult1 = await registerUser(graphql, username, password);
-    sessionKey1 = registerUserResult1.sessionKey;
-    userId1 = registerUserResult1.userId;
-    isSetupComplete = true;
-  }
+  await setup();
 });
 
 test("user can create initial workspace structure", async () => {
