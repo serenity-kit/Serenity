@@ -8,6 +8,10 @@ import {
   FirstDocumentDocument,
   FirstDocumentQuery,
   FirstDocumentQueryVariables,
+  useWorkspaceQuery,
+  WorkspaceDocument,
+  WorkspaceQuery,
+  WorkspaceQueryVariables,
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { getLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
@@ -21,7 +25,21 @@ export default function WorkspaceRootScreen(
 
   useEffect(() => {
     (async () => {
+      // check if the user has access to this workspace
+      const workspaceResult = await urqlClient
+        .query<WorkspaceQuery, WorkspaceQueryVariables>(
+          WorkspaceDocument,
+          { id: workspaceId },
+          { requestPolicy: "network-only" }
+        )
+        .toPromise();
+      console.log({ workspaceResult });
+      if (workspaceResult.data?.workspace === null) {
+        props.navigation.replace("WorkspaceNotFound");
+        return;
+      }
       const lastUsedDocumentId = await getLastUsedDocumentId(workspaceId);
+      console.log({ lastUsedDocumentId });
       if (lastUsedDocumentId) {
         props.navigation.replace("Workspace", {
           workspaceId,
@@ -51,10 +69,11 @@ export default function WorkspaceRootScreen(
           },
         });
       } else {
-        props.navigation.replace("Workspace", {
-          workspaceId: workspaceId,
-          screen: "NoPageExists",
-        });
+        // props.navigation.replace("Workspace", {
+        //   workspaceId: workspaceId,
+        //   screen: "NoPageExists",
+        // });
+        props.navigation.replace("WorkspaceNotFound");
       }
     })();
   }, [urqlClient, props.navigation]);
