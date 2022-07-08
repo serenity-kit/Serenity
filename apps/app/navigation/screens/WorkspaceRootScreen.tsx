@@ -33,7 +33,6 @@ export default function WorkspaceRootScreen(
           { requestPolicy: "network-only" }
         )
         .toPromise();
-      console.log({ workspaceResult });
       if (workspaceResult.data?.workspace === null) {
         props.navigation.replace("WorkspaceNotFound");
         return;

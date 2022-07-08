@@ -116,7 +116,6 @@ export default function WorkspaceSettingsScreen(
         setGraphqlError(workspaceResult.error.message || "");
       }
       if (workspaceResult.data?.workspace) {
-        console.log(workspaceResult.data?.workspace);
         updateWorkspaceData(workspaceResult.data.workspace);
       } else {
         props.navigation.replace("WorkspaceNotFound");
