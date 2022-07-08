@@ -15,7 +15,10 @@
     "build:web": "yarn build:editor && yarn build:opaque-client && expo build:web --no-pwa && cp _redirects ./web-build/_redirects",
     "test": "echo TODO",
     "ts:check": "yarn tsc --noEmit",
-    "lint": "eslint --ext .tsx --ext .ts ./"
+    "lint": "eslint --ext .tsx --ext .ts ./",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "jest": {
     "preset": "jest-expo"
@@ -55,7 +58,7 @@
     "expo-web-browser": "~10.1.0",
     "graphql": "^16.3.0",
     "native-base": "^3.4.7",
-    "react": "17.0.2",
+    "react": "17.0.1",
     "react-dom": "17.0.2",
     "react-native": "0.64.3",
     "react-native-gesture-handler": "~2.1.0",

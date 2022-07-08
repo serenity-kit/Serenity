@@ -25,11 +25,21 @@ export const Modal = React.forwardRef(({ ...rest }: ModalProps, ref: any) => {
   }, []);
 
   useEffect(() => {
-    document.addEventListener("keydown", closeModalOnEscape);
+    let escapeKeyListener: any = null;
+    if (Platform.OS === "web") {
+      escapeKeyListener = (e: KeyboardEvent) => {
+        if (e.key === "Escape" && rest.isVisible) {
+          rest.onBackdropPress();
+        }
+      };
+      document.addEventListener("keydown", escapeKeyListener);
+    }
     return () => {
-      document.removeEventListener("keydown", closeModalOnEscape);
+      if (Platform.OS === "web") {
+        document.removeEventListener("keydown", escapeKeyListener);
+      }
     };
-  }, [closeModalOnEscape]);
+  }, [rest.isVisible, rest.onBackdropPress]);
 
   return (
     <ReactNativeModal
