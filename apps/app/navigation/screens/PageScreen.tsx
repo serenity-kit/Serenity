@@ -33,7 +33,6 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
         }
       )
       .toPromise();
-    console.log({ documentResult });
     if (documentResult.error?.message === "[GraphQL] Document not found") {
       return false;
     }
@@ -68,7 +67,6 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     (async () => {
       if (pageId) {
         const hasAccess = await doesUserHaveAccess(pageId);
-        console.log({ hasAccess });
         if (!hasAccess) {
           props.navigation.replace("Workspace", {
             workspaceId,
