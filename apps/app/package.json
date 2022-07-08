@@ -14,7 +14,8 @@
     "build:graphql-types": "graphql-codegen --config codegen.yml",
     "build:web": "yarn build:editor && yarn build:opaque-client && expo build:web --no-pwa && cp _redirects ./web-build/_redirects",
     "test": "echo TODO",
-    "ts:check": "yarn tsc --noEmit"
+    "ts:check": "yarn tsc --noEmit",
+    "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "jest": {
     "preset": "jest-expo"
