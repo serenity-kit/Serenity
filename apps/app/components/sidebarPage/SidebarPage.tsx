@@ -68,7 +68,7 @@ export default function SidebarPage(props: Props) {
   };
 
   const styles = StyleSheet.create({
-    page: tw`px-2`,
+    page: tw``,
     hover: tw`bg-gray-200`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
@@ -88,18 +88,28 @@ export default function SidebarPage(props: Props) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <HStack>
-        <HStack alignItems="center" style={tw`grow-1`}>
-          {isEditing ? (
-            <HStack style={tw`py-1.5`}>
-              {/* @icon : needs to be here in both versions (isEditing & not) as putting the 
-                          InlineInput inside the Link adds weird behaviour we don't want
-              */}
-              <Icon
-                name="page"
-                size={5}
-                mobileSize={8}
-                color={tw.color("gray-600")}
-              />
+        <Pressable
+          {...linkProps}
+          {...focusRingProps} // needed so focus is shown on view-wrapper
+          style={[
+            tw`grow-1 pl-${7 + depth * 3}`, // needed so clickable area is as large as possible
+          ]}
+          // disable default outline styles and add 1 overridden style manually (grow)
+          _focusVisible={{
+            _web: { style: { outlineWidth: 0, flexGrow: 1 } },
+          }}
+        >
+          <HStack
+            alignItems="center"
+            style={tw`py-3 md:py-1.5 pl-${5 + depth} md:pl-2.5`}
+          >
+            <Icon
+              name="page"
+              size={5}
+              mobileSize={8}
+              color={tw.color("gray-600")}
+            />
+            {isEditing ? (
               <InlineInput
                 onCancel={() => {
                   setIsEditing(false);
@@ -108,43 +118,22 @@ export default function SidebarPage(props: Props) {
                 value={props.documentName}
                 style={tw`ml-0.5 w-${maxWidth}`}
               />
-            </HStack>
-          ) : (
-            <Pressable
-              {...linkProps}
-              {...focusRingProps} // needed so focus is shown on view-wrapper
-              style={[
-                tw`flex w-full py-1.5`,
-                Platform.OS === "web" && { outlineWidth: 0 }, // override default outline
-              ]}
-            >
-              <HStack style={tw`grow-1`} alignItems="center">
-                {/* @icon : needs to be here in both versions (isEditing & not)
-                            as we want the clickable area as big as possible
-                */}
-                <Icon
-                  name="page"
-                  size={5}
-                  mobileSize={8}
-                  color={tw.color("gray-600")}
-                />
-                {/* TODO check why ellipsis is broken => renders as span .. but why ?? */}
-                <Text
-                  variant="small"
-                  style={[tw`pl-1.5 max-w-${maxWidth}`]}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  bold={document?.id === props.documentId}
-                >
-                  {props.documentName}
-                </Text>
-              </HStack>
-            </Pressable>
-          )}
-        </HStack>
+            ) : (
+              <Text
+                variant="small"
+                style={[tw`pl-1.5 max-w-${maxWidth}`]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                bold={document?.id === props.documentId}
+              >
+                {props.documentName}
+              </Text>
+            )}
+          </HStack>
+        </Pressable>
 
         {(isHovered || !isDesktopDevice) && (
-          <HStack alignItems="center">
+          <HStack alignItems="center" space={1} style={tw`pr-3 md:pr-2`}>
             <SidebarPageMenu
               documentId={props.documentId}
               refetchDocuments={props.onRefetchDocumentsPress}
