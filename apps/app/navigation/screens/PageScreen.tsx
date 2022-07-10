@@ -8,11 +8,36 @@ import { PageHeader } from "../../components/page/PageHeader";
 import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 import { useDocumentStore } from "../../utils/document/documentStore";
+import {
+  DocumentQuery,
+  DocumentQueryVariables,
+  DocumentDocument,
+} from "../../generated/graphql";
+import { useClient } from "urql";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const workspaceId = useWorkspaceId();
   const documentStore = useDocumentStore();
+  const pageId = props.route.params.pageId;
+  const urqlClient = useClient();
+
+  const doesUserHaveAccess = async (docId: string) => {
+    const documentResult = await urqlClient
+      .query<DocumentQuery, DocumentQueryVariables>(
+        DocumentDocument,
+        { id: docId },
+        {
+          // better to be safe here and always refetch
+          requestPolicy: "network-only",
+        }
+      )
+      .toPromise();
+    if (documentResult.error?.message === "[GraphQL] Document not found") {
+      return false;
+    }
+    return true;
+  };
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
@@ -25,7 +50,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   const updateTitle = async (title: string) => {
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
-        id: props.route.params.pageId,
+        id: pageId,
         name: title,
       },
     });
@@ -37,17 +62,27 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   };
 
   useEffect(() => {
-    setLastUsedDocumentId(props.route.params.pageId, workspaceId);
-
-    // removing the isNew param right after the first render so users don't have it after a refresh
+    setLastUsedDocumentId(pageId, workspaceId);
     props.navigation.setParams({ isNew: undefined });
-  }, [props.route.params.pageId]);
+    (async () => {
+      if (pageId) {
+        const hasAccess = await doesUserHaveAccess(pageId);
+        if (!hasAccess) {
+          props.navigation.replace("Workspace", {
+            workspaceId,
+            screen: "NoPageExists",
+          });
+        }
+      }
+      // removing the isNew param right after the first render so users don't have it after a refresh
+    })();
+  }, [pageId]);
 
   return (
     <Page
       {...props}
       // to force unmount and mount the page
-      key={props.route.params.pageId}
+      key={pageId}
       updateTitle={updateTitle}
     />
   );
