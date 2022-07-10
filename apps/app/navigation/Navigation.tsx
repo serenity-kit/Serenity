@@ -33,6 +33,7 @@ import { useEffect } from "react";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -145,6 +146,11 @@ function RootNavigator() {
       <Stack.Screen
         name="AcceptWorkspaceInvitation"
         component={AcceptWorkspaceInvitationScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="WorkspaceNotFound"
+        component={WorkspaceNotFoundScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

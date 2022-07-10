@@ -55,6 +55,7 @@ export type RootStackParamList = {
   Register: undefined;
   RegistrationVerification: RegistrationVerificationParams;
   AcceptWorkspaceInvitation: WorkspaceInvitationParams;
+  WorkspaceNotFound: undefined;
   Login: LoginParams;
   EncryptDecryptImageTest: undefined;
   TestLibsodium: undefined;

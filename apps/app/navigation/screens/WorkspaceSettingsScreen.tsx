@@ -110,15 +110,16 @@ export default function WorkspaceSettingsScreen(
     useState<string>("");
 
   useEffect(() => {
-    if (
-      !workspaceResult.fetching &&
-      workspaceResult.data &&
-      workspaceResult.data.workspace
-    ) {
-      updateWorkspaceData(workspaceResult.data.workspace);
-    } else if (workspaceResult.error) {
-      setHasGraphqlError(true);
-      setGraphqlError(workspaceResult.error.message || "");
+    if (!workspaceResult.fetching) {
+      if (workspaceResult.error) {
+        setHasGraphqlError(true);
+        setGraphqlError(workspaceResult.error.message || "");
+      }
+      if (workspaceResult.data?.workspace) {
+        updateWorkspaceData(workspaceResult.data.workspace);
+      } else {
+        props.navigation.replace("WorkspaceNotFound");
+      }
     }
   }, [workspaceResult.fetching]);
 
