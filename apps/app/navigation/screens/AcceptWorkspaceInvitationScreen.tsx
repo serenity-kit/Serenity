@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { Text, View, tw, Box } from "@serenity-tools/ui";
-import { useEffect } from "react";
+import { Text, View, tw, Box, Button } from "@serenity-tools/ui";
 import { useWindowDimensions, StyleSheet } from "react-native";
-import { useClient } from "urql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
   useAcceptWorkspaceInvitationMutation,
@@ -16,7 +14,6 @@ export default function AcceptWorkspaceInvitationScreen(
 ) {
   const workspaceInvitationId = props.route.params?.workspaceInvitationId;
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const urqlClient = useClient();
   const { sessionKey } = useAuthentication();
   const [workspaceInvitationQuery, refetchWorkspaceInvitationQuery] =
     useWorkspaceInvitationQuery({
@@ -28,23 +25,6 @@ export default function AcceptWorkspaceInvitationScreen(
     useAcceptWorkspaceInvitationMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
-  const [workspaceName, setWorkspaceName] = useState<string>("");
-  const [inviterUsername, setInviterUsername] = useState<string>("");
-
-  useEffect(() => {
-    if (workspaceInvitationId && sessionKey !== null) {
-      acceptWorkspaceInvitation();
-    }
-  }, [sessionKey, urqlClient, props.navigation]);
-
-  useEffect(() => {
-    if (workspaceInvitationQuery.data?.workspaceInvitation) {
-      const workspaceInvitation =
-        workspaceInvitationQuery.data.workspaceInvitation;
-      setWorkspaceName(workspaceInvitation.workspaceName || "");
-      setInviterUsername(workspaceInvitation.inviterUsername);
-    }
-  }, [workspaceInvitationQuery.fetching]);
 
   if (!workspaceInvitationId) {
     return (
@@ -79,10 +59,6 @@ export default function AcceptWorkspaceInvitationScreen(
     }
   };
 
-  const onLoginSuccess = () => {
-    // TODO
-  };
-
   return (
     <>
       {hasGraphqlError && (
@@ -97,16 +73,35 @@ export default function AcceptWorkspaceInvitationScreen(
           {!workspaceInvitationQuery.fetching && (
             <View style={styles.alertBanner}>
               <Text style={styles.alertBannerText}>
-                You have been invited to join workspace <b>{workspaceName}</b>{" "}
-                by <b>{inviterUsername}</b>
+                You have been invited to join workspace{" "}
+                <b>
+                  {
+                    workspaceInvitationQuery.data?.workspaceInvitation
+                      ?.workspaceName
+                  }
+                </b>{" "}
+                by{" "}
+                <b>
+                  {
+                    workspaceInvitationQuery.data?.workspaceInvitation
+                      ?.inviterUsername
+                  }
+                </b>
               </Text>
-
-              <Text style={styles.alertBannerText}>
-                Log in to accept the invitation.
-              </Text>
+              {!sessionKey && (
+                <Text style={styles.alertBannerText}>
+                  Log in to accept the invitation.
+                </Text>
+              )}
             </View>
           )}
-          <LoginForm onLoginSuccess={onLoginSuccess} />
+          {sessionKey ? (
+            <Button onPress={acceptWorkspaceInvitation} size="large">
+              Accept
+            </Button>
+          ) : (
+            <LoginForm />
+          )}
         </Box>
       </View>
     </>
@@ -114,12 +109,7 @@ export default function AcceptWorkspaceInvitationScreen(
 }
 
 const styles = StyleSheet.create({
-  alertBanner: {
-    padding: 20,
-    backgroundColor: "#fff",
-    color: "#000",
-    marginBottom: 30,
-  },
+  alertBanner: {},
   alertBannerText: {
     color: "#000",
   },

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Button,
   LabeledInput,
@@ -28,7 +28,7 @@ const browser = detect();
 
 type Props = {
   defaultEmail?: string;
-  onLoginSuccess: () => void;
+  onLoginSuccess?: () => void;
   onLoginFail?: () => void;
   onEmailChangeText?: (username: string) => void;
   onFormFilled?: () => void;
@@ -108,7 +108,9 @@ export function LoginForm(props: Props) {
       setPassword("");
       setUsername("");
       setIsLoggingIn(false);
-      props.onLoginSuccess();
+      if (props.onLoginSuccess) {
+        props.onLoginSuccess();
+      }
     } catch (error) {
       console.error(error);
       setGqlErrorMessage("Failed to login.");
