@@ -8,7 +8,7 @@ import {
   tw,
   Checkbox,
 } from "@serenity-tools/ui";
-import { Platform, useWindowDimensions } from "react-native";
+import { Platform, useWindowDimensions, StyleSheet } from "react-native";
 import { VStack } from "native-base";
 import {
   useStartLoginMutation,
@@ -24,6 +24,7 @@ import {
 import { useClient } from "urql";
 import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
 import { detect } from "detect-browser";
+import { TouchableOpacity } from "react-native-gesture-handler";
 const browser = detect();
 
 type Props = {
@@ -32,6 +33,7 @@ type Props = {
   onLoginFail?: () => void;
   onEmailChangeText?: (username: string) => void;
   onFormFilled?: () => void;
+  onRegisterPress?: () => void;
 };
 
 export function LoginForm(props: Props) {
@@ -167,10 +169,19 @@ export function LoginForm(props: Props) {
         <Text variant="xs" muted>
           Don't have an account?{" "}
         </Text>
-        <Text variant="xs">
-          <Link to={{ screen: "Register" }}>Register here</Link>
-        </Text>
+        <TouchableOpacity onPress={props.onRegisterPress}>
+          <Text variant="xs" style={styles.linkText}>
+            Register here
+          </Text>
+        </TouchableOpacity>
       </View>
     </VStack>
   );
 }
+
+// TODO: centralize link style
+const styles = StyleSheet.create({
+  linkText: {
+    color: "blue",
+  },
+});

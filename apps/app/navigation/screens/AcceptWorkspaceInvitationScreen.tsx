@@ -8,6 +8,7 @@ import {
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
 import { LoginForm } from "../../components/login/LoginForm";
+import RegisterForm from "../../components/register/RegisterForm";
 
 export default function AcceptWorkspaceInvitationScreen(
   props: RootStackScreenProps<"AcceptWorkspaceInvitation">
@@ -25,6 +26,9 @@ export default function AcceptWorkspaceInvitationScreen(
     useAcceptWorkspaceInvitationMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
+  const AUTH_FORM_LOGIN = "login";
+  const AUTH_FORM_REGISTER = "register";
+  const [authForm, setAuthForm] = useState(AUTH_FORM_LOGIN);
 
   if (!workspaceInvitationId) {
     return (
@@ -33,6 +37,13 @@ export default function AcceptWorkspaceInvitationScreen(
       </View>
     );
   }
+
+  const switchToRegisterForm = () => {
+    setAuthForm(AUTH_FORM_REGISTER);
+  };
+  const switchToLoginForm = () => {
+    setAuthForm(AUTH_FORM_LOGIN);
+  };
 
   const acceptWorkspaceInvitation = async () => {
     const result = await acceptWorkspaceInvitationMutation({
@@ -100,7 +111,13 @@ export default function AcceptWorkspaceInvitationScreen(
               Accept
             </Button>
           ) : (
-            <LoginForm />
+            <>
+              {authForm === AUTH_FORM_LOGIN ? (
+                <LoginForm onRegisterPress={switchToRegisterForm} />
+              ) : (
+                <RegisterForm onLoginPress={switchToLoginForm} />
+              )}
+            </>
           )}
         </Box>
       </View>
