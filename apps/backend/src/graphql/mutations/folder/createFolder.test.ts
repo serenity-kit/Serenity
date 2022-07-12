@@ -1,6 +1,6 @@
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/registerUser";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { v4 as uuidv4 } from "uuid";

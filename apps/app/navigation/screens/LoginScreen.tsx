@@ -5,10 +5,18 @@ import { LoginForm } from "../../components/login/LoginForm";
 import { navigateToNextAuthenticatedPage } from "../../utils/authentication/loginHelper";
 import { KeyboardAvoidingView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { roundToNearestMinutes } from "date-fns";
 
 export default function LoginScreen(props: RootStackScreenProps<"Login">) {
-  const onLoginSuccess = () => {
-    navigateToNextAuthenticatedPage(props.navigation);
+  const switchToRegisterForm = () => {
+    props.navigation.navigate("Register");
+  };
+
+  const onLoginSuccess = (pendingWorkspaceInvitationId) => {
+    navigateToNextAuthenticatedPage({
+      navigation: props.navigation,
+      pendingWorkspaceInvitationId,
+    });
   };
   return (
     <SafeAreaView style={tw`flex-auto`}>
@@ -27,7 +35,10 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
                 </Text>
               </View>
             </View>
-            <LoginForm onLoginSuccess={onLoginSuccess} />
+            <LoginForm
+              onRegisterPress={switchToRegisterForm}
+              onLoginSuccess={onLoginSuccess}
+            />
           </Box>
         </View>
       </KeyboardAvoidingView>

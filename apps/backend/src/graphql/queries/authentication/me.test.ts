@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/registerUser";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 
 const graphql = setupGraphql();
 let userId = "";

@@ -2,7 +2,7 @@ import { GraphQLClient } from "graphql-request";
 import getPort, { portNumbers } from "./getPort";
 import createServer from "../../src/createServer";
 
-type TestContext = {
+export type TestContext = {
   client: GraphQLClient;
 };
 

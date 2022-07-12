@@ -19,8 +19,6 @@ import {
 import {
   useStartLoginMutation,
   useFinishLoginMutation,
-  MainDeviceQuery,
-  MainDeviceDocument,
 } from "../../generated/graphql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
@@ -29,6 +27,7 @@ import {
   navigateToNextAuthenticatedPage,
 } from "../../utils/authentication/loginHelper";
 import { useClient } from "urql";
+import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
 
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
@@ -69,8 +68,15 @@ export default function RegistrationVerificationScreen(
         updateAuthentication,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
+      const pendingWorkspaceInvitationId =
+        await getPendingWorkspaceInvitationId({
+          urqlClient,
+        });
       setIsLoggingIn(false);
-      navigateToNextAuthenticatedPage(props.navigation);
+      navigateToNextAuthenticatedPage({
+        navigation: props.navigation,
+        pendingWorkspaceInvitationId,
+      });
     } catch (error) {
       console.error(error);
       setErrorMessage("Failed to login.");

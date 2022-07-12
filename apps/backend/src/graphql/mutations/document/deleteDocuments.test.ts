@@ -1,6 +1,6 @@
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/registerUser";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { deleteDocuments } from "../../../../test/helpers/document/deleteDocuments";

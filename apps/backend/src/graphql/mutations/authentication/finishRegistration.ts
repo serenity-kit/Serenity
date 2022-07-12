@@ -20,6 +20,7 @@ export const FinishRegistrationInput = inputObjectType({
     t.nonNull.string("message");
     t.nonNull.string("registrationId");
     t.nonNull.field("mainDevice", { type: FinishRegistrationDeviceInput });
+    t.string("pendingWorkspaceInvitationId");
   },
 });
 
@@ -51,6 +52,7 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
       username,
       opaqueEnvelope: envelope,
       mainDevice: args.input.mainDevice,
+      pendingWorkspaceInvitationId: args.input.pendingWorkspaceInvitationId,
     });
     return {
       id: unverifiedUser.id,

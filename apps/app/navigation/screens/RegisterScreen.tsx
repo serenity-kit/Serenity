@@ -8,6 +8,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function RegisterScreen(
   props: RootStackScreenProps<"Register">
 ) {
+  const switchToLoginForm = () => {
+    props.navigation.navigate("Login", { next: undefined });
+  };
+
   const onRegisterSuccess = (username: string, verificationCode?: string) => {
     props.navigation.push("RegistrationVerification", {
       username,
@@ -32,7 +36,10 @@ export default function RegisterScreen(
                 No credit card required.
               </Text>
             </View>
-            <RegisterForm onRegisterSuccess={onRegisterSuccess} />
+            <RegisterForm
+              onLoginPress={switchToLoginForm}
+              onRegisterSuccess={onRegisterSuccess}
+            />
           </Box>
         </View>
       </KeyboardAvoidingView>

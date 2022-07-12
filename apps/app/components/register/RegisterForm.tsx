@@ -12,7 +12,11 @@ import {
   useFinishRegistrationMutation,
   useStartRegistrationMutation,
 } from "../../generated/graphql";
-import { useWindowDimensions } from "react-native";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+} from "react-native";
 import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
 import { VStack } from "native-base";
 import { createAndEncryptDevice } from "@serenity-tools/common";
@@ -20,8 +24,10 @@ import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { storeUsernamePassword } from "../../utils/authentication/registrationMemoryStore";
 
 type Props = {
+  pendingWorkspaceInvitationId?: string;
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
   onRegisterFail?: () => void;
+  onLoginPress?: () => void;
 };
 
 export default function RegisterForm(props: Props) {
@@ -71,6 +77,7 @@ export default function RegisterForm(props: Props) {
             registrationId:
               startRegistrationResult.data.startRegistration.registrationId,
             mainDevice,
+            pendingWorkspaceInvitationId: props.pendingWorkspaceInvitationId,
           },
         });
         // check for an error
@@ -157,10 +164,19 @@ export default function RegisterForm(props: Props) {
         <Text variant="xs" muted>
           Already have an account?
         </Text>
-        <Text variant="xs">
-          <Link to={{ screen: "Login" }}>Login here</Link>
-        </Text>
+        <TouchableOpacity onPress={props.onLoginPress}>
+          <Text variant="xs" style={styles.linkText}>
+            Login here
+          </Text>
+        </TouchableOpacity>
       </View>
     </VStack>
   );
 }
+
+// TODO: centralize the text link style
+const styles = StyleSheet.create({
+  linkText: {
+    color: "blue",
+  },
+});

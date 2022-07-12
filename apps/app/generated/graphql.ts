@@ -212,7 +212,7 @@ export type FinishLoginInput = {
 
 export type FinishLoginResult = {
   __typename?: 'FinishLoginResult';
-  expiresAt?: Maybe<Scalars['Date']>;
+  expiresAt: Scalars['Date'];
 };
 
 export type FinishRegistrationDeviceInput = {
@@ -227,6 +227,7 @@ export type FinishRegistrationDeviceInput = {
 export type FinishRegistrationInput = {
   mainDevice: FinishRegistrationDeviceInput;
   message: Scalars['String'];
+  pendingWorkspaceInvitationId?: InputMaybe<Scalars['String']>;
   registrationId: Scalars['String'];
 };
 
@@ -411,6 +412,11 @@ export type PageInfo = {
   startCursor?: Maybe<Scalars['String']>;
 };
 
+export type PendingWorkspaceInvitationResult = {
+  __typename?: 'PendingWorkspaceInvitationResult';
+  id?: Maybe<Scalars['String']>;
+};
+
 export type Query = {
   __typename?: 'Query';
   deviceBySigningPublicKey?: Maybe<DeviceResult>;
@@ -422,6 +428,7 @@ export type Query = {
   folders?: Maybe<FolderConnection>;
   mainDevice?: Maybe<MainDeviceResult>;
   me?: Maybe<MeResult>;
+  pendingWorkspaceInvitation?: Maybe<PendingWorkspaceInvitationResult>;
   rootFolders?: Maybe<FolderConnection>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
   workspace?: Maybe<Workspace>;
@@ -726,7 +733,7 @@ export type FinishLoginMutationVariables = Exact<{
 }>;
 
 
-export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', expiresAt?: any | null } | null };
+export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', expiresAt: any } | null };
 
 export type FinishRegistrationMutationVariables = Exact<{
   input: FinishRegistrationInput;
@@ -833,6 +840,11 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null };
+
+export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PendingWorkspaceInvitationQuery = { __typename?: 'Query', pendingWorkspaceInvitation?: { __typename?: 'PendingWorkspaceInvitationResult', id?: string | null } | null };
 
 export type RootFoldersQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1280,6 +1292,17 @@ export const MeDocument = gql`
 
 export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const PendingWorkspaceInvitationDocument = gql`
+    query pendingWorkspaceInvitation {
+  pendingWorkspaceInvitation {
+    id
+  }
+}
+    `;
+
+export function usePendingWorkspaceInvitationQuery(options?: Omit<Urql.UseQueryArgs<PendingWorkspaceInvitationQueryVariables>, 'query'>) {
+  return Urql.useQuery<PendingWorkspaceInvitationQuery>({ query: PendingWorkspaceInvitationDocument, ...options });
 };
 export const RootFoldersDocument = gql`
     query rootFolders($workspaceId: ID!, $first: Int!, $after: String) {
