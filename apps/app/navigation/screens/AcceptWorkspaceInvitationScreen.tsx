@@ -9,7 +9,6 @@ import {
 import { RootStackScreenProps } from "../../types/navigation";
 import { LoginForm } from "../../components/login/LoginForm";
 import RegisterForm from "../../components/register/RegisterForm";
-import { navigateToNextAuthenticatedPage } from "../../utils/authentication/loginHelper";
 
 export default function AcceptWorkspaceInvitationScreen(
   props: RootStackScreenProps<"AcceptWorkspaceInvitation">
@@ -27,9 +26,7 @@ export default function AcceptWorkspaceInvitationScreen(
     useAcceptWorkspaceInvitationMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
-  const AUTH_FORM_LOGIN = "login";
-  const AUTH_FORM_REGISTER = "register";
-  const [authForm, setAuthForm] = useState(AUTH_FORM_LOGIN);
+  const [authForm, setAuthForm] = useState<"login" | "register">("login");
 
   if (!workspaceInvitationId) {
     return (
@@ -40,11 +37,11 @@ export default function AcceptWorkspaceInvitationScreen(
   }
 
   const switchToRegisterForm = () => {
-    setAuthForm(AUTH_FORM_REGISTER);
+    setAuthForm("register");
   };
 
   const switchToLoginForm = () => {
-    setAuthForm(AUTH_FORM_LOGIN);
+    setAuthForm("login");
   };
 
   const onRegisterSuccess = (username: string, verificationCode: string) => {
@@ -121,7 +118,7 @@ export default function AcceptWorkspaceInvitationScreen(
             </Button>
           ) : (
             <>
-              {authForm === AUTH_FORM_LOGIN ? (
+              {authForm === "login" ? (
                 <LoginForm onRegisterPress={switchToRegisterForm} />
               ) : (
                 <RegisterForm
