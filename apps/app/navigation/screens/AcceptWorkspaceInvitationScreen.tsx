@@ -70,7 +70,6 @@ export default function AcceptWorkspaceInvitationScreen(
     const result = await acceptWorkspaceInvitationMutation({
       input: { workspaceInvitationId },
     });
-    console.log({ result });
     if (result.error) {
       setHasGraphqlError(true);
       setGraphqlError(result.error.message);
