@@ -8,6 +8,8 @@ import {
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
 import { LoginForm } from "../../components/login/LoginForm";
+import RegisterForm from "../../components/register/RegisterForm";
+import { navigateToNextAuthenticatedPage } from "../../utils/authentication/loginHelper";
 
 export default function AcceptWorkspaceInvitationScreen(
   props: RootStackScreenProps<"AcceptWorkspaceInvitation">
@@ -25,6 +27,9 @@ export default function AcceptWorkspaceInvitationScreen(
     useAcceptWorkspaceInvitationMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
+  const AUTH_FORM_LOGIN = "login";
+  const AUTH_FORM_REGISTER = "register";
+  const [authForm, setAuthForm] = useState(AUTH_FORM_LOGIN);
 
   if (!workspaceInvitationId) {
     return (
@@ -33,6 +38,21 @@ export default function AcceptWorkspaceInvitationScreen(
       </View>
     );
   }
+
+  const switchToRegisterForm = () => {
+    setAuthForm(AUTH_FORM_REGISTER);
+  };
+
+  const switchToLoginForm = () => {
+    setAuthForm(AUTH_FORM_LOGIN);
+  };
+
+  const onRegisterSuccess = (username: string, verificationCode: string) => {
+    props.navigation.navigate("RegistrationVerification", {
+      username,
+      verification: verificationCode,
+    });
+  };
 
   const acceptWorkspaceInvitation = async () => {
     const result = await acceptWorkspaceInvitationMutation({
@@ -90,7 +110,7 @@ export default function AcceptWorkspaceInvitationScreen(
               </Text>
               {!sessionKey && (
                 <Text style={styles.alertBannerText}>
-                  Log in to accept the invitation.
+                  Log in or register to accept the invitation.
                 </Text>
               )}
             </View>
@@ -101,8 +121,17 @@ export default function AcceptWorkspaceInvitationScreen(
             </Button>
           ) : (
             <>
-              {/* TODO: add workspaceInvitationId to RegisterForm after merged PRs */}
-              <LoginForm />
+              {authForm === AUTH_FORM_LOGIN ? (
+                <LoginForm onRegisterPress={switchToRegisterForm} />
+              ) : (
+                <RegisterForm
+                  pendingWorkspaceInvitationId={
+                    props.route.params.workspaceInvitationId
+                  }
+                  onLoginPress={switchToLoginForm}
+                  onRegisterSuccess={onRegisterSuccess}
+                />
+              )}
             </>
           )}
         </Box>

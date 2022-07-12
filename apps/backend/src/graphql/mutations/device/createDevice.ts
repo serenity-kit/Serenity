@@ -14,7 +14,6 @@ export const CreateDeviceInput = inputObjectType({
     t.nonNull.string("signingPublicKey");
     t.nonNull.string("encryptionPublicKey");
     t.nonNull.string("encryptionPublicKeySignature");
-    t.field("createdAt", { type: nonNull("Date") });
     t.nonNull.string("info");
   },
 });
