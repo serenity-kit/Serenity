@@ -104,7 +104,6 @@ export const navigateToNextAuthenticatedPage = ({
   pendingWorkspaceInvitationId,
   autoAcceptWorkspaceInvitation,
 }: NavigateToNextAuthenticatedPageProps) => {
-  console.log({ pendingWorkspaceInvitationId, autoAcceptWorkspaceInvitation });
   if (pendingWorkspaceInvitationId) {
     let accept = WorkspaceInvitationAcceptParam.DO_NOT_ACCEPT;
     if (autoAcceptWorkspaceInvitation) {

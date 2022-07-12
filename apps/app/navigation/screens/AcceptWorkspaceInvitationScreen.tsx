@@ -93,12 +93,7 @@ export default function AcceptWorkspaceInvitationScreen(
   };
 
   useEffect(() => {
-    console.log({
-      accept: props.route.params.accept,
-      want: WorkspaceInvitationAcceptParam.ACCEPT,
-    });
     if (props.route.params.accept == WorkspaceInvitationAcceptParam.ACCEPT) {
-      console.log("accepting workspace invitation!!!");
       acceptWorkspaceInvitation();
     }
   }, [props.route.params.accept, props.route.params.workspaceInvitationId]);
