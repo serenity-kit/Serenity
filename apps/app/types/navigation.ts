@@ -43,8 +43,13 @@ export type WorkspaceParams =
     workspaceId: string;
   };
 
+export enum WorkspaceInvitationAcceptParam {
+  ACCEPT = "1",
+  DO_NOT_ACCEPT = "",
+}
 export type WorkspaceInvitationParams = {
   workspaceInvitationId: string;
+  accept?: WorkspaceInvitationAcceptParam;
 };
 
 export type RootStackParamList = {

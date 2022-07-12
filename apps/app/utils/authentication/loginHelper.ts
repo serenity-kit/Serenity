@@ -4,6 +4,7 @@ import { decryptDevice } from "@serenity-tools/common";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { Client } from "urql";
 import { UpdateAuthenticationFunction } from "../../context/AuthenticationContext";
+import { WorkspaceInvitationAcceptParam } from "../../types/navigation";
 
 export type LoginParams = {
   username: string;
@@ -95,15 +96,23 @@ export const fetchMainDevice = async ({
  */
 export type NavigateToNextAuthenticatedPageProps = {
   navigation: any;
-  pendingWorkspaceInvitationId: string | null | undefined;
+  pendingWorkspaceInvitationId?: string | null | undefined;
+  autoAcceptWorkspaceInvitation?: boolean;
 };
 export const navigateToNextAuthenticatedPage = ({
   navigation,
   pendingWorkspaceInvitationId,
+  autoAcceptWorkspaceInvitation,
 }: NavigateToNextAuthenticatedPageProps) => {
+  console.log({ pendingWorkspaceInvitationId, autoAcceptWorkspaceInvitation });
   if (pendingWorkspaceInvitationId) {
+    let accept = WorkspaceInvitationAcceptParam.DO_NOT_ACCEPT;
+    if (autoAcceptWorkspaceInvitation) {
+      accept = WorkspaceInvitationAcceptParam.ACCEPT;
+    }
     navigation.navigate("AcceptWorkspaceInvitation", {
       workspaceInvitationId: pendingWorkspaceInvitationId,
+      accept,
     });
   } else {
     navigation.navigate("Root");

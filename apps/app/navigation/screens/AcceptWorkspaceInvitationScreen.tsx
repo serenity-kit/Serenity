@@ -1,12 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, tw, Box, Button } from "@serenity-tools/ui";
-import { useWindowDimensions, StyleSheet } from "react-native";
+import {
+  useWindowDimensions,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
   useAcceptWorkspaceInvitationMutation,
   useWorkspaceInvitationQuery,
 } from "../../generated/graphql";
-import { RootStackScreenProps } from "../../types/navigation";
+import {
+  RootStackScreenProps,
+  WorkspaceInvitationAcceptParam,
+} from "../../types/navigation";
 import { LoginForm } from "../../components/login/LoginForm";
 import RegisterForm from "../../components/register/RegisterForm";
 
@@ -55,10 +62,15 @@ export default function AcceptWorkspaceInvitationScreen(
     await acceptWorkspaceInvitation();
   };
 
+  const goToRoot = () => {
+    props.navigation.navigate("Root");
+  };
+
   const acceptWorkspaceInvitation = async () => {
     const result = await acceptWorkspaceInvitationMutation({
       input: { workspaceInvitationId },
     });
+    console.log({ result });
     if (result.error) {
       setHasGraphqlError(true);
       setGraphqlError(result.error.message);
@@ -79,6 +91,17 @@ export default function AcceptWorkspaceInvitationScreen(
       });
     }
   };
+
+  useEffect(() => {
+    console.log({
+      accept: props.route.params.accept,
+      want: WorkspaceInvitationAcceptParam.ACCEPT,
+    });
+    if (props.route.params.accept == WorkspaceInvitationAcceptParam.ACCEPT) {
+      console.log("accepting workspace invitation!!!");
+      acceptWorkspaceInvitation();
+    }
+  }, [props.route.params.accept, props.route.params.workspaceInvitationId]);
 
   return (
     <>
@@ -117,9 +140,17 @@ export default function AcceptWorkspaceInvitationScreen(
             </View>
           )}
           {sessionKey ? (
-            <Button onPress={acceptWorkspaceInvitation} size="large">
-              Accept
-            </Button>
+            <>
+              <Button onPress={acceptWorkspaceInvitation} size="large">
+                Accept
+              </Button>
+
+              <TouchableOpacity onPress={goToRoot}>
+                <Text variant="xs" style={styles.linkText}>
+                  Go to Home
+                </Text>
+              </TouchableOpacity>
+            </>
           ) : (
             <>
               {authForm === "login" ? (
@@ -145,6 +176,11 @@ export default function AcceptWorkspaceInvitationScreen(
 }
 
 const styles = StyleSheet.create({
+  // TODO: centralize the text link style
+  linkText: {
+    color: "blue",
+    textAlign: "center",
+  },
   alertBanner: {},
   alertBannerText: {
     color: "#000",

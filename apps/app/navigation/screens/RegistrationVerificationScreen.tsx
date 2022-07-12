@@ -73,9 +73,11 @@ export default function RegistrationVerificationScreen(
           urqlClient,
         });
       setIsLoggingIn(false);
+      const autoAcceptWorkspaceInvitation = !!pendingWorkspaceInvitationId;
       navigateToNextAuthenticatedPage({
         navigation: props.navigation,
         pendingWorkspaceInvitationId,
+        autoAcceptWorkspaceInvitation,
       });
     } catch (error) {
       console.error(error);
