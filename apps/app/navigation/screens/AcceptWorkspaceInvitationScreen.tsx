@@ -51,6 +51,10 @@ export default function AcceptWorkspaceInvitationScreen(
     });
   };
 
+  const onLoginSuccess = async (pendingWorkspaceInvitationId: string) => {
+    await acceptWorkspaceInvitation();
+  };
+
   const acceptWorkspaceInvitation = async () => {
     const result = await acceptWorkspaceInvitationMutation({
       input: { workspaceInvitationId },
@@ -119,7 +123,10 @@ export default function AcceptWorkspaceInvitationScreen(
           ) : (
             <>
               {authForm === "login" ? (
-                <LoginForm onRegisterPress={switchToRegisterForm} />
+                <LoginForm
+                  onRegisterPress={switchToRegisterForm}
+                  onLoginSuccess={onLoginSuccess}
+                />
               ) : (
                 <RegisterForm
                   pendingWorkspaceInvitationId={
