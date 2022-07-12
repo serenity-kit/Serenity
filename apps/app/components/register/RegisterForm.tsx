@@ -20,7 +20,7 @@ import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { storeUsernamePassword } from "../../utils/authentication/registrationMemoryStore";
 
 type Props = {
-  pendingWorkspaceInvitationId: string | undefined | null;
+  pendingWorkspaceInvitationId?: string;
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
   onRegisterFail?: () => void;
 };

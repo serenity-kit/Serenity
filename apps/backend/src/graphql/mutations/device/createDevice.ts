@@ -1,4 +1,10 @@
-import { arg, inputObjectType, mutationField, objectType } from "nexus";
+import {
+  arg,
+  nonNull,
+  inputObjectType,
+  mutationField,
+  objectType,
+} from "nexus";
 import { createDevice } from "../../../database/device/createDevice";
 import { Device } from "../../types/device";
 
@@ -8,6 +14,7 @@ export const CreateDeviceInput = inputObjectType({
     t.nonNull.string("signingPublicKey");
     t.nonNull.string("encryptionPublicKey");
     t.nonNull.string("encryptionPublicKeySignature");
+    t.field("createdAt", { type: nonNull("Date") });
     t.nonNull.string("info");
   },
 });
@@ -49,6 +56,7 @@ export const createDeviceMutation = mutationField("createDevice", {
         encryptionPublicKeySignature: device.encryptionPublicKeySignature,
         signingPublicKey: device.signingPublicKey,
         userId: device.userId,
+        createdAt: device.createdAt,
         info: device.info,
       },
     };
