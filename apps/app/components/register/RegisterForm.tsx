@@ -20,6 +20,7 @@ import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { storeUsernamePassword } from "../../utils/authentication/registrationMemoryStore";
 
 type Props = {
+  pendingWorkspaceInvitationId: string | undefined | null;
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
   onRegisterFail?: () => void;
 };
@@ -71,6 +72,7 @@ export default function RegisterForm(props: Props) {
             registrationId:
               startRegistrationResult.data.startRegistration.registrationId,
             mainDevice,
+            pendingWorkspaceInvitationId: props.pendingWorkspaceInvitationId,
           },
         });
         // check for an error

@@ -12,6 +12,7 @@ type Props = {
   username: string;
   opaqueEnvelope: string;
   mainDevice: DeviceInput;
+  pendingWorkspaceInvitationId: string | null | undefined;
 };
 
 const createConfirmationCode = async (): Promise<string> => {
@@ -35,6 +36,7 @@ export async function finalizeRegistration({
   username,
   opaqueEnvelope,
   mainDevice,
+  pendingWorkspaceInvitationId,
 }: Props) {
   if (!verifyDevice(mainDevice)) {
     throw new Error("Failed to verify main device.");
@@ -66,6 +68,7 @@ export async function finalizeRegistration({
           mainDeviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
           mainDeviceEncryptionPublicKeySignature:
             mainDevice.encryptionPublicKeySignature,
+          pendingWorkspaceInvitationId,
         },
       });
       // TODO: send an email to the user's email address

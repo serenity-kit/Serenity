@@ -212,7 +212,7 @@ export type FinishLoginInput = {
 
 export type FinishLoginResult = {
   __typename?: 'FinishLoginResult';
-  expiresAt?: Maybe<Scalars['Date']>;
+  expiresAt: Scalars['Date'];
 };
 
 export type FinishRegistrationDeviceInput = {
@@ -227,6 +227,7 @@ export type FinishRegistrationDeviceInput = {
 export type FinishRegistrationInput = {
   mainDevice: FinishRegistrationDeviceInput;
   message: Scalars['String'];
+  pendingWorkspaceInvitationId?: InputMaybe<Scalars['String']>;
   registrationId: Scalars['String'];
 };
 
@@ -726,7 +727,7 @@ export type FinishLoginMutationVariables = Exact<{
 }>;
 
 
-export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', expiresAt?: any | null } | null };
+export type FinishLoginMutation = { __typename?: 'Mutation', finishLogin?: { __typename?: 'FinishLoginResult', expiresAt: any } | null };
 
 export type FinishRegistrationMutationVariables = Exact<{
   input: FinishRegistrationInput;

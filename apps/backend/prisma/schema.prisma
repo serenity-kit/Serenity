@@ -64,6 +64,7 @@ model UnverifiedUser {
   mainDeviceSigningPublicKey                 String    @unique
   mainDeviceEncryptionPublicKey              String    @unique
   mainDeviceEncryptionPublicKeySignature     String    @unique
+  pendingWorkspaceInvitationId               String?
 }
 
 model User {
@@ -85,6 +86,7 @@ model User {
   usersToWorkspaces                          UsersToWorkspaces[]
   workspaceInvitations                       WorkspaceInvitations[]
   sessions                                   Session[]
+  pendingWorkspaceInvitationId               String?
 }
 
 model Session {

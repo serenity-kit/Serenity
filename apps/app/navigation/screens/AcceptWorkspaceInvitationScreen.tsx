@@ -100,7 +100,10 @@ export default function AcceptWorkspaceInvitationScreen(
               Accept
             </Button>
           ) : (
-            <LoginForm />
+            <>
+              {/* TODO: add workspaceInvitationId to RegisterForm after merged PRs */}
+              <LoginForm />
+            </>
           )}
         </Box>
       </View>
