@@ -74,19 +74,13 @@ test("should throw an error if we try to fetch more than 50", async () => {
     id: otherWorkspaceId2,
     username: username,
   });
-  const workspaceInvitationsResult = await workspaceInvitations({
-    graphql,
-    workspaceId,
-    authorizationHeader: userAndDevice.sessionKey,
-    first: 51,
-  });
-  const invitations = workspaceInvitationsResult.workspaceInvitations.edges;
   await expect(
     (async () =>
       await workspaceInvitations({
         graphql,
         workspaceId,
         authorizationHeader: userAndDevice.sessionKey,
+        first: 51,
       }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
