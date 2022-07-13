@@ -1,5 +1,6 @@
 import { prisma } from "../prisma";
 import { WorkspaceInvitation } from "../../types/workspace";
+import { ForbiddenError } from "apollo-server-express";
 
 type Cursor = {
   id?: string;
@@ -27,7 +28,7 @@ export async function getWorkspaceInvitations({
     },
   });
   if (!userToWorkspaces) {
-    throw new Error("Unauthorized");
+    throw new ForbiddenError("Unauthorized");
   }
   const rawWorkspaceInvitations = await prisma.workspaceInvitations.findMany({
     where: {
