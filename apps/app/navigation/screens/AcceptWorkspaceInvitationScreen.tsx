@@ -1,6 +1,10 @@
 import React, { useState } from "react";
-import { Text, View, tw, Box, Button } from "@serenity-tools/ui";
-import { useWindowDimensions, StyleSheet } from "react-native";
+import { Text, View, tw, Box, Button, LinkButton } from "@serenity-tools/ui";
+import {
+  useWindowDimensions,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
   useAcceptWorkspaceInvitationMutation,
@@ -119,15 +123,34 @@ export default function AcceptWorkspaceInvitationScreen(
           ) : (
             <>
               {authForm === "login" ? (
-                <LoginForm onRegisterPress={switchToRegisterForm} />
+                <>
+                  <LoginForm />
+                  <View style={tw`text-center`}>
+                    <Text variant="xs" muted>
+                      Don't have an account?
+                    </Text>
+                    <LinkButton onPress={switchToRegisterForm}>
+                      Register here
+                    </LinkButton>
+                  </View>
+                </>
               ) : (
-                <RegisterForm
-                  pendingWorkspaceInvitationId={
-                    props.route.params.workspaceInvitationId
-                  }
-                  onLoginPress={switchToLoginForm}
-                  onRegisterSuccess={onRegisterSuccess}
-                />
+                <>
+                  <RegisterForm
+                    pendingWorkspaceInvitationId={
+                      props.route.params.workspaceInvitationId
+                    }
+                    onRegisterSuccess={onRegisterSuccess}
+                  />
+                  <View style={tw`text-center`}>
+                    <Text variant="xs" muted>
+                      Already have an account?
+                    </Text>
+                    <LinkButton onPress={switchToLoginForm}>
+                      Login here
+                    </LinkButton>
+                  </View>
+                </>
               )}
             </>
           )}

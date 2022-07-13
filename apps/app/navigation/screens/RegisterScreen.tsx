@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, Box, tw } from "@serenity-tools/ui";
+import { Text, View, Box, tw, Link } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types/navigation";
 import RegisterForm from "../../components/register/RegisterForm";
 import { KeyboardAvoidingView } from "react-native";
@@ -8,10 +8,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function RegisterScreen(
   props: RootStackScreenProps<"Register">
 ) {
-  const switchToLoginForm = () => {
-    props.navigation.navigate("Login", { next: undefined });
-  };
-
   const onRegisterSuccess = (username: string, verificationCode?: string) => {
     props.navigation.push("RegistrationVerification", {
       username,
@@ -36,10 +32,13 @@ export default function RegisterScreen(
                 No credit card required.
               </Text>
             </View>
-            <RegisterForm
-              onLoginPress={switchToLoginForm}
-              onRegisterSuccess={onRegisterSuccess}
-            />
+            <RegisterForm onRegisterSuccess={onRegisterSuccess} />
+            <View style={tw`text-center`}>
+              <Text variant="xs" muted>
+                Already have an account?
+              </Text>
+              <Link to={{ screen: "Login" }}>Login here</Link>
+            </View>
           </Box>
         </View>
       </KeyboardAvoidingView>

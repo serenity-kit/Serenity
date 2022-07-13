@@ -4,7 +4,6 @@ import {
   View,
   Button,
   Checkbox,
-  tw,
   Link,
   LabeledInput,
 } from "@serenity-tools/ui";
@@ -12,11 +11,7 @@ import {
   useFinishRegistrationMutation,
   useStartRegistrationMutation,
 } from "../../generated/graphql";
-import {
-  StyleSheet,
-  TouchableOpacity,
-  useWindowDimensions,
-} from "react-native";
+import { useWindowDimensions } from "react-native";
 import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
 import { VStack } from "native-base";
 import { createAndEncryptDevice } from "@serenity-tools/common";
@@ -27,7 +22,6 @@ type Props = {
   pendingWorkspaceInvitationId?: string;
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
   onRegisterFail?: () => void;
-  onLoginPress?: () => void;
 };
 
 export default function RegisterForm(props: Props) {
@@ -159,24 +153,6 @@ export default function RegisterForm(props: Props) {
       <Button onPress={onRegisterPress} size="large">
         Register
       </Button>
-
-      <View style={tw`text-center`}>
-        <Text variant="xs" muted>
-          Already have an account?
-        </Text>
-        <TouchableOpacity onPress={props.onLoginPress}>
-          <Text variant="xs" style={styles.linkText}>
-            Login here
-          </Text>
-        </TouchableOpacity>
-      </View>
     </VStack>
   );
 }
-
-// TODO: centralize the text link style
-const styles = StyleSheet.create({
-  linkText: {
-    color: "blue",
-  },
-});

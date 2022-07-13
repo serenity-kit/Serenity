@@ -1,19 +1,6 @@
 import React, { useState } from "react";
-import {
-  Button,
-  LabeledInput,
-  Text,
-  View,
-  Link,
-  tw,
-  Checkbox,
-} from "@serenity-tools/ui";
-import {
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  useWindowDimensions,
-} from "react-native";
+import { Button, LabeledInput, Text, View, Checkbox } from "@serenity-tools/ui";
+import { Platform, useWindowDimensions } from "react-native";
 import { VStack } from "native-base";
 import {
   useStartLoginMutation,
@@ -40,7 +27,6 @@ type Props = {
   onLoginFail?: () => void;
   onEmailChangeText?: (username: string) => void;
   onFormFilled?: () => void;
-  onRegisterPress?: () => void;
 };
 
 export function LoginForm(props: Props) {
@@ -176,23 +162,6 @@ export function LoginForm(props: Props) {
       <Button onPress={onLoginPress} size="large" disabled={isLoggingIn}>
         Log in
       </Button>
-      <View style={tw`text-center`}>
-        <Text variant="xs" muted>
-          Don't have an account?{" "}
-        </Text>
-        <TouchableOpacity onPress={props.onRegisterPress}>
-          <Text variant="xs" style={styles.linkText}>
-            Register here
-          </Text>
-        </TouchableOpacity>
-      </View>
     </VStack>
   );
 }
-
-// TODO: centralize the text link style
-const styles = StyleSheet.create({
-  linkText: {
-    color: "blue",
-  },
-});
