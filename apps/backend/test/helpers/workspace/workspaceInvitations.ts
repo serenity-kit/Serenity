@@ -4,19 +4,21 @@ type Params = {
   graphql: any;
   workspaceId: string;
   authorizationHeader: string;
+  first?: number;
 };
 
 export const workspaceInvitations = async ({
   graphql,
   workspaceId,
   authorizationHeader,
+  first = 50,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
   const query = gql`
     {
-        workspaceInvitations(workspaceId: "${workspaceId}", first: 50) {
+        workspaceInvitations(workspaceId: "${workspaceId}", first: ${first}) {
             edges {
                 node {
                     id
