@@ -13,6 +13,7 @@ import {
 import { RootStackScreenProps } from "../../types/navigation";
 import { LoginForm } from "../../components/login/LoginForm";
 import RegisterForm from "../../components/register/RegisterForm";
+import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
 
 export default function AcceptWorkspaceInvitationScreen(
   props: RootStackScreenProps<"AcceptWorkspaceInvitation">
@@ -55,28 +56,19 @@ export default function AcceptWorkspaceInvitationScreen(
     });
   };
 
-  const acceptWorkspaceInvitation = async () => {
-    const result = await acceptWorkspaceInvitationMutation({
-      input: { workspaceInvitationId },
-    });
-    if (result.error) {
-      setHasGraphqlError(true);
-      setGraphqlError(result.error.message);
-      return;
-    }
-    if (result.data) {
-      // TODO: put up a toast explaining the new workspace
-      const workspace = result.data.acceptWorkspaceInvitation?.workspace;
-      if (!workspace) {
-        // NOTE: probably the invitation expired or was deleted
-        setHasGraphqlError(true);
-        setGraphqlError("Could not find workspace");
-        return;
-      }
+  const onAcceptWorkspaceInvitationPress = async () => {
+    try {
+      const workspace = await acceptWorkspaceInvitation({
+        workspaceInvitationId,
+        acceptWorkspaceInvitationMutation,
+      });
       props.navigation.navigate("Workspace", {
-        workspaceId: workspace.id,
+        workspaceId: workspace!.id,
         screen: "WorkspaceRoot",
       });
+    } catch (error) {
+      setHasGraphqlError(true);
+      setGraphqlError(error.message);
     }
   };
 
@@ -117,7 +109,7 @@ export default function AcceptWorkspaceInvitationScreen(
             </View>
           )}
           {sessionKey ? (
-            <Button onPress={acceptWorkspaceInvitation} size="large">
+            <Button onPress={onAcceptWorkspaceInvitationPress} size="large">
               Accept
             </Button>
           ) : (

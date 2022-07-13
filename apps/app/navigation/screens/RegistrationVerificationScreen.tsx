@@ -9,7 +9,10 @@ import {
   InfoMessage,
 } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types/navigation";
-import { useVerifyRegistrationMutation } from "../../generated/graphql";
+import {
+  useAcceptWorkspaceInvitationMutation,
+  useVerifyRegistrationMutation,
+} from "../../generated/graphql";
 import {
   isUsernamePasswordStored,
   getStoredUsername,
@@ -28,6 +31,7 @@ import {
 } from "../../utils/authentication/loginHelper";
 import { useClient } from "urql";
 import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
+import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
 
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
@@ -38,14 +42,33 @@ export default function RegistrationVerificationScreen(
   );
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [graphqlError, setGraphqlError] = useState("");
 
   const { updateAuthentication } = useAuthentication();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
+  const [, acceptWorkspaceInvitationMutation] =
+    useAcceptWorkspaceInvitationMutation();
   const urqlClient = useClient();
 
   const navigateToLoginScreen = () => {
     props.navigation.push("Login", {});
+  };
+
+  const acceptPendingWorkspaceInvitation = async () => {
+    const pendingWorkspaceInvitationId = await getPendingWorkspaceInvitationId({
+      urqlClient,
+    });
+    if (pendingWorkspaceInvitationId) {
+      try {
+        await acceptWorkspaceInvitation({
+          workspaceInvitationId: pendingWorkspaceInvitationId,
+          acceptWorkspaceInvitationMutation,
+        });
+      } catch (error) {
+        setGraphqlError(error.message);
+      }
+    }
   };
 
   const loginWithStoredUsernamePassword = async () => {
@@ -56,7 +79,6 @@ export default function RegistrationVerificationScreen(
       navigateToLoginScreen();
       return;
     }
-
     try {
       setErrorMessage("");
       setIsLoggingIn(true);
@@ -68,14 +90,11 @@ export default function RegistrationVerificationScreen(
         updateAuthentication,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
-      const pendingWorkspaceInvitationId =
-        await getPendingWorkspaceInvitationId({
-          urqlClient,
-        });
+      await acceptPendingWorkspaceInvitation();
       setIsLoggingIn(false);
       navigateToNextAuthenticatedPage({
         navigation: props.navigation,
-        pendingWorkspaceInvitationId,
+        pendingWorkspaceInvitationId: null,
       });
     } catch (error) {
       console.error(error);
@@ -123,6 +142,10 @@ export default function RegistrationVerificationScreen(
             Please enter the verification code{"\n"}sent to you via Email.
           </Text>
         </View>
+
+        {graphqlError !== "" && (
+          <InfoMessage variant="error">{graphqlError}</InfoMessage>
+        )}
 
         {errorMessage ? (
           <InfoMessage variant="error" icon>
