@@ -1,8 +1,9 @@
 import "regenerator-runtime/runtime.js";
+import { base64ToArrayBuffer, wasmBase64String } from "./opaque-wasm-base64";
 import init, { Registration, Login } from "./vendor/opaque-wasm-web-build";
 
 // alert(init);
-init();
+init(base64ToArrayBuffer(wasmBase64String));
 // .then(() => {
 //   alert("READY A");
 // })
