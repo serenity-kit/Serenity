@@ -8,7 +8,7 @@ yarn-error.log
 package-lock.json
 
 # editor built for the mobile editor web view
-apps/app/assets/index.html
+apps/app/webviews/editor/index.html
 # opaque bridge built for mobile
 apps/app/assets/opaque.html
 
