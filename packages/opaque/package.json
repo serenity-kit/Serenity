@@ -4,7 +4,7 @@
   "main": "index",
   "scripts": {
     "build": "yarn build:web && yarn build:mobile",
-    "build:mobile": "webpack --config webpack.config.mobile-webview.js",
+    "build:mobile": "webpack --config webpack.config.mobile-webview.js && cp -r dist/index.html ../../apps/app/webviews/opaque/index.html",
     "build:web": "webpack --config webpack.config.web.js --mode=production && cp -r dist/web ../../apps/app",
     "dev:mobile": "webpack serve --config webpack.config.mobile-webview.js",
     "ts:check": "yarn tsc --noEmit",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "opaque-wasm": "^1.1.0",
+    "regenerator-runtime": "^0.13.9",
     "webpack": "^5.58.2",
     "webpack-cli": "^4.9.0"
   },
@@ -23,7 +24,7 @@
     "babel-loader": "^8.2.3",
     "html-webpack-plugin": "^5.5.0",
     "react-dev-utils": "^12.0.1",
-    "webpack-dev-server": "^4.3.1",
-    "typescript": "^4.6.3"
+    "typescript": "^4.6.3",
+    "webpack-dev-server": "^4.3.1"
   }
 }

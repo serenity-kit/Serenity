@@ -1,0 +1,37 @@
+{
+  "name": "opaque-wasm",
+  "collaborators": [
+    "Marcin Lazar <marcin.lazar@pm.me>",
+    "Hawkheart",
+    "r0kk3rz"
+  ],
+  "description": "An implementation of the OPAQUE key exchange protocol in WASM(WebAssembly)",
+  "version": "1.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marucjmar/opaque-wasm"
+  },
+  "files": [
+    "opaque_wasm_bg.wasm",
+    "opaque_wasm.js",
+    "opaque_wasm.d.ts"
+  ],
+  "module": "opaque_wasm.js",
+  "types": "opaque_wasm.d.ts",
+  "sideEffects": false,
+  "keywords": [
+    "cryptography",
+    "crypto",
+    "opaque",
+    "passwords",
+    "authentication",
+    "wasm",
+    "js",
+    "browser",
+    "webassembly",
+    "node",
+    "wasm-pack",
+    "bindgen",
+    "wasm-bindgen"
+  ]
+}

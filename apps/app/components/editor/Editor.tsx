@@ -1,25 +1,21 @@
 import { useEffect, useRef } from "react";
-import { Platform, SafeAreaView } from "react-native";
+import { SafeAreaView } from "react-native";
 import { WebView } from "react-native-webview";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
 import { Text, tw, View } from "@serenity-tools/ui";
 import * as Y from "yjs";
 import { EditorProps } from "./types";
+import { source } from "../../webviews/editor/source";
 
-// TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
-export async function loadEditorSourceForAndroid() {
-  const indexHtml = Asset.fromModule(require("../../assets/index.html"));
-  await indexHtml.downloadAsync();
-  // @ts-expect-error
-  const html = await FileSystem.readAsStringAsync(indexHtml.localUri);
-  return { html };
-}
-
-let editorSource =
-  Platform.OS !== "android"
-    ? require("../../assets/index.html")
-    : { html: null };
+// // TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
+// export async function loadEditorSourceForAndroid() {
+//   const indexHtml = Asset.fromModule(require("../../assets/index.html"));
+//   await indexHtml.downloadAsync();
+//   // @ts-expect-error
+//   const html = await FileSystem.readAsStringAsync(indexHtml.localUri);
+//   return { html };
+// }
 
 export default function Editor({
   yDocRef,
@@ -29,14 +25,14 @@ export default function Editor({
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
 
-  useEffect(() => {
-    const initEditor = async () => {
-      if (Platform.OS === "android") {
-        editorSource = await loadEditorSourceForAndroid();
-      }
-    };
-    initEditor();
-  }, []);
+  // useEffect(() => {
+  //   const initEditor = async () => {
+  //     if (Platform.OS === "android") {
+  //       editorSource = await loadEditorSourceForAndroid();
+  //     }
+  //   };
+  //   initEditor();
+  // }, []);
 
   yDocRef.current.on("updateV2", (update: any, origin: string) => {
     if (origin === "naisho-remote") {
@@ -56,7 +52,7 @@ export default function Editor({
       <WebView
         ref={webViewRef}
         originWhitelist={["*"]}
-        source={editorSource}
+        source={source}
         startInLoadingState={true}
         // can be activated once there is `Done` button
         // hideKeyboardAccessoryView={true}

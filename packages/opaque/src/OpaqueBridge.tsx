@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from "react";
-import { Platform, View } from "react-native";
+import { View } from "react-native";
 import { WebView } from "react-native-webview";
+import { WebViewSource } from "react-native-webview/lib/WebViewTypes";
 
 type PromiseCallbacks = {
   resolve: (value?: any) => void;
@@ -11,13 +12,10 @@ declare global {
   var _opaque: any;
 }
 
-let source =
-  Platform.OS !== "android" ? require("../dist/index.html") : { html: null };
-
 let counter = 0;
 const promisesStorage: { [key: string]: PromiseCallbacks } = {};
 
-export default function OpaqueBridge() {
+export default function OpaqueBridge({ source }: { source: WebViewSource }) {
   const webViewRef = useRef<WebView>(null);
 
   useEffect(() => {

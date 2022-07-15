@@ -20,7 +20,5 @@ apps/app/web-build
 # ignore ejected react-native ios app
 apps/app/ios
 
-# editor built for the mobile editor web view
-apps/app/webviews/editor/index.html
-# opaque bridge built for mobile
-apps/app/webviews/opaque/index.html
+# ignore entire backend
+apps/backend/
