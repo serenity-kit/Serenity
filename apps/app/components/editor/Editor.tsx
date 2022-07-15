@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
-import { Platform, SafeAreaView } from "react-native";
+import { SafeAreaView } from "react-native";
 import { WebView } from "react-native-webview";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
 import { Text, tw, View } from "@serenity-tools/ui";
 import * as Y from "yjs";
 import { EditorProps } from "./types";
+import { source } from "../../webviews/editor/source";
 
 // // TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
 // export async function loadEditorSourceForAndroid() {
@@ -15,11 +16,6 @@ import { EditorProps } from "./types";
 //   const html = await FileSystem.readAsStringAsync(indexHtml.localUri);
 //   return { html };
 // }
-
-let editorSource =
-  Platform.OS === "ios"
-    ? require("../../webviews/editor/index.html")
-    : { html: null };
 
 export default function Editor({
   yDocRef,
@@ -56,7 +52,7 @@ export default function Editor({
       <WebView
         ref={webViewRef}
         originWhitelist={["*"]}
-        source={editorSource}
+        source={source}
         startInLoadingState={true}
         // can be activated once there is `Done` button
         // hideKeyboardAccessoryView={true}
