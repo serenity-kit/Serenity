@@ -1,14 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { prisma } from "../../../src/database/prisma";
+import { delayForSeconds } from "../../helpers/delayForSeconds";
 import deleteAllRecords from "../../helpers/deleteAllRecords";
-
-const waitFor = async (seconds: number): Promise<void> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, seconds * 1000);
-  });
-};
 
 test.beforeAll(async () => {
   await deleteAllRecords();
@@ -34,7 +27,7 @@ test("Register", async ({ page }) => {
   // Click "register button"
   await page.locator('div[role="button"]:has-text("Register")').click();
 
-  await waitFor(1);
+  await delayForSeconds(1);
   // unverified user should have been created
   const unverifiedUser = await prisma.unverifiedUser.findFirst({
     where: { username },
@@ -70,7 +63,7 @@ test("Register", async ({ page }) => {
   // Click the "create" button
   await page.locator('div[role="button"]:has-text("Create")').click();
 
-  await waitFor(1);
+  await delayForSeconds(1);
   const user = await prisma.user.findFirst({
     where: { username },
   });
