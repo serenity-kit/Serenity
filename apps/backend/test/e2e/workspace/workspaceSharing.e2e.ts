@@ -2,9 +2,7 @@ import { test, expect, Page } from "@playwright/test";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import deleteAllRecords from "../../helpers/deleteAllRecords";
 import { v4 as uuidv4 } from "uuid";
-import { userIdFromUsername } from "../../../src/graphql/queries/userIdFromUsername";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
-import { registerUnverifiedUser } from "../../helpers/authentication/registerUnverifiedUser";
 import { prisma } from "../../../src/database/prisma";
 
 test.beforeAll(async () => {
@@ -111,12 +109,39 @@ test.describe("Workspace Sharing", () => {
       username,
     });
     sharedWorkspaceId = workspace.id;
+    // const workspaceName = "sharable";
+    // await page.goto("http://localhost:19006/register");
+    // await registerOnPage({ page, username, password, workspaceName });
+    await page.goto("http://localhost:19006/login");
     await loginOnPage({ page, username, password });
     // click on workspace settings
+    await page.locator("text=Settings").click();
+    await expect(page).toHaveURL(
+      `http://localhost:19006/workspace/${workspace.id}/settings`
+    );
+
     // click "create invitation"
+    await page
+      .locator('div[role="button"]:has-text("Create Invitation")')
+      .click();
+
     // get invitation text
+    const linkInfoDiv = page
+      .locator(
+        "//div/div/div/div/div/div/div[4]/div/div/div/div/div/div[1]/div/div/div[2]/div/div[1]/div/div[3]/div[2]/div[1]/div[2]/div[2]/input"
+      )
+      .first();
+    const linkInfoText = await linkInfoDiv.inputValue();
     // parse url and store into variable
-    // expect there to be one invitation in the list
+    const linkInfoWords = linkInfoText.split(" ");
+    workspaceInvitationUrl = linkInfoWords[linkInfoWords.length - 1];
+    // expect there to be one invitation in the list (plus a header row)
+    const numInvitations = await page
+      .locator(
+        "//div/div/div/div/div/div/div[4]/div/div/div/div/div/div[1]/div/div/div[2]/div/div[1]/div/div[3]/div[2]/div[1]/div[4]/div"
+      )
+      .count();
+    expect(numInvitations).toBe(2);
   });
 
   test("Existing other user can accept workspace", async ({ page }) => {
