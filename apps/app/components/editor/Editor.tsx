@@ -16,10 +16,10 @@ import { EditorProps } from "./types";
 //   return { html };
 // }
 
-// let editorSource =
-//   Platform.OS !== "android"
-//     ? require("../../assets/index.html")
-//     : { html: null };
+let editorSource =
+  Platform.OS === "ios"
+    ? require("../../webviews/editor/index.html")
+    : { html: null };
 
 export default function Editor({
   yDocRef,
@@ -53,7 +53,7 @@ export default function Editor({
 
   return (
     <SafeAreaView style={tw`bg-white flex-auto`}>
-      {/* <WebView
+      <WebView
         ref={webViewRef}
         originWhitelist={["*"]}
         source={editorSource}
@@ -109,7 +109,7 @@ export default function Editor({
               true;
             `);
         }}
-      /> */}
+      />
     </SafeAreaView>
   );
 }
