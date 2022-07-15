@@ -1,15 +1,9 @@
 import "regenerator-runtime/runtime.js";
-import { base64ToArrayBuffer, wasmBase64String } from "./opaque-wasm-base64";
+import { wasmBase64String } from "./src/opaque-wasm-base64";
+import { base64ToArrayBuffer } from "./src/base64ToArrayBuffer";
 import init, { Registration, Login } from "./vendor/opaque-wasm-web-build";
 
-// alert(init);
 init(base64ToArrayBuffer(wasmBase64String));
-// .then(() => {
-//   alert("READY A");
-// })
-// .catch((err) => {
-//   alert(err);
-// });
 
 const toBase64 = (data: Uint8Array) => {
   return btoa(String.fromCharCode.apply(null, [...data]));
@@ -22,8 +16,6 @@ const fromBase64 = (value: string) => {
 let registration: Registration | null = null;
 let login: Login | null = null;
 
-console.log("weeeeeee");
-
 window.registerInitialize = function (id: string, password: string) {
   registration = new Registration();
   const message = registration.start(password);
@@ -34,8 +26,6 @@ window.registerInitialize = function (id: string, password: string) {
     })
   );
 };
-
-console.log("weeeeeee2");
 
 window.finishRegistration = function (id: string, challengeResponse: string) {
   if (registration === null) {
