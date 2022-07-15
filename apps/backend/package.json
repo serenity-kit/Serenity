@@ -33,6 +33,7 @@
     "ws": "^8.3.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.23.3",
     "@types/libsodium-wrappers": "^0.7.9",
     "@types/node": "16.11.9",
     "@types/uuid": "^8.3.3",
