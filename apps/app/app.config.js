@@ -1,6 +1,6 @@
 export default {
   expo: {
-    name: "serenity",
+    name: "Serenity",
     owner: "serenity-app",
     slug: "serenity",
     version: "0.0.1",
@@ -26,10 +26,12 @@ export default {
     android: {
       package: "re.serenity.app",
       adaptiveIcon: {
-        foregroundImage: "./assets/images/adaptive-icon.png",
-        backgroundColor: "#ffffff",
+        foregroundImage: "./assets/logo_serenity_android.png",
+        backgroundColor: "#FFF",
       },
+      // permissions: [],
     },
+
     web: {
       favicon: "./assets/images/favicon.png",
     },
