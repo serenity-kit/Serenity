@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, Box, tw, Link } from "@serenity-tools/ui";
+import { Text, View, Box, tw, Link, Icon } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types/navigation";
 import RegisterForm from "../../components/register/RegisterForm";
 import { KeyboardAvoidingView } from "react-native";
@@ -40,6 +40,11 @@ export default function RegisterScreen(
               <Link to={{ screen: "Login" }}>Login here</Link>
             </View>
           </Box>
+          <View style={tw`absolute left-0 ios:left-4 bottom-0`}>
+            <Link to={{ screen: "DevDashboard" }} style={tw`p-4`}>
+              <Icon name="dashboard-line" color={tw.color("gray-500")} />
+            </Link>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

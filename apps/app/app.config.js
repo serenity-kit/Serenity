@@ -26,7 +26,7 @@ export default {
     android: {
       package: "re.serenity.app",
       adaptiveIcon: {
-        foregroundImage: "./assets/logo_serenity_android.png",
+        foregroundImage: "./assets/images/logo_serenity_android.png",
         backgroundColor: "#FFF",
       },
       // permissions: [],
