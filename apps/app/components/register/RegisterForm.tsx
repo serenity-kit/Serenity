@@ -6,6 +6,7 @@ import {
   Checkbox,
   Link,
   LabeledInput,
+  LinkExternal,
 } from "@serenity-tools/ui";
 import {
   useFinishRegistrationMutation,
@@ -145,8 +146,20 @@ export default function RegisterForm(props: Props) {
       >
         <Text variant="xs" muted>
           Yes, I do agree to Serenity's{" "}
-          <Link to={{ screen: "NotFound" }}>terms of services</Link> and{" "}
-          <Link to={{ screen: "NotFound" }}>privacy policy</Link>.
+          <LinkExternal
+            variant="xs"
+            href="https://www.serenity.re/en/notes/terms-of-service"
+          >
+            terms of services
+          </LinkExternal>{" "}
+          and{" "}
+          <LinkExternal
+            variant="xs"
+            href="https://www.serenity.re/en/notes/privacy-policy"
+          >
+            privacy policy
+          </LinkExternal>
+          .
         </Text>
       </Checkbox>
 
