@@ -15,7 +15,6 @@ test("Login without remembering web keys", async ({ page }) => {
     id: userId,
     username,
   });
-  console.log({ user, workspace });
 
   await page.goto("http://localhost:19006/login");
 
