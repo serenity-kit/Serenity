@@ -61,7 +61,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   }
   const docId = route.params.pageId;
   // const workspaceId = route.params.workspaceId;
-  console.log({ route: route });
   const isNew = route.params.isNew ?? false;
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
