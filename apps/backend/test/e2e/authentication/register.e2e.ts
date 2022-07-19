@@ -27,7 +27,7 @@ test("Register", async ({ page }) => {
   // Click "register button"
   await page.locator('div[role="button"]:has-text("Register")').click();
 
-  await delayForSeconds(2);
+  await delayForSeconds(3);
   // unverified user should have been created
   const unverifiedUser = await prisma.unverifiedUser.findFirst({
     where: { username },
