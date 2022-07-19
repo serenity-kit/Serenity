@@ -59,7 +59,6 @@ export default async function createServer() {
     "http://localhost:4000",
   ];
   const allowedOrigin = (origin, callback) => {
-    console.log({ origin });
     if (allowedList.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
     } else {

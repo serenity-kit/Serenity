@@ -41,6 +41,23 @@ export default function AcceptWorkspaceInvitationScreen(
     );
   }
 
+  const acceptAndGoToWorkspace = async () => {
+    try {
+      const workspace = await acceptWorkspaceInvitation({
+        workspaceInvitationId,
+        acceptWorkspaceInvitationMutation,
+      });
+      console.log({ workspace });
+      props.navigation.navigate("Workspace", {
+        workspaceId: workspace!.id,
+        screen: "WorkspaceRoot",
+      });
+    } catch (error) {
+      setHasGraphqlError(true);
+      setGraphqlError(error.message);
+    }
+  };
+
   const switchToRegisterForm = () => {
     setAuthForm("register");
   };
@@ -56,20 +73,12 @@ export default function AcceptWorkspaceInvitationScreen(
     });
   };
 
+  const onLoginSuccess = async () => {
+    await acceptAndGoToWorkspace();
+  };
+
   const onAcceptWorkspaceInvitationPress = async () => {
-    try {
-      const workspace = await acceptWorkspaceInvitation({
-        workspaceInvitationId,
-        acceptWorkspaceInvitationMutation,
-      });
-      props.navigation.navigate("Workspace", {
-        workspaceId: workspace!.id,
-        screen: "WorkspaceRoot",
-      });
-    } catch (error) {
-      setHasGraphqlError(true);
-      setGraphqlError(error.message);
-    }
+    await acceptAndGoToWorkspace();
   };
 
   return (
@@ -116,7 +125,7 @@ export default function AcceptWorkspaceInvitationScreen(
             <>
               {authForm === "login" ? (
                 <>
-                  <LoginForm />
+                  <LoginForm onLoginSuccess={onLoginSuccess} />
                   <View style={tw`text-center`}>
                     <Text variant="xs" muted>
                       Don't have an account?

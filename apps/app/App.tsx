@@ -61,6 +61,10 @@ const exchanges = [
       Device: (device) => {
         return device.signingPublicKey;
       },
+      // @ts-expect-error the type seems to be wrong
+      PendingWorkspaceInvitationResult: (pendingWorkspaceInvitation) => {
+        return pendingWorkspaceInvitation.id;
+      },
     },
   }),
   authExchange<AuthState>({
