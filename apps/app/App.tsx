@@ -33,7 +33,6 @@ import * as storage from "./utils/storage/storage";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { getWebDevice } from "./utils/device/webDeviceStore";
 import Constants from "expo-constants";
-import { source } from "./webviews/opaque/source";
 
 // import { clearLocalSessionData } from "./utils/authentication/clearLocalSessionData";
 // clearLocalSessionData();
@@ -197,7 +196,7 @@ export default function App() {
               <NativeBaseProvider theme={rnTheme}>
                 <Navigation colorScheme={colorScheme} />
                 <StatusBar />
-                <OpaqueBridge source={source} />
+                <OpaqueBridge />
               </NativeBaseProvider>
             </SafeAreaProvider>
           </Provider>
