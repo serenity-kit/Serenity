@@ -5,22 +5,26 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
+import { removeLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function NoPageExistsScreen(props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const workspaceId = useWorkspaceId();
+
+  const removeLastUsedDocumentIdAndNavigateToWorkspace = async () => {
+    removeLastUsedDocumentId(workspaceId);
+    props.navigation.replace("Workspace", {
+      screen: "WorkspaceRoot",
+      workspaceId,
+    });
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>This page doesn't exist.</Text>
       <Text>It has been removed or you no longer have access.</Text>
       <TouchableOpacity
-        onPress={() => {
-          props.navigation.replace("Workspace", {
-            screen: "WorkspaceRoot",
-            workspaceId,
-          });
-        }}
+        onPress={removeLastUsedDocumentIdAndNavigateToWorkspace}
         style={styles.link}
       >
         <Text style={styles.linkText}>Go to workspace!</Text>

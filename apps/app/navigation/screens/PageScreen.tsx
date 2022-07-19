@@ -14,6 +14,7 @@ import {
   DocumentDocument,
 } from "../../generated/graphql";
 import { useClient } from "urql";
+import { removeLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -33,8 +34,16 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
         }
       )
       .toPromise();
-    if (documentResult.error?.message === "[GraphQL] Document not found") {
-      return false;
+    console.log({ documentResult });
+    if (
+      documentResult.error?.message === "[GraphQL] Document not found" ||
+      documentResult.error?.message === "[GraphQL] Unauthorized"
+    ) {
+      props.navigation.replace("Workspace", {
+        workspaceId,
+        screen: "NoPageExists",
+      });
+      return;
     }
     return true;
   };
