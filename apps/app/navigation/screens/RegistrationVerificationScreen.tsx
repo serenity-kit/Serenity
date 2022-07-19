@@ -64,7 +64,6 @@ export default function RegistrationVerificationScreen(
     props.navigation.push("Login", {});
   };
 
-
   const registerNewDevice = async () => {
     if (Platform.OS == "ios") {
       const newDeviceInfo = await createSetAndRegisterDevice();
@@ -108,6 +107,7 @@ export default function RegistrationVerificationScreen(
         finishLoginMutation,
         updateAuthentication,
       });
+      console.log({ loginResult });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
       await acceptPendingWorkspaceInvitation();
       setIsLoggingIn(false);
