@@ -19,12 +19,8 @@ declare type Props<ParamList extends ReactNavigation.RootParamList> = {
   children: React.ReactNode;
 });
 
-export function Link<ParamList extends ReactNavigation.RootParamList>(
-  props: Props<ParamList>
-) {
-  const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
-
-  const styles = StyleSheet.create({
+export const createLinkStyles = () => {
+  return StyleSheet.create({
     // reset outline for web focusVisible
     default: tw.style(
       `text-primary-500 underline`,
@@ -33,6 +29,13 @@ export function Link<ParamList extends ReactNavigation.RootParamList>(
     focusVisible:
       Platform.OS === "web" ? tw`se-outline-focus-mini rounded` : {},
   });
+};
+
+export function Link<ParamList extends ReactNavigation.RootParamList>(
+  props: Props<ParamList>
+) {
+  const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
+  const styles = createLinkStyles();
 
   return (
     <ReactNavigationLink
