@@ -1,4 +1,10 @@
-import { Link, Text, tw, ScrollSafeAreaView } from "@serenity-tools/ui";
+import {
+  SidebarLink,
+  tw,
+  ScrollSafeAreaView,
+  Icon,
+  Text,
+} from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
 
 export default function DevDashboardScreen(props) {
@@ -6,13 +12,42 @@ export default function DevDashboardScreen(props) {
 
   return (
     <ScrollSafeAreaView style={tw`px-4 py-6`}>
-      <Text>Dev Dashboard Screen</Text>
-      <Link to={{ screen: "DesignSystem" }}>Design System</Link>
-      <Link to={{ screen: "Root" }}>Root</Link>
-      <Link to={{ screen: "TestLibsodium" }}>Libsodium Test Screen</Link>
-      <Link to={{ screen: "EncryptDecryptImageTest" }}>
-        Encrypt / Decrypt Image
-      </Link>
+      <SidebarLink to={{ screen: "Root" }}>
+        <Icon
+          name="dashboard-line"
+          size={4.5}
+          mobileSize={5.5}
+          color={tw.color("gray-800")}
+        />
+        <Text>Home</Text>
+      </SidebarLink>
+      <SidebarLink to={{ screen: "DesignSystem" }}>
+        <Icon
+          name="dashboard-line"
+          size={4.5}
+          mobileSize={5.5}
+          color={tw.color("gray-800")}
+        />
+        <Text>Design System</Text>
+      </SidebarLink>
+      <SidebarLink to={{ screen: "TestLibsodium" }}>
+        <Icon
+          name="dashboard-line"
+          size={4.5}
+          mobileSize={5.5}
+          color={tw.color("gray-800")}
+        />
+        <Text>Libsodium Test Screen</Text>
+      </SidebarLink>
+      <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+        <Icon
+          name="dashboard-line"
+          size={4.5}
+          mobileSize={5.5}
+          color={tw.color("gray-800")}
+        />
+        <Text>Encrypt / Decrypt Image</Text>
+      </SidebarLink>
     </ScrollSafeAreaView>
   );
 }
