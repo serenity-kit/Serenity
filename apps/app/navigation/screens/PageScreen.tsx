@@ -34,7 +34,6 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
         }
       )
       .toPromise();
-    console.log({ documentResult });
     if (
       documentResult.error?.message === "[GraphQL] Document not found" ||
       documentResult.error?.message === "[GraphQL] Unauthorized"
