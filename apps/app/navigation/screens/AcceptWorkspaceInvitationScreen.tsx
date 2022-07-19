@@ -1,26 +1,17 @@
 import React, { useState } from "react";
-import { Text, View, tw, Box, Button, LinkButton } from "@serenity-tools/ui";
-import {
-  useWindowDimensions,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
-import { useAuthentication } from "../../context/AuthenticationContext";
+import { Text, View, tw, Box } from "@serenity-tools/ui";
+import { useWindowDimensions, StyleSheet } from "react-native";
 import {
   useAcceptWorkspaceInvitationMutation,
   useWorkspaceInvitationQuery,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
 import { LoginForm } from "../../components/login/LoginForm";
-import RegisterForm from "../../components/register/RegisterForm";
-import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
-
 export default function AcceptWorkspaceInvitationScreen(
   props: RootStackScreenProps<"AcceptWorkspaceInvitation">
 ) {
   const workspaceInvitationId = props.route.params?.workspaceInvitationId;
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const { sessionKey } = useAuthentication();
   const [workspaceInvitationQuery, refetchWorkspaceInvitationQuery] =
     useWorkspaceInvitationQuery({
       variables: {
@@ -31,7 +22,6 @@ export default function AcceptWorkspaceInvitationScreen(
     useAcceptWorkspaceInvitationMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
-  const [authForm, setAuthForm] = useState<"login" | "register">("login");
 
   if (!workspaceInvitationId) {
     return (
@@ -41,43 +31,33 @@ export default function AcceptWorkspaceInvitationScreen(
     );
   }
 
-  const acceptAndGoToWorkspace = async () => {
-    try {
-      const workspace = await acceptWorkspaceInvitation({
-        workspaceInvitationId,
-        acceptWorkspaceInvitationMutation,
-      });
+  const acceptWorkspaceInvitation = async () => {
+    const result = await acceptWorkspaceInvitationMutation({
+      input: { workspaceInvitationId },
+    });
+    if (result.error) {
+      setHasGraphqlError(true);
+      setGraphqlError(result.error.message);
+      return;
+    }
+    if (result.data) {
+      // TODO: put up a toast explaining the new workspace
+      const workspace = result.data.acceptWorkspaceInvitation?.workspace;
+      if (!workspace) {
+        // NOTE: probably the invitation expired or was deleted
+        setHasGraphqlError(true);
+        setGraphqlError("Could not find workspace");
+        return;
+      }
       props.navigation.navigate("Workspace", {
-        workspaceId: workspace!.id,
+        workspaceId: workspace.id,
         screen: "WorkspaceRoot",
       });
-    } catch (error) {
-      setHasGraphqlError(true);
-      setGraphqlError(error.message);
     }
   };
 
-  const switchToRegisterForm = () => {
-    setAuthForm("register");
-  };
-
-  const switchToLoginForm = () => {
-    setAuthForm("login");
-  };
-
-  const onRegisterSuccess = (username: string, verificationCode: string) => {
-    props.navigation.navigate("RegistrationVerification", {
-      username,
-      verification: verificationCode,
-    });
-  };
-
-  const onLoginSuccess = async () => {
-    await acceptAndGoToWorkspace();
-  };
-
-  const onAcceptWorkspaceInvitationPress = async () => {
-    await acceptAndGoToWorkspace();
+  const onLoginSuccess = () => {
+    // TODO
   };
 
   return (
@@ -109,51 +89,13 @@ export default function AcceptWorkspaceInvitationScreen(
                   }
                 </b>
               </Text>
-              {!sessionKey && (
-                <Text style={styles.alertBannerText}>
-                  Log in or register to accept the invitation.
-                </Text>
-              )}
+
+              <Text style={styles.alertBannerText}>
+                Log in to accept the invitation.
+              </Text>
             </View>
           )}
-          {sessionKey ? (
-            <Button onPress={onAcceptWorkspaceInvitationPress} size="large">
-              Accept
-            </Button>
-          ) : (
-            <>
-              {authForm === "login" ? (
-                <>
-                  <LoginForm onLoginSuccess={onLoginSuccess} />
-                  <View style={tw`text-center`}>
-                    <Text variant="xs" muted>
-                      Don't have an account?
-                    </Text>
-                    <LinkButton onPress={switchToRegisterForm}>
-                      Register here
-                    </LinkButton>
-                  </View>
-                </>
-              ) : (
-                <>
-                  <RegisterForm
-                    pendingWorkspaceInvitationId={
-                      props.route.params.workspaceInvitationId
-                    }
-                    onRegisterSuccess={onRegisterSuccess}
-                  />
-                  <View style={tw`text-center`}>
-                    <Text variant="xs" muted>
-                      Already have an account?
-                    </Text>
-                    <LinkButton onPress={switchToLoginForm}>
-                      Login here
-                    </LinkButton>
-                  </View>
-                </>
-              )}
-            </>
-          )}
+          <LoginForm onLoginSuccess={onLoginSuccess} />
         </Box>
       </View>
     </>
@@ -161,7 +103,12 @@ export default function AcceptWorkspaceInvitationScreen(
 }
 
 const styles = StyleSheet.create({
-  alertBanner: {},
+  alertBanner: {
+    padding: 20,
+    backgroundColor: "#fff",
+    color: "#000",
+    marginBottom: 30,
+  },
   alertBannerText: {
     color: "#000",
   },
