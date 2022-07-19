@@ -47,7 +47,6 @@ export default function AcceptWorkspaceInvitationScreen(
         workspaceInvitationId,
         acceptWorkspaceInvitationMutation,
       });
-      console.log({ workspace });
       props.navigation.navigate("Workspace", {
         workspaceId: workspace!.id,
         screen: "WorkspaceRoot",
