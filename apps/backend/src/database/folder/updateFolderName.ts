@@ -23,7 +23,6 @@ export async function updateFolderName({ id, name, userId }: Params) {
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
           userId,
-          isAdmin: true,
           workspaceId: folder.workspaceId,
         },
       });

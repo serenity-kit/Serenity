@@ -43,7 +43,6 @@ export async function deleteFolders({ folderIds, userId }: DeleteFolderParams) {
       const validWorkspaces = await prisma.usersToWorkspaces.findMany({
         where: {
           userId,
-          isAdmin: true,
           workspaceId: {
             in: requestedWorkspaceIds,
           },
