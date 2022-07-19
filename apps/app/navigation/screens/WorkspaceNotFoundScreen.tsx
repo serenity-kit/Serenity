@@ -6,7 +6,11 @@ import {
 
 import { Text, View } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types/navigation";
-import { removeLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import {
+  getLastUsedWorkspaceId,
+  removeLastUsedWorkspaceId,
+  removeLastUsedDocumentId,
+} from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceNotFoundScreen({
   navigation,
@@ -14,6 +18,10 @@ export default function WorkspaceNotFoundScreen({
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
   const removeLastUsedWorkspaceIdAndNavigateToRoot = async () => {
+    const workspaceId = await getLastUsedWorkspaceId();
+    if (workspaceId) {
+      removeLastUsedDocumentId(workspaceId);
+    }
     await removeLastUsedWorkspaceId();
     navigation.replace("Root");
   };
@@ -27,7 +35,7 @@ export default function WorkspaceNotFoundScreen({
         onPress={removeLastUsedWorkspaceIdAndNavigateToRoot}
         style={styles.link}
       >
-        <Text style={styles.linkText}>Go to dashboard!</Text>
+        <Text style={styles.linkText}>Go to home!</Text>
       </TouchableOpacity>
     </View>
   );
