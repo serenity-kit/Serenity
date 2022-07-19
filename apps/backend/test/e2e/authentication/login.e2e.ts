@@ -11,11 +11,11 @@ test("Login without remembering web keys", async ({ page }) => {
   const userId = uuidv4();
   const username = "user1@example.com";
   const password = "password";
-  const { workspace } = await createUserWithWorkspace({
+  const { user, workspace } = await createUserWithWorkspace({
     id: userId,
     username,
   });
-  console.log({ workspace });
+  console.log({ user, workspace });
 
   await page.goto("http://localhost:19006/login");
 
