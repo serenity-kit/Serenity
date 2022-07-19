@@ -14,7 +14,6 @@ export async function deleteDocuments({ documentIds, userId }: Params) {
       const userToWorkspaces = await prisma.usersToWorkspaces.findMany({
         where: {
           userId,
-          isAdmin: true,
         },
       });
       if (!userToWorkspaces || !userToWorkspaces.length) {
