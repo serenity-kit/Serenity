@@ -60,7 +60,7 @@ export default async function createUserWithWorkspace({
       },
     });
 
-    await prisma.workspace.create({
+    const workspace = await prisma.workspace.create({
       data: {
         id,
         name: "My Workspace",
@@ -73,7 +73,7 @@ export default async function createUserWithWorkspace({
         },
       },
     });
-    return { user, device };
+    return { user, device, workspace };
   });
 
   const login = new Login();
@@ -96,5 +96,5 @@ export default async function createUserWithWorkspace({
     expiresAt: addDays(new Date(), 30),
   });
 
-  return { ...result, session, sessionKey };
+  return { ...result, session, sessionKey, workspace: result.workspace };
 }
