@@ -27,7 +27,6 @@ export async function createFolder({
         where: {
           userId,
           workspaceId,
-          isAdmin: true,
         },
       });
       if (!userToWorkspace) {

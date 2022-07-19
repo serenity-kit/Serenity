@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/registerUser";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { v4 as uuidv4 } from "uuid";
 
@@ -10,42 +10,38 @@ let userId = "";
 let sessionKey = "";
 const username = "user";
 const password = "password";
-let didRegisterUser = false;
+
+const setup = async () => {
+  const registerUserResult = await registerUser(graphql, username, password);
+  userId = registerUserResult.userId;
+  sessionKey = registerUserResult.sessionKey;
+  await createInitialWorkspaceStructure({
+    workspaceName: "workspace 1",
+    workspaceId: "abc",
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    folderName: "Getting started",
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey,
+  });
+  await createInitialWorkspaceStructure({
+    workspaceName: "workspace 2",
+    workspaceId: "123",
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    folderName: "Getting started",
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey,
+  });
+};
 
 beforeAll(async () => {
   await deleteAllRecords();
-});
-
-beforeEach(async () => {
-  // TODO: we don't want this before every test
-  if (!didRegisterUser) {
-    const registerUserResult = await registerUser(graphql, username, password);
-    userId = registerUserResult.userId;
-    sessionKey = registerUserResult.sessionKey;
-    await createInitialWorkspaceStructure({
-      workspaceName: "workspace 1",
-      workspaceId: "abc",
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      folderName: "Getting started",
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey,
-    });
-    await createInitialWorkspaceStructure({
-      workspaceName: "workspace 2",
-      workspaceId: "123",
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      folderName: "Getting started",
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey,
-    });
-    didRegisterUser = true;
-  }
+  await setup();
 });
 
 test("user should be able to list workspaces", async () => {

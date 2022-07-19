@@ -15,7 +15,6 @@ const inviter2Username = "inviter2@example.com";
 beforeAll(async () => {
   await deleteAllRecords();
 });
-beforeEach(async () => {});
 
 test("should return a list of workspace invitations if they are admin", async () => {
   const inviterUserAndDevice1 = await createUserWithWorkspace({
@@ -68,6 +67,24 @@ test("should return a list of workspace invitations if they are admin", async ()
   expect(invitations.length).toBe(2);
 });
 
+test("should throw an error if we try to fetch more than 50", async () => {
+  const otherWorkspaceId2 = "otherWorkspace44";
+  const username = "newuser44@example.com";
+  const userAndDevice = await createUserWithWorkspace({
+    id: otherWorkspaceId2,
+    username: username,
+  });
+  await expect(
+    (async () =>
+      await workspaceInvitations({
+        graphql,
+        workspaceId,
+        authorizationHeader: userAndDevice.sessionKey,
+        first: 51,
+      }))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
+
 test("not admin should throw error", async () => {
   // add user2 as an non-admin
   const otherWorkspaceId2 = "otherWorkspace2";
@@ -98,5 +115,36 @@ test("not admin should throw error", async () => {
         workspaceId,
         authorizationHeader: userAndDevice.sessionKey,
       }))()
-  ).rejects.toThrow("Unauthorized");
+  ).rejects.toThrowError(/FORBIDDEN/);
+});
+
+test("not logged in user should throw an authentication error", async () => {
+  const username = "newuserd87509bb502f@example.com";
+  const userAndDevice = await createUserWithWorkspace({
+    id: "25364d28-0883-42d4-872c-d87509bb502f",
+    username: username,
+  });
+  await prisma.usersToWorkspaces.create({
+    data: {
+      user: {
+        connect: {
+          username: username,
+        },
+      },
+      workspace: {
+        connect: {
+          id: workspaceId,
+        },
+      },
+      isAdmin: false,
+    },
+  });
+  await expect(
+    (async () =>
+      await workspaceInvitations({
+        graphql,
+        workspaceId,
+        authorizationHeader: "abc",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

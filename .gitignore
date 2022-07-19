@@ -7,11 +7,6 @@ yarn-error.log
 # we are using yarn
 package-lock.json
 
-# editor built for the mobile editor web view
-apps/app/assets/index.html
-# opaque bridge built for mobile
-apps/app/assets/opaque.html
-
 # editor tailwind build step output
 packages/editor/editor-output.css
 
@@ -20,5 +15,12 @@ apps/backend/prisma/generated/output
 apps/backend/src/generated
 # backend build
 apps/backend/build
+# expo web-built files
+apps/app/web-build
 # ignore ejected react-native ios app
 apps/app/ios
+
+# editor built for the mobile editor web view
+apps/app/webviews/editor/index.html
+# opaque bridge built for mobile
+apps/app/webviews/opaque/index.html

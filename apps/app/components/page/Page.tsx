@@ -60,6 +60,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
     throw Error("Page ID was not set");
   }
   const docId = route.params.pageId;
+  // const workspaceId = route.params.workspaceId;
   const isNew = route.params.isNew ?? false;
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());

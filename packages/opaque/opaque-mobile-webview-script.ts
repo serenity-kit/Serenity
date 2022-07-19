@@ -1,4 +1,9 @@
-import { Registration, Login } from "opaque-wasm";
+import "regenerator-runtime/runtime.js";
+import { wasmBase64String } from "./src/opaque-wasm-base64";
+import { base64ToArrayBuffer } from "./src/base64ToArrayBuffer";
+import init, { Registration, Login } from "./vendor/opaque-wasm-web-build";
+
+init(base64ToArrayBuffer(wasmBase64String));
 
 const toBase64 = (data: Uint8Array) => {
   return btoa(String.fromCharCode.apply(null, [...data]));
@@ -8,10 +13,11 @@ const fromBase64 = (value: string) => {
   return Uint8Array.from(atob(value), (c) => c.charCodeAt(0));
 };
 
-const registration = new Registration();
-const login = new Login();
+let registration: Registration | null = null;
+let login: Login | null = null;
 
 window.registerInitialize = function (id: string, password: string) {
+  registration = new Registration();
   const message = registration.start(password);
   window.ReactNativeWebView.postMessage(
     JSON.stringify({
@@ -22,6 +28,9 @@ window.registerInitialize = function (id: string, password: string) {
 };
 
 window.finishRegistration = function (id: string, challengeResponse: string) {
+  if (registration === null) {
+    throw new Error("Failed to initialize WebView Registration");
+  }
   const message = registration.finish(fromBase64(challengeResponse));
   window.ReactNativeWebView.postMessage(
     JSON.stringify({
@@ -35,6 +44,7 @@ window.finishRegistration = function (id: string, challengeResponse: string) {
 };
 
 window.startLogin = function (id: string, password: string) {
+  login = new Login();
   const message = login.start(password);
   window.ReactNativeWebView.postMessage(
     JSON.stringify({
@@ -45,6 +55,9 @@ window.startLogin = function (id: string, password: string) {
 };
 
 window.finishLogin = function (id: string, response: string) {
+  if (login === null) {
+    throw new Error("Failed to initialize WebView Login");
+  }
   const message = login.finish(fromBase64(response));
   window.ReactNativeWebView.postMessage(
     JSON.stringify({

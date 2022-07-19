@@ -5,7 +5,6 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
 import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
-import { loginUser } from "../../../../test/helpers/loginUser";
 
 const graphql = setupGraphql();
 const username1 = "user1";
@@ -15,7 +14,6 @@ let userAndDevice2: any;
 
 beforeAll(async () => {
   await deleteAllRecords();
-  // TODO: we don't want this before every test
   userAndDevice1 = await createUserWithWorkspace({
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     username: username1,

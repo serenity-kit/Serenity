@@ -1,6 +1,6 @@
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/registerUser";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { deleteWorkspaces } from "../../../../test/helpers/workspace/deleteWorkspaces";
 import { v4 as uuidv4 } from "uuid";
@@ -8,34 +8,30 @@ import { v4 as uuidv4 } from "uuid";
 const graphql = setupGraphql();
 const username = "user1";
 const password = "password";
-let isUserRegistered = false;
 let addedWorkspace: any = null;
 let sessionKey = "";
 
+const setup = async () => {
+  const registerUserResult = await registerUser(graphql, username, password);
+  sessionKey = registerUserResult.sessionKey;
+  const createWorkspaceResult = await createInitialWorkspaceStructure({
+    workspaceName: "workspace 1",
+    workspaceId: "abc",
+    folderName: "Getting started",
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey,
+  });
+  addedWorkspace =
+    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+};
+
 beforeAll(async () => {
   await deleteAllRecords();
-});
-
-beforeEach(async () => {
-  // TODO: we don't want this before every test
-  if (!isUserRegistered) {
-    const registerUserResult = await registerUser(graphql, username, password);
-    sessionKey = registerUserResult.sessionKey;
-    const createWorkspaceResult = await createInitialWorkspaceStructure({
-      workspaceName: "workspace 1",
-      workspaceId: "abc",
-      folderName: "Getting started",
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey,
-    });
-    addedWorkspace =
-      createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-    isUserRegistered = true;
-  }
+  await setup();
 });
 
 test.only("user should be able to delete a workspace", async () => {

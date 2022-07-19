@@ -4,9 +4,9 @@ import {
   View,
   Button,
   Checkbox,
-  tw,
   Link,
   LabeledInput,
+  LinkExternal,
 } from "@serenity-tools/ui";
 import {
   useFinishRegistrationMutation,
@@ -20,6 +20,7 @@ import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { storeUsernamePassword } from "../../utils/authentication/registrationMemoryStore";
 
 type Props = {
+  pendingWorkspaceInvitationId?: string;
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
   onRegisterFail?: () => void;
 };
@@ -71,6 +72,7 @@ export default function RegisterForm(props: Props) {
             registrationId:
               startRegistrationResult.data.startRegistration.registrationId,
             mainDevice,
+            pendingWorkspaceInvitationId: props.pendingWorkspaceInvitationId,
           },
         });
         // check for an error
@@ -144,23 +146,26 @@ export default function RegisterForm(props: Props) {
       >
         <Text variant="xs" muted>
           Yes, I do agree to Serenity's{" "}
-          <Link to={{ screen: "NotFound" }}>terms of services</Link> and{" "}
-          <Link to={{ screen: "NotFound" }}>privacy policy</Link>.
+          <LinkExternal
+            variant="xs"
+            href="https://www.serenity.re/en/notes/terms-of-service"
+          >
+            terms of services
+          </LinkExternal>{" "}
+          and{" "}
+          <LinkExternal
+            variant="xs"
+            href="https://www.serenity.re/en/notes/privacy-policy"
+          >
+            privacy policy
+          </LinkExternal>
+          .
         </Text>
       </Checkbox>
 
       <Button onPress={onRegisterPress} size="large">
         Register
       </Button>
-
-      <View style={tw`text-center`}>
-        <Text variant="xs" muted>
-          Already have an account?
-        </Text>
-        <Text variant="xs">
-          <Link to={{ screen: "Login" }}>Login here</Link>
-        </Text>
-      </View>
     </VStack>
   );
 }

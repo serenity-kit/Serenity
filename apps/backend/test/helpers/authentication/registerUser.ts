@@ -3,13 +3,15 @@ import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
 import { loginUser } from "./loginUser";
 import { requestRegistrationChallengeResponse } from "./requestRegistrationChallengeResponse";
+import { verifyUser } from "./verifyUser";
 
 let result: any = null;
 
 export const registerUser = async (
   graphql: any,
   username: string,
-  password: string
+  password: string,
+  pendingWorkspaceInvitationId?: string
 ) => {
   result = await requestRegistrationChallengeResponse(
     graphql,
@@ -38,27 +40,15 @@ export const registerUser = async (
       registrationId: result.data.registrationId,
       message: sodium.to_base64(message),
       mainDevice,
+      pendingWorkspaceInvitationId,
     },
   });
 
-  const verifyRegistrationQuery = gql`
-    mutation verifyRegistration($input: VerifyRegistrationInput!) {
-      verifyRegistration(input: $input) {
-        id
-      }
-    }
-  `;
-
-  const verifyRegistrationResponse = await graphql.client.request(
-    verifyRegistrationQuery,
-    {
-      input: {
-        username,
-        verificationCode:
-          registrationResponse.finishRegistration.verificationCode,
-      },
-    }
-  );
+  const verifyRegistrationResponse = await verifyUser({
+    graphql,
+    username,
+    verificationCode: registrationResponse.finishRegistration.verificationCode,
+  });
 
   const { sessionKey } = await loginUser({ graphql, username, password });
   return {

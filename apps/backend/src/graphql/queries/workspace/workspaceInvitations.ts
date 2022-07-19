@@ -1,3 +1,4 @@
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getWorkspaceInvitations } from "../../../database/workspace/getWorkspaceInvitations";
 import { WorkspaceInvitation } from "../../types/workspace";
@@ -13,12 +14,13 @@ export const workspaceInvitations = queryField((t) => {
     },
     async nodes(root, args, context) {
       if (args.first > 50) {
-        throw new Error(
-          "Requested too many workspace invitations. First value exceeds 50."
+        throw new UserInputError(
+          "Requested too many workspace invitations. First value exceeds 50.",
+          { invalidArgs: ["first"] }
         );
       }
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new AuthenticationError("Not authenticated");
       }
       const userId = context.user.id;
       const cursor = args.after ? { id: args.after } : undefined;

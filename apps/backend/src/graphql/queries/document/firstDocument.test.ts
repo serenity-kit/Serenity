@@ -1,10 +1,9 @@
 import { gql } from "graphql-request";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/registerUser";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
-import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { v4 as uuidv4 } from "uuid";
 
 const graphql = setupGraphql();
@@ -12,10 +11,6 @@ const username = "591e6e60-8a85-41fa-9ec8-33fdca675a2a@example.com";
 const password = "password";
 let didRegisterUser = false;
 let sessionKey = "";
-
-beforeAll(async () => {
-  await deleteAllRecords();
-});
 
 const workspaceId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
 const parentFolderId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
@@ -33,41 +28,43 @@ const query = gql`
   }
 `;
 
-beforeEach(async () => {
-  // TODO: we don't want this before every test
-  if (!didRegisterUser) {
-    const registerUserResult = await registerUser(graphql, username, password);
-    sessionKey = registerUserResult.sessionKey;
+const setup = async () => {
+  const registerUserResult = await registerUser(graphql, username, password);
+  sessionKey = registerUserResult.sessionKey;
 
-    await createInitialWorkspaceStructure({
-      workspaceName: "workspace 1",
-      workspaceId: workspaceId,
-      folderName: "Getting started",
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey,
-    });
-    const createParentFolderResult = await createFolder({
-      graphql,
-      id: parentFolderId,
-      name: null,
-      parentFolderId: null,
-      authorizationHeader: sessionKey,
-      workspaceId: workspaceId,
-    });
-    const createFolderResult = await createFolder({
-      graphql,
-      id: folderId,
-      name: null,
-      parentFolderId: parentFolderId,
-      authorizationHeader: sessionKey,
-      workspaceId: workspaceId,
-    });
-    didRegisterUser = true;
-  }
+  await createInitialWorkspaceStructure({
+    workspaceName: "workspace 1",
+    workspaceId: workspaceId,
+    folderName: "Getting started",
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey,
+  });
+  const createParentFolderResult = await createFolder({
+    graphql,
+    id: parentFolderId,
+    name: null,
+    parentFolderId: null,
+    authorizationHeader: sessionKey,
+    workspaceId: workspaceId,
+  });
+  const createFolderResult = await createFolder({
+    graphql,
+    id: folderId,
+    name: null,
+    parentFolderId: parentFolderId,
+    authorizationHeader: sessionKey,
+    workspaceId: workspaceId,
+  });
+  didRegisterUser = true;
+};
+
+beforeAll(async () => {
+  await deleteAllRecords();
+  await setup();
 });
 
 test("user should be able to retrieve the first document", async () => {

@@ -127,6 +127,19 @@ export const createSetAndRegisterDevice = async (): Promise<any> => {
  *
  * @param navigation
  */
-export const navigateToNextAuthenticatedPage = (navigation) => {
-  navigation.navigate("Root");
+export type NavigateToNextAuthenticatedPageProps = {
+  navigation: any;
+  pendingWorkspaceInvitationId: string | null | undefined;
+};
+export const navigateToNextAuthenticatedPage = ({
+  navigation,
+  pendingWorkspaceInvitationId,
+}: NavigateToNextAuthenticatedPageProps) => {
+  if (pendingWorkspaceInvitationId) {
+    navigation.navigate("AcceptWorkspaceInvitation", {
+      workspaceInvitationId: pendingWorkspaceInvitationId,
+    });
+  } else {
+    navigation.navigate("Root");
+  }
 };

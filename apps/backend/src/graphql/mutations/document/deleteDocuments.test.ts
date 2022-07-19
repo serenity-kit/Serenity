@@ -1,6 +1,6 @@
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/registerUser";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { deleteDocuments } from "../../../../test/helpers/document/deleteDocuments";
@@ -9,43 +9,39 @@ import { v4 as uuidv4 } from "uuid";
 const graphql = setupGraphql();
 const username = "user1";
 const password = "password";
-let isUserRegistered = false;
 let addedWorkspace: any = null;
 let addedDocumentId: any = null;
 let sessionKey = "";
 
+const setup = async () => {
+  const registerUserResult = await registerUser(graphql, username, password);
+  sessionKey = registerUserResult.sessionKey;
+  const createWorkspaceResult = await createInitialWorkspaceStructure({
+    workspaceName: "workspace 1",
+    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+    folderName: "Getting started",
+    folderId: uuidv4(),
+    folderIdSignature: `TODO+${uuidv4()}`,
+    documentName: "Introduction",
+    documentId: uuidv4(),
+    graphql,
+    authorizationHeader: sessionKey,
+  });
+  addedWorkspace =
+    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  const createDocumentResult = await createDocument({
+    id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+    graphql,
+    authorizationHeader: sessionKey,
+    parentFolderId: null,
+    workspaceId: addedWorkspace.id,
+  });
+  addedDocumentId = createDocumentResult.createDocument.id;
+};
+
 beforeAll(async () => {
   await deleteAllRecords();
-});
-
-beforeEach(async () => {
-  // TODO: we don't want this before every test
-  if (!isUserRegistered) {
-    const registerUserResult = await registerUser(graphql, username, password);
-    sessionKey = registerUserResult.sessionKey;
-    isUserRegistered = true;
-    const createWorkspaceResult = await createInitialWorkspaceStructure({
-      workspaceName: "workspace 1",
-      workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-      folderName: "Getting started",
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      documentName: "Introduction",
-      documentId: uuidv4(),
-      graphql,
-      authorizationHeader: sessionKey,
-    });
-    addedWorkspace =
-      createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-    const createDocumentResult = await createDocument({
-      id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-      graphql,
-      authorizationHeader: sessionKey,
-      parentFolderId: null,
-      workspaceId: addedWorkspace.id,
-    });
-    addedDocumentId = createDocumentResult.createDocument.id;
-  }
+  await setup();
 });
 
 test("user should be able to delete a document", async () => {

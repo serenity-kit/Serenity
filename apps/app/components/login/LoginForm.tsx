@@ -1,13 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {
-  Button,
-  LabeledInput,
-  Text,
-  View,
-  Link,
-  tw,
-  Checkbox,
-} from "@serenity-tools/ui";
+import React, { useState } from "react";
+import { Button, LabeledInput, Text, View, Checkbox } from "@serenity-tools/ui";
 import { Platform, useWindowDimensions } from "react-native";
 import { VStack } from "native-base";
 import {
@@ -33,7 +25,7 @@ const browser = detect();
 
 type Props = {
   defaultEmail?: string;
-  onLoginSuccess: () => void;
+  onLoginSuccess?: () => void;
   onLoginFail?: () => void;
   onEmailChangeText?: (username: string) => void;
   onFormFilled?: () => void;
@@ -128,7 +120,9 @@ export function LoginForm(props: Props) {
       setPassword("");
       setUsername("");
       setIsLoggingIn(false);
-      props.onLoginSuccess();
+      if (props.onLoginSuccess) {
+        props.onLoginSuccess();
+      }
     } catch (error) {
       console.error(error);
       setGqlErrorMessage("Failed to login.");
@@ -181,14 +175,6 @@ export function LoginForm(props: Props) {
       <Button onPress={onLoginPress} size="large" disabled={isLoggingIn}>
         Log in
       </Button>
-      <View style={tw`text-center`}>
-        <Text variant="xs" muted>
-          Don't have an account?{" "}
-        </Text>
-        <Text variant="xs">
-          <Link to={{ screen: "Register" }}>Register here</Link>
-        </Text>
-      </View>
     </VStack>
   );
 }

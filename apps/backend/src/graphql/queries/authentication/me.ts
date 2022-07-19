@@ -1,4 +1,4 @@
-import { idArg, list, queryField, objectType } from "nexus";
+import { queryField, objectType } from "nexus";
 
 export const MeResult = objectType({
   name: "MeResult",

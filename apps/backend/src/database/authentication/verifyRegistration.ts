@@ -56,6 +56,8 @@ export async function verifyRegistration({
               signingPublicKey: device.signingPublicKey,
             },
           },
+          pendingWorkspaceInvitationId:
+            unverifiedUser.pendingWorkspaceInvitationId,
         },
       });
       await prisma.unverifiedUser.delete({

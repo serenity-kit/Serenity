@@ -4,6 +4,8 @@ export * from "./components/avatarGroup/AvatarGroup";
 export * from "./components/text/Text";
 export * from "./components/view/View";
 export * from "./components/link/Link";
+export * from "./components/linkButton/LinkButton";
+export * from "./components/linkExternal/LinkExternal";
 export * from "./components/box/Box";
 export * from "./components/boxShadow/BoxShadow";
 export * from "./components/button/Button";

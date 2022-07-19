@@ -11,6 +11,7 @@ import {
 import { RootStackScreenProps } from "../../types/navigation";
 import {
   useCreateDeviceMutation,
+  useAcceptWorkspaceInvitationMutation,
   useVerifyRegistrationMutation,
 } from "../../generated/graphql";
 import {
@@ -22,8 +23,6 @@ import {
 import {
   useStartLoginMutation,
   useFinishLoginMutation,
-  MainDeviceQuery,
-  MainDeviceDocument,
 } from "../../generated/graphql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
@@ -37,6 +36,9 @@ import { Platform } from "react-native";
 import { detect } from "detect-browser";
 import { createAndSetDevice } from "../../utils/device/deviceStore";
 const browser = detect();
+import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
+import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
+import { removeLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
@@ -47,16 +49,21 @@ export default function RegistrationVerificationScreen(
   );
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [graphqlError, setGraphqlError] = useState("");
 
   const { updateAuthentication } = useAuthentication();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
   const [, createDeviceMutation] = useCreateDeviceMutation();
+  const [, acceptWorkspaceInvitationMutation] =
+    useAcceptWorkspaceInvitationMutation();
   const urqlClient = useClient();
 
-  const navigateToLoginScreen = () => {
+  const navigateToLoginScreen = async () => {
+    await removeLastUsedWorkspaceId();
     props.navigation.push("Login", {});
   };
+
 
   const registerNewDevice = async () => {
     if (Platform.OS == "ios") {
@@ -64,6 +71,22 @@ export default function RegistrationVerificationScreen(
       await createDeviceMutation({
         input: newDeviceInfo,
       });
+    }
+  };
+
+  const acceptPendingWorkspaceInvitation = async () => {
+    const pendingWorkspaceInvitationId = await getPendingWorkspaceInvitationId({
+      urqlClient,
+    });
+    if (pendingWorkspaceInvitationId) {
+      try {
+        await acceptWorkspaceInvitation({
+          workspaceInvitationId: pendingWorkspaceInvitationId,
+          acceptWorkspaceInvitationMutation,
+        });
+      } catch (error) {
+        setGraphqlError(error.message);
+      }
     }
   };
 
@@ -86,8 +109,12 @@ export default function RegistrationVerificationScreen(
         updateAuthentication,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
+      await acceptPendingWorkspaceInvitation();
       setIsLoggingIn(false);
-      navigateToNextAuthenticatedPage(props.navigation);
+      navigateToNextAuthenticatedPage({
+        navigation: props.navigation,
+        pendingWorkspaceInvitationId: null,
+      });
     } catch (error) {
       console.error(error);
       setErrorMessage("Failed to login.");
@@ -135,6 +162,10 @@ export default function RegistrationVerificationScreen(
             Please enter the verification code{"\n"}sent to you via Email.
           </Text>
         </View>
+
+        {graphqlError !== "" && (
+          <InfoMessage variant="error">{graphqlError}</InfoMessage>
+        )}
 
         {errorMessage ? (
           <InfoMessage variant="error" icon>

@@ -33,6 +33,7 @@ import { useEffect } from "react";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -79,11 +80,6 @@ function WorkspaceStackScreen(props) {
           overlayColor: "transparent",
         }}
       >
-        <Drawer.Screen
-          name="NoPageExists"
-          component={NoPageExistsScreen}
-          options={{ headerShown: false }}
-        />
         <Drawer.Screen name="Page" component={PageScreen} />
         <Drawer.Screen name="Settings" component={WorkspaceSettingsScreen} />
         <Drawer.Screen
@@ -92,6 +88,11 @@ function WorkspaceStackScreen(props) {
           options={{ headerShown: false }}
         />
         <Drawer.Screen name="DeviceManager" component={DeviceManagerScreen} />
+        <Drawer.Screen
+          name="NoPageExists"
+          component={NoPageExistsScreen}
+          options={{ headerShown: false }}
+        />
       </Drawer.Navigator>
     </WorkspaceIdProvider>
   );
@@ -100,7 +101,6 @@ function WorkspaceStackScreen(props) {
 function RootNavigator() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
       <Stack.Screen
         name="Root"
         component={RootScreen}
@@ -137,14 +137,20 @@ function RootNavigator() {
         component={EncryptDecryptImageTestScreen}
       />
       <Stack.Screen name="TestLibsodium" component={LibsodiumTestScreen} />
-      <Stack.Screen
-        name="NotFound"
-        component={NotFoundScreen}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
       <Stack.Screen
         name="AcceptWorkspaceInvitation"
         component={AcceptWorkspaceInvitationScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="WorkspaceNotFound"
+        component={WorkspaceNotFoundScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="NotFound"
+        component={NotFoundScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

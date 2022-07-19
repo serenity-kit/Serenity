@@ -36,6 +36,7 @@ import {
   deleteSessionKey,
   getSessionKey,
 } from "./utils/authentication/sessionKeyStore";
+import { source } from "./webviews/opaque/source";
 
 // import { clearLocalSessionData } from "./utils/authentication/clearLocalSessionData";
 // clearLocalSessionData();
@@ -200,7 +201,7 @@ export default function App() {
               <NativeBaseProvider theme={rnTheme}>
                 <Navigation colorScheme={colorScheme} />
                 <StatusBar />
-                <OpaqueBridge />
+                <OpaqueBridge source={source} />
               </NativeBaseProvider>
             </SafeAreaProvider>
           </Provider>
