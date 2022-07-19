@@ -10,7 +10,7 @@ test.beforeAll(async () => {
 test("Login without remembering web keys", async ({ page }) => {
   const userId = uuidv4();
   const username = "user1@example.com";
-  const password = "password";
+  const password = "12345689"; // because createUserWithWorkspace uses this password
   const { user, workspace } = await createUserWithWorkspace({
     id: userId,
     username,

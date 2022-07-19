@@ -103,7 +103,7 @@ test.describe("Workspace Sharing", () => {
   test("User 1 can create a sharing link", async ({ page }) => {
     const userId = uuidv4();
     const username = "user1@example.com";
-    const password = "password";
+    const password = "12345689"; // because createUserWithWorkspace uses this password
     const { workspace } = await createUserWithWorkspace({
       id: userId,
       username,
@@ -147,7 +147,7 @@ test.describe("Workspace Sharing", () => {
   test("Existing other user can accept workspace", async ({ page }) => {
     const userId = uuidv4();
     const username = "user2@example.com";
-    const password = "password";
+    const password = "12345689";
     await createUserWithWorkspace({
       id: userId,
       username,
@@ -166,7 +166,7 @@ test.describe("Workspace Sharing", () => {
   test("Unauthenticated other user can accept workspace", async ({ page }) => {
     const userId = uuidv4();
     const username = "user3@example.com";
-    const password = "password";
+    const password = "12345689";
     await createUserWithWorkspace({
       id: userId,
       username,
@@ -181,7 +181,7 @@ test.describe("Workspace Sharing", () => {
 
   test("Unregistered other user can accept workspace", async ({ page }) => {
     const username = "user4@example.com";
-    const password = "password";
+    const password = "12345689";
     const workspaceName = "my workspace";
     await page.goto(workspaceInvitationUrl);
     // click "register" button
