@@ -33,7 +33,7 @@ export default function AcceptWorkspaceInvitationScreen(
 
   useEffect(() => {
     if (workspaceInvitationId && sessionKey !== null) {
-      acceptWorkspaceInvitation();
+      // acceptWorkspaceInvitation();
     }
   }, [sessionKey, urqlClient, props.navigation]);
 
