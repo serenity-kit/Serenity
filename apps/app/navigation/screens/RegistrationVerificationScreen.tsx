@@ -32,6 +32,7 @@ import {
 import { useClient } from "urql";
 import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
 import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
+import { removeLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
@@ -51,7 +52,8 @@ export default function RegistrationVerificationScreen(
     useAcceptWorkspaceInvitationMutation();
   const urqlClient = useClient();
 
-  const navigateToLoginScreen = () => {
+  const navigateToLoginScreen = async () => {
+    await removeLastUsedWorkspaceId();
     props.navigation.push("Login", {});
   };
 
