@@ -53,7 +53,11 @@ export default async function createServer() {
   await apolloServer.start();
 
   // on staging we also want the dev setup to be able to connect
-  const allowedList = ["http://localhost:19006", "https://www.serenity.li"];
+  const allowedList = [
+    "http://localhost:19006",
+    "https://www.serenity.li",
+    "http://localhost:4000",
+  ];
   const allowedOrigin = (origin, callback) => {
     if (allowedList.indexOf(origin) !== -1 || !origin) {
       callback(null, true);
@@ -62,7 +66,6 @@ export default async function createServer() {
     }
   };
   const corsOptions = { credentials: true, origin: allowedOrigin };
-
   const app = express();
   app.use(cors(corsOptions));
   apolloServer.applyMiddleware({ app, cors: corsOptions });

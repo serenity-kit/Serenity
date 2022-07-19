@@ -16,14 +16,11 @@ import {
 import { useClient } from "urql";
 import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
 import { detect } from "detect-browser";
-import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
 const browser = detect();
 
 type Props = {
   defaultEmail?: string;
-  onLoginSuccess?: (
-    pendingWorkspaceInvitationId: string | null | undefined
-  ) => void;
+  onLoginSuccess?: () => void;
   onLoginFail?: () => void;
   onEmailChangeText?: (username: string) => void;
   onFormFilled?: () => void;
@@ -100,15 +97,11 @@ export function LoginForm(props: Props) {
           await removeWebDevice();
         }
       }
-      const pendingWorkspaceInvitationId =
-        await getPendingWorkspaceInvitationId({
-          urqlClient,
-        });
       setPassword("");
       setUsername("");
       setIsLoggingIn(false);
       if (props.onLoginSuccess) {
-        props.onLoginSuccess(pendingWorkspaceInvitationId);
+        props.onLoginSuccess();
       }
     } catch (error) {
       console.error(error);
