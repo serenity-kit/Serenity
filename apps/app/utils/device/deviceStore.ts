@@ -1,5 +1,5 @@
 import { Device } from "../../types/Device";
-import { getItemAsync, setItemAsync, deleteItemAsync } from "expo-secure-store";
+import { getItem, setItem, removeItem } from "../storage/storage";
 import { createDevice } from "@serenity-tools/common";
 import { Platform } from "react-native";
 
@@ -18,13 +18,13 @@ export const createAndSetDevice = async (): Promise<Device | null> => {
 
 export const setDevice = async (device: Device) => {
   if (Platform.OS === "ios") {
-    await setItemAsync(deviceStorageKey, JSON.stringify(device));
+    await setItem(deviceStorageKey, JSON.stringify(device));
   }
 };
 
 export const getDevice = async (): Promise<Device | null> => {
   if (Platform.OS === "ios") {
-    const jsonDevice = await getItemAsync(deviceStorageKey);
+    const jsonDevice = await getItem(deviceStorageKey);
     if (!jsonDevice) {
       return null;
     }
@@ -41,6 +41,6 @@ export const getDevice = async (): Promise<Device | null> => {
 
 export const removeDevice = async () => {
   if (Platform.OS === "ios") {
-    await deleteItemAsync(deviceStorageKey);
+    await removeItem(deviceStorageKey);
   }
 };
