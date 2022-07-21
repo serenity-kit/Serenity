@@ -68,7 +68,6 @@ export const fetchMainDevice = async ({
       requestPolicy: "network-only",
     })
     .toPromise();
-  console.log({ mainDeviceResult });
   if (!mainDeviceResult.data?.mainDevice) {
     throw new Error("Failed to fetch main device.");
   }
@@ -100,21 +99,24 @@ export const createSetAndRegisterDevice = async (): Promise<any> => {
   if (Platform.OS === "web") {
     type = "web";
   }
-  const { signingPrivateKey, encryptionPrivateKey, ...platformDevice } =
-    await createAndSetDevice();
-  const deviceInfoJson = {
-    type,
-    os: browser?.os,
-    osVersion: Platform.Version,
-    browser: null,
-    browserVersion: null,
-  };
-  const deviceInfo = JSON.stringify(deviceInfoJson);
-  const newDeviceInfo = {
-    ...platformDevice,
-    info: deviceInfo,
-  };
-  return newDeviceInfo;
+  const deviceData = await createAndSetDevice();
+  if (deviceData) {
+    const { signingPrivateKey, encryptionPrivateKey, ...platformDevice } =
+      deviceData;
+    const deviceInfoJson = {
+      type,
+      os: Platform.OS,
+      osVersion: Platform.Version,
+      browser: null,
+      browserVersion: null,
+    };
+    const deviceInfo = JSON.stringify(deviceInfoJson);
+    const newDeviceInfo = {
+      ...platformDevice,
+      info: deviceInfo,
+    };
+    return newDeviceInfo;
+  }
 };
 
 /**

@@ -32,10 +32,7 @@ import { OpaqueBridge } from "@serenity-tools/opaque";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { getWebDevice } from "./utils/device/webDeviceStore";
 import Constants from "expo-constants";
-import {
-  deleteSessionKey,
-  getSessionKey,
-} from "./utils/authentication/sessionKeyStore";
+import * as SessionKeyStore from "./utils/authentication/sessionKeyStore";
 import { source } from "./webviews/opaque/source";
 
 // import { clearLocalSessionData } from "./utils/authentication/clearLocalSessionData";
@@ -94,7 +91,7 @@ const exchanges = [
       if (!authState) {
         // check for login
         try {
-          const sessionKey = await getSessionKey();
+          const sessionKey = await SessionKeyStore.getSessionKey();
           if (sessionKey) {
             return { sessionKey };
           }
@@ -109,7 +106,6 @@ const exchanges = [
       if (!authState || !authState.sessionKey) {
         return operation;
       }
-
       const fetchOptions =
         typeof operation.context.fetchOptions === "function"
           ? operation.context.fetchOptions()
@@ -137,10 +133,10 @@ export default function App() {
     async (session: { sessionKey: string; expiresAt: string } | null) => {
       if (session) {
         setSessionKey(session.sessionKey);
-        await setSessionKey(session.sessionKey);
+        await SessionKeyStore.setSessionKey(session.sessionKey);
       } else {
         setSessionKey(null);
-        await deleteSessionKey();
+        await SessionKeyStore.deleteSessionKey();
       }
     },
     [setSessionKey]
@@ -148,7 +144,6 @@ export default function App() {
 
   const checkForWebDevice = async () => {
     const webDevice = await getWebDevice();
-    console.log({ webDevice });
   };
 
   useEffect(() => {
