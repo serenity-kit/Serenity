@@ -34,7 +34,10 @@ import {
 import { useClient } from "urql";
 import { Platform } from "react-native";
 import { detect } from "detect-browser";
-import { createAndSetDevice } from "../../utils/device/deviceStore";
+import {
+  createAndSetDevice,
+  removeDevice,
+} from "../../utils/device/deviceStore";
 const browser = detect();
 import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
 import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
@@ -50,7 +53,6 @@ export default function RegistrationVerificationScreen(
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [graphqlError, setGraphqlError] = useState("");
-
   const { updateAuthentication } = useAuthentication();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
@@ -108,6 +110,7 @@ export default function RegistrationVerificationScreen(
         updateAuthentication,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
+      await registerNewDevice();
       await acceptPendingWorkspaceInvitation();
       setIsLoggingIn(false);
       navigateToNextAuthenticatedPage({
