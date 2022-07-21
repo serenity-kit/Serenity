@@ -4,7 +4,7 @@ import * as Y from "yjs";
 export type EditorProps = {
   documentId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
-  yAwarenessRef?: React.MutableRefObject<Awareness>;
+  yAwarenessRef: React.MutableRefObject<Awareness>;
   isNew: boolean;
   openDrawer: () => void;
   updateTitle: (title: string) => void;

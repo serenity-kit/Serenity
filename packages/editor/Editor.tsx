@@ -82,7 +82,7 @@ export const Editor = (props: EditorProps) => {
           field: "page",
         }),
         AwarnessExtension.configure({
-          awareness: props.yAwarenessRef?.current,
+          awareness: props.yAwarenessRef.current,
         }),
       ],
       onCreate: (params) => {

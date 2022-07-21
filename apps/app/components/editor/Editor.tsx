@@ -3,10 +3,14 @@ import { SafeAreaView } from "react-native";
 import { WebView } from "react-native-webview";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
-import { Spinner, Text, tw, View } from "@serenity-tools/ui";
+import { Spinner, tw, View } from "@serenity-tools/ui";
 import * as Y from "yjs";
 import { EditorProps } from "./types";
 import { source } from "../../webviews/editor/source";
+import {
+  applyAwarenessUpdate,
+  encodeAwarenessUpdate,
+} from "y-protocols/awareness";
 
 // // TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
 // export async function loadEditorSourceForAndroid() {
@@ -19,6 +23,7 @@ import { source } from "../../webviews/editor/source";
 
 export default function Editor({
   yDocRef,
+  yAwarenessRef,
   openDrawer,
   updateTitle,
   isNew,
@@ -49,6 +54,24 @@ export default function Editor({
       `);
     }
   });
+
+  yAwarenessRef.current.on(
+    "update",
+    ({ added, updated, removed }, origin: string) => {
+      const changedClients = added.concat(updated).concat(removed);
+      const update = encodeAwarenessUpdate(
+        yAwarenessRef.current,
+        changedClients
+      );
+
+      webViewRef.current?.injectJavaScript(`
+        window.applyYAwarenessUpdate(${JSON.stringify(
+          Array.apply([], update)
+        )});
+        true;
+      `);
+    }
+  );
 
   return (
     <SafeAreaView style={tw`bg-white flex-auto`}>
@@ -82,6 +105,16 @@ export default function Editor({
               // TODO switch to applyUpdateV2
               Y.applyUpdate(yDocRef.current, update, "mobile-webview");
               console.log("apply update");
+            }
+          }
+          if (message.type === "updateYAwareness") {
+            const update = new Uint8Array(message.content);
+            if (yAwarenessRef.current) {
+              applyAwarenessUpdate(
+                yAwarenessRef.current,
+                update,
+                "mobile-webview"
+              );
             }
           }
         }}
