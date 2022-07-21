@@ -19,7 +19,7 @@ import { useHasEditorSidebar } from "./hooks/useHasEditorSidebar";
 type EditorProps = {
   documentId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
-  yAwarenessRef?: React.MutableRefObject<Awareness>;
+  yAwarenessRef: React.MutableRefObject<Awareness>;
   isNew?: boolean;
   openDrawer: () => void;
   updateTitle: (title: string) => void;
@@ -82,7 +82,7 @@ export const Editor = (props: EditorProps) => {
           field: "page",
         }),
         AwarnessExtension.configure({
-          awareness: props.yAwarenessRef?.current,
+          awareness: props.yAwarenessRef.current,
         }),
       ],
       onCreate: (params) => {

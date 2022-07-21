@@ -12,5 +12,6 @@ declare global {
     isNew: boolean;
     initialContent: any;
     applyYjsUpdate: (update: any) => void;
+    applyYAwarenessUpdate: (update: any) => void;
   }
 }
