@@ -4,6 +4,10 @@ import { decryptDevice } from "@serenity-tools/common";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { Client } from "urql";
 import { UpdateAuthenticationFunction } from "../../context/AuthenticationContext";
+import { createAndSetDevice } from "../device/deviceStore";
+import { Platform } from "react-native";
+import { detect } from "detect-browser";
+const browser = detect();
 
 export type LoginParams = {
   username: string;
@@ -64,7 +68,6 @@ export const fetchMainDevice = async ({
       requestPolicy: "network-only",
     })
     .toPromise();
-  console.log({ mainDeviceResult });
   if (!mainDeviceResult.data?.mainDevice) {
     throw new Error("Failed to fetch main device.");
   }
@@ -81,6 +84,39 @@ export const fetchMainDevice = async ({
     signingPublicKey: mainDevice.signingPublicKey,
     encryptionPublicKey: mainDevice.encryptionPublicKey,
   });
+};
+
+/**
+ * This method creates a new device, stores it in secure storage,
+ * creates the JSON device info, and prepares it for registering
+ * with graphql.
+ *
+ * @returns the device information including signing and encryption private keys
+ *          and stringified JSON device info
+ */
+export const createRegisterAndStoreDevice = async (): Promise<any> => {
+  let type = "device";
+  if (Platform.OS === "web") {
+    type = "web";
+  }
+  const deviceData = await createAndSetDevice();
+  if (deviceData) {
+    const { signingPrivateKey, encryptionPrivateKey, ...platformDevice } =
+      deviceData;
+    const deviceInfoJson = {
+      type,
+      os: Platform.OS,
+      osVersion: Platform.Version,
+      browser: null,
+      browserVersion: null,
+    };
+    const deviceInfo = JSON.stringify(deviceInfoJson);
+    const newDeviceInfo = {
+      ...platformDevice,
+      info: deviceInfo,
+    };
+    return newDeviceInfo;
+  }
 };
 
 /**

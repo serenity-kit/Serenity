@@ -1,5 +1,8 @@
 import { getItem, setItem, removeItem } from "../storage/storage";
 
+export const lastUsedDocumentIdKeyPrefix = "lastUsedDocumentId:";
+export const lastUsedWorkspaceIdKey = "lastUsedWorkspaceId";
+
 export const setLastUsedWorkspaceId = async (workspaceId: string) => {
   try {
     await setItem("lastUsedWorkspaceId", workspaceId);

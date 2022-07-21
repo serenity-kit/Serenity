@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { tw, View } from "@serenity-tools/ui";
 import { CreateWorkspaceForm } from "../../components/createWorkspaceForm/CreateWorkspaceForm";

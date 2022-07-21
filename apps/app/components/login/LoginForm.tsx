@@ -8,14 +8,19 @@ import {
   useCreateDeviceMutation,
 } from "../../generated/graphql";
 import { useAuthentication } from "../../context/AuthenticationContext";
-import { login, fetchMainDevice } from "../../utils/authentication/loginHelper";
+import {
+  login,
+  fetchMainDevice,
+  createRegisterAndStoreDevice,
+} from "../../utils/authentication/loginHelper";
 import {
   createWebDevice,
   removeWebDevice,
 } from "../../utils/device/webDeviceStore";
 import { useClient } from "urql";
-import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
+import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { detect } from "detect-browser";
+import { removeDevice } from "../../utils/device/deviceStore";
 const browser = detect();
 
 type Props = {
@@ -28,9 +33,15 @@ type Props = {
 
 export function LoginForm(props: Props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+  let defaultUseExtendedLogin = false;
+  if (Platform.OS === "ios") {
+    defaultUseExtendedLogin = true;
+  }
   const [username, _setUsername] = useState("");
   const [password, _setPassword] = useState("");
-  const [useExtendedLogin, setUseExtendedLogin] = useState(false);
+  const [useExtendedLogin, setUseExtendedLogin] = useState(
+    defaultUseExtendedLogin
+  );
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const [gqlErrorMessage, setGqlErrorMessage] = useState("");
@@ -59,11 +70,18 @@ export function LoginForm(props: Props) {
     _setPassword(password);
   };
 
+  const registerNewDevice = async () => {
+    const newDeviceInfo = await createRegisterAndStoreDevice();
+    await createDeviceMutation({
+      input: newDeviceInfo,
+    });
+  };
+
   const onLoginPress = async () => {
     try {
       setGqlErrorMessage("");
       setIsLoggingIn(true);
-      await clearLocalSessionData();
+      await clearDeviceAndSessionStorage();
       const loginResult = await login({
         username,
         password,
@@ -95,6 +113,10 @@ export function LoginForm(props: Props) {
           });
         } else {
           await removeWebDevice();
+        }
+      } else if (Platform.OS === "ios") {
+        if (useExtendedLogin) {
+          await registerNewDevice();
         }
       }
       setPassword("");

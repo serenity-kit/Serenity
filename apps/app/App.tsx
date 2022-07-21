@@ -29,14 +29,14 @@ import { useCallback, useEffect, useMemo } from "react";
 import { devtoolsExchange } from "@urql/devtools";
 import { theme } from "../../tailwind.config";
 import { OpaqueBridge } from "@serenity-tools/opaque";
-import * as storage from "./utils/storage/storage";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { getWebDevice } from "./utils/device/webDeviceStore";
 import Constants from "expo-constants";
+import * as SessionKeyStore from "./utils/authentication/sessionKeyStore";
 import { source } from "./webviews/opaque/source";
 
-// import { clearLocalSessionData } from "./utils/authentication/clearLocalSessionData";
-// clearLocalSessionData();
+// import { clearDeviceAndSessionStorage } from "./utils/authentication/clearDeviceAndSessionStorage";
+// clearDeviceAndSessionStorage();
 
 type AuthState = {
   sessionKey: string;
@@ -89,23 +89,24 @@ const exchanges = [
     },
     getAuth: async ({ authState }) => {
       if (!authState) {
+        // check for login
         try {
-          const sessionKey = await storage.getItem("sessionKey");
+          const sessionKey = await SessionKeyStore.getSessionKey();
           if (sessionKey) {
             return { sessionKey };
           }
         } catch (err) {
-          // TODO: explain why fetching the webdevice failed
+          // TODO: explain why fetching the sessionKey failed
           console.error(err);
         }
       }
+
       return null;
     },
     addAuthToOperation: ({ authState, operation }) => {
       if (!authState || !authState.sessionKey) {
         return operation;
       }
-
       const fetchOptions =
         typeof operation.context.fetchOptions === "function"
           ? operation.context.fetchOptions()
@@ -133,10 +134,10 @@ export default function App() {
     async (session: { sessionKey: string; expiresAt: string } | null) => {
       if (session) {
         setSessionKey(session.sessionKey);
-        await storage.setItem("sessionKey", session.sessionKey);
+        await SessionKeyStore.setSessionKey(session.sessionKey);
       } else {
         setSessionKey(null);
-        await storage.removeItem("sessionKey");
+        await SessionKeyStore.deleteSessionKey();
       }
     },
     [setSessionKey]
@@ -144,7 +145,6 @@ export default function App() {
 
   const checkForWebDevice = async () => {
     const webDevice = await getWebDevice();
-    console.log({ webDevice });
   };
 
   useEffect(() => {

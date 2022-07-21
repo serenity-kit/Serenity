@@ -1,13 +1,27 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
 
 export const getItem = async (key: string): Promise<string | null> => {
-  return AsyncStorage.getItem(key);
+  if (Platform.OS === "web") {
+    return AsyncStorage.getItem(key);
+  } else {
+    return SecureStore.getItemAsync(key);
+  }
 };
 
 export const removeItem = async (key: string): Promise<void> => {
-  return AsyncStorage.removeItem(key);
+  if (Platform.OS === "web") {
+    return AsyncStorage.removeItem(key);
+  } else {
+    return SecureStore.deleteItemAsync(key);
+  }
 };
 
 export const setItem = async (key: string, value: string): Promise<void> => {
-  return AsyncStorage.setItem(key, value);
+  if (Platform.OS === "web") {
+    return AsyncStorage.setItem(key, value);
+  } else {
+    return SecureStore.setItemAsync(key, value);
+  }
 };

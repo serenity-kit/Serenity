@@ -10,6 +10,7 @@ import {
 } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types/navigation";
 import {
+  useCreateDeviceMutation,
   useAcceptWorkspaceInvitationMutation,
   useVerifyRegistrationMutation,
 } from "../../generated/graphql";
@@ -28,8 +29,10 @@ import {
   login,
   fetchMainDevice,
   navigateToNextAuthenticatedPage,
+  createRegisterAndStoreDevice,
 } from "../../utils/authentication/loginHelper";
 import { useClient } from "urql";
+import { Platform } from "react-native";
 import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
 import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
 import { removeLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
@@ -44,10 +47,10 @@ export default function RegistrationVerificationScreen(
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [graphqlError, setGraphqlError] = useState("");
-
   const { updateAuthentication } = useAuthentication();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
+  const [, createDeviceMutation] = useCreateDeviceMutation();
   const [, acceptWorkspaceInvitationMutation] =
     useAcceptWorkspaceInvitationMutation();
   const urqlClient = useClient();
@@ -55,6 +58,15 @@ export default function RegistrationVerificationScreen(
   const navigateToLoginScreen = async () => {
     await removeLastUsedWorkspaceId();
     props.navigation.push("Login", {});
+  };
+
+  const registerNewDevice = async () => {
+    if (Platform.OS === "ios") {
+      const newDeviceInfo = await createRegisterAndStoreDevice();
+      await createDeviceMutation({
+        input: newDeviceInfo,
+      });
+    }
   };
 
   const acceptPendingWorkspaceInvitation = async () => {
@@ -92,6 +104,7 @@ export default function RegistrationVerificationScreen(
         updateAuthentication,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
+      await registerNewDevice();
       await acceptPendingWorkspaceInvitation();
       setIsLoggingIn(false);
       navigateToNextAuthenticatedPage({
