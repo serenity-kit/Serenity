@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import SecureStore from "expo-secure-store";
+import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
 export const getItem = async (key: string): Promise<string | null> => {

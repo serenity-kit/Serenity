@@ -70,6 +70,13 @@ export function LoginForm(props: Props) {
     _setPassword(password);
   };
 
+  const registerNewDevice = async () => {
+    const newDeviceInfo = await createSetAndRegisterDevice();
+    await createDeviceMutation({
+      input: newDeviceInfo,
+    });
+  };
+
   const onLoginPress = async () => {
     try {
       setGqlErrorMessage("");
@@ -109,12 +116,7 @@ export function LoginForm(props: Props) {
         }
       } else if (Platform.OS === "ios") {
         if (useExtendedLogin) {
-          const newDeviceInfo = await createSetAndRegisterDevice();
-          await createDeviceMutation({
-            input: newDeviceInfo,
-          });
-        } else {
-          removeDevice();
+          await registerNewDevice();
         }
       }
       setPassword("");
