@@ -100,6 +100,7 @@ const exchanges = [
           console.error(err);
         }
       }
+
       return null;
     },
     addAuthToOperation: ({ authState, operation }) => {
