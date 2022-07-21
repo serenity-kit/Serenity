@@ -107,7 +107,6 @@ export default function RegistrationVerificationScreen(
         finishLoginMutation,
         updateAuthentication,
       });
-      console.log({ loginResult });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
       await acceptPendingWorkspaceInvitation();
       setIsLoggingIn(false);
