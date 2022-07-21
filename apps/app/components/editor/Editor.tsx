@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native";
 import { WebView } from "react-native-webview";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
-import { Text, tw, View } from "@serenity-tools/ui";
+import { Spinner, Text, tw, View } from "@serenity-tools/ui";
 import * as Y from "yjs";
 import { EditorProps } from "./types";
 import { source } from "../../webviews/editor/source";
@@ -24,6 +24,9 @@ export default function Editor({
   isNew,
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
+  // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
+  // seem to not inject the initial isNew, but the current value
+  const isNewRef = useRef<boolean>(isNew);
 
   // useEffect(() => {
   //   const initEditor = async () => {
@@ -60,8 +63,8 @@ export default function Editor({
         // scrollEnabled={Platform.OS === "macos" ? true : false}
         scrollEnabled={true}
         renderLoading={() => (
-          <View style={tw`bg-white flex-auto`}>
-            <Text>Loading</Text>
+          <View style={tw`justify-center items-center flex-auto`}>
+            <Spinner fadeIn size="lg" />
           </View>
         )}
         onMessage={async (event) => {
@@ -78,16 +81,21 @@ export default function Editor({
             if (yDocRef.current) {
               // TODO switch to applyUpdateV2
               Y.applyUpdate(yDocRef.current, update, "mobile-webview");
-              console.log("apply update", update);
+              console.log("apply update");
             }
           }
         }}
         style={tw`bg-white flex-auto`}
         // Needed for .focus() to work
         keyboardDisplayRequiresUserAction={false}
+        injectedJavaScriptBeforeContentLoaded={`
+          window.isNew = ${isNewRef.current};
+          window.initialContent = ${JSON.stringify(
+            Array.apply([], Y.encodeStateAsUpdateV2(yDocRef.current))
+          )};
+          true; // this is required, or you'll sometimes get silent failures
+        `}
         onLoad={() => {
-          // TODO apply isNew for new documents
-
           // debug for the editor
           // console.log(JSON.stringify(Array.apply([], contentRef.current)));
           // if (isNew) {
@@ -97,13 +105,12 @@ export default function Editor({
           //   `);
           // } else {
           // }
-
-          webViewRef.current?.injectJavaScript(`
-              window.applyYjsUpdate(${JSON.stringify(
-                Array.apply([], Y.encodeStateAsUpdateV2(yDocRef.current))
-              )});
-              true;
-            `);
+          // webViewRef.current?.injectJavaScript(`
+          //     window.applyYjsUpdate(${JSON.stringify(
+          //       Array.apply([], Y.encodeStateAsUpdateV2(yDocRef.current))
+          //     )});
+          //     true;
+          //   `);
         }}
       />
     </SafeAreaView>

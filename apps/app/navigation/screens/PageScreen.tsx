@@ -71,6 +71,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
 
   useEffect(() => {
     setLastUsedDocumentId(pageId, workspaceId);
+    // removing the isNew param right after the first render so users don't have it after a refresh
     props.navigation.setParams({ isNew: undefined });
     (async () => {
       if (pageId) {
@@ -82,7 +83,6 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
           });
         }
       }
-      // removing the isNew param right after the first render so users don't have it after a refresh
     })();
   }, [pageId]);
 

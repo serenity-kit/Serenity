@@ -441,7 +441,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
 
       // TODO switch to v2 updates
       yDocRef.current.on("update", async (update, origin) => {
-        if (origin?.key === "y-sync$") {
+        if (origin?.key === "y-sync$" || origin === "mobile-webview") {
           if (!activeSnapshotIdRef.current || createSnapshotRef.current) {
             createSnapshotRef.current = false;
 

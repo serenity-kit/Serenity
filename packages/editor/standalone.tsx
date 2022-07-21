@@ -6,6 +6,11 @@ import * as Y from "yjs";
 
 const ydoc = new Y.Doc();
 window.ydoc = ydoc;
+window.isNew = window.isNew === undefined ? false : window.isNew;
+if (window.initialContent) {
+  const update = new Uint8Array(window.initialContent);
+  Y.applyUpdateV2(window.ydoc, update, "react-native-bridge");
+}
 
 window.applyYjsUpdate = function (updateArray) {
   if (updateArray) {
@@ -28,7 +33,7 @@ const openDrawer = () => {
 
 const updateTitle = (title: string) => {
   window.ReactNativeWebView.postMessage(
-    JSON.stringify({ type: "openDrawer", title })
+    JSON.stringify({ type: "updateTitle", title })
   );
 };
 
@@ -40,8 +45,7 @@ ReactDOM.render(
       yDocRef={{ current: ydoc }}
       openDrawer={openDrawer}
       updateTitle={updateTitle}
-      // TODO set isNew on Mobile
-      isNew={false}
+      isNew={window.isNew}
     />
   </NativeBaseProvider>,
   domContainer

@@ -9,6 +9,8 @@ declare global {
   interface Window {
     ReactNativeWebView: ReactNativeWebView;
     ydoc: any;
+    isNew: boolean;
+    initialContent: any;
     applyYjsUpdate: (update: any) => void;
   }
 }
