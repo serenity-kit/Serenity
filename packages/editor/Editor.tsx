@@ -15,6 +15,7 @@ import TaskItem from "@tiptap/extension-task-item";
 import Placeholder from "@tiptap/extension-placeholder";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import { useHasEditorSidebar } from "./hooks/useHasEditorSidebar";
+import { EditorEvents } from "@tiptap/core";
 
 type EditorProps = {
   documentId: string;
@@ -23,6 +24,7 @@ type EditorProps = {
   isNew?: boolean;
   openDrawer: () => void;
   updateTitle: (title: string) => void;
+  onTransaction?: (params: EditorEvents["transaction"]) => void;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -107,9 +109,15 @@ export const Editor = (props: EditorProps) => {
           }
         }
       },
+      onTransaction: (transactionParams) => {
+        if (props.onTransaction) {
+          props.onTransaction(transactionParams);
+        }
+      },
     },
     [props.documentId]
   );
+  window.editor = editor;
 
   return (
     <div className="flex flex-auto flex-row">

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native";
 import { WebView } from "react-native-webview";
 import { Asset } from "expo-asset";
@@ -11,6 +11,8 @@ import {
   applyAwarenessUpdate,
   encodeAwarenessUpdate,
 } from "y-protocols/awareness";
+import { EditorBottomBar } from "../editorBottomBar/EditorBottomBar";
+import { EditorToolbarState, UpdateEditorParams } from "@serenity-tools/editor";
 
 // // TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
 // export async function loadEditorSourceForAndroid() {
@@ -32,6 +34,11 @@ export default function Editor({
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
   // seem to not inject the initial isNew, but the current value
   const isNewRef = useRef<boolean>(isNew);
+  const [editorToolbarState, setEditorToolbarState] =
+    useState<EditorToolbarState>({
+      isBold: false,
+      isItalic: false,
+    });
 
   // useEffect(() => {
   //   const initEditor = async () => {
@@ -117,6 +124,9 @@ export default function Editor({
               );
             }
           }
+          if (message.type === "update-editor-toolbar-state") {
+            setEditorToolbarState(message.content);
+          }
         }}
         style={tw`bg-white flex-auto`}
         // Needed for .focus() to work
@@ -144,6 +154,15 @@ export default function Editor({
           //     )});
           //     true;
           //   `);
+        }}
+      />
+      <EditorBottomBar
+        editorToolbarState={editorToolbarState}
+        onUpdate={(params: UpdateEditorParams) => {
+          webViewRef.current?.injectJavaScript(`
+            window.updateEditor(\`${JSON.stringify(params)}\`);
+            true;
+          `);
         }}
       />
     </SafeAreaView>
