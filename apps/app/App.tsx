@@ -35,8 +35,8 @@ import Constants from "expo-constants";
 import * as SessionKeyStore from "./utils/authentication/sessionKeyStore";
 import { source } from "./webviews/opaque/source";
 
-// import { clearLocalSessionData } from "./utils/authentication/clearLocalSessionData";
-// clearLocalSessionData();
+// import { clearDeviceAndSessionStorage } from "./utils/authentication/clearDeviceAndSessionStorage";
+// clearDeviceAndSessionStorage();
 
 type AuthState = {
   sessionKey: string;

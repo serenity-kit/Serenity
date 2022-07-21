@@ -11,14 +11,14 @@ import { useAuthentication } from "../../context/AuthenticationContext";
 import {
   login,
   fetchMainDevice,
-  createSetAndRegisterDevice,
+  createRegisterAndStoreDevice,
 } from "../../utils/authentication/loginHelper";
 import {
   createWebDevice,
   removeWebDevice,
 } from "../../utils/device/webDeviceStore";
 import { useClient } from "urql";
-import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
+import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { detect } from "detect-browser";
 import { removeDevice } from "../../utils/device/deviceStore";
 const browser = detect();
@@ -71,7 +71,7 @@ export function LoginForm(props: Props) {
   };
 
   const registerNewDevice = async () => {
-    const newDeviceInfo = await createSetAndRegisterDevice();
+    const newDeviceInfo = await createRegisterAndStoreDevice();
     await createDeviceMutation({
       input: newDeviceInfo,
     });
@@ -81,7 +81,7 @@ export function LoginForm(props: Props) {
     try {
       setGqlErrorMessage("");
       setIsLoggingIn(true);
-      await clearLocalSessionData();
+      await clearDeviceAndSessionStorage();
       const loginResult = await login({
         username,
         password,

@@ -1,6 +1,6 @@
 import * as storage from "../storage/storage";
 
-const sessionKeyStorageKey = "sessionKey";
+export const sessionKeyStorageKey = "sessionKey";
 
 export const setSessionKey = async (sessionKey: string) => {
   await storage.setItem(sessionKeyStorageKey, sessionKey);

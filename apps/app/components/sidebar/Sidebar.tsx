@@ -35,7 +35,7 @@ import { HStack } from "native-base";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useEffect, useState } from "react";
 import Folder from "../sidebarFolder/SidebarFolder";
-import { clearLocalSessionData } from "../../utils/authentication/clearLocalSessionData";
+import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { Platform } from "react-native";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
@@ -220,7 +220,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             onPress={async () => {
               setIsOpenWorkspaceSwitcher(false);
               await updateAuthentication(null);
-              clearLocalSessionData();
+              clearDeviceAndSessionStorage();
               // @ts-expect-error navigation ts issue
               props.navigation.push("Login");
             }}

@@ -94,7 +94,7 @@ export const fetchMainDevice = async ({
  * @returns the device information including signing and encryption private keys
  *          and stringified JSON device info
  */
-export const createSetAndRegisterDevice = async (): Promise<any> => {
+export const createRegisterAndStoreDevice = async (): Promise<any> => {
   let type = "device";
   if (Platform.OS === "web") {
     type = "web";

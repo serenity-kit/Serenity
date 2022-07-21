@@ -8,39 +8,29 @@ export const deviceStorageKey = "device.device";
 let device: Device | null = null;
 
 export const createAndSetDevice = async (): Promise<Device | null> => {
-  if (Platform.OS === "ios") {
-    const device = await createDevice();
-    await setDevice(device);
-    return device;
-  }
-  return null;
+  const device = await createDevice();
+  await setDevice(device);
+  return device;
 };
 
 export const setDevice = async (device: Device) => {
-  if (Platform.OS === "ios") {
-    await setItem(deviceStorageKey, JSON.stringify(device));
-  }
+  await setItem(deviceStorageKey, JSON.stringify(device));
 };
 
 export const getDevice = async (): Promise<Device | null> => {
-  if (Platform.OS === "ios") {
-    const jsonDevice = await getItem(deviceStorageKey);
-    if (!jsonDevice) {
-      return null;
-    }
-    try {
-      const device = JSON.parse(jsonDevice);
-      return device;
-    } catch (error) {
-      await removeDevice();
-      return null;
-    }
+  const jsonDevice = await getItem(deviceStorageKey);
+  if (!jsonDevice) {
+    return null;
   }
-  return null;
+  try {
+    const device = JSON.parse(jsonDevice);
+    return device;
+  } catch (error) {
+    await removeDevice();
+    return null;
+  }
 };
 
-export const removeDevice = async () => {
-  if (Platform.OS === "ios") {
-    await removeItem(deviceStorageKey);
-  }
+export const removeDevice = async (): Promise<void> => {
+  await removeItem(deviceStorageKey);
 };
