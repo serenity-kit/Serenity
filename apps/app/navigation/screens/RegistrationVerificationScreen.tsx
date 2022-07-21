@@ -29,16 +29,10 @@ import {
   login,
   fetchMainDevice,
   navigateToNextAuthenticatedPage,
-  createSetAndRegisterDevice,
+  createRegisterAndStoreDevice,
 } from "../../utils/authentication/loginHelper";
 import { useClient } from "urql";
 import { Platform } from "react-native";
-import { detect } from "detect-browser";
-import {
-  createAndSetDevice,
-  removeDevice,
-} from "../../utils/device/deviceStore";
-const browser = detect();
 import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
 import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
 import { removeLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
@@ -67,8 +61,8 @@ export default function RegistrationVerificationScreen(
   };
 
   const registerNewDevice = async () => {
-    if (Platform.OS == "ios") {
-      const newDeviceInfo = await createSetAndRegisterDevice();
+    if (Platform.OS === "ios") {
+      const newDeviceInfo = await createRegisterAndStoreDevice();
       await createDeviceMutation({
         input: newDeviceInfo,
       });
@@ -143,7 +137,6 @@ export default function RegistrationVerificationScreen(
       if (isUsernamePasswordStored()) {
         await loginWithStoredUsernamePassword();
       } else {
-        await registerNewDevice();
         navigateToLoginScreen();
       }
     } catch (err) {
