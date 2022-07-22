@@ -64,7 +64,7 @@ test("Register", async ({ page }) => {
   // Click the "create" button
   await page.locator('div[role="button"]:has-text("Create")').click();
 
-  await delayForSeconds(3);
+  await delayForSeconds(5);
   const user = await prisma.user.findFirst({
     where: { username },
   });
