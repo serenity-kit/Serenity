@@ -8,6 +8,7 @@ import {
 } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { deleteSessionKey } from "./sessionKeyStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { removeLastLogin } from "./lastLoginStore";
 
 export const clearDeviceAndSessionStorage = async () => {
   if (Platform.OS === "web") {
@@ -26,5 +27,6 @@ export const clearDeviceAndSessionStorage = async () => {
     await removeDevice();
     await removeWebDevice();
     await deleteSessionKey();
+    await removeLastLogin();
   }
 };

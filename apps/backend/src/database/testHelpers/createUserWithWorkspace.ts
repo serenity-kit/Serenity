@@ -1,4 +1,7 @@
-import { createAndEncryptDevice } from "@serenity-tools/common";
+import {
+  createAndEncryptDevice,
+  createIntroductionDocumentSnapshot,
+} from "@serenity-tools/common";
 import { Login, Registration } from "@serenity-tools/opaque-server";
 import * as sodium from "@serenity-tools/libsodium";
 import {
@@ -10,19 +13,27 @@ import {
 import { prisma } from "../prisma";
 import { createSession } from "../authentication/createSession";
 import { addDays } from "../../utils/addDays/addDays";
+import { v4 as uuidv4 } from "uuid";
+import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
 
 type Params = {
   id: string;
   username: string;
+  password?: string;
 };
 
 export default async function createUserWithWorkspace({
   id,
   username,
+  password,
 }: Params) {
+  let thePassword = "12345689";
+  if (password) {
+    thePassword = password;
+  }
   // setup server registration opaque
   const registration = new Registration();
-  const challenge = registration.start("12345689");
+  const challenge = registration.start(thePassword);
   const { response, registrationId } = startRegistration({
     username,
     challenge: sodium.to_base64(challenge),
@@ -59,25 +70,33 @@ export default async function createUserWithWorkspace({
         },
       },
     });
+    return { user, device };
+  });
 
-    const workspace = await prisma.workspace.create({
-      data: {
-        id,
-        name: "My Workspace",
-        idSignature: "TODO",
-        usersToWorkspaces: {
-          create: {
-            userId: user.id,
-            isAdmin: true,
-          },
-        },
-      },
-    });
-    return { user, device, workspace };
+  const documentId = uuidv4();
+  const documentEncryptionKey = sodium.from_base64(
+    "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
+  );
+  const documentSnapshot = await createIntroductionDocumentSnapshot({
+    documentId,
+    documentEncryptionKey,
+  });
+
+  const user = result.user;
+  const createWorkspaceResult = await createInitialWorkspaceStructure({
+    userId: user.id,
+    workspaceId: id,
+    workspaceName: "My Workspace",
+    folderId: uuidv4(),
+    folderIdSignature: uuidv4(),
+    folderName: "Getting Started",
+    documentId,
+    documentName: "Introduction",
+    documentSnapshot,
   });
 
   const login = new Login();
-  const loginChallenge = login.start("12345689");
+  const loginChallenge = login.start(thePassword);
   const { message: loginMessage, loginId } = startLogin({
     envelope,
     username,
@@ -96,5 +115,12 @@ export default async function createUserWithWorkspace({
     expiresAt: addDays(new Date(), 30),
   });
 
-  return { ...result, session, sessionKey, workspace: result.workspace };
+  return {
+    ...result,
+    session,
+    sessionKey,
+    workspace: createWorkspaceResult.workspace,
+    folder: createWorkspaceResult.folder,
+    document: createWorkspaceResult.document,
+  };
 }
