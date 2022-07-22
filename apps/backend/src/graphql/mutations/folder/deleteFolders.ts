@@ -32,7 +32,6 @@ export const deleteFoldersMutation = mutationField("deleteFolders", {
     if (!args.input) {
       throw new Error("Invalid input");
     }
-    console.log({ ids: args.input.ids });
     await deleteFolders({
       folderIds: args.input.ids,
       userId: context.user.id,
