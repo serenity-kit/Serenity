@@ -158,7 +158,6 @@ test("user can delete multiple folders", async () => {
   expect(createFolderResult1.createFolder.folder.id).toBe(folderId1);
   expect(createFolderResult2.createFolder.folder.id).toBe(folderId2);
   const folderIds = [folderId1, folderId2];
-  console.log({ folderIds });
   await deleteFolders({
     graphql,
     ids: folderIds,
