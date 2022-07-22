@@ -17,7 +17,6 @@ const hashUsername = async ({ username, salt }: HashUsernameProps) => {
     sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
     sodium.crypto_pwhash_ALG_DEFAULT
   );
-  console.log({ username, salt });
   return hashedUsername;
 };
 
