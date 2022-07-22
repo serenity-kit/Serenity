@@ -113,6 +113,7 @@ test.describe("Workspace Sharing", () => {
       password,
     });
     sharedWorkspaceId = workspace.id;
+    await delayForSeconds(2);
     // const workspaceName = "sharable";
     // await page.goto("http://localhost:19006/register");
     // await registerOnPage({ page, username, password, workspaceName });
@@ -160,6 +161,7 @@ test.describe("Workspace Sharing", () => {
       username,
       password,
     });
+    await delayForSeconds(2);
     await page.goto("http://localhost:19006/login");
     await loginOnPage({ page, username, password });
     await delayForSeconds(2);
@@ -167,6 +169,7 @@ test.describe("Workspace Sharing", () => {
       `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
     );
     await page.goto(workspaceInvitationUrl);
+    await delayForSeconds(2);
     // click "accept"
     await page.locator('div[role="button"]:has-text("Accept")').click();
     await delayForSeconds(5);
@@ -188,7 +191,9 @@ test.describe("Workspace Sharing", () => {
       username,
       password,
     });
+    await delayForSeconds(2);
     await page.goto(workspaceInvitationUrl);
+    await delayForSeconds(2);
     await loginOnPage({ page, username, password });
     await delayForSeconds(2);
     // expect the new url to include the new workspace ID
@@ -205,6 +210,7 @@ test.describe("Workspace Sharing", () => {
     const password = "pass";
     const workspaceName = "my workspace";
     await page.goto(workspaceInvitationUrl);
+    await delayForSeconds(2);
     // click "register" button
     await page.locator("text=Register here").click();
     await delayForSeconds(2);
