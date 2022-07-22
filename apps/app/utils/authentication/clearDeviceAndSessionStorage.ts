@@ -3,8 +3,7 @@ import { removeDevice } from "../device/deviceStore";
 import { removeWebDevice } from "../device/webDeviceStore";
 import {
   getLastUsedWorkspaceId,
-  removeLastUsedDocumentId,
-  removeLastUsedWorkspaceId,
+  removeLastUsedDocumentIdAndWorkspaceId,
 } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { deleteSessionKey } from "./sessionKeyStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,11 +18,7 @@ export const clearDeviceAndSessionStorage = async () => {
       AsyncStorage.clear();
     }
   } else {
-    const lastUsedWorkspaceId = await getLastUsedWorkspaceId();
-    if (lastUsedWorkspaceId) {
-      await removeLastUsedDocumentId(lastUsedWorkspaceId);
-      await removeLastUsedWorkspaceId();
-    }
+    await removeLastUsedDocumentIdAndWorkspaceId();
     await removeDevice();
     await removeWebDevice();
     await deleteSessionKey();

@@ -11,21 +11,13 @@ import {
   isUsernameSameAsLastLogin,
   setLoggedInUsername,
 } from "./lastLoginStore";
-import {
-  getLastUsedWorkspaceId,
-  removeLastUsedDocumentId,
-  removeLastUsedWorkspaceId,
-} from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 const browser = detect();
 
 const removeLastUsedWorkspaceIdIfLoginChanged = async (username: string) => {
   const isLoginSame = isUsernameSameAsLastLogin(username);
   if (!isLoginSame) {
-    const lastUsedWorkspaceId = await getLastUsedWorkspaceId();
-    if (lastUsedWorkspaceId) {
-      await removeLastUsedDocumentId(lastUsedWorkspaceId);
-      await removeLastUsedWorkspaceId();
-    }
+    await removeLastUsedDocumentIdAndWorkspaceId();
     await setLoggedInUsername(username);
   }
 };

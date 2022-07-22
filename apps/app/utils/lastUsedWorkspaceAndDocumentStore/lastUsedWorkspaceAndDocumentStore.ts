@@ -61,3 +61,11 @@ export const removeLastUsedWorkspaceId = async () => {
     return null;
   }
 };
+
+export const removeLastUsedDocumentIdAndWorkspaceId = async () => {
+  const lastUsedWorkspaceId = await getLastUsedWorkspaceId();
+  if (lastUsedWorkspaceId) {
+    await removeLastUsedDocumentId(lastUsedWorkspaceId);
+    await removeLastUsedWorkspaceId();
+  }
+};
