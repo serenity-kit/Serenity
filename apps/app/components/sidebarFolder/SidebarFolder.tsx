@@ -154,7 +154,6 @@ export default function SidebarFolder(props: Props) {
 
   const closeFolder = () => {
     setIsOpen(false);
-
     const openFolderIds = folderStore.folderIds;
     const position = openFolderIds.indexOf(props.folderId);
     if (position >= 0) {
