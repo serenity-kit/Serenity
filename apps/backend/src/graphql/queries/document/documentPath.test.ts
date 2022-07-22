@@ -222,3 +222,26 @@ test("retrieving a document that doesn't exist should throw an error", async () 
       ))()
   ).rejects.toThrow("Document not found");
 });
+
+test("Unauthenticated", async () => {
+  const authorizationHeader = { authorization: "badauthheader" };
+  const query = gql`
+    query documentPath($id: ID!) {
+      documentPath(id: $id) {
+        id
+        name
+        parentFolderId
+        rootFolderId
+        workspaceId
+      }
+    }
+  `;
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        { id: otherDocumentId },
+        authorizationHeader
+      ))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

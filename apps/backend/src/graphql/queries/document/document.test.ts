@@ -59,3 +59,14 @@ test("user should be retrieve a document", async () => {
     }
   `);
 });
+
+test("Unauthenticated", async () => {
+  await expect(
+    (async () =>
+      await getDocument({
+        graphql,
+        id: uuidv4(),
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

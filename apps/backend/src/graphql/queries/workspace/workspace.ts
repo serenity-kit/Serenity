@@ -4,6 +4,7 @@ import { getWorkspace } from "../../../database/workspace/getWorkspace";
 import { getWorkspaces } from "../../../database/workspace/getWorkspaces";
 import { Workspace } from "../../types/workspace";
 import { WorkspaceMember } from "../../../types/workspace";
+import { AuthenticationError } from "apollo-server-express";
 
 export const workspaces = queryField((t) => {
   t.field("workspace", {
@@ -13,7 +14,7 @@ export const workspaces = queryField((t) => {
     },
     async resolve(root, args, context) {
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new AuthenticationError("Not authenticated");
       }
       const userId = context.user.id;
       if (args.id) {

@@ -15,19 +15,15 @@ export const deleteFolders = async ({
     authorization: authorizationHeader,
   };
   const query = gql`
-        mutation {
-          deleteFolders(
-            input: {
-              ids: "${ids}"
-            }
-          ) {
-            status
-          }
-        }
-      `;
+    mutation deleteFolders($input: DeleteFoldersInput!) {
+      deleteFolders(input: $input) {
+        status
+      }
+    }
+  `;
   const result = await graphql.client.request(
     query,
-    null,
+    { input: { ids } },
     authorizationHeaders
   );
   return result;

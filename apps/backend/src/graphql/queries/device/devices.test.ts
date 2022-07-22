@@ -37,3 +37,13 @@ test("user should be able to list their devices", async () => {
   const edges = result.devices.edges;
   expect(edges.length).toBe(3);
 });
+
+test("Unauthenticated", async () => {
+  await expect(
+    (async () =>
+      await getDevices({
+        graphql,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

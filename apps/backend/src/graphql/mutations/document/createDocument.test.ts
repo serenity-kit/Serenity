@@ -29,14 +29,6 @@ const setup = async () => {
   });
   addedWorkspace =
     createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-  const createDocumentResult = await createDocument({
-    id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    graphql,
-    authorizationHeader: sessionKey,
-    parentFolderId: null,
-    workspaceId: addedWorkspace.id,
-  });
-  addedDocumentId = createDocumentResult.createDocument.id;
 };
 
 beforeAll(async () => {
@@ -44,36 +36,27 @@ beforeAll(async () => {
   await setup();
 });
 
-test("user should be able to delete a document", async () => {
-  const authorizationHeader = sessionKey;
-  const ids = [addedDocumentId];
-  const result = await deleteDocuments({ graphql, ids, authorizationHeader });
-  expect(result.deleteDocuments).toMatchInlineSnapshot(`
-    Object {
-      "status": "success",
-    }
-  `);
-});
-
-test("Deleting nonexistent document does nothing", async () => {
-  const authorizationHeader = sessionKey;
-  const ids = ["badthing"];
-  const result = await deleteDocuments({ graphql, ids, authorizationHeader });
-  expect(result.deleteDocuments).toMatchInlineSnapshot(`
-    Object {
-      "status": "success",
-    }
-  `);
+test("user should be able to create a document", async () => {
+  const id = uuidv4();
+  const result = await createDocument({
+    id,
+    graphql,
+    authorizationHeader: sessionKey,
+    parentFolderId: null,
+    workspaceId: addedWorkspace.id,
+  });
+  expect(result.createDocument.id).toBe(id);
 });
 
 test("Unauthenticated", async () => {
-  const ids = [addedDocumentId];
   await expect(
     (async () =>
-      await deleteDocuments({
+      await createDocument({
+        id: uuidv4(),
         graphql,
-        ids,
-        authorizationHeader: "badauthheader",
+        authorizationHeader: "badauthkey",
+        parentFolderId: null,
+        workspaceId: addedWorkspace.id,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

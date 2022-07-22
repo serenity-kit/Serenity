@@ -41,3 +41,21 @@ test("user should be retrieve a device by signingPublicKey", async () => {
     }
   `);
 });
+
+test("Unauthenticated", async () => {
+  const authorizationHeader = sessionKey;
+  const createDeviceResponse = await createDevice({
+    graphql,
+    authorizationHeader,
+  });
+  const createdDevice = createDeviceResponse.createDevice.device;
+  const deviceBySigningPublicKey = createdDevice.signingPublicKey;
+  await expect(
+    (async () =>
+      await getDeviceBySigningPublicKey({
+        graphql,
+        signingPublicKey: deviceBySigningPublicKey,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

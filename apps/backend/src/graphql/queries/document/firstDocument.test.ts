@@ -96,3 +96,15 @@ test("user should not be able to retreive the first document from another worksp
       ))()
   ).rejects.toThrow("Unauthorized");
 });
+
+test("Unauthenticated", async () => {
+  const authorizationHeader = { authorization: "badauthheader" };
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        { workspaceId },
+        authorizationHeader
+      ))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

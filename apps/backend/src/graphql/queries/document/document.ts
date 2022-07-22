@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getDocument } from "../../../database/document/getDocument";
 import { Document } from "../../types/document";
@@ -10,7 +11,7 @@ export const documentQuery = queryField((t) => {
     },
     async resolve(root, args, context) {
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new AuthenticationError("Not authenticated");
       }
       const userId = context.user.id;
       const document = await getDocument({

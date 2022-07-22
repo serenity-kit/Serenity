@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { queryField, objectType, nonNull, stringArg } from "nexus";
 import { prisma } from "../../database/prisma";
 
@@ -16,7 +17,7 @@ export const userIdFromUsername = queryField((t) => {
     },
     async resolve(root, args, context) {
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new AuthenticationError("Not authenticated");
       }
       if (!args.username) {
         throw new Error("Invalid input");

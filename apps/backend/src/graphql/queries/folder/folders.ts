@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getSubfolders } from "../../../database/folder/getSubfolders";
 import { Folder } from "../../types/folder";
@@ -16,7 +17,7 @@ export const folders = queryField((t) => {
         throw new Error("Requested too many folders. First value exceeds 50.");
       }
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new AuthenticationError("Not authenticated");
       }
       const userId = context.user.id;
       const cursor = args.after ? { id: args.after } : undefined;

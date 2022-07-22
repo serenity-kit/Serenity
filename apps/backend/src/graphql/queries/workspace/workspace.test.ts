@@ -86,3 +86,19 @@ test("user should get a workspace without providing an id", async () => {
     }
   `);
 });
+
+test("Unauthenticated", async () => {
+  const authorizationHeader = { authorization: "badauthheader" };
+  const query = gql`
+    query workspace {
+      workspace {
+        id
+        name
+      }
+    }
+  `;
+  await expect(
+    (async () =>
+      await graphql.client.request(query, null, authorizationHeader))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

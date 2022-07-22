@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { arg, inputObjectType, list, mutationField, objectType } from "nexus";
 import { updateWorkspace } from "../../../database/workspace/updateWorkspace";
 import { Workspace, WorkspaceMemberInput } from "../../types/workspace";
@@ -29,7 +30,7 @@ export const updateWorkspaceMutation = mutationField("updateWorkspace", {
   },
   async resolve(root, args, context) {
     if (!context.user) {
-      throw new Error("Unauthorized");
+      throw new AuthenticationError("Not authenticated");
     }
     if (!args.input) {
       throw new Error("Invalid input");

@@ -53,6 +53,8 @@ export async function deleteFolders({ folderIds, userId }: DeleteFolderParams) {
         validWorkspaceIds.push(validWorkspace.workspaceId);
       });
 
+      console.log({ deletingFolderIds: folderIds });
+
       // 4. Finally, delete all folders where the the user is an admin
       // of the workspace
       // the database cascade should handle the rest

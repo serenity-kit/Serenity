@@ -3,6 +3,7 @@ import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
+import { v4 as uuidv4 } from "uuid";
 
 const graphql = setupGraphql();
 
@@ -72,4 +73,21 @@ test("user should not be able to invite from a workspace that doesn't exist", as
         authorizationHeader: userAndDevice2.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
+});
+
+test("Unauthenticated", async () => {
+  const workspaceId = uuidv4();
+  const username = "a@a.com";
+  await createUserWithWorkspace({
+    id: workspaceId,
+    username: username,
+  });
+  await expect(
+    (async () =>
+      await createWorkspaceInvitation({
+        graphql,
+        workspaceId,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

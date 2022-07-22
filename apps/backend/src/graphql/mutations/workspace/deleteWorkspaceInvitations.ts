@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { deleteWorkspaceInvitations } from "../../../database/workspace/deleteWorkspaceInvitations";
 
@@ -28,7 +29,7 @@ export const deleteWorkspaceInvitationsMutation = mutationField(
     },
     async resolve(root, args, context) {
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new AuthenticationError("Not authenticated");
       }
       if (!args.input) {
         throw new Error("Invalid input");

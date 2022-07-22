@@ -123,3 +123,15 @@ test("throw error when user doesn't have access", async () => {
       }))()
   ).rejects.toThrow("Unauthorized");
 });
+
+test("Unauthenticated", async () => {
+  await expect(
+    (async () =>
+      await updateFolderName({
+        graphql,
+        id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
+        name: "renamed",
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

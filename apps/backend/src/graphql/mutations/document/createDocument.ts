@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { createDocument } from "../../../database/document/createDocument";
 
@@ -25,6 +26,9 @@ export const createDocumentMutation = mutationField("createDocument", {
     }),
   },
   async resolve(root, args, context) {
+    if (!context.user) {
+      throw new AuthenticationError("Not authenticated");
+    }
     if (!args?.input?.id) throw new Error("Missing documentId");
     const parentFolderId = args.input.parentFolderId || null;
     // FIXME: does this need a userId?

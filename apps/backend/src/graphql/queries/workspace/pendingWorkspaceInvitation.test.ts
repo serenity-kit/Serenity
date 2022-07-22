@@ -57,3 +57,18 @@ test("user should be be able to get their pending workspace invitation", async (
       }
     `);
 });
+
+test("Unauthenticated", async () => {
+  const authorizationHeader = { authorization: "badauthheader" };
+  const query = gql`
+    {
+      pendingWorkspaceInvitation {
+        id
+      }
+    }
+  `;
+  await expect(
+    (async () =>
+      await graphql.client.request(query, null, authorizationHeader))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

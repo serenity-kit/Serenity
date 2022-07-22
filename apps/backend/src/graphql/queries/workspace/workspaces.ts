@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { queryField } from "nexus";
 import { getWorkspaces } from "../../../database/workspace/getWorkspaces";
 import { Workspace } from "../../types/workspace";
@@ -15,7 +16,7 @@ export const workspaces = queryField((t) => {
         );
       }
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new AuthenticationError("Not authenticated");
       }
       const userId = context.user.id;
       const cursor = args.after ? { id: args.after } : undefined;
