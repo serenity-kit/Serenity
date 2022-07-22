@@ -81,14 +81,14 @@ export default function Page({ navigation, route, updateTitle }: Props) {
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPath = await getDocumentPath(urqlClient, docId);
-    const documentPathIds: string[] = [];
+    const openFolderIds = folderStore.folderIds;
     if (!documentPath) {
       return;
     }
     documentPath.forEach((folder: Folder) => {
-      documentPathIds.push(folder.id);
+      openFolderIds.push(folder.id);
     });
-    folderStore.update(documentPathIds);
+    folderStore.update(openFolderIds);
     documentPathStore.update(documentPath);
   };
 

@@ -47,6 +47,7 @@ export default function SidebarFolder(props: Props) {
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const openFolderIds = useOpenFolderStore((state) => state.folderIds);
+  const folderStore = useOpenFolderStore();
   const isDesktopDevice = useIsDesktopDevice();
   const [isOpen, setIsOpen] = useState(openFolderIds.includes(props.folderId));
   const [isHovered, setIsHovered] = useState(false);
@@ -104,7 +105,7 @@ export default function SidebarFolder(props: Props) {
   };
 
   const createDocument = async () => {
-    setIsOpen(true);
+    openFolder();
     const id = uuidv4();
     const result = await createDocumentMutation({
       input: {
@@ -134,6 +135,32 @@ export default function SidebarFolder(props: Props) {
     setIsEditing("name");
   };
 
+  const toggleFolderOpen = () => {
+    if (isOpen) {
+      closeFolder();
+    } else {
+      openFolder();
+    }
+  };
+
+  const openFolder = () => {
+    setIsOpen(true);
+    const openFolderIds = folderStore.folderIds;
+    if (!openFolderIds.includes(props.folderId)) {
+      openFolderIds.push(props.folderId);
+      folderStore.update(openFolderIds);
+    }
+  };
+
+  const closeFolder = () => {
+    setIsOpen(false);
+    const openFolderIds = folderStore.folderIds;
+    const position = openFolderIds.indexOf(props.folderId);
+    if (position >= 0) {
+      openFolderIds.splice(position, 1);
+      folderStore.update(openFolderIds);
+    }
+  };
   const updateFolderName = async (newFolderName: string) => {
     const updateFolderNameResult = await updateFolderNameMutation({
       input: {
@@ -192,9 +219,7 @@ export default function SidebarFolder(props: Props) {
         <HStack>
           <Pressable
             {...focusRingProps} // needed so focus is shown on view-wrapper
-            onPress={() => {
-              setIsOpen((currentIsOpen) => !currentIsOpen);
-            }}
+            onPress={toggleFolderOpen}
             style={[
               tw`grow-1 pl-${depth * 3}`, // needed so clickable area is as large as possible
             ]}
