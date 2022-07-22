@@ -117,6 +117,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       {selectedWorkspaceInvitationId !== null && (
         <>
           <LabeledInput
+            nativeID="workspaceInvitationInstructionsInput"
             label="Invitation text"
             value={getWorkspaceInvitationText()}
           />
@@ -131,6 +132,7 @@ export function CreateWorkspaceInvitation(props: Props) {
         <Button disabled>Loading...</Button>
       ) : (
         <WorkspaceInvitationList
+          nativeID="workspaceInviteeList"
           workspaceInvitations={
             workspaceInvitationsResult.data?.workspaceInvitations?.nodes || []
           }

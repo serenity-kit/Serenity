@@ -77,8 +77,17 @@ const registerOnPage = async ({
       'text=Verify your EmailPlease enter the verification code sent to you via Email.Verifi >> div[role="button"]'
     )
     .click();
-  await expect(page).toHaveURL("http://localhost:19006/onboarding");
+};
 
+type CreateFirstWorkspaceProps = {
+  page: Page;
+  workspaceName: string;
+};
+const createFirstWorkspace = async ({
+  page,
+  workspaceName,
+}: CreateFirstWorkspaceProps) => {
+  await expect(page).toHaveURL("http://localhost:19006/onboarding");
   // Fill in the new workspace name
   await page
     .locator(
@@ -94,28 +103,30 @@ test.describe("Workspace Sharing", () => {
   let workspaceInvitationUrl = "";
   let sharedWorkspaceId = "";
 
-  test.beforeEach(async ({ browser }) => {
-    // create new browser contexts for each potential user
-    const context = await browser.newContext();
-    await context.newPage();
-  });
-
   test("User 1 can create a sharing link", async ({ page }) => {
     const userId = uuidv4();
     const username = "user1@example.com";
-    const password = "12345689"; // because createUserWithWorkspace uses this password
-    const { workspace } = await createUserWithWorkspace({
+    const password = "pass";
+    const { workspace, document } = await createUserWithWorkspace({
       id: userId,
       username,
+      password,
     });
     sharedWorkspaceId = workspace.id;
+    await delayForSeconds(2);
     // const workspaceName = "sharable";
     // await page.goto("http://localhost:19006/register");
     // await registerOnPage({ page, username, password, workspaceName });
     await page.goto("http://localhost:19006/login");
     await loginOnPage({ page, username, password });
+    await delayForSeconds(2);
+    await expect(page).toHaveURL(
+      `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
+    );
+
     // click on workspace settings
     await page.locator("text=Settings").click();
+    delayForSeconds(2);
     await expect(page).toHaveURL(
       `http://localhost:19006/workspace/${workspace.id}/settings`
     );
@@ -124,41 +135,49 @@ test.describe("Workspace Sharing", () => {
     await page
       .locator('div[role="button"]:has-text("Create Invitation")')
       .click();
+    await delayForSeconds(2);
 
     // get invitation text
     const linkInfoDiv = page
-      .locator(
-        "//div/div/div/div/div/div/div[4]/div/div/div/div/div/div[1]/div/div/div[2]/div/div[1]/div/div[3]/div[2]/div[1]/div[2]/div[2]/input"
-      )
+      .locator("//input[@id='workspaceInvitationInstructionsInput']")
       .first();
     const linkInfoText = await linkInfoDiv.inputValue();
     // parse url and store into variable
     const linkInfoWords = linkInfoText.split(" ");
     workspaceInvitationUrl = linkInfoWords[linkInfoWords.length - 1];
-    // expect there to be one invitation in the list (plus a header row)
+    // expect there to be one invitation in the list
     const numInvitations = await page
-      .locator(
-        "//div/div/div/div/div/div/div[4]/div/div/div/div/div/div[1]/div/div/div[2]/div/div[1]/div/div[3]/div[2]/div[1]/div[4]/div"
-      )
+      .locator("//div[@id='workspaceInviteeList']/div/div")
       .count();
-    expect(numInvitations).toBe(2);
+    expect(numInvitations).toBe(1);
   });
 
   test("Existing other user can accept workspace", async ({ page }) => {
     const userId = uuidv4();
     const username = "user2@example.com";
-    const password = "12345689";
-    await createUserWithWorkspace({
+    const password = "pass";
+    const { workspace, document } = await createUserWithWorkspace({
       id: userId,
       username,
+      password,
     });
+    await delayForSeconds(2);
     await page.goto("http://localhost:19006/login");
     await loginOnPage({ page, username, password });
+    await delayForSeconds(2);
+    await expect(page).toHaveURL(
+      `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
+    );
     await page.goto(workspaceInvitationUrl);
+    await delayForSeconds(2);
     // click "accept"
     await page.locator('div[role="button"]:has-text("Accept")').click();
+    await delayForSeconds(5);
     // expect the new url to include the new workspace ID
-    expect(page.url).toContain(
+    const pageUrl = page.url();
+    const lastIndexOfSlash = pageUrl.lastIndexOf("/");
+    const pageUrlStart = pageUrl.substring(0, lastIndexOfSlash + 1);
+    expect(pageUrlStart).toBe(
       `http://localhost:19006/workspace/${sharedWorkspaceId}/page/`
     );
   });
@@ -166,29 +185,42 @@ test.describe("Workspace Sharing", () => {
   test("Unauthenticated other user can accept workspace", async ({ page }) => {
     const userId = uuidv4();
     const username = "user3@example.com";
-    const password = "12345689";
+    const password = "pass";
     await createUserWithWorkspace({
       id: userId,
       username,
+      password,
     });
+    await delayForSeconds(2);
     await page.goto(workspaceInvitationUrl);
+    await delayForSeconds(2);
     await loginOnPage({ page, username, password });
+    await delayForSeconds(2);
     // expect the new url to include the new workspace ID
-    expect(page.url).toContain(
+    const pageUrl = page.url();
+    const lastIndexOfSlash = pageUrl.lastIndexOf("/");
+    const pageUrlStart = pageUrl.substring(0, lastIndexOfSlash + 1);
+    expect(pageUrlStart).toBe(
       `http://localhost:19006/workspace/${sharedWorkspaceId}/page/`
     );
   });
 
   test("Unregistered other user can accept workspace", async ({ page }) => {
     const username = "user4@example.com";
-    const password = "12345689";
+    const password = "pass";
     const workspaceName = "my workspace";
     await page.goto(workspaceInvitationUrl);
+    await delayForSeconds(2);
     // click "register" button
-    await page.locator('a[role="link"]:has-text("Register here")').click();
+    await page.locator("text=Register here").click();
+    await delayForSeconds(2);
     await registerOnPage({ page, username, password, workspaceName });
+    await delayForSeconds(2);
     // expect new URL to include the shared workspace ID
-    expect(page.url).toContain(
+    const pageUrl = page.url();
+    const lastIndexOfSlash = pageUrl.lastIndexOf("/");
+    const pageUrlStart = pageUrl.substring(0, lastIndexOfSlash + 1);
+    expect(pageUrlStart).toBe(
       `http://localhost:19006/workspace/${sharedWorkspaceId}/page/`
     );
   });

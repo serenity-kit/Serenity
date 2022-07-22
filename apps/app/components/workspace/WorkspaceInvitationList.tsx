@@ -6,6 +6,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 
 type Props = {
   workspaceInvitations: any[];
+  nativeID?: string;
   onDeletePress: (id: string) => void;
   onSelect: (id: string) => void;
 };
@@ -22,6 +23,7 @@ export function WorkspaceInvitationList(props: Props) {
         </View>
       </View>
       <FlatList
+        nativeID={props.nativeID}
         data={props.workspaceInvitations}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => props.onSelect(item.id)}>

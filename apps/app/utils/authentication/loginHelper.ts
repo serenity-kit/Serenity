@@ -7,7 +7,20 @@ import { UpdateAuthenticationFunction } from "../../context/AuthenticationContex
 import { createAndSetDevice } from "../device/deviceStore";
 import { Platform } from "react-native";
 import { detect } from "detect-browser";
+import {
+  isUsernameSameAsLastLogin,
+  setLoggedInUsername,
+} from "./lastLoginStore";
+import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 const browser = detect();
+
+const removeLastUsedWorkspaceIdIfLoginChanged = async (username: string) => {
+  const isLoginSame = isUsernameSameAsLastLogin(username);
+  if (!isLoginSame) {
+    await removeLastUsedDocumentIdAndWorkspaceId();
+    await setLoggedInUsername(username);
+  }
+};
 
 export type LoginParams = {
   username: string;
@@ -47,6 +60,8 @@ export const login = async ({
   if (!finishLoginResult.data?.finishLogin) {
     throw new Error("Failed to finish login");
   }
+  // if the user has changed, remove the previous lastusedworkspaceId and lastUsedDocumentId
+  await removeLastUsedWorkspaceIdIfLoginChanged(username);
   await updateAuthentication({
     sessionKey: result.sessionKey,
     expiresAt: finishLoginResult.data.finishLogin.expiresAt,

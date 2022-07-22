@@ -14,6 +14,7 @@ test("Register", async ({ page }) => {
 
   // Go to registration url
   await page.goto("http://localhost:19006/register");
+  await delayForSeconds(2);
 
   // Fill username
   await page.locator('[placeholder="Enter your email …"]').fill(username);
@@ -63,7 +64,7 @@ test("Register", async ({ page }) => {
   // Click the "create" button
   await page.locator('div[role="button"]:has-text("Create")').click();
 
-  await delayForSeconds(1);
+  await delayForSeconds(5);
   const user = await prisma.user.findFirst({
     where: { username },
   });
