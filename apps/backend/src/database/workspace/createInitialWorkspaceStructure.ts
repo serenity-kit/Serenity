@@ -35,7 +35,6 @@ export async function createInitialWorkspaceStructure({
   documentName,
   documentSnapshot,
 }: Params): Promise<CreateWorkspaceResult> {
-  console.log({ userId, workspaceId, workspaceName });
   const workspace = await createWorkspace({
     id: workspaceId,
     name: workspaceName,
