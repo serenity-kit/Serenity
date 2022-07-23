@@ -21,10 +21,10 @@ export default function Editor({
         updateTitle={updateTitle}
       />
       {/* TODO */}
-      <EditorBottomBar
+      {/* <EditorBottomBar
         editorToolbarState={{ isBold: false, isItalic: false }}
         onUpdate={() => undefined}
-      />
+      /> */}
     </>
   );
 }

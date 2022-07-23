@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { SafeAreaView } from "react-native";
+import {
+  Animated,
+  Keyboard,
+  Platform,
+  SafeAreaView,
+  useWindowDimensions,
+} from "react-native";
 import { WebView } from "react-native-webview";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
@@ -11,8 +17,13 @@ import {
   applyAwarenessUpdate,
   encodeAwarenessUpdate,
 } from "y-protocols/awareness";
-import { EditorBottomBar } from "../editorBottomBar/EditorBottomBar";
+import {
+  EditorBottomBar,
+  EditorBottomBarProps,
+} from "../editorBottomBar/EditorBottomBar";
 import { EditorToolbarState, UpdateEditorParams } from "@serenity-tools/editor";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 // // TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
 // export async function loadEditorSourceForAndroid() {
@@ -22,6 +33,41 @@ import { EditorToolbarState, UpdateEditorParams } from "@serenity-tools/editor";
 //   const html = await FileSystem.readAsStringAsync(indexHtml.localUri);
 //   return { html };
 // }
+
+type BottomBarWrapperProps = EditorBottomBarProps & {
+  keyboardHeight: number;
+  keyboardAnimationDuration: number;
+};
+
+const BottomBarWrapper = ({
+  keyboardHeight,
+  keyboardAnimationDuration,
+  editorToolbarState,
+  onUpdate,
+}: BottomBarWrapperProps) => {
+  const [bottom] = useState(new Animated.Value(0));
+
+  console.log("keyboardHeight", keyboardHeight);
+  console.log("keyboardAnimationDuration", keyboardAnimationDuration);
+
+  useEffect(() => {
+    Animated.timing(bottom, {
+      useNativeDriver: false,
+      toValue: keyboardHeight,
+      duration: keyboardAnimationDuration,
+      delay: 0,
+    }).start();
+  }, []);
+
+  return (
+    <Animated.View style={{ bottom }}>
+      <EditorBottomBar
+        editorToolbarState={editorToolbarState}
+        onUpdate={onUpdate}
+      />
+    </Animated.View>
+  );
+};
 
 export default function Editor({
   yDocRef,
@@ -34,6 +80,34 @@ export default function Editor({
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
   // seem to not inject the initial isNew, but the current value
   const isNewRef = useRef<boolean>(isNew);
+  const dimensions = useWindowDimensions();
+  const headerHeight = useHeaderHeight();
+
+  const editorHeight = dimensions.height - headerHeight;
+
+  const [isVisible, setIsVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [keyboardAnimationDuration, setKeyboardAnimationDuration] = useState(0);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener(
+      "keyboardWillShow",
+      (event) => {
+        setKeyboardAnimationDuration(event.duration);
+        setKeyboardHeight(event.endCoordinates.height);
+        setIsVisible(true);
+      }
+    );
+    const hideSubscription = Keyboard.addListener("keyboardWillHide", () => {
+      setIsVisible(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
   const [editorToolbarState, setEditorToolbarState] =
     useState<EditorToolbarState>({
       isBold: false,
@@ -81,7 +155,7 @@ export default function Editor({
   );
 
   return (
-    <SafeAreaView style={tw`bg-white flex-auto`}>
+    <>
       <WebView
         ref={webViewRef}
         originWhitelist={["*"]}
@@ -128,7 +202,8 @@ export default function Editor({
             setEditorToolbarState(message.content);
           }
         }}
-        style={tw`bg-white flex-auto`}
+        // style={[tw`flex-auto bg-primary-200`]}
+        // containerStyle={{ flex: 0, height: editorHeight }}
         // Needed for .focus() to work
         keyboardDisplayRequiresUserAction={false}
         injectedJavaScriptBeforeContentLoaded={`
@@ -136,6 +211,7 @@ export default function Editor({
           window.initialContent = ${JSON.stringify(
             Array.apply([], Y.encodeStateAsUpdateV2(yDocRef.current))
           )};
+          window.editorHeight = ${editorHeight};
           true; // this is required, or you'll sometimes get silent failures
         `}
         onLoad={() => {
@@ -156,15 +232,20 @@ export default function Editor({
           //   `);
         }}
       />
-      <EditorBottomBar
-        editorToolbarState={editorToolbarState}
-        onUpdate={(params: UpdateEditorParams) => {
-          webViewRef.current?.injectJavaScript(`
-            window.updateEditor(\`${JSON.stringify(params)}\`);
-            true;
-          `);
-        }}
-      />
-    </SafeAreaView>
+
+      {isVisible && (
+        <BottomBarWrapper
+          keyboardHeight={keyboardHeight}
+          keyboardAnimationDuration={keyboardAnimationDuration}
+          editorToolbarState={editorToolbarState}
+          onUpdate={(params: UpdateEditorParams) => {
+            webViewRef.current?.injectJavaScript(`
+          window.updateEditor(\`${JSON.stringify(params)}\`);
+          true;
+        `);
+          }}
+        />
+      )}
+    </>
   );
 }

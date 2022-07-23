@@ -83,6 +83,7 @@ ReactDOM.render(
       openDrawer={openDrawer}
       updateTitle={updateTitle}
       isNew={window.isNew}
+      editorHeight={window.editorHeight}
       onTransaction={({ editor }) => {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({

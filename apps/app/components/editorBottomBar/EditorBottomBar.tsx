@@ -1,24 +1,34 @@
 import React from "react";
-import { EditorSidebarIcon, SidebarButton } from "@serenity-tools/ui";
-import { KeyboardAvoidingView } from "react-native";
+import {
+  EditorSidebarIcon,
+  ScrollView,
+  SidebarButton,
+  Text,
+  tw,
+  View,
+} from "@serenity-tools/ui";
 import { EditorToolbarState, UpdateEditor } from "@serenity-tools/editor";
 
-type Props = {
+export type EditorBottomBarProps = {
   onUpdate: UpdateEditor;
   editorToolbarState: EditorToolbarState;
 };
 
-export function EditorBottomBar({ onUpdate, editorToolbarState }: Props) {
+const editorToolbarHeight = 48;
+
+export function EditorBottomBar({
+  onUpdate,
+  editorToolbarState,
+}: EditorBottomBarProps) {
   return (
-    <KeyboardAvoidingView
-      behavior={"position"}
-      style={{ paddingBottom: 80 }}
-      contentContainerStyle={{
-        backgroundColor: "#ff00ff",
-        // flex: 1,
-        // flexDirection: "row",
-        // width: "100%",
-      }}
+    <ScrollView
+      horizontal={true}
+      style={[
+        tw`flex flex-row flex-nowrap overflow-x-visible border-t border-gray-200`,
+        {
+          height: editorToolbarHeight,
+        },
+      ]}
     >
       <SidebarButton
         onPress={() => {
@@ -27,7 +37,6 @@ export function EditorBottomBar({ onUpdate, editorToolbarState }: Props) {
       >
         <EditorSidebarIcon isActive={editorToolbarState.isBold} name="bold" />
       </SidebarButton>
-
       <SidebarButton
         onPress={() => {
           onUpdate({ variant: "toggle-italic" });
@@ -38,6 +47,11 @@ export function EditorBottomBar({ onUpdate, editorToolbarState }: Props) {
           name="italic"
         />
       </SidebarButton>
-    </KeyboardAvoidingView>
+
+      <Text>
+        here more buttons will come soon, but needed a long text for testing the
+        horizontal scroll
+      </Text>
+    </ScrollView>
   );
 }

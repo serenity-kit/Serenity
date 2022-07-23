@@ -22,6 +22,7 @@ type EditorProps = {
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef: React.MutableRefObject<Awareness>;
   isNew?: boolean;
+  editorHeight?: number;
   openDrawer: () => void;
   updateTitle: (title: string) => void;
   onTransaction?: (params: EditorEvents["transaction"]) => void;
@@ -123,8 +124,13 @@ export const Editor = (props: EditorProps) => {
     <div className="flex flex-auto flex-row">
       <View style={tw`flex-auto text-gray-900 dark:text-white`}>
         <div className="flex-auto overflow-y-auto overflow-x-hidden">
-          {/* h-full needed to expand the editor to it's full height even when empty */}
-          <EditorContent className="h-full" editor={editor} />
+          <EditorContent
+            // 100% needed to expand the editor to it's full height even when empty
+            style={{
+              height: props.editorHeight ?? "100%",
+            }}
+            editor={editor}
+          />
         </div>
       </View>
       {hasEditorSidebar && (
