@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { idArg, nonNull, queryField, objectType } from "nexus";
 import { getDeviceBySigningPublicKey } from "../../../database/device/getDeviceBySigningPublicKey";
 import { Device } from "../../types/device";
@@ -17,7 +18,7 @@ export const deviceBySigningPublicKey = queryField((t) => {
     },
     async resolve(root, args, context) {
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new AuthenticationError("Not authenticated");
       }
       const userId = context.user.id;
       const device = await getDeviceBySigningPublicKey({

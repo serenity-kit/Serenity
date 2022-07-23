@@ -41,7 +41,7 @@ test("user should be be able to get their username", async () => {
   `);
 });
 
-test("unauthenticated user should not get any result", async () => {
+test("Unauthenticated", async () => {
   const authorizationHeader = {
     authorization: "lala",
   };
@@ -56,5 +56,5 @@ test("unauthenticated user should not get any result", async () => {
   await expect(
     (async () =>
       await graphql.client.request(query, null, authorizationHeader))()
-  ).rejects.toThrow("Unauthorized");
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { createInitialWorkspaceStructure } from "../../../database/workspace/createInitialWorkspaceStructure";
 import { Document } from "../../types/document";
@@ -57,7 +58,7 @@ export const createInitialWorkspaceStructureMutation = mutationField(
     },
     async resolve(root, args, context) {
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new AuthenticationError("Not authenticated");
       }
       if (!args.input) {
         throw new Error("Invalid input");

@@ -127,3 +127,22 @@ test("user should not be able to delete a workspace invitation if they aren't ad
     }
   `);
 });
+
+test("Unauthenticated", async () => {
+  const workspaceInvitationResult = await createWorkspaceInvitation({
+    graphql,
+    workspaceId: workspace1,
+    authorizationHeader: userAndDevice1.sessionKey,
+  });
+  const workspaceInvitationId =
+    workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
+  const workspaceInvitationIds: string[] = [workspaceInvitationId];
+  await expect(
+    (async () =>
+      await deleteWorkspaceInvitations({
+        graphql,
+        ids: workspaceInvitationIds,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

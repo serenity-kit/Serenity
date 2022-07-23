@@ -47,3 +47,18 @@ test("can't retrieve a non-existant user", async () => {
       await graphql.client.request(query, null, authorizationHeader))()
   ).rejects.toThrow("User not found");
 });
+
+test("Unauthenticated", async () => {
+  const authorizationHeader = { authorization: "badauthheader" };
+  const query = gql`
+    {
+      userIdFromUsername(username: "${username2}") {
+        id
+      }
+    }
+  `;
+  await expect(
+    (async () =>
+      await graphql.client.request(query, null, authorizationHeader))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
   nonNull,
@@ -34,7 +35,7 @@ export const createDeviceMutation = mutationField("createDevice", {
   },
   async resolve(root, args, context) {
     if (!context.user) {
-      throw new Error("Unauthorized");
+      throw new AuthenticationError("Not authenticated");
     }
     if (!args.input) {
       throw new Error("Input missing");

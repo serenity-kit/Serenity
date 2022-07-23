@@ -271,3 +271,30 @@ test("listing folders that the user doesn't own throws an error", async () => {
       await graphql.client.request(query, null, authorizationHeader))()
   ).rejects.toThrow("Unauthorized");
 });
+
+test("Unauthenticated", async () => {
+  const authorizationHeader = { authorization: "badauthheader" };
+  const query = gql`
+  {
+      folders(parentFolderId: "${otherFolderId}", first: 50) {
+          edges {
+              node {
+                  id
+                  name
+                  parentFolderId
+                  rootFolderId
+                  workspaceId
+              }
+          }
+          pageInfo {
+              hasNextPage
+              endCursor
+          }
+      }
+  }
+  `;
+  await expect(
+    (async () =>
+      await graphql.client.request(query, null, authorizationHeader))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

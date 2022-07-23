@@ -58,3 +58,27 @@ test("user can create initial workspace structure", async () => {
     expect(member.isAdmin).toBe(true);
   });
 });
+
+test("Unauthenticated", async () => {
+  const workspaceId = uuidv4();
+  const workspaceName = "New Workspace";
+  const folderId = uuidv4();
+  const folderIdSignature = `TODO+${folderId}`;
+  const folderName = "Getting started";
+  const documentId = uuidv4();
+  const documentName = "Introduction";
+  await expect(
+    (async () =>
+      await createInitialWorkspaceStructure({
+        graphql,
+        workspaceId,
+        workspaceName,
+        folderId,
+        folderIdSignature,
+        folderName,
+        documentId,
+        documentName,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

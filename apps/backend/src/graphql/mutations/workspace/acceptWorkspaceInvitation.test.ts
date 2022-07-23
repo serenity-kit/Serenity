@@ -111,3 +111,14 @@ test("expired invitation id should throw error", async () => {
       }))()
   ).rejects.toThrow("Workspace invitation not found");
 });
+
+test("Unauthenticated", async () => {
+  await expect(
+    (async () =>
+      await acceptWorkspaceInvitation({
+        graphql,
+        workspaceInvitationId,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

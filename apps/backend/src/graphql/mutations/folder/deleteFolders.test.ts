@@ -3,9 +3,9 @@ import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
-import { deleteFolders } from "../../../database/folder/deleteFolders";
 import { prisma } from "../../../database/prisma";
 import { v4 as uuidv4 } from "uuid";
+import { deleteFolders } from "../../../../test/helpers/folder/deleteFolder";
 
 const graphql = setupGraphql();
 let userId = "";
@@ -81,7 +81,11 @@ test("user can delete a folder", async () => {
   });
   expect(createFolderResult.createFolder.folder.id).toBe(folderId);
   const folderIds = [folderId];
-  await deleteFolders({ userId, folderIds });
+  await deleteFolders({
+    graphql,
+    ids: folderIds,
+    authorizationHeader: sessionKey,
+  });
   // try to retrieve the folder. It should come back as null
   const folder = await prisma.folder.findFirst({
     where: { id: "43130abd-ffcc-4b6e-abb8-1eebb221dd5e" },
@@ -116,7 +120,11 @@ test("deleting a parent folder will cascade to children", async () => {
     parentFolderId
   );
   const folderIds = [parentFolderId];
-  await deleteFolders({ userId, folderIds });
+  await deleteFolders({
+    graphql,
+    ids: folderIds,
+    authorizationHeader: sessionKey,
+  });
   // try to retrieve the folder.  It should come back as null
   const folder = await prisma.folder.findFirst({
     where: {
@@ -150,7 +158,11 @@ test("user can delete multiple folders", async () => {
   expect(createFolderResult1.createFolder.folder.id).toBe(folderId1);
   expect(createFolderResult2.createFolder.folder.id).toBe(folderId2);
   const folderIds = [folderId1, folderId2];
-  await deleteFolders({ userId, folderIds });
+  await deleteFolders({
+    graphql,
+    ids: folderIds,
+    authorizationHeader: sessionKey,
+  });
   // try to retrieve the folder.  It should come back as null
   const folders = await prisma.folder.findMany({
     where: {
@@ -210,7 +222,11 @@ test("user can delete multiple folders", async () => {
   expect(createChildFolderResult1.createFolder.folder.id).toBe(childFolderId1);
   expect(createChildFolderResult2.createFolder.folder.id).toBe(childFolderId2);
   const folderIds = [parentFolderId1, parentFolderId2];
-  await deleteFolders({ userId, folderIds });
+  await deleteFolders({
+    graphql,
+    ids: folderIds,
+    authorizationHeader: sessionKey,
+  });
   // try to retrieve the folder.  It should come back as null
   const folders = await prisma.folder.findMany({
     where: {
@@ -236,7 +252,11 @@ test("user can't delete folders they don't own", async () => {
   });
   expect(createFoldeResult.createFolder.folder.id).toBe(folderId);
   const folderIds = [folderId];
-  await deleteFolders({ userId, folderIds });
+  await deleteFolders({
+    graphql,
+    ids: folderIds,
+    authorizationHeader: sessionKey,
+  });
   // try to retrieve the folder.  It should come back as null
   const folder = await prisma.folder.findFirst({
     where: { id: folderId },
@@ -250,10 +270,27 @@ test("user can't delete folders that don't exist", async () => {
   // first, create a folder
   const folderId = "5b5d0365-5e68-499d-bf50-b20665c2cb5e";
   const folderIds = [folderId];
-  await deleteFolders({ userId, folderIds });
+  await deleteFolders({
+    graphql,
+    ids: folderIds,
+    authorizationHeader: sessionKey,
+  });
   // try to retrieve the folder.  It should come back as null
   const folder = await prisma.folder.findFirst({
     where: { id: folderId },
   });
   expect(folder).toBe(null);
+});
+
+test("Unauthenticated", async () => {
+  const folderId = "5b5d0365-5e68-499d-bf50-b20665c2cb5e";
+  const folderIds = [folderId];
+  await expect(
+    (async () =>
+      await deleteFolders({
+        graphql,
+        ids: folderIds,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

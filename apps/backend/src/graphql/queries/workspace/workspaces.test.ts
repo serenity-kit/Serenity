@@ -149,3 +149,28 @@ test("user cannot query by paginating cursor", async () => {
     }
   `);
 });
+
+test("Unauthenticated", async () => {
+  const authorizationHeader = { authorization: "badauthheader" };
+  const query = gql`
+    {
+      workspaces(first: 50) {
+        nodes {
+          id
+          name
+          members {
+            userId
+            isAdmin
+          }
+        }
+        edges {
+          cursor
+        }
+      }
+    }
+  `;
+  await expect(
+    (async () =>
+      await graphql.client.request(query, null, authorizationHeader))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { queryField, objectType } from "nexus";
 
 export const MeResult = objectType({
@@ -15,7 +16,7 @@ export const folders = queryField((t) => {
     args: null,
     async resolve(root, args, context) {
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new AuthenticationError("Not authenticated");
       }
       const id = context.user.id;
       const username = context.user.username;

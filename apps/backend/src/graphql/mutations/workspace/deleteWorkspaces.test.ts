@@ -50,3 +50,15 @@ test("Deleting nonexistent workspace does nothing", async () => {
     await deleteWorkspaces({ graphql, ids, authorizationHeader })
   ).rejects.toThrow("Invalid workspace IDs");
 });
+
+test("Unauthenticated", async () => {
+  const ids = [addedWorkspace.id];
+  await expect(
+    (async () =>
+      await deleteWorkspaces({
+        graphql,
+        ids,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

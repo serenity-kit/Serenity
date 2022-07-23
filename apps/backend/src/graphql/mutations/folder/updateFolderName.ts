@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { updateFolderName } from "../../../database/folder/updateFolderName";
 import { Folder } from "../../types/folder";
@@ -26,7 +27,7 @@ export const updateFolderNameMutation = mutationField("updateFolderName", {
   },
   async resolve(root, args, context) {
     if (!context.user) {
-      throw new Error("Unauthorized");
+      throw new AuthenticationError("Not authenticated");
     }
     if (!args.input) {
       throw new Error("Invalid input");

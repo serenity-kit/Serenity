@@ -123,3 +123,24 @@ test("user cannot delete a device they don't own", async () => {
   });
   expect(numDevicesAfterDelete.devices.edges.length).toBe(expectedNumDevices);
 });
+
+test("Unauthenticated", async () => {
+  const authorizationHeader1 = userAndDevice1.sessionKey;
+  const createDeviceResult = await createDevice({
+    graphql,
+    authorizationHeader: authorizationHeader1,
+  });
+
+  const device = createDeviceResult.createDevice.device;
+  const signingPublicKey = device.signingPublicKey;
+  const signingPublicKeys = [signingPublicKey];
+
+  await expect(
+    (async () =>
+      await deleteDevices({
+        graphql,
+        signingPublicKeys,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

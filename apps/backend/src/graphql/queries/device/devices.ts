@@ -1,3 +1,4 @@
+import { AuthenticationError } from "apollo-server-express";
 import { queryField } from "nexus";
 import { getDevices } from "../../../database/device/getDevices";
 import { Device } from "../../types/device";
@@ -13,7 +14,7 @@ export const devices = queryField((t) => {
         throw new Error("Requested too many devices. First value exceeds 50.");
       }
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new AuthenticationError("Not authenticated");
       }
       const userId = context.user.id;
       const cursor = args.after ? { signingPublicKey: args.after } : undefined;

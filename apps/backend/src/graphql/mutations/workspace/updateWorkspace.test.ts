@@ -183,3 +183,24 @@ test("user should not be able to update a workspace for a workspace that doesn't
       }))()
   ).rejects.toThrow("Unauthorized");
 });
+
+test("Unauthenticated", async () => {
+  const id = addedWorkspace.id;
+  const name = "unautharized workspace";
+  const members = [
+    {
+      userId: userId1,
+      isAdmin: false,
+    },
+  ];
+  await expect(
+    (async () =>
+      await updateWorkspace({
+        graphql,
+        id,
+        name,
+        members,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

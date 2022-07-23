@@ -30,3 +30,13 @@ test("user should be retrieve the mainDevice", async () => {
   const retrivedDevice = result.mainDevice.device;
   expect(retrivedDevice).toMatchInlineSnapshot(`undefined`);
 });
+
+test("Unauthenticated", async () => {
+  await expect(
+    (async () =>
+      await getMainDevice({
+        graphql,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

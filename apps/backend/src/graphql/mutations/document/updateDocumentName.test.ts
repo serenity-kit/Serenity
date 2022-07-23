@@ -117,3 +117,17 @@ test("Throw error when user doesn't have access", async () => {
       }))()
   ).rejects.toThrow("Unauthorized");
 });
+
+test("Unauthenticated", async () => {
+  const id = addedDocumentId;
+  const name = "Updated Name";
+  await expect(
+    (async () =>
+      await updateDocumentName({
+        graphql,
+        id,
+        name,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});

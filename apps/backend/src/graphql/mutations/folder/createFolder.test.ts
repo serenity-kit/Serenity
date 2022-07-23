@@ -182,3 +182,18 @@ test("Throw error when user doesn't have access", async () => {
       }))()
   ).rejects.toThrow("Unauthorized");
 });
+
+test("Unauthenticated", async () => {
+  const id = uuidv4();
+  await expect(
+    (async () =>
+      await createFolder({
+        graphql,
+        id,
+        name: "test",
+        parentFolderId: null,
+        workspaceId: addedWorkspace.id,
+        authorizationHeader: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
