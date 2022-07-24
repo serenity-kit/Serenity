@@ -1,3 +1,4 @@
+import { ForbiddenError } from "apollo-server-express";
 import { Folder } from "../../types/folder";
 import { prisma } from "../prisma";
 
@@ -39,7 +40,7 @@ export async function getFolder({ userId, id }: Params) {
         },
       });
       if (!rawFolder) {
-        throw Error("Folder not found");
+        throw new Error("Folder not found");
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
@@ -48,7 +49,7 @@ export async function getFolder({ userId, id }: Params) {
         },
       });
       if (!userToWorkspace) {
-        throw Error("Unauthorized");
+        throw new ForbiddenError("Unauthorized");
       }
       // next let's build the folder tree up to this folder
       const folder = toFolderType(rawFolder);

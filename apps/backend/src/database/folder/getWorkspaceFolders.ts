@@ -1,3 +1,4 @@
+import { ForbiddenError } from "apollo-server-express";
 import { prisma } from "../prisma";
 
 type Cursor = {
@@ -29,7 +30,7 @@ export async function getWorkspaceFolders({
         },
       });
       if (!userToWorkspace) {
-        throw Error("Unauthorized");
+        throw new ForbiddenError("Unauthorized");
       }
       // then fetch the folders where there is no parent folder
       const folders = await prisma.folder.findMany({

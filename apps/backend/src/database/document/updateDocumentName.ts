@@ -1,3 +1,4 @@
+import { ForbiddenError } from "apollo-server-express";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -19,7 +20,7 @@ export async function updateDocumentName({ id, name, userId }: Params) {
         },
       });
       if (!document) {
-        throw Error("Document not found");
+        throw new Error("Document not found");
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
@@ -31,7 +32,7 @@ export async function updateDocumentName({ id, name, userId }: Params) {
         !userToWorkspace ||
         document.workspaceId !== userToWorkspace.workspaceId
       ) {
-        throw Error("Unauthorized");
+        throw new ForbiddenError("Unauthorized");
       }
       const updatedDocument = await prisma.document.update({
         where: { id },
