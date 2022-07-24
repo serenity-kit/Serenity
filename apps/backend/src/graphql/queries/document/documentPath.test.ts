@@ -245,3 +245,34 @@ test("Unauthenticated", async () => {
       ))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
+
+describe("Input errors", () => {
+  const authorizationHeader = { authorization: sessionKey };
+  const query = gql`
+    query documentPath($id: ID!) {
+      documentPath(id: $id) {
+        id
+        name
+        parentFolderId
+        rootFolderId
+        workspaceId
+      }
+    }
+  `;
+  test("Invalid id", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          { id: null },
+          authorizationHeader
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("No input", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeader))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+});

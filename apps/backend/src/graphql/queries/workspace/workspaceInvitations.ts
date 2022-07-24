@@ -19,6 +19,9 @@ export const workspaceInvitations = queryField((t) => {
           { invalidArgs: ["first"] }
         );
       }
+      if (!args.workspaceId) {
+        throw new UserInputError("Invalid input: workspaceId cannot be null");
+      }
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }

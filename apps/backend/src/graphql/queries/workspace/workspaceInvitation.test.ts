@@ -5,12 +5,15 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
 import { prisma } from "../../../database/prisma";
+import { v4 as uuidv4 } from "uuid";
 
 const graphql = setupGraphql();
 const workspaceId = "workspace1";
 const otherWorkspaceId = "otherWorkspace";
 const inviter1Username = "inviter1@example.com";
 const inviter2Username = "inviter2@example.com";
+
+const setup = async () => {};
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -147,4 +150,26 @@ test("not logged in user should throw an authentication error", async () => {
         authorizationHeader: "abc",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+let userAndDevice: any = null;
+describe("Input errors", () => {
+  beforeAll(async () => {
+    const workspaceId = uuidv4();
+    const username = `${uuidv4()}@example.com`;
+    userAndDevice = await createUserWithWorkspace({
+      id: workspaceId,
+      username: username,
+    });
+  });
+  test("Invalid workspaceId", async () => {
+    await expect(
+      (async () =>
+        await workspaceInvitations({
+          graphql,
+          workspaceId: "",
+          authorizationHeader: userAndDevice.sessionKey,
+        }))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

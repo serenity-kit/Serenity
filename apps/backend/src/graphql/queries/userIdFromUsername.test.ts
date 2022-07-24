@@ -12,11 +12,13 @@ let sessionKey = "";
 const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
   sessionKey = registerUserResult.sessionKey;
+  return { sessionKey };
 };
 
 beforeAll(async () => {
   await deleteAllRecords();
-  await setup();
+  const setupResult = await setup();
+  sessionKey = setupResult.sessionKey;
 });
 
 test("can retrieve a user by username", async () => {
@@ -61,4 +63,35 @@ test("Unauthenticated", async () => {
     (async () =>
       await graphql.client.request(query, null, authorizationHeader))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+describe("Input errors", () => {
+  test("Invalid input", async () => {
+    const authorizationHeader = { authorization: sessionKey };
+    const query1 = gql`
+      {
+        userIdFromUsername(username: "") {
+          id
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query1, null, authorizationHeader))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid username", async () => {
+    const authorizationHeader = { authorization: sessionKey };
+    const query2 = gql`
+      {
+        userIdFromUsername(username: "nouser") {
+          id
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query2, null, authorizationHeader))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

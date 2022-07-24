@@ -4,6 +4,7 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { deleteWorkspaceInvitations } from "../../../../test/helpers/workspace/deleteWorkspaceInvitations";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
 import { prisma } from "../../../database/prisma";
+import { gql } from "graphql-request";
 
 const graphql = setupGraphql();
 const username1 = "user1";
@@ -13,7 +14,7 @@ const workspace2 = "workspace2";
 let userAndDevice1: any = null;
 let userAndDevice2: any = null;
 
-const initializeData = async () => {
+const setup = async () => {
   userAndDevice1 = await createUserWithWorkspace({
     id: workspace1,
     username: username1,
@@ -22,11 +23,14 @@ const initializeData = async () => {
     id: workspace2,
     username: username2,
   });
+  return { userAndDevice1, userAndDevice2 };
 };
 
 beforeAll(async () => {
   await deleteAllRecords();
-  await initializeData();
+  const setupResult = await setup();
+  userAndDevice1 = setupResult.userAndDevice1;
+  userAndDevice2 = setupResult.userAndDevice2;
 });
 
 test("user should be able to delete a workspace invitation they created", async () => {
@@ -145,4 +149,51 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+describe("Input Errors", () => {
+  const query = gql`
+    mutation deleteWorkspaceInvitations(
+      $input: DeleteWorkspaceInvitationsInput
+    ) {
+      deleteWorkspaceInvitations(input: $input) {
+        status
+      }
+    }
+  `;
+  test("Invalid id", async () => {
+    const authorizationHeaders = {
+      authorization: userAndDevice1.sessionKey,
+    };
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          { input: { ids: null } },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid input", async () => {
+    const authorizationHeaders = {
+      authorization: userAndDevice1.sessionKey,
+    };
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          { input: null },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("No input", async () => {
+    const authorizationHeaders = {
+      authorization: userAndDevice1.sessionKey,
+    };
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

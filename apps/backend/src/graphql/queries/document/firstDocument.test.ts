@@ -108,3 +108,19 @@ test("Unauthenticated", async () => {
       ))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
+
+test("Input Errors", async () => {
+  const authorizationHeader = { authorization: sessionKey };
+  await expect(
+    (async () =>
+      await graphql.client.request(query, null, authorizationHeader))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        { workspaceId: null },
+        authorizationHeader
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});

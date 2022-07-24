@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { arg, inputObjectType, list, mutationField, objectType } from "nexus";
 import { updateWorkspace } from "../../../database/workspace/updateWorkspace";
 import { Workspace, WorkspaceMemberInput } from "../../types/workspace";
@@ -33,17 +33,17 @@ export const updateWorkspaceMutation = mutationField("updateWorkspace", {
       throw new AuthenticationError("Not authenticated");
     }
     if (!args.input) {
-      throw new Error("Invalid input");
+      throw new UserInputError("Invalid input");
     }
-    if (args.input.name === null) {
-      throw new Error("Invalid input: name cannot be null");
+    if (args.input.id === null) {
+      throw new UserInputError("Invalid input: id cannot be null");
     }
     if (args.input.members === null) {
-      throw new Error("Invalid input: members cannot be null");
+      throw new UserInputError("Invalid input: members cannot be null");
     }
     const workspace = await updateWorkspace({
       id: args.input.id,
-      name: args.input.name,
+      name: args.input.name || undefined,
       members: args.input.members,
       userId: context.user.id,
     });

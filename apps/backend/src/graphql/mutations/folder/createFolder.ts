@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { createFolder } from "../../../database/folder/createFolder";
 import { Folder } from "../../types/folder";
@@ -32,7 +32,13 @@ export const createFolderMutation = mutationField("createFolder", {
       throw new AuthenticationError("Not authenticated");
     }
     if (!args.input) {
-      throw new Error("Invalid input");
+      throw new UserInputError("Invalid input");
+    }
+    if (!args.input.id) {
+      throw new UserInputError("Invalid input: id cannot be null");
+    }
+    if (!args.input.workspaceId) {
+      throw new UserInputError("Invalid input: workspaceId cannot be null");
     }
     let parentFolderId: string | undefined = undefined;
     if (args.input.parentFolderId) {

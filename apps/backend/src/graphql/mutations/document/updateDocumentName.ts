@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { updateDocumentName } from "../../../database/document/updateDocumentName";
 import { Document } from "../../types/document";
@@ -26,11 +26,17 @@ export const updateDocumentNameMutation = mutationField("updateDocumentName", {
     }),
   },
   async resolve(root, args, context) {
+    if (!args.input) {
+      throw new UserInputError("Invalid input");
+    }
+    if (!args.input.id) {
+      throw new UserInputError("Invalid input: id cannot be null");
+    }
+    if (!args.input.name) {
+      throw new UserInputError("Invalid input: name cannot be null");
+    }
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
-    }
-    if (!args.input) {
-      throw new Error("Invalid input");
     }
     const document = await updateDocumentName({
       id: args.input.id,

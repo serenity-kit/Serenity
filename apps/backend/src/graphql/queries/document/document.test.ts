@@ -70,3 +70,14 @@ test("Unauthenticated", async () => {
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
+
+test("Input Errors", async () => {
+  await expect(
+    (async () =>
+      await getDocument({
+        graphql,
+        id: "",
+        authorizationHeader: sessionKey,
+      }))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
