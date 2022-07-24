@@ -15,14 +15,20 @@ import TaskItem from "@tiptap/extension-task-item";
 import Placeholder from "@tiptap/extension-placeholder";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import { useHasEditorSidebar } from "./hooks/useHasEditorSidebar";
+import { EditorEvents } from "@tiptap/core";
 
 type EditorProps = {
   documentId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef: React.MutableRefObject<Awareness>;
   isNew?: boolean;
+  editorHeight?: number;
   openDrawer: () => void;
   updateTitle: (title: string) => void;
+  onTransaction?: (params: EditorEvents["transaction"]) => void;
+  onFocus?: (params: EditorEvents["focus"]) => void;
+  onBlur?: (params: EditorEvents["blur"]) => void;
+  onCreate?: (params: EditorEvents["create"]) => void;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -92,6 +98,9 @@ export const Editor = (props: EditorProps) => {
             params.editor.chain().toggleHeading({ level: 1 }).focus().run();
           }
         }
+        if (props.onCreate) {
+          props.onCreate(params);
+        }
       },
       onUpdate: (params) => {
         if (isNew) {
@@ -107,6 +116,21 @@ export const Editor = (props: EditorProps) => {
           }
         }
       },
+      onTransaction: (transactionParams) => {
+        if (props.onTransaction) {
+          props.onTransaction(transactionParams);
+        }
+      },
+      onFocus: (params) => {
+        if (props.onFocus) {
+          props.onFocus(params);
+        }
+      },
+      onBlur: (params) => {
+        if (props.onBlur) {
+          props.onBlur(params);
+        }
+      },
     },
     [props.documentId]
   );
@@ -115,8 +139,13 @@ export const Editor = (props: EditorProps) => {
     <div className="flex flex-auto flex-row">
       <View style={tw`flex-auto text-gray-900 dark:text-white`}>
         <div className="flex-auto overflow-y-auto overflow-x-hidden">
-          {/* h-full needed to expand the editor to it's full height even when empty */}
-          <EditorContent className="h-full" editor={editor} />
+          <EditorContent
+            // 100% needed to expand the editor to it's full height even when empty
+            style={{
+              height: props.editorHeight ?? "100%",
+            }}
+            editor={editor}
+          />
         </div>
       </View>
       {hasEditorSidebar && (

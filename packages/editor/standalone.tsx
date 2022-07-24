@@ -9,6 +9,9 @@ import {
   applyAwarenessUpdate,
   removeAwarenessStates,
 } from "y-protocols/awareness";
+import { UpdateEditorParams } from "./types";
+import { updateEditor } from "./updateEditor";
+import { getEditorToolbarStateFromEditor } from "./getEditorToolbarStateFromEditor";
 
 const ydoc = new Y.Doc();
 window.ydoc = ydoc;
@@ -62,6 +65,11 @@ const updateTitle = (title: string) => {
   );
 };
 
+window.updateEditor = (paramsString: string) => {
+  const params: UpdateEditorParams = JSON.parse(paramsString);
+  updateEditor(window.editor, params);
+};
+
 const domContainer = document.querySelector("#editor");
 ReactDOM.render(
   <NativeBaseProvider>
@@ -72,6 +80,16 @@ ReactDOM.render(
       openDrawer={openDrawer}
       updateTitle={updateTitle}
       isNew={window.isNew}
+      editorHeight={window.editorHeight}
+      onCreate={(params) => (window.editor = params.editor)}
+      onTransaction={({ editor }) => {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: "update-editor-toolbar-state",
+            content: getEditorToolbarStateFromEditor(editor),
+          })
+        );
+      }}
     />
   </NativeBaseProvider>,
   domContainer

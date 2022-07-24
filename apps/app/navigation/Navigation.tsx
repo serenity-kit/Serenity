@@ -32,7 +32,6 @@ import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
 import { useEffect } from "react";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
 
 /**
@@ -49,7 +48,6 @@ const styles = StyleSheet.create({
 
 function WorkspaceStackScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
-  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
   useEffect(() => {
