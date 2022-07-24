@@ -15,7 +15,7 @@ import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndD
 const browser = detect();
 
 const removeLastUsedWorkspaceIdIfLoginChanged = async (username: string) => {
-  const isLoginSame = isUsernameSameAsLastLogin(username);
+  const isLoginSame = await isUsernameSameAsLastLogin(username);
   if (!isLoginSame) {
     await removeLastUsedDocumentIdAndWorkspaceId();
     await setLoggedInUsername(username);
