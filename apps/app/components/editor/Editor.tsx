@@ -24,6 +24,7 @@ import {
 import { EditorToolbarState, UpdateEditorParams } from "@serenity-tools/editor";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { initialEditorToolbarState } from "./initialEditorToolbarState";
 
 // // TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
 // export async function loadEditorSourceForAndroid() {
@@ -109,10 +110,7 @@ export default function Editor({
   }, []);
 
   const [editorToolbarState, setEditorToolbarState] =
-    useState<EditorToolbarState>({
-      isBold: false,
-      isItalic: false,
-    });
+    useState<EditorToolbarState>(initialEditorToolbarState);
 
   // useEffect(() => {
   //   const initEditor = async () => {

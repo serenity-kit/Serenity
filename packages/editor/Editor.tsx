@@ -26,6 +26,9 @@ type EditorProps = {
   openDrawer: () => void;
   updateTitle: (title: string) => void;
   onTransaction?: (params: EditorEvents["transaction"]) => void;
+  onFocus?: (params: EditorEvents["focus"]) => void;
+  onBlur?: (params: EditorEvents["blur"]) => void;
+  onCreate?: (params: EditorEvents["create"]) => void;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -95,6 +98,9 @@ export const Editor = (props: EditorProps) => {
             params.editor.chain().toggleHeading({ level: 1 }).focus().run();
           }
         }
+        if (props.onCreate) {
+          props.onCreate(params);
+        }
       },
       onUpdate: (params) => {
         if (isNew) {
@@ -115,10 +121,19 @@ export const Editor = (props: EditorProps) => {
           props.onTransaction(transactionParams);
         }
       },
+      onFocus: (params) => {
+        if (props.onFocus) {
+          props.onFocus(params);
+        }
+      },
+      onBlur: (params) => {
+        if (props.onBlur) {
+          props.onBlur(params);
+        }
+      },
     },
     [props.documentId]
   );
-  window.editor = editor;
 
   return (
     <div className="flex flex-auto flex-row">

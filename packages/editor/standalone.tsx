@@ -10,6 +10,8 @@ import {
   removeAwarenessStates,
 } from "y-protocols/awareness";
 import { UpdateEditorParams } from "./types";
+import { updateEditor } from "./updateEditor";
+import { getEditorToolbarStateFromEditor } from "./getEditorToolbarStateFromEditor";
 
 const ydoc = new Y.Doc();
 window.ydoc = ydoc;
@@ -65,12 +67,7 @@ const updateTitle = (title: string) => {
 
 window.updateEditor = (paramsString: string) => {
   const params: UpdateEditorParams = JSON.parse(paramsString);
-  console.log(params);
-  if (params.variant === "toggle-bold") {
-    window.editor.chain().focus().toggleBold().run();
-  } else if (params.variant === "toggle-italic") {
-    window.editor.chain().focus().toggleItalic().run();
-  }
+  updateEditor(window.editor, params);
 };
 
 const domContainer = document.querySelector("#editor");
@@ -84,14 +81,12 @@ ReactDOM.render(
       updateTitle={updateTitle}
       isNew={window.isNew}
       editorHeight={window.editorHeight}
+      onCreate={(params) => (window.editor = params.editor)}
       onTransaction={({ editor }) => {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
             type: "update-editor-toolbar-state",
-            content: {
-              isBold: editor.isActive("bold") || false,
-              isItalic: editor.isActive("italic") || false,
-            },
+            content: getEditorToolbarStateFromEditor(editor),
           })
         );
       }}

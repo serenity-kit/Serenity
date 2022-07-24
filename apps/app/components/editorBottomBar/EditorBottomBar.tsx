@@ -14,7 +14,7 @@ export type EditorBottomBarProps = {
   editorToolbarState: EditorToolbarState;
 };
 
-const editorToolbarHeight = 48;
+export const editorToolbarHeight = 48;
 
 export function EditorBottomBar({
   onUpdate,
@@ -24,21 +24,21 @@ export function EditorBottomBar({
     <ScrollView
       horizontal={true}
       style={[
-        tw`flex flex-row flex-nowrap overflow-x-visible border-t border-gray-200`,
+        tw`flex flex-row flex-nowrap border-t border-gray-200`,
         {
           height: editorToolbarHeight,
         },
       ]}
     >
       <SidebarButton
-        onPress={() => {
+        onPress={(event) => {
           onUpdate({ variant: "toggle-bold" });
         }}
       >
         <EditorSidebarIcon isActive={editorToolbarState.isBold} name="bold" />
       </SidebarButton>
       <SidebarButton
-        onPress={() => {
+        onPress={(event) => {
           onUpdate({ variant: "toggle-italic" });
         }}
       >
