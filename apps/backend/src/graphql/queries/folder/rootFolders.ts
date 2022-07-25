@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getWorkspaceFolders } from "../../../database/folder/getWorkspaceFolders";
 import { Folder } from "../../types/folder";
@@ -14,7 +14,12 @@ export const workspaces = queryField((t) => {
     },
     async nodes(root, args, context) {
       if (args.first > 50) {
-        throw new Error("Requested too many folders. First value exceeds 50.");
+        throw new UserInputError(
+          "Requested too many folders. First value exceeds 50."
+        );
+      }
+      if (!args.workspaceId) {
+        throw new UserInputError("Invalid input: workspaceId cannot be null");
       }
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");

@@ -5,6 +5,8 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
 import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
+import { gql } from "graphql-request";
+import { v4 as uuidv4 } from "uuid";
 
 const graphql = setupGraphql();
 const username1 = "user1";
@@ -143,4 +145,50 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+describe("Input errors", () => {
+  const authorizationHeaders = {
+    authorization: "somesessionKey",
+  };
+  const query = gql`
+    mutation deleteDevices($input: DeleteDevicesInput!) {
+      deleteDevices(input: $input) {
+        status
+      }
+    }
+  `;
+  const id = uuidv4();
+  test("Invalid signingPublicKeys", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              signingPublicKeys: null,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid input", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: null,
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("No input", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

@@ -5,6 +5,7 @@ import { createInitialWorkspaceStructure } from "../../../../test/helpers/worksp
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { updateFolderName } from "../../../../test/helpers/folder/updateFolderName";
 import { v4 as uuidv4 } from "uuid";
+import { gql } from "graphql-request";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -88,7 +89,7 @@ test("throw error when user doesn't have access", async () => {
   // create a new user with access to different folders
   const username2 = "user2";
   const registerUserResult = await registerUser(graphql, username2, password);
-  sessionKey = registerUserResult.sessionKey;
+  // sessionKey = registerUserResult.sessionKey;
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     workspaceName: "workspace 1",
     workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
@@ -134,4 +135,69 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+describe("Input errors", () => {
+  const authorizationHeaders = {
+    authorization: sessionKey,
+  };
+  test("Invalid id", async () => {
+    const query = gql`
+      mutation {
+        updateFolderName(input: { id: "", name: "updated folder name" }) {
+          folder {
+            name
+            id
+            parentFolderId
+            rootFolderId
+            workspaceId
+          }
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid name", async () => {
+    const query = gql`
+      mutation {
+        updateFolderName(
+          input: { id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23", name: "" }
+        ) {
+          folder {
+            name
+            id
+            parentFolderId
+            rootFolderId
+            workspaceId
+          }
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid input", async () => {
+    const query = gql`
+      mutation {
+        updateFolderName(input: null) {
+          folder {
+            name
+            id
+            parentFolderId
+            rootFolderId
+            workspaceId
+          }
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

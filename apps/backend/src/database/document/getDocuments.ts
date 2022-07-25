@@ -1,3 +1,4 @@
+import { ForbiddenError } from "apollo-server-express";
 import { prisma } from "../prisma";
 
 type Cursor = {
@@ -21,9 +22,6 @@ export async function getDocuments({
 }: Params) {
   try {
     return await prisma.$transaction(async (prisma) => {
-      if (!parentFolderId) {
-        throw Error("Parent folder id is required");
-      }
       // get the document and determine it's workspace
       const parentFolder = await prisma.folder.findFirst({
         where: {
@@ -31,7 +29,7 @@ export async function getDocuments({
         },
       });
       if (!parentFolder) {
-        throw Error("Folder not found");
+        throw new Error("Folder not found");
       }
       // then check if the user has access to the workspace
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
@@ -41,7 +39,7 @@ export async function getDocuments({
         },
       });
       if (!userToWorkspace) {
-        throw Error("Unauthorized");
+        throw new ForbiddenError("Unauthorized");
       }
       // then fetch the documents in that folder
       const documents = await prisma.document.findMany({

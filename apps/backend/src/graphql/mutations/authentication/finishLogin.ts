@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server-express";
 import {
   arg,
   inputObjectType,
@@ -33,7 +34,13 @@ export const finishLoginMutation = mutationField("finishLogin", {
   },
   async resolve(root, args, context) {
     if (!args || !args.input) {
-      throw Error("Missing input");
+      throw new UserInputError("Missing input");
+    }
+    if (!args.input.loginId) {
+      throw new UserInputError("Invalid input: loginId cannot be null");
+    }
+    if (!args.input.message) {
+      throw new UserInputError("Invalid input: message cannot be null");
     }
     const finishLoginResult = finishLogin({
       loginId: args.input.loginId,

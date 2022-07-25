@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { arg, mutationField, inputObjectType, objectType } from "nexus";
 import { deleteDevices } from "../../../database/device/deleteDevices";
 
@@ -30,7 +30,12 @@ export const deleteDevicesMutation = mutationField("deleteDevices", {
       throw new AuthenticationError("Not authenticated");
     }
     if (!args.input) {
-      throw new Error("Invalid input");
+      throw new UserInputError("Input missing");
+    }
+    if (!args.input.signingPublicKeys) {
+      throw new UserInputError(
+        "Invalid input: signingPublicKeys cannot be null"
+      );
     }
     await deleteDevices({
       userId: context.user.id,

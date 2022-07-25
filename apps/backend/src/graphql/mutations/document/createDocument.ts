@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { createDocument } from "../../../database/document/createDocument";
 
@@ -29,7 +29,15 @@ export const createDocumentMutation = mutationField("createDocument", {
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
     }
-    if (!args?.input?.id) throw new Error("Missing documentId");
+    if (!args.input) {
+      throw new UserInputError("Invalid input");
+    }
+    if (!args.input.id) {
+      throw new UserInputError("Invalid input: id cannot be null");
+    }
+    if (!args.input.workspaceId) {
+      throw new UserInputError("Invalid input: workspaceId cannot be null");
+    }
     const parentFolderId = args.input.parentFolderId || null;
     // FIXME: does this need a userId?
     const document = await createDocument({

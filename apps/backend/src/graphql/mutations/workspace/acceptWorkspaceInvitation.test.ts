@@ -5,6 +5,7 @@ import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/cr
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
 import { prisma } from "../../../database/prisma";
+import { gql } from "graphql-request";
 
 const graphql = setupGraphql();
 const workspaceId = "workspace1";
@@ -121,4 +122,55 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+describe("Input errors", () => {
+  const authorizationHeaders = {
+    authorization: "somesessionkey",
+  };
+  const query = gql`
+    mutation ($input: AcceptWorkspaceInvitationInput!) {
+      acceptWorkspaceInvitation(input: $input) {
+        workspace {
+          id
+          name
+          members {
+            userId
+            username
+            isAdmin
+          }
+        }
+      }
+    }
+  `;
+  test("Invalid workspaceInvitationId", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              workspaceInvitationId: null,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid input", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          { input: null },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("No input", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

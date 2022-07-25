@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getSubfolders } from "../../../database/folder/getSubfolders";
 import { Folder } from "../../types/folder";
@@ -14,7 +14,14 @@ export const folders = queryField((t) => {
     },
     async nodes(root, args, context) {
       if (args.first > 50) {
-        throw new Error("Requested too many folders. First value exceeds 50.");
+        throw new UserInputError(
+          "Requested too many folders. First value exceeds 50."
+        );
+      }
+      if (!args.parentFolderId) {
+        throw new UserInputError(
+          "Invalid input: parentFolderId cannot be null"
+        );
       }
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");

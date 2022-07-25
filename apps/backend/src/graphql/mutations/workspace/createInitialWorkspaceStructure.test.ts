@@ -3,17 +3,32 @@ import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { v4 as uuidv4 } from "uuid";
+import { gql } from "graphql-request";
+import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
+import sodium from "@serenity-tools/libsodium";
+import { Snapshot } from "@naisho/core";
 
 const graphql = setupGraphql();
 let userId1 = "";
 const username = "user";
 const password = "password";
 let sessionKey1 = "";
+const documentId = uuidv4();
+let documentSnapshot: Snapshot;
 
 const setup = async () => {
   const registerUserResult1 = await registerUser(graphql, username, password);
   sessionKey1 = registerUserResult1.sessionKey;
   userId1 = registerUserResult1.userId;
+
+  // currently hard-coded until we enable e2e encryption per workspace
+  const documentEncryptionKey = sodium.from_base64(
+    "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
+  );
+  documentSnapshot = await createIntroductionDocumentSnapshot({
+    documentId,
+    documentEncryptionKey,
+  });
 };
 
 beforeAll(async () => {
@@ -81,4 +96,235 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+describe("Test login", () => {
+  const workspaceId = uuidv4();
+  const workspaceName = "New Workspace";
+  const folderId = uuidv4();
+  const folderIdSignature = `TODO+${folderId}`;
+  const folderName = "Getting started";
+
+  const documentName = "Introduction";
+
+  const authorizationHeaders = {
+    authorization: sessionKey1,
+  };
+  const query = gql`
+    mutation createInitialWorkspaceStructure(
+      $input: CreateInitialWorkspaceStructureInput!
+    ) {
+      createInitialWorkspaceStructure(input: $input) {
+        workspace {
+          id
+          name
+          members {
+            userId
+            isAdmin
+          }
+        }
+        folder {
+          id
+          name
+          parentFolderId
+          rootFolderId
+          workspaceId
+        }
+      }
+    }
+  `;
+
+  test("Invalid workspaceName", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              workspaceName: null,
+              workspaceId,
+              folderId,
+              folderIdSignature,
+              folderName,
+              documentId,
+              documentName,
+              documentSnapshot,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid workspaceId", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              workspaceName,
+              workspaceId: null,
+              folderId,
+              folderIdSignature,
+              folderName,
+              documentId,
+              documentName,
+              documentSnapshot,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+
+  test("Invalid folderId", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              workspaceName,
+              workspaceId,
+              folderId: null,
+              folderIdSignature,
+              folderName,
+              documentId,
+              documentName,
+              documentSnapshot,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+
+  test("Invalid folderIdSignature", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              workspaceName,
+              workspaceId,
+              folderId,
+              folderIdSignature: null,
+              folderName,
+              documentId,
+              documentName,
+              documentSnapshot,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+
+  test("Invalid folderName", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              workspaceName,
+              workspaceId,
+              folderId,
+              folderIdSignature,
+              folderName: null,
+              documentId,
+              documentName,
+              documentSnapshot,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+
+  test("Invalid documentId", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              workspaceName,
+              workspaceId,
+              folderId,
+              folderIdSignature,
+              folderName,
+              documentId: null,
+              documentName,
+              documentSnapshot,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid documentName", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              workspaceName,
+              workspaceId,
+              folderId,
+              folderIdSignature,
+              folderName,
+              documentId,
+              documentName: null,
+              documentSnapshot,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+
+  test("Invalid documentSnapshot", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              workspaceName,
+              workspaceId,
+              folderId,
+              folderIdSignature,
+              folderName,
+              documentId,
+              documentName,
+              documentSnapshot: null,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+
+  test("Invalid input", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: null,
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+
+  test("No input", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

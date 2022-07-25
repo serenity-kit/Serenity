@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { queryField } from "nexus";
 import { getDevices } from "../../../database/device/getDevices";
 import { Device } from "../../types/device";
@@ -11,7 +11,9 @@ export const devices = queryField((t) => {
     cursorFromNode: (node) => node?.signingPublicKey ?? "",
     async nodes(root, args, context) {
       if (args.first > 50) {
-        throw new Error("Requested too many devices. First value exceeds 50.");
+        throw new UserInputError(
+          "Requested too many devices. First value exceeds 50."
+        );
       }
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
@@ -32,7 +34,7 @@ export const devices = queryField((t) => {
       });
       return devices.map((device) => {
         if (!device.userId) {
-          throw new Error("Device without a userId");
+          throw new UserInputError("Device without a userId");
         }
         return {
           encryptionPublicKey: device.encryptionPublicKey,

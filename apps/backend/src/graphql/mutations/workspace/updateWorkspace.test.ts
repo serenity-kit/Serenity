@@ -4,6 +4,7 @@ import { registerUser } from "../../../../test/helpers/authentication/registerUs
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { updateWorkspace } from "../../../../test/helpers/workspace/updateWorkspace";
 import { v4 as uuidv4 } from "uuid";
+import { gql } from "graphql-request";
 
 const graphql = setupGraphql();
 let userId1 = "";
@@ -203,4 +204,101 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+describe("Input errors", () => {
+  const query = gql`
+    mutation updateWorkspace($input: UpdateWorkspaceInput!) {
+      updateWorkspace(input: $input) {
+        workspace {
+          id
+          name
+          members {
+            userId
+            isAdmin
+          }
+        }
+      }
+    }
+  `;
+  test("Invalid id", async () => {
+    const id = addedWorkspace.id;
+    const name = undefined;
+    const members = [
+      {
+        userId: userId1,
+        isAdmin: false,
+      },
+    ];
+    const authorizationHeaders = {
+      authorization: sessionKey1,
+    };
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          { input: { id: null, name, members } },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid members", async () => {
+    const id = addedWorkspace.id;
+    const name = undefined;
+    const members = [
+      {
+        userId: userId1,
+        isAdmin: false,
+      },
+    ];
+    const authorizationHeaders = {
+      authorization: sessionKey1,
+    };
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          { input: { id, name, members: null } },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid input", async () => {
+    const id = addedWorkspace.id;
+    const name = undefined;
+    const members = [
+      {
+        userId: userId1,
+        isAdmin: false,
+      },
+    ];
+    const authorizationHeaders = {
+      authorization: sessionKey1,
+    };
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          { input: null },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("No input", async () => {
+    const id = addedWorkspace.id;
+    const name = undefined;
+    const members = [
+      {
+        userId: userId1,
+        isAdmin: false,
+      },
+    ];
+    const authorizationHeaders = {
+      authorization: sessionKey1,
+    };
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

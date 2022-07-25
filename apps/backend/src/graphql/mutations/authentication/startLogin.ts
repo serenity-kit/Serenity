@@ -1,6 +1,7 @@
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { startLogin } from "../../../utils/opaque";
 import { getEnvelope } from "../../../database/authentication/getEnvelope";
+import { UserInputError } from "apollo-server-express";
 
 export const StartLoginInput = inputObjectType({
   name: "StartLoginInput",
@@ -27,7 +28,13 @@ export const startLoginMutation = mutationField("startLogin", {
   },
   async resolve(root, args, context) {
     if (!args || !args.input) {
-      throw Error("Missing input");
+      throw new UserInputError("Missing input");
+    }
+    if (!args.input.username) {
+      throw new UserInputError("Invalid input: username cannot be null");
+    }
+    if (!args.input.challenge) {
+      throw new UserInputError("Invalid input: challenge cannot be null");
     }
     const username = args.input.username;
     const result = await getEnvelope(username);

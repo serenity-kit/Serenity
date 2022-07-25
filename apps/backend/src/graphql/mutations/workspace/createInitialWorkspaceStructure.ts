@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { createInitialWorkspaceStructure } from "../../../database/workspace/createInitialWorkspaceStructure";
 import { Document } from "../../types/document";
@@ -61,7 +61,35 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         throw new AuthenticationError("Not authenticated");
       }
       if (!args.input) {
-        throw new Error("Invalid input");
+        throw new UserInputError("Invalid input");
+      }
+      if (!args.input.workspaceId) {
+        throw new UserInputError("Invalid input: workspaceId cannot be null");
+      }
+      if (!args.input.workspaceName) {
+        throw new UserInputError("Invalid input: workspaceName cannot be null");
+      }
+      if (!args.input.folderId) {
+        throw new UserInputError("Invalid input: folderId cannot be null");
+      }
+      if (!args.input.folderIdSignature) {
+        throw new UserInputError(
+          "Invalid input: folderIdSignature cannot be null"
+        );
+      }
+      if (!args.input.folderName) {
+        throw new UserInputError("Invalid input: folderName cannot be null");
+      }
+      if (!args.input.documentId) {
+        throw new UserInputError("Invalid input: documentId cannot be null");
+      }
+      if (!args.input.documentName) {
+        throw new UserInputError("Invalid input: documentName cannot be null");
+      }
+      if (!args.input.documentSnapshot) {
+        throw new UserInputError(
+          "Invalid input: documentSnapshot cannot be null"
+        );
       }
       const workspaceStructure = await createInitialWorkspaceStructure({
         userId: context.user.id,

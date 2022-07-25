@@ -1,3 +1,4 @@
+import { ForbiddenError } from "apollo-server-express";
 import { Folder } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 
@@ -27,7 +28,7 @@ export async function getDocumentPath({ userId, id }: Params) {
         },
       });
       if (!document) {
-        throw Error("Document not found");
+        throw new Error("Document not found");
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
@@ -36,7 +37,7 @@ export async function getDocumentPath({ userId, id }: Params) {
         },
       });
       if (!userToWorkspace) {
-        throw Error("Unauthorized");
+        throw new ForbiddenError("Unauthorized");
       }
       // if the document doesn't have a parent folder, return an empty array
       if (!document.parentFolderId) {
@@ -49,7 +50,7 @@ export async function getDocumentPath({ userId, id }: Params) {
         },
       });
       if (!parentFolder) {
-        throw Error("Folder not found");
+        throw new Error("Folder not found");
       }
 
       // next let's build the folder tree up to this folder

@@ -5,6 +5,7 @@ import { createInitialWorkspaceStructure } from "../../../../test/helpers/worksp
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";
 import { v4 as uuidv4 } from "uuid";
+import { gql } from "graphql-request";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -130,4 +131,64 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+describe("Input errors", () => {
+  const authorizationHeaders = {
+    authorization: sessionKey,
+  };
+  const id = uuidv4();
+  test("Invalid Id", async () => {
+    const query = gql`
+      mutation {
+        updateDocumentName(input: { id: "", name: "updated name" }) {
+          document {
+            name
+            id
+          }
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid name", async () => {
+    const query = gql`
+        mutation {
+            updateDocumentName(
+            input: {
+              id: "${id}"
+              name: ""
+            }
+          ) {
+            document {
+              name
+              id
+            }
+          }
+        }
+      `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid input", async () => {
+    const query = gql`
+      mutation {
+        updateDocumentName(input: null) {
+          document {
+            name
+            id
+          }
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

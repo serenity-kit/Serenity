@@ -10,7 +10,7 @@ export async function getEnvelope(username: string): Promise<{
     },
   });
   if (!user) {
-    throw Error("User is not registered");
+    throw new Error("User is not registered");
   }
   return {
     envelop: user.opaqueEnvelope,
