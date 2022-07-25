@@ -92,14 +92,14 @@ export default function RegisterForm(props: Props) {
           if (props.onRegisterFail) {
             props.onRegisterFail();
           }
-          throw Error(errorMessage);
+          throw new Error(errorMessage);
         }
       } else {
         console.error(startRegistrationResult.error);
         if (props.onRegisterFail) {
           props.onRegisterFail();
         }
-        throw Error("Failed to register.");
+        throw new Error("Failed to register.");
       }
     } catch (error) {
       setErrorMessage(error.toString());

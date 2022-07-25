@@ -57,7 +57,7 @@ type Props = WorkspaceDrawerScreenProps<"Page"> & {
 export default function Page({ navigation, route, updateTitle }: Props) {
   if (!route.params?.pageId) {
     // should never happen
-    throw Error("Page ID was not set");
+    throw new Error("Page ID was not set");
   }
   const docId = route.params.pageId;
   // const workspaceId = route.params.workspaceId;

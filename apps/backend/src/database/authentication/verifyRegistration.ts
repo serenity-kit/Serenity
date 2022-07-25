@@ -18,7 +18,7 @@ export async function verifyRegistration({
     },
   });
   if (existingUserData) {
-    throw Error("This username has already been registered");
+    throw new Error("This username has already been registered");
   }
   try {
     return await prisma.$transaction(async (prisma) => {
