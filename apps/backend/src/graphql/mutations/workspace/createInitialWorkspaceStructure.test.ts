@@ -9,11 +9,18 @@ let userId1 = "";
 const username = "user";
 const password = "password";
 let sessionKey1 = "";
+let device: any = null;
+let encryptionPrivateKey = "";
+let signingPrivateKey = "";
 
 const setup = async () => {
   const registerUserResult1 = await registerUser(graphql, username, password);
+  registerUserResult1.mainDeviceSigningPublicKey
   sessionKey1 = registerUserResult1.sessionKey;
   userId1 = registerUserResult1.userId;
+  device = registerUserResult1.mainDevice;
+  encryptionPrivateKey = registerUserResult1.encryptionPrivateKey;
+  signingPrivateKey = registerUserResult1.signingPrivateKey;
 };
 
 beforeAll(async () => {
@@ -26,6 +33,7 @@ test("user can create initial workspace structure", async () => {
   const authorizationHeader = sessionKey1;
   const workspaceId = uuidv4();
   const workspaceName = "New Workspace";
+  const deviceSigningPublicKey = device.signingPublicKey;
   const folderId = uuidv4();
   const folderIdSignature = `TODO+${folderId}`;
   const folderName = "Getting started";
@@ -35,6 +43,8 @@ test("user can create initial workspace structure", async () => {
     graphql,
     workspaceId,
     workspaceName,
+    deviceSigningPublicKey,
+    deviceAeadCiphertext,
     folderId,
     folderIdSignature,
     folderName,
@@ -62,6 +72,7 @@ test("user can create initial workspace structure", async () => {
 test("Unauthenticated", async () => {
   const workspaceId = uuidv4();
   const workspaceName = "New Workspace";
+  const deviceSigningPublicKey = 
   const folderId = uuidv4();
   const folderIdSignature = `TODO+${folderId}`;
   const folderName = "Getting started";
@@ -73,6 +84,8 @@ test("Unauthenticated", async () => {
         graphql,
         workspaceId,
         workspaceName,
+        deviceSigningPublicKey,
+        deviceAeadCiphertext,
         folderId,
         folderIdSignature,
         folderName,

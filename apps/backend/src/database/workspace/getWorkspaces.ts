@@ -10,8 +10,15 @@ type Params = {
   cursor?: Cursor;
   skip?: number;
   take: number;
+  deviceSigningPublicKey: string;
 };
-export async function getWorkspaces({ userId, cursor, skip, take }: Params) {
+export async function getWorkspaces({
+  userId,
+  deviceSigningPublicKey,
+  cursor,
+  skip,
+  take,
+}: Params) {
   const userToWorkspaces = await prisma.usersToWorkspaces.findMany({
     where: {
       userId,
@@ -40,6 +47,15 @@ export async function getWorkspaces({ userId, cursor, skip, take }: Params) {
           user: {
             select: {
               username: true,
+            },
+          },
+        },
+      },
+      workspaceKeys: {
+        include: {
+          workspaceKeyBoxes: {
+            where: {
+              deviceSigningPublicKey,
             },
           },
         },

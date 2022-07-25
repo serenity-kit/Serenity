@@ -11,6 +11,8 @@ export type Params = {
   userId: string;
   workspaceId: string;
   workspaceName: string;
+  deviceSigningPublicKey: string;
+  deviceAeadCiphertext: string;
   folderId: string;
   folderIdSignature: string;
   folderName: string;
@@ -29,6 +31,8 @@ export async function createInitialWorkspaceStructure({
   userId,
   workspaceId,
   workspaceName,
+  deviceSigningPublicKey,
+  deviceAeadCiphertext,
   folderId,
   folderName,
   documentId,
@@ -39,6 +43,8 @@ export async function createInitialWorkspaceStructure({
     id: workspaceId,
     name: workspaceName,
     userId,
+    deviceSigningPublicKey,
+    deviceAeadCiphertext,
   });
   const folder = await createFolder({
     userId,

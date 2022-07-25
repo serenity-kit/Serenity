@@ -1,3 +1,16 @@
+export type WorkspaceKeyBox = {
+  workspaceId?: string;
+  deviceSigningPublicKey: string;
+  ciphertext: string;
+};
+
+export type WorkspaceKey = {
+  id: string;
+  workspaceId: string;
+  generation: number;
+  workspaceKeyBoxes: WorkspaceKeyBox[];
+};
+
 export type WorkspaceMember = {
   userId: string;
   username: string | undefined | null;
@@ -9,6 +22,7 @@ export type Workspace = {
   name: string;
   idSignature: string;
   members: WorkspaceMember[];
+  workspaceKeys?: WorkspaceKey[];
 };
 
 export type WorkspaceInvitation = {

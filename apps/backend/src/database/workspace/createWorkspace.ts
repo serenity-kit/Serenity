@@ -1,16 +1,26 @@
 import { prisma } from "../prisma";
-import { Workspace, WorkspaceMember } from "../../types/workspace";
+import {
+  Workspace,
+  WorkspaceKey,
+  WorkspaceKeyBox,
+  WorkspaceMember,
+} from "../../types/workspace";
+import { v4 as uuidv4 } from "uuid";
 
 type Params = {
   id: string;
   name: string;
   userId: string;
+  deviceSigningPublicKey: string;
+  deviceAeadCiphertext: string;
 };
 
 export async function createWorkspace({
   id,
   name,
   userId,
+  deviceSigningPublicKey,
+  deviceAeadCiphertext,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
     const rawWorkspace = await prisma.workspace.create({
@@ -24,8 +34,30 @@ export async function createWorkspace({
             isAdmin: true,
           },
         },
+        workspaceKey: {
+          create: {
+            id: uuidv4(),
+            generation: 0,
+          },
+        },
       },
     });
+    const currentWorkspaceKey = await prisma.workspaceKey.findFirst({
+      where: {
+        workspaceId: rawWorkspace.id,
+      },
+    });
+    if (!currentWorkspaceKey) {
+      throw new Error("Error fetching newly created WorkspaceKey");
+    }
+    const workspaceKeyBox: WorkspaceKeyBox =
+      await prisma.workspaceKeyBox.create({
+        data: {
+          deviceSigningPublicKey,
+          ciphertext: deviceAeadCiphertext,
+          workspaceKeyId: currentWorkspaceKey.id,
+        },
+      });
     const usersToWorkspaces = await prisma.usersToWorkspaces.findMany({
       where: {
         workspaceId: rawWorkspace.id,
@@ -41,6 +73,10 @@ export async function createWorkspace({
         },
       },
     });
+    const returningWorkspaceKey: WorkspaceKey = {
+      ...currentWorkspaceKey,
+      workspaceKeyBoxes: [workspaceKeyBox],
+    };
     const members: WorkspaceMember[] = [];
     usersToWorkspaces.forEach((userToWorkspace) => {
       members.push({
@@ -54,9 +90,8 @@ export async function createWorkspace({
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
       members,
+      workspaceKeys: [returningWorkspaceKey],
     };
-
-    // TODO: insert a snapshot that includes basic title and text content to document
     return workspace;
   });
 }

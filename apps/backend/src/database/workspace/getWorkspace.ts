@@ -4,8 +4,13 @@ import { prisma } from "../prisma";
 type Params = {
   id: string;
   userId: string;
+  deviceSigningPublicKey: string;
 };
-export async function getWorkspace({ userId, id }: Params) {
+export async function getWorkspace({
+  userId,
+  id,
+  deviceSigningPublicKey,
+}: Params) {
   // include userstoworkspaces but in descending alphabetical order by userId
   const rawWorkspace = await prisma.workspace.findUnique({
     include: {
@@ -17,6 +22,15 @@ export async function getWorkspace({ userId, id }: Params) {
           user: {
             select: {
               username: true,
+            },
+          },
+        },
+      },
+      workspaceKeys: {
+        include: {
+          workspaceKeyBoxes: {
+            where: {
+              deviceSigningPublicKey,
             },
           },
         },
@@ -46,6 +60,7 @@ export async function getWorkspace({ userId, id }: Params) {
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
       members: workspaceMembers,
+      workspaceKeys: rawWorkspace.workspaceKeys,
     };
     return workspace;
   }
