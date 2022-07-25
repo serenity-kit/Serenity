@@ -1,4 +1,3 @@
-import { Platform } from "react-native";
 import { removeDevice } from "../device/deviceStore";
 import { removeWebDevice } from "../device/webDeviceStore";
 import {
@@ -6,22 +5,11 @@ import {
   removeLastUsedDocumentIdAndWorkspaceId,
 } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { deleteSessionKey } from "./sessionKeyStore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { removeLastLogin } from "./lastLoginStore";
 
 export const clearDeviceAndSessionStorage = async () => {
-  if (Platform.OS === "web") {
-    // on iOS .clear would throw an exception in case there are no keys in the store
-    // https://github.com/react-native-async-storage/async-storage/issues/86#issuecomment-554257281
-    const asyncStorageKeys = await AsyncStorage.getAllKeys();
-    if (asyncStorageKeys.length > 0) {
-      AsyncStorage.clear();
-    }
-  } else {
-    await removeLastUsedDocumentIdAndWorkspaceId();
-    await removeDevice();
-    await removeWebDevice();
-    await deleteSessionKey();
-    await removeLastLogin();
-  }
+  await removeLastUsedDocumentIdAndWorkspaceId();
+  await removeDevice();
+  await removeWebDevice();
+  await deleteSessionKey();
+  // NOTE: don't remove last login
 };
