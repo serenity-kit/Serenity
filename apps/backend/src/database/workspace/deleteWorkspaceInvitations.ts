@@ -55,6 +55,6 @@ export async function deleteWorkspaceInvitations({
       });
     });
   } catch (error) {
-    throw Error("Invalid workspace invitation IDs");
+    throw new Error("Invalid workspaceInvitationIds");
   }
 }

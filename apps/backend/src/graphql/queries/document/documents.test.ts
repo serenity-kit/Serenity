@@ -374,3 +374,57 @@ test("Unauthenticated", async () => {
       await graphql.client.request(query, null, authorizationHeader))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
+
+describe("Input Errors", () => {
+  const authorizationHeader = { authorization: sessionKey };
+  test("Invalid first", async () => {
+    const query1 = gql`
+    {
+        documents(parentFolderId: "${otherFolderId}", first: 51) {
+            edges {
+                node {
+                    id
+                    name
+                    parentFolderId
+                    rootFolderId
+                    workspaceId
+                }
+            }
+            pageInfo {
+                hasNextPage
+                endCursor
+            }
+        }
+    }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query1, null, authorizationHeader))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid input", async () => {
+    const query2 = gql`
+      {
+        documents(parentFolderId: "", first: 50) {
+          edges {
+            node {
+              id
+              name
+              parentFolderId
+              rootFolderId
+              workspaceId
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query2, null, authorizationHeader))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+});

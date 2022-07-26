@@ -47,3 +47,34 @@ test("Unauthenticated", async () => {
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
+
+test("Input Errors", async () => {
+  const authorizationHeaders = {
+    authorization: sessionKey,
+  };
+
+  // get root folders from graphql
+  const query = gql`
+    {
+      devices(first: 51) {
+        edges {
+          node {
+            userId
+            signingPublicKey
+            encryptionPublicKey
+            encryptionPublicKeySignature
+            info
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  `;
+  await expect(
+    (async () =>
+      await graphql.client.request(query, null, authorizationHeaders))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});

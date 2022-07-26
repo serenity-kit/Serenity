@@ -4,6 +4,7 @@ import { registerUser } from "../../../../test/helpers/authentication/registerUs
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { v4 as uuidv4 } from "uuid";
+import { gql } from "graphql-request";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -196,4 +197,114 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+describe("Input errors", () => {
+  const authorizationHeaders = {
+    authorization: sessionKey,
+  };
+  test("Invalid id", async () => {
+    const query = gql`
+      mutation createFolder($input: CreateFolderInput!) {
+        createFolder(input: $input) {
+          folder {
+            id
+            name
+            parentFolderId
+            rootFolderId
+            workspaceId
+          }
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              id: null,
+              name: "test",
+              parentFolderId: null,
+              workspaceId: addedWorkspace.id,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid workspaceId", async () => {
+    const query = gql`
+      mutation createFolder($input: CreateFolderInput!) {
+        createFolder(input: $input) {
+          folder {
+            id
+            name
+            parentFolderId
+            rootFolderId
+            workspaceId
+          }
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              id: "abc123",
+              name: "test",
+              parentFolderId: null,
+              workspaceId: null,
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid input", async () => {
+    const query = gql`
+      mutation createFolder($input: CreateFolderInput!) {
+        createFolder(input: $input) {
+          folder {
+            id
+            name
+            parentFolderId
+            rootFolderId
+            workspaceId
+          }
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: null,
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("No input", async () => {
+    const query = gql`
+      mutation createFolder($input: CreateFolderInput!) {
+        createFolder(input: $input) {
+          folder {
+            id
+            name
+            parentFolderId
+            rootFolderId
+            workspaceId
+          }
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

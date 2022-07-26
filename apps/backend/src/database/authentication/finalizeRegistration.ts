@@ -41,7 +41,6 @@ export async function finalizeRegistration({
   if (!verifyDevice(mainDevice)) {
     throw new Error("Failed to verify main device.");
   }
-
   try {
     return await prisma.$transaction(async (prisma) => {
       // if this user has already completed registration, throw an error
@@ -53,9 +52,7 @@ export async function finalizeRegistration({
       if (existingUserData) {
         throw Error("This username has already been registered");
       }
-
       const confirmationCode = await createConfirmationCode();
-
       const unverifiedUser = await prisma.unverifiedUser.create({
         data: {
           username,
@@ -80,6 +77,6 @@ export async function finalizeRegistration({
   } catch (error) {
     console.error("Error saving user");
     console.log(error);
-    throw Error("Internal server error");
+    throw error;
   }
 }

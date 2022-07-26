@@ -1,5 +1,6 @@
 import { prisma } from "../prisma";
 import { Folder } from "../../types/folder";
+import { ForbiddenError } from "apollo-server-express";
 
 type Params = {
   userId: string;
@@ -30,7 +31,7 @@ export async function createFolder({
         },
       });
       if (!userToWorkspace) {
-        throw Error("Unauthorized");
+        throw new ForbiddenError("Unauthorized");
       }
       // if there is a parentId, then grab it's root folder id for our own
       let rootFolderId: string | null = null;
@@ -42,7 +43,7 @@ export async function createFolder({
           },
         });
         if (!parentFolder) {
-          throw Error("Parent folder not found");
+          throw new Error("Parent folder not found");
         }
         if (parentFolder.rootFolderId) {
           rootFolderId = parentFolder.rootFolderId;

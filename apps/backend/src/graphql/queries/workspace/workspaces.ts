@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { queryField } from "nexus";
 import { getWorkspaces } from "../../../database/workspace/getWorkspaces";
 import { Workspace } from "../../types/workspace";
@@ -11,7 +11,7 @@ export const workspaces = queryField((t) => {
     cursorFromNode: (node) => node?.id ?? "",
     async nodes(root, args, context) {
       if (args.first > 50) {
-        throw new Error(
+        throw new UserInputError(
           "Requested too many workspaces. First value exceeds 50."
         );
       }

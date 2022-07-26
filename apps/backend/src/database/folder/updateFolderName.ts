@@ -1,3 +1,4 @@
+import { ForbiddenError } from "apollo-server-express";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -18,7 +19,7 @@ export async function updateFolderName({ id, name, userId }: Params) {
         },
       });
       if (!folder) {
-        throw Error("Folder not found");
+        throw new Error("Folder not found");
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
@@ -30,7 +31,7 @@ export async function updateFolderName({ id, name, userId }: Params) {
         !userToWorkspace ||
         folder.workspaceId !== userToWorkspace.workspaceId
       ) {
-        throw Error("Unauthorized");
+        throw new ForbiddenError("Unauthorized");
       }
       const updatedFolder = await prisma.folder.update({
         where: {

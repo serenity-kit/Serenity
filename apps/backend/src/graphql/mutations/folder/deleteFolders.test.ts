@@ -6,6 +6,7 @@ import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { prisma } from "../../../database/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { deleteFolders } from "../../../../test/helpers/folder/deleteFolder";
+import { gql } from "graphql-request";
 
 const graphql = setupGraphql();
 let userId = "";
@@ -293,4 +294,57 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+describe("Input errors", () => {
+  const authorizationHeaders = {
+    authorization: sessionKey,
+  };
+  test("Invalid ids", async () => {
+    const query = gql`
+      mutation deleteFolders($input: DeleteFoldersInput!) {
+        deleteFolders(input: $input) {
+          status
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          { input: { ids: null } },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid input", async () => {
+    const query = gql`
+      mutation deleteFolders($input: DeleteFoldersInput!) {
+        deleteFolders(input: $input) {
+          status
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          { input: null },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("No input", async () => {
+    const query = gql`
+      mutation deleteFolders($input: DeleteFoldersInput!) {
+        deleteFolders(input: $input) {
+          status
+        }
+      }
+    `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

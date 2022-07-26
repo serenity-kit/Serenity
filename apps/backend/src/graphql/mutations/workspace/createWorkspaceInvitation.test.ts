@@ -4,6 +4,7 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
 import { v4 as uuidv4 } from "uuid";
+import { gql } from "graphql-request";
 
 const graphql = setupGraphql();
 
@@ -90,4 +91,26 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+test("Input Error", async () => {
+  const authorizationHeaders = {
+    authorization: userAndDevice2.sessionKey,
+  };
+  const query1 = gql`
+    mutation {
+      createWorkspaceInvitation(input: null) {
+        workspaceInvitation {
+          id
+          workspaceId
+          inviterUserId
+          expiresAt
+        }
+      }
+    }
+  `;
+  await expect(
+    (async () =>
+      await graphql.client.request(query1, null, authorizationHeaders))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });

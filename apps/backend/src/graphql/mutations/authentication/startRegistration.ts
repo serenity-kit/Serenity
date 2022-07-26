@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server-express";
 import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { startRegistration } from "../../../utils/opaque";
 
@@ -26,17 +27,16 @@ export const startRegistrationMutation = mutationField("startRegistration", {
   },
   async resolve(root, args) {
     if (!args || !args.input) {
-      throw Error("Missing input");
+      throw new UserInputError("Missing input");
     }
-    const username = args.input.username;
-    if (username === "") {
-      throw Error("Username cannot be empty.");
+    if (!args.input.username) {
+      throw new UserInputError("Invalid input: username cannot be null");
     }
-    if (args.input.challenge === "") {
-      throw Error("Challenge cannot be empty.");
+    if (!args.input.challenge) {
+      throw new UserInputError("Invalid input: challenge cannot be null");
     }
     const result = startRegistration({
-      username,
+      username: args.input.username,
       challenge: args.input.challenge,
     });
     return {

@@ -70,6 +70,6 @@ export async function verifyRegistration({
   } catch (error) {
     console.error("Error saving user");
     console.log(error);
-    throw Error("Internal server error");
+    throw error;
   }
 }

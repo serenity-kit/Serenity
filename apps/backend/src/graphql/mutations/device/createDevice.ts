@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import {
   arg,
   nonNull,
@@ -38,7 +38,25 @@ export const createDeviceMutation = mutationField("createDevice", {
       throw new AuthenticationError("Not authenticated");
     }
     if (!args.input) {
-      throw new Error("Input missing");
+      throw new UserInputError("Input missing");
+    }
+    if (!args.input.signingPublicKey) {
+      throw new UserInputError(
+        "Invalid input: signingPublicKey cannot be null"
+      );
+    }
+    if (!args.input.encryptionPublicKey) {
+      throw new UserInputError(
+        "Invalid input: encryptionPublicKey cannot be null"
+      );
+    }
+    if (!args.input.encryptionPublicKeySignature) {
+      throw new UserInputError(
+        "Invalid input: encryptionPublicKeySignature cannot be null"
+      );
+    }
+    if (!args.input.info) {
+      throw new UserInputError("Invalid input: info cannot be null");
     }
     const device = await createDevice({
       userId: context.user.id,

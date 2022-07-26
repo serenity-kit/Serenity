@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { registerUnverifiedUser } from "../../../../test/helpers/authentication/registerUnverifiedUser";
 import { prisma } from "../../../database/prisma";
 import { verifyUser } from "../../../../test/helpers/authentication/verifyUser";
+import { gql } from "graphql-request";
 
 const graphql = setupGraphql();
 
@@ -67,4 +68,50 @@ test("server should verify a user with a pending workspace id", async () => {
   expect(verifiedUser?.pendingWorkspaceInvitationId).toBe(
     pendingWorkspaceInvitationId
   );
+});
+
+describe("Input errors", () => {
+  const verifyRegistrationQuery = gql`
+    mutation verifyRegistration($input: VerifyRegistrationInput!) {
+      verifyRegistration(input: $input) {
+        id
+      }
+    }
+  `;
+  test("Invalid username", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(verifyRegistrationQuery, {
+          input: {
+            username: null,
+            verificationCode: "1234",
+          },
+        }))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid verificationCode", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(verifyRegistrationQuery, {
+          input: {
+            username: "user@example.com",
+            verificationCode: null,
+          },
+        }))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid input", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(verifyRegistrationQuery, {
+          input: null,
+        }))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("No input", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(verifyRegistrationQuery, null))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

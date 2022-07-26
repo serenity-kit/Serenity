@@ -39,6 +39,6 @@ export async function deleteWorkspaces({ workspaceIds, userId }: Params) {
       });
     });
   } catch (error) {
-    throw Error("Invalid workspace IDs");
+    throw new Error("Invalid workspaceIds");
   }
 }

@@ -183,3 +183,28 @@ test("Unauthenticated", async () => {
     });
   }).rejects.toThrowError(/UNAUTHENTICATED/);
 });
+
+test("Input errors", async () => {
+  const authorizationHeader = { authorization: sessionKey };
+  const query = gql`
+    {
+      workspaces(first: 51) {
+        nodes {
+          id
+          name
+          members {
+            userId
+            isAdmin
+          }
+        }
+        edges {
+          cursor
+        }
+      }
+    }
+  `;
+  await expect(
+    (async () =>
+      await graphql.client.request(query, null, authorizationHeader))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});

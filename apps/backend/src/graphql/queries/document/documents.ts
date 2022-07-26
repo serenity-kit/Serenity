@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getDocuments } from "../../../database/document/getDocuments";
 import { Document } from "../../types/document";
@@ -14,8 +14,13 @@ export const documents = queryField((t) => {
     },
     async nodes(root, args, context) {
       if (args.first > 50) {
-        throw new Error(
+        throw new UserInputError(
           "Requested too many documents. First value exceeds 50."
+        );
+      }
+      if (!args.parentFolderId) {
+        throw new UserInputError(
+          "Invalid input: parentFolderId cannot be null"
         );
       }
       if (!context.user) {

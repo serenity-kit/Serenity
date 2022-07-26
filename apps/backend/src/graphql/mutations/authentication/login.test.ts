@@ -55,3 +55,66 @@ test("server should login a user", async () => {
   const loginResponse = await graphql.client.request(query);
   expect(loginResponse.finishLogin.expiresAt).toBeDefined();
 });
+
+describe("Input errors", () => {
+  const query = gql`
+    mutation finishLogin($input: FinishLoginInput) {
+      finishLogin(input: $input) {
+        expiresAt
+      }
+    }
+  `;
+  test("Invalid loginId", async () => {
+    const result = await requestLoginChallengeResponse({
+      graphql,
+      username,
+      password,
+    });
+
+    const finishMessage = sodium.to_base64(
+      result.login.finish(sodium.from_base64(result.data.challengeResponse))
+    );
+    await expect(
+      (async () =>
+        await graphql.client.request(query, {
+          input: {
+            loginId: null,
+            message: finishMessage,
+          },
+        }))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid message", async () => {
+    const result = await requestLoginChallengeResponse({
+      graphql,
+      username,
+      password,
+    });
+
+    const finishMessage = sodium.to_base64(
+      result.login.finish(sodium.from_base64(result.data.challengeResponse))
+    );
+    await expect(
+      (async () =>
+        await graphql.client.request(query, {
+          input: {
+            loginId: result.data.loginId,
+            message: null,
+          },
+        }))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid input", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(query, {
+          input: null,
+        }))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("No input", async () => {
+    await expect(
+      (async () => await graphql.client.request(query, null))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+});

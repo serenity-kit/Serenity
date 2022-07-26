@@ -4,6 +4,7 @@ import { registerUser } from "../../../../test/helpers/authentication/registerUs
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { deleteWorkspaces } from "../../../../test/helpers/workspace/deleteWorkspaces";
 import { v4 as uuidv4 } from "uuid";
+import { gql } from "graphql-request";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -60,5 +61,22 @@ test("Unauthenticated", async () => {
         ids,
         authorizationHeader: "badauthheader",
       }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+test("Input Errors", async () => {
+  const authorizationHeaders = {
+    authorization: sessionKey,
+  };
+  const query = gql`
+    mutation {
+      deleteWorkspaces(input: { ids: null }) {
+        status
+      }
+    }
+  `;
+  await expect(
+    (async () =>
+      await graphql.client.request(query, null, authorizationHeaders))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
