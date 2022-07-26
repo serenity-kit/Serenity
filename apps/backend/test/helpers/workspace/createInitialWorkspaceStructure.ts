@@ -78,15 +78,19 @@ export const createInitialWorkspaceStructure = async ({
       input: {
         workspaceName,
         workspaceId,
-        deviceSigningPublicKey,
-        deviceAeadNonce: nonce,
-        deviceAeadCiphertext: ciphertext,
         folderId,
         folderIdSignature,
         folderName,
         documentId,
         documentName,
         documentSnapshot,
+        deviceWorkspaceKeyBoxes: [
+          {
+            deviceSigningPublicKey,
+            nonce,
+            ciphertext,
+          },
+        ],
       },
     },
     authorizationHeaders

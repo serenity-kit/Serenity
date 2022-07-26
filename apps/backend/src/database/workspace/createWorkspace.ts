@@ -7,22 +7,24 @@ import {
 } from "../../types/workspace";
 import { v4 as uuidv4 } from "uuid";
 
+export type DeviceWorkspaceKeyBoxParams = {
+  deviceSigningPublicKey: string;
+  nonce: string;
+  ciphertext: string;
+};
+
 type Params = {
   id: string;
   name: string;
   userId: string;
-  deviceSigningPublicKey: string;
-  deviceAeadNonce: string;
-  deviceAeadCiphertext: string;
+  deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
 };
 
 export async function createWorkspace({
   id,
   name,
   userId,
-  deviceSigningPublicKey,
-  deviceAeadNonce,
-  deviceAeadCiphertext,
+  deviceWorkspaceKeyBoxes,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
     const rawWorkspace = await prisma.workspace.create({
@@ -52,15 +54,24 @@ export async function createWorkspace({
     if (!currentWorkspaceKey) {
       throw new Error("Error fetching newly created WorkspaceKey");
     }
-    const workspaceKeyBox: WorkspaceKeyBox =
-      await prisma.workspaceKeyBox.create({
-        data: {
-          deviceSigningPublicKey,
-          nonce: deviceAeadNonce,
-          ciphertext: deviceAeadCiphertext,
+    const workspaceKeyBoxes: WorkspaceKeyBox[] = [];
+    deviceWorkspaceKeyBoxes.forEach(
+      (deviceWorkspaceKeyBox: DeviceWorkspaceKeyBoxParams) => {
+        workspaceKeyBoxes.push({
+          id: uuidv4(),
           workspaceKeyId: currentWorkspaceKey.id,
-        },
-      });
+          ...deviceWorkspaceKeyBox,
+        });
+      }
+    );
+    await prisma.workspaceKeyBox.createMany({
+      data: workspaceKeyBoxes,
+    });
+    const createdWorkspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
+      where: {
+        workspaceKeyId: currentWorkspaceKey.id,
+      },
+    });
     const usersToWorkspaces = await prisma.usersToWorkspaces.findMany({
       where: {
         workspaceId: rawWorkspace.id,
@@ -78,7 +89,7 @@ export async function createWorkspace({
     });
     const returningWorkspaceKey: WorkspaceKey = {
       ...currentWorkspaceKey,
-      workspaceKeyBoxes: [workspaceKeyBox],
+      workspaceKeyBoxes: createdWorkspaceKeyBoxes,
     };
     const members: WorkspaceMember[] = [];
     usersToWorkspaces.forEach((userToWorkspace) => {

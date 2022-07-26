@@ -24,6 +24,7 @@ test("user should be able to accept an invitation", async () => {
     id: workspaceId,
     username: inviterUserName,
   });
+  const device = inviterUserAndDevice.device;
   inviteeUserAndDevice = await createUserWithWorkspace({
     id: otherWorkspaceId,
     username: inviteeUsername,
@@ -31,6 +32,7 @@ test("user should be able to accept an invitation", async () => {
   const workspace = await getWorkspace({
     id: workspaceId,
     userId: inviterUserAndDevice.user.id,
+    deviceSigningPublicKey: device.signingPublicKey,
   });
   if (!workspace) {
     throw new Error("workspace not found");

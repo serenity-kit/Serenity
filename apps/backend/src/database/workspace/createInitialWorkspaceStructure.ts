@@ -1,4 +1,7 @@
-import { createWorkspace } from "./createWorkspace";
+import {
+  createWorkspace,
+  DeviceWorkspaceKeyBoxParams,
+} from "./createWorkspace";
 import { createFolder } from "../folder/createFolder";
 import { Workspace } from "../../types/workspace";
 import { Document } from "../../types/document";
@@ -11,15 +14,13 @@ export type Params = {
   userId: string;
   workspaceId: string;
   workspaceName: string;
-  deviceSigningPublicKey: string;
-  deviceAeadNonce: string;
-  deviceAeadCiphertext: string;
   folderId: string;
   folderIdSignature: string;
   folderName: string;
   documentId: string;
   documentName: string;
   documentSnapshot: Snapshot;
+  deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
 };
 
 export type CreateWorkspaceResult = {
@@ -32,22 +33,18 @@ export async function createInitialWorkspaceStructure({
   userId,
   workspaceId,
   workspaceName,
-  deviceSigningPublicKey,
-  deviceAeadNonce,
-  deviceAeadCiphertext,
   folderId,
   folderName,
   documentId,
   documentName,
   documentSnapshot,
+  deviceWorkspaceKeyBoxes,
 }: Params): Promise<CreateWorkspaceResult> {
   const workspace = await createWorkspace({
     id: workspaceId,
     name: workspaceName,
     userId,
-    deviceSigningPublicKey,
-    deviceAeadNonce,
-    deviceAeadCiphertext,
+    deviceWorkspaceKeyBoxes,
   });
   const folder = await createFolder({
     userId,

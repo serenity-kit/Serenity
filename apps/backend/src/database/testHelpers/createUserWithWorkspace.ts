@@ -93,15 +93,19 @@ export default async function createUserWithWorkspace({
     userId: user.id,
     workspaceId: id,
     workspaceName: "My Workspace",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceAeadNonce: nonce,
-    deviceAeadCiphertext: ciphertext,
     folderId: uuidv4(),
     folderIdSignature: uuidv4(),
     folderName: "Getting Started",
     documentId,
     documentName: "Introduction",
     documentSnapshot,
+    deviceWorkspaceKeyBoxes: [
+      {
+        deviceSigningPublicKey: device.signingPublicKey,
+        nonce,
+        ciphertext,
+      },
+    ],
   });
 
   const login = new Login();
@@ -128,6 +132,7 @@ export default async function createUserWithWorkspace({
     ...result,
     session,
     sessionKey,
+    device,
     workspace: createWorkspaceResult.workspace,
     folder: createWorkspaceResult.folder,
     document: createWorkspaceResult.document,

@@ -17,10 +17,12 @@ let addedFolderId: any = null;
 const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
   sessionKey = registerUserResult.sessionKey;
-
+  const device = registerUserResult.mainDevice;
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     workspaceName: "workspace 1",
     workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+    deviceSigningPublicKey: device.signingPublicKey,
+    deviceEncryptionPublicKey: device.encryptionPublicKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -89,10 +91,13 @@ test("throw error when user doesn't have access", async () => {
   // create a new user with access to different folders
   const username2 = "user2";
   const registerUserResult = await registerUser(graphql, username2, password);
+  const device = registerUserResult.mainDevice;
   // sessionKey = registerUserResult.sessionKey;
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     workspaceName: "workspace 1",
     workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
+    deviceSigningPublicKey: device.signingPublicKey,
+    deviceEncryptionPublicKey: device.encryptionPublicKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,

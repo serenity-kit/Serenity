@@ -5,6 +5,15 @@ import { Document } from "../../types/document";
 import { Folder } from "../../types/folder";
 import { Workspace } from "../../types/workspace";
 
+export const DeviceWorkspaceKeyBoxInput = inputObjectType({
+  name: "DeviceWorkspaceKeyBoxInput",
+  definition(t) {
+    t.nonNull.string("deviceSigningPublicKey");
+    t.nonNull.string("nonce");
+    t.nonNull.string("ciphertext");
+  },
+});
+
 export const DocumentSnapshotPublicDataInput = inputObjectType({
   name: "DocumentSnapshotPublicDataInput",
   definition(t) {
@@ -29,15 +38,15 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
   definition(t) {
     t.nonNull.string("workspaceId");
     t.nonNull.string("workspaceName");
-    t.nonNull.string("deviceSigningPublicKey");
-    t.nonNull.string("deviceAeadNonce");
-    t.nonNull.string("deviceAeadCiphertext");
     t.nonNull.string("folderId");
     t.nonNull.string("folderIdSignature");
     t.nonNull.string("folderName");
     t.nonNull.string("documentId");
     t.nonNull.string("documentName");
     t.nonNull.field("documentSnapshot", { type: DocumentSnapshotInput });
+    t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
+      type: DeviceWorkspaceKeyBoxInput,
+    });
   },
 });
 
@@ -94,19 +103,27 @@ export const createInitialWorkspaceStructureMutation = mutationField(
           "Invalid input: documentSnapshot cannot be null"
         );
       }
+      if (!args.input.deviceWorkspaceKeyBoxes) {
+        throw new UserInputError(
+          "Invalid input: deviceWorkspaceKeyBoxes cannot be netull"
+        );
+      }
+      if (args.input.deviceWorkspaceKeyBoxes.length <= 0) {
+        throw new UserInputError(
+          "Invalid input: deviceWorkspaceKeyBoxes cannot be empty"
+        );
+      }
       const workspaceStructure = await createInitialWorkspaceStructure({
         userId: context.user.id,
         workspaceId: args.input.workspaceId,
         workspaceName: args.input.workspaceName,
-        deviceSigningPublicKey: args.input.deviceSigningPublicKey,
-        deviceAeadNonce: args.input.deviceAeadNonce,
-        deviceAeadCiphertext: args.input.deviceAeadCiphertext,
         folderId: args.input.folderId,
         folderIdSignature: args.input.folderIdSignature,
         folderName: args.input.folderName,
         documentId: args.input.documentId,
         documentName: args.input.documentName,
         documentSnapshot: args.input.documentSnapshot,
+        deviceWorkspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,
       });
       return workspaceStructure;
     },
