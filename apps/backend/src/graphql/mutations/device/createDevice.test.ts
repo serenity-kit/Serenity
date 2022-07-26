@@ -2,9 +2,7 @@ import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDevice } from "../../../../test/helpers/device/createDevice";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
-import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
 
 const graphql = setupGraphql();
 const username1 = "user1";

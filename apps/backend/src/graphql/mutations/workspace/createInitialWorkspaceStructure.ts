@@ -30,6 +30,7 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
     t.nonNull.string("workspaceId");
     t.nonNull.string("workspaceName");
     t.nonNull.string("deviceSigningPublicKey");
+    t.nonNull.string("deviceAeadNonce");
     t.nonNull.string("deviceAeadCiphertext");
     t.nonNull.string("folderId");
     t.nonNull.string("folderIdSignature");
@@ -70,6 +71,7 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         workspaceId: args.input.workspaceId,
         workspaceName: args.input.workspaceName,
         deviceSigningPublicKey: args.input.deviceSigningPublicKey,
+        deviceAeadNonce: args.input.deviceAeadNonce,
         deviceAeadCiphertext: args.input.deviceAeadCiphertext,
         folderId: args.input.folderId,
         folderIdSignature: args.input.folderIdSignature,

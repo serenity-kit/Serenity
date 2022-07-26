@@ -15,6 +15,7 @@ import { createSession } from "../authentication/createSession";
 import { addDays } from "../../utils/addDays/addDays";
 import { v4 as uuidv4 } from "uuid";
 import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
+import { createAeadKeyAndCipherTextForDevice } from "../../../test/helpers/device/createAeadKeyAndCipherTextForDevice";
 
 type Params = {
   id: string;
@@ -83,10 +84,18 @@ export default async function createUserWithWorkspace({
   });
 
   const user = result.user;
+  const device = result.device;
+  const deviceEncryptionPublicKey = device.encryptionPublicKey;
+  const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+    deviceEncryptionPublicKey,
+  });
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
     workspaceId: id,
     workspaceName: "My Workspace",
+    deviceSigningPublicKey: device.signingPublicKey,
+    deviceAeadNonce: nonce,
+    deviceAeadCiphertext: ciphertext,
     folderId: uuidv4(),
     folderIdSignature: uuidv4(),
     folderName: "Getting Started",

@@ -171,12 +171,12 @@ model WorkspaceKey {
 }
 
 model WorkspaceKeyBox {
+  id                     String       @id @unique @default(uuid())
   workspaceKey           WorkspaceKey @relation(fields: [workspaceKeyId], references: [id], onDelete: Cascade)
   workspaceKeyId         String
   deviceSigningPublicKey String
+  nonce                  String
   ciphertext             String
-
-  @@id([workspaceKeyId, deviceSigningPublicKey])
 }
 
 model Folder {

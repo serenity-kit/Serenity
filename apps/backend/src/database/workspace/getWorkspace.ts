@@ -1,4 +1,8 @@
-import { Workspace, WorkspaceMember } from "../../types/workspace";
+import {
+  Workspace,
+  WorkspaceKey,
+  WorkspaceMember,
+} from "../../types/workspace";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -26,13 +30,16 @@ export async function getWorkspace({
           },
         },
       },
-      workspaceKeys: {
+      workspaceKey: {
         include: {
           workspaceKeyBoxes: {
             where: {
               deviceSigningPublicKey,
             },
           },
+        },
+        orderBy: {
+          generation: "desc",
         },
       },
     },
@@ -55,12 +62,14 @@ export async function getWorkspace({
       };
       workspaceMembers.push(workspaceMember);
     });
+    let currentWorkspaceKey = rawWorkspace.workspaceKey[0];
     const workspace: Workspace = {
       id: rawWorkspace.id,
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
       members: workspaceMembers,
-      workspaceKeys: rawWorkspace.workspaceKeys,
+      workspaceKeys: rawWorkspace.workspaceKey,
+      currentWorkspaceKey: currentWorkspaceKey,
     };
     return workspace;
   }

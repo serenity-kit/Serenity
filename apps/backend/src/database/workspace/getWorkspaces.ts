@@ -51,13 +51,16 @@ export async function getWorkspaces({
           },
         },
       },
-      workspaceKeys: {
+      workspaceKey: {
         include: {
           workspaceKeyBoxes: {
             where: {
               deviceSigningPublicKey,
             },
           },
+        },
+        orderBy: {
+          generation: "desc",
         },
       },
     },
@@ -79,6 +82,8 @@ export async function getWorkspaces({
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
       members: members,
+      workspaceKeys: rawWorkspace.workspaceKey,
+      currentWorkspaceKey: rawWorkspace.workspaceKey[0],
     };
     workspaces.push(workspace);
   });

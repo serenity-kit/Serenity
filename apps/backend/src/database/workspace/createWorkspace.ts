@@ -12,6 +12,7 @@ type Params = {
   name: string;
   userId: string;
   deviceSigningPublicKey: string;
+  deviceAeadNonce: string;
   deviceAeadCiphertext: string;
 };
 
@@ -20,6 +21,7 @@ export async function createWorkspace({
   name,
   userId,
   deviceSigningPublicKey,
+  deviceAeadNonce,
   deviceAeadCiphertext,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
@@ -54,6 +56,7 @@ export async function createWorkspace({
       await prisma.workspaceKeyBox.create({
         data: {
           deviceSigningPublicKey,
+          nonce: deviceAeadNonce,
           ciphertext: deviceAeadCiphertext,
           workspaceKeyId: currentWorkspaceKey.id,
         },

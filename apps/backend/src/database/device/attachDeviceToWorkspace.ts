@@ -7,6 +7,7 @@ type Params = {
   userId: string;
   signingPublicKey: string;
   workspaceId: string;
+  nonce: string;
   ciphertext: string;
 };
 
@@ -14,6 +15,7 @@ export async function attachDeviceToWorkspace({
   userId,
   signingPublicKey,
   workspaceId,
+  nonce,
   ciphertext,
 }: Params): Promise<WorkspaceKey> {
   try {
@@ -57,13 +59,15 @@ export async function attachDeviceToWorkspace({
         data: {
           workspaceKeyId: workspaceKey.id,
           deviceSigningPublicKey: signingPublicKey,
+          nonce,
           ciphertext,
         },
       });
-      return {
+      const result = {
         ...workspaceKey,
         workspaceKeyBoxes: [workspaceKeyBox],
       };
+      return result;
     });
   } catch (error) {
     throw error;
