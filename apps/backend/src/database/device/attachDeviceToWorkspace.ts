@@ -1,6 +1,6 @@
 import { prisma } from "../prisma";
 import { v4 as uuidv4 } from "uuid";
-import { WorkspaceKey } from "../../types/workspace";
+import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
 import { ForbiddenError } from "apollo-server-express";
 
 type Params = {
@@ -21,8 +21,10 @@ export async function attachDeviceToWorkspace({
   try {
     return await prisma.$transaction(async (prisma) => {
       // 1. get the workspace associated with this user if it exists
-      // 2. Fetch latest the workspaceKey for this workspace
-      // 3. Create a new worskpaceKeyBox for this signingPublicKey
+      // 2. Fetch all the workspaceKeys for this workspace
+      // 3. Delete all workspaceKeyBoxes for this signingPublicKey
+      // 4. Create a new worskpaceKeyBoxes for this signingPublicKey
+      //    on all workspaceKeys for this workspace
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
           workspaceId,
@@ -36,7 +38,7 @@ export async function attachDeviceToWorkspace({
         throw new ForbiddenError("Unauthorized");
       }
       const workspace = userToWorkspace.workspace;
-      let workspaceKey = await prisma.workspaceKey.findFirst({
+      const workspaceKeys = await prisma.workspaceKey.findMany({
         where: {
           workspaceId: workspace.id,
         },
@@ -44,7 +46,7 @@ export async function attachDeviceToWorkspace({
           generation: "desc",
         },
       });
-      if (!workspaceKey) {
+      if (workspaceKeys.length === 0) {
         // create new WorkspaceKey
         const newWorkspaceKey = await prisma.workspaceKey.create({
           data: {
@@ -53,19 +55,25 @@ export async function attachDeviceToWorkspace({
             generation: 0,
           },
         });
-        workspaceKey = newWorkspaceKey;
+        workspaceKeys.push(newWorkspaceKey);
       }
-      const workspaceKeyBox = await prisma.workspaceKeyBox.create({
-        data: {
+      const currentWorkspaceKey = workspaceKeys[0];
+      const workspaceKeyBoxes: WorkspaceKeyBox[] = [];
+      workspaceKeys.forEach((workspaceKey) => {
+        workspaceKeyBoxes.push({
+          id: uuidv4(),
           workspaceKeyId: workspaceKey.id,
           deviceSigningPublicKey: signingPublicKey,
           nonce,
           ciphertext,
-        },
+        });
+      });
+      await prisma.workspaceKeyBox.createMany({
+        data: workspaceKeyBoxes,
       });
       const result = {
-        ...workspaceKey,
-        workspaceKeyBoxes: [workspaceKeyBox],
+        ...currentWorkspaceKey,
+        workspaceKeyBoxes: [workspaceKeyBoxes[0]],
       };
       return result;
     });
