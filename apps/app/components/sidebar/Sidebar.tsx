@@ -45,6 +45,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const urqlClient = useClient();
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
+  const sessionKey = useAuthentication();
   const workspaceId = route.params.workspaceId;
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
@@ -84,20 +85,23 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
   useEffect(() => {
     (async () => {
-      const device = await getActiveDevice();
-      if (!device) {
-        console.error("No active devices found!");
-        return;
+      if (sessionKey) {
+        const device = await getActiveDevice();
+        if (!device) {
+          console.error("No active devices found!");
+          return;
+        }
+        setDeviceSigningPublicKey(device.signingPublicKey);
+        const deviceSigningPublicKey: string = device?.signingPublicKey;
+        const workspace = await getWorkspace({
+          urqlClient,
+          deviceSigningPublicKey,
+          workspaceId,
+        });
+        setWorkspace(workspace);
+        const workspaces = await getWorkspaces({ urqlClient });
+        setWorkspaces(workspaces);
       }
-      setDeviceSigningPublicKey(device.signingPublicKey);
-      const deviceSigningPublicKey: string = device?.signingPublicKey;
-      const workspace = await getWorkspace({
-        urqlClient,
-        deviceSigningPublicKey,
-      });
-      setWorkspace(workspace);
-      const workspaces = await getWorkspaces({ urqlClient });
-      setWorkspaces(workspaces);
     })();
   }, [urqlClient, navigation]);
 
@@ -110,6 +114,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       const createdWorkspace = await getWorkspace({
         urqlClient,
         deviceSigningPublicKey,
+        workspaceId,
       });
       setWorkspace(createdWorkspace);
       setShowCreateWorkspaceModal(false);

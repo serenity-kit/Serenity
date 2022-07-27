@@ -51,6 +51,18 @@ export const createInitialWorkspaceStructure = async ({
             userId
             isAdmin
           }
+          currentWorkspaceKey {
+            id
+            workspaceId
+            generation
+            workspaceKeyBoxes {
+              id
+              workspaceKeyId
+              deviceSigningPublicKey
+              nonce
+              ciphertext
+            }
+          }
         }
         folder {
           id

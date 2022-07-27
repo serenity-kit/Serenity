@@ -6,7 +6,6 @@ import {
   ModalButtonFooter,
 } from "@serenity-tools/ui";
 import {
-  Device,
   useCreateInitialWorkspaceStructureMutation,
   useDevicesQuery,
 } from "../../generated/graphql";
@@ -14,6 +13,8 @@ import { v4 as uuidv4 } from "uuid";
 import sodium from "@serenity-tools/libsodium";
 import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
 import { createAeadKeyAndCipherTextForDevice } from "../../utils/device/createAeadKeyAndCipherTextForDevice";
+import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { Device } from "../../types/Device";
 
 type DeviceWorkspaceKeyBoxParams = {
   deviceSigningPublicKey: string;
@@ -66,10 +67,15 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
 
   const buildDeviceWorkspaceKeyBoxes = async (devices: Device[]) => {
     const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[] = [];
-    if (!devices) {
+    const allDevices = devices;
+    const mainDevice = getMainDevice();
+    if (mainDevice) {
+      allDevices.push(mainDevice);
+    }
+    if (!mainDevice) {
       return deviceWorkspaceKeyBoxes;
     }
-    for await (const device of devices) {
+    for await (const device of allDevices) {
       const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
         deviceEncryptionPublicKey: device.encryptionPublicKey,
       });
@@ -97,7 +103,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
 
     // grab all devices for this user
     //
-    console.log({ devicesResult });
     if (!devicesResult.data?.devices?.nodes) {
       // TODO: Handle this error
       console.error("No devices found!");

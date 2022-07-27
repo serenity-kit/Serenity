@@ -104,7 +104,7 @@ export async function createWorkspace({
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
       members,
-      workspaceKeys: [returningWorkspaceKey],
+      currentWorkspaceKey: returningWorkspaceKey,
     };
     return workspace;
   });

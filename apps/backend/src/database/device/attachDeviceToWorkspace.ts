@@ -47,7 +47,6 @@ export async function attachDeviceToWorkspace({
         },
       });
       if (workspaceKeys.length === 0) {
-        // create new WorkspaceKey
         const newWorkspaceKey = await prisma.workspaceKey.create({
           data: {
             id: uuidv4(),
