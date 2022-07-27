@@ -535,6 +535,7 @@ export type QueryWorkspaceInvitationsArgs = {
 
 export type QueryWorkspacesArgs = {
   after?: InputMaybe<Scalars['String']>;
+  deviceSigningPublicKey: Scalars['String'];
   first: Scalars['Int'];
 };
 
@@ -936,7 +937,9 @@ export type WorkspaceInvitationsQueryVariables = Exact<{
 
 export type WorkspaceInvitationsQuery = { __typename?: 'Query', workspaceInvitations?: { __typename?: 'WorkspaceInvitationConnection', nodes?: Array<{ __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, expiresAt: any } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
-export type WorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
+export type WorkspacesQueryVariables = Exact<{
+  deviceSigningPublicKey: Scalars['String'];
+}>;
 
 
 export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, nonce: string, ciphertext: string }> } | null } | null> | null } | null };
@@ -1488,8 +1491,8 @@ export function useWorkspaceInvitationsQuery(options: Omit<Urql.UseQueryArgs<Wor
   return Urql.useQuery<WorkspaceInvitationsQuery>({ query: WorkspaceInvitationsDocument, ...options });
 };
 export const WorkspacesDocument = gql`
-    query workspaces {
-  workspaces(first: 50) {
+    query workspaces($deviceSigningPublicKey: String!) {
+  workspaces(first: 50, deviceSigningPublicKey: $deviceSigningPublicKey) {
     nodes {
       id
       name
@@ -1513,6 +1516,6 @@ export const WorkspacesDocument = gql`
 }
     `;
 
-export function useWorkspacesQuery(options?: Omit<Urql.UseQueryArgs<WorkspacesQueryVariables>, 'query'>) {
+export function useWorkspacesQuery(options: Omit<Urql.UseQueryArgs<WorkspacesQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspacesQuery>({ query: WorkspacesDocument, ...options });
 };

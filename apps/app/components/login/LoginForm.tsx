@@ -32,7 +32,7 @@ type Props = {
 
 export function LoginForm(props: Props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  let defaultUseExtendedLogin = false;
+  let defaultUseExtendedLogin = true;
   if (Platform.OS === "ios") {
     defaultUseExtendedLogin = true;
   }

@@ -8,15 +8,19 @@ import {
 
 export type Props = {
   urqlClient: Client;
+  deviceSigningPublicKey: string;
 };
 export const getWorkspaces = async ({
   urqlClient,
+  deviceSigningPublicKey,
 }: Props): Promise<Workspace[] | null> => {
   // check if the user has access to this workspace
   const workspacesResult = await urqlClient
     .query<WorkspacesQuery, WorkspacesQueryVariables>(
       WorkspacesDocument,
-      undefined,
+      {
+        deviceSigningPublicKey,
+      },
       { requestPolicy: "network-only" }
     )
     .toPromise();

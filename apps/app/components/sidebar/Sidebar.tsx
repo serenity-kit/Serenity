@@ -99,7 +99,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           workspaceId,
         });
         setWorkspace(workspace);
-        const workspaces = await getWorkspaces({ urqlClient });
+        const workspaces = await getWorkspaces({
+          urqlClient,
+          deviceSigningPublicKey,
+        });
         setWorkspaces(workspaces);
       }
     })();

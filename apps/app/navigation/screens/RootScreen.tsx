@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import { useAuthentication } from "../../context/AuthenticationContext";
-import { WorkspaceDocument, WorkspaceQuery } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
