@@ -28,7 +28,7 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
           const device = await getActiveDevice();
           if (!device) {
             // TODO: handle a no device error
-            console.error("Error fetching workspace.");
+            console.error("Error fetching active device.");
             return;
           }
           const workspace = await getWorkspace({
@@ -46,7 +46,7 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
           }
         } catch (error) {
           // TODO: handle workspace fetch error
-          console.error("Error fetching workspace.");
+          console.error("Error fetching last used workspaceId.");
         }
       })();
     } else {
