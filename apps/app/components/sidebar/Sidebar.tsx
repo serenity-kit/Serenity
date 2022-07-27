@@ -21,11 +21,10 @@ import {
 } from "@serenity-tools/ui";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 import {
-  useWorkspacesQuery,
-  useWorkspaceQuery,
   useCreateFolderMutation,
   useRootFoldersQuery,
   useMeQuery,
+  Workspace,
 } from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -37,8 +36,13 @@ import { useEffect, useState } from "react";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { Platform } from "react-native";
+import { useClient } from "urql";
+import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
+  const urqlClient = useClient();
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const workspaceId = route.params.workspaceId;
@@ -46,14 +50,16 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
-  const [workspacesResult, refetchWorkspacesResult] = useWorkspacesQuery();
   const [meResult] = useMeQuery();
   const [username, setUsername] = useState<string>("");
-  const [workspaceResult] = useWorkspaceQuery({
-    variables: {
-      id: workspaceId,
-    },
-  });
+  const [workspace, setWorkspace] = useState<Workspace | null>(null);
+  const [workspaces, setWorkspaces] = useState<Workspace[] | null | undefined>(
+    null
+  );
+  const [deviceSigningPublicKey, setDeviceSigningPublicKey] = useState<
+    string | undefined
+  >();
+
   const [rootFoldersResult, refetchRootFolders] = useRootFoldersQuery({
     variables: {
       workspaceId,
@@ -76,16 +82,50 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     }
   }, [meResult.fetching]);
 
-  const onWorkspaceStructureCreated = ({ workspace, folder, document }) => {
-    refetchWorkspacesResult();
-    setShowCreateWorkspaceModal(false);
-    navigation.navigate("Workspace", {
-      workspaceId: workspace.id,
-      screen: "Page",
-      params: {
-        pageId: document.id,
-      },
-    });
+  useEffect(() => {
+    (async () => {
+      const device = await getActiveDevice();
+      if (!device) {
+        console.error("No active devices found!");
+        return;
+      }
+      setDeviceSigningPublicKey(device.signingPublicKey);
+      const deviceSigningPublicKey: string = device?.signingPublicKey;
+      const workspace = await getWorkspace({
+        urqlClient,
+        deviceSigningPublicKey,
+      });
+      setWorkspace(workspace);
+      const workspaces = await getWorkspaces({ urqlClient });
+      setWorkspaces(workspaces);
+    })();
+  }, [urqlClient, navigation]);
+
+  const onWorkspaceStructureCreated = async ({
+    workspace,
+    folder,
+    document,
+  }) => {
+    if (deviceSigningPublicKey) {
+      const workspace = await getWorkspace({
+        urqlClient,
+        deviceSigningPublicKey,
+      });
+      setWorkspace(workspace);
+      setShowCreateWorkspaceModal(false);
+      if (workspace) {
+        navigation.navigate("Workspace", {
+          workspaceId: workspace.id,
+          screen: "Page",
+          params: {
+            pageId: document.id,
+          },
+        });
+      } else {
+        // TODO: handle this error
+        console.error("No workspace found!");
+      }
+    }
   };
 
   const createFolder = async (name: string) => {
@@ -151,9 +191,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
-                  {workspaceResult.fetching
-                    ? " "
-                    : workspaceResult.data?.workspace?.name}
+                  {workspace === null ? " " : workspace.name}
                 </Text>
                 <Icon name="arrow-down-s-line" color={tw.color("gray-400")} />
               </HStack>
@@ -165,9 +203,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               {username}
             </Text>
           </View>
-          {workspacesResult.fetching
+          {workspaces === null ||
+          workspaces === undefined ||
+          workspaces.length === 0
             ? null
-            : workspacesResult.data?.workspaces?.nodes?.map((workspace) =>
+            : workspaces.map((workspace) =>
                 workspace === null || workspace === undefined ? null : (
                   <SidebarLink
                     key={workspace.id}

@@ -1,0 +1,15 @@
+mutation attachDeviceToWorkspace($input: AttachDeviceToWorkspaceInput!) {
+  attachDeviceToWorkspace(input: $input) {
+    workspaceKey {
+      id
+      workspaceId
+      generation
+      workspaceKeyBoxes {
+        id
+        deviceSigningPublicKey
+        nonce
+        ciphertext
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, useWindowDimensions } from "react-native";
+import { Platform, StyleSheet, useWindowDimensions } from "react-native";
 import {
   Text,
   View,
@@ -14,10 +14,12 @@ import {
 } from "@serenity-tools/ui";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import {
-  useWorkspaceQuery,
   useUpdateWorkspaceMutation,
   useMeQuery,
   useDeleteWorkspacesMutation,
+  WorkspaceQuery,
+  WorkspaceQueryVariables,
+  WorkspaceDocument,
 } from "../../generated/graphql";
 import { CreateWorkspaceInvitation } from "../../components/workspace/CreateWorkspaceInvitation";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
@@ -25,6 +27,9 @@ import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { useClient } from "urql";
+import { Workspace } from "../../types/workspace";
+import { getActiveDevice } from "../../utils/device/getActiveDevice";
 
 type Member = {
   userId: string;
@@ -85,12 +90,8 @@ const workspaceMemberStyles = StyleSheet.create({
 export default function WorkspaceSettingsScreen(
   props: WorkspaceDrawerScreenProps<"Settings">
 ) {
+  const urqlClient = useClient();
   const workspaceId = useWorkspaceId();
-  const [workspaceResult, refetchWorkspaceResult] = useWorkspaceQuery({
-    variables: {
-      id: workspaceId,
-    },
-  });
   const [, deleteWorkspacesMutation] = useDeleteWorkspacesMutation();
   const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
   const [meResult] = useMeQuery();
@@ -108,20 +109,37 @@ export default function WorkspaceSettingsScreen(
     useState<boolean>(false);
   const [deletingWorkspaceName, setDeletingWorkspaceName] =
     useState<string>("");
+  const [workspace, setWorkspace] = useState<Workspace | null>(null);
 
   useEffect(() => {
-    if (!workspaceResult.fetching) {
-      if (workspaceResult.error) {
-        setHasGraphqlError(true);
-        setGraphqlError(workspaceResult.error.message || "");
+    (async () => {
+      const device = await getActiveDevice();
+      if (!device) {
+        // TODO: handle this error
+        console.error("No active device found");
+        return;
       }
+      const deviceSigningPublicKey: string = device?.signingPublicKey;
+      // check if the user has access to this workspace
+      const workspaceResult = await urqlClient
+        .query<WorkspaceQuery, WorkspaceQueryVariables>(
+          WorkspaceDocument,
+          {
+            id: workspaceId,
+            deviceSigningPublicKey,
+          },
+          { requestPolicy: "network-only" }
+        )
+        .toPromise();
       if (workspaceResult.data?.workspace) {
-        updateWorkspaceData(workspaceResult.data.workspace);
+        const worskpace = workspaceResult.data?.workspace;
+        setWorkspace(workspace);
       } else {
         props.navigation.replace("WorkspaceNotFound");
+        return;
       }
-    }
-  }, [workspaceResult.fetching]);
+    })();
+  }, [urqlClient, props.navigation]);
 
   const updateWorkspaceData = async (workspace: any) => {
     setIsLoadingWorkspaceData(true);
@@ -172,7 +190,7 @@ export default function WorkspaceSettingsScreen(
         name: workspaceName,
       },
     });
-    if (workspaceResult.data && workspaceResult.data.workspace) {
+    if (updateWorkspaceResult.data?.updateWorkspace?.workspace) {
       updateWorkspaceData(
         updateWorkspaceResult.data?.updateWorkspace?.workspace
       );
@@ -238,7 +256,7 @@ export default function WorkspaceSettingsScreen(
         <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
           Workspace Settings
         </Text>
-        {workspaceResult.fetching ? (
+        {!workspace ? (
           <Text>Loading...</Text>
         ) : (
           <>

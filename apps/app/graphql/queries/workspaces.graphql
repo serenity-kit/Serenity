@@ -3,6 +3,21 @@ query workspaces {
     nodes {
       id
       name
+      members {
+        userId
+        isAdmin
+      }
+      currentWorkspaceKey {
+        id
+        workspaceId
+        workspaceKeyBoxes {
+          id
+          workspaceKeyId
+          deviceSigningPublicKey
+          nonce
+          ciphertext
+        }
+      }
     }
   }
 }

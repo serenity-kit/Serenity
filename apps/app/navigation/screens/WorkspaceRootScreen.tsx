@@ -1,4 +1,3 @@
-import { useRoute } from "@react-navigation/native";
 import { Spinner, tw, View } from "@serenity-tools/ui";
 import { useEffect } from "react";
 import { useWindowDimensions } from "react-native";
@@ -8,12 +7,12 @@ import {
   FirstDocumentDocument,
   FirstDocumentQuery,
   FirstDocumentQueryVariables,
-  useWorkspaceQuery,
   WorkspaceDocument,
   WorkspaceQuery,
   WorkspaceQueryVariables,
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceRootScreen(
@@ -25,17 +24,32 @@ export default function WorkspaceRootScreen(
 
   useEffect(() => {
     (async () => {
+      const device = await getActiveDevice();
+      if (!device) {
+        // TODO: handle this error
+        console.error("No active device found");
+        return;
+      }
+      const deviceSigningPublicKey: string = device?.signingPublicKey;
       // check if the user has access to this workspace
       const workspaceResult = await urqlClient
         .query<WorkspaceQuery, WorkspaceQueryVariables>(
           WorkspaceDocument,
-          { id: workspaceId },
+          {
+            id: workspaceId,
+            deviceSigningPublicKey,
+          },
           { requestPolicy: "network-only" }
         )
         .toPromise();
       if (workspaceResult.data?.workspace === null) {
-        props.navigation.replace("WorkspaceNotFound");
-        return;
+        console.log("workspaceresult returned null workspace");
+        // props.navigation.replace("WorkspaceNotFound");
+        // return;
+      } else {
+        // check if this workspace has keys for this device
+        // if for example we are logging in with a new webDevice, we need
+        // to generate keys for this workspace
       }
       const lastUsedDocumentId = await getLastUsedDocumentId(workspaceId);
       console.log({ lastUsedDocumentId });
@@ -68,7 +82,8 @@ export default function WorkspaceRootScreen(
           },
         });
       } else {
-        props.navigation.replace("WorkspaceNotFound");
+        console.log("first document not found");
+        // props.navigation.replace("WorkspaceNotFound");
       }
     })();
   }, [urqlClient, props.navigation]);

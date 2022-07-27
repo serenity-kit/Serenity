@@ -20,7 +20,6 @@ import {
 import { useClient } from "urql";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { detect } from "detect-browser";
-import { removeDevice } from "../../utils/device/deviceStore";
 const browser = detect();
 
 type Props = {

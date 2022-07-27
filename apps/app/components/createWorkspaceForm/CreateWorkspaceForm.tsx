@@ -5,10 +5,21 @@ import {
   ModalHeader,
   ModalButtonFooter,
 } from "@serenity-tools/ui";
-import { useCreateInitialWorkspaceStructureMutation } from "../../generated/graphql";
+import {
+  Device,
+  useCreateInitialWorkspaceStructureMutation,
+  useDevicesQuery,
+} from "../../generated/graphql";
 import { v4 as uuidv4 } from "uuid";
 import sodium from "@serenity-tools/libsodium";
 import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
+import { createAeadKeyAndCipherTextForDevice } from "../../utils/device/createAeadKeyAndCipherTextForDevice";
+
+type DeviceWorkspaceKeyBoxParams = {
+  deviceSigningPublicKey: string;
+  nonce: string;
+  ciphertext: string;
+};
 
 type WorkspaceProps = {
   id: string;
@@ -34,6 +45,12 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   const [, createInitialWorkspaceStructure] =
     useCreateInitialWorkspaceStructureMutation();
 
+  const [devicesResult] = useDevicesQuery({
+    variables: {
+      first: 50,
+    },
+  });
+
   useEffect(() => {
     setTimeout(() => {
       if (inputRef.current) {
@@ -42,6 +59,28 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       }
     }, 250);
   }, []);
+
+  useEffect(() => {
+    console.log({ devicesResult });
+  }, [devicesResult.fetching]);
+
+  const buildDeviceWorkspaceKeyBoxes = async (devices: Device[]) => {
+    const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[] = [];
+    if (!devices) {
+      return deviceWorkspaceKeyBoxes;
+    }
+    for await (const device of devices) {
+      const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+        deviceEncryptionPublicKey: device.encryptionPublicKey,
+      });
+      deviceWorkspaceKeyBoxes.push({
+        deviceSigningPublicKey: device.signingPublicKey,
+        ciphertext,
+        nonce,
+      });
+    }
+    return deviceWorkspaceKeyBoxes;
+  };
 
   const createWorkspace = async () => {
     const workspaceId = uuidv4();
@@ -56,6 +95,17 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       documentEncryptionKey,
     });
 
+    // grab all devices for this user
+    //
+    console.log({ devicesResult });
+    if (!devicesResult.data?.devices?.nodes) {
+      // TODO: Handle this error
+      console.error("No devices found!");
+      return;
+    }
+    const devices = devicesResult.data?.devices?.nodes as Device[];
+    const deviceWorkspaceKeyBoxes = await buildDeviceWorkspaceKeyBoxes(devices);
+    // FIXME: add mainDevice
     const createInitialWorkspaceStructureResult =
       await createInitialWorkspaceStructure({
         input: {
@@ -67,8 +117,10 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           documentName: "Introduction",
           documentId,
           documentSnapshot: snapshot,
+          deviceWorkspaceKeyBoxes,
         },
       });
+    console.log({ createInitialWorkspaceStructureResult });
     if (
       !createInitialWorkspaceStructureResult.data
         ?.createInitialWorkspaceStructure?.workspace
@@ -106,7 +158,13 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       />
       <ModalButtonFooter
         confirm={
-          <Button disabled={name === ""} onPress={createWorkspace}>
+          <Button
+            disabled={
+              name === "" &&
+              devicesResult.data?.devices?.nodes?.length !== undefined
+            }
+            onPress={createWorkspace}
+          >
             Create
           </Button>
         }
