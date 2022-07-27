@@ -61,12 +61,14 @@ beforeAll(async () => {
 
 type GetWorkspacesProps = {
   graphql: TestContext;
+  deviceSigningPublicKey: string;
   first: number;
   after?: string;
   authorizationHeader: string;
 };
 const getWorkspaces = async ({
   graphql,
+  deviceSigningPublicKey,
   first,
   after,
   authorizationHeader,
@@ -75,8 +77,16 @@ const getWorkspaces = async ({
     authorization: authorizationHeader,
   };
   const query = gql`
-    query workspaces($first: Int!, $after: String) {
-      workspaces(first: $first, after: $after) {
+    query workspaces(
+      $first: Int!
+      $after: String
+      $deviceSigningPublicKey: String!
+    ) {
+      workspaces(
+        first: $first
+        after: $after
+        deviceSigningPublicKey: $deviceSigningPublicKey
+      ) {
         nodes {
           id
           name
@@ -105,6 +115,7 @@ const getWorkspaces = async ({
   return graphql.client.request(
     query,
     {
+      deviceSigningPublicKey,
       first,
       after,
     },
@@ -116,6 +127,7 @@ test("user should be able to list workspaces", async () => {
   const result = await getWorkspaces({
     graphql,
     first: 50,
+    deviceSigningPublicKey: device.signingPublicKey,
     authorizationHeader: sessionKey,
   });
   const workspaces = result.workspaces.nodes;
@@ -152,6 +164,7 @@ test("user cannot query more than 50 results", async () => {
   await expect(async () => {
     await getWorkspaces({
       graphql,
+      deviceSigningPublicKey: device.signingPublicKey,
       first: 51,
       authorizationHeader: sessionKey,
     });
@@ -163,6 +176,7 @@ test("user cannot query more than 50 results", async () => {
 test("user can query by paginating cursor", async () => {
   const result = await getWorkspaces({
     graphql,
+    deviceSigningPublicKey: device.signingPublicKey,
     first: 1,
     after: firstWorkspaceCursor,
     authorizationHeader: sessionKey,
@@ -178,6 +192,7 @@ test("Unauthenticated", async () => {
   await expect(async () => {
     await getWorkspaces({
       graphql,
+      deviceSigningPublicKey: device.signingPublicKey,
       first: 50,
       authorizationHeader: "badauthtoken",
     });
@@ -206,5 +221,5 @@ test("Input errors", async () => {
   await expect(
     (async () =>
       await graphql.client.request(query, null, authorizationHeader))()
-  ).rejects.toThrowError(/BAD_USER_INPUT/);
+  ).rejects.toThrowError();
 });
