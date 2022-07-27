@@ -107,13 +107,13 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     document,
   }) => {
     if (deviceSigningPublicKey) {
-      const workspace = await getWorkspace({
+      const createdWorkspace = await getWorkspace({
         urqlClient,
         deviceSigningPublicKey,
       });
-      setWorkspace(workspace);
+      setWorkspace(createdWorkspace);
       setShowCreateWorkspaceModal(false);
-      if (workspace) {
+      if (createdWorkspace) {
         navigation.navigate("Workspace", {
           workspaceId: workspace.id,
           screen: "Page",
