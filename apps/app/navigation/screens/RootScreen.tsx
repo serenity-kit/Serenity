@@ -5,7 +5,9 @@ import { useClient } from "urql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { WorkspaceDocument, WorkspaceQuery } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
+import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 export default function RootScreen(props: RootStackScreenProps<"Root">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -23,21 +25,29 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
           });
           return;
         }
-
-        const workspaceResult = await urqlClient
-          .query<WorkspaceQuery>(WorkspaceDocument, undefined, {
-            // better to be safe here and always refetch
-            requestPolicy: "network-only",
-          })
-          .toPromise();
-        if (workspaceResult.data?.workspace?.id) {
-          // query first document on first workspace and go there
-          props.navigation.replace("Workspace", {
-            workspaceId: workspaceResult.data.workspace.id,
-            screen: "WorkspaceRoot",
+        try {
+          const device = await getActiveDevice();
+          if (!device) {
+            // TODO: handle a no device error
+            console.error("Error fetching workspace.");
+            return;
+          }
+          const workspace = await getWorkspace({
+            urqlClient,
+            deviceSigningPublicKey: device?.signingPublicKey,
           });
-        } else {
-          props.navigation.replace("Onboarding");
+          if (workspace?.id) {
+            // query first document on first workspace and go there
+            props.navigation.replace("Workspace", {
+              workspaceId: workspace.id,
+              screen: "WorkspaceRoot",
+            });
+          } else {
+            props.navigation.replace("Onboarding");
+          }
+        } catch (error) {
+          // TODO: handle workspace fetch error
+          console.error("Error fetching workspace.");
         }
       })();
     } else {

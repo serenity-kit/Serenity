@@ -101,8 +101,8 @@ export default function WorkspaceRootScreen(
         .toPromise();
       if (workspaceResult.data?.workspace === null) {
         console.log("workspaceresult returned null workspace");
-        // props.navigation.replace("WorkspaceNotFound");
-        // return;
+        props.navigation.replace("WorkspaceNotFound");
+        return;
       } else {
         // check if this workspace has keys for this device
         // if for example we are logging in with a new webDevice, we need
@@ -145,7 +145,7 @@ export default function WorkspaceRootScreen(
         });
       } else {
         console.log("first document not found");
-        // props.navigation.replace("WorkspaceNotFound");
+        props.navigation.replace("WorkspaceNotFound");
       }
     })();
   }, [urqlClient, props.navigation]);

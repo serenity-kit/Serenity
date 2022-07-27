@@ -61,10 +61,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     }, 250);
   }, []);
 
-  useEffect(() => {
-    console.log({ devicesResult });
-  }, [devicesResult.fetching]);
-
   const buildDeviceWorkspaceKeyBoxes = async (devices: Device[]) => {
     const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[] = [];
     const allDevices = devices;
@@ -125,7 +121,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           deviceWorkspaceKeyBoxes,
         },
       });
-    console.log({ createInitialWorkspaceStructureResult });
     if (
       !createInitialWorkspaceStructureResult.data
         ?.createInitialWorkspaceStructure?.workspace

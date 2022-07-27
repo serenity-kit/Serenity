@@ -920,7 +920,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, nonce: string, ciphertext: string }> } | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, nonce: string, ciphertext: string }> } | null } | null };
 
 export type WorkspaceInvitationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1427,6 +1427,11 @@ export const WorkspaceDocument = gql`
   workspace(id: $id, deviceSigningPublicKey: $deviceSigningPublicKey) {
     id
     name
+    members {
+      userId
+      username
+      isAdmin
+    }
     currentWorkspaceKey {
       id
       workspaceId
