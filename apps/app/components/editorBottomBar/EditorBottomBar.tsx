@@ -1,13 +1,7 @@
 import React from "react";
-import {
-  EditorSidebarIcon,
-  ScrollView,
-  SidebarButton,
-  Text,
-  tw,
-  View,
-} from "@serenity-tools/ui";
+import { EditorToolbarButton, ScrollView, Text, tw } from "@serenity-tools/ui";
 import { EditorToolbarState, UpdateEditor } from "@serenity-tools/editor";
+import { HStack } from "native-base";
 
 export type EditorBottomBarProps = {
   onUpdate: UpdateEditor;
@@ -24,34 +18,32 @@ export function EditorBottomBar({
     <ScrollView
       horizontal={true}
       style={[
-        tw`flex flex-row flex-nowrap border-t border-gray-200`,
-        {
-          height: editorToolbarHeight,
-        },
+        tw`flex flex-row flex-nowrap h-${
+          editorToolbarHeight / 4
+        } px-2.5 border-t border-gray-200`,
       ]}
     >
-      <SidebarButton
-        onPress={(event) => {
-          onUpdate({ variant: "toggle-bold" });
-        }}
-      >
-        <EditorSidebarIcon isActive={editorToolbarState.isBold} name="bold" />
-      </SidebarButton>
-      <SidebarButton
-        onPress={(event) => {
-          onUpdate({ variant: "toggle-italic" });
-        }}
-      >
-        <EditorSidebarIcon
-          isActive={editorToolbarState.isItalic}
-          name="italic"
+      <HStack space={2} alignItems="center">
+        <EditorToolbarButton
+          onPress={(event) => {
+            onUpdate({ variant: "toggle-bold" });
+          }}
+          name="bold"
+          isActive={editorToolbarState.isBold}
         />
-      </SidebarButton>
+        <EditorToolbarButton
+          onPress={(event) => {
+            onUpdate({ variant: "toggle-italic" });
+          }}
+          name="italic"
+          isActive={editorToolbarState.isItalic}
+        />
 
-      <Text>
-        here more buttons will come soon, but needed a long text for testing the
-        horizontal scroll
-      </Text>
+        <Text>
+          here more buttons will come soon, but needed a long text for testing
+          the horizontal scroll
+        </Text>
+      </HStack>
     </ScrollView>
   );
 }
