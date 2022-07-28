@@ -24,7 +24,7 @@ export const from_base64 = (data: string): Uint8Array => {
   } else {
     const decodedBase64Str = urlSafeBase64ToBase64(data);
     if (decodedBase64Str.includes(" ")) {
-      throw Error("incomplete input");
+      throw new Error("incomplete input");
     }
     return new Uint8Array(Buffer.from(decodedBase64Str, "base64"));
   }
@@ -42,7 +42,7 @@ export const from_base64_to_string = (data: string): string => {
   } else {
     const decodedBase64Str = urlSafeBase64ToBase64(data);
     if (decodedBase64Str.includes(" ")) {
-      throw Error("incomplete input");
+      throw new Error("incomplete input");
     }
     return Buffer.from(decodedBase64Str, "base64").toString("utf8");
   }

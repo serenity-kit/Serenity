@@ -34,7 +34,7 @@ const logins: {
 // console.log(sodium.to_base64(serverSetup.serialize()));
 export const opaqueServerSetup = () => {
   if (!process.env.OPAQUE_SERVER_PRIVATE_KEY) {
-    throw Error("Missing process.env.OPAQUE_SERVER_PRIVATE_KEY");
+    throw new Error("Missing process.env.OPAQUE_SERVER_PRIVATE_KEY");
   }
   return ServerSetup.deserialize(
     sodium.from_base64(process.env.OPAQUE_SERVER_PRIVATE_KEY)

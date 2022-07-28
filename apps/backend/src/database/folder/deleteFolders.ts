@@ -68,6 +68,6 @@ export async function deleteFolders({ folderIds, userId }: DeleteFolderParams) {
       });
     });
   } catch (error) {
-    throw Error("Invalid folderIds");
+    throw new Error("Invalid folderIds");
   }
 }
