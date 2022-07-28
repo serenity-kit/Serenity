@@ -27,7 +27,6 @@ export type AcceptWorkspaceInvitationResult = {
 
 export type AttachDeviceToWorkspaceInput = {
   ciphertext: Scalars['String'];
-  nonce: Scalars['String'];
   signingPublicKey: Scalars['String'];
   workspaceId: Scalars['String'];
 };
@@ -181,7 +180,6 @@ export type DeviceResult = {
 export type DeviceWorkspaceKeyBoxInput = {
   ciphertext: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
-  nonce: Scalars['String'];
 };
 
 export type Document = {
@@ -709,7 +707,7 @@ export type AttachDeviceToWorkspaceMutationVariables = Exact<{
 }>;
 
 
-export type AttachDeviceToWorkspaceMutation = { __typename?: 'Mutation', attachDeviceToWorkspace?: { __typename?: 'AttachDeviceToWorkspaceResult', workspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, nonce: string, ciphertext: string }> } | null } | null };
+export type AttachDeviceToWorkspaceMutation = { __typename?: 'Mutation', attachDeviceToWorkspace?: { __typename?: 'AttachDeviceToWorkspaceResult', workspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, ciphertext: string }> } | null } | null };
 
 export type CreateDeviceMutationVariables = Exact<{
   input: CreateDeviceInput;
@@ -737,7 +735,7 @@ export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
 }>;
 
 
-export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, nonce: string, ciphertext: string }> } | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string }> } | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
 
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
@@ -921,7 +919,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, nonce: string, ciphertext: string }> } | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string }> } | null } | null };
 
 export type WorkspaceInvitationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -942,7 +940,7 @@ export type WorkspacesQueryVariables = Exact<{
 }>;
 
 
-export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, nonce: string, ciphertext: string }> } | null } | null> | null } | null };
+export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string }> } | null } | null> | null } | null };
 
 
 export const AcceptWorkspaceInvitationDocument = gql`
@@ -974,7 +972,6 @@ export const AttachDeviceToWorkspaceDocument = gql`
       workspaceKeyBoxes {
         id
         deviceSigningPublicKey
-        nonce
         ciphertext
       }
     }
@@ -1048,7 +1045,6 @@ export const CreateInitialWorkspaceStructureDocument = gql`
           id
           workspaceKeyId
           deviceSigningPublicKey
-          nonce
           ciphertext
         }
       }
@@ -1442,7 +1438,6 @@ export const WorkspaceDocument = gql`
         id
         workspaceKeyId
         deviceSigningPublicKey
-        nonce
         ciphertext
       }
     }
@@ -1507,7 +1502,6 @@ export const WorkspacesDocument = gql`
           id
           workspaceKeyId
           deviceSigningPublicKey
-          nonce
           ciphertext
         }
       }

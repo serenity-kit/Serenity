@@ -2,7 +2,6 @@ export type WorkspaceKeyBox = {
   id: string;
   workspaceKeyId: string;
   deviceSigningPublicKey: string;
-  nonce: string;
   ciphertext: string;
 };
 

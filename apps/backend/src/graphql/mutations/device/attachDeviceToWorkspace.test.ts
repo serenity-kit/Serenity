@@ -23,7 +23,7 @@ test("attach a device to a workspace", async () => {
   const authorizationHeader = userAndDevice1.sessionKey;
   const deviceSigningPublicKey = userAndDevice1.device.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
-  const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+  const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
     deviceEncryptionPublicKey,
   });
   const workspaceId = userAndDevice1.workspace.id;
@@ -31,7 +31,6 @@ test("attach a device to a workspace", async () => {
     graphql,
     workspaceId,
     deviceSigningPublicKey,
-    deviceAeadNonce: nonce,
     deviceAeadCiphertext: ciphertext,
     authorizationHeader,
   });
@@ -43,7 +42,6 @@ test("attach a device to a workspace", async () => {
   // This query will return the newly created workspaceKeyId
   expect(workspaceKey.workspaceKeyBoxes.length).toBe(1);
   const workspaceKeyBox = workspaceKey.workspaceKeyBoxes[0];
-  expect(workspaceKeyBox.nonce).toBe(nonce);
   expect(workspaceKeyBox.ciphertext).toBe(ciphertext);
   expect(workspaceKeyBox.deviceSigningPublicKey).toBe(deviceSigningPublicKey);
   // there should now be two workspacKeyBoxes

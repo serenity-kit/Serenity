@@ -75,7 +75,7 @@ export default function RegistrationVerificationScreen(
     // }
   };
 
-  const storeKeys = async () => {
+  const storeDeviceKeys = async () => {
     // FIXME: allow non-extended login by storing into sessionStorage
     // for now this is a HACK to support devices and workspaceKeyBoxes
     const useExtendedLogin = true;
@@ -95,6 +95,7 @@ export default function RegistrationVerificationScreen(
           ...webDevice,
           info: deviceInfo,
         };
+        console.log({ newDeviceInfo });
         await createDeviceMutation({
           input: newDeviceInfo,
         });
@@ -143,7 +144,7 @@ export default function RegistrationVerificationScreen(
         updateAuthentication,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
-      await storeKeys();
+      await storeDeviceKeys();
       // await registerNewDevice(); // NOTE: keep this here for when we use sessionStorage to store devices
       await acceptPendingWorkspaceInvitation();
       setIsLoggingIn(false);

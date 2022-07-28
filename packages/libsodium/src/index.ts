@@ -155,6 +155,30 @@ export const crypto_box_keypair = (): StringKeyPair => {
   };
 };
 
+export const crypto_box_seal = async (
+  message: string,
+  recipientPublicKey: string
+): Promise<string> => {
+  const cipherText = sodium.crypto_box_seal(
+    from_base64(message),
+    from_base64(recipientPublicKey)
+  );
+  return to_base64(cipherText);
+};
+
+export const crypto_box_seal_open = async (
+  ciphertext: string,
+  recipientPublicKey: string,
+  recipientPrivateKey: string
+): Promise<string> => {
+  const message = sodium.crypto_box_seal_open(
+    from_base64(ciphertext),
+    from_base64(recipientPublicKey),
+    from_base64(recipientPrivateKey)
+  );
+  return to_base64(message);
+};
+
 const libsodiumExports = {
   ready,
   to_base64,
@@ -167,6 +191,8 @@ const libsodiumExports = {
   crypto_box_keypair,
   crypto_sign_keypair,
   crypto_sign_detached,
+  crypto_box_seal,
+  crypto_box_seal_open,
   crypto_secretbox_easy,
   crypto_secretbox_open_easy,
   crypto_sign_verify_detached,
@@ -185,6 +211,8 @@ type Libsodium = typeof libsodiumExports & {
   crypto_pwhash_MEMLIMIT_INTERACTIVE: number;
   crypto_pwhash_ALG_DEFAULT: number;
   crypto_secretbox_KEYBYTES: number;
+  crypto_box_PUBLICKEYBYTES: number;
+  crypto_box_SECRETKEYBYTES: number;
 };
 
 const handler = {
@@ -203,6 +231,10 @@ const handler = {
       return sodium.crypto_pwhash_ALG_DEFAULT;
     } else if (prop === "crypto_secretbox_KEYBYTES") {
       return sodium.crypto_secretbox_KEYBYTES;
+    } else if (prop === "crypto_box_PUBLICKEYBYTES") {
+      return sodium.crypto_box_PUBLICKEYBYTES;
+    } else if (prop === "crypto_box_SECRETKEYBYTES") {
+      return sodium.crypto_box_SECRETKEYBYTES;
     }
     // @ts-ignore
     return Reflect.get(...arguments);

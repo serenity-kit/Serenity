@@ -13,6 +13,8 @@ export async function getSessionIncludingUser({ sessionKey }: Params) {
       user: true,
     },
   });
+  console.log("Getting session data:");
+  console.log({ session });
   if (session?.expiresAt && session.expiresAt < new Date()) {
     return null;
   }

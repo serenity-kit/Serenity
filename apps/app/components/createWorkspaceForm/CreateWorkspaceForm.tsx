@@ -18,7 +18,6 @@ import { Device } from "../../types/Device";
 
 type DeviceWorkspaceKeyBoxParams = {
   deviceSigningPublicKey: string;
-  nonce: string;
   ciphertext: string;
 };
 
@@ -72,13 +71,12 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       return deviceWorkspaceKeyBoxes;
     }
     for await (const device of allDevices) {
-      const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+      const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
         deviceEncryptionPublicKey: device.encryptionPublicKey,
       });
       deviceWorkspaceKeyBoxes.push({
         deviceSigningPublicKey: device.signingPublicKey,
         ciphertext,
-        nonce,
       });
     }
     return deviceWorkspaceKeyBoxes;

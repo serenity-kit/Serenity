@@ -8,7 +8,6 @@ export const AttachDeviceToWorkspaceInput = inputObjectType({
   definition(t) {
     t.nonNull.string("workspaceId");
     t.nonNull.string("signingPublicKey");
-    t.nonNull.string("nonce");
     t.nonNull.string("ciphertext");
   },
 });
@@ -44,9 +43,6 @@ export const attachDeviceToWorkspaceMutation = mutationField(
           "Invalid input: signingPublicKey cannot be null"
         );
       }
-      if (!args.input.nonce) {
-        throw new UserInputError("Invalid input: nonce cannot be null");
-      }
       if (!args.input.ciphertext) {
         throw new UserInputError("Invalid input: ciphertext cannot be null");
       }
@@ -54,7 +50,6 @@ export const attachDeviceToWorkspaceMutation = mutationField(
         userId: context.user.id,
         signingPublicKey: args.input.signingPublicKey,
         workspaceId: args.input.workspaceId,
-        nonce: args.input.nonce,
         ciphertext: args.input.ciphertext,
       });
       return { workspaceKey };

@@ -41,6 +41,8 @@ export async function verifyRegistration({
           info: JSON.stringify({ type: "main" }),
         },
       });
+      console.log(`verifying registration for user ${username}`);
+      console.log({ device });
 
       const user = await prisma.user.create({
         data: {

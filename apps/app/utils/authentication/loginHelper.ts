@@ -36,6 +36,7 @@ export const login = async ({
   finishLoginMutation,
   updateAuthentication,
 }: LoginParams) => {
+  await updateAuthentication(null);
   const message = await startLogin(password);
   const startLoginResult = await startLoginMutation({
     input: {
@@ -66,6 +67,8 @@ export const login = async ({
     sessionKey: result.sessionKey,
     expiresAt: finishLoginResult.data.finishLogin.expiresAt,
   });
+  console.log("Logging in...");
+  console.log({ result });
   return result;
 };
 
@@ -83,6 +86,10 @@ export const fetchMainDevice = async ({
       requestPolicy: "network-only",
     })
     .toPromise();
+  console.log({ mainDeviceResult });
+  if (mainDeviceResult.error) {
+    throw new Error(mainDeviceResult.error.message);
+  }
   if (!mainDeviceResult.data?.mainDevice) {
     throw new Error("Failed to fetch main device.");
   }
@@ -93,6 +100,8 @@ export const fetchMainDevice = async ({
     nonce: mainDevice.nonce,
     exportKey,
   });
+  console.log("main device private keys:");
+  console.log({ privateKeys });
   setMainDevice({
     encryptionPrivateKey: privateKeys.encryptionPrivateKey,
     signingPrivateKey: privateKeys.signingPrivateKey,

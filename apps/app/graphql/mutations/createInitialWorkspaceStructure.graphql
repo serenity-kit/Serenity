@@ -17,7 +17,6 @@ mutation createInitialWorkspaceStructure(
           id
           workspaceKeyId
           deviceSigningPublicKey
-          nonce
           ciphertext
         }
       }

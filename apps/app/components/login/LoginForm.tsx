@@ -51,6 +51,36 @@ export function LoginForm(props: Props) {
   const [, createDeviceMutation] = useCreateDeviceMutation();
   const urqlClient = useClient();
 
+  const storeDeviceKeys = async () => {
+    if (Platform.OS === "web") {
+      if (useExtendedLogin) {
+        const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
+          await createWebDevice();
+        const deviceInfoJson = {
+          type: "web",
+          os: browser?.os,
+          osVersion: null,
+          browser: browser?.name,
+          browserVersion: browser?.version,
+        };
+        const deviceInfo = JSON.stringify(deviceInfoJson);
+        const newDeviceInfo = {
+          ...webDevice,
+          info: deviceInfo,
+        };
+        await createDeviceMutation({
+          input: newDeviceInfo,
+        });
+      } else {
+        await removeWebDevice();
+      }
+    } else if (Platform.OS === "ios") {
+      if (useExtendedLogin) {
+        await registerNewDevice();
+      }
+    }
+  };
+
   const onFormFilled = (username: string, password: string) => {
     if (props.onFormFilled) {
       props.onFormFilled();
@@ -91,33 +121,7 @@ export function LoginForm(props: Props) {
       const exportKey = loginResult.exportKey;
       // reset the password in case the user ends up on this screen again
       await fetchMainDevice({ urqlClient, exportKey });
-      if (Platform.OS === "web") {
-        if (useExtendedLogin) {
-          const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
-            await createWebDevice();
-          const deviceInfoJson = {
-            type: "web",
-            os: browser?.os,
-            osVersion: null,
-            browser: browser?.name,
-            browserVersion: browser?.version,
-          };
-          const deviceInfo = JSON.stringify(deviceInfoJson);
-          const newDeviceInfo = {
-            ...webDevice,
-            info: deviceInfo,
-          };
-          await createDeviceMutation({
-            input: newDeviceInfo,
-          });
-        } else {
-          await removeWebDevice();
-        }
-      } else if (Platform.OS === "ios") {
-        if (useExtendedLogin) {
-          await registerNewDevice();
-        }
-      }
+      await storeDeviceKeys();
       setPassword("");
       setUsername("");
       setIsLoggingIn(false);

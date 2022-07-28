@@ -78,7 +78,6 @@ const getWorkspace = async ({
             id
             workspaceKeyId
             deviceSigningPublicKey
-            nonce
             ciphertext
           }
         }
@@ -107,7 +106,6 @@ test("user should be able to get a workspace by id", async () => {
   expect(workspace.currentWorkspaceKey.workspaceKeyBoxes.length).toBe(1);
   const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBoxes[0];
   expect(workspaceKeyBox.deviceSigningPublicKey).toBe(device.signingPublicKey);
-  expect(typeof workspaceKeyBox.nonce).toBe("string");
   expect(typeof workspaceKeyBox.ciphertext).toBe("string");
   expect(workspaceKeyBox.workspaceKeyId).toBe(workspace.currentWorkspaceKey.id);
 });
@@ -126,7 +124,6 @@ test("user should get a workspace without providing an id", async () => {
   expect(workspace.currentWorkspaceKey.workspaceKeyBoxes.length).toBe(1);
   const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBoxes[0];
   expect(workspaceKeyBox.deviceSigningPublicKey).toBe(device.signingPublicKey);
-  expect(typeof workspaceKeyBox.nonce).toBe("string");
   expect(typeof workspaceKeyBox.ciphertext).toBe("string");
   expect(workspaceKeyBox.workspaceKeyId).toBe(workspace.currentWorkspaceKey.id);
 });

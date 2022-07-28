@@ -175,7 +175,6 @@ model WorkspaceKeyBox {
   workspaceKey           WorkspaceKey @relation(fields: [workspaceKeyId], references: [id], onDelete: Cascade)
   workspaceKeyId         String
   deviceSigningPublicKey String
-  nonce                  String
   ciphertext             String
 }
 

@@ -60,18 +60,19 @@ export default function WorkspaceRootScreen(
       console.log("main device doesn't have an encryption private key!");
       return;
     }
+    console.log("attemtping to decrypt workspace box");
+    console.log({ mainDeviceWorkspaceBox });
     const aeadKey = await decryptAeadkey({
+      deviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
       deviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
-      nonce: mainDeviceWorkspaceBox.nonce,
       ciphertext: mainDeviceWorkspaceBox.ciphertext,
     });
-    const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+    const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
       deviceEncryptionPublicKey: device.encryptionPublicKey,
       aeadKey,
     });
     await attatchDeviceToWorkspace({
       input: {
-        nonce,
         ciphertext,
         signingPublicKey: device.signingPublicKey,
         workspaceId,

@@ -22,11 +22,13 @@ export const mainDeviceQuery = queryField((t) => {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-
+      console.log(`fetching main device for user ${context.user.username}`);
+      console.log({ user: context.user });
       const device = await getDeviceBySigningPublicKey({
         userId: context.user.id,
         signingPublicKey: context.user.mainDeviceSigningPublicKey,
       });
+      console.log({ device });
 
       return {
         ciphertext: context.user.mainDeviceCiphertext,

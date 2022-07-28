@@ -9,7 +9,6 @@ import { v4 as uuidv4 } from "uuid";
 
 export type DeviceWorkspaceKeyBoxParams = {
   deviceSigningPublicKey: string;
-  nonce: string;
   ciphertext: string;
 };
 

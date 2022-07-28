@@ -1,9 +1,6 @@
 import { gql } from "graphql-request";
 import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
-import sodium, {
-  crypto_aead_xchacha20poly1305_ietf_keygen,
-  crypto_secretbox_easy,
-} from "@serenity-tools/libsodium";
+import sodium from "@serenity-tools/libsodium";
 import { createAeadKeyAndCipherTextForDevice } from "../device/createAeadKeyAndCipherTextForDevice";
 
 type Params = {
@@ -36,7 +33,7 @@ export const createInitialWorkspaceStructure = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+  const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
     deviceEncryptionPublicKey,
   });
   const query = gql`
@@ -59,7 +56,6 @@ export const createInitialWorkspaceStructure = async ({
               id
               workspaceKeyId
               deviceSigningPublicKey
-              nonce
               ciphertext
             }
           }
@@ -99,7 +95,6 @@ export const createInitialWorkspaceStructure = async ({
         deviceWorkspaceKeyBoxes: [
           {
             deviceSigningPublicKey,
-            nonce,
             ciphertext,
           },
         ],
