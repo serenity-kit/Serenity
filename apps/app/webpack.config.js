@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const createExpoWebpackConfigAsync = require("@expo/webpack-config");
+const webpack = require("webpack");
 
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath);
@@ -30,7 +31,7 @@ module.exports = async function (env, argv) {
     config.resolve.extensions.unshift(".electron.ts");
   }
 
-  console.log(config);
+  config.plugins.push(new webpack.EnvironmentPlugin({ IS_E2E_TEST: false }));
 
   return config;
 };

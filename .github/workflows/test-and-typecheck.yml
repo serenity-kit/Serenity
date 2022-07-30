@@ -39,3 +39,28 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Test
         run: yarn prettier:check
+  e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .env
+        run: cp apps/backend/.env.example apps/backend/.env
+      - name: Run Database
+        run: docker-compose up -d
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Build backend
+        run: yarn workspace backend build
+      - name: Run backend
+        run: yarn workspace backend start:e2e &
+      - name: Build frontend
+        run: yarn workspace serenity build:web:e2e
+      - name: Run frontend
+        run: yarn workspace serenity start:e2e &
+      - name: Sleep for 5 seconds
+        run: sleep 5s
+        shell: bash
+      - name: Run e2e tests
+        run: yarn workspace backend test:e2e

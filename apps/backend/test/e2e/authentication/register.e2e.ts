@@ -1,11 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { prisma } from "../../../src/database/prisma";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
-import deleteAllRecords from "../../helpers/deleteAllRecords";
-
-test.beforeAll(async () => {
-  await deleteAllRecords();
-});
 
 test("Register", async ({ page }) => {
   const username = "usera9c9322313e2@example.com";
@@ -23,7 +18,9 @@ test("Register", async ({ page }) => {
   await page.locator('[placeholder="Enter your password …"]').fill(password);
 
   // Click "i agree" checkbox
-  await page.locator("div > div:nth-child(2) > .css-view-1dbjc4n").click();
+  await page
+    .locator('[aria-label="This is the terms and condition checkbox"] >> nth=1')
+    .click();
 
   // Click "register button"
   await page.locator('div[role="button"]:has-text("Register")').click();

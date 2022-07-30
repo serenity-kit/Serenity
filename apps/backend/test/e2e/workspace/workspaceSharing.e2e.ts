@@ -1,13 +1,8 @@
 import { test, expect, Page } from "@playwright/test";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
-import deleteAllRecords from "../../helpers/deleteAllRecords";
 import { v4 as uuidv4 } from "uuid";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { prisma } from "../../../src/database/prisma";
-
-test.beforeAll(async () => {
-  await deleteAllRecords();
-});
 
 type LoginOnPageProps = { page: Page; username: string; password: string };
 const loginOnPage = async ({ page, username, password }: LoginOnPageProps) => {
@@ -48,7 +43,9 @@ const registerOnPage = async ({
   await page.locator('[placeholder="Enter your password …"]').fill(password);
 
   // Click "i agree" checkbox
-  await page.locator("div > div:nth-child(2) > .css-view-1dbjc4n").click();
+  await page
+    .locator('[aria-label="This is the terms and condition checkbox"] >> nth=1')
+    .click();
 
   // Click "register button"
   await page.locator('div[role="button"]:has-text("Register")').click();
@@ -144,7 +141,6 @@ test.describe("Workspace Sharing", () => {
     const linkInfoText = await linkInfoDiv.inputValue();
     // parse url and store into variable
     const linkInfoWords = linkInfoText.split(" ");
-    console.log("HHHHH", linkInfoWords);
     workspaceInvitationUrl = linkInfoWords[linkInfoWords.length - 1];
     // expect there to be one invitation in the list
     const numInvitations = await page

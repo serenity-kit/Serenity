@@ -1,12 +1,7 @@
 import { test, expect } from "@playwright/test";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
-import deleteAllRecords from "../../helpers/deleteAllRecords";
 import { v4 as uuidv4 } from "uuid";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
-
-test.beforeAll(async () => {
-  await deleteAllRecords();
-});
 
 test("Login without remembering web keys", async ({ page }) => {
   const userId = uuidv4();
