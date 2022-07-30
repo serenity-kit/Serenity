@@ -52,11 +52,13 @@ export default async function createServer() {
   });
   await apolloServer.start();
 
-  // on staging we also want the dev setup to be able to connect
+  // Note: on staging we also want the dev setup to be able to connect
   const allowedList = [
-    "http://localhost:19006",
-    "https://www.serenity.li",
-    "http://localhost:4000",
+    "https://www.serenity.li", // production web app
+    "http://localhost:19006", // development web app
+    "http://localhost:3000", // e2e web app
+    "http://localhost:4000", // needed for GraphiQL in development
+    "http://localhost:4001", // needed for GraphiQL in e2e
   ];
   const allowedOrigin = (origin, callback) => {
     if (allowedList.indexOf(origin) !== -1 || !origin) {

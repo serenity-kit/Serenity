@@ -8,12 +8,12 @@ test.beforeAll(async () => {
 });
 
 test("Register", async ({ page }) => {
-  const username = "user1@example.com";
+  const username = "usera9c9322313e2@example.com";
   const password = "password";
   const workspaceName = "my workspace";
 
   // Go to registration url
-  await page.goto("http://localhost:19006/register");
+  await page.goto("http://localhost:3000/register");
   await delayForSeconds(2);
 
   // Fill username
@@ -35,7 +35,7 @@ test("Register", async ({ page }) => {
   });
   expect(unverifiedUser).not.toBe(null);
   const confirmationCode = unverifiedUser?.confirmationCode || "";
-  const confirmRegistrationUrl = `http://localhost:19006/registration-verification?username=${encodeURIComponent(
+  const confirmRegistrationUrl = `http://localhost:3000/registration-verification?username=${encodeURIComponent(
     username
   )}&verification=${encodeURIComponent(confirmationCode)}`;
 
@@ -52,7 +52,7 @@ test("Register", async ({ page }) => {
       'text=Verify your EmailPlease enter the verification code sent to you via Email.Verifi >> div[role="button"]'
     )
     .click();
-  await expect(page).toHaveURL("http://localhost:19006/onboarding");
+  await expect(page).toHaveURL("http://localhost:3000/onboarding");
 
   // Fill in the new workspace name
   await page
@@ -93,6 +93,6 @@ test("Register", async ({ page }) => {
   const documentId = document?.id;
   // TODO: get the workspace id and expect URL to match
   await expect(page).toHaveURL(
-    `http://localhost:19006/workspace/${workspaceId}/page/${documentId}`
+    `http://localhost:3000/workspace/${workspaceId}/page/${documentId}`
   );
 });

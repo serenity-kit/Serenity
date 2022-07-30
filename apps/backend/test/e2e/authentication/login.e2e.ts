@@ -18,7 +18,7 @@ test("Login without remembering web keys", async ({ page }) => {
     password,
   });
 
-  await page.goto("http://localhost:19006/login");
+  await page.goto("http://localhost:3000/login");
 
   // Fill username input
   await page
@@ -38,6 +38,6 @@ test("Login without remembering web keys", async ({ page }) => {
   await page.locator('div[role="button"]:has-text("Log in")').click();
   delayForSeconds(2);
   await expect(page).toHaveURL(
-    `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
+    `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
   );
 });

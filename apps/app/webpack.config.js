@@ -30,5 +30,7 @@ module.exports = async function (env, argv) {
     config.resolve.extensions.unshift(".electron.ts");
   }
 
+  console.log(config);
+
   return config;
 };

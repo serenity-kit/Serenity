@@ -60,7 +60,7 @@ const registerOnPage = async ({
   });
   expect(unverifiedUser).not.toBe(null);
   const confirmationCode = unverifiedUser?.confirmationCode || "";
-  const confirmRegistrationUrl = `http://localhost:19006/registration-verification?username=${encodeURIComponent(
+  const confirmRegistrationUrl = `http://localhost:3000/registration-verification?username=${encodeURIComponent(
     username
   )}&verification=${encodeURIComponent(confirmationCode)}`;
 
@@ -87,7 +87,7 @@ const createFirstWorkspace = async ({
   page,
   workspaceName,
 }: CreateFirstWorkspaceProps) => {
-  await expect(page).toHaveURL("http://localhost:19006/onboarding");
+  await expect(page).toHaveURL("http://localhost:3000/onboarding");
   // Fill in the new workspace name
   await page
     .locator(
@@ -115,20 +115,20 @@ test.describe("Workspace Sharing", () => {
     sharedWorkspaceId = workspace.id;
     await delayForSeconds(2);
     // const workspaceName = "sharable";
-    // await page.goto("http://localhost:19006/register");
+    // await page.goto("http://localhost:3000/register");
     // await registerOnPage({ page, username, password, workspaceName });
-    await page.goto("http://localhost:19006/login");
+    await page.goto("http://localhost:3000/login");
     await loginOnPage({ page, username, password });
     await delayForSeconds(2);
     await expect(page).toHaveURL(
-      `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
+      `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
     );
 
     // click on workspace settings
     await page.locator("text=Settings").click();
     delayForSeconds(2);
     await expect(page).toHaveURL(
-      `http://localhost:19006/workspace/${workspace.id}/settings`
+      `http://localhost:3000/workspace/${workspace.id}/settings`
     );
 
     // click "create invitation"
@@ -144,6 +144,7 @@ test.describe("Workspace Sharing", () => {
     const linkInfoText = await linkInfoDiv.inputValue();
     // parse url and store into variable
     const linkInfoWords = linkInfoText.split(" ");
+    console.log("HHHHH", linkInfoWords);
     workspaceInvitationUrl = linkInfoWords[linkInfoWords.length - 1];
     // expect there to be one invitation in the list
     const numInvitations = await page
@@ -154,7 +155,7 @@ test.describe("Workspace Sharing", () => {
 
   test("Existing other user can accept workspace", async ({ page }) => {
     const userId = uuidv4();
-    const username = "user2@example.com";
+    const username = "userb7ce3e17@example.com";
     const password = "pass";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
@@ -162,11 +163,11 @@ test.describe("Workspace Sharing", () => {
       password,
     });
     await delayForSeconds(2);
-    await page.goto("http://localhost:19006/login");
+    await page.goto("http://localhost:3000/login");
     await loginOnPage({ page, username, password });
     await delayForSeconds(2);
     await expect(page).toHaveURL(
-      `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
+      `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
     );
     await page.goto(workspaceInvitationUrl);
     await delayForSeconds(2);
@@ -178,7 +179,7 @@ test.describe("Workspace Sharing", () => {
     const lastIndexOfSlash = pageUrl.lastIndexOf("/");
     const pageUrlStart = pageUrl.substring(0, lastIndexOfSlash + 1);
     expect(pageUrlStart).toBe(
-      `http://localhost:19006/workspace/${sharedWorkspaceId}/page/`
+      `http://localhost:3000/workspace/${sharedWorkspaceId}/page/`
     );
   });
 
@@ -201,7 +202,7 @@ test.describe("Workspace Sharing", () => {
     const lastIndexOfSlash = pageUrl.lastIndexOf("/");
     const pageUrlStart = pageUrl.substring(0, lastIndexOfSlash + 1);
     expect(pageUrlStart).toBe(
-      `http://localhost:19006/workspace/${sharedWorkspaceId}/page/`
+      `http://localhost:3000/workspace/${sharedWorkspaceId}/page/`
     );
   });
 
@@ -221,7 +222,7 @@ test.describe("Workspace Sharing", () => {
     const lastIndexOfSlash = pageUrl.lastIndexOf("/");
     const pageUrlStart = pageUrl.substring(0, lastIndexOfSlash + 1);
     expect(pageUrlStart).toBe(
-      `http://localhost:19006/workspace/${sharedWorkspaceId}/page/`
+      `http://localhost:3000/workspace/${sharedWorkspaceId}/page/`
     );
   });
 });
