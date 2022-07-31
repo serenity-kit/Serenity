@@ -7,6 +7,7 @@ import {
   Link,
   LabeledInput,
   LinkExternal,
+  InfoMessage,
 } from "@serenity-tools/ui";
 import {
   useFinishRegistrationMutation,
@@ -36,7 +37,7 @@ export default function RegisterForm(props: Props) {
 
   const onRegisterPress = async () => {
     if (!hasAcceptedTerms) {
-      setErrorMessage("Please accept the terms of service first.");
+      setErrorMessage("Please accept the terms of service.");
       return;
     }
     setErrorMessage("");
@@ -88,21 +89,26 @@ export default function RegisterForm(props: Props) {
           setPassword("");
           setUsername("");
         } else if (finishRegistrationResult.error) {
-          setErrorMessage("Failed to register.");
-          if (props.onRegisterFail) {
-            props.onRegisterFail();
+          if (
+            finishRegistrationResult.error.graphQLErrors[0].extensions.code ===
+            "EXPECTED_GRAPHQL_ERROR"
+          ) {
+            throw new Error(
+              finishRegistrationResult.error.graphQLErrors[0].message
+            );
+          } else {
+            throw new Error(
+              "Failed to register. Please try again or contact our support."
+            );
           }
-          throw new Error(errorMessage);
         }
       } else {
-        console.error(startRegistrationResult.error);
-        if (props.onRegisterFail) {
-          props.onRegisterFail();
-        }
-        throw new Error("Failed to register.");
+        throw new Error(
+          "Failed to register. Please try again or contact our support."
+        );
       }
     } catch (error) {
-      setErrorMessage(error.toString());
+      setErrorMessage(error.message);
       if (props.onRegisterFail) {
         props.onRegisterFail();
       }
@@ -111,12 +117,6 @@ export default function RegisterForm(props: Props) {
 
   return (
     <VStack space="5">
-      {errorMessage ? (
-        <View>
-          <Text>{errorMessage}</Text>
-        </View>
-      ) : null}
-
       <LabeledInput
         label={"Email"}
         keyboardType="email-address"
@@ -162,6 +162,12 @@ export default function RegisterForm(props: Props) {
           .
         </Text>
       </Checkbox>
+
+      {errorMessage ? (
+        <InfoMessage variant="error" icon>
+          {errorMessage}
+        </InfoMessage>
+      ) : null}
 
       <Button onPress={onRegisterPress} size="large">
         Register

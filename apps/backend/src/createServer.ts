@@ -1,4 +1,11 @@
-import { ApolloServer } from "apollo-server-express";
+import {
+  ApolloServer,
+  AuthenticationError,
+  UserInputError,
+  ForbiddenError,
+  ValidationError,
+  SyntaxError,
+} from "apollo-server-express";
 import {
   ApolloServerPluginLandingPageGraphQLPlayground,
   ApolloServerPluginLandingPageDisabled,
@@ -20,6 +27,7 @@ import {
   UpdateWithServerData,
 } from "@naisho/core";
 import { getSessionIncludingUser } from "./database/authentication/getSessionIncludingUser";
+import { ExpectedGraphqlError } from "./utils/expectedGraphqlError/expectedGraphqlError";
 
 export default async function createServer() {
   const apolloServer = new ApolloServer({
@@ -42,6 +50,20 @@ export default async function createServer() {
         }
       }
       return {};
+    },
+    formatError: (err) => {
+      if (
+        err.originalError instanceof AuthenticationError ||
+        err.originalError instanceof UserInputError ||
+        err.originalError instanceof ForbiddenError ||
+        err.originalError instanceof ValidationError ||
+        err.originalError instanceof SyntaxError ||
+        err.originalError instanceof ExpectedGraphqlError
+      ) {
+        return err;
+      }
+
+      return new Error("Internal server error");
     },
     mocks: process.env.MOCK_GRAPHQL
       ? {
