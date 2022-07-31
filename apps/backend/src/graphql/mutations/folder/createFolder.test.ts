@@ -151,7 +151,7 @@ test("Throw error when the parent folder doesn't exist", async () => {
         workspaceId: addedWorkspace.id,
         authorizationHeader,
       }))()
-  ).rejects.toThrow("Parent folder not found");
+  ).rejects.toThrowError(/FORBIDDEN/);
 });
 
 test("Throw error when user doesn't have access", async () => {

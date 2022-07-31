@@ -1,3 +1,4 @@
+import { ForbiddenError } from "apollo-server-express";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -17,7 +18,7 @@ export async function getDeviceBySigningPublicKey({
     },
   });
   if (!device) {
-    throw new Error("Device not found");
+    throw new ForbiddenError("Unauthorized");
   }
   return device;
 }

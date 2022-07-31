@@ -54,11 +54,13 @@ export default async function createServer() {
     formatError: (err) => {
       if (
         err.originalError instanceof AuthenticationError ||
-        err.originalError instanceof UserInputError ||
         err.originalError instanceof ForbiddenError ||
         err.originalError instanceof ValidationError ||
         err.originalError instanceof SyntaxError ||
-        err.originalError instanceof ExpectedGraphqlError
+        err.originalError instanceof ExpectedGraphqlError ||
+        // need to cover built in and manual thrown errors
+        err.originalError instanceof UserInputError ||
+        err instanceof UserInputError
       ) {
         return err;
       }

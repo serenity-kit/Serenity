@@ -82,7 +82,7 @@ test("throw error when folder doesn't exist", async () => {
         name,
         authorizationHeader,
       }))()
-  ).rejects.toThrow("Folder not found");
+  ).rejects.toThrow("Unauthorized");
 });
 
 test("throw error when user doesn't have access", async () => {

@@ -20,7 +20,7 @@ export async function updateDocumentName({ id, name, userId }: Params) {
         },
       });
       if (!document) {
-        throw new Error("Document not found");
+        throw new ForbiddenError("Unauthorized");
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {

@@ -318,7 +318,7 @@ test("retrieving a folder that doesn't exist throws an error", async () => {
   await expect(
     (async () =>
       await graphql.client.request(query, null, authorizationHeader))()
-  ).rejects.toThrow("Folder not found");
+  ).rejects.toThrow("Unauthorized");
 });
 
 test("listing documents that the user doesn't own throws an error", async () => {

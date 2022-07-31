@@ -84,13 +84,13 @@ describe("Input errors", () => {
         }))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
+
   test("Invalid message", async () => {
     const result = await requestLoginChallengeResponse({
       graphql,
       username,
       password,
     });
-
     const finishMessage = sodium.to_base64(
       result.login.finish(sodium.from_base64(result.data.challengeResponse))
     );
@@ -104,6 +104,7 @@ describe("Input errors", () => {
         }))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
+
   test("Invalid input", async () => {
     await expect(
       (async () =>
@@ -112,6 +113,7 @@ describe("Input errors", () => {
         }))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
+
   test("No input", async () => {
     await expect(
       (async () => await graphql.client.request(query, null))()

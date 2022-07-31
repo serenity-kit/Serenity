@@ -28,7 +28,7 @@ export async function getDocumentPath({ userId, id }: Params) {
         },
       });
       if (!document) {
-        throw new Error("Document not found");
+        throw new ForbiddenError("Unauthorized");
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
@@ -50,7 +50,7 @@ export async function getDocumentPath({ userId, id }: Params) {
         },
       });
       if (!parentFolder) {
-        throw new Error("Folder not found");
+        throw new ForbiddenError("Unauthorized");
       }
 
       // next let's build the folder tree up to this folder
