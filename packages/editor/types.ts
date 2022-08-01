@@ -4,6 +4,10 @@ export {};
 export type EditorBottombarState = {
   isBold: boolean;
   isItalic: boolean;
+  isCode: boolean;
+  isHeading1: boolean;
+  isHeading2: boolean;
+  isHeading3: boolean;
 };
 
 export type UpdateEditorParams =
@@ -12,6 +16,18 @@ export type UpdateEditorParams =
     }
   | {
       variant: "toggle-italic";
+    }
+  | {
+      variant: "toggle-code";
+    }
+  | {
+      variant: "toggle-heading-1";
+    }
+  | {
+      variant: "toggle-heading-2";
+    }
+  | {
+      variant: "toggle-heading-3";
     };
 
 export type UpdateEditor = (params: UpdateEditorParams) => void;
