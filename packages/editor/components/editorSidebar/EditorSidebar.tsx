@@ -124,7 +124,7 @@ export default function EditorSidebar({
         >
           <EditorSidebarIcon
             isActive={editor?.isActive("blockquote") || false}
-            name="question-mark"
+            name="question-mark" // TODO tbd
           />
           <Text variant="small" bold={editor?.isActive("blockquote") || false}>
             Blockquote
