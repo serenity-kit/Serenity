@@ -11,7 +11,7 @@ import {
 } from "y-protocols/awareness";
 import { UpdateEditorParams } from "./types";
 import { updateEditor } from "./updateEditor";
-import { getEditorToolbarStateFromEditor } from "./getEditorToolbarStateFromEditor";
+import { getEditorBottombarStateFromEditor } from "./getEditorBottombarStateFromEditor";
 
 const ydoc = new Y.Doc();
 window.ydoc = ydoc;
@@ -86,7 +86,7 @@ ReactDOM.render(
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
             type: "update-editor-toolbar-state",
-            content: getEditorToolbarStateFromEditor(editor),
+            content: getEditorBottombarStateFromEditor(editor),
           })
         );
       }}

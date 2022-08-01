@@ -1,7 +1,7 @@
 // needed to allow extending the global scope
 export {};
 
-export type EditorToolbarState = {
+export type EditorBottombarState = {
   isBold: boolean;
   isItalic: boolean;
 };

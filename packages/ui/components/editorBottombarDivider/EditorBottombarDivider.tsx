@@ -2,7 +2,7 @@ import React from "react";
 import { View as RNView, StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
 
-export type EditorToolbarDividerProps = RNView["props"] & {
+export type EditorBottombarDividerProps = RNView["props"] & {
   collapsed?: boolean;
 };
 
@@ -11,8 +11,8 @@ const styles = StyleSheet.create({
   collapsed: tw`mx-0`,
 });
 
-export const EditorToolbarDivider = React.forwardRef(function View(
-  props: EditorToolbarDividerProps,
+export const EditorBottombarDivider = React.forwardRef(function View(
+  props: EditorBottombarDividerProps,
   ref: React.Ref<RNView> | undefined
 ) {
   return (

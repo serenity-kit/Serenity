@@ -6,13 +6,13 @@ import { tw } from "../../tailwind";
 import { Pressable, PressableProps } from "../pressable/Pressable";
 import { Icon, IconNames } from "../icon/Icon";
 
-export type EditorToolbarButtonProps = PressableProps & {
+export type EditorBottombarButtonProps = PressableProps & {
   name: IconNames;
   isActive?: boolean;
 };
 
-export const EditorToolbarButton = forwardRef(
-  (props: EditorToolbarButtonProps, ref) => {
+export const EditorBottombarButton = forwardRef(
+  (props: EditorBottombarButtonProps, ref) => {
     const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
     const { name, isActive, ...rest } = props;
 

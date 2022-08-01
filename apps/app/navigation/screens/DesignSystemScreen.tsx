@@ -29,8 +29,8 @@ import {
   BoxShadowLevels,
   InfoMessage,
   ScrollSafeAreaView,
-  EditorToolbarButton,
-  EditorToolbarDivider,
+  EditorBottombarButton,
+  EditorBottombarDivider,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -52,15 +52,15 @@ export default function DesignSystemScreen() {
   return (
     <ScrollSafeAreaView style={tw`px-4 py-6`}>
       <HStack space={2} style={tw`mb-5`} alignItems="center">
-        <EditorToolbarButton name="arrow-down-s-line" />
-        <EditorToolbarButton name="text" />
-        <EditorToolbarButton name="list-unordered" />
-        <EditorToolbarDivider />
-        <EditorToolbarButton name="image-2-line" />
-        <EditorToolbarButton name="at-line" />
-        <EditorToolbarButton name="chat-1-line" />
-        <EditorToolbarDivider />
-        <EditorToolbarButton name="link" isActive />
+        <EditorBottombarButton name="arrow-down-s-line" />
+        <EditorBottombarButton name="text" />
+        <EditorBottombarButton name="list-unordered" />
+        <EditorBottombarDivider />
+        <EditorBottombarButton name="image-2-line" />
+        <EditorBottombarButton name="at-line" />
+        <EditorBottombarButton name="chat-1-line" />
+        <EditorBottombarDivider />
+        <EditorBottombarButton name="link" isActive />
       </HStack>
 
       <Text style={tw`mb-4 h2`}>Info Messages</Text>

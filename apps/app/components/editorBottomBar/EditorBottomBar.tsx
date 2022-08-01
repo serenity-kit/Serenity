@@ -1,42 +1,47 @@
 import React from "react";
-import { EditorToolbarButton, ScrollView, Text, tw } from "@serenity-tools/ui";
-import { EditorToolbarState, UpdateEditor } from "@serenity-tools/editor";
+import {
+  EditorBottombarButton,
+  ScrollView,
+  Text,
+  tw,
+} from "@serenity-tools/ui";
+import { EditorBottombarState, UpdateEditor } from "@serenity-tools/editor";
 import { HStack } from "native-base";
 
 export type EditorBottombarProps = {
   onUpdate: UpdateEditor;
-  editorToolbarState: EditorToolbarState;
+  editorBottombarState: EditorBottombarState;
 };
 
-export const editorToolbarHeight = 48;
+export const editorBottombarHeight = 48;
 
 export function EditorBottombar({
   onUpdate,
-  editorToolbarState,
+  editorBottombarState,
 }: EditorBottombarProps) {
   return (
     <ScrollView
       horizontal={true}
       style={[
         tw`flex flex-row flex-nowrap h-${
-          editorToolbarHeight / 4
+          editorBottombarHeight / 4
         } px-2.5 border-t border-gray-200`,
       ]}
     >
       <HStack space={2} alignItems="center">
-        <EditorToolbarButton
+        <EditorBottombarButton
           onPress={(event) => {
             onUpdate({ variant: "toggle-bold" });
           }}
           name="bold"
-          isActive={editorToolbarState.isBold}
+          isActive={editorBottombarState.isBold}
         />
-        <EditorToolbarButton
+        <EditorBottombarButton
           onPress={(event) => {
             onUpdate({ variant: "toggle-italic" });
           }}
           name="italic"
-          isActive={editorToolbarState.isItalic}
+          isActive={editorBottombarState.isItalic}
         />
 
         <Text>

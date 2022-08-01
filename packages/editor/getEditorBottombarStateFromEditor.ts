@@ -1,9 +1,9 @@
 import { Editor } from "@tiptap/core";
-import { EditorToolbarState } from "./types";
+import { EditorBottombarState } from "./types";
 
-export const getEditorToolbarStateFromEditor = (
+export const getEditorBottombarStateFromEditor = (
   editor: Editor
-): EditorToolbarState => {
+): EditorBottombarState => {
   return {
     isBold: editor.isActive("bold"),
     isItalic: editor.isActive("italic"),

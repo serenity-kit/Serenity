@@ -1,7 +1,7 @@
 import {
   Editor as SerenityEditor,
-  EditorToolbarState,
-  getEditorToolbarStateFromEditor,
+  EditorBottombarState,
+  getEditorBottombarStateFromEditor,
   updateEditor,
 } from "@serenity-tools/editor";
 import { View } from "@serenity-tools/ui";
@@ -11,10 +11,10 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { Editor as TipTapEditor } from "@tiptap/core";
 import {
   EditorBottombar,
-  editorToolbarHeight,
+  editorBottombarHeight,
 } from "../editorBottombar/EditorBottombar";
 import { EditorProps } from "./types";
-import { initialEditorToolbarState } from "./initialEditorToolbarState";
+import { initialEditorBottombarState } from "./initialEditorBottombarState";
 
 export default function Editor({
   yDocRef,
@@ -27,8 +27,8 @@ export default function Editor({
   const headerHeight = useHeaderHeight();
   const dimensions = useWindowDimensions();
   const [isFocused, setIsFocused] = useState(false);
-  const [editorToolbarState, setEditorToolbarState] =
-    useState<EditorToolbarState>(initialEditorToolbarState);
+  const [editorBottombarState, setEditorBottombarState] =
+    useState<EditorBottombarState>(initialEditorBottombarState);
   const tipTapEditorRef = useRef<TipTapEditor | null>(null);
 
   return (
@@ -36,7 +36,7 @@ export default function Editor({
       <View
         style={{
           height: isFocused
-            ? dimensions.height - editorToolbarHeight - headerHeight
+            ? dimensions.height - editorBottombarHeight - headerHeight
             : undefined,
         }}
       >
@@ -58,14 +58,14 @@ export default function Editor({
           }
           onCreate={(params) => (tipTapEditorRef.current = params.editor)}
           onTransaction={(params) => {
-            setEditorToolbarState(
-              getEditorToolbarStateFromEditor(params.editor)
+            setEditorBottombarState(
+              getEditorBottombarStateFromEditor(params.editor)
             );
           }}
         />
       </View>
       <EditorBottombar
-        editorToolbarState={editorToolbarState}
+        editorBottombarState={editorBottombarState}
         onUpdate={(params) => {
           if (tipTapEditorRef.current) {
             updateEditor(tipTapEditorRef.current, params);
