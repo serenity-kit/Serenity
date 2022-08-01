@@ -49,7 +49,14 @@ export function EditorBottombar({
             onUpdate({ variant: "toggle-code" });
           }}
           name="code-view"
-          isActive={editorBottombarState.isItalic}
+          isActive={editorBottombarState.isCode}
+        />
+        <EditorBottombarButton
+          onPress={(event) => {
+            onUpdate({ variant: "toggle-link" });
+          }}
+          name="link"
+          isActive={editorBottombarState.isLink}
         />
 
         <EditorBottombarDivider />
@@ -74,6 +81,44 @@ export function EditorBottombar({
           }}
           name="h-3"
           isActive={editorBottombarState.isHeading3}
+        />
+        <EditorBottombarButton
+          onPress={(event) => {
+            onUpdate({ variant: "toggle-code-block" });
+          }}
+          name="code-s-slash-line"
+          isActive={editorBottombarState.isCodeBlock}
+        />
+        <EditorBottombarButton
+          onPress={(event) => {
+            onUpdate({ variant: "toggle-blockquote" });
+          }}
+          name="question-mark" // TODO tbd
+          isActive={editorBottombarState.isBlockquote}
+        />
+
+        <EditorBottombarDivider />
+
+        <EditorBottombarButton
+          onPress={(event) => {
+            onUpdate({ variant: "toggle-bullet-list" });
+          }}
+          name="list-unordered"
+          isActive={editorBottombarState.isBulletList}
+        />
+        <EditorBottombarButton
+          onPress={(event) => {
+            onUpdate({ variant: "toggle-ordered-list" });
+          }}
+          name="list-ordered"
+          isActive={editorBottombarState.isOrderedList}
+        />
+        <EditorBottombarButton
+          onPress={(event) => {
+            onUpdate({ variant: "toggle-task-list" });
+          }}
+          name="list-check-2"
+          isActive={editorBottombarState.isTaskList}
         />
       </HStack>
     </ScrollView>
