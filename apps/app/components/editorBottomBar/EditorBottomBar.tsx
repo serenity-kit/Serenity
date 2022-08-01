@@ -3,17 +3,17 @@ import { EditorToolbarButton, ScrollView, Text, tw } from "@serenity-tools/ui";
 import { EditorToolbarState, UpdateEditor } from "@serenity-tools/editor";
 import { HStack } from "native-base";
 
-export type EditorBottomBarProps = {
+export type EditorBottombarProps = {
   onUpdate: UpdateEditor;
   editorToolbarState: EditorToolbarState;
 };
 
 export const editorToolbarHeight = 48;
 
-export function EditorBottomBar({
+export function EditorBottombar({
   onUpdate,
   editorToolbarState,
-}: EditorBottomBarProps) {
+}: EditorBottombarProps) {
   return (
     <ScrollView
       horizontal={true}

@@ -10,9 +10,9 @@ import { useWindowDimensions } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { Editor as TipTapEditor } from "@tiptap/core";
 import {
-  EditorBottomBar,
+  EditorBottombar,
   editorToolbarHeight,
-} from "../editorBottomBar/EditorBottomBar";
+} from "../editorBottombar/EditorBottombar";
 import { EditorProps } from "./types";
 import { initialEditorToolbarState } from "./initialEditorToolbarState";
 
@@ -49,7 +49,7 @@ export default function Editor({
           updateTitle={updateTitle}
           onFocus={() => setIsFocused(true)}
           onBlur={
-            // hack to avoid the EditorBottomBar to disappear before
+            // hack to avoid the EditorBottombar to disappear before
             // the click on it can be recognized
             () =>
               setTimeout(() => {
@@ -64,13 +64,13 @@ export default function Editor({
           }}
         />
       </View>
-      <EditorBottomBar
+      <EditorBottombar
         editorToolbarState={editorToolbarState}
         onUpdate={(params) => {
           if (tipTapEditorRef.current) {
             updateEditor(tipTapEditorRef.current, params);
             // cleanup hack for the onBlur hack to make sure the
-            // EditorBottomBar stays visible
+            // EditorBottombar stays visible
             setTimeout(() => {
               setIsFocused(true);
             }, 0);

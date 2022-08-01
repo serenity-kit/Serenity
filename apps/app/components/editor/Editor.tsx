@@ -18,9 +18,9 @@ import {
   encodeAwarenessUpdate,
 } from "y-protocols/awareness";
 import {
-  EditorBottomBar,
-  EditorBottomBarProps,
-} from "../editorBottomBar/EditorBottomBar";
+  EditorBottombar,
+  EditorBottombarProps,
+} from "../editorBottombar/EditorBottombar";
 import { EditorToolbarState, UpdateEditorParams } from "@serenity-tools/editor";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -35,17 +35,17 @@ import { initialEditorToolbarState } from "./initialEditorToolbarState";
 //   return { html };
 // }
 
-type BottomBarWrapperProps = EditorBottomBarProps & {
+type BottombarWrapperProps = EditorBottombarProps & {
   keyboardHeight: number;
   keyboardAnimationDuration: number;
 };
 
-const BottomBarWrapper = ({
+const BottombarWrapper = ({
   keyboardHeight,
   keyboardAnimationDuration,
   editorToolbarState,
   onUpdate,
-}: BottomBarWrapperProps) => {
+}: BottombarWrapperProps) => {
   const [bottom] = useState(new Animated.Value(0));
 
   console.log("keyboardHeight", keyboardHeight);
@@ -62,7 +62,7 @@ const BottomBarWrapper = ({
 
   return (
     <Animated.View style={{ bottom }}>
-      <EditorBottomBar
+      <EditorBottombar
         editorToolbarState={editorToolbarState}
         onUpdate={onUpdate}
       />
@@ -232,7 +232,7 @@ export default function Editor({
       />
 
       {isVisible && (
-        <BottomBarWrapper
+        <BottombarWrapper
           keyboardHeight={keyboardHeight}
           keyboardAnimationDuration={keyboardAnimationDuration}
           editorToolbarState={editorToolbarState}
