@@ -1,5 +1,6 @@
 import { prisma } from "../prisma";
 import { Workspace, formatWorkspace } from "../../types/workspace";
+import { ForbiddenError } from "apollo-server-express";
 
 type Params = {
   workspaceInvitationId: string;
@@ -22,7 +23,7 @@ export async function acceptWorkspaceInvitation({
       },
     });
     if (!workspaceInvitation) {
-      throw new Error("Workspace invitation not found");
+      throw new ForbiddenError("Unauthorized");
     }
     const workspaceId = workspaceInvitation.workspaceId;
     // check if this user already has access to this workspace

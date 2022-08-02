@@ -65,7 +65,7 @@ test("create a device", async () => {
         signingPublicKey,
         authorizationHeader,
       }))()
-  ).rejects.toThrow("Device not found");
+  ).rejects.toThrowError(/FORBIDDEN/);
 });
 
 test("user cannot delete a device that does'nt exist", async () => {

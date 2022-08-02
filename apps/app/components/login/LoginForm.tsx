@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { Button, LabeledInput, Text, View, Checkbox } from "@serenity-tools/ui";
+import {
+  Button,
+  LabeledInput,
+  Text,
+  Checkbox,
+  InfoMessage,
+} from "@serenity-tools/ui";
 import { Platform, useWindowDimensions } from "react-native";
 import { VStack } from "native-base";
 import {
@@ -127,7 +133,9 @@ export function LoginForm(props: Props) {
       }
     } catch (error) {
       console.error(error);
-      setGqlErrorMessage("Failed to login.");
+      setGqlErrorMessage(
+        "Failed to login due incorrect credentials or a network issue. Please try again."
+      );
       setIsLoggingIn(false);
       if (props.onLoginFail) {
         props.onLoginFail();
@@ -137,11 +145,6 @@ export function LoginForm(props: Props) {
 
   return (
     <VStack space="5">
-      {gqlErrorMessage !== "" && (
-        <View>
-          <Text>{gqlErrorMessage}</Text>
-        </View>
-      )}
       <LabeledInput
         label={"Email"}
         keyboardType="email-address"
@@ -174,6 +177,13 @@ export function LoginForm(props: Props) {
           </Text>
         </Checkbox>
       )}
+
+      {gqlErrorMessage !== "" ? (
+        <InfoMessage variant="error" icon>
+          {gqlErrorMessage}
+        </InfoMessage>
+      ) : null}
+
       <Button onPress={onLoginPress} size="large" disabled={isLoggingIn}>
         Log in
       </Button>

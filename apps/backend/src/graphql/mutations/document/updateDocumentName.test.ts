@@ -77,7 +77,7 @@ test("Throw error when document doesn't exist", async () => {
         name,
         authorizationHeader,
       }))()
-  ).rejects.toThrow("Document not found");
+  ).rejects.toThrowError(/FORBIDDEN/);
 });
 
 test("Throw error when user doesn't have access", async () => {

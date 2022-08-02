@@ -1,6 +1,7 @@
 import { prisma } from "../prisma";
 import * as sodium from "@serenity-tools/libsodium";
 import { Device } from "../../types/device";
+import { ExpectedGraphqlError } from "../../utils/expectedGraphqlError/expectedGraphqlError";
 
 type DeviceInput = Device & {
   ciphertext: string;
@@ -50,7 +51,9 @@ export async function finalizeRegistration({
         },
       });
       if (existingUserData) {
-        throw new Error("This username has already been registered");
+        throw new ExpectedGraphqlError(
+          "This email has already been registered."
+        );
       }
       const confirmationCode = await createConfirmationCode();
       const unverifiedUser = await prisma.unverifiedUser.create({

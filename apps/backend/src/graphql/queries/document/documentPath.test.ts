@@ -220,7 +220,7 @@ test("retrieving a document that doesn't exist should throw an error", async () 
         { id: "2bd63f0b-66f4-491c-8808-0a1de192cb67" },
         authorizationHeader
       ))()
-  ).rejects.toThrow("Document not found");
+  ).rejects.toThrowError(/FORBIDDEN/);
 });
 
 test("Unauthenticated", async () => {

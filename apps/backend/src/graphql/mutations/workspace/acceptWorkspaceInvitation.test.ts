@@ -91,7 +91,7 @@ test("invalid invitation id should throw error", async () => {
         workspaceInvitationId: "invalid",
         authorizationHeader: inviteeUserAndDevice.sessionKey,
       }))()
-  ).rejects.toThrow("Workspace invitation not found");
+  ).rejects.toThrowError(/FORBIDDEN/);
 });
 
 test("expired invitation id should throw error", async () => {
@@ -110,7 +110,7 @@ test("expired invitation id should throw error", async () => {
         workspaceInvitationId: "invalid",
         authorizationHeader: inviteeUserAndDevice.sessionKey,
       }))()
-  ).rejects.toThrow("Workspace invitation not found");
+  ).rejects.toThrowError(/FORBIDDEN/);
 });
 
 test("Unauthenticated", async () => {

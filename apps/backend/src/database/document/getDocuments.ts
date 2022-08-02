@@ -29,7 +29,7 @@ export async function getDocuments({
         },
       });
       if (!parentFolder) {
-        throw new Error("Folder not found");
+        throw new ForbiddenError("Unauthorized");
       }
       // then check if the user has access to the workspace
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({

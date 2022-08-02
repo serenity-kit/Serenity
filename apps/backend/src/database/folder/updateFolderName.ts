@@ -19,7 +19,7 @@ export async function updateFolderName({ id, name, userId }: Params) {
         },
       });
       if (!folder) {
-        throw new Error("Folder not found");
+        throw new ForbiddenError("Unauthorized");
       }
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {

@@ -43,7 +43,7 @@ export async function createFolder({
           },
         });
         if (!parentFolder) {
-          throw new Error("Parent folder not found");
+          throw new ForbiddenError("Unauthorized");
         }
         if (parentFolder.rootFolderId) {
           rootFolderId = parentFolder.rootFolderId;
