@@ -23,11 +23,8 @@ export function EditorBottombar({
   return (
     <ScrollView
       horizontal={true}
-      style={[
-        tw`flex flex-row flex-nowrap h-${
-          editorBottombarHeight / 4
-        } px-2.5 border-t border-gray-200`,
-      ]}
+      style={[tw`h-${editorBottombarHeight / 4} border-t border-gray-200`]}
+      contentContainerStyle={tw`px-2.5`} // needed here as it isn't handled correctly on the parent element
     >
       <HStack space={2} alignItems="center">
         <EditorBottombarButton
