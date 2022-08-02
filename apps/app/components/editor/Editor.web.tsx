@@ -4,7 +4,7 @@ import {
   getEditorBottombarStateFromEditor,
   updateEditor,
 } from "@serenity-tools/editor";
-import { View } from "@serenity-tools/ui";
+import { tw, View } from "@serenity-tools/ui";
 import { useRef, useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -32,7 +32,8 @@ export default function Editor({
   const tipTapEditorRef = useRef<TipTapEditor | null>(null);
 
   return (
-    <>
+    // needed so hidden elements with borders don't trigger scrolling behaviour
+    <View style={tw`flex-1 overflow-hidden`}>
       <View
         style={{
           height: isFocused
@@ -77,6 +78,6 @@ export default function Editor({
           }
         }}
       />
-    </>
+    </View>
   );
 }
