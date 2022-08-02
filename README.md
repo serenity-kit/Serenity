@@ -126,6 +126,27 @@ or
 yarn workspace @serenity-tools/libsodium test
 ```
 
+## End-to-end tests
+
+To develop the tests run
+
+```sh
+docker-compose up
+## in another tab run
+yarn workspace backend dev:e2e
+## in another tab run
+yarn workspace serenity dev:e2e
+## in another tab run
+yarn workspace backend test:e2e
+```
+
+The tests will use a separate database for the tests and a separate expo webpack server on http://localhost:3000/
+
+The tests on the CI run with production build. The commands are available in the Github Actions file.
+
+When writing e2e tests don't rely on generated CSS classes since they might be different on the production build which is used for running the e2e tests
+on the CI servers.
+
 ## Deploy
 
 Backend deployment icluding running migrations is done via Github Actions.

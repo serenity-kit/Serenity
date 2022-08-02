@@ -359,10 +359,13 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       };
 
       const setupWebsocket = () => {
-        const host =
-          process.env.NODE_ENV === "development"
-            ? "ws://localhost:4000"
-            : "wss://serenity-staging-api.herokuapp.com";
+        let host = "wss://serenity-staging-api.herokuapp.com";
+        if (process.env.NODE_ENV === "development") {
+          host = "ws://localhost:4000";
+        }
+        if (process.env.IS_E2E_TEST === "true") {
+          host = "ws://localhost:4001";
+        }
         const connection = new WebSocket(`${host}/${docId}`);
         // @ts-expect-error TODO handle later
         websocketConnectionRef.current = connection;

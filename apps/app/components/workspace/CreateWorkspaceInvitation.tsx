@@ -64,9 +64,11 @@ export function CreateWorkspaceInvitation(props: Props) {
       return;
     }
     const rootUrl =
-      process.env.NODE_ENV === "development"
-        ? "http://localhost:19006"
+      process.env.NODE_ENV === "development" ||
+      process.env.IS_E2E_TEST === "true"
+        ? `http://${window.location.host}`
         : "https://www.serenity.li";
+
     return `You are invited to a Serenity Workspace. To join, go to ${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}`;
   };
 

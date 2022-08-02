@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "yarn prisma migrate dev && ts-node-dev --transpile-only --no-notify ./src/index.ts",
+    "dev:e2e": "(export PORT=4001; export POSTGRES_URL=postgres://prisma:prisma@localhost:5432/serenity_e2e_tests; yarn prisma migrate dev && ts-node-dev --transpile-only --no-notify ./src/index.ts)",
     "dev:mock": "yarn && yarn prisma generate && MOCK_GRAPHQL=true ts-node-dev --transpile-only --no-notify ./src/index.ts",
     "clean": "rm -rf build",
     "build": "yarn && yarn clean && yarn prisma:prod:generate && yarn ncc build ./src/index.ts -o build --external \"@serenity-tools/opaque-server\" && yarn build:copy-externals",
@@ -13,9 +14,10 @@
     "prisma:prod:studio": "POSTGRES_URL=$POSTGRES_URL prisma studio",
     "prisma:test:studio": "POSTGRES_URL=postgres://prisma:prisma@localhost:5432/serenity_test prisma studio",
     "start:prod": "PORT=$PORT POSTGRES_URL=$POSTGRES_URL NODE_ENV=production node ./build",
+    "start:e2e": "export $(cat .e2e-tests.env | xargs) && yarn prisma migrate dev && node ./build",
     "ts:check": "yarn tsc --noEmit",
-    "test:e2e": "npx playwright test",
-    "test:e2e:headed": "npx playwright test --headed",
+    "test:e2e": "POSTGRES_URL=postgres://prisma:prisma@localhost:5432/serenity_e2e_tests npx playwright test",
+    "test:e2e:headed": "POSTGRES_URL=postgres://prisma:prisma@localhost:5432/serenity_e2e_tests npx playwright test --headed",
     "test": "jest --runInBand",
     "lint": "eslint --ext .tsx --ext .ts ./"
   },
@@ -41,6 +43,7 @@
     "@types/uuid": "^8.3.3",
     "@types/ws": "^8.2.1",
     "@vercel/ncc": "^0.34.0",
+    "dotenv": "^16.0.1",
     "graphql-request": "^4.2.0",
     "jest": "^28.1.1",
     "prisma": "^3.13.0",

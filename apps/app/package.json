@@ -9,10 +9,13 @@
     "dev": "yarn setup && API_URL=http://localhost:4000/graphql expo start --dev-client",
     "dev:speed": "API_URL=http://localhost:4000/graphql expo start --dev-client",
     "dev:staging": "yarn setup && expo start --dev-client",
+    "dev:e2e": "yarn setup && IS_E2E_TEST=true API_URL=http://localhost:4001/graphql expo start:web --port=3000",
     "dev:electron-web": "yarn setup && EXPO_ELECTRON_MODE=true expo start --web --dev-client",
     "dev:electron-main": "yarn && electron ./electron/main/index.ts",
     "build:graphql-types": "graphql-codegen --config codegen.yml",
     "build:web": "yarn setup && expo build:web --no-pwa && cp _redirects ./web-build/_redirects",
+    "build:web:e2e": "yarn setup && IS_E2E_TEST=true API_URL=http://localhost:4001/graphql expo build:web --no-pwa && cp _redirects ./web-build/_redirects",
+    "start:e2e": "yarn serve web-build --single -p 3000",
     "test": "echo TODO",
     "ts:check": "yarn tsc --noEmit",
     "lint": "eslint --ext .tsx --ext .ts ./"
@@ -97,6 +100,7 @@
     "jest-expo": "~44.0.1",
     "prettier": "2.6.2",
     "react-test-renderer": "17.0.1",
+    "serve": "^14.0.1",
     "typescript": "^4.6.3"
   },
   "private": true
