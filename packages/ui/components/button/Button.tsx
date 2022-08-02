@@ -187,7 +187,6 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
               </View>
               <Text
                 onLayout={(event) => {
-                  console.log("onLayout", event);
                   if (size === "small") {
                     setSpinnerSize({
                       scale: 0.5,
