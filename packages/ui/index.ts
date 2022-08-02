@@ -10,6 +10,8 @@ export * from "./components/box/Box";
 export * from "./components/boxShadow/BoxShadow";
 export * from "./components/button/Button";
 export * from "./components/checkbox/Checkbox";
+export * from "./components/editorBottombarButton/EditorBottombarButton";
+export * from "./components/editorBottombarDivider/EditorBottombarDivider";
 export * from "./components/inlineInput/InlineInput";
 export * from "./components/iconButton/IconButton";
 export * from "./components/infoMessage/InfoMessage";

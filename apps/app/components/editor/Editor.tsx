@@ -18,13 +18,16 @@ import {
   encodeAwarenessUpdate,
 } from "y-protocols/awareness";
 import {
-  EditorBottomBar,
-  EditorBottomBarProps,
-} from "../editorBottomBar/EditorBottomBar";
-import { EditorToolbarState, UpdateEditorParams } from "@serenity-tools/editor";
+  EditorBottombar,
+  EditorBottombarProps,
+} from "../editorBottombar/EditorBottombar";
+import {
+  EditorBottombarState,
+  UpdateEditorParams,
+} from "@serenity-tools/editor";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { initialEditorToolbarState } from "./initialEditorToolbarState";
+import { initialEditorBottombarState } from "./initialEditorBottombarState";
 
 // // TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
 // export async function loadEditorSourceForAndroid() {
@@ -35,17 +38,17 @@ import { initialEditorToolbarState } from "./initialEditorToolbarState";
 //   return { html };
 // }
 
-type BottomBarWrapperProps = EditorBottomBarProps & {
+type BottombarWrapperProps = EditorBottombarProps & {
   keyboardHeight: number;
   keyboardAnimationDuration: number;
 };
 
-const BottomBarWrapper = ({
+const BottombarWrapper = ({
   keyboardHeight,
   keyboardAnimationDuration,
-  editorToolbarState,
+  editorBottombarState,
   onUpdate,
-}: BottomBarWrapperProps) => {
+}: BottombarWrapperProps) => {
   const [bottom] = useState(new Animated.Value(0));
 
   console.log("keyboardHeight", keyboardHeight);
@@ -62,8 +65,8 @@ const BottomBarWrapper = ({
 
   return (
     <Animated.View style={{ bottom }}>
-      <EditorBottomBar
-        editorToolbarState={editorToolbarState}
+      <EditorBottombar
+        editorBottombarState={editorBottombarState}
         onUpdate={onUpdate}
       />
     </Animated.View>
@@ -109,8 +112,8 @@ export default function Editor({
     };
   }, []);
 
-  const [editorToolbarState, setEditorToolbarState] =
-    useState<EditorToolbarState>(initialEditorToolbarState);
+  const [editorBottombarState, setEditorBottombarState] =
+    useState<EditorBottombarState>(initialEditorBottombarState);
 
   // useEffect(() => {
   //   const initEditor = async () => {
@@ -197,7 +200,7 @@ export default function Editor({
             }
           }
           if (message.type === "update-editor-toolbar-state") {
-            setEditorToolbarState(message.content);
+            setEditorBottombarState(message.content);
           }
         }}
         // style={[tw`flex-auto bg-primary-200`]}
@@ -232,10 +235,10 @@ export default function Editor({
       />
 
       {isVisible && (
-        <BottomBarWrapper
+        <BottombarWrapper
           keyboardHeight={keyboardHeight}
           keyboardAnimationDuration={keyboardAnimationDuration}
-          editorToolbarState={editorToolbarState}
+          editorBottombarState={editorBottombarState}
           onUpdate={(params: UpdateEditorParams) => {
             webViewRef.current?.injectJavaScript(`
           window.updateEditor(\`${JSON.stringify(params)}\`);
