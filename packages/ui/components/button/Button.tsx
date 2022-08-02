@@ -78,9 +78,7 @@ const computeStyle = ({
 };
 
 export const Button = forwardRef((props: ButtonProps, ref) => {
-  const [spinnerPosition, setSpinnerPosition] = React.useState<null | {
-    x: number;
-    y: number;
+  const [spinnerSize, setSpinnerSize] = React.useState<null | {
     scale: number;
   }>(null);
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
@@ -125,7 +123,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
       wrapperStyle.size[size],
       wrapperStyle.variant[variant]
     ),
-    text: tw`text-center font-button`,
+    text: tw`text-center font-button leading-5`, // leading needed for centering text next to Spinner
   });
 
   return (
@@ -161,26 +159,45 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
             ]}
           >
             <View style={tw`flex flex-row justify-items-center`}>
-              <View style={tw`grow`} />
+              <View style={tw`grow items-end`}>
+                {isLoading && spinnerSize ? (
+                  // needed fixed width wrapper so scale calculation doesn't collide with flex
+                  // for readability: 20 => spinner default size, 4 => tw sizing base
+                  <View style={tw`w-${(spinnerSize.scale * 20) / 4}`}>
+                    <Spinner
+                      color={
+                        variant === "secondary"
+                          ? tw.color("gray-600")
+                          : undefined
+                      }
+                      fadeIn
+                      style={[
+                        tw`mr-${spinnerSize.scale * 8}`,
+                        {
+                          transform: [
+                            {
+                              scale: spinnerSize.scale,
+                            },
+                          ],
+                        },
+                      ]}
+                    />
+                  </View>
+                ) : null}
+              </View>
               <Text
                 onLayout={(event) => {
                   console.log("onLayout", event);
                   if (size === "small") {
-                    setSpinnerPosition({
-                      x: event.nativeEvent.layout.x - 28,
-                      y: event.nativeEvent.layout.y - 17,
+                    setSpinnerSize({
                       scale: 0.5,
                     });
                   } else if (size === "medium") {
-                    setSpinnerPosition({
-                      x: event.nativeEvent.layout.x - 32,
-                      y: event.nativeEvent.layout.y - 20,
+                    setSpinnerSize({
                       scale: 0.75,
                     });
                   } else {
-                    setSpinnerPosition({
-                      x: event.nativeEvent.layout.x - 36,
-                      y: event.nativeEvent.layout.y - 23,
+                    setSpinnerSize({
                       scale: 0.9,
                     });
                   }
@@ -192,22 +209,6 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
               </Text>
               <View style={tw`grow`} />
             </View>
-            {isLoading && spinnerPosition ? (
-              <Spinner
-                color={
-                  variant === "secondary" ? tw.color("gray-600") : undefined
-                }
-                fadeIn
-                style={[
-                  tw`absolute`,
-                  {
-                    left: spinnerPosition.x,
-                    top: spinnerPosition.y,
-                    transform: [{ scale: spinnerPosition.scale }],
-                  },
-                ]}
-              />
-            ) : null}
           </RnView>
         );
       }}
