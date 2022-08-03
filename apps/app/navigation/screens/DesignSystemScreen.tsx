@@ -221,6 +221,10 @@ export default function DesignSystemScreen() {
             animation: true,
             hideOnPress: true,
             delay: 0,
+            backgroundColor: tw.color("gray-900"),
+            opacity: 1,
+            containerStyle: tw`py-3 px-8`,
+            textStyle: tw`text-xs inter-regular`,
           });
         }}
       >
