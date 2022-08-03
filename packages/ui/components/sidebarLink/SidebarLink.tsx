@@ -32,7 +32,7 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
 
   const styles = StyleSheet.create({
     link: tw.style(Platform.OS === "web" && { outlineWidth: 0 }),
-    stack: tw.style(`flex px-4 py-1.5`), // flex needed for correct height calculation
+    stack: tw.style(`flex px-5 md:px-4 py-3 md:py-1.5`), // flex needed for correct height calculation
     hover: tw`bg-gray-200`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
