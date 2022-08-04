@@ -143,7 +143,6 @@ export default function WorkspaceRootScreen(
           },
         });
       } else {
-        console.log("first document not found");
         props.navigation.replace("WorkspaceNotFound");
       }
     })();
