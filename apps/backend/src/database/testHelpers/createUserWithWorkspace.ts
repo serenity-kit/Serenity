@@ -86,7 +86,7 @@ export default async function createUserWithWorkspace({
   const user = result.user;
   const device = result.device;
   const deviceEncryptionPublicKey = device.encryptionPublicKey;
-  const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+  const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
     deviceEncryptionPublicKey,
   });
   const createWorkspaceResult = await createInitialWorkspaceStructure({
@@ -102,7 +102,6 @@ export default async function createUserWithWorkspace({
     deviceWorkspaceKeyBoxes: [
       {
         deviceSigningPublicKey: device.signingPublicKey,
-        nonce,
         ciphertext,
       },
     ],
