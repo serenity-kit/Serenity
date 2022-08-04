@@ -61,6 +61,9 @@ export async function getFolder({ userId, id }: Params) {
               in: [rawFolder.rootFolderId],
             },
           },
+          orderBy: {
+            createdAt: "desc",
+          },
         });
         const rootFolder = await prisma.folder.findUnique({
           where: {

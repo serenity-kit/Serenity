@@ -51,7 +51,7 @@ export async function getDocuments({
         skip,
         take,
         orderBy: {
-          name: "asc",
+          createdAt: "desc",
         },
       });
 

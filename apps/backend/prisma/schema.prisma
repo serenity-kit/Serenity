@@ -171,6 +171,7 @@ model Folder {
   parentFolderId String?
   rootFolder     Folder?    @relation(name: "rootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
   rootFolderId   String?
+  createdAt      DateTime   @default(now())
   childFolders   Folder[]   @relation("parentFolder")
   descendent     Folder[]   @relation("rootFolder")
   documents      Document[]
