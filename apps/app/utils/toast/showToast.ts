@@ -1,4 +1,4 @@
-import { tw } from "../../tailwind";
+import { tw } from "@serenity-tools/ui";
 import Toast, { ToastOptions } from "react-native-root-toast";
 
 export const showToast = (message: string, options?: ToastOptions) => {
