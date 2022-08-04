@@ -94,6 +94,7 @@ export function LoginForm(props: Props) {
         startLoginMutation,
         finishLoginMutation,
         updateAuthentication,
+        urqlClient,
       });
       const exportKey = loginResult.exportKey;
       // reset the password in case the user ends up on this screen again

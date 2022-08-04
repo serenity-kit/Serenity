@@ -1,4 +1,10 @@
-import { MainDeviceQuery, MainDeviceDocument } from "../../generated/graphql";
+import {
+  MainDeviceQuery,
+  MainDeviceDocument,
+  MeQuery,
+  MeQueryVariables,
+  MeDocument,
+} from "../../generated/graphql";
 import { startLogin, finishLogin } from "@serenity-tools/opaque";
 import { decryptDevice } from "@serenity-tools/common";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
@@ -7,18 +13,16 @@ import { UpdateAuthenticationFunction } from "../../context/AuthenticationContex
 import { createAndSetDevice } from "../device/deviceStore";
 import { Platform } from "react-native";
 import { detect } from "detect-browser";
-import {
-  isUsernameSameAsLastLogin,
-  setLoggedInUsername,
-} from "./lastLoginStore";
+import { isUserIdSameAsLastLogin, setLoggedInUserId } from "./lastLoginStore";
 import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { v4 as uuidv4 } from "uuid";
 const browser = detect();
 
-const removeLastUsedWorkspaceIdIfLoginChanged = async (username: string) => {
-  const isLoginSame = await isUsernameSameAsLastLogin(username);
+const removeLastUsedWorkspaceIdIfLoginChanged = async (userId: string) => {
+  const isLoginSame = await isUserIdSameAsLastLogin(userId);
   if (!isLoginSame) {
     await removeLastUsedDocumentIdAndWorkspaceId();
-    await setLoggedInUsername(username);
+    await setLoggedInUserId(userId);
   }
 };
 
@@ -28,6 +32,7 @@ export type LoginParams = {
   startLoginMutation: any;
   finishLoginMutation: any;
   updateAuthentication: UpdateAuthenticationFunction;
+  urqlClient: Client;
 };
 export const login = async ({
   username,
@@ -35,6 +40,7 @@ export const login = async ({
   startLoginMutation,
   finishLoginMutation,
   updateAuthentication,
+  urqlClient,
 }: LoginParams) => {
   const message = await startLogin(password);
   const startLoginResult = await startLoginMutation({
@@ -60,12 +66,19 @@ export const login = async ({
   if (!finishLoginResult.data?.finishLogin) {
     throw new Error("Failed to finish login");
   }
-  // if the user has changed, remove the previous lastusedworkspaceId and lastUsedDocumentId
-  await removeLastUsedWorkspaceIdIfLoginChanged(username);
   await updateAuthentication({
     sessionKey: result.sessionKey,
     expiresAt: finishLoginResult.data.finishLogin.expiresAt,
   });
+  const meResult = await urqlClient
+    .query<MeQuery, MeQueryVariables>(MeDocument, undefined, {
+      // better to be safe here and always refetch
+      requestPolicy: "network-only",
+    })
+    .toPromise();
+  const userId = meResult.data?.me?.id || uuidv4();
+  // if the user has changed, remove the previous lastusedworkspaceId and lastUsedDocumentId
+  await removeLastUsedWorkspaceIdIfLoginChanged(userId);
   return result;
 };
 
