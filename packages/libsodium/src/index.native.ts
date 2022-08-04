@@ -184,6 +184,22 @@ export const crypto_box_seal_open = async (
   return base64ToUrlSafeBase64(result);
 };
 
+export const crypto_kdf_keygen = async (): Promise<string> => {
+  throw new Error("Not implemented");
+};
+
+export const crypto_kdf_derive_from_key = async (
+  subkey_len: number,
+  nonce: number,
+  context: string,
+  key: string
+): Promise<string> => {
+  if ([...context].length !== 8) {
+    throw new Error("crypto_kdf_derive_from_key context must be 8 bytes");
+  }
+  throw new Error("Not implemented");
+};
+
 export default {
   ready,
   to_base64,
@@ -201,6 +217,8 @@ export default {
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
+  crypto_kdf_keygen,
+  crypto_kdf_derive_from_key,
   crypto_secretbox_NONCEBYTES: sodium.crypto_secretbox_NONCEBYTES,
   crypto_secretbox_KEYBYTES: sodium.crypto_secretbox_KEYBYTES,
   crypto_pwhash_SALTBYTES: sodium.crypto_pwhash_SALTBYTES,
@@ -209,6 +227,7 @@ export default {
   crypto_pwhash_MEMLIMIT_INTERACTIVE: 67108864, // copied from the web version
   crypto_box_PUBLICKEYBYTES: sodium.crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES: sodium.crypto_box_SECRETKEYBYTES,
+  crypto_aead_xchacha20poly1305_ietf_KEYBYTES: 32, // copied from the web version
   base64_to_url_safe_base64: base64ToUrlSafeBase64,
   url_safe_base64_to_base64: urlSafeBase64ToBase64,
 };
