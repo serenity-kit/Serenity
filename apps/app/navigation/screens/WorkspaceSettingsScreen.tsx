@@ -147,7 +147,7 @@ export default function WorkspaceSettingsScreen(
         return;
       }
     })();
-  }, [urqlClient, props.navigation, getMe]);
+  }, [urqlClient, props.navigation]);
 
   const updateWorkspaceData = async (
     me: MeResult | null | undefined,
