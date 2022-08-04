@@ -28,10 +28,12 @@ const otherDocumentId = "929ca262-f144-40f7-8fe2-d3147f415f26";
 const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
   sessionKey = registerUserResult.sessionKey;
-
+  const device = registerUserResult.mainDevice;
   await createInitialWorkspaceStructure({
     workspaceName: "workspace 1",
     workspaceId: workspaceId,
+    deviceSigningPublicKey: device.signingPublicKey,
+    deviceEncryptionPublicKey: device.encryptionPublicKey,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",
@@ -81,10 +83,12 @@ const setup = async () => {
 
   const registerUserResult2 = await registerUser(graphql, username2, password);
   sessionKey2 = registerUserResult2.sessionKey;
-
+  const device2 = registerUserResult2.mainDevice;
   await createInitialWorkspaceStructure({
     workspaceName: "other user workspace",
     workspaceId: otherWorkspaceId,
+    deviceSigningPublicKey: device2.signingPublicKey,
+    deviceEncryptionPublicKey: device2.encryptionPublicKey,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",

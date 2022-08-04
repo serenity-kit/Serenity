@@ -26,7 +26,6 @@ import {
 import { useClient } from "urql";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { detect } from "detect-browser";
-import { removeDevice } from "../../utils/device/deviceStore";
 const browser = detect();
 
 type Props = {
@@ -39,7 +38,7 @@ type Props = {
 
 export function LoginForm(props: Props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  let defaultUseExtendedLogin = false;
+  let defaultUseExtendedLogin = true;
   if (Platform.OS === "ios") {
     defaultUseExtendedLogin = true;
   }
@@ -57,6 +56,36 @@ export function LoginForm(props: Props) {
   const [, finishLoginMutation] = useFinishLoginMutation();
   const [, createDeviceMutation] = useCreateDeviceMutation();
   const urqlClient = useClient();
+
+  const storeDeviceKeys = async () => {
+    if (Platform.OS === "web") {
+      if (useExtendedLogin) {
+        const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
+          await createWebDevice();
+        const deviceInfoJson = {
+          type: "web",
+          os: browser?.os,
+          osVersion: null,
+          browser: browser?.name,
+          browserVersion: browser?.version,
+        };
+        const deviceInfo = JSON.stringify(deviceInfoJson);
+        const newDeviceInfo = {
+          ...webDevice,
+          info: deviceInfo,
+        };
+        await createDeviceMutation({
+          input: newDeviceInfo,
+        });
+      } else {
+        await removeWebDevice();
+      }
+    } else if (Platform.OS === "ios") {
+      if (useExtendedLogin) {
+        await registerNewDevice();
+      }
+    }
+  };
 
   const onFormFilled = (username: string, password: string) => {
     if (props.onFormFilled) {
@@ -98,33 +127,7 @@ export function LoginForm(props: Props) {
       const exportKey = loginResult.exportKey;
       // reset the password in case the user ends up on this screen again
       await fetchMainDevice({ urqlClient, exportKey });
-      if (Platform.OS === "web") {
-        if (useExtendedLogin) {
-          const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
-            await createWebDevice();
-          const deviceInfoJson = {
-            type: "web",
-            os: browser?.os,
-            osVersion: null,
-            browser: browser?.name,
-            browserVersion: browser?.version,
-          };
-          const deviceInfo = JSON.stringify(deviceInfoJson);
-          const newDeviceInfo = {
-            ...webDevice,
-            info: deviceInfo,
-          };
-          await createDeviceMutation({
-            input: newDeviceInfo,
-          });
-        } else {
-          await removeWebDevice();
-        }
-      } else if (Platform.OS === "ios") {
-        if (useExtendedLogin) {
-          await registerNewDevice();
-        }
-      }
+      await storeDeviceKeys();
       setPassword("");
       setUsername("");
       setIsLoggingIn(false);

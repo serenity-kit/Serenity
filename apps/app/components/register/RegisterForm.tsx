@@ -19,6 +19,7 @@ import { VStack } from "native-base";
 import { createAndEncryptDevice } from "@serenity-tools/common";
 import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { storeUsernamePassword } from "../../utils/authentication/registrationMemoryStore";
+import { useAuthentication } from "../../context/AuthenticationContext";
 
 type Props = {
   pendingWorkspaceInvitationId?: string;
@@ -28,6 +29,7 @@ type Props = {
 
 export default function RegisterForm(props: Props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+  const { updateAuthentication } = useAuthentication();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
@@ -44,6 +46,7 @@ export default function RegisterForm(props: Props) {
     try {
       // TODO the getServerChallenge should include a signature of the challenge response and be verified that it belongs to
       // the server public to make sure it wasn't tampered with
+      await updateAuthentication(null);
       const challenge = await registerInitialize(password);
       const startRegistrationResult = await startRegistrationMutation({
         input: {
@@ -55,7 +58,6 @@ export default function RegisterForm(props: Props) {
         const { response, exportKey } = await finishRegistration(
           startRegistrationResult.data.startRegistration.challengeResponse
         );
-
         const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
           await createAndEncryptDevice(exportKey);
 
@@ -66,7 +68,6 @@ export default function RegisterForm(props: Props) {
           encryptionPublicKey: mainDevice.encryptionPublicKey,
           info: JSON.stringify({ type: "main" }),
         });
-
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
             message: response,

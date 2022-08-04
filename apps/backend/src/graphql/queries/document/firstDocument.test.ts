@@ -31,10 +31,12 @@ const query = gql`
 const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
   sessionKey = registerUserResult.sessionKey;
-
+  const device = registerUserResult.mainDevice;
   await createInitialWorkspaceStructure({
     workspaceName: "workspace 1",
     workspaceId: workspaceId,
+    deviceSigningPublicKey: device.signingPublicKey,
+    deviceEncryptionPublicKey: device.encryptionPublicKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,

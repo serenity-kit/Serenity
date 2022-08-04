@@ -54,6 +54,9 @@ export const registerUser = async (
   return {
     userId: verifyRegistrationResponse.verifyRegistration.id,
     mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
+    mainDevice: mainDevice,
+    encryptionPrivateKey,
+    signingPrivateKey,
     sessionKey,
   };
 };

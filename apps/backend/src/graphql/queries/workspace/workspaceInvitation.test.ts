@@ -24,6 +24,7 @@ test("should return a list of workspace invitations if they are admin", async ()
     id: workspaceId,
     username: inviter1Username,
   });
+  const device = inviterUserAndDevice1.device;
   const inviterUserAndDevice2 = await createUserWithWorkspace({
     id: otherWorkspaceId,
     username: inviter2Username,
@@ -31,6 +32,7 @@ test("should return a list of workspace invitations if they are admin", async ()
   const workspace = await getWorkspace({
     id: workspaceId,
     userId: inviterUserAndDevice1.user.id,
+    deviceSigningPublicKey: device.signingPublicKey,
   });
   if (!workspace) {
     throw new Error("workspace not found");

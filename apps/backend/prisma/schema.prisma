@@ -149,6 +149,7 @@ model Workspace {
   documents         Document[]
   usersToWorkspaces UsersToWorkspaces[]
   invitations       WorkspaceInvitations[]
+  workspaceKey      WorkspaceKey[]
 }
 
 model UsersToWorkspaces {
@@ -159,6 +160,22 @@ model UsersToWorkspaces {
   isAdmin     Boolean
 
   @@id([userId, workspaceId])
+}
+
+model WorkspaceKey {
+  id                String            @id @unique
+  workspaceKeyBoxes WorkspaceKeyBox[]
+  workspace         Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId       String
+  generation        Int               @default(0)
+}
+
+model WorkspaceKeyBox {
+  id                     String       @id @unique @default(uuid())
+  workspaceKey           WorkspaceKey @relation(fields: [workspaceKeyId], references: [id], onDelete: Cascade)
+  workspaceKeyId         String
+  deviceSigningPublicKey String
+  ciphertext             String
 }
 
 model Folder {

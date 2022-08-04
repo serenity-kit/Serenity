@@ -5,6 +5,14 @@ import { Document } from "../../types/document";
 import { Folder } from "../../types/folder";
 import { Workspace } from "../../types/workspace";
 
+export const DeviceWorkspaceKeyBoxInput = inputObjectType({
+  name: "DeviceWorkspaceKeyBoxInput",
+  definition(t) {
+    t.nonNull.string("deviceSigningPublicKey");
+    t.nonNull.string("ciphertext");
+  },
+});
+
 export const DocumentSnapshotPublicDataInput = inputObjectType({
   name: "DocumentSnapshotPublicDataInput",
   definition(t) {
@@ -35,6 +43,9 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
     t.nonNull.string("documentId");
     t.nonNull.string("documentName");
     t.nonNull.field("documentSnapshot", { type: DocumentSnapshotInput });
+    t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
+      type: DeviceWorkspaceKeyBoxInput,
+    });
   },
 });
 
@@ -91,6 +102,16 @@ export const createInitialWorkspaceStructureMutation = mutationField(
           "Invalid input: documentSnapshot cannot be null"
         );
       }
+      if (!args.input.deviceWorkspaceKeyBoxes) {
+        throw new UserInputError(
+          "Invalid input: deviceWorkspaceKeyBoxes cannot be netull"
+        );
+      }
+      if (args.input.deviceWorkspaceKeyBoxes.length <= 0) {
+        throw new UserInputError(
+          "Invalid input: deviceWorkspaceKeyBoxes cannot be empty"
+        );
+      }
       const workspaceStructure = await createInitialWorkspaceStructure({
         userId: context.user.id,
         workspaceId: args.input.workspaceId,
@@ -101,6 +122,7 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         documentId: args.input.documentId,
         documentName: args.input.documentName,
         documentSnapshot: args.input.documentSnapshot,
+        deviceWorkspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,
       });
       return workspaceStructure;
     },

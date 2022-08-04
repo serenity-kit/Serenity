@@ -7,19 +7,27 @@ import { gql } from "graphql-request";
 import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { Snapshot } from "@naisho/core";
+import { createAeadKeyAndCipherTextForDevice } from "../../../../test/helpers/device/createAeadKeyAndCipherTextForDevice";
 
 const graphql = setupGraphql();
 let userId1 = "";
 const username = "user";
 const password = "password";
 let sessionKey1 = "";
+let device: any = null;
+let encryptionPrivateKey = "";
+let signingPrivateKey = "";
 const documentId = uuidv4();
 let documentSnapshot: Snapshot;
 
 const setup = async () => {
   const registerUserResult1 = await registerUser(graphql, username, password);
+  registerUserResult1.mainDeviceSigningPublicKey;
   sessionKey1 = registerUserResult1.sessionKey;
   userId1 = registerUserResult1.userId;
+  device = registerUserResult1.mainDevice;
+  encryptionPrivateKey = registerUserResult1.encryptionPrivateKey;
+  signingPrivateKey = registerUserResult1.signingPrivateKey;
 
   // currently hard-coded until we enable e2e encryption per workspace
   const documentEncryptionKey = sodium.from_base64(
@@ -41,6 +49,7 @@ test("user can create initial workspace structure", async () => {
   const authorizationHeader = sessionKey1;
   const workspaceId = uuidv4();
   const workspaceName = "New Workspace";
+  const deviceSigningPublicKey = device.signingPublicKey;
   const folderId = uuidv4();
   const folderIdSignature = `TODO+${folderId}`;
   const folderName = "Getting started";
@@ -50,6 +59,8 @@ test("user can create initial workspace structure", async () => {
     graphql,
     workspaceId,
     workspaceName,
+    deviceSigningPublicKey,
+    deviceEncryptionPublicKey: device.encryptionPublicKey,
     folderId,
     folderIdSignature,
     folderName,
@@ -77,6 +88,7 @@ test("user can create initial workspace structure", async () => {
 test("Unauthenticated", async () => {
   const workspaceId = uuidv4();
   const workspaceName = "New Workspace";
+  const deviceSigningPublicKey = device.signingPublicKey;
   const folderId = uuidv4();
   const folderIdSignature = `TODO+${folderId}`;
   const folderName = "Getting started";
@@ -88,6 +100,8 @@ test("Unauthenticated", async () => {
         graphql,
         workspaceId,
         workspaceName,
+        deviceSigningPublicKey,
+        deviceEncryptionPublicKey: device.encryptionPublicKey,
         folderId,
         folderIdSignature,
         folderName,

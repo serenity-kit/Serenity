@@ -1,20 +1,26 @@
-import { useRoute } from "@react-navigation/native";
 import { Spinner, tw, View } from "@serenity-tools/ui";
 import { useEffect } from "react";
 import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
+import { useAuthentication } from "../../context/AuthenticationContext";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 import {
   FirstDocumentDocument,
   FirstDocumentQuery,
   FirstDocumentQueryVariables,
-  useWorkspaceQuery,
+  useAttachDeviceToWorkspaceMutation,
   WorkspaceDocument,
   WorkspaceQuery,
   WorkspaceQueryVariables,
 } from "../../generated/graphql";
+import { Device } from "../../types/Device";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+import { createAeadKeyAndCipherTextForDevice } from "../../utils/device/createAeadKeyAndCipherTextForDevice";
+import { decryptAeadkey } from "../../utils/device/decryptAeadKey";
+import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 export default function WorkspaceRootScreen(
   props: WorkspaceDrawerScreenProps<"WorkspaceRoot">
@@ -22,20 +28,88 @@ export default function WorkspaceRootScreen(
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const urqlClient = useClient();
   const workspaceId = useWorkspaceId();
+  const { sessionKey } = useAuthentication();
+  const [, attatchDeviceToWorkspace] = useAttachDeviceToWorkspaceMutation();
+
+  const doMainDeviceToAttachDeviceToWorkspace = async (device: Device) => {
+    if (!sessionKey) {
+      // TODO: handle a no session key error
+      console.log("No session key found!");
+      return;
+    }
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      // TODO: handle a no main device error
+      console.log("No main device found!");
+      return;
+    }
+    const mainDeviceWorkspaceDetails = await getWorkspace({
+      workspaceId,
+      deviceSigningPublicKey: mainDevice.signingPublicKey,
+      urqlClient,
+    });
+    if (!mainDeviceWorkspaceDetails?.currentWorkspaceKey?.workspaceKeyBox) {
+      // TODO: handle a no matching key boxes found error
+      console.log("No workspaceKeyBox found for mainDevice!");
+      return;
+    }
+    const mainDeviceWorkspaceBox =
+      mainDeviceWorkspaceDetails?.currentWorkspaceKey?.workspaceKeyBox;
+    if (!mainDevice.encryptionPrivateKey) {
+      // TODO: handle a no main device encryption private key
+      console.log("main device doesn't have an encryption private key!");
+      return;
+    }
+    const aeadKey = await decryptAeadkey({
+      deviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
+      deviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
+      ciphertext: mainDeviceWorkspaceBox.ciphertext,
+    });
+    const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
+      deviceEncryptionPublicKey: device.encryptionPublicKey,
+      aeadKey,
+    });
+    await attatchDeviceToWorkspace({
+      input: {
+        ciphertext,
+        signingPublicKey: device.signingPublicKey,
+        workspaceId,
+      },
+    });
+  };
 
   useEffect(() => {
     (async () => {
-      // check if the user has access to this workspace
+      const device = await getActiveDevice();
+      if (!device) {
+        // TODO: handle this error
+        console.error("No active device found");
+        return;
+      }
+      const deviceSigningPublicKey: string = device?.signingPublicKey;
       const workspaceResult = await urqlClient
         .query<WorkspaceQuery, WorkspaceQueryVariables>(
           WorkspaceDocument,
-          { id: workspaceId },
+          {
+            id: workspaceId,
+            deviceSigningPublicKey,
+          },
           { requestPolicy: "network-only" }
         )
         .toPromise();
       if (workspaceResult.data?.workspace === null) {
+        console.log("workspaceresult returned null workspace");
         props.navigation.replace("WorkspaceNotFound");
         return;
+      } else {
+        // check if this workspace has keys for this device
+        // if for example we are logging in with a new webDevice, we need
+        // to generate keys for this workspace
+        const workspace = workspaceResult.data?.workspace;
+        if (workspace?.currentWorkspaceKey?.workspaceKeyBox) {
+          // use the mainDevice to decrypt the aeadkey
+          await doMainDeviceToAttachDeviceToWorkspace(device);
+        }
       }
       const lastUsedDocumentId = await getLastUsedDocumentId(workspaceId);
       console.log({ lastUsedDocumentId });
@@ -71,7 +145,7 @@ export default function WorkspaceRootScreen(
         props.navigation.replace("WorkspaceNotFound");
       }
     })();
-  }, [urqlClient, props.navigation]);
+  }, [urqlClient, props.navigation, workspaceId]);
 
   return (
     <View style={tw`justify-center items-center flex-auto`}>

@@ -1,11 +1,14 @@
 import { gql } from "graphql-request";
 import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
+import { createAeadKeyAndCipherTextForDevice } from "../device/createAeadKeyAndCipherTextForDevice";
 
 type Params = {
   graphql: any;
   workspaceId: string;
   workspaceName: string;
+  deviceSigningPublicKey: string;
+  deviceEncryptionPublicKey: string;
   folderId: string;
   folderIdSignature: string;
   folderName: string;
@@ -18,6 +21,8 @@ export const createInitialWorkspaceStructure = async ({
   graphql,
   workspaceName,
   workspaceId,
+  deviceSigningPublicKey,
+  deviceEncryptionPublicKey,
   folderId,
   folderIdSignature,
   folderName,
@@ -28,6 +33,9 @@ export const createInitialWorkspaceStructure = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
+  const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
+    deviceEncryptionPublicKey,
+  });
   const query = gql`
     mutation createInitialWorkspaceStructure(
       $input: CreateInitialWorkspaceStructureInput!
@@ -39,6 +47,17 @@ export const createInitialWorkspaceStructure = async ({
           members {
             userId
             isAdmin
+          }
+          currentWorkspaceKey {
+            id
+            workspaceId
+            generation
+            workspaceKeyBox {
+              id
+              workspaceKeyId
+              deviceSigningPublicKey
+              ciphertext
+            }
           }
         }
         folder {
@@ -73,6 +92,12 @@ export const createInitialWorkspaceStructure = async ({
         documentId,
         documentName,
         documentSnapshot,
+        deviceWorkspaceKeyBoxes: [
+          {
+            deviceSigningPublicKey,
+            ciphertext,
+          },
+        ],
       },
     },
     authorizationHeaders

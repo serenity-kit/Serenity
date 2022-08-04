@@ -1,5 +1,27 @@
 import { inputObjectType, list, nonNull, objectType } from "nexus";
 
+export const WorkspaceKeyBox = objectType({
+  name: "WorkspaceKeyBox",
+  definition(t) {
+    t.nonNull.string("id");
+    t.nonNull.string("workspaceKeyId");
+    t.nonNull.string("deviceSigningPublicKey");
+    t.nonNull.string("ciphertext");
+  },
+});
+
+export const WorkspaceKey = objectType({
+  name: "WorkspaceKey",
+  definition(t) {
+    t.nonNull.string("id");
+    t.nonNull.string("workspaceId");
+    t.nonNull.int("generation");
+    t.field("workspaceKeyBox", {
+      type: WorkspaceKeyBox,
+    });
+  },
+});
+
 export const WorkspaceMember = objectType({
   name: "WorkspaceMember",
   definition(t) {
@@ -14,9 +36,11 @@ export const Workspace = objectType({
   definition(t) {
     t.nonNull.string("id");
     t.string("name");
-    t.list.nonNull.field("members", {
-      type: WorkspaceMember,
+    t.field("currentWorkspaceKey", {
+      type: WorkspaceKey,
     });
+    t.list.nonNull.field("workspaceKeys", { type: WorkspaceKey });
+    t.list.nonNull.field("members", { type: WorkspaceMember });
   },
 });
 

@@ -15,6 +15,7 @@ import { createSession } from "../authentication/createSession";
 import { addDays } from "../../utils/addDays/addDays";
 import { v4 as uuidv4 } from "uuid";
 import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
+import { createAeadKeyAndCipherTextForDevice } from "../../../test/helpers/device/createAeadKeyAndCipherTextForDevice";
 
 type Params = {
   id: string;
@@ -83,6 +84,11 @@ export default async function createUserWithWorkspace({
   });
 
   const user = result.user;
+  const device = result.device;
+  const deviceEncryptionPublicKey = device.encryptionPublicKey;
+  const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
+    deviceEncryptionPublicKey,
+  });
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
     workspaceId: id,
@@ -93,6 +99,12 @@ export default async function createUserWithWorkspace({
     documentId,
     documentName: "Introduction",
     documentSnapshot,
+    deviceWorkspaceKeyBoxes: [
+      {
+        deviceSigningPublicKey: device.signingPublicKey,
+        ciphertext,
+      },
+    ],
   });
 
   const login = new Login();
@@ -119,6 +131,7 @@ export default async function createUserWithWorkspace({
     ...result,
     session,
     sessionKey,
+    device,
     workspace: createWorkspaceResult.workspace,
     folder: createWorkspaceResult.folder,
     document: createWorkspaceResult.document,

@@ -14,7 +14,6 @@ export async function createWorkspaceInvitation({
   workspaceId,
   inviterUserId,
 }: Params) {
-  // check if the user has access to this workspace
   const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
     where: {
       userId: inviterUserId,

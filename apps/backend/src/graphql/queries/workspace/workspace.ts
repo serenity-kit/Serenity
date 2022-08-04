@@ -1,26 +1,33 @@
-import { idArg, queryField } from "nexus";
+import { nonNull, idArg, queryField, stringArg } from "nexus";
 import { prisma } from "../../../database/prisma";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
 import { getWorkspaces } from "../../../database/workspace/getWorkspaces";
 import { Workspace } from "../../types/workspace";
 import { WorkspaceMember } from "../../../types/workspace";
-import { AuthenticationError } from "apollo-server-express";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 
 export const workspaces = queryField((t) => {
   t.field("workspace", {
     type: Workspace,
     args: {
       id: idArg(),
+      deviceSigningPublicKey: nonNull(stringArg()),
     },
     async resolve(root, args, context) {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
+      }
+      if (!args.deviceSigningPublicKey) {
+        throw new UserInputError(
+          "Invalid input: deviceSigningPublicKey cannot be null"
+        );
       }
       const userId = context.user.id;
       if (args.id) {
         const workspace = await getWorkspace({
           userId,
           id: args.id,
+          deviceSigningPublicKey: args.deviceSigningPublicKey,
         });
         if (!workspace) {
           return null;
@@ -33,6 +40,7 @@ export const workspaces = queryField((t) => {
         cursor: undefined,
         skip: undefined,
         take: 1,
+        deviceSigningPublicKey: args.deviceSigningPublicKey,
       });
       if (workspaces.length > 0) {
         const workspace = workspaces[0];

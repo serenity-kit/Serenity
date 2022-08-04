@@ -36,6 +36,12 @@ import { Platform } from "react-native";
 import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
 import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
 import { removeLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import {
+  createWebDevice,
+  removeWebDevice,
+} from "../../utils/device/webDeviceStore";
+import { detect } from "detect-browser";
+const browser = detect();
 
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
@@ -61,11 +67,44 @@ export default function RegistrationVerificationScreen(
   };
 
   const registerNewDevice = async () => {
-    if (Platform.OS === "ios") {
-      const newDeviceInfo = await createRegisterAndStoreDevice();
-      await createDeviceMutation({
-        input: newDeviceInfo,
-      });
+    // if (Platform.OS === "ios") { // FIXME: handle webDevices using sessionStorage
+    const newDeviceInfo = await createRegisterAndStoreDevice();
+    await createDeviceMutation({
+      input: newDeviceInfo,
+    });
+    // }
+  };
+
+  const storeDeviceKeys = async () => {
+    // FIXME: allow non-extended login by storing into sessionStorage
+    // for now this is a HACK to support devices and workspaceKeyBoxes
+    const useExtendedLogin = true;
+    if (Platform.OS === "web") {
+      if (useExtendedLogin) {
+        const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
+          await createWebDevice();
+        const deviceInfoJson = {
+          type: "web",
+          os: browser?.os,
+          osVersion: null,
+          browser: browser?.name,
+          browserVersion: browser?.version,
+        };
+        const deviceInfo = JSON.stringify(deviceInfoJson);
+        const newDeviceInfo = {
+          ...webDevice,
+          info: deviceInfo,
+        };
+        await createDeviceMutation({
+          input: newDeviceInfo,
+        });
+      } else {
+        await removeWebDevice();
+      }
+    } else if (Platform.OS === "ios") {
+      if (useExtendedLogin) {
+        await registerNewDevice();
+      }
     }
   };
 
@@ -104,7 +143,8 @@ export default function RegistrationVerificationScreen(
         updateAuthentication,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
-      await registerNewDevice();
+      await storeDeviceKeys();
+      // await registerNewDevice(); // NOTE: keep this here for when we use sessionStorage to store devices
       await acceptPendingWorkspaceInvitation();
       setIsLoggingIn(false);
       navigateToNextAuthenticatedPage({

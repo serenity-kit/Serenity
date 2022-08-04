@@ -1,8 +1,22 @@
-query workspaces {
-  workspaces(first: 50) {
+query workspaces($deviceSigningPublicKey: String!) {
+  workspaces(first: 50, deviceSigningPublicKey: $deviceSigningPublicKey) {
     nodes {
       id
       name
+      members {
+        userId
+        isAdmin
+      }
+      currentWorkspaceKey {
+        id
+        workspaceId
+        workspaceKeyBox {
+          id
+          workspaceKeyId
+          deviceSigningPublicKey
+          ciphertext
+        }
+      }
     }
   }
 }

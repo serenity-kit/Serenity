@@ -1,16 +1,29 @@
 import { prisma } from "../prisma";
-import { Workspace, WorkspaceMember } from "../../types/workspace";
+import {
+  Workspace,
+  WorkspaceKey,
+  WorkspaceKeyBox,
+  WorkspaceMember,
+} from "../../types/workspace";
+import { v4 as uuidv4 } from "uuid";
+
+export type DeviceWorkspaceKeyBoxParams = {
+  deviceSigningPublicKey: string;
+  ciphertext: string;
+};
 
 type Params = {
   id: string;
   name: string;
   userId: string;
+  deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
 };
 
 export async function createWorkspace({
   id,
   name,
   userId,
+  deviceWorkspaceKeyBoxes,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
     const rawWorkspace = await prisma.workspace.create({
@@ -24,6 +37,38 @@ export async function createWorkspace({
             isAdmin: true,
           },
         },
+        workspaceKey: {
+          create: {
+            id: uuidv4(),
+            generation: 0,
+          },
+        },
+      },
+    });
+    const currentWorkspaceKey = await prisma.workspaceKey.findFirst({
+      where: {
+        workspaceId: rawWorkspace.id,
+      },
+    });
+    if (!currentWorkspaceKey) {
+      throw new Error("Error fetching newly created WorkspaceKey");
+    }
+    const workspaceKeyBoxes: WorkspaceKeyBox[] = [];
+    deviceWorkspaceKeyBoxes.forEach(
+      (deviceWorkspaceKeyBox: DeviceWorkspaceKeyBoxParams) => {
+        workspaceKeyBoxes.push({
+          id: uuidv4(),
+          workspaceKeyId: currentWorkspaceKey.id,
+          ...deviceWorkspaceKeyBox,
+        });
+      }
+    );
+    await prisma.workspaceKeyBox.createMany({
+      data: workspaceKeyBoxes,
+    });
+    const createdWorkspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
+      where: {
+        workspaceKeyId: currentWorkspaceKey.id,
       },
     });
     const usersToWorkspaces = await prisma.usersToWorkspaces.findMany({
@@ -41,6 +86,10 @@ export async function createWorkspace({
         },
       },
     });
+    const returningWorkspaceKey: WorkspaceKey = {
+      ...currentWorkspaceKey,
+      workspaceKeyBox: createdWorkspaceKeyBoxes[0],
+    };
     const members: WorkspaceMember[] = [];
     usersToWorkspaces.forEach((userToWorkspace) => {
       members.push({
@@ -54,9 +103,8 @@ export async function createWorkspace({
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
       members,
+      currentWorkspaceKey: returningWorkspaceKey,
     };
-
-    // TODO: insert a snapshot that includes basic title and text content to document
     return workspace;
   });
 }

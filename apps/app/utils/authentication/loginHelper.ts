@@ -36,6 +36,7 @@ export const login = async ({
   finishLoginMutation,
   updateAuthentication,
 }: LoginParams) => {
+  await updateAuthentication(null);
   const message = await startLogin(password);
   const startLoginResult = await startLoginMutation({
     input: {
@@ -83,6 +84,9 @@ export const fetchMainDevice = async ({
       requestPolicy: "network-only",
     })
     .toPromise();
+  if (mainDeviceResult.error) {
+    throw new Error(mainDeviceResult.error.message);
+  }
   if (!mainDeviceResult.data?.mainDevice) {
     throw new Error("Failed to fetch main device.");
   }

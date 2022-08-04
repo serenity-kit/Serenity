@@ -1,5 +1,9 @@
 import { prisma } from "../prisma";
-import { Workspace, WorkspaceMember } from "../../types/workspace";
+import {
+  WorkspaceKey,
+  Workspace,
+  WorkspaceMember,
+} from "../../types/workspace";
 
 type Cursor = {
   id?: string;
@@ -10,8 +14,15 @@ type Params = {
   cursor?: Cursor;
   skip?: number;
   take: number;
+  deviceSigningPublicKey: string;
 };
-export async function getWorkspaces({ userId, cursor, skip, take }: Params) {
+export async function getWorkspaces({
+  userId,
+  deviceSigningPublicKey,
+  cursor,
+  skip,
+  take,
+}: Params) {
   const userToWorkspaces = await prisma.usersToWorkspaces.findMany({
     where: {
       userId,
@@ -44,6 +55,18 @@ export async function getWorkspaces({ userId, cursor, skip, take }: Params) {
           },
         },
       },
+      workspaceKey: {
+        include: {
+          workspaceKeyBoxes: {
+            where: {
+              deviceSigningPublicKey,
+            },
+          },
+        },
+        orderBy: {
+          generation: "desc",
+        },
+      },
     },
   });
   // attach the .usersToWorkspaces as .members property
@@ -58,11 +81,18 @@ export async function getWorkspaces({ userId, cursor, skip, take }: Params) {
         isAdmin: userToWorkspace.isAdmin,
       });
     });
+    const currentWorkspaceKey: WorkspaceKey = rawWorkspace.workspaceKey[0];
+    if (currentWorkspaceKey) {
+      currentWorkspaceKey.workspaceKeyBox =
+        rawWorkspace.workspaceKey[0].workspaceKeyBoxes[0];
+    }
     const workspace: Workspace = {
       id: rawWorkspace.id,
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
       members: members,
+      workspaceKeys: rawWorkspace.workspaceKey,
+      currentWorkspaceKey,
     };
     workspaces.push(workspace);
   });

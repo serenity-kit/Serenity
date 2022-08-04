@@ -42,6 +42,7 @@ import * as DevicesQueryTypes from "./graphql/queries/device/devices";
 import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
 import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
 import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
+import * as AttachDeviceToWorkspaceMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspace";
 
 import * as DocumentTypes from "./graphql/types/document";
 
@@ -97,6 +98,7 @@ export const schema = makeSchema({
     deviceBySigningPublicKeyQueryTypes,
     DeleteDevicesMutationTypes,
     MainDeviceQueryTypes,
+    AttachDeviceToWorkspaceMutationTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),

@@ -1,5 +1,5 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
-import { queryField } from "nexus";
+import { nonNull, queryField, stringArg } from "nexus";
 import { getWorkspaces } from "../../../database/workspace/getWorkspaces";
 import { Workspace } from "../../types/workspace";
 
@@ -9,6 +9,9 @@ export const workspaces = queryField((t) => {
     type: Workspace,
     disableBackwardPagination: true,
     cursorFromNode: (node) => node?.id ?? "",
+    additionalArgs: {
+      deviceSigningPublicKey: nonNull(stringArg()),
+    },
     async nodes(root, args, context) {
       if (args.first > 50) {
         throw new UserInputError(
@@ -17,6 +20,11 @@ export const workspaces = queryField((t) => {
       }
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
+      }
+      if (!args.deviceSigningPublicKey) {
+        throw new UserInputError(
+          "Invalid input: deviceSigningPublicKey cannot be null"
+        );
       }
       const userId = context.user.id;
       const cursor = args.after ? { id: args.after } : undefined;
@@ -31,6 +39,7 @@ export const workspaces = queryField((t) => {
         cursor,
         skip,
         take,
+        deviceSigningPublicKey: args.deviceSigningPublicKey,
       });
       return workspaces;
     },

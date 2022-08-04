@@ -9,6 +9,17 @@ mutation createInitialWorkspaceStructure(
         userId
         isAdmin
       }
+      currentWorkspaceKey {
+        id
+        workspaceId
+        generation
+        workspaceKeyBox {
+          id
+          workspaceKeyId
+          deviceSigningPublicKey
+          ciphertext
+        }
+      }
     }
     folder {
       id

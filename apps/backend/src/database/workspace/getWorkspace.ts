@@ -1,11 +1,20 @@
-import { Workspace, WorkspaceMember } from "../../types/workspace";
+import {
+  Workspace,
+  WorkspaceKey,
+  WorkspaceMember,
+} from "../../types/workspace";
 import { prisma } from "../prisma";
 
 type Params = {
   id: string;
   userId: string;
+  deviceSigningPublicKey: string;
 };
-export async function getWorkspace({ userId, id }: Params) {
+export async function getWorkspace({
+  userId,
+  id,
+  deviceSigningPublicKey,
+}: Params) {
   // include userstoworkspaces but in descending alphabetical order by userId
   const rawWorkspace = await prisma.workspace.findUnique({
     include: {
@@ -19,6 +28,18 @@ export async function getWorkspace({ userId, id }: Params) {
               username: true,
             },
           },
+        },
+      },
+      workspaceKey: {
+        include: {
+          workspaceKeyBoxes: {
+            where: {
+              deviceSigningPublicKey,
+            },
+          },
+        },
+        orderBy: {
+          generation: "desc",
         },
       },
     },
@@ -41,11 +62,18 @@ export async function getWorkspace({ userId, id }: Params) {
       };
       workspaceMembers.push(workspaceMember);
     });
+    let currentWorkspaceKey: WorkspaceKey = rawWorkspace.workspaceKey[0];
+    if (currentWorkspaceKey) {
+      currentWorkspaceKey.workspaceKeyBox =
+        rawWorkspace.workspaceKey[0].workspaceKeyBoxes[0];
+    }
     const workspace: Workspace = {
       id: rawWorkspace.id,
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
       members: workspaceMembers,
+      workspaceKeys: rawWorkspace.workspaceKey,
+      currentWorkspaceKey: currentWorkspaceKey,
     };
     return workspace;
   }
