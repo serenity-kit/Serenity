@@ -28,8 +28,6 @@ export const mainDeviceQuery = queryField((t) => {
         userId: context.user.id,
         signingPublicKey: context.user.mainDeviceSigningPublicKey,
       });
-      console.log({ device });
-
       return {
         ciphertext: context.user.mainDeviceCiphertext,
         nonce: context.user.mainDeviceNonce,

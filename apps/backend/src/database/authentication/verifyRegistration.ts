@@ -31,19 +31,15 @@ export async function verifyRegistration({
       if (!unverifiedUser) {
         throw new Error("Invalid user or confirmation code");
       }
-
       const device = await prisma.device.create({
         data: {
-          encryptionPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
+          encryptionPublicKey: unverifiedUser.mainDeviceEncryptionPublicKey,
           signingPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
           encryptionPublicKeySignature:
             unverifiedUser.mainDeviceEncryptionPublicKeySignature,
           info: JSON.stringify({ type: "main" }),
         },
       });
-      console.log(`verifying registration for user ${username}`);
-      console.log({ device });
-
       const user = await prisma.user.create({
         data: {
           username: unverifiedUser.username,

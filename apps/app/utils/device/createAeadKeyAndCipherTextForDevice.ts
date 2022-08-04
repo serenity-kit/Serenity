@@ -16,8 +16,6 @@ export const createAeadKeyAndCipherTextForDevice = async ({
     key,
     deviceEncryptionPublicKey
   );
-  console.log("creating aeadkey and ciphertext");
-  console.log({ deviceEncryptionPublicKey, ciphertext, aeadKey, key });
   return {
     aeadKey: key,
     ciphertext,

@@ -57,7 +57,6 @@ export default function RegisterForm(props: Props) {
         const { response, exportKey } = await finishRegistration(
           startRegistrationResult.data.startRegistration.challengeResponse
         );
-
         const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
           await createAndEncryptDevice(exportKey);
 
@@ -68,9 +67,6 @@ export default function RegisterForm(props: Props) {
           encryptionPublicKey: mainDevice.encryptionPublicKey,
           info: JSON.stringify({ type: "main" }),
         });
-        console.log("creating mainDevice");
-        console.log({ mainDevice });
-
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
             message: response,

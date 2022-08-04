@@ -67,9 +67,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     if (mainDevice) {
       allDevices.push(mainDevice);
     }
-    if (!mainDevice) {
-      return deviceWorkspaceKeyBoxes;
-    }
     for await (const device of allDevices) {
       const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
         deviceEncryptionPublicKey: device.encryptionPublicKey,
@@ -104,7 +101,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     }
     const devices = devicesResult.data?.devices?.nodes as Device[];
     const deviceWorkspaceKeyBoxes = await buildDeviceWorkspaceKeyBoxes(devices);
-    // FIXME: add mainDevice
     const createInitialWorkspaceStructureResult =
       await createInitialWorkspaceStructure({
         input: {

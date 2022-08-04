@@ -88,22 +88,30 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       if (sessionKey) {
         const device = await getActiveDevice();
         if (!device) {
-          console.error("No active devices found!");
           return;
         }
         setDeviceSigningPublicKey(device.signingPublicKey);
         const deviceSigningPublicKey: string = device?.signingPublicKey;
-        const workspace = await getWorkspace({
-          urqlClient,
-          deviceSigningPublicKey,
-          workspaceId,
-        });
-        setWorkspace(workspace);
-        const workspaces = await getWorkspaces({
-          urqlClient,
-          deviceSigningPublicKey,
-        });
-        setWorkspaces(workspaces);
+        try {
+          const workspace = await getWorkspace({
+            urqlClient,
+            deviceSigningPublicKey,
+            workspaceId,
+          });
+          setWorkspace(workspace);
+          const workspaces = await getWorkspaces({
+            urqlClient,
+            deviceSigningPublicKey,
+          });
+          setWorkspaces(workspaces);
+        } catch (error) {
+          // TODO: handle unauthenticated graphql error
+          // this happens when the user logs out, prior to
+          // being navigated to the login screen
+          console.error(
+            "sidebar tried to get workspace without authentication"
+          );
+        }
       }
     })();
   }, [urqlClient, navigation]);
