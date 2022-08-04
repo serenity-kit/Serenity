@@ -107,7 +107,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <HStack
         alignItems="center"
         justifyContent="space-between"
-        style={tw`py-1.5 pl-2 pr-4`}
+        style={tw`py-1.5 px-5 md:px-4`}
       >
         <Menu
           placement="bottom left"
@@ -131,7 +131,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 space={2}
                 alignItems="center"
                 style={[
-                  tw`py-1.5 px-2`,
+                  tw`py-1.5 pr-2`,
                   isFocusVisible && tw`se-inset-focus-mini`,
                 ]}
               >
@@ -286,9 +286,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <HStack
         justifyContent="space-between"
         alignItems="center"
-        style={tw`ml-4 mr-2 mb-4`}
+        style={tw`ml-4 mr-5 mb-4 md:mr-2`}
       >
-        <Text variant="xxs" bold>
+        <Text variant={isPermanentLeftSidebar ? "xxs" : "small"} bold>
           Folders
         </Text>
         {/* offset not working yet as NB has a no-no in their component */}
