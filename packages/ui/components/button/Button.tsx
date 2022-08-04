@@ -158,7 +158,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
               props.style,
             ]}
           >
-            <View style={tw`flex flex-row justify-items-center`}>
+            <View style={tw`flex flex-row justify-center`}>
               <View style={tw`grow items-end`}>
                 {isLoading && spinnerSize ? (
                   // needed fixed width wrapper so scale calculation doesn't collide with flex
