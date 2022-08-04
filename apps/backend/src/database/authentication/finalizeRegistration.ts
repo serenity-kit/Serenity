@@ -52,8 +52,6 @@ export async function finalizeRegistration({
       if (existingUserData) {
         throw Error("This username has already been registered");
       }
-      console.log(`finalize registration for user ${username}`);
-      console.log({ mainDevice });
       const confirmationCode = await createConfirmationCode();
       const unverifiedUser = await prisma.unverifiedUser.create({
         data: {

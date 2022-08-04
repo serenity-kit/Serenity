@@ -10,12 +10,6 @@ export const decryptAeadkey = async ({
   deviceEncryptionPublicKey,
   deviceEncryptionPrivateKey,
 }: Props) => {
-  console.log("decrypting secretbox");
-  console.log({
-    ciphertext,
-    deviceEncryptionPublicKey,
-    deviceEncryptionPrivateKey,
-  });
   const aeadKey = await sodium.crypto_box_seal_open(
     ciphertext,
     deviceEncryptionPublicKey,

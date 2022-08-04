@@ -95,7 +95,6 @@ export default function RegistrationVerificationScreen(
           ...webDevice,
           info: deviceInfo,
         };
-        console.log({ newDeviceInfo });
         await createDeviceMutation({
           input: newDeviceInfo,
         });
