@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, tw, Box, Button, LinkButton } from "@serenity-tools/ui";
 import {
   useWindowDimensions,
@@ -9,11 +9,16 @@ import { useAuthentication } from "../../context/AuthenticationContext";
 import {
   useAcceptWorkspaceInvitationMutation,
   useWorkspaceInvitationQuery,
+  WorkspaceInvitation,
+  WorkspaceInvitationDocument,
+  WorkspaceInvitationQuery,
+  WorkspaceInvitationQueryVariables,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
 import { LoginForm } from "../../components/login/LoginForm";
 import RegisterForm from "../../components/register/RegisterForm";
 import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
+import { useClient } from "urql";
 
 export default function AcceptWorkspaceInvitationScreen(
   props: RootStackScreenProps<"AcceptWorkspaceInvitation">
@@ -21,12 +26,10 @@ export default function AcceptWorkspaceInvitationScreen(
   const workspaceInvitationId = props.route.params?.workspaceInvitationId;
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const { sessionKey } = useAuthentication();
-  const [workspaceInvitationQuery, refetchWorkspaceInvitationQuery] =
-    useWorkspaceInvitationQuery({
-      variables: {
-        id: workspaceInvitationId,
-      },
-    });
+  const urqlClient = useClient();
+  const [workspaceInvitation, setWorkspaceInvitation] = useState<
+    WorkspaceInvitation | undefined
+  >();
   const [, acceptWorkspaceInvitationMutation] =
     useAcceptWorkspaceInvitationMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
@@ -40,6 +43,31 @@ export default function AcceptWorkspaceInvitationScreen(
       </View>
     );
   }
+
+  const getWorskpaceInvitation = async (workspaceInvitationId: string) => {
+    const workspaceInvitationResult = await urqlClient
+      .query<WorkspaceInvitationQuery, WorkspaceInvitationQueryVariables>(
+        WorkspaceInvitationDocument,
+        { id: workspaceInvitationId },
+        {
+          // better to be safe here and always refetch
+          requestPolicy: "network-only",
+        }
+      )
+      .toPromise();
+    if (
+      workspaceInvitationResult.error ||
+      !workspaceInvitationResult.data?.workspaceInvitation
+    ) {
+      props.navigation.replace("WorkspaceNotFound");
+      return;
+    }
+    setWorkspaceInvitation(workspaceInvitationResult.data.workspaceInvitation);
+  };
+
+  useEffect(() => {
+    getWorskpaceInvitation(workspaceInvitationId);
+  }, []);
 
   const acceptAndGoToWorkspace = async () => {
     try {
@@ -91,23 +119,12 @@ export default function AcceptWorkspaceInvitationScreen(
         style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
       >
         <Box>
-          {!workspaceInvitationQuery.fetching && (
+          {workspaceInvitation && (
             <View style={styles.alertBanner}>
               <Text style={styles.alertBannerText}>
                 You have been invited to join workspace{" "}
-                <b>
-                  {
-                    workspaceInvitationQuery.data?.workspaceInvitation
-                      ?.workspaceName
-                  }
-                </b>{" "}
-                by{" "}
-                <b>
-                  {
-                    workspaceInvitationQuery.data?.workspaceInvitation
-                      ?.inviterUsername
-                  }
-                </b>
+                <b>{workspaceInvitation?.workspaceName}</b> by{" "}
+                <b>{workspaceInvitation?.inviterUsername}</b>
               </Text>
               {!sessionKey && (
                 <Text style={styles.alertBannerText}>

@@ -3,6 +3,7 @@ import { TextProps } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
 import { Pressable } from "../pressable/Pressable";
 import { createLinkStyles } from "../link/Link";
+import { Text } from "@serenity-tools/ui";
 
 export type LinkButtonProps = TextProps & {
   children: React.ReactNode;
