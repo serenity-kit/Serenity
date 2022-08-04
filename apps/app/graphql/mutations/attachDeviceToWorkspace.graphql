@@ -4,7 +4,7 @@ mutation attachDeviceToWorkspace($input: AttachDeviceToWorkspaceInput!) {
       id
       workspaceId
       generation
-      workspaceKeyBoxes {
+      workspaceKeyBox {
         id
         deviceSigningPublicKey
         ciphertext

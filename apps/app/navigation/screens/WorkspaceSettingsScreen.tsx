@@ -162,7 +162,6 @@ export default function WorkspaceSettingsScreen(
     members.forEach((member: WorkspaceMember, row: number) => {
       memberLookup[member.userId] = row;
       if (member.userId === me?.id) {
-        console.log(" you are an admin!");
         setIsAdmin(member.isAdmin);
       }
     });

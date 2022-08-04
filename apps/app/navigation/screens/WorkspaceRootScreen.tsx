@@ -48,13 +48,13 @@ export default function WorkspaceRootScreen(
       deviceSigningPublicKey: mainDevice.signingPublicKey,
       urqlClient,
     });
-    if (!mainDeviceWorkspaceDetails?.currentWorkspaceKey?.workspaceKeyBoxes) {
+    if (!mainDeviceWorkspaceDetails?.currentWorkspaceKey?.workspaceKeyBox) {
       // TODO: handle a no matching key boxes found error
-      console.log("No workspaceKeyBoxes found for mainDevice!");
+      console.log("No workspaceKeyBox found for mainDevice!");
       return;
     }
     const mainDeviceWorkspaceBox =
-      mainDeviceWorkspaceDetails?.currentWorkspaceKey?.workspaceKeyBoxes[0];
+      mainDeviceWorkspaceDetails?.currentWorkspaceKey?.workspaceKeyBox;
     if (!mainDevice.encryptionPrivateKey) {
       // TODO: handle a no main device encryption private key
       console.log("main device doesn't have an encryption private key!");
@@ -87,7 +87,6 @@ export default function WorkspaceRootScreen(
         return;
       }
       const deviceSigningPublicKey: string = device?.signingPublicKey;
-      // check if the user has access to this workspace
       const workspaceResult = await urqlClient
         .query<WorkspaceQuery, WorkspaceQueryVariables>(
           WorkspaceDocument,
@@ -107,7 +106,7 @@ export default function WorkspaceRootScreen(
         // if for example we are logging in with a new webDevice, we need
         // to generate keys for this workspace
         const workspace = workspaceResult.data?.workspace;
-        if (workspace?.currentWorkspaceKey?.workspaceKeyBoxes.length === 0) {
+        if (workspace?.currentWorkspaceKey?.workspaceKeyBox) {
           // use the mainDevice to decrypt the aeadkey
           await useMainDeviceToAttachDeviceToWorkspace(device);
         }

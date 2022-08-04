@@ -16,7 +16,6 @@ export const getWorkspace = async ({
   urqlClient,
   deviceSigningPublicKey,
 }: Props): Promise<Workspace | null> => {
-  // check if the user has access to this workspace
   const workspaceResult = await urqlClient
     .query<WorkspaceQuery, WorkspaceQueryVariables>(
       WorkspaceDocument,

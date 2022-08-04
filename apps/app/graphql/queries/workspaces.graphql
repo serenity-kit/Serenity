@@ -10,7 +10,7 @@ query workspaces($deviceSigningPublicKey: String!) {
       currentWorkspaceKey {
         id
         workspaceId
-        workspaceKeyBoxes {
+        workspaceKeyBox {
           id
           workspaceKeyId
           deviceSigningPublicKey

@@ -13,7 +13,7 @@ mutation createInitialWorkspaceStructure(
         id
         workspaceId
         generation
-        workspaceKeyBoxes {
+        workspaceKeyBox {
           id
           workspaceKeyId
           deviceSigningPublicKey

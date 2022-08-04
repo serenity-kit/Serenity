@@ -47,6 +47,7 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
         } catch (error) {
           // TODO: handle workspace fetch error
           console.error("Error fetching last used workspaceId.");
+          console.log(error);
         }
       })();
     } else {

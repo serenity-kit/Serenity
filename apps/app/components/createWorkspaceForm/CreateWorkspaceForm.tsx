@@ -47,7 +47,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
 
   const [devicesResult] = useDevicesQuery({
     variables: {
-      first: 50,
+      first: 500,
     },
   });
 
