@@ -81,7 +81,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         // TODO: error! Couldn't fetch user
       }
     }
-  }, [meResult.fetching]);
+  }, [meResult.fetching, meResult.data]);
 
   useEffect(() => {
     (async () => {
@@ -114,7 +114,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         }
       }
     })();
-  }, [urqlClient, navigation]);
+  }, [urqlClient, navigation, workspaceId, sessionKey]);
 
   const onWorkspaceStructureCreated = async ({
     workspace,

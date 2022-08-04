@@ -147,7 +147,7 @@ export default function WorkspaceRootScreen(
         props.navigation.replace("WorkspaceNotFound");
       }
     })();
-  }, [urqlClient, props.navigation]);
+  }, [urqlClient, props.navigation, workspaceId]);
 
   return (
     <View style={tw`justify-center items-center flex-auto`}>

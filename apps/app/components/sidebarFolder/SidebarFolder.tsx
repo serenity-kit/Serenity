@@ -80,7 +80,7 @@ export default function SidebarFolder(props: Props) {
 
   useEffect(() => {
     setIsOpen(openFolderIds.includes(props.folderId));
-  }, [openFolderIds]);
+  }, [openFolderIds, props.folderId]);
 
   const createFolder = async (name: string | null) => {
     setIsOpen(true);
