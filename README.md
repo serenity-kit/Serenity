@@ -71,6 +71,13 @@ cd apps/app
 yarn eas build --profile development --platform ios
 ```
 
+Creating a preview build for internal distribution.
+
+```sh
+cd apps/app
+yarn eas build --profile preview --platform ios
+```
+
 Build new graphql types
 
 ```sh
