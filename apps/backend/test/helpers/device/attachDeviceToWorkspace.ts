@@ -25,7 +25,7 @@ export const attachDeviceToWorkspace = async ({
           id
           workspaceId
           generation
-          workspaceKeyBoxes {
+          workspaceKeyBox {
             id
             deviceSigningPublicKey
             ciphertext

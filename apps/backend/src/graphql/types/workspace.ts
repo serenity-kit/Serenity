@@ -16,7 +16,7 @@ export const WorkspaceKey = objectType({
     t.nonNull.string("id");
     t.nonNull.string("workspaceId");
     t.nonNull.int("generation");
-    t.nonNull.list.nonNull.field("workspaceKeyBoxes", {
+    t.nonNull.field("workspaceKeyBox", {
       type: WorkspaceKeyBox,
     });
   },

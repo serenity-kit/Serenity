@@ -40,10 +40,9 @@ test("attach a device to a workspace", async () => {
   expect(workspaceKey.generation).toBe(0);
   expect(workspaceKey.workspaceId).toBe(workspaceId);
   // This query will return the newly created workspaceKeyId
-  expect(workspaceKey.workspaceKeyBoxes.length).toBe(1);
-  const workspaceKeyBox = workspaceKey.workspaceKeyBoxes[0];
-  expect(workspaceKeyBox.ciphertext).toBe(ciphertext);
-  expect(workspaceKeyBox.deviceSigningPublicKey).toBe(deviceSigningPublicKey);
+  const workspaceKeyBox = workspaceKey.workspaceKeyBox;
+  expect(workspaceKeyBox?.ciphertext).toBe(ciphertext);
+  expect(workspaceKeyBox?.deviceSigningPublicKey).toBe(deviceSigningPublicKey);
   // there should now be two workspacKeyBoxes
   const workspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
     where: {

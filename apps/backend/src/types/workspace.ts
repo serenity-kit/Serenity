@@ -9,7 +9,8 @@ export type WorkspaceKey = {
   id: string;
   workspaceId: string;
   generation: number;
-  workspaceKeyBoxes: WorkspaceKeyBox[];
+  workspaceKeyBox?: WorkspaceKeyBox;
+  workspaceKeyBoxes?: WorkspaceKeyBox[];
 };
 
 export type WorkspaceMember = {

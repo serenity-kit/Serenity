@@ -62,7 +62,11 @@ export async function getWorkspace({
       };
       workspaceMembers.push(workspaceMember);
     });
-    let currentWorkspaceKey = rawWorkspace.workspaceKey[0];
+    let currentWorkspaceKey: WorkspaceKey = rawWorkspace.workspaceKey[0];
+    if (currentWorkspaceKey) {
+      currentWorkspaceKey.workspaceKeyBox =
+        rawWorkspace.workspaceKey[0].workspaceKeyBoxes[0];
+    }
     const workspace: Workspace = {
       id: rawWorkspace.id,
       name: rawWorkspace.name,

@@ -56,7 +56,7 @@ test("Input Errors", async () => {
   // get root folders from graphql
   const query = gql`
     {
-      devices(first: 51) {
+      devices(first: 501) {
         edges {
           node {
             userId

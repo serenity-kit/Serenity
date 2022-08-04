@@ -88,7 +88,7 @@ export async function createWorkspace({
     });
     const returningWorkspaceKey: WorkspaceKey = {
       ...currentWorkspaceKey,
-      workspaceKeyBoxes: createdWorkspaceKeyBoxes,
+      workspaceKeyBox: createdWorkspaceKeyBoxes[0],
     };
     const members: WorkspaceMember[] = [];
     usersToWorkspaces.forEach((userToWorkspace) => {

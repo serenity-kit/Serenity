@@ -20,8 +20,7 @@ export async function attachDeviceToWorkspace({
     return await prisma.$transaction(async (prisma) => {
       // 1. get the workspace associated with this user if it exists
       // 2. Fetch all the workspaceKeys for this workspace
-      // 3. Delete all workspaceKeyBoxes for this signingPublicKey
-      // 4. Create a new worskpaceKeyBoxes for this signingPublicKey
+      // 3. Create a new worskpaceKeyBoxes for this signingPublicKey
       //    on all workspaceKeys for this workspace
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
         where: {
@@ -67,9 +66,10 @@ export async function attachDeviceToWorkspace({
       await prisma.workspaceKeyBox.createMany({
         data: workspaceKeyBoxes,
       });
+      
       const result = {
         ...currentWorkspaceKey,
-        workspaceKeyBoxes: [workspaceKeyBoxes[0]],
+        workspaceKeyBox: workspaceKeyBoxes[0],
       };
       return result;
     });

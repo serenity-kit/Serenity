@@ -52,7 +52,7 @@ export const createInitialWorkspaceStructure = async ({
             id
             workspaceId
             generation
-            workspaceKeyBoxes {
+            workspaceKeyBox {
               id
               workspaceKeyId
               deviceSigningPublicKey

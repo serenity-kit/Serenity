@@ -1,5 +1,9 @@
 import { prisma } from "../prisma";
-import { Workspace, WorkspaceMember } from "../../types/workspace";
+import {
+  WorkspaceKey,
+  Workspace,
+  WorkspaceMember,
+} from "../../types/workspace";
 
 type Cursor = {
   id?: string;
@@ -77,13 +81,18 @@ export async function getWorkspaces({
         isAdmin: userToWorkspace.isAdmin,
       });
     });
+    const currentWorkspaceKey: WorkspaceKey = rawWorkspace.workspaceKey[0];
+    if (currentWorkspaceKey) {
+      currentWorkspaceKey.workspaceKeyBox =
+        rawWorkspace.workspaceKey[0].workspaceKeyBoxes[0];
+    }
     const workspace: Workspace = {
       id: rawWorkspace.id,
       name: rawWorkspace.name,
       idSignature: rawWorkspace.idSignature,
       members: members,
       workspaceKeys: rawWorkspace.workspaceKey,
-      currentWorkspaceKey: rawWorkspace.workspaceKey[0],
+      currentWorkspaceKey,
     };
     workspaces.push(workspace);
   });

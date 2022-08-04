@@ -74,7 +74,7 @@ const getWorkspace = async ({
         currentWorkspaceKey {
           id
           workspaceId
-          workspaceKeyBoxes {
+          workspaceKeyBox {
             id
             workspaceKeyId
             deviceSigningPublicKey
@@ -103,8 +103,7 @@ test("user should be able to get a workspace by id", async () => {
   expect(workspace.name).toBe(workspace2Name);
   expect(typeof workspace.currentWorkspaceKey.id).toBe("string");
   expect(workspace.currentWorkspaceKey.workspaceId).toBe(workspace2Id);
-  expect(workspace.currentWorkspaceKey.workspaceKeyBoxes.length).toBe(1);
-  const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBoxes[0];
+  const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBox;
   expect(workspaceKeyBox.deviceSigningPublicKey).toBe(device.signingPublicKey);
   expect(typeof workspaceKeyBox.ciphertext).toBe("string");
   expect(workspaceKeyBox.workspaceKeyId).toBe(workspace.currentWorkspaceKey.id);
@@ -121,8 +120,7 @@ test("user should get a workspace without providing an id", async () => {
   expect(workspace.name).toBe(workspace1Name);
   expect(typeof workspace.currentWorkspaceKey.id).toBe("string");
   expect(workspace.currentWorkspaceKey.workspaceId).toBe(workspace1Id);
-  expect(workspace.currentWorkspaceKey.workspaceKeyBoxes.length).toBe(1);
-  const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBoxes[0];
+  const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBox;
   expect(workspaceKeyBox.deviceSigningPublicKey).toBe(device.signingPublicKey);
   expect(typeof workspaceKeyBox.ciphertext).toBe("string");
   expect(workspaceKeyBox.workspaceKeyId).toBe(workspace.currentWorkspaceKey.id);
