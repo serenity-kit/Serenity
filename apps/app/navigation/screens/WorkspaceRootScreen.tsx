@@ -31,7 +31,7 @@ export default function WorkspaceRootScreen(
   const { sessionKey } = useAuthentication();
   const [, attatchDeviceToWorkspace] = useAttachDeviceToWorkspaceMutation();
 
-  const useMainDeviceToAttachDeviceToWorkspace = async (device: Device) => {
+  const doMainDeviceToAttachDeviceToWorkspace = async (device: Device) => {
     if (!sessionKey) {
       // TODO: handle a no session key error
       console.log("No session key found!");
@@ -108,7 +108,7 @@ export default function WorkspaceRootScreen(
         const workspace = workspaceResult.data?.workspace;
         if (workspace?.currentWorkspaceKey?.workspaceKeyBox) {
           // use the mainDevice to decrypt the aeadkey
-          await useMainDeviceToAttachDeviceToWorkspace(device);
+          await doMainDeviceToAttachDeviceToWorkspace(device);
         }
       }
       const lastUsedDocumentId = await getLastUsedDocumentId(workspaceId);

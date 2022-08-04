@@ -66,10 +66,10 @@ export async function attachDeviceToWorkspace({
       await prisma.workspaceKeyBox.createMany({
         data: workspaceKeyBoxes,
       });
-      
+
       const result = {
         ...currentWorkspaceKey,
-        workspaceKeyBox: workspaceKeyBoxes[0],
+        workspaceKeyBox: workspaceKeyBoxes[0] || undefined,
       };
       return result;
     });
