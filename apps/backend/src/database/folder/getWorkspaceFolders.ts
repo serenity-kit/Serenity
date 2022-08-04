@@ -42,7 +42,7 @@ export async function getWorkspaceFolders({
         skip,
         take,
         orderBy: {
-          name: "asc",
+          createdAt: "desc",
         },
       });
       return folders;
