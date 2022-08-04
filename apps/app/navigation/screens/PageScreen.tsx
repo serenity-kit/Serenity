@@ -3,7 +3,12 @@ import Page from "../../components/page/Page";
 import { useWindowDimensions } from "react-native";
 import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
 import { useEffect, useLayoutEffect } from "react";
-import { useUpdateDocumentNameMutation } from "../../generated/graphql";
+import {
+  useUpdateDocumentNameMutation,
+  WorkspaceDocument,
+  WorkspaceQuery,
+  WorkspaceQueryVariables,
+} from "../../generated/graphql";
 import { PageHeader } from "../../components/page/PageHeader";
 import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
@@ -23,7 +28,21 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   const pageId = props.route.params.pageId;
   const urqlClient = useClient();
 
-  const doesUserHaveAccess = async (docId: string) => {
+  const navigateAwayIfUserDoesntHaveAccess = async (
+    workspaceId: string,
+    docId: string
+  ) => {
+    const workspaceResult = await urqlClient
+      .query<WorkspaceQuery, WorkspaceQueryVariables>(
+        WorkspaceDocument,
+        { id: workspaceId },
+        { requestPolicy: "network-only" }
+      )
+      .toPromise();
+    if (workspaceResult.data?.workspace === null) {
+      props.navigation.replace("WorkspaceNotFound");
+      return;
+    }
     const documentResult = await urqlClient
       .query<DocumentQuery, DocumentQueryVariables>(
         DocumentDocument,
@@ -76,13 +95,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     props.navigation.setParams({ isNew: undefined });
     (async () => {
       if (pageId) {
-        const hasAccess = await doesUserHaveAccess(pageId);
-        if (!hasAccess) {
-          props.navigation.replace("Workspace", {
-            workspaceId,
-            screen: "NoPageExists",
-          });
-        }
+        await navigateAwayIfUserDoesntHaveAccess(workspaceId, pageId);
       }
     })();
   }, [pageId]);
