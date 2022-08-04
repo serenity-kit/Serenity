@@ -37,8 +37,8 @@ import React, { useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { VStack, HStack } from "native-base";
 import { theme } from "../../../../tailwind.config";
-import Toast from "react-native-root-toast";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { showToast } from "../../utils/toast/showToast";
 
 let counter = 0;
 
@@ -214,18 +214,7 @@ export default function DesignSystemScreen() {
       <Button
         onPress={() => {
           counter = counter + 1;
-          Toast.show(`This is a message ${counter}`, {
-            duration: Toast.durations.LONG,
-            position: Toast.positions.BOTTOM,
-            shadow: true,
-            animation: true,
-            hideOnPress: true,
-            delay: 0,
-            backgroundColor: tw.color("gray-900"),
-            opacity: 1,
-            containerStyle: tw`py-3 px-8`,
-            textStyle: tw`text-xs inter-regular`,
-          });
+          showToast(`This is a message ${counter}`);
         }}
       >
         Add Toast
