@@ -34,7 +34,7 @@ import {
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
-import { useWindowDimensions } from "react-native";
+import { useWindowDimensions, StyleSheet } from "react-native";
 import { VStack, HStack } from "native-base";
 import { theme } from "../../../../tailwind.config";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -49,9 +49,33 @@ export default function DesignSystemScreen() {
   const collabColors = Object.keys(theme.colors.collaboration);
   const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
 
+  const styles = StyleSheet.create({
+    header: tw`mt-12 mb-4 text-2xl`,
+    subHeader: tw`mt-4 mb-2`,
+  });
+
+  // TODO extract into ui as components
+  const DesignSystemHeader = (props) => {
+    return (
+      <Text variant="large" style={[styles.header, props.style]} bold>
+        {props.children}
+      </Text>
+    );
+  };
+
+  const DesignSystemSubHeader = (props) => {
+    return (
+      <Text variant="small" style={[styles.subHeader, props.style]} muted>
+        {props.children}
+      </Text>
+    );
+  };
+
+  // TODO refactor order
   return (
     <ScrollSafeAreaView style={tw`px-4 py-6`}>
-      <HStack space={2} style={tw`mb-5`} alignItems="center">
+      <DesignSystemHeader style={tw`mt-6`}>EditorBottombar</DesignSystemHeader>
+      <HStack space={2} alignItems="center">
         <EditorBottombarButton name="arrow-down-s-line" />
         <EditorBottombarButton name="text" />
         <EditorBottombarButton name="list-unordered" />
@@ -62,10 +86,9 @@ export default function DesignSystemScreen() {
         <EditorBottombarDivider />
         <EditorBottombarButton name="link" isActive />
       </HStack>
-
-      <Text style={tw`mb-4 h2`}>Info Messages</Text>
-      <Text>Info</Text>
-      <VStack space={4} style={tw`max-w-90`}>
+      <DesignSystemHeader style={tw`mb-0`}>Info Messages</DesignSystemHeader>
+      <DesignSystemSubHeader>Info</DesignSystemSubHeader>
+      <VStack space={2} style={tw`max-w-90`}>
         <InfoMessage>
           The verification code is prefilled on staging.
         </InfoMessage>
@@ -73,8 +96,8 @@ export default function DesignSystemScreen() {
           The verification code is prefilled on staging.
         </InfoMessage>
       </VStack>
-      <Text style={tw`mt-4`}>Error</Text>
-      <VStack space={4} style={tw`max-w-90`}>
+      <DesignSystemSubHeader>Error</DesignSystemSubHeader>
+      <VStack space={2} style={tw`max-w-90`}>
         <InfoMessage variant="error">
           Unfortunately your registration request failed due a network error.
           Please try again later.
@@ -84,14 +107,16 @@ export default function DesignSystemScreen() {
           Please try again later.
         </InfoMessage>
       </VStack>
-
-      <Text style={tw`my-4 h2`}>Tooltip</Text>
-      <Tooltip label="This is a tip!" placement="right">
-        <IconButton name="arrow-right" color="gray-500" />
-      </Tooltip>
-
-      <Text style={tw`my-4 h2`}>Elevation</Text>
-      <HStack space={3}>
+      <DesignSystemHeader>Tooltip</DesignSystemHeader>
+      <HStack>
+        <Tooltip label="This is a tip!" placement="right">
+          <IconButton name="file-add-line" color="gray-500" large />
+        </Tooltip>
+      </HStack>
+      <Text variant="large" style={tw`mt-12 mb-4 text-2xl`} bold>
+        Elevation
+      </Text>
+      <HStack space={3} style={tw`pt-2 pb-4 pr-2 overflow-scroll`}>
         {elevationLevels.map((level) => {
           return (
             <BoxShadow elevation={level} rounded>
@@ -108,14 +133,13 @@ export default function DesignSystemScreen() {
           );
         })}
       </HStack>
-
-      <Text style={tw`my-4 h2`}>Text</Text>
+      <DesignSystemHeader>Text</DesignSystemHeader>
       <Text variant="large">large Text</Text>
       <Text>regular Text</Text>
       <Text variant="small">small Text</Text>
       <Text variant="xs">xs Text</Text>
       <Text variant="xxs">xxs Text</Text>
-      <Text variant="large" bold>
+      <Text style={tw`pt-4`} variant="large" bold>
         bold large Text
       </Text>
       <Text bold>bold regular Text</Text>
@@ -128,7 +152,7 @@ export default function DesignSystemScreen() {
       <Text variant="xxs" bold>
         bold xxs Text
       </Text>
-      <Text variant="large" muted>
+      <Text style={tw`pt-4`} variant="large" muted>
         muted large Text
       </Text>
       <Text muted>muted regular Text</Text>
@@ -141,38 +165,35 @@ export default function DesignSystemScreen() {
       <Text variant="xxs" muted>
         muted xxs Text
       </Text>
-      <Text style={tw`mt-6 mb-4 h2`}>Icon Button</Text>
+      <DesignSystemHeader>Icon Button</DesignSystemHeader>
       <HStack alignItems="center" space={4}>
         <IconButton name="add-line" color="gray-500" />
         <IconButton name="menu" color="gray-800" large />
       </HStack>
-      <Text style={tw`mt-6 mb-4 h2`}>Button</Text>
-      <Text>Default Button</Text>
+      <DesignSystemHeader style={tw`mb-0`}>Button</DesignSystemHeader>
+      <DesignSystemSubHeader>Default Button</DesignSystemSubHeader>
       <Button>Login</Button>
-      <Text>Disabled Button</Text>
+      <DesignSystemSubHeader>Disabled Button</DesignSystemSubHeader>
       <Button disabled>Login</Button>
-      <Text>Loading Button</Text>
+      <DesignSystemSubHeader>Loading Button</DesignSystemSubHeader>
       <Button isLoading>Login</Button>
-
-      <Text>Secondary Button</Text>
+      <DesignSystemSubHeader>Secondary Button</DesignSystemSubHeader>
       <Button variant="secondary">Login</Button>
-      <Text>Disabled Secondary Button</Text>
+      <DesignSystemSubHeader>Disabled Secondary Button</DesignSystemSubHeader>
       <Button variant="secondary" disabled>
         Login
       </Button>
-      <Text>Loading Secondary Button</Text>
+      <DesignSystemSubHeader>Loading Secondary Button</DesignSystemSubHeader>
       <Button variant="secondary" isLoading>
         Login
       </Button>
-
-      <Text>Button sizes</Text>
+      <DesignSystemSubHeader>Button sizes</DesignSystemSubHeader>
       <VStack space="2">
         <Button size="small">Small</Button>
         <Button size="medium">Medium</Button>
         <Button size="large">Large</Button>
       </VStack>
-
-      <Text>Loading Button sizes</Text>
+      <DesignSystemSubHeader>Loading Button sizes</DesignSystemSubHeader>
       <VStack space="2">
         <Button size="small" isLoading>
           Login
@@ -185,7 +206,7 @@ export default function DesignSystemScreen() {
         </Button>
       </VStack>
 
-      <Text style={tw`mt-6 mb-4 h2`}>Input</Text>
+      <DesignSystemHeader>Input</DesignSystemHeader>
       <VStack space={4}>
         <Input />
         <LabeledInput label={"Input"} />
@@ -210,7 +231,7 @@ export default function DesignSystemScreen() {
         />
       </VStack>
 
-      <Text style={tw`mb-4 h2`}>Toast</Text>
+      <DesignSystemHeader>Toast</DesignSystemHeader>
       <Button
         onPress={() => {
           counter = counter + 1;
@@ -220,9 +241,9 @@ export default function DesignSystemScreen() {
         Add Toast
       </Button>
 
-      <Text style={tw`mt-6 mb-4 h2`}>Avatar</Text>
-      <Text style={tw`mt-4 mb-1`}>Sizing</Text>
-      <HStack space={2} alignItems="center">
+      <DesignSystemHeader style={tw`mb-0`}>Avatar</DesignSystemHeader>
+      <DesignSystemSubHeader>Sizing</DesignSystemSubHeader>
+      <HStack space={2} alignItems="center" style={tw`pr-2 overflow-scroll`}>
         <Avatar bg="primary.500" size={"xs"}>
           XS
         </Avatar>
@@ -242,7 +263,8 @@ export default function DesignSystemScreen() {
           2XL
         </Avatar>
       </HStack>
-      <Text style={tw`mt-4 mb-1`}>Avatar Group</Text>
+
+      <DesignSystemSubHeader>Avatar Group</DesignSystemSubHeader>
       <AvatarGroup max={8} _avatar={{ size: "sm" }}>
         <Avatar bg="collaboration.arctic">BE</Avatar>
         <Avatar bg="collaboration.lavender">NG</Avatar>
@@ -251,7 +273,9 @@ export default function DesignSystemScreen() {
         <Avatar bg="collaboration.sky">NG</Avatar>
         <Avatar bg={tw.color(`collaboration-terracotta`)}>NG</Avatar>
       </AvatarGroup>
-      <Text style={tw`mt-4 mb-1`}>Avatar Group with max 3 shown</Text>
+      <DesignSystemSubHeader>
+        Avatar Group with max 3 shown
+      </DesignSystemSubHeader>
       <AvatarGroup max={3} _avatar={{ size: "sm" }}>
         <Avatar bg="collaboration.arctic">SK</Avatar>
         <Avatar bg="collaboration.lavender">NG</Avatar>
@@ -259,8 +283,11 @@ export default function DesignSystemScreen() {
         <Avatar bg="collaboration.honey">NG</Avatar>
         <Avatar bg="collaboration.sky">NG</Avatar>
       </AvatarGroup>
-      <Text style={tw`mt-4 mb-1`}>Collaboration Colors - Workspace Style</Text>
-      <HStack space={4}>
+
+      <DesignSystemSubHeader>
+        Collaboration Colors - Workspace Style
+      </DesignSystemSubHeader>
+      <HStack space={4} style={tw`pb-3 pr-2 overflow-scroll`}>
         {collabColors.map((color) => {
           return (
             <Avatar
@@ -280,7 +307,7 @@ export default function DesignSystemScreen() {
         })}
       </HStack>
 
-      <Text style={tw`mt-6 mb-4 h2`}>SidebarButton</Text>
+      <DesignSystemHeader>SidebarButton</DesignSystemHeader>
       <SidebarButton>
         <Text variant="small">Hallo</Text>
       </SidebarButton>
@@ -288,7 +315,7 @@ export default function DesignSystemScreen() {
         <Text variant="small">Hallo</Text>
       </SidebarButton>
 
-      <Text style={tw`mt-6 mb-4 h2`}>Menu</Text>
+      <DesignSystemHeader>Menu</DesignSystemHeader>
       <View style={tw`flex flex-row`}>
         <Menu
           placement="bottom left"
@@ -378,7 +405,7 @@ export default function DesignSystemScreen() {
         </Menu>
       </View>
 
-      <Text style={tw`mt-6 mb-4 h2`}>Link</Text>
+      <DesignSystemHeader>Link</DesignSystemHeader>
       <Text>
         This is a link to{" "}
         <Link to={{ screen: "EncryptDecryptImageTest" }}>
@@ -404,7 +431,7 @@ export default function DesignSystemScreen() {
         </Link>
       </Text>
 
-      <Text style={tw`mt-6 mb-4 h2`}>SidebarLink</Text>
+      <DesignSystemHeader>SidebarLink</DesignSystemHeader>
       <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
         <Avatar
           borderRadius={4}
@@ -416,7 +443,7 @@ export default function DesignSystemScreen() {
         <Text>Encrypt / Decrypt Image</Text>
       </SidebarLink>
 
-      <Text style={tw`mt-6 mb-4 h2`}>Modal (work in progress)</Text>
+      <DesignSystemHeader>Modal (work in progress)</DesignSystemHeader>
       <Modal isVisible={showModal} onBackdropPress={() => setShowModal(false)}>
         <ModalHeader>This is the header</ModalHeader>
         <LabeledInput
@@ -443,43 +470,49 @@ export default function DesignSystemScreen() {
         Open Modal
       </Button>
 
-      <Text style={tw`mt-6 mb-4 h2`}>Spinner</Text>
-      <Spinner />
-      <Spinner size="lg" />
-      <Spinner fadeIn size="lg" />
+      <DesignSystemHeader>Spinner</DesignSystemHeader>
+      <VStack space={3}>
+        <Spinner />
+        <Spinner size="lg" />
+        <Spinner fadeIn size="lg" />
+      </VStack>
 
-      <Text style={tw`mt-6 mb-4 h2`}>Checkbox</Text>
-      <Checkbox value="test" accessibilityLabel="This is a dummy checkbox" />
-      <Checkbox
-        value="test"
-        accessibilityLabel="This is a dummy checkbox"
-        defaultIsChecked
-      >
-        <Text>
-          Software Development{" "}
-          <Link to={{ screen: "EncryptDecryptImageTest" }}>
-            Encrypt / Decrypt Image
-          </Link>
-        </Text>
-      </Checkbox>
-      <Checkbox
-        value="test"
-        accessibilityLabel="This is a dummy checkbox"
-        isDisabled
-      />
-      <Checkbox
-        value="test"
-        accessibilityLabel="This is a dummy checkbox"
-        isDisabled
-        isChecked
-      />
+      <DesignSystemHeader>Checkbox</DesignSystemHeader>
+      <VStack space={3}>
+        <Checkbox value="test" accessibilityLabel="This is a dummy checkbox" />
+        <Checkbox
+          value="test"
+          accessibilityLabel="This is a dummy checkbox"
+          defaultIsChecked
+        >
+          <Text>
+            Software Development{" "}
+            <Link to={{ screen: "EncryptDecryptImageTest" }}>
+              Encrypt / Decrypt Image
+            </Link>
+          </Text>
+        </Checkbox>
+        <Checkbox
+          value="test"
+          accessibilityLabel="This is a dummy checkbox"
+          isDisabled
+        />
+        <Checkbox
+          value="test"
+          accessibilityLabel="This is a dummy checkbox"
+          isDisabled
+          isChecked
+        />
+      </VStack>
 
-      <Text style={tw`mt-6 mb-4 h2`}>Editor Icons</Text>
-      <EditorSidebarIcon name="bold" />
-      <EditorSidebarIcon name="bold" isActive />
+      <DesignSystemHeader>Editor Icons</DesignSystemHeader>
+      <VStack space={3}>
+        <EditorSidebarIcon name="bold" />
+        <EditorSidebarIcon name="bold" isActive />
+      </VStack>
 
-      <Text style={tw`mt-6 mb-4 h2`}>Icons</Text>
-      <Text style={tw`mb-1`}>Marks</Text>
+      <DesignSystemHeader style={tw`mb-0`}>Icons</DesignSystemHeader>
+      <DesignSystemSubHeader>Marks</DesignSystemSubHeader>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="bold" />
         <Icon name="code-view" />
@@ -489,7 +522,7 @@ export default function DesignSystemScreen() {
         <Icon name="strikethrough" />
         <Icon name="underline" />
       </Tiles>
-      <Text style={tw`mt-4 mb-1`}>Nodes</Text>
+      <DesignSystemSubHeader>Nodes</DesignSystemSubHeader>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="at-line" />
         <Icon name="code-s-slash-line" />
@@ -511,11 +544,11 @@ export default function DesignSystemScreen() {
         <Icon name="table-2" />
         <Icon name="text" />
       </Tiles>
-      <Text style={tw`mt-4 mb-1`}>Extension</Text>
+      <DesignSystemSubHeader>Extension</DesignSystemSubHeader>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="font-color" />
       </Tiles>
-      <Text style={tw`mt-4 mb-1`}>Editor Custom</Text>
+      <DesignSystemSubHeader>Editor Custom</DesignSystemSubHeader>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="attachment-2" />
         <Icon name="font-size-2" />
@@ -525,7 +558,7 @@ export default function DesignSystemScreen() {
         <Icon name="page-separator" />
         <Icon name="separator" />
       </Tiles>
-      <Text style={tw`mt-4 mb-1`}>UI</Text>
+      <DesignSystemSubHeader>UI</DesignSystemSubHeader>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="add-line" />
         <Icon name="archive-fill" />
@@ -584,12 +617,12 @@ export default function DesignSystemScreen() {
         <Icon name="serenity-feather" />
         <Icon name="warning-fill" />
       </Tiles>
-      <Text style={tw`mt-4 mb-1`}>Sidebar</Text>
+      <DesignSystemSubHeader>Sidebar</DesignSystemSubHeader>
       <Tiles style={tw`max-w-lg`} space={4} columns={10}>
         <Icon name="folder" />
         <Icon name="page" />
       </Tiles>
-      <Text style={tw`mt-4 mb-1`}>Icons resized</Text>
+      <DesignSystemSubHeader>Icons resized</DesignSystemSubHeader>
       <Columns space={4} alignY="center" alignX="left">
         <Column width="content">
           <Icon name="list-unordered" />
@@ -598,7 +631,7 @@ export default function DesignSystemScreen() {
           <Icon name="list-unordered" size={8} mobileSize={9} />
         </Column>
       </Columns>
-      <Text style={tw`mt-4 mb-1`}>Icons coloured</Text>
+      <DesignSystemSubHeader>Icons coloured</DesignSystemSubHeader>
       <Icon name="list-check-2" color={tw.color("primary-500")} />
     </ScrollSafeAreaView>
   );
