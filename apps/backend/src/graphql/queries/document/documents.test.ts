@@ -209,7 +209,7 @@ test("user should be able to list documents in a folder with multiple items", as
       "edges": Array [
         Object {
           "node": Object {
-            "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
+            "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
             "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
@@ -218,7 +218,7 @@ test("user should be able to list documents in a folder with multiple items", as
         },
         Object {
           "node": Object {
-            "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
+            "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
             "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
@@ -227,7 +227,7 @@ test("user should be able to list documents in a folder with multiple items", as
         },
       ],
       "pageInfo": Object {
-        "endCursor": "OWU5MTFmMjktN2E4Ni00ODBiLTg5ZDctNWM2NDdmMjEzMTdm",
+        "endCursor": "MzUzMGI5ZWQtMTFmMy00NGM3LTllMTYtN2RiYTFlMTQ4MTVm",
         "hasNextPage": false,
       },
     }
@@ -268,7 +268,7 @@ test("user should be able to list without showing subfolder documents", async ()
       "edges": Array [
         Object {
           "node": Object {
-            "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
+            "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
             "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
@@ -277,7 +277,7 @@ test("user should be able to list without showing subfolder documents", async ()
         },
         Object {
           "node": Object {
-            "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
+            "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
             "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
@@ -286,7 +286,7 @@ test("user should be able to list without showing subfolder documents", async ()
         },
       ],
       "pageInfo": Object {
-        "endCursor": "OWU5MTFmMjktN2E4Ni00ODBiLTg5ZDctNWM2NDdmMjEzMTdm",
+        "endCursor": "MzUzMGI5ZWQtMTFmMy00NGM3LTllMTYtN2RiYTFlMTQ4MTVm",
         "hasNextPage": false,
       },
     }
