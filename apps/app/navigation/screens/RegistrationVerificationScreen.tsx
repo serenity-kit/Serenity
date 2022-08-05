@@ -141,6 +141,7 @@ export default function RegistrationVerificationScreen(
         startLoginMutation,
         finishLoginMutation,
         updateAuthentication,
+        urqlClient,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
       await storeDeviceKeys();
