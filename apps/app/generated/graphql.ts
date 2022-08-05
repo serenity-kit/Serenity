@@ -27,7 +27,9 @@ export type AcceptWorkspaceInvitationResult = {
 
 export type AttachDeviceToWorkspaceInput = {
   ciphertext: Scalars['String'];
-  signingPublicKey: Scalars['String'];
+  creatorDeviceSigningPublicKey: Scalars['String'];
+  nonce: Scalars['String'];
+  receiverDeviceSigningPublicKey: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
@@ -179,7 +181,9 @@ export type DeviceResult = {
 
 export type DeviceWorkspaceKeyBoxInput = {
   ciphertext: Scalars['String'];
+  creatorDeviceSigningPublicKey: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
+  nonce: Scalars['String'];
 };
 
 export type Document = {
@@ -677,8 +681,10 @@ export type WorkspaceKey = {
 export type WorkspaceKeyBox = {
   __typename?: 'WorkspaceKeyBox';
   ciphertext: Scalars['String'];
+  creatorDeviceSigningPublicKey: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
   id: Scalars['String'];
+  nonce: Scalars['String'];
   workspaceKeyId: Scalars['String'];
 };
 

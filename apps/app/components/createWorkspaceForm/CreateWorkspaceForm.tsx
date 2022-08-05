@@ -15,9 +15,12 @@ import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
 import { createAeadKeyAndCipherTextForDevice } from "../../utils/device/createAeadKeyAndCipherTextForDevice";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { Device } from "../../types/Device";
+import { getActiveDevice } from "../../utils/device/getActiveDevice";
 
 type DeviceWorkspaceKeyBoxParams = {
   deviceSigningPublicKey: string;
+  creatorDeviceSigningPublicKey: string;
+  nonce: string;
   ciphertext: string;
 };
 
@@ -64,15 +67,23 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[] = [];
     const allDevices = devices;
     const mainDevice = getMainDevice();
+    const activeDevice = await getActiveDevice();
+    if (!activeDevice) {
+      // TODO: handle this error
+      console.error("No active device!");
+    }
     if (mainDevice) {
       allDevices.push(mainDevice);
     }
     for await (const device of allDevices) {
-      const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
-        deviceEncryptionPublicKey: device.encryptionPublicKey,
+      const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+        receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+        creatorDeviceEncryptionPrivateKey: activeDevice?.encryptionPrivateKey!,
       });
       deviceWorkspaceKeyBoxes.push({
         deviceSigningPublicKey: device.signingPublicKey,
+        creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
+        nonce,
         ciphertext,
       });
     }

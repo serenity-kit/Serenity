@@ -31,7 +31,7 @@ export default function WorkspaceRootScreen(
   const { sessionKey } = useAuthentication();
   const [, attatchDeviceToWorkspace] = useAttachDeviceToWorkspaceMutation();
 
-  const doMainDeviceToAttachDeviceToWorkspace = async (device: Device) => {
+  const doActiveDeviceToAttachDeviceToWorkspace = async (device: Device) => {
     if (!sessionKey) {
       // TODO: handle a no session key error
       console.log("No session key found!");
@@ -61,19 +61,29 @@ export default function WorkspaceRootScreen(
       return;
     }
     const aeadKey = await decryptAeadkey({
-      deviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
-      deviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
+      creatorDeviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
+      receiverDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
+      nonce: mainDeviceWorkspaceBox.nonce,
       ciphertext: mainDeviceWorkspaceBox.ciphertext,
     });
-    const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
-      deviceEncryptionPublicKey: device.encryptionPublicKey,
+    const activeDevice = await getActiveDevice();
+    if (!activeDevice) {
+      // TODO: handle this error
+      console.error("No active device!");
+    }
+    const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+      receiverDeviceEncryptionPublicKey: activeDevice?.encryptionPublicKey!,
+      creatorDeviceEncryptionPrivateKey: activeDevice?.encryptionPrivateKey!,
+      nonce: mainDeviceWorkspaceBox.nonce,
       aeadKey,
     });
     await attatchDeviceToWorkspace({
       input: {
-        ciphertext,
-        signingPublicKey: device.signingPublicKey,
         workspaceId,
+        receiverDeviceSigningPublicKey: device.signingPublicKey,
+        creatorDeviceSigningPublicKey: device.signingPublicKey,
+        nonce,
+        ciphertext,
       },
     });
   };
@@ -108,7 +118,7 @@ export default function WorkspaceRootScreen(
         const workspace = workspaceResult.data?.workspace;
         if (workspace?.currentWorkspaceKey?.workspaceKeyBox) {
           // use the mainDevice to decrypt the aeadkey
-          await doMainDeviceToAttachDeviceToWorkspace(device);
+          await doActiveDeviceToAttachDeviceToWorkspace(device);
         }
       }
       const lastUsedDocumentId = await getLastUsedDocumentId(workspaceId);
