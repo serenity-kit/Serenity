@@ -184,6 +184,36 @@ export const crypto_box_seal_open = async (
   return base64ToUrlSafeBase64(result);
 };
 
+export const crypto_box_easy = async (
+  message: string,
+  nonce: string,
+  recipientPublicKey: string,
+  creatorPrivateKey: string
+): Promise<string> => {
+  const cipherText = await sodium.crypto_box_easy(
+    urlSafeBase64ToBase64(message),
+    urlSafeBase64ToBase64(nonce),
+    urlSafeBase64ToBase64(recipientPublicKey),
+    urlSafeBase64ToBase64(creatorPrivateKey)
+  );
+  return base64ToUrlSafeBase64(cipherText);
+};
+
+export const crypto_box_open_easy = async (
+  ciphertext: string,
+  nonce: string,
+  creatorPublicKey: string,
+  recipientPrivateKey: string
+): Promise<string> => {
+  const message = await sodium.crypto_box_open_easy(
+    urlSafeBase64ToBase64(ciphertext),
+    urlSafeBase64ToBase64(nonce),
+    urlSafeBase64ToBase64(creatorPublicKey),
+    urlSafeBase64ToBase64(recipientPrivateKey)
+  );
+  return base64ToUrlSafeBase64(message);
+};
+
 export default {
   ready,
   to_base64,
@@ -192,6 +222,8 @@ export default {
   randombytes_buf,
   randombytes_uniform,
   crypto_pwhash,
+  crypto_box_easy,
+  crypto_box_open_easy,
   crypto_box_keypair,
   crypto_sign_keypair,
   crypto_sign_detached,

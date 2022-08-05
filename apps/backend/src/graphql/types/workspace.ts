@@ -6,6 +6,8 @@ export const WorkspaceKeyBox = objectType({
     t.nonNull.string("id");
     t.nonNull.string("workspaceKeyId");
     t.nonNull.string("deviceSigningPublicKey");
+    t.nonNull.string("creatorDeviceSigningPublicKey");
+    t.nonNull.string("nonce");
     t.nonNull.string("ciphertext");
   },
 });

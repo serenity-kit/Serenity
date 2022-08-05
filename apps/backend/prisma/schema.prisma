@@ -171,11 +171,13 @@ model WorkspaceKey {
 }
 
 model WorkspaceKeyBox {
-  id                     String       @id @unique @default(uuid())
-  workspaceKey           WorkspaceKey @relation(fields: [workspaceKeyId], references: [id], onDelete: Cascade)
-  workspaceKeyId         String
-  deviceSigningPublicKey String
-  ciphertext             String
+  id                            String       @id @unique @default(uuid())
+  workspaceKey                  WorkspaceKey @relation(fields: [workspaceKeyId], references: [id], onDelete: Cascade)
+  workspaceKeyId                String
+  deviceSigningPublicKey        String
+  creatorDeviceSigningPublicKey String       @default("invalid")
+  nonce                         String       @default("invalid")
+  ciphertext                    String
 }
 
 model Folder {
