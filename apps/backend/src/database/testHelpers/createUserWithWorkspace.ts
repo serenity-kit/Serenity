@@ -71,7 +71,12 @@ export default async function createUserWithWorkspace({
         },
       },
     });
-    return { user, device };
+    return {
+      user,
+      device,
+      encryptionPrivateKey: mainDevice.encryptionPrivateKey,
+      signingPrivateKey: mainDevice.signingPrivateKey,
+    };
   });
 
   const documentId = uuidv4();
@@ -85,9 +90,12 @@ export default async function createUserWithWorkspace({
 
   const user = result.user;
   const device = result.device;
+  const deviceEncryptionPrivateKey = result.encryptionPrivateKey;
   const deviceEncryptionPublicKey = device.encryptionPublicKey;
-  const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
-    deviceEncryptionPublicKey,
+  const deviceSigningPrivateKey = result.signingPrivateKey;
+  const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+    receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
   });
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
@@ -102,6 +110,8 @@ export default async function createUserWithWorkspace({
     deviceWorkspaceKeyBoxes: [
       {
         deviceSigningPublicKey: device.signingPublicKey,
+        creatorDeviceSigningPublicKey: device.signingPublicKey,
+        nonce,
         ciphertext,
       },
     ],
@@ -132,6 +142,8 @@ export default async function createUserWithWorkspace({
     session,
     sessionKey,
     device,
+    deviceEncryptionPrivateKey,
+    deviceSigningPrivateKey,
     workspace: createWorkspaceResult.workspace,
     folder: createWorkspaceResult.folder,
     document: createWorkspaceResult.document,

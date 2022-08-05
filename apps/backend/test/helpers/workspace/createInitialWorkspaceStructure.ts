@@ -33,8 +33,9 @@ export const createInitialWorkspaceStructure = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
-    deviceEncryptionPublicKey,
+  const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+    receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: deviceEncryptionPublicKey,
   });
   const query = gql`
     mutation createInitialWorkspaceStructure(
@@ -95,6 +96,8 @@ export const createInitialWorkspaceStructure = async ({
         deviceWorkspaceKeyBoxes: [
           {
             deviceSigningPublicKey,
+            creatorDeviceSigningPublicKey: deviceSigningPublicKey,
+            nonce,
             ciphertext,
           },
         ],

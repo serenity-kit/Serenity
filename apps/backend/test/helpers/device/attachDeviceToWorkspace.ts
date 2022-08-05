@@ -4,6 +4,8 @@ type Params = {
   graphql: any;
   workspaceId: string;
   deviceSigningPublicKey: string;
+  creatorDeviceSigningPublicKey: string;
+  deviceAeadNonce: string;
   deviceAeadCiphertext: string;
   authorizationHeader: string;
 };
@@ -11,6 +13,8 @@ type Params = {
 export const attachDeviceToWorkspace = async ({
   graphql,
   deviceSigningPublicKey,
+  creatorDeviceSigningPublicKey,
+  deviceAeadNonce,
   deviceAeadCiphertext,
   workspaceId,
   authorizationHeader,
@@ -39,7 +43,9 @@ export const attachDeviceToWorkspace = async ({
     {
       input: {
         workspaceId,
-        signingPublicKey: deviceSigningPublicKey,
+        receiverDeviceSigningPublicKey: deviceSigningPublicKey,
+        creatorDeviceSigningPublicKey,
+        nonce: deviceAeadNonce,
         ciphertext: deviceAeadCiphertext,
       },
     },

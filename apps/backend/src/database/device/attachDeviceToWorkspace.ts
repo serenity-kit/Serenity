@@ -5,15 +5,19 @@ import { ForbiddenError } from "apollo-server-express";
 
 type Params = {
   userId: string;
-  signingPublicKey: string;
+  receiverDeviceSigningPublicKey: string;
+  creatorDeviceSigningPublicKey: string;
   workspaceId: string;
+  nonce: string;
   ciphertext: string;
 };
 
 export async function attachDeviceToWorkspace({
   userId,
-  signingPublicKey,
+  receiverDeviceSigningPublicKey,
+  creatorDeviceSigningPublicKey,
   workspaceId,
+  nonce,
   ciphertext,
 }: Params): Promise<WorkspaceKey> {
   try {
@@ -59,7 +63,9 @@ export async function attachDeviceToWorkspace({
         workspaceKeyBoxes.push({
           id: uuidv4(),
           workspaceKeyId: workspaceKey.id,
-          deviceSigningPublicKey: signingPublicKey,
+          deviceSigningPublicKey: receiverDeviceSigningPublicKey,
+          creatorDeviceSigningPublicKey,
+          nonce,
           ciphertext,
         });
       });

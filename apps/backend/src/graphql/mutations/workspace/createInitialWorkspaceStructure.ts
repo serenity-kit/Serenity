@@ -9,6 +9,8 @@ export const DeviceWorkspaceKeyBoxInput = inputObjectType({
   name: "DeviceWorkspaceKeyBoxInput",
   definition(t) {
     t.nonNull.string("deviceSigningPublicKey");
+    t.nonNull.string("creatorDeviceSigningPublicKey");
+    t.nonNull.string("nonce");
     t.nonNull.string("ciphertext");
   },
 });

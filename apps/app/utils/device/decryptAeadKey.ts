@@ -2,18 +2,21 @@ import sodium from "@serenity-tools/libsodium";
 
 export type Props = {
   ciphertext: string;
-  deviceEncryptionPublicKey: string;
-  deviceEncryptionPrivateKey: string;
+  nonce: string;
+  creatorDeviceEncryptionPublicKey: string;
+  receiverDeviceEncryptionPrivateKey: string;
 };
 export const decryptAeadkey = async ({
   ciphertext,
-  deviceEncryptionPublicKey,
-  deviceEncryptionPrivateKey,
+  nonce,
+  creatorDeviceEncryptionPublicKey,
+  receiverDeviceEncryptionPrivateKey,
 }: Props) => {
-  const aeadKey = await sodium.crypto_box_seal_open(
+  const aeadKey = await sodium.crypto_box_open_easy(
     ciphertext,
-    deviceEncryptionPublicKey,
-    deviceEncryptionPrivateKey
+    nonce,
+    creatorDeviceEncryptionPublicKey,
+    receiverDeviceEncryptionPrivateKey
   );
   return aeadKey;
 };

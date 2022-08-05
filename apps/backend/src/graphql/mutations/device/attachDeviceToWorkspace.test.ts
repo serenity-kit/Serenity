@@ -23,14 +23,18 @@ test("attach a device to a workspace", async () => {
   const authorizationHeader = userAndDevice1.sessionKey;
   const deviceSigningPublicKey = userAndDevice1.device.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
-  const { ciphertext } = await createAeadKeyAndCipherTextForDevice({
-    deviceEncryptionPublicKey,
+  const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+    receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey:
+      userAndDevice1.deviceEncryptionPrivateKey,
   });
   const workspaceId = userAndDevice1.workspace.id;
   const result = await attachDeviceToWorkspace({
     graphql,
     workspaceId,
     deviceSigningPublicKey,
+    creatorDeviceSigningPublicKey: deviceSigningPublicKey,
+    deviceAeadNonce: nonce,
     deviceAeadCiphertext: ciphertext,
     authorizationHeader,
   });

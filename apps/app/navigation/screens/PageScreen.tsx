@@ -33,16 +33,18 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     workspaceId: string,
     docId: string
   ) => {
-    const device = await getActiveDevice();
-    if (!device) {
-      // TODO this is a temporary fix and will be removed anyway
-      return;
+    const activeDevice = await getActiveDevice();
+    if (!activeDevice) {
+      // TODO: handle this error
+      console.error("No active device found!");
     }
-
     const workspaceResult = await urqlClient
       .query<WorkspaceQuery, WorkspaceQueryVariables>(
         WorkspaceDocument,
-        { id: workspaceId, deviceSigningPublicKey: device.signingPublicKey },
+        {
+          id: workspaceId,
+          deviceSigningPublicKey: activeDevice?.signingPublicKey!,
+        },
         { requestPolicy: "network-only" }
       )
       .toPromise();
