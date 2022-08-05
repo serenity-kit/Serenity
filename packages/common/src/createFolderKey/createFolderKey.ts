@@ -8,6 +8,8 @@ const upperBound = 2 ** 31 - 1;
 export const derivedKeyContext = "serenity";
 
 export const createFolderKey = async (workspaceKey: string) => {
+  // TODO On the frontend and on the backend we should check no
+  // subkeyId per workspaceKey is a duplicate.
   const subkeyId = await sodium.randombytes_uniform(upperBound);
   const derivedKey = await sodium.crypto_kdf_derive_from_key(
     sodium.crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
