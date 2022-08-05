@@ -13,16 +13,25 @@ import { UpdateAuthenticationFunction } from "../../context/AuthenticationContex
 import { createAndSetDevice } from "../device/deviceStore";
 import { Platform } from "react-native";
 import { detect } from "detect-browser";
-import { isUserIdSameAsLastLogin, setLoggedInUserId } from "./lastLoginStore";
+import {
+  isUserIdSameAsLastLogin,
+  removeLastLogin,
+  setLoggedInUserId,
+} from "./lastLoginStore";
 import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { v4 as uuidv4 } from "uuid";
 const browser = detect();
 
-const removeLastUsedWorkspaceIdIfLoginChanged = async (userId: string) => {
-  const isLoginSame = await isUserIdSameAsLastLogin(userId);
-  if (!isLoginSame) {
+const removeLastUsedWorkspaceIdIfLoginChanged = async (userId?: string) => {
+  if (!userId) {
     await removeLastUsedDocumentIdAndWorkspaceId();
-    await setLoggedInUserId(userId);
+    await removeLastLogin();
+  } else {
+    const isLoginSame = await isUserIdSameAsLastLogin(userId);
+    if (!isLoginSame) {
+      await removeLastUsedDocumentIdAndWorkspaceId();
+      await setLoggedInUserId(userId);
+    }
   }
 };
 
@@ -76,7 +85,7 @@ export const login = async ({
       requestPolicy: "network-only",
     })
     .toPromise();
-  const userId = meResult.data?.me?.id || uuidv4();
+  const userId = meResult.data?.me?.id;
   // if the user has changed, remove the previous lastusedworkspaceId and lastUsedDocumentId
   await removeLastUsedWorkspaceIdIfLoginChanged(userId);
   return result;
