@@ -194,6 +194,7 @@ export const crypto_kdf_derive_from_key = async (
   context: string,
   key: string
 ): Promise<string> => {
+  // TODO expose and use crypto_kdf_CONTEXTBYTES instead of 8
   if ([...context].length !== 8) {
     throw new Error("crypto_kdf_derive_from_key context must be 8 bytes");
   }
