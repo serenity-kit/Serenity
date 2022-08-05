@@ -12,7 +12,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import sodium from "@serenity-tools/libsodium";
 import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
-import { createAeadKeyAndCipherTextForDevice } from "../../utils/device/createAeadKeyAndCipherTextForDevice";
+import { createWorkspaceKeyAndCipherTextForDevice } from "../../utils/device/createWorkspaceKeyAndCipherTextForDevice";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { Device } from "../../types/Device";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
@@ -76,10 +76,12 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       allDevices.push(mainDevice);
     }
     for await (const device of allDevices) {
-      const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
-        receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-        creatorDeviceEncryptionPrivateKey: activeDevice?.encryptionPrivateKey!,
-      });
+      const { nonce, ciphertext } =
+        await createWorkspaceKeyAndCipherTextForDevice({
+          receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+          creatorDeviceEncryptionPrivateKey:
+            activeDevice?.encryptionPrivateKey!,
+        });
       deviceWorkspaceKeyBoxes.push({
         deviceSigningPublicKey: device.signingPublicKey,
         creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,

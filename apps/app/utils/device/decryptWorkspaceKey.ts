@@ -6,17 +6,17 @@ export type Props = {
   creatorDeviceEncryptionPublicKey: string;
   receiverDeviceEncryptionPrivateKey: string;
 };
-export const decryptAeadkey = async ({
+export const decryptWorkspaceKey = async ({
   ciphertext,
   nonce,
   creatorDeviceEncryptionPublicKey,
   receiverDeviceEncryptionPrivateKey,
 }: Props) => {
-  const aeadKey = await sodium.crypto_box_open_easy(
+  const workspaceKey = await sodium.crypto_box_open_easy(
     ciphertext,
     nonce,
     creatorDeviceEncryptionPublicKey,
     receiverDeviceEncryptionPrivateKey
   );
-  return aeadKey;
+  return workspaceKey;
 };

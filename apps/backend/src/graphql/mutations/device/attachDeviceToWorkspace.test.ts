@@ -4,7 +4,7 @@ import { createDevice } from "../../../../test/helpers/device/createDevice";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { attachDeviceToWorkspace } from "../../../../test/helpers/device/attachDeviceToWorkspace";
 import { WorkspaceKey } from "../../../types/workspace";
-import { createAeadKeyAndCipherTextForDevice } from "../../../../test/helpers/device/createAeadKeyAndCipherTextForDevice";
+import { createWorkspaceKeyAndCipherTextForDevice } from "../../../../test/helpers/device/createWorkspaceKeyAndCipherTextForDevice";
 import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
@@ -23,7 +23,7 @@ test("attach a device to a workspace", async () => {
   const authorizationHeader = userAndDevice1.sessionKey;
   const deviceSigningPublicKey = userAndDevice1.device.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
-  const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+  const { nonce, ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey:
       userAndDevice1.deviceEncryptionPrivateKey,

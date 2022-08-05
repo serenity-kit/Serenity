@@ -3,24 +3,32 @@ import sodium from "@serenity-tools/libsodium";
 export type Props = {
   receiverDeviceEncryptionPublicKey: string;
   creatorDeviceEncryptionPrivateKey: string;
+  workspaceKey?: string;
+  nonce?: string;
 };
-export const createAeadKeyAndCipherTextForDevice = async ({
+export const createWorkspaceKeyAndCipherTextForDevice = async ({
   receiverDeviceEncryptionPublicKey,
   creatorDeviceEncryptionPrivateKey,
+  workspaceKey,
+  nonce,
 }: Props) => {
-  const aeadKey = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
-  const nonce = await sodium.randombytes_buf(
-    sodium.crypto_secretbox_NONCEBYTES
-  );
+  let key = workspaceKey;
+  if (!key) {
+    key = await sodium.crypto_kdf_keygen();
+  }
+  let theNonce = nonce;
+  if (!theNonce) {
+    theNonce = await sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+  }
   const ciphertext = await sodium.crypto_box_easy(
-    aeadKey,
-    nonce,
+    key,
+    theNonce,
     receiverDeviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey
   );
   return {
-    aeadKey,
-    nonce,
+    workspaceKey: key,
+    nonce: theNonce,
     ciphertext,
   };
 };
