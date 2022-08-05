@@ -36,14 +36,6 @@ export default function AcceptWorkspaceInvitationScreen(
   const [graphqlError, setGraphqlError] = useState<string>("");
   const [authForm, setAuthForm] = useState<"login" | "register">("login");
 
-  if (!workspaceInvitationId) {
-    return (
-      <View>
-        <Text>Invalid invitation.</Text>
-      </View>
-    );
-  }
-
   const getWorskpaceInvitation = async (workspaceInvitationId: string) => {
     const workspaceInvitationResult = await urqlClient
       .query<WorkspaceInvitationQuery, WorkspaceInvitationQueryVariables>(
@@ -66,9 +58,18 @@ export default function AcceptWorkspaceInvitationScreen(
   };
 
   useEffect(() => {
-    getWorskpaceInvitation(workspaceInvitationId);
+    if (workspaceInvitationId) {
+      getWorskpaceInvitation(workspaceInvitationId);
+    }
   }, []);
 
+  if (!workspaceInvitationId) {
+    return (
+      <View>
+        <Text>Invalid invitation.</Text>
+      </View>
+    );
+  }
   const acceptAndGoToWorkspace = async () => {
     try {
       const workspace = await acceptWorkspaceInvitation({
