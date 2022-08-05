@@ -155,30 +155,6 @@ export const crypto_box_keypair = (): StringKeyPair => {
   };
 };
 
-export const crypto_box_seal = async (
-  message: string,
-  recipientPublicKey: string
-): Promise<string> => {
-  const cipherText = sodium.crypto_box_seal(
-    from_base64(message),
-    from_base64(recipientPublicKey)
-  );
-  return to_base64(cipherText);
-};
-
-export const crypto_box_seal_open = async (
-  ciphertext: string,
-  recipientPublicKey: string,
-  recipientPrivateKey: string
-): Promise<string> => {
-  const message = sodium.crypto_box_seal_open(
-    from_base64(ciphertext),
-    from_base64(recipientPublicKey),
-    from_base64(recipientPrivateKey)
-  );
-  return to_base64(message);
-};
-
 export const crypto_box_easy = async (
   message: string,
   nonce: string,
@@ -246,8 +222,6 @@ const libsodiumExports = {
   crypto_sign_detached,
   crypto_box_easy,
   crypto_box_open_easy,
-  crypto_box_seal,
-  crypto_box_seal_open,
   crypto_secretbox_easy,
   crypto_secretbox_open_easy,
   crypto_sign_verify_detached,
