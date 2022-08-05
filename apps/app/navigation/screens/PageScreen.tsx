@@ -20,6 +20,7 @@ import {
 } from "../../generated/graphql";
 import { useClient } from "urql";
 import { removeLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { getActiveDevice } from "../../utils/device/getActiveDevice";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -32,10 +33,18 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     workspaceId: string,
     docId: string
   ) => {
+    const activeDevice = await getActiveDevice();
+    if (!activeDevice) {
+      // TODO: handle this error
+      console.error("No active device found!");
+    }
     const workspaceResult = await urqlClient
       .query<WorkspaceQuery, WorkspaceQueryVariables>(
         WorkspaceDocument,
-        { id: workspaceId },
+        {
+          id: workspaceId,
+          deviceSigningPublicKey: activeDevice?.signingPublicKey!,
+        },
         { requestPolicy: "network-only" }
       )
       .toPromise();
