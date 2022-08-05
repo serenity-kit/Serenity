@@ -8,22 +8,40 @@ export const webDeviceExpirationSeconds = 1000 * 60 * 60 * 24 * 30;
 
 let device: Device | null = null;
 
-export const createWebDevice = async () => {
+export const createWebDevice = async (useExtendedLogin: boolean) => {
   const webDevice = await createDevice();
-  await setWebDevice(webDevice);
+  await setWebDevice(webDevice, useExtendedLogin);
   return webDevice;
 };
 
-export const setWebDevice = async (newDevice: Device) => {
+export const setWebDevice = async (
+  newDevice: Device,
+  useExtendedLogin: boolean
+) => {
   const expirationExpireTime =
     new Date().getTime() + webDeviceExpirationSeconds;
   const expiration = new Date(expirationExpireTime);
-  await setItem(webDeviceExpirationStorageKey, expiration.toISOString());
-  await setItem(webDeviceStorageKey, JSON.stringify(newDevice));
+  if (useExtendedLogin) {
+    await setItem(webDeviceExpirationStorageKey, expiration.toISOString());
+    await setItem(webDeviceStorageKey, JSON.stringify(newDevice));
+  } else {
+    sessionStorage.setItem(
+      webDeviceExpirationStorageKey,
+      expiration.toISOString()
+    );
+    sessionStorage.setItem(webDeviceStorageKey, JSON.stringify(newDevice));
+  }
 };
 
 export const getWebDevice = async (): Promise<Device | null> => {
-  const isoExpirationDate = await getItem(webDeviceExpirationStorageKey);
+  let isoExpirationDate = sessionStorage.getItem(webDeviceExpirationStorageKey);
+  let jsonWebDevice = sessionStorage.getItem(webDeviceStorageKey);
+  if (!isoExpirationDate) {
+    isoExpirationDate = await getItem(webDeviceExpirationStorageKey);
+  }
+  if (!jsonWebDevice) {
+    jsonWebDevice = await getItem(webDeviceStorageKey);
+  }
   if (!isoExpirationDate) {
     await removeWebDevice();
     return null;
@@ -34,7 +52,6 @@ export const getWebDevice = async (): Promise<Device | null> => {
     await removeWebDevice();
     return null;
   }
-  const jsonWebDevice = await getItem(webDeviceStorageKey);
   if (!jsonWebDevice) {
     return null;
   }
@@ -50,4 +67,6 @@ export const getWebDevice = async (): Promise<Device | null> => {
 export const removeWebDevice = async () => {
   await removeItem(webDeviceStorageKey);
   await removeItem(webDeviceExpirationStorageKey);
+  sessionStorage.removeItem(webDeviceStorageKey);
+  sessionStorage.removeItem(webDeviceExpirationStorageKey);
 };

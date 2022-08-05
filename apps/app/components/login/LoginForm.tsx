@@ -59,27 +59,26 @@ export function LoginForm(props: Props) {
 
   const storeDeviceKeys = async () => {
     if (Platform.OS === "web") {
-      if (useExtendedLogin) {
-        const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
-          await createWebDevice();
-        const deviceInfoJson = {
-          type: "web",
-          os: browser?.os,
-          osVersion: null,
-          browser: browser?.name,
-          browserVersion: browser?.version,
-        };
-        const deviceInfo = JSON.stringify(deviceInfoJson);
-        const newDeviceInfo = {
-          ...webDevice,
-          info: deviceInfo,
-        };
-        await createDeviceMutation({
-          input: newDeviceInfo,
-        });
-      } else {
+      if (!useExtendedLogin) {
         await removeWebDevice();
       }
+      const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
+        await createWebDevice(useExtendedLogin);
+      const deviceInfoJson = {
+        type: "web",
+        os: browser?.os,
+        osVersion: null,
+        browser: browser?.name,
+        browserVersion: browser?.version,
+      };
+      const deviceInfo = JSON.stringify(deviceInfoJson);
+      const newDeviceInfo = {
+        ...webDevice,
+        info: deviceInfo,
+      };
+      await createDeviceMutation({
+        input: newDeviceInfo,
+      });
     } else if (Platform.OS === "ios") {
       if (useExtendedLogin) {
         await registerNewDevice();
