@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server-express";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -39,6 +40,6 @@ export async function deleteWorkspaces({ workspaceIds, userId }: Params) {
       });
     });
   } catch (error) {
-    throw new Error("Invalid workspaceIds");
+    throw new UserInputError("Invalid workspaceIds");
   }
 }

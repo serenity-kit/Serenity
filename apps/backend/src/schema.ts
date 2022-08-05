@@ -36,6 +36,7 @@ import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspace
 import * as DeleteWorkspaceInvitationsTypes from "./graphql/mutations/workspace/deleteWorkspaceInvitations";
 import * as CreateInitialWorkspaceStructureMutationTypes from "./graphql/mutations/workspace/createInitialWorkspaceStructure";
 import * as PendingingWorkspaceInvitationQueryTypes from "./graphql/queries/workspace/pendingWorkspaceInvitation";
+import * as WorkspaceKeysQueryTypes from "./graphql/queries/workspace/workspaceKeys";
 
 import * as CreateDeviceMutationTypes from "./graphql/mutations/device/createDevice";
 import * as DevicesQueryTypes from "./graphql/queries/device/devices";
@@ -92,6 +93,7 @@ export const schema = makeSchema({
     DeleteWorkspaceInvitationsTypes,
     CreateInitialWorkspaceStructureMutationTypes,
     PendingingWorkspaceInvitationQueryTypes,
+    WorkspaceKeysQueryTypes,
 
     CreateDeviceMutationTypes,
     DevicesQueryTypes,
