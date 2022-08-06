@@ -8,7 +8,7 @@ beforeAll(async () => {
 test("encryptFolder", async () => {
   const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const result = await encryptFolder({
-    workspaceKey: kdfKey,
+    parentKey: kdfKey,
     name: "Getting started",
   });
   expect(typeof result.folderSubKey).toBe("string");
