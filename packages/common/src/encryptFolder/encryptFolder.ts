@@ -6,6 +6,7 @@ type Params = {
   name: string;
   // parentKey is the master key for the workspace or the key of the parent folder
   parentKey: string;
+  publicData?: any;
 };
 
 // Having a specific "folder__" context allows us to use have the same subKeyId
@@ -13,6 +14,11 @@ type Params = {
 export const derivedKeyContext = "folder__";
 
 export const encryptFolder = async (params: Params) => {
+  const publicData = params.publicData || {};
+  const canonicalizedPublicData = canonicalize(publicData);
+  if (!canonicalizedPublicData) {
+    throw new Error("Invalid public data for encrypting the name.");
+  }
   // TODO On the frontend and on the backend we should check no
   // subkeyId per parentKey is a duplicate.
   const folderKey = await kdfDeriveFromKey({
@@ -21,7 +27,7 @@ export const encryptFolder = async (params: Params) => {
   });
   const result = await encryptAead(
     params.name,
-    canonicalize({}) as string,
+    canonicalizedPublicData,
     folderKey.key
   );
   return {
@@ -29,5 +35,6 @@ export const encryptFolder = async (params: Params) => {
     folderSubkeyId: folderKey.subkeyId,
     ciphertext: result.ciphertext,
     publicNonce: result.publicNonce,
+    publicData,
   };
 };

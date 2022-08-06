@@ -10,18 +10,22 @@ type Params = {
   subkeyId: number;
   ciphertext: string;
   publicNonce: string;
+  publicData: any;
 };
 
 export const decryptFolder = async (params: Params) => {
+  const canonicalizedPublicData = canonicalize(params.publicData);
+  if (!canonicalizedPublicData) {
+    throw new Error("Invalid public data for decrypting the folder.");
+  }
   const folderKey = await kdfDeriveFromKey({
     key: params.parentKey,
     context: derivedKeyContext,
     subkeyId: params.subkeyId,
   });
-
   const result = await decryptAead(
     sodium.from_base64(params.ciphertext),
-    canonicalize({}) as string,
+    canonicalizedPublicData,
     folderKey.key,
     params.publicNonce
   );
