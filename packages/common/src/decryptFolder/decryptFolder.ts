@@ -25,5 +25,5 @@ export const decryptFolder = async (params: Params) => {
     folderKey.key,
     params.publicNonce
   );
-  return result;
+  return sodium.from_base64_to_string(result);
 };

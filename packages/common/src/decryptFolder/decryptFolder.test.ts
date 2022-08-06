@@ -18,7 +18,5 @@ test("decryptFolder", async () => {
     publicNonce: result.publicNonce,
     subkeyId: result.folderSubkeyId,
   });
-  expect(sodium.from_base64_to_string(decryptFolderResult)).toBe(
-    "Getting started"
-  );
+  expect(decryptFolderResult).toBe("Getting started");
 });
