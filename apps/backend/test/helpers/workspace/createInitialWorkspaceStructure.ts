@@ -1,6 +1,6 @@
-import { gql } from "graphql-request";
 import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
+import { gql } from "graphql-request";
 import { createWorkspaceKeyAndCipherTextForDevice } from "../device/createWorkspaceKeyAndCipherTextForDevice";
 
 type Params = {

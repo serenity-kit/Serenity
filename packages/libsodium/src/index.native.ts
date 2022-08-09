@@ -160,28 +160,51 @@ export const crypto_secretbox_open_easy = async (
   return base64ToUrlSafeBase64(result);
 };
 
-export const crypto_box_seal = async (
+export const crypto_box_easy = async (
   message: string,
-  recipientPublicKey: string
+  nonce: string,
+  recipientPublicKey: string,
+  creatorPrivateKey: string
 ): Promise<string> => {
-  const result = await sodium.crypto_box_seal(
+  const cipherText = await sodium.crypto_box_easy(
     urlSafeBase64ToBase64(message),
-    urlSafeBase64ToBase64(recipientPublicKey)
+    urlSafeBase64ToBase64(nonce),
+    urlSafeBase64ToBase64(recipientPublicKey),
+    urlSafeBase64ToBase64(creatorPrivateKey)
   );
-  return base64ToUrlSafeBase64(result);
+  return base64ToUrlSafeBase64(cipherText);
 };
 
-export const crypto_box_seal_open = async (
+export const crypto_box_open_easy = async (
   ciphertext: string,
-  recipientPublicKey: string,
+  nonce: string,
+  creatorPublicKey: string,
   recipientPrivateKey: string
 ): Promise<string> => {
-  const result = await sodium.crypto_box_seal_open(
+  const message = await sodium.crypto_box_open_easy(
     urlSafeBase64ToBase64(ciphertext),
-    urlSafeBase64ToBase64(recipientPublicKey),
+    urlSafeBase64ToBase64(nonce),
+    urlSafeBase64ToBase64(creatorPublicKey),
     urlSafeBase64ToBase64(recipientPrivateKey)
   );
-  return base64ToUrlSafeBase64(result);
+  return base64ToUrlSafeBase64(message);
+};
+
+export const crypto_kdf_keygen = async (): Promise<string> => {
+  throw new Error("Not implemented");
+};
+
+export const crypto_kdf_derive_from_key = async (
+  subkey_len: number,
+  nonce: number,
+  context: string,
+  key: string
+): Promise<string> => {
+  // TODO expose and use crypto_kdf_CONTEXTBYTES instead of 8
+  if ([...context].length !== 8) {
+    throw new Error("crypto_kdf_derive_from_key context must be 8 bytes");
+  }
+  throw new Error("Not implemented");
 };
 
 export const crypto_box_easy = async (
@@ -233,6 +256,8 @@ export default {
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
+  crypto_kdf_keygen,
+  crypto_kdf_derive_from_key,
   crypto_secretbox_NONCEBYTES: sodium.crypto_secretbox_NONCEBYTES,
   crypto_secretbox_KEYBYTES: sodium.crypto_secretbox_KEYBYTES,
   crypto_pwhash_SALTBYTES: sodium.crypto_pwhash_SALTBYTES,
@@ -241,6 +266,7 @@ export default {
   crypto_pwhash_MEMLIMIT_INTERACTIVE: 67108864, // copied from the web version
   crypto_box_PUBLICKEYBYTES: sodium.crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES: sodium.crypto_box_SECRETKEYBYTES,
+  crypto_aead_xchacha20poly1305_ietf_KEYBYTES: 32, // copied from the web version
   base64_to_url_safe_base64: base64ToUrlSafeBase64,
   url_safe_base64_to_base64: urlSafeBase64ToBase64,
 };

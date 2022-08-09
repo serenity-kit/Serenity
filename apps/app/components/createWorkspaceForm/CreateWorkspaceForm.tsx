@@ -1,21 +1,21 @@
-import React, { useEffect, useState, useRef } from "react";
+import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
+import sodium from "@serenity-tools/libsodium";
 import {
   Button,
   LabeledInput,
-  ModalHeader,
   ModalButtonFooter,
+  ModalHeader,
 } from "@serenity-tools/ui";
+import { useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import {
   useCreateInitialWorkspaceStructureMutation,
   useDevicesQuery,
 } from "../../generated/graphql";
-import { v4 as uuidv4 } from "uuid";
-import sodium from "@serenity-tools/libsodium";
-import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
-import { createWorkspaceKeyAndCipherTextForDevice } from "../../utils/device/createWorkspaceKeyAndCipherTextForDevice";
-import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { Device } from "../../types/Device";
+import { createWorkspaceKeyAndCipherTextForDevice } from "../../utils/device/createWorkspaceKeyAndCipherTextForDevice";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 
 type DeviceWorkspaceKeyBoxParams = {
   deviceSigningPublicKey: string;

@@ -1,11 +1,11 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { createDevice } from "../../../../test/helpers/device/createDevice";
-import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { attachDeviceToWorkspace } from "../../../../test/helpers/device/attachDeviceToWorkspace";
-import { WorkspaceKey } from "../../../types/workspace";
+import { createDevice } from "../../../../test/helpers/device/createDevice";
 import { createWorkspaceKeyAndCipherTextForDevice } from "../../../../test/helpers/device/createWorkspaceKeyAndCipherTextForDevice";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { WorkspaceKey } from "../../../types/workspace";
 
 const graphql = setupGraphql();
 const username1 = "user1";

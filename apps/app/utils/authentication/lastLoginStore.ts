@@ -3,26 +3,26 @@ import * as crypto from "expo-crypto";
 
 const lastLoginHashedUsernameKey = "lastLoginHashedUsername";
 
-const hashUsername = async (username: string) => {
-  const hashedUsername = await crypto.digestStringAsync(
+const hashUserId = async (userId: string) => {
+  const hashedUserId = await crypto.digestStringAsync(
     crypto.CryptoDigestAlgorithm.SHA256,
-    username
+    userId
   );
-  return hashedUsername;
+  return hashedUserId;
 };
 
-export const setLoggedInUsername = async (username: string): Promise<void> => {
-  const hashedUsername = await hashUsername(username);
-  await setItem(lastLoginHashedUsernameKey, hashedUsername);
+export const setLoggedInUserId = async (userId: string): Promise<void> => {
+  const hashedUserId = await hashUserId(userId);
+  await setItem(lastLoginHashedUsernameKey, hashedUserId);
 };
 
-export const isUsernameSameAsLastLogin = async (
-  username: string
+export const isUserIdSameAsLastLogin = async (
+  userId: string
 ): Promise<boolean> => {
-  const hashedPreviousUsername = await getItem(lastLoginHashedUsernameKey);
-  const hashedNewUsername = await hashUsername(username);
-  await setLoggedInUsername(username);
-  return hashedNewUsername === hashedPreviousUsername;
+  const hashedPreviousUserId = await getItem(lastLoginHashedUsernameKey);
+  const hashedNewUserId = await hashUserId(userId);
+  await setLoggedInUserId(userId);
+  return hashedNewUserId === hashedPreviousUserId;
 };
 
 export const removeLastLogin = async () => {

@@ -80,27 +80,26 @@ export default function RegistrationVerificationScreen(
     // for now this is a HACK to support devices and workspaceKeyBoxes
     const useExtendedLogin = true;
     if (Platform.OS === "web") {
-      if (useExtendedLogin) {
-        const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
-          await createWebDevice();
-        const deviceInfoJson = {
-          type: "web",
-          os: browser?.os,
-          osVersion: null,
-          browser: browser?.name,
-          browserVersion: browser?.version,
-        };
-        const deviceInfo = JSON.stringify(deviceInfoJson);
-        const newDeviceInfo = {
-          ...webDevice,
-          info: deviceInfo,
-        };
-        await createDeviceMutation({
-          input: newDeviceInfo,
-        });
-      } else {
-        await removeWebDevice();
+      if (!useExtendedLogin) {
+        removeWebDevice();
       }
+      const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
+        await createWebDevice(useExtendedLogin);
+      const deviceInfoJson = {
+        type: "web",
+        os: browser?.os,
+        osVersion: null,
+        browser: browser?.name,
+        browserVersion: browser?.version,
+      };
+      const deviceInfo = JSON.stringify(deviceInfoJson);
+      const newDeviceInfo = {
+        ...webDevice,
+        info: deviceInfo,
+      };
+      await createDeviceMutation({
+        input: newDeviceInfo,
+      });
     } else if (Platform.OS === "ios") {
       if (useExtendedLogin) {
         await registerNewDevice();
@@ -141,6 +140,7 @@ export default function RegistrationVerificationScreen(
         startLoginMutation,
         finishLoginMutation,
         updateAuthentication,
+        urqlClient,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
       await storeDeviceKeys();
