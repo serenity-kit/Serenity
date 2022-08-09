@@ -7,7 +7,6 @@ import { gql } from "graphql-request";
 import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { Snapshot } from "@naisho/core";
-import { createAeadKeyAndCipherTextForDevice } from "../../../../test/helpers/device/createAeadKeyAndCipherTextForDevice";
 
 const graphql = setupGraphql();
 let userId1 = "";
