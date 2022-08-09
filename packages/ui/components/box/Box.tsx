@@ -13,7 +13,7 @@ export const Box = forwardRef((props: BoxProps, ref) => {
 
   return (
     <NbBox {...props} style={[styles.box, props.style]}>
-      <VStack space="5">{props.children}</VStack>
+      <VStack space="4">{props.children}</VStack>
     </NbBox>
   );
 });
