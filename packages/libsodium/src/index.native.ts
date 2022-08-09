@@ -1,10 +1,10 @@
 import sodium from "react-native-sodium-expo-plugin";
-import { to_base64, from_base64, from_base64_to_string } from "./base64native";
 import {
   base64ToUrlSafeBase64,
   urlSafeBase64ToBase64,
 } from "./base64Conversion";
-export { to_base64, from_base64, from_base64_to_string } from "./base64native";
+import { from_base64, from_base64_to_string, to_base64 } from "./base64native";
+export { from_base64, from_base64_to_string, to_base64 } from "./base64native";
 
 export type KeyType = "curve25519" | "ed25519" | "x25519";
 
@@ -205,36 +205,6 @@ export const crypto_kdf_derive_from_key = async (
     throw new Error("crypto_kdf_derive_from_key context must be 8 bytes");
   }
   throw new Error("Not implemented");
-};
-
-export const crypto_box_easy = async (
-  message: string,
-  nonce: string,
-  recipientPublicKey: string,
-  creatorPrivateKey: string
-): Promise<string> => {
-  const cipherText = await sodium.crypto_box_easy(
-    urlSafeBase64ToBase64(message),
-    urlSafeBase64ToBase64(nonce),
-    urlSafeBase64ToBase64(recipientPublicKey),
-    urlSafeBase64ToBase64(creatorPrivateKey)
-  );
-  return base64ToUrlSafeBase64(cipherText);
-};
-
-export const crypto_box_open_easy = async (
-  ciphertext: string,
-  nonce: string,
-  creatorPublicKey: string,
-  recipientPrivateKey: string
-): Promise<string> => {
-  const message = await sodium.crypto_box_open_easy(
-    urlSafeBase64ToBase64(ciphertext),
-    urlSafeBase64ToBase64(nonce),
-    urlSafeBase64ToBase64(creatorPublicKey),
-    urlSafeBase64ToBase64(recipientPrivateKey)
-  );
-  return base64ToUrlSafeBase64(message);
 };
 
 export default {
