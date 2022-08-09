@@ -184,6 +184,9 @@ model Folder {
   id             String     @id
   idSignature    String
   name           String // TODO must be encrypted
+  encryptedName  String?
+  nameNonce      String?
+  subKeyId       Int?
   workspace      Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId    String
   parentFolder   Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)

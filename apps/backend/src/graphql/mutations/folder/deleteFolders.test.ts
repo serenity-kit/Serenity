@@ -1,12 +1,13 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/authentication/registerUser";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
-import { createFolder } from "../../../../test/helpers/folder/createFolder";
-import { prisma } from "../../../database/prisma";
-import { v4 as uuidv4 } from "uuid";
-import { deleteFolders } from "../../../../test/helpers/folder/deleteFolder";
 import { gql } from "graphql-request";
+import { v4 as uuidv4 } from "uuid";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
+import { createFolder } from "../../../../test/helpers/folder/createFolder";
+import { deleteFolders } from "../../../../test/helpers/folder/deleteFolder";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 let userId = "";
@@ -18,6 +19,8 @@ const password = "password";
 let addedWorkspace: any = null;
 let addedFolderId: any = null;
 let otherUserWorkspaceId: any = null;
+let workspaceKey = "";
+let workspaceKey2 = "";
 
 const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
@@ -29,6 +32,7 @@ const setup = async () => {
     workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -39,10 +43,16 @@ const setup = async () => {
   });
   addedWorkspace =
     createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: registerUserResult.mainDevice,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    workspace: addedWorkspace,
+  });
   const createFolderResult = await createFolder({
     graphql,
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    name: null,
+    name: "Untitled",
+    parentKey: workspaceKey,
     parentFolderId: null,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
@@ -51,11 +61,13 @@ const setup = async () => {
 
   const registrationResponse = await registerUser(graphql, username2, password);
   sessionKey2 = registrationResponse.sessionKey;
+  const device2 = registrationResponse.mainDevice;
   const createWorkspaceResult2 = await createInitialWorkspaceStructure({
     workspaceName: "other user workspace",
     workspaceId: "e9f04512-8317-46e0-ae1b-64eddf70690d",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
+    deviceSigningPublicKey: device2.signingPublicKey,
+    deviceEncryptionPublicKey: device2.encryptionPublicKey,
+    deviceEncryptionPrivateKey: registrationResponse.encryptionPrivateKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -66,6 +78,13 @@ const setup = async () => {
   });
   otherUserWorkspaceId =
     createWorkspaceResult2.createInitialWorkspaceStructure.workspace.id;
+  const addedWorkspace2 =
+    createWorkspaceResult2.createInitialWorkspaceStructure.workspace;
+  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: registrationResponse.mainDevice,
+    deviceEncryptionPrivateKey: registrationResponse.encryptionPrivateKey,
+    workspace: addedWorkspace2,
+  });
 };
 
 beforeAll(async () => {
@@ -80,7 +99,8 @@ test("user can delete a folder", async () => {
   const createFolderResult = await createFolder({
     graphql,
     id: folderId,
-    name: null,
+    name: "Untitled",
+    parentKey: workspaceKey,
     parentFolderId: null,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
@@ -107,16 +127,18 @@ test("deleting a parent folder will cascade to children", async () => {
   const createParentFolderResult = await createFolder({
     graphql,
     id: parentFolderId,
-    name: null,
+    name: "Parent folder",
     parentFolderId: null,
+    parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   const createChildFolderResult = await createFolder({
     graphql,
     id: childFolderId,
-    name: null,
+    name: "Child folder",
     parentFolderId: parentFolderId,
+    parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
@@ -148,16 +170,18 @@ test("user can delete multiple folders", async () => {
   const createFolderResult1 = await createFolder({
     graphql,
     id: folderId1,
-    name: null,
+    name: "folder 1",
     parentFolderId: null,
+    parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   const createFolderResult2 = await createFolder({
     graphql,
     id: folderId2,
-    name: null,
+    name: "folder 2",
     parentFolderId: null,
+    parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
@@ -190,23 +214,26 @@ test("user can delete multiple folders", async () => {
   const createParentFolderResult1 = await createFolder({
     graphql,
     id: parentFolderId1,
-    name: null,
+    name: "parent folder",
     parentFolderId: null,
+    parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   const createParentFolderResult2 = await createFolder({
     graphql,
     id: parentFolderId2,
-    name: null,
+    name: "parent folder 2",
     parentFolderId: null,
+    parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
   const createChildFolderResult1 = await createFolder({
     graphql,
     id: childFolderId1,
-    name: null,
+    name: "child folder",
+    parentKey: workspaceKey,
     parentFolderId: parentFolderId1,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
@@ -214,7 +241,8 @@ test("user can delete multiple folders", async () => {
   const createChildFolderResult2 = await createFolder({
     graphql,
     id: childFolderId2,
-    name: null,
+    name: "child folder 2",
+    parentKey: workspaceKey,
     parentFolderId: parentFolderId2,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
@@ -251,7 +279,8 @@ test("user can't delete folders they don't own", async () => {
   const createFoldeResult = await createFolder({
     graphql,
     id: folderId,
-    name: null,
+    name: "folder name",
+    parentKey: workspaceKey,
     parentFolderId: null,
     authorizationHeader: sessionKey2,
     workspaceId: otherUserWorkspaceId,

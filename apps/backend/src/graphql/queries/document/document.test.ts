@@ -1,10 +1,10 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { getDocument } from "../../../../test/helpers/document/getDocument";
-import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { v4 as uuidv4 } from "uuid";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { createDocument } from "../../../../test/helpers/document/createDocument";
+import { getDocument } from "../../../../test/helpers/document/getDocument";
 import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { Device } from "../../../types/device";
 
 const graphql = setupGraphql();
@@ -20,6 +20,7 @@ beforeAll(async () => {
     id: workspaceId,
     username,
   });
+  console.log({ result });
   userId = result.user.id;
   device = result.device;
   sessionKey = result.sessionKey;

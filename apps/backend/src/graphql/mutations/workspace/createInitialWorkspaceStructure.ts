@@ -42,6 +42,9 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
     t.nonNull.string("folderId");
     t.nonNull.string("folderIdSignature");
     t.nonNull.string("folderName");
+    t.nonNull.string("encryptedFolderName");
+    t.nonNull.string("folderNameNonce");
+    t.nonNull.int("folderSubkeyId");
     t.nonNull.string("documentId");
     t.nonNull.string("documentName");
     t.nonNull.field("documentSnapshot", { type: DocumentSnapshotInput });
@@ -93,6 +96,26 @@ export const createInitialWorkspaceStructureMutation = mutationField(
       if (!args.input.folderName) {
         throw new UserInputError("Invalid input: folderName cannot be null");
       }
+      if (!args.input.encryptedFolderName) {
+        throw new UserInputError(
+          "Invalid input: encryptedFolderName cannot be null"
+        );
+      }
+      if (!args.input.folderNameNonce) {
+        throw new UserInputError(
+          "Invalid input: folderNameNonce cannot be null"
+        );
+      }
+      if (!args.input.folderSubkeyId) {
+        throw new UserInputError(
+          "Invalid input: folderSubkeyId cannot be null"
+        );
+      }
+      if (typeof args.input.folderSubkeyId !== "number") {
+        throw new UserInputError(
+          "Invalid input: folderSubkeyId must be a number"
+        );
+      }
       if (!args.input.documentId) {
         throw new UserInputError("Invalid input: documentId cannot be null");
       }
@@ -121,6 +144,9 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         folderId: args.input.folderId,
         folderIdSignature: args.input.folderIdSignature,
         folderName: args.input.folderName,
+        encryptedFolderName: args.input.encryptedFolderName,
+        folderNameNonce: args.input.folderNameNonce,
+        folderSubkeyId: args.input.folderSubkeyId,
         documentId: args.input.documentId,
         documentName: args.input.documentName,
         documentSnapshot: args.input.documentSnapshot,

@@ -1,11 +1,11 @@
-import { prisma } from "../prisma";
+import { v4 as uuidv4 } from "uuid";
 import {
   Workspace,
   WorkspaceKey,
   WorkspaceKeyBox,
   WorkspaceMember,
 } from "../../types/workspace";
-import { v4 as uuidv4 } from "uuid";
+import { prisma } from "../prisma";
 
 export type DeviceWorkspaceKeyBoxParams = {
   deviceSigningPublicKey: string;
@@ -106,6 +106,7 @@ export async function createWorkspace({
       idSignature: rawWorkspace.idSignature,
       members,
       currentWorkspaceKey: returningWorkspaceKey,
+      workspaceKeys: [returningWorkspaceKey],
     };
     return workspace;
   });
