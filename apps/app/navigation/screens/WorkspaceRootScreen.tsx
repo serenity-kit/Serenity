@@ -15,8 +15,8 @@ import {
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { createAeadKeyAndCipherTextForDevice } from "../../utils/device/createAeadKeyAndCipherTextForDevice";
-import { decryptAeadkey } from "../../utils/device/decryptAeadKey";
+import { createWorkspaceKeyAndCipherTextForDevice } from "../../utils/device/createWorkspaceKeyAndCipherTextForDevice";
+import { decryptWorkspaceKey } from "../../utils/device/decryptWorkspaceKey";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
@@ -60,7 +60,7 @@ export default function WorkspaceRootScreen(
       console.log("main device doesn't have an encryption private key!");
       return;
     }
-    const aeadKey = await decryptAeadkey({
+    const workspaceKey = await decryptWorkspaceKey({
       creatorDeviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
       receiverDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
       nonce: mainDeviceWorkspaceBox.nonce,
@@ -71,12 +71,13 @@ export default function WorkspaceRootScreen(
       // TODO: handle this error
       console.error("No active device!");
     }
-    const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
-      receiverDeviceEncryptionPublicKey: activeDevice?.encryptionPublicKey!,
-      creatorDeviceEncryptionPrivateKey: activeDevice?.encryptionPrivateKey!,
-      nonce: mainDeviceWorkspaceBox.nonce,
-      aeadKey,
-    });
+    const { nonce, ciphertext } =
+      await createWorkspaceKeyAndCipherTextForDevice({
+        receiverDeviceEncryptionPublicKey: activeDevice?.encryptionPublicKey!,
+        creatorDeviceEncryptionPrivateKey: activeDevice?.encryptionPrivateKey!,
+        nonce: mainDeviceWorkspaceBox.nonce,
+        workspaceKey,
+      });
     await attatchDeviceToWorkspace({
       input: {
         workspaceId,
@@ -117,7 +118,7 @@ export default function WorkspaceRootScreen(
         // to generate keys for this workspace
         const workspace = workspaceResult.data?.workspace;
         if (workspace?.currentWorkspaceKey?.workspaceKeyBox) {
-          // use the mainDevice to decrypt the aeadkey
+          // use the mainDevice to decrypt the workspace key
           await doActiveDeviceToAttachDeviceToWorkspace(device);
         }
       }
