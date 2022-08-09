@@ -9,7 +9,7 @@ export const workspaceInvitation = queryField((t) => {
     args: {
       id: nonNull(idArg()),
     },
-    async resolve(root, args, context) {
+    async resolve(_root, args, _context) {
       if (!args.id) {
         throw new UserInputError("Invalid input: id cannot be null");
       }

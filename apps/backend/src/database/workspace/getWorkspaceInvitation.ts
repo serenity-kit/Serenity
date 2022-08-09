@@ -1,6 +1,6 @@
-import { prisma } from "../prisma";
+import { UserInputError } from "apollo-server-express";
 import { WorkspaceInvitation } from "../../types/workspace";
-import { ForbiddenError } from "apollo-server-express";
+import { prisma } from "../prisma";
 
 type Params = {
   workspaceInvitationId: string;
@@ -34,7 +34,7 @@ export async function getWorkspaceInvitation({
     },
   });
   if (!rawWorkspaceInvitation) {
-    throw new ForbiddenError("Unauthorized");
+    throw new UserInputError("Workspace invitation not found");
   }
   const workspaceInvitation: WorkspaceInvitation = {
     id: rawWorkspaceInvitation.id,
