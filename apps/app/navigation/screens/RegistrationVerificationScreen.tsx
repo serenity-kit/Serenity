@@ -204,7 +204,7 @@ export default function RegistrationVerificationScreen(
 
         {errorMessage ? (
           <InfoMessage variant="error" icon>
-            <Text>{errorMessage}</Text>
+            {errorMessage}
           </InfoMessage>
         ) : null}
 
