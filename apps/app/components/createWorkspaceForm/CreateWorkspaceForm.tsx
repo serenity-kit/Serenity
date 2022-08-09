@@ -1,21 +1,21 @@
-import React, { useEffect, useState, useRef } from "react";
+import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
+import sodium from "@serenity-tools/libsodium";
 import {
   Button,
   LabeledInput,
-  ModalHeader,
   ModalButtonFooter,
+  ModalHeader,
 } from "@serenity-tools/ui";
+import { useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import {
   useCreateInitialWorkspaceStructureMutation,
   useDevicesQuery,
 } from "../../generated/graphql";
-import { v4 as uuidv4 } from "uuid";
-import sodium from "@serenity-tools/libsodium";
-import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
-import { createAeadKeyAndCipherTextForDevice } from "../../utils/device/createAeadKeyAndCipherTextForDevice";
-import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { Device } from "../../types/Device";
+import { createWorkspaceKeyAndCipherTextForDevice } from "../../utils/device/createWorkspaceKeyAndCipherTextForDevice";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 
 type DeviceWorkspaceKeyBoxParams = {
   deviceSigningPublicKey: string;
@@ -76,10 +76,12 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       allDevices.push(mainDevice);
     }
     for await (const device of allDevices) {
-      const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
-        receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-        creatorDeviceEncryptionPrivateKey: activeDevice?.encryptionPrivateKey!,
-      });
+      const { nonce, ciphertext } =
+        await createWorkspaceKeyAndCipherTextForDevice({
+          receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+          creatorDeviceEncryptionPrivateKey:
+            activeDevice?.encryptionPrivateKey!,
+        });
       deviceWorkspaceKeyBoxes.push({
         deviceSigningPublicKey: device.signingPublicKey,
         creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,

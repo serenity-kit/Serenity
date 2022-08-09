@@ -1,10 +1,10 @@
 import sodium from "react-native-sodium-expo-plugin";
-import { to_base64, from_base64, from_base64_to_string } from "./base64native";
 import {
   base64ToUrlSafeBase64,
   urlSafeBase64ToBase64,
 } from "./base64Conversion";
-export { to_base64, from_base64, from_base64_to_string } from "./base64native";
+import { from_base64, from_base64_to_string, to_base64 } from "./base64native";
+export { from_base64, from_base64_to_string, to_base64 } from "./base64native";
 
 export type KeyType = "curve25519" | "ed25519" | "x25519";
 
