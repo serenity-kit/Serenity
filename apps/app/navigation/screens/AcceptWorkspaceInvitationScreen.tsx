@@ -1,24 +1,27 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, tw, Box, Button, LinkButton } from "@serenity-tools/ui";
 import {
-  useWindowDimensions,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+  Box,
+  Button,
+  InfoMessage,
+  LinkButton,
+  Text,
+  tw,
+  View,
+} from "@serenity-tools/ui";
+import { useEffect, useState } from "react";
+import { StyleSheet, useWindowDimensions } from "react-native";
+import { useClient } from "urql";
+import { LoginForm } from "../../components/login/LoginForm";
+import RegisterForm from "../../components/register/RegisterForm";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
   useAcceptWorkspaceInvitationMutation,
-  useWorkspaceInvitationQuery,
   WorkspaceInvitation,
   WorkspaceInvitationDocument,
   WorkspaceInvitationQuery,
   WorkspaceInvitationQueryVariables,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
-import { LoginForm } from "../../components/login/LoginForm";
-import RegisterForm from "../../components/register/RegisterForm";
 import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
-import { useClient } from "urql";
 
 export default function AcceptWorkspaceInvitationScreen(
   props: RootStackScreenProps<"AcceptWorkspaceInvitation">
@@ -30,6 +33,10 @@ export default function AcceptWorkspaceInvitationScreen(
   const [workspaceInvitation, setWorkspaceInvitation] = useState<
     WorkspaceInvitation | undefined
   >();
+  const [workspaceInvitationError, setWorkspaceInvitationError] =
+    useState(false);
+  const [noWorkspaceInvitationFoundError, setNoWorkspaceInvitationFoundError] =
+    useState(false);
   const [, acceptWorkspaceInvitationMutation] =
     useAcceptWorkspaceInvitationMutation();
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
@@ -47,14 +54,15 @@ export default function AcceptWorkspaceInvitationScreen(
         }
       )
       .toPromise();
-    if (
-      workspaceInvitationResult.error ||
-      !workspaceInvitationResult.data?.workspaceInvitation
-    ) {
-      props.navigation.replace("WorkspaceNotFound");
-      return;
+    if (workspaceInvitationResult.error) {
+      setWorkspaceInvitationError(true);
+    } else if (!workspaceInvitationResult.data?.workspaceInvitation) {
+      setNoWorkspaceInvitationFoundError(true);
+    } else {
+      setWorkspaceInvitation(
+        workspaceInvitationResult.data.workspaceInvitation
+      );
     }
-    setWorkspaceInvitation(workspaceInvitationResult.data.workspaceInvitation);
   };
 
   useEffect(() => {
@@ -65,9 +73,10 @@ export default function AcceptWorkspaceInvitationScreen(
 
   if (!workspaceInvitationId) {
     return (
-      <View>
-        <Text>Invalid invitation.</Text>
-      </View>
+      <InfoMessage variant="error" icon>
+        Unfortunately your link misses an invitation ID. Please check verify the
+        invitation link is correct.
+      </InfoMessage>
     );
   }
   const acceptAndGoToWorkspace = async () => {
@@ -111,69 +120,85 @@ export default function AcceptWorkspaceInvitationScreen(
 
   return (
     <>
-      {hasGraphqlError && (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>{graphqlError}</Text>
-        </View>
+      {workspaceInvitationError && (
+        <InfoMessage variant="error" icon>
+          Unfortunately there was an error retrieving your invitation. Please
+          try again later or contact support.
+        </InfoMessage>
       )}
-      <View
-        style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
-      >
-        <Box>
-          {workspaceInvitation && (
-            <View style={styles.alertBanner}>
-              <Text style={styles.alertBannerText}>
-                You have been invited to join workspace{" "}
-                <b>{workspaceInvitation?.workspaceName}</b> by{" "}
-                <b>{workspaceInvitation?.inviterUsername}</b>
-              </Text>
-              {!sessionKey && (
-                <Text style={styles.alertBannerText}>
-                  Log in or register to accept the invitation.
-                </Text>
-              )}
+      {noWorkspaceInvitationFoundError && (
+        <InfoMessage variant="error" icon>
+          Unfortunately the invitation doesn't exist or was deleted. Please
+          contact the person that invited you to send you a new invitation link.
+        </InfoMessage>
+      )}
+      {!workspaceInvitationError && !noWorkspaceInvitationFoundError && (
+        <>
+          {hasGraphqlError && (
+            <View style={styles.errorBanner}>
+              <Text style={styles.errorText}>{graphqlError}</Text>
             </View>
           )}
-          {sessionKey ? (
-            <Button onPress={onAcceptWorkspaceInvitationPress} size="large">
-              Accept
-            </Button>
-          ) : (
-            <>
-              {authForm === "login" ? (
-                <>
-                  <LoginForm onLoginSuccess={onLoginSuccess} />
-                  <View style={tw`text-center`}>
-                    <Text variant="xs" muted>
-                      Don't have an account?
+          <View
+            style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
+          >
+            <Box>
+              {workspaceInvitation && (
+                <View style={styles.alertBanner}>
+                  <Text style={styles.alertBannerText}>
+                    You have been invited to join workspace{" "}
+                    <b>{workspaceInvitation?.workspaceName}</b> by{" "}
+                    <b>{workspaceInvitation?.inviterUsername}</b>
+                  </Text>
+                  {!sessionKey && (
+                    <Text style={styles.alertBannerText}>
+                      Log in or register to accept the invitation.
                     </Text>
-                    <LinkButton onPress={switchToRegisterForm}>
-                      Register here
-                    </LinkButton>
-                  </View>
-                </>
+                  )}
+                </View>
+              )}
+              {sessionKey ? (
+                <Button onPress={onAcceptWorkspaceInvitationPress} size="large">
+                  Accept
+                </Button>
               ) : (
                 <>
-                  <RegisterForm
-                    pendingWorkspaceInvitationId={
-                      props.route.params.workspaceInvitationId
-                    }
-                    onRegisterSuccess={onRegisterSuccess}
-                  />
-                  <View style={tw`text-center`}>
-                    <Text variant="xs" muted>
-                      Already have an account?
-                    </Text>
-                    <LinkButton onPress={switchToLoginForm}>
-                      Login here
-                    </LinkButton>
-                  </View>
+                  {authForm === "login" ? (
+                    <>
+                      <LoginForm onLoginSuccess={onLoginSuccess} />
+                      <View style={tw`text-center`}>
+                        <Text variant="xs" muted>
+                          Don't have an account?
+                        </Text>
+                        <LinkButton onPress={switchToRegisterForm}>
+                          Register here
+                        </LinkButton>
+                      </View>
+                    </>
+                  ) : (
+                    <>
+                      <RegisterForm
+                        pendingWorkspaceInvitationId={
+                          props.route.params.workspaceInvitationId
+                        }
+                        onRegisterSuccess={onRegisterSuccess}
+                      />
+                      <View style={tw`text-center`}>
+                        <Text variant="xs" muted>
+                          Already have an account?
+                        </Text>
+                        <LinkButton onPress={switchToLoginForm}>
+                          Login here
+                        </LinkButton>
+                      </View>
+                    </>
+                  )}
                 </>
               )}
-            </>
-          )}
-        </Box>
-      </View>
+            </Box>
+          </View>
+        </>
+      )}
     </>
   );
 }
