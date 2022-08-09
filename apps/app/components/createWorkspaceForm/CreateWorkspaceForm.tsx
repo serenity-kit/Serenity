@@ -4,6 +4,7 @@ import {
   LabeledInput,
   ModalHeader,
   ModalButtonFooter,
+  FormWrapper,
 } from "@serenity-tools/ui";
 import {
   useCreateInitialWorkspaceStructureMutation,
@@ -152,7 +153,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   };
 
   return (
-    <>
+    <FormWrapper>
       <ModalHeader>Create a Workspace</ModalHeader>
       <LabeledInput
         ref={inputRef}
@@ -174,6 +175,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           </Button>
         }
       />
-    </>
+    </FormWrapper>
   );
 }

@@ -5,9 +5,9 @@ import {
   Text,
   Checkbox,
   InfoMessage,
+  FormWrapper,
 } from "@serenity-tools/ui";
 import { Platform, useWindowDimensions } from "react-native";
-import { VStack } from "native-base";
 import {
   useStartLoginMutation,
   useFinishLoginMutation,
@@ -147,7 +147,7 @@ export function LoginForm(props: Props) {
   };
 
   return (
-    <VStack space="5">
+    <FormWrapper>
       <LabeledInput
         label={"Email"}
         keyboardType="email-address"
@@ -190,6 +190,6 @@ export function LoginForm(props: Props) {
       <Button onPress={onLoginPress} size="large" disabled={isLoggingIn}>
         Log in
       </Button>
-    </VStack>
+    </FormWrapper>
   );
 }
