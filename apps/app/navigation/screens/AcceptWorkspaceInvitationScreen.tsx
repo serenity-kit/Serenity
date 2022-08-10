@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Text, View, tw, Box, Button, LinkButton } from "@serenity-tools/ui";
+import {
+  Text,
+  View,
+  tw,
+  Box,
+  Button,
+  LinkButton,
+  InfoMessage,
+} from "@serenity-tools/ui";
 import {
   useWindowDimensions,
   StyleSheet,
@@ -14,6 +22,7 @@ import { RootStackScreenProps } from "../../types/navigation";
 import { LoginForm } from "../../components/login/LoginForm";
 import RegisterForm from "../../components/register/RegisterForm";
 import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
+import { VStack } from "native-base";
 
 export default function AcceptWorkspaceInvitationScreen(
   props: RootStackScreenProps<"AcceptWorkspaceInvitation">
@@ -82,42 +91,49 @@ export default function AcceptWorkspaceInvitationScreen(
 
   return (
     <>
-      {hasGraphqlError && (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>{graphqlError}</Text>
-        </View>
-      )}
       <View
         style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
       >
-        <Box>
-          {!workspaceInvitationQuery.fetching && (
-            <View style={styles.alertBanner}>
-              <Text style={styles.alertBannerText}>
+        <Box plush>
+          {!workspaceInvitationQuery.fetching ? (
+            <VStack alignItems="center" space={4} style={tw`text-center`}>
+              <Text variant={"large"} bold>
+                Hi there!
+              </Text>
+              <Text>
                 You have been invited to join workspace{" "}
-                <b>
+                <Text bold>
                   {
                     workspaceInvitationQuery.data?.workspaceInvitation
                       ?.workspaceName
                   }
-                </b>{" "}
+                </Text>{" "}
                 by{" "}
-                <b>
+                <Text bold>
                   {
                     workspaceInvitationQuery.data?.workspaceInvitation
                       ?.inviterUsername
                   }
-                </b>
+                </Text>
               </Text>
-              {!sessionKey && (
-                <Text style={styles.alertBannerText}>
+              {!sessionKey ? (
+                <Text variant="small" muted>
                   Log in or register to accept the invitation.
                 </Text>
-              )}
-            </View>
-          )}
+              ) : null}
+              {hasGraphqlError ? (
+                <InfoMessage variant="error" icon>
+                  {graphqlError}
+                </InfoMessage>
+              ) : null}
+            </VStack>
+          ) : null}
           {sessionKey ? (
-            <Button onPress={onAcceptWorkspaceInvitationPress} size="large">
+            <Button
+              onPress={onAcceptWorkspaceInvitationPress}
+              size="large"
+              style={tw`self-center`}
+            >
               Accept
             </Button>
           ) : (
@@ -159,16 +175,3 @@ export default function AcceptWorkspaceInvitationScreen(
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  alertBanner: {},
-  alertBannerText: {
-    color: "#000",
-  },
-  errorBanner: {
-    backgroundColor: "red",
-  },
-  errorText: {
-    color: "white",
-  },
-});
