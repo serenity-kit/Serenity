@@ -2,20 +2,20 @@ import {
   createAndEncryptDevice,
   createIntroductionDocumentSnapshot,
 } from "@serenity-tools/common";
-import { Login, Registration } from "@serenity-tools/opaque-server";
 import * as sodium from "@serenity-tools/libsodium";
+import { Login, Registration } from "@serenity-tools/opaque-server";
+import { v4 as uuidv4 } from "uuid";
+import { createWorkspaceKeyAndCipherTextForDevice } from "../../../test/helpers/device/createWorkspaceKeyAndCipherTextForDevice";
+import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
+import { addDays } from "../../utils/addDays/addDays";
 import {
   finishLogin,
   finishRegistration,
   startLogin,
   startRegistration,
 } from "../../utils/opaque";
-import { prisma } from "../prisma";
 import { createSession } from "../authentication/createSession";
-import { addDays } from "../../utils/addDays/addDays";
-import { v4 as uuidv4 } from "uuid";
-import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
-import { createAeadKeyAndCipherTextForDevice } from "../../../test/helpers/device/createAeadKeyAndCipherTextForDevice";
+import { prisma } from "../prisma";
 
 type Params = {
   id: string;
@@ -93,7 +93,7 @@ export default async function createUserWithWorkspace({
   const deviceEncryptionPrivateKey = result.encryptionPrivateKey;
   const deviceEncryptionPublicKey = device.encryptionPublicKey;
   const deviceSigningPrivateKey = result.signingPrivateKey;
-  const { nonce, ciphertext } = await createAeadKeyAndCipherTextForDevice({
+  const { nonce, ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
   });
