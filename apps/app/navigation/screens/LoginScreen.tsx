@@ -20,7 +20,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
         <View
           style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
         >
-          <Box>
+          <Box plush>
             <View>
               <Text variant="large" bold style={tw`text-center`}>
                 Welcome back

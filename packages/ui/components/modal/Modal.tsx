@@ -16,7 +16,7 @@ export const Modal = React.forwardRef(
   ({ children, isVisible, onBackdropPress, ...rest }: ModalProps, ref: any) => {
     const styles = StyleSheet.create({
       modal: tw`items-center`, // needed to horizontally center the box
-      box: tw`p-6`,
+      box: tw``,
     });
 
     useEffect(() => {

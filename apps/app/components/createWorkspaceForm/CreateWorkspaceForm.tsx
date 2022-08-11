@@ -4,6 +4,7 @@ import {
   Button,
   LabeledInput,
   ModalButtonFooter,
+  FormWrapper,
   ModalHeader,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
@@ -154,7 +155,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   };
 
   return (
-    <>
+    <FormWrapper>
       <ModalHeader>Create a Workspace</ModalHeader>
       <LabeledInput
         ref={inputRef}
@@ -176,6 +177,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           </Button>
         }
       />
-    </>
+    </FormWrapper>
   );
 }

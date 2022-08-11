@@ -13,6 +13,7 @@ export const workspaceInvitation = queryField((t) => {
       if (!args.id) {
         throw new UserInputError("Invalid input: id cannot be null");
       }
+
       const workspaceInvitationId = args.id;
       const workspaceInvitation = await getWorkspaceInvitation({
         workspaceInvitationId,
