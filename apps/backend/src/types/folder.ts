@@ -1,6 +1,9 @@
 export type Folder = {
   id: string;
   name: string;
+  encryptedName?: string | null;
+  encryptedNameNonce?: string | null;
+  subKeyId?: number | null;
   idSignature: string;
   parentFolderId: string | null;
   rootFolderId: string | null;

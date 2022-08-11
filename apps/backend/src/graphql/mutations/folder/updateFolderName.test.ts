@@ -1,11 +1,12 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { gql } from "graphql-request";
+import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { updateFolderName } from "../../../../test/helpers/folder/updateFolderName";
-import { v4 as uuidv4 } from "uuid";
-import { gql } from "graphql-request";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -23,6 +24,7 @@ const setup = async () => {
     workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -33,11 +35,17 @@ const setup = async () => {
   });
   addedWorkspace =
     createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: registerUserResult.mainDevice,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    workspace: addedWorkspace,
+  });
   const createFolderResult = await createFolder({
     graphql,
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    name: null,
+    name: "folder",
     parentFolderId: null,
+    parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
@@ -98,6 +106,7 @@ test("throw error when user doesn't have access", async () => {
     workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -108,11 +117,17 @@ test("throw error when user doesn't have access", async () => {
   });
   addedWorkspace =
     createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: registerUserResult.mainDevice,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    workspace: addedWorkspace,
+  });
   const otherUserFolderResult = await createFolder({
     graphql,
     id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
-    name: null,
+    name: "folder",
     parentFolderId: null,
+    parentKey: workspaceKey,
     authorizationHeader: registerUserResult.sessionKey,
     workspaceId: addedWorkspace.id,
   });
