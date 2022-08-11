@@ -69,7 +69,7 @@ test("user should be able to create a root folder", async () => {
   expect(typeof folder.encryptedName).toBe("string");
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
-  expect(typeof folder.nameNonce).toBe("string");
+  expect(typeof folder.encryptedNameNonce).toBe("string");
   expect(typeof folder.subKeyId).toBe("number");
 });
 
@@ -93,7 +93,7 @@ test("user should be able to create a root folder with a name", async () => {
   expect(typeof folder.encryptedName).toBe("string");
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
-  expect(typeof folder.nameNonce).toBe("string");
+  expect(typeof folder.encryptedNameNonce).toBe("string");
   expect(typeof folder.subKeyId).toBe("number");
 });
 
@@ -118,7 +118,7 @@ test("user should be able to create a child folder", async () => {
   expect(typeof folder.encryptedName).toBe("string");
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
-  expect(typeof folder.nameNonce).toBe("string");
+  expect(typeof folder.encryptedNameNonce).toBe("string");
   expect(typeof folder.subKeyId).toBe("number");
 });
 
@@ -233,7 +233,7 @@ describe("Input errors", () => {
       parentKey: workspaceKey,
     });
     const encryptedName = encryptedFolderResult.ciphertext;
-    const nameNonce = encryptedFolderResult.publicNonce;
+    const encryptedNameNonce = encryptedFolderResult.publicNonce;
     const subKeyId = encryptedFolderResult.folderSubkeyId;
     const query = gql`
       mutation createFolder($input: CreateFolderInput!) {
@@ -242,7 +242,7 @@ describe("Input errors", () => {
             id
             name
             encryptedName
-            nameNonce
+            encryptedNameNonce
             subKeyId
             parentFolderId
             rootFolderId
@@ -260,7 +260,7 @@ describe("Input errors", () => {
               id: null,
               name,
               encryptedName,
-              nameNonce,
+              encryptedNameNonce,
               subKeyId,
               parentFolderId: null,
               workspaceId: addedWorkspace.id,
@@ -277,7 +277,7 @@ describe("Input errors", () => {
       parentKey: workspaceKey,
     });
     const encryptedName = encryptedFolderResult.ciphertext;
-    const nameNonce = encryptedFolderResult.publicNonce;
+    const encryptedNameNonce = encryptedFolderResult.publicNonce;
     const subKeyId = encryptedFolderResult.folderSubkeyId;
     const query = gql`
       mutation createFolder($input: CreateFolderInput!) {
@@ -286,7 +286,7 @@ describe("Input errors", () => {
             id
             name
             encryptedName
-            nameNonce
+            encryptedNameNonce
             subKeyId
             parentFolderId
             rootFolderId
@@ -304,7 +304,7 @@ describe("Input errors", () => {
               id: "abc123",
               name,
               encryptedName,
-              nameNonce,
+              encryptedNameNonce,
               subKeyId,
               parentFolderId: null,
               workspaceId: null,
@@ -322,7 +322,7 @@ describe("Input errors", () => {
             id
             name
             encryptedName
-            nameNonce
+            encryptedNameNonce
             subKeyId
             parentFolderId
             rootFolderId
@@ -350,7 +350,7 @@ describe("Input errors", () => {
             id
             name
             encryptedName
-            nameNonce
+            encryptedNameNonce
             subKeyId
             parentFolderId
             rootFolderId

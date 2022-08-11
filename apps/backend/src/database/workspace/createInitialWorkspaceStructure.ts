@@ -7,7 +7,7 @@ import { createDocument } from "../document/createDocument";
 import { createFolder } from "../folder/createFolder";
 import {
   createWorkspace,
-  DeviceWorkspaceKeyBoxParams,
+  DeviceWorkspaceKeyBoxParams
 } from "./createWorkspace";
 
 export type Params = {
@@ -18,7 +18,7 @@ export type Params = {
   folderIdSignature: string;
   folderName: string;
   encryptedFolderName: string;
-  folderNameNonce: string;
+  encryptedFolderNameNonce: string;
   folderSubkeyId: number;
   documentId: string;
   documentName: string;
@@ -39,7 +39,7 @@ export async function createInitialWorkspaceStructure({
   folderId,
   folderName,
   encryptedFolderName,
-  folderNameNonce,
+  encryptedFolderNameNonce,
   folderSubkeyId,
   documentId,
   documentName,
@@ -57,7 +57,7 @@ export async function createInitialWorkspaceStructure({
     id: folderId,
     name: folderName,
     encryptedName: encryptedFolderName,
-    nameNonce: folderNameNonce,
+    encryptedNameNonce: encryptedFolderNameNonce,
     subKeyId: folderSubkeyId,
     parentFolderId: undefined,
     workspaceId: workspace.id,

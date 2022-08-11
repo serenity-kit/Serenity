@@ -7,7 +7,7 @@ type Params = {
   id: string;
   name?: string;
   encryptedName: string;
-  nameNonce: string;
+  encryptedNameNonce: string;
   subKeyId: number;
   parentFolderId?: string;
   workspaceId: string;
@@ -18,7 +18,7 @@ export async function createFolder({
   id,
   name,
   encryptedName,
-  nameNonce,
+  encryptedNameNonce,
   subKeyId,
   parentFolderId,
   workspaceId,
@@ -63,7 +63,7 @@ export async function createFolder({
           idSignature: "TODO",
           name: folderName,
           encryptedName,
-          nameNonce,
+          encryptedNameNonce,
           subKeyId,
           parentFolderId,
           rootFolderId,

@@ -72,7 +72,7 @@ export const createInitialWorkspaceStructure = async ({
           id
           name
           encryptedName
-          nameNonce
+          encryptedNameNonce
           subKeyId
           parentFolderId
           rootFolderId
@@ -87,7 +87,7 @@ export const createInitialWorkspaceStructure = async ({
     parentKey: workspaceKey,
   });
   const encryptedFolderName = encryptedFolderResult.ciphertext;
-  const folderNameNonce = encryptedFolderResult.publicNonce;
+  const encryptedFolderNameNonce = encryptedFolderResult.publicNonce;
   const folderSubkeyId = encryptedFolderResult.folderSubkeyId;
 
   // currently hard-coded until we enable e2e encryption per workspace
@@ -109,7 +109,7 @@ export const createInitialWorkspaceStructure = async ({
         folderIdSignature,
         folderName,
         encryptedFolderName,
-        folderNameNonce,
+        encryptedFolderNameNonce,
         folderSubkeyId,
         documentId,
         documentName,
