@@ -109,7 +109,7 @@ export default function AcceptWorkspaceInvitationScreen(
       <LoadingErrorWrapper>
         <InfoMessage variant="error" icon>
           Unfortunately there was an error retrieving your invitation. Please
-          try again later or contact support.
+          try again later or contact our support at hi@serenity.li.
         </InfoMessage>
       </LoadingErrorWrapper>
     );
@@ -162,12 +162,15 @@ export default function AcceptWorkspaceInvitationScreen(
           </Text>
         </Text>
 
-        <Text variant="small" muted>
-          Log in or register to accept the invitation.
-        </Text>
+        {!sessionKey ? (
+          <Text variant="small" muted>
+            Log in or register to accept the invitation.
+          </Text>
+        ) : null}
         {hasGraphqlError ? (
           <InfoMessage variant="error" icon>
-            {graphqlError}
+            Failed to accept the invitation. Please try again later or contact
+            our support at hi@serenity.li.
           </InfoMessage>
         ) : null}
       </VStack>
