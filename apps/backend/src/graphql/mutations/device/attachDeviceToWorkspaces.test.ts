@@ -1,5 +1,5 @@
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { attachDeviceToWorkspace } from "../../../../test/helpers/device/attachDeviceToWorkspace";
+import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
 import { createDevice } from "../../../../test/helpers/device/createDevice";
 import { createWorkspaceKeyAndCipherTextForDevice } from "../../../../test/helpers/device/createWorkspaceKeyAndCipherTextForDevice";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -29,17 +29,21 @@ test("attach a device to a workspace", async () => {
       userAndDevice1.deviceEncryptionPrivateKey,
   });
   const workspaceId = userAndDevice1.workspace.id;
-  const result = await attachDeviceToWorkspace({
+  const result = await attachDeviceToWorkspaces({
     graphql,
-    workspaceId,
     deviceSigningPublicKey,
     creatorDeviceSigningPublicKey: deviceSigningPublicKey,
-    deviceAeadNonce: nonce,
-    deviceAeadCiphertext: ciphertext,
+    workspaceKeyBoxes: [
+      {
+        workspaceId,
+        nonce,
+        ciphertext,
+      },
+    ],
     authorizationHeader,
   });
   const workspaceKey: WorkspaceKey =
-    result.attachDeviceToWorkspace.workspaceKey;
+    result.attachDeviceToWorkspaces.workspaceKey;
   expect(typeof workspaceKey.id).toBe("string");
   expect(workspaceKey.generation).toBe(0);
   expect(workspaceKey.workspaceId).toBe(workspaceId);

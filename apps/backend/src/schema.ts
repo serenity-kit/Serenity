@@ -1,48 +1,48 @@
-import { makeSchema, connectionPlugin } from "nexus";
+import { connectionPlugin, makeSchema } from "nexus";
 import path from "path";
 
 import * as WorkspaceQueryTypes from "./graphql/queries/workspace/workspace";
 import * as WorkspacesQueryTypes from "./graphql/queries/workspace/workspaces";
 
 import * as CreateDocumentMutationTypes from "./graphql/mutations/document/createDocument";
-import * as UpdateDocumentNameMutationTypes from "./graphql/mutations/document/updateDocumentName";
 import * as DeleteDocumentsMutationTypes from "./graphql/mutations/document/deleteDocuments";
-import * as DocumentsQueryTypes from "./graphql/queries/document/documents";
-import * as DocumentPathQueryTypes from "./graphql/queries/document/documentPath";
-import * as FirstDocumentQueryTypes from "./graphql/queries/document/firstDocument";
+import * as UpdateDocumentNameMutationTypes from "./graphql/mutations/document/updateDocumentName";
 import * as DocumentQueryTypes from "./graphql/queries/document/document";
+import * as DocumentPathQueryTypes from "./graphql/queries/document/documentPath";
+import * as DocumentsQueryTypes from "./graphql/queries/document/documents";
+import * as FirstDocumentQueryTypes from "./graphql/queries/document/firstDocument";
 
-import * as RootFoldersQueryTypes from "./graphql/queries/folder/rootFolders";
-import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
 import * as CreateFolderMutationTypes from "./graphql/mutations/folder/createFolder";
-import * as UpdateFolderNameMutationTypes from "./graphql/mutations/folder/updateFolderName";
 import * as DeleteFoldersMutationTypes from "./graphql/mutations/folder/deleteFolders";
+import * as UpdateFolderNameMutationTypes from "./graphql/mutations/folder/updateFolderName";
+import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
+import * as RootFoldersQueryTypes from "./graphql/queries/folder/rootFolders";
 
-import * as StartRegistrationTypes from "./graphql/mutations/authentication/startRegistration";
-import * as FinishRegistrationTypes from "./graphql/mutations/authentication/finishRegistration";
-import * as VerifyRegistrationTypes from "./graphql/mutations/authentication/verifyRegistration";
-import * as StartLoginTypes from "./graphql/mutations/authentication/startLogin";
 import * as FinishLoginTypes from "./graphql/mutations/authentication/finishLogin";
+import * as FinishRegistrationTypes from "./graphql/mutations/authentication/finishRegistration";
+import * as StartLoginTypes from "./graphql/mutations/authentication/startLogin";
+import * as StartRegistrationTypes from "./graphql/mutations/authentication/startRegistration";
+import * as VerifyRegistrationTypes from "./graphql/mutations/authentication/verifyRegistration";
 import * as MeQueryTypes from "./graphql/queries/authentication/me";
 import * as UserIdFromUsernameQueryTypes from "./graphql/queries/userIdFromUsername";
 
-import * as WorkspaceTypes from "./graphql/types/workspace";
+import * as AcceptWorkspaceInvitationTypes from "./graphql/mutations/workspace/acceptWorkspaceInvitation";
+import * as CreateInitialWorkspaceStructureMutationTypes from "./graphql/mutations/workspace/createInitialWorkspaceStructure";
+import * as CreateWorkspaceInvitationTypes from "./graphql/mutations/workspace/createWorkspaceInvitation";
+import * as DeleteWorkspaceInvitationsTypes from "./graphql/mutations/workspace/deleteWorkspaceInvitations";
 import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/deleteWorkspaces";
 import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/updateWorkspace";
-import * as CreateWorkspaceInvitationTypes from "./graphql/mutations/workspace/createWorkspaceInvitation";
-import * as AcceptWorkspaceInvitationTypes from "./graphql/mutations/workspace/acceptWorkspaceInvitation";
-import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspaceInvitations";
-import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspaceInvitation";
-import * as DeleteWorkspaceInvitationsTypes from "./graphql/mutations/workspace/deleteWorkspaceInvitations";
-import * as CreateInitialWorkspaceStructureMutationTypes from "./graphql/mutations/workspace/createInitialWorkspaceStructure";
 import * as PendingingWorkspaceInvitationQueryTypes from "./graphql/queries/workspace/pendingWorkspaceInvitation";
+import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspaceInvitation";
+import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspaceInvitations";
+import * as WorkspaceTypes from "./graphql/types/workspace";
 
+import * as attachDeviceToWorkspacesMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspaces";
 import * as CreateDeviceMutationTypes from "./graphql/mutations/device/createDevice";
-import * as DevicesQueryTypes from "./graphql/queries/device/devices";
-import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
 import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
+import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
+import * as DevicesQueryTypes from "./graphql/queries/device/devices";
 import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
-import * as AttachDeviceToWorkspaceMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspace";
 
 import * as DocumentTypes from "./graphql/types/document";
 
@@ -98,7 +98,7 @@ export const schema = makeSchema({
     deviceBySigningPublicKeyQueryTypes,
     DeleteDevicesMutationTypes,
     MainDeviceQueryTypes,
-    AttachDeviceToWorkspaceMutationTypes,
+    attachDeviceToWorkspacesMutationTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),
