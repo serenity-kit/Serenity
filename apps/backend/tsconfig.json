@@ -10,5 +10,6 @@
     "allowJs": true
   },
 
-  "include": ["**/*"]
+  "include": ["**/*"],
+  "exclude": ["node_modules", "prisma/migrations/**/*", "build/**/*"]
 }
