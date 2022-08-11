@@ -5,7 +5,12 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
+import {
+  ColorSchemeName,
+  Platform,
+  StyleSheet,
+  useWindowDimensions,
+} from "react-native";
 import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 
@@ -23,13 +28,20 @@ import Sidebar from "../components/sidebar/Sidebar";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
 import AcceptWorkspaceInvitationScreen from "./screens/AcceptWorkspaceInvitationScreen";
 import DeviceManagerScreen from "./screens/DeviceManagerScreen";
-import { Text, tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
+import {
+  BoxShadow,
+  Button,
+  Text,
+  tw,
+  useIsPermanentLeftSidebar,
+  View,
+} from "@serenity-tools/ui";
 import RootScreen from "./screens/RootScreen";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import RegistrationVerificationScreen from "./screens/RegistrationVerificationScreen";
 import WorkspaceRootScreen from "./screens/WorkspaceRootScreen";
 import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
@@ -65,6 +77,7 @@ function WorkspaceStackScreen(props) {
       <Drawer.Navigator
         drawerContent={(props) => <Sidebar {...props} />}
         screenOptions={{
+          unmountOnBlur: true,
           headerShown: true,
           headerTitle: (props) => <Text>{props.children}</Text>,
           headerStyle: [styles.header],
@@ -96,61 +109,117 @@ function WorkspaceStackScreen(props) {
   );
 }
 
+function ModalScreen({ navigation }) {
+  // TODO onclick on overlay should close the modal
+  // TODO close button should look for back and if not go to root
+
+  const wrapperRef = useRef(null);
+  useLayoutEffect(() => {
+    if (Platform.OS === "web") {
+      const modalGroup = wrapperRef.current.parentNode.parentNode.parentNode;
+      // since we have stack navigator multiple screens are rendered, but set to display none
+      const previousScreen =
+        modalGroup.parentNode.children[
+          modalGroup.parentNode.children.length - 2
+        ];
+      previousScreen.style.display = "block"; // make sure the main content is available
+      modalGroup.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
+      // window.modalGroup = modalGroup;
+      // window.mainGroup = mainGroup;
+    }
+  });
+
+  return (
+    <View
+      ref={wrapperRef}
+      style={{
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <BoxShadow elevation={2} rounded>
+        <View
+          style={{
+            backgroundColor: "white",
+            width: "90vw",
+            height: "90vh",
+          }}
+        >
+          <Text style={{ fontSize: 30 }}>This is a modal!</Text>
+          <Button onPress={() => navigation.goBack()}>Back</Button>
+        </View>
+      </BoxShadow>
+    </View>
+  );
+}
+
 function RootNavigator() {
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Root"
-        component={RootScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Workspace"
-        component={WorkspaceStackScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
-      <Stack.Screen
-        name="Onboarding"
-        component={OnboardingScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Register"
-        component={RegisterScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="RegistrationVerification"
-        component={RegistrationVerificationScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Login"
-        component={LoginScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="EncryptDecryptImageTest"
-        component={EncryptDecryptImageTestScreen}
-      />
-      <Stack.Screen name="TestLibsodium" component={LibsodiumTestScreen} />
-      <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
-      <Stack.Screen
-        name="AcceptWorkspaceInvitation"
-        component={AcceptWorkspaceInvitationScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="WorkspaceNotFound"
-        component={WorkspaceNotFoundScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="NotFound"
-        component={NotFoundScreen}
-        options={{ headerShown: false }}
-      />
+      <Stack.Group>
+        <Stack.Screen
+          name="Root"
+          component={RootScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Workspace"
+          component={WorkspaceStackScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
+        <Stack.Screen
+          name="Onboarding"
+          component={OnboardingScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={RegisterScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="RegistrationVerification"
+          component={RegistrationVerificationScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="EncryptDecryptImageTest"
+          component={EncryptDecryptImageTestScreen}
+        />
+        <Stack.Screen name="TestLibsodium" component={LibsodiumTestScreen} />
+        <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
+        <Stack.Screen
+          name="AcceptWorkspaceInvitation"
+          component={AcceptWorkspaceInvitationScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="WorkspaceNotFound"
+          component={WorkspaceNotFoundScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="NotFound"
+          component={NotFoundScreen}
+          options={{ headerShown: false }}
+        />
+      </Stack.Group>
+      <Stack.Group
+        screenOptions={{
+          presentation: "modal",
+          // contentStyle: { backgroundColor: "red" },
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="UserSettings" component={ModalScreen} />
+      </Stack.Group>
     </Stack.Navigator>
   );
 }
@@ -179,6 +248,7 @@ const linking: LinkingOptions<RootStackParamList> = {
       AcceptWorkspaceInvitation:
         "accept-workspace-invitation/:workspaceInvitationId",
       TestLibsodium: "test-libsodium",
+      UserSettings: "user-settings",
       Root: "",
       NotFound: "*",
     },

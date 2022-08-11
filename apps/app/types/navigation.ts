@@ -59,6 +59,7 @@ export type RootStackParamList = {
   Login: LoginParams;
   EncryptDecryptImageTest: undefined;
   TestLibsodium: undefined;
+  UserSettings: undefined;
   Root: undefined;
   NotFound: undefined;
 };

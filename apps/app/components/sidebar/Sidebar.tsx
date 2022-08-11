@@ -286,6 +286,17 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               {username}
             </Text>
           </View>
+
+          <SidebarLink to={{ screen: "UserSettings" }}>
+            <Icon
+              name="dashboard-line"
+              size={4.5}
+              mobileSize={5.5}
+              color={tw.color("gray-800")}
+            />
+            <Text>User Settings</Text>
+          </SidebarLink>
+
           {workspaces === null ||
           workspaces === undefined ||
           workspaces.length === 0
