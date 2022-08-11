@@ -62,9 +62,12 @@ export type CreateDocumentResult = {
 };
 
 export type CreateFolderInput = {
+  encryptedName?: InputMaybe<Scalars['String']>;
+  encryptedNameNonce?: InputMaybe<Scalars['String']>;
   id: Scalars['String'];
   name?: InputMaybe<Scalars['String']>;
   parentFolderId?: InputMaybe<Scalars['String']>;
+  subKeyId?: InputMaybe<Scalars['Int']>;
   workspaceId: Scalars['String'];
 };
 
@@ -78,9 +81,12 @@ export type CreateInitialWorkspaceStructureInput = {
   documentId: Scalars['String'];
   documentName: Scalars['String'];
   documentSnapshot: DocumentSnapshotInput;
+  encryptedFolderName: Scalars['String'];
+  encryptedFolderNameNonce: Scalars['String'];
   folderId: Scalars['String'];
   folderIdSignature: Scalars['String'];
   folderName: Scalars['String'];
+  folderSubkeyId: Scalars['Int'];
   workspaceId: Scalars['String'];
   workspaceName: Scalars['String'];
 };
@@ -260,10 +266,13 @@ export type FinishRegistrationResult = {
 
 export type Folder = {
   __typename?: 'Folder';
+  encryptedName?: Maybe<Scalars['String']>;
+  encryptedNameNonce?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   name: Scalars['String'];
   parentFolderId?: Maybe<Scalars['String']>;
   rootFolderId?: Maybe<Scalars['String']>;
+  subKeyId?: Maybe<Scalars['Int']>;
   workspaceId?: Maybe<Scalars['String']>;
 };
 
@@ -924,7 +933,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string } | null } | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string } | null } | null } | null };
 
 export type WorkspaceInvitationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -945,7 +954,7 @@ export type WorkspacesQueryVariables = Exact<{
 }>;
 
 
-export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string } | null } | null } | null> | null } | null };
+export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string } | null } | null } | null> | null } | null };
 
 
 export const AcceptWorkspaceInvitationDocument = gql`
@@ -1443,7 +1452,9 @@ export const WorkspaceDocument = gql`
         id
         workspaceKeyId
         deviceSigningPublicKey
+        creatorDeviceSigningPublicKey
         ciphertext
+        nonce
       }
     }
   }
@@ -1507,7 +1518,9 @@ export const WorkspacesDocument = gql`
           id
           workspaceKeyId
           deviceSigningPublicKey
+          creatorDeviceSigningPublicKey
           ciphertext
+          nonce
         }
       }
     }

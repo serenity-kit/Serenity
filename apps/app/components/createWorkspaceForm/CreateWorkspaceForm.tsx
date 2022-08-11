@@ -1,16 +1,19 @@
-import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
+import {
+  createIntroductionDocumentSnapshot,
+  encryptFolder
+} from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import {
   Button,
   LabeledInput,
   ModalButtonFooter,
-  ModalHeader,
+  ModalHeader
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateInitialWorkspaceStructureMutation,
-  useDevicesQuery,
+  useDevicesQuery
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { createWorkspaceKeyAndCipherTextForDevice } from "../../utils/device/createWorkspaceKeyAndCipherTextForDevice";
@@ -75,13 +78,17 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     if (mainDevice) {
       allDevices.push(mainDevice);
     }
+    let workspaceKeyString: string = "";
     for await (const device of allDevices) {
-      const { nonce, ciphertext } =
+      const { nonce, ciphertext, workspaceKey } =
         await createWorkspaceKeyAndCipherTextForDevice({
           receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
           creatorDeviceEncryptionPrivateKey:
             activeDevice?.encryptionPrivateKey!,
         });
+      if (workspaceKeyString === "") {
+        workspaceKeyString = workspaceKey;
+      }
       deviceWorkspaceKeyBoxes.push({
         deviceSigningPublicKey: device.signingPublicKey,
         creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
@@ -89,7 +96,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         ciphertext,
       });
     }
-    return deviceWorkspaceKeyBoxes;
+    return { deviceWorkspaceKeyBoxes, workspaceKey: workspaceKeyString };
   };
 
   const createWorkspace = async () => {
@@ -113,13 +120,22 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       return;
     }
     const devices = devicesResult.data?.devices?.nodes as Device[];
-    const deviceWorkspaceKeyBoxes = await buildDeviceWorkspaceKeyBoxes(devices);
+    const { deviceWorkspaceKeyBoxes, workspaceKey } =
+      await buildDeviceWorkspaceKeyBoxes(devices);
+    const folderName = "Getting started";
+    const encryptedFolderResult = await encryptFolder({
+      name: folderName,
+      parentKey: workspaceKey,
+    });
     const createInitialWorkspaceStructureResult =
       await createInitialWorkspaceStructure({
         input: {
           workspaceName: name,
           workspaceId,
-          folderName: "Getting started",
+          folderName,
+          encryptedFolderName: encryptedFolderResult.ciphertext,
+          encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
+          folderSubkeyId: encryptedFolderResult.folderSubkeyId,
           folderId,
           folderIdSignature: `TODO+${folderId}`,
           documentName: "Introduction",

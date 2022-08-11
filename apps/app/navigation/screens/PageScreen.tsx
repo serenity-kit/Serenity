@@ -1,54 +1,52 @@
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import Page from "../../components/page/Page";
-import { useWindowDimensions } from "react-native";
-import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
 import { useEffect, useLayoutEffect } from "react";
-import {
-  useUpdateDocumentNameMutation,
-  WorkspaceDocument,
-  WorkspaceQuery,
-  WorkspaceQueryVariables,
-} from "../../generated/graphql";
+import { useWindowDimensions } from "react-native";
+import { useClient } from "urql";
+import Page from "../../components/page/Page";
 import { PageHeader } from "../../components/page/PageHeader";
-import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
+import { useAuthentication } from "../../context/AuthenticationContext";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
-import { useDocumentStore } from "../../utils/document/documentStore";
 import {
+  DocumentDocument,
   DocumentQuery,
   DocumentQueryVariables,
-  DocumentDocument,
+  useUpdateDocumentNameMutation,
 } from "../../generated/graphql";
-import { useClient } from "urql";
-import { removeLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { useDocumentStore } from "../../utils/document/documentStore";
+import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const workspaceId = useWorkspaceId();
   const documentStore = useDocumentStore();
   const pageId = props.route.params.pageId;
+  const { sessionKey } = useAuthentication();
   const urqlClient = useClient();
 
   const navigateAwayIfUserDoesntHaveAccess = async (
     workspaceId: string,
     docId: string
   ) => {
+    if (!sessionKey) {
+      // TODO: handle this error
+      console.error("No sessionKey found. Probably you aren't logged in!");
+      return;
+    }
     const activeDevice = await getActiveDevice();
     if (!activeDevice) {
       // TODO: handle this error
       console.error("No active device found!");
+      return;
     }
-    const workspaceResult = await urqlClient
-      .query<WorkspaceQuery, WorkspaceQueryVariables>(
-        WorkspaceDocument,
-        {
-          id: workspaceId,
-          deviceSigningPublicKey: activeDevice?.signingPublicKey!,
-        },
-        { requestPolicy: "network-only" }
-      )
-      .toPromise();
-    if (workspaceResult.data?.workspace === null) {
+    const workspace = await getWorkspace({
+      workspaceId,
+      urqlClient,
+      deviceSigningPublicKey: activeDevice?.signingPublicKey,
+    });
+    if (!workspace) {
       props.navigation.replace("WorkspaceNotFound");
       return;
     }
