@@ -287,7 +287,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             </Text>
           </View>
 
-          <SidebarLink to={{ screen: "UserSettings" }}>
+          <SidebarLink to={{ screen: "AccountSettings" }}>
             <Icon
               name="dashboard-line"
               size={4.5}
@@ -396,23 +396,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           color={tw.color("gray-800")}
         />
         <Text variant="small">Dev Dashboard</Text>
-      </SidebarLink>
-      <SidebarLink
-        to={{
-          screen: "Workspace",
-          params: {
-            workspaceId: route.params.workspaceId,
-            screen: "DeviceManager",
-          },
-        }}
-      >
-        <Icon
-          name="dashboard-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={tw.color("gray-800")}
-        />
-        <Text variant="small">Device Manager</Text>
       </SidebarLink>
 
       <SidebarDivider />

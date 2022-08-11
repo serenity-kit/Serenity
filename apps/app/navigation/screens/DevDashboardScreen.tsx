@@ -48,7 +48,7 @@ export default function DevDashboardScreen(props) {
         />
         <Text>Encrypt / Decrypt Image</Text>
       </SidebarLink>
-      <SidebarLink to={{ screen: "UserSettings" }}>
+      <SidebarLink to={{ screen: "AccountSettings" }}>
         <Icon
           name="dashboard-line"
           size={4.5}

@@ -52,6 +52,7 @@ import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
  */
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
+const AccountSettingsDrawer = createDrawerNavigator();
 
 const styles = StyleSheet.create({
   // web prefix needed as this otherwise messes with the height-calculation for mobile
@@ -98,7 +99,6 @@ function WorkspaceStackScreen(props) {
           component={WorkspaceRootScreen}
           options={{ headerShown: false }}
         />
-        <Drawer.Screen name="DeviceManager" component={DeviceManagerScreen} />
         <Drawer.Screen
           name="NoPageExists"
           component={NoPageExistsScreen}
@@ -109,20 +109,24 @@ function WorkspaceStackScreen(props) {
   );
 }
 
-function ModalScreen({ navigation }) {
+function AccountSettingsDrawerScreen(props) {
   // TODO onclick on overlay should close the modal
   // TODO close button should look for back and if not go to root
 
+  const dimensions = useWindowDimensions();
   const wrapperRef = useRef(null);
+
   useLayoutEffect(() => {
     if (Platform.OS === "web") {
       const modalGroup = wrapperRef.current.parentNode.parentNode.parentNode;
       // since we have stack navigator multiple screens are rendered, but set to display none
-      const previousScreen =
-        modalGroup.parentNode.children[
-          modalGroup.parentNode.children.length - 2
-        ];
-      previousScreen.style.display = "block"; // make sure the main content is available
+      if (modalGroup.parentNode.children.length > 1) {
+        const previousScreen =
+          modalGroup.parentNode.children[
+            modalGroup.parentNode.children.length - 2
+          ];
+        previousScreen.style.display = "block"; // make sure the main content is available
+      }
       modalGroup.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
       // window.modalGroup = modalGroup;
       // window.mainGroup = mainGroup;
@@ -142,15 +146,39 @@ function ModalScreen({ navigation }) {
         <View
           style={{
             backgroundColor: "white",
-            width: "90vw",
-            height: "90vh",
+            width: dimensions.width * 0.8,
+            height: dimensions.height * 0.8,
           }}
         >
-          <Text style={{ fontSize: 30 }}>This is a modal!</Text>
-          <Button onPress={() => navigation.goBack()}>Back</Button>
+          <AccountSettingsDrawer.Navigator
+            screenOptions={{
+              unmountOnBlur: true,
+              headerShown: false,
+              drawerType: "permanent",
+              // overlayColor: "transparent",
+            }}
+          >
+            <AccountSettingsDrawer.Screen
+              name="GeneralAccountSettings"
+              component={ModalScreen}
+            />
+            <AccountSettingsDrawer.Screen
+              name="DevicesSettings"
+              component={DeviceManagerScreen}
+            />
+          </AccountSettingsDrawer.Navigator>
         </View>
       </BoxShadow>
     </View>
+  );
+}
+
+function ModalScreen({ navigation }) {
+  return (
+    <>
+      <Text style={{ fontSize: 30 }}>This is a modal!</Text>
+      <Button onPress={() => navigation.goBack()}>Back</Button>
+    </>
   );
 }
 
@@ -214,11 +242,13 @@ function RootNavigator() {
       <Stack.Group
         screenOptions={{
           presentation: "modal",
-          // contentStyle: { backgroundColor: "red" },
           headerShown: false,
         }}
       >
-        <Stack.Screen name="UserSettings" component={ModalScreen} />
+        <Stack.Screen
+          name="AccountSettings"
+          component={AccountSettingsDrawerScreen}
+        />
       </Stack.Group>
     </Stack.Navigator>
   );
@@ -234,7 +264,6 @@ const linking: LinkingOptions<RootStackParamList> = {
           NoPageExists: "no-page-exits",
           Page: "page/:pageId",
           Settings: "settings",
-          DeviceManager: "devices",
           WorkspaceRoot: "",
         },
       },
@@ -248,7 +277,13 @@ const linking: LinkingOptions<RootStackParamList> = {
       AcceptWorkspaceInvitation:
         "accept-workspace-invitation/:workspaceInvitationId",
       TestLibsodium: "test-libsodium",
-      UserSettings: "user-settings",
+      AccountSettings: {
+        path: "/account-settings",
+        screens: {
+          GeneralAccountSettings: "general",
+          DevicesSettings: "devices",
+        },
+      },
       Root: "",
       NotFound: "*",
     },

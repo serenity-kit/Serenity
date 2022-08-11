@@ -34,7 +34,6 @@ export type WorkspaceDrawerParamList = {
   NoPageExists: undefined;
   Page: PageParams;
   Settings: undefined;
-  DeviceManager: undefined;
   WorkspaceRoot: undefined;
 };
 
@@ -59,7 +58,7 @@ export type RootStackParamList = {
   Login: LoginParams;
   EncryptDecryptImageTest: undefined;
   TestLibsodium: undefined;
-  UserSettings: undefined;
+  AccountSettings: undefined;
   Root: undefined;
   NotFound: undefined;
 };
