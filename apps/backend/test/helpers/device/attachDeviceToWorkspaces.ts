@@ -23,8 +23,15 @@ export const attachDeviceToWorkspaces = async ({
     mutation attachDeviceToWorkspaces($input: AttachDeviceToWorkspacesInput!) {
       attachDeviceToWorkspaces(input: $input) {
         workspaceKeys {
-          nodes {
+          id
+          generation
+          workspaceId
+          workspaceKeyBox {
             id
+            deviceSigningPublicKey
+            creatorDeviceSigningPublicKey
+            ciphertext
+            nonce
           }
         }
       }
