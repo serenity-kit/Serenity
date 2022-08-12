@@ -5,7 +5,7 @@ type Params = {
   graphql: any;
   deviceSigningPublicKey: string;
   creatorDeviceSigningPublicKey: string;
-  workspaceKeyBoxes: AttachToDeviceWorkspaceKeyBoxData[];
+  deviceWorkspaceKeyBoxes: AttachToDeviceWorkspaceKeyBoxData[];
   authorizationHeader: string;
 };
 
@@ -13,7 +13,7 @@ export const attachDeviceToWorkspaces = async ({
   graphql,
   deviceSigningPublicKey,
   creatorDeviceSigningPublicKey,
-  workspaceKeyBoxes,
+  deviceWorkspaceKeyBoxes,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -48,7 +48,7 @@ export const attachDeviceToWorkspaces = async ({
       input: {
         creatorDeviceSigningPublicKey,
         receiverDeviceSigningPublicKey: deviceSigningPublicKey,
-        workspaceKeyBoxes,
+        deviceWorkspaceKeyBoxes,
       },
     },
     authorizationHeaders

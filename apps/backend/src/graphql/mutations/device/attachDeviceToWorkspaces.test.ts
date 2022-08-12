@@ -33,7 +33,7 @@ test("attach a device to a workspace", async () => {
     graphql,
     deviceSigningPublicKey,
     creatorDeviceSigningPublicKey: deviceSigningPublicKey,
-    workspaceKeyBoxes: [
+    deviceWorkspaceKeyBoxes: [
       {
         workspaceId,
         nonce,

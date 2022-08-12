@@ -1,9 +1,9 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
-import { arg, inputObjectType, list, mutationField, objectType } from "nexus";
+import { arg, inputObjectType, mutationField, objectType } from "nexus";
 import { attachDeviceToWorkspaces } from "../../../database/device/attachDeviceToWorkspaces";
 import { WorkspaceKey } from "../../types/workspace";
 
-export const WorkspaceKeyBoxData = inputObjectType({
+export const DeviceWorkspaceKeyBoxInput = inputObjectType({
   name: "WorkspaceKeyBoxData",
   definition(t) {
     t.nonNull.string("workspaceId");
@@ -17,8 +17,8 @@ export const AttachDeviceToWorkspacesInput = inputObjectType({
   definition(t) {
     t.nonNull.string("receiverDeviceSigningPublicKey");
     t.nonNull.string("creatorDeviceSigningPublicKey");
-    t.nonNull.list.nonNull.field("workspaceKeyBoxes", {
-      type: WorkspaceKeyBoxData,
+    t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
+      type: DeviceWorkspaceKeyBoxInput,
     });
   },
 });
@@ -26,7 +26,9 @@ export const AttachDeviceToWorkspacesInput = inputObjectType({
 export const AttachDeviceToWorkspacesResult = objectType({
   name: "AttachDeviceToWorkspacesResult",
   definition(t) {
-    t.field("workspaceKeys", { type: list(WorkspaceKey) });
+    t.nonNull.list.nonNull.field("workspaceKeys", {
+      type: WorkspaceKey,
+    });
   },
 });
 
@@ -56,12 +58,12 @@ export const attachDeviceToWorkspacesMutation = mutationField(
           "Invalid input: creatorDeviceSigningPublicKey cannot be null"
         );
       }
-      if (!args.input.workspaceKeyBoxes) {
+      if (!args.input.deviceWorkspaceKeyBoxes) {
         throw new UserInputError(
           "Invalid input: workspaceKeyBoxes cannot be null"
         );
       }
-      const workspaceKeyBoxes = args.input.workspaceKeyBoxes;
+      const workspaceKeyBoxes = args.input.deviceWorkspaceKeyBoxes;
       workspaceKeyBoxes.forEach((workspaceKeyBox: any) => {
         if (!workspaceKeyBox.workspaceId) {
           throw new UserInputError(
@@ -84,7 +86,7 @@ export const attachDeviceToWorkspacesMutation = mutationField(
         receiverDeviceSigningPublicKey:
           args.input.receiverDeviceSigningPublicKey,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
-        workspaceKeyBoxes: args.input.workspaceKeyBoxes,
+        workspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,
       });
       return { workspaceKeys };
     },
