@@ -16,6 +16,7 @@ import {
   startRegistration,
 } from "../../utils/opaque";
 import { createSession } from "../authentication/createSession";
+import { doesFolderSubkeyIdExist } from "../folder/doesFolderSubkeyIdExist";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -100,10 +101,18 @@ export default async function createUserWithWorkspace({
       creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
     });
   const folderName = "Getting Started";
-  const encryptedFolderResult = await encryptFolder({
-    name: folderName,
-    parentKey: workspaceKey,
-  });
+  let encryptedFolderResult: any = null;
+  let folderSubkeyExists = true;
+  do {
+    encryptedFolderResult = await encryptFolder({
+      name: folderName,
+      parentKey: workspaceKey,
+    });
+    folderSubkeyExists = await doesFolderSubkeyIdExist({
+      userId: user.id,
+      subkeyId: encryptedFolderResult.folderSubkeyId,
+    });
+  } while (folderSubkeyExists);
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
     workspaceId: id,

@@ -7,7 +7,7 @@ import { createDocument } from "../document/createDocument";
 import { createFolder } from "../folder/createFolder";
 import {
   createWorkspace,
-  DeviceWorkspaceKeyBoxParams
+  DeviceWorkspaceKeyBoxParams,
 } from "./createWorkspace";
 
 export type Params = {

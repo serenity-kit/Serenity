@@ -1,6 +1,7 @@
-import { ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Folder } from "../../types/folder";
 import { prisma } from "../prisma";
+import { doesFolderSubkeyIdExist } from "./doesFolderSubkeyIdExist";
 
 type Params = {
   userId: string;
@@ -26,6 +27,13 @@ export async function createFolder({
   let folderName = "Untitled";
   if (name) {
     folderName = name;
+  }
+  const folderSubkeyIdExists = await doesFolderSubkeyIdExist({
+    subkeyId: subKeyId,
+    userId,
+  });
+  if (folderSubkeyIdExists) {
+    throw new UserInputError("subKeyId already exists");
   }
   try {
     return await prisma.$transaction(async (prisma) => {
