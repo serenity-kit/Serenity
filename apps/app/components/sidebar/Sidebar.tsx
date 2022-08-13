@@ -176,11 +176,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       return;
     }
     const mainDevice = getMainDevice();
-    if (!mainDevice) {
-      // TODO: handle this error
-      console.error("No mainDevice found!");
-      return;
-    }
     const userDevices = devicesResult.data?.devices?.nodes;
     if (!userDevices) {
       // TODO: handle this error
@@ -193,7 +188,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         devices.push(device);
       }
     });
-    devices.push(mainDevice);
+    if (mainDevice) {
+      devices.push(mainDevice);
+    }
     const encryptingDevice = getDeviceBySigningPublicKey({
       signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
       // @ts-ignore: devices array could include nulls
