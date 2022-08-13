@@ -1,25 +1,24 @@
-import {
-  MainDeviceQuery,
-  MainDeviceDocument,
-  MeQuery,
-  MeQueryVariables,
-  MeDocument,
-} from "../../generated/graphql";
-import { startLogin, finishLogin } from "@serenity-tools/opaque";
 import { decryptDevice } from "@serenity-tools/common";
-import { setMainDevice } from "../device/mainDeviceMemoryStore";
+import { finishLogin, startLogin } from "@serenity-tools/opaque";
+import { detect } from "detect-browser";
+import { Platform } from "react-native";
 import { Client } from "urql";
 import { UpdateAuthenticationFunction } from "../../context/AuthenticationContext";
+import {
+  MainDeviceDocument,
+  MainDeviceQuery,
+  MeDocument,
+  MeQuery,
+  MeQueryVariables,
+} from "../../generated/graphql";
 import { createAndSetDevice } from "../device/deviceStore";
-import { Platform } from "react-native";
-import { detect } from "detect-browser";
+import { setMainDevice } from "../device/mainDeviceMemoryStore";
+import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import {
   isUserIdSameAsLastLogin,
   removeLastLogin,
   setLoggedInUserId,
 } from "./lastLoginStore";
-import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { v4 as uuidv4 } from "uuid";
 const browser = detect();
 
 const removeLastUsedWorkspaceIdIfLoginChanged = async (userId?: string) => {

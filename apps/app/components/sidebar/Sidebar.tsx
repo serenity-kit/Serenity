@@ -1,10 +1,15 @@
 import {
-  DrawerContentScrollView,
   DrawerContentComponentProps,
+  DrawerContentScrollView,
 } from "@react-navigation/drawer";
 
+import { useFocusRing } from "@react-native-aria/focus";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { encryptFolder } from "@serenity-tools/common";
 import {
+  Avatar,
   Icon,
+  IconButton,
   InlineInput,
   Menu,
   Pressable,
@@ -12,34 +17,35 @@ import {
   SidebarDivider,
   SidebarLink,
   Text,
+  Tooltip,
   tw,
   useIsPermanentLeftSidebar,
   View,
-  Avatar,
-  IconButton,
-  Tooltip,
 } from "@serenity-tools/ui";
-import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
-import {
-  useCreateFolderMutation,
-  useRootFoldersQuery,
-  useMeQuery,
-  Workspace,
-} from "../../generated/graphql";
-import { v4 as uuidv4 } from "uuid";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { RootStackScreenProps } from "../../types/navigation";
-import { useAuthentication } from "../../context/AuthenticationContext";
 import { HStack } from "native-base";
-import { useFocusRing } from "@react-native-aria/focus";
 import { useEffect, useState } from "react";
-import Folder from "../sidebarFolder/SidebarFolder";
-import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { Platform } from "react-native";
 import { useClient } from "urql";
+import { v4 as uuidv4 } from "uuid";
+import { useAuthentication } from "../../context/AuthenticationContext";
+import {
+  useCreateFolderMutation,
+  useDevicesQuery,
+  useMeQuery,
+  useRootFoldersQuery,
+  Workspace,
+} from "../../generated/graphql";
+import { Device } from "../../types/Device";
+import { RootStackScreenProps } from "../../types/navigation";
+import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
+import { decryptWorkspaceKey } from "../../utils/device/decryptWorkspaceKey";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { getDeviceBySigningPublicKey } from "../../utils/device/getDeviceBySigningPublicKey";
+import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
+import Folder from "../sidebarFolder/SidebarFolder";
+import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const urqlClient = useClient();
@@ -65,6 +71,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     variables: {
       workspaceId,
       first: 20,
+    },
+  });
+  const [devicesResult] = useDevicesQuery({
+    variables: {
+      first: 500,
     },
   });
 
@@ -146,8 +157,67 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
   const createFolder = async (name: string) => {
     const id = uuidv4();
+    const activeDevice = await getActiveDevice();
+    if (!activeDevice) {
+      // TODO: handle this error
+      console.error("No active device!");
+      return;
+    }
+    // fetch the workspace again in case the workspaceKeybox has been changed
+    const workspace = await getWorkspace({
+      workspaceId,
+      urqlClient,
+      deviceSigningPublicKey: activeDevice?.signingPublicKey,
+    });
+    const workspaceKeyBox = workspace?.currentWorkspaceKey?.workspaceKeyBox;
+    if (!workspaceKeyBox) {
+      // TODO: handle this error
+      console.error("This device isn't registered for this workspace!");
+      return;
+    }
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      // TODO: handle this error
+      console.error("No mainDevice found!");
+      return;
+    }
+    const userDevices = devicesResult.data?.devices?.nodes;
+    if (!userDevices) {
+      // TODO: handle this error
+      console.error("No devices found!");
+      return;
+    }
+    const devices: Device[] = [];
+    userDevices.forEach((device) => {
+      if (device) {
+        devices.push(device);
+      }
+    });
+    devices.push(mainDevice);
+    const encryptingDevice = getDeviceBySigningPublicKey({
+      signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
+      // @ts-ignore: devices array could include nulls
+      devices,
+    });
+    const workspaceKey = await decryptWorkspaceKey({
+      ciphertext: workspaceKeyBox.ciphertext,
+      nonce: workspaceKeyBox.nonce,
+      creatorDeviceEncryptionPublicKey: encryptingDevice?.encryptionPublicKey!,
+      receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+    });
+    const encryptedFolderResult = await encryptFolder({
+      name,
+      parentKey: workspaceKey,
+    });
     const result = await createFolderMutation({
-      input: { id, workspaceId: route.params.workspaceId, name },
+      input: {
+        id,
+        workspaceId: route.params.workspaceId,
+        name,
+        encryptedName: encryptedFolderResult.ciphertext,
+        encryptedNameNonce: encryptedFolderResult.publicNonce,
+        subKeyId: encryptedFolderResult.folderSubkeyId,
+      },
     });
     if (!result.data?.createFolder?.folder?.id) {
       console.error(result.error);

@@ -14,7 +14,9 @@ query workspace($id: ID, $deviceSigningPublicKey: String!) {
         id
         workspaceKeyId
         deviceSigningPublicKey
+        creatorDeviceSigningPublicKey
         ciphertext
+        nonce
       }
     }
   }
