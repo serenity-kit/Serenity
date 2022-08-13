@@ -15,5 +15,5 @@
     "allowJs": true // Seems to be needed for index.js
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "web-build/**/*", ".expo/**/*"]
 }

@@ -1,5 +1,5 @@
-import { gql } from "graphql-request";
 import { createDevice as createdDeviceHelper } from "@serenity-tools/common";
+import { gql } from "graphql-request";
 
 type Params = {
   graphql: any;
@@ -50,5 +50,6 @@ export const createDevice = async ({
     },
     authorizationHeaders
   );
+  result.localDevice = device;
   return result;
 };

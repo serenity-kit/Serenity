@@ -1,39 +1,47 @@
+import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { encryptFolder } from "@serenity-tools/common";
 import {
   Icon,
+  IconButton,
+  InlineInput,
   Pressable,
   Text,
+  Tooltip,
   tw,
+  useIsDesktopDevice,
   View,
   ViewProps,
-  InlineInput,
-  IconButton,
-  Tooltip,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, Platform } from "react-native";
-import { useFocusRing } from "@react-native-aria/focus";
+import { ActivityIndicator, Platform, StyleSheet } from "react-native";
+import { useClient } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateDocumentMutation,
   useCreateFolderMutation,
+  useDeleteFoldersMutation,
+  useDevicesQuery,
   useDocumentsQuery,
   useFoldersQuery,
   useUpdateFolderNameMutation,
-  useDeleteFoldersMutation,
 } from "../../generated/graphql";
+import { Device } from "../../types/Device";
 import { RootStackScreenProps } from "../../types/navigation";
-import SidebarPage from "../sidebarPage/SidebarPage";
-import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
-import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { decryptWorkspaceKey } from "../../utils/device/decryptWorkspaceKey";
+import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { getDeviceBySigningPublicKey } from "../../utils/device/getDeviceBySigningPublicKey";
+import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import {
-  useDocumentPathStore,
   getDocumentPath,
+  useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
-import { useClient } from "urql";
-import { useIsDesktopDevice } from "@serenity-tools/ui";
+import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
+import SidebarPage from "../sidebarPage/SidebarPage";
 
 type Props = ViewProps & {
   workspaceId: string;
@@ -44,6 +52,7 @@ type Props = ViewProps & {
 };
 
 export default function SidebarFolder(props: Props) {
+  const defaultFolderName = "Untitled";
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const openFolderIds = useOpenFolderStore((state) => state.folderIds);
@@ -72,6 +81,11 @@ export default function SidebarFolder(props: Props) {
       first: 50,
     },
   });
+  const [devicesResult] = useDevicesQuery({
+    variables: {
+      first: 500,
+    },
+  });
   const { depth = 0 } = props;
   const urqlClient = useClient();
   const documentPathStore = useDocumentPathStore();
@@ -82,13 +96,67 @@ export default function SidebarFolder(props: Props) {
     setIsOpen(openFolderIds.includes(props.folderId));
   }, [openFolderIds, props.folderId]);
 
-  const createFolder = async (name: string | null) => {
+  const createFolder = async (name: string) => {
     setIsOpen(true);
     const id = uuidv4();
+    const activeDevice = await getActiveDevice();
+    if (!activeDevice) {
+      // TODO: handle this error
+      console.error("No active device!");
+      return;
+    }
+    const workspace = await getWorkspace({
+      urqlClient,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+      workspaceId: props.workspaceId,
+    });
+    const workspaceKeyBox = workspace?.currentWorkspaceKey?.workspaceKeyBox;
+    if (!workspaceKeyBox) {
+      // TODO: handle this error
+      console.error("This device isn't registered for this workspace!");
+      return;
+    }
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      // TODO: handle this error
+      console.error("No mainDevice found!");
+      return;
+    }
+    const userDevices = devicesResult.data?.devices?.nodes;
+    if (!userDevices) {
+      // TODO: handle this error
+      console.error("No devices found!");
+      return;
+    }
+    const devices: Device[] = [];
+    userDevices.forEach((device) => {
+      if (device) {
+        devices.push(device);
+      }
+    });
+    devices.push(mainDevice);
+    const encryptingDevice = getDeviceBySigningPublicKey({
+      signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
+      // @ts-ignore: devices array could include nulls
+      devices,
+    });
+    const workspaceKey = await decryptWorkspaceKey({
+      ciphertext: workspaceKeyBox?.ciphertext,
+      nonce: workspaceKeyBox.nonce,
+      creatorDeviceEncryptionPublicKey: encryptingDevice?.encryptionPublicKey!,
+      receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+    });
+    const encryptedFolderResult = await encryptFolder({
+      name,
+      parentKey: workspaceKey,
+    });
     const result = await createFolderMutation({
       input: {
         id,
         name,
+        encryptedName: encryptedFolderResult.ciphertext,
+        encryptedNameNonce: encryptedFolderResult.publicNonce,
+        subKeyId: encryptedFolderResult.folderSubkeyId,
         workspaceId: props.workspaceId,
         parentFolderId: props.folderId,
       },
@@ -285,7 +353,7 @@ export default function SidebarFolder(props: Props) {
                 onUpdateNamePress={editFolderName}
                 onDeletePressed={() => deleteFolder(props.folderId)}
                 onCreateFolderPress={() => {
-                  createFolder(null);
+                  createFolder(defaultFolderName);
                 }}
               />
               {/* offset not working yet as NB has a no-no in their component */}
