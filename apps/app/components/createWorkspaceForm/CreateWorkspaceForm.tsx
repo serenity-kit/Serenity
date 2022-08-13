@@ -1,19 +1,20 @@
 import {
   createIntroductionDocumentSnapshot,
-  encryptFolder
+  encryptFolder,
 } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import {
   Button,
   LabeledInput,
   ModalButtonFooter,
-  ModalHeader
+  FormWrapper,
+  ModalHeader,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateInitialWorkspaceStructureMutation,
-  useDevicesQuery
+  useDevicesQuery,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { createWorkspaceKeyAndCipherTextForDevice } from "../../utils/device/createWorkspaceKeyAndCipherTextForDevice";
@@ -133,10 +134,10 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           workspaceName: name,
           workspaceId,
           folderName,
+          folderId,
           encryptedFolderName: encryptedFolderResult.ciphertext,
           encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
           folderSubkeyId: encryptedFolderResult.folderSubkeyId,
-          folderId,
           folderIdSignature: `TODO+${folderId}`,
           documentName: "Introduction",
           documentId,
@@ -170,7 +171,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   };
 
   return (
-    <>
+    <FormWrapper>
       <ModalHeader>Create a Workspace</ModalHeader>
       <LabeledInput
         ref={inputRef}
@@ -192,6 +193,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           </Button>
         }
       />
-    </>
+    </FormWrapper>
   );
 }

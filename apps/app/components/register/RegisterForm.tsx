@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import {
   Text,
-  View,
   Button,
   Checkbox,
-  Link,
   LabeledInput,
   LinkExternal,
   InfoMessage,
+  FormWrapper,
 } from "@serenity-tools/ui";
 import {
   useFinishRegistrationMutation,
@@ -15,7 +14,6 @@ import {
 } from "../../generated/graphql";
 import { useWindowDimensions } from "react-native";
 import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
-import { VStack } from "native-base";
 import { createAndEncryptDevice } from "@serenity-tools/common";
 import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { storeUsernamePassword } from "../../utils/authentication/registrationMemoryStore";
@@ -117,7 +115,7 @@ export default function RegisterForm(props: Props) {
   };
 
   return (
-    <VStack space="5">
+    <FormWrapper>
       <LabeledInput
         label={"Email"}
         keyboardType="email-address"
@@ -173,6 +171,6 @@ export default function RegisterForm(props: Props) {
       <Button onPress={onRegisterPress} size="large">
         Register
       </Button>
-    </VStack>
+    </FormWrapper>
   );
 }
