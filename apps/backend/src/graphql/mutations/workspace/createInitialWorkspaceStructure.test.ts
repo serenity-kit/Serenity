@@ -1,12 +1,12 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/authentication/registerUser";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
-import { v4 as uuidv4 } from "uuid";
-import { gql } from "graphql-request";
+import { Snapshot } from "@naisho/core";
 import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
-import { Snapshot } from "@naisho/core";
+import { gql } from "graphql-request";
+import { v4 as uuidv4 } from "uuid";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 
 const graphql = setupGraphql();
 let userId1 = "";
@@ -16,6 +16,7 @@ let sessionKey1 = "";
 let device: any = null;
 let encryptionPrivateKey = "";
 let signingPrivateKey = "";
+let workspaceKey = "";
 const documentId = uuidv4();
 let documentSnapshot: Snapshot;
 
@@ -60,6 +61,7 @@ test("user can create initial workspace structure", async () => {
     workspaceName,
     deviceSigningPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
+    deviceEncryptionPrivateKey: encryptionPrivateKey,
     folderId,
     folderIdSignature,
     folderName,
@@ -67,6 +69,7 @@ test("user can create initial workspace structure", async () => {
     documentName,
     authorizationHeader,
   });
+
   const workspace = result.createInitialWorkspaceStructure.workspace;
   // const document = result.createInitialWorkspaceStructure.document;
   const folder = result.createInitialWorkspaceStructure.folder;
@@ -101,6 +104,7 @@ test("Unauthenticated", async () => {
         workspaceName,
         deviceSigningPublicKey,
         deviceEncryptionPublicKey: device.encryptionPublicKey,
+        deviceEncryptionPrivateKey: encryptionPrivateKey,
         folderId,
         folderIdSignature,
         folderName,

@@ -1,14 +1,14 @@
+import { Snapshot } from "@naisho/core";
+import { Document } from "../../types/document";
+import { Folder } from "../../types/folder";
+import { Workspace } from "../../types/workspace";
+import { createSnapshot } from "../createSnapshot";
+import { createDocument } from "../document/createDocument";
+import { createFolder } from "../folder/createFolder";
 import {
   createWorkspace,
   DeviceWorkspaceKeyBoxParams,
 } from "./createWorkspace";
-import { createFolder } from "../folder/createFolder";
-import { Workspace } from "../../types/workspace";
-import { Document } from "../../types/document";
-import { Folder } from "../../types/folder";
-import { Snapshot } from "@naisho/core";
-import { createDocument } from "../document/createDocument";
-import { createSnapshot } from "../createSnapshot";
 
 export type Params = {
   userId: string;
@@ -17,6 +17,9 @@ export type Params = {
   folderId: string;
   folderIdSignature: string;
   folderName: string;
+  encryptedFolderName: string;
+  encryptedFolderNameNonce: string;
+  folderSubkeyId: number;
   documentId: string;
   documentName: string;
   documentSnapshot: Snapshot;
@@ -35,6 +38,9 @@ export async function createInitialWorkspaceStructure({
   workspaceName,
   folderId,
   folderName,
+  encryptedFolderName,
+  encryptedFolderNameNonce,
+  folderSubkeyId,
   documentId,
   documentName,
   documentSnapshot,
@@ -50,6 +56,9 @@ export async function createInitialWorkspaceStructure({
     userId,
     id: folderId,
     name: folderName,
+    encryptedName: encryptedFolderName,
+    encryptedNameNonce: encryptedFolderNameNonce,
+    subKeyId: folderSubkeyId,
     parentFolderId: undefined,
     workspaceId: workspace.id,
   });

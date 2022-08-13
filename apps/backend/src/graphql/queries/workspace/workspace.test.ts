@@ -1,9 +1,9 @@
 import { gql } from "graphql-request";
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/authentication/registerUser";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { v4 as uuidv4 } from "uuid";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
@@ -26,6 +26,7 @@ const setup = async () => {
     deviceSigningPublicKey: registerUserResult.mainDevice.signingPublicKey,
     deviceEncryptionPublicKey:
       registerUserResult.mainDevice.encryptionPublicKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",
@@ -38,6 +39,7 @@ const setup = async () => {
     workspaceName: workspace2Name,
     workspaceId: workspace2Id,
     deviceSigningPublicKey: registerUserResult.mainDevice.signingPublicKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     deviceEncryptionPublicKey:
       registerUserResult.mainDevice.encryptionPublicKey,
     folderId: uuidv4(),

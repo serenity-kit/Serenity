@@ -1,11 +1,11 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { gql } from "graphql-request";
+import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";
-import { v4 as uuidv4 } from "uuid";
-import { gql } from "graphql-request";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -23,6 +23,7 @@ const setup = async () => {
     workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -93,6 +94,7 @@ test("Throw error when user doesn't have access", async () => {
     workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,

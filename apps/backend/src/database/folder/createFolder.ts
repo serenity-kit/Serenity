@@ -1,11 +1,14 @@
-import { prisma } from "../prisma";
-import { Folder } from "../../types/folder";
 import { ForbiddenError } from "apollo-server-express";
+import { Folder } from "../../types/folder";
+import { prisma } from "../prisma";
 
 type Params = {
   userId: string;
   id: string;
   name?: string;
+  encryptedName: string;
+  encryptedNameNonce: string;
+  subKeyId: number;
   parentFolderId?: string;
   workspaceId: string;
 };
@@ -14,6 +17,9 @@ export async function createFolder({
   userId,
   id,
   name,
+  encryptedName,
+  encryptedNameNonce,
+  subKeyId,
   parentFolderId,
   workspaceId,
 }: Params) {
@@ -56,18 +62,16 @@ export async function createFolder({
           id,
           idSignature: "TODO",
           name: folderName,
+          encryptedName,
+          encryptedNameNonce,
+          subKeyId,
           parentFolderId,
           rootFolderId,
           workspaceId,
         },
       });
       const folder: Folder = {
-        id: rawFolder.id,
-        name: rawFolder.name,
-        idSignature: rawFolder.idSignature,
-        parentFolderId: rawFolder.parentFolderId,
-        rootFolderId: rawFolder.rootFolderId,
-        workspaceId: rawFolder.workspaceId,
+        ...rawFolder,
         parentFolders: [],
       };
       return folder;

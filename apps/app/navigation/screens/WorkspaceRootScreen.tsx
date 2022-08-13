@@ -8,7 +8,7 @@ import {
   FirstDocumentDocument,
   FirstDocumentQuery,
   FirstDocumentQueryVariables,
-  useAttachDeviceToWorkspaceMutation,
+  useAttachDeviceToWorkspacesMutation,
   WorkspaceDocument,
   WorkspaceQuery,
   WorkspaceQueryVariables,
@@ -29,9 +29,9 @@ export default function WorkspaceRootScreen(
   const urqlClient = useClient();
   const workspaceId = useWorkspaceId();
   const { sessionKey } = useAuthentication();
-  const [, attatchDeviceToWorkspace] = useAttachDeviceToWorkspaceMutation();
+  const [, attatchDeviceToWorkspaces] = useAttachDeviceToWorkspacesMutation();
 
-  const doActiveDeviceToAttachDeviceToWorkspace = async (device: Device) => {
+  const doActiveDeviceToAttachDeviceToWorkspaces = async (device: Device) => {
     if (!sessionKey) {
       // TODO: handle a no session key error
       console.log("No session key found!");
@@ -78,13 +78,17 @@ export default function WorkspaceRootScreen(
         nonce: mainDeviceWorkspaceBox.nonce,
         workspaceKey,
       });
-    await attatchDeviceToWorkspace({
+    await attatchDeviceToWorkspaces({
       input: {
-        workspaceId,
         receiverDeviceSigningPublicKey: device.signingPublicKey,
         creatorDeviceSigningPublicKey: device.signingPublicKey,
-        nonce,
-        ciphertext,
+        deviceWorkspaceKeyBoxes: [
+          {
+            workspaceId,
+            nonce,
+            ciphertext,
+          },
+        ],
       },
     });
   };
@@ -119,7 +123,7 @@ export default function WorkspaceRootScreen(
         const workspace = workspaceResult.data?.workspace;
         if (workspace?.currentWorkspaceKey?.workspaceKeyBox) {
           // use the mainDevice to decrypt the workspace key
-          await doActiveDeviceToAttachDeviceToWorkspace(device);
+          await doActiveDeviceToAttachDeviceToWorkspaces(device);
         }
       }
       const lastUsedDocumentId = await getLastUsedDocumentId(workspaceId);

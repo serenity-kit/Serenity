@@ -1,11 +1,13 @@
+import { encryptFolder } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 
 type Params = {
   graphql: any;
   id: string;
-  name: string | null;
+  name: string;
   parentFolderId: string | null | undefined;
   workspaceId: string;
+  parentKey: string;
   authorizationHeader: string;
 };
 
@@ -13,6 +15,7 @@ export const createFolder = async ({
   graphql,
   id,
   name,
+  parentKey,
   parentFolderId,
   workspaceId,
   authorizationHeader,
@@ -20,6 +23,13 @@ export const createFolder = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
+  const encryptedFolderResult = await encryptFolder({
+    name,
+    parentKey,
+  });
+  const subKeyId = encryptedFolderResult.folderSubkeyId;
+  const encryptedName = encryptedFolderResult.ciphertext;
+  const encryptedNameNonce = encryptedFolderResult.publicNonce;
 
   const query = gql`
     mutation createFolder($input: CreateFolderInput!) {
@@ -27,6 +37,9 @@ export const createFolder = async ({
         folder {
           id
           name
+          encryptedName
+          encryptedNameNonce
+          subKeyId
           parentFolderId
           rootFolderId
           workspaceId
@@ -36,7 +49,17 @@ export const createFolder = async ({
   `;
   const result = await graphql.client.request(
     query,
-    { input: { id, name, parentFolderId, workspaceId } },
+    {
+      input: {
+        id,
+        name,
+        encryptedName,
+        encryptedNameNonce,
+        parentFolderId,
+        subKeyId,
+        workspaceId,
+      },
+    },
     authorizationHeaders
   );
   return result;

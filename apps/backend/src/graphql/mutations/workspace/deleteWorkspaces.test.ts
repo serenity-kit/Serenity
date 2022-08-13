@@ -1,10 +1,10 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { gql } from "graphql-request";
+import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { deleteWorkspaces } from "../../../../test/helpers/workspace/deleteWorkspaces";
-import { v4 as uuidv4 } from "uuid";
-import { gql } from "graphql-request";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -21,6 +21,7 @@ const setup = async () => {
     workspaceId: "abc",
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,

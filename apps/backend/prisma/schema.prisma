@@ -181,17 +181,20 @@ model WorkspaceKeyBox {
 }
 
 model Folder {
-  id             String     @id
-  idSignature    String
-  name           String // TODO must be encrypted
-  workspace      Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId    String
-  parentFolder   Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
-  parentFolderId String?
-  rootFolder     Folder?    @relation(name: "rootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
-  rootFolderId   String?
-  createdAt      DateTime   @default(now())
-  childFolders   Folder[]   @relation("parentFolder")
-  descendent     Folder[]   @relation("rootFolder")
-  documents      Document[]
+  id                 String     @id
+  idSignature        String
+  name               String // TODO must be encrypted
+  encryptedName      String?
+  encryptedNameNonce String?
+  subKeyId           Int?
+  workspace          Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId        String
+  parentFolder       Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
+  parentFolderId     String?
+  rootFolder         Folder?    @relation(name: "rootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
+  rootFolderId       String?
+  createdAt          DateTime   @default(now())
+  childFolders       Folder[]   @relation("parentFolder")
+  descendent         Folder[]   @relation("rootFolder")
+  documents          Document[]
 }
