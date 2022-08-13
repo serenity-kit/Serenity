@@ -32,7 +32,6 @@ import { AuthenticationProvider } from "./context/AuthenticationContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
 import * as SessionKeyStore from "./utils/authentication/sessionKeyStore";
-import { getWebDevice } from "./utils/device/webDeviceStore";
 import { source } from "./webviews/opaque/source";
 
 // import { clearDeviceAndSessionStorage } from "./utils/authentication/clearDeviceAndSessionStorage";
@@ -142,16 +141,6 @@ export default function App() {
     },
     [setSessionKey]
   );
-
-  const checkForWebDevice = async () => {
-    const webDevice = await getWebDevice();
-  };
-
-  useEffect(() => {
-    (async () => {
-      await checkForWebDevice();
-    })();
-  }, []);
 
   const [isFontLoadingComplete] = useFonts({
     Inter_400Regular,
