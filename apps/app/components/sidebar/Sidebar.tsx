@@ -281,20 +281,23 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             </Pressable>
           }
         >
-          <View style={tw`p-menu-item`}>
-            <Text variant="xxs" muted bold>
-              {username}
-            </Text>
-          </View>
-
-          <SidebarLink to={{ screen: "AccountSettings" }}>
-            <Icon
-              name="dashboard-line"
-              size={4.5}
-              mobileSize={5.5}
-              color={tw.color("gray-800")}
-            />
-            <Text>User Settings</Text>
+          <SidebarLink
+            to={{ screen: "AccountSettings", params: { screen: "Profile" } }}
+            // onPress={() => {
+            //   setIsOpenWorkspaceSwitcher(false);
+            //   // // on mobile Modals can't be open at the same time
+            //   // // and closing the workspace switcher takes a bit of time
+            //   // const timeout = Platform.OS === "web" ? 0 : 400;
+            //   // setTimeout(() => {
+            //   //   setShowCreateWorkspaceModal(true);
+            //   // }, timeout);
+            // }}
+          >
+            <View style={tw`p-menu-item`}>
+              <Text variant="xxs" muted bold>
+                {username}
+              </Text>
+            </View>
           </SidebarLink>
 
           {workspaces === null ||

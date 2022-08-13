@@ -42,6 +42,14 @@ export type WorkspaceParams =
     workspaceId: string;
   };
 
+export type AccountSettingsDrawerParamList = {
+  Profile: undefined;
+  Devices: undefined;
+};
+
+export type AccountSettingsParams =
+  NavigatorScreenParams<AccountSettingsDrawerParamList>;
+
 export type WorkspaceInvitationParams = {
   workspaceInvitationId: string;
 };
@@ -58,7 +66,7 @@ export type RootStackParamList = {
   Login: LoginParams;
   EncryptDecryptImageTest: undefined;
   TestLibsodium: undefined;
-  AccountSettings: undefined;
+  AccountSettings: AccountSettingsParams;
   Root: undefined;
   NotFound: undefined;
 };

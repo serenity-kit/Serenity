@@ -45,6 +45,8 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
+import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
+import AccountProfileSettingsScreen from "./screens/AccountProfileSettingsScreen";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -115,10 +117,12 @@ function AccountSettingsDrawerScreen(props) {
 
   const dimensions = useWindowDimensions();
   const wrapperRef = useRef(null);
+  const contentRef = useRef(null);
 
   useLayoutEffect(() => {
     if (Platform.OS === "web") {
-      const modalGroup = wrapperRef.current.parentNode.parentNode.parentNode;
+      // @ts-expect-error parentNode must exist
+      const modalGroup = wrapperRef.current?.parentNode.parentNode.parentNode;
       // since we have stack navigator multiple screens are rendered, but set to display none
       if (modalGroup.parentNode.children.length > 1) {
         const previousScreen =
@@ -128,8 +132,14 @@ function AccountSettingsDrawerScreen(props) {
         previousScreen.style.display = "block"; // make sure the main content is available
       }
       modalGroup.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
-      // window.modalGroup = modalGroup;
-      // window.mainGroup = mainGroup;
+
+      // add event listener to close modal on click outside of modal
+      modalGroup.addEventListener("click", (event) => {
+        // @ts-expect-error the ref must exists
+        if (!contentRef.current.contains(event.target)) {
+          props.navigation.goBack();
+        }
+      });
     }
   });
 
@@ -144,6 +154,7 @@ function AccountSettingsDrawerScreen(props) {
     >
       <BoxShadow elevation={2} rounded>
         <View
+          ref={contentRef}
           style={{
             backgroundColor: "white",
             width: dimensions.width * 0.8,
@@ -151,34 +162,25 @@ function AccountSettingsDrawerScreen(props) {
           }}
         >
           <AccountSettingsDrawer.Navigator
+            drawerContent={(props) => <AccountSettingsSidebar {...props} />}
             screenOptions={{
               unmountOnBlur: true,
               headerShown: false,
               drawerType: "permanent",
-              // overlayColor: "transparent",
             }}
           >
             <AccountSettingsDrawer.Screen
-              name="GeneralAccountSettings"
-              component={ModalScreen}
+              name="Profile"
+              component={AccountProfileSettingsScreen}
             />
             <AccountSettingsDrawer.Screen
-              name="DevicesSettings"
+              name="Devices"
               component={DeviceManagerScreen}
             />
           </AccountSettingsDrawer.Navigator>
         </View>
       </BoxShadow>
     </View>
-  );
-}
-
-function ModalScreen({ navigation }) {
-  return (
-    <>
-      <Text style={{ fontSize: 30 }}>This is a modal!</Text>
-      <Button onPress={() => navigation.goBack()}>Back</Button>
-    </>
   );
 }
 
@@ -280,8 +282,8 @@ const linking: LinkingOptions<RootStackParamList> = {
       AccountSettings: {
         path: "/account-settings",
         screens: {
-          GeneralAccountSettings: "general",
-          DevicesSettings: "devices",
+          Profile: "profile",
+          Devices: "devices",
         },
       },
       Root: "",
