@@ -47,6 +47,7 @@ import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
 import AccountProfileSettingsScreen from "./screens/AccountProfileSettingsScreen";
+import AccountProfileMobileOverviewScreen from "./screens/AccountSettingsMobileOverviewScreen";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -54,12 +55,15 @@ import AccountProfileSettingsScreen from "./screens/AccountProfileSettingsScreen
  */
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
-const AccountSettingsDrawer = createDrawerNavigator();
+const AccountSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
+const AccountSettingsStack = createNativeStackNavigator(); // for phones
 
 const styles = StyleSheet.create({
   // web prefix needed as this otherwise messes with the height-calculation for mobile
   header: tw`web:h-top-bar bg-white dark:bg-gray-900 border-b border-gray-200 shadow-opacity-0`,
 });
+
+const isPhoneDimensions = (width: number) => width < 768;
 
 function WorkspaceStackScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
@@ -123,6 +127,7 @@ function AccountSettingsDrawerScreen(props) {
     if (Platform.OS === "web") {
       // @ts-expect-error parentNode must exist
       const modalGroup = wrapperRef.current?.parentNode.parentNode.parentNode;
+
       // since we have stack navigator multiple screens are rendered, but set to display none
       if (modalGroup.parentNode.children.length > 1) {
         const previousScreen =
@@ -135,7 +140,6 @@ function AccountSettingsDrawerScreen(props) {
       modalGroup.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
 
       const overlayClickHandler = (event) => {
-        modalGroup.removeEventListener("click", overlayClickHandler);
         // @ts-expect-error the ref must exists
         if (!contentRef.current.contains(event.target)) {
           if (props.navigation.canGoBack()) {
@@ -148,51 +152,96 @@ function AccountSettingsDrawerScreen(props) {
 
       // add event listener to close modal on click outside of modal
       modalGroup.addEventListener("click", overlayClickHandler);
+
+      return () => {
+        modalGroup.removeEventListener("click", overlayClickHandler);
+      };
     }
   });
 
-  return (
-    <View
-      ref={wrapperRef}
-      style={{
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <BoxShadow elevation={2} rounded>
-        <View
-          ref={contentRef}
-          style={{
-            backgroundColor: "white",
-            width: dimensions.width * 0.8,
-            height: dimensions.height * 0.8,
-          }}
-        >
-          <AccountSettingsDrawer.Navigator
-            drawerContent={(props) => <AccountSettingsSidebar {...props} />}
-            screenOptions={{
-              unmountOnBlur: true,
-              headerShown: false,
-              drawerType: "permanent",
+  if (Platform.OS === "web" && !isPhoneDimensions(dimensions.width)) {
+    return (
+      <View
+        ref={wrapperRef}
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <BoxShadow elevation={2} rounded>
+          <View
+            ref={contentRef}
+            style={{
+              backgroundColor: "white",
+              width: dimensions.width * 0.8,
+              height: dimensions.height * 0.8,
             }}
           >
-            <AccountSettingsDrawer.Screen
-              name="Profile"
-              component={AccountProfileSettingsScreen}
-            />
-            <AccountSettingsDrawer.Screen
-              name="Devices"
-              component={DeviceManagerScreen}
-            />
-          </AccountSettingsDrawer.Navigator>
-        </View>
-      </BoxShadow>
-    </View>
-  );
+            <AccountSettingsDrawer.Navigator
+              drawerContent={(props) => <AccountSettingsSidebar {...props} />}
+              screenOptions={{
+                unmountOnBlur: true,
+                headerShown: false,
+                drawerType: "permanent",
+              }}
+            >
+              <AccountSettingsDrawer.Screen
+                name="Profile"
+                component={AccountProfileSettingsScreen}
+              />
+              <AccountSettingsDrawer.Screen
+                name="Devices"
+                component={DeviceManagerScreen}
+              />
+            </AccountSettingsDrawer.Navigator>
+          </View>
+        </BoxShadow>
+      </View>
+    );
+  } else if (Platform.OS === "ios" && !isPhoneDimensions(dimensions.width)) {
+    return (
+      <AccountSettingsDrawer.Navigator
+        drawerContent={(props) => <AccountSettingsSidebar {...props} />}
+        screenOptions={{
+          unmountOnBlur: true,
+          headerShown: false,
+          drawerType: "permanent",
+        }}
+      >
+        <AccountSettingsDrawer.Screen
+          name="Profile"
+          component={AccountProfileSettingsScreen}
+        />
+        <AccountSettingsDrawer.Screen
+          name="Devices"
+          component={DeviceManagerScreen}
+        />
+      </AccountSettingsDrawer.Navigator>
+    );
+  } else {
+    return (
+      <AccountSettingsStack.Navigator>
+        <AccountSettingsStack.Screen
+          name="Overview"
+          component={AccountProfileMobileOverviewScreen}
+        />
+        <AccountSettingsStack.Screen
+          name="Profile"
+          component={AccountProfileSettingsScreen}
+        />
+        <AccountSettingsStack.Screen
+          name="Devices"
+          component={DeviceManagerScreen}
+        />
+      </AccountSettingsStack.Navigator>
+    );
+  }
 }
 
 function RootNavigator() {
+  const dimensions = useWindowDimensions();
+
   return (
     <Stack.Navigator>
       <Stack.Group>
@@ -248,6 +297,22 @@ function RootNavigator() {
           component={NotFoundScreen}
           options={{ headerShown: false }}
         />
+        {isPhoneDimensions(dimensions.width) ? (
+          <>
+            <Stack.Screen
+              name="AccountSettings"
+              component={AccountProfileMobileOverviewScreen}
+            />
+            <Stack.Screen
+              name="AccountSettingsProfile"
+              component={AccountProfileSettingsScreen}
+            />
+            <Stack.Screen
+              name="AccountSettingsDevices"
+              component={DeviceManagerScreen}
+            />
+          </>
+        ) : null}
       </Stack.Group>
       <Stack.Group
         screenOptions={{
@@ -255,49 +320,66 @@ function RootNavigator() {
           headerShown: false,
         }}
       >
-        <Stack.Screen
-          name="AccountSettings"
-          component={AccountSettingsDrawerScreen}
-        />
+        {!isPhoneDimensions(dimensions.width) ? (
+          <Stack.Screen
+            name="AccountSettings"
+            component={AccountSettingsDrawerScreen}
+          />
+        ) : null}
       </Stack.Group>
     </Stack.Navigator>
   );
 }
 
-const linking: LinkingOptions<RootStackParamList> = {
-  prefixes: [Linking.createURL("/")],
-  config: {
-    screens: {
-      Workspace: {
-        path: "/workspace/:workspaceId",
-        screens: {
-          NoPageExists: "no-page-exits",
-          Page: "page/:pageId",
-          Settings: "settings",
-          WorkspaceRoot: "",
+const getLinking = (
+  isPhoneDimensions: boolean
+): LinkingOptions<RootStackParamList> => {
+  const accountSettings = isPhoneDimensions
+    ? {
+        AccountSettings: "/account-settings",
+        AccountSettingsProfile: "/account-settings/profile",
+        AccountSettingsDevices: "/account-settings/devices",
+      }
+    : {
+        AccountSettings: {
+          path: "/account-settings",
+          // only on tablet or larger screens
+          screens: {
+            Profile: "profile",
+            Devices: "devices",
+          },
         },
-      },
-      Onboarding: "onboarding",
-      DevDashboard: "dev-dashboard",
-      DesignSystem: "design-system",
-      Register: "register",
-      RegistrationVerification: "registration-verification",
-      Login: "login",
-      EncryptDecryptImageTest: "encrypt-decrypt-image-test",
-      AcceptWorkspaceInvitation:
-        "accept-workspace-invitation/:workspaceInvitationId",
-      TestLibsodium: "test-libsodium",
-      AccountSettings: {
-        path: "/account-settings",
-        screens: {
-          Profile: "profile",
-          Devices: "devices",
+      };
+
+  return {
+    prefixes: [Linking.createURL("/")],
+    config: {
+      screens: {
+        Workspace: {
+          path: "/workspace/:workspaceId",
+          screens: {
+            NoPageExists: "no-page-exits",
+            Page: "page/:pageId",
+            Settings: "settings",
+            WorkspaceRoot: "",
+          },
         },
+        Onboarding: "onboarding",
+        DevDashboard: "dev-dashboard",
+        DesignSystem: "design-system",
+        Register: "register",
+        RegistrationVerification: "registration-verification",
+        Login: "login",
+        EncryptDecryptImageTest: "encrypt-decrypt-image-test",
+        AcceptWorkspaceInvitation:
+          "accept-workspace-invitation/:workspaceInvitationId",
+        TestLibsodium: "test-libsodium",
+        ...accountSettings,
+        Root: "",
+        NotFound: "*",
       },
-      Root: "",
-      NotFound: "*",
     },
-  },
+  };
 };
 
 const LightTheme = {
@@ -314,9 +396,11 @@ export default function Navigation({
 }: {
   colorScheme: ColorSchemeName;
 }) {
+  const dimensions = useWindowDimensions();
+
   return (
     <NavigationContainer
-      linking={linking}
+      linking={getLinking(isPhoneDimensions(dimensions.width))}
       theme={colorScheme === "dark" ? DarkTheme : LightTheme}
     >
       <RootNavigator />

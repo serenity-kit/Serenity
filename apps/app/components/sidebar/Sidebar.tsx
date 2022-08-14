@@ -282,9 +282,21 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           }
         >
           <SidebarLink
-            to={{ screen: "AccountSettings", params: { screen: "Profile" } }}
-            onPress={() => {
+            to={{ screen: "AccountSettings" }}
+            onPress={(event) => {
               setIsOpenWorkspaceSwitcher(false);
+              // on iOS Modals can't be open at the same time
+              // and closing the workspace switcher takes a bit of time
+              // technically we only need it for tables and larger, but
+              // don't want to complicate things for now
+              if (Platform.OS === "ios") {
+                event.preventDefault();
+                setTimeout(() => {
+                  props.navigation.navigate("AccountSettings", {
+                    screen: "Profile",
+                  });
+                }, 400);
+              }
             }}
           >
             <View style={tw`p-menu-item`}>
