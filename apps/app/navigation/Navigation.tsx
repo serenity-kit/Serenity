@@ -125,6 +125,8 @@ function AccountSettingsDrawerScreen(props) {
       const modalGroup = wrapperRef.current?.parentNode.parentNode.parentNode;
       // since we have stack navigator multiple screens are rendered, but set to display none
       if (modalGroup.parentNode.children.length > 1) {
+        console.log(modalGroup.parentNode.children);
+
         const previousScreen =
           modalGroup.parentNode.children[
             modalGroup.parentNode.children.length - 2
@@ -133,13 +135,20 @@ function AccountSettingsDrawerScreen(props) {
       }
       modalGroup.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
 
-      // add event listener to close modal on click outside of modal
-      modalGroup.addEventListener("click", (event) => {
+      const overlayClickHandler = (event) => {
+        modalGroup.removeEventListener("click", overlayClickHandler);
         // @ts-expect-error the ref must exists
         if (!contentRef.current.contains(event.target)) {
-          props.navigation.goBack();
+          if (props.navigation.canGoBack()) {
+            props.navigation.goBack();
+          } else {
+            props.navigation.navigate("Root");
+          }
         }
-      });
+      };
+
+      // add event listener to close modal on click outside of modal
+      modalGroup.addEventListener("click", overlayClickHandler);
     }
   });
 

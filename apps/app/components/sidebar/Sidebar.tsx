@@ -283,15 +283,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         >
           <SidebarLink
             to={{ screen: "AccountSettings", params: { screen: "Profile" } }}
-            // onPress={() => {
-            //   setIsOpenWorkspaceSwitcher(false);
-            //   // // on mobile Modals can't be open at the same time
-            //   // // and closing the workspace switcher takes a bit of time
-            //   // const timeout = Platform.OS === "web" ? 0 : 400;
-            //   // setTimeout(() => {
-            //   //   setShowCreateWorkspaceModal(true);
-            //   // }, timeout);
-            // }}
+            onPress={() => {
+              setIsOpenWorkspaceSwitcher(false);
+            }}
           >
             <View style={tw`p-menu-item`}>
               <Text variant="xxs" muted bold>
