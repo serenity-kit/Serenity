@@ -125,13 +125,12 @@ function AccountSettingsDrawerScreen(props) {
       const modalGroup = wrapperRef.current?.parentNode.parentNode.parentNode;
       // since we have stack navigator multiple screens are rendered, but set to display none
       if (modalGroup.parentNode.children.length > 1) {
-        console.log(modalGroup.parentNode.children);
-
         const previousScreen =
           modalGroup.parentNode.children[
             modalGroup.parentNode.children.length - 2
           ];
-        previousScreen.style.display = "block"; // make sure the main content is available
+        // make sure the main content is available
+        previousScreen.style.display = "block";
       }
       modalGroup.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
 
