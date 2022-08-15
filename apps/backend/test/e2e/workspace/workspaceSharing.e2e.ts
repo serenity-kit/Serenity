@@ -125,8 +125,9 @@ test.describe("Workspace Sharing", () => {
     await page.locator("text=Settings").click();
     delayForSeconds(2);
     await expect(page).toHaveURL(
-      `http://localhost:3000/workspace/${workspace.id}/settings`
+      `http://localhost:3000/workspace/${workspace.id}/settings/general`
     );
+    await page.locator("text=Members").click();
 
     // click "create invitation"
     await page
