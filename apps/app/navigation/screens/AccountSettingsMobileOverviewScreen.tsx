@@ -1,6 +1,6 @@
 import { Text, SidebarLink } from "@serenity-tools/ui";
 
-export default function AccountProfileMobileOverviewScreen() {
+export default function AccountSettingsMobileOverviewScreen() {
   return (
     <>
       <SidebarLink

@@ -46,11 +46,12 @@ import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
 import AccountProfileSettingsScreen from "./screens/AccountProfileSettingsScreen";
-import AccountProfileMobileOverviewScreen from "./screens/AccountSettingsMobileOverviewScreen";
+import AccountSettingsMobileOverviewScreen from "./screens/AccountSettingsMobileOverviewScreen";
 import WorkspaceSettingsMembersScreen from "./screens/WorkspaceSettingsMembersScreen";
 import WorkspaceSettingsGeneralScreen from "./screens/WorkspaceSettingsGeneralScreen";
 import WorkspaceSettingsMobileOverviewScreen from "./screens/WorkspaceSettingsMobileOverviewScreen";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
+import NavigationDrawerModal from "../components/navigationDrawerModal/NavigationDrawerModal";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -118,92 +119,8 @@ function WorkspaceDrawerScreen(props) {
 }
 
 function WorkspaceSettingsDrawerScreen(props) {
-  const dimensions = useWindowDimensions();
-  const wrapperRef = useRef(null);
-  const contentRef = useRef(null);
-
-  useLayoutEffect(() => {
-    if (Platform.OS === "web") {
-      // @ts-expect-error parentNode must exist
-      const modalGroup = wrapperRef.current?.parentNode.parentNode.parentNode;
-
-      // since we have stack navigator multiple screens are rendered, but set to display none
-      if (modalGroup.parentNode.children.length > 1) {
-        const previousScreen =
-          modalGroup.parentNode.children[
-            modalGroup.parentNode.children.length - 2
-          ];
-        // make sure the main content is available
-        previousScreen.style.display = "block";
-      }
-      modalGroup.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
-
-      const overlayClickHandler = (event) => {
-        // @ts-expect-error the ref must exists
-        if (!contentRef.current.contains(event.target)) {
-          if (props.navigation.canGoBack()) {
-            props.navigation.goBack();
-          } else {
-            props.navigation.navigate("Root");
-          }
-        }
-      };
-
-      // add event listener to close modal on click outside of modal
-      modalGroup.addEventListener("click", overlayClickHandler);
-
-      return () => {
-        modalGroup.removeEventListener("click", overlayClickHandler);
-      };
-    }
-  });
-
-  if (Platform.OS === "web") {
-    return (
-      <View
-        ref={wrapperRef}
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <BoxShadow elevation={2} rounded>
-          <View
-            ref={contentRef}
-            style={{
-              backgroundColor: "white",
-              width: dimensions.width * 0.8,
-              height: dimensions.height * 0.8,
-            }}
-          >
-            <WorkspaceIdProvider value={props.route.params.workspaceId}>
-              <WorkspaceSettingsDrawer.Navigator
-                drawerContent={(props) => (
-                  <WorkspaceSettingsSidebar {...props} />
-                )}
-                screenOptions={{
-                  unmountOnBlur: true,
-                  headerShown: false,
-                  drawerType: "permanent",
-                }}
-              >
-                <WorkspaceSettingsDrawer.Screen
-                  name="General"
-                  component={WorkspaceSettingsGeneralScreen}
-                />
-                <WorkspaceSettingsDrawer.Screen
-                  name="Members"
-                  component={WorkspaceSettingsMembersScreen}
-                />
-              </WorkspaceSettingsDrawer.Navigator>
-            </WorkspaceIdProvider>
-          </View>
-        </BoxShadow>
-      </View>
-    );
-  } else {
-    return (
+  return (
+    <NavigationDrawerModal {...props}>
       <WorkspaceIdProvider value={props.route.params.workspaceId}>
         <WorkspaceSettingsDrawer.Navigator
           drawerContent={(props) => <WorkspaceSettingsSidebar {...props} />}
@@ -223,93 +140,13 @@ function WorkspaceSettingsDrawerScreen(props) {
           />
         </WorkspaceSettingsDrawer.Navigator>
       </WorkspaceIdProvider>
-    );
-  }
+    </NavigationDrawerModal>
+  );
 }
 
 function AccountSettingsDrawerScreen(props) {
-  const dimensions = useWindowDimensions();
-  const wrapperRef = useRef(null);
-  const contentRef = useRef(null);
-
-  useLayoutEffect(() => {
-    if (Platform.OS === "web") {
-      // @ts-expect-error parentNode must exist
-      const modalGroup = wrapperRef.current?.parentNode.parentNode.parentNode;
-
-      // since we have stack navigator multiple screens are rendered, but set to display none
-      if (modalGroup.parentNode.children.length > 1) {
-        const previousScreen =
-          modalGroup.parentNode.children[
-            modalGroup.parentNode.children.length - 2
-          ];
-        // make sure the main content is available
-        previousScreen.style.display = "block";
-      }
-      modalGroup.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
-
-      const overlayClickHandler = (event) => {
-        // @ts-expect-error the ref must exists
-        if (!contentRef.current.contains(event.target)) {
-          if (props.navigation.canGoBack()) {
-            props.navigation.goBack();
-          } else {
-            props.navigation.navigate("Root");
-          }
-        }
-      };
-
-      // add event listener to close modal on click outside of modal
-      modalGroup.addEventListener("click", overlayClickHandler);
-
-      return () => {
-        modalGroup.removeEventListener("click", overlayClickHandler);
-      };
-    }
-  });
-
-  if (Platform.OS === "web") {
-    return (
-      <View
-        ref={wrapperRef}
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <BoxShadow elevation={2} rounded>
-          <View
-            ref={contentRef}
-            style={{
-              backgroundColor: "white",
-              width: dimensions.width * 0.8,
-              height: dimensions.height * 0.8,
-            }}
-          >
-            <AccountSettingsDrawer.Navigator
-              drawerContent={(props) => <AccountSettingsSidebar {...props} />}
-              screenOptions={{
-                unmountOnBlur: true,
-                headerShown: false,
-                drawerType: "permanent",
-              }}
-            >
-              <AccountSettingsDrawer.Screen
-                name="Profile"
-                component={AccountProfileSettingsScreen}
-              />
-              <AccountSettingsDrawer.Screen
-                name="Devices"
-                component={DeviceManagerScreen}
-              />
-            </AccountSettingsDrawer.Navigator>
-          </View>
-        </BoxShadow>
-      </View>
-    );
-  } else {
-    return (
+  return (
+    <NavigationDrawerModal {...props}>
       <AccountSettingsDrawer.Navigator
         drawerContent={(props) => <AccountSettingsSidebar {...props} />}
         screenOptions={{
@@ -327,8 +164,8 @@ function AccountSettingsDrawerScreen(props) {
           component={DeviceManagerScreen}
         />
       </AccountSettingsDrawer.Navigator>
-    );
-  }
+    </NavigationDrawerModal>
+  );
 }
 
 function RootNavigator() {
@@ -384,7 +221,7 @@ function RootNavigator() {
           <>
             <Stack.Screen
               name="AccountSettings"
-              component={AccountProfileMobileOverviewScreen}
+              component={AccountSettingsMobileOverviewScreen}
             />
             <Stack.Screen
               name="AccountSettingsProfile"
