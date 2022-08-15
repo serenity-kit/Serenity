@@ -382,7 +382,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           ></IconButton>
         )}
       </HStack>
-
       <SidebarLink
         to={{
           screen: "Workspace",
@@ -397,6 +396,21 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         />
         <Text variant="small">Settings</Text>
       </SidebarLink>
+      <SidebarLink
+        to={{
+          screen: "WorkspaceSettings",
+          params: { workspaceId: route.params.workspaceId },
+        }}
+      >
+        <Icon
+          name="settings-4-line"
+          size={4.5}
+          mobileSize={5.5}
+          color={tw.color("gray-800")}
+        />
+        <Text variant="small">Settings TODO</Text>
+      </SidebarLink>
+
       <SidebarLink to={{ screen: "DevDashboard" }}>
         <Icon
           name="dashboard-line"
@@ -406,9 +420,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         />
         <Text variant="small">Dev Dashboard</Text>
       </SidebarLink>
-
       <SidebarDivider />
-
       <HStack
         justifyContent="space-between"
         alignItems="center"
@@ -427,7 +439,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           ></IconButton>
         </Tooltip>
       </HStack>
-
       {isCreatingNewFolder && (
         <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
           <View style={tw`ml-0.5 -mr-0.5`}>
@@ -444,7 +455,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           />
         </HStack>
       )}
-
       {rootFoldersResult.fetching ? (
         <Text variant="xs" muted style={tw`py-1.5 pl-4`}>
           Loading Folders…
@@ -465,7 +475,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           );
         })
       ) : null}
-
       <CreateWorkspaceModal
         isVisible={showCreateWorkspaceModal}
         onBackdropPress={() => setShowCreateWorkspaceModal(false)}

@@ -50,12 +50,26 @@ export type AccountSettingsDrawerParamList = {
 export type AccountSettingsParams =
   NavigatorScreenParams<AccountSettingsDrawerParamList>;
 
+export type WorkspaceSettingsDrawerParamList = {
+  General: undefined;
+  Members: undefined;
+};
+
+export type WorkspaceSettingsParams =
+  | (NavigatorScreenParams<WorkspaceSettingsDrawerParamList> & {
+      workspaceId: string;
+    })
+  | {
+      workspaceId: string;
+    };
+
 export type WorkspaceInvitationParams = {
   workspaceInvitationId: string;
 };
 
 export type RootStackParamList = {
   Workspace: WorkspaceParams;
+  WorkspaceSettings: WorkspaceSettingsParams;
   Onboarding: undefined;
   DesignSystem: undefined;
   DevDashboard: undefined;
@@ -69,6 +83,8 @@ export type RootStackParamList = {
   AccountSettings: AccountSettingsParams;
   AccountSettingsProfile: undefined; // on phones
   AccountSettingsDevices: undefined; // on phones
+  WorkspaceSettingsGeneral: undefined; // on phones
+  WorkspaceSettingsMembers: undefined; // on phones
   Root: undefined;
   NotFound: undefined;
 };

@@ -48,6 +48,10 @@ import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
 import AccountProfileSettingsScreen from "./screens/AccountProfileSettingsScreen";
 import AccountProfileMobileOverviewScreen from "./screens/AccountSettingsMobileOverviewScreen";
+import WorkspaceSettingsMembersScreen from "./screens/WorkspaceSettingsMembersScreen";
+import WorkspaceSettingsGeneralScreen from "./screens/WorkspaceSettingsGeneralScreen";
+import WorkspaceSettingsMobileOverviewScreen from "./screens/WorkspaceSettingsMobileOverviewScreen";
+import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -56,7 +60,7 @@ import AccountProfileMobileOverviewScreen from "./screens/AccountSettingsMobileO
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 const AccountSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
-const AccountSettingsStack = createNativeStackNavigator(); // for phones
+const WorkspaceSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
 
 const styles = StyleSheet.create({
   // web prefix needed as this otherwise messes with the height-calculation for mobile
@@ -65,7 +69,7 @@ const styles = StyleSheet.create({
 
 const isPhoneDimensions = (width: number) => width < 768;
 
-function WorkspaceStackScreen(props) {
+function WorkspaceDrawerScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
 
@@ -115,10 +119,7 @@ function WorkspaceStackScreen(props) {
   );
 }
 
-function AccountSettingsDrawerScreen(props) {
-  // TODO onclick on overlay should close the modal
-  // TODO close button should look for back and if not go to root
-
+function WorkspaceSettingsDrawerScreen(props) {
   const dimensions = useWindowDimensions();
   const wrapperRef = useRef(null);
   const contentRef = useRef(null);
@@ -159,7 +160,117 @@ function AccountSettingsDrawerScreen(props) {
     }
   });
 
-  if (Platform.OS === "web" && !isPhoneDimensions(dimensions.width)) {
+  if (Platform.OS === "web") {
+    return (
+      <View
+        ref={wrapperRef}
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <BoxShadow elevation={2} rounded>
+          <View
+            ref={contentRef}
+            style={{
+              backgroundColor: "white",
+              width: dimensions.width * 0.8,
+              height: dimensions.height * 0.8,
+            }}
+          >
+            <WorkspaceIdProvider value={props.route.params.workspaceId}>
+              <WorkspaceSettingsDrawer.Navigator
+                drawerContent={(props) => (
+                  <WorkspaceSettingsSidebar {...props} />
+                )}
+                screenOptions={{
+                  unmountOnBlur: true,
+                  headerShown: false,
+                  drawerType: "permanent",
+                }}
+              >
+                <WorkspaceSettingsDrawer.Screen
+                  name="General"
+                  component={WorkspaceSettingsGeneralScreen}
+                />
+                <WorkspaceSettingsDrawer.Screen
+                  name="Members"
+                  component={WorkspaceSettingsMembersScreen}
+                />
+              </WorkspaceSettingsDrawer.Navigator>
+            </WorkspaceIdProvider>
+          </View>
+        </BoxShadow>
+      </View>
+    );
+  } else {
+    return (
+      <WorkspaceIdProvider value={props.route.params.workspaceId}>
+        <WorkspaceSettingsDrawer.Navigator
+          drawerContent={(props) => <WorkspaceSettingsSidebar {...props} />}
+          screenOptions={{
+            unmountOnBlur: true,
+            headerShown: false,
+            drawerType: "permanent",
+          }}
+        >
+          <WorkspaceSettingsDrawer.Screen
+            name="General"
+            component={WorkspaceSettingsGeneralScreen}
+          />
+          <WorkspaceSettingsDrawer.Screen
+            name="Members"
+            component={WorkspaceSettingsMembersScreen}
+          />
+        </WorkspaceSettingsDrawer.Navigator>
+      </WorkspaceIdProvider>
+    );
+  }
+}
+
+function AccountSettingsDrawerScreen(props) {
+  const dimensions = useWindowDimensions();
+  const wrapperRef = useRef(null);
+  const contentRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (Platform.OS === "web") {
+      // @ts-expect-error parentNode must exist
+      const modalGroup = wrapperRef.current?.parentNode.parentNode.parentNode;
+
+      // since we have stack navigator multiple screens are rendered, but set to display none
+      if (modalGroup.parentNode.children.length > 1) {
+        const previousScreen =
+          modalGroup.parentNode.children[
+            modalGroup.parentNode.children.length - 2
+          ];
+        // make sure the main content is available
+        previousScreen.style.display = "block";
+      }
+      modalGroup.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
+
+      const overlayClickHandler = (event) => {
+        // @ts-expect-error the ref must exists
+        if (!contentRef.current.contains(event.target)) {
+          if (props.navigation.canGoBack()) {
+            props.navigation.goBack();
+          } else {
+            props.navigation.navigate("Root");
+          }
+        }
+      };
+
+      // add event listener to close modal on click outside of modal
+      modalGroup.addEventListener("click", overlayClickHandler);
+
+      return () => {
+        modalGroup.removeEventListener("click", overlayClickHandler);
+      };
+    }
+  });
+
+  if (Platform.OS === "web") {
     return (
       <View
         ref={wrapperRef}
@@ -199,7 +310,7 @@ function AccountSettingsDrawerScreen(props) {
         </BoxShadow>
       </View>
     );
-  } else if (Platform.OS === "ios" && !isPhoneDimensions(dimensions.width)) {
+  } else {
     return (
       <AccountSettingsDrawer.Navigator
         drawerContent={(props) => <AccountSettingsSidebar {...props} />}
@@ -219,23 +330,6 @@ function AccountSettingsDrawerScreen(props) {
         />
       </AccountSettingsDrawer.Navigator>
     );
-  } else {
-    return (
-      <AccountSettingsStack.Navigator>
-        <AccountSettingsStack.Screen
-          name="Overview"
-          component={AccountProfileMobileOverviewScreen}
-        />
-        <AccountSettingsStack.Screen
-          name="Profile"
-          component={AccountProfileSettingsScreen}
-        />
-        <AccountSettingsStack.Screen
-          name="Devices"
-          component={DeviceManagerScreen}
-        />
-      </AccountSettingsStack.Navigator>
-    );
   }
 }
 
@@ -252,7 +346,7 @@ function RootNavigator() {
         />
         <Stack.Screen
           name="Workspace"
-          component={WorkspaceStackScreen}
+          component={WorkspaceDrawerScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
@@ -287,16 +381,7 @@ function RootNavigator() {
           component={AcceptWorkspaceInvitationScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="WorkspaceNotFound"
-          component={WorkspaceNotFoundScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="NotFound"
-          component={NotFoundScreen}
-          options={{ headerShown: false }}
-        />
+
         {isPhoneDimensions(dimensions.width) ? (
           <>
             <Stack.Screen
@@ -311,8 +396,30 @@ function RootNavigator() {
               name="AccountSettingsDevices"
               component={DeviceManagerScreen}
             />
+            <Stack.Screen
+              name="WorkspaceSettings"
+              component={WorkspaceSettingsMobileOverviewScreen}
+            />
+            <Stack.Screen
+              name="WorkspaceSettingsGeneral"
+              component={WorkspaceSettingsGeneralScreen}
+            />
+            <Stack.Screen
+              name="WorkspaceSettingsMembers"
+              component={WorkspaceSettingsMembersScreen}
+            />
           </>
         ) : null}
+        <Stack.Screen
+          name="WorkspaceNotFound"
+          component={WorkspaceNotFoundScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="NotFound"
+          component={NotFoundScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Group>
       <Stack.Group
         screenOptions={{
@@ -321,10 +428,16 @@ function RootNavigator() {
         }}
       >
         {!isPhoneDimensions(dimensions.width) ? (
-          <Stack.Screen
-            name="AccountSettings"
-            component={AccountSettingsDrawerScreen}
-          />
+          <>
+            <Stack.Screen
+              name="AccountSettings"
+              component={AccountSettingsDrawerScreen}
+            />
+            <Stack.Screen
+              name="WorkspaceSettings"
+              component={WorkspaceSettingsDrawerScreen}
+            />
+          </>
         ) : null}
       </Stack.Group>
     </Stack.Navigator>
@@ -343,10 +456,25 @@ const getLinking = (
     : {
         AccountSettings: {
           path: "/account-settings",
-          // only on tablet or larger screens
           screens: {
             Profile: "profile",
             Devices: "devices",
+          },
+        },
+      };
+
+  const workspaceSettings = isPhoneDimensions
+    ? {
+        WorkspaceSettings: "/workspace/:workspaceId/settings",
+        WorkspaceSettingsGeneral: "/workspace/:workspaceId/settings/general",
+        WorkspaceSettingsMembers: "/workspace/:workspaceId/settings/members",
+      }
+    : {
+        WorkspaceSettings: {
+          path: "/workspace/:workspaceId/settings",
+          screens: {
+            General: "general",
+            Members: "members",
           },
         },
       };
@@ -355,12 +483,13 @@ const getLinking = (
     prefixes: [Linking.createURL("/")],
     config: {
       screens: {
+        ...workspaceSettings,
         Workspace: {
           path: "/workspace/:workspaceId",
           screens: {
             NoPageExists: "no-page-exits",
             Page: "page/:pageId",
-            Settings: "settings",
+            Settings: "settings-old",
             WorkspaceRoot: "",
           },
         },
