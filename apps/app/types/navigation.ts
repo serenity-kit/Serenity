@@ -21,6 +21,10 @@ type PageParams = {
   isNew?: boolean;
 };
 
+type WorkspacePageParams = {
+  workspaceId: string;
+};
+
 type LoginParams = {
   next?: string;
 };
@@ -37,10 +41,8 @@ export type WorkspaceDrawerParamList = {
   WorkspaceRoot: undefined;
 };
 
-export type WorkspaceParams =
-  NavigatorScreenParams<WorkspaceDrawerParamList> & {
-    workspaceId: string;
-  };
+export type WorkspaceParams = NavigatorScreenParams<WorkspaceDrawerParamList> &
+  WorkspacePageParams;
 
 export type AccountSettingsDrawerParamList = {
   Profile: undefined;
@@ -56,12 +58,11 @@ export type WorkspaceSettingsDrawerParamList = {
 };
 
 export type WorkspaceSettingsParams =
-  | (NavigatorScreenParams<WorkspaceSettingsDrawerParamList> & {
-      workspaceId: string;
-    })
-  | {
-      workspaceId: string;
-    };
+  // tablet & desktop params
+  | (NavigatorScreenParams<WorkspaceSettingsDrawerParamList> &
+      WorkspacePageParams)
+  // phone params
+  | WorkspacePageParams;
 
 export type WorkspaceInvitationParams = {
   workspaceInvitationId: string;

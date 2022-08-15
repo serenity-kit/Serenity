@@ -384,20 +384,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       </HStack>
       <SidebarLink
         to={{
-          screen: "Workspace",
-          params: { workspaceId: route.params.workspaceId, screen: "Settings" },
-        }}
-      >
-        <Icon
-          name="settings-4-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={tw.color("gray-800")}
-        />
-        <Text variant="small">Settings</Text>
-      </SidebarLink>
-      <SidebarLink
-        to={{
           screen: "WorkspaceSettings",
           params: { workspaceId: route.params.workspaceId },
         }}
@@ -408,7 +394,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           mobileSize={5.5}
           color={tw.color("gray-800")}
         />
-        <Text variant="small">Settings TODO</Text>
+        <Text variant="small">Settings</Text>
       </SidebarLink>
 
       <SidebarLink to={{ screen: "DevDashboard" }}>

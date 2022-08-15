@@ -22,7 +22,6 @@ import PageScreen from "./screens/PageScreen";
 import LibsodiumTestScreen from "./screens/LibsodiumTestScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import LoginScreen from "./screens/LoginScreen";
-import WorkspaceSettingsScreen from "./screens/WorkspaceSettingsScreen";
 import DesignSystemScreen from "./screens/DesignSystemScreen";
 import Sidebar from "../components/sidebar/Sidebar";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
@@ -103,7 +102,6 @@ function WorkspaceDrawerScreen(props) {
         }}
       >
         <Drawer.Screen name="Page" component={PageScreen} />
-        <Drawer.Screen name="Settings" component={WorkspaceSettingsScreen} />
         <Drawer.Screen
           name="WorkspaceRoot"
           component={WorkspaceRootScreen}
@@ -489,7 +487,6 @@ const getLinking = (
           screens: {
             NoPageExists: "no-page-exits",
             Page: "page/:pageId",
-            Settings: "settings-old",
             WorkspaceRoot: "",
           },
         },
