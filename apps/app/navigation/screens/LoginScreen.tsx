@@ -1,5 +1,5 @@
 import React from "react";
-import { View, tw, Box, Text, Link, InfoMessage } from "@serenity-tools/ui";
+import { View, tw, Box, Text, Link, CenterContent } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types/navigation";
 import { LoginForm } from "../../components/login/LoginForm";
 import { navigateToNextAuthenticatedPage } from "../../utils/authentication/loginHelper";
@@ -17,9 +17,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
   return (
     <SafeAreaView style={tw`flex-auto`}>
       <KeyboardAvoidingView behavior="padding" style={tw`flex-auto`}>
-        <View
-          style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
-        >
+        <CenterContent serenityBg>
           <Box plush>
             <View>
               <Text variant="large" bold style={tw`text-center`}>
@@ -41,7 +39,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
               </Text>
             </View>
           </Box>
-        </View>
+        </CenterContent>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

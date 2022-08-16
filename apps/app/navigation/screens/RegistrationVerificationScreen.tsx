@@ -7,6 +7,7 @@ import {
   Button,
   LabeledInput,
   InfoMessage,
+  CenterContent,
 } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types/navigation";
 import {
@@ -185,9 +186,7 @@ export default function RegistrationVerificationScreen(
   };
 
   return (
-    <View
-      style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
-    >
+    <CenterContent serenityBg>
       <Box>
         <View>
           <Text variant="large" bold style={tw`text-center`}>
@@ -225,6 +224,6 @@ export default function RegistrationVerificationScreen(
           Register
         </Button>
       </Box>
-    </View>
+    </CenterContent>
   );
 }
