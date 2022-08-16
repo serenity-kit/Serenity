@@ -48,6 +48,15 @@ export default function DevDashboardScreen(props) {
         />
         <Text>Encrypt / Decrypt Image</Text>
       </SidebarLink>
+      <SidebarLink to={{ screen: "AccountSettings" }}>
+        <Icon
+          name="dashboard-line"
+          size={4.5}
+          mobileSize={5.5}
+          color={tw.color("gray-800")}
+        />
+        <Text>User Settings</Text>
+      </SidebarLink>
     </ScrollSafeAreaView>
   );
 }

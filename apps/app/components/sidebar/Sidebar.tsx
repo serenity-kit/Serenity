@@ -281,11 +281,31 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             </Pressable>
           }
         >
-          <View style={tw`p-menu-item`}>
-            <Text variant="xxs" muted bold>
-              {username}
-            </Text>
-          </View>
+          <SidebarLink
+            to={{ screen: "AccountSettings" }}
+            onPress={(event) => {
+              setIsOpenWorkspaceSwitcher(false);
+              // on iOS Modals can't be open at the same time
+              // and closing the workspace switcher takes a bit of time
+              // technically we only need it for tables and larger, but
+              // don't want to complicate things for now
+              if (Platform.OS === "ios") {
+                event.preventDefault();
+                setTimeout(() => {
+                  props.navigation.navigate("AccountSettings", {
+                    screen: "Profile",
+                  });
+                }, 400);
+              }
+            }}
+          >
+            <View style={tw`p-menu-item`}>
+              <Text variant="xxs" muted bold>
+                {username}
+              </Text>
+            </View>
+          </SidebarLink>
+
           {workspaces === null ||
           workspaces === undefined ||
           workspaces.length === 0
@@ -362,11 +382,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           ></IconButton>
         )}
       </HStack>
-
       <SidebarLink
         to={{
-          screen: "Workspace",
-          params: { workspaceId: route.params.workspaceId, screen: "Settings" },
+          screen: "WorkspaceSettings",
+          params: { workspaceId: route.params.workspaceId },
         }}
       >
         <Icon
@@ -377,6 +396,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         />
         <Text variant="small">Settings</Text>
       </SidebarLink>
+
       <SidebarLink to={{ screen: "DevDashboard" }}>
         <Icon
           name="dashboard-line"
@@ -386,26 +406,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         />
         <Text variant="small">Dev Dashboard</Text>
       </SidebarLink>
-      <SidebarLink
-        to={{
-          screen: "Workspace",
-          params: {
-            workspaceId: route.params.workspaceId,
-            screen: "DeviceManager",
-          },
-        }}
-      >
-        <Icon
-          name="dashboard-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={tw.color("gray-800")}
-        />
-        <Text variant="small">Device Manager</Text>
-      </SidebarLink>
-
       <SidebarDivider />
-
       <HStack
         justifyContent="space-between"
         alignItems="center"
@@ -424,7 +425,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           ></IconButton>
         </Tooltip>
       </HStack>
-
       {isCreatingNewFolder && (
         <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
           <View style={tw`ml-0.5 -mr-0.5`}>
@@ -441,7 +441,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           />
         </HStack>
       )}
-
       {rootFoldersResult.fetching ? (
         <Text variant="xs" muted style={tw`py-1.5 pl-4`}>
           Loading Folders…
@@ -462,7 +461,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           );
         })
       ) : null}
-
       <CreateWorkspaceModal
         isVisible={showCreateWorkspaceModal}
         onBackdropPress={() => setShowCreateWorkspaceModal(false)}

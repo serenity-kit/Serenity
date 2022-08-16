@@ -191,7 +191,8 @@ export const crypto_box_open_easy = async (
 };
 
 export const crypto_kdf_keygen = async (): Promise<string> => {
-  throw new Error("Not implemented");
+  console.error("crypto_kdf_keygen not implemented");
+  return "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
 };
 
 export const crypto_kdf_derive_from_key = async (
@@ -204,7 +205,8 @@ export const crypto_kdf_derive_from_key = async (
   if ([...context].length !== 8) {
     throw new Error("crypto_kdf_derive_from_key context must be 8 bytes");
   }
-  throw new Error("Not implemented");
+  console.error("crypto_kdf_keygen crypto_kdf_derive_from_key implemented");
+  return "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJt1";
 };
 
 export default {
