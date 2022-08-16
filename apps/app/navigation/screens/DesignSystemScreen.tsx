@@ -31,6 +31,9 @@ import {
   ScrollSafeAreaView,
   EditorBottombarButton,
   EditorBottombarDivider,
+  CenterContent,
+  Box,
+  Mono,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -71,10 +74,58 @@ export default function DesignSystemScreen() {
     );
   };
 
+  const DesignSystemArea = (props) => {
+    return (
+      <View
+        style={[
+          tw`h-60 border border-gray-300 rounded overflow-hidden`,
+          props.style,
+          props.transparent ? tw`bg-transparent` : tw`bg-gray-200`,
+        ]}
+      >
+        {props.children}
+      </View>
+    );
+  };
+
+  const CodeArea = (props) => {
+    return (
+      <View style={[tw`p-4 bg-gray-200 rounded`, props.style]}>
+        {props.children}
+      </View>
+    );
+  };
+
   // TODO refactor order
   return (
     <ScrollSafeAreaView style={tw`px-4 py-6`}>
-      <DesignSystemHeader style={tw`mt-6`}>EditorBottombar</DesignSystemHeader>
+      <CodeArea>
+        <Mono muted>Code</Mono>
+      </CodeArea>
+      <DesignSystemHeader style={tw`mt-6 mb-0`}>
+        CenterContent
+      </DesignSystemHeader>
+      <DesignSystemSubHeader>Basic</DesignSystemSubHeader>
+      <DesignSystemArea transparent>
+        <CenterContent>
+          <Text>I am centered</Text>
+        </CenterContent>
+      </DesignSystemArea>
+      <DesignSystemSubHeader>
+        with responsive serenity Background
+      </DesignSystemSubHeader>
+      <DesignSystemArea transparent style={tw`xs:border-transparent`}>
+        <CenterContent serenityBg>
+          <Box style={tw`text-center`}>
+            <Text variant="large">Me too!</Text>
+            <Text muted>
+              With this wrapper you can center content within the available
+              space, well isn't that nice.
+            </Text>
+          </Box>
+        </CenterContent>
+      </DesignSystemArea>
+      <DesignSystemHeader>EditorBottombar</DesignSystemHeader>
       <HStack space={2} alignItems="center">
         <EditorBottombarButton name="arrow-down-s-line" />
         <EditorBottombarButton name="text" />
@@ -116,7 +167,10 @@ export default function DesignSystemScreen() {
       <Text variant="large" style={tw`mt-12 mb-4 text-2xl`} bold>
         Elevation
       </Text>
-      <HStack space={3} style={tw`pt-2 pb-4 pr-2 overflow-scroll`}>
+      <HStack
+        space={3}
+        style={tw`pt-2 pb-4 pr-2 overflow-scroll sm:overflow-visible`}
+      >
         {elevationLevels.map((level) => {
           return (
             <BoxShadow elevation={level} rounded>
@@ -243,7 +297,11 @@ export default function DesignSystemScreen() {
 
       <DesignSystemHeader style={tw`mb-0`}>Avatar</DesignSystemHeader>
       <DesignSystemSubHeader>Sizing</DesignSystemSubHeader>
-      <HStack space={2} alignItems="center" style={tw`pr-2 overflow-scroll`}>
+      <HStack
+        space={2}
+        alignItems="center"
+        style={tw`pr-2 overflow-scroll sm:overflow-visible`}
+      >
         <Avatar bg="primary.500" size={"xs"}>
           XS
         </Avatar>
@@ -287,7 +345,10 @@ export default function DesignSystemScreen() {
       <DesignSystemSubHeader>
         Collaboration Colors - Workspace Style
       </DesignSystemSubHeader>
-      <HStack space={4} style={tw`pb-3 pr-2 overflow-scroll`}>
+      <HStack
+        space={4}
+        style={tw`pb-3 pr-2 overflow-scroll sm:overflow-visible`}
+      >
         {collabColors.map((color) => {
           return (
             <Avatar
