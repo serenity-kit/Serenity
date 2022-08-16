@@ -28,12 +28,23 @@ export async function createFolder({
     folderName = name;
   }
   return await prisma.$transaction(async (prisma) => {
+    // to prevent an internal server error
+    // throw a bad user input on duplicate id
     const folderforId = await prisma.folder.findFirst({
       where: { id },
       select: { id: true },
     });
     if (folderforId) {
       throw new UserInputError("Invalid input: duplicate id");
+    }
+    // to prevent an internal server error
+    // throw a bad user input on duplicate subkeyid
+    const folderForSubkeyId = await prisma.folder.findFirst({
+      where: { subKeyId },
+      select: { id: true },
+    });
+    if (folderForSubkeyId) {
+      throw new UserInputError("Invalid input: duplicate subKeyId");
     }
     // make sure we have permissions to do stuff with this workspace
     const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
@@ -62,13 +73,6 @@ export async function createFolder({
       } else {
         rootFolderId = parentFolder.id;
       }
-    }
-    const folderForSubkeyId = await prisma.folder.findFirst({
-      where: { subKeyId },
-      select: { id: true },
-    });
-    if (folderForSubkeyId) {
-      throw new UserInputError("Invalid input: duplicate subKeyId");
     }
     const rawFolder = await prisma.folder.create({
       data: {
