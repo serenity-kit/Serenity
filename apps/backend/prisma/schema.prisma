@@ -181,12 +181,12 @@ model WorkspaceKeyBox {
 }
 
 model Folder {
-  id                 String     @id
+  id                 String     @id @unique
   idSignature        String
   name               String // TODO must be encrypted
   encryptedName      String?
   encryptedNameNonce String?
-  subKeyId           Int?
+  subKeyId           Int?       @unique
   workspace          Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId        String
   parentFolder       Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
