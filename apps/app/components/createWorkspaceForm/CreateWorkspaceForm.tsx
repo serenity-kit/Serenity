@@ -2,9 +2,9 @@ import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import {
   Button,
+  FormWrapper,
   LabeledInput,
   ModalButtonFooter,
-  FormWrapper,
   ModalHeader,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
@@ -94,6 +94,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   };
 
   const createWorkspace = async () => {
+    console.log("createWorkspace");
     const workspaceId = uuidv4();
     const folderId = uuidv4();
     const documentId = uuidv4();
@@ -115,6 +116,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     }
     const devices = devicesResult.data?.devices?.nodes as Device[];
     const deviceWorkspaceKeyBoxes = await buildDeviceWorkspaceKeyBoxes(devices);
+    console.log({ deviceWorkspaceKeyBoxes });
     const createInitialWorkspaceStructureResult =
       await createInitialWorkspaceStructure({
         input: {
@@ -129,6 +131,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           deviceWorkspaceKeyBoxes,
         },
       });
+    console.log({ createInitialWorkspaceStructureResult });
     if (
       !createInitialWorkspaceStructureResult.data
         ?.createInitialWorkspaceStructure?.workspace
