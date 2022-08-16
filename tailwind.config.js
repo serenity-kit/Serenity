@@ -129,7 +129,6 @@ module.exports = {
         "text-muted": `text-gray-600`,
         "form-element-height": "h-12",
         "p-menu-item": `py-2 px-3`,
-        "flex-center-center": `flex-auto items-center justify-center`,
       });
     }),
   ],
