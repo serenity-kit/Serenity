@@ -147,21 +147,28 @@ export default function SidebarFolder(props: Props) {
       name,
       parentKey: workspaceKey,
     });
-    const result = await createFolderMutation({
-      input: {
-        id,
-        name,
-        encryptedName: encryptedFolderResult.ciphertext,
-        encryptedNameNonce: encryptedFolderResult.publicNonce,
-        subKeyId: encryptedFolderResult.folderSubkeyId,
-        workspaceId: props.workspaceId,
-        parentFolderId: props.folderId,
-      },
-    });
-    if (result.data?.createFolder?.folder?.id) {
-      // TODO show notification
-      setIsEditing("none");
-    } else {
+
+    let didCreateFolderSucceed = false;
+    let numCreateFolderAttempts = 0;
+    let folderId: string | undefined = undefined;
+    let result: any = undefined;
+    do {
+      result = await createFolderMutation({
+        input: {
+          id,
+          workspaceId: route.params.workspaceId,
+          name,
+          encryptedName: encryptedFolderResult.ciphertext,
+          encryptedNameNonce: encryptedFolderResult.publicNonce,
+          subKeyId: encryptedFolderResult.folderSubkeyId,
+        },
+      });
+      if (result.data?.createFolder?.folder?.id) {
+        didCreateFolderSucceed = true;
+        setIsEditing("none");
+      }
+    } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
+    if (!folderId) {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
     }
