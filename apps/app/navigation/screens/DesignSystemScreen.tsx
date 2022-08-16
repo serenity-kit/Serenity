@@ -34,6 +34,10 @@ import {
   CenterContent,
   Box,
   Mono,
+  DesignSystemHeader,
+  DesignSystemSubHeader,
+  DesignSystemExampleArea,
+  DesignSystemInlineCode as DSCode,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -52,69 +56,27 @@ export default function DesignSystemScreen() {
   const collabColors = Object.keys(theme.colors.collaboration);
   const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
 
-  const styles = StyleSheet.create({
-    header: tw`mt-12 mb-4 text-2xl`,
-    subHeader: tw`mt-4 mb-2`,
-  });
-
-  // TODO extract into ui as components
-  const DesignSystemHeader = (props) => {
-    return (
-      <Text variant="large" style={[styles.header, props.style]} bold>
-        {props.children}
-      </Text>
-    );
-  };
-
-  const DesignSystemSubHeader = (props) => {
-    return (
-      <Text variant="small" style={[styles.subHeader, props.style]} muted>
-        {props.children}
-      </Text>
-    );
-  };
-
-  const DesignSystemArea = (props) => {
-    return (
-      <View
-        style={[
-          tw`h-60 border border-gray-300 rounded overflow-hidden`,
-          props.style,
-          props.transparent ? tw`bg-transparent` : tw`bg-gray-200`,
-        ]}
-      >
-        {props.children}
-      </View>
-    );
-  };
-
-  const CodeArea = (props) => {
-    return (
-      <View style={[tw`p-4 bg-gray-200 rounded`, props.style]}>
-        {props.children}
-      </View>
-    );
-  };
-
   // TODO refactor order
+  // TODO add structural elements
   return (
     <ScrollSafeAreaView style={tw`px-4 py-6`}>
-      <CodeArea>
-        <Mono muted>Code</Mono>
-      </CodeArea>
+      <Text>
+        Here is some Text and then some <DSCode>Code</DSCode> and then some more
+        text and more and <DSCode>more</DSCode> and more and more
+      </Text>
       <DesignSystemHeader style={tw`mt-6 mb-0`}>
         CenterContent
       </DesignSystemHeader>
       <DesignSystemSubHeader>Basic</DesignSystemSubHeader>
-      <DesignSystemArea transparent>
+      <DesignSystemExampleArea>
         <CenterContent>
           <Text>I am centered</Text>
         </CenterContent>
-      </DesignSystemArea>
+      </DesignSystemExampleArea>
       <DesignSystemSubHeader>
         with responsive serenity Background
       </DesignSystemSubHeader>
-      <DesignSystemArea transparent style={tw`xs:border-transparent`}>
+      <DesignSystemExampleArea style={tw`xs:border-transparent`}>
         <CenterContent serenityBg>
           <Box style={tw`text-center`}>
             <Text variant="large">Me too!</Text>
@@ -124,7 +86,7 @@ export default function DesignSystemScreen() {
             </Text>
           </Box>
         </CenterContent>
-      </DesignSystemArea>
+      </DesignSystemExampleArea>
       <DesignSystemHeader>EditorBottombar</DesignSystemHeader>
       <HStack space={2} alignItems="center">
         <EditorBottombarButton name="arrow-down-s-line" />
@@ -225,6 +187,11 @@ export default function DesignSystemScreen() {
         <IconButton name="menu" color="gray-800" large />
       </HStack>
       <DesignSystemHeader style={tw`mb-0`}>Button</DesignSystemHeader>
+      <Text>
+        Button component is used to trigger an action or event, such as
+        submitting a form, opening a Dialog, canceling an action, or performing
+        a delete operation.
+      </Text>
       <DesignSystemSubHeader>Default Button</DesignSystemSubHeader>
       <Button>Login</Button>
       <DesignSystemSubHeader>Disabled Button</DesignSystemSubHeader>
