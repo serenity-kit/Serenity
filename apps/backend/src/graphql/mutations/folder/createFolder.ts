@@ -8,9 +8,9 @@ export const CreateFolderInput = inputObjectType({
   definition(t) {
     t.nonNull.string("id");
     t.string("name");
-    t.string("encryptedName");
-    t.string("encryptedNameNonce");
-    t.int("subKeyId");
+    t.nonNull.string("encryptedName");
+    t.nonNull.string("encryptedNameNonce");
+    t.nonNull.int("subKeyId");
     t.string("parentFolderId");
     t.nonNull.string("workspaceId");
   },

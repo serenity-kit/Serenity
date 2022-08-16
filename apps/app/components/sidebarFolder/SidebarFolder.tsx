@@ -227,13 +227,74 @@ export default function SidebarFolder(props: Props) {
     }
   };
   const updateFolderName = async (newFolderName: string) => {
-    const updateFolderNameResult = await updateFolderNameMutation({
-      input: {
-        id: props.folderId,
-        name: newFolderName,
-      },
+    const activeDevice = await getActiveDevice();
+    if (!activeDevice) {
+      // TODO: handle this error
+      console.error("No active device!");
+      return;
+    }
+    // fetch the workspace again in case the workspaceKeybox has been changed
+    const workspace = await getWorkspace({
+      workspaceId: props.workspaceId,
+      urqlClient,
+      deviceSigningPublicKey: activeDevice?.signingPublicKey,
     });
-    if (updateFolderNameResult.data?.updateFolderName?.folder) {
+    const workspaceKeyBox = workspace?.currentWorkspaceKey?.workspaceKeyBox;
+    if (!workspaceKeyBox) {
+      // TODO: handle this error
+      console.error("This device isn't registered for this workspace!");
+      return;
+    }
+    const mainDevice = getMainDevice();
+    const userDevices = devicesResult.data?.devices?.nodes;
+    if (!userDevices) {
+      // TODO: handle this error
+      console.error("No devices found!");
+      return;
+    }
+    const devices: Device[] = [];
+    userDevices.forEach((device) => {
+      if (device) {
+        devices.push(device);
+      }
+    });
+    if (mainDevice) {
+      devices.push(mainDevice);
+    }
+    const encryptingDevice = getDeviceBySigningPublicKey({
+      signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
+      // @ts-ignore: devices array could include nulls
+      devices,
+    });
+    const workspaceKey = await decryptWorkspaceKey({
+      ciphertext: workspaceKeyBox.ciphertext,
+      nonce: workspaceKeyBox.nonce,
+      creatorDeviceEncryptionPublicKey: encryptingDevice?.encryptionPublicKey!,
+      receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+    });
+    const encryptedFolderResult = await encryptFolder({
+      name: newFolderName,
+      parentKey: workspaceKey,
+    });
+    let numUpdateFolderNameAttempts = 0;
+    let didFolderNameUpdatedSucceed = false;
+    let folder: any = undefined;
+    do {
+      const updateFolderNameResult = await updateFolderNameMutation({
+        input: {
+          id: props.folderId,
+          name: newFolderName,
+          encryptedName: encryptedFolderResult.ciphertext,
+          encryptedNameNonce: encryptedFolderResult.publicNonce,
+          subkeyId: encryptedFolderResult.folderSubkeyId,
+        },
+      });
+      if (updateFolderNameResult.data?.updateFolderName?.folder) {
+        folder = updateFolderNameResult.data?.updateFolderName?.folder;
+        didFolderNameUpdatedSucceed = true;
+      }
+    } while (!didFolderNameUpdatedSucceed && numUpdateFolderNameAttempts < 5);
+    if (folder) {
       // refetch the document path
       // TODO: Optimize by checking if the current folder is in the document path
       if (document && documentPathIds.includes(props.folderId)) {

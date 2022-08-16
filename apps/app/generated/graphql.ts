@@ -60,12 +60,12 @@ export type CreateDocumentResult = {
 };
 
 export type CreateFolderInput = {
-  encryptedName?: InputMaybe<Scalars['String']>;
-  encryptedNameNonce?: InputMaybe<Scalars['String']>;
+  encryptedName: Scalars['String'];
+  encryptedNameNonce: Scalars['String'];
   id: Scalars['String'];
   name?: InputMaybe<Scalars['String']>;
   parentFolderId?: InputMaybe<Scalars['String']>;
-  subKeyId?: InputMaybe<Scalars['Int']>;
+  subKeyId: Scalars['Int'];
   workspaceId: Scalars['String'];
 };
 
@@ -581,8 +581,11 @@ export type UpdateDocumentNameResult = {
 };
 
 export type UpdateFolderNameInput = {
+  encryptedName: Scalars['String'];
+  encryptedNameNonce: Scalars['String'];
   id: Scalars['String'];
-  name: Scalars['String'];
+  name?: InputMaybe<Scalars['String']>;
+  subkeyId: Scalars['Int'];
 };
 
 export type UpdateFolderNameResult = {
@@ -837,7 +840,7 @@ export type UpdateFolderNameMutationVariables = Exact<{
 }>;
 
 
-export type UpdateFolderNameMutation = { __typename?: 'Mutation', updateFolderName?: { __typename?: 'UpdateFolderNameResult', folder?: { __typename?: 'Folder', id: string, name: string } | null } | null };
+export type UpdateFolderNameMutation = { __typename?: 'Mutation', updateFolderName?: { __typename?: 'UpdateFolderNameResult', folder?: { __typename?: 'Folder', id: string, name: string, encryptedName?: string | null, encryptedNameNonce?: string | null, subKeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null } | null } | null };
 
 export type UpdateWorkspaceMutationVariables = Exact<{
   input: UpdateWorkspaceInput;
@@ -1226,6 +1229,11 @@ export const UpdateFolderNameDocument = gql`
     folder {
       id
       name
+      encryptedName
+      encryptedNameNonce
+      subKeyId
+      parentFolderId
+      rootFolderId
     }
   }
 }
