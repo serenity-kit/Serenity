@@ -1,15 +1,32 @@
-import { ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { prisma } from "../prisma";
 
 type Params = {
   id: string;
-  name: string;
+  name?: string;
+  encryptedName: string;
+  encryptedNameNonce: string;
+  subkeyId: number;
   userId: string;
 };
 
-export async function updateFolderName({ id, name, userId }: Params) {
+export async function updateFolderName({
+  id,
+  name,
+  encryptedName,
+  encryptedNameNonce,
+  subkeyId,
+  userId,
+}: Params) {
   try {
     return await prisma.$transaction(async (prisma) => {
+      const folderWithSubkeyId = await prisma.folder.findFirst({
+        where: { subKeyId: subkeyId },
+        select: { id: true },
+      });
+      if (folderWithSubkeyId) {
+        throw new UserInputError("Invalid input: duplicate subkeyId");
+      }
       // fetch the folder
       // check if the user has access to the workspace
       // update the folder
@@ -39,6 +56,9 @@ export async function updateFolderName({ id, name, userId }: Params) {
         },
         data: {
           name,
+          encryptedName,
+          encryptedNameNonce,
+          subKeyId: subkeyId,
         },
       });
       return updatedFolder;
