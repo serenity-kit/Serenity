@@ -64,6 +64,51 @@ export default function DesignSystemScreen() {
         Here is some Text and then some <DSCode>Code</DSCode> and then some more
         text and more and <DSCode>more</DSCode> and more and more
       </Text>
+      <DesignSystemHeader>Button</DesignSystemHeader>
+      <Text>
+        The{" "}
+        <Mono variant="medium" color="primary">
+          Button
+        </Mono>{" "}
+        component is used to trigger an action or event, such as submitting a
+        form, opening a Dialog, canceling an action, or performing a delete
+        operation.
+      </Text>
+      <DesignSystemSubHeader>Default Button</DesignSystemSubHeader>
+      <Button>Login</Button>
+      <DesignSystemSubHeader>Disabled Button</DesignSystemSubHeader>
+      <Button disabled>Login</Button>
+      <DesignSystemSubHeader>Loading Button</DesignSystemSubHeader>
+      <Button isLoading>Login</Button>
+      <DesignSystemSubHeader>Secondary Button</DesignSystemSubHeader>
+      <Button variant="secondary">Login</Button>
+      <DesignSystemSubHeader>Disabled Secondary Button</DesignSystemSubHeader>
+      <Button variant="secondary" disabled>
+        Login
+      </Button>
+      <DesignSystemSubHeader>Loading Secondary Button</DesignSystemSubHeader>
+      <Button variant="secondary" isLoading>
+        Login
+      </Button>
+      <DesignSystemSubHeader>Button sizes</DesignSystemSubHeader>
+      <VStack space="2">
+        <Button size="small">Small</Button>
+        <Button size="medium">Medium</Button>
+        <Button size="large">Large</Button>
+      </VStack>
+      <DesignSystemSubHeader>Loading Button sizes</DesignSystemSubHeader>
+      <VStack space="2">
+        <Button size="small" isLoading>
+          Login
+        </Button>
+        <Button size="medium" isLoading>
+          Login
+        </Button>
+        <Button size="large" isLoading>
+          Login
+        </Button>
+      </VStack>
+
       <DesignSystemHeader style={tw`mt-6 mb-0`}>
         CenterContent
       </DesignSystemHeader>
@@ -186,46 +231,6 @@ export default function DesignSystemScreen() {
         <IconButton name="add-line" color="gray-500" />
         <IconButton name="menu" color="gray-800" large />
       </HStack>
-      <DesignSystemHeader style={tw`mb-0`}>Button</DesignSystemHeader>
-      <Text>
-        Button component is used to trigger an action or event, such as
-        submitting a form, opening a Dialog, canceling an action, or performing
-        a delete operation.
-      </Text>
-      <DesignSystemSubHeader>Default Button</DesignSystemSubHeader>
-      <Button>Login</Button>
-      <DesignSystemSubHeader>Disabled Button</DesignSystemSubHeader>
-      <Button disabled>Login</Button>
-      <DesignSystemSubHeader>Loading Button</DesignSystemSubHeader>
-      <Button isLoading>Login</Button>
-      <DesignSystemSubHeader>Secondary Button</DesignSystemSubHeader>
-      <Button variant="secondary">Login</Button>
-      <DesignSystemSubHeader>Disabled Secondary Button</DesignSystemSubHeader>
-      <Button variant="secondary" disabled>
-        Login
-      </Button>
-      <DesignSystemSubHeader>Loading Secondary Button</DesignSystemSubHeader>
-      <Button variant="secondary" isLoading>
-        Login
-      </Button>
-      <DesignSystemSubHeader>Button sizes</DesignSystemSubHeader>
-      <VStack space="2">
-        <Button size="small">Small</Button>
-        <Button size="medium">Medium</Button>
-        <Button size="large">Large</Button>
-      </VStack>
-      <DesignSystemSubHeader>Loading Button sizes</DesignSystemSubHeader>
-      <VStack space="2">
-        <Button size="small" isLoading>
-          Login
-        </Button>
-        <Button size="medium" isLoading>
-          Login
-        </Button>
-        <Button size="large" isLoading>
-          Login
-        </Button>
-      </VStack>
 
       <DesignSystemHeader>Input</DesignSystemHeader>
       <VStack space={4}>

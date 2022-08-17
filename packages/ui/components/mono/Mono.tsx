@@ -3,38 +3,48 @@ import { Text as RNText, StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
 
 export type MonoVariants = "medium" | "small" | "xs";
+export type MonoColors = "base" | "primary" | "muted";
 
 export type MonoProps = RNText["props"] & {
-  muted?: boolean;
   variant?: MonoVariants;
+  color?: MonoColors;
 };
 
 export function Mono(props: MonoProps) {
-  const { variant = "small" } = props;
+  const { variant = "small", color = "base" } = props;
+
+  let textColor = "";
+  switch (color) {
+    case "primary":
+      textColor = "text-primary-400";
+      break;
+    case "muted":
+      textColor = "text-muted";
+      break;
+    case "base":
+    default:
+      textColor = "text-gray-900 dark:text-white";
+  }
+
   const styles = StyleSheet.create({
     // 1rem (16px)
-    medium: tw.style(`text-base text-gray-900 dark:text-white`, {
+    medium: tw.style(`text-base`, {
       fontFamily: "space-mono",
     }),
     // 0.875rem (14px)
-    small: tw.style(`text-sm text-gray-900 dark:text-white`, {
+    small: tw.style(`text-sm`, {
       fontFamily: "space-mono",
     }),
     // 0.8125rem (13px)
-    xs: tw.style(`text-xs text-gray-900 dark:text-white`, {
+    xs: tw.style(`text-xs`, {
       fontFamily: "space-mono",
     }),
-    muted: tw`text-muted`,
   });
 
   return (
     <RNText
       {...props}
-      style={[
-        styles[variant],
-        props.muted ? styles.muted : undefined,
-        props.style,
-      ]}
+      style={[styles[variant], tw.style(textColor), props.style]}
     />
   );
 }
