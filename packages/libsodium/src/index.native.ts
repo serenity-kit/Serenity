@@ -239,6 +239,7 @@ export default {
   crypto_box_PUBLICKEYBYTES: sodium.crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES: sodium.crypto_box_SECRETKEYBYTES,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES: 32, // copied from the web version
+  crypto_kdf_KEYBYTES: sodium.crypto_kdf_KEYBYTES,
   base64_to_url_safe_base64: base64ToUrlSafeBase64,
   url_safe_base64_to_base64: urlSafeBase64ToBase64,
 };

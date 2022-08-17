@@ -72,6 +72,7 @@ RCT_EXPORT_MODULE();
     @"crypto_aead_xchacha20poly1305_ietf_KEYBYTES": @ crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
     @"crypto_aead_xchacha20poly1305_ietf_NPUBBYTES": @ crypto_aead_xchacha20poly1305_ietf_NPUBBYTES,
     @"crypto_aead_xchacha20poly1305_ietf_ABYTES": @ crypto_aead_xchacha20poly1305_ietf_ABYTES,
+    @"crypto_kdf_KEYBYTES": @ crypto_kdf_KEYBYTES,
   };
 
 }
@@ -561,5 +562,14 @@ RCT_EXPORT_METHOD(crypto_aead_xchacha20poly1305_ietf_decrypt:(NSString*)c d:(NSS
   }
 }
 
+// *****************************************************************************
+// * KDF cryptography
+// *****************************************************************************
+RCT_EXPORT_METHOD(crypto_kdf_keygen:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+{
+  unsigned char key[crypto_kdf_KEYBYTES];
+  crypto_kdf_keygen(key);
+  resolve([[NSData dataWithBytesNoCopy:key length:sizeof(key) freeWhenDone:NO]  base64EncodedStringWithOptions:0]);
+}
 
 @end
