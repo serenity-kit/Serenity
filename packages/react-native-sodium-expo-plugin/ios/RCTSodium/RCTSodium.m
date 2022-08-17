@@ -572,4 +572,19 @@ RCT_EXPORT_METHOD(crypto_kdf_keygen:(RCTPromiseResolveBlock)resolve reject:(RCTP
   resolve([[NSData dataWithBytesNoCopy:key length:sizeof(key) freeWhenDone:NO]  base64EncodedStringWithOptions:0]);
 }
 
+RCT_EXPORT_METHOD(crypto_kdf_derive_from_key:(nonnull NSNumber*)subkey_len subkey_id:(nonnull NSNumber*)subkey_id ctx:(NSString*)ctx k:(NSString*)k resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject)
+{
+  const NSData *dctx = [[NSData alloc] initWithBase64EncodedString:ctx options:0];
+  const NSData *dk = [[NSData alloc] initWithBase64EncodedString:k options:0];
+  if (!dctx || !dk) reject(ESODIUM,ERR_FAILURE,nil);
+  else if (dk.length != crypto_kdf_KEYBYTES) reject(ESODIUM,ERR_BAD_KEY,nil);
+  else {
+    unsigned char subkey[subkey_len.unsignedIntValue];
+    if (crypto_kdf_derive_from_key(subkey, subkey_len.unsignedIntValue, subkey_id.unsignedIntValue, [dctx bytes], [dk bytes]) != 0)
+      reject(ESODIUM,ERR_FAILURE,nil);
+    else
+      resolve([[NSData dataWithBytesNoCopy:subkey length:sizeof(subkey) freeWhenDone:NO]  base64EncodedStringWithOptions:0]);
+  }
+}
+
 @end
