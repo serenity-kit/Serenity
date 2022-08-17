@@ -6,12 +6,12 @@ export type MonoVariants = "medium" | "small" | "xs";
 export type MonoColors = "base" | "primary" | "muted";
 
 export type MonoProps = RNText["props"] & {
-  variant?: MonoVariants;
+  size?: MonoVariants;
   color?: MonoColors;
 };
 
 export function Mono(props: MonoProps) {
-  const { variant = "small", color = "base" } = props;
+  const { size = "small", color = "base" } = props;
 
   let textColor = "";
   switch (color) {
@@ -44,7 +44,7 @@ export function Mono(props: MonoProps) {
   return (
     <RNText
       {...props}
-      style={[styles[variant], tw.style(textColor), props.style]}
+      style={[styles[size], tw.style(textColor), props.style]}
     />
   );
 }

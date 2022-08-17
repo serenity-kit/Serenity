@@ -37,7 +37,7 @@ import {
   DesignSystemHeader,
   DesignSystemSubHeader,
   DesignSystemExampleArea,
-  DesignSystemInlineCode as DSCode,
+  DesignSystemMono as DSMono,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -60,46 +60,48 @@ export default function DesignSystemScreen() {
   // TODO add structural elements
   return (
     <ScrollSafeAreaView>
-      <View style={tw`max-w-4xl mx-auto px-4 py-6`}>
-        <Text>
-          Here is some Text and then some <DSCode>Code</DSCode> and then some
-          more text and more and <DSCode>more</DSCode> and more and more
-        </Text>
-
+      <View style={tw`max-w-4xl mx-auto px-4 pt-2 pb-6`}>
         <DesignSystemHeader>Button</DesignSystemHeader>
         <Text>
-          The{" "}
-          <Mono variant="medium" color="primary">
-            Button
-          </Mono>{" "}
-          component is used to trigger an action or event, such as submitting a
-          form, opening a Dialog, canceling an action, or performing a delete
-          operation.
+          The <DSMono variant={"component"}>Button</DSMono> component is used to
+          trigger an action or event, such as submitting a form, opening a
+          Dialog, canceling an action, or performing a delete operation.
         </Text>
-        <DesignSystemSubHeader>Default Button</DesignSystemSubHeader>
-        <Button>Login</Button>
-        <DesignSystemSubHeader>Disabled Button</DesignSystemSubHeader>
-        <Button disabled>Login</Button>
-        <DesignSystemSubHeader>Loading Button</DesignSystemSubHeader>
-        <Button isLoading>Login</Button>
-        <DesignSystemSubHeader>Secondary Button</DesignSystemSubHeader>
-        <Button variant="secondary">Login</Button>
-        <DesignSystemSubHeader>Disabled Secondary Button</DesignSystemSubHeader>
-        <Button variant="secondary" disabled>
-          Login
-        </Button>
-        <DesignSystemSubHeader>Loading Secondary Button</DesignSystemSubHeader>
-        <Button variant="secondary" isLoading>
-          Login
-        </Button>
-        <DesignSystemSubHeader>Button sizes</DesignSystemSubHeader>
-        <VStack space="2">
-          <Button size="small">Small</Button>
-          <Button size="medium">Medium</Button>
-          <Button size="large">Large</Button>
-        </VStack>
-        <DesignSystemSubHeader>Loading Button sizes</DesignSystemSubHeader>
-        <VStack space="2">
+        <Text variant={"xs"} bold style={tw`mt-6 -mb-3 text-primary-400`}>
+          Properties
+        </Text>
+        <DesignSystemSubHeader>Variants</DesignSystemSubHeader>
+        <Text variant="small">
+          Use the <DSMono variant="property">variant</DSMono> property to
+          display either a <DSMono variant={"type"}>primary</DSMono> or{" "}
+          <DSMono variant={"type"}>secondary</DSMono> Button.
+        </Text>
+        <DesignSystemExampleArea>
+          <Button>Login</Button>
+          <Button variant="secondary">Login</Button>
+        </DesignSystemExampleArea>
+
+        <DesignSystemSubHeader>Sizes</DesignSystemSubHeader>
+        <Text variant="small">
+          For larger or smaller Buttons, use the{" "}
+          <DSMono variant="property">size</DSMono> property. You can set it to{" "}
+          <DSMono variant={"type"}>small</DSMono> ,{" "}
+          <DSMono variant={"type"}>medium</DSMono> , or{" "}
+          <DSMono variant={"type"}>large</DSMono> .
+        </Text>
+        <DesignSystemExampleArea>
+          <Button size="small">Login</Button>
+          <Button size="medium">Login</Button>
+          <Button size="large">Login</Button>
+        </DesignSystemExampleArea>
+
+        <DesignSystemSubHeader>Loading State</DesignSystemSubHeader>
+        <Text variant="small">
+          Buttons also support an <DSMono variant="property">isLoading</DSMono>{" "}
+          property, which shows a loading indicator, while disabling the button,
+          as well.
+        </Text>
+        <DesignSystemExampleArea>
           <Button size="small" isLoading>
             Login
           </Button>
@@ -109,21 +111,48 @@ export default function DesignSystemScreen() {
           <Button size="large" isLoading>
             Login
           </Button>
-        </VStack>
+        </DesignSystemExampleArea>
 
-        <DesignSystemHeader style={tw`mt-6 mb-0`}>
-          CenterContent
-        </DesignSystemHeader>
-        <DesignSystemSubHeader>Basic</DesignSystemSubHeader>
+        <Text variant={"xs"} bold style={tw`mt-8 -mb-3 text-primary-400`}>
+          Basic usage
+        </Text>
+        <DesignSystemSubHeader>Primary Button</DesignSystemSubHeader>
+        <Text variant="small">
+          Primary Buttons are high-emphasis, they contain actions that are
+          important to our app.
+        </Text>
         <DesignSystemExampleArea>
+          <Button>Login</Button>
+          <Button disabled>Login</Button>
+          <Button isLoading>Login</Button>
+        </DesignSystemExampleArea>
+
+        <DesignSystemSubHeader>Secondary Button</DesignSystemSubHeader>
+        <Text variant="small">
+          Secondary Buttons are typically used for less-pronounced actions,
+          including canceling.
+        </Text>
+        <DesignSystemExampleArea>
+          <Button variant={"secondary"}>Cancel</Button>
+          <Button variant={"secondary"} disabled>
+            Cancel
+          </Button>
+          <Button variant={"secondary"} isLoading>
+            Cancel
+          </Button>
+        </DesignSystemExampleArea>
+
+        <DesignSystemHeader>CenterContent</DesignSystemHeader>
+        <DesignSystemSubHeader>Basic</DesignSystemSubHeader>
+        <View style={tw`h-60`}>
           <CenterContent>
             <Text>I am centered</Text>
           </CenterContent>
-        </DesignSystemExampleArea>
+        </View>
         <DesignSystemSubHeader>
           with responsive serenity Background
         </DesignSystemSubHeader>
-        <DesignSystemExampleArea style={tw`xs:border-transparent`}>
+        <View style={tw`h-60 xs:border-transparent`}>
           <CenterContent serenityBg>
             <Box style={tw`text-center`}>
               <Text variant="large">Me too!</Text>
@@ -133,7 +162,7 @@ export default function DesignSystemScreen() {
               </Text>
             </Box>
           </CenterContent>
-        </DesignSystemExampleArea>
+        </View>
         <DesignSystemHeader>EditorBottombar</DesignSystemHeader>
         <HStack space={2} alignItems="center">
           <EditorBottombarButton name="arrow-down-s-line" />

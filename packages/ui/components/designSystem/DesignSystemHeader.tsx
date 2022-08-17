@@ -7,7 +7,7 @@ export type DesignSystemHeaderProps = TextProps & {};
 
 export const DesignSystemHeader = (props: DesignSystemHeaderProps) => {
   const styles = StyleSheet.create({
-    header: tw`mt-12 mb-4 text-2xl`,
+    header: tw`mt-12 mb-4 text-4xl`,
   });
 
   return (

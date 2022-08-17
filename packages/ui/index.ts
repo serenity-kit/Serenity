@@ -13,7 +13,7 @@ export * from "./components/centerContent/CenterContent";
 export * from "./components/checkbox/Checkbox";
 export * from "./components/designSystem/DesignSystemExampleArea";
 export * from "./components/designSystem/DesignSystemHeader";
-export * from "./components/designSystem/DesignSystemInlineCode";
+export * from "./components/designSystem/DesignSystemMono";
 export * from "./components/designSystem/DesignSystemSubHeader";
 export * from "./components/editorBottombarButton/EditorBottombarButton";
 export * from "./components/editorBottombarDivider/EditorBottombarDivider";
