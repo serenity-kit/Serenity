@@ -56,248 +56,11 @@ export default function DesignSystemScreen() {
   const collabColors = Object.keys(theme.colors.collaboration);
   const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
 
-  // TODO refactor order
-  // TODO add structural elements
+  // TODO use structural elements
+  // TODO header, subheader etc. or variants (h1, h2, h3 ... ??)
   return (
     <ScrollSafeAreaView>
       <View style={tw`max-w-4xl mx-auto px-4 pt-2 pb-6`}>
-        <DesignSystemHeader>Button</DesignSystemHeader>
-        <Text>
-          The <DSMono variant={"component"}>Button</DSMono> component is used to
-          trigger an action or event, such as submitting a form, opening a
-          Dialog, canceling an action, or performing a delete operation.
-        </Text>
-        <Text variant={"xs"} bold style={tw`mt-6 -mb-3 text-primary-400`}>
-          Properties
-        </Text>
-        <DesignSystemSubHeader>Variants</DesignSystemSubHeader>
-        <Text variant="small">
-          Use the <DSMono variant="property">variant</DSMono> property to
-          display either a <DSMono variant={"type"}>primary</DSMono> or{" "}
-          <DSMono variant={"type"}>secondary</DSMono> Button.
-        </Text>
-        <DesignSystemExampleArea>
-          <Button>Login</Button>
-          <Button variant="secondary">Login</Button>
-        </DesignSystemExampleArea>
-
-        <DesignSystemSubHeader>Sizes</DesignSystemSubHeader>
-        <Text variant="small">
-          For larger or smaller Buttons, use the{" "}
-          <DSMono variant="property">size</DSMono> property. You can set it to{" "}
-          <DSMono variant={"type"}>small</DSMono> ,{" "}
-          <DSMono variant={"type"}>medium</DSMono> , or{" "}
-          <DSMono variant={"type"}>large</DSMono> .
-        </Text>
-        <DesignSystemExampleArea>
-          <Button size="small">Login</Button>
-          <Button size="medium">Login</Button>
-          <Button size="large">Login</Button>
-        </DesignSystemExampleArea>
-
-        <DesignSystemSubHeader>Loading State</DesignSystemSubHeader>
-        <Text variant="small">
-          Buttons also support an <DSMono variant="property">isLoading</DSMono>{" "}
-          property, which shows a loading indicator, while disabling the button,
-          as well.
-        </Text>
-        <DesignSystemExampleArea>
-          <Button size="small" isLoading>
-            Login
-          </Button>
-          <Button size="medium" isLoading>
-            Login
-          </Button>
-          <Button size="large" isLoading>
-            Login
-          </Button>
-        </DesignSystemExampleArea>
-
-        <Text variant={"xs"} bold style={tw`mt-8 -mb-3 text-primary-400`}>
-          Basic usage
-        </Text>
-        <DesignSystemSubHeader>Primary Button</DesignSystemSubHeader>
-        <Text variant="small">
-          Primary Buttons are high-emphasis, they contain actions that are
-          important to our app.
-        </Text>
-        <DesignSystemExampleArea>
-          <Button>Login</Button>
-          <Button disabled>Login</Button>
-          <Button isLoading>Login</Button>
-        </DesignSystemExampleArea>
-
-        <DesignSystemSubHeader>Secondary Button</DesignSystemSubHeader>
-        <Text variant="small">
-          Secondary Buttons are typically used for less-pronounced actions,
-          including canceling.
-        </Text>
-        <DesignSystemExampleArea>
-          <Button variant={"secondary"}>Cancel</Button>
-          <Button variant={"secondary"} disabled>
-            Cancel
-          </Button>
-          <Button variant={"secondary"} isLoading>
-            Cancel
-          </Button>
-        </DesignSystemExampleArea>
-
-        <DesignSystemHeader>CenterContent</DesignSystemHeader>
-        <DesignSystemSubHeader>Basic</DesignSystemSubHeader>
-        <View style={tw`h-60`}>
-          <CenterContent>
-            <Text>I am centered</Text>
-          </CenterContent>
-        </View>
-        <DesignSystemSubHeader>
-          with responsive serenity Background
-        </DesignSystemSubHeader>
-        <View style={tw`h-60 xs:border-transparent`}>
-          <CenterContent serenityBg>
-            <Box style={tw`text-center`}>
-              <Text variant="large">Me too!</Text>
-              <Text muted>
-                With this wrapper you can center content within the available
-                space, well isn't that nice.
-              </Text>
-            </Box>
-          </CenterContent>
-        </View>
-        <DesignSystemHeader>EditorBottombar</DesignSystemHeader>
-        <HStack space={2} alignItems="center">
-          <EditorBottombarButton name="arrow-down-s-line" />
-          <EditorBottombarButton name="text" />
-          <EditorBottombarButton name="list-unordered" />
-          <EditorBottombarDivider />
-          <EditorBottombarButton name="image-2-line" />
-          <EditorBottombarButton name="at-line" />
-          <EditorBottombarButton name="chat-1-line" />
-          <EditorBottombarDivider />
-          <EditorBottombarButton name="link" isActive />
-        </HStack>
-        <DesignSystemHeader style={tw`mb-0`}>Info Messages</DesignSystemHeader>
-        <DesignSystemSubHeader>Info</DesignSystemSubHeader>
-        <VStack space={2} style={tw`max-w-90`}>
-          <InfoMessage>
-            The verification code is prefilled on staging.
-          </InfoMessage>
-          <InfoMessage icon>
-            The verification code is prefilled on staging.
-          </InfoMessage>
-        </VStack>
-        <DesignSystemSubHeader>Error</DesignSystemSubHeader>
-        <VStack space={2} style={tw`max-w-90`}>
-          <InfoMessage variant="error">
-            Unfortunately your registration request failed due a network error.
-            Please try again later.
-          </InfoMessage>
-          <InfoMessage variant="error" icon>
-            Unfortunately your registration request failed due a network error.
-            Please try again later.
-          </InfoMessage>
-        </VStack>
-        <DesignSystemHeader>Tooltip</DesignSystemHeader>
-        <HStack>
-          <Tooltip label="This is a tip!" placement="right">
-            <IconButton name="file-add-line" color="gray-500" large />
-          </Tooltip>
-        </HStack>
-        <Text variant="large" style={tw`mt-12 mb-4 text-2xl`} bold>
-          Elevation
-        </Text>
-        <HStack
-          space={3}
-          style={tw`pt-2 pb-4 pr-2 overflow-scroll sm:overflow-visible`}
-        >
-          {elevationLevels.map((level) => {
-            return (
-              <BoxShadow elevation={level} rounded>
-                <HStack
-                  style={tw`h-24 w-24 bg-white rounded`}
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Text variant="xxs" muted>
-                    elevation {level}
-                  </Text>
-                </HStack>
-              </BoxShadow>
-            );
-          })}
-        </HStack>
-        <DesignSystemHeader>Text</DesignSystemHeader>
-        <Text variant="large">large Text</Text>
-        <Text>regular Text</Text>
-        <Text variant="small">small Text</Text>
-        <Text variant="xs">xs Text</Text>
-        <Text variant="xxs">xxs Text</Text>
-        <Text style={tw`pt-4`} variant="large" bold>
-          bold large Text
-        </Text>
-        <Text bold>bold regular Text</Text>
-        <Text variant="small" bold>
-          bold small Text
-        </Text>
-        <Text variant="xs" bold>
-          bold xs Text
-        </Text>
-        <Text variant="xxs" bold>
-          bold xxs Text
-        </Text>
-        <Text style={tw`pt-4`} variant="large" muted>
-          muted large Text
-        </Text>
-        <Text muted>muted regular Text</Text>
-        <Text variant="small" muted>
-          muted small Text
-        </Text>
-        <Text variant="xs" muted>
-          muted xs Text
-        </Text>
-        <Text variant="xxs" muted>
-          muted xxs Text
-        </Text>
-        <DesignSystemHeader>Icon Button</DesignSystemHeader>
-        <HStack alignItems="center" space={4}>
-          <IconButton name="add-line" color="gray-500" />
-          <IconButton name="menu" color="gray-800" large />
-        </HStack>
-
-        <DesignSystemHeader>Input</DesignSystemHeader>
-        <VStack space={4}>
-          <Input />
-          <LabeledInput label={"Input"} />
-          <LabeledInput
-            label={"Input w/ Value"}
-            value="jane@example.com"
-            hint="Here you can put information you want the user to have regarding this input."
-          />
-          <LabeledInput
-            label={"Input w/ Placeholder"}
-            placeholder="Enter your email …"
-          />
-          <LabeledInput
-            label={"Input Disabled"}
-            value="jane@example.com"
-            disabled
-          />
-          <LabeledInput
-            label={"Input Disabled"}
-            placeholder="Enter your email …"
-            disabled
-          />
-        </VStack>
-
-        <DesignSystemHeader>Toast</DesignSystemHeader>
-        <Button
-          onPress={() => {
-            counter = counter + 1;
-            showToast(`This is a message ${counter}`);
-          }}
-        >
-          Add Toast
-        </Button>
-
         <DesignSystemHeader style={tw`mb-0`}>Avatar</DesignSystemHeader>
         <DesignSystemSubHeader>Sizing</DesignSystemSubHeader>
         <HStack
@@ -371,178 +134,104 @@ export default function DesignSystemScreen() {
           })}
         </HStack>
 
-        <DesignSystemHeader>SidebarButton</DesignSystemHeader>
-        <SidebarButton>
-          <Text variant="small">Hallo</Text>
-        </SidebarButton>
-        <SidebarButton disabled>
-          <Text variant="small">Hallo</Text>
-        </SidebarButton>
-
-        <DesignSystemHeader>Menu</DesignSystemHeader>
-        <View style={tw`flex flex-row`}>
-          <Menu
-            placement="bottom left"
-            style={tw`w-60`}
-            offset={8}
-            isOpen={isOpenPopover}
-            onChange={setIsOpenPopover}
-            trigger={
-              <Pressable
-                accessibilityLabel="More options menu"
-                style={tw`flex flex-row`}
-              >
-                <Text>Open Menu</Text>
-                <Icon name="arrow-down-s-fill" />
-              </Pressable>
-            }
-          >
-            <View style={tw`p-menu-item`}>
-              <Text variant="xxs" muted bold>
-                jane@example.com
-              </Text>
-            </View>
-            <SidebarLink
-              to={{ screen: "EncryptDecryptImageTest" }}
-              style={tw`p-menu-item`}
-            >
-              <Avatar
-                borderRadius={4}
-                size="xs"
-                bg={tw.color(`collaboration-emerald`)}
-              >
-                <Icon
-                  name="serenity-feather"
-                  color={tw.color("black/35")}
-                  size={5}
-                  mobileSize={6}
-                />
-              </Avatar>
-              <Text variant="xs">Happy Workspace</Text>
-            </SidebarLink>
-            <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
-              <Avatar
-                borderRadius={4}
-                size="xs"
-                bg={tw.color(`collaboration-arctic`)}
-              >
-                <Icon
-                  name="serenity-feather"
-                  color={tw.color("black/35")}
-                  size={5}
-                  mobileSize={6}
-                />
-              </Avatar>
-              <Text variant="xs">Funny Bunny</Text>
-            </SidebarLink>
-            <View style={tw`pl-2 pr-3 py-1.5`}>
-              <IconButton
-                onPress={() => {
-                  setIsOpenPopover(false);
-                  alert("You are awesome !");
-                }}
-                name="plus"
-                label="Create awesomeness"
-              />
-            </View>
-
-            <SidebarDivider collapsed />
-            <MenuButton
-              onPress={() => {
-                setIsOpenPopover(false);
-              }}
-              icon="emotion-line"
-              shortcut={<Shortcut letter="H" />}
-            >
-              Hello
-            </MenuButton>
-            <MenuButton
-              onPress={() => {
-                setIsOpenPopover(false);
-                alert("Danger !!");
-              }}
-              icon="delete-bin-line"
-              danger
-            >
-              Danger
-            </MenuButton>
-          </Menu>
-        </View>
-
-        <DesignSystemHeader>Link</DesignSystemHeader>
+        <DesignSystemHeader>Button</DesignSystemHeader>
         <Text>
-          This is a link to{" "}
-          <Link to={{ screen: "EncryptDecryptImageTest" }}>
-            Encrypt / Decrypt Image
-          </Link>
+          The <DSMono variant={"component"}>Button</DSMono> component is used to
+          trigger an action or event, such as submitting a form, opening a
+          Dialog, canceling an action, or performing a delete operation.
         </Text>
-        <Text muted>
-          This is a link to{" "}
-          <Link to={{ screen: "EncryptDecryptImageTest" }}>
-            Encrypt / Decrypt Image
-          </Link>
+        <Text variant={"xs"} bold style={tw`mt-6 -mb-3 text-primary-400`}>
+          Properties
         </Text>
-        <Text bold>
-          This is a link to{" "}
-          <Link to={{ screen: "EncryptDecryptImageTest" }}>
-            Encrypt / Decrypt Image
-          </Link>
+        <DesignSystemSubHeader>Variants</DesignSystemSubHeader>
+        <Text variant="small">
+          Use the <DSMono variant="property">variant</DSMono> property to
+          display either a <DSMono variant={"type"}>primary</DSMono> or{" "}
+          <DSMono variant={"type"}>secondary</DSMono> Button.
         </Text>
-        <Text variant="xxs">
-          This is a link to{" "}
-          <Link to={{ screen: "EncryptDecryptImageTest" }}>
-            Encrypt / Decrypt Image
-          </Link>
+        <DesignSystemExampleArea>
+          <Button>Login</Button>
+          <Button variant="secondary">Login</Button>
+        </DesignSystemExampleArea>
+        <DesignSystemSubHeader>Sizes</DesignSystemSubHeader>
+        <Text variant="small">
+          For larger or smaller Buttons, use the{" "}
+          <DSMono variant="property">size</DSMono> property. You can set it to{" "}
+          <DSMono variant={"type"}>small</DSMono> ,{" "}
+          <DSMono variant={"type"}>medium</DSMono> , or{" "}
+          <DSMono variant={"type"}>large</DSMono> .
         </Text>
+        <DesignSystemExampleArea>
+          <Button size="small">Login</Button>
+          <Button size="medium">Login</Button>
+          <Button size="large">Login</Button>
+        </DesignSystemExampleArea>
+        <DesignSystemSubHeader>Loading State</DesignSystemSubHeader>
+        <Text variant="small">
+          Buttons also support an <DSMono variant="property">isLoading</DSMono>{" "}
+          property, which shows a loading indicator, while disabling the button,
+          as well.
+        </Text>
+        <DesignSystemExampleArea>
+          <Button size="small" isLoading>
+            Login
+          </Button>
+          <Button size="medium" isLoading>
+            Login
+          </Button>
+          <Button size="large" isLoading>
+            Login
+          </Button>
+        </DesignSystemExampleArea>
+        <Text variant={"xs"} bold style={tw`mt-8 -mb-3 text-primary-400`}>
+          Basic usage
+        </Text>
+        <DesignSystemSubHeader>Primary Button</DesignSystemSubHeader>
+        <Text variant="small">
+          Primary Buttons are high-emphasis, they contain actions that are
+          important to our app.
+        </Text>
+        <DesignSystemExampleArea>
+          <Button>Login</Button>
+          <Button disabled>Login</Button>
+          <Button isLoading>Login</Button>
+        </DesignSystemExampleArea>
+        <DesignSystemSubHeader>Secondary Button</DesignSystemSubHeader>
+        <Text variant="small">
+          Secondary Buttons are typically used for less-pronounced actions,
+          including canceling.
+        </Text>
+        <DesignSystemExampleArea>
+          <Button variant={"secondary"}>Cancel</Button>
+          <Button variant={"secondary"} disabled>
+            Cancel
+          </Button>
+          <Button variant={"secondary"} isLoading>
+            Cancel
+          </Button>
+        </DesignSystemExampleArea>
 
-        <DesignSystemHeader>SidebarLink</DesignSystemHeader>
-        <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-          <Avatar
-            borderRadius={4}
-            size="xs"
-            bg={tw.color(`collaboration-arctic`)}
-          >
-            <Icon name="serenity-feather" color={tw.color("black/35")} />
-          </Avatar>
-          <Text>Encrypt / Decrypt Image</Text>
-        </SidebarLink>
-
-        <DesignSystemHeader>Modal (work in progress)</DesignSystemHeader>
-        <Modal
-          isVisible={showModal}
-          onBackdropPress={() => setShowModal(false)}
-        >
-          <ModalHeader>This is the header</ModalHeader>
-          <LabeledInput
-            label={"Label of the Input"}
-            value="While typi"
-            hint="Here you can put information you want the user to have regarding this input."
-          />
-          <ModalButtonFooter
-            cancel={
-              <Button variant="secondary" onPress={() => setShowModal(false)}>
-                Cancel
-              </Button>
-            }
-            confirm={<Button variant="primary">Confirm</Button>}
-          />
-        </Modal>
-        <Button
-          onPress={() => {
-            setShowModal(true);
-          }}
-          variant="primary"
-          size="small"
-        >
-          Open Modal
-        </Button>
-
-        <DesignSystemHeader>Spinner</DesignSystemHeader>
-        <VStack space={3}>
-          <Spinner />
-          <Spinner size="lg" />
-          <Spinner fadeIn size="lg" />
-        </VStack>
+        <DesignSystemHeader>CenterContent</DesignSystemHeader>
+        <DesignSystemSubHeader>Basic</DesignSystemSubHeader>
+        <View style={tw`h-60`}>
+          <CenterContent>
+            <Text>I am centered</Text>
+          </CenterContent>
+        </View>
+        <DesignSystemSubHeader>
+          with responsive serenity Background
+        </DesignSystemSubHeader>
+        <View style={tw`h-60 xs:border-transparent`}>
+          <CenterContent serenityBg>
+            <Box style={tw`text-center`}>
+              <Text variant="large">Me too!</Text>
+              <Text muted>
+                With this wrapper you can center content within the available
+                space, well isn't that nice.
+              </Text>
+            </Box>
+          </CenterContent>
+        </View>
 
         <DesignSystemHeader>Checkbox</DesignSystemHeader>
         <VStack space={3}>
@@ -575,11 +264,46 @@ export default function DesignSystemScreen() {
           />
         </VStack>
 
+        <DesignSystemHeader>EditorBottombar</DesignSystemHeader>
+        <HStack space={2} alignItems="center">
+          <EditorBottombarButton name="arrow-down-s-line" />
+          <EditorBottombarButton name="text" />
+          <EditorBottombarButton name="list-unordered" />
+          <EditorBottombarDivider />
+          <EditorBottombarButton name="image-2-line" />
+          <EditorBottombarButton name="at-line" />
+          <EditorBottombarButton name="chat-1-line" />
+          <EditorBottombarDivider />
+          <EditorBottombarButton name="link" isActive />
+        </HStack>
+
         <DesignSystemHeader>Editor Icons</DesignSystemHeader>
         <VStack space={3}>
           <EditorSidebarIcon name="bold" />
           <EditorSidebarIcon name="bold" isActive />
         </VStack>
+
+        <DesignSystemHeader>Elevation</DesignSystemHeader>
+        <HStack
+          space={3}
+          style={tw`pt-2 pb-4 pr-2 overflow-scroll sm:overflow-visible`}
+        >
+          {elevationLevels.map((level) => {
+            return (
+              <BoxShadow elevation={level} rounded>
+                <HStack
+                  style={tw`h-24 w-24 bg-white rounded`}
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Text variant="xxs" muted>
+                    elevation {level}
+                  </Text>
+                </HStack>
+              </BoxShadow>
+            );
+          })}
+        </HStack>
 
         <DesignSystemHeader style={tw`mb-0`}>Icons</DesignSystemHeader>
         <DesignSystemSubHeader>Marks</DesignSystemSubHeader>
@@ -703,6 +427,282 @@ export default function DesignSystemScreen() {
         </Columns>
         <DesignSystemSubHeader>Icons coloured</DesignSystemSubHeader>
         <Icon name="list-check-2" color={tw.color("primary-500")} />
+
+        <DesignSystemHeader style={tw`mb-0`}>Info Messages</DesignSystemHeader>
+        <DesignSystemSubHeader>Info</DesignSystemSubHeader>
+        <VStack space={2} style={tw`max-w-90`}>
+          <InfoMessage>
+            The verification code is prefilled on staging.
+          </InfoMessage>
+          <InfoMessage icon>
+            The verification code is prefilled on staging.
+          </InfoMessage>
+        </VStack>
+        <DesignSystemSubHeader>Error</DesignSystemSubHeader>
+        <VStack space={2} style={tw`max-w-90`}>
+          <InfoMessage variant="error">
+            Unfortunately your registration request failed due a network error.
+            Please try again later.
+          </InfoMessage>
+          <InfoMessage variant="error" icon>
+            Unfortunately your registration request failed due a network error.
+            Please try again later.
+          </InfoMessage>
+        </VStack>
+
+        <DesignSystemHeader>Icon Button</DesignSystemHeader>
+        <HStack alignItems="center" space={4}>
+          <IconButton name="add-line" color="gray-500" />
+          <IconButton name="menu" color="gray-800" large />
+        </HStack>
+
+        <DesignSystemHeader>Input</DesignSystemHeader>
+        <VStack space={4}>
+          <Input />
+          <LabeledInput label={"Input"} />
+          <LabeledInput
+            label={"Input w/ Value"}
+            value="jane@example.com"
+            hint="Here you can put information you want the user to have regarding this input."
+          />
+          <LabeledInput
+            label={"Input w/ Placeholder"}
+            placeholder="Enter your email …"
+          />
+          <LabeledInput
+            label={"Input Disabled"}
+            value="jane@example.com"
+            disabled
+          />
+          <LabeledInput
+            label={"Input Disabled"}
+            placeholder="Enter your email …"
+            disabled
+          />
+        </VStack>
+
+        <DesignSystemHeader>Link</DesignSystemHeader>
+        <Text>
+          This is a link to{" "}
+          <Link to={{ screen: "EncryptDecryptImageTest" }}>
+            Encrypt / Decrypt Image
+          </Link>
+        </Text>
+        <Text muted>
+          This is a link to{" "}
+          <Link to={{ screen: "EncryptDecryptImageTest" }}>
+            Encrypt / Decrypt Image
+          </Link>
+        </Text>
+        <Text bold>
+          This is a link to{" "}
+          <Link to={{ screen: "EncryptDecryptImageTest" }}>
+            Encrypt / Decrypt Image
+          </Link>
+        </Text>
+        <Text variant="xxs">
+          This is a link to{" "}
+          <Link to={{ screen: "EncryptDecryptImageTest" }}>
+            Encrypt / Decrypt Image
+          </Link>
+        </Text>
+
+        <DesignSystemHeader>Menu</DesignSystemHeader>
+        <View style={tw`flex flex-row`}>
+          <Menu
+            placement="bottom left"
+            style={tw`w-60`}
+            offset={8}
+            isOpen={isOpenPopover}
+            onChange={setIsOpenPopover}
+            trigger={
+              <Pressable
+                accessibilityLabel="More options menu"
+                style={tw`flex flex-row`}
+              >
+                <Text>Open Menu</Text>
+                <Icon name="arrow-down-s-fill" />
+              </Pressable>
+            }
+          >
+            <View style={tw`p-menu-item`}>
+              <Text variant="xxs" muted bold>
+                jane@example.com
+              </Text>
+            </View>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              style={tw`p-menu-item`}
+            >
+              <Avatar
+                borderRadius={4}
+                size="xs"
+                bg={tw.color(`collaboration-emerald`)}
+              >
+                <Icon
+                  name="serenity-feather"
+                  color={tw.color("black/35")}
+                  size={5}
+                  mobileSize={6}
+                />
+              </Avatar>
+              <Text variant="xs">Happy Workspace</Text>
+            </SidebarLink>
+            <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
+              <Avatar
+                borderRadius={4}
+                size="xs"
+                bg={tw.color(`collaboration-arctic`)}
+              >
+                <Icon
+                  name="serenity-feather"
+                  color={tw.color("black/35")}
+                  size={5}
+                  mobileSize={6}
+                />
+              </Avatar>
+              <Text variant="xs">Funny Bunny</Text>
+            </SidebarLink>
+            <View style={tw`pl-2 pr-3 py-1.5`}>
+              <IconButton
+                onPress={() => {
+                  setIsOpenPopover(false);
+                  alert("You are awesome !");
+                }}
+                name="plus"
+                label="Create awesomeness"
+              />
+            </View>
+
+            <SidebarDivider collapsed />
+            <MenuButton
+              onPress={() => {
+                setIsOpenPopover(false);
+              }}
+              icon="emotion-line"
+              shortcut={<Shortcut letter="H" />}
+            >
+              Hello
+            </MenuButton>
+            <MenuButton
+              onPress={() => {
+                setIsOpenPopover(false);
+                alert("Danger !!");
+              }}
+              icon="delete-bin-line"
+              danger
+            >
+              Danger
+            </MenuButton>
+          </Menu>
+        </View>
+
+        <DesignSystemHeader>Modal (work in progress)</DesignSystemHeader>
+        <Modal
+          isVisible={showModal}
+          onBackdropPress={() => setShowModal(false)}
+        >
+          <ModalHeader>This is the header</ModalHeader>
+          <LabeledInput
+            label={"Label of the Input"}
+            value="While typi"
+            hint="Here you can put information you want the user to have regarding this input."
+          />
+          <ModalButtonFooter
+            cancel={
+              <Button variant="secondary" onPress={() => setShowModal(false)}>
+                Cancel
+              </Button>
+            }
+            confirm={<Button variant="primary">Confirm</Button>}
+          />
+        </Modal>
+        <Button
+          onPress={() => {
+            setShowModal(true);
+          }}
+          variant="primary"
+          size="small"
+        >
+          Open Modal
+        </Button>
+
+        <DesignSystemHeader>SidebarButton</DesignSystemHeader>
+        <SidebarButton>
+          <Text variant="small">Hallo</Text>
+        </SidebarButton>
+        <SidebarButton disabled>
+          <Text variant="small">Hallo</Text>
+        </SidebarButton>
+
+        <DesignSystemHeader>SidebarLink</DesignSystemHeader>
+        <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+          <Avatar
+            borderRadius={4}
+            size="xs"
+            bg={tw.color(`collaboration-arctic`)}
+          >
+            <Icon name="serenity-feather" color={tw.color("black/35")} />
+          </Avatar>
+          <Text>Encrypt / Decrypt Image</Text>
+        </SidebarLink>
+
+        <DesignSystemHeader>Spinner</DesignSystemHeader>
+        <VStack space={3}>
+          <Spinner />
+          <Spinner size="lg" />
+          <Spinner fadeIn size="lg" />
+        </VStack>
+
+        <DesignSystemHeader>Text</DesignSystemHeader>
+        <Text variant="large">large Text</Text>
+        <Text>regular Text</Text>
+        <Text variant="small">small Text</Text>
+        <Text variant="xs">xs Text</Text>
+        <Text variant="xxs">xxs Text</Text>
+        <Text style={tw`pt-4`} variant="large" bold>
+          bold large Text
+        </Text>
+        <Text bold>bold regular Text</Text>
+        <Text variant="small" bold>
+          bold small Text
+        </Text>
+        <Text variant="xs" bold>
+          bold xs Text
+        </Text>
+        <Text variant="xxs" bold>
+          bold xxs Text
+        </Text>
+        <Text style={tw`pt-4`} variant="large" muted>
+          muted large Text
+        </Text>
+        <Text muted>muted regular Text</Text>
+        <Text variant="small" muted>
+          muted small Text
+        </Text>
+        <Text variant="xs" muted>
+          muted xs Text
+        </Text>
+        <Text variant="xxs" muted>
+          muted xxs Text
+        </Text>
+
+        <DesignSystemHeader>Toast</DesignSystemHeader>
+        <Button
+          onPress={() => {
+            counter = counter + 1;
+            showToast(`This is a message ${counter}`);
+          }}
+        >
+          Add Toast
+        </Button>
+
+        <DesignSystemHeader>Tooltip</DesignSystemHeader>
+        <HStack>
+          <Tooltip label="This is a tip!" placement="right">
+            <IconButton name="file-add-line" color="gray-500" large />
+          </Tooltip>
+        </HStack>
       </View>
     </ScrollSafeAreaView>
   );
