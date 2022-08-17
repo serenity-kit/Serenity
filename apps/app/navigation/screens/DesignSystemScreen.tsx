@@ -58,6 +58,7 @@ export default function DesignSystemScreen() {
 
   // TODO use structural elements
   // TODO header, subheader etc. or variants (h1, h2, h3 ... ??)
+  // extract workspace avatar into own component
   return (
     <ScrollSafeAreaView>
       <View style={tw`max-w-4xl mx-auto px-4 pt-2 pb-6`}>
@@ -66,7 +67,19 @@ export default function DesignSystemScreen() {
           An <DSMono variant={"component"}>Avatar</DSMono> component represents
           an object or entity.
         </Text>
-        <DSSubHeader>Sizing</DSSubHeader>
+        <DSSubHeader>Sizes</DSSubHeader>
+        <Text variant="small">
+          With the <DSMono variant="property">size</DSMono> property you can use
+          the Avatar in 6 different sizes: <DSMono variant={"type"}>xs</DSMono>{" "}
+          , <DSMono variant={"type"}>sm</DSMono> ,{" "}
+          <DSMono variant={"type"}>md</DSMono> ,{" "}
+          <DSMono variant={"type"}>lg</DSMono> ,{" "}
+          <DSMono variant={"type"}>xl</DSMono> , or{" "}
+          <DSMono variant={"type"}>2xl</DSMono> .
+        </Text>
+        <Text variant="small" style={tw`mt-1`}>
+          The initials will size automatically.
+        </Text>
         <DSExampleArea>
           <HStack
             space={2}
@@ -74,22 +87,22 @@ export default function DesignSystemScreen() {
             style={tw`pr-2 overflow-scroll sm:overflow-visible`}
           >
             <Avatar bg="primary.500" size={"xs"}>
-              XS
+              BE
             </Avatar>
             <Avatar bg="primary.500" size={"sm"}>
-              SM
+              NG
             </Avatar>
             <Avatar bg="primary.500" size={"md"}>
-              MD
+              AB
             </Avatar>
             <Avatar bg="primary.500" size={"lg"}>
-              LG
+              SK
             </Avatar>
             <Avatar bg="primary.500" size={"xl"}>
-              XL
+              AD
             </Avatar>
             <Avatar bg="primary.500" size={"2xl"}>
-              2XL
+              HG
             </Avatar>
           </HStack>
         </DSExampleArea>
