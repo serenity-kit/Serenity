@@ -22,6 +22,9 @@ export type Params = {
   folderSubkeyId: number;
   documentId: string;
   documentName: string;
+  encryptedDocumentName: string;
+  encryptedDocumentNameNonce: string;
+  documentSubkeyId: number;
   documentSnapshot: Snapshot;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
 };
@@ -43,6 +46,9 @@ export async function createInitialWorkspaceStructure({
   folderSubkeyId,
   documentId,
   documentName,
+  encryptedDocumentName,
+  encryptedDocumentNameNonce,
+  documentSubkeyId,
   documentSnapshot,
   deviceWorkspaceKeyBoxes,
 }: Params): Promise<CreateWorkspaceResult> {
@@ -65,6 +71,9 @@ export async function createInitialWorkspaceStructure({
   const document = await createDocument({
     id: documentId,
     name: documentName,
+    encryptedName: encryptedDocumentName,
+    encryptedNameNonce: encryptedDocumentNameNonce,
+    subkeyId: documentSubkeyId,
     parentFolderId: folder.id,
     workspaceId: workspaceId,
   });

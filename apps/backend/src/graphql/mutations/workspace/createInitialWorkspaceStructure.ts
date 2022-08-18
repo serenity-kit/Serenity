@@ -47,6 +47,9 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
     t.nonNull.int("folderSubkeyId");
     t.nonNull.string("documentId");
     t.nonNull.string("documentName");
+    t.nonNull.string("encryptedDocumentName");
+    t.nonNull.string("encryptedDocumentNameNonce");
+    t.nonNull.int("documentSubkeyId");
     t.nonNull.field("documentSnapshot", { type: DocumentSnapshotInput });
     t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
       type: DeviceWorkspaceKeyBoxInput,
@@ -122,6 +125,21 @@ export const createInitialWorkspaceStructureMutation = mutationField(
       if (!args.input.documentName) {
         throw new UserInputError("Invalid input: documentName cannot be null");
       }
+      if (!args.input.encryptedDocumentName) {
+        throw new UserInputError(
+          "Invalid input: encryptedDocumentName cannot be null"
+        );
+      }
+      if (!args.input.encryptedDocumentNameNonce) {
+        throw new UserInputError(
+          "Invalid input: encryptedDocumentNameNonce cannot be null"
+        );
+      }
+      if (!args.input.documentSubkeyId) {
+        throw new UserInputError(
+          "Invalid input: documentSubkeyId cannot be null"
+        );
+      }
       if (!args.input.documentSnapshot) {
         throw new UserInputError(
           "Invalid input: documentSnapshot cannot be null"
@@ -149,6 +167,9 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         folderSubkeyId: args.input.folderSubkeyId,
         documentId: args.input.documentId,
         documentName: args.input.documentName,
+        encryptedDocumentName: args.input.encryptedDocumentName,
+        encryptedDocumentNameNonce: args.input.encryptedDocumentNameNonce,
+        documentSubkeyId: args.input.documentSubkeyId,
         documentSnapshot: args.input.documentSnapshot,
         deviceWorkspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,
       });

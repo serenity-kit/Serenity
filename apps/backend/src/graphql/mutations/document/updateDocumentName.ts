@@ -8,6 +8,9 @@ export const UpdateDocumentNameInput = inputObjectType({
   definition(t) {
     t.nonNull.string("id");
     t.nonNull.string("name");
+    t.nonNull.string("encryptedName");
+    t.nonNull.string("encryptedNameNonce");
+    t.nonNull.int("subkeyId");
   },
 });
 
@@ -35,12 +38,26 @@ export const updateDocumentNameMutation = mutationField("updateDocumentName", {
     if (!args.input.name) {
       throw new UserInputError("Invalid input: name cannot be null");
     }
+    if (!args.input.encryptedName) {
+      throw new UserInputError("Invalid input: encryptedName cannot be null");
+    }
+    if (!args.input.encryptedNameNonce) {
+      throw new UserInputError(
+        "Invalid input: encryptedNameNonce cannot be null"
+      );
+    }
+    if (!args.input.subkeyId) {
+      throw new UserInputError("Invalid input: subkeyId cannot be null");
+    }
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
     }
     const document = await updateDocumentName({
       id: args.input.id,
       name: args.input.name,
+      encryptedName: args.input.encryptedName,
+      encryptedNameNonce: args.input.encryptedNameNonce,
+      subkeyId: args.input.subkeyId,
       userId: context.user.id,
     });
     return { document };

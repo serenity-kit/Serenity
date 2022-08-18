@@ -11,16 +11,21 @@ generator client {
 }
 
 model Document {
-  id               String     @id
-  activeSnapshot   Snapshot?  @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
-  activeSnapshotId String?    @unique
-  snapshots        Snapshot[]
-  createdAt        DateTime   @default(now())
-  workspace        Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId      String
-  parentFolder     Folder?    @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
-  parentFolderId   String?
-  name             String // TODO must be encrypted
+  id                 String     @id
+  activeSnapshot     Snapshot?  @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
+  activeSnapshotId   String?    @unique
+  snapshots          Snapshot[]
+  createdAt          DateTime   @default(now())
+  workspace          Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId        String
+  parentFolder       Folder?    @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
+  parentFolderId     String?
+  name               String?
+  encryptedName      String?
+  encryptedNameNonce String?
+  subkeyId           Int?       @unique
+
+  @@unique([subkeyId, workspaceId])
 }
 
 model Snapshot {

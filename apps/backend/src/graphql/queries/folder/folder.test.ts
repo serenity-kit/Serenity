@@ -1,15 +1,10 @@
-import {
-  decryptDocumentTitle,
-  folderDerivedKeyContext,
-  recreateDocumentKey,
-} from "@serenity-tools/common";
+import { folderDerivedKeyContext } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { decryptWorkspaceKey } from "../../../../test/helpers/device/decryptWorkspaceKey";
-import { createDocument } from "../../../../test/helpers/document/createDocument";
-import { getDocument } from "../../../../test/helpers/document/getDocument";
-import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";
+import { createFolder } from "../../../../test/helpers/folder/createFolder";
+import { getFolder } from "../../../../test/helpers/folder/getFolder";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { Device } from "../../../types/device";
@@ -21,10 +16,11 @@ let userId: string | null = null;
 let device: Device | null = null;
 let sessionKey = "";
 let workspaceKey = "";
-let addedFolder: any = null;
 let folderKey = "";
+let addedFolder: any = null;
 
-const setup = async () => {
+beforeAll(async () => {
+  await deleteAllRecords();
   const result = await createUserWithWorkspace({
     id: workspaceId,
     username,
@@ -47,67 +43,37 @@ const setup = async () => {
     subkeyId: addedFolder.subKeyId,
   });
   folderKey = folderKeyResult.key;
-};
-beforeAll(async () => {
-  await deleteAllRecords();
-  await setup();
 });
 
-test("user should be retrieve a document", async () => {
+test("user should be retrieve a folder", async () => {
   const authorizationHeader = sessionKey;
-  const documentId = uuidv4();
-  const documentName = "Test document";
-  const createDocumentResponse = await createDocument({
+  const folderId = uuidv4();
+  const folderName = "New folder";
+  await createFolder({
     graphql,
-    id: documentId,
+    id: folderId,
+    name: folderName,
+    parentKey: workspaceKey,
     parentFolderId: null,
     workspaceId: workspaceId,
     authorizationHeader,
   });
-  await updateDocumentName({
+  const result = await getFolder({
     graphql,
-    id: documentId,
-    name: documentName,
-    folderKey,
+    id: folderId,
     authorizationHeader,
   });
-
-  // const createdDocument = createDocumentResponse.createDevice.document;
-
-  const result = await getDocument({
-    graphql,
-    id: documentId,
-    authorizationHeader,
-  });
-  const retrievedDocument = result.document;
-  expect(retrievedDocument.id).toBe(documentId);
-  expect(retrievedDocument.name).toBe(documentName);
-  expect(retrievedDocument.workspaceId).toBe(workspaceId);
-  expect(retrievedDocument.parentFolderId).toBe(null);
-  expect(typeof retrievedDocument.encryptedName).toBe("string");
-  expect(typeof retrievedDocument.encryptedNameNonce).toBe("string");
-  expect(typeof retrievedDocument.subkeyId).toBe("number");
-
-  expect(typeof retrievedDocument.encryptedName).toBe("string");
-  expect(typeof retrievedDocument.encryptedNameNonce).toBe("string");
-  expect(typeof retrievedDocument.subkeyId).toBe("number");
-  const documentSubkey = await recreateDocumentKey({
-    folderKey,
-    subkeyId: retrievedDocument.subkeyId,
-  });
-  const decryptedName = await decryptDocumentTitle({
-    key: documentSubkey.key,
-    ciphertext: retrievedDocument.encryptedName,
-    publicNonce: retrievedDocument.encryptedNameNonce,
-    publicData: null,
-  });
-  expect(decryptedName).toBe(documentName);
+  const retrievedFolder = result.folder;
+  expect(retrievedFolder.id).toBe(folderId);
+  expect(retrievedFolder.name).toBe(folderName);
+  expect(retrievedFolder.parentFolderId).toBe(null);
+  expect(retrievedFolder.workspaceId).toBe(workspaceId);
 });
 
 test("Unauthenticated", async () => {
   await expect(
     (async () =>
-      await getDocument({
+      await getFolder({
         graphql,
         id: uuidv4(),
         authorizationHeader: "badauthheader",
@@ -118,7 +84,7 @@ test("Unauthenticated", async () => {
 test("Input Errors", async () => {
   await expect(
     (async () =>
-      await getDocument({
+      await getFolder({
         graphql,
         id: "",
         authorizationHeader: sessionKey,
