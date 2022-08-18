@@ -10,24 +10,18 @@ import {
   DocumentDocument,
   DocumentQuery,
   DocumentQueryVariables,
-  useAttachDeviceToWorkspacesMutation,
   useUpdateDocumentNameMutation,
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { buildDeviceWorkspaceKeyBoxes } from "../../utils/device/buildDeviceWorkspaceKeyBoxes";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
-import { getDevices } from "../../utils/device/getDevices";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const workspaceId = useWorkspaceId();
   const documentStore = useDocumentStore();
   const pageId = props.route.params.pageId;
-  const [, attachDeviceToWorkspacesMutation] =
-    useAttachDeviceToWorkspacesMutation();
   const { sessionKey } = useAuthentication();
   const urqlClient = useClient();
 
@@ -40,38 +34,11 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
       console.error("No sessionKey found. Probably you aren't logged in!");
       return;
     }
-    const activeDevice = await getActiveDevice();
-    if (!activeDevice) {
-      // TODO: handle this error
-      console.error("No active device found!");
-      return;
-    }
-    const deviceSigningPublicKey = activeDevice.signingPublicKey;
-    const devices = await getDevices({ urqlClient });
-    if (!devices) {
-      // TODO: handle this erros
-      console.error("No devices found!");
-      return;
-    }
-    const { existingWorkspaceDeviceWorkspaceKeyBoxes } =
-      await buildDeviceWorkspaceKeyBoxes({
-        workspaceId,
-        devices,
-      });
-    await attachDeviceToWorkspacesMutation({
-      input: {
-        creatorDeviceSigningPublicKey: deviceSigningPublicKey,
-        deviceWorkspaceKeyBoxes: existingWorkspaceDeviceWorkspaceKeyBoxes,
-        receiverDeviceSigningPublicKey: deviceSigningPublicKey,
-      },
-    });
-    const workspace = await getWorkspace({
-      workspaceId,
-      urqlClient,
-      deviceSigningPublicKey: activeDevice?.signingPublicKey,
-    });
-    if (!workspace) {
-      props.navigation.replace("WorkspaceNotFound");
+    try {
+      await attachDeviceToWorkspaces({ workspaceId, urqlClient });
+    } catch (error) {
+      // TOOD: handle error
+      console.error(error);
       return;
     }
     const documentResult = await urqlClient

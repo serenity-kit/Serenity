@@ -1,20 +1,16 @@
-import React, { useState, useEffect } from "react";
+import { Button, Checkbox, Text, tw, View } from "@serenity-tools/ui";
+import { useEffect, useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
-import { Text, View, Button, Checkbox, tw } from "@serenity-tools/ui";
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import {
-  WorkspaceMember,
-  MeResult,
-  Workspace,
-  useUpdateWorkspaceMutation,
-  MeQuery,
-  MeQueryVariables,
-  MeDocument,
-} from "../../generated/graphql";
+import { useClient } from "urql";
 import { CreateWorkspaceInvitation } from "../../components/workspace/CreateWorkspaceInvitation";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
-import { useClient } from "urql";
+import {
+  MeDocument, MeQuery,
+  MeQueryVariables, MeResult, useUpdateWorkspaceMutation, Workspace, WorkspaceMember
+} from "../../generated/graphql";
+import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 type Member = {
@@ -112,6 +108,13 @@ export default function WorkspaceSettingsMembersScreen(
       if (!device) {
         // TODO: handle this error
         console.error("No active device found");
+        return;
+      }
+      try {
+        await attachDeviceToWorkspaces({ workspaceId, urqlClient });
+      } catch (error) {
+        // TOOD: handle error
+        console.error(error);
         return;
       }
       const workspace = await getWorkspace({

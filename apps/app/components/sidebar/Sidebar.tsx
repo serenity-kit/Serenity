@@ -1,6 +1,6 @@
 import {
   DrawerContentComponentProps,
-  DrawerContentScrollView
+  DrawerContentScrollView,
 } from "@react-navigation/drawer";
 
 import { useFocusRing } from "@react-native-aria/focus";
@@ -20,7 +20,7 @@ import {
   Tooltip,
   tw,
   useIsPermanentLeftSidebar,
-  View
+  View,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
@@ -33,7 +33,7 @@ import {
   useDevicesQuery,
   useMeQuery,
   useRootFoldersQuery,
-  Workspace
+  Workspace,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";

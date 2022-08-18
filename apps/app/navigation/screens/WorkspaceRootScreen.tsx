@@ -14,10 +14,9 @@ import {
   WorkspaceQueryVariables,
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { buildDeviceWorkspaceKeyBoxes } from "../../utils/device/buildDeviceWorkspaceKeyBoxes";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
-import { getDevices } from "../../utils/device/getDevices";
 import { getLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
 
 export default function WorkspaceRootScreen(
   props: WorkspaceDrawerScreenProps<"WorkspaceRoot">
@@ -36,31 +35,19 @@ export default function WorkspaceRootScreen(
         console.error("No sessionKey found, probably you aren't logged in");
         return;
       }
+      try {
+        await attachDeviceToWorkspaces({ workspaceId, urqlClient });
+      } catch (error) {
+        // TOOD: handle error
+        console.error(error);
+        return;
+      }
       const activeDevice = await getActiveDevice();
       if (!activeDevice) {
         // TODO: handle this error
-        console.error("No active device found");
-        return;
+        throw new Error("No active device found!");
       }
-      const deviceSigningPublicKey: string = activeDevice?.signingPublicKey;
-      const devices = await getDevices({ urqlClient });
-      if (!devices) {
-        // TODO: handle this erros
-        console.error("No devices found!");
-        return;
-      }
-      const { existingWorkspaceDeviceWorkspaceKeyBoxes } =
-        await buildDeviceWorkspaceKeyBoxes({
-          workspaceId,
-          devices,
-        });
-      await attachDeviceToWorkspacesMutation({
-        input: {
-          creatorDeviceSigningPublicKey: deviceSigningPublicKey,
-          deviceWorkspaceKeyBoxes: existingWorkspaceDeviceWorkspaceKeyBoxes,
-          receiverDeviceSigningPublicKey: deviceSigningPublicKey,
-        },
-      });
+      const deviceSigningPublicKey = activeDevice.signingPublicKey;
       const workspaceResult = await urqlClient
         .query<WorkspaceQuery, WorkspaceQueryVariables>(
           WorkspaceDocument,
