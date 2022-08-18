@@ -11,7 +11,7 @@ export type DeviceWorkspaceKeyBoxParams = {
   ciphertext: string;
 };
 export type Props = {
-  workspaceId: string;
+  workspaceId?: string;
   devices: Device[];
 };
 export const buildDeviceWorkspaceKeyBoxes = async ({
@@ -46,11 +46,13 @@ export const buildDeviceWorkspaceKeyBoxes = async ({
       nonce,
       ciphertext,
     });
-    existingWorkspaceDeviceWorkspaceKeyBoxes.push({
-      ciphertext,
-      nonce,
-      workspaceId,
-    });
+    if (workspaceId) {
+      existingWorkspaceDeviceWorkspaceKeyBoxes.push({
+        ciphertext,
+        nonce,
+        workspaceId,
+      });
+    }
   }
   return {
     existingWorkspaceDeviceWorkspaceKeyBoxes,
