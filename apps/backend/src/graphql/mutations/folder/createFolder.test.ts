@@ -153,7 +153,7 @@ test("duplicate ID throws an error", async () => {
   ).rejects.toThrow("Invalid input: duplicate id");
 });
 
-test("Throw error on duplicate subkeyId", async () => {
+test("Throw error on duplicate subkeyId, workspaceId", async () => {
   const authorizationHeaders = { authorization: sessionKey };
   const name = "subkey test";
   const encryptedFolderResult = await encryptFolder({

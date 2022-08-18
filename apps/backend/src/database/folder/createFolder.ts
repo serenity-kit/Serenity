@@ -40,7 +40,7 @@ export async function createFolder({
     // to prevent an internal server error
     // throw a bad user input on duplicate subkeyid
     const folderForSubkeyId = await prisma.folder.findFirst({
-      where: { subKeyId },
+      where: { subKeyId, workspaceId },
       select: { id: true },
     });
     if (folderForSubkeyId) {

@@ -197,4 +197,6 @@ model Folder {
   childFolders       Folder[]   @relation("parentFolder")
   descendent         Folder[]   @relation("rootFolder")
   documents          Document[]
+
+  @@unique([workspaceId, subKeyId])
 }
