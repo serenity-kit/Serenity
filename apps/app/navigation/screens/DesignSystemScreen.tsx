@@ -61,11 +61,14 @@ export default function DesignSystemScreen() {
   // TODO header, subheader etc. or variants (h1, h2, h3 ... ??)
   return (
     <ScrollSafeAreaView>
-      <View style={tw`max-w-4xl mx-auto px-4 pt-2 pb-6`}>
+      <View style={tw`w-full max-w-4xl mx-auto px-4 pt-2 pb-6`}>
         <DSHeader>Avatar</DSHeader>
         <Text>
-          An <DSMono variant={"component"}>Avatar</DSMono> component represents
-          an object or entity.
+          An{" "}
+          <DSMono variant={"component"} size="medium">
+            Avatar
+          </DSMono>{" "}
+          component represents an object or entity.
         </Text>
         <DSSubHeader>Sizes</DSSubHeader>
         <Text variant="small">
@@ -86,60 +89,68 @@ export default function DesignSystemScreen() {
             alignItems="center"
             style={tw`pr-2 overflow-scroll sm:overflow-visible`}
           >
-            <Avatar bg="primary.500" size={"xs"}>
-              BE
-            </Avatar>
-            <Avatar bg="primary.500" size={"sm"}>
-              NG
-            </Avatar>
-            <Avatar bg="primary.500" size={"md"}>
-              AB
-            </Avatar>
-            <Avatar bg="primary.500" size={"lg"}>
-              SK
-            </Avatar>
-            <Avatar bg="primary.500" size={"xl"}>
-              AD
-            </Avatar>
-            <Avatar bg="primary.500" size={"2xl"}>
-              HG
-            </Avatar>
+            <Avatar size={"xs"}>BE</Avatar>
+            <Avatar size={"sm"}>NG</Avatar>
+            <Avatar size={"md"}>AB</Avatar>
+            <Avatar size={"lg"}>SK</Avatar>
+            <Avatar size={"xl"}>AD</Avatar>
+            <Avatar size={"2xl"}>HG</Avatar>
           </HStack>
         </DSExampleArea>
 
-        <DSSubHeader>Avatar Group</DSSubHeader>
-        <AvatarGroup max={8} _avatar={{ size: "sm" }}>
-          <Avatar bg="collaboration.arctic">BE</Avatar>
-          <Avatar bg="collaboration.lavender">NG</Avatar>
-          <Avatar bg="collaboration.rose">AN</Avatar>
-          <Avatar bg="collaboration.honey">NG</Avatar>
-          <Avatar bg="collaboration.sky">NG</Avatar>
-          <Avatar bg={tw.color(`collaboration-terracotta`)}>NG</Avatar>
-        </AvatarGroup>
-        <DSSubHeader>Avatar Group with max 3 shown</DSSubHeader>
-        <AvatarGroup max={3} _avatar={{ size: "sm" }}>
-          <Avatar bg="collaboration.arctic">SK</Avatar>
-          <Avatar bg="collaboration.lavender">NG</Avatar>
-          <Avatar bg="collaboration.rose">AN</Avatar>
-          <Avatar bg="collaboration.honey">NG</Avatar>
-          <Avatar bg="collaboration.sky">NG</Avatar>
-        </AvatarGroup>
+        <DSSubHeader>Styling</DSSubHeader>
+        <Text variant="small" style={tw`mt-1`}>
+          Set one of the many coloring options with the{" "}
+          <DSMono variant="property">customColor</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <Avatar customColor="arctic">BE</Avatar>
+          <Avatar customColor="lavender">NG</Avatar>
+          <Avatar customColor="rose">AB</Avatar>
+          <Avatar customColor="honey">SK</Avatar>
+          <Avatar customColor="emerald">AD</Avatar>
+        </DSExampleArea>
 
-        <DSSubHeader>Collaboration Colors - Workspace Style</DSSubHeader>
-        <HStack
-          space={4}
-          style={tw`pb-3 pr-2 overflow-scroll sm:overflow-visible`}
-        >
+        <DSSubHeader>Grouping</DSSubHeader>
+        <Text variant="small">
+          The <DSMono variant="component">AvatarGroup</DSMono> lets you stack
+          Avatars. Use the <DSMono variant="property">max</DSMono> property to
+          limit the number of Avatars.
+        </Text>
+        <DSExampleArea>
+          <AvatarGroup max={3} _avatar={{ size: "sm" }}>
+            <Avatar customColor="arctic">SK</Avatar>
+            <Avatar customColor="lavender">NG</Avatar>
+            <Avatar customColor="rose">AN</Avatar>
+            <Avatar customColor="honey">NG</Avatar>
+            <Avatar customColor="sky">NG</Avatar>
+          </AvatarGroup>
+        </DSExampleArea>
+
+        <DSSubHeader>Workspace Variation</DSSubHeader>
+        <Text variant="small">
+          The <DSMono variant="component">WorkspaceAvatar</DSMono> should be
+          used for all workspace related representation.
+        </Text>
+        <Text variant="small" style={tw`mt-1`}>
+          Set one of the many coloring options with the{" "}
+          <DSMono variant="property">customColor</DSMono> property.
+        </Text>
+        <DSExampleArea style={tw`overflow-scroll sm:overflow-visible`}>
           {collaborationColors.map((color) => {
             return <WorkspaceAvatar customColor={color} />;
           })}
-        </HStack>
+        </DSExampleArea>
 
         <DSHeader>Button</DSHeader>
         <Text>
-          The <DSMono variant={"component"}>Button</DSMono> component is used to
-          trigger an action or event, such as submitting a form, opening a
-          Dialog, canceling an action, or performing a delete operation.
+          The{" "}
+          <DSMono variant={"component"} size="medium">
+            Button
+          </DSMono>{" "}
+          component is used to trigger an action or event, such as submitting a
+          form, opening a Dialog, canceling an action, or performing a delete
+          operation.
         </Text>
         <Text variant={"xs"} bold style={tw`mt-6 -mb-3 text-primary-400`}>
           Properties
@@ -213,27 +224,48 @@ export default function DesignSystemScreen() {
         </DSExampleArea>
 
         <DSHeader>CenterContent</DSHeader>
+        <Text>
+          With the <DSMono variant="component">CenterContent</DSMono> component
+          you can easily center a child element vertically and horizontally
+          within the available space.
+        </Text>
         <DSSubHeader>Basic</DSSubHeader>
-        <View style={tw`h-60`}>
+        <Text variant="small">
+          The basic version doesn't need any properties and silently centers
+          it's content.
+        </Text>
+        <View
+          style={tw`h-40 mt-4 border border-gray-200 rounded overflow-hidden`}
+        >
           <CenterContent>
-            <Text>I am centered</Text>
+            <Avatar size={"md"}>AV</Avatar>
           </CenterContent>
         </View>
-        <DSSubHeader>with responsive serenity Background</DSSubHeader>
-        <View style={tw`h-60 xs:border-transparent`}>
+        <DSSubHeader>Background</DSSubHeader>
+        <Text variant="small">
+          To add a background like in Login/Register to it just add the{" "}
+          <DSMono variant="property">serenityBg</DSMono> property.
+        </Text>
+        <View style={tw`h-80 mt-4 rounded overflow-hidden`}>
           <CenterContent serenityBg>
             <Box style={tw`text-center`}>
-              <Text variant="large">Me too!</Text>
-              <Text muted>
-                With this wrapper you can center content within the available
-                space, well isn't that nice.
+              <Text bold>Can not connect to a network</Text>
+              <Text muted variant="small">
+                Unfortunately your registration request failed due a network
+                error. Please try again later.
               </Text>
+              <Button style={tw`self-center`}>Try Again</Button>
             </Box>
           </CenterContent>
         </View>
 
         <DSHeader>Checkbox</DSHeader>
-        <VStack space={3}>
+        <Text>
+          The <DSMono variant="component">Checkbox</DSMono> allows the user to
+          select one or more items from a set.
+        </Text>
+        <DSSubHeader style={tw`-mb-2.5`}>Basic component</DSSubHeader>
+        <DSExampleArea>
           <Checkbox
             value="test"
             accessibilityLabel="This is a dummy checkbox"
@@ -242,14 +274,7 @@ export default function DesignSystemScreen() {
             value="test"
             accessibilityLabel="This is a dummy checkbox"
             defaultIsChecked
-          >
-            <Text>
-              Software Development{" "}
-              <Link to={{ screen: "EncryptDecryptImageTest" }}>
-                Encrypt / Decrypt Image
-              </Link>
-            </Text>
-          </Checkbox>
+          />
           <Checkbox
             value="test"
             accessibilityLabel="This is a dummy checkbox"
@@ -261,7 +286,28 @@ export default function DesignSystemScreen() {
             isDisabled
             isChecked
           />
-        </VStack>
+        </DSExampleArea>
+        <DSSubHeader>Label</DSSubHeader>
+        <Text variant="small">
+          You can provide a Label by just including a{" "}
+          <DSMono variant="component">Text</DSMono> element inside your
+          Checkbox.
+        </Text>
+        <DSExampleArea>
+          <Checkbox
+            value="test"
+            accessibilityLabel="This is a dummy checkbox"
+            defaultIsChecked
+          >
+            <Text variant="small">
+              I accept our{" "}
+              <Link to={{ screen: "EncryptDecryptImageTest" }}>
+                Encrypt / Decrypt Image
+              </Link>{" "}
+              test
+            </Text>
+          </Checkbox>
+        </DSExampleArea>
 
         <DSHeader>EditorBottombar</DSHeader>
         <HStack space={2} alignItems="center">
@@ -534,33 +580,11 @@ export default function DesignSystemScreen() {
               to={{ screen: "EncryptDecryptImageTest" }}
               style={tw`p-menu-item`}
             >
-              <Avatar
-                borderRadius={4}
-                size="xs"
-                bg={tw.color(`collaboration-emerald`)}
-              >
-                <Icon
-                  name="serenity-feather"
-                  color={tw.color("black/35")}
-                  size={5}
-                  mobileSize={6}
-                />
-              </Avatar>
+              <WorkspaceAvatar customColor="emerald" />
               <Text variant="xs">Happy Workspace</Text>
             </SidebarLink>
             <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
-              <Avatar
-                borderRadius={4}
-                size="xs"
-                bg={tw.color(`collaboration-arctic`)}
-              >
-                <Icon
-                  name="serenity-feather"
-                  color={tw.color("black/35")}
-                  size={5}
-                  mobileSize={6}
-                />
-              </Avatar>
+              <WorkspaceAvatar customColor="lavender" />
               <Text variant="xs">Funny Bunny</Text>
             </SidebarLink>
             <View style={tw`pl-2 pr-3 py-1.5`}>
@@ -637,13 +661,7 @@ export default function DesignSystemScreen() {
 
         <DSHeader>SidebarLink</DSHeader>
         <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-          <Avatar
-            borderRadius={4}
-            size="xs"
-            bg={tw.color(`collaboration-arctic`)}
-          >
-            <Icon name="serenity-feather" color={tw.color("black/35")} />
-          </Avatar>
+          <WorkspaceAvatar />
           <Text>Encrypt / Decrypt Image</Text>
         </SidebarLink>
 

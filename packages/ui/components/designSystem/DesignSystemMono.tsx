@@ -21,16 +21,12 @@ export const DesignSystemMono = (props: DesignSystemMonoProps) => {
     base: tw`text-base`,
     code: tw`text-gray-400`,
     component: tw`text-primary-500`,
-    property: tw`px-1.25 pt-0.25 pb-0.5 bg-primary-100 text-primary-400 rounded self-start`,
+    property: tw`px-1 pt-0 pb-0.25 bg-primary-100 text-primary-400 rounded self-start`,
     type: tw`text-primary-500`,
   });
 
   return (
-    <Mono
-      {...rest}
-      style={[styles[variant], props.style]}
-      size={variant === "component" ? "medium" : "small"}
-    >
+    <Mono {...rest} style={[styles[variant], props.style]}>
       {props.children}
     </Mono>
   );

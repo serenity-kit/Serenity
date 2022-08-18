@@ -7,7 +7,7 @@ export type DesignSystemSubHeaderProps = TextProps & {};
 
 export const DesignSystemSubHeader = (props: DesignSystemSubHeaderProps) => {
   const styles = StyleSheet.create({
-    subHeader: tw`mt-5 mb-1.5 text-xl`,
+    subHeader: tw`mt-6 mb-1.5 text-xl`,
   });
 
   return (
