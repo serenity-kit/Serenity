@@ -8,10 +8,9 @@ import {
   FirstDocumentDocument,
   FirstDocumentQuery,
   FirstDocumentQueryVariables,
-  useAttachDeviceToWorkspacesMutation,
   WorkspaceDocument,
   WorkspaceQuery,
-  WorkspaceQueryVariables,
+  WorkspaceQueryVariables
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
@@ -25,8 +24,6 @@ export default function WorkspaceRootScreen(
   const urqlClient = useClient();
   const workspaceId = useWorkspaceId();
   const { sessionKey } = useAuthentication();
-  const [, attachDeviceToWorkspacesMutation] =
-    useAttachDeviceToWorkspacesMutation();
 
   useEffect(() => {
     (async () => {
