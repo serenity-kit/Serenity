@@ -3,7 +3,7 @@ import { idArg, nonNull, queryField } from "nexus";
 import { getFolder } from "../../../database/folder/getFolder";
 import { Folder } from "../../types/folder";
 
-export const documentQuery = queryField((t) => {
+export const folderQuery = queryField((t) => {
   t.field("folder", {
     type: Folder,
     args: {

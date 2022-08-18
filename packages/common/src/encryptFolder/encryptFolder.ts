@@ -11,7 +11,7 @@ type Params = {
 
 // Having a specific "folder__" context allows us to use have the same subKeyId
 // for one parentKey and checking only the uniquness for this type.
-export const derivedKeyContext = "folder__";
+export const folderDerivedKeyContext = "folder__";
 
 export const encryptFolder = async (params: Params) => {
   const publicData = params.publicData || {};
@@ -23,7 +23,7 @@ export const encryptFolder = async (params: Params) => {
   // subkeyId per parentKey is a duplicate.
   const folderKey = await kdfDeriveFromKey({
     key: params.parentKey,
-    context: derivedKeyContext,
+    context: folderDerivedKeyContext,
   });
   const result = await encryptAead(
     params.name,
