@@ -1,7 +1,8 @@
-import { Text, View } from "@serenity-tools/ui";
+import { ScrollSafeAreaView, ScrollView, Text, View } from "@serenity-tools/ui";
 import { useEffect, useState } from "react";
 import sodium from "@serenity-tools/libsodium";
 import { useWindowDimensions } from "react-native";
+import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 
 const signingKeyPair = {
   keyType: "ed25519",
@@ -13,6 +14,8 @@ const signingKeyPair = {
 const exitingCiphertext = "DtMWG6Jx9wAmLXh64enOwd6E7cFX";
 const key = "eL4FdkhTmU2F56ySJKKH-2ZVrzdsIIbbmvyz_N3Swb0";
 const nonce = "5GDx6cP2_uToVP-UKhddEmUelpyKTJLZ";
+
+const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
 
 export default function PageScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -97,6 +100,12 @@ export default function PageScreen() {
         sodium.from_base64_to_string(decryptedSecretBox)
       );
 
+      const kdfDerivedKey = await kdfDeriveFromKey({
+        key: kdfKey,
+        context: "serenity",
+        subkeyId: 5200022,
+      });
+
       setData({
         randombytes_buf,
         crypto_sign_keypair,
@@ -109,6 +118,9 @@ export default function PageScreen() {
         messageFromExistingCiphertext: sodium.from_base64_to_string(
           messageFromExistingCiphertext
         ),
+        kdfDerivedKey,
+        kdfDerivedKeyIsCorrect:
+          kdfDerivedKey.key === "R2ycEA9jEapG3MEAM3VEgYsKgiwkMm_JuwqbtfE13F4",
       });
     }
 
@@ -116,7 +128,7 @@ export default function PageScreen() {
   }, []);
 
   return (
-    <View>
+    <ScrollView>
       <Text>Libsodium Test Screen</Text>
       {Object.keys(data).map((key) => (
         <View key={key}>
@@ -125,6 +137,6 @@ export default function PageScreen() {
           </Text>
         </View>
       ))}
-    </View>
+    </ScrollView>
   );
 }
