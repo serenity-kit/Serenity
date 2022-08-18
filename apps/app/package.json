@@ -49,7 +49,7 @@
     "expo-clipboard": "~2.1.0",
     "expo-constants": "~13.0.0",
     "expo-crypto": "~10.1.1",
-    "expo-dev-client": "~0.8.5",
+    "expo-dev-client": "~0.8.6",
     "expo-font": "~10.0.4",
     "expo-image-picker": "^12.0.2",
     "expo-linking": "~3.0.0",
