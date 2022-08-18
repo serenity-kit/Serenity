@@ -5,8 +5,13 @@ import { useClient } from "urql";
 import { CreateWorkspaceInvitation } from "../../components/workspace/CreateWorkspaceInvitation";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 import {
-  MeDocument, MeQuery,
-  MeQueryVariables, MeResult, useUpdateWorkspaceMutation, Workspace, WorkspaceMember
+  MeDocument,
+  MeQuery,
+  MeQueryVariables,
+  MeResult,
+  useUpdateWorkspaceMutation,
+  Workspace,
+  WorkspaceMember,
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
