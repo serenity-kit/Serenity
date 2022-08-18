@@ -8,12 +8,15 @@ import {
   FirstDocumentDocument,
   FirstDocumentQuery,
   FirstDocumentQueryVariables,
+  useAttachDeviceToWorkspacesMutation,
   WorkspaceDocument,
   WorkspaceQuery,
   WorkspaceQueryVariables,
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+import { buildDeviceWorkspaceKeyBoxes } from "../../utils/device/buildDeviceWorkspaceKeyBoxes";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { getDevices } from "../../utils/device/getDevices";
 import { getLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceRootScreen(
@@ -23,6 +26,8 @@ export default function WorkspaceRootScreen(
   const urqlClient = useClient();
   const workspaceId = useWorkspaceId();
   const { sessionKey } = useAuthentication();
+  const [, attachDeviceToWorkspacesMutation] =
+    useAttachDeviceToWorkspacesMutation();
 
   useEffect(() => {
     (async () => {
@@ -38,6 +43,24 @@ export default function WorkspaceRootScreen(
         return;
       }
       const deviceSigningPublicKey: string = activeDevice?.signingPublicKey;
+      const devices = await getDevices({ urqlClient });
+      if (!devices) {
+        // TODO: handle this erros
+        console.error("No devices found!");
+        return;
+      }
+      const { existingWorkspaceDeviceWorkspaceKeyBoxes } =
+        await buildDeviceWorkspaceKeyBoxes({
+          workspaceId,
+          devices,
+        });
+      await attachDeviceToWorkspacesMutation({
+        input: {
+          creatorDeviceSigningPublicKey: deviceSigningPublicKey,
+          deviceWorkspaceKeyBoxes: existingWorkspaceDeviceWorkspaceKeyBoxes,
+          receiverDeviceSigningPublicKey: deviceSigningPublicKey,
+        },
+      });
       const workspaceResult = await urqlClient
         .query<WorkspaceQuery, WorkspaceQueryVariables>(
           WorkspaceDocument,
