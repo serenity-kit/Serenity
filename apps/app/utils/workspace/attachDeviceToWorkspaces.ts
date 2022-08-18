@@ -3,13 +3,14 @@ import {
   AttachDeviceToWorkspacesDocument,
   AttachDeviceToWorkspacesMutation,
   AttachDeviceToWorkspacesMutationVariables,
+  WorkspaceKeyBoxData,
 } from "../../generated/graphql";
 import { buildDeviceWorkspaceKeyBoxes } from "../device/buildDeviceWorkspaceKeyBoxes";
 import { getActiveDevice } from "../device/getActiveDevice";
 import { getDevices } from "../device/getDevices";
 
 export type Props = {
-  workspaceId: string;
+  workspaceId?: string;
   urqlClient: Client;
 };
 export const attachDeviceToWorkspaces = async ({
@@ -28,11 +29,16 @@ export const attachDeviceToWorkspaces = async ({
     console.error("No devices found!");
     return;
   }
-  const { existingWorkspaceDeviceWorkspaceKeyBoxes } =
-    await buildDeviceWorkspaceKeyBoxes({
-      workspaceId,
-      devices,
-    });
+  let existingWorkspaceDeviceWorkspaceKeyBoxes: WorkspaceKeyBoxData[] = [];
+  if (workspaceId) {
+    const buildDeviceWorkspaceKeyBoxesResult =
+      await buildDeviceWorkspaceKeyBoxes({
+        workspaceId,
+        devices,
+      });
+    existingWorkspaceDeviceWorkspaceKeyBoxes =
+      buildDeviceWorkspaceKeyBoxesResult.existingWorkspaceDeviceWorkspaceKeyBoxes;
+  }
   await urqlClient
     .mutation<
       AttachDeviceToWorkspacesMutation,
