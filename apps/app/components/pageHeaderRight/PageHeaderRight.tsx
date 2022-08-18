@@ -19,11 +19,11 @@ export function PageHeaderRight() {
         alignItems="center"
       >
         <AvatarGroup max={hasEditorSidebar ? 3 : 2} _avatar={{ size: "sm" }}>
-          <Avatar bg="green.400">BE</Avatar>
-          <Avatar bg="yellow.400">AN</Avatar>
-          <Avatar bg="orange.400">NG</Avatar>
-          <Avatar bg="yellow.300">NG</Avatar>
-          <Avatar bg="green.300">NG</Avatar>
+          <Avatar customColor="emerald">BE</Avatar>
+          <Avatar customColor="honey">NG</Avatar>
+          <Avatar customColor="orange">AB</Avatar>
+          <Avatar customColor="rose">SK</Avatar>
+          <Avatar customColor="serenity">AD</Avatar>
         </AvatarGroup>
         {hasEditorSidebar ? (
           <Button
