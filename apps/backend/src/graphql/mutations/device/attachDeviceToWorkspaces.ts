@@ -12,21 +12,20 @@ export const DeviceWorkspaceKeyBoxInput = inputObjectType({
   },
 });
 
-export const AttachDeviceToWorkspaceInput = inputObjectType({
-  name: "AttachDeviceToWorkspaceInput",
+export const AttachDeviceToWorkspacesInput = inputObjectType({
+  name: "AttachDeviceToWorkspacesInput",
   definition(t) {
     t.nonNull.string("receiverDeviceSigningPublicKey");
     t.nonNull.string("creatorDeviceSigningPublicKey");
-    t.nonNull.list.nonNull.field("workspaceKeyBoxes", {
+    t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
       type: DeviceWorkspaceKeyBoxInput,
     });
   },
 });
 
-export const AttachDeviceToWorkspaceResult = objectType({
-  name: "AttachDeviceToWorkspaceResult",
+export const AttachDeviceToWorkspacesResult = objectType({
+  name: "AttachDeviceToWorkspacesResult",
   definition(t) {
-    t.nonNull.list.nonNull.field("workspaceKeys", { type: WorkspaceKey });
     t.nonNull.list.nonNull.field("workspaceKeys", {
       type: WorkspaceKey,
     });
@@ -36,10 +35,10 @@ export const AttachDeviceToWorkspaceResult = objectType({
 export const attachDeviceToWorkspacesMutation = mutationField(
   "attachDeviceToWorkspaces",
   {
-    type: AttachDeviceToWorkspaceResult,
+    type: AttachDeviceToWorkspacesResult,
     args: {
       input: arg({
-        type: AttachDeviceToWorkspaceInput,
+        type: AttachDeviceToWorkspacesInput,
       }),
     },
     async resolve(_root, args, context) {
@@ -48,9 +47,6 @@ export const attachDeviceToWorkspacesMutation = mutationField(
       }
       if (!args.input) {
         throw new UserInputError("Input missing");
-      }
-      if (!args.input.workspaceId) {
-        throw new UserInputError("Invalid input: workspaceId cannot be null");
       }
       if (!args.input.receiverDeviceSigningPublicKey) {
         throw new UserInputError(
@@ -62,12 +58,12 @@ export const attachDeviceToWorkspacesMutation = mutationField(
           "Invalid input: creatorDeviceSigningPublicKey cannot be null"
         );
       }
-      if (!args.input.workspaceKeyBoxes) {
+      if (!args.input.deviceWorkspaceKeyBoxes) {
         throw new UserInputError(
-          "Invalid input: workspaceKeyBoxes cannot be null"
+          "Invalid input: deviceWorkspaceKeyBoxes cannot be null"
         );
       }
-      const workspaceKeyBoxes = args.input.workspaceKeyBoxes;
+      const workspaceKeyBoxes = args.input.deviceWorkspaceKeyBoxes;
       workspaceKeyBoxes.forEach((workspaceKeyBox: any) => {
         if (!workspaceKeyBox.workspaceId) {
           throw new UserInputError(
@@ -90,7 +86,7 @@ export const attachDeviceToWorkspacesMutation = mutationField(
         receiverDeviceSigningPublicKey:
           args.input.receiverDeviceSigningPublicKey,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
-        workspaceKeyBoxes: args.input.workspaceKeyBoxes,
+        workspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,
       });
       return { workspaceKeys };
     },

@@ -33,7 +33,8 @@ export async function attachDeviceToWorkspaces({
     return await prisma.$transaction(async (prisma) => {
       // 1. get the workspaces associated with this user
       // 2. Add any missing workspaceKeys
-      // 3. Create a new worskpaceKeyBoxes for this signingPublicKey
+      // 3. Find any existing workspaceKeyBoxes matching this device signingPublicKey
+      // 4. Create a new worskpaceKeyBoxes for this signingPublicKey
       //    on all workspaceKeys for the user's workspaces
       const userToWorkspaces = await prisma.usersToWorkspaces.findMany({
         where: {
@@ -83,27 +84,52 @@ export async function attachDeviceToWorkspaces({
           },
         },
       });
+      const existingWorkspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
+        where: {
+          deviceSigningPublicKey: receiverDeviceSigningPublicKey,
+          workspaceKey: { workspaceId: { in: workspaceIds } },
+        },
+      });
+      const existingWorkspaceKeyBoxLookup: {
+        [workspaceKeyId: string]: WorkspaceKeyBox;
+      } = {};
+      existingWorkspaceKeyBoxes.forEach((workspaceKeyBox) => {
+        existingWorkspaceKeyBoxLookup[workspaceKeyBox.workspaceKeyId] =
+          workspaceKeyBox;
+      });
       const workspaceKeyBoxes: WorkspaceKeyBox[] = [];
       workspaces.forEach((workspace) => {
         const workspaceKey = workspace.workspaceKey[0];
         const currentWorkspaceKeyBoxData = workspaceKeyBoxLookup[workspace.id];
-        workspaceKeyBoxes.push({
-          id: uuidv4(),
-          workspaceKeyId: workspaceKey.id,
-          deviceSigningPublicKey: receiverDeviceSigningPublicKey,
-          creatorDeviceSigningPublicKey,
-          nonce: currentWorkspaceKeyBoxData.nonce,
-          ciphertext: currentWorkspaceKeyBoxData.ciphertext,
-        });
+        if (!(workspaceKey.id in existingWorkspaceKeyBoxLookup)) {
+          workspaceKeyBoxes.push({
+            id: uuidv4(),
+            workspaceKeyId: workspaceKey.id,
+            deviceSigningPublicKey: receiverDeviceSigningPublicKey,
+            creatorDeviceSigningPublicKey,
+            nonce: currentWorkspaceKeyBoxData.nonce,
+            ciphertext: currentWorkspaceKeyBoxData.ciphertext,
+          });
+        }
       });
-
       await prisma.workspaceKeyBox.createMany({
         data: workspaceKeyBoxes,
       });
-      const workspaceKeys = await prisma.workspaceKey.findMany({
+      const rawWorkspaceKeys = await prisma.workspaceKey.findMany({
         where: { workspaceId: { in: userWorkspaceIds } },
-        include: { workspaceKeyBoxes: true },
+        include: {
+          workspaceKeyBoxes: {
+            where: { deviceSigningPublicKey: receiverDeviceSigningPublicKey },
+          },
+        },
         orderBy: { generation: "desc" },
+      });
+      const workspaceKeys: WorkspaceKey[] = [];
+      rawWorkspaceKeys.forEach(({ workspaceKeyBoxes, ...workspaceKey }) => {
+        workspaceKeys.push({
+          ...workspaceKey,
+          workspaceKeyBox: workspaceKeyBoxes[0],
+        });
       });
       return workspaceKeys;
     });

@@ -8,9 +8,9 @@ export const CreateFolderInput = inputObjectType({
   definition(t) {
     t.nonNull.string("id");
     t.string("name");
-    t.string("encryptedName");
-    t.string("nameNonce");
-    t.int("subKeyId");
+    t.nonNull.string("encryptedName");
+    t.nonNull.string("encryptedNameNonce");
+    t.nonNull.int("subKeyId");
     t.string("parentFolderId");
     t.nonNull.string("workspaceId");
   },
@@ -50,8 +50,10 @@ export const createFolderMutation = mutationField("createFolder", {
     if (!args.input.encryptedName) {
       throw new UserInputError("Invalid input: encryptedName cannot be null");
     }
-    if (!args.input.nameNonce) {
-      throw new UserInputError("Invalid input: nameNonce cannot be null");
+    if (!args.input.encryptedNameNonce) {
+      throw new UserInputError(
+        "Invalid input: encryptedNameNonce cannot be null"
+      );
     }
     if (!args.input.subKeyId) {
       throw new UserInputError("Invalid input: subKeyId cannot be null");
@@ -68,7 +70,7 @@ export const createFolderMutation = mutationField("createFolder", {
       id: args.input.id,
       name,
       encryptedName: args.input.encryptedName,
-      nameNonce: args.input.nameNonce,
+      encryptedNameNonce: args.input.encryptedNameNonce,
       subKeyId: args.input.subKeyId,
       parentFolderId,
       workspaceId: args.input.workspaceId,

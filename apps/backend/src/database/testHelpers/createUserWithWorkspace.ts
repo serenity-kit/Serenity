@@ -1,7 +1,7 @@
 import {
   createAndEncryptDevice,
   createIntroductionDocumentSnapshot,
-  encryptFolder
+  encryptFolder,
 } from "@serenity-tools/common";
 import * as sodium from "@serenity-tools/libsodium";
 import { Login, Registration } from "@serenity-tools/opaque-server";
@@ -13,7 +13,7 @@ import {
   finishLogin,
   finishRegistration,
   startLogin,
-  startRegistration
+  startRegistration,
 } from "../../utils/opaque";
 import { createSession } from "../authentication/createSession";
 import { prisma } from "../prisma";
@@ -112,7 +112,7 @@ export default async function createUserWithWorkspace({
     folderIdSignature: uuidv4(),
     folderName,
     encryptedFolderName: encryptedFolderResult.ciphertext,
-    folderNameNonce: encryptedFolderResult.publicNonce,
+    encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
     folderSubkeyId: encryptedFolderResult.folderSubkeyId,
     documentId,
     documentName: "Introduction",

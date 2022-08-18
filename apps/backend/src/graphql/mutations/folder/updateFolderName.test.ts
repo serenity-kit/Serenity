@@ -1,3 +1,4 @@
+import { encryptFolder } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
@@ -7,13 +8,16 @@ import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { updateFolderName } from "../../../../test/helpers/folder/updateFolderName";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 const username = "user1";
 const password = "password";
 let sessionKey = "";
 let addedWorkspace: any = null;
+let addedFolder: any = null;
 let addedFolderId: any = null;
+let workspaceKey = "";
 
 const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
@@ -33,9 +37,10 @@ const setup = async () => {
     graphql,
     authorizationHeader: sessionKey,
   });
+
   addedWorkspace =
     createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
     device: registerUserResult.mainDevice,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     workspace: addedWorkspace,
@@ -49,6 +54,7 @@ const setup = async () => {
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
   });
+  addedFolder = createFolderResult.createFolder.folder;
   addedFolderId = createFolderResult.createFolder.folder.id;
 };
 
@@ -65,19 +71,18 @@ test("user should be able to change a folder name", async () => {
     graphql,
     id,
     name,
+    workspaceKey,
     authorizationHeader,
   });
-  expect(result.updateFolderName).toMatchInlineSnapshot(`
-    Object {
-      "folder": Object {
-        "id": "${addedFolderId}",
-        "name": "${name}",
-        "parentFolderId": null,
-        "rootFolderId": null,
-        "workspaceId": "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-      },
-    }
-  `);
+  const updatedFolder = result.updateFolderName.folder;
+  expect(updatedFolder.id).toBe(addedFolderId);
+  expect(updatedFolder.name).toBe(name);
+  expect(typeof updatedFolder.encryptedName).toBe("string");
+  expect(typeof updatedFolder.encryptedNameNonce).toBe("string");
+  expect(typeof updatedFolder.subKeyId).toBe("number");
+  expect(updatedFolder.parentFolderId).toBe(null);
+  expect(updatedFolder.rootFolderId).toBe(null);
+  expect(updatedFolder.workspaceId).toBe(addedWorkspace.id);
 });
 
 test("throw error when folder doesn't exist", async () => {
@@ -90,9 +95,55 @@ test("throw error when folder doesn't exist", async () => {
         graphql,
         id,
         name,
+        workspaceKey,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
+});
+
+test("throw error on duplicate subkeyId", async () => {
+  const existingFolder = await prisma.folder.findFirst({
+    where: { id: addedFolderId },
+  });
+  const authorizationHeaders = { authorization: sessionKey };
+  const id = addedFolderId;
+  const name = "Updated folder name";
+  const encryptedFolderResult = await encryptFolder({
+    name,
+    parentKey: workspaceKey,
+  });
+  const query = gql`
+    mutation updateFolderName($input: UpdateFolderNameInput!) {
+      updateFolderName(input: $input) {
+        folder {
+          name
+          id
+          encryptedName
+          encryptedNameNonce
+          subKeyId
+          parentFolderId
+          rootFolderId
+          workspaceId
+        }
+      }
+    }
+  `;
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            id,
+            name,
+            encryptedName: encryptedFolderResult.ciphertext,
+            encryptedNameNonce: encryptedFolderResult.publicNonce,
+            subkeyId: existingFolder?.subKeyId,
+          },
+        },
+        authorizationHeaders
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("throw error when user doesn't have access", async () => {
@@ -140,6 +191,7 @@ test("throw error when user doesn't have access", async () => {
         graphql,
         id,
         name,
+        workspaceKey,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -152,6 +204,7 @@ test("Unauthenticated", async () => {
         graphql,
         id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
         name: "renamed",
+        workspaceKey,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -163,8 +216,8 @@ describe("Input errors", () => {
   };
   test("Invalid id", async () => {
     const query = gql`
-      mutation {
-        updateFolderName(input: { id: "", name: "updated folder name" }) {
+      mutation updateFolderName($input: UpdateFolderNameInput!) {
+        updateFolderName(input: $input) {
           folder {
             name
             id
@@ -182,10 +235,8 @@ describe("Input errors", () => {
   });
   test("Invalid name", async () => {
     const query = gql`
-      mutation {
-        updateFolderName(
-          input: { id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23", name: "" }
-        ) {
+      mutation updateFolderName($input: UpdateFolderNameInput!) {
+        updateFolderName(input: $input) {
           folder {
             name
             id

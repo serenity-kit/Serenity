@@ -1,3 +1,4 @@
+import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
 import { createDevice } from "../../../../test/helpers/device/createDevice";
@@ -19,21 +20,23 @@ beforeAll(async () => {
   });
 });
 
-test("attach a device to a workspace", async () => {
+test("attach the same device does nothing", async () => {
+  const workspaceId = userAndDevice1.workspace.id;
+  const existingWorkspaceKeyBox = await prisma.workspaceKeyBox.findFirst({
+    where: { workspaceKey: { workspaceId } },
+  });
   const authorizationHeader = userAndDevice1.sessionKey;
   const deviceSigningPublicKey = userAndDevice1.device.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
   const { nonce, ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
-    creatorDeviceEncryptionPrivateKey:
-      userAndDevice1.deviceEncryptionPrivateKey,
+    creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
   });
-  const workspaceId = userAndDevice1.workspace.id;
   const result = await attachDeviceToWorkspaces({
     graphql,
     deviceSigningPublicKey,
     creatorDeviceSigningPublicKey: deviceSigningPublicKey,
-    workspaceKeyBoxes: [
+    deviceWorkspaceKeyBoxes: [
       {
         workspaceId,
         nonce,
@@ -42,15 +45,72 @@ test("attach a device to a workspace", async () => {
     ],
     authorizationHeader,
   });
-  const workspaceKey: WorkspaceKey =
-    result.attachDeviceToWorkspace.workspaceKey;
+  const workspaceKeys: WorkspaceKey[] =
+    result.attachDeviceToWorkspaces.workspaceKeys;
+  expect(workspaceKeys.length).toBe(1);
+  const workspaceKey = workspaceKeys[0];
   expect(typeof workspaceKey.id).toBe("string");
   expect(workspaceKey.generation).toBe(0);
   expect(workspaceKey.workspaceId).toBe(workspaceId);
-  // This query will return the newly created workspaceKeyId
+  // // This query will return the newly created workspaceKeyId
+  const workspaceKeyBox = workspaceKey.workspaceKeyBox;
+  expect(workspaceKeyBox?.ciphertext).toBe(existingWorkspaceKeyBox?.ciphertext);
+  expect(workspaceKeyBox?.nonce).toBe(existingWorkspaceKeyBox?.nonce);
+  expect(workspaceKeyBox?.deviceSigningPublicKey).toBe(deviceSigningPublicKey);
+  expect(workspaceKeyBox?.creatorDeviceSigningPublicKey).toBe(
+    deviceSigningPublicKey
+  );
+  // there should now be two workspacKeyBoxes
+  const workspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
+    where: {
+      workspaceKeyId: workspaceKey.id,
+    },
+  });
+  expect(workspaceKeyBoxes?.length).toBe(1);
+});
+
+test("attach a device to a workspace", async () => {
+  const authorizationHeader = userAndDevice1.sessionKey;
+  const newDeviceResult = await createDevice({
+    graphql,
+    authorizationHeader,
+  });
+  const newDevice = newDeviceResult.localDevice;
+  const deviceSigningPublicKey = newDevice.signingPublicKey;
+  const deviceEncryptionPublicKey = newDevice.encryptionPublicKey;
+  const { nonce, ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
+    receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
+  });
+  const workspaceId = userAndDevice1.workspace.id;
+  const result = await attachDeviceToWorkspaces({
+    graphql,
+    deviceSigningPublicKey: newDevice.signingPublicKey,
+    creatorDeviceSigningPublicKey: userAndDevice1.device.signingPublicKey,
+    deviceWorkspaceKeyBoxes: [
+      {
+        workspaceId,
+        nonce,
+        ciphertext,
+      },
+    ],
+    authorizationHeader,
+  });
+  const workspaceKeys: WorkspaceKey[] =
+    result.attachDeviceToWorkspaces.workspaceKeys;
+  expect(workspaceKeys.length).toBe(1);
+  const workspaceKey = workspaceKeys[0];
+  expect(typeof workspaceKey.id).toBe("string");
+  expect(workspaceKey.generation).toBe(0);
+  expect(workspaceKey.workspaceId).toBe(workspaceId);
+  // // This query will return the newly created workspaceKeyId
   const workspaceKeyBox = workspaceKey.workspaceKeyBox;
   expect(workspaceKeyBox?.ciphertext).toBe(ciphertext);
+  expect(workspaceKeyBox?.nonce).toBe(nonce);
   expect(workspaceKeyBox?.deviceSigningPublicKey).toBe(deviceSigningPublicKey);
+  expect(workspaceKeyBox?.creatorDeviceSigningPublicKey).toBe(
+    userAndDevice1.device.signingPublicKey
+  );
   // there should now be two workspacKeyBoxes
   const workspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
     where: {
@@ -62,11 +122,208 @@ test("attach a device to a workspace", async () => {
 
 test("Unauthenticated", async () => {
   const authorizationHeader = "";
+  const workspaceId = userAndDevice1.workspace.id;
+  const deviceSigningPublicKey = userAndDevice1.device.signingPublicKey;
+  const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
+  const { nonce, ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
+    receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey:
+      userAndDevice1.deviceEncryptionPrivateKey,
+  });
   await expect(
     (async () =>
-      await createDevice({
+      await attachDeviceToWorkspaces({
         graphql,
+        deviceSigningPublicKey,
+        creatorDeviceSigningPublicKey: deviceSigningPublicKey,
+        deviceWorkspaceKeyBoxes: [
+          {
+            workspaceId,
+            nonce,
+            ciphertext,
+          },
+        ],
         authorizationHeader,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
+
+describe("Input errors", () => {
+  const query = gql`
+    mutation attachDeviceToWorkspaces($input: AttachDeviceToWorkspacesInput!) {
+      attachDeviceToWorkspaces(input: $input) {
+        workspaceKeys {
+          id
+          generation
+          workspaceId
+          workspaceKeyBox {
+            id
+            deviceSigningPublicKey
+            creatorDeviceSigningPublicKey
+            ciphertext
+            nonce
+          }
+        }
+      }
+    }
+  `;
+  test("Invalid deviceWorkspaceKeyBox ciphertext", async () => {
+    const { nonce } = await createWorkspaceKeyAndCipherTextForDevice({
+      receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
+      creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
+    });
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              creatorDeviceSigningPublicKey:
+                userAndDevice1.device.signingPublicKey,
+              receiverDeviceSigningPublicKey:
+                userAndDevice1.device.signingPublicKey,
+              deviceWorkspaceKeyBoxes: [
+                {
+                  workspaceId: userAndDevice1.workspace.id,
+                  nonce,
+                },
+              ],
+            },
+          },
+          { authorization: userAndDevice1.sessionKey }
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid deviceWorkspaceKeyBox nonce", async () => {
+    const { ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
+      receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
+      creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
+    });
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              creatorDeviceSigningPublicKey:
+                userAndDevice1.device.signingPublicKey,
+              receiverDeviceSigningPublicKey:
+                userAndDevice1.device.signingPublicKey,
+              deviceWorkspaceKeyBoxes: [
+                {
+                  workspaceId: userAndDevice1.workspace.id,
+                  ciphertext,
+                },
+              ],
+            },
+          },
+          { authorization: userAndDevice1.sessionKey }
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid deviceWorkspaceKeyBox workspaceId", async () => {
+    const { ciphertext, nonce } =
+      await createWorkspaceKeyAndCipherTextForDevice({
+        receiverDeviceEncryptionPublicKey:
+          userAndDevice1.device.signingPublicKey,
+        creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
+      });
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              creatorDeviceSigningPublicKey:
+                userAndDevice1.device.signingPublicKey,
+              receiverDeviceSigningPublicKey:
+                userAndDevice1.device.signingPublicKey,
+              deviceWorkspaceKeyBoxes: [
+                {
+                  ciphertext,
+                  nonce,
+                },
+              ],
+            },
+          },
+          { authorization: userAndDevice1.sessionKey }
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid deviceWorkspaceKeyBoxes", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              creatorDeviceSigningPublicKey:
+                userAndDevice1.device.signingPublicKey,
+              receiverDeviceSigningPublicKey: undefined,
+            },
+          },
+          { authorization: userAndDevice1.sessionKey }
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid deviceSigningPublicKey", async () => {
+    const { ciphertext, nonce } =
+      await createWorkspaceKeyAndCipherTextForDevice({
+        receiverDeviceEncryptionPublicKey:
+          userAndDevice1.device.signingPublicKey,
+        creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
+      });
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              creatorDeviceSigningPublicKey:
+                userAndDevice1.device.signingPublicKey,
+              receiverDeviceSigningPublicKey: undefined,
+              deviceWorkspaceKeyBoxes: [
+                // @ts-ignore testing bad inputs
+                {
+                  workspaceId: userAndDevice1.workspace.id,
+                  ciphertext,
+                  nonce,
+                },
+              ],
+            },
+          },
+          { authorization: userAndDevice1.sessionKey }
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid creatorDeviceSigningPublicKey", async () => {
+    const { ciphertext, nonce } =
+      await createWorkspaceKeyAndCipherTextForDevice({
+        receiverDeviceEncryptionPublicKey:
+          userAndDevice1.device.signingPublicKey,
+        creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
+      });
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              creatorDeviceSigningPublicKey: undefined,
+              receiverDeviceSigningPublicKey:
+                userAndDevice1.device.signingPublicKey,
+              deviceWorkspaceKeyBoxes: [
+                // @ts-ignore testing bad inputs
+                {
+                  workspaceId: userAndDevice1.workspace.id,
+                  ciphertext,
+                  nonce,
+                },
+              ],
+            },
+          },
+          { authorization: userAndDevice1.sessionKey }
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
 });

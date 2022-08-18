@@ -42,6 +42,12 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
       {...linkProps}
       {...props}
       {...focusRingProps} // sets onFocus and onBlur
+      onPress={(event) => {
+        if (props.onPress) {
+          props.onPress(event);
+        }
+        linkProps.onPress(event);
+      }}
       style={[
         styles.link,
         isHovered && styles.hover,

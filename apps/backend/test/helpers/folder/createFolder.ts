@@ -29,7 +29,7 @@ export const createFolder = async ({
   });
   const subKeyId = encryptedFolderResult.folderSubkeyId;
   const encryptedName = encryptedFolderResult.ciphertext;
-  const nameNonce = encryptedFolderResult.publicNonce;
+  const encryptedNameNonce = encryptedFolderResult.publicNonce;
 
   const query = gql`
     mutation createFolder($input: CreateFolderInput!) {
@@ -38,7 +38,7 @@ export const createFolder = async ({
           id
           name
           encryptedName
-          nameNonce
+          encryptedNameNonce
           subKeyId
           parentFolderId
           rootFolderId
@@ -54,7 +54,7 @@ export const createFolder = async ({
         id,
         name,
         encryptedName,
-        nameNonce,
+        encryptedNameNonce,
         parentFolderId,
         subKeyId,
         workspaceId,

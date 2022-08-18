@@ -1,11 +1,8 @@
 import { Device } from "../../types/Device";
 import { getItem, setItem, removeItem } from "../storage/storage";
 import { createDevice } from "@serenity-tools/common";
-import { Platform } from "react-native";
 
 export const deviceStorageKey = "device.device";
-
-let device: Device | null = null;
 
 export const createAndSetDevice = async (): Promise<Device | null> => {
   const device = await createDevice();
