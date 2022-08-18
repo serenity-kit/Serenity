@@ -3,8 +3,10 @@ mutation updateDocumentName($input: UpdateDocumentNameInput!) {
     document {
       id
       name
+      encryptedName
+      encryptedNameNonce
+      subkeyId
       parentFolderId
-      rootFolderId
       workspaceId
     }
   }

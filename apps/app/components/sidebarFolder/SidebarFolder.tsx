@@ -27,25 +27,22 @@ import {
   useFoldersQuery,
   useUpdateFolderNameMutation,
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { RootStackScreenProps } from "../../types/navigation";
-import { decryptWorkspaceKey } from "../../utils/device/decryptWorkspaceKey";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
-import { getDeviceBySigningPublicKey } from "../../utils/device/getDeviceBySigningPublicKey";
-import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { getDevices } from "../../utils/device/getDevices";
 import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 import SidebarPage from "../sidebarPage/SidebarPage";
 
 type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
+  folderSubkeyId?: number | null;
   folderName: string;
   depth?: number;
   onStructureChange: () => void;
@@ -99,50 +96,23 @@ export default function SidebarFolder(props: Props) {
   const createFolder = async (name: string) => {
     setIsOpen(true);
     const id = uuidv4();
-    const activeDevice = await getActiveDevice();
-    if (!activeDevice) {
-      // TODO: handle this error
-      console.error("No active device!");
-      return;
-    }
-    const workspace = await getWorkspace({
-      urqlClient,
-      deviceSigningPublicKey: activeDevice.signingPublicKey,
-      workspaceId: props.workspaceId,
-    });
-    const workspaceKeyBox = workspace?.currentWorkspaceKey?.workspaceKeyBox;
-    if (!workspaceKeyBox) {
-      // TODO: handle this error
-      console.error("This device isn't registered for this workspace!");
-      return;
-    }
-    const mainDevice = getMainDevice();
-    const userDevices = devicesResult.data?.devices?.nodes;
-    if (!userDevices) {
-      // TODO: handle this error
+    const devices = await getDevices({ urqlClient });
+    if (!devices) {
       console.error("No devices found!");
       return;
     }
-    const devices: Device[] = [];
-    userDevices.forEach((device) => {
-      if (device) {
-        devices.push(device);
-      }
-    });
-    if (mainDevice) {
-      devices.push(mainDevice);
+    let workspaceKey = "";
+    try {
+      workspaceKey = await getWorkspaceKey({
+        workspaceId: props.workspaceId,
+        devices,
+        urqlClient,
+      });
+    } catch (error: any) {
+      // TODO: handle device not registered error
+      console.error(error);
+      return;
     }
-    const encryptingDevice = getDeviceBySigningPublicKey({
-      signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
-      // @ts-ignore: devices array could include nulls
-      devices,
-    });
-    const workspaceKey = await decryptWorkspaceKey({
-      ciphertext: workspaceKeyBox?.ciphertext,
-      nonce: workspaceKeyBox.nonce,
-      creatorDeviceEncryptionPublicKey: encryptingDevice?.encryptionPublicKey!,
-      receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
-    });
     const encryptedFolderResult = await encryptFolder({
       name,
       parentKey: workspaceKey,
@@ -170,7 +140,6 @@ export default function SidebarFolder(props: Props) {
   };
 
   const createDocument = async () => {
-    openFolder();
     const id = uuidv4();
     const result = await createDocumentMutation({
       input: {
@@ -227,51 +196,23 @@ export default function SidebarFolder(props: Props) {
     }
   };
   const updateFolderName = async (newFolderName: string) => {
-    const activeDevice = await getActiveDevice();
-    if (!activeDevice) {
-      // TODO: handle this error
-      console.error("No active device!");
-      return;
-    }
-    // fetch the workspace again in case the workspaceKeybox has been changed
-    const workspace = await getWorkspace({
-      workspaceId: props.workspaceId,
-      urqlClient,
-      deviceSigningPublicKey: activeDevice?.signingPublicKey,
-    });
-    const workspaceKeyBox = workspace?.currentWorkspaceKey?.workspaceKeyBox;
-    if (!workspaceKeyBox) {
-      // TODO: handle this error
-      console.error("This device isn't registered for this workspace!");
-      return;
-    }
-    const mainDevice = getMainDevice();
-    const userDevices = devicesResult.data?.devices?.nodes;
-    if (!userDevices) {
-      // TODO: handle this error
+    const devices = await getDevices({ urqlClient });
+    if (!devices) {
       console.error("No devices found!");
       return;
     }
-    const devices: Device[] = [];
-    userDevices.forEach((device) => {
-      if (device) {
-        devices.push(device);
-      }
-    });
-    if (mainDevice) {
-      devices.push(mainDevice);
+    let workspaceKey = "";
+    try {
+      workspaceKey = await getWorkspaceKey({
+        workspaceId: props.workspaceId,
+        devices,
+        urqlClient,
+      });
+    } catch (error: any) {
+      // TODO: handle device not registered error
+      console.error(error);
+      return;
     }
-    const encryptingDevice = getDeviceBySigningPublicKey({
-      signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
-      // @ts-ignore: devices array could include nulls
-      devices,
-    });
-    const workspaceKey = await decryptWorkspaceKey({
-      ciphertext: workspaceKeyBox.ciphertext,
-      nonce: workspaceKeyBox.nonce,
-      creatorDeviceEncryptionPublicKey: encryptingDevice?.encryptionPublicKey!,
-      receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
-    });
     const encryptedFolderResult = await encryptFolder({
       name: newFolderName,
       parentKey: workspaceKey,
@@ -442,6 +383,7 @@ export default function SidebarFolder(props: Props) {
                     key={folder.id}
                     folderId={folder.id}
                     workspaceId={props.workspaceId}
+                    folderSubkeyId={props.folderSubkeyId}
                     folderName={folder.name}
                     onStructureChange={props.onStructureChange}
                     depth={depth + 1}
@@ -457,6 +399,7 @@ export default function SidebarFolder(props: Props) {
                 return (
                   <SidebarPage
                     key={document.id}
+                    folderSubkeyId={props.folderSubkeyId}
                     documentId={document.id}
                     documentName={document.name || "Untitled"}
                     workspaceId={props.workspaceId}

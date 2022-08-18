@@ -1,3 +1,9 @@
+import {
+  createDocumentKey,
+  encryptDocumentTitle,
+  folderDerivedKeyContext,
+} from "@serenity-tools/common";
+import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { useEffect, useLayoutEffect } from "react";
 import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
@@ -14,9 +20,12 @@ import {
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { getDevices } from "../../utils/device/getDevices";
 import { useDocumentStore } from "../../utils/document/documentStore";
+import { getFolder } from "../../utils/folder/getFolder";
 import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -83,10 +92,46 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
 
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const updateTitle = async (title: string) => {
+    const devices = await getDevices({ urqlClient });
+    if (!devices) {
+      console.error("No devices found!");
+      return;
+    }
+    let workspaceKey = "";
+    try {
+      workspaceKey = await getWorkspaceKey({
+        workspaceId: workspaceId,
+        devices,
+        urqlClient,
+      });
+    } catch (error: any) {
+      // TODO: handle device not registered error
+      console.error(error);
+      return;
+    }
+    const folder = await getFolder({
+      id: documentStore.document?.parentFolderId!,
+      urqlClient,
+    });
+    const folderKeyResult = await kdfDeriveFromKey({
+      key: workspaceKey,
+      context: folderDerivedKeyContext,
+      subkeyId: folder.subKeyId!,
+    });
+    const documentKeyData = await createDocumentKey({
+      folderKey: folderKeyResult.key,
+    });
+    const encryptedDocumentTitle = await encryptDocumentTitle({
+      title,
+      key: documentKeyData.key,
+    });
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
         id: pageId,
         name: title,
+        encryptedName: encryptedDocumentTitle.ciphertext,
+        encryptedNameNonce: encryptedDocumentTitle.publicNonce,
+        subkeyId: documentKeyData.subkeyId,
       },
     });
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {

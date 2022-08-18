@@ -1,13 +1,15 @@
 import {
+  createDocumentKey,
   createIntroductionDocumentSnapshot,
+  encryptDocumentTitle,
   encryptFolder,
 } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import {
   Button,
+  FormWrapper,
   LabeledInput,
   ModalButtonFooter,
-  FormWrapper,
   ModalHeader,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
@@ -128,6 +130,14 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       name: folderName,
       parentKey: workspaceKey,
     });
+    const documentName = "Introduction";
+    const documentKeyData = await createDocumentKey({
+      folderKey: encryptedFolderResult.folderSubKey,
+    });
+    const encryptedDocumentTitle = await encryptDocumentTitle({
+      title: documentName,
+      key: documentKeyData.key,
+    });
     const createInitialWorkspaceStructureResult =
       await createInitialWorkspaceStructure({
         input: {
@@ -140,6 +150,9 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           folderSubkeyId: encryptedFolderResult.folderSubkeyId,
           folderIdSignature: `TODO+${folderId}`,
           documentName: "Introduction",
+          encryptedDocumentName: encryptedDocumentTitle.ciphertext,
+          encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
+          documentSubkeyId: documentKeyData.subkeyId,
           documentId,
           documentSnapshot: snapshot,
           deviceWorkspaceKeyBoxes,
