@@ -59,7 +59,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   }, []);
 
   const createWorkspace = async () => {
-    console.log("createWorkspace");
     const workspaceId = uuidv4();
     const folderId = uuidv4();
     const documentId = uuidv4();
@@ -104,7 +103,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           deviceWorkspaceKeyBoxes: newWorkspaceDeviceWorkspaceKeyBoxes,
         },
       });
-    console.log({ createInitialWorkspaceStructureResult });
     if (
       !createInitialWorkspaceStructureResult.data
         ?.createInitialWorkspaceStructure?.workspace

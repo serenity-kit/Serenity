@@ -1,6 +1,6 @@
 import {
   DrawerContentComponentProps,
-  DrawerContentScrollView,
+  DrawerContentScrollView
 } from "@react-navigation/drawer";
 
 import { useFocusRing } from "@react-native-aria/focus";
@@ -20,7 +20,7 @@ import {
   Tooltip,
   tw,
   useIsPermanentLeftSidebar,
-  View,
+  View
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
@@ -33,15 +33,14 @@ import {
   useDevicesQuery,
   useMeQuery,
   useRootFoldersQuery,
-  Workspace,
+  Workspace
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { RootStackScreenProps } from "../../types/navigation";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { decryptWorkspaceKey } from "../../utils/device/decryptWorkspaceKey";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getDeviceBySigningPublicKey } from "../../utils/device/getDeviceBySigningPublicKey";
-import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { getDevices } from "../../utils/device/getDevices";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
 import Folder from "../sidebarFolder/SidebarFolder";
@@ -175,21 +174,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       console.error("This device isn't registered for this workspace!");
       return;
     }
-    const mainDevice = getMainDevice();
-    const userDevices = devicesResult.data?.devices?.nodes;
-    if (!userDevices) {
+    const devices = getDevices({ urqlClient });
+    if (!devices) {
       // TODO: handle this error
       console.error("No devices found!");
       return;
-    }
-    const devices: Device[] = [];
-    userDevices.forEach((device) => {
-      if (device) {
-        devices.push(device);
-      }
-    });
-    if (mainDevice) {
-      devices.push(mainDevice);
     }
     const encryptingDevice = getDeviceBySigningPublicKey({
       signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,

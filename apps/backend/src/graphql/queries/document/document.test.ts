@@ -20,7 +20,6 @@ beforeAll(async () => {
     id: workspaceId,
     username,
   });
-  console.log({ result });
   userId = result.user.id;
   device = result.device;
   sessionKey = result.sessionKey;
