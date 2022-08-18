@@ -38,12 +38,13 @@ import {
   DesignSystemSubHeader as DSSubHeader,
   DesignSystemExampleArea as DSExampleArea,
   DesignSystemMono as DSMono,
+  WorkspaceAvatar,
+  collaborationColors,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
 import { useWindowDimensions, StyleSheet } from "react-native";
 import { VStack, HStack } from "native-base";
-import { theme } from "../../../../tailwind.config";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { showToast } from "../../utils/toast/showToast";
 
@@ -53,12 +54,11 @@ export default function DesignSystemScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [showModal, setShowModal] = useState(false);
   const [isOpenPopover, setIsOpenPopover] = useState(false);
-  const collabColors = Object.keys(theme.colors.collaboration);
   const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
 
   // TODO use structural elements
+
   // TODO header, subheader etc. or variants (h1, h2, h3 ... ??)
-  // extract workspace avatar into own component
   return (
     <ScrollSafeAreaView>
       <View style={tw`max-w-4xl mx-auto px-4 pt-2 pb-6`}>
@@ -130,22 +130,8 @@ export default function DesignSystemScreen() {
           space={4}
           style={tw`pb-3 pr-2 overflow-scroll sm:overflow-visible`}
         >
-          {collabColors.map((color) => {
-            return (
-              <Avatar
-                borderRadius={4}
-                size="xs"
-                bg={tw.color(`collaboration-${color}`)}
-                key={`avatar_${color}`}
-              >
-                <Icon
-                  name="serenity-feather"
-                  color={tw.color("black/40")}
-                  size={5}
-                  mobileSize={6}
-                />
-              </Avatar>
-            );
+          {collaborationColors.map((color) => {
+            return <WorkspaceAvatar customColor={color} />;
           })}
         </HStack>
 
@@ -308,6 +294,7 @@ export default function DesignSystemScreen() {
                   style={tw`h-24 w-24 bg-white rounded`}
                   alignItems="center"
                   justifyContent="center"
+                  key={`shadow_${level}`}
                 >
                   <Text variant="xxs" muted>
                     elevation {level}

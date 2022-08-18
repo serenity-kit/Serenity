@@ -15,9 +15,9 @@ import {
   tw,
   useIsPermanentLeftSidebar,
   View,
-  Avatar,
   IconButton,
   Tooltip,
+  WorkspaceAvatar,
 } from "@serenity-tools/ui";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 import {
@@ -191,15 +191,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   isFocusVisible && tw`se-inset-focus-mini`,
                 ]}
               >
-                <Avatar borderRadius={4} size="xs" bg={tw.color("primary-400")}>
-                  {/* TODO show conditionally when no image-source is set */}
-                  <Icon
-                    name="serenity-feather"
-                    color={tw.color("black/35")}
-                    size={5}
-                    mobileSize={5}
-                  />
-                </Avatar>
+                <WorkspaceAvatar />
                 <Text
                   variant="xs"
                   bold
@@ -236,20 +228,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                     }}
                     style={tw`p-menu-item`}
                   >
-                    <Avatar
-                      borderRadius={4}
-                      size="xs"
-                      // TODO adjust color for each workspace if no image is set
-                      bg={tw.color(`collaboration-honey`)}
+                    <WorkspaceAvatar
+                      customColor={"honey"}
                       key={`avatar_${workspace.id}`}
-                    >
-                      <Icon
-                        name="serenity-feather"
-                        color={tw.color("black/35")}
-                        size={5}
-                        mobileSize={5}
-                      />
-                    </Avatar>
+                    />
                     <Text variant="xs">{workspace.name}</Text>
                   </SidebarLink>
                 )
