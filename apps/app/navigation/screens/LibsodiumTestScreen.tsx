@@ -106,6 +106,8 @@ export default function PageScreen() {
         subkeyId: 5200022,
       });
 
+      const generatedKdfKey = await sodium.crypto_kdf_keygen();
+
       setData({
         randombytes_buf,
         crypto_sign_keypair,
@@ -121,6 +123,7 @@ export default function PageScreen() {
         kdfDerivedKey,
         kdfDerivedKeyIsCorrect:
           kdfDerivedKey.key === "R2ycEA9jEapG3MEAM3VEgYsKgiwkMm_JuwqbtfE13F4",
+        generatedKdfKey,
       });
     }
 
