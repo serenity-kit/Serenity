@@ -70,6 +70,9 @@ export default function DesignSystemScreen() {
           </DSMono>{" "}
           component represents an object or entity.
         </Text>
+        <Text variant={"xs"} bold style={tw`mt-8 -mb-3 text-primary-400`}>
+          Properties
+        </Text>
         <DSSubHeader>Sizes</DSSubHeader>
         <Text variant="small">
           With the <DSMono variant="property">size</DSMono> property you can use
@@ -127,6 +130,9 @@ export default function DesignSystemScreen() {
           </AvatarGroup>
         </DSExampleArea>
 
+        <Text variant={"xs"} bold style={tw`mt-8 -mb-3 text-primary-400`}>
+          Related components
+        </Text>
         <DSSubHeader>Workspace Variation</DSSubHeader>
         <Text variant="small">
           The <DSMono variant="component">WorkspaceAvatar</DSMono> should be
@@ -222,6 +228,108 @@ export default function DesignSystemScreen() {
             Cancel
           </Button>
         </DSExampleArea>
+        <Text variant={"xs"} bold style={tw`mt-8 -mb-3 text-primary-400`}>
+          Related components
+        </Text>
+        <DSSubHeader>IconButton</DSSubHeader>
+        <Text variant="small">
+          <DSMono variant="component">IconButtons</DSMono> are commonly found in
+          the <Mono size="small">PageHeader</Mono> and it's siblings, as well as
+          in the <Mono size="small">Sidebar</Mono>.
+        </Text>
+        <DSExampleArea>
+          <IconButton name="add-line" color="gray-500" />
+          <IconButton name="menu" color="gray-800" />
+        </DSExampleArea>
+        <DSSubHeader>Sizes</DSSubHeader>
+        <Text variant="small">
+          The <DSMono variant="component">IconButton</DSMono> comes in two
+          sizes, the default is regular, to make it a bit bigger use the{" "}
+          <DSMono variant="property">large</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <IconButton name="add-line" color="gray-500" />
+          <IconButton name="menu" color="gray-800" large />
+        </DSExampleArea>
+        <DSSubHeader>Usage</DSSubHeader>
+        <Text variant="small">
+          <DSMono variant="component">IconButtons</DSMono> are for now used to
+          toggle certain elements - such as the navigation{" "}
+          <Mono size="small">Sidebar</Mono> on mobile or{" "}
+          <Mono size="small">Menus</Mono> - or as trigger for common actions -
+          like creating a new page.
+        </Text>
+        <DSExampleArea>
+          <VStack>
+            <SidebarButton>
+              <View style={tw`fle flex-row justify-between`}>
+                <HStack>
+                  <View>
+                    <Icon
+                      name="arrow-right-filled"
+                      color={tw.color("gray-600")}
+                      mobileSize={5}
+                    />
+                  </View>
+                  <View style={tw`-ml-0.5`}>
+                    <Icon name="folder" size={5} mobileSize={8} />
+                  </View>
+                  <Text
+                    variant="small"
+                    style={tw`ml-1.5 max-w-32`}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Getting Started
+                  </Text>
+                </HStack>
+                <HStack alignItems="center" space={2} style={tw`pl-10`}>
+                  <Icon name="more-line" color={tw.color("gray-600")}></Icon>
+                  <Icon
+                    name="file-add-line"
+                    color={tw.color("gray-600")}
+                  ></Icon>
+                </HStack>
+              </View>
+            </SidebarButton>
+            <SidebarButton>
+              <View style={tw`w-full flex flex-row justify-between`}>
+                <HStack>
+                  <View>
+                    <Icon
+                      name="arrow-right-filled"
+                      color={tw.color("gray-600")}
+                      mobileSize={5}
+                    />
+                  </View>
+                  <View style={tw`-ml-0.5`}>
+                    <Icon name="folder" size={5} mobileSize={8} />
+                  </View>
+                  <Text
+                    variant="small"
+                    style={tw`ml-1.5 max-w-32`}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Notes
+                  </Text>
+                </HStack>
+                <HStack alignItems="center" space={2}>
+                  <Icon name="more-line" color={tw.color("gray-600")}></Icon>
+                  <Icon
+                    name="file-add-line"
+                    color={tw.color("gray-600")}
+                  ></Icon>
+                </HStack>
+              </View>
+            </SidebarButton>
+          </VStack>
+        </DSExampleArea>
+        <Text variant="xs">
+          They are later also used to toggle buttons that allow a single choice
+          to be selected or deselected, such as adding or removing a star to an
+          item.
+        </Text>
 
         <DSHeader>CenterContent</DSHeader>
         <Text>
@@ -264,7 +372,7 @@ export default function DesignSystemScreen() {
           The <DSMono variant="component">Checkbox</DSMono> allows the user to
           select one or more items from a set.
         </Text>
-        <DSSubHeader style={tw`-mb-2.5`}>Basic component</DSSubHeader>
+        <DSSubHeader style={tw`-mb-2.5`}>Basic</DSSubHeader>
         <DSExampleArea>
           <Checkbox
             value="test"
@@ -310,25 +418,134 @@ export default function DesignSystemScreen() {
         </DSExampleArea>
 
         <DSHeader>EditorBottombar</DSHeader>
-        <HStack space={2} alignItems="center">
+        <Text>
+          The <DSMono variant="component">EditorBottombar</DSMono> is used on
+          small devices to show all of our Editors functionality, which are held
+          in our <DSMono variant="component">EditorSidebar</DSMono> on larger
+          screens.
+        </Text>
+        <DSSubHeader>Basic</DSSubHeader>
+        <Text variant="small">
+          The <DSMono variant="component">EditorBottombarButton</DSMono> is used
+          to toggle <Mono>marks</Mono> and <Mono>nodes</Mono> of the editor, and
+          also to show hidden functions &#40;wip&#41; due to limits of available
+          space on mobile.
+        </Text>
+        <DSExampleArea>
           <EditorBottombarButton name="arrow-down-s-line" />
           <EditorBottombarButton name="text" />
           <EditorBottombarButton name="list-unordered" />
-          <EditorBottombarDivider />
-          <EditorBottombarButton name="image-2-line" />
-          <EditorBottombarButton name="at-line" />
-          <EditorBottombarButton name="chat-1-line" />
-          <EditorBottombarDivider />
+        </DSExampleArea>
+        <DSSubHeader>States</DSSubHeader>
+        <Text variant="small">
+          To show a <Mono>mark</Mono> or <Mono>node</Mono> is active use the{" "}
+          <DSMono variant="property">isActive</DSMono> property of the{" "}
+          <DSMono variant="component">EditorBottombarButton</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <EditorBottombarButton name="arrow-down-s-line" />
+          <EditorBottombarButton name="text" />
+          <EditorBottombarButton name="list-unordered" isActive />
+        </DSExampleArea>
+        <DSSubHeader>Divider</DSSubHeader>
+        <Text variant="small">
+          To section the different functionalities you can use the{" "}
+          <DSMono variant="component">EditorBottombarDivider</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <EditorBottombarButton name="bold" />
+          <EditorBottombarButton name="italic" />
+          <EditorBottombarButton name="code-view" />
           <EditorBottombarButton name="link" isActive />
-        </HStack>
+          <EditorBottombarDivider />
+          <EditorBottombarButton name="list-unordered" />
+          <EditorBottombarButton name="list-ordered" />
+          <EditorBottombarButton name="list-check-2" />
+        </DSExampleArea>
 
-        <DSHeader>Editor Icons</DSHeader>
-        <VStack space={3}>
+        <DSHeader>EditorSidebar</DSHeader>
+        <Text>
+          The <DSMono variant="component">EditorSidebar</DSMono> is used on
+          large devices to show all of our Editors functionality.
+        </Text>
+        <Text style={tw`mt-2`}>
+          For smaller devices we use the{" "}
+          <DSMono variant="component">EditorBottombar</DSMono>.
+        </Text>
+        <DSSubHeader>Basic</DSSubHeader>
+        <Text variant="small">
+          The <DSMono variant="component">EditorSidebarIcon</DSMono> is used to
+          make it easier for users to find <Mono>marks</Mono> and{" "}
+          <Mono>nodes</Mono> of the editor in the{" "}
+          <DSMono variant="component">EditorSidebar</DSMono>.
+        </Text>
+        <DSExampleArea>
           <EditorSidebarIcon name="bold" />
+        </DSExampleArea>
+        <DSSubHeader>States</DSSubHeader>
+        <Text variant="small">
+          To show a <Mono>mark</Mono> or <Mono>node</Mono> is active use the{" "}
+          <DSMono variant="property">isActive</DSMono> property of the{" "}
+          <DSMono variant="component">EditorSidebarIcon</DSMono>
+        </Text>
+        <DSExampleArea>
           <EditorSidebarIcon name="bold" isActive />
-        </VStack>
+          <EditorSidebarIcon name="italic" isActive />
+          <EditorSidebarIcon name="code-view" />
+        </DSExampleArea>
+        <DSSubHeader>Usage</DSSubHeader>
+        <Text variant="small">
+          The <DSMono variant="component">EditorSidebarIcon</DSMono> is usually
+          the first child of a{" "}
+          <DSMono variant="component">SidebarButton</DSMono> followed by a{" "}
+          <DSMono variant="component">Text</DSMono> component to make the
+          functionality more descriptive.
+        </Text>
+        <DSExampleArea>
+          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
+            <SidebarButton>
+              <EditorSidebarIcon name="bold" />
+              <Text variant="small">Bold</Text>
+            </SidebarButton>
+            <SidebarButton>
+              <EditorSidebarIcon name="italic" />
+              <Text variant="small">Italic</Text>
+            </SidebarButton>
+            <SidebarButton>
+              <EditorSidebarIcon name="code-view" isActive />
+              <Text variant="small" bold>
+                Code
+              </Text>
+            </SidebarButton>
+          </VStack>
+        </DSExampleArea>
+        <DSSubHeader>Divider</DSSubHeader>
+        <Text variant="small">
+          To section the different functionalities you can use the generic{" "}
+          <DSMono variant="component">SidebarDivider</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
+            <SidebarButton>
+              <EditorSidebarIcon name="code-s-slash-line" isActive />
+              <Text variant="small" bold>
+                Codeblock
+              </Text>
+            </SidebarButton>
+            <SidebarDivider></SidebarDivider>
+            <SidebarButton>
+              <EditorSidebarIcon name="list-unordered" />
+              <Text variant="small">Bullet-List</Text>
+            </SidebarButton>
+            <SidebarButton>
+              <EditorSidebarIcon name="list-ordered" />
+              <Text variant="small">Numbered-List</Text>
+            </SidebarButton>
+          </VStack>
+        </DSExampleArea>
 
         <DSHeader>Elevation</DSHeader>
+        <Text></Text>
         <HStack
           space={3}
           style={tw`pt-2 pb-4 pr-2 overflow-scroll sm:overflow-visible`}
@@ -495,12 +712,6 @@ export default function DesignSystemScreen() {
             Please try again later.
           </InfoMessage>
         </VStack>
-
-        <DSHeader>Icon Button</DSHeader>
-        <HStack alignItems="center" space={4}>
-          <IconButton name="add-line" color="gray-500" />
-          <IconButton name="menu" color="gray-800" large />
-        </HStack>
 
         <DSHeader>Input</DSHeader>
         <VStack space={4}>
