@@ -29,7 +29,6 @@ import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 export default function WorkspaceSettingsGeneralScreen(
@@ -76,13 +75,6 @@ export default function WorkspaceSettingsGeneralScreen(
       if (!device) {
         // TODO: handle this error
         console.error("No active device found");
-        return;
-      }
-      try {
-        await attachDeviceToWorkspaces({ workspaceId, urqlClient });
-      } catch (error) {
-        // TOOD: handle error
-        console.error(error);
         return;
       }
       const workspace = await getWorkspace({

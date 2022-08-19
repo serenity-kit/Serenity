@@ -10,12 +10,11 @@ import {
   FirstDocumentQueryVariables,
   WorkspaceDocument,
   WorkspaceQuery,
-  WorkspaceQueryVariables
+  WorkspaceQueryVariables,
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
 
 export default function WorkspaceRootScreen(
   props: WorkspaceDrawerScreenProps<"WorkspaceRoot">
@@ -30,13 +29,6 @@ export default function WorkspaceRootScreen(
       if (!sessionKey) {
         // TODO: handle this error
         console.error("No sessionKey found, probably you aren't logged in");
-        return;
-      }
-      try {
-        await attachDeviceToWorkspaces({ workspaceId, urqlClient });
-      } catch (error) {
-        // TOOD: handle error
-        console.error(error);
         return;
       }
       const activeDevice = await getActiveDevice();

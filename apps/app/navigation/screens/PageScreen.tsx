@@ -15,7 +15,6 @@ import {
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -32,13 +31,6 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     if (!sessionKey) {
       // TODO: handle this error
       console.error("No sessionKey found. Probably you aren't logged in!");
-      return;
-    }
-    try {
-      await attachDeviceToWorkspaces({ workspaceId, urqlClient });
-    } catch (error) {
-      // TOOD: handle error
-      console.error(error);
       return;
     }
     const documentResult = await urqlClient

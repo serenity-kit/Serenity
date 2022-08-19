@@ -1,31 +1,32 @@
-import React, { useState } from "react";
 import {
   Button,
+  Checkbox,
+  FormWrapper,
+  InfoMessage,
   LabeledInput,
   Text,
-  Checkbox,
-  InfoMessage,
-  FormWrapper,
 } from "@serenity-tools/ui";
+import { detect } from "detect-browser";
+import { useState } from "react";
 import { Platform, useWindowDimensions } from "react-native";
-import {
-  useStartLoginMutation,
-  useFinishLoginMutation,
-  useCreateDeviceMutation,
-} from "../../generated/graphql";
+import { useClient } from "urql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
-  login,
-  fetchMainDevice,
+  useCreateDeviceMutation,
+  useFinishLoginMutation,
+  useStartLoginMutation,
+} from "../../generated/graphql";
+import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
+import {
   createRegisterAndStoreDevice,
+  fetchMainDevice,
+  login,
 } from "../../utils/authentication/loginHelper";
 import {
   createWebDevice,
   removeWebDevice,
 } from "../../utils/device/webDeviceStore";
-import { useClient } from "urql";
-import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
-import { detect } from "detect-browser";
+import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
 const browser = detect();
 
 type Props = {
@@ -83,6 +84,13 @@ export function LoginForm(props: Props) {
       if (useExtendedLogin) {
         await registerNewDevice();
       }
+    }
+    try {
+      await attachDeviceToWorkspaces({ urqlClient });
+    } catch (error) {
+      // TOOD: handle error
+      console.error(error);
+      return;
     }
   };
 
