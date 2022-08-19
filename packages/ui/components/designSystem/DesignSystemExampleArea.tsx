@@ -6,6 +6,7 @@ import { View, ViewProps } from "../view/View";
 
 export type DesignSystemExampleAreaProps = ViewProps & {
   vertical?: boolean;
+  stackWidth?: number;
 };
 
 export const DesignSystemExampleArea = (
@@ -22,6 +23,7 @@ export const DesignSystemExampleArea = (
         direction={vertical ? "column" : "row"}
         space={4}
         alignItems={"center"}
+        width={props.stackWidth}
       >
         {props.children}
       </Stack>
