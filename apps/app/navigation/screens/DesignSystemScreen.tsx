@@ -39,6 +39,7 @@ import {
   DesignSystemMono as DSMono,
   WorkspaceAvatar,
   collaborationColors,
+  LinkExternal,
 } from "@serenity-tools/ui";
 import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
@@ -55,9 +56,30 @@ export default function DesignSystemScreen() {
   const [isOpenPopover, setIsOpenPopover] = useState(false);
   const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
 
-  // TODO use structural elements
+  const IconTile = (props) => {
+    return (
+      <CenterContent style={tw`w-30 h-20`}>
+        <Icon name={props.name} size={6} />
+        <Text variant="xxs" muted style={tw`mt-2 capitalize`}>
+          {props.name.replace(/-./g, (x) => x[1].toUpperCase())}
+        </Text>
+      </CenterContent>
+    );
+  };
 
-  // TODO header, subheader etc. or variants (h1, h2, h3 ... ??)
+  const TilesFiller = (props) => {
+    return (
+      <>
+        <View style={tw`flex-auto w-30 h-0`} />
+        <View style={tw`flex-auto w-30 h-0`} />
+        <View style={tw`flex-auto w-30 h-0`} />
+        <View style={tw`flex-auto w-30 h-0`} />
+        <View style={tw`flex-auto w-30 h-0`} />
+      </>
+    );
+  };
+
+  // TODO use structural elements
   return (
     <ScrollSafeAreaView>
       <View style={tw`w-full max-w-4xl mx-auto px-4 pt-2 pb-6`}>
@@ -317,10 +339,12 @@ export default function DesignSystemScreen() {
           actions - like creating a new page.
         </Text>
         <DSExampleArea>
-          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
+          <VStack
+            style={tw`w-80 md:w-sidebar py-4 border border-gray-200 bg-gray-100`}
+          >
             <SidebarButton>
               <View style={tw`w-full flex flex-row justify-between`}>
-                <HStack>
+                <HStack alignItems={"center"}>
                   <View>
                     <Icon
                       name="arrow-right-filled"
@@ -351,7 +375,7 @@ export default function DesignSystemScreen() {
             </SidebarButton>
             <SidebarButton>
               <View style={tw`w-full flex flex-row justify-between`}>
-                <HStack>
+                <HStack alignItems={"center"}>
                   <View>
                     <Icon
                       name="arrow-right-filled"
@@ -620,130 +644,221 @@ export default function DesignSystemScreen() {
           </VStack>
         </DSExampleArea>
 
-        <Heading lvl={1} style={tw`mb-0`}>
-          Icons
-        </Heading>
-        <Heading lvl={3}>Marks</Heading>
-        <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-          <Icon name="bold" />
-          <Icon name="code-view" />
-          <Icon name="italic" />
-          <Icon name="link" />
-          <Icon name="link-m" />
-          <Icon name="strikethrough" />
-          <Icon name="underline" />
-        </Tiles>
-        <Heading lvl={3}>Nodes</Heading>
-        <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-          <Icon name="at-line" />
-          <Icon name="code-s-slash-line" />
-          <Icon name="double-quotes-l" />
-          <Icon name="heading" />
-          <Icon name="h-1" />
-          <Icon name="h-2" />
-          <Icon name="h-3" />
-          <Icon name="h-4" />
-          <Icon name="h-5" />
-          <Icon name="h-6" />
-          <Icon name="indent-decrease" />
-          <Icon name="indent-increase" />
-          <Icon name="list-check" />
-          <Icon name="list-check-2" />
-          <Icon name="list-ordered" />
-          <Icon name="list-unordered" />
-          <Icon name="paragraph" />
-          <Icon name="table-2" />
-          <Icon name="text" />
-        </Tiles>
-        <Heading lvl={3}>Extension</Heading>
-        <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-          <Icon name="font-color" />
-        </Tiles>
-        <Heading lvl={3}>Editor Custom</Heading>
-        <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-          <Icon name="attachment-2" />
-          <Icon name="font-size-2" />
-          <Icon name="format-clear" />
-          <Icon name="functions" />
-          <Icon name="hashtag" />
-          <Icon name="page-separator" />
-          <Icon name="separator" />
-        </Tiles>
-        <Heading lvl={3}>UI</Heading>
-        <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-          <Icon name="add-line" />
-          <Icon name="archive-fill" />
-          <Icon name="archive-line" />
-          <Icon name="arrow-down-filled" />
-          <Icon name="arrow-down-s-fill" />
-          <Icon name="arrow-down-s-line" />
-          <Icon name="arrow-go-back-fill" />
-          <Icon name="arrow-go-back-line" />
-          <Icon name="arrow-go-forward-fill" />
-          <Icon name="arrow-go-forward-line" />
-          <Icon name="arrow-right-s-line" />
-          <Icon name="arrow-right" />
-          <Icon name="arrow-right-filled" />
-          <Icon name="arrow-up-down-line" />
-          <Icon name="bookmark-fill" />
-          <Icon name="bookmark-line" />
-          <Icon name="book-open-line" />
-          <Icon name="calendar-check-fill" />
-          <Icon name="chat-1-line" />
-          <Icon name="chat-4-line" />
+        <Heading lvl={1}>Icons</Heading>
+        <Text>
+          We mostly use{" "}
+          <DSMono variant="component" size="medium">
+            Icons
+          </DSMono>{" "}
+          from{" "}
+          <LinkExternal
+            variant="medium"
+            href="https://remixicon.com/"
+            style={tw`text-gray-700`}
+          >
+            remixicon
+          </LinkExternal>{" "}
+          but some are even more fancy and custom made by our lovely Designer,
+          so have a look at{" "}
+          <LinkExternal
+            variant="medium"
+            href="https://www.figma.com/"
+            style={tw`text-gray-700`}
+          >
+            Figma
+          </LinkExternal>{" "}
+          to see what she is up to ;-&#41;
+        </Text>
+        <Heading lvl={3}>Sizes</Heading>
+        <Text variant="small">
+          You can scale Icons with the <DSMono variant="property">size</DSMono>{" "}
+          property. If you want to add a different size for smaller Devices,
+          also set <DSMono variant="property">mobileSize</DSMono> .
+        </Text>
+        <DSExampleArea>
           <Icon name="check-line" />
-          <Icon name="close-circle-fill" />
-          <Icon name="command-line" />
-          <Icon name="cup-line" />
-          <Icon name="cursor" />
-          <Icon name="delete-bin-line" />
-          <Icon name="double-arrow-left" />
-          <Icon name="double-arrow-right" />
-          <Icon name="download-line" />
-          <Icon name="emotion-line" />
-          <Icon name="file-add-fill" />
-          <Icon name="file-add-line" />
-          <Icon name="file-copy-line" />
-          <Icon name="file-line" />
-          <Icon name="file-search-line" />
-          <Icon name="file-transfer-line" />
-          <Icon name="folder-fill" />
-          <Icon name="folder-line" />
-          <Icon name="folder-music-line" />
-          <Icon name="history-line" />
-          <Icon name="image-2-line" />
-          <Icon name="image-line" />
-          <Icon name="information-fill" />
-          <Icon name="information-line" />
-          <Icon name="more" />
-          <Icon name="more-2-line" />
-          <Icon name="more-line" />
-          <Icon name="movie-line" />
-          <Icon name="plus" />
-          <Icon name="printer-line" />
-          <Icon name="question-mark" />
-          <Icon name="search-line" />
-          <Icon name="settings-4-line" />
-          <Icon name="stars-s-fill" />
-          <Icon name="serenity-feather" />
-          <Icon name="warning-fill" />
-        </Tiles>
-        <Heading lvl={3}>Sidebar</Heading>
-        <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-          <Icon name="folder" />
-          <Icon name="page" />
-        </Tiles>
-        <Heading lvl={3}>Icons resized</Heading>
-        <Columns space={4} alignY="center" alignX="left">
-          <Column width="content">
-            <Icon name="list-unordered" />
-          </Column>
-          <Column width="content">
-            <Icon name="list-unordered" size={8} mobileSize={9} />
-          </Column>
-        </Columns>
-        <Heading lvl={3}>Icons coloured</Heading>
-        <Icon name="list-check-2" color={tw.color("primary-500")} />
+          <Icon name="check-line" size={6} mobileSize={8} />
+          <Icon name="check-line" size={8} mobileSize={10} />
+          <Icon name="check-line" size={10} mobileSize={12} />
+          <Icon name="check-line" size={12} mobileSize={14} />
+        </DSExampleArea>
+        <Heading lvl={3}>Styling</Heading>
+        <Text variant="small">
+          Icons don't have a style property, but you can still dye them with the{" "}
+          <DSMono variant="property">color</DSMono> property.
+        </Text>
+        <Text variant="small" style={tw`mt-4`}>
+          For now you can either put in a{" "}
+          <DSMono variant="type">HEX-string</DSMono> directly, or pass one of
+          our custom colors by using <DSMono variant="type">tw.color</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <Icon name="list-check-2" size={8} color={tw.color("primary-200")} />
+          <Icon name="list-check-2" size={8} color={tw.color("primary-300")} />
+          <Icon name="list-check-2" size={8} color={tw.color("primary-400")} />
+          <Icon name="list-check-2" size={8} color={tw.color("primary-500")} />
+          <Icon name="list-check-2" size={8} color={tw.color("primary-600")} />
+          <Icon
+            name="list-check-2"
+            size={8}
+            color={tw.color("collaboration-purple")}
+          />
+          <Icon
+            name="list-check-2"
+            size={8}
+            color={tw.color("collaboration-raspberry")}
+          />
+          <Icon
+            name="list-check-2"
+            size={8}
+            color={tw.color("collaboration-orange")}
+          />
+          <Icon
+            name="list-check-2"
+            size={8}
+            color={tw.color("collaboration-honey")}
+          />
+          <Icon
+            name="list-check-2"
+            size={8}
+            color={tw.color("collaboration-emerald")}
+          />
+        </DSExampleArea>
+        <Heading lvl={3}>Set</Heading>
+        <Text variant="small">
+          Below is a list of all of the{" "}
+          <DSMono variant="component">Icons</DSMono> in the library, along with
+          the corresponding component names, divided in their most common
+          usages:
+        </Text>
+        <DSExampleArea vertical>
+          <Heading lvl={3} style={tw`text-center mt-4 mb-0`}>
+            Marks
+          </Heading>
+          <HStack flexWrap="wrap">
+            <IconTile name="bold" />
+            <IconTile name="code-view" />
+            <IconTile name="italic" />
+            <IconTile name="link" />
+            <IconTile name="link-m" />
+            <IconTile name="strikethrough" />
+            <IconTile name="underline" />
+            <TilesFiller />
+          </HStack>
+          <Heading lvl={3} style={tw`text-center m-0`}>
+            Nodes
+          </Heading>
+          <HStack flexWrap="wrap">
+            <IconTile name="at-line" />
+            <IconTile name="code-s-slash-line" />
+            <IconTile name="double-quotes-l" />
+            <IconTile name="heading" />
+            <IconTile name="h-1" />
+            <IconTile name="h-2" />
+            <IconTile name="h-3" />
+            <IconTile name="h-4" />
+            <IconTile name="h-5" />
+            <IconTile name="h-6" />
+            <IconTile name="indent-decrease" />
+            <IconTile name="indent-increase" />
+            <IconTile name="list-check" />
+            <IconTile name="list-check-2" />
+            <IconTile name="list-ordered" />
+            <IconTile name="list-unordered" />
+            <IconTile name="paragraph" />
+            <IconTile name="table-2" />
+            <IconTile name="text" />
+            <TilesFiller />
+          </HStack>
+          <Heading lvl={3} style={tw`text-center m-0`}>
+            Extension
+          </Heading>
+          <HStack flexWrap="wrap">
+            <IconTile name="font-color" />
+          </HStack>
+          <Heading lvl={3} style={tw`text-center m-0`}>
+            Editor Custom
+          </Heading>
+          <HStack flexWrap="wrap">
+            <IconTile name="attachment-2" />
+            <IconTile name="font-size-2" />
+            <IconTile name="format-clear" />
+            <IconTile name="functions" />
+            <IconTile name="hashtag" />
+            <IconTile name="page-separator" />
+            <IconTile name="separator" />
+            <TilesFiller />
+          </HStack>
+          <Heading lvl={3} style={tw`text-center m-0`}>
+            UI
+          </Heading>
+          <HStack flexWrap="wrap">
+            <IconTile name="add-line" />
+            <IconTile name="archive-fill" />
+            <IconTile name="archive-line" />
+            <IconTile name="arrow-down-filled" />
+            <IconTile name="arrow-down-s-fill" />
+            <IconTile name="arrow-down-s-line" />
+            <IconTile name="arrow-go-back-fill" />
+            <IconTile name="arrow-go-back-line" />
+            <IconTile name="arrow-go-forward-fill" />
+            <IconTile name="arrow-go-forward-line" />
+            <IconTile name="arrow-right-s-line" />
+            <IconTile name="arrow-right" />
+            <IconTile name="arrow-right-filled" />
+            <IconTile name="arrow-up-down-line" />
+            <IconTile name="bookmark-fill" />
+            <IconTile name="bookmark-line" />
+            <IconTile name="book-open-line" />
+            <IconTile name="calendar-check-fill" />
+            <IconTile name="chat-1-line" />
+            <IconTile name="chat-4-line" />
+            <IconTile name="check-line" />
+            <IconTile name="close-circle-fill" />
+            <IconTile name="command-line" />
+            <IconTile name="cup-line" />
+            <IconTile name="cursor" />
+            <IconTile name="delete-bin-line" />
+            <IconTile name="double-arrow-left" />
+            <IconTile name="double-arrow-right" />
+            <IconTile name="download-line" />
+            <IconTile name="emotion-line" />
+            <IconTile name="file-add-fill" />
+            <IconTile name="file-add-line" />
+            <IconTile name="file-copy-line" />
+            <IconTile name="file-line" />
+            <IconTile name="file-search-line" />
+            <IconTile name="file-transfer-line" />
+            <IconTile name="folder-fill" />
+            <IconTile name="folder-line" />
+            <IconTile name="folder-music-line" />
+            <IconTile name="history-line" />
+            <IconTile name="image-2-line" />
+            <IconTile name="image-line" />
+            <IconTile name="information-fill" />
+            <IconTile name="information-line" />
+            <IconTile name="more" />
+            <IconTile name="more-2-line" />
+            <IconTile name="more-line" />
+            <IconTile name="movie-line" />
+            <IconTile name="plus" />
+            <IconTile name="printer-line" />
+            <IconTile name="question-mark" />
+            <IconTile name="search-line" />
+            <IconTile name="settings-4-line" />
+            <IconTile name="stars-s-fill" />
+            <IconTile name="serenity-feather" />
+            <IconTile name="warning-fill" />
+            <TilesFiller />
+          </HStack>
+          <Heading lvl={3} style={tw`text-center m-0`}>
+            Sidebar
+          </Heading>
+          <HStack flexWrap="wrap">
+            <IconTile name="folder" />
+            <IconTile name="page" />
+          </HStack>
+        </DSExampleArea>
 
         <Heading lvl={1} style={tw`mb-0`}>
           Info Messages
