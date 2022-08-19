@@ -21,6 +21,7 @@ export async function attachDeviceToWorkspaces({
   creatorDeviceSigningPublicKey,
   workspaceKeyBoxes,
 }: Params): Promise<WorkspaceKey[]> {
+  console.log("attachDeviceToWorkspaces");
   const workspaceKeyBoxLookup: {
     [workspaceId: string]: AttachToDeviceWorkspaceKeyBoxData;
   } = {};

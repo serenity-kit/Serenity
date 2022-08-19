@@ -871,6 +871,13 @@ export type VerifyRegistrationMutationVariables = Exact<{
 
 export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegistration?: { __typename?: 'VerifyRegistrationResult', id: string } | null };
 
+export type DeviceBySigningPublicKeyQueryVariables = Exact<{
+  signingPublicKey: Scalars['ID'];
+}>;
+
+
+export type DeviceBySigningPublicKeyQuery = { __typename?: 'Query', deviceBySigningPublicKey?: { __typename?: 'DeviceResult', device?: { __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt: any } | null } | null };
+
 export type DevicesQueryVariables = Exact<{
   first: Scalars['Int'];
   after?: InputMaybe<Scalars['String']>;
@@ -1295,6 +1302,24 @@ export const VerifyRegistrationDocument = gql`
 
 export function useVerifyRegistrationMutation() {
   return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
+};
+export const DeviceBySigningPublicKeyDocument = gql`
+    query deviceBySigningPublicKey($signingPublicKey: ID!) {
+  deviceBySigningPublicKey(signingPublicKey: $signingPublicKey) {
+    device {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      encryptionPublicKeySignature
+      info
+      createdAt
+    }
+  }
+}
+    `;
+
+export function useDeviceBySigningPublicKeyQuery(options: Omit<Urql.UseQueryArgs<DeviceBySigningPublicKeyQueryVariables>, 'query'>) {
+  return Urql.useQuery<DeviceBySigningPublicKeyQuery>({ query: DeviceBySigningPublicKeyDocument, ...options });
 };
 export const DevicesDocument = gql`
     query devices($first: Int!, $after: String) {

@@ -19,7 +19,7 @@ import {
   useDevicesQuery,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { buildDeviceWorkspaceKeyBoxes } from "../../utils/device/buildDeviceWorkspaceKeyBoxes";
+import { createWorkspaceKeyBoxesForDevices } from "../../utils/device/createWorkspaceKeyBoxesForDevices";
 
 type WorkspaceProps = {
   id: string;
@@ -81,8 +81,8 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       return;
     }
     const devices = devicesResult.data?.devices?.nodes as Device[];
-    const { newWorkspaceDeviceWorkspaceKeyBoxes, workspaceKey } =
-      await buildDeviceWorkspaceKeyBoxes({ devices });
+    const { deviceWorkspaceKeyBoxes, workspaceKey } =
+      await createWorkspaceKeyBoxesForDevices({ workspaceId, devices });
     const folderName = "Getting started";
     const encryptedFolderResult = await encryptFolder({
       name: folderName,
@@ -113,7 +113,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           documentSubkeyId: documentKeyData.subkeyId,
           documentId,
           documentSnapshot: snapshot,
-          deviceWorkspaceKeyBoxes: newWorkspaceDeviceWorkspaceKeyBoxes,
+          deviceWorkspaceKeyBoxes,
         },
       });
     if (

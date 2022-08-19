@@ -17,7 +17,7 @@ export const createWorkspaceKeyAndCipherTextForDevice = async ({
     key = await sodium.crypto_kdf_keygen();
   }
   let theNonce = "";
-  if (theNonce === undefined) {
+  if (nonce === undefined) {
     theNonce = await sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
   } else {
     theNonce = nonce!;

@@ -65,6 +65,7 @@ export default function SidebarPage(props: Props) {
       console.error("No devices found!");
       return;
     }
+    console.log({ devices });
     let workspaceKey = "";
     try {
       workspaceKey = await getWorkspaceKey({
@@ -77,18 +78,22 @@ export default function SidebarPage(props: Props) {
       console.error(error);
       return;
     }
+    console.log({ workspaceKey });
     const folderKeyResult = await kdfDeriveFromKey({
       key: workspaceKey,
       context: folderDerivedKeyContext,
       subkeyId: props.folderSubkeyId,
     });
+    console.log({ folderKeyResult });
     const documentKeyData = await createDocumentKey({
       folderKey: folderKeyResult.key,
     });
+    console.log({ documentKeyData });
     const encryptedDocumentTitle = await encryptDocumentTitle({
       title: name,
       key: documentKeyData.key,
     });
+    console.log({ encryptedDocumentTitle });
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
         id: props.documentId,

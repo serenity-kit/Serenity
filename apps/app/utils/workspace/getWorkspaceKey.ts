@@ -2,7 +2,7 @@ import { Client } from "urql";
 import { Device } from "../../types/Device";
 import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
 import { getActiveDevice } from "../device/getActiveDevice";
-import { getDeviceBySigningPublicKey } from "../device/getDeviceBySigningPublicKey";
+import { getLocalDeviceBySigningPublicKey } from "../device/getLocalDeviceBySigningPublicKey";
 import { getMainDevice } from "../device/mainDeviceMemoryStore";
 import { getWorkspace } from "./getWorkspace";
 
@@ -25,8 +25,6 @@ export const getWorkspaceKey = async ({
     deviceSigningPublicKey: activeDevice.signingPublicKey,
     workspaceId: workspaceId,
   });
-  console.log({ activeDevice });
-  console.log({ workspace });
   const workspaceKeyBox = workspace?.currentWorkspaceKey?.workspaceKeyBox;
   if (!workspaceKeyBox) {
     throw new Error("This device isn't registered for this workspace!");
@@ -45,14 +43,20 @@ export const getWorkspaceKey = async ({
   if (mainDevice) {
     allDevices.push(mainDevice);
   }
-  const encryptingDevice = getDeviceBySigningPublicKey({
+  const encryptingDevice = getLocalDeviceBySigningPublicKey({
     signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
-    devices: allDevices,
+    devices,
+  });
+  console.log({
+    workspaceKeyBox,
+    encryptingDevice,
+    activeDevice,
+    receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
   });
   const workspaceKey = await decryptWorkspaceKey({
-    ciphertext: workspaceKeyBox?.ciphertext,
+    ciphertext: workspaceKeyBox.ciphertext,
     nonce: workspaceKeyBox.nonce,
-    creatorDeviceEncryptionPublicKey: encryptingDevice?.encryptionPublicKey!,
+    creatorDeviceEncryptionPublicKey: encryptingDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
   });
   return workspaceKey;

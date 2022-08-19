@@ -4,7 +4,7 @@ import {
   AttachDeviceToWorkspacesMutation,
   AttachDeviceToWorkspacesMutationVariables,
 } from "../../generated/graphql";
-import { buildDeviceWorkspaceKeyBoxes } from "../device/buildDeviceWorkspaceKeyBoxes";
+import { createNewWorkspaceKeyBoxesForActiveDevice } from "../device/createNewWorkspaceKeyBoxesForActiveDevice";
 import { getActiveDevice } from "../device/getActiveDevice";
 import { getDevices } from "../device/getDevices";
 
@@ -21,7 +21,6 @@ export const attachDeviceToWorkspaces = async ({
     // TODO: handle this error
     throw new Error("No active device found!");
   }
-  console.log({ activeDevice });
   const deviceSigningPublicKey = activeDevice.signingPublicKey;
   const devices = await getDevices({ urqlClient });
   if (!devices) {
@@ -29,11 +28,9 @@ export const attachDeviceToWorkspaces = async ({
     console.error("No devices found!");
     return;
   }
-  const { existingWorkspaceDeviceWorkspaceKeyBoxes } =
-    await buildDeviceWorkspaceKeyBoxes({
-      workspaceId,
-      devices,
-    });
+  const deviceWorkspaceKeyBoxes =
+    await createNewWorkspaceKeyBoxesForActiveDevice({ urqlClient });
+  console.log("attachDeviceToWorkspaces:");
   await urqlClient
     .mutation<
       AttachDeviceToWorkspacesMutation,
@@ -43,7 +40,7 @@ export const attachDeviceToWorkspaces = async ({
       {
         input: {
           creatorDeviceSigningPublicKey: deviceSigningPublicKey,
-          deviceWorkspaceKeyBoxes: existingWorkspaceDeviceWorkspaceKeyBoxes,
+          deviceWorkspaceKeyBoxes,
           receiverDeviceSigningPublicKey: deviceSigningPublicKey,
         },
       },
@@ -52,4 +49,5 @@ export const attachDeviceToWorkspaces = async ({
       }
     )
     .toPromise();
+  console.log("done");
 };

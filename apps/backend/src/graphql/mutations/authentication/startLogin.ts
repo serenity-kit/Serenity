@@ -27,7 +27,6 @@ export const startLoginMutation = mutationField("startLogin", {
     }),
   },
   async resolve(root, args, context) {
-    console.log({ args });
     if (!args || !args.input) {
       throw new UserInputError("Missing input");
     }
