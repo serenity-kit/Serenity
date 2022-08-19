@@ -10,7 +10,7 @@ export const DesignSystemExampleArea = (
   props: DesignSystemExampleAreaProps
 ) => {
   const styles = StyleSheet.create({
-    area: tw`mt-4 p-4 border border-gray-200 rounded overflow-hidden items-start`,
+    area: tw`mt-2.5 p-4 border border-gray-200 rounded overflow-hidden items-start`,
   });
 
   return (

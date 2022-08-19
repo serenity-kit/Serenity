@@ -34,8 +34,7 @@ import {
   CenterContent,
   Box,
   Mono,
-  DesignSystemHeader as DSHeader,
-  DesignSystemSubHeader as DSSubHeader,
+  DesignSystemHeading as Heading,
   DesignSystemExampleArea as DSExampleArea,
   DesignSystemMono as DSMono,
   WorkspaceAvatar,
@@ -62,7 +61,7 @@ export default function DesignSystemScreen() {
   return (
     <ScrollSafeAreaView>
       <View style={tw`w-full max-w-4xl mx-auto px-4 pt-2 pb-6`}>
-        <DSHeader>Avatar</DSHeader>
+        <Heading lvl={1}>Avatar</Heading>
         <Text>
           An{" "}
           <DSMono variant={"component"} size="medium">
@@ -70,10 +69,10 @@ export default function DesignSystemScreen() {
           </DSMono>{" "}
           component represents an object or entity.
         </Text>
-        <Text variant={"xs"} bold style={tw`mt-8 -mb-3 text-primary-400`}>
+        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
           Properties
-        </Text>
-        <DSSubHeader>Sizes</DSSubHeader>
+        </Heading>
+        <Heading lvl={3}>Sizes</Heading>
         <Text variant="small">
           With the <DSMono variant="property">size</DSMono> property you can use
           the Avatar in 6 different sizes: <DSMono variant={"type"}>xs</DSMono>{" "}
@@ -101,7 +100,7 @@ export default function DesignSystemScreen() {
           </HStack>
         </DSExampleArea>
 
-        <DSSubHeader>Styling</DSSubHeader>
+        <Heading lvl={3}>Styling</Heading>
         <Text variant="small" style={tw`mt-1`}>
           Set one of the many coloring options with the{" "}
           <DSMono variant="property">customColor</DSMono> property.
@@ -114,7 +113,7 @@ export default function DesignSystemScreen() {
           <Avatar customColor="emerald">AD</Avatar>
         </DSExampleArea>
 
-        <DSSubHeader>Grouping</DSSubHeader>
+        <Heading lvl={3}>Grouping</Heading>
         <Text variant="small">
           The <DSMono variant="component">AvatarGroup</DSMono> lets you stack
           Avatars. Use the <DSMono variant="property">max</DSMono> property to
@@ -130,10 +129,10 @@ export default function DesignSystemScreen() {
           </AvatarGroup>
         </DSExampleArea>
 
-        <Text variant={"xs"} bold style={tw`mt-8 -mb-3 text-primary-400`}>
+        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
           Related components
-        </Text>
-        <DSSubHeader>Workspace Variation</DSSubHeader>
+        </Heading>
+        <Heading lvl={2}>WorkspaceAvatar</Heading>
         <Text variant="small">
           The <DSMono variant="component">WorkspaceAvatar</DSMono> should be
           used for all workspace related representation.
@@ -148,7 +147,7 @@ export default function DesignSystemScreen() {
           })}
         </DSExampleArea>
 
-        <DSHeader>Button</DSHeader>
+        <Heading lvl={1}>Button</Heading>
         <Text>
           The{" "}
           <DSMono variant={"component"} size="medium">
@@ -158,10 +157,10 @@ export default function DesignSystemScreen() {
           form, opening a Dialog, canceling an action, or performing a delete
           operation.
         </Text>
-        <Text variant={"xs"} bold style={tw`mt-6 -mb-3 text-primary-400`}>
+        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
           Properties
-        </Text>
-        <DSSubHeader>Variants</DSSubHeader>
+        </Heading>
+        <Heading lvl={3}>Variants</Heading>
         <Text variant="small">
           Use the <DSMono variant="property">variant</DSMono> property to
           display either a <DSMono variant={"type"}>primary</DSMono> or{" "}
@@ -171,7 +170,7 @@ export default function DesignSystemScreen() {
           <Button>Login</Button>
           <Button variant="secondary">Login</Button>
         </DSExampleArea>
-        <DSSubHeader>Sizes</DSSubHeader>
+        <Heading lvl={3}>Sizes</Heading>
         <Text variant="small">
           For larger or smaller Buttons, use the{" "}
           <DSMono variant="property">size</DSMono> property. You can set it to{" "}
@@ -184,7 +183,7 @@ export default function DesignSystemScreen() {
           <Button size="medium">Login</Button>
           <Button size="large">Login</Button>
         </DSExampleArea>
-        <DSSubHeader>Loading State</DSSubHeader>
+        <Heading lvl={3}>Loading State</Heading>
         <Text variant="small">
           Buttons also support an <DSMono variant="property">isLoading</DSMono>{" "}
           property, which shows a loading indicator, while disabling the button,
@@ -201,10 +200,10 @@ export default function DesignSystemScreen() {
             Login
           </Button>
         </DSExampleArea>
-        <Text variant={"xs"} bold style={tw`mt-8 -mb-3 text-primary-400`}>
+        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
           Basic usage
-        </Text>
-        <DSSubHeader>Primary Button</DSSubHeader>
+        </Heading>
+        <Heading lvl={3}>Primary Button</Heading>
         <Text variant="small">
           Primary Buttons are high-emphasis, they contain actions that are
           important to our app.
@@ -214,7 +213,7 @@ export default function DesignSystemScreen() {
           <Button disabled>Login</Button>
           <Button isLoading>Login</Button>
         </DSExampleArea>
-        <DSSubHeader>Secondary Button</DSSubHeader>
+        <Heading lvl={3}>Secondary Button</Heading>
         <Text variant="small">
           Secondary Buttons are typically used for less-pronounced actions,
           including canceling.
@@ -228,36 +227,47 @@ export default function DesignSystemScreen() {
             Cancel
           </Button>
         </DSExampleArea>
-        <Text variant={"xs"} bold style={tw`mt-8 -mb-3 text-primary-400`}>
+        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
           Related components
+        </Heading>
+        <Heading lvl={2}>IconButton</Heading>
+        <Text>
+          <DSMono variant="component" size="medium">
+            IconButtons
+          </DSMono>{" "}
+          are commonly found in the{" "}
+          <DSMono variant="context">PageHeader</DSMono> and it's siblings, as
+          well as in the <DSMono variant="context">Sidebar</DSMono>.
         </Text>
-        <DSSubHeader>IconButton</DSSubHeader>
-        <Text variant="small">
-          <DSMono variant="component">IconButtons</DSMono> are commonly found in
-          the <Mono size="small">PageHeader</Mono> and it's siblings, as well as
-          in the <Mono size="small">Sidebar</Mono>.
+        <Heading lvl={3}>Basic</Heading>
+        <Text>
+          They require their <DSMono variant="property">name</DSMono> property
+          which uses the <DSMono variant={"type"}>IconNames</DSMono> type, just
+          like the <DSMono variant="component">Icon</DSMono> component.
         </Text>
         <DSExampleArea>
           <IconButton name="add-line" color="gray-500" />
-          <IconButton name="menu" color="gray-800" />
+          <IconButton name="more-line" color="gray-500" />
+          <IconButton name="file-add-line" color="gray-500" />
         </DSExampleArea>
-        <DSSubHeader>Sizes</DSSubHeader>
+        <Heading lvl={3}>Sizes</Heading>
         <Text variant="small">
           The <DSMono variant="component">IconButton</DSMono> comes in two
           sizes, the default is regular, to make it a bit bigger use the{" "}
           <DSMono variant="property">large</DSMono> property.
         </Text>
         <DSExampleArea>
-          <IconButton name="add-line" color="gray-500" />
           <IconButton name="menu" color="gray-800" large />
+          <IconButton name="double-arrow-left" color="gray-800" large />
+          <IconButton name="double-arrow-right" color="gray-800" large />
         </DSExampleArea>
-        <DSSubHeader>Usage</DSSubHeader>
+        <Heading lvl={3}>Usage</Heading>
         <Text variant="small">
           <DSMono variant="component">IconButtons</DSMono> are for now used to
           toggle certain elements - such as the navigation{" "}
-          <Mono size="small">Sidebar</Mono> on mobile or{" "}
-          <Mono size="small">Menus</Mono> - or as trigger for common actions -
-          like creating a new page.
+          <DSMono variant="context">Sidebar</DSMono> on mobile or{" "}
+          <DSMono variant="context">Menus</DSMono> - or as trigger for common
+          actions - like creating a new page.
         </Text>
         <DSExampleArea>
           <VStack>
@@ -325,19 +335,22 @@ export default function DesignSystemScreen() {
             </SidebarButton>
           </VStack>
         </DSExampleArea>
-        <Text variant="xs">
-          They are later also used to toggle buttons that allow a single choice
-          to be selected or deselected, such as adding or removing a star to an
-          item.
+        <Text style={tw`mt-4`} variant="xxs" muted>
+          TBD: They are later also used to toggle buttons that allow a single
+          choice to be selected or deselected, such as adding or removing a star
+          to an item.
         </Text>
 
-        <DSHeader>CenterContent</DSHeader>
+        <Heading lvl={1}>CenterContent</Heading>
         <Text>
-          With the <DSMono variant="component">CenterContent</DSMono> component
-          you can easily center a child element vertically and horizontally
-          within the available space.
+          With the{" "}
+          <DSMono variant="component" size="medium">
+            CenterContent
+          </DSMono>{" "}
+          component you can easily center a child element vertically and
+          horizontally within the available space.
         </Text>
-        <DSSubHeader>Basic</DSSubHeader>
+        <Heading lvl={3}>Basic</Heading>
         <Text variant="small">
           The basic version doesn't need any properties and silently centers
           it's content.
@@ -349,9 +362,10 @@ export default function DesignSystemScreen() {
             <Avatar size={"md"}>AV</Avatar>
           </CenterContent>
         </View>
-        <DSSubHeader>Background</DSSubHeader>
+        <Heading lvl={3}>Background</Heading>
         <Text variant="small">
-          To add a background like in Login/Register to it just add the{" "}
+          To add a background like in{" "}
+          <DSMono variant={"context"}>Login/Register</DSMono> to it just add the{" "}
           <DSMono variant="property">serenityBg</DSMono> property.
         </Text>
         <View style={tw`h-80 mt-4 rounded overflow-hidden`}>
@@ -367,12 +381,17 @@ export default function DesignSystemScreen() {
           </CenterContent>
         </View>
 
-        <DSHeader>Checkbox</DSHeader>
+        <Heading lvl={1}>Checkbox</Heading>
         <Text>
-          The <DSMono variant="component">Checkbox</DSMono> allows the user to
-          select one or more items from a set.
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Checkbox
+          </DSMono>{" "}
+          allows the user to select one or more items from a set.
         </Text>
-        <DSSubHeader style={tw`-mb-2.5`}>Basic</DSSubHeader>
+        <Heading lvl={3} style={tw`-mb-2.5`}>
+          Basic
+        </Heading>
         <DSExampleArea>
           <Checkbox
             value="test"
@@ -395,7 +414,7 @@ export default function DesignSystemScreen() {
             isChecked
           />
         </DSExampleArea>
-        <DSSubHeader>Label</DSSubHeader>
+        <Heading lvl={3}>Label</Heading>
         <Text variant="small">
           You can provide a Label by just including a{" "}
           <DSMono variant="component">Text</DSMono> element inside your
@@ -417,14 +436,17 @@ export default function DesignSystemScreen() {
           </Checkbox>
         </DSExampleArea>
 
-        <DSHeader>EditorBottombar</DSHeader>
+        <Heading lvl={1}>EditorBottombar</Heading>
         <Text>
-          The <DSMono variant="component">EditorBottombar</DSMono> is used on
-          small devices to show all of our Editors functionality, which are held
-          in our <DSMono variant="component">EditorSidebar</DSMono> on larger
-          screens.
+          The{" "}
+          <DSMono variant="component" size="medium">
+            EditorBottombar
+          </DSMono>{" "}
+          is used on small devices to show all of our Editors functionality,
+          which are held in our <DSMono variant="context">EditorSidebar</DSMono>{" "}
+          on larger screens.
         </Text>
-        <DSSubHeader>Basic</DSSubHeader>
+        <Heading lvl={3}>Basic</Heading>
         <Text variant="small">
           The <DSMono variant="component">EditorBottombarButton</DSMono> is used
           to toggle <Mono>marks</Mono> and <Mono>nodes</Mono> of the editor, and
@@ -436,7 +458,7 @@ export default function DesignSystemScreen() {
           <EditorBottombarButton name="text" />
           <EditorBottombarButton name="list-unordered" />
         </DSExampleArea>
-        <DSSubHeader>States</DSSubHeader>
+        <Heading lvl={3}>States</Heading>
         <Text variant="small">
           To show a <Mono>mark</Mono> or <Mono>node</Mono> is active use the{" "}
           <DSMono variant="property">isActive</DSMono> property of the{" "}
@@ -447,7 +469,7 @@ export default function DesignSystemScreen() {
           <EditorBottombarButton name="text" />
           <EditorBottombarButton name="list-unordered" isActive />
         </DSExampleArea>
-        <DSSubHeader>Divider</DSSubHeader>
+        <Heading lvl={3}>Divider</Heading>
         <Text variant="small">
           To section the different functionalities you can use the{" "}
           <DSMono variant="component">EditorBottombarDivider</DSMono>.
@@ -463,16 +485,19 @@ export default function DesignSystemScreen() {
           <EditorBottombarButton name="list-check-2" />
         </DSExampleArea>
 
-        <DSHeader>EditorSidebar</DSHeader>
+        <Heading lvl={1}>EditorSidebar</Heading>
         <Text>
-          The <DSMono variant="component">EditorSidebar</DSMono> is used on
-          large devices to show all of our Editors functionality.
+          The{" "}
+          <DSMono variant="component" size="medium">
+            EditorSidebar
+          </DSMono>{" "}
+          is used on large devices to show all of our Editors functionality.
         </Text>
-        <Text style={tw`mt-2`}>
+        <Text>
           For smaller devices we use the{" "}
-          <DSMono variant="component">EditorBottombar</DSMono>.
+          <DSMono variant="context">EditorBottombar</DSMono>.
         </Text>
-        <DSSubHeader>Basic</DSSubHeader>
+        <Heading lvl={3}>Basic</Heading>
         <Text variant="small">
           The <DSMono variant="component">EditorSidebarIcon</DSMono> is used to
           make it easier for users to find <Mono>marks</Mono> and{" "}
@@ -482,7 +507,7 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <EditorSidebarIcon name="bold" />
         </DSExampleArea>
-        <DSSubHeader>States</DSSubHeader>
+        <Heading lvl={3}>States</Heading>
         <Text variant="small">
           To show a <Mono>mark</Mono> or <Mono>node</Mono> is active use the{" "}
           <DSMono variant="property">isActive</DSMono> property of the{" "}
@@ -493,7 +518,7 @@ export default function DesignSystemScreen() {
           <EditorSidebarIcon name="italic" isActive />
           <EditorSidebarIcon name="code-view" />
         </DSExampleArea>
-        <DSSubHeader>Usage</DSSubHeader>
+        <Heading lvl={3}>Usage</Heading>
         <Text variant="small">
           The <DSMono variant="component">EditorSidebarIcon</DSMono> is usually
           the first child of a{" "}
@@ -519,7 +544,7 @@ export default function DesignSystemScreen() {
             </SidebarButton>
           </VStack>
         </DSExampleArea>
-        <DSSubHeader>Divider</DSSubHeader>
+        <Heading lvl={3}>Divider</Heading>
         <Text variant="small">
           To section the different functionalities you can use the generic{" "}
           <DSMono variant="component">SidebarDivider</DSMono>.
@@ -544,7 +569,7 @@ export default function DesignSystemScreen() {
           </VStack>
         </DSExampleArea>
 
-        <DSHeader>Elevation</DSHeader>
+        <Heading lvl={1}>Elevation</Heading>
         <Text></Text>
         <HStack
           space={3}
@@ -568,8 +593,10 @@ export default function DesignSystemScreen() {
           })}
         </HStack>
 
-        <DSHeader style={tw`mb-0`}>Icons</DSHeader>
-        <DSSubHeader>Marks</DSSubHeader>
+        <Heading lvl={1} style={tw`mb-0`}>
+          Icons
+        </Heading>
+        <Heading lvl={3}>Marks</Heading>
         <Tiles style={tw`max-w-lg`} space={4} columns={10}>
           <Icon name="bold" />
           <Icon name="code-view" />
@@ -579,7 +606,7 @@ export default function DesignSystemScreen() {
           <Icon name="strikethrough" />
           <Icon name="underline" />
         </Tiles>
-        <DSSubHeader>Nodes</DSSubHeader>
+        <Heading lvl={3}>Nodes</Heading>
         <Tiles style={tw`max-w-lg`} space={4} columns={10}>
           <Icon name="at-line" />
           <Icon name="code-s-slash-line" />
@@ -601,11 +628,11 @@ export default function DesignSystemScreen() {
           <Icon name="table-2" />
           <Icon name="text" />
         </Tiles>
-        <DSSubHeader>Extension</DSSubHeader>
+        <Heading lvl={3}>Extension</Heading>
         <Tiles style={tw`max-w-lg`} space={4} columns={10}>
           <Icon name="font-color" />
         </Tiles>
-        <DSSubHeader>Editor Custom</DSSubHeader>
+        <Heading lvl={3}>Editor Custom</Heading>
         <Tiles style={tw`max-w-lg`} space={4} columns={10}>
           <Icon name="attachment-2" />
           <Icon name="font-size-2" />
@@ -615,7 +642,7 @@ export default function DesignSystemScreen() {
           <Icon name="page-separator" />
           <Icon name="separator" />
         </Tiles>
-        <DSSubHeader>UI</DSSubHeader>
+        <Heading lvl={3}>UI</Heading>
         <Tiles style={tw`max-w-lg`} space={4} columns={10}>
           <Icon name="add-line" />
           <Icon name="archive-fill" />
@@ -674,12 +701,12 @@ export default function DesignSystemScreen() {
           <Icon name="serenity-feather" />
           <Icon name="warning-fill" />
         </Tiles>
-        <DSSubHeader>Sidebar</DSSubHeader>
+        <Heading lvl={3}>Sidebar</Heading>
         <Tiles style={tw`max-w-lg`} space={4} columns={10}>
           <Icon name="folder" />
           <Icon name="page" />
         </Tiles>
-        <DSSubHeader>Icons resized</DSSubHeader>
+        <Heading lvl={3}>Icons resized</Heading>
         <Columns space={4} alignY="center" alignX="left">
           <Column width="content">
             <Icon name="list-unordered" />
@@ -688,11 +715,13 @@ export default function DesignSystemScreen() {
             <Icon name="list-unordered" size={8} mobileSize={9} />
           </Column>
         </Columns>
-        <DSSubHeader>Icons coloured</DSSubHeader>
+        <Heading lvl={3}>Icons coloured</Heading>
         <Icon name="list-check-2" color={tw.color("primary-500")} />
 
-        <DSHeader style={tw`mb-0`}>Info Messages</DSHeader>
-        <DSSubHeader>Info</DSSubHeader>
+        <Heading lvl={1} style={tw`mb-0`}>
+          Info Messages
+        </Heading>
+        <Heading lvl={3}>Info</Heading>
         <VStack space={2} style={tw`max-w-90`}>
           <InfoMessage>
             The verification code is prefilled on staging.
@@ -701,7 +730,7 @@ export default function DesignSystemScreen() {
             The verification code is prefilled on staging.
           </InfoMessage>
         </VStack>
-        <DSSubHeader>Error</DSSubHeader>
+        <Heading lvl={3}>Error</Heading>
         <VStack space={2} style={tw`max-w-90`}>
           <InfoMessage variant="error">
             Unfortunately your registration request failed due a network error.
@@ -713,7 +742,7 @@ export default function DesignSystemScreen() {
           </InfoMessage>
         </VStack>
 
-        <DSHeader>Input</DSHeader>
+        <Heading lvl={1}>Input</Heading>
         <VStack space={4}>
           <Input />
           <LabeledInput label={"Input"} />
@@ -738,7 +767,7 @@ export default function DesignSystemScreen() {
           />
         </VStack>
 
-        <DSHeader>Link</DSHeader>
+        <Heading lvl={1}>Link</Heading>
         <Text>
           This is a link to{" "}
           <Link to={{ screen: "EncryptDecryptImageTest" }}>
@@ -764,7 +793,7 @@ export default function DesignSystemScreen() {
           </Link>
         </Text>
 
-        <DSHeader>Menu</DSHeader>
+        <Heading lvl={1}>Menu</Heading>
         <View style={tw`flex flex-row`}>
           <Menu
             placement="bottom left"
@@ -832,7 +861,7 @@ export default function DesignSystemScreen() {
           </Menu>
         </View>
 
-        <DSHeader>Modal (work in progress)</DSHeader>
+        <Heading lvl={1}>Modal (work in progress)</Heading>
         <Modal
           isVisible={showModal}
           onBackdropPress={() => setShowModal(false)}
@@ -862,7 +891,7 @@ export default function DesignSystemScreen() {
           Open Modal
         </Button>
 
-        <DSHeader>SidebarButton</DSHeader>
+        <Heading lvl={1}>SidebarButton</Heading>
         <SidebarButton>
           <Text variant="small">Hallo</Text>
         </SidebarButton>
@@ -870,20 +899,20 @@ export default function DesignSystemScreen() {
           <Text variant="small">Hallo</Text>
         </SidebarButton>
 
-        <DSHeader>SidebarLink</DSHeader>
+        <Heading lvl={1}>SidebarLink</Heading>
         <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
           <WorkspaceAvatar />
           <Text>Encrypt / Decrypt Image</Text>
         </SidebarLink>
 
-        <DSHeader>Spinner</DSHeader>
+        <Heading lvl={1}>Spinner</Heading>
         <VStack space={3}>
           <Spinner />
           <Spinner size="lg" />
           <Spinner fadeIn size="lg" />
         </VStack>
 
-        <DSHeader>Text</DSHeader>
+        <Heading lvl={1}>Text</Heading>
         <Text variant="large">large Text</Text>
         <Text>regular Text</Text>
         <Text variant="small">small Text</Text>
@@ -916,7 +945,7 @@ export default function DesignSystemScreen() {
           muted xxs Text
         </Text>
 
-        <DSHeader>Toast</DSHeader>
+        <Heading lvl={1}>Toast</Heading>
         <Button
           onPress={() => {
             counter = counter + 1;
@@ -926,7 +955,7 @@ export default function DesignSystemScreen() {
           Add Toast
         </Button>
 
-        <DSHeader>Tooltip</DSHeader>
+        <Heading lvl={1}>Tooltip</Heading>
         <HStack>
           <Tooltip label="This is a tip!" placement="right">
             <IconButton name="file-add-line" color="gray-500" large />
