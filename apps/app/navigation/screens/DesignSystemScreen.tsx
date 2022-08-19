@@ -86,11 +86,7 @@ export default function DesignSystemScreen() {
           The initials will size automatically.
         </Text>
         <DSExampleArea>
-          <HStack
-            space={2}
-            alignItems="center"
-            style={tw`pr-2 overflow-scroll sm:overflow-visible`}
-          >
+          <HStack space={2} alignItems="center" style={tw`pr-2`}>
             <Avatar size={"xs"}>BE</Avatar>
             <Avatar size={"sm"}>NG</Avatar>
             <Avatar size={"md"}>AB</Avatar>
@@ -99,7 +95,6 @@ export default function DesignSystemScreen() {
             <Avatar size={"2xl"}>HG</Avatar>
           </HStack>
         </DSExampleArea>
-
         <Heading lvl={3}>Styling</Heading>
         <Text variant="small" style={tw`mt-1`}>
           Set one of the many coloring options with the{" "}
@@ -112,7 +107,6 @@ export default function DesignSystemScreen() {
           <Avatar customColor="honey">SK</Avatar>
           <Avatar customColor="emerald">AD</Avatar>
         </DSExampleArea>
-
         <Heading lvl={3}>Grouping</Heading>
         <Text variant="small">
           The <DSMono variant="component">AvatarGroup</DSMono> lets you stack
@@ -128,7 +122,6 @@ export default function DesignSystemScreen() {
             <Avatar customColor="sky">NG</Avatar>
           </AvatarGroup>
         </DSExampleArea>
-
         <Heading lvl={4} style={tw`mt-8 -mb-4`}>
           Related components
         </Heading>
@@ -141,10 +134,44 @@ export default function DesignSystemScreen() {
           Set one of the many coloring options with the{" "}
           <DSMono variant="property">customColor</DSMono> property.
         </Text>
-        <DSExampleArea style={tw`overflow-scroll sm:overflow-visible`}>
+        <DSExampleArea>
           {collaborationColors.map((color) => {
             return <WorkspaceAvatar customColor={color} />;
           })}
+        </DSExampleArea>
+
+        <Heading lvl={1}>BoxShadow</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            BoxShadow
+          </DSMono>{" "}
+          component can be used to establish a hierarchy between other content.
+          It controls the size of the shadow applied to the surface.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          You can raise a component up to three levels by using the{" "}
+          <DSMono variant="property">elevation</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <HStack space={3} style={tw`pr-2`}>
+            {elevationLevels.map((level) => {
+              return (
+                <BoxShadow elevation={level} rounded key={`shadow_${level}`}>
+                  <HStack
+                    style={tw`h-24 w-24 bg-white rounded`}
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Text variant="xxs" muted>
+                      elevation {level}
+                    </Text>
+                  </HStack>
+                </BoxShadow>
+              );
+            })}
+          </HStack>
         </DSExampleArea>
 
         <Heading lvl={1}>Button</Heading>
@@ -388,7 +415,9 @@ export default function DesignSystemScreen() {
           <DSMono variant={"context"}>Login/Register</DSMono> to it just add the{" "}
           <DSMono variant="property">serenityBg</DSMono> property.
         </Text>
-        <View style={tw`h-80 mt-4 rounded overflow-hidden`}>
+        <View
+          style={tw`h-80 mt-4 border border-gray-200 md:border-white rounded overflow-hidden`}
+        >
           <CenterContent serenityBg>
             <Box style={tw`text-center`}>
               <Text bold>Can not connect to a network</Text>
@@ -590,30 +619,6 @@ export default function DesignSystemScreen() {
             </SidebarButton>
           </VStack>
         </DSExampleArea>
-
-        <Heading lvl={1}>Elevation</Heading>
-        <Text></Text>
-        <HStack
-          space={3}
-          style={tw`pt-2 pb-4 pr-2 overflow-scroll sm:overflow-visible`}
-        >
-          {elevationLevels.map((level) => {
-            return (
-              <BoxShadow elevation={level} rounded>
-                <HStack
-                  style={tw`h-24 w-24 bg-white rounded`}
-                  alignItems="center"
-                  justifyContent="center"
-                  key={`shadow_${level}`}
-                >
-                  <Text variant="xxs" muted>
-                    elevation {level}
-                  </Text>
-                </HStack>
-              </BoxShadow>
-            );
-          })}
-        </HStack>
 
         <Heading lvl={1} style={tw`mb-0`}>
           Icons
