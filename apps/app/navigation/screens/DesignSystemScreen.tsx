@@ -860,29 +860,44 @@ export default function DesignSystemScreen() {
           </HStack>
         </DSExampleArea>
 
-        <Heading lvl={1} style={tw`mb-0`}>
-          Info Messages
-        </Heading>
-        <Heading lvl={3}>Info</Heading>
-        <VStack space={2} style={tw`max-w-90`}>
+        <Heading lvl={1}>Info Messages</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            InfoMessage
+          </DSMono>{" "}
+          component is used to show feedback to the user about an action or
+          state.
+        </Text>
+        <Heading lvl={3}>Variants</Heading>
+        <Text variant="small">
+          Use the <DSMono variant="property">variant</DSMono> property to
+          display either an <DSMono variant={"type"}>info</DSMono> or{" "}
+          <DSMono variant={"type"}>error</DSMono> Message.
+        </Text>
+        <DSExampleArea vertical stackWidth={80}>
           <InfoMessage>
             The verification code is prefilled on staging.
           </InfoMessage>
-          <InfoMessage icon>
-            The verification code is prefilled on staging.
-          </InfoMessage>
-        </VStack>
-        <Heading lvl={3}>Error</Heading>
-        <VStack space={2} style={tw`max-w-90`}>
           <InfoMessage variant="error">
             Unfortunately your registration request failed due a network error.
             Please try again later.
+          </InfoMessage>
+        </DSExampleArea>
+        <Heading lvl={3}>Icons</Heading>
+        <Text variant="small">
+          You can add a for now predefined Icon to the message by adding the{" "}
+          <DSMono variant="property">icon</DSMono> property.
+        </Text>
+        <DSExampleArea vertical stackWidth={80}>
+          <InfoMessage icon>
+            The verification code is prefilled on staging.
           </InfoMessage>
           <InfoMessage variant="error" icon>
             Unfortunately your registration request failed due a network error.
             Please try again later.
           </InfoMessage>
-        </VStack>
+        </DSExampleArea>
 
         <Heading lvl={1}>Input</Heading>
         <VStack space={4}>
