@@ -24,18 +24,22 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
   if (workspaces === null) {
     throw new Error("No workspaces found");
   }
-  const workspaceDeviceWorkspaceKeyBoxes: WorkspaceKeyBoxData[] = [];
+  const deviceWorkspaceKeyBoxes: WorkspaceKeyBoxData[] = [];
   for (const workspace of workspaces) {
     const { nonce, ciphertext } =
       await createWorkspaceKeyAndCipherTextForDevice({
         receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
         creatorDeviceEncryptionPrivateKey: mainDevice?.encryptionPrivateKey!,
       });
-    workspaceDeviceWorkspaceKeyBoxes.push({
+    deviceWorkspaceKeyBoxes.push({
       ciphertext,
       nonce,
       workspaceId: workspace.id,
     });
   }
-  return workspaceDeviceWorkspaceKeyBoxes;
+  return {
+    deviceWorkspaceKeyBoxes,
+    creatorDevice: mainDevice,
+    receiverDevice: activeDevice,
+  };
 };

@@ -47,12 +47,6 @@ export const getWorkspaceKey = async ({
     signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
     devices,
   });
-  console.log({
-    workspaceKeyBox,
-    encryptingDevice,
-    activeDevice,
-    receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
-  });
   const workspaceKey = await decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext,
     nonce: workspaceKeyBox.nonce,

@@ -9,28 +9,21 @@ import { getActiveDevice } from "../device/getActiveDevice";
 import { getDevices } from "../device/getDevices";
 
 export type Props = {
-  workspaceId?: string;
   urqlClient: Client;
 };
-export const attachDeviceToWorkspaces = async ({
-  workspaceId,
-  urqlClient,
-}: Props) => {
+export const attachDeviceToWorkspaces = async ({ urqlClient }: Props) => {
   const activeDevice = await getActiveDevice();
   if (!activeDevice) {
     // TODO: handle this error
     throw new Error("No active device found!");
   }
-  const deviceSigningPublicKey = activeDevice.signingPublicKey;
   const devices = await getDevices({ urqlClient });
   if (!devices) {
     // TODO: handle this erros
-    console.error("No devices found!");
-    return;
+    throw new Error("No devices found!");
   }
-  const deviceWorkspaceKeyBoxes =
+  const { deviceWorkspaceKeyBoxes, creatorDevice, receiverDevice } =
     await createNewWorkspaceKeyBoxesForActiveDevice({ urqlClient });
-  console.log("attachDeviceToWorkspaces:");
   await urqlClient
     .mutation<
       AttachDeviceToWorkspacesMutation,
@@ -39,9 +32,9 @@ export const attachDeviceToWorkspaces = async ({
       AttachDeviceToWorkspacesDocument,
       {
         input: {
-          creatorDeviceSigningPublicKey: deviceSigningPublicKey,
+          creatorDeviceSigningPublicKey: creatorDevice?.signingPublicKey!,
           deviceWorkspaceKeyBoxes,
-          receiverDeviceSigningPublicKey: deviceSigningPublicKey,
+          receiverDeviceSigningPublicKey: receiverDevice.signingPublicKey,
         },
       },
       {
@@ -49,5 +42,4 @@ export const attachDeviceToWorkspaces = async ({
       }
     )
     .toPromise();
-  console.log("done");
 };

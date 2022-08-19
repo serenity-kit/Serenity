@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Image, useWindowDimensions } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import { Text, View, Button } from "@serenity-tools/ui";
 import sodium from "@serenity-tools/libsodium";
+import { Button, Text, View } from "@serenity-tools/ui";
+import * as ImagePicker from "expo-image-picker";
+import { useEffect, useState } from "react";
+import { Image, useWindowDimensions } from "react-native";
 
 export default function EncryptDecryptImageTestScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -58,7 +58,6 @@ export default function EncryptDecryptImageTestScreen() {
 
   const chaChaDecryptBase64ImageData = async () => {
     const additionalData = "";
-    console.log({ additionalData, chaChaNonce, chaChaKey });
     const decryptedImageData =
       await sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
         null,

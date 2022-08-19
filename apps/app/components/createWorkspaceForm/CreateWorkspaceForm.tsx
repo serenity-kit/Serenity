@@ -83,6 +83,11 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     const devices = devicesResult.data?.devices?.nodes as Device[];
     const { deviceWorkspaceKeyBoxes, workspaceKey } =
       await createWorkspaceKeyBoxesForDevices({ workspaceId, devices });
+    if (!workspaceKey) {
+      // TODO: handle this error
+      console.error("Could not retrieve workspaceKey!");
+      return;
+    }
     const folderName = "Getting started";
     const encryptedFolderResult = await encryptFolder({
       name: folderName,

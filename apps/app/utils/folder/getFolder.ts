@@ -12,7 +12,7 @@ export type Props = {
 };
 export const getFolder = async ({ id, urqlClient }: Props): Promise<Folder> => {
   const folderResult = await urqlClient
-    .mutation<FolderQuery, FolderQueryVariables>(
+    .query<FolderQuery, FolderQueryVariables>(
       FolderDocument,
       { id },
       {
