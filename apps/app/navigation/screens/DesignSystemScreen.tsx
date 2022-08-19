@@ -232,6 +232,7 @@ export default function DesignSystemScreen() {
         </Heading>
         <Heading lvl={2}>IconButton</Heading>
         <Text>
+          The{" "}
           <DSMono variant="component" size="medium">
             IconButtons
           </DSMono>{" "}
@@ -241,24 +242,43 @@ export default function DesignSystemScreen() {
         </Text>
         <Heading lvl={3}>Basic</Heading>
         <Text>
-          They require their <DSMono variant="property">name</DSMono> property
-          which uses the <DSMono variant={"type"}>IconNames</DSMono> type, just
-          like the <DSMono variant="component">Icon</DSMono> component.
+          <DSMono variant="component">IconButtons</DSMono> require their{" "}
+          <DSMono variant="property">name</DSMono> property which uses the{" "}
+          <DSMono variant={"type"}>IconNames</DSMono> type, just like the{" "}
+          <DSMono variant="component">Icon</DSMono> component.
         </Text>
         <DSExampleArea>
-          <IconButton name="add-line" color="gray-500" />
-          <IconButton name="more-line" color="gray-500" />
-          <IconButton name="file-add-line" color="gray-500" />
+          <IconButton name="add-line" color="gray-800" />
+          <IconButton name="more-line" color="gray-800" />
+          <IconButton name="file-add-line" color="gray-800" />
         </DSExampleArea>
         <Heading lvl={3}>Sizes</Heading>
         <Text variant="small">
-          The <DSMono variant="component">IconButton</DSMono> comes in two
-          sizes, the default is regular, to make it a bit bigger use the{" "}
+          The <DSMono variant="component">IconButton</DSMono> comes in two sizes
+          which for now only affects the clickable/hovered area.
+        </Text>
+        <Text variant="small">
+          The default is regular, to make it a bit bigger use the{" "}
           <DSMono variant="property">large</DSMono> property.
         </Text>
         <DSExampleArea>
-          <IconButton name="menu" color="gray-800" large />
+          <IconButton name="double-arrow-left" color="gray-800" />
+          <IconButton name="double-arrow-right" color="gray-800" />
           <IconButton name="double-arrow-left" color="gray-800" large />
+          <IconButton name="double-arrow-right" color="gray-800" large />
+        </DSExampleArea>
+        <Heading lvl={3}>Styling</Heading>
+        <Text variant="small">
+          As with <DSMono variant="component">Icons</DSMono> you can use the{" "}
+          <DSMono variant="property">color</DSMono> property to style it, but
+          for now we only support <DSMono variant="type">gray-400</DSMono> to{" "}
+          <DSMono variant="type">gray-800</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <IconButton name="menu" color="gray-400" large />
+          <IconButton name="image-line" color="gray-500" large />
+          <IconButton name="settings-4-line" color="gray-600" large />
+          <IconButton name="double-arrow-left" color="gray-700" large />
           <IconButton name="double-arrow-right" color="gray-800" large />
         </DSExampleArea>
         <Heading lvl={3}>Usage</Heading>
@@ -270,9 +290,9 @@ export default function DesignSystemScreen() {
           actions - like creating a new page.
         </Text>
         <DSExampleArea>
-          <VStack>
+          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
             <SidebarButton>
-              <View style={tw`fle flex-row justify-between`}>
+              <View style={tw`w-full flex flex-row justify-between`}>
                 <HStack>
                   <View>
                     <Icon
@@ -293,7 +313,7 @@ export default function DesignSystemScreen() {
                     Getting Started
                   </Text>
                 </HStack>
-                <HStack alignItems="center" space={2} style={tw`pl-10`}>
+                <HStack alignItems="center" space={2}>
                   <Icon name="more-line" color={tw.color("gray-600")}></Icon>
                   <Icon
                     name="file-add-line"
@@ -506,6 +526,8 @@ export default function DesignSystemScreen() {
         </Text>
         <DSExampleArea>
           <EditorSidebarIcon name="bold" />
+          <EditorSidebarIcon name="italic" />
+          <EditorSidebarIcon name="code-view" />
         </DSExampleArea>
         <Heading lvl={3}>States</Heading>
         <Text variant="small">
