@@ -34,10 +34,9 @@ export default function WorkspaceRootScreen(
       const activeDevice = await getActiveDevice();
       if (!activeDevice) {
         // TODO: handle this error
-        console.error("No active device found");
-        return;
+        throw new Error("No active device found!");
       }
-      const deviceSigningPublicKey: string = activeDevice?.signingPublicKey;
+      const deviceSigningPublicKey = activeDevice.signingPublicKey;
       const workspaceResult = await urqlClient
         .query<WorkspaceQuery, WorkspaceQueryVariables>(
           WorkspaceDocument,

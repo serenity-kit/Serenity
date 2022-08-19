@@ -17,7 +17,7 @@ import { authExchange } from "@urql/exchange-auth";
 import { cacheExchange } from "@urql/exchange-graphcache";
 import Constants from "expo-constants";
 import { extendTheme, NativeBaseProvider } from "native-base";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { useAppColorScheme, useDeviceContext } from "twrnc";
 import {

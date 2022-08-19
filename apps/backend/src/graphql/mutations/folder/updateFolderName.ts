@@ -51,7 +51,7 @@ export const updateFolderNameMutation = mutationField("updateFolderName", {
     }
     const folder = await updateFolderName({
       id: args.input.id,
-      name: args.input.name || undefined,
+      name: args.input.name || "TODO: remove unencrypted name",
       encryptedName: args.input.encryptedName,
       encryptedNameNonce: args.input.encryptedNameNonce,
       subkeyId: args.input.subkeyId,

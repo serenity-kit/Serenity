@@ -60,7 +60,7 @@ export const attachDeviceToWorkspacesMutation = mutationField(
       }
       if (!args.input.deviceWorkspaceKeyBoxes) {
         throw new UserInputError(
-          "Invalid input: workspaceKeyBoxes cannot be null"
+          "Invalid input: deviceWorkspaceKeyBoxes cannot be null"
         );
       }
       const workspaceKeyBoxes = args.input.deviceWorkspaceKeyBoxes;

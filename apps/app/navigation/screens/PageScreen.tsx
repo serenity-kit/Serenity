@@ -13,10 +13,8 @@ import {
   useUpdateDocumentNameMutation,
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -33,21 +31,6 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     if (!sessionKey) {
       // TODO: handle this error
       console.error("No sessionKey found. Probably you aren't logged in!");
-      return;
-    }
-    const activeDevice = await getActiveDevice();
-    if (!activeDevice) {
-      // TODO: handle this error
-      console.error("No active device found!");
-      return;
-    }
-    const workspace = await getWorkspace({
-      workspaceId,
-      urqlClient,
-      deviceSigningPublicKey: activeDevice?.signingPublicKey,
-    });
-    if (!workspace) {
-      props.navigation.replace("WorkspaceNotFound");
       return;
     }
     const documentResult = await urqlClient
