@@ -245,6 +245,7 @@ type Libsodium = typeof libsodiumExports & {
   crypto_box_PUBLICKEYBYTES: number;
   crypto_box_SECRETKEYBYTES: number;
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES: number;
+  crypto_kdf_KEYBYTES: number;
 };
 
 const handler = {
@@ -269,6 +270,8 @@ const handler = {
       return sodium.crypto_box_SECRETKEYBYTES;
     } else if (prop === "crypto_aead_xchacha20poly1305_ietf_KEYBYTES") {
       return sodium.crypto_aead_xchacha20poly1305_ietf_KEYBYTES;
+    } else if (prop === "crypto_kdf_KEYBYTES") {
+      return sodium.crypto_kdf_KEYBYTES;
     }
     // @ts-ignore
     return Reflect.get(...arguments);
