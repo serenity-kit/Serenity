@@ -25,6 +25,7 @@ export const getWorkspaceKey = async ({
     deviceSigningPublicKey: activeDevice.signingPublicKey,
     workspaceId: workspaceId,
   });
+  console.log({ activeDevice });
   console.log({ workspace });
   const workspaceKeyBox = workspace?.currentWorkspaceKey?.workspaceKeyBox;
   if (!workspaceKeyBox) {

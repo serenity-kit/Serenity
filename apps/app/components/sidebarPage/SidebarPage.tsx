@@ -29,7 +29,7 @@ import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 type Props = ViewProps & {
   documentId: string;
   workspaceId: string;
-  folderSubkeyId: number;
+  folderSubkeyId?: number;
   documentName: string;
   depth?: number;
   onRefetchDocumentsPress: () => void;

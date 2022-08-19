@@ -399,7 +399,7 @@ export default function SidebarFolder(props: Props) {
                 return (
                   <SidebarPage
                     key={document.id}
-                    folderSubkeyId={props.folderSubkeyId}
+                    folderSubkeyId={props.folderSubkeyId || undefined}
                     documentId={document.id}
                     documentName={document.name || "Untitled"}
                     workspaceId={props.workspaceId}

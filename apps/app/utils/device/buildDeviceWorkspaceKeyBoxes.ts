@@ -30,7 +30,7 @@ export const buildDeviceWorkspaceKeyBoxes = async ({
   if (mainDevice) {
     allDevices.push(mainDevice);
   }
-  let workspaceKeyString: string = "";
+  let workspaceKeyString: string | undefined = undefined;
   for await (const device of allDevices) {
     const { nonce, ciphertext, workspaceKey } =
       await createWorkspaceKeyAndCipherTextForDevice({

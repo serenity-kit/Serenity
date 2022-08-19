@@ -21,6 +21,7 @@ export const attachDeviceToWorkspaces = async ({
     // TODO: handle this error
     throw new Error("No active device found!");
   }
+  console.log({ activeDevice });
   const deviceSigningPublicKey = activeDevice.signingPublicKey;
   const devices = await getDevices({ urqlClient });
   if (!devices) {
