@@ -142,6 +142,7 @@ export default function App() {
   );
 
   const [isFontLoadingComplete] = useFonts({
+    // Inter options can be found here https://github.com/expo/google-fonts/tree/master/font-packages/inter
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
