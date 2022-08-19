@@ -1,34 +1,34 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet } from "react-native";
 import {
-  Text,
-  View,
   Button,
   Input,
   LabeledInput,
   Modal,
-  tw,
-  ModalHeader,
   ModalButtonFooter,
+  ModalHeader,
+  Text,
+  tw,
+  View,
 } from "@serenity-tools/ui";
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+import { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
+import { useClient } from "urql";
+import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 import {
-  MeResult,
-  Workspace,
-  useUpdateWorkspaceMutation,
-  useDeleteWorkspacesMutation,
+  MeDocument,
   MeQuery,
   MeQueryVariables,
-  MeDocument,
+  MeResult,
+  useDeleteWorkspacesMutation,
+  useUpdateWorkspaceMutation,
+  Workspace,
   WorkspaceMember,
 } from "../../generated/graphql";
-import { useWorkspaceId } from "../../context/WorkspaceIdContext";
+import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { useClient } from "urql";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 export default function WorkspaceSettingsGeneralScreen(

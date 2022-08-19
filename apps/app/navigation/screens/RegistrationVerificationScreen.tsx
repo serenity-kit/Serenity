@@ -1,46 +1,45 @@
-import React, { useState } from "react";
 import {
-  Text,
-  View,
   Box,
-  tw,
   Button,
-  LabeledInput,
   InfoMessage,
+  LabeledInput,
+  Text,
+  tw,
+  View,
 } from "@serenity-tools/ui";
-import { RootStackScreenProps } from "../../types/navigation";
-import {
-  useCreateDeviceMutation,
-  useAcceptWorkspaceInvitationMutation,
-  useVerifyRegistrationMutation,
-} from "../../generated/graphql";
-import {
-  isUsernamePasswordStored,
-  getStoredUsername,
-  getStoredPassword,
-  deleteStoredUsernamePassword,
-} from "../../utils/authentication/registrationMemoryStore";
-import {
-  useStartLoginMutation,
-  useFinishLoginMutation,
-} from "../../generated/graphql";
+import { detect } from "detect-browser";
+import { useState } from "react";
+import { Platform } from "react-native";
+import { useClient } from "urql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
-  login,
-  fetchMainDevice,
-  navigateToNextAuthenticatedPage,
+  useAcceptWorkspaceInvitationMutation,
+  useCreateDeviceMutation,
+  useFinishLoginMutation,
+  useStartLoginMutation,
+  useVerifyRegistrationMutation,
+} from "../../generated/graphql";
+import { RootStackScreenProps } from "../../types/navigation";
+import {
   createRegisterAndStoreDevice,
+  fetchMainDevice,
+  login,
+  navigateToNextAuthenticatedPage,
 } from "../../utils/authentication/loginHelper";
-import { useClient } from "urql";
-import { Platform } from "react-native";
-import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
-import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
-import { removeLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import {
+  deleteStoredUsernamePassword,
+  getStoredPassword,
+  getStoredUsername,
+  isUsernamePasswordStored,
+} from "../../utils/authentication/registrationMemoryStore";
 import {
   createWebDevice,
   removeWebDevice,
 } from "../../utils/device/webDeviceStore";
-import { detect } from "detect-browser";
+import { removeLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
+import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
+import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
 const browser = detect();
 
 export default function RegistrationVerificationScreen(
@@ -104,6 +103,13 @@ export default function RegistrationVerificationScreen(
       if (useExtendedLogin) {
         await registerNewDevice();
       }
+    }
+    try {
+      await attachDeviceToWorkspaces({ urqlClient });
+    } catch (error) {
+      // TOOD: handle error
+      console.error(error);
+      return;
     }
   };
 

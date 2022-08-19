@@ -1,10 +1,10 @@
-import { nonNull, idArg, queryField, stringArg } from "nexus";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
+import { idArg, nonNull, queryField, stringArg } from "nexus";
 import { prisma } from "../../../database/prisma";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
 import { getWorkspaces } from "../../../database/workspace/getWorkspaces";
-import { Workspace } from "../../types/workspace";
 import { WorkspaceMember } from "../../../types/workspace";
-import { AuthenticationError, UserInputError } from "apollo-server-express";
+import { Workspace } from "../../types/workspace";
 
 export const workspaces = queryField((t) => {
   t.field("workspace", {

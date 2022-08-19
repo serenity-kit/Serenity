@@ -19,16 +19,7 @@ import {
   useDevicesQuery,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { createWorkspaceKeyAndCipherTextForDevice } from "../../utils/device/createWorkspaceKeyAndCipherTextForDevice";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
-import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
-
-type DeviceWorkspaceKeyBoxParams = {
-  deviceSigningPublicKey: string;
-  creatorDeviceSigningPublicKey: string;
-  nonce: string;
-  ciphertext: string;
-};
+import { buildDeviceWorkspaceKeyBoxes } from "../../utils/device/buildDeviceWorkspaceKeyBoxes";
 
 type WorkspaceProps = {
   id: string;
@@ -69,39 +60,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     }, 250);
   }, []);
 
-  const buildDeviceWorkspaceKeyBoxes = async (devices: Device[]) => {
-    const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[] = [];
-    const allDevices = devices;
-    const mainDevice = getMainDevice();
-    const activeDevice = await getActiveDevice();
-    if (!activeDevice) {
-      // TODO: handle this error
-      console.error("No active device!");
-    }
-    if (mainDevice) {
-      allDevices.push(mainDevice);
-    }
-    let workspaceKeyString: string = "";
-    for await (const device of allDevices) {
-      const { nonce, ciphertext, workspaceKey } =
-        await createWorkspaceKeyAndCipherTextForDevice({
-          receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-          creatorDeviceEncryptionPrivateKey:
-            activeDevice?.encryptionPrivateKey!,
-        });
-      if (workspaceKeyString === "") {
-        workspaceKeyString = workspaceKey;
-      }
-      deviceWorkspaceKeyBoxes.push({
-        deviceSigningPublicKey: device.signingPublicKey,
-        creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
-        nonce,
-        ciphertext,
-      });
-    }
-    return { deviceWorkspaceKeyBoxes, workspaceKey: workspaceKeyString };
-  };
-
   const createWorkspace = async () => {
     const workspaceId = uuidv4();
     const folderId = uuidv4();
@@ -123,8 +81,8 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       return;
     }
     const devices = devicesResult.data?.devices?.nodes as Device[];
-    const { deviceWorkspaceKeyBoxes, workspaceKey } =
-      await buildDeviceWorkspaceKeyBoxes(devices);
+    const { newWorkspaceDeviceWorkspaceKeyBoxes, workspaceKey } =
+      await buildDeviceWorkspaceKeyBoxes({ devices });
     const folderName = "Getting started";
     const encryptedFolderResult = await encryptFolder({
       name: folderName,
@@ -155,7 +113,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           documentSubkeyId: documentKeyData.subkeyId,
           documentId,
           documentSnapshot: snapshot,
-          deviceWorkspaceKeyBoxes,
+          deviceWorkspaceKeyBoxes: newWorkspaceDeviceWorkspaceKeyBoxes,
         },
       });
     if (

@@ -17,7 +17,7 @@ let sessionKey = "";
 let addedWorkspace: any = null;
 let addedFolder: any = null;
 let addedFolderId: any = null;
-let workspaceKey: string = "";
+let workspaceKey = "";
 
 const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);

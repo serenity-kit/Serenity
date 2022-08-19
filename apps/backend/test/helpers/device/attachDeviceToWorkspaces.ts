@@ -37,18 +37,6 @@ export const attachDeviceToWorkspaces = async ({
       }
     }
   `;
-
-  // workspaceKeys {
-  //   id
-  //   generation
-  //   workspaceKeyBox {
-  //     id
-  //     creatorDeviceSigningPublicKey
-  //     receiverDeviceSigningPublicKey
-  //     ciphertext
-  //     nonce
-  //   }
-  // }
   const result = await graphql.client.request(
     query,
     {
