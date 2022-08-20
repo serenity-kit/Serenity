@@ -1,25 +1,35 @@
-import React, { useState } from "react";
-import { StyleSheet, Platform } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
+import { useLinkProps } from "@react-navigation/native";
+import {
+  createDocumentKey,
+  encryptDocumentTitle,
+  folderDerivedKeyContext,
+} from "@serenity-tools/common";
+import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import {
   Icon,
-  tw,
-  View,
-  Text,
-  ViewProps,
   InlineInput,
   Pressable,
+  Text,
+  tw,
+  useIsDesktopDevice,
+  View,
+  ViewProps,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
-import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
+import { useState } from "react";
+import { Platform, StyleSheet } from "react-native";
+import { useClient } from "urql";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
+import { getDevices } from "../../utils/device/getDevices";
 import { useDocumentStore } from "../../utils/document/documentStore";
-import { useLinkProps } from "@react-navigation/native";
-import { useIsDesktopDevice } from "@serenity-tools/ui";
+import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
+import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
 type Props = ViewProps & {
   documentId: string;
   workspaceId: string;
+  folderSubkeyId?: number;
   documentName: string;
   depth?: number;
   onRefetchDocumentsPress: () => void;
@@ -32,6 +42,7 @@ export default function SidebarPage(props: Props) {
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const document = useDocumentStore((state) => state.document);
   const documentStore = useDocumentStore();
+  const urqlClient = useClient();
   const linkProps = useLinkProps({
     to: {
       screen: "Workspace",
@@ -48,11 +59,43 @@ export default function SidebarPage(props: Props) {
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const { depth = 0 } = props;
 
-  const updateDocumentName = async (name) => {
+  const updateDocumentName = async (name: string) => {
+    const devices = await getDevices({ urqlClient });
+    if (!devices) {
+      console.error("No devices found!");
+      return;
+    }
+    let workspaceKey = "";
+    try {
+      workspaceKey = await getWorkspaceKey({
+        workspaceId: props.workspaceId,
+        devices,
+        urqlClient,
+      });
+    } catch (error: any) {
+      // TODO: handle device not registered error
+      console.error(error);
+      return;
+    }
+    const folderKeyResult = await kdfDeriveFromKey({
+      key: workspaceKey,
+      context: folderDerivedKeyContext,
+      subkeyId: props.folderSubkeyId,
+    });
+    const documentKeyData = await createDocumentKey({
+      folderKey: folderKeyResult.key,
+    });
+    const encryptedDocumentTitle = await encryptDocumentTitle({
+      title: name,
+      key: documentKeyData.key,
+    });
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
         id: props.documentId,
         name,
+        encryptedName: encryptedDocumentTitle.ciphertext,
+        encryptedNameNonce: encryptedDocumentTitle.publicNonce,
+        subkeyId: documentKeyData.subkeyId,
       },
     });
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {

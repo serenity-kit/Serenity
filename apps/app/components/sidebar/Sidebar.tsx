@@ -37,11 +37,10 @@ import {
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
-import { decryptWorkspaceKey } from "../../utils/device/decryptWorkspaceKey";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
-import { getDeviceBySigningPublicKey } from "../../utils/device/getDeviceBySigningPublicKey";
 import { getDevices } from "../../utils/device/getDevices";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
@@ -156,41 +155,23 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
   const createFolder = async (name: string) => {
     const id = uuidv4();
-    const activeDevice = await getActiveDevice();
-    if (!activeDevice) {
-      // TODO: handle this error
-      console.error("No active device!");
-      return;
-    }
-    // fetch the workspace again in case the workspaceKeybox has been changed
-    const workspace = await getWorkspace({
-      workspaceId,
-      urqlClient,
-      deviceSigningPublicKey: activeDevice?.signingPublicKey,
-    });
-    const workspaceKeyBox = workspace?.currentWorkspaceKey?.workspaceKeyBox;
-    if (!workspaceKeyBox) {
-      // TODO: handle this error
-      console.error("This device isn't registered for this workspace!");
-      return;
-    }
-    const devices = getDevices({ urqlClient });
+    const devices = await getDevices({ urqlClient });
     if (!devices) {
-      // TODO: handle this error
       console.error("No devices found!");
       return;
     }
-    const encryptingDevice = getDeviceBySigningPublicKey({
-      signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
-      // @ts-ignore: devices array could include nulls
-      devices,
-    });
-    const workspaceKey = await decryptWorkspaceKey({
-      ciphertext: workspaceKeyBox.ciphertext,
-      nonce: workspaceKeyBox.nonce,
-      creatorDeviceEncryptionPublicKey: encryptingDevice?.encryptionPublicKey!,
-      receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
-    });
+    let workspaceKey = "";
+    try {
+      workspaceKey = await getWorkspaceKey({
+        workspaceId: workspaceId,
+        devices,
+        urqlClient,
+      });
+    } catch (error: any) {
+      // TODO: handle device not registered error
+      console.error(error);
+      return;
+    }
     const encryptedFolderResult = await encryptFolder({
       name,
       parentKey: workspaceKey,
@@ -444,6 +425,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               key={folder.id}
               folderId={folder.id}
               folderName={folder.name}
+              folderSubkeyId={folder.subKeyId}
               workspaceId={route.params.workspaceId}
               onStructureChange={refetchRootFolders}
             />

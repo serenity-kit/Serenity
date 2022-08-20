@@ -6,7 +6,7 @@ type Params = {
   authorizationHeader: string;
 };
 
-export const getDocument = async ({
+export const getFolder = async ({
   graphql,
   id,
   authorizationHeader,
@@ -15,14 +15,12 @@ export const getDocument = async ({
     authorization: authorizationHeader,
   };
   const query = gql`
-    query document($id: ID!) {
-      document(id: $id) {
+    query folder($id: ID!) {
+      folder(id: $id) {
         id
         name
-        encryptedName
-        encryptedNameNonce
-        subkeyId
         parentFolderId
+        rootFolderId
         workspaceId
       }
     }

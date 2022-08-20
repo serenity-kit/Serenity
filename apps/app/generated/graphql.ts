@@ -79,6 +79,9 @@ export type CreateInitialWorkspaceStructureInput = {
   documentId: Scalars['String'];
   documentName: Scalars['String'];
   documentSnapshot: DocumentSnapshotInput;
+  documentSubkeyId: Scalars['Int'];
+  encryptedDocumentName: Scalars['String'];
+  encryptedDocumentNameNonce: Scalars['String'];
   encryptedFolderName: Scalars['String'];
   encryptedFolderNameNonce: Scalars['String'];
   folderId: Scalars['String'];
@@ -192,10 +195,13 @@ export type DeviceWorkspaceKeyBoxInput = {
 
 export type Document = {
   __typename?: 'Document';
+  encryptedName?: Maybe<Scalars['String']>;
+  encryptedNameNonce?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   name?: Maybe<Scalars['String']>;
   parentFolderId?: Maybe<Scalars['String']>;
   rootFolderId?: Maybe<Scalars['String']>;
+  subkeyId?: Maybe<Scalars['Int']>;
   workspaceId?: Maybe<Scalars['String']>;
 };
 
@@ -459,6 +465,7 @@ export type Query = {
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documents?: Maybe<DocumentConnection>;
   firstDocument?: Maybe<Document>;
+  folder?: Maybe<Folder>;
   folders?: Maybe<FolderConnection>;
   mainDevice?: Maybe<MainDeviceResult>;
   me?: Maybe<MeResult>;
@@ -502,6 +509,11 @@ export type QueryDocumentsArgs = {
 
 export type QueryFirstDocumentArgs = {
   workspaceId: Scalars['ID'];
+};
+
+
+export type QueryFolderArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -571,8 +583,11 @@ export type StartRegistrationResult = {
 };
 
 export type UpdateDocumentNameInput = {
+  encryptedName: Scalars['String'];
+  encryptedNameNonce: Scalars['String'];
   id: Scalars['String'];
   name: Scalars['String'];
+  subkeyId: Scalars['Int'];
 };
 
 export type UpdateDocumentNameResult = {
@@ -833,7 +848,7 @@ export type UpdateDocumentNameMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, name?: string | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
+export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, name?: string | null, encryptedName?: string | null, encryptedNameNonce?: string | null, subkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null } | null } | null };
 
 export type UpdateFolderNameMutationVariables = Exact<{
   input: UpdateFolderNameInput;
@@ -856,6 +871,13 @@ export type VerifyRegistrationMutationVariables = Exact<{
 
 export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegistration?: { __typename?: 'VerifyRegistrationResult', id: string } | null };
 
+export type DeviceBySigningPublicKeyQueryVariables = Exact<{
+  signingPublicKey: Scalars['ID'];
+}>;
+
+
+export type DeviceBySigningPublicKeyQuery = { __typename?: 'Query', deviceBySigningPublicKey?: { __typename?: 'DeviceResult', device?: { __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt: any } | null } | null };
+
 export type DevicesQueryVariables = Exact<{
   first: Scalars['Int'];
   after?: InputMaybe<Scalars['String']>;
@@ -876,7 +898,7 @@ export type DocumentPathQueryVariables = Exact<{
 }>;
 
 
-export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null };
+export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, name: string, encryptedName?: string | null, encryptedNameNonce?: string | null, subKeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null };
 
 export type DocumentsQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -893,6 +915,13 @@ export type FirstDocumentQueryVariables = Exact<{
 
 
 export type FirstDocumentQuery = { __typename?: 'Query', firstDocument?: { __typename?: 'Document', id: string } | null };
+
+export type FolderQueryVariables = Exact<{
+  id: Scalars['ID'];
+}>;
+
+
+export type FolderQuery = { __typename?: 'Query', folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, workspaceId?: string | null } | null };
 
 export type FoldersQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -925,7 +954,7 @@ export type RootFoldersQueryVariables = Exact<{
 }>;
 
 
-export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, name: string, encryptedName?: string | null, encryptedNameNonce?: string | null, subKeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type UserIdFromUsernameQueryVariables = Exact<{
   username: Scalars['String'];
@@ -1212,8 +1241,10 @@ export const UpdateDocumentNameDocument = gql`
     document {
       id
       name
+      encryptedName
+      encryptedNameNonce
+      subkeyId
       parentFolderId
-      rootFolderId
       workspaceId
     }
   }
@@ -1272,6 +1303,24 @@ export const VerifyRegistrationDocument = gql`
 export function useVerifyRegistrationMutation() {
   return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
 };
+export const DeviceBySigningPublicKeyDocument = gql`
+    query deviceBySigningPublicKey($signingPublicKey: ID!) {
+  deviceBySigningPublicKey(signingPublicKey: $signingPublicKey) {
+    device {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      encryptionPublicKeySignature
+      info
+      createdAt
+    }
+  }
+}
+    `;
+
+export function useDeviceBySigningPublicKeyQuery(options: Omit<Urql.UseQueryArgs<DeviceBySigningPublicKeyQueryVariables>, 'query'>) {
+  return Urql.useQuery<DeviceBySigningPublicKeyQuery>({ query: DeviceBySigningPublicKeyDocument, ...options });
+};
 export const DevicesDocument = gql`
     query devices($first: Int!, $after: String) {
   devices(first: $first, after: $after) {
@@ -1313,6 +1362,9 @@ export const DocumentPathDocument = gql`
   documentPath(id: $id) {
     id
     name
+    encryptedName
+    encryptedNameNonce
+    subKeyId
     parentFolderId
     rootFolderId
     workspaceId
@@ -1356,6 +1408,20 @@ export const FirstDocumentDocument = gql`
 
 export function useFirstDocumentQuery(options: Omit<Urql.UseQueryArgs<FirstDocumentQueryVariables>, 'query'>) {
   return Urql.useQuery<FirstDocumentQuery>({ query: FirstDocumentDocument, ...options });
+};
+export const FolderDocument = gql`
+    query folder($id: ID!) {
+  folder(id: $id) {
+    id
+    name
+    parentFolderId
+    workspaceId
+  }
+}
+    `;
+
+export function useFolderQuery(options: Omit<Urql.UseQueryArgs<FolderQueryVariables>, 'query'>) {
+  return Urql.useQuery<FolderQuery>({ query: FolderDocument, ...options });
 };
 export const FoldersDocument = gql`
     query folders($parentFolderId: ID!, $first: Int!, $after: String) {
@@ -1423,6 +1489,9 @@ export const RootFoldersDocument = gql`
     nodes {
       id
       name
+      encryptedName
+      encryptedNameNonce
+      subKeyId
       parentFolderId
       rootFolderId
       workspaceId

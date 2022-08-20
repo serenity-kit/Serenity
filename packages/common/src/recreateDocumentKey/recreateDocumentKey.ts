@@ -1,4 +1,4 @@
-import { derivedKeyContext } from "../createDocumentKey/createDocumentKey";
+import { documentDerivedKeyContext } from "../createDocumentKey/createDocumentKey";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {
@@ -11,7 +11,7 @@ export const recreateDocumentKey = async (params: Params) => {
   // subkeyId per folderKey is a duplicate.
   return await kdfDeriveFromKey({
     key: params.folderKey,
-    context: derivedKeyContext,
+    context: documentDerivedKeyContext,
     subkeyId: params.subkeyId,
   });
 };

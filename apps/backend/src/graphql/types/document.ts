@@ -5,6 +5,9 @@ export const Document = objectType({
   definition(t) {
     t.nonNull.string("id");
     t.string("name");
+    t.string("encryptedName");
+    t.string("encryptedNameNonce");
+    t.int("subkeyId");
     t.string("parentFolderId");
     t.string("rootFolderId");
     t.string("workspaceId");

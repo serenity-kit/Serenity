@@ -1,5 +1,7 @@
 import {
+  createDocumentKey,
   createIntroductionDocumentSnapshot,
+  encryptDocumentTitle,
   encryptFolder,
 } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
@@ -17,7 +19,7 @@ import {
   useDevicesQuery,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { buildDeviceWorkspaceKeyBoxes } from "../../utils/device/buildDeviceWorkspaceKeyBoxes";
+import { createWorkspaceKeyBoxesForDevices } from "../../utils/device/createWorkspaceKeyBoxesForDevices";
 
 type WorkspaceProps = {
   id: string;
@@ -79,12 +81,25 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       return;
     }
     const devices = devicesResult.data?.devices?.nodes as Device[];
-    const { newWorkspaceDeviceWorkspaceKeyBoxes, workspaceKey } =
-      await buildDeviceWorkspaceKeyBoxes({ devices });
+    const { deviceWorkspaceKeyBoxes, workspaceKey } =
+      await createWorkspaceKeyBoxesForDevices({ workspaceId, devices });
+    if (!workspaceKey) {
+      // TODO: handle this error
+      console.error("Could not retrieve workspaceKey!");
+      return;
+    }
     const folderName = "Getting started";
     const encryptedFolderResult = await encryptFolder({
       name: folderName,
       parentKey: workspaceKey,
+    });
+    const documentName = "Introduction";
+    const documentKeyData = await createDocumentKey({
+      folderKey: encryptedFolderResult.folderSubKey,
+    });
+    const encryptedDocumentTitle = await encryptDocumentTitle({
+      title: documentName,
+      key: documentKeyData.key,
     });
     const createInitialWorkspaceStructureResult =
       await createInitialWorkspaceStructure({
@@ -98,9 +113,12 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           folderSubkeyId: encryptedFolderResult.folderSubkeyId,
           folderIdSignature: `TODO+${folderId}`,
           documentName: "Introduction",
+          encryptedDocumentName: encryptedDocumentTitle.ciphertext,
+          encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
+          documentSubkeyId: documentKeyData.subkeyId,
           documentId,
           documentSnapshot: snapshot,
-          deviceWorkspaceKeyBoxes: newWorkspaceDeviceWorkspaceKeyBoxes,
+          deviceWorkspaceKeyBoxes,
         },
       });
     if (

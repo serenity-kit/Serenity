@@ -1,5 +1,7 @@
 import {
+  createDocumentKey,
   createIntroductionDocumentSnapshot,
+  encryptDocumentTitle,
   encryptFolder,
 } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
@@ -89,6 +91,18 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedFolderName = encryptedFolderResult.ciphertext;
   const encryptedFolderNameNonce = encryptedFolderResult.publicNonce;
   const folderSubkeyId = encryptedFolderResult.folderSubkeyId;
+  const folderKey = encryptedFolderResult.folderSubKey;
+
+  const documentKeyResult = await createDocumentKey({
+    folderKey,
+  });
+  const encryptedDocumentTitleResult = await encryptDocumentTitle({
+    title: documentName,
+    key: documentKeyResult.key,
+  });
+  const encryptedDocumentName = encryptedDocumentTitleResult.ciphertext;
+  const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;
+  const documentSubkeyId = documentKeyResult.subkeyId;
 
   // currently hard-coded until we enable e2e encryption per workspace
   const documentEncryptionKey = sodium.from_base64(
@@ -113,6 +127,9 @@ export const createInitialWorkspaceStructure = async ({
         folderSubkeyId,
         documentId,
         documentName,
+        encryptedDocumentName,
+        encryptedDocumentNameNonce,
+        documentSubkeyId,
         documentSnapshot,
         deviceWorkspaceKeyBoxes: [
           {
