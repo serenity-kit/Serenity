@@ -4,7 +4,7 @@ import {
   getEditorBottombarStateFromEditor,
   updateEditor,
 } from "@serenity-tools/editor";
-import { tw, View } from "@serenity-tools/ui";
+import { tw, View, useHasEditorSidebar } from "@serenity-tools/ui";
 import { useRef, useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
@@ -32,6 +32,7 @@ export default function Editor({
     useState<EditorBottombarState>(initialEditorBottombarState);
   const tipTapEditorRef = useRef<TipTapEditor | null>(null);
   const editorBottombarRef = useRef<null | HTMLElement>(null);
+  const hasEditorSidebar = useHasEditorSidebar();
 
   return (
     // needed so hidden elements with borders don't trigger scrolling behaviour
@@ -72,15 +73,17 @@ export default function Editor({
           }}
         />
       </View>
-      <EditorBottombar
-        ref={editorBottombarRef}
-        editorBottombarState={editorBottombarState}
-        onUpdate={(params) => {
-          if (tipTapEditorRef.current) {
-            updateEditor(tipTapEditorRef.current, params);
-          }
-        }}
-      />
+      {!hasEditorSidebar && (
+        <EditorBottombar
+          ref={editorBottombarRef}
+          editorBottombarState={editorBottombarState}
+          onUpdate={(params) => {
+            if (tipTapEditorRef.current) {
+              updateEditor(tipTapEditorRef.current, params);
+            }
+          }}
+        />
+      )}
     </View>
   );
 }

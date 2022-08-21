@@ -36,6 +36,7 @@ export * from "./components/spinner/Spinner";
 export * from "./components/pressable/Pressable";
 export * from "./components/tooltip/Tooltip";
 
+export * from "./hooks/useHasEditorSidebar/useHasEditorSidebar";
 export * from "./hooks/useIsDesktopDevice/useIsDesktopDevice";
 export * from "./hooks/useIsEqualOrLargerThanBreakpoint/useIsEqualOrLargerThanBreakpoint";
 export * from "./hooks/useIsPermanentLeftSidebar/useIsPermanentLeftSidebar";
