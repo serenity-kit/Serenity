@@ -26,17 +26,19 @@ export default function Editor({
 }: EditorProps) {
   const headerHeight = useHeaderHeight();
   const dimensions = useWindowDimensions();
-  const [isFocused, setIsFocused] = useState(false);
+  const [isEditorBottombarVisible, setIsEditorBottombarVisible] =
+    useState(false);
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
   const tipTapEditorRef = useRef<TipTapEditor | null>(null);
+  const editorBottombarRef = useRef<null | HTMLElement>(null);
 
   return (
     // needed so hidden elements with borders don't trigger scrolling behaviour
     <View style={tw`flex-1 overflow-hidden`}>
       <View
         style={{
-          height: isFocused
+          height: isEditorBottombarVisible
             ? dimensions.height - editorBottombarHeight - headerHeight
             : undefined,
         }}
@@ -48,15 +50,20 @@ export default function Editor({
           isNew={isNew}
           openDrawer={openDrawer}
           updateTitle={updateTitle}
-          onFocus={() => setIsFocused(true)}
-          onBlur={
-            // hack to avoid the EditorBottombar to disappear before
-            // the click on it can be recognized
-            () =>
-              setTimeout(() => {
-                setIsFocused(false);
-              }, 0)
-          }
+          onFocus={() => {
+            setIsEditorBottombarVisible(true);
+          }}
+          onBlur={(params) => {
+            if (
+              !(
+                params.event.relatedTarget &&
+                "nodeType" in params.event.relatedTarget &&
+                editorBottombarRef.current?.contains(params.event.relatedTarget)
+              )
+            ) {
+              setIsEditorBottombarVisible(false);
+            }
+          }}
           onCreate={(params) => (tipTapEditorRef.current = params.editor)}
           onTransaction={(params) => {
             setEditorBottombarState(
@@ -66,15 +73,11 @@ export default function Editor({
         />
       </View>
       <EditorBottombar
+        ref={editorBottombarRef}
         editorBottombarState={editorBottombarState}
         onUpdate={(params) => {
           if (tipTapEditorRef.current) {
             updateEditor(tipTapEditorRef.current, params);
-            // cleanup hack for the onBlur hack to make sure the
-            // EditorBottombar stays visible
-            setTimeout(() => {
-              setIsFocused(true);
-            }, 0);
           }
         }}
       />
