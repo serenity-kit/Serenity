@@ -9,7 +9,6 @@ import {
   ScrollView,
   SidebarButton,
   Checkbox,
-  Pressable,
   Link,
   EditorSidebarIcon,
   LabeledInput,
@@ -81,7 +80,6 @@ export default function DesignSystemScreen() {
 
   const h4Styles = tw`mt-8 -mb-4`;
 
-  // TODO labeled IconButton
   // TODO use structural elements
   return (
     <ScrollSafeAreaView>
@@ -332,6 +330,16 @@ export default function DesignSystemScreen() {
           <IconButton name="settings-4-line" color="gray-600" large />
           <IconButton name="double-arrow-left" color="gray-700" large />
           <IconButton name="double-arrow-right" color="gray-800" large />
+        </DSExampleArea>
+        <Heading lvl={3}>Label</Heading>
+        <Text variant="small">
+          An <DSMono variant="component">IconButton</DSMono> can have a{" "}
+          <DSMono variant="property">label</DSMono> to make it more explicit and
+          fitting in context's like the{" "}
+          <DSMono variant="component">Menu</DSMono> .
+        </Text>
+        <DSExampleArea>
+          <IconButton name="plus" large label="New workspace" />
         </DSExampleArea>
         <Heading lvl={3}>Usage</Heading>
         <Text variant="small">
@@ -1259,7 +1267,7 @@ export default function DesignSystemScreen() {
                 <Text variant="xs">Project X</Text>
               </SidebarLink>
               <View style={tw`pl-2 pr-3 py-1.5`}>
-                <IconButton name="plus" label="Create workspace" />
+                <IconButton name="plus" label="New workspace" />
               </View>
 
               <SidebarDivider collapsed />
@@ -1269,34 +1277,97 @@ export default function DesignSystemScreen() {
         </DSExampleArea>
 
         <Heading lvl={1}>Modal (work in progress)</Heading>
-        <Modal
-          isVisible={showModal}
-          onBackdropPress={() => setShowModal(false)}
-        >
-          <ModalHeader>This is the header</ModalHeader>
-          <LabeledInput
-            label={"Label of the Input"}
-            value="While typi"
-            hint="Here you can put information you want the user to have regarding this input."
+        <Text>
+          The <DSMono variant="component">Modal</DSMono> is a Dialog on top of
+          an overlay used to show content that requires user interaction.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          As the <DSMono variant="component">Modal</DSMono> is used for explicit
+          user interaction it is necessary to provide at least one Button. To
+          ensure consistent user experience they should be added as children of
+          the
+          <DSMono variant="component">ModalButtonFooter</DSMono> component.
+        </Text>
+        <Text variant="small" style={tw`mt-2`}>
+          This component requires to be passed a{" "}
+          <DSMono variant="component">Button</DSMono> via the Footers{" "}
+          <DSMono variant="property">confirm</DSMono> property. To add a{" "}
+          <DSMono variant="property">cancel</DSMono> action pass a Button to the
+          Footers <DSMono variant="property">confirm</DSMono> property.
+        </Text>
+        <DSExampleArea style={tw`bg-gray-900/50 items-center`} vertical center>
+          <Box>
+            <Text variant="small">
+              Something has happened and I just wanted to let you know
+              explicitly and not just by a Toast.
+            </Text>
+            <ModalButtonFooter
+              confirm={<Button variant="primary">Confirm</Button>}
+            />
+          </Box>
+        </DSExampleArea>
+        <Heading lvl={3}>Header</Heading>
+        <Text variant="small">
+          A <DSMono variant="component">Modal</DSMono> doesn't require a header,{" "}
+          but can be added by using the{" "}
+          <DSMono variant="component">ModalHeader</DSMono> component.
+        </Text>
+        <DSExampleArea style={tw`bg-gray-900/50 items-center`} vertical center>
+          <Box>
+            <ModalHeader>Delete Workspace ?</ModalHeader>
+            <Text variant="small">
+              Are you sure you want to delete the workspace{" "}
+              <Text variant="small" bold>
+                “Paula's Workspace”
+              </Text>
+              with all its pages and folders? You can't undo this action.
+            </Text>
+            <ModalButtonFooter
+              cancel={<Button variant="secondary">Keep workspace</Button>}
+              confirm={<Button variant="primary">Delete</Button>}
+            />
+          </Box>
+        </DSExampleArea>
+        <Heading lvl={3}>Trigger</Heading>
+        <Text variant="small">
+          Our Modals are commonly triggered by{" "}
+          <DSMono variant="component">Buttons</DSMono> ,{" "}
+          <DSMono variant="component">IconButtons</DSMono> and{" "}
+          <DSMono variant="component">Menu</DSMono> actions.
+        </Text>
+        <DSExampleArea>
+          <IconButton
+            onPress={() => {
+              setShowModal(true);
+            }}
+            size="medium"
+            label="New workspace"
+            name="plus"
+            style={tw`bold`}
           />
-          <ModalButtonFooter
-            cancel={
-              <Button variant="secondary" onPress={() => setShowModal(false)}>
-                Cancel
-              </Button>
-            }
-            confirm={<Button variant="primary">Confirm</Button>}
-          />
-        </Modal>
-        <Button
-          onPress={() => {
-            setShowModal(true);
-          }}
-          variant="primary"
-          size="small"
-        >
-          Open Modal
-        </Button>
+          <Modal
+            isVisible={showModal}
+            onBackdropPress={() => setShowModal(false)}
+          >
+            <ModalHeader>Create a workspace</ModalHeader>
+            <LabeledInput
+              label={"Workspace Name"}
+              value="Surf &amp; Chill Co."
+              hint="This is the name of your organization, team or private notes. You can invite team members afterwards."
+            />
+            <ModalButtonFooter
+              cancel={
+                <Button variant="secondary" onPress={() => setShowModal(false)}>
+                  Cancel
+                </Button>
+              }
+              confirm={<Button variant="primary">Create Workspace</Button>}
+            />
+          </Modal>
+        </DSExampleArea>
+
+        {/* ---------------------------------- insert here ------------------------------------------------ */}
 
         <Heading lvl={1}>SidebarButton</Heading>
         <SidebarButton>
