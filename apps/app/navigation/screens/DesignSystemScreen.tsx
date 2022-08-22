@@ -1311,7 +1311,11 @@ export default function DesignSystemScreen() {
           <DSMono variant="property">cancel</DSMono> action pass a Button to the
           Footers <DSMono variant="property">confirm</DSMono> property.
         </Text>
-        <DSExampleArea style={tw`bg-gray-900/50 items-center`} vertical center>
+        <DSExampleArea
+          style={tw`py-12 bg-gray-900/40 items-center`}
+          vertical
+          center
+        >
           <Box>
             <Text variant="small">
               Something has happened and I just wanted to let you know
@@ -1328,7 +1332,11 @@ export default function DesignSystemScreen() {
           but can be added by using the{" "}
           <DSMono variant="component">ModalHeader</DSMono> component.
         </Text>
-        <DSExampleArea style={tw`bg-gray-900/50 items-center`} vertical center>
+        <DSExampleArea
+          style={tw`py-12 bg-gray-900/40 items-center`}
+          vertical
+          center
+        >
           <Box>
             <ModalHeader>Delete Workspace ?</ModalHeader>
             <Text variant="small">
@@ -1339,8 +1347,8 @@ export default function DesignSystemScreen() {
               with all its pages and folders? You can't undo this action.
             </Text>
             <ModalButtonFooter
-              cancel={<Button variant="secondary">Keep workspace</Button>}
-              confirm={<Button variant="danger">Delete</Button>}
+              cancel={<Button variant="secondary">Keep</Button>}
+              confirm={<Button variant="danger">Delete Workspace</Button>}
             />
           </Box>
         </DSExampleArea>
