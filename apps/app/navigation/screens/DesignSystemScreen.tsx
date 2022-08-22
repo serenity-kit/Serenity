@@ -80,10 +80,9 @@ export default function DesignSystemScreen() {
 
   const h4Styles = tw`mt-8 -mb-4`;
 
-  // TODO use structural elements
   return (
     <ScrollSafeAreaView>
-      <View style={tw`w-full max-w-4xl mx-auto px-4 pt-2 pb-6`}>
+      <View style={tw`w-full max-w-4xl mx-auto px-4 pt-2 pb-12`}>
         <Heading lvl={1}>Avatar</Heading>
         <Text>
           An{" "}
@@ -281,17 +280,14 @@ export default function DesignSystemScreen() {
           Related components
         </Heading>
         <Heading lvl={2}>IconButton</Heading>
-        <Text>
-          The{" "}
-          <DSMono variant="component" size="medium">
-            IconButtons
-          </DSMono>{" "}
-          are commonly found in the{" "}
-          <DSMono variant="context">PageHeader</DSMono> and it's siblings, as
-          well as in the <DSMono variant="context">Sidebar</DSMono>.
+        <Text variant="small">
+          The <DSMono variant="component">IconButtons</DSMono> are commonly
+          found in the <DSMono variant="context">PageHeader</DSMono> and it's
+          siblings, as well as in the <DSMono variant="context">Sidebar</DSMono>
+          .
         </Text>
         <Heading lvl={3}>Basic</Heading>
-        <Text>
+        <Text variant="small">
           <DSMono variant="component">IconButtons</DSMono> require their{" "}
           <DSMono variant="property">name</DSMono> property which uses the{" "}
           <DSMono variant={"type"}>IconNames</DSMono> type, just like the{" "}
@@ -1278,8 +1274,12 @@ export default function DesignSystemScreen() {
 
         <Heading lvl={1}>Modal (work in progress)</Heading>
         <Text>
-          The <DSMono variant="component">Modal</DSMono> is a Dialog on top of
-          an overlay used to show content that requires user interaction.
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Modal
+          </DSMono>{" "}
+          is a Dialog on top of an overlay used to show content that requires
+          user interaction.
         </Text>
         <Heading lvl={3}>Basic</Heading>
         <Text variant="small">
@@ -1512,57 +1512,184 @@ export default function DesignSystemScreen() {
           <Spinner size="lg" />
         </DSExampleArea>
 
-        {/* ---------------------------------- insert here ------------------------------------------------ */}
-
         <Heading lvl={1}>Text</Heading>
-        <Text variant="large">large Text</Text>
-        <Text>regular Text</Text>
-        <Text variant="small">small Text</Text>
-        <Text variant="xs">xs Text</Text>
-        <Text variant="xxs">xxs Text</Text>
-        <Text style={tw`pt-4`} variant="large" bold>
-          bold large Text
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Text
+          </DSMono>{" "}
+          component makes it easy to apply a default set of font weights and
+          sizes in our application.
         </Text>
-        <Text bold>bold regular Text</Text>
-        <Text variant="small" bold>
-          bold small Text
+        <Heading lvl={3}>Sizes</Heading>
+        <Text variant="small">
+          Our typographic scale has a limited set of type sizes that work well
+          together along with the layout grid.
         </Text>
-        <Text variant="xs" bold>
-          bold xs Text
+        <Text variant="small">
+          To change the type use the <DSMono variant="property">variant</DSMono>{" "}
+          property and choose one of the 5 types:{" "}
+          <DSMono variant={"type"}>xxs</DSMono> ,{" "}
+          <DSMono variant={"type"}>xs</DSMono> ,{" "}
+          <DSMono variant={"type"}>small</DSMono> ,{" "}
+          <DSMono variant={"type"}>medium</DSMono> , or{" "}
+          <DSMono variant={"type"}>large</DSMono> .
         </Text>
-        <Text variant="xxs" bold>
-          bold xxs Text
+        <DSExampleArea vertical>
+          <Text variant="xxs">the quick brown fox</Text>
+          <Text variant="xs">the quick brown fox</Text>
+          <Text variant="small">the quick brown fox</Text>
+          <Text>the quick brown fox</Text>
+          <Text variant="large">the quick brown fox</Text>
+        </DSExampleArea>
+        <Heading lvl={3}>Weight</Heading>
+        <Text variant="small">
+          As we use different font-faces depending on the weight of the text,
+          using the <DSMono variant="property">bold</DSMono> property is
+          mandatory for heavier text.
         </Text>
-        <Text style={tw`pt-4`} variant="large" muted>
-          muted large Text
+        <DSExampleArea vertical>
+          <Text bold variant="xxs">
+            the quick brown fox
+          </Text>
+          <Text bold variant="xs">
+            the quick brown fox
+          </Text>
+          <Text bold variant="small">
+            the quick brown fox
+          </Text>
+          <Text bold>the quick brown fox</Text>
+          <Text bold variant="large">
+            the quick brown fox
+          </Text>
+        </DSExampleArea>
+        <Heading lvl={3}>Emphasis</Heading>
+        <Text variant="small">
+          The <DSMono variant="property">muted</DSMono> property is useful for
+          phrases you need to see but are less important and therefore can be in
+          the background.
         </Text>
-        <Text muted>muted regular Text</Text>
-        <Text variant="small" muted>
-          muted small Text
-        </Text>
-        <Text variant="xs" muted>
-          muted xs Text
-        </Text>
-        <Text variant="xxs" muted>
-          muted xxs Text
-        </Text>
+        <DSExampleArea vertical>
+          <Text muted variant="xxs">
+            the quick brown fox
+          </Text>
+          <Text muted variant="xs">
+            the quick brown fox
+          </Text>
+          <Text muted variant="small">
+            the quick brown fox
+          </Text>
+          <Text muted>the quick brown fox</Text>
+          <Text muted variant="large">
+            the quick brown fox
+          </Text>
+        </DSExampleArea>
 
         <Heading lvl={1}>Toast</Heading>
-        <Button
-          onPress={() => {
-            counter = counter + 1;
-            showToast(`This is a message ${counter}`);
-          }}
-        >
-          Add Toast
-        </Button>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Toast
+          </DSMono>{" "}
+          component is used to give feedback to users after an action has taken
+          place.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          A <DSMono variant="component">Toast</DSMono> informs users of a
+          process that an app has performed or will perform. They appear
+          temporarily, towards the bottom of the screen.
+        </Text>
+        <Text variant="small">
+          They shouldn't interrupt the user experience, and they don't require
+          user input to disappear.
+        </Text>
+        <DSExampleArea>
+          <Button
+            onPress={() => {
+              counter = counter + 1;
+              showToast(`Copied to clipboard ${counter}`);
+            }}
+            size={"medium"}
+          >
+            Copy
+          </Button>
+        </DSExampleArea>
 
         <Heading lvl={1}>Tooltip</Heading>
-        <HStack>
-          <Tooltip label="This is a tip!" placement="right">
-            <IconButton name="file-add-line" color="gray-500" large />
-          </Tooltip>
-        </HStack>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Tooltip
+          </DSMono>{" "}
+          is a brief, informative message that appears when a user interacts
+          with an element.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          For now we use <DSMono variant="component">Tooltip</DSMono>s
+          exclusively for <DSMono variant="context">desktop</DSMono> for actions
+          triggerd by <DSMono variant="component">IconButton</DSMono>s.
+        </Text>
+        <DSExampleArea>
+          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="history-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Recently edited</Text>
+            </SidebarLink>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="settings-4-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Settings</Text>
+            </SidebarLink>
+            <SidebarDivider />
+            <HStack
+              justifyContent="space-between"
+              alignItems="center"
+              style={tw`mx-4 mb-4`}
+            >
+              <Text variant={"xxs"} bold>
+                Folders
+              </Text>
+              <Tooltip label="Create Folder" placement="right" offset={8}>
+                <IconButton name="plus" />
+              </Tooltip>
+            </HStack>
+            <SidebarButton>
+              <View style={tw`w-full flex flex-row justify-between`}>
+                <HStack alignItems={"center"}>
+                  <View>
+                    <Icon
+                      name="arrow-right-filled"
+                      color={tw.color("gray-600")}
+                      mobileSize={5}
+                    />
+                  </View>
+                  <View style={tw`-ml-0.5`}>
+                    <Icon name="folder" size={5} mobileSize={8} />
+                  </View>
+                  <Text
+                    variant="small"
+                    style={tw`ml-1.5 max-w-32`}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Getting Started
+                  </Text>
+                </HStack>
+              </View>
+            </SidebarButton>
+          </VStack>
+        </DSExampleArea>
       </View>
     </ScrollSafeAreaView>
   );
