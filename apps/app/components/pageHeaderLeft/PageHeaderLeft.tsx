@@ -1,7 +1,6 @@
-import { tw, View, IconButton } from "@serenity-tools/ui";
+import { tw, View, IconButton, useHasEditorSidebar } from "@serenity-tools/ui";
 import React from "react";
 import { DrawerActions } from "@react-navigation/native";
-import { useHasEditorSidebar } from "@serenity-tools/editor/hooks/useHasEditorSidebar";
 
 export function PageHeaderLeft(props: any) {
   const hasEditorSidebar = useHasEditorSidebar();
