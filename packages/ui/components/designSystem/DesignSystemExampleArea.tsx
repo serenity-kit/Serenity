@@ -6,13 +6,14 @@ import { View, ViewProps } from "../view/View";
 
 export type DesignSystemExampleAreaProps = ViewProps & {
   vertical?: boolean;
+  start?: boolean;
   stackWidth?: number;
 };
 
 export const DesignSystemExampleArea = (
   props: DesignSystemExampleAreaProps
 ) => {
-  const { vertical } = props;
+  const { vertical, start } = props;
   const styles = StyleSheet.create({
     area: tw`mt-2.5 p-4 border border-gray-200 rounded overflow-scroll sm:overflow-visible items-start`,
   });
@@ -22,7 +23,7 @@ export const DesignSystemExampleArea = (
       <Stack
         direction={vertical ? "column" : "row"}
         space={4}
-        alignItems={"center"}
+        alignItems={start ? "flex-start" : "center"}
         width={props.stackWidth}
       >
         {props.children}
