@@ -1,4 +1,5 @@
 import { Stack } from "native-base";
+import { ResponsiveValue } from "native-base/src/components/types/responsiveValue";
 import React from "react";
 import { StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
@@ -6,14 +7,14 @@ import { View, ViewProps } from "../view/View";
 
 export type DesignSystemExampleAreaProps = ViewProps & {
   vertical?: boolean;
-  start?: boolean;
+  center?: boolean;
   stackWidth?: number;
 };
 
 export const DesignSystemExampleArea = (
   props: DesignSystemExampleAreaProps
 ) => {
-  const { vertical, start } = props;
+  const { vertical, center } = props;
   const styles = StyleSheet.create({
     area: tw`mt-2.5 p-4 border border-gray-200 rounded overflow-scroll sm:overflow-visible items-start`,
   });
@@ -23,7 +24,7 @@ export const DesignSystemExampleArea = (
       <Stack
         direction={vertical ? "column" : "row"}
         space={4}
-        alignItems={start ? "flex-start" : "center"}
+        alignItems={vertical && !center ? "flex-start" : "center"}
         width={props.stackWidth}
       >
         {props.children}

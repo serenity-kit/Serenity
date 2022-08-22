@@ -79,6 +79,9 @@ export default function DesignSystemScreen() {
     );
   };
 
+  const h4Styles = tw`mt-8 -mb-4`;
+
+  // TODO labeled IconButton
   // TODO use structural elements
   return (
     <ScrollSafeAreaView>
@@ -91,7 +94,7 @@ export default function DesignSystemScreen() {
           </DSMono>{" "}
           component represents an object or entity.
         </Text>
-        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
+        <Heading lvl={4} style={h4Styles}>
           Properties
         </Heading>
         <Heading lvl={3}>Sizes</Heading>
@@ -144,7 +147,7 @@ export default function DesignSystemScreen() {
             <Avatar customColor="sky">NG</Avatar>
           </AvatarGroup>
         </DSExampleArea>
-        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
+        <Heading lvl={4} style={h4Styles}>
           Related components
         </Heading>
         <Heading lvl={2}>WorkspaceAvatar</Heading>
@@ -206,7 +209,7 @@ export default function DesignSystemScreen() {
           form, opening a Dialog, canceling an action, or performing a delete
           operation.
         </Text>
-        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
+        <Heading lvl={4} style={h4Styles}>
           Properties
         </Heading>
         <Heading lvl={3}>Variants</Heading>
@@ -249,7 +252,7 @@ export default function DesignSystemScreen() {
             Login
           </Button>
         </DSExampleArea>
-        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
+        <Heading lvl={4} style={h4Styles}>
           Basic usage
         </Heading>
         <Heading lvl={3}>Primary Button</Heading>
@@ -276,7 +279,7 @@ export default function DesignSystemScreen() {
             Cancel
           </Button>
         </DSExampleArea>
-        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
+        <Heading lvl={4} style={h4Styles}>
           Related components
         </Heading>
         <Heading lvl={2}>IconButton</Heading>
@@ -731,7 +734,7 @@ export default function DesignSystemScreen() {
           the corresponding component names, divided in their most common
           usages:
         </Text>
-        <DSExampleArea vertical>
+        <DSExampleArea vertical center>
           <Heading lvl={3} style={tw`text-center mt-4 mb-0`}>
             Marks
           </Heading>
@@ -908,30 +911,63 @@ export default function DesignSystemScreen() {
           </DSMono>{" "}
           lets users enter and edit text.
         </Text>
-        <Heading lvl={3}></Heading>
-        <VStack space={4}>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          The basic <DSMono variant="component">Input</DSMono> component is
+          minimal in styling and features, as it is used as a building block for
+          the <DSMono variant="component">LabeledInput</DSMono> component.
+        </Text>
+        <DSExampleArea>
           <Input />
-          <LabeledInput label={"Input"} />
+        </DSExampleArea>
+        <Heading lvl={4} style={h4Styles}>
+          Commonly used
+        </Heading>
+        <Heading lvl={2}>Labeled Input</Heading>
+        <Text variant="small">
+          <DSMono variant="component">LabeledInput</DSMono>s share all the{" "}
+          <DSMono variant="component">InputProps</DSMono> and are used in all
+          the forms of our application. You can easily add a{" "}
+          <DSMono variant="property">label</DSMono> via property.
+        </Text>
+        <DSExampleArea vertical>
           <LabeledInput
-            label={"Input w/ Value"}
+            label={"Email"}
             value="jane@example.com"
-            hint="Here you can put information you want the user to have regarding this input."
-          />
-          <LabeledInput
-            label={"Input w/ Placeholder"}
+            keyboardType="email-address"
             placeholder="Enter your email …"
+            autoCapitalize="none"
           />
           <LabeledInput
-            label={"Input Disabled"}
-            value="jane@example.com"
+            label={"Password"}
+            secureTextEntry
+            placeholder="Enter your password …"
+          />
+          <LabeledInput
+            label={"Verification Key"}
+            value="70909qer798q7987q"
             disabled
           />
+        </DSExampleArea>
+        <Heading lvl={3}>Hints</Heading>
+        <Text variant="small">
+          You can use a <DSMono variant="property">hint</DSMono> to add
+          information you want the user to have regarding this input.
+        </Text>
+        <DSExampleArea vertical>
           <LabeledInput
-            label={"Input Disabled"}
-            placeholder="Enter your email …"
-            disabled
+            label={"Password"}
+            secureTextEntry
+            value="password1234"
+            placeholder="Enter your password …"
           />
-        </VStack>
+          <LabeledInput
+            label={"Verification Key"}
+            value="70909qer798q7987q"
+            disabled
+            hint="We have already prefilled this field with your key."
+          />
+        </DSExampleArea>
 
         <Heading lvl={1}>Link</Heading>
         <Text>
@@ -957,7 +993,7 @@ export default function DesignSystemScreen() {
           ensure a consistent and distinguishable look &amp; feel of all{" "}
           <DSMono variant={"component"}>Links</DSMono> in our application.
         </Text>
-        <DSExampleArea vertical start>
+        <DSExampleArea vertical>
           <Text>
             This is a link to{" "}
             <Link to={{ screen: "EncryptDecryptImageTest" }}>
@@ -983,7 +1019,7 @@ export default function DesignSystemScreen() {
             </Link>
           </Text>
         </DSExampleArea>
-        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
+        <Heading lvl={4} style={h4Styles}>
           Related components
         </Heading>
         <Heading lvl={2}>Link External</Heading>
@@ -998,7 +1034,7 @@ export default function DesignSystemScreen() {
           the <DSMono variant={"component"}>Text</DSMono> component. Therefore
           it is not adjusting to it's contexts variant and properties.
         </Text>
-        <DSExampleArea vertical start>
+        <DSExampleArea vertical>
           <Text variant="xxs">
             This is an xxs Text and here a default{" "}
             <LinkExternal href="https://www.figma.com/">link</LinkExternal> to
@@ -1018,7 +1054,7 @@ export default function DesignSystemScreen() {
           <DSMono variant="property">icon</DSMono> property if we explicitly
           need to tell the user that they will leave the application context.
         </Text>
-        <DSExampleArea vertical start>
+        <DSExampleArea vertical>
           <Text variant="xxs">
             For further info check out our{" "}
             <LinkExternal variant="xxs" href="https://www.serenity.li" icon>
@@ -1052,7 +1088,75 @@ export default function DesignSystemScreen() {
         </DSExampleArea>
 
         <Heading lvl={1}>Menu</Heading>
-        <View style={tw`flex flex-row`}>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Menu
+          </DSMono>{" "}
+          component shows a list of actions that a user can take.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          Elements as the <DSMono variant="component">MenuButton</DSMono>{" "}
+          component represent the actions of the{" "}
+          <DSMono variant="component">Menu</DSMono> .
+        </Text>
+        <DSExampleArea>
+          <BoxShadow elevation={2} rounded>
+            <VStack style={tw`py-1.5 bg-white rounded overflow-hidden`}>
+              <MenuButton>Create Folder</MenuButton>
+              <MenuButton>Rename</MenuButton>
+            </VStack>
+          </BoxShadow>
+        </DSExampleArea>
+        <Heading lvl={3}>Divider</Heading>
+        <Text variant="small">
+          To section the different functionalities you can use the{" "}
+          <DSMono variant="component">SidebarDivider</DSMono> with added{" "}
+          <DSMono variant="property">collapsed</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <BoxShadow elevation={2} rounded>
+            <VStack style={tw`py-1.5 bg-white rounded overflow-hidden`}>
+              <MenuButton>Create Folder</MenuButton>
+              <MenuButton>Rename</MenuButton>
+              <SidebarDivider collapsed />
+              <MenuButton>Delete</MenuButton>
+            </VStack>
+          </BoxShadow>
+        </DSExampleArea>
+        <Heading lvl={3}>Icons</Heading>
+        <Text variant="small">
+          Usually all <DSMono variant="component">MenuButton</DSMono>s should
+          have set an <DSMono variant="property">icon</DSMono> to make it easier
+          for the user to understand and learn the common actions of the
+          application.
+        </Text>
+        <Text variant="small" style={tw`mt-2`}>
+          Add the optional property <DSMono variant="property">danger</DSMono>{" "}
+          to show the user irreversible actions.
+        </Text>
+        <DSExampleArea>
+          <BoxShadow elevation={2} rounded>
+            <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
+              <MenuButton icon="folder-line">Create Folder</MenuButton>
+              <MenuButton icon="font-size-2">Rename</MenuButton>
+              <SidebarDivider collapsed />
+              <MenuButton icon="delete-bin-line" danger>
+                Delete
+              </MenuButton>
+            </VStack>
+          </BoxShadow>
+        </DSExampleArea>
+        <Heading lvl={3}>Trigger</Heading>
+        <Text variant="small">
+          To add an opening element to a{" "}
+          <DSMono variant="component">Menu</DSMono> just pass a clickable
+          element via the <DSMono variant="property">trigger</DSMono> property.
+          Although any element would work we commonly use{" "}
+          <DSMono variant="component">Icon</DSMono>s as triggers.
+        </Text>
+        <DSExampleArea>
           <Menu
             placement="bottom left"
             style={tw`w-60`}
@@ -1060,64 +1164,109 @@ export default function DesignSystemScreen() {
             isOpen={isOpenPopover}
             onChange={setIsOpenPopover}
             trigger={
-              <Pressable
+              <IconButton
                 accessibilityLabel="More options menu"
-                style={tw`flex flex-row`}
-              >
-                <Text>Open Menu</Text>
-                <Icon name="arrow-down-s-fill" />
-              </Pressable>
+                name="more-line"
+                color="gray-600"
+                style={tw`p-2 md:p-0`}
+              ></IconButton>
             }
           >
-            <View style={tw`p-menu-item`}>
-              <Text variant="xxs" muted bold>
-                jane@example.com
-              </Text>
-            </View>
-            <SidebarLink
-              to={{ screen: "EncryptDecryptImageTest" }}
-              style={tw`p-menu-item`}
+            <MenuButton
+              onPress={() => {
+                setIsOpenPopover(false);
+              }}
+              icon="folder-line"
             >
-              <WorkspaceAvatar customColor="emerald" />
-              <Text variant="xs">Happy Workspace</Text>
-            </SidebarLink>
-            <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
-              <WorkspaceAvatar customColor="lavender" />
-              <Text variant="xs">Funny Bunny</Text>
-            </SidebarLink>
-            <View style={tw`pl-2 pr-3 py-1.5`}>
-              <IconButton
-                onPress={() => {
-                  setIsOpenPopover(false);
-                  alert("You are awesome !");
-                }}
-                name="plus"
-                label="Create awesomeness"
-              />
-            </View>
-
+              Create Folder
+            </MenuButton>
+            <MenuButton
+              onPress={() => {
+                setIsOpenPopover(false);
+              }}
+              icon="font-size-2"
+            >
+              Rename
+            </MenuButton>
             <SidebarDivider collapsed />
             <MenuButton
               onPress={() => {
                 setIsOpenPopover(false);
               }}
-              icon="emotion-line"
-              shortcut={<Shortcut letter="H" />}
-            >
-              Hello
-            </MenuButton>
-            <MenuButton
-              onPress={() => {
-                setIsOpenPopover(false);
-                alert("Danger !!");
-              }}
               icon="delete-bin-line"
               danger
             >
-              Danger
+              Delete
             </MenuButton>
           </Menu>
-        </View>
+        </DSExampleArea>
+
+        <Heading lvl={4} style={h4Styles}>
+          Advanced usage
+        </Heading>
+        <Heading lvl={3}>Shortcuts</Heading>
+        <Text variant="small">
+          To add keyboard shortcuts to one of your actions just add a{" "}
+          <DSMono variant="component">Shortcut</DSMono> component via{" "}
+          <DSMono variant="property">shortcut</DSMono> .
+        </Text>
+        <Text variant="small" style={tw`mt-2 text-left`}>
+          To avoid accidents don't put a shortcut on a{" "}
+          <DSMono variant="context">dangerous</DSMono> action.
+        </Text>
+        <DSExampleArea>
+          <BoxShadow elevation={2} rounded>
+            <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
+              <MenuButton icon="folder-line" shortcut={<Shortcut letter="N" />}>
+                Create Folder
+              </MenuButton>
+              <MenuButton icon="font-size-2" shortcut={<Shortcut letter="R" />}>
+                Rename
+              </MenuButton>
+              <SidebarDivider collapsed />
+              <MenuButton icon="delete-bin-line" danger>
+                Delete
+              </MenuButton>
+            </VStack>
+          </BoxShadow>
+        </DSExampleArea>
+        <Heading lvl={3}>Links and more</Heading>
+        <Text variant={"small"}>
+          Besides the <DSMono variant="component">MenuButton</DSMono> you can
+          also use a <DSMono variant="component">SidebarLink</DSMono> as one of
+          the Menu-actions. Just be sure to give it a{" "}
+          <DSMono variant="type">p-menu-item</DSMono> class passed via the{" "}
+          <DSMono variant="property">style</DSMono> property to mimic the look
+          of MenuButtons.
+        </Text>
+        <DSExampleArea>
+          <BoxShadow elevation={2} rounded>
+            <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
+              <View style={tw`p-menu-item`}>
+                <Text variant="xxs" muted bold>
+                  jane@example.com
+                </Text>
+              </View>
+              <SidebarLink
+                to={{ screen: "EncryptDecryptImageTest" }}
+                style={tw`p-menu-item`}
+              >
+                <WorkspaceAvatar customColor="emerald" />
+                <Text variant="xs">Notes</Text>
+              </SidebarLink>
+              <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
+                <WorkspaceAvatar customColor="honey" />
+                <Text variant="xs">Project X</Text>
+              </SidebarLink>
+              <View style={tw`pl-2 pr-3 py-1.5`}>
+                <IconButton name="plus" label="Create workspace" />
+              </View>
+
+              <SidebarDivider collapsed />
+              <MenuButton>Logout</MenuButton>
+            </VStack>
+          </BoxShadow>
+        </DSExampleArea>
 
         <Heading lvl={1}>Modal (work in progress)</Heading>
         <Modal
