@@ -212,8 +212,9 @@ export default function DesignSystemScreen() {
         <Heading lvl={3}>Variants</Heading>
         <Text variant="small">
           Use the <DSMono variant="property">variant</DSMono> property to
-          display either a <DSMono variant={"type"}>primary</DSMono> or{" "}
-          <DSMono variant={"type"}>secondary</DSMono> Button.
+          display either a <DSMono variant={"type"}>primary</DSMono>,{" "}
+          <DSMono variant={"type"}>secondary</DSMono>, or{" "}
+          <DSMono variant={"type"}>danger</DSMono> Button.
         </Text>
         <DSExampleArea>
           <Button>Login</Button>
@@ -274,6 +275,20 @@ export default function DesignSystemScreen() {
           </Button>
           <Button variant={"secondary"} isLoading>
             Cancel
+          </Button>
+        </DSExampleArea>
+        <Heading lvl={3}>Danger Button</Heading>
+        <Text variant="small">
+          Danger Buttons are typically used for actions which are irreversible
+          like deleting an element.
+        </Text>
+        <DSExampleArea>
+          <Button variant={"danger"}>Delete</Button>
+          <Button variant={"danger"} disabled>
+            Delete
+          </Button>
+          <Button variant={"danger"} isLoading>
+            Delete
           </Button>
         </DSExampleArea>
         <Heading lvl={4} style={h4Styles}>
@@ -1325,7 +1340,7 @@ export default function DesignSystemScreen() {
             </Text>
             <ModalButtonFooter
               cancel={<Button variant="secondary">Keep workspace</Button>}
-              confirm={<Button variant="primary">Delete</Button>}
+              confirm={<Button variant="danger">Delete</Button>}
             />
           </Box>
         </DSExampleArea>
