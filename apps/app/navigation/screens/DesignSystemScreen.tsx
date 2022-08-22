@@ -823,6 +823,7 @@ export default function DesignSystemScreen() {
             <IconTile name="double-arrow-right" />
             <IconTile name="download-line" />
             <IconTile name="emotion-line" />
+            <IconTile name="external-link-line" />
             <IconTile name="file-add-fill" />
             <IconTile name="file-add-line" />
             <IconTile name="file-copy-line" />
@@ -900,6 +901,14 @@ export default function DesignSystemScreen() {
         </DSExampleArea>
 
         <Heading lvl={1}>Input</Heading>
+        <Text>
+          An{" "}
+          <DSMono variant="component" size="medium">
+            Input
+          </DSMono>{" "}
+          lets users enter and edit text.
+        </Text>
+        <Heading lvl={3}></Heading>
         <VStack space={4}>
           <Input />
           <LabeledInput label={"Input"} />
@@ -926,29 +935,121 @@ export default function DesignSystemScreen() {
 
         <Heading lvl={1}>Link</Heading>
         <Text>
-          This is a link to{" "}
-          <Link to={{ screen: "EncryptDecryptImageTest" }}>
-            Encrypt / Decrypt Image
-          </Link>
+          The{" "}
+          <DSMono variant={"component"} size={"medium"}>
+            Link
+          </DSMono>{" "}
+          is an accessible element for navigation inside the application.
         </Text>
-        <Text muted>
-          This is a link to{" "}
-          <Link to={{ screen: "EncryptDecryptImageTest" }}>
-            Encrypt / Decrypt Image
-          </Link>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          The component adjusts to the{" "}
+          <DSMono variant="property">variant</DSMono> of the parenting{" "}
+          <DSMono variant="component">Text</DSMono> component in{" "}
+          <DSMono variant="type">size</DSMono> and{" "}
+          <DSMono variant="type">font-family</DSMono> as well as when said
+          parent is set to <DSMono variant="property">bold</DSMono>.
         </Text>
-        <Text bold>
-          This is a link to{" "}
-          <Link to={{ screen: "EncryptDecryptImageTest" }}>
-            Encrypt / Decrypt Image
-          </Link>
+        <Text variant="small" style={tw`mt-2`}>
+          Notice though the color stays the same no matter if the parent{" "}
+          <DSMono variant="component">Text</DSMono> is set to be{" "}
+          <DSMono variant="property">muted</DSMono> or the color is changed, to
+          ensure a consistent and distinguishable look &amp; feel of all{" "}
+          <DSMono variant={"component"}>Links</DSMono> in our application.
         </Text>
-        <Text variant="xxs">
-          This is a link to{" "}
-          <Link to={{ screen: "EncryptDecryptImageTest" }}>
-            Encrypt / Decrypt Image
-          </Link>
+        <DSExampleArea vertical start>
+          <Text>
+            This is a link to{" "}
+            <Link to={{ screen: "EncryptDecryptImageTest" }}>
+              Encrypt / Decrypt Image
+            </Link>
+          </Text>
+          <Text muted>
+            This is a link to{" "}
+            <Link to={{ screen: "EncryptDecryptImageTest" }}>
+              Encrypt / Decrypt Image
+            </Link>
+          </Text>
+          <Text bold>
+            This is a link to{" "}
+            <Link to={{ screen: "EncryptDecryptImageTest" }}>
+              Encrypt / Decrypt Image
+            </Link>
+          </Text>
+          <Text variant="xxs">
+            This is a link to{" "}
+            <Link to={{ screen: "EncryptDecryptImageTest" }}>
+              Encrypt / Decrypt Image
+            </Link>
+          </Text>
+        </DSExampleArea>
+        <Heading lvl={4} style={tw`mt-8 -mb-4`}>
+          Related components
+        </Heading>
+        <Heading lvl={2}>Link External</Heading>
+        <Text variant="small">
+          The <DSMono variant={"component"}>LinkExternal</DSMono> component is
+          used for links outside of our application.
         </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          In comparison to the <DSMono variant={"component"}>Link</DSMono>{" "}
+          component it is an independent element which accepts all properties of
+          the <DSMono variant={"component"}>Text</DSMono> component. Therefore
+          it is not adjusting to it's contexts variant and properties.
+        </Text>
+        <DSExampleArea vertical start>
+          <Text variant="xxs">
+            This is an xxs Text and here a default{" "}
+            <LinkExternal href="https://www.figma.com/">link</LinkExternal> to
+            somewhere else
+          </Text>
+          <Text variant="xxs" bold>
+            But I can easily give the{" "}
+            <LinkExternal href="https://www.figma.com/" variant="xxs" bold>
+              link
+            </LinkExternal>{" "}
+            the same styling as it's parent as they share the same properties
+          </Text>
+        </DSExampleArea>
+        <Heading lvl={3}>Icon</Heading>
+        <Text variant="small">
+          The component can be marked with an additional Icon via the{" "}
+          <DSMono variant="property">icon</DSMono> property if we explicitly
+          need to tell the user that they will leave the application context.
+        </Text>
+        <DSExampleArea vertical start>
+          <Text variant="xxs">
+            For further info check out our{" "}
+            <LinkExternal variant="xxs" href="https://www.serenity.li" icon>
+              knowledgebase
+            </LinkExternal>
+          </Text>
+          <Text variant="xs">
+            For further info check out our{" "}
+            <LinkExternal variant="xs" href="https://www.serenity.li" icon>
+              knowledgebase
+            </LinkExternal>
+          </Text>
+          <Text variant="small">
+            For further info check out our{" "}
+            <LinkExternal variant="small" href="https://www.serenity.li" icon>
+              knowledgebase
+            </LinkExternal>
+          </Text>
+          <Text variant="medium">
+            For further info check out our{" "}
+            <LinkExternal variant="medium" href="https://www.serenity.li" icon>
+              knowledgebase
+            </LinkExternal>
+          </Text>
+          <Text variant="large">
+            For further info check out our{" "}
+            <LinkExternal variant="large" href="https://www.serenity.li" icon>
+              knowledgebase
+            </LinkExternal>
+          </Text>
+        </DSExampleArea>
 
         <Heading lvl={1}>Menu</Heading>
         <View style={tw`flex flex-row`}>
