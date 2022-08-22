@@ -40,6 +40,7 @@ import { DoubleQuotesL } from "./icons/DoubleQuotesL";
 import { DownloadLine } from "./icons/DownloadLine";
 import { DraftLine } from "./icons/DraftLine";
 import { EmotionLine } from "./icons/EmotionLine";
+import { ExternalLinkLine } from "./icons/ExternalLinkLine";
 import { FileAddFill } from "./icons/FileAddFill";
 import { FileAddLine } from "./icons/FileAddLine";
 import { FileCopyLine } from "./icons/FileCopyLine";
@@ -143,6 +144,7 @@ export type IconNames =
   | "download-line"
   | "draft-line"
   | "emotion-line"
+  | "external-link-line"
   | "file-add-fill"
   | "file-add-line"
   | "file-copy-line"
@@ -339,6 +341,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "emotion-line") {
     icon = <EmotionLine color={color} size={iconSize} />;
+  }
+  if (name === "external-link-line") {
+    icon = <ExternalLinkLine color={color} size={iconSize} />;
   }
   if (name === "file-add-fill") {
     icon = <FileAddFill color={color} size={iconSize} />;
