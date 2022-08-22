@@ -1367,28 +1367,152 @@ export default function DesignSystemScreen() {
           </Modal>
         </DSExampleArea>
 
-        {/* ---------------------------------- insert here ------------------------------------------------ */}
-
-        <Heading lvl={1}>SidebarButton</Heading>
-        <SidebarButton>
-          <Text variant="small">Hallo</Text>
-        </SidebarButton>
-        <SidebarButton disabled>
-          <Text variant="small">Hallo</Text>
-        </SidebarButton>
-
-        <Heading lvl={1}>SidebarLink</Heading>
-        <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-          <WorkspaceAvatar />
-          <Text>Encrypt / Decrypt Image</Text>
-        </SidebarLink>
+        <Heading lvl={1}>Sidebar</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Sidebar
+          </DSMono>{" "}
+          is the applications navigational element. It is always present on{" "}
+          <DSMono variant="base">desktop</DSMono> and accessible via an upper
+          left IconButton on smaller devices.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          You can either use <DSMono variant="component">SidebarButton</DSMono>s
+          to trigger actions or <DSMono variant="component">SidebarLink</DSMono>
+          s to provide access to destinations in our app.
+        </Text>
+        <DSExampleArea>
+          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
+            <SidebarButton>
+              <Icon
+                name="search-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Search...</Text>
+            </SidebarButton>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="history-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Recently edited</Text>
+            </SidebarLink>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="settings-4-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Settings</Text>
+            </SidebarLink>
+          </VStack>
+        </DSExampleArea>
+        <Heading lvl={3}>Divider</Heading>
+        <Text variant="small">
+          To section the different elements you can use the{" "}
+          <DSMono variant="component">SidebarDivider</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="history-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Recently edited</Text>
+            </SidebarLink>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="settings-4-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Settings</Text>
+            </SidebarLink>
+            <SidebarDivider />
+            <HStack
+              justifyContent="space-between"
+              alignItems="center"
+              style={tw`ml-4 mr-5 mb-4 md:mr-2`}
+            >
+              <Text variant={"xxs"} bold>
+                Folders
+              </Text>
+            </HStack>
+            <SidebarButton>
+              <View style={tw`w-full flex flex-row justify-between`}>
+                <HStack alignItems={"center"}>
+                  <View>
+                    <Icon
+                      name="arrow-right-filled"
+                      color={tw.color("gray-600")}
+                      mobileSize={5}
+                    />
+                  </View>
+                  <View style={tw`-ml-0.5`}>
+                    <Icon name="folder" size={5} mobileSize={8} />
+                  </View>
+                  <Text
+                    variant="small"
+                    style={tw`ml-1.5 max-w-32`}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Getting Started
+                  </Text>
+                </HStack>
+                <HStack alignItems="center" space={2}>
+                  <Icon name="more-line" color={tw.color("gray-600")}></Icon>
+                  <Icon
+                    name="file-add-line"
+                    color={tw.color("gray-600")}
+                  ></Icon>
+                </HStack>
+              </View>
+            </SidebarButton>
+          </VStack>
+        </DSExampleArea>
 
         <Heading lvl={1}>Spinner</Heading>
-        <VStack space={3}>
-          <Spinner />
+        <Text>
+          A{" "}
+          <DSMono variant={"component"} size="medium">
+            Spinner
+          </DSMono>{" "}
+          provides a visual cue that an action is processing awaiting a course
+          of change or a result.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          To enable a fading effect add the property{" "}
+          <DSMono variant="property">fadeIn</DSMono> .
+        </Text>
+        <DSExampleArea>
+          <Spinner fadeIn />
+        </DSExampleArea>
+        <Heading lvl={3}>Sizes</Heading>
+        <Text variant="small">
+          With the <DSMono variant="property">size</DSMono> property you can
+          display a Spinner in two different sizes:{" "}
+          <DSMono variant={"type"}>sm</DSMono> or{" "}
+          <DSMono variant={"type"}>lg</DSMono> .
+        </Text>
+        <DSExampleArea>
+          <Spinner size="sm" />
           <Spinner size="lg" />
-          <Spinner fadeIn size="lg" />
-        </VStack>
+        </DSExampleArea>
+
+        {/* ---------------------------------- insert here ------------------------------------------------ */}
 
         <Heading lvl={1}>Text</Heading>
         <Text variant="large">large Text</Text>
