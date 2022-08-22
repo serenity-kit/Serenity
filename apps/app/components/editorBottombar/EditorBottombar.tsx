@@ -90,7 +90,7 @@ export function EditorBottombar({
           onPress={(event) => {
             onUpdate({ variant: "toggle-blockquote" });
           }}
-          name="question-mark" // TODO tbd
+          name="double-quotes-l"
           isActive={editorBottombarState.isBlockquote}
         />
 
