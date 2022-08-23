@@ -10,6 +10,7 @@ import Collaboration from "@tiptap/extension-collaboration";
 import * as Y from "yjs";
 import { Awareness } from "y-protocols/awareness";
 import { AwarnessExtension } from "./naisho-awareness-extension";
+import { SerenityScrollIntoViewExtension } from "./scroll-into-view-extensions";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -89,6 +90,7 @@ export const Editor = (props: EditorProps) => {
         AwarnessExtension.configure({
           awareness: props.yAwarenessRef.current,
         }),
+        SerenityScrollIntoViewExtension.configure({}),
       ],
       onCreate: (params) => {
         if (isNew) {
