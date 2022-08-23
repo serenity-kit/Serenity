@@ -40,7 +40,6 @@ import {
   collaborationColors,
   LinkExternal,
 } from "@serenity-tools/ui";
-import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
 import { useWindowDimensions, StyleSheet } from "react-native";
 import { VStack, HStack } from "native-base";
@@ -66,6 +65,7 @@ export default function DesignSystemScreen() {
     );
   };
 
+  // fakes filling elements into container to hinder the last wrapping children to grow and center themselves
   const TilesFiller = (props) => {
     return (
       <>
@@ -88,9 +88,8 @@ export default function DesignSystemScreen() {
     );
   };
 
+  // DesignSystemScreen specific
   const h4Styles = tw`mt-8 -mb-4`;
-
-  // check all icons are in their right group (tiptap)
 
   return (
     <ScrollSafeAreaView>
@@ -805,7 +804,7 @@ export default function DesignSystemScreen() {
           <DSTiles>
             <IconTile name="font-color" />
           </DSTiles>
-          <Heading lvl={3}>Editor Custom</Heading>
+          <Heading lvl={3}>Custom</Heading>
           <DSTiles>
             <IconTile name="arrow-go-back-line" />
             <IconTile name="arrow-go-forward-line" />
@@ -838,7 +837,7 @@ export default function DesignSystemScreen() {
             <IconTile name="check-line" />
             <IconTile name="close-circle-fill" />
             <IconTile name="add-line" />
-            {/* settings (6) */}
+            <IconTile name="settings-4-line" />
             <IconTile name="download-line" />
             <IconTile name="printer-line" />
             <IconTile name="search-line" />
@@ -850,8 +849,8 @@ export default function DesignSystemScreen() {
             <IconTile name="file-copy-line" />
             <IconTile name="chat-1-line" />
             <IconTile name="chat-4-line" />
-            {/* pencil line */}
-            {/* error warning line */}
+            <IconTile name="pencil-line" />
+            <IconTile name="error-warning-line" />
           </DSTiles>
           <Heading lvl={3}>Page &amp; Folder</Heading>
           <DSTiles>
@@ -892,7 +891,6 @@ export default function DesignSystemScreen() {
           <DSTiles>
             {/* in use */}
             <IconTile name="warning-fill" />
-            <IconTile name="settings-4-line" />
 
             {/* really needed as we have others ?? */}
             <IconTile name="arrow-down-s-fill" />
