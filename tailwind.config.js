@@ -39,6 +39,7 @@ const customTheme = {
       emerald: "#47C07A",
       arctic: "#4ABAC1",
       sky: "#1E8EDE",
+      serenity: "#435BF8", // primary 500
       lavender: "#515DCE",
       purple: "#9E36CF",
       slate: "#4F5D78",
@@ -129,7 +130,6 @@ module.exports = {
         "text-muted": `text-gray-600`,
         "form-element-height": "h-12",
         "p-menu-item": `py-2 px-3`,
-        "flex-center-center": `flex-auto items-center justify-center`,
       });
     }),
   ],

@@ -1,4 +1,4 @@
-import { Spinner, tw, View } from "@serenity-tools/ui";
+import { CenterContent, Spinner } from "@serenity-tools/ui";
 import { useEffect } from "react";
 import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
@@ -87,8 +87,8 @@ export default function WorkspaceRootScreen(
   }, [urqlClient, props.navigation, workspaceId]);
 
   return (
-    <View style={tw`justify-center items-center flex-auto`}>
+    <CenterContent>
       <Spinner fadeIn size="lg" />
-    </View>
+    </CenterContent>
   );
 }

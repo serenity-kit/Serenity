@@ -9,7 +9,7 @@ import { Text, TextVariants } from "../text/Text";
 import { Spinner } from "../spinner/Spinner";
 import { View } from "../view/View";
 
-export type ButtonVariants = "primary" | "secondary";
+export type ButtonVariants = "primary" | "secondary" | "danger";
 export type ButtonSizes = "small" | "medium" | "large";
 
 export type ButtonProps = PressableProps & {
@@ -44,6 +44,8 @@ const computeStyle = ({
         return tw`bg-gray-200 border-gray-200`;
       case "primary":
         return tw`bg-primary-100 border-primary-100`;
+      case "danger":
+        return tw`bg-gray-300 border-gray-300`;
     }
   }
 
@@ -61,6 +63,8 @@ const computeStyle = ({
         return tw`bg-gray-300 border-gray-300`;
       case "primary":
         return tw`bg-primary-700 border-primary-700`;
+      case "danger":
+        return tw`bg-error-200 border-error-200`;
     }
   }
 
@@ -71,6 +75,8 @@ const computeStyle = ({
         return tw.style(`bg-gray-200 border-gray-200`, style);
       case "primary":
         return tw.style(`bg-primary-600 border-primary-600`, style);
+      case "danger":
+        return tw.style(`bg-error-200/75 border-error-200/75`, style);
     }
   }
 
@@ -101,6 +107,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
     variant: {
       primary: tw`bg-primary-500 border-primary-500`,
       secondary: tw`bg-transparent border-gray-200`,
+      danger: tw`bg-error-100 border-error-100`,
     },
   };
 
@@ -114,6 +121,15 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
     variant: {
       primary: disabled ? tw`text-primary-300` : tw`text-gray-100`,
       secondary: disabled ? tw`text-gray-400` : tw`text-gray-800`,
+      danger: disabled ? tw`text-gray-600` : tw`text-error-500`,
+    },
+  };
+
+  const spinnerStyle = {
+    color: {
+      primary: tw.color("primary-500"),
+      secondary: tw.color("gray-500"),
+      danger: tw.color("gray-600"),
     },
   };
 
@@ -165,11 +181,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
                   // for readability: 20 => spinner default size, 4 => tw sizing base
                   <View style={tw`w-${(spinnerSize.scale * 20) / 4}`}>
                     <Spinner
-                      color={
-                        variant === "secondary"
-                          ? tw.color("gray-600")
-                          : undefined
-                      }
+                      color={spinnerStyle.color[variant]}
                       fadeIn
                       style={[
                         tw`mr-${spinnerSize.scale * 8}`,

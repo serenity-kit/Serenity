@@ -36,11 +36,11 @@ export const InfoMessage = forwardRef((props: InfoMessageProps, ref) => {
 
   return (
     <VStack
+      {...rest}
       justifyContent="center"
       alignItems="center"
       space={2}
-      style={[styles.stack]}
-      {...rest}
+      style={[styles.stack, props.style]}
     >
       {icon ? (
         <Icon name={iconNames[variant]} color={tw.color(iconColors[variant])} />

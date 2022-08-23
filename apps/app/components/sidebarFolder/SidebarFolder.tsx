@@ -267,7 +267,8 @@ export default function SidebarFolder(props: Props) {
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
 
-  const maxWidth = 32 - depth * 2;
+  const maxWidthBase = isDesktopDevice ? 32 : 42;
+  const maxWidth = maxWidthBase - depth * 2;
 
   return (
     <>

@@ -40,6 +40,8 @@ import { DoubleQuotesL } from "./icons/DoubleQuotesL";
 import { DownloadLine } from "./icons/DownloadLine";
 import { DraftLine } from "./icons/DraftLine";
 import { EmotionLine } from "./icons/EmotionLine";
+import { ErrorWarningLine } from "./icons/ErrorWarningLine";
+import { ExternalLinkLine } from "./icons/ExternalLinkLine";
 import { FileAddFill } from "./icons/FileAddFill";
 import { FileAddLine } from "./icons/FileAddLine";
 import { FileCopyLine } from "./icons/FileCopyLine";
@@ -85,6 +87,7 @@ import { MovieLine } from "./icons/MovieLine";
 import { Page } from "./icons/Page";
 import { PageSeparator } from "./icons/PageSeparator";
 import { Paragraph } from "./icons/Paragraph";
+import { PencilLine } from "./icons/PencilLine";
 import { Plus } from "./icons/Plus";
 import { PrinterLine } from "./icons/PrinterLine";
 import { QuestionMark } from "./icons/QuestionMark";
@@ -143,6 +146,8 @@ export type IconNames =
   | "download-line"
   | "draft-line"
   | "emotion-line"
+  | "error-warning-line"
+  | "external-link-line"
   | "file-add-fill"
   | "file-add-line"
   | "file-copy-line"
@@ -188,6 +193,7 @@ export type IconNames =
   | "page"
   | "page-separator"
   | "paragraph"
+  | "pencil-line"
   | "plus"
   | "printer-line"
   | "question-mark"
@@ -340,6 +346,12 @@ export const Icon = (props: IconProps) => {
   if (name === "emotion-line") {
     icon = <EmotionLine color={color} size={iconSize} />;
   }
+  if (name === "error-warning-line") {
+    icon = <ErrorWarningLine color={color} size={iconSize} />;
+  }
+  if (name === "external-link-line") {
+    icon = <ExternalLinkLine color={color} size={iconSize} />;
+  }
   if (name === "file-add-fill") {
     icon = <FileAddFill color={color} size={iconSize} />;
   }
@@ -474,6 +486,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "paragraph") {
     icon = <Paragraph color={color} size={iconSize} />;
+  }
+  if (name === "pencil-line") {
+    icon = <PencilLine color={color} size={iconSize} />;
   }
   if (name === "plus") {
     icon = <Plus color={color} size={iconSize} />;

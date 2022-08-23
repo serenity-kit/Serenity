@@ -88,7 +88,7 @@ export const EditorBottombar = forwardRef(
             onPress={(event) => {
               onUpdate({ variant: "toggle-blockquote" });
             }}
-            name="question-mark" // TODO tbd
+            name="double-quotes-l"
             isActive={editorBottombarState.isBlockquote}
           />
 
