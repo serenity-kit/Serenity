@@ -1033,25 +1033,19 @@ export default function DesignSystemScreen() {
           <DSMono variant={"component"}>Links</DSMono> in our application.
         </Text>
         <DSExampleArea vertical>
-          <Text>
+          <Text variant="small">
             This is a link to{" "}
             <Link to={{ screen: "EncryptDecryptImageTest" }}>
               Encrypt / Decrypt Image
             </Link>
           </Text>
-          <Text muted>
+          <Text variant="small" muted>
             This is a link to{" "}
             <Link to={{ screen: "EncryptDecryptImageTest" }}>
               Encrypt / Decrypt Image
             </Link>
           </Text>
-          <Text bold>
-            This is a link to{" "}
-            <Link to={{ screen: "EncryptDecryptImageTest" }}>
-              Encrypt / Decrypt Image
-            </Link>
-          </Text>
-          <Text variant="xxs">
+          <Text variant="small" bold>
             This is a link to{" "}
             <Link to={{ screen: "EncryptDecryptImageTest" }}>
               Encrypt / Decrypt Image
