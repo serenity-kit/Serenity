@@ -74,11 +74,23 @@ export default function DesignSystemScreen() {
         <View style={tw`flex-auto w-30 h-0`} />
         <View style={tw`flex-auto w-30 h-0`} />
         <View style={tw`flex-auto w-30 h-0`} />
+        <View style={tw`flex-auto w-30 h-0`} />
       </>
     );
   };
 
+  const DSTiles = (props) => {
+    return (
+      <HStack {...props} flexWrap={"wrap"}>
+        {props.children}
+        <TilesFiller />
+      </HStack>
+    );
+  };
+
   const h4Styles = tw`mt-8 -mb-4`;
+
+  // check all icons are in their right group (tiptap)
 
   return (
     <ScrollSafeAreaView>
@@ -177,7 +189,7 @@ export default function DesignSystemScreen() {
           <DSMono variant="property">elevation</DSMono> property.
         </Text>
         <DSExampleArea>
-          <HStack space={3} style={tw`pr-2`}>
+          <HStack space={4} style={tw`pr-2`}>
             {elevationLevels.map((level) => {
               return (
                 <BoxShadow elevation={level} rounded key={`shadow_${level}`}>
@@ -754,10 +766,13 @@ export default function DesignSystemScreen() {
           usages:
         </Text>
         <DSExampleArea vertical center>
-          <Heading lvl={3} style={tw`text-center mt-4 mb-0`}>
-            Marks
-          </Heading>
-          <HStack flexWrap="wrap">
+          <Heading lvl={3}>Commands</Heading>
+          <DSTiles>
+            <IconTile name="indent-decrease" />
+            <IconTile name="indent-increase" />
+          </DSTiles>
+          <Heading lvl={3}>Marks</Heading>
+          <DSTiles>
             <IconTile name="bold" />
             <IconTile name="code-view" />
             <IconTile name="italic" />
@@ -765,12 +780,9 @@ export default function DesignSystemScreen() {
             <IconTile name="link-m" />
             <IconTile name="strikethrough" />
             <IconTile name="underline" />
-            <TilesFiller />
-          </HStack>
-          <Heading lvl={3} style={tw`text-center m-0`}>
-            Nodes
-          </Heading>
-          <HStack flexWrap="wrap">
+          </DSTiles>
+          <Heading lvl={3}>Nodes</Heading>
+          <DSTiles>
             <IconTile name="at-line" />
             <IconTile name="code-s-slash-line" />
             <IconTile name="double-quotes-l" />
@@ -781,27 +793,22 @@ export default function DesignSystemScreen() {
             <IconTile name="h-4" />
             <IconTile name="h-5" />
             <IconTile name="h-6" />
-            <IconTile name="indent-decrease" />
-            <IconTile name="indent-increase" />
-            <IconTile name="list-check" />
             <IconTile name="list-check-2" />
+            <IconTile name="list-check" />
             <IconTile name="list-ordered" />
             <IconTile name="list-unordered" />
             <IconTile name="paragraph" />
-            <IconTile name="table-2" />
             <IconTile name="text" />
-            <TilesFiller />
-          </HStack>
-          <Heading lvl={3} style={tw`text-center m-0`}>
-            Extension
-          </Heading>
-          <HStack flexWrap="wrap">
+            <IconTile name="table-2" />
+          </DSTiles>
+          <Heading lvl={3}>Extension</Heading>
+          <DSTiles>
             <IconTile name="font-color" />
-          </HStack>
-          <Heading lvl={3} style={tw`text-center m-0`}>
-            Editor Custom
-          </Heading>
-          <HStack flexWrap="wrap">
+          </DSTiles>
+          <Heading lvl={3}>Editor Custom</Heading>
+          <DSTiles>
+            <IconTile name="arrow-go-back-line" />
+            <IconTile name="arrow-go-forward-line" />
             <IconTile name="attachment-2" />
             <IconTile name="font-size-2" />
             <IconTile name="format-clear" />
@@ -809,78 +816,91 @@ export default function DesignSystemScreen() {
             <IconTile name="hashtag" />
             <IconTile name="page-separator" />
             <IconTile name="separator" />
-            <TilesFiller />
-          </HStack>
-          <Heading lvl={3} style={tw`text-center m-0`}>
-            UI
-          </Heading>
-          <HStack flexWrap="wrap">
-            <IconTile name="add-line" />
-            <IconTile name="archive-fill" />
-            <IconTile name="archive-line" />
-            <IconTile name="arrow-down-filled" />
-            <IconTile name="arrow-down-s-fill" />
-            <IconTile name="arrow-down-s-line" />
-            <IconTile name="arrow-go-back-fill" />
-            <IconTile name="arrow-go-back-line" />
-            <IconTile name="arrow-go-forward-fill" />
-            <IconTile name="arrow-go-forward-line" />
-            <IconTile name="arrow-right-s-line" />
-            <IconTile name="arrow-right" />
-            <IconTile name="arrow-right-filled" />
-            <IconTile name="arrow-up-down-line" />
-            <IconTile name="bookmark-fill" />
-            <IconTile name="bookmark-line" />
-            <IconTile name="book-open-line" />
             <IconTile name="calendar-check-fill" />
-            <IconTile name="chat-1-line" />
-            <IconTile name="chat-4-line" />
-            <IconTile name="check-line" />
-            <IconTile name="close-circle-fill" />
-            <IconTile name="command-line" />
-            <IconTile name="cup-line" />
-            <IconTile name="cursor" />
-            <IconTile name="delete-bin-line" />
-            <IconTile name="double-arrow-left" />
-            <IconTile name="double-arrow-right" />
-            <IconTile name="download-line" />
-            <IconTile name="emotion-line" />
-            <IconTile name="external-link-line" />
-            <IconTile name="file-add-fill" />
-            <IconTile name="file-add-line" />
-            <IconTile name="file-copy-line" />
-            <IconTile name="file-line" />
-            <IconTile name="file-search-line" />
-            <IconTile name="file-transfer-line" />
-            <IconTile name="folder-fill" />
-            <IconTile name="folder-line" />
-            <IconTile name="folder-music-line" />
-            <IconTile name="history-line" />
             <IconTile name="image-2-line" />
             <IconTile name="image-line" />
-            <IconTile name="information-fill" />
-            <IconTile name="information-line" />
-            <IconTile name="more" />
-            <IconTile name="more-2-line" />
-            <IconTile name="more-line" />
             <IconTile name="movie-line" />
-            <IconTile name="plus" />
+            <IconTile name="folder-music-line" />
+            <IconTile name="emotion-line" />
+          </DSTiles>
+          <Heading lvl={3}>Navigation</Heading>
+          <DSTiles>
+            <IconTile name="double-arrow-left" />
+            <IconTile name="double-arrow-right" />
+            <IconTile name="arrow-right-s-line" />
+            <IconTile name="arrow-down-s-line" />
+            <IconTile name="arrow-up-down-line" />
+            <IconTile name="more-line" />
+            <IconTile name="more-2-line" />
+          </DSTiles>
+          <Heading lvl={3}>Actions</Heading>
+          <DSTiles>
+            <IconTile name="check-line" />
+            <IconTile name="close-circle-fill" />
+            <IconTile name="add-line" />
+            {/* settings (6) */}
+            <IconTile name="download-line" />
             <IconTile name="printer-line" />
-            <IconTile name="question-mark" />
             <IconTile name="search-line" />
-            <IconTile name="settings-4-line" />
             <IconTile name="stars-s-fill" />
+            <IconTile name="delete-bin-line" />
+            <IconTile name="history-line" />
+            <IconTile name="cup-line" />
+            <IconTile name="question-mark" />
+            <IconTile name="file-copy-line" />
+            <IconTile name="chat-1-line" />
+            <IconTile name="chat-4-line" />
+            {/* pencil line */}
+            {/* error warning line */}
+          </DSTiles>
+          <Heading lvl={3}>Page &amp; Folder</Heading>
+          <DSTiles>
+            <IconTile name="archive-line" />
+            <IconTile name="archive-fill" />
+            <IconTile name="file-transfer-line" />
+            <IconTile name="file-search-line" />
+            <IconTile name="book-open-line" />
+            <IconTile name="folder-line" />
+            <IconTile name="folder-fill" />
+            <IconTile name="bookmark-line" />
+            <IconTile name="bookmark-fill" />
+            <IconTile name="file-line" />
+            <IconTile name="file-add-line" />
+            <IconTile name="file-add-fill" />
+          </DSTiles>
+          <Heading lvl={3}>Custom</Heading>
+          <DSTiles>
+            <IconTile name="plus" />
+            <IconTile name="more" />
+            <IconTile name="cursor" />
+            <IconTile name="arrow-right-filled" />
+            <IconTile name="arrow-down-filled" />
             <IconTile name="serenity-feather" />
-            <IconTile name="warning-fill" />
-            <TilesFiller />
-          </HStack>
-          <Heading lvl={3} style={tw`text-center m-0`}>
-            Sidebar
-          </Heading>
-          <HStack flexWrap="wrap">
+          </DSTiles>
+          <Heading lvl={3}>UI</Heading>
+          <DSTiles>
+            <IconTile name="command-line" />
+            <IconTile name="external-link-line" />
+            <IconTile name="information-line" />
+          </DSTiles>
+          <Heading lvl={3}>Sidebar</Heading>
+          <DSTiles>
             <IconTile name="folder" />
             <IconTile name="page" />
-          </HStack>
+          </DSTiles>
+          <Heading lvl={3}>Rest</Heading>
+          <DSTiles>
+            {/* in use */}
+            <IconTile name="warning-fill" />
+            <IconTile name="settings-4-line" />
+
+            {/* really needed as we have others ?? */}
+            <IconTile name="arrow-down-s-fill" />
+            <IconTile name="arrow-go-back-fill" />
+            <IconTile name="arrow-go-forward-fill" />
+            <IconTile name="arrow-right" />
+            <IconTile name="information-fill" />
+          </DSTiles>
         </DSExampleArea>
 
         <Heading lvl={1}>Info Messages</Heading>
