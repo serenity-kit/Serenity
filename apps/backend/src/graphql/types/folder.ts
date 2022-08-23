@@ -7,7 +7,7 @@ export const Folder = objectType({
     t.nonNull.string("name");
     t.string("encryptedName");
     t.string("encryptedNameNonce");
-    t.int("subKeyId");
+    t.int("subkeyId");
     t.string("parentFolderId");
     t.string("rootFolderId");
     t.string("workspaceId");

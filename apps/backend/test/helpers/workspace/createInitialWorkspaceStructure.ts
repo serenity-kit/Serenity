@@ -75,7 +75,7 @@ export const createInitialWorkspaceStructure = async ({
           name
           encryptedName
           encryptedNameNonce
-          subKeyId
+          subkeyId
           parentFolderId
           rootFolderId
           workspaceId
@@ -91,7 +91,7 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedFolderName = encryptedFolderResult.ciphertext;
   const encryptedFolderNameNonce = encryptedFolderResult.publicNonce;
   const folderSubkeyId = encryptedFolderResult.folderSubkeyId;
-  const folderKey = encryptedFolderResult.folderSubKey;
+  const folderKey = encryptedFolderResult.folderSubkey;
 
   const documentKeyResult = await createDocumentKey({
     folderKey,

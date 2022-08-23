@@ -1,4 +1,4 @@
-import { ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Folder } from "../../types/folder";
 import { prisma } from "../prisma";
 
@@ -8,7 +8,7 @@ type Params = {
   name?: string;
   encryptedName: string;
   encryptedNameNonce: string;
-  subKeyId: number;
+  subkeyId: number;
   parentFolderId?: string;
   workspaceId: string;
 };
@@ -19,7 +19,7 @@ export async function createFolder({
   name,
   encryptedName,
   encryptedNameNonce,
-  subKeyId,
+  subkeyId,
   parentFolderId,
   workspaceId,
 }: Params) {
@@ -27,56 +27,68 @@ export async function createFolder({
   if (name) {
     folderName = name;
   }
-  try {
-    return await prisma.$transaction(async (prisma) => {
-      // make sure we have permissions to do stuff with this workspace
-      const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+  return await prisma.$transaction(async (prisma) => {
+    const folderforId = await prisma.folder.findFirst({
+      where: { id },
+      select: { id: true },
+    });
+    if (folderforId) {
+      throw new UserInputError("Invalid input: duplicate id");
+    }
+    // to prevent an internal server error
+    // throw a bad user input on duplicate subkeyid
+    const folderForSubkeyId = await prisma.folder.findFirst({
+      where: { subkeyId, workspaceId },
+      select: { id: true },
+    });
+    if (folderForSubkeyId) {
+      throw new UserInputError("Invalid input: duplicate subKeyId");
+    }
+    // make sure we have permissions to do stuff with this workspace
+    const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+      where: {
+        userId,
+        workspaceId,
+      },
+    });
+    if (!userToWorkspace) {
+      throw new ForbiddenError("Unauthorized");
+    }
+    // if there is a parentId, then grab it's root folder id for our own
+    let rootFolderId: string | null = null;
+    if (parentFolderId) {
+      const parentFolder = await prisma.folder.findFirst({
         where: {
-          userId,
-          workspaceId,
+          id: parentFolderId,
+          workspaceId: workspaceId,
         },
       });
-      if (!userToWorkspace) {
+      if (!parentFolder) {
         throw new ForbiddenError("Unauthorized");
       }
-      // if there is a parentId, then grab it's root folder id for our own
-      let rootFolderId: string | null = null;
-      if (parentFolderId) {
-        const parentFolder = await prisma.folder.findFirst({
-          where: {
-            id: parentFolderId,
-            workspaceId: workspaceId,
-          },
-        });
-        if (!parentFolder) {
-          throw new ForbiddenError("Unauthorized");
-        }
-        if (parentFolder.rootFolderId) {
-          rootFolderId = parentFolder.rootFolderId;
-        } else {
-          rootFolderId = parentFolder.id;
-        }
+      if (parentFolder.rootFolderId) {
+        rootFolderId = parentFolder.rootFolderId;
+      } else {
+        rootFolderId = parentFolder.id;
       }
-      const rawFolder = await prisma.folder.create({
-        data: {
-          id,
-          idSignature: "TODO",
-          name: folderName,
-          encryptedName,
-          encryptedNameNonce,
-          subKeyId,
-          parentFolderId,
-          rootFolderId,
-          workspaceId,
-        },
-      });
-      const folder: Folder = {
-        ...rawFolder,
-        parentFolders: [],
-      };
-      return folder;
+    }
+    const rawFolder = await prisma.folder.create({
+      data: {
+        id,
+        idSignature: "TODO",
+        name: folderName,
+        encryptedName,
+        encryptedNameNonce,
+        subkeyId,
+        parentFolderId,
+        rootFolderId,
+        workspaceId,
+      },
     });
-  } catch (error) {
-    throw error;
-  }
+    const folder: Folder = {
+      ...rawFolder,
+      parentFolders: [],
+    };
+    return folder;
+  });
 }

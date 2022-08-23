@@ -79,7 +79,7 @@ test("user should be able to change a folder name", async () => {
   expect(updatedFolder.name).toBe(name);
   expect(typeof updatedFolder.encryptedName).toBe("string");
   expect(typeof updatedFolder.encryptedNameNonce).toBe("string");
-  expect(typeof updatedFolder.subKeyId).toBe("number");
+  expect(typeof updatedFolder.subkeyId).toBe("number");
   expect(updatedFolder.parentFolderId).toBe(null);
   expect(updatedFolder.rootFolderId).toBe(null);
   expect(updatedFolder.workspaceId).toBe(addedWorkspace.id);
@@ -120,7 +120,7 @@ test("throw error on duplicate subkeyId", async () => {
           id
           encryptedName
           encryptedNameNonce
-          subKeyId
+          subkeyId
           parentFolderId
           rootFolderId
           workspaceId
@@ -138,7 +138,7 @@ test("throw error on duplicate subkeyId", async () => {
             name,
             encryptedName: encryptedFolderResult.ciphertext,
             encryptedNameNonce: encryptedFolderResult.publicNonce,
-            subkeyId: existingFolder?.subKeyId,
+            subkeyId: existingFolder?.subkeyId,
           },
         },
         authorizationHeaders
