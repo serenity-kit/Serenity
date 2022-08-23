@@ -9,7 +9,7 @@ type Params = {
   publicData?: any;
 };
 
-// Having a specific "folder__" context allows us to use have the same subKeyId
+// Having a specific "folder__" context allows us to use have the same subkeyId
 // for one parentKey and checking only the uniquness for this type.
 export const folderDerivedKeyContext = "folder__";
 
@@ -31,7 +31,7 @@ export const encryptFolder = async (params: Params) => {
     folderKey.key
   );
   return {
-    folderSubKey: folderKey.key,
+    folderSubkey: folderKey.key,
     folderSubkeyId: folderKey.subkeyId,
     ciphertext: result.ciphertext,
     publicNonce: result.publicNonce,

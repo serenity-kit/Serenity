@@ -21,7 +21,7 @@ export async function updateFolderName({
   try {
     return await prisma.$transaction(async (prisma) => {
       const folderWithSubkeyId = await prisma.folder.findFirst({
-        where: { subKeyId: subkeyId },
+        where: { subkeyId },
         select: { id: true },
       });
       if (folderWithSubkeyId) {
@@ -58,7 +58,7 @@ export async function updateFolderName({
           name,
           encryptedName,
           encryptedNameNonce,
-          subKeyId: subkeyId,
+          subkeyId,
         },
       });
       return updatedFolder;

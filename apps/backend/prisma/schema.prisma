@@ -23,7 +23,7 @@ model Document {
   name               String?
   encryptedName      String?
   encryptedNameNonce String?
-  subkeyId           Int?       @unique
+  subkeyId           Int?
 
   @@unique([subkeyId, workspaceId])
 }
@@ -191,7 +191,7 @@ model Folder {
   name               String // TODO must be encrypted
   encryptedName      String?
   encryptedNameNonce String?
-  subKeyId           Int?       @unique
+  subkeyId           Int?
   workspace          Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId        String
   parentFolder       Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
@@ -202,4 +202,6 @@ model Folder {
   childFolders       Folder[]   @relation("parentFolder")
   descendent         Folder[]   @relation("rootFolder")
   documents          Document[]
+
+  @@unique([subkeyId, workspaceId])
 }

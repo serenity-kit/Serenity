@@ -27,7 +27,7 @@ export const createFolder = async ({
     name,
     parentKey,
   });
-  const subKeyId = encryptedFolderResult.folderSubkeyId;
+  const subkeyId = encryptedFolderResult.folderSubkeyId;
   const encryptedName = encryptedFolderResult.ciphertext;
   const encryptedNameNonce = encryptedFolderResult.publicNonce;
 
@@ -39,7 +39,7 @@ export const createFolder = async ({
           name
           encryptedName
           encryptedNameNonce
-          subKeyId
+          subkeyId
           parentFolderId
           rootFolderId
           workspaceId
@@ -56,7 +56,7 @@ export const createFolder = async ({
         encryptedName,
         encryptedNameNonce,
         parentFolderId,
-        subKeyId,
+        subkeyId,
         workspaceId,
       },
     },

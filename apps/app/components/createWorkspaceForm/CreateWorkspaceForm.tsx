@@ -95,7 +95,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     });
     const documentName = "Introduction";
     const documentKeyData = await createDocumentKey({
-      folderKey: encryptedFolderResult.folderSubKey,
+      folderKey: encryptedFolderResult.folderSubkey,
     });
     const encryptedDocumentTitle = await encryptDocumentTitle({
       title: documentName,

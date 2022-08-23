@@ -177,17 +177,29 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       name,
       parentKey: workspaceKey,
     });
-    const result = await createFolderMutation({
-      input: {
-        id,
-        workspaceId: route.params.workspaceId,
-        name,
-        encryptedName: encryptedFolderResult.ciphertext,
-        encryptedNameNonce: encryptedFolderResult.publicNonce,
-        subKeyId: encryptedFolderResult.folderSubkeyId,
-      },
-    });
-    if (!result.data?.createFolder?.folder?.id) {
+    let didCreateFolderSucceed = false;
+    let numCreateFolderAttempts = 0;
+    let folderId: string | undefined = undefined;
+    let result: any = undefined;
+    do {
+      numCreateFolderAttempts += 1;
+      result = await createFolderMutation({
+        input: {
+          id,
+          workspaceId: route.params.workspaceId,
+          name,
+          encryptedName: encryptedFolderResult.ciphertext,
+          encryptedNameNonce: encryptedFolderResult.publicNonce,
+          subkeyId: encryptedFolderResult.folderSubkeyId,
+        },
+      });
+      if (result.data?.createFolder?.folder?.id) {
+        didCreateFolderSucceed = true;
+        folderId = result.data?.createFolder?.folder?.id;
+      }
+      console.log({ numCreateFolderAttempts });
+    } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
+    if (!folderId) {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
     }
@@ -408,7 +420,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               key={folder.id}
               folderId={folder.id}
               folderName={folder.name}
-              folderSubkeyId={folder.subKeyId}
+              folderSubkeyId={folder.subkeyId}
               workspaceId={route.params.workspaceId}
               onStructureChange={refetchRootFolders}
             />

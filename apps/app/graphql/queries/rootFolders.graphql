@@ -5,7 +5,7 @@ query rootFolders($workspaceId: ID!, $first: Int!, $after: String) {
       name
       encryptedName
       encryptedNameNonce
-      subKeyId
+      subkeyId
       parentFolderId
       rootFolderId
       workspaceId
