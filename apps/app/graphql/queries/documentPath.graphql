@@ -4,7 +4,7 @@ query documentPath($id: ID!) {
     name
     encryptedName
     encryptedNameNonce
-    subKeyId
+    subkeyId
     parentFolderId
     rootFolderId
     workspaceId

@@ -100,7 +100,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     const folderKeyResult = await kdfDeriveFromKey({
       key: workspaceKey,
       context: folderDerivedKeyContext,
-      subkeyId: folder.subKeyId!,
+      subkeyId: folder.subkeyId!,
     });
     const documentKeyData = await createDocumentKey({
       folderKey: folderKeyResult.key,

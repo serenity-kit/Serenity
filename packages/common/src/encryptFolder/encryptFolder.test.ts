@@ -12,8 +12,8 @@ test("encryptFolder", async () => {
     parentKey: kdfKey,
     name: "Getting started",
   });
-  expect(typeof result.folderSubKey).toBe("string");
-  expect(result.folderSubKey.length).toBe(43);
+  expect(typeof result.folderSubkey).toBe("string");
+  expect(result.folderSubkey.length).toBe(43);
   expect(typeof result.folderSubkeyId).toBe("number");
   expect(typeof result.ciphertext).toBe("string");
   expect(typeof result.publicNonce).toBe("string");

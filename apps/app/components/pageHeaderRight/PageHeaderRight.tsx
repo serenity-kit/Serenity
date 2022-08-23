@@ -1,5 +1,11 @@
-import { useHasEditorSidebar } from "@serenity-tools/editor/hooks/useHasEditorSidebar";
-import { tw, Avatar, AvatarGroup, Button, Icon } from "@serenity-tools/ui";
+import {
+  tw,
+  Avatar,
+  AvatarGroup,
+  Button,
+  Icon,
+  useHasEditorSidebar,
+} from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { Modal } from "@serenity-tools/ui";
 import React, { useState } from "react";
@@ -19,11 +25,11 @@ export function PageHeaderRight() {
         alignItems="center"
       >
         <AvatarGroup max={hasEditorSidebar ? 3 : 2} _avatar={{ size: "sm" }}>
-          <Avatar bg="green.400">BE</Avatar>
-          <Avatar bg="yellow.400">AN</Avatar>
-          <Avatar bg="orange.400">NG</Avatar>
-          <Avatar bg="yellow.300">NG</Avatar>
-          <Avatar bg="green.300">NG</Avatar>
+          <Avatar customColor="emerald">BE</Avatar>
+          <Avatar customColor="honey">NG</Avatar>
+          <Avatar customColor="orange">AB</Avatar>
+          <Avatar customColor="rose">SK</Avatar>
+          <Avatar customColor="serenity">AD</Avatar>
         </AvatarGroup>
         {hasEditorSidebar ? (
           <Button

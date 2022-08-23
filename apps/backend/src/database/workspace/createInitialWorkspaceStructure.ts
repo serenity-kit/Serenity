@@ -64,7 +64,7 @@ export async function createInitialWorkspaceStructure({
     name: folderName,
     encryptedName: encryptedFolderName,
     encryptedNameNonce: encryptedFolderNameNonce,
-    subKeyId: folderSubkeyId,
+    subkeyId: folderSubkeyId,
     parentFolderId: undefined,
     workspaceId: workspace.id,
   });

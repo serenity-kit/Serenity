@@ -40,7 +40,7 @@ beforeAll(async () => {
   const folderKeyResult = await kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
-    subkeyId: addedFolder.subKeyId,
+    subkeyId: addedFolder.subkeyId,
   });
   folderKey = folderKeyResult.key;
 });

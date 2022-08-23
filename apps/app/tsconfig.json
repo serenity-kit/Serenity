@@ -11,7 +11,7 @@
     "target": "esnext",
     "esModuleInterop": true,
     "module": "esnext",
-    "isolatedModules": true,
+    // "isolatedModules": true, // disabled because of native-base issues
     "allowJs": true // Seems to be needed for index.js
   },
   "include": ["**/*.ts", "**/*.tsx"],

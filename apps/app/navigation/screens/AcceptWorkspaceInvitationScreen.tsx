@@ -8,6 +8,7 @@ import {
   LinkButton,
   InfoMessage,
   Spinner,
+  CenterContent,
 } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
 import { useAuthentication } from "../../context/AuthenticationContext";
@@ -22,11 +23,9 @@ import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspace
 import { VStack } from "native-base";
 
 const Wrapper = ({ children }) => (
-  <View
-    style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
-  >
+  <CenterContent serenityBg>
     <Box plush>{children}</Box>
-  </View>
+  </CenterContent>
 );
 
 const LoadingErrorWrapper = ({ children }) => (

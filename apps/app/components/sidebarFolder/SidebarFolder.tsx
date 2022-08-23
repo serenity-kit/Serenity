@@ -118,19 +118,32 @@ export default function SidebarFolder(props: Props) {
       name,
       parentKey: workspaceKey,
     });
-    const result = await createFolderMutation({
-      input: {
-        id,
-        name,
-        encryptedName: encryptedFolderResult.ciphertext,
-        encryptedNameNonce: encryptedFolderResult.publicNonce,
-        subKeyId: encryptedFolderResult.folderSubkeyId,
-        workspaceId: props.workspaceId,
-        parentFolderId: props.folderId,
-      },
-    });
-    if (result.data?.createFolder?.folder?.id) {
-      // TODO show notification
+    let didCreateFolderSucceed = false;
+    let numCreateFolderAttempts = 0;
+    let folderId: string | undefined = undefined;
+    let result: any = undefined;
+    do {
+      numCreateFolderAttempts += 1;
+      result = await createFolderMutation({
+        input: {
+          id,
+          workspaceId: route.params.workspaceId,
+          name,
+          encryptedName: encryptedFolderResult.ciphertext,
+          encryptedNameNonce: encryptedFolderResult.publicNonce,
+          subkeyId: encryptedFolderResult.folderSubkeyId,
+          parentFolderId: props.folderId,
+        },
+      });
+      console.log({ result });
+      if (result.data?.createFolder?.folder?.id) {
+        didCreateFolderSucceed = true;
+        folderId = result.data?.createFolder?.folder?.id;
+        console.log({ folderId });
+        setIsEditing("none");
+      }
+    } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
+    if (folderId) {
       setIsEditing("none");
     } else {
       console.error(result.error);
@@ -268,7 +281,8 @@ export default function SidebarFolder(props: Props) {
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
 
-  const maxWidth = 32 - depth * 2;
+  const maxWidthBase = isDesktopDevice ? 32 : 42;
+  const maxWidth = maxWidthBase - depth * 2;
 
   return (
     <>

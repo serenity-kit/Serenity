@@ -2,7 +2,7 @@ import "./editor-output.css";
 import "./awareness.css";
 import React, { useRef, useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
-import { tw, View } from "@serenity-tools/ui";
+import { tw, useHasEditorSidebar, View } from "@serenity-tools/ui";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
 import { Level } from "@tiptap/extension-heading";
@@ -14,7 +14,6 @@ import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import Placeholder from "@tiptap/extension-placeholder";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
-import { useHasEditorSidebar } from "./hooks/useHasEditorSidebar";
 import { EditorEvents } from "@tiptap/core";
 
 type EditorProps = {

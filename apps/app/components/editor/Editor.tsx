@@ -9,7 +9,13 @@ import {
 import { WebView } from "react-native-webview";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
-import { Spinner, tw, View } from "@serenity-tools/ui";
+import {
+  CenterContent,
+  Spinner,
+  tw,
+  View,
+  useHasEditorSidebar,
+} from "@serenity-tools/ui";
 import * as Y from "yjs";
 import { EditorProps } from "./types";
 import { source } from "../../webviews/editor/source";
@@ -89,7 +95,10 @@ export default function Editor({
 
   const editorHeight = dimensions.height - headerHeight;
 
-  const [isVisible, setIsVisible] = useState(false);
+  const [isEditorBottombarVisible, setIsEditorBottombarVisible] =
+    useState(false);
+  const hasEditorSidebar = useHasEditorSidebar();
+
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [keyboardAnimationDuration, setKeyboardAnimationDuration] = useState(0);
 
@@ -99,11 +108,11 @@ export default function Editor({
       (event) => {
         setKeyboardAnimationDuration(event.duration);
         setKeyboardHeight(event.endCoordinates.height);
-        setIsVisible(true);
+        setIsEditorBottombarVisible(true);
       }
     );
     const hideSubscription = Keyboard.addListener("keyboardWillHide", () => {
-      setIsVisible(false);
+      setIsEditorBottombarVisible(false);
     });
 
     return () => {
@@ -168,9 +177,9 @@ export default function Editor({
         // scrollEnabled={Platform.OS === "macos" ? true : false}
         scrollEnabled={true}
         renderLoading={() => (
-          <View style={tw`justify-center items-center flex-auto`}>
+          <CenterContent>
             <Spinner fadeIn size="lg" />
-          </View>
+          </CenterContent>
         )}
         onMessage={async (event) => {
           // event.persist();
@@ -234,7 +243,7 @@ export default function Editor({
         }}
       />
 
-      {isVisible && (
+      {!hasEditorSidebar && isEditorBottombarVisible ? (
         <BottombarWrapper
           keyboardHeight={keyboardHeight}
           keyboardAnimationDuration={keyboardAnimationDuration}
@@ -246,7 +255,7 @@ export default function Editor({
         `);
           }}
         />
-      )}
+      ) : null}
     </>
   );
 }

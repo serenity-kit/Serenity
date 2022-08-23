@@ -1,5 +1,13 @@
 import React from "react";
-import { Text, View, Box, tw, Link, Icon } from "@serenity-tools/ui";
+import {
+  Text,
+  View,
+  Box,
+  tw,
+  Link,
+  Icon,
+  CenterContent,
+} from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../types/navigation";
 import RegisterForm from "../../components/register/RegisterForm";
 import { KeyboardAvoidingView } from "react-native";
@@ -18,9 +26,7 @@ export default function RegisterScreen(
   return (
     <SafeAreaView style={tw`flex-auto`}>
       <KeyboardAvoidingView behavior="padding" style={tw`flex-auto`}>
-        <View
-          style={tw`bg-white xs:bg-primary-900 justify-center items-center flex-auto`}
-        >
+        <CenterContent serenityBg>
           <Box plush>
             <View>
               <Text variant="large" bold style={tw`text-center`}>
@@ -45,7 +51,7 @@ export default function RegisterScreen(
               <Icon name="dashboard-line" color={tw.color("gray-500")} />
             </Link>
           </View>
-        </View>
+        </CenterContent>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

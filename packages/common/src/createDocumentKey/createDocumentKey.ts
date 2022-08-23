@@ -4,7 +4,7 @@ type Params = {
   folderKey: string;
 };
 
-// Having a specific "document" context allows us to use have the same subKeyId
+// Having a specific "document" context allows us to use have the same subkeyId
 // for one folderKey and checking only the uniquness for this type.
 export const documentDerivedKeyContext = "document";
 

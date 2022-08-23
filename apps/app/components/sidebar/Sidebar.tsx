@@ -21,6 +21,7 @@ import {
   tw,
   useIsPermanentLeftSidebar,
   View,
+  WorkspaceAvatar,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
@@ -176,17 +177,29 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       name,
       parentKey: workspaceKey,
     });
-    const result = await createFolderMutation({
-      input: {
-        id,
-        workspaceId: route.params.workspaceId,
-        name,
-        encryptedName: encryptedFolderResult.ciphertext,
-        encryptedNameNonce: encryptedFolderResult.publicNonce,
-        subKeyId: encryptedFolderResult.folderSubkeyId,
-      },
-    });
-    if (!result.data?.createFolder?.folder?.id) {
+    let didCreateFolderSucceed = false;
+    let numCreateFolderAttempts = 0;
+    let folderId: string | undefined = undefined;
+    let result: any = undefined;
+    do {
+      numCreateFolderAttempts += 1;
+      result = await createFolderMutation({
+        input: {
+          id,
+          workspaceId: route.params.workspaceId,
+          name,
+          encryptedName: encryptedFolderResult.ciphertext,
+          encryptedNameNonce: encryptedFolderResult.publicNonce,
+          subkeyId: encryptedFolderResult.folderSubkeyId,
+        },
+      });
+      if (result.data?.createFolder?.folder?.id) {
+        didCreateFolderSucceed = true;
+        folderId = result.data?.createFolder?.folder?.id;
+      }
+      console.log({ numCreateFolderAttempts });
+    } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
+    if (!folderId) {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
     }
@@ -228,15 +241,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   isFocusVisible && tw`se-inset-focus-mini`,
                 ]}
               >
-                <Avatar borderRadius={4} size="xs" bg={tw.color("primary-400")}>
-                  {/* TODO show conditionally when no image-source is set */}
-                  <Icon
-                    name="serenity-feather"
-                    color={tw.color("black/35")}
-                    size={5}
-                    mobileSize={5}
-                  />
-                </Avatar>
+                <WorkspaceAvatar />
                 <Text
                   variant="xs"
                   bold
@@ -293,20 +298,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                     }}
                     style={tw`p-menu-item`}
                   >
-                    <Avatar
-                      borderRadius={4}
-                      size="xs"
-                      // TODO adjust color for each workspace if no image is set
-                      bg={tw.color(`collaboration-honey`)}
+                    <WorkspaceAvatar
+                      customColor={"honey"}
                       key={`avatar_${workspace.id}`}
-                    >
-                      <Icon
-                        name="serenity-feather"
-                        color={tw.color("black/35")}
-                        size={5}
-                        mobileSize={5}
-                      />
-                    </Avatar>
+                    />
                     <Text variant="xs">{workspace.name}</Text>
                   </SidebarLink>
                 )
@@ -425,7 +420,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               key={folder.id}
               folderId={folder.id}
               folderName={folder.name}
-              folderSubkeyId={folder.subKeyId}
+              folderSubkeyId={folder.subkeyId}
               workspaceId={route.params.workspaceId}
               onStructureChange={refetchRootFolders}
             />

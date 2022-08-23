@@ -9,7 +9,6 @@ import {
   ScrollView,
   SidebarButton,
   Checkbox,
-  Pressable,
   Link,
   EditorSidebarIcon,
   LabeledInput,
@@ -31,12 +30,19 @@ import {
   ScrollSafeAreaView,
   EditorBottombarButton,
   EditorBottombarDivider,
+  CenterContent,
+  Box,
+  Mono,
+  DesignSystemHeading as Heading,
+  DesignSystemExampleArea as DSExampleArea,
+  DesignSystemMono as DSMono,
+  WorkspaceAvatar,
+  collaborationColors,
+  LinkExternal,
 } from "@serenity-tools/ui";
-import { Columns, Column, Tiles } from "@mobily/stacks";
 import React, { useState } from "react";
 import { useWindowDimensions, StyleSheet } from "react-native";
 import { VStack, HStack } from "native-base";
-import { theme } from "../../../../tailwind.config";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { showToast } from "../../utils/toast/showToast";
 
@@ -46,593 +52,1680 @@ export default function DesignSystemScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [showModal, setShowModal] = useState(false);
   const [isOpenPopover, setIsOpenPopover] = useState(false);
-  const collabColors = Object.keys(theme.colors.collaboration);
   const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
 
-  const styles = StyleSheet.create({
-    header: tw`mt-12 mb-4 text-2xl`,
-    subHeader: tw`mt-4 mb-2`,
-  });
-
-  // TODO extract into ui as components
-  const DesignSystemHeader = (props) => {
+  const IconTile = (props) => {
     return (
-      <Text variant="large" style={[styles.header, props.style]} bold>
-        {props.children}
-      </Text>
+      <CenterContent style={tw`w-30 h-20`}>
+        <Icon name={props.name} size={6} />
+        <Text variant="xxs" muted style={tw`mt-2 capitalize`}>
+          {props.name.replace(/-./g, (x) => x[1].toUpperCase())}
+        </Text>
+      </CenterContent>
     );
   };
 
-  const DesignSystemSubHeader = (props) => {
+  // fakes filling elements into container to hinder the last wrapping children to grow and center themselves
+  const TilesFiller = (props) => {
     return (
-      <Text variant="small" style={[styles.subHeader, props.style]} muted>
-        {props.children}
-      </Text>
+      <>
+        <View style={tw`flex-auto w-30 h-0`} />
+        <View style={tw`flex-auto w-30 h-0`} />
+        <View style={tw`flex-auto w-30 h-0`} />
+        <View style={tw`flex-auto w-30 h-0`} />
+        <View style={tw`flex-auto w-30 h-0`} />
+        <View style={tw`flex-auto w-30 h-0`} />
+      </>
     );
   };
 
-  // TODO refactor order
+  const DSTiles = (props) => {
+    return (
+      <HStack {...props} flexWrap={"wrap"}>
+        {props.children}
+        <TilesFiller />
+      </HStack>
+    );
+  };
+
+  // DesignSystemScreen specific
+  const h4Styles = tw`mt-8 -mb-4`;
+
   return (
-    <ScrollSafeAreaView style={tw`px-4 py-6`}>
-      <DesignSystemHeader style={tw`mt-6`}>EditorBottombar</DesignSystemHeader>
-      <HStack space={2} alignItems="center">
-        <EditorBottombarButton name="arrow-down-s-line" />
-        <EditorBottombarButton name="text" />
-        <EditorBottombarButton name="list-unordered" />
-        <EditorBottombarDivider />
-        <EditorBottombarButton name="image-2-line" />
-        <EditorBottombarButton name="at-line" />
-        <EditorBottombarButton name="chat-1-line" />
-        <EditorBottombarDivider />
-        <EditorBottombarButton name="link" isActive />
-      </HStack>
-      <DesignSystemHeader style={tw`mb-0`}>Info Messages</DesignSystemHeader>
-      <DesignSystemSubHeader>Info</DesignSystemSubHeader>
-      <VStack space={2} style={tw`max-w-90`}>
-        <InfoMessage>
-          The verification code is prefilled on staging.
-        </InfoMessage>
-        <InfoMessage icon>
-          The verification code is prefilled on staging.
-        </InfoMessage>
-      </VStack>
-      <DesignSystemSubHeader>Error</DesignSystemSubHeader>
-      <VStack space={2} style={tw`max-w-90`}>
-        <InfoMessage variant="error">
-          Unfortunately your registration request failed due a network error.
-          Please try again later.
-        </InfoMessage>
-        <InfoMessage variant="error" icon>
-          Unfortunately your registration request failed due a network error.
-          Please try again later.
-        </InfoMessage>
-      </VStack>
-      <DesignSystemHeader>Tooltip</DesignSystemHeader>
-      <HStack>
-        <Tooltip label="This is a tip!" placement="right">
-          <IconButton name="file-add-line" color="gray-500" large />
-        </Tooltip>
-      </HStack>
-      <Text variant="large" style={tw`mt-12 mb-4 text-2xl`} bold>
-        Elevation
-      </Text>
-      <HStack space={3} style={tw`pt-2 pb-4 pr-2 overflow-scroll`}>
-        {elevationLevels.map((level) => {
-          return (
-            <BoxShadow elevation={level} rounded>
-              <HStack
-                style={tw`h-24 w-24 bg-white rounded`}
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Text variant="xxs" muted>
-                  elevation {level}
-                </Text>
-              </HStack>
-            </BoxShadow>
-          );
-        })}
-      </HStack>
-      <DesignSystemHeader>Text</DesignSystemHeader>
-      <Text variant="large">large Text</Text>
-      <Text>regular Text</Text>
-      <Text variant="small">small Text</Text>
-      <Text variant="xs">xs Text</Text>
-      <Text variant="xxs">xxs Text</Text>
-      <Text style={tw`pt-4`} variant="large" bold>
-        bold large Text
-      </Text>
-      <Text bold>bold regular Text</Text>
-      <Text variant="small" bold>
-        bold small Text
-      </Text>
-      <Text variant="xs" bold>
-        bold xs Text
-      </Text>
-      <Text variant="xxs" bold>
-        bold xxs Text
-      </Text>
-      <Text style={tw`pt-4`} variant="large" muted>
-        muted large Text
-      </Text>
-      <Text muted>muted regular Text</Text>
-      <Text variant="small" muted>
-        muted small Text
-      </Text>
-      <Text variant="xs" muted>
-        muted xs Text
-      </Text>
-      <Text variant="xxs" muted>
-        muted xxs Text
-      </Text>
-      <DesignSystemHeader>Icon Button</DesignSystemHeader>
-      <HStack alignItems="center" space={4}>
-        <IconButton name="add-line" color="gray-500" />
-        <IconButton name="menu" color="gray-800" large />
-      </HStack>
-      <DesignSystemHeader style={tw`mb-0`}>Button</DesignSystemHeader>
-      <DesignSystemSubHeader>Default Button</DesignSystemSubHeader>
-      <Button>Login</Button>
-      <DesignSystemSubHeader>Disabled Button</DesignSystemSubHeader>
-      <Button disabled>Login</Button>
-      <DesignSystemSubHeader>Loading Button</DesignSystemSubHeader>
-      <Button isLoading>Login</Button>
-      <DesignSystemSubHeader>Secondary Button</DesignSystemSubHeader>
-      <Button variant="secondary">Login</Button>
-      <DesignSystemSubHeader>Disabled Secondary Button</DesignSystemSubHeader>
-      <Button variant="secondary" disabled>
-        Login
-      </Button>
-      <DesignSystemSubHeader>Loading Secondary Button</DesignSystemSubHeader>
-      <Button variant="secondary" isLoading>
-        Login
-      </Button>
-      <DesignSystemSubHeader>Button sizes</DesignSystemSubHeader>
-      <VStack space="2">
-        <Button size="small">Small</Button>
-        <Button size="medium">Medium</Button>
-        <Button size="large">Large</Button>
-      </VStack>
-      <DesignSystemSubHeader>Loading Button sizes</DesignSystemSubHeader>
-      <VStack space="2">
-        <Button size="small" isLoading>
-          Login
-        </Button>
-        <Button size="medium" isLoading>
-          Login
-        </Button>
-        <Button size="large" isLoading>
-          Login
-        </Button>
-      </VStack>
+    <ScrollSafeAreaView>
+      <View style={tw`w-full max-w-4xl mx-auto px-4 pt-2 pb-12`}>
+        <Heading lvl={1}>Avatar</Heading>
+        <Text>
+          An{" "}
+          <DSMono variant={"component"} size="medium">
+            Avatar
+          </DSMono>{" "}
+          component represents an object or entity.
+        </Text>
+        <Heading lvl={4} style={h4Styles}>
+          Properties
+        </Heading>
+        <Heading lvl={3}>Sizes</Heading>
+        <Text variant="small">
+          With the <DSMono variant="property">size</DSMono> property you can use
+          the Avatar in 6 different sizes: <DSMono variant={"type"}>xs</DSMono>{" "}
+          , <DSMono variant={"type"}>sm</DSMono> ,{" "}
+          <DSMono variant={"type"}>md</DSMono> ,{" "}
+          <DSMono variant={"type"}>lg</DSMono> ,{" "}
+          <DSMono variant={"type"}>xl</DSMono> , or{" "}
+          <DSMono variant={"type"}>2xl</DSMono> .
+        </Text>
+        <Text variant="small" style={tw`mt-1`}>
+          The initials will size automatically.
+        </Text>
+        <DSExampleArea>
+          <HStack space={2} alignItems="center" style={tw`pr-2`}>
+            <Avatar size={"xs"}>BE</Avatar>
+            <Avatar size={"sm"}>NG</Avatar>
+            <Avatar size={"md"}>AB</Avatar>
+            <Avatar size={"lg"}>SK</Avatar>
+            <Avatar size={"xl"}>AD</Avatar>
+            <Avatar size={"2xl"}>HG</Avatar>
+          </HStack>
+        </DSExampleArea>
+        <Heading lvl={3}>Styling</Heading>
+        <Text variant="small" style={tw`mt-1`}>
+          Set one of the many coloring options with the{" "}
+          <DSMono variant="property">customColor</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <Avatar customColor="arctic">BE</Avatar>
+          <Avatar customColor="lavender">NG</Avatar>
+          <Avatar customColor="rose">AB</Avatar>
+          <Avatar customColor="honey">SK</Avatar>
+          <Avatar customColor="emerald">AD</Avatar>
+        </DSExampleArea>
+        <Heading lvl={3}>Grouping</Heading>
+        <Text variant="small">
+          The <DSMono variant="component">AvatarGroup</DSMono> lets you stack
+          Avatars. Use the <DSMono variant="property">max</DSMono> property to
+          limit the number of Avatars.
+        </Text>
+        <DSExampleArea>
+          <AvatarGroup max={3} _avatar={{ size: "sm" }}>
+            <Avatar customColor="arctic">SK</Avatar>
+            <Avatar customColor="lavender">NG</Avatar>
+            <Avatar customColor="rose">AN</Avatar>
+            <Avatar customColor="honey">NG</Avatar>
+            <Avatar customColor="sky">NG</Avatar>
+          </AvatarGroup>
+        </DSExampleArea>
+        <Heading lvl={4} style={h4Styles}>
+          Related components
+        </Heading>
+        <Heading lvl={2}>WorkspaceAvatar</Heading>
+        <Text variant="small">
+          The <DSMono variant="component">WorkspaceAvatar</DSMono> should be
+          used for all workspace related representation.
+        </Text>
+        <Text variant="small" style={tw`mt-1`}>
+          Set one of the many coloring options with the{" "}
+          <DSMono variant="property">customColor</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          {collaborationColors.map((color) => {
+            return <WorkspaceAvatar customColor={color} />;
+          })}
+        </DSExampleArea>
 
-      <DesignSystemHeader>Input</DesignSystemHeader>
-      <VStack space={4}>
-        <Input />
-        <LabeledInput label={"Input"} />
-        <LabeledInput
-          label={"Input w/ Value"}
-          value="jane@example.com"
-          hint="Here you can put information you want the user to have regarding this input."
-        />
-        <LabeledInput
-          label={"Input w/ Placeholder"}
-          placeholder="Enter your email …"
-        />
-        <LabeledInput
-          label={"Input Disabled"}
-          value="jane@example.com"
-          disabled
-        />
-        <LabeledInput
-          label={"Input Disabled"}
-          placeholder="Enter your email …"
-          disabled
-        />
-      </VStack>
+        <Heading lvl={1}>BoxShadow</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            BoxShadow
+          </DSMono>{" "}
+          component can be used to establish a hierarchy between other content.
+          It controls the size of the shadow applied to the surface.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          You can raise a component up to three levels by using the{" "}
+          <DSMono variant="property">elevation</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <HStack space={4} style={tw`pr-2`}>
+            {elevationLevels.map((level) => {
+              return (
+                <BoxShadow elevation={level} rounded key={`shadow_${level}`}>
+                  <HStack
+                    style={tw`h-24 w-24 bg-white rounded`}
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Text variant="xxs" muted>
+                      elevation {level}
+                    </Text>
+                  </HStack>
+                </BoxShadow>
+              );
+            })}
+          </HStack>
+        </DSExampleArea>
 
-      <DesignSystemHeader>Toast</DesignSystemHeader>
-      <Button
-        onPress={() => {
-          counter = counter + 1;
-          showToast(`This is a message ${counter}`);
-        }}
-      >
-        Add Toast
-      </Button>
+        <Heading lvl={1}>Button</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant={"component"} size="medium">
+            Button
+          </DSMono>{" "}
+          component is used to trigger an action or event, such as submitting a
+          form, opening a Dialog, canceling an action, or performing a delete
+          operation.
+        </Text>
+        <Heading lvl={4} style={h4Styles}>
+          Properties
+        </Heading>
+        <Heading lvl={3}>Variants</Heading>
+        <Text variant="small">
+          Use the <DSMono variant="property">variant</DSMono> property to
+          display either a <DSMono variant={"type"}>primary</DSMono>,{" "}
+          <DSMono variant={"type"}>secondary</DSMono>, or{" "}
+          <DSMono variant={"type"}>danger</DSMono> Button.
+        </Text>
+        <DSExampleArea>
+          <Button>Login</Button>
+          <Button variant="secondary">Login</Button>
+        </DSExampleArea>
+        <Heading lvl={3}>Sizes</Heading>
+        <Text variant="small">
+          For larger or smaller Buttons, use the{" "}
+          <DSMono variant="property">size</DSMono> property. You can set it to{" "}
+          <DSMono variant={"type"}>small</DSMono> ,{" "}
+          <DSMono variant={"type"}>medium</DSMono> , or{" "}
+          <DSMono variant={"type"}>large</DSMono> .
+        </Text>
+        <DSExampleArea>
+          <Button size="small">Login</Button>
+          <Button size="medium">Login</Button>
+          <Button size="large">Login</Button>
+        </DSExampleArea>
+        <Heading lvl={3}>Loading State</Heading>
+        <Text variant="small">
+          Buttons also support an <DSMono variant="property">isLoading</DSMono>{" "}
+          property, which shows a loading indicator, while disabling the button,
+          as well.
+        </Text>
+        <DSExampleArea>
+          <Button size="small" isLoading>
+            Login
+          </Button>
+          <Button size="medium" isLoading>
+            Login
+          </Button>
+          <Button size="large" isLoading>
+            Login
+          </Button>
+        </DSExampleArea>
+        <Heading lvl={4} style={h4Styles}>
+          Basic usage
+        </Heading>
+        <Heading lvl={3}>Primary Button</Heading>
+        <Text variant="small">
+          Primary Buttons are high-emphasis, they contain actions that are
+          important to our app.
+        </Text>
+        <DSExampleArea>
+          <Button>Login</Button>
+          <Button disabled>Login</Button>
+          <Button isLoading>Login</Button>
+        </DSExampleArea>
+        <Heading lvl={3}>Secondary Button</Heading>
+        <Text variant="small">
+          Secondary Buttons are typically used for less-pronounced actions,
+          including canceling.
+        </Text>
+        <DSExampleArea>
+          <Button variant={"secondary"}>Cancel</Button>
+          <Button variant={"secondary"} disabled>
+            Cancel
+          </Button>
+          <Button variant={"secondary"} isLoading>
+            Cancel
+          </Button>
+        </DSExampleArea>
+        <Heading lvl={3}>Danger Button</Heading>
+        <Text variant="small">
+          Danger Buttons are typically used for actions which are irreversible
+          like deleting an element.
+        </Text>
+        <DSExampleArea>
+          <Button variant={"danger"}>Delete</Button>
+          <Button variant={"danger"} disabled>
+            Delete
+          </Button>
+          <Button variant={"danger"} isLoading>
+            Delete
+          </Button>
+        </DSExampleArea>
+        <Heading lvl={4} style={h4Styles}>
+          Related components
+        </Heading>
+        <Heading lvl={2}>IconButton</Heading>
+        <Text variant="small">
+          The <DSMono variant="component">IconButtons</DSMono> are commonly
+          found in the <DSMono variant="context">PageHeader</DSMono> and it's
+          siblings, as well as in the <DSMono variant="context">Sidebar</DSMono>
+          .
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          <DSMono variant="component">IconButtons</DSMono> require their{" "}
+          <DSMono variant="property">name</DSMono> property which uses the{" "}
+          <DSMono variant={"type"}>IconNames</DSMono> type, just like the{" "}
+          <DSMono variant="component">Icon</DSMono> component.
+        </Text>
+        <DSExampleArea>
+          <IconButton name="add-line" color="gray-800" />
+          <IconButton name="more-line" color="gray-800" />
+          <IconButton name="file-add-line" color="gray-800" />
+        </DSExampleArea>
+        <Heading lvl={3}>Sizes</Heading>
+        <Text variant="small">
+          The <DSMono variant="component">IconButton</DSMono> comes in two sizes
+          which for now only affects the clickable/hovered area.
+        </Text>
+        <Text variant="small">
+          The default is regular, to make it a bit bigger use the{" "}
+          <DSMono variant="property">large</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <IconButton name="double-arrow-left" color="gray-800" />
+          <IconButton name="double-arrow-right" color="gray-800" />
+          <IconButton name="double-arrow-left" color="gray-800" large />
+          <IconButton name="double-arrow-right" color="gray-800" large />
+        </DSExampleArea>
+        <Heading lvl={3}>Styling</Heading>
+        <Text variant="small">
+          As with <DSMono variant="component">Icons</DSMono> you can use the{" "}
+          <DSMono variant="property">color</DSMono> property to style it, but
+          for now we only support <DSMono variant="type">gray-400</DSMono> to{" "}
+          <DSMono variant="type">gray-800</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <IconButton name="menu" color="gray-400" large />
+          <IconButton name="image-line" color="gray-500" large />
+          <IconButton name="settings-4-line" color="gray-600" large />
+          <IconButton name="double-arrow-left" color="gray-700" large />
+          <IconButton name="double-arrow-right" color="gray-800" large />
+        </DSExampleArea>
+        <Heading lvl={3}>Label</Heading>
+        <Text variant="small">
+          An <DSMono variant="component">IconButton</DSMono> can have a{" "}
+          <DSMono variant="property">label</DSMono> to make it more explicit and
+          fitting in context's like the{" "}
+          <DSMono variant="component">Menu</DSMono> .
+        </Text>
+        <DSExampleArea>
+          <IconButton name="plus" large label="New workspace" />
+        </DSExampleArea>
+        <Heading lvl={3}>Usage</Heading>
+        <Text variant="small">
+          <DSMono variant="component">IconButtons</DSMono> are for now used to
+          toggle certain elements - such as the navigation{" "}
+          <DSMono variant="context">Sidebar</DSMono> on mobile or{" "}
+          <DSMono variant="context">Menus</DSMono> - or as trigger for common
+          actions - like creating a new page.
+        </Text>
+        <DSExampleArea>
+          <VStack
+            style={tw`w-80 md:w-sidebar py-4 border border-gray-200 bg-gray-100`}
+          >
+            <SidebarButton>
+              <View style={tw`w-full flex flex-row justify-between`}>
+                <HStack alignItems={"center"}>
+                  <View>
+                    <Icon
+                      name="arrow-right-filled"
+                      color={tw.color("gray-600")}
+                      mobileSize={5}
+                    />
+                  </View>
+                  <View style={tw`-ml-0.5`}>
+                    <Icon name="folder" size={5} mobileSize={8} />
+                  </View>
+                  <Text
+                    variant="small"
+                    style={tw`ml-1.5 max-w-32`}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Getting Started
+                  </Text>
+                </HStack>
+                <HStack alignItems="center" space={2}>
+                  <Icon name="more-line" color={tw.color("gray-600")}></Icon>
+                  <Icon
+                    name="file-add-line"
+                    color={tw.color("gray-600")}
+                  ></Icon>
+                </HStack>
+              </View>
+            </SidebarButton>
+            <SidebarButton>
+              <View style={tw`w-full flex flex-row justify-between`}>
+                <HStack alignItems={"center"}>
+                  <View>
+                    <Icon
+                      name="arrow-right-filled"
+                      color={tw.color("gray-600")}
+                      mobileSize={5}
+                    />
+                  </View>
+                  <View style={tw`-ml-0.5`}>
+                    <Icon name="folder" size={5} mobileSize={8} />
+                  </View>
+                  <Text
+                    variant="small"
+                    style={tw`ml-1.5 max-w-32`}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Notes
+                  </Text>
+                </HStack>
+                <HStack alignItems="center" space={2}>
+                  <Icon name="more-line" color={tw.color("gray-600")}></Icon>
+                  <Icon
+                    name="file-add-line"
+                    color={tw.color("gray-600")}
+                  ></Icon>
+                </HStack>
+              </View>
+            </SidebarButton>
+          </VStack>
+        </DSExampleArea>
+        <Text style={tw`mt-4`} variant="xxs" muted>
+          TBD: They are later also used to toggle buttons that allow a single
+          choice to be selected or deselected, such as adding or removing a star
+          to an item.
+        </Text>
 
-      <DesignSystemHeader style={tw`mb-0`}>Avatar</DesignSystemHeader>
-      <DesignSystemSubHeader>Sizing</DesignSystemSubHeader>
-      <HStack space={2} alignItems="center" style={tw`pr-2 overflow-scroll`}>
-        <Avatar bg="primary.500" size={"xs"}>
-          XS
-        </Avatar>
-        <Avatar bg="primary.500" size={"sm"}>
-          SM
-        </Avatar>
-        <Avatar bg="primary.500" size={"md"}>
-          MD
-        </Avatar>
-        <Avatar bg="primary.500" size={"lg"}>
-          LG
-        </Avatar>
-        <Avatar bg="primary.500" size={"xl"}>
-          XL
-        </Avatar>
-        <Avatar bg="primary.500" size={"2xl"}>
-          2XL
-        </Avatar>
-      </HStack>
-
-      <DesignSystemSubHeader>Avatar Group</DesignSystemSubHeader>
-      <AvatarGroup max={8} _avatar={{ size: "sm" }}>
-        <Avatar bg="collaboration.arctic">BE</Avatar>
-        <Avatar bg="collaboration.lavender">NG</Avatar>
-        <Avatar bg="collaboration.rose">AN</Avatar>
-        <Avatar bg="collaboration.honey">NG</Avatar>
-        <Avatar bg="collaboration.sky">NG</Avatar>
-        <Avatar bg={tw.color(`collaboration-terracotta`)}>NG</Avatar>
-      </AvatarGroup>
-      <DesignSystemSubHeader>
-        Avatar Group with max 3 shown
-      </DesignSystemSubHeader>
-      <AvatarGroup max={3} _avatar={{ size: "sm" }}>
-        <Avatar bg="collaboration.arctic">SK</Avatar>
-        <Avatar bg="collaboration.lavender">NG</Avatar>
-        <Avatar bg="collaboration.rose">AN</Avatar>
-        <Avatar bg="collaboration.honey">NG</Avatar>
-        <Avatar bg="collaboration.sky">NG</Avatar>
-      </AvatarGroup>
-
-      <DesignSystemSubHeader>
-        Collaboration Colors - Workspace Style
-      </DesignSystemSubHeader>
-      <HStack space={4} style={tw`pb-3 pr-2 overflow-scroll`}>
-        {collabColors.map((color) => {
-          return (
-            <Avatar
-              borderRadius={4}
-              size="xs"
-              bg={tw.color(`collaboration-${color}`)}
-              key={`avatar_${color}`}
-            >
-              <Icon
-                name="serenity-feather"
-                color={tw.color("black/40")}
-                size={5}
-                mobileSize={6}
-              />
-            </Avatar>
-          );
-        })}
-      </HStack>
-
-      <DesignSystemHeader>SidebarButton</DesignSystemHeader>
-      <SidebarButton>
-        <Text variant="small">Hallo</Text>
-      </SidebarButton>
-      <SidebarButton disabled>
-        <Text variant="small">Hallo</Text>
-      </SidebarButton>
-
-      <DesignSystemHeader>Menu</DesignSystemHeader>
-      <View style={tw`flex flex-row`}>
-        <Menu
-          placement="bottom left"
-          style={tw`w-60`}
-          offset={8}
-          isOpen={isOpenPopover}
-          onChange={setIsOpenPopover}
-          trigger={
-            <Pressable
-              accessibilityLabel="More options menu"
-              style={tw`flex flex-row`}
-            >
-              <Text>Open Menu</Text>
-              <Icon name="arrow-down-s-fill" />
-            </Pressable>
-          }
+        <Heading lvl={1}>CenterContent</Heading>
+        <Text>
+          With the{" "}
+          <DSMono variant="component" size="medium">
+            CenterContent
+          </DSMono>{" "}
+          component you can easily center a child element vertically and
+          horizontally within the available space.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          The basic version doesn't need any properties and silently centers
+          it's content.
+        </Text>
+        <View
+          style={tw`h-40 mt-4 border border-gray-200 rounded overflow-hidden`}
         >
-          <View style={tw`p-menu-item`}>
-            <Text variant="xxs" muted bold>
-              jane@example.com
+          <CenterContent>
+            <Avatar size={"md"}>AV</Avatar>
+          </CenterContent>
+        </View>
+        <Heading lvl={3}>Background</Heading>
+        <Text variant="small">
+          To add a background like in{" "}
+          <DSMono variant={"context"}>Login/Register</DSMono> to it just add the{" "}
+          <DSMono variant="property">serenityBg</DSMono> property.
+        </Text>
+        <View
+          style={tw`h-80 mt-4 border border-gray-200 md:border-white rounded overflow-hidden`}
+        >
+          <CenterContent serenityBg>
+            <Box style={tw`text-center`}>
+              <Text bold>Can not connect to a network</Text>
+              <Text muted variant="small">
+                Unfortunately your registration request failed due a network
+                error. Please try again later.
+              </Text>
+              <Button style={tw`self-center`}>Try Again</Button>
+            </Box>
+          </CenterContent>
+        </View>
+
+        <Heading lvl={1}>Checkbox</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Checkbox
+          </DSMono>{" "}
+          allows the user to select one or more items from a set.
+        </Text>
+        <Heading lvl={3} style={tw`-mb-2.5`}>
+          Basic
+        </Heading>
+        <DSExampleArea>
+          <Checkbox
+            value="test"
+            accessibilityLabel="This is a dummy checkbox"
+          />
+          <Checkbox
+            value="test"
+            accessibilityLabel="This is a dummy checkbox"
+            defaultIsChecked
+          />
+          <Checkbox
+            value="test"
+            accessibilityLabel="This is a dummy checkbox"
+            isDisabled
+          />
+          <Checkbox
+            value="test"
+            accessibilityLabel="This is a dummy checkbox"
+            isDisabled
+            isChecked
+          />
+        </DSExampleArea>
+        <Heading lvl={3}>Label</Heading>
+        <Text variant="small">
+          You can provide a Label by just including a{" "}
+          <DSMono variant="component">Text</DSMono> element inside your
+          Checkbox.
+        </Text>
+        <DSExampleArea>
+          <Checkbox
+            value="test"
+            accessibilityLabel="This is a dummy checkbox"
+            defaultIsChecked
+          >
+            <Text variant="small">
+              I accept our{" "}
+              <Link to={{ screen: "EncryptDecryptImageTest" }}>
+                Encrypt / Decrypt Image
+              </Link>{" "}
+              test
             </Text>
-          </View>
-          <SidebarLink
-            to={{ screen: "EncryptDecryptImageTest" }}
-            style={tw`p-menu-item`}
+          </Checkbox>
+        </DSExampleArea>
+
+        <Heading lvl={1}>EditorBottombar</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            EditorBottombar
+          </DSMono>{" "}
+          is used on small devices to show all of our Editors functionality,
+          which are held in our <DSMono variant="context">EditorSidebar</DSMono>{" "}
+          on larger screens.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          The <DSMono variant="component">EditorBottombarButton</DSMono> is used
+          to toggle <Mono>marks</Mono> and <Mono>nodes</Mono> of the editor, and
+          also to show hidden functions &#40;wip&#41; due to limits of available
+          space on mobile.
+        </Text>
+        <DSExampleArea>
+          <EditorBottombarButton name="arrow-down-s-line" />
+          <EditorBottombarButton name="text" />
+          <EditorBottombarButton name="list-unordered" />
+        </DSExampleArea>
+        <Heading lvl={3}>States</Heading>
+        <Text variant="small">
+          To show a <Mono>mark</Mono> or <Mono>node</Mono> is active use the{" "}
+          <DSMono variant="property">isActive</DSMono> property of the{" "}
+          <DSMono variant="component">EditorBottombarButton</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <EditorBottombarButton name="arrow-down-s-line" />
+          <EditorBottombarButton name="text" />
+          <EditorBottombarButton name="list-unordered" isActive />
+        </DSExampleArea>
+        <Heading lvl={3}>Divider</Heading>
+        <Text variant="small">
+          To section the different functionalities you can use the{" "}
+          <DSMono variant="component">EditorBottombarDivider</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <EditorBottombarButton name="bold" />
+          <EditorBottombarButton name="italic" />
+          <EditorBottombarButton name="code-view" />
+          <EditorBottombarButton name="link" isActive />
+          <EditorBottombarDivider />
+          <EditorBottombarButton name="list-unordered" />
+          <EditorBottombarButton name="list-ordered" />
+          <EditorBottombarButton name="list-check-2" />
+        </DSExampleArea>
+
+        <Heading lvl={1}>EditorSidebar</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            EditorSidebar
+          </DSMono>{" "}
+          is used on large devices to show all of our Editors functionality.
+        </Text>
+        <Text>
+          For smaller devices we use the{" "}
+          <DSMono variant="context">EditorBottombar</DSMono>.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          The <DSMono variant="component">EditorSidebarIcon</DSMono> is used to
+          make it easier for users to find <Mono>marks</Mono> and{" "}
+          <Mono>nodes</Mono> of the editor in the{" "}
+          <DSMono variant="component">EditorSidebar</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <EditorSidebarIcon name="bold" />
+          <EditorSidebarIcon name="italic" />
+          <EditorSidebarIcon name="code-view" />
+        </DSExampleArea>
+        <Heading lvl={3}>States</Heading>
+        <Text variant="small">
+          To show a <Mono>mark</Mono> or <Mono>node</Mono> is active use the{" "}
+          <DSMono variant="property">isActive</DSMono> property of the{" "}
+          <DSMono variant="component">EditorSidebarIcon</DSMono>
+        </Text>
+        <DSExampleArea>
+          <EditorSidebarIcon name="bold" isActive />
+          <EditorSidebarIcon name="italic" isActive />
+          <EditorSidebarIcon name="code-view" />
+        </DSExampleArea>
+        <Heading lvl={3}>Usage</Heading>
+        <Text variant="small">
+          The <DSMono variant="component">EditorSidebarIcon</DSMono> is usually
+          the first child of a{" "}
+          <DSMono variant="component">SidebarButton</DSMono> followed by a{" "}
+          <DSMono variant="component">Text</DSMono> component to make the
+          functionality more descriptive.
+        </Text>
+        <DSExampleArea>
+          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
+            <SidebarButton>
+              <EditorSidebarIcon name="bold" />
+              <Text variant="small">Bold</Text>
+            </SidebarButton>
+            <SidebarButton>
+              <EditorSidebarIcon name="italic" />
+              <Text variant="small">Italic</Text>
+            </SidebarButton>
+            <SidebarButton>
+              <EditorSidebarIcon name="code-view" isActive />
+              <Text variant="small" bold>
+                Code
+              </Text>
+            </SidebarButton>
+          </VStack>
+        </DSExampleArea>
+        <Heading lvl={3}>Divider</Heading>
+        <Text variant="small">
+          To section the different functionalities you can use the generic{" "}
+          <DSMono variant="component">SidebarDivider</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
+            <SidebarButton>
+              <EditorSidebarIcon name="code-s-slash-line" isActive />
+              <Text variant="small" bold>
+                Codeblock
+              </Text>
+            </SidebarButton>
+            <SidebarDivider></SidebarDivider>
+            <SidebarButton>
+              <EditorSidebarIcon name="list-unordered" />
+              <Text variant="small">Bullet-List</Text>
+            </SidebarButton>
+            <SidebarButton>
+              <EditorSidebarIcon name="list-ordered" />
+              <Text variant="small">Numbered-List</Text>
+            </SidebarButton>
+          </VStack>
+        </DSExampleArea>
+
+        <Heading lvl={1}>Icons</Heading>
+        <Text>
+          We mostly use{" "}
+          <DSMono variant="component" size="medium">
+            Icons
+          </DSMono>{" "}
+          from{" "}
+          <LinkExternal
+            variant="medium"
+            href="https://remixicon.com/"
+            style={tw`text-gray-700`}
           >
-            <Avatar
-              borderRadius={4}
-              size="xs"
-              bg={tw.color(`collaboration-emerald`)}
-            >
-              <Icon
-                name="serenity-feather"
-                color={tw.color("black/35")}
-                size={5}
-                mobileSize={6}
-              />
-            </Avatar>
-            <Text variant="xs">Happy Workspace</Text>
-          </SidebarLink>
-          <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
-            <Avatar
-              borderRadius={4}
-              size="xs"
-              bg={tw.color(`collaboration-arctic`)}
-            >
-              <Icon
-                name="serenity-feather"
-                color={tw.color("black/35")}
-                size={5}
-                mobileSize={6}
-              />
-            </Avatar>
-            <Text variant="xs">Funny Bunny</Text>
-          </SidebarLink>
-          <View style={tw`pl-2 pr-3 py-1.5`}>
-            <IconButton
-              onPress={() => {
-                setIsOpenPopover(false);
-                alert("You are awesome !");
-              }}
-              name="plus"
-              label="Create awesomeness"
-            />
-          </View>
-
-          <SidebarDivider collapsed />
-          <MenuButton
-            onPress={() => {
-              setIsOpenPopover(false);
-            }}
-            icon="emotion-line"
-            shortcut={<Shortcut letter="H" />}
+            remixicon
+          </LinkExternal>{" "}
+          but some are even more fancy and custom made by our lovely Designer,
+          so have a look at{" "}
+          <LinkExternal
+            variant="medium"
+            href="https://www.figma.com/"
+            style={tw`text-gray-700`}
           >
-            Hello
-          </MenuButton>
-          <MenuButton
-            onPress={() => {
-              setIsOpenPopover(false);
-              alert("Danger !!");
-            }}
-            icon="delete-bin-line"
-            danger
-          >
-            Danger
-          </MenuButton>
-        </Menu>
-      </View>
+            Figma
+          </LinkExternal>{" "}
+          to see what she is up to ;-&#41;
+        </Text>
+        <Heading lvl={3}>Sizes</Heading>
+        <Text variant="small">
+          You can scale Icons with the <DSMono variant="property">size</DSMono>{" "}
+          property. If you want to add a different size for smaller Devices,
+          also set <DSMono variant="property">mobileSize</DSMono> .
+        </Text>
+        <DSExampleArea>
+          <Icon name="check-line" />
+          <Icon name="check-line" size={6} mobileSize={8} />
+          <Icon name="check-line" size={8} mobileSize={10} />
+          <Icon name="check-line" size={10} mobileSize={12} />
+          <Icon name="check-line" size={12} mobileSize={14} />
+        </DSExampleArea>
+        <Heading lvl={3}>Styling</Heading>
+        <Text variant="small">
+          Icons don't have a style property, but you can still dye them with the{" "}
+          <DSMono variant="property">color</DSMono> property.
+        </Text>
+        <Text variant="small" style={tw`mt-4`}>
+          For now you can either put in a{" "}
+          <DSMono variant="type">HEX-string</DSMono> directly, or pass one of
+          our custom colors by using <DSMono variant="type">tw.color</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <Icon name="list-check-2" size={8} color={tw.color("primary-200")} />
+          <Icon name="list-check-2" size={8} color={tw.color("primary-300")} />
+          <Icon name="list-check-2" size={8} color={tw.color("primary-400")} />
+          <Icon name="list-check-2" size={8} color={tw.color("primary-500")} />
+          <Icon name="list-check-2" size={8} color={tw.color("primary-600")} />
+          <Icon
+            name="list-check-2"
+            size={8}
+            color={tw.color("collaboration-purple")}
+          />
+          <Icon
+            name="list-check-2"
+            size={8}
+            color={tw.color("collaboration-raspberry")}
+          />
+          <Icon
+            name="list-check-2"
+            size={8}
+            color={tw.color("collaboration-orange")}
+          />
+          <Icon
+            name="list-check-2"
+            size={8}
+            color={tw.color("collaboration-honey")}
+          />
+          <Icon
+            name="list-check-2"
+            size={8}
+            color={tw.color("collaboration-emerald")}
+          />
+        </DSExampleArea>
+        <Heading lvl={3}>Set</Heading>
+        <Text variant="small">
+          Below is a list of all of the{" "}
+          <DSMono variant="component">Icons</DSMono> in the library, along with
+          the corresponding component names, divided in their most common
+          usages:
+        </Text>
+        <DSExampleArea vertical center>
+          <Heading lvl={3}>Commands</Heading>
+          <DSTiles>
+            <IconTile name="indent-decrease" />
+            <IconTile name="indent-increase" />
+          </DSTiles>
+          <Heading lvl={3}>Marks</Heading>
+          <DSTiles>
+            <IconTile name="bold" />
+            <IconTile name="code-view" />
+            <IconTile name="italic" />
+            <IconTile name="link" />
+            <IconTile name="link-m" />
+            <IconTile name="strikethrough" />
+            <IconTile name="underline" />
+          </DSTiles>
+          <Heading lvl={3}>Nodes</Heading>
+          <DSTiles>
+            <IconTile name="at-line" />
+            <IconTile name="code-s-slash-line" />
+            <IconTile name="double-quotes-l" />
+            <IconTile name="heading" />
+            <IconTile name="h-1" />
+            <IconTile name="h-2" />
+            <IconTile name="h-3" />
+            <IconTile name="h-4" />
+            <IconTile name="h-5" />
+            <IconTile name="h-6" />
+            <IconTile name="list-check-2" />
+            <IconTile name="list-check" />
+            <IconTile name="list-ordered" />
+            <IconTile name="list-unordered" />
+            <IconTile name="paragraph" />
+            <IconTile name="text" />
+            <IconTile name="table-2" />
+          </DSTiles>
+          <Heading lvl={3}>Extension</Heading>
+          <DSTiles>
+            <IconTile name="font-color" />
+          </DSTiles>
+          <Heading lvl={3}>Custom</Heading>
+          <DSTiles>
+            <IconTile name="arrow-go-back-line" />
+            <IconTile name="arrow-go-forward-line" />
+            <IconTile name="attachment-2" />
+            <IconTile name="font-size-2" />
+            <IconTile name="format-clear" />
+            <IconTile name="functions" />
+            <IconTile name="hashtag" />
+            <IconTile name="page-separator" />
+            <IconTile name="separator" />
+            <IconTile name="calendar-check-fill" />
+            <IconTile name="image-2-line" />
+            <IconTile name="image-line" />
+            <IconTile name="movie-line" />
+            <IconTile name="folder-music-line" />
+            <IconTile name="emotion-line" />
+          </DSTiles>
+          <Heading lvl={3}>Navigation</Heading>
+          <DSTiles>
+            <IconTile name="double-arrow-left" />
+            <IconTile name="double-arrow-right" />
+            <IconTile name="arrow-right-s-line" />
+            <IconTile name="arrow-down-s-line" />
+            <IconTile name="arrow-up-down-line" />
+            <IconTile name="more-line" />
+            <IconTile name="more-2-line" />
+          </DSTiles>
+          <Heading lvl={3}>Actions</Heading>
+          <DSTiles>
+            <IconTile name="check-line" />
+            <IconTile name="close-circle-fill" />
+            <IconTile name="add-line" />
+            <IconTile name="settings-4-line" />
+            <IconTile name="download-line" />
+            <IconTile name="printer-line" />
+            <IconTile name="search-line" />
+            <IconTile name="stars-s-fill" />
+            <IconTile name="delete-bin-line" />
+            <IconTile name="history-line" />
+            <IconTile name="cup-line" />
+            <IconTile name="question-mark" />
+            <IconTile name="file-copy-line" />
+            <IconTile name="chat-1-line" />
+            <IconTile name="chat-4-line" />
+            <IconTile name="pencil-line" />
+            <IconTile name="error-warning-line" />
+          </DSTiles>
+          <Heading lvl={3}>Page &amp; Folder</Heading>
+          <DSTiles>
+            <IconTile name="archive-line" />
+            <IconTile name="archive-fill" />
+            <IconTile name="file-transfer-line" />
+            <IconTile name="file-search-line" />
+            <IconTile name="book-open-line" />
+            <IconTile name="folder-line" />
+            <IconTile name="folder-fill" />
+            <IconTile name="bookmark-line" />
+            <IconTile name="bookmark-fill" />
+            <IconTile name="file-line" />
+            <IconTile name="file-add-line" />
+            <IconTile name="file-add-fill" />
+          </DSTiles>
+          <Heading lvl={3}>Custom</Heading>
+          <DSTiles>
+            <IconTile name="plus" />
+            <IconTile name="more" />
+            <IconTile name="cursor" />
+            <IconTile name="arrow-right-filled" />
+            <IconTile name="arrow-down-filled" />
+            <IconTile name="serenity-feather" />
+          </DSTiles>
+          <Heading lvl={3}>UI</Heading>
+          <DSTiles>
+            <IconTile name="command-line" />
+            <IconTile name="external-link-line" />
+            <IconTile name="information-line" />
+          </DSTiles>
+          <Heading lvl={3}>Sidebar</Heading>
+          <DSTiles>
+            <IconTile name="folder" />
+            <IconTile name="page" />
+          </DSTiles>
+          <Heading lvl={3}>Rest</Heading>
+          <DSTiles>
+            {/* in use */}
+            <IconTile name="warning-fill" />
 
-      <DesignSystemHeader>Link</DesignSystemHeader>
-      <Text>
-        This is a link to{" "}
-        <Link to={{ screen: "EncryptDecryptImageTest" }}>
-          Encrypt / Decrypt Image
-        </Link>
-      </Text>
-      <Text muted>
-        This is a link to{" "}
-        <Link to={{ screen: "EncryptDecryptImageTest" }}>
-          Encrypt / Decrypt Image
-        </Link>
-      </Text>
-      <Text bold>
-        This is a link to{" "}
-        <Link to={{ screen: "EncryptDecryptImageTest" }}>
-          Encrypt / Decrypt Image
-        </Link>
-      </Text>
-      <Text variant="xxs">
-        This is a link to{" "}
-        <Link to={{ screen: "EncryptDecryptImageTest" }}>
-          Encrypt / Decrypt Image
-        </Link>
-      </Text>
+            {/* really needed as we have others ?? */}
+            <IconTile name="arrow-down-s-fill" />
+            <IconTile name="arrow-go-back-fill" />
+            <IconTile name="arrow-go-forward-fill" />
+            <IconTile name="arrow-right" />
+            <IconTile name="information-fill" />
+          </DSTiles>
+        </DSExampleArea>
 
-      <DesignSystemHeader>SidebarLink</DesignSystemHeader>
-      <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-        <Avatar
-          borderRadius={4}
-          size="xs"
-          bg={tw.color(`collaboration-arctic`)}
-        >
-          <Icon name="serenity-feather" color={tw.color("black/35")} />
-        </Avatar>
-        <Text>Encrypt / Decrypt Image</Text>
-      </SidebarLink>
+        <Heading lvl={1}>Info Messages</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            InfoMessage
+          </DSMono>{" "}
+          component is used to show feedback to the user about an action or
+          state.
+        </Text>
+        <Heading lvl={3}>Variants</Heading>
+        <Text variant="small">
+          Use the <DSMono variant="property">variant</DSMono> property to
+          display either an <DSMono variant={"type"}>info</DSMono> or{" "}
+          <DSMono variant={"type"}>error</DSMono> Message.
+        </Text>
+        <DSExampleArea vertical stackWidth={80}>
+          <InfoMessage>
+            The verification code is prefilled on staging.
+          </InfoMessage>
+          <InfoMessage variant="error">
+            Unfortunately your registration request failed due a network error.
+            Please try again later.
+          </InfoMessage>
+        </DSExampleArea>
+        <Heading lvl={3}>Icons</Heading>
+        <Text variant="small">
+          You can add a for now predefined Icon to the message by adding the{" "}
+          <DSMono variant="property">icon</DSMono> property.
+        </Text>
+        <DSExampleArea vertical stackWidth={80}>
+          <InfoMessage icon>
+            The verification code is prefilled on staging.
+          </InfoMessage>
+          <InfoMessage variant="error" icon>
+            Unfortunately your registration request failed due a network error.
+            Please try again later.
+          </InfoMessage>
+        </DSExampleArea>
 
-      <DesignSystemHeader>Modal (work in progress)</DesignSystemHeader>
-      <Modal isVisible={showModal} onBackdropPress={() => setShowModal(false)}>
-        <ModalHeader>This is the header</ModalHeader>
-        <LabeledInput
-          label={"Label of the Input"}
-          value="While typi"
-          hint="Here you can put information you want the user to have regarding this input."
-        />
-        <ModalButtonFooter
-          cancel={
-            <Button variant="secondary" onPress={() => setShowModal(false)}>
-              Cancel
-            </Button>
-          }
-          confirm={<Button variant="primary">Confirm</Button>}
-        />
-      </Modal>
-      <Button
-        onPress={() => {
-          setShowModal(true);
-        }}
-        variant="primary"
-        size="small"
-      >
-        Open Modal
-      </Button>
+        <Heading lvl={1}>Input</Heading>
+        <Text>
+          An{" "}
+          <DSMono variant="component" size="medium">
+            Input
+          </DSMono>{" "}
+          lets users enter and edit text.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          The basic <DSMono variant="component">Input</DSMono> component is
+          minimal in styling and features, as it is used as a building block for
+          the <DSMono variant="component">LabeledInput</DSMono> component.
+        </Text>
+        <DSExampleArea>
+          <Input />
+        </DSExampleArea>
+        <Heading lvl={4} style={h4Styles}>
+          Commonly used
+        </Heading>
+        <Heading lvl={2}>Labeled Input</Heading>
+        <Text variant="small">
+          <DSMono variant="component">LabeledInput</DSMono>s share all the{" "}
+          <DSMono variant="component">InputProps</DSMono> and are used in all
+          the forms of our application. You can easily add a{" "}
+          <DSMono variant="property">label</DSMono> via property.
+        </Text>
+        <DSExampleArea vertical>
+          <LabeledInput
+            label={"Email"}
+            value="jane@example.com"
+            keyboardType="email-address"
+            placeholder="Enter your email …"
+            autoCapitalize="none"
+          />
+          <LabeledInput
+            label={"Password"}
+            secureTextEntry
+            placeholder="Enter your password …"
+          />
+          <LabeledInput
+            label={"Verification Key"}
+            value="70909qer798q7987q"
+            disabled
+          />
+        </DSExampleArea>
+        <Heading lvl={3}>Hints</Heading>
+        <Text variant="small">
+          You can use a <DSMono variant="property">hint</DSMono> to add
+          information you want the user to have regarding this input.
+        </Text>
+        <DSExampleArea vertical>
+          <LabeledInput
+            label={"Password"}
+            secureTextEntry
+            value="password1234"
+            placeholder="Enter your password …"
+          />
+          <LabeledInput
+            label={"Verification Key"}
+            value="70909qer798q7987q"
+            disabled
+            hint="We have already prefilled this field with your key."
+          />
+        </DSExampleArea>
 
-      <DesignSystemHeader>Spinner</DesignSystemHeader>
-      <VStack space={3}>
-        <Spinner />
-        <Spinner size="lg" />
-        <Spinner fadeIn size="lg" />
-      </VStack>
-
-      <DesignSystemHeader>Checkbox</DesignSystemHeader>
-      <VStack space={3}>
-        <Checkbox value="test" accessibilityLabel="This is a dummy checkbox" />
-        <Checkbox
-          value="test"
-          accessibilityLabel="This is a dummy checkbox"
-          defaultIsChecked
-        >
-          <Text>
-            Software Development{" "}
+        <Heading lvl={1}>Link</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant={"component"} size={"medium"}>
+            Link
+          </DSMono>{" "}
+          is an accessible element for navigation inside the application.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          The component adjusts to the{" "}
+          <DSMono variant="property">variant</DSMono> of the parenting{" "}
+          <DSMono variant="component">Text</DSMono> component in{" "}
+          <DSMono variant="type">size</DSMono> and{" "}
+          <DSMono variant="type">font-family</DSMono> as well as when said
+          parent is set to <DSMono variant="property">bold</DSMono>.
+        </Text>
+        <Text variant="small" style={tw`mt-2`}>
+          Notice though the color stays the same no matter if the parent{" "}
+          <DSMono variant="component">Text</DSMono> is set to be{" "}
+          <DSMono variant="property">muted</DSMono> or the color is changed, to
+          ensure a consistent and distinguishable look &amp; feel of all{" "}
+          <DSMono variant={"component"}>Links</DSMono> in our application.
+        </Text>
+        <DSExampleArea vertical>
+          <Text variant="small">
+            This is a link to{" "}
             <Link to={{ screen: "EncryptDecryptImageTest" }}>
               Encrypt / Decrypt Image
             </Link>
           </Text>
-        </Checkbox>
-        <Checkbox
-          value="test"
-          accessibilityLabel="This is a dummy checkbox"
-          isDisabled
-        />
-        <Checkbox
-          value="test"
-          accessibilityLabel="This is a dummy checkbox"
-          isDisabled
-          isChecked
-        />
-      </VStack>
+          <Text variant="small" muted>
+            This is a link to{" "}
+            <Link to={{ screen: "EncryptDecryptImageTest" }}>
+              Encrypt / Decrypt Image
+            </Link>
+          </Text>
+          <Text variant="small" bold>
+            This is a link to{" "}
+            <Link to={{ screen: "EncryptDecryptImageTest" }}>
+              Encrypt / Decrypt Image
+            </Link>
+          </Text>
+        </DSExampleArea>
+        <Heading lvl={4} style={h4Styles}>
+          Related components
+        </Heading>
+        <Heading lvl={2}>Link External</Heading>
+        <Text variant="small">
+          The <DSMono variant={"component"}>LinkExternal</DSMono> component is
+          used for links outside of our application.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          In comparison to the <DSMono variant={"component"}>Link</DSMono>{" "}
+          component it is an independent element which accepts all properties of
+          the <DSMono variant={"component"}>Text</DSMono> component. Therefore
+          it is not adjusting to it's contexts variant and properties.
+        </Text>
+        <DSExampleArea vertical>
+          <Text variant="xxs">
+            This is an xxs Text and here a default{" "}
+            <LinkExternal href="https://www.figma.com/">link</LinkExternal> to
+            somewhere else
+          </Text>
+          <Text variant="xxs" bold>
+            But I can easily give the{" "}
+            <LinkExternal href="https://www.figma.com/" variant="xxs" bold>
+              link
+            </LinkExternal>{" "}
+            the same styling as it's parent as they share the same properties
+          </Text>
+        </DSExampleArea>
+        <Heading lvl={3}>Icon</Heading>
+        <Text variant="small">
+          The component can be marked with an additional Icon via the{" "}
+          <DSMono variant="property">icon</DSMono> property if we explicitly
+          need to tell the user that they will leave the application context.
+        </Text>
+        <DSExampleArea vertical>
+          <Text variant="xxs">
+            For further info check out our{" "}
+            <LinkExternal variant="xxs" href="https://www.serenity.li" icon>
+              knowledgebase
+            </LinkExternal>
+          </Text>
+          <Text variant="xs">
+            For further info check out our{" "}
+            <LinkExternal variant="xs" href="https://www.serenity.li" icon>
+              knowledgebase
+            </LinkExternal>
+          </Text>
+          <Text variant="small">
+            For further info check out our{" "}
+            <LinkExternal variant="small" href="https://www.serenity.li" icon>
+              knowledgebase
+            </LinkExternal>
+          </Text>
+          <Text variant="medium">
+            For further info check out our{" "}
+            <LinkExternal variant="medium" href="https://www.serenity.li" icon>
+              knowledgebase
+            </LinkExternal>
+          </Text>
+          <Text variant="large">
+            For further info check out our{" "}
+            <LinkExternal variant="large" href="https://www.serenity.li" icon>
+              knowledgebase
+            </LinkExternal>
+          </Text>
+        </DSExampleArea>
 
-      <DesignSystemHeader>Editor Icons</DesignSystemHeader>
-      <VStack space={3}>
-        <EditorSidebarIcon name="bold" />
-        <EditorSidebarIcon name="bold" isActive />
-      </VStack>
+        <Heading lvl={1}>Menu</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Menu
+          </DSMono>{" "}
+          component shows a list of actions that a user can take.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          Elements as the <DSMono variant="component">MenuButton</DSMono>{" "}
+          component represent the actions of the{" "}
+          <DSMono variant="component">Menu</DSMono> .
+        </Text>
+        <DSExampleArea>
+          <BoxShadow elevation={2} rounded>
+            <VStack style={tw`py-1.5 bg-white rounded overflow-hidden`}>
+              <MenuButton>Create Folder</MenuButton>
+              <MenuButton>Rename</MenuButton>
+            </VStack>
+          </BoxShadow>
+        </DSExampleArea>
+        <Heading lvl={3}>Divider</Heading>
+        <Text variant="small">
+          To section the different functionalities you can use the{" "}
+          <DSMono variant="component">SidebarDivider</DSMono> with added{" "}
+          <DSMono variant="property">collapsed</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <BoxShadow elevation={2} rounded>
+            <VStack style={tw`py-1.5 bg-white rounded overflow-hidden`}>
+              <MenuButton>Create Folder</MenuButton>
+              <MenuButton>Rename</MenuButton>
+              <SidebarDivider collapsed />
+              <MenuButton>Delete</MenuButton>
+            </VStack>
+          </BoxShadow>
+        </DSExampleArea>
+        <Heading lvl={3}>Icons</Heading>
+        <Text variant="small">
+          Usually all <DSMono variant="component">MenuButton</DSMono>s should
+          have set an <DSMono variant="property">icon</DSMono> to make it easier
+          for the user to understand and learn the common actions of the
+          application.
+        </Text>
+        <Text variant="small" style={tw`mt-2`}>
+          Add the optional property <DSMono variant="property">danger</DSMono>{" "}
+          to show the user irreversible actions.
+        </Text>
+        <DSExampleArea>
+          <BoxShadow elevation={2} rounded>
+            <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
+              <MenuButton icon="folder-line">Create Folder</MenuButton>
+              <MenuButton icon="font-size-2">Rename</MenuButton>
+              <SidebarDivider collapsed />
+              <MenuButton icon="delete-bin-line" danger>
+                Delete
+              </MenuButton>
+            </VStack>
+          </BoxShadow>
+        </DSExampleArea>
+        <Heading lvl={3}>Trigger</Heading>
+        <Text variant="small">
+          To add an opening element to a{" "}
+          <DSMono variant="component">Menu</DSMono> just pass a clickable
+          element via the <DSMono variant="property">trigger</DSMono> property.
+          Although any element would work we commonly use{" "}
+          <DSMono variant="component">Icon</DSMono>s as triggers.
+        </Text>
+        <DSExampleArea>
+          <Menu
+            placement="bottom left"
+            style={tw`w-60`}
+            offset={8}
+            isOpen={isOpenPopover}
+            onChange={setIsOpenPopover}
+            trigger={
+              <IconButton
+                accessibilityLabel="More options menu"
+                name="more-line"
+                color="gray-600"
+                style={tw`p-2 md:p-0`}
+              ></IconButton>
+            }
+          >
+            <MenuButton
+              onPress={() => {
+                setIsOpenPopover(false);
+              }}
+              icon="folder-line"
+            >
+              Create Folder
+            </MenuButton>
+            <MenuButton
+              onPress={() => {
+                setIsOpenPopover(false);
+              }}
+              icon="font-size-2"
+            >
+              Rename
+            </MenuButton>
+            <SidebarDivider collapsed />
+            <MenuButton
+              onPress={() => {
+                setIsOpenPopover(false);
+              }}
+              icon="delete-bin-line"
+              danger
+            >
+              Delete
+            </MenuButton>
+          </Menu>
+        </DSExampleArea>
 
-      <DesignSystemHeader style={tw`mb-0`}>Icons</DesignSystemHeader>
-      <DesignSystemSubHeader>Marks</DesignSystemSubHeader>
-      <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-        <Icon name="bold" />
-        <Icon name="code-view" />
-        <Icon name="italic" />
-        <Icon name="link" />
-        <Icon name="link-m" />
-        <Icon name="strikethrough" />
-        <Icon name="underline" />
-      </Tiles>
-      <DesignSystemSubHeader>Nodes</DesignSystemSubHeader>
-      <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-        <Icon name="at-line" />
-        <Icon name="code-s-slash-line" />
-        <Icon name="double-quotes-l" />
-        <Icon name="heading" />
-        <Icon name="h-1" />
-        <Icon name="h-2" />
-        <Icon name="h-3" />
-        <Icon name="h-4" />
-        <Icon name="h-5" />
-        <Icon name="h-6" />
-        <Icon name="indent-decrease" />
-        <Icon name="indent-increase" />
-        <Icon name="list-check" />
-        <Icon name="list-check-2" />
-        <Icon name="list-ordered" />
-        <Icon name="list-unordered" />
-        <Icon name="paragraph" />
-        <Icon name="table-2" />
-        <Icon name="text" />
-      </Tiles>
-      <DesignSystemSubHeader>Extension</DesignSystemSubHeader>
-      <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-        <Icon name="font-color" />
-      </Tiles>
-      <DesignSystemSubHeader>Editor Custom</DesignSystemSubHeader>
-      <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-        <Icon name="attachment-2" />
-        <Icon name="font-size-2" />
-        <Icon name="format-clear" />
-        <Icon name="functions" />
-        <Icon name="hashtag" />
-        <Icon name="page-separator" />
-        <Icon name="separator" />
-      </Tiles>
-      <DesignSystemSubHeader>UI</DesignSystemSubHeader>
-      <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-        <Icon name="add-line" />
-        <Icon name="archive-fill" />
-        <Icon name="archive-line" />
-        <Icon name="arrow-down-filled" />
-        <Icon name="arrow-down-s-fill" />
-        <Icon name="arrow-down-s-line" />
-        <Icon name="arrow-go-back-fill" />
-        <Icon name="arrow-go-back-line" />
-        <Icon name="arrow-go-forward-fill" />
-        <Icon name="arrow-go-forward-line" />
-        <Icon name="arrow-right-s-line" />
-        <Icon name="arrow-right" />
-        <Icon name="arrow-right-filled" />
-        <Icon name="arrow-up-down-line" />
-        <Icon name="bookmark-fill" />
-        <Icon name="bookmark-line" />
-        <Icon name="book-open-line" />
-        <Icon name="calendar-check-fill" />
-        <Icon name="chat-1-line" />
-        <Icon name="chat-4-line" />
-        <Icon name="check-line" />
-        <Icon name="close-circle-fill" />
-        <Icon name="command-line" />
-        <Icon name="cup-line" />
-        <Icon name="cursor" />
-        <Icon name="delete-bin-line" />
-        <Icon name="double-arrow-left" />
-        <Icon name="double-arrow-right" />
-        <Icon name="download-line" />
-        <Icon name="emotion-line" />
-        <Icon name="file-add-fill" />
-        <Icon name="file-add-line" />
-        <Icon name="file-copy-line" />
-        <Icon name="file-line" />
-        <Icon name="file-search-line" />
-        <Icon name="file-transfer-line" />
-        <Icon name="folder-fill" />
-        <Icon name="folder-line" />
-        <Icon name="folder-music-line" />
-        <Icon name="history-line" />
-        <Icon name="image-2-line" />
-        <Icon name="image-line" />
-        <Icon name="information-fill" />
-        <Icon name="information-line" />
-        <Icon name="more" />
-        <Icon name="more-2-line" />
-        <Icon name="more-line" />
-        <Icon name="movie-line" />
-        <Icon name="plus" />
-        <Icon name="printer-line" />
-        <Icon name="question-mark" />
-        <Icon name="search-line" />
-        <Icon name="settings-4-line" />
-        <Icon name="stars-s-fill" />
-        <Icon name="serenity-feather" />
-        <Icon name="warning-fill" />
-      </Tiles>
-      <DesignSystemSubHeader>Sidebar</DesignSystemSubHeader>
-      <Tiles style={tw`max-w-lg`} space={4} columns={10}>
-        <Icon name="folder" />
-        <Icon name="page" />
-      </Tiles>
-      <DesignSystemSubHeader>Icons resized</DesignSystemSubHeader>
-      <Columns space={4} alignY="center" alignX="left">
-        <Column width="content">
-          <Icon name="list-unordered" />
-        </Column>
-        <Column width="content">
-          <Icon name="list-unordered" size={8} mobileSize={9} />
-        </Column>
-      </Columns>
-      <DesignSystemSubHeader>Icons coloured</DesignSystemSubHeader>
-      <Icon name="list-check-2" color={tw.color("primary-500")} />
+        <Heading lvl={4} style={h4Styles}>
+          Advanced usage
+        </Heading>
+        <Heading lvl={3}>Shortcuts</Heading>
+        <Text variant="small">
+          To add keyboard shortcuts to one of your actions just add a{" "}
+          <DSMono variant="component">Shortcut</DSMono> component via{" "}
+          <DSMono variant="property">shortcut</DSMono> .
+        </Text>
+        <Text variant="small" style={tw`mt-2 text-left`}>
+          To avoid accidents don't put a shortcut on a{" "}
+          <DSMono variant="context">dangerous</DSMono> action.
+        </Text>
+        <DSExampleArea>
+          <BoxShadow elevation={2} rounded>
+            <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
+              <MenuButton icon="folder-line" shortcut={<Shortcut letter="N" />}>
+                Create Folder
+              </MenuButton>
+              <MenuButton icon="font-size-2" shortcut={<Shortcut letter="R" />}>
+                Rename
+              </MenuButton>
+              <SidebarDivider collapsed />
+              <MenuButton icon="delete-bin-line" danger>
+                Delete
+              </MenuButton>
+            </VStack>
+          </BoxShadow>
+        </DSExampleArea>
+        <Heading lvl={3}>Links and more</Heading>
+        <Text variant={"small"}>
+          Besides the <DSMono variant="component">MenuButton</DSMono> you can
+          also use a <DSMono variant="component">SidebarLink</DSMono> as one of
+          the Menu-actions. Just be sure to give it a{" "}
+          <DSMono variant="type">p-menu-item</DSMono> class passed via the{" "}
+          <DSMono variant="property">style</DSMono> property to mimic the look
+          of MenuButtons.
+        </Text>
+        <DSExampleArea>
+          <BoxShadow elevation={2} rounded>
+            <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
+              <View style={tw`p-menu-item`}>
+                <Text variant="xxs" muted bold>
+                  jane@example.com
+                </Text>
+              </View>
+              <SidebarLink
+                to={{ screen: "EncryptDecryptImageTest" }}
+                style={tw`p-menu-item`}
+              >
+                <WorkspaceAvatar customColor="emerald" />
+                <Text variant="xs">Notes</Text>
+              </SidebarLink>
+              <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
+                <WorkspaceAvatar customColor="honey" />
+                <Text variant="xs">Project X</Text>
+              </SidebarLink>
+              <View style={tw`pl-2 pr-3 py-1.5`}>
+                <IconButton name="plus" label="New workspace" />
+              </View>
+
+              <SidebarDivider collapsed />
+              <MenuButton>Logout</MenuButton>
+            </VStack>
+          </BoxShadow>
+        </DSExampleArea>
+
+        <Heading lvl={1}>Modal (work in progress)</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Modal
+          </DSMono>{" "}
+          is a Dialog on top of an overlay used to show content that requires
+          user interaction.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          As the <DSMono variant="component">Modal</DSMono> is used for explicit
+          user interaction it is necessary to provide at least one Button. To
+          ensure consistent user experience they should be added as children of
+          the
+          <DSMono variant="component">ModalButtonFooter</DSMono> component.
+        </Text>
+        <Text variant="small" style={tw`mt-2`}>
+          This component requires to be passed a{" "}
+          <DSMono variant="component">Button</DSMono> via the Footers{" "}
+          <DSMono variant="property">confirm</DSMono> property. To add a{" "}
+          <DSMono variant="property">cancel</DSMono> action pass a Button to the
+          Footers <DSMono variant="property">confirm</DSMono> property.
+        </Text>
+        <DSExampleArea
+          style={tw`py-12 bg-gray-900/40 items-center`}
+          vertical
+          center
+        >
+          <Box>
+            <Text variant="small">
+              Something has happened and I just wanted to let you know
+              explicitly and not just by a Toast.
+            </Text>
+            <ModalButtonFooter
+              confirm={<Button variant="primary">Confirm</Button>}
+            />
+          </Box>
+        </DSExampleArea>
+        <Heading lvl={3}>Header</Heading>
+        <Text variant="small">
+          A <DSMono variant="component">Modal</DSMono> doesn't require a header,{" "}
+          but can be added by using the{" "}
+          <DSMono variant="component">ModalHeader</DSMono> component.
+        </Text>
+        <DSExampleArea
+          style={tw`py-12 bg-gray-900/40 items-center`}
+          vertical
+          center
+        >
+          <Box>
+            <ModalHeader>Delete Workspace ?</ModalHeader>
+            <Text variant="small">
+              Are you sure you want to delete the workspace{" "}
+              <Text variant="small" bold>
+                “Paula's Workspace”
+              </Text>
+              with all its pages and folders? You can't undo this action.
+            </Text>
+            <ModalButtonFooter
+              cancel={<Button variant="secondary">Keep</Button>}
+              confirm={<Button variant="danger">Delete Workspace</Button>}
+            />
+          </Box>
+        </DSExampleArea>
+        <Heading lvl={3}>Trigger</Heading>
+        <Text variant="small">
+          Our Modals are commonly triggered by{" "}
+          <DSMono variant="component">Buttons</DSMono> ,{" "}
+          <DSMono variant="component">IconButtons</DSMono> and{" "}
+          <DSMono variant="component">Menu</DSMono> actions.
+        </Text>
+        <DSExampleArea>
+          <IconButton
+            onPress={() => {
+              setShowModal(true);
+            }}
+            size="medium"
+            label="New workspace"
+            name="plus"
+            style={tw`bold`}
+          />
+          <Modal
+            isVisible={showModal}
+            onBackdropPress={() => setShowModal(false)}
+          >
+            <ModalHeader>Create a workspace</ModalHeader>
+            <LabeledInput
+              label={"Workspace Name"}
+              value="Surf &amp; Chill Co."
+              hint="This is the name of your organization, team or private notes. You can invite team members afterwards."
+            />
+            <ModalButtonFooter
+              cancel={
+                <Button variant="secondary" onPress={() => setShowModal(false)}>
+                  Cancel
+                </Button>
+              }
+              confirm={<Button variant="primary">Create Workspace</Button>}
+            />
+          </Modal>
+        </DSExampleArea>
+
+        <Heading lvl={1}>Sidebar</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Sidebar
+          </DSMono>{" "}
+          is the applications navigational element. It is always present on{" "}
+          <DSMono variant="base">desktop</DSMono> and accessible via an upper
+          left IconButton on smaller devices.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          You can either use <DSMono variant="component">SidebarButton</DSMono>s
+          to trigger actions or <DSMono variant="component">SidebarLink</DSMono>
+          s to provide access to destinations in our app.
+        </Text>
+        <DSExampleArea>
+          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
+            <SidebarButton>
+              <Icon
+                name="search-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Search...</Text>
+            </SidebarButton>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="history-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Recently edited</Text>
+            </SidebarLink>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="settings-4-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Settings</Text>
+            </SidebarLink>
+          </VStack>
+        </DSExampleArea>
+        <Heading lvl={3}>Divider</Heading>
+        <Text variant="small">
+          To section the different elements you can use the{" "}
+          <DSMono variant="component">SidebarDivider</DSMono>.
+        </Text>
+        <DSExampleArea>
+          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="history-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Recently edited</Text>
+            </SidebarLink>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="settings-4-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Settings</Text>
+            </SidebarLink>
+            <SidebarDivider />
+            <HStack
+              justifyContent="space-between"
+              alignItems="center"
+              style={tw`ml-4 mr-5 mb-4 md:mr-2`}
+            >
+              <Text variant={"xxs"} bold>
+                Folders
+              </Text>
+            </HStack>
+            <SidebarButton>
+              <View style={tw`w-full flex flex-row justify-between`}>
+                <HStack alignItems={"center"}>
+                  <View>
+                    <Icon
+                      name="arrow-right-filled"
+                      color={tw.color("gray-600")}
+                      mobileSize={5}
+                    />
+                  </View>
+                  <View style={tw`-ml-0.5`}>
+                    <Icon name="folder" size={5} mobileSize={8} />
+                  </View>
+                  <Text
+                    variant="small"
+                    style={tw`ml-1.5 max-w-32`}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Getting Started
+                  </Text>
+                </HStack>
+                <HStack alignItems="center" space={2}>
+                  <Icon name="more-line" color={tw.color("gray-600")}></Icon>
+                  <Icon
+                    name="file-add-line"
+                    color={tw.color("gray-600")}
+                  ></Icon>
+                </HStack>
+              </View>
+            </SidebarButton>
+          </VStack>
+        </DSExampleArea>
+
+        <Heading lvl={1}>Spinner</Heading>
+        <Text>
+          A{" "}
+          <DSMono variant={"component"} size="medium">
+            Spinner
+          </DSMono>{" "}
+          provides a visual cue that an action is processing awaiting a course
+          of change or a result.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          To enable a fading effect add the property{" "}
+          <DSMono variant="property">fadeIn</DSMono> .
+        </Text>
+        <DSExampleArea>
+          <Spinner fadeIn />
+        </DSExampleArea>
+        <Heading lvl={3}>Sizes</Heading>
+        <Text variant="small">
+          With the <DSMono variant="property">size</DSMono> property you can
+          display a Spinner in two different sizes:{" "}
+          <DSMono variant={"type"}>sm</DSMono> or{" "}
+          <DSMono variant={"type"}>lg</DSMono> .
+        </Text>
+        <DSExampleArea>
+          <Spinner size="sm" />
+          <Spinner size="lg" />
+        </DSExampleArea>
+
+        <Heading lvl={1}>Text</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Text
+          </DSMono>{" "}
+          component makes it easy to apply a default set of font weights and
+          sizes in our application.
+        </Text>
+        <Heading lvl={3}>Sizes</Heading>
+        <Text variant="small">
+          Our typographic scale has a limited set of type sizes that work well
+          together along with the layout grid.
+        </Text>
+        <Text variant="small">
+          To change the type use the <DSMono variant="property">variant</DSMono>{" "}
+          property and choose one of the 5 types:{" "}
+          <DSMono variant={"type"}>xxs</DSMono> ,{" "}
+          <DSMono variant={"type"}>xs</DSMono> ,{" "}
+          <DSMono variant={"type"}>small</DSMono> ,{" "}
+          <DSMono variant={"type"}>medium</DSMono> , or{" "}
+          <DSMono variant={"type"}>large</DSMono> .
+        </Text>
+        <DSExampleArea vertical>
+          <Text variant="xxs">the quick brown fox</Text>
+          <Text variant="xs">the quick brown fox</Text>
+          <Text variant="small">the quick brown fox</Text>
+          <Text>the quick brown fox</Text>
+          <Text variant="large">the quick brown fox</Text>
+        </DSExampleArea>
+        <Heading lvl={3}>Weight</Heading>
+        <Text variant="small">
+          As we use different font-faces depending on the weight of the text,
+          using the <DSMono variant="property">bold</DSMono> property is
+          mandatory for heavier text.
+        </Text>
+        <DSExampleArea vertical>
+          <Text bold variant="xxs">
+            the quick brown fox
+          </Text>
+          <Text bold variant="xs">
+            the quick brown fox
+          </Text>
+          <Text bold variant="small">
+            the quick brown fox
+          </Text>
+          <Text bold>the quick brown fox</Text>
+          <Text bold variant="large">
+            the quick brown fox
+          </Text>
+        </DSExampleArea>
+        <Heading lvl={3}>Emphasis</Heading>
+        <Text variant="small">
+          The <DSMono variant="property">muted</DSMono> property is useful for
+          phrases you need to see but are less important and therefore can be in
+          the background.
+        </Text>
+        <DSExampleArea vertical>
+          <Text muted variant="xxs">
+            the quick brown fox
+          </Text>
+          <Text muted variant="xs">
+            the quick brown fox
+          </Text>
+          <Text muted variant="small">
+            the quick brown fox
+          </Text>
+          <Text muted>the quick brown fox</Text>
+          <Text muted variant="large">
+            the quick brown fox
+          </Text>
+        </DSExampleArea>
+
+        <Heading lvl={1}>Toast</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Toast
+          </DSMono>{" "}
+          component is used to give feedback to users after an action has taken
+          place.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          A <DSMono variant="component">Toast</DSMono> informs users of a
+          process that an app has performed or will perform. They appear
+          temporarily, towards the bottom of the screen.
+        </Text>
+        <Text variant="small">
+          They shouldn't interrupt the user experience, and they don't require
+          user input to disappear.
+        </Text>
+        <DSExampleArea>
+          <Button
+            onPress={() => {
+              counter = counter + 1;
+              showToast(`Copied to clipboard ${counter}`);
+            }}
+            size={"medium"}
+          >
+            Copy
+          </Button>
+        </DSExampleArea>
+
+        <Heading lvl={1}>Tooltip</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="medium">
+            Tooltip
+          </DSMono>{" "}
+          is a brief, informative message that appears when a user interacts
+          with an element.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="small">
+          For now we use <DSMono variant="component">Tooltip</DSMono>s
+          exclusively for <DSMono variant="context">desktop</DSMono> for actions
+          triggerd by <DSMono variant="component">IconButton</DSMono>s.
+        </Text>
+        <DSExampleArea>
+          <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="history-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Recently edited</Text>
+            </SidebarLink>
+            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
+              <Icon
+                name="settings-4-line"
+                size={4.5}
+                mobileSize={5.5}
+                color={tw.color("gray-800")}
+              />
+              <Text variant="small">Settings</Text>
+            </SidebarLink>
+            <SidebarDivider />
+            <HStack
+              justifyContent="space-between"
+              alignItems="center"
+              style={tw`mx-4 mb-4`}
+            >
+              <Text variant={"xxs"} bold>
+                Folders
+              </Text>
+              <Tooltip label="Create Folder" placement="right" offset={8}>
+                <IconButton name="plus" />
+              </Tooltip>
+            </HStack>
+            <SidebarButton>
+              <View style={tw`w-full flex flex-row justify-between`}>
+                <HStack alignItems={"center"}>
+                  <View>
+                    <Icon
+                      name="arrow-right-filled"
+                      color={tw.color("gray-600")}
+                      mobileSize={5}
+                    />
+                  </View>
+                  <View style={tw`-ml-0.5`}>
+                    <Icon name="folder" size={5} mobileSize={8} />
+                  </View>
+                  <Text
+                    variant="small"
+                    style={tw`ml-1.5 max-w-32`}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Getting Started
+                  </Text>
+                </HStack>
+              </View>
+            </SidebarButton>
+          </VStack>
+        </DSExampleArea>
+      </View>
     </ScrollSafeAreaView>
   );
 }
