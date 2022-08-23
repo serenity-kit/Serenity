@@ -23,7 +23,6 @@ import { useClient } from "urql";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { getDevices } from "../../utils/device/getDevices";
 import { useDocumentStore } from "../../utils/document/documentStore";
-import { getFolder } from "../../utils/folder/getFolder";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
@@ -103,16 +102,7 @@ export default function SidebarPage(props: Props) {
       // TODO show notification
       const document =
         updateDocumentNameResult.data.updateDocumentName.document;
-      const parentFolder = await getFolder({
-        id: document?.parentFolderId!,
-        urqlClient,
-      });
-      const folderKeyData = await kdfDeriveFromKey({
-        key: workspaceKey,
-        context: folderDerivedKeyContext,
-        subkeyId: parentFolder.subKeyId!,
-      });
-      documentStore.update(document, folderKeyData.key);
+      documentStore.update(document, urqlClient);
     } else {
       // TODO: show error: couldn't update folder name
       // refetch to revert back to actual name

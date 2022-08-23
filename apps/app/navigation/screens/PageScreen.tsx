@@ -121,7 +121,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {
       const document =
         updateDocumentNameResult.data.updateDocumentName.document;
-      documentStore.update(document);
+      documentStore.update(document, urqlClient);
     }
   };
 

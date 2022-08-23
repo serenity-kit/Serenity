@@ -1,52 +1,57 @@
+import {
+  addPendingSnapshot,
+  addPendingUpdate,
+  addSnapshotToInProgress,
+  addUpdateToInProgressQueue,
+  cleanupUpdates,
+  createAwarenessUpdate,
+  createSignatureKeyPair,
+  createSnapshot,
+  createUpdate,
+  dispatchWebsocketState,
+  getPending,
+  getSnapshotInProgress,
+  getUpdateInProgress,
+  getWebsocketState,
+  removePending,
+  removeSnapshotInProgress,
+  removeUpdateFromInProgressQueue,
+  useWebsocketState,
+  verifyAndDecryptAwarenessUpdate,
+  verifyAndDecryptSnapshot,
+  verifyAndDecryptUpdate,
+} from "@naisho/core";
+import { folderDerivedKeyContext } from "@serenity-tools/common";
+import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
+import sodium, { KeyPair } from "@serenity-tools/libsodium";
+import { useEffect, useRef } from "react";
+import { useClient } from "urql";
+import { v4 as uuidv4 } from "uuid";
+import {
+  applyAwarenessUpdate,
+  Awareness,
+  encodeAwarenessUpdate,
+  removeAwarenessStates,
+} from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
 import {
-  createSnapshot,
-  createUpdate,
-  createAwarenessUpdate,
-  verifyAndDecryptSnapshot,
-  verifyAndDecryptUpdate,
-  verifyAndDecryptAwarenessUpdate,
-  createSignatureKeyPair,
-  addUpdateToInProgressQueue,
-  removeUpdateFromInProgressQueue,
-  getUpdateInProgress,
-  addSnapshotToInProgress,
-  removeSnapshotInProgress,
-  getSnapshotInProgress,
-  addPendingUpdate,
-  addPendingSnapshot,
-  getPending,
-  removePending,
-  dispatchWebsocketState,
-  getWebsocketState,
-  useWebsocketState,
-  cleanupUpdates,
-} from "@naisho/core";
-import { v4 as uuidv4 } from "uuid";
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
-import {
-  Awareness,
-  encodeAwarenessUpdate,
-  applyAwarenessUpdate,
-  removeAwarenessStates,
-} from "y-protocols/awareness";
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { useEffect, useRef } from "react";
-import {
   Document,
+  DocumentDocument,
   DocumentQuery,
   DocumentQueryVariables,
-  DocumentDocument,
 } from "../../generated/graphql";
-import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { Folder } from "../../types/Folder";
+import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+import { getDevices } from "../../utils/device/getDevices";
 import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
-import { Folder } from "../../types/Folder";
-import { useClient } from "urql";
+import { getFolder } from "../../utils/folder/getFolder";
+import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 
 const reconnectTimeout = 2000;
 
@@ -104,7 +109,26 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       )
       .toPromise();
     const document = documentResult.data?.document as Document;
-    documentStore.update(document);
+    const devices = await getDevices({ urqlClient });
+    if (!devices) {
+      console.error("No devices found");
+      return;
+    }
+    const workspaceKey = await getWorkspaceKey({
+      workspaceId: document.workspaceId!,
+      devices,
+      urqlClient,
+    });
+    const folder = await getFolder({
+      id: document.parentFolderId!,
+      urqlClient,
+    });
+    const folderKeyData = await kdfDeriveFromKey({
+      key: workspaceKey,
+      context: folderDerivedKeyContext,
+      subkeyId: folder.subKeyId!,
+    });
+    documentStore.update(document, urqlClient);
   };
 
   useEffect(() => {
