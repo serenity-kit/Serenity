@@ -1,0 +1,12 @@
+query deviceBySigningPublicKey($signingPublicKey: ID!) {
+  deviceBySigningPublicKey(signingPublicKey: $signingPublicKey) {
+    device {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      encryptionPublicKeySignature
+      info
+      createdAt
+    }
+  }
+}

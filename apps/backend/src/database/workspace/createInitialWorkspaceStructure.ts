@@ -1,14 +1,14 @@
+import { Snapshot } from "@naisho/core";
+import { Document } from "../../types/document";
+import { Folder } from "../../types/folder";
+import { Workspace } from "../../types/workspace";
+import { createSnapshot } from "../createSnapshot";
+import { createDocument } from "../document/createDocument";
+import { createFolder } from "../folder/createFolder";
 import {
   createWorkspace,
   DeviceWorkspaceKeyBoxParams,
 } from "./createWorkspace";
-import { createFolder } from "../folder/createFolder";
-import { Workspace } from "../../types/workspace";
-import { Document } from "../../types/document";
-import { Folder } from "../../types/folder";
-import { Snapshot } from "@naisho/core";
-import { createDocument } from "../document/createDocument";
-import { createSnapshot } from "../createSnapshot";
 
 export type Params = {
   userId: string;
@@ -17,8 +17,14 @@ export type Params = {
   folderId: string;
   folderIdSignature: string;
   folderName: string;
+  encryptedFolderName: string;
+  encryptedFolderNameNonce: string;
+  folderSubkeyId: number;
   documentId: string;
   documentName: string;
+  encryptedDocumentName: string;
+  encryptedDocumentNameNonce: string;
+  documentSubkeyId: number;
   documentSnapshot: Snapshot;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
 };
@@ -35,8 +41,14 @@ export async function createInitialWorkspaceStructure({
   workspaceName,
   folderId,
   folderName,
+  encryptedFolderName,
+  encryptedFolderNameNonce,
+  folderSubkeyId,
   documentId,
   documentName,
+  encryptedDocumentName,
+  encryptedDocumentNameNonce,
+  documentSubkeyId,
   documentSnapshot,
   deviceWorkspaceKeyBoxes,
 }: Params): Promise<CreateWorkspaceResult> {
@@ -50,12 +62,18 @@ export async function createInitialWorkspaceStructure({
     userId,
     id: folderId,
     name: folderName,
+    encryptedName: encryptedFolderName,
+    encryptedNameNonce: encryptedFolderNameNonce,
+    subKeyId: folderSubkeyId,
     parentFolderId: undefined,
     workspaceId: workspace.id,
   });
   const document = await createDocument({
     id: documentId,
     name: documentName,
+    encryptedName: encryptedDocumentName,
+    encryptedNameNonce: encryptedDocumentNameNonce,
+    subkeyId: documentSubkeyId,
     parentFolderId: folder.id,
     workspaceId: workspaceId,
   });

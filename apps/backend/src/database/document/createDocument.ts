@@ -3,6 +3,9 @@ import { prisma } from "../prisma";
 type Params = {
   id: string;
   name?: string | null;
+  encryptedName?: string | null;
+  encryptedNameNonce?: string | null;
+  subkeyId?: number | null;
   parentFolderId?: string | null;
   workspaceId: string;
 };
@@ -10,6 +13,9 @@ type Params = {
 export async function createDocument({
   id,
   name,
+  encryptedName,
+  encryptedNameNonce,
+  subkeyId,
   parentFolderId,
   workspaceId,
 }: Params) {
@@ -18,6 +24,14 @@ export async function createDocument({
     folderName = name;
   }
   return prisma.document.create({
-    data: { id, name: folderName, parentFolderId, workspaceId },
+    data: {
+      id,
+      name: folderName,
+      encryptedName,
+      encryptedNameNonce,
+      subkeyId,
+      parentFolderId,
+      workspaceId,
+    },
   });
 }

@@ -1,5 +1,11 @@
-import { useHasEditorSidebar } from "@serenity-tools/editor/hooks/useHasEditorSidebar";
-import { tw, Avatar, AvatarGroup, Button, Icon } from "@serenity-tools/ui";
+import {
+  tw,
+  Avatar,
+  AvatarGroup,
+  Button,
+  Icon,
+  useHasEditorSidebar,
+} from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { Modal } from "@serenity-tools/ui";
 import React, { useState } from "react";

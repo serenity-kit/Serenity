@@ -1,6 +1,9 @@
 import {
   createAndEncryptDevice,
+  createDocumentKey,
   createIntroductionDocumentSnapshot,
+  encryptDocumentTitle,
+  encryptFolder,
 } from "@serenity-tools/common";
 import * as sodium from "@serenity-tools/libsodium";
 import { Login, Registration } from "@serenity-tools/opaque-server";
@@ -80,6 +83,7 @@ export default async function createUserWithWorkspace({
   });
 
   const documentId = uuidv4();
+  const documentName = "Introduction";
   const documentEncryptionKey = sodium.from_base64(
     "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
   );
@@ -93,9 +97,23 @@ export default async function createUserWithWorkspace({
   const deviceEncryptionPrivateKey = result.encryptionPrivateKey;
   const deviceEncryptionPublicKey = device.encryptionPublicKey;
   const deviceSigningPrivateKey = result.signingPrivateKey;
-  const { nonce, ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
-    receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
-    creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
+  const { nonce, ciphertext, workspaceKey } =
+    await createWorkspaceKeyAndCipherTextForDevice({
+      receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
+      creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
+    });
+  const folderName = "Getting Started";
+  const encryptedFolderResult = await encryptFolder({
+    name: folderName,
+    parentKey: workspaceKey,
+  });
+  const folderKey = encryptedFolderResult.folderSubKey;
+  const docmentKeyResult = await createDocumentKey({
+    folderKey,
+  });
+  const encryptedDocumentTitleResult = await encryptDocumentTitle({
+    title: documentName,
+    key: docmentKeyResult.key,
   });
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
@@ -103,9 +121,15 @@ export default async function createUserWithWorkspace({
     workspaceName: "My Workspace",
     folderId: uuidv4(),
     folderIdSignature: uuidv4(),
-    folderName: "Getting Started",
+    folderName,
+    encryptedFolderName: encryptedFolderResult.ciphertext,
+    encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
+    folderSubkeyId: encryptedFolderResult.folderSubkeyId,
     documentId,
-    documentName: "Introduction",
+    documentName,
+    encryptedDocumentName: encryptedDocumentTitleResult.ciphertext,
+    encryptedDocumentNameNonce: encryptedDocumentTitleResult.publicNonce,
+    documentSubkeyId: docmentKeyResult.subkeyId,
     documentSnapshot,
     deviceWorkspaceKeyBoxes: [
       {

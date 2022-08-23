@@ -1,6 +1,5 @@
 import { DrawerHeaderProps } from "@react-navigation/drawer";
-import { useHasEditorSidebar } from "@serenity-tools/editor/hooks/useHasEditorSidebar";
-import { Icon, Text, tw } from "@serenity-tools/ui";
+import { Icon, Text, tw, useHasEditorSidebar } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useDocumentPathStore } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";

@@ -1,38 +1,37 @@
 import { gql } from "graphql-request";
+import { AttachToDeviceWorkspaceKeyBoxData } from "../../../src/database/device/attachDeviceToWorkspaces";
 
 type Params = {
   graphql: any;
-  workspaceId: string;
   deviceSigningPublicKey: string;
   creatorDeviceSigningPublicKey: string;
-  deviceAeadNonce: string;
-  deviceAeadCiphertext: string;
+  deviceWorkspaceKeyBoxes: AttachToDeviceWorkspaceKeyBoxData[];
   authorizationHeader: string;
 };
 
-export const attachDeviceToWorkspace = async ({
+export const attachDeviceToWorkspaces = async ({
   graphql,
   deviceSigningPublicKey,
   creatorDeviceSigningPublicKey,
-  deviceAeadNonce,
-  deviceAeadCiphertext,
-  workspaceId,
+  deviceWorkspaceKeyBoxes,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
   const query = gql`
-    mutation attachDeviceToWorkspace($input: AttachDeviceToWorkspaceInput!) {
-      attachDeviceToWorkspace(input: $input) {
-        workspaceKey {
+    mutation attachDeviceToWorkspaces($input: AttachDeviceToWorkspacesInput!) {
+      attachDeviceToWorkspaces(input: $input) {
+        workspaceKeys {
           id
-          workspaceId
           generation
+          workspaceId
           workspaceKeyBox {
             id
             deviceSigningPublicKey
+            creatorDeviceSigningPublicKey
             ciphertext
+            nonce
           }
         }
       }
@@ -42,11 +41,9 @@ export const attachDeviceToWorkspace = async ({
     query,
     {
       input: {
-        workspaceId,
-        receiverDeviceSigningPublicKey: deviceSigningPublicKey,
         creatorDeviceSigningPublicKey,
-        nonce: deviceAeadNonce,
-        ciphertext: deviceAeadCiphertext,
+        receiverDeviceSigningPublicKey: deviceSigningPublicKey,
+        deviceWorkspaceKeyBoxes,
       },
     },
     authorizationHeaders

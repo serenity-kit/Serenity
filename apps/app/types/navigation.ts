@@ -21,6 +21,10 @@ type PageParams = {
   isNew?: boolean;
 };
 
+type WorkspacePageParams = {
+  workspaceId: string;
+};
+
 type LoginParams = {
   next?: string;
 };
@@ -34,14 +38,31 @@ export type WorkspaceDrawerParamList = {
   NoPageExists: undefined;
   Page: PageParams;
   Settings: undefined;
-  DeviceManager: undefined;
   WorkspaceRoot: undefined;
 };
 
-export type WorkspaceParams =
-  NavigatorScreenParams<WorkspaceDrawerParamList> & {
-    workspaceId: string;
-  };
+export type WorkspaceParams = NavigatorScreenParams<WorkspaceDrawerParamList> &
+  WorkspacePageParams;
+
+export type AccountSettingsDrawerParamList = {
+  Profile: undefined;
+  Devices: undefined;
+};
+
+export type AccountSettingsParams =
+  NavigatorScreenParams<AccountSettingsDrawerParamList>;
+
+export type WorkspaceSettingsDrawerParamList = {
+  General: undefined;
+  Members: undefined;
+};
+
+export type WorkspaceSettingsParams =
+  // tablet & desktop params
+  | (NavigatorScreenParams<WorkspaceSettingsDrawerParamList> &
+      WorkspacePageParams)
+  // phone params
+  | WorkspacePageParams;
 
 export type WorkspaceInvitationParams = {
   workspaceInvitationId: string;
@@ -49,6 +70,7 @@ export type WorkspaceInvitationParams = {
 
 export type RootStackParamList = {
   Workspace: WorkspaceParams;
+  WorkspaceSettings: WorkspaceSettingsParams;
   Onboarding: undefined;
   DesignSystem: undefined;
   DevDashboard: undefined;
@@ -59,6 +81,11 @@ export type RootStackParamList = {
   Login: LoginParams;
   EncryptDecryptImageTest: undefined;
   TestLibsodium: undefined;
+  AccountSettings: AccountSettingsParams;
+  AccountSettingsProfile: undefined; // on phones
+  AccountSettingsDevices: undefined; // on phones
+  WorkspaceSettingsGeneral: undefined; // on phones
+  WorkspaceSettingsMembers: undefined; // on phones
   Root: undefined;
   NotFound: undefined;
 };

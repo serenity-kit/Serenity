@@ -191,12 +191,13 @@ export const crypto_box_open_easy = async (
 };
 
 export const crypto_kdf_keygen = async (): Promise<string> => {
-  throw new Error("Not implemented");
+  const key = await sodium.crypto_kdf_keygen();
+  return base64ToUrlSafeBase64(key);
 };
 
 export const crypto_kdf_derive_from_key = async (
   subkey_len: number,
-  nonce: number,
+  subkey_id: number,
   context: string,
   key: string
 ): Promise<string> => {
@@ -204,7 +205,13 @@ export const crypto_kdf_derive_from_key = async (
   if ([...context].length !== 8) {
     throw new Error("crypto_kdf_derive_from_key context must be 8 bytes");
   }
-  throw new Error("Not implemented");
+  const kdfDeriveFromKey = await sodium.crypto_kdf_derive_from_key(
+    subkey_len,
+    subkey_id,
+    urlSafeBase64ToBase64(to_base64(context)),
+    urlSafeBase64ToBase64(key)
+  );
+  return base64ToUrlSafeBase64(kdfDeriveFromKey);
 };
 
 export default {
@@ -237,6 +244,7 @@ export default {
   crypto_box_PUBLICKEYBYTES: sodium.crypto_box_PUBLICKEYBYTES,
   crypto_box_SECRETKEYBYTES: sodium.crypto_box_SECRETKEYBYTES,
   crypto_aead_xchacha20poly1305_ietf_KEYBYTES: 32, // copied from the web version
+  crypto_kdf_KEYBYTES: sodium.crypto_kdf_KEYBYTES,
   base64_to_url_safe_base64: base64ToUrlSafeBase64,
   url_safe_base64_to_base64: urlSafeBase64ToBase64,
 };

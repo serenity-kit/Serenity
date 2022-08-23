@@ -49,4 +49,7 @@
 - (void) crypto_aead_xchacha20poly1305_ietf_encrypt:(NSString*)m d:(NSString*)d n:(NSString*)n k:(NSString*)k resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject;
 - (void) crypto_aead_xchacha20poly1305_ietf_decrypt:(NSString*)c d:(NSString*)d n:(NSString*)n k:(NSString*)k resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject;
 
+- (void) crypto_kdf_keygen:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject;
+- (void) crypto_kdf_derive_from_key:(NSNumber*)subkey_len subkey_id:(NSNumber*)subkey_id ctx:(NSString*)ctx k:(NSString*)k resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject;
+
 @end

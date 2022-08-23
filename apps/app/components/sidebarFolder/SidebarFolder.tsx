@@ -1,49 +1,55 @@
+import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { encryptFolder } from "@serenity-tools/common";
 import {
   Icon,
+  IconButton,
+  InlineInput,
   Pressable,
   Text,
+  Tooltip,
   tw,
+  useIsDesktopDevice,
   View,
   ViewProps,
-  InlineInput,
-  IconButton,
-  Tooltip,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, Platform } from "react-native";
-import { useFocusRing } from "@react-native-aria/focus";
+import { ActivityIndicator, Platform, StyleSheet } from "react-native";
+import { useClient } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateDocumentMutation,
   useCreateFolderMutation,
+  useDeleteFoldersMutation,
+  useDevicesQuery,
   useDocumentsQuery,
   useFoldersQuery,
   useUpdateFolderNameMutation,
-  useDeleteFoldersMutation,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
-import SidebarPage from "../sidebarPage/SidebarPage";
-import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
-import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { getDevices } from "../../utils/device/getDevices";
 import {
-  useDocumentPathStore,
   getDocumentPath,
+  useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
-import { useClient } from "urql";
-import { useIsDesktopDevice } from "@serenity-tools/ui";
+import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
+import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
+import SidebarPage from "../sidebarPage/SidebarPage";
 
 type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
+  folderSubkeyId?: number | null;
   folderName: string;
   depth?: number;
   onStructureChange: () => void;
 };
 
 export default function SidebarFolder(props: Props) {
+  const defaultFolderName = "Untitled";
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const openFolderIds = useOpenFolderStore((state) => state.folderIds);
@@ -72,6 +78,11 @@ export default function SidebarFolder(props: Props) {
       first: 50,
     },
   });
+  const [devicesResult] = useDevicesQuery({
+    variables: {
+      first: 500,
+    },
+  });
   const { depth = 0 } = props;
   const urqlClient = useClient();
   const documentPathStore = useDocumentPathStore();
@@ -82,13 +93,37 @@ export default function SidebarFolder(props: Props) {
     setIsOpen(openFolderIds.includes(props.folderId));
   }, [openFolderIds, props.folderId]);
 
-  const createFolder = async (name: string | null) => {
+  const createFolder = async (name: string) => {
     setIsOpen(true);
     const id = uuidv4();
+    const devices = await getDevices({ urqlClient });
+    if (!devices) {
+      console.error("No devices found!");
+      return;
+    }
+    let workspaceKey = "";
+    try {
+      workspaceKey = await getWorkspaceKey({
+        workspaceId: props.workspaceId,
+        devices,
+        urqlClient,
+      });
+    } catch (error: any) {
+      // TODO: handle device not registered error
+      console.error(error);
+      return;
+    }
+    const encryptedFolderResult = await encryptFolder({
+      name,
+      parentKey: workspaceKey,
+    });
     const result = await createFolderMutation({
       input: {
         id,
         name,
+        encryptedName: encryptedFolderResult.ciphertext,
+        encryptedNameNonce: encryptedFolderResult.publicNonce,
+        subKeyId: encryptedFolderResult.folderSubkeyId,
         workspaceId: props.workspaceId,
         parentFolderId: props.folderId,
       },
@@ -105,7 +140,6 @@ export default function SidebarFolder(props: Props) {
   };
 
   const createDocument = async () => {
-    openFolder();
     const id = uuidv4();
     const result = await createDocumentMutation({
       input: {
@@ -162,13 +196,46 @@ export default function SidebarFolder(props: Props) {
     }
   };
   const updateFolderName = async (newFolderName: string) => {
-    const updateFolderNameResult = await updateFolderNameMutation({
-      input: {
-        id: props.folderId,
-        name: newFolderName,
-      },
+    const devices = await getDevices({ urqlClient });
+    if (!devices) {
+      console.error("No devices found!");
+      return;
+    }
+    let workspaceKey = "";
+    try {
+      workspaceKey = await getWorkspaceKey({
+        workspaceId: props.workspaceId,
+        devices,
+        urqlClient,
+      });
+    } catch (error: any) {
+      // TODO: handle device not registered error
+      console.error(error);
+      return;
+    }
+    const encryptedFolderResult = await encryptFolder({
+      name: newFolderName,
+      parentKey: workspaceKey,
     });
-    if (updateFolderNameResult.data?.updateFolderName?.folder) {
+    let numUpdateFolderNameAttempts = 0;
+    let didFolderNameUpdatedSucceed = false;
+    let folder: any = undefined;
+    do {
+      const updateFolderNameResult = await updateFolderNameMutation({
+        input: {
+          id: props.folderId,
+          name: newFolderName,
+          encryptedName: encryptedFolderResult.ciphertext,
+          encryptedNameNonce: encryptedFolderResult.publicNonce,
+          subkeyId: encryptedFolderResult.folderSubkeyId,
+        },
+      });
+      if (updateFolderNameResult.data?.updateFolderName?.folder) {
+        folder = updateFolderNameResult.data?.updateFolderName?.folder;
+        didFolderNameUpdatedSucceed = true;
+      }
+    } while (!didFolderNameUpdatedSucceed && numUpdateFolderNameAttempts < 5);
+    if (folder) {
       // refetch the document path
       // TODO: Optimize by checking if the current folder is in the document path
       if (document && documentPathIds.includes(props.folderId)) {
@@ -286,7 +353,7 @@ export default function SidebarFolder(props: Props) {
                 onUpdateNamePress={editFolderName}
                 onDeletePressed={() => deleteFolder(props.folderId)}
                 onCreateFolderPress={() => {
-                  createFolder(null);
+                  createFolder(defaultFolderName);
                 }}
               />
               {/* offset not working yet as NB has a no-no in their component */}
@@ -317,6 +384,7 @@ export default function SidebarFolder(props: Props) {
                     key={folder.id}
                     folderId={folder.id}
                     workspaceId={props.workspaceId}
+                    folderSubkeyId={props.folderSubkeyId}
                     folderName={folder.name}
                     onStructureChange={props.onStructureChange}
                     depth={depth + 1}
@@ -332,6 +400,7 @@ export default function SidebarFolder(props: Props) {
                 return (
                   <SidebarPage
                     key={document.id}
+                    folderSubkeyId={props.folderSubkeyId || undefined}
                     documentId={document.id}
                     documentName={document.name || "Untitled"}
                     workspaceId={props.workspaceId}

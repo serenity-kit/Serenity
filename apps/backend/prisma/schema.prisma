@@ -11,16 +11,21 @@ generator client {
 }
 
 model Document {
-  id               String     @id
-  activeSnapshot   Snapshot?  @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
-  activeSnapshotId String?    @unique
-  snapshots        Snapshot[]
-  createdAt        DateTime   @default(now())
-  workspace        Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId      String
-  parentFolder     Folder?    @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
-  parentFolderId   String?
-  name             String // TODO must be encrypted
+  id                 String     @id
+  activeSnapshot     Snapshot?  @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
+  activeSnapshotId   String?    @unique
+  snapshots          Snapshot[]
+  createdAt          DateTime   @default(now())
+  workspace          Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId        String
+  parentFolder       Folder?    @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
+  parentFolderId     String?
+  name               String?
+  encryptedName      String?
+  encryptedNameNonce String?
+  subkeyId           Int?       @unique
+
+  @@unique([subkeyId, workspaceId])
 }
 
 model Snapshot {
@@ -181,17 +186,20 @@ model WorkspaceKeyBox {
 }
 
 model Folder {
-  id             String     @id
-  idSignature    String
-  name           String // TODO must be encrypted
-  workspace      Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId    String
-  parentFolder   Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
-  parentFolderId String?
-  rootFolder     Folder?    @relation(name: "rootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
-  rootFolderId   String?
-  createdAt      DateTime   @default(now())
-  childFolders   Folder[]   @relation("parentFolder")
-  descendent     Folder[]   @relation("rootFolder")
-  documents      Document[]
+  id                 String     @id @unique
+  idSignature        String
+  name               String // TODO must be encrypted
+  encryptedName      String?
+  encryptedNameNonce String?
+  subKeyId           Int?       @unique
+  workspace          Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId        String
+  parentFolder       Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
+  parentFolderId     String?
+  rootFolder         Folder?    @relation(name: "rootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
+  rootFolderId       String?
+  createdAt          DateTime   @default(now())
+  childFolders       Folder[]   @relation("parentFolder")
+  descendent         Folder[]   @relation("rootFolder")
+  documents          Document[]
 }

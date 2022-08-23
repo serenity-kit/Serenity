@@ -19,6 +19,9 @@ export const getDocument = async ({
       document(id: $id) {
         id
         name
+        encryptedName
+        encryptedNameNonce
+        subkeyId
         parentFolderId
         workspaceId
       }

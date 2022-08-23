@@ -1,10 +1,15 @@
 import {
-  DrawerContentScrollView,
   DrawerContentComponentProps,
+  DrawerContentScrollView,
 } from "@react-navigation/drawer";
 
+import { useFocusRing } from "@react-native-aria/focus";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { encryptFolder } from "@serenity-tools/common";
 import {
+  Avatar,
   Icon,
+  IconButton,
   InlineInput,
   Menu,
   Pressable,
@@ -12,34 +17,34 @@ import {
   SidebarDivider,
   SidebarLink,
   Text,
+  Tooltip,
   tw,
   useIsPermanentLeftSidebar,
   View,
-  IconButton,
-  Tooltip,
-  WorkspaceAvatar,
+  WorkspaceAvatar
 } from "@serenity-tools/ui";
-import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
-import {
-  useCreateFolderMutation,
-  useRootFoldersQuery,
-  useMeQuery,
-  Workspace,
-} from "../../generated/graphql";
-import { v4 as uuidv4 } from "uuid";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { RootStackScreenProps } from "../../types/navigation";
-import { useAuthentication } from "../../context/AuthenticationContext";
 import { HStack } from "native-base";
-import { useFocusRing } from "@react-native-aria/focus";
 import { useEffect, useState } from "react";
-import Folder from "../sidebarFolder/SidebarFolder";
-import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { Platform } from "react-native";
 import { useClient } from "urql";
+import { v4 as uuidv4 } from "uuid";
+import { useAuthentication } from "../../context/AuthenticationContext";
+import {
+  useCreateFolderMutation,
+  useDevicesQuery,
+  useMeQuery,
+  useRootFoldersQuery,
+  Workspace,
+} from "../../generated/graphql";
+import { RootStackScreenProps } from "../../types/navigation";
+import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { getDevices } from "../../utils/device/getDevices";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
+import Folder from "../sidebarFolder/SidebarFolder";
+import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const urqlClient = useClient();
@@ -65,6 +70,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     variables: {
       workspaceId,
       first: 20,
+    },
+  });
+  const [devicesResult] = useDevicesQuery({
+    variables: {
+      first: 500,
     },
   });
 
@@ -146,8 +156,36 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
   const createFolder = async (name: string) => {
     const id = uuidv4();
+    const devices = await getDevices({ urqlClient });
+    if (!devices) {
+      console.error("No devices found!");
+      return;
+    }
+    let workspaceKey = "";
+    try {
+      workspaceKey = await getWorkspaceKey({
+        workspaceId: workspaceId,
+        devices,
+        urqlClient,
+      });
+    } catch (error: any) {
+      // TODO: handle device not registered error
+      console.error(error);
+      return;
+    }
+    const encryptedFolderResult = await encryptFolder({
+      name,
+      parentKey: workspaceKey,
+    });
     const result = await createFolderMutation({
-      input: { id, workspaceId: route.params.workspaceId, name },
+      input: {
+        id,
+        workspaceId: route.params.workspaceId,
+        name,
+        encryptedName: encryptedFolderResult.ciphertext,
+        encryptedNameNonce: encryptedFolderResult.publicNonce,
+        subKeyId: encryptedFolderResult.folderSubkeyId,
+      },
     });
     if (!result.data?.createFolder?.folder?.id) {
       console.error(result.error);
@@ -206,11 +244,31 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             </Pressable>
           }
         >
-          <View style={tw`p-menu-item`}>
-            <Text variant="xxs" muted bold>
-              {username}
-            </Text>
-          </View>
+          <SidebarLink
+            to={{ screen: "AccountSettings" }}
+            onPress={(event) => {
+              setIsOpenWorkspaceSwitcher(false);
+              // on iOS Modals can't be open at the same time
+              // and closing the workspace switcher takes a bit of time
+              // technically we only need it for tables and larger, but
+              // don't want to complicate things for now
+              if (Platform.OS === "ios") {
+                event.preventDefault();
+                setTimeout(() => {
+                  props.navigation.navigate("AccountSettings", {
+                    screen: "Profile",
+                  });
+                }, 400);
+              }
+            }}
+          >
+            <View style={tw`p-menu-item`}>
+              <Text variant="xxs" muted bold>
+                {username}
+              </Text>
+            </View>
+          </SidebarLink>
+
           {workspaces === null ||
           workspaces === undefined ||
           workspaces.length === 0
@@ -277,11 +335,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           ></IconButton>
         )}
       </HStack>
-
       <SidebarLink
         to={{
-          screen: "Workspace",
-          params: { workspaceId: route.params.workspaceId, screen: "Settings" },
+          screen: "WorkspaceSettings",
+          params: { workspaceId: route.params.workspaceId },
         }}
       >
         <Icon
@@ -292,6 +349,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         />
         <Text variant="small">Settings</Text>
       </SidebarLink>
+
       <SidebarLink to={{ screen: "DevDashboard" }}>
         <Icon
           name="dashboard-line"
@@ -301,26 +359,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         />
         <Text variant="small">Dev Dashboard</Text>
       </SidebarLink>
-      <SidebarLink
-        to={{
-          screen: "Workspace",
-          params: {
-            workspaceId: route.params.workspaceId,
-            screen: "DeviceManager",
-          },
-        }}
-      >
-        <Icon
-          name="dashboard-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={tw.color("gray-800")}
-        />
-        <Text variant="small">Device Manager</Text>
-      </SidebarLink>
-
       <SidebarDivider />
-
       <HStack
         justifyContent="space-between"
         alignItems="center"
@@ -339,7 +378,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           ></IconButton>
         </Tooltip>
       </HStack>
-
       {isCreatingNewFolder && (
         <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
           <View style={tw`ml-0.5 -mr-0.5`}>
@@ -356,7 +394,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           />
         </HStack>
       )}
-
       {rootFoldersResult.fetching ? (
         <Text variant="xs" muted style={tw`py-1.5 pl-4`}>
           Loading Folders…
@@ -371,13 +408,13 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               key={folder.id}
               folderId={folder.id}
               folderName={folder.name}
+              folderSubkeyId={folder.subKeyId}
               workspaceId={route.params.workspaceId}
               onStructureChange={refetchRootFolders}
             />
           );
         })
       ) : null}
-
       <CreateWorkspaceModal
         isVisible={showCreateWorkspaceModal}
         onBackdropPress={() => setShowCreateWorkspaceModal(false)}

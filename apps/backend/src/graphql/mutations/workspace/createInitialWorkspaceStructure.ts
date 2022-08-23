@@ -42,8 +42,14 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
     t.nonNull.string("folderId");
     t.nonNull.string("folderIdSignature");
     t.nonNull.string("folderName");
+    t.nonNull.string("encryptedFolderName");
+    t.nonNull.string("encryptedFolderNameNonce");
+    t.nonNull.int("folderSubkeyId");
     t.nonNull.string("documentId");
     t.nonNull.string("documentName");
+    t.nonNull.string("encryptedDocumentName");
+    t.nonNull.string("encryptedDocumentNameNonce");
+    t.nonNull.int("documentSubkeyId");
     t.nonNull.field("documentSnapshot", { type: DocumentSnapshotInput });
     t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
       type: DeviceWorkspaceKeyBoxInput,
@@ -93,11 +99,46 @@ export const createInitialWorkspaceStructureMutation = mutationField(
       if (!args.input.folderName) {
         throw new UserInputError("Invalid input: folderName cannot be null");
       }
+      if (!args.input.encryptedFolderName) {
+        throw new UserInputError(
+          "Invalid input: encryptedFolderName cannot be null"
+        );
+      }
+      if (!args.input.encryptedFolderNameNonce) {
+        throw new UserInputError(
+          "Invalid input: encryptedFolderNameNonce cannot be null"
+        );
+      }
+      if (!args.input.folderSubkeyId) {
+        throw new UserInputError(
+          "Invalid input: folderSubkeyId cannot be null"
+        );
+      }
+      if (typeof args.input.folderSubkeyId !== "number") {
+        throw new UserInputError(
+          "Invalid input: folderSubkeyId must be a number"
+        );
+      }
       if (!args.input.documentId) {
         throw new UserInputError("Invalid input: documentId cannot be null");
       }
       if (!args.input.documentName) {
         throw new UserInputError("Invalid input: documentName cannot be null");
+      }
+      if (!args.input.encryptedDocumentName) {
+        throw new UserInputError(
+          "Invalid input: encryptedDocumentName cannot be null"
+        );
+      }
+      if (!args.input.encryptedDocumentNameNonce) {
+        throw new UserInputError(
+          "Invalid input: encryptedDocumentNameNonce cannot be null"
+        );
+      }
+      if (!args.input.documentSubkeyId) {
+        throw new UserInputError(
+          "Invalid input: documentSubkeyId cannot be null"
+        );
       }
       if (!args.input.documentSnapshot) {
         throw new UserInputError(
@@ -121,8 +162,14 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         folderId: args.input.folderId,
         folderIdSignature: args.input.folderIdSignature,
         folderName: args.input.folderName,
+        encryptedFolderName: args.input.encryptedFolderName,
+        encryptedFolderNameNonce: args.input.encryptedFolderNameNonce,
+        folderSubkeyId: args.input.folderSubkeyId,
         documentId: args.input.documentId,
         documentName: args.input.documentName,
+        encryptedDocumentName: args.input.encryptedDocumentName,
+        encryptedDocumentNameNonce: args.input.encryptedDocumentNameNonce,
+        documentSubkeyId: args.input.documentSubkeyId,
         documentSnapshot: args.input.documentSnapshot,
         deviceWorkspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,
       });

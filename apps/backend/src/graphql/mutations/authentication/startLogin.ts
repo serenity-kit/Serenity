@@ -1,7 +1,7 @@
-import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { startLogin } from "../../../utils/opaque";
-import { getEnvelope } from "../../../database/authentication/getEnvelope";
 import { UserInputError } from "apollo-server-express";
+import { arg, inputObjectType, mutationField, objectType } from "nexus";
+import { getEnvelope } from "../../../database/authentication/getEnvelope";
+import { startLogin } from "../../../utils/opaque";
 
 export const StartLoginInput = inputObjectType({
   name: "StartLoginInput",

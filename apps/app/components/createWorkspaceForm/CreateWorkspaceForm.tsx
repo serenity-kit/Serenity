@@ -1,10 +1,15 @@
-import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
+import {
+  createDocumentKey,
+  createIntroductionDocumentSnapshot,
+  encryptDocumentTitle,
+  encryptFolder,
+} from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import {
   Button,
+  FormWrapper,
   LabeledInput,
   ModalButtonFooter,
-  FormWrapper,
   ModalHeader,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
@@ -14,16 +19,7 @@ import {
   useDevicesQuery,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { createWorkspaceKeyAndCipherTextForDevice } from "../../utils/device/createWorkspaceKeyAndCipherTextForDevice";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
-import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
-
-type DeviceWorkspaceKeyBoxParams = {
-  deviceSigningPublicKey: string;
-  creatorDeviceSigningPublicKey: string;
-  nonce: string;
-  ciphertext: string;
-};
+import { createWorkspaceKeyBoxesForDevices } from "../../utils/device/createWorkspaceKeyBoxesForDevices";
 
 type WorkspaceProps = {
   id: string;
@@ -64,35 +60,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     }, 250);
   }, []);
 
-  const buildDeviceWorkspaceKeyBoxes = async (devices: Device[]) => {
-    const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[] = [];
-    const allDevices = devices;
-    const mainDevice = getMainDevice();
-    const activeDevice = await getActiveDevice();
-    if (!activeDevice) {
-      // TODO: handle this error
-      console.error("No active device!");
-    }
-    if (mainDevice) {
-      allDevices.push(mainDevice);
-    }
-    for await (const device of allDevices) {
-      const { nonce, ciphertext } =
-        await createWorkspaceKeyAndCipherTextForDevice({
-          receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-          creatorDeviceEncryptionPrivateKey:
-            activeDevice?.encryptionPrivateKey!,
-        });
-      deviceWorkspaceKeyBoxes.push({
-        deviceSigningPublicKey: device.signingPublicKey,
-        creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
-        nonce,
-        ciphertext,
-      });
-    }
-    return deviceWorkspaceKeyBoxes;
-  };
-
   const createWorkspace = async () => {
     const workspaceId = uuidv4();
     const folderId = uuidv4();
@@ -114,16 +81,41 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       return;
     }
     const devices = devicesResult.data?.devices?.nodes as Device[];
-    const deviceWorkspaceKeyBoxes = await buildDeviceWorkspaceKeyBoxes(devices);
+    const { deviceWorkspaceKeyBoxes, workspaceKey } =
+      await createWorkspaceKeyBoxesForDevices({ workspaceId, devices });
+    if (!workspaceKey) {
+      // TODO: handle this error
+      console.error("Could not retrieve workspaceKey!");
+      return;
+    }
+    const folderName = "Getting started";
+    const encryptedFolderResult = await encryptFolder({
+      name: folderName,
+      parentKey: workspaceKey,
+    });
+    const documentName = "Introduction";
+    const documentKeyData = await createDocumentKey({
+      folderKey: encryptedFolderResult.folderSubKey,
+    });
+    const encryptedDocumentTitle = await encryptDocumentTitle({
+      title: documentName,
+      key: documentKeyData.key,
+    });
     const createInitialWorkspaceStructureResult =
       await createInitialWorkspaceStructure({
         input: {
           workspaceName: name,
           workspaceId,
-          folderName: "Getting started",
+          folderName,
           folderId,
+          encryptedFolderName: encryptedFolderResult.ciphertext,
+          encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
+          folderSubkeyId: encryptedFolderResult.folderSubkeyId,
           folderIdSignature: `TODO+${folderId}`,
           documentName: "Introduction",
+          encryptedDocumentName: encryptedDocumentTitle.ciphertext,
+          encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
+          documentSubkeyId: documentKeyData.subkeyId,
           documentId,
           documentSnapshot: snapshot,
           deviceWorkspaceKeyBoxes,

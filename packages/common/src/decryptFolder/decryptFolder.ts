@@ -1,7 +1,7 @@
-import sodium from "@serenity-tools/libsodium";
 import { decryptAead } from "@naisho/core";
+import sodium from "@serenity-tools/libsodium";
 import canonicalize from "canonicalize";
-import { derivedKeyContext } from "../encryptFolder/encryptFolder";
+import { folderDerivedKeyContext } from "../encryptFolder/encryptFolder";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {
@@ -10,17 +10,18 @@ type Params = {
   subkeyId: number;
   ciphertext: string;
   publicNonce: string;
-  publicData: any;
+  publicData?: any;
 };
 
 export const decryptFolder = async (params: Params) => {
-  const canonicalizedPublicData = canonicalize(params.publicData);
+  const publicData = params.publicData || {};
+  const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {
     throw new Error("Invalid public data for decrypting the folder.");
   }
   const folderKey = await kdfDeriveFromKey({
     key: params.parentKey,
-    context: derivedKeyContext,
+    context: folderDerivedKeyContext,
     subkeyId: params.subkeyId,
   });
   const result = await decryptAead(

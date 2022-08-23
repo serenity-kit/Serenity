@@ -1,4 +1,9 @@
-import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
+import {
+  createDocumentKey,
+  createIntroductionDocumentSnapshot,
+  encryptDocumentTitle,
+  encryptFolder,
+} from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
 import { createWorkspaceKeyAndCipherTextForDevice } from "../device/createWorkspaceKeyAndCipherTextForDevice";
@@ -9,6 +14,7 @@ type Params = {
   workspaceName: string;
   deviceSigningPublicKey: string;
   deviceEncryptionPublicKey: string;
+  deviceEncryptionPrivateKey: string;
   folderId: string;
   folderIdSignature: string;
   folderName: string;
@@ -23,6 +29,7 @@ export const createInitialWorkspaceStructure = async ({
   workspaceId,
   deviceSigningPublicKey,
   deviceEncryptionPublicKey,
+  deviceEncryptionPrivateKey,
   folderId,
   folderIdSignature,
   folderName,
@@ -33,10 +40,11 @@ export const createInitialWorkspaceStructure = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const { nonce, ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
-    receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
-    creatorDeviceEncryptionPrivateKey: deviceEncryptionPublicKey,
-  });
+  const { nonce, ciphertext, workspaceKey } =
+    await createWorkspaceKeyAndCipherTextForDevice({
+      receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
+      creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
+    });
   const query = gql`
     mutation createInitialWorkspaceStructure(
       $input: CreateInitialWorkspaceStructureInput!
@@ -58,12 +66,16 @@ export const createInitialWorkspaceStructure = async ({
               workspaceKeyId
               deviceSigningPublicKey
               ciphertext
+              nonce
             }
           }
         }
         folder {
           id
           name
+          encryptedName
+          encryptedNameNonce
+          subKeyId
           parentFolderId
           rootFolderId
           workspaceId
@@ -71,6 +83,26 @@ export const createInitialWorkspaceStructure = async ({
       }
     }
   `;
+
+  const encryptedFolderResult = await encryptFolder({
+    name: folderName,
+    parentKey: workspaceKey,
+  });
+  const encryptedFolderName = encryptedFolderResult.ciphertext;
+  const encryptedFolderNameNonce = encryptedFolderResult.publicNonce;
+  const folderSubkeyId = encryptedFolderResult.folderSubkeyId;
+  const folderKey = encryptedFolderResult.folderSubKey;
+
+  const documentKeyResult = await createDocumentKey({
+    folderKey,
+  });
+  const encryptedDocumentTitleResult = await encryptDocumentTitle({
+    title: documentName,
+    key: documentKeyResult.key,
+  });
+  const encryptedDocumentName = encryptedDocumentTitleResult.ciphertext;
+  const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;
+  const documentSubkeyId = documentKeyResult.subkeyId;
 
   // currently hard-coded until we enable e2e encryption per workspace
   const documentEncryptionKey = sodium.from_base64(
@@ -90,8 +122,14 @@ export const createInitialWorkspaceStructure = async ({
         folderId,
         folderIdSignature,
         folderName,
+        encryptedFolderName,
+        encryptedFolderNameNonce,
+        folderSubkeyId,
         documentId,
         documentName,
+        encryptedDocumentName,
+        encryptedDocumentNameNonce,
+        documentSubkeyId,
         documentSnapshot,
         deviceWorkspaceKeyBoxes: [
           {

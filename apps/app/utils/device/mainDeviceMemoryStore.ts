@@ -9,7 +9,3 @@ export const setMainDevice = (newDevice: Device) => {
 export const getMainDevice = (): Device | null => {
   return device;
 };
-
-export const deleteMainDevice = async () => {
-  device = null;
-};

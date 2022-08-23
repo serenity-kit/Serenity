@@ -1,55 +1,46 @@
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import Page from "../../components/page/Page";
-import { useWindowDimensions } from "react-native";
-import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
+import {
+  createDocumentKey,
+  encryptDocumentTitle,
+  folderDerivedKeyContext,
+} from "@serenity-tools/common";
+import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { useEffect, useLayoutEffect } from "react";
-import {
-  useUpdateDocumentNameMutation,
-  WorkspaceDocument,
-  WorkspaceQuery,
-  WorkspaceQueryVariables,
-} from "../../generated/graphql";
+import { useWindowDimensions } from "react-native";
+import { useClient } from "urql";
+import Page from "../../components/page/Page";
 import { PageHeader } from "../../components/page/PageHeader";
-import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
+import { useAuthentication } from "../../context/AuthenticationContext";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
-import { useDocumentStore } from "../../utils/document/documentStore";
 import {
+  DocumentDocument,
   DocumentQuery,
   DocumentQueryVariables,
-  DocumentDocument,
+  useUpdateDocumentNameMutation,
 } from "../../generated/graphql";
-import { useClient } from "urql";
-import { removeLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+
+import { getDevices } from "../../utils/device/getDevices";
+import { useDocumentStore } from "../../utils/document/documentStore";
+import { getFolder } from "../../utils/folder/getFolder";
+import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const workspaceId = useWorkspaceId();
   const documentStore = useDocumentStore();
   const pageId = props.route.params.pageId;
+  const { sessionKey } = useAuthentication();
   const urqlClient = useClient();
 
   const navigateAwayIfUserDoesntHaveAccess = async (
     workspaceId: string,
     docId: string
   ) => {
-    const activeDevice = await getActiveDevice();
-    if (!activeDevice) {
+    if (!sessionKey) {
       // TODO: handle this error
-      console.error("No active device found!");
-    }
-    const workspaceResult = await urqlClient
-      .query<WorkspaceQuery, WorkspaceQueryVariables>(
-        WorkspaceDocument,
-        {
-          id: workspaceId,
-          deviceSigningPublicKey: activeDevice?.signingPublicKey!,
-        },
-        { requestPolicy: "network-only" }
-      )
-      .toPromise();
-    if (workspaceResult.data?.workspace === null) {
-      props.navigation.replace("WorkspaceNotFound");
+      console.error("No sessionKey found. Probably you aren't logged in!");
       return;
     }
     const documentResult = await urqlClient
@@ -85,10 +76,46 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
 
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const updateTitle = async (title: string) => {
+    const devices = await getDevices({ urqlClient });
+    if (!devices) {
+      console.error("No devices found!");
+      return;
+    }
+    let workspaceKey = "";
+    try {
+      workspaceKey = await getWorkspaceKey({
+        workspaceId: workspaceId,
+        devices,
+        urqlClient,
+      });
+    } catch (error: any) {
+      // TODO: handle device not registered error
+      console.error(error);
+      return;
+    }
+    const folder = await getFolder({
+      id: documentStore.document?.parentFolderId!,
+      urqlClient,
+    });
+    const folderKeyResult = await kdfDeriveFromKey({
+      key: workspaceKey,
+      context: folderDerivedKeyContext,
+      subkeyId: folder.subKeyId!,
+    });
+    const documentKeyData = await createDocumentKey({
+      folderKey: folderKeyResult.key,
+    });
+    const encryptedDocumentTitle = await encryptDocumentTitle({
+      title,
+      key: documentKeyData.key,
+    });
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
         id: pageId,
         name: title,
+        encryptedName: encryptedDocumentTitle.ciphertext,
+        encryptedNameNonce: encryptedDocumentTitle.publicNonce,
+        subkeyId: documentKeyData.subkeyId,
       },
     });
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {

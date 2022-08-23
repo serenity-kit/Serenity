@@ -2,8 +2,8 @@ import sodium from "libsodium-wrappers";
 import { v4 as uuidv4 } from "uuid";
 
 import type {
-  HandleRegistration as HandleRegistrationType,
   HandleLogin as HandleLoginType,
+  HandleRegistration as HandleRegistrationType,
 } from "@serenity-tools/opaque-server";
 
 const {
@@ -106,6 +106,7 @@ export const startLogin = ({
     username,
     handleLogin: serverLogin,
   };
+  console.log({ loginId, message: sodium.to_base64(response) });
   return {
     loginId,
     message: sodium.to_base64(response),

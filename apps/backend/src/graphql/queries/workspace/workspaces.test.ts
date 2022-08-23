@@ -1,11 +1,11 @@
 import { gql } from "graphql-request";
+import { v4 as uuidv4 } from "uuid";
+import { registerUser } from "../../../../test/helpers/authentication/registerUser";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql, {
   TestContext,
 } from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
-import { v4 as uuidv4 } from "uuid";
 import { Workspace } from "../../../types/workspace";
 
 const graphql = setupGraphql();
@@ -31,6 +31,7 @@ const setup = async () => {
     workspaceId: workspace1Id,
     deviceSigningPublicKey: registerUserResult.mainDevice.signingPublicKey,
     deviceEncryptionPublicKey: registerUserResult.encryptionPrivateKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",
@@ -44,6 +45,7 @@ const setup = async () => {
     workspaceId: workspace2Id,
     deviceSigningPublicKey: registerUserResult.mainDevice.signingPublicKey,
     deviceEncryptionPublicKey: registerUserResult.encryptionPrivateKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",

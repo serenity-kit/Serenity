@@ -1,18 +1,28 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import {
+  decryptDocumentTitle,
+  folderDerivedKeyContext,
+  recreateDocumentKey,
+} from "@serenity-tools/common";
+import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
+import { gql } from "graphql-request";
+import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { decryptWorkspaceKey } from "../../../../test/helpers/device/decryptWorkspaceKey";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";
-import { v4 as uuidv4 } from "uuid";
-import { gql } from "graphql-request";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 
 const graphql = setupGraphql();
 const username = "user1";
 const password = "password";
 let addedWorkspace: any = null;
-let addedDocumentId: any = null;
+let addedFolder: any = null;
+let addedDocumentId = "";
 let sessionKey = "";
+let workspaceKey = "";
+let folderKey = "";
 
 const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
@@ -23,6 +33,7 @@ const setup = async () => {
     workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -41,6 +52,21 @@ const setup = async () => {
     workspaceId: addedWorkspace.id,
   });
   addedDocumentId = createDocumentResult.createDocument.id;
+  const workspaceKeyBox = addedWorkspace.currentWorkspaceKey.workspaceKeyBox;
+  workspaceKey = await decryptWorkspaceKey({
+    ciphertext: workspaceKeyBox.ciphertext,
+    nonce: workspaceKeyBox.nonce,
+    creatorDeviceEncryptionPublicKey:
+      registerUserResult.mainDevice.encryptionPublicKey,
+    receiverDeviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+  });
+  addedFolder = createWorkspaceResult.createInitialWorkspaceStructure.folder;
+  const folderKeyResult = await kdfDeriveFromKey({
+    key: workspaceKey,
+    context: folderDerivedKeyContext,
+    subkeyId: addedFolder.subKeyId,
+  });
+  folderKey = folderKeyResult.key;
 };
 
 beforeAll(async () => {
@@ -56,16 +82,24 @@ test("user should be able to change a document name", async () => {
     graphql,
     id,
     name,
+    folderKey,
     authorizationHeader,
   });
-  expect(result.updateDocumentName).toMatchInlineSnapshot(`
-    Object {
-      "document": Object {
-        "id": "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-        "name": "Updated Name",
-      },
-    }
-  `);
+  const updatedDocument = result.updateDocumentName.document;
+  expect(typeof updatedDocument.encryptedName).toBe("string");
+  expect(typeof updatedDocument.encryptedNameNonce).toBe("string");
+  expect(typeof updatedDocument.subkeyId).toBe("number");
+  const documentSubkey = await recreateDocumentKey({
+    folderKey,
+    subkeyId: updatedDocument.subkeyId,
+  });
+  const decryptedName = await decryptDocumentTitle({
+    key: documentSubkey.key,
+    ciphertext: updatedDocument.encryptedName,
+    publicNonce: updatedDocument.encryptedNameNonce,
+    publicData: null,
+  });
+  expect(decryptedName).toBe(name);
 });
 
 test("Throw error when document doesn't exist", async () => {
@@ -78,6 +112,7 @@ test("Throw error when document doesn't exist", async () => {
         graphql,
         id,
         name,
+        folderKey,
         authorizationHeader,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
@@ -93,6 +128,7 @@ test("Throw error when user doesn't have access", async () => {
     workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
+    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -119,6 +155,7 @@ test("Throw error when user doesn't have access", async () => {
         graphql,
         id,
         name,
+        folderKey,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -133,6 +170,7 @@ test("Unauthenticated", async () => {
         graphql,
         id,
         name,
+        folderKey,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -146,7 +184,15 @@ describe("Input errors", () => {
   test("Invalid Id", async () => {
     const query = gql`
       mutation {
-        updateDocumentName(input: { id: "", name: "updated name" }) {
+        updateDocumentName(
+          input: {
+            id: ""
+            name: "updated name"
+            encryptedName: ""
+            encryptedNameNonce: ""
+            subkeyId: 1
+          }
+        ) {
           document {
             name
             id
@@ -166,6 +212,9 @@ describe("Input errors", () => {
             input: {
               id: "${id}"
               name: ""
+              encryptedName: ""
+              encryptedNameNonce: ""
+              subkeyId: 1
             }
           ) {
             document {
@@ -175,6 +224,30 @@ describe("Input errors", () => {
           }
         }
       `;
+    await expect(
+      (async () =>
+        await graphql.client.request(query, null, authorizationHeaders))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid subkeyId", async () => {
+    const query = gql`
+      mutation {
+        updateDocumentName(
+          input: {
+            id: ""
+            name: "updated name"
+            encryptedName: "abc123"
+            encryptedNameNonce: "abc123"
+            subkeyId: 0
+          }
+        ) {
+          document {
+            name
+            id
+          }
+        }
+      }
+    `;
     await expect(
       (async () =>
         await graphql.client.request(query, null, authorizationHeaders))()

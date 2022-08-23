@@ -2,36 +2,35 @@ import "expo-dev-client";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import useCachedResources from "./hooks/useCachedResources";
-import { tw } from "@serenity-tools/ui";
-import Navigation from "./navigation/Navigation";
-import { useDeviceContext, useAppColorScheme } from "twrnc";
 import {
-  createClient,
-  makeOperation,
-  Provider,
-  fetchExchange,
-  dedupExchange,
-} from "urql";
-import { cacheExchange } from "@urql/exchange-graphcache";
-import { NativeBaseProvider, extendTheme } from "native-base";
-import { authExchange } from "@urql/exchange-auth";
-import {
-  useFonts,
   // Inter options can be found here https://github.com/expo/google-fonts/tree/master/font-packages/inter
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
+  useFonts,
 } from "@expo-google-fonts/inter";
-import { AuthenticationProvider } from "./context/AuthenticationContext";
-import { useCallback, useEffect, useMemo } from "react";
-import { devtoolsExchange } from "@urql/devtools";
-import { theme } from "../../tailwind.config";
 import { OpaqueBridge } from "@serenity-tools/opaque";
-import { RootSiblingParent } from "react-native-root-siblings";
-import { getWebDevice } from "./utils/device/webDeviceStore";
+import { tw } from "@serenity-tools/ui";
+import { devtoolsExchange } from "@urql/devtools";
+import { authExchange } from "@urql/exchange-auth";
+import { cacheExchange } from "@urql/exchange-graphcache";
 import Constants from "expo-constants";
+import { extendTheme, NativeBaseProvider } from "native-base";
+import { useCallback, useMemo } from "react";
+import { RootSiblingParent } from "react-native-root-siblings";
+import { useAppColorScheme, useDeviceContext } from "twrnc";
+import {
+  createClient,
+  dedupExchange,
+  fetchExchange,
+  makeOperation,
+  Provider,
+} from "urql";
+import { theme } from "../../tailwind.config";
+import { AuthenticationProvider } from "./context/AuthenticationContext";
+import useCachedResources from "./hooks/useCachedResources";
+import Navigation from "./navigation/Navigation";
 import * as SessionKeyStore from "./utils/authentication/sessionKeyStore";
 import { source } from "./webviews/opaque/source";
 
@@ -142,16 +141,6 @@ export default function App() {
     },
     [setSessionKey]
   );
-
-  const checkForWebDevice = async () => {
-    const webDevice = await getWebDevice();
-  };
-
-  useEffect(() => {
-    (async () => {
-      await checkForWebDevice();
-    })();
-  }, []);
 
   const [isFontLoadingComplete] = useFonts({
     Inter_400Regular,

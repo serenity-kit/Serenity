@@ -1,16 +1,17 @@
-import sodium from "@serenity-tools/libsodium";
 import { decryptAead } from "@naisho/core";
+import sodium from "@serenity-tools/libsodium";
 import canonicalize from "canonicalize";
 
 type Params = {
   key: string;
   ciphertext: string;
   publicNonce: string;
-  publicData: any;
+  publicData?: any;
 };
 
 export const decryptDocumentTitle = async (params: Params) => {
-  const canonicalizedPublicData = canonicalize(params.publicData);
+  const publicData = params.publicData || {};
+  const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {
     throw new Error("Invalid public data for decrypting the document.");
   }

@@ -396,4 +396,15 @@ declare module "react-native-sodium-expo-plugin" {
     public_nonce: string,
     key: string
   ): Promise<string>;
+
+  export const crypto_kdf_KEYBYTES: number;
+
+  export function crypto_kdf_keygen(): Promise<string>;
+
+  export function crypto_kdf_derive_from_key(
+    subkey_len: number,
+    subkey_id: number,
+    ctx: string,
+    key: string
+  ): Promise<string>;
 }

@@ -43,6 +43,9 @@ export const createDocumentMutation = mutationField("createDocument", {
     const document = await createDocument({
       id: args.input.id,
       name: null,
+      encryptedName: null,
+      encryptedNameNonce: null,
+      subkeyId: null,
       parentFolderId,
       workspaceId: args.input.workspaceId,
     });
