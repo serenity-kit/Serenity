@@ -122,6 +122,7 @@ export default function SidebarFolder(props: Props) {
     let folderId: string | undefined = undefined;
     let result: any = undefined;
     do {
+      numCreateFolderAttempts += 1;
       result = await createFolderMutation({
         input: {
           id,
@@ -130,15 +131,18 @@ export default function SidebarFolder(props: Props) {
           encryptedName: encryptedFolderResult.ciphertext,
           encryptedNameNonce: encryptedFolderResult.publicNonce,
           subkeyId: encryptedFolderResult.folderSubkeyId,
+          parentFolderId: props.folderId,
         },
       });
+      console.log({ result });
       if (result.data?.createFolder?.folder?.id) {
         didCreateFolderSucceed = true;
+        folderId = result.data?.createFolder?.folder?.id;
+        console.log({ folderId });
         setIsEditing("none");
       }
     } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
-    if (!folderId) {
-      // TODO show notification
+    if (folderId) {
       setIsEditing("none");
     } else {
       console.error(result.error);

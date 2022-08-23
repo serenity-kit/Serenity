@@ -181,6 +181,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     let folderId: string | undefined = undefined;
     let result: any = undefined;
     do {
+      numCreateFolderAttempts += 1;
       result = await createFolderMutation({
         input: {
           id,
@@ -195,7 +196,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         didCreateFolderSucceed = true;
         folderId = result.data?.createFolder?.folder?.id;
       }
-      numCreateFolderAttempts += 1;
+      console.log({ numCreateFolderAttempts });
     } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
     if (!folderId) {
       console.error(result.error);
