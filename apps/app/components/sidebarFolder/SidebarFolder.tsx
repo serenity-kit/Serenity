@@ -87,6 +87,7 @@ export default function SidebarFolder(props: Props) {
   const urqlClient = useClient();
   const documentPathStore = useDocumentPathStore();
   const document = useDocumentStore((state) => state.document);
+  const documentName = useDocumentStore((state) => state.documentName);
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
 
   useEffect(() => {
@@ -401,7 +402,7 @@ export default function SidebarFolder(props: Props) {
                     key={document.id}
                     folderSubkeyId={props.folderSubkeyId || undefined}
                     documentId={document.id}
-                    documentName={document.name || "Untitled"}
+                    documentName={documentName || "Untitled"}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}
                     depth={depth}

@@ -12,6 +12,7 @@ type Props = DrawerHeaderProps & {
 export function PageHeader(props: Props) {
   const documentPathList = useDocumentPathStore((state) => state.folders);
   const document = useDocumentStore((state) => state.document);
+  const documentName = useDocumentStore((state) => state.documentName);
   const hasEditorSidebar = useHasEditorSidebar();
 
   return (
@@ -32,7 +33,7 @@ export function PageHeader(props: Props) {
       )}
       {document ? (
         <Text variant="xxs" bold={hasEditorSidebar} muted={!hasEditorSidebar}>
-          {document.name}
+          {documentName}
         </Text>
       ) : null}
     </HStack>
