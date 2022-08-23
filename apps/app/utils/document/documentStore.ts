@@ -21,34 +21,42 @@ export const useDocumentStore = create<DocumentState>((set) => ({
   document: null,
   documentName: null,
   update: async (document, urqlClient) => {
-    const devices = await getDevices({ urqlClient });
-    if (!devices) {
-      console.error("No devices found");
-      return;
+    let documentName: string | null = null;
+    if (
+      document &&
+      document.encryptedName &&
+      document.encryptedNameNonce &&
+      document.subkeyId
+    ) {
+      const devices = await getDevices({ urqlClient });
+      if (!devices) {
+        console.error("No devices found");
+        return;
+      }
+      const workspaceKey = await getWorkspaceKey({
+        workspaceId: document?.workspaceId!,
+        devices,
+        urqlClient,
+      });
+      const folder = await getFolder({
+        id: document?.parentFolderId!,
+        urqlClient,
+      });
+      const folderKeyData = await kdfDeriveFromKey({
+        key: workspaceKey,
+        context: folderDerivedKeyContext,
+        subkeyId: folder.subKeyId!,
+      });
+      const documentKeyData = await recreateDocumentKey({
+        folderKey: folderKeyData.key,
+        subkeyId: document?.subkeyId!,
+      });
+      documentName = await decryptDocumentTitle({
+        key: documentKeyData.key,
+        ciphertext: document?.encryptedName!,
+        publicNonce: document?.encryptedNameNonce!,
+      });
     }
-    const workspaceKey = await getWorkspaceKey({
-      workspaceId: document?.workspaceId!,
-      devices,
-      urqlClient,
-    });
-    const folder = await getFolder({
-      id: document?.parentFolderId!,
-      urqlClient,
-    });
-    const folderKeyData = await kdfDeriveFromKey({
-      key: workspaceKey,
-      context: folderDerivedKeyContext,
-      subkeyId: folder.subKeyId!,
-    });
-    const documentKeyData = await recreateDocumentKey({
-      folderKey: folderKeyData.key,
-      subkeyId: document?.subkeyId!,
-    });
-    const documentName = await decryptDocumentTitle({
-      key: documentKeyData.key,
-      ciphertext: document?.encryptedName!,
-      publicNonce: document?.encryptedNameNonce!,
-    });
     set((state) => ({
       document,
       documentName,
