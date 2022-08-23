@@ -21,7 +21,7 @@ import {
   tw,
   useIsPermanentLeftSidebar,
   View,
-  WorkspaceAvatar
+  WorkspaceAvatar,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";

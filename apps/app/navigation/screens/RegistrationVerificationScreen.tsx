@@ -6,7 +6,7 @@ import {
   LabeledInput,
   Text,
   tw,
-  View
+  View,
 } from "@serenity-tools/ui";
 import { detect } from "detect-browser";
 import { useState } from "react";

@@ -9,7 +9,13 @@ import {
 import { WebView } from "react-native-webview";
 import { Asset } from "expo-asset";
 import * as FileSystem from "expo-file-system";
-import { CenterContent, Spinner, tw, View, useHasEditorSidebar } from "@serenity-tools/ui";
+import {
+  CenterContent,
+  Spinner,
+  tw,
+  View,
+  useHasEditorSidebar,
+} from "@serenity-tools/ui";
 import * as Y from "yjs";
 import { EditorProps } from "./types";
 import { source } from "../../webviews/editor/source";
