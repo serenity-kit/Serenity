@@ -29,42 +29,42 @@ export function LinkExternal(props: LinkExternalProps) {
   };
 
   return (
-    <Text
-      {...props}
-      {...focusRingProps} // sets onFocus and onBlur
-      accessibilityRole="link"
-      // @ts-expect-error
-      href={props.href}
-      hrefAttrs={{
-        target: "_blank",
-      }}
-      onPress={(event) => {
-        // on web it's a regular link and therefor
-        // no custom onPress handling is necessary
-        if (Platform.OS !== "web") {
-          Linking.openURL(props.href);
-        }
-        props.onPress && props.onPress(event);
-      }}
-      variant={variant}
-      style={[
-        styles.default,
-        isFocusVisible && styles.focusVisible,
-        props.style,
-      ]}
-    >
-      <HStack alignItems={"center"}>
+    <HStack alignItems={"center"}>
+      <Text
+        {...props}
+        {...focusRingProps} // sets onFocus and onBlur
+        accessibilityRole="link"
+        // @ts-expect-error
+        href={props.href}
+        hrefAttrs={{
+          target: "_blank",
+        }}
+        onPress={(event) => {
+          // on web it's a regular link and therefor
+          // no custom onPress handling is necessary
+          if (Platform.OS !== "web") {
+            Linking.openURL(props.href);
+          }
+          props.onPress && props.onPress(event);
+        }}
+        variant={variant}
+        style={[
+          styles.default,
+          isFocusVisible && styles.focusVisible,
+          props.style,
+        ]}
+      >
         {props.children}
-        {icon ? (
-          <View style={tw`pl-0.5`}>
-            <Icon
-              name="external-link-line"
-              color={tw.color("primary-500")}
-              size={iconSizes[variant]}
-            />
-          </View>
-        ) : null}
-      </HStack>
-    </Text>
+      </Text>
+      {icon ? (
+        <View style={tw`pl-0.5`}>
+          <Icon
+            name="external-link-line"
+            color={tw.color("primary-500")}
+            size={iconSizes[variant]}
+          />
+        </View>
+      ) : null}
+    </HStack>
   );
 }
