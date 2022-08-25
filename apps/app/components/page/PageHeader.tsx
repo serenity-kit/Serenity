@@ -10,6 +10,7 @@ type Props = DrawerHeaderProps & {
 
 export function PageHeader(props: Props) {
   const documentPathList = useDocumentPathStore((state) => state.folders);
+  const { getName } = useDocumentPathStore();
   const document = useDocumentStore((state) => state.document);
   const documentName = useDocumentStore((state) => state.documentName);
   const hasEditorSidebar = useHasEditorSidebar();
@@ -26,7 +27,7 @@ export function PageHeader(props: Props) {
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {folder.name}
+              {getName(folder.id)}
             </Text>
             <Icon name="arrow-right-s-line" color={tw.color("gray-600")} />
           </HStack>

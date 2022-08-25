@@ -90,7 +90,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       }
     });
     folderStore.update(openFolderIds);
-    documentPathStore.update(documentPath);
+    documentPathStore.update(documentPath, urqlClient);
   };
 
   const updateDocumentName = async (docId: string) => {

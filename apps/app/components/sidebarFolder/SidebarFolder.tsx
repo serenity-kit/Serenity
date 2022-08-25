@@ -288,7 +288,7 @@ export default function SidebarFolder(props: Props) {
       // TODO: Optimize by checking if the current folder is in the document path
       if (document && documentPathIds.includes(props.folderId)) {
         const documentPath = await getDocumentPath(urqlClient, document.id);
-        documentPathStore.update(documentPath);
+        documentPathStore.update(documentPath, urqlClient);
       }
     } else {
       // TODO: show error: couldn't update folder name
