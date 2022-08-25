@@ -10,15 +10,15 @@ import { HStack } from "native-base";
 export type IconButtonProps = PressableProps & {
   name: IconNames;
   color?: string;
-  large?: boolean;
   label?: string;
+  size?: "md" | "lg";
 };
 
 export const IconButton = forwardRef((props: IconButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
-  const { name, large, color, label, ...rest } = props;
+  const { name, size = "md", color, label, ...rest } = props;
 
-  let dimensions = large ? "w-8 h-8" : "w-5 h-5";
+  let dimensions = size === "lg" ? "w-8 h-8" : "w-5 h-5";
   let iconColor = color ?? "gray-400";
 
   if (label) {

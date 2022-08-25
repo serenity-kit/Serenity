@@ -33,7 +33,7 @@ export function PageHeaderRight() {
         </AvatarGroup>
         {hasEditorSidebar ? (
           <Button
-            size="small"
+            size="sm"
             onPress={() => {
               setIsActiveShareModal(true);
             }}
