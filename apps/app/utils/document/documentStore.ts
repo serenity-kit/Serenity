@@ -1,15 +1,11 @@
 import {
   decryptDocumentTitle,
-  folderDerivedKeyContext,
   recreateDocumentKey,
 } from "@serenity-tools/common";
-import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { Client } from "urql";
 import create from "zustand";
 import { Document } from "../../generated/graphql";
-import { getDevices } from "../device/getDevices";
-import { getFolder } from "../folder/getFolder";
-import { getWorkspaceKey } from "../workspace/getWorkspaceKey";
+import { getFolderKey } from "../folder/getFolderKey";
 
 interface DocumentState {
   document: Document | null | undefined;
@@ -21,31 +17,17 @@ export const useDocumentStore = create<DocumentState>((set) => ({
   document: null,
   documentName: null,
   update: async (document, urqlClient) => {
-    let documentName: string | null = null;
+    let documentName: string | null = "Could not decrypt";
     if (
       document &&
       document.encryptedName &&
       document.encryptedNameNonce &&
       document.subkeyId
     ) {
-      const devices = await getDevices({ urqlClient });
-      if (!devices) {
-        console.error("No devices found");
-        return;
-      }
-      const workspaceKey = await getWorkspaceKey({
+      const folderKeyData = await getFolderKey({
+        folderId: document?.parentFolderId!,
         workspaceId: document?.workspaceId!,
-        devices,
         urqlClient,
-      });
-      const folder = await getFolder({
-        id: document?.parentFolderId!,
-        urqlClient,
-      });
-      const folderKeyData = await kdfDeriveFromKey({
-        key: workspaceKey,
-        context: folderDerivedKeyContext,
-        subkeyId: folder.subkeyId!,
       });
       const documentKeyData = await recreateDocumentKey({
         folderKey: folderKeyData.key,

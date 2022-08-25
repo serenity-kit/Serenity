@@ -42,7 +42,6 @@ import SidebarPage from "../sidebarPage/SidebarPage";
 type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
-  folderSubkeyId?: number | null;
   folderName: string;
   depth?: number;
   onStructureChange: () => void;
@@ -135,11 +134,9 @@ export default function SidebarFolder(props: Props) {
           parentFolderId: props.folderId,
         },
       });
-      console.log({ result });
       if (result.data?.createFolder?.folder?.id) {
         didCreateFolderSucceed = true;
         folderId = result.data?.createFolder?.folder?.id;
-        console.log({ folderId });
         setIsEditing("none");
       }
     } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
@@ -398,7 +395,6 @@ export default function SidebarFolder(props: Props) {
                     key={folder.id}
                     folderId={folder.id}
                     workspaceId={props.workspaceId}
-                    folderSubkeyId={props.folderSubkeyId}
                     folderName={folder.name}
                     onStructureChange={props.onStructureChange}
                     depth={depth + 1}
@@ -414,9 +410,11 @@ export default function SidebarFolder(props: Props) {
                 return (
                   <SidebarPage
                     key={document.id}
-                    folderSubkeyId={props.folderSubkeyId || undefined}
+                    parentFolderId={props.folderId}
                     documentId={document.id}
-                    documentName={documentName || "Untitled"}
+                    encryptedName={document.encryptedName}
+                    encryptedNameNonce={document.encryptedNameNonce}
+                    subkeyId={document.subkeyId}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}
                     depth={depth}

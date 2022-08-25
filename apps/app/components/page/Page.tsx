@@ -21,8 +21,6 @@ import {
   verifyAndDecryptSnapshot,
   verifyAndDecryptUpdate,
 } from "@naisho/core";
-import { folderDerivedKeyContext } from "@serenity-tools/common";
-import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { useEffect, useRef } from "react";
 import { useClient } from "urql";
@@ -41,17 +39,13 @@ import {
   DocumentQuery,
   DocumentQueryVariables,
 } from "../../generated/graphql";
-import { Folder } from "../../types/Folder";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { getDevices } from "../../utils/device/getDevices";
 import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
-import { getFolder } from "../../utils/folder/getFolder";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
-import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 
 const reconnectTimeout = 2000;
 
@@ -90,8 +84,10 @@ export default function Page({ navigation, route, updateTitle }: Props) {
     if (!documentPath) {
       return;
     }
-    documentPath.forEach((folder: Folder) => {
-      openFolderIds.push(folder.id);
+    documentPath.forEach((folder) => {
+      if (folder) {
+        openFolderIds.push(folder.id);
+      }
     });
     folderStore.update(openFolderIds);
     documentPathStore.update(documentPath);

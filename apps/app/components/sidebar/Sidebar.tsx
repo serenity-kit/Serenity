@@ -7,7 +7,6 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { encryptFolder } from "@serenity-tools/common";
 import {
-  Avatar,
   Icon,
   IconButton,
   InlineInput,
@@ -197,7 +196,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         didCreateFolderSucceed = true;
         folderId = result.data?.createFolder?.folder?.id;
       }
-      console.log({ numCreateFolderAttempts });
     } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
     if (!folderId) {
       console.error(result.error);
@@ -420,7 +418,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               key={folder.id}
               folderId={folder.id}
               folderName={folder.name}
-              folderSubkeyId={folder.subkeyId}
               workspaceId={route.params.workspaceId}
               onStructureChange={refetchRootFolders}
             />
