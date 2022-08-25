@@ -109,25 +109,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       )
       .toPromise();
     const document = documentResult.data?.document as Document;
-    const devices = await getDevices({ urqlClient });
-    if (!devices) {
-      console.error("No devices found");
-      return;
-    }
-    const workspaceKey = await getWorkspaceKey({
-      workspaceId: document.workspaceId!,
-      devices,
-      urqlClient,
-    });
-    const folder = await getFolder({
-      id: document.parentFolderId!,
-      urqlClient,
-    });
-    const folderKeyData = await kdfDeriveFromKey({
-      key: workspaceKey,
-      context: folderDerivedKeyContext,
-      subkeyId: folder.subKeyId!,
-    });
     documentStore.update(document, urqlClient);
   };
 

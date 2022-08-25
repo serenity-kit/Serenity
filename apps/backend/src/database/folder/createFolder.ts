@@ -42,7 +42,7 @@ export async function createFolder({
       select: { id: true },
     });
     if (folderForSubkeyId) {
-      throw new UserInputError("Invalid input: duplicate subKeyId");
+      throw new UserInputError("Invalid input: duplicate subkeyId");
     }
     // make sure we have permissions to do stuff with this workspace
     const userToWorkspace = await prisma.usersToWorkspaces.findFirst({

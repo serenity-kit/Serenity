@@ -45,7 +45,7 @@ export const useDocumentStore = create<DocumentState>((set) => ({
       const folderKeyData = await kdfDeriveFromKey({
         key: workspaceKey,
         context: folderDerivedKeyContext,
-        subkeyId: folder.subKeyId!,
+        subkeyId: folder.subkeyId!,
       });
       const documentKeyData = await recreateDocumentKey({
         folderKey: folderKeyData.key,
