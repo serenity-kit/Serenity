@@ -417,7 +417,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             <Folder
               key={folder.id}
               folderId={folder.id}
-              folderName={folder.name}
+              encryptedName={folder.encryptedName}
+              encryptedNameNonce={folder.encryptedNameNonce}
+              subkeyId={folder.subkeyId}
               workspaceId={route.params.workspaceId}
               onStructureChange={refetchRootFolders}
             />

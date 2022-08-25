@@ -1,6 +1,6 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { encryptFolder } from "@serenity-tools/common";
+import { decryptFolder, encryptFolder } from "@serenity-tools/common";
 import {
   Icon,
   IconButton,
@@ -42,7 +42,10 @@ import SidebarPage from "../sidebarPage/SidebarPage";
 type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
-  folderName: string;
+  folderName?: string;
+  encryptedName?: string | null;
+  encryptedNameNonce?: string | null;
+  subkeyId?: number | null;
   depth?: number;
   onStructureChange: () => void;
 };
@@ -86,12 +89,46 @@ export default function SidebarFolder(props: Props) {
   const urqlClient = useClient();
   const documentPathStore = useDocumentPathStore();
   const document = useDocumentStore((state) => state.document);
-  const documentName = useDocumentStore((state) => state.documentName);
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
+  const [folderName, setFolderName] = useState("Decrypting...");
 
   useEffect(() => {
     setIsOpen(openFolderIds.includes(props.folderId));
   }, [openFolderIds, props.folderId]);
+
+  useEffect(() => {
+    decryptName();
+  }, [props.encryptedName, props.subkeyId]);
+
+  const decryptName = async () => {
+    if (!props.subkeyId || !props.encryptedName || !props.encryptedNameNonce) {
+      setFolderName("Untitled");
+      return;
+    }
+    try {
+      const devices = await getDevices({ urqlClient });
+      if (!devices) {
+        // TODO: handle this error
+        console.error("No devices!");
+        return;
+      }
+      const workspaceKey = await getWorkspaceKey({
+        workspaceId: props.workspaceId,
+        devices,
+        urqlClient,
+      });
+      const folderName = await decryptFolder({
+        parentKey: workspaceKey,
+        subkeyId: props.subkeyId!,
+        ciphertext: props.encryptedName!,
+        publicNonce: props.encryptedNameNonce!,
+      });
+      setFolderName(folderName);
+    } catch (error) {
+      console.error(error);
+      setFolderName("Decryption error");
+    }
+  };
 
   const createFolder = async (name: string) => {
     setIsOpen(true);
@@ -328,7 +365,7 @@ export default function SidebarFolder(props: Props) {
                   onCancel={() => {
                     setIsEditing("none");
                   }}
-                  value={props.folderName}
+                  value={folderName}
                   style={tw`ml-0.5 w-${maxWidth}`}
                 />
               ) : (
@@ -339,7 +376,7 @@ export default function SidebarFolder(props: Props) {
                   ellipsizeMode="tail"
                   bold={documentPathIds.includes(props.folderId)}
                 >
-                  {props.folderName}
+                  {folderName}
                 </Text>
               )}
             </HStack>
@@ -395,7 +432,7 @@ export default function SidebarFolder(props: Props) {
                     key={folder.id}
                     folderId={folder.id}
                     workspaceId={props.workspaceId}
-                    folderName={folder.name}
+                    folderName={folderName}
                     onStructureChange={props.onStructureChange}
                     depth={depth + 1}
                   />
