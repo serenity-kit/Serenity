@@ -34,6 +34,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
+import { useEditorStore } from "../../utils/editorStore/editorStore";
 
 // // TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
 // export async function loadEditorSourceForAndroid() {
@@ -101,6 +102,7 @@ export default function Editor({
 
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [keyboardAnimationDuration, setKeyboardAnimationDuration] = useState(0);
+  const store = useEditorStore();
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener(
@@ -109,15 +111,25 @@ export default function Editor({
         setKeyboardAnimationDuration(event.duration);
         setKeyboardHeight(event.endCoordinates.height);
         setIsEditorBottombarVisible(true);
+        store.setIsInEditingMode(true);
       }
     );
     const hideSubscription = Keyboard.addListener("keyboardWillHide", () => {
       setIsEditorBottombarVisible(false);
+      store.setIsInEditingMode(false);
+    });
+
+    store.subscribeToBlurTrigger(() => {
+      webViewRef.current?.injectJavaScript(`
+        window.blurEditor();
+        true;
+      `);
     });
 
     return () => {
       showSubscription.remove();
       hideSubscription.remove();
+      store.removeAllSubscribers();
     };
   }, []);
 
@@ -171,10 +183,9 @@ export default function Editor({
         originWhitelist={["*"]}
         source={source}
         startInLoadingState={true}
-        // can be activated once there is `Done` button
-        // hideKeyboardAccessoryView={true}
-        // to avoid weird scrolling behaviour when the keyboard becomes active
-        // scrollEnabled={Platform.OS === "macos" ? true : false}
+        // avoid showing the form next/prev & Done button on iOS
+        // when the keyboard is shown
+        hideKeyboardAccessoryView={true}
         scrollEnabled={true}
         renderLoading={() => (
           <CenterContent>

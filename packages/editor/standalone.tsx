@@ -70,6 +70,10 @@ window.updateEditor = (paramsString: string) => {
   updateEditor(window.editor, params);
 };
 
+window.blurEditor = () => {
+  window.editor.commands.blur();
+};
+
 const domContainer = document.querySelector("#editor");
 ReactDOM.render(
   <NativeBaseProvider>
