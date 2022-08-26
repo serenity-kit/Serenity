@@ -32,8 +32,6 @@ export function PageHeaderRight() {
         alignItems="center"
         alignContent={hasEditorSidebar ? "center" : "flex-end"}
       >
-        {/* spacer to push the avatar group to the right */}
-        <View style={tw`flex-1 flex-grow`} />
         <AvatarGroup max={hasEditorSidebar ? 3 : 2} _avatar={{ size: "sm" }}>
           <Avatar customColor="emerald">BE</Avatar>
           <Avatar customColor="honey">NG</Avatar>
