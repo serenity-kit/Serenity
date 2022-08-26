@@ -428,7 +428,7 @@ export default function Page({
       };
 
       const setupWebsocket = () => {
-        let host = "wss://serenity-staging-api.herokuapp.com";
+        let host = "wss://serenity-dev.fly.dev";
         if (process.env.NODE_ENV === "development") {
           host = "ws://localhost:4000";
         }
