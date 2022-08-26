@@ -13,8 +13,8 @@ export function PageHeaderLeft(props: any) {
         }}
         name="double-arrow-right"
         color={"gray-800"}
-        large={hasEditorSidebar}
-      ></IconButton>
+        size={hasEditorSidebar ? "lg" : "md"}
+      />
     </View>
   );
 }
