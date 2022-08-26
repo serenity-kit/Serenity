@@ -19,10 +19,6 @@
     "@tiptap/extension-task-list": "^2.0.0-beta.26",
     "@tiptap/react": "^2.0.0-beta.108",
     "@tiptap/starter-kit": "^2.0.0-beta.183",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-native": "0.64.3",
-    "react-native-web": "^0.17.7",
     "y-prosemirror": "^1.0.15",
     "y-protocols": "^1.0.5",
     "yjs": "^13.5.30"
