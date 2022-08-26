@@ -106,7 +106,6 @@ export const startLogin = ({
     username,
     handleLogin: serverLogin,
   };
-  console.log({ loginId, message: sodium.to_base64(response) });
   return {
     loginId,
     message: sodium.to_base64(response),

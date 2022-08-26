@@ -101,6 +101,7 @@ export default function SidebarFolder(props: Props) {
   }, [props.encryptedName, props.subkeyId]);
 
   const decryptName = async () => {
+    console.log("Decrypting folder name");
     if (!props.subkeyId || !props.encryptedName || !props.encryptedNameNonce) {
       setFolderName("Untitled");
       return;
@@ -128,6 +129,7 @@ export default function SidebarFolder(props: Props) {
       console.error(error);
       setFolderName("Decryption error");
     }
+    console.log("end decrypting folder name");
   };
 
   const createFolder = async (name: string) => {

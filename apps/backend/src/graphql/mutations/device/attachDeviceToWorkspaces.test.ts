@@ -1,8 +1,8 @@
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
+import { createAndEncryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
 import { createDevice } from "../../../../test/helpers/device/createDevice";
-import { createWorkspaceKeyAndCipherTextForDevice } from "../../../../test/helpers/device/createWorkspaceKeyAndCipherTextForDevice";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
@@ -28,7 +28,7 @@ test("attach the same device does nothing", async () => {
   const authorizationHeader = userAndDevice1.sessionKey;
   const deviceSigningPublicKey = userAndDevice1.device.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
-  const { nonce, ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
+  const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
   });
@@ -78,7 +78,7 @@ test("attach a device to a workspace", async () => {
   const newDevice = newDeviceResult.localDevice;
   const deviceSigningPublicKey = newDevice.signingPublicKey;
   const deviceEncryptionPublicKey = newDevice.encryptionPublicKey;
-  const { nonce, ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
+  const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
   });
@@ -125,7 +125,7 @@ test("Unauthenticated", async () => {
   const workspaceId = userAndDevice1.workspace.id;
   const deviceSigningPublicKey = userAndDevice1.device.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
-  const { nonce, ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
+  const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey:
       userAndDevice1.deviceEncryptionPrivateKey,
@@ -168,7 +168,7 @@ describe("Input errors", () => {
     }
   `;
   test("Invalid deviceWorkspaceKeyBox ciphertext", async () => {
-    const { nonce } = await createWorkspaceKeyAndCipherTextForDevice({
+    const { nonce } = await createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -195,7 +195,7 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid deviceWorkspaceKeyBox nonce", async () => {
-    const { ciphertext } = await createWorkspaceKeyAndCipherTextForDevice({
+    const { ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -222,12 +222,10 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid deviceWorkspaceKeyBox workspaceId", async () => {
-    const { ciphertext, nonce } =
-      await createWorkspaceKeyAndCipherTextForDevice({
-        receiverDeviceEncryptionPublicKey:
-          userAndDevice1.device.signingPublicKey,
-        creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
-      });
+    const { ciphertext, nonce } = await createAndEncryptWorkspaceKeyForDevice({
+      receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
+      creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
+    });
     await expect(
       (async () =>
         await graphql.client.request(
@@ -267,12 +265,10 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid deviceSigningPublicKey", async () => {
-    const { ciphertext, nonce } =
-      await createWorkspaceKeyAndCipherTextForDevice({
-        receiverDeviceEncryptionPublicKey:
-          userAndDevice1.device.signingPublicKey,
-        creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
-      });
+    const { ciphertext, nonce } = await createAndEncryptWorkspaceKeyForDevice({
+      receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
+      creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
+    });
     await expect(
       (async () =>
         await graphql.client.request(
@@ -297,12 +293,10 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid creatorDeviceSigningPublicKey", async () => {
-    const { ciphertext, nonce } =
-      await createWorkspaceKeyAndCipherTextForDevice({
-        receiverDeviceEncryptionPublicKey:
-          userAndDevice1.device.signingPublicKey,
-        creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
-      });
+    const { ciphertext, nonce } = await createAndEncryptWorkspaceKeyForDevice({
+      receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
+      creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
+    });
     await expect(
       (async () =>
         await graphql.client.request(

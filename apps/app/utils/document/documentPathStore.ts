@@ -44,8 +44,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
     });
     const folderIds: string[] = [];
     const folderNames: { [id: string]: string } = {};
-    for (let row in folders) {
-      const folder = folders[row];
+    for (let folder of folders) {
       folderIds.push(folder.id);
       let folderName = "Decrypting...";
       try {

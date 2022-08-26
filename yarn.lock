@@ -5335,6 +5335,11 @@
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.5.tgz#1001cc5e6a3704b83c236027e77f2f58ea010f40"
   integrity sha512-Klz949h02Gz2uZCMGwDUSDS1YBlTdDDgbWHi+81l29tQALUtvz4rAYi5uoVhE5Lagoq6DeqAUlbrHvW/mXDgdQ==
 
+"@types/node-emoji@^1.8.1":
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/@types/node-emoji/-/node-emoji-1.8.1.tgz#689cb74fdf6e84309bcafce93a135dfecd01de3f"
+  integrity sha512-0fRfA90FWm6KJfw6P9QGyo0HDTCmthZ7cWaBQndITlaWLTZ6njRyKwrwpzpg+n6kBXBIGKeUHEQuBx7bphGJkA==
+
 "@types/node@*":
   version "17.0.21"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.21.tgz#864b987c0c68d07b4345845c3e63b75edd143644"
@@ -15629,6 +15634,13 @@ node-domexception@1.0.0:
   resolved "https://registry.yarnpkg.com/node-domexception/-/node-domexception-1.0.0.tgz#6888db46a1f71c0b76b3f7555016b63fe64766e5"
   integrity sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==
 
+node-emoji@^1.11.0:
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/node-emoji/-/node-emoji-1.11.0.tgz#69a0150e6946e2f115e9d7ea4df7971e2628301c"
+  integrity sha512-wo2DpQkQp7Sjm2A0cq+sN7EHKO6Sl0ctXeBdFZrL9T9+UywORbufTcTZxom8YqpLQt/FqNMUkOpkZrJVYSKD3A==
+  dependencies:
+    lodash "^4.17.21"
+
 node-fetch@2.6.7, node-fetch@^2.2.0, node-fetch@^2.6.0, node-fetch@^2.6.1, node-fetch@^2.6.7:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
@@ -20778,8 +20790,10 @@ watchpack@^1.6.1:
   resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.7.5.tgz#1267e6c55e0b9b5be44c2023aed5437a2c26c453"
   integrity sha512-9P3MWk6SrKjHsGkLT2KHXdQ/9SNkyoJbabxnKOoJepsvJjJG8uYTR3yTPxPQvNDI3w4Nz1xnE0TLHK4RIVe/MQ==
   dependencies:
+    chokidar "^3.4.1"
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
+    watchpack-chokidar2 "^2.0.1"
   optionalDependencies:
     chokidar "^3.4.1"
     watchpack-chokidar2 "^2.0.1"
