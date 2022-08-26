@@ -1,6 +1,10 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { decryptFolder, encryptFolder } from "@serenity-tools/common";
+import {
+  decryptFolder,
+  encryptedRenameFolder,
+  encryptFolder,
+} from "@serenity-tools/common";
 import {
   Icon,
   IconButton,
@@ -28,6 +32,7 @@ import {
   useUpdateFolderNameMutation,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
+import { b64emoji } from "../../utils/b64emojis";
 import { getDevices } from "../../utils/device/getDevices";
 import {
   getDocumentPath,
@@ -101,7 +106,7 @@ export default function SidebarFolder(props: Props) {
   }, [props.encryptedName, props.subkeyId]);
 
   const decryptName = async () => {
-    console.log("Decrypting folder name");
+    console.log("decryptName()");
     if (!props.subkeyId || !props.encryptedName || !props.encryptedNameNonce) {
       setFolderName("Untitled");
       return;
@@ -118,6 +123,17 @@ export default function SidebarFolder(props: Props) {
         devices,
         urqlClient,
       });
+
+      console.log({
+        action: "decrypting folder",
+        folderId: props.folderId,
+        ciphertext: b64emoji(props.encryptedName),
+        nonce: b64emoji(props.encryptedNameNonce),
+        subkeyId: props.subkeyId,
+        workspaceKey: b64emoji(workspaceKey),
+      });
+
+      console.log({ workspaceKey: b64emoji(workspaceKey) });
       const folderName = await decryptFolder({
         parentKey: workspaceKey,
         subkeyId: props.subkeyId!,
@@ -129,10 +145,11 @@ export default function SidebarFolder(props: Props) {
       console.error(error);
       setFolderName("Decryption error");
     }
-    console.log("end decrypting folder name");
+    console.log("end decryptName()");
   };
 
   const createFolder = async (name: string) => {
+    console.log("createFolder()");
     setIsOpen(true);
     const id = uuidv4();
     const devices = await getDevices({ urqlClient });
@@ -152,9 +169,18 @@ export default function SidebarFolder(props: Props) {
       console.error(error);
       return;
     }
+    console.log({ workspaceKey: b64emoji(workspaceKey) });
     const encryptedFolderResult = await encryptFolder({
       name,
       parentKey: workspaceKey,
+    });
+    console.log({
+      action: "creating folder",
+      folderId: props.folderId,
+      ciphertext: b64emoji(encryptedFolderResult.ciphertext),
+      nonce: b64emoji(encryptedFolderResult.publicNonce),
+      subkeyId: encryptedFolderResult.folderSubkeyId,
+      workspaceKey: b64emoji(workspaceKey),
     });
     let didCreateFolderSucceed = false;
     let numCreateFolderAttempts = 0;
@@ -185,6 +211,7 @@ export default function SidebarFolder(props: Props) {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
     }
+    console.log("end createFolder()");
     refetchDocuments();
     refetchFolders();
   };
@@ -263,28 +290,34 @@ export default function SidebarFolder(props: Props) {
       console.error(error);
       return;
     }
-    const encryptedFolderResult = await encryptFolder({
+    const encryptedFolderResult = await encryptedRenameFolder({
       name: newFolderName,
       parentKey: workspaceKey,
+      subkeyId: props.subkeyId!,
     });
-    let numUpdateFolderNameAttempts = 0;
-    let didFolderNameUpdatedSucceed = false;
-    let folder: any = undefined;
-    do {
-      const updateFolderNameResult = await updateFolderNameMutation({
-        input: {
-          id: props.folderId,
-          name: newFolderName,
-          encryptedName: encryptedFolderResult.ciphertext,
-          encryptedNameNonce: encryptedFolderResult.publicNonce,
-          subkeyId: encryptedFolderResult.folderSubkeyId,
-        },
-      });
-      if (updateFolderNameResult.data?.updateFolderName?.folder) {
-        folder = updateFolderNameResult.data?.updateFolderName?.folder;
-        didFolderNameUpdatedSucceed = true;
-      }
-    } while (!didFolderNameUpdatedSucceed && numUpdateFolderNameAttempts < 5);
+    console.log({
+      action: "updating folder name",
+      folderId: props.folderId,
+      ciphertext: b64emoji(encryptedFolderResult.ciphertext),
+      ciphertextOld: b64emoji(props.encryptedName || ""),
+      nonce: b64emoji(encryptedFolderResult.publicNonce),
+      nonceOld: b64emoji(props.encryptedNameNonce || ""),
+      subkeyId: encryptedFolderResult.folderSubkeyId,
+      oldSubkeyId: props.subkeyId,
+      workspaceKey,
+    });
+    const updateFolderNameResult = await updateFolderNameMutation({
+      input: {
+        id: props.folderId,
+        name: newFolderName,
+        encryptedName: encryptedFolderResult.ciphertext,
+        encryptedNameNonce: encryptedFolderResult.publicNonce,
+        subkeyId: props.subkeyId!,
+      },
+    });
+    console.log({ updateFolderNameResult });
+    const folder = updateFolderNameResult.data?.updateFolderName?.folder;
+    console.log({ folder });
     if (folder) {
       // refetch the document path
       // TODO: Optimize by checking if the current folder is in the document path
@@ -434,6 +467,7 @@ export default function SidebarFolder(props: Props) {
                     key={folder.id}
                     folderId={folder.id}
                     workspaceId={props.workspaceId}
+                    subkeyId={folder.subkeyId}
                     folderName={folderName}
                     onStructureChange={props.onStructureChange}
                     depth={depth + 1}
