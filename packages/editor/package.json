@@ -4,7 +4,7 @@
   "main": "index",
   "scripts": {
     "build": "yarn style:editor && webpack --mode=production && cp dist/index.html ../../apps/app/webviews/editor/index.html",
-    "dev": "style:editor && webpack-dev-server",
+    "dev": "yarn style:editor && echo 'DEV NOT SERVING THE CURRENT VERSION' && webpack-dev-server",
     "ts:check": "yarn tsc --noEmit",
     "style:editor": "yarn run tailwindcss --config ./tailwind.config.js -i ./editor-input.css -o ./editor-output.css",
     "test": "echo TODO",
