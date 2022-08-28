@@ -3751,10 +3751,10 @@
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
-"@mobily/stacks@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@mobily/stacks/-/stacks-2.1.0.tgz#4a111a1f3938bf829746e845af7ad52215c1ab2e"
-  integrity sha512-JWHW7XT6J6Pwic5TgBIjZLfCfHvD9iZ/DQDZ2+2w+66Gi3viWlGhQL6OgNc9Q4ZNj6nipKkvxo7KLjYehywXVw==
+"@mobily/stacks@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@mobily/stacks/-/stacks-2.2.0.tgz#81592b3b5488cefcbe5024ab3facb0dde0a39968"
+  integrity sha512-ihFFrvwwdCj/aoF5Sh8QtggXk4uikJFR9vTIVlQUTJqTPpSFDx3wZJ11jlV/TglAMO4hOuzVrbbTCVj6wTk4QA==
   dependencies:
     wonka "~4.0.15"
 
@@ -9327,10 +9327,10 @@ date-fns@^1.27.2:
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-1.30.1.tgz#2e71bf0b119153dbb4cc4e88d9ea5acfb50dc05c"
   integrity sha512-hBSVCvSmWC+QypYObzwGOd9wqdDpOt+0wl0KbU+R+uuZBS1jN8VsD1ss3irQDknRj5NvxiTF6oj/nDRnN/UQNw==
 
-date-fns@^2.28.0:
-  version "2.28.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.28.0.tgz#9570d656f5fc13143e50c975a3b6bbeb46cd08b2"
-  integrity sha512-8d35hViGYx/QH0icHYCeLmsLmMUheMmTyV9Fcm6gvNwdw31yXXH+O85sOBJ+OLnLQMKZowvpKb6FgMIQjcpvQw==
+date-fns@^2.29.2:
+  version "2.29.2"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.29.2.tgz#0d4b3d0f3dff0f920820a070920f0d9662c51931"
+  integrity sha512-0VNbwmWJDS/G3ySwFSJA3ayhbURMTJLtwM2DTxf9CWondCnh6DTNlO9JgRSq6ibf4eD0lfMJNBxUdEAHHix+bA==
 
 dateformat@3.0.3:
   version "3.0.3"
@@ -17499,20 +17499,15 @@ prepend-http@^3.0.1:
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-3.0.1.tgz#3e724d58fd5867465b300bb9615009fa2f8ee3b6"
   integrity sha512-BLxfZh+m6UiAiCPZFJ4+vYoL7NrRs5XgCTRrjseATAggXhdZKKxn+JUNmuVYWY23bDHgaEHodxw8mnmtVEDtHw==
 
-prettier-plugin-tailwindcss@^0.1.10:
-  version "0.1.10"
-  resolved "https://registry.yarnpkg.com/prettier-plugin-tailwindcss/-/prettier-plugin-tailwindcss-0.1.10.tgz#437bd0757819c8393fc780e17e50e8a7518e2a6b"
-  integrity sha512-ooDGNuXUjgCXfShliVYQ6+0iXqUFXn+zdNInPe0WZN9qINt9srbLGFGY5jeVL4MXtY20/4S8JaBcd8l6N6NfCQ==
+prettier-plugin-tailwindcss@^0.1.13:
+  version "0.1.13"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-tailwindcss/-/prettier-plugin-tailwindcss-0.1.13.tgz#ca1071361dc7e2ed5d95a2ee36825ce45f814942"
+  integrity sha512-/EKQURUrxLu66CMUg4+1LwGdxnz8of7IDvrSLqEtDqhLH61SAlNNUSr90UTvZaemujgl3OH/VHg+fyGltrNixw==
 
-prettier@2.5.1:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.5.1.tgz#fff75fa9d519c54cf0fce328c1017d94546bc56a"
-  integrity sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==
-
-prettier@2.6.2:
-  version "2.6.2"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.6.2.tgz#e26d71a18a74c3d0f0597f55f01fb6c06c206032"
-  integrity sha512-PkUpF+qoXTqhOeWL9fu7As8LXsIUZ1WYaJiY/a7McAQzxjk82OF0tibkFXVCDImZtWxbvojFjerkiLb0/q8mew==
+prettier@2.7.1:
+  version "2.7.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.7.1.tgz#e235806850d057f97bb08368a4f7d899f7760c64"
+  integrity sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==
 
 pretty-bytes@5.6.0, pretty-bytes@^5.3.0:
   version "5.6.0"
@@ -20654,10 +20649,10 @@ turndown@~7.0.0:
   dependencies:
     domino "^2.1.6"
 
-twrnc@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/twrnc/-/twrnc-3.3.0.tgz#408ee29b2029a61c1417fffc136bf593e120bcaf"
-  integrity sha512-Fp17JuDkaMDinOATHeqol32oEtcYXd6G7lNPZ+IuEzDsTGyue8f7CHrJUFMrzAusmph2Y6Wbx/0eo9IUsjjtnw==
+twrnc@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/twrnc/-/twrnc-3.4.0.tgz#017d0bac510e90095da727bd35af8b8da63acc66"
+  integrity sha512-zJzueyC+LUphbrUEyeVmbR7VfAFObq2mr6ALfMytusHxzHJnOMCdxsw2GCTD67nThP1V22QFp9CZ/DulcZMl1g==
   dependencies:
     tailwindcss ">=2.0.0"
 
