@@ -983,7 +983,7 @@ export default function DesignSystemScreen() {
           <LabeledInput
             label={"Verification Key"}
             value="70909qer798q7987q"
-            disabled
+            isDisabled
           />
         </DSExampleArea>
         <Heading lvl={3}>Hints</Heading>
@@ -1001,7 +1001,7 @@ export default function DesignSystemScreen() {
           <LabeledInput
             label={"Verification Key"}
             value="70909qer798q7987q"
-            disabled
+            isDisabled
             hint="We have already prefilled this field with your key."
           />
         </DSExampleArea>

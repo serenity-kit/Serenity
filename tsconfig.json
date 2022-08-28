@@ -3,7 +3,8 @@
     "strict": false,
     "strictNullChecks": true,
     "allowJs": false,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
   },
   "extends": "expo/tsconfig.base"
 }

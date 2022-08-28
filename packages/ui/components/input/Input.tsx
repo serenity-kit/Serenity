@@ -16,15 +16,15 @@ export const Input = forwardRef((props: InputProps, ref) => {
       // @ts-ignore
       ref={ref}
       {...props}
-      style={[styles.input, props.disabled && tw`text-muted`, props.style]}
+      style={[styles.input, props.isDisabled && tw`text-muted`, props.style]}
       _stack={{
-        style: props.disabled
+        style: props.isDisabled
           ? [styles.wrapper, tw`bg-gray-100 border-gray-400`]
           : [styles.wrapper, tw`bg-white border-gray-400`],
       }}
       _hover={{
         _stack: {
-          style: props.disabled
+          style: props.isDisabled
             ? [styles.wrapper, tw`bg-gray-100 border-gray-400`]
             : [styles.wrapper, tw`bg-white border-gray-600`],
         },
