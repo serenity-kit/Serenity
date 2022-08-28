@@ -32,10 +32,10 @@ type DocumentProps = {
 };
 
 export type CreateWorkspaceFormProps = {
-  onWorkspaceStructureCreated: ({
-    workspace: WorkspaceProps,
-    folder: FolderProps,
-    document: DocumentProps,
+  onWorkspaceStructureCreated: (params: {
+    workspace: WorkspaceProps;
+    folder: FolderProps;
+    document: DocumentProps;
   }) => void;
 };
 
@@ -123,7 +123,11 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       });
     if (
       !createInitialWorkspaceStructureResult.data
-        ?.createInitialWorkspaceStructure?.workspace
+        ?.createInitialWorkspaceStructure?.workspace ||
+      !createInitialWorkspaceStructureResult.data
+        ?.createInitialWorkspaceStructure?.folder ||
+      !createInitialWorkspaceStructureResult.data
+        ?.createInitialWorkspaceStructure?.document
     ) {
       // TODO: handle error
       return;

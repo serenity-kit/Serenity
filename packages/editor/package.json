@@ -4,8 +4,8 @@
   "main": "index",
   "scripts": {
     "build": "yarn style:editor && webpack --mode=production && cp dist/index.html ../../apps/app/webviews/editor/index.html",
-    "dev": "style:editor && webpack-dev-server",
-    "ts:check": "yarn tsc --noEmit",
+    "dev": "yarn style:editor && echo 'DEV NOT SERVING THE CURRENT VERSION' && webpack-dev-server",
+    "ts:check": "node ../../add-ts-no-check.js && yarn tsc --noEmit",
     "style:editor": "yarn run tailwindcss --config ./tailwind.config.js -i ./editor-input.css -o ./editor-output.css",
     "test": "echo TODO",
     "lint": "eslint --ext .tsx --ext .ts ./"
@@ -19,10 +19,6 @@
     "@tiptap/extension-task-list": "^2.0.0-beta.26",
     "@tiptap/react": "^2.0.0-beta.108",
     "@tiptap/starter-kit": "^2.0.0-beta.183",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-native": "0.64.3",
-    "react-native-web": "^0.17.7",
     "y-prosemirror": "^1.0.15",
     "y-protocols": "^1.0.5",
     "yjs": "^13.5.30"
@@ -37,6 +33,7 @@
     "@types/lodash.get": "^4.4.7",
     "@types/lodash.isempty": "^4.4.7",
     "@types/lodash.isnil": "^4.0.7",
+    "@types/lodash.merge": "^4.6.7",
     "@types/lodash.mergewith": "^4.6.7",
     "@types/lodash.omit": "^4.5.7",
     "@types/lodash.omitby": "^4.6.7",
@@ -51,7 +48,7 @@
     "react-dev-utils": "^12.0.0",
     "style-loader": "^3.3.1",
     "tailwindcss": "^3.0.23",
-    "typescript": "^4.6.3",
+    "typescript": "^4.8.2",
     "webpack": "^5.70.0",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.4"
