@@ -74,7 +74,7 @@ const workspaceMemberStyles = StyleSheet.create({
 });
 
 export default function WorkspaceSettingsMembersScreen(
-  props: WorkspaceDrawerScreenProps<"Settings">
+  props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
   const urqlClient = useClient();
   const workspaceId = useWorkspaceId();
