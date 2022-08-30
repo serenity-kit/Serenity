@@ -84,7 +84,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.18.13",
-    "@expo/webpack-config": "^0.16.18",
+    "@expo/webpack-config": "^0.17.2",
     "@graphql-codegen/cli": "2.6.2",
     "@graphql-codegen/typescript": "2.4.8",
     "@graphql-codegen/typescript-operations": "2.3.5",
