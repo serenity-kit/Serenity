@@ -49,7 +49,7 @@ test("user should be able to delete a workspace invitation they created", async 
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
     .toMatchInlineSnapshot(`
-    Object {
+    {
       "status": "success",
     }
   `);
@@ -87,7 +87,7 @@ test("user should be able to delete a workspace invitation they didn't create", 
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
     .toMatchInlineSnapshot(`
-    Object {
+    {
       "status": "success",
     }
   `);
@@ -126,7 +126,7 @@ test("user should not be able to delete a workspace invitation if they aren't ad
   });
   expect(deleteWorkspaceInvitationResult.deleteWorkspaceInvitations)
     .toMatchInlineSnapshot(`
-    Object {
+    {
       "status": "success",
     }
   `);

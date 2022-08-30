@@ -20,13 +20,7 @@ import { extendTheme, NativeBaseProvider } from "native-base";
 import { useCallback, useMemo } from "react";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { useAppColorScheme, useDeviceContext } from "twrnc";
-import {
-  createClient,
-  dedupExchange,
-  fetchExchange,
-  makeOperation,
-  Provider,
-} from "urql";
+import { createClient, dedupExchange, fetchExchange, Provider } from "urql";
 import { theme } from "../../tailwind.config";
 import { AuthenticationProvider } from "./context/AuthenticationContext";
 import useCachedResources from "./hooks/useCachedResources";
@@ -111,16 +105,19 @@ const exchanges = [
           ? operation.context.fetchOptions()
           : operation.context.fetchOptions || {};
 
-      return makeOperation(operation.kind, operation, {
-        ...operation.context,
-        fetchOptions: {
-          ...fetchOptions,
-          headers: {
-            ...fetchOptions.headers,
-            Authorization: authState.sessionKey,
+      return {
+        ...operation,
+        context: {
+          ...operation.context,
+          fetchOptions: {
+            ...fetchOptions,
+            headers: {
+              ...fetchOptions.headers,
+              Authorization: authState.sessionKey,
+            },
           },
         },
-      });
+      };
     },
   }),
   fetchExchange,

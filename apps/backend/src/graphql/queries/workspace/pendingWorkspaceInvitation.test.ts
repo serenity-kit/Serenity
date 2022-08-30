@@ -27,7 +27,7 @@ test("user should be be able to get their pending workspace invitation when null
   `;
   const result = await graphql.client.request(query, null, authorizationHeader);
   expect(result.pendingWorkspaceInvitation).toMatchInlineSnapshot(`
-    Object {
+    {
       "id": null,
     }
   `);
@@ -52,7 +52,7 @@ test("user should be be able to get their pending workspace invitation", async (
   `;
   const result = await graphql.client.request(query, null, authorizationHeader);
   expect(result.pendingWorkspaceInvitation).toMatchInlineSnapshot(`
-      Object {
+      {
         "id": "${pendingWorkspaceInvitation2}",
       }
     `);

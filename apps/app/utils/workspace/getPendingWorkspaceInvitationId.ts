@@ -15,10 +15,14 @@ export const getPendingWorkspaceInvitationId = async ({
     .query<
       PendingWorkspaceInvitationQuery,
       PendingWorkspaceInvitationQueryVariables
-    >(PendingWorkspaceInvitationDocument, undefined, {
-      // better to be safe here and always refetch
-      requestPolicy: "network-only",
-    })
+    >(
+      PendingWorkspaceInvitationDocument,
+      {},
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+      }
+    )
     .toPromise();
   const pendingWorkspaceInvitationId =
     pendingWorkspaceInvitationResult.data?.pendingWorkspaceInvitation?.id;

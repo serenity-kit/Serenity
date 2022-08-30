@@ -7,10 +7,10 @@
     "packages/*"
   ],
   "devDependencies": {
-    "eslint": "^8.18.0",
+    "eslint": "^8.23.0",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^7.0.4",
-    "lint-staged": "^12.3.5",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
     "prettier": "2.7.1",
     "prettier-plugin-tailwindcss": "^0.1.13"
   },

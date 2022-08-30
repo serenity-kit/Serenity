@@ -34,7 +34,7 @@ test("user should be be able to get their username", async () => {
   `;
   const result = await graphql.client.request(query, null, authorizationHeader);
   expect(result.me).toMatchInlineSnapshot(`
-    Object {
+    {
       "id": "${userId}",
       "username": "${username}",
     }

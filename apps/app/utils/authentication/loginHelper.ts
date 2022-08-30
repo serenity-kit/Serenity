@@ -80,10 +80,14 @@ export const login = async ({
     expiresAt: finishLoginResult.data.finishLogin.expiresAt,
   });
   const meResult = await urqlClient
-    .query<MeQuery, MeQueryVariables>(MeDocument, undefined, {
-      // better to be safe here and always refetch
-      requestPolicy: "network-only",
-    })
+    .query<MeQuery, MeQueryVariables>(
+      MeDocument,
+      {},
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+      }
+    )
     .toPromise();
   const userId = meResult.data?.me?.id;
   // if the user has changed, remove the previous lastusedworkspaceId and lastUsedDocumentId
