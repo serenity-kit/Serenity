@@ -25,6 +25,9 @@ export const DesignSystemHeading = (props: DesignSystemHeadingProps) => {
       variant={variants[lvl - 1]}
       style={[styles[lvl], props.style]}
       bold
+      // @ts-expect-error react-native-web needs react-native unsupported values here
+      accessibilityRole="heading"
+      accessibilityLevel={lvl}
     >
       {props.children}
     </Text>
