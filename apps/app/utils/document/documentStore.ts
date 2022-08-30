@@ -20,27 +20,32 @@ export const useDocumentStore = create<DocumentState>((set) => ({
   document: null,
   documentName: null,
   update: async (document, urqlClient) => {
-    let documentName: string | null = "Could not decrypt";
+    let documentName: string | null = "Untitled";
     if (
       document &&
       document.encryptedName &&
       document.encryptedNameNonce &&
       document.subkeyId
     ) {
-      const folderKeyData = await getFolderKey({
-        folderId: document?.parentFolderId!,
-        workspaceId: document?.workspaceId!,
-        urqlClient,
-      });
-      const documentKeyData = await recreateDocumentKey({
-        folderKey: folderKeyData.key,
-        subkeyId: document?.subkeyId!,
-      });
-      documentName = await decryptDocumentTitle({
-        key: documentKeyData.key,
-        ciphertext: document?.encryptedName!,
-        publicNonce: document?.encryptedNameNonce!,
-      });
+      try {
+        const folderKeyData = await getFolderKey({
+          folderId: document?.parentFolderId!,
+          workspaceId: document?.workspaceId!,
+          urqlClient,
+        });
+        const documentKeyData = await recreateDocumentKey({
+          folderKey: folderKeyData.key,
+          subkeyId: document?.subkeyId!,
+        });
+        documentName = await decryptDocumentTitle({
+          key: documentKeyData.key,
+          ciphertext: document?.encryptedName!,
+          publicNonce: document?.encryptedNameNonce!,
+        });
+      } catch (error) {
+        documentName = "Could not decrypt";
+        console.error(error);
+      }
     }
     set(() => ({
       document,
