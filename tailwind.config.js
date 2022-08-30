@@ -125,7 +125,10 @@ module.exports = {
           boxShadow: `0px 0px 0px 0.125rem ${customTheme.colors.error["200"]}`, // web-only
         },
         "p-menu-item": {
-          padding: "0.5rem 0.75rem",
+          paddingTop: "0.5rem",
+          paddingRight: "0.75rem",
+          paddingBottom: "0.5rem",
+          paddingLeft: "0.75rem",
         },
       });
     }),

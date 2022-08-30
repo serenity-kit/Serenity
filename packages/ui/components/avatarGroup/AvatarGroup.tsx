@@ -24,6 +24,9 @@ export const AvatarGroup = forwardRef((props: AvatarGroupProps, ref) => {
         {...props}
         max={max}
         style={[styles.avatarGroup, props.style]}
+        _avatar={{
+          borderColor: "white",
+        }}
         _hiddenAvatarPlaceholder={{
           style: tw`-ml-1 bg-transparent border-transparent`, // nb-overrides
           _text: {
