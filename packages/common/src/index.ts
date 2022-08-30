@@ -5,8 +5,8 @@ export * from "./createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromO
 export * from "./createIntroductionDocumentSnapshot/createIntroductionDocumentSnapshot";
 export * from "./decryptDevice/decryptDevice";
 export * from "./decryptDocumentTitle/decryptDocumentTitle";
-export * from "./decryptFolder/decryptFolder";
+export * from "./decryptFolderName/decryptFolderName";
 export * from "./encryptDocumentTitle/encryptDocumentTitle";
-export * from "./encryptedRenameFolder/encryptedRenameFolder";
-export * from "./encryptFolder/encryptFolder";
+export * from "./encryptExistingFolderName/encryptExistingFolderName";
+export * from "./encryptFolderName/encryptFolderName";
 export * from "./recreateDocumentKey/recreateDocumentKey";

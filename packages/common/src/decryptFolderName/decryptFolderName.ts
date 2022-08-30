@@ -1,7 +1,7 @@
 import { decryptAead } from "@naisho/core";
 import sodium from "@serenity-tools/libsodium";
 import canonicalize from "canonicalize";
-import { folderDerivedKeyContext } from "../encryptFolder/encryptFolder";
+import { folderDerivedKeyContext } from "../encryptFolderName/encryptFolderName";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {
@@ -13,7 +13,7 @@ type Params = {
   publicData?: any;
 };
 
-export const decryptFolder = async (params: Params) => {
+export const decryptFolderName = async (params: Params) => {
   const publicData = params.publicData || {};
   const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {

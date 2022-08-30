@@ -1,9 +1,9 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
-  decryptFolder,
-  encryptedRenameFolder,
-  encryptFolder,
+  decryptFolderName,
+  encryptExistingFolderName,
+  encryptFolderName,
 } from "@serenity-tools/common";
 import {
   Icon,
@@ -122,7 +122,7 @@ export default function SidebarFolder(props: Props) {
         devices,
         urqlClient,
       });
-      const folderName = await decryptFolder({
+      const folderName = await decryptFolderName({
         parentKey: workspaceKey,
         subkeyId: props.subkeyId!,
         ciphertext: props.encryptedName!,
@@ -155,7 +155,7 @@ export default function SidebarFolder(props: Props) {
       console.error(error);
       return;
     }
-    const encryptedFolderResult = await encryptFolder({
+    const encryptedFolderResult = await encryptFolderName({
       name,
       parentKey: workspaceKey,
     });
@@ -266,7 +266,7 @@ export default function SidebarFolder(props: Props) {
       console.error(error);
       return;
     }
-    const encryptedFolderResult = await encryptedRenameFolder({
+    const encryptedFolderResult = await encryptExistingFolderName({
       name: newFolderName,
       parentKey: workspaceKey,
       subkeyId: props.subkeyId!,
