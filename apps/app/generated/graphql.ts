@@ -1325,7 +1325,7 @@ export const DeviceBySigningPublicKeyDocument = gql`
     `;
 
 export function useDeviceBySigningPublicKeyQuery(options: Omit<Urql.UseQueryArgs<DeviceBySigningPublicKeyQueryVariables>, 'query'>) {
-  return Urql.useQuery<DeviceBySigningPublicKeyQuery>({ query: DeviceBySigningPublicKeyDocument, ...options });
+  return Urql.useQuery<DeviceBySigningPublicKeyQuery, DeviceBySigningPublicKeyQueryVariables>({ query: DeviceBySigningPublicKeyDocument, ...options });
 };
 export const DevicesDocument = gql`
     query devices($first: Int!, $after: String) {
@@ -1347,7 +1347,7 @@ export const DevicesDocument = gql`
     `;
 
 export function useDevicesQuery(options: Omit<Urql.UseQueryArgs<DevicesQueryVariables>, 'query'>) {
-  return Urql.useQuery<DevicesQuery>({ query: DevicesDocument, ...options });
+  return Urql.useQuery<DevicesQuery, DevicesQueryVariables>({ query: DevicesDocument, ...options });
 };
 export const DocumentDocument = gql`
     query document($id: ID!) {
@@ -1364,7 +1364,7 @@ export const DocumentDocument = gql`
     `;
 
 export function useDocumentQuery(options: Omit<Urql.UseQueryArgs<DocumentQueryVariables>, 'query'>) {
-  return Urql.useQuery<DocumentQuery>({ query: DocumentDocument, ...options });
+  return Urql.useQuery<DocumentQuery, DocumentQueryVariables>({ query: DocumentDocument, ...options });
 };
 export const DocumentPathDocument = gql`
     query documentPath($id: ID!) {
@@ -1382,7 +1382,7 @@ export const DocumentPathDocument = gql`
     `;
 
 export function useDocumentPathQuery(options: Omit<Urql.UseQueryArgs<DocumentPathQueryVariables>, 'query'>) {
-  return Urql.useQuery<DocumentPathQuery>({ query: DocumentPathDocument, ...options });
+  return Urql.useQuery<DocumentPathQuery, DocumentPathQueryVariables>({ query: DocumentPathDocument, ...options });
 };
 export const DocumentsDocument = gql`
     query documents($parentFolderId: ID!, $first: Int! = 100, $after: String) {
@@ -1408,7 +1408,7 @@ export const DocumentsDocument = gql`
     `;
 
 export function useDocumentsQuery(options: Omit<Urql.UseQueryArgs<DocumentsQueryVariables>, 'query'>) {
-  return Urql.useQuery<DocumentsQuery>({ query: DocumentsDocument, ...options });
+  return Urql.useQuery<DocumentsQuery, DocumentsQueryVariables>({ query: DocumentsDocument, ...options });
 };
 export const FirstDocumentDocument = gql`
     query firstDocument($workspaceId: ID!) {
@@ -1419,7 +1419,7 @@ export const FirstDocumentDocument = gql`
     `;
 
 export function useFirstDocumentQuery(options: Omit<Urql.UseQueryArgs<FirstDocumentQueryVariables>, 'query'>) {
-  return Urql.useQuery<FirstDocumentQuery>({ query: FirstDocumentDocument, ...options });
+  return Urql.useQuery<FirstDocumentQuery, FirstDocumentQueryVariables>({ query: FirstDocumentDocument, ...options });
 };
 export const FolderDocument = gql`
     query folder($id: ID!) {
@@ -1436,7 +1436,7 @@ export const FolderDocument = gql`
     `;
 
 export function useFolderQuery(options: Omit<Urql.UseQueryArgs<FolderQueryVariables>, 'query'>) {
-  return Urql.useQuery<FolderQuery>({ query: FolderDocument, ...options });
+  return Urql.useQuery<FolderQuery, FolderQueryVariables>({ query: FolderDocument, ...options });
 };
 export const FoldersDocument = gql`
     query folders($parentFolderId: ID!, $first: Int!, $after: String) {
@@ -1460,7 +1460,7 @@ export const FoldersDocument = gql`
     `;
 
 export function useFoldersQuery(options: Omit<Urql.UseQueryArgs<FoldersQueryVariables>, 'query'>) {
-  return Urql.useQuery<FoldersQuery>({ query: FoldersDocument, ...options });
+  return Urql.useQuery<FoldersQuery, FoldersQueryVariables>({ query: FoldersDocument, ...options });
 };
 export const MainDeviceDocument = gql`
     query mainDevice {
@@ -1476,7 +1476,7 @@ export const MainDeviceDocument = gql`
     `;
 
 export function useMainDeviceQuery(options?: Omit<Urql.UseQueryArgs<MainDeviceQueryVariables>, 'query'>) {
-  return Urql.useQuery<MainDeviceQuery>({ query: MainDeviceDocument, ...options });
+  return Urql.useQuery<MainDeviceQuery, MainDeviceQueryVariables>({ query: MainDeviceDocument, ...options });
 };
 export const MeDocument = gql`
     query me {
@@ -1488,7 +1488,7 @@ export const MeDocument = gql`
     `;
 
 export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
-  return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+  return Urql.useQuery<MeQuery, MeQueryVariables>({ query: MeDocument, ...options });
 };
 export const PendingWorkspaceInvitationDocument = gql`
     query pendingWorkspaceInvitation {
@@ -1499,7 +1499,7 @@ export const PendingWorkspaceInvitationDocument = gql`
     `;
 
 export function usePendingWorkspaceInvitationQuery(options?: Omit<Urql.UseQueryArgs<PendingWorkspaceInvitationQueryVariables>, 'query'>) {
-  return Urql.useQuery<PendingWorkspaceInvitationQuery>({ query: PendingWorkspaceInvitationDocument, ...options });
+  return Urql.useQuery<PendingWorkspaceInvitationQuery, PendingWorkspaceInvitationQueryVariables>({ query: PendingWorkspaceInvitationDocument, ...options });
 };
 export const RootFoldersDocument = gql`
     query rootFolders($workspaceId: ID!, $first: Int!, $after: String) {
@@ -1523,7 +1523,7 @@ export const RootFoldersDocument = gql`
     `;
 
 export function useRootFoldersQuery(options: Omit<Urql.UseQueryArgs<RootFoldersQueryVariables>, 'query'>) {
-  return Urql.useQuery<RootFoldersQuery>({ query: RootFoldersDocument, ...options });
+  return Urql.useQuery<RootFoldersQuery, RootFoldersQueryVariables>({ query: RootFoldersDocument, ...options });
 };
 export const UserIdFromUsernameDocument = gql`
     query userIdFromUsername($username: String!) {
@@ -1534,7 +1534,7 @@ export const UserIdFromUsernameDocument = gql`
     `;
 
 export function useUserIdFromUsernameQuery(options: Omit<Urql.UseQueryArgs<UserIdFromUsernameQueryVariables>, 'query'>) {
-  return Urql.useQuery<UserIdFromUsernameQuery>({ query: UserIdFromUsernameDocument, ...options });
+  return Urql.useQuery<UserIdFromUsernameQuery, UserIdFromUsernameQueryVariables>({ query: UserIdFromUsernameDocument, ...options });
 };
 export const WorkspaceDocument = gql`
     query workspace($id: ID, $deviceSigningPublicKey: String!) {
@@ -1563,7 +1563,7 @@ export const WorkspaceDocument = gql`
     `;
 
 export function useWorkspaceQuery(options: Omit<Urql.UseQueryArgs<WorkspaceQueryVariables>, 'query'>) {
-  return Urql.useQuery<WorkspaceQuery>({ query: WorkspaceDocument, ...options });
+  return Urql.useQuery<WorkspaceQuery, WorkspaceQueryVariables>({ query: WorkspaceDocument, ...options });
 };
 export const WorkspaceInvitationDocument = gql`
     query workspaceInvitation($id: ID!) {
@@ -1579,7 +1579,7 @@ export const WorkspaceInvitationDocument = gql`
     `;
 
 export function useWorkspaceInvitationQuery(options: Omit<Urql.UseQueryArgs<WorkspaceInvitationQueryVariables>, 'query'>) {
-  return Urql.useQuery<WorkspaceInvitationQuery>({ query: WorkspaceInvitationDocument, ...options });
+  return Urql.useQuery<WorkspaceInvitationQuery, WorkspaceInvitationQueryVariables>({ query: WorkspaceInvitationDocument, ...options });
 };
 export const WorkspaceInvitationsDocument = gql`
     query workspaceInvitations($workspaceId: ID!) {
@@ -1600,7 +1600,7 @@ export const WorkspaceInvitationsDocument = gql`
     `;
 
 export function useWorkspaceInvitationsQuery(options: Omit<Urql.UseQueryArgs<WorkspaceInvitationsQueryVariables>, 'query'>) {
-  return Urql.useQuery<WorkspaceInvitationsQuery>({ query: WorkspaceInvitationsDocument, ...options });
+  return Urql.useQuery<WorkspaceInvitationsQuery, WorkspaceInvitationsQueryVariables>({ query: WorkspaceInvitationsDocument, ...options });
 };
 export const WorkspacesDocument = gql`
     query workspaces($deviceSigningPublicKey: String!) {
@@ -1630,5 +1630,5 @@ export const WorkspacesDocument = gql`
     `;
 
 export function useWorkspacesQuery(options: Omit<Urql.UseQueryArgs<WorkspacesQueryVariables>, 'query'>) {
-  return Urql.useQuery<WorkspacesQuery>({ query: WorkspacesDocument, ...options });
+  return Urql.useQuery<WorkspacesQuery, WorkspacesQueryVariables>({ query: WorkspacesDocument, ...options });
 };

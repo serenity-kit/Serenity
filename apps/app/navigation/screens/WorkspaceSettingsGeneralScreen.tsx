@@ -57,9 +57,13 @@ export default function WorkspaceSettingsGeneralScreen(
 
   const getMe = async () => {
     const meResult = await urqlClient
-      .query<MeQuery, MeQueryVariables>(MeDocument, undefined, {
-        requestPolicy: "network-only",
-      })
+      .query<MeQuery, MeQueryVariables>(
+        MeDocument,
+        {},
+        {
+          requestPolicy: "network-only",
+        }
+      )
       .toPromise();
     if (meResult.error) {
       throw new Error(meResult.error.message);
