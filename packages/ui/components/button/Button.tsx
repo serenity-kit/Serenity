@@ -102,7 +102,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
       // no py as we v-align the text via flex
       sm: tw`h-8 px-4`,
       md: tw`h-10 px-4`,
-      lg: tw`form-element-height px-6`,
+      lg: tw`h-form-element px-6`,
     },
     variant: {
       primary: tw`bg-primary-500 border-primary-500`,
