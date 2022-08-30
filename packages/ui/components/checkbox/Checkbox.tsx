@@ -18,6 +18,7 @@ export const Checkbox = React.forwardRef(
         ref={ref}
         {...rest}
         style={[styles.default, rest.style]}
+        color="white"
         borderWidth={1}
         borderRadius={2}
         _disabled={{

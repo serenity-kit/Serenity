@@ -8,6 +8,9 @@ export type TextProps = RNText["props"] & {
   bold?: boolean;
   muted?: boolean;
   variant?: TextVariants;
+  // inspired by https://github.com/necolas/react-native-web/issues/1684#issuecomment-1022716132
+  // https://github.com/necolas/react-native-web/blob/master/packages/react-native-web/src/modules/AccessibilityUtil/propsToAccessibilityComponent.js#L12
+  accessibilityLevel?: number;
 };
 
 export function Text(props: TextProps) {

@@ -55,6 +55,7 @@ const customTheme = {
     success: {
       500: "#48AD83",
     },
+    muted: "#8A8B96",
   },
   screens: {
     xs: "475px",
@@ -79,6 +80,7 @@ const customTheme = {
     },
     height: {
       "top-bar": "3rem",
+      "form-element": "3rem",
     },
     margin: {
       4.5: "1.125rem",
@@ -122,14 +124,12 @@ module.exports = {
         "se-outline-error-mini": {
           boxShadow: `0px 0px 0px 0.125rem ${customTheme.colors.error["200"]}`, // web-only
         },
-        "se-shadow-lg": `shadow-black shadow-color-opacity-10 shadow-radius-2 shadow-offset-0/[1px]`,
-        // TODO remove when heading declarations are done
-        h1: `text-h1 font-bold`,
-        h2: `text-h2 font-bold`,
-        h3: `text-h3 font-bold`,
-        "text-muted": `text-gray-600`,
-        "form-element-height": "h-12",
-        "p-menu-item": `py-2 px-3`,
+        "p-menu-item": {
+          paddingTop: "0.5rem",
+          paddingRight: "0.75rem",
+          paddingBottom: "0.5rem",
+          paddingLeft: "0.75rem",
+        },
       });
     }),
   ],
