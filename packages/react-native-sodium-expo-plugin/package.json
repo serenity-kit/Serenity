@@ -25,6 +25,6 @@
     "sodium"
   ],
   "devDependencies": {
-    "@expo/config-plugins": "^4.1.0"
+    "@expo/config-plugins": "^5.0.1"
   }
 }
