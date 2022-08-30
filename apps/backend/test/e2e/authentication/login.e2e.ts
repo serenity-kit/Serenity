@@ -1,13 +1,13 @@
-import { test, expect } from "@playwright/test";
-import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
+import { expect, test } from "@playwright/test";
 import { v4 as uuidv4 } from "uuid";
+import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 
 test("Login without remembering web keys", async ({ page }) => {
   const userId = uuidv4();
   const username = "a@a.com";
   const password = "pass";
-  const { user, workspace, document } = await createUserWithWorkspace({
+  const { workspace, document } = await createUserWithWorkspace({
     id: userId,
     username,
     password,
@@ -31,7 +31,7 @@ test("Login without remembering web keys", async ({ page }) => {
 
   // Click "Log in" button
   await page.locator('div[role="button"]:has-text("Log in")').click();
-  delayForSeconds(2);
+  delayForSeconds(3);
   await expect(page).toHaveURL(
     `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
   );

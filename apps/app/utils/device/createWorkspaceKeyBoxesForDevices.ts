@@ -1,6 +1,7 @@
+import * as sodium from "@serenity-tools/libsodium";
 import { DeviceWorkspaceKeyBoxInput } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { createWorkspaceKeyAndCipherTextForDevice } from "./createWorkspaceKeyAndCipherTextForDevice";
+import { createAndEncryptWorkspaceKeyForDevice } from "./createAndEncryptWorkspaceKeyForDevice";
 import { getActiveDevice } from "./getActiveDevice";
 import { getMainDevice } from "./mainDeviceMemoryStore";
 
@@ -11,46 +12,43 @@ export type DeviceWorkspaceKeyBoxParams = {
   ciphertext: string;
 };
 export type Props = {
-  workspaceId: string;
   devices: Device[];
 };
-export const createWorkspaceKeyBoxesForDevices = async ({
-  workspaceId,
-  devices,
-}: Props) => {
+export const createWorkspaceKeyBoxesForDevices = async ({ devices }: Props) => {
   const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxInput[] = [];
   const allDevices = devices;
   const mainDevice = getMainDevice();
-  const activeDevice = await getActiveDevice();
-  if (!activeDevice) {
+  if (!mainDevice) {
+    throw new Error("No main device found!");
+  }
+  const creatorDevice = await getActiveDevice();
+  if (!creatorDevice) {
     // TODO: handle this error
     throw new Error("No active device!");
   }
-  if (!activeDevice.encryptionPrivateKey) {
+  if (!creatorDevice.encryptionPrivateKey) {
     throw new Error("Active device doesn't have an encryptionPrivateKey!");
   }
-  if (mainDevice) {
-    allDevices.push(mainDevice);
+  const activeDevice = await getActiveDevice();
+  if (!activeDevice) {
+    throw new Error("No active device found!");
   }
-  let workspaceKeyString: string | undefined = undefined;
-  for (const device of allDevices) {
-    const { nonce, ciphertext, workspaceKey } =
-      await createWorkspaceKeyAndCipherTextForDevice({
-        receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-        creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
-      });
-    if (device.signingPublicKey === activeDevice.signingPublicKey) {
-      workspaceKeyString = workspaceKey;
-    }
+  const workspaceKey = await sodium.crypto_kdf_keygen();
+  for (const receiverDevice of allDevices) {
+    const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
+      receiverDeviceEncryptionPublicKey: receiverDevice.encryptionPublicKey,
+      creatorDeviceEncryptionPrivateKey: creatorDevice.encryptionPrivateKey,
+      workspaceKey,
+    });
     deviceWorkspaceKeyBoxes.push({
       ciphertext,
       nonce,
-      deviceSigningPublicKey: device.signingPublicKey,
-      creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
+      deviceSigningPublicKey: receiverDevice.signingPublicKey,
+      creatorDeviceSigningPublicKey: creatorDevice?.signingPublicKey!,
     });
   }
   return {
     deviceWorkspaceKeyBoxes,
-    workspaceKey: workspaceKeyString,
+    workspaceKey: workspaceKey,
   };
 };

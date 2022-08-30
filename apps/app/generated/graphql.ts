@@ -764,14 +764,14 @@ export type CreateFolderMutationVariables = Exact<{
 }>;
 
 
-export type CreateFolderMutation = { __typename?: 'Mutation', createFolder?: { __typename?: 'CreateFolderResult', folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
+export type CreateFolderMutation = { __typename?: 'Mutation', createFolder?: { __typename?: 'CreateFolderResult', folder?: { __typename?: 'Folder', id: string, name: string, encryptedName?: string | null, encryptedNameNonce?: string | null, subkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
 
 export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
   input: CreateInitialWorkspaceStructureInput;
 }>;
 
 
-export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, name: string, encryptedName?: string | null, encryptedNameNonce?: string | null, subkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
 
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
@@ -891,7 +891,7 @@ export type DocumentQueryVariables = Exact<{
 }>;
 
 
-export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, name?: string | null, parentFolderId?: string | null, workspaceId?: string | null } | null };
+export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, name?: string | null, encryptedName?: string | null, encryptedNameNonce?: string | null, subkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null } | null };
 
 export type DocumentPathQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -907,7 +907,7 @@ export type DocumentsQueryVariables = Exact<{
 }>;
 
 
-export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, name?: string | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, name?: string | null, encryptedName?: string | null, encryptedNameNonce?: string | null, subkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type FirstDocumentQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -921,7 +921,7 @@ export type FolderQueryVariables = Exact<{
 }>;
 
 
-export type FolderQuery = { __typename?: 'Query', folder?: { __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, workspaceId?: string | null } | null };
+export type FolderQuery = { __typename?: 'Query', folder?: { __typename?: 'Folder', id: string, name: string, encryptedName?: string | null, encryptedNameNonce?: string | null, subkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null } | null };
 
 export type FoldersQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -930,7 +930,7 @@ export type FoldersQueryVariables = Exact<{
 }>;
 
 
-export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, name: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, name: string, encryptedName?: string | null, encryptedNameNonce?: string | null, subkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1068,6 +1068,9 @@ export const CreateFolderDocument = gql`
     folder {
       id
       name
+      encryptedName
+      encryptedNameNonce
+      subkeyId
       parentFolderId
       rootFolderId
       workspaceId
@@ -1104,6 +1107,9 @@ export const CreateInitialWorkspaceStructureDocument = gql`
     folder {
       id
       name
+      encryptedName
+      encryptedNameNonce
+      subkeyId
       parentFolderId
       rootFolderId
       workspaceId
@@ -1348,6 +1354,9 @@ export const DocumentDocument = gql`
   document(id: $id) {
     id
     name
+    encryptedName
+    encryptedNameNonce
+    subkeyId
     parentFolderId
     workspaceId
   }
@@ -1381,6 +1390,9 @@ export const DocumentsDocument = gql`
     nodes {
       id
       name
+      encryptedName
+      encryptedNameNonce
+      subkeyId
       parentFolderId
       rootFolderId
       workspaceId
@@ -1414,6 +1426,9 @@ export const FolderDocument = gql`
   folder(id: $id) {
     id
     name
+    encryptedName
+    encryptedNameNonce
+    subkeyId
     parentFolderId
     workspaceId
   }
@@ -1429,6 +1444,9 @@ export const FoldersDocument = gql`
     nodes {
       id
       name
+      encryptedName
+      encryptedNameNonce
+      subkeyId
       parentFolderId
       rootFolderId
       workspaceId

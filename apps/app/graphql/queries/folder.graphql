@@ -2,6 +2,9 @@ query folder($id: ID!) {
   folder(id: $id) {
     id
     name
+    encryptedName
+    encryptedNameNonce
+    subkeyId
     parentFolderId
     workspaceId
   }

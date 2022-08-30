@@ -2,10 +2,10 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { useLinkProps } from "@react-navigation/native";
 import {
   createDocumentKey,
+  decryptDocumentTitle,
   encryptDocumentTitle,
-  folderDerivedKeyContext,
+  recreateDocumentKey,
 } from "@serenity-tools/common";
-import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import {
   Icon,
   InlineInput,
@@ -17,20 +17,21 @@ import {
   ViewProps,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import { useClient } from "urql";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
-import { getDevices } from "../../utils/device/getDevices";
 import { useDocumentStore } from "../../utils/document/documentStore";
-import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
+import { getFolderKey } from "../../utils/folder/getFolderKey";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
 type Props = ViewProps & {
   documentId: string;
   workspaceId: string;
-  folderSubkeyId?: number;
-  documentName: string;
+  parentFolderId: string;
+  encryptedName?: string | null;
+  encryptedNameNonce?: string | null;
+  subkeyId?: number | null;
   depth?: number;
   onRefetchDocumentsPress: () => void;
 };
@@ -39,6 +40,7 @@ export default function SidebarPage(props: Props) {
   const isDesktopDevice = useIsDesktopDevice();
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [documentTitle, setDocumentTitle] = useState("Decrypting...");
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const document = useDocumentStore((state) => state.document);
   const documentStore = useDocumentStore();
@@ -56,34 +58,48 @@ export default function SidebarPage(props: Props) {
     },
   });
 
+  useEffect(() => {
+    decryptTitle();
+  }, [props.encryptedName, props.subkeyId]);
+
+  const decryptTitle = async () => {
+    if (!props.subkeyId || !props.encryptedName || !props.encryptedNameNonce) {
+      setDocumentTitle("Untitled");
+      return;
+    }
+    try {
+      const folderKeyData = await getFolderKey({
+        folderId: props.parentFolderId,
+        workspaceId: props.workspaceId,
+        urqlClient,
+      });
+      const documentKeyData = await recreateDocumentKey({
+        folderKey: folderKeyData.key,
+        subkeyId: props.subkeyId,
+      });
+      const documentTitle = await decryptDocumentTitle({
+        key: documentKeyData.key,
+        ciphertext: props.encryptedName,
+        publicNonce: props.encryptedNameNonce,
+      });
+      setDocumentTitle(documentTitle);
+    } catch (error) {
+      console.error(error);
+      setDocumentTitle("Decryption error");
+    }
+  };
+
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const { depth = 0 } = props;
 
   const updateDocumentName = async (name: string) => {
-    const devices = await getDevices({ urqlClient });
-    if (!devices) {
-      console.error("No devices found!");
-      return;
-    }
-    let workspaceKey = "";
-    try {
-      workspaceKey = await getWorkspaceKey({
-        workspaceId: props.workspaceId,
-        devices,
-        urqlClient,
-      });
-    } catch (error: any) {
-      // TODO: handle device not registered error
-      console.error(error);
-      return;
-    }
-    const folderKeyResult = await kdfDeriveFromKey({
-      key: workspaceKey,
-      context: folderDerivedKeyContext,
-      subkeyId: props.folderSubkeyId,
+    const folderKeyData = await getFolderKey({
+      folderId: props.parentFolderId,
+      workspaceId: props.workspaceId,
+      urqlClient,
     });
     const documentKeyData = await createDocumentKey({
-      folderKey: folderKeyResult.key,
+      folderKey: folderKeyData.key,
     });
     const encryptedDocumentTitle = await encryptDocumentTitle({
       title: name,
@@ -102,7 +118,7 @@ export default function SidebarPage(props: Props) {
       // TODO show notification
       const document =
         updateDocumentNameResult.data.updateDocumentName.document;
-      documentStore.update(document);
+      documentStore.update(document, urqlClient);
     } else {
       // TODO: show error: couldn't update folder name
       // refetch to revert back to actual name
@@ -159,7 +175,7 @@ export default function SidebarPage(props: Props) {
                   setIsEditing(false);
                 }}
                 onSubmit={updateDocumentName}
-                value={props.documentName}
+                value={documentTitle}
                 style={tw`ml-0.5 w-${maxWidth}`}
               />
             ) : (
@@ -170,7 +186,7 @@ export default function SidebarPage(props: Props) {
                 ellipsizeMode="tail"
                 bold={document?.id === props.documentId}
               >
-                {props.documentName}
+                {documentTitle}
               </Text>
             )}
           </HStack>

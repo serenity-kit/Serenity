@@ -1,6 +1,10 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { encryptFolder } from "@serenity-tools/common";
+import {
+  decryptFolder,
+  encryptedRenameFolder,
+  encryptFolder,
+} from "@serenity-tools/common";
 import {
   Icon,
   IconButton,
@@ -42,8 +46,10 @@ import SidebarPage from "../sidebarPage/SidebarPage";
 type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
-  folderSubkeyId?: number | null;
-  folderName: string;
+  folderName?: string;
+  encryptedName?: string | null;
+  encryptedNameNonce?: string | null;
+  subkeyId?: number | null;
   depth?: number;
   onStructureChange: () => void;
 };
@@ -58,6 +64,7 @@ export default function SidebarFolder(props: Props) {
   const [isOpen, setIsOpen] = useState(openFolderIds.includes(props.folderId));
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
+  const [isDeleted, setIsDeleted] = useState(false);
 
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
   const [, createDocumentMutation] = useCreateDocumentMutation();
@@ -88,10 +95,45 @@ export default function SidebarFolder(props: Props) {
   const documentPathStore = useDocumentPathStore();
   const document = useDocumentStore((state) => state.document);
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
+  const [folderName, setFolderName] = useState("Decrypting...");
 
   useEffect(() => {
     setIsOpen(openFolderIds.includes(props.folderId));
   }, [openFolderIds, props.folderId]);
+
+  useEffect(() => {
+    decryptName();
+  }, [props.encryptedName, props.subkeyId]);
+
+  const decryptName = async () => {
+    if (!props.subkeyId || !props.encryptedName || !props.encryptedNameNonce) {
+      setFolderName("Untitled");
+      return;
+    }
+    try {
+      const devices = await getDevices({ urqlClient });
+      if (!devices) {
+        // TODO: handle this error
+        console.error("No devices!");
+        return;
+      }
+      const workspaceKey = await getWorkspaceKey({
+        workspaceId: props.workspaceId,
+        devices,
+        urqlClient,
+      });
+      const folderName = await decryptFolder({
+        parentKey: workspaceKey,
+        subkeyId: props.subkeyId!,
+        ciphertext: props.encryptedName!,
+        publicNonce: props.encryptedNameNonce!,
+      });
+      setFolderName(folderName);
+    } catch (error) {
+      console.error(error);
+      setFolderName("Decryption error");
+    }
+  };
 
   const createFolder = async (name: string) => {
     setIsOpen(true);
@@ -134,11 +176,9 @@ export default function SidebarFolder(props: Props) {
           parentFolderId: props.folderId,
         },
       });
-      console.log({ result });
       if (result.data?.createFolder?.folder?.id) {
         didCreateFolderSucceed = true;
         folderId = result.data?.createFolder?.folder?.id;
-        console.log({ folderId });
         setIsEditing("none");
       }
     } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
@@ -226,34 +266,28 @@ export default function SidebarFolder(props: Props) {
       console.error(error);
       return;
     }
-    const encryptedFolderResult = await encryptFolder({
+    const encryptedFolderResult = await encryptedRenameFolder({
       name: newFolderName,
       parentKey: workspaceKey,
+      subkeyId: props.subkeyId!,
     });
-    let numUpdateFolderNameAttempts = 0;
-    let didFolderNameUpdatedSucceed = false;
-    let folder: any = undefined;
-    do {
-      const updateFolderNameResult = await updateFolderNameMutation({
-        input: {
-          id: props.folderId,
-          name: newFolderName,
-          encryptedName: encryptedFolderResult.ciphertext,
-          encryptedNameNonce: encryptedFolderResult.publicNonce,
-          subkeyId: encryptedFolderResult.folderSubkeyId,
-        },
-      });
-      if (updateFolderNameResult.data?.updateFolderName?.folder) {
-        folder = updateFolderNameResult.data?.updateFolderName?.folder;
-        didFolderNameUpdatedSucceed = true;
-      }
-    } while (!didFolderNameUpdatedSucceed && numUpdateFolderNameAttempts < 5);
+    const updateFolderNameResult = await updateFolderNameMutation({
+      input: {
+        id: props.folderId,
+        name: newFolderName,
+        encryptedName: encryptedFolderResult.ciphertext,
+        encryptedNameNonce: encryptedFolderResult.publicNonce,
+        subkeyId: props.subkeyId!,
+      },
+    });
+    const folder = updateFolderNameResult.data?.updateFolderName?.folder;
     if (folder) {
+      setFolderName(newFolderName);
       // refetch the document path
       // TODO: Optimize by checking if the current folder is in the document path
       if (document && documentPathIds.includes(props.folderId)) {
         const documentPath = await getDocumentPath(urqlClient, document.id);
-        documentPathStore.update(documentPath);
+        documentPathStore.update(documentPath, urqlClient);
       }
     } else {
       // TODO: show error: couldn't update folder name
@@ -268,6 +302,7 @@ export default function SidebarFolder(props: Props) {
       },
     });
     if (deleteFoldersResult.data && deleteFoldersResult.data.deleteFolders) {
+      setIsDeleted(true);
       props.onStructureChange();
     } else {
       // TODO: show error: couldn't delete folder
@@ -282,6 +317,10 @@ export default function SidebarFolder(props: Props) {
 
   const maxWidthBase = isDesktopDevice ? 32 : 42;
   const maxWidth = maxWidthBase - depth * 2;
+
+  if (isDeleted) {
+    return <></>;
+  }
 
   return (
     <>
@@ -330,7 +369,7 @@ export default function SidebarFolder(props: Props) {
                   onCancel={() => {
                     setIsEditing("none");
                   }}
-                  value={props.folderName}
+                  value={folderName}
                   style={tw`ml-0.5 w-${maxWidth}`}
                 />
               ) : (
@@ -341,7 +380,7 @@ export default function SidebarFolder(props: Props) {
                   ellipsizeMode="tail"
                   bold={documentPathIds.includes(props.folderId)}
                 >
-                  {props.folderName}
+                  {folderName}
                 </Text>
               )}
             </HStack>
@@ -397,8 +436,9 @@ export default function SidebarFolder(props: Props) {
                     key={folder.id}
                     folderId={folder.id}
                     workspaceId={props.workspaceId}
-                    folderSubkeyId={props.folderSubkeyId}
-                    folderName={folder.name}
+                    subkeyId={folder.subkeyId}
+                    encryptedName={folder.encryptedName}
+                    encryptedNameNonce={folder.encryptedNameNonce}
                     onStructureChange={props.onStructureChange}
                     depth={depth + 1}
                   />
@@ -413,9 +453,11 @@ export default function SidebarFolder(props: Props) {
                 return (
                   <SidebarPage
                     key={document.id}
-                    folderSubkeyId={props.folderSubkeyId || undefined}
+                    parentFolderId={props.folderId}
                     documentId={document.id}
-                    documentName={document.name || "Untitled"}
+                    encryptedName={document.encryptedName}
+                    encryptedNameNonce={document.encryptedNameNonce}
+                    subkeyId={document.subkeyId}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}
                     depth={depth}

@@ -1,52 +1,51 @@
+import {
+  addPendingSnapshot,
+  addPendingUpdate,
+  addSnapshotToInProgress,
+  addUpdateToInProgressQueue,
+  cleanupUpdates,
+  createAwarenessUpdate,
+  createSignatureKeyPair,
+  createSnapshot,
+  createUpdate,
+  dispatchWebsocketState,
+  getPending,
+  getSnapshotInProgress,
+  getUpdateInProgress,
+  getWebsocketState,
+  removePending,
+  removeSnapshotInProgress,
+  removeUpdateFromInProgressQueue,
+  useWebsocketState,
+  verifyAndDecryptAwarenessUpdate,
+  verifyAndDecryptSnapshot,
+  verifyAndDecryptUpdate,
+} from "@naisho/core";
+import sodium, { KeyPair } from "@serenity-tools/libsodium";
+import { useEffect, useRef } from "react";
+import { useClient } from "urql";
+import { v4 as uuidv4 } from "uuid";
+import {
+  applyAwarenessUpdate,
+  Awareness,
+  encodeAwarenessUpdate,
+  removeAwarenessStates,
+} from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
 import {
-  createSnapshot,
-  createUpdate,
-  createAwarenessUpdate,
-  verifyAndDecryptSnapshot,
-  verifyAndDecryptUpdate,
-  verifyAndDecryptAwarenessUpdate,
-  createSignatureKeyPair,
-  addUpdateToInProgressQueue,
-  removeUpdateFromInProgressQueue,
-  getUpdateInProgress,
-  addSnapshotToInProgress,
-  removeSnapshotInProgress,
-  getSnapshotInProgress,
-  addPendingUpdate,
-  addPendingSnapshot,
-  getPending,
-  removePending,
-  dispatchWebsocketState,
-  getWebsocketState,
-  useWebsocketState,
-  cleanupUpdates,
-} from "@naisho/core";
-import { v4 as uuidv4 } from "uuid";
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
-import {
-  Awareness,
-  encodeAwarenessUpdate,
-  applyAwarenessUpdate,
-  removeAwarenessStates,
-} from "y-protocols/awareness";
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { useEffect, useRef } from "react";
-import {
   Document,
+  DocumentDocument,
   DocumentQuery,
   DocumentQueryVariables,
-  DocumentDocument,
 } from "../../generated/graphql";
-import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
-import { Folder } from "../../types/Folder";
-import { useClient } from "urql";
+import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 
 const reconnectTimeout = 2000;
 
@@ -85,11 +84,13 @@ export default function Page({ navigation, route, updateTitle }: Props) {
     if (!documentPath) {
       return;
     }
-    documentPath.forEach((folder: Folder) => {
-      openFolderIds.push(folder.id);
+    documentPath.forEach((folder) => {
+      if (folder) {
+        openFolderIds.push(folder.id);
+      }
     });
     folderStore.update(openFolderIds);
-    documentPathStore.update(documentPath);
+    documentPathStore.update(documentPath, urqlClient);
   };
 
   const updateDocumentName = async (docId: string) => {
@@ -104,7 +105,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       )
       .toPromise();
     const document = documentResult.data?.document as Document;
-    documentStore.update(document);
+    documentStore.update(document, urqlClient);
   };
 
   useEffect(() => {

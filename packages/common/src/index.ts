@@ -7,5 +7,6 @@ export * from "./decryptDevice/decryptDevice";
 export * from "./decryptDocumentTitle/decryptDocumentTitle";
 export * from "./decryptFolder/decryptFolder";
 export * from "./encryptDocumentTitle/encryptDocumentTitle";
+export * from "./encryptedRenameFolder/encryptedRenameFolder";
 export * from "./encryptFolder/encryptFolder";
 export * from "./recreateDocumentKey/recreateDocumentKey";
