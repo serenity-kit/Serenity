@@ -5,5 +5,5 @@ import { Breakpoint } from "../../types";
 export const useIsSmallerThanBreakpoint = (breakpoint: Breakpoint) => {
   const { width } = useWindowDimensions();
 
-  return width < parseInt(theme.screens[breakpoint].replace("px"), 10);
+  return width < parseInt(theme.screens[breakpoint].replace("px", ""), 10);
 };
