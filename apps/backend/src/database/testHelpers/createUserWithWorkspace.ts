@@ -3,7 +3,7 @@ import {
   createDocumentKey,
   createIntroductionDocumentSnapshot,
   encryptDocumentTitle,
-  encryptFolder,
+  encryptFolderName,
 } from "@serenity-tools/common";
 import * as sodium from "@serenity-tools/libsodium";
 import { Login, Registration } from "@serenity-tools/opaque-server";
@@ -103,7 +103,7 @@ export default async function createUserWithWorkspace({
       creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
     });
   const folderName = "Getting Started";
-  const encryptedFolderResult = await encryptFolder({
+  const encryptedFolderResult = await encryptFolderName({
     name: folderName,
     parentKey: workspaceKey,
   });

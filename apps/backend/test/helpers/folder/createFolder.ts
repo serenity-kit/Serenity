@@ -1,4 +1,4 @@
-import { encryptFolder } from "@serenity-tools/common";
+import { encryptFolderName } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 
 type Params = {
@@ -23,7 +23,7 @@ export const createFolder = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const encryptedFolderResult = await encryptFolder({
+  const encryptedFolderResult = await encryptFolderName({
     name,
     parentKey,
   });

@@ -2,7 +2,7 @@ import {
   createDocumentKey,
   createIntroductionDocumentSnapshot,
   encryptDocumentTitle,
-  encryptFolder,
+  encryptFolderName,
 } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
@@ -84,7 +84,7 @@ export const createInitialWorkspaceStructure = async ({
     }
   `;
 
-  const encryptedFolderResult = await encryptFolder({
+  const encryptedFolderResult = await encryptFolderName({
     name: folderName,
     parentKey: workspaceKey,
   });

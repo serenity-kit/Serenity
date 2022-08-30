@@ -2,7 +2,7 @@ import {
   createDocumentKey,
   createIntroductionDocumentSnapshot,
   encryptDocumentTitle,
-  encryptFolder,
+  encryptFolderName,
 } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import {
@@ -89,7 +89,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       return;
     }
     const folderName = "Getting started";
-    const encryptedFolderResult = await encryptFolder({
+    const encryptedFolderResult = await encryptFolderName({
       name: folderName,
       parentKey: workspaceKey,
     });

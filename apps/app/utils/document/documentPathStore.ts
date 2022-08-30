@@ -1,4 +1,4 @@
-import { decryptFolder } from "@serenity-tools/common";
+import { decryptFolderName } from "@serenity-tools/common";
 import { Client } from "urql";
 import create from "zustand";
 import {
@@ -48,7 +48,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
       folderIds.push(folder.id);
       let folderName = "Decrypting...";
       try {
-        folderName = await decryptFolder({
+        folderName = await decryptFolderName({
           parentKey: workspaceKey,
           subkeyId: folder.subkeyId!,
           ciphertext: folder.encryptedName!,

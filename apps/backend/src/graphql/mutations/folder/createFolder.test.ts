@@ -1,4 +1,4 @@
-import { encryptFolder } from "@serenity-tools/common";
+import { encryptFolderName } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
@@ -156,7 +156,7 @@ test("duplicate ID throws an error", async () => {
 test("Throw error on duplicate subkeyId, workspaceId", async () => {
   const authorizationHeaders = { authorization: sessionKey };
   const name = "subkey test";
-  const encryptedFolderResult = await encryptFolder({
+  const encryptedFolderResult = await encryptFolderName({
     name,
     parentKey: workspaceKey,
   });
@@ -277,7 +277,7 @@ describe("Input errors", () => {
   };
   test("Invalid id", async () => {
     const name = "test";
-    const encryptedFolderResult = await encryptFolder({
+    const encryptedFolderResult = await encryptFolderName({
       name,
       parentKey: workspaceKey,
     });
@@ -321,7 +321,7 @@ describe("Input errors", () => {
   });
   test("Invalid workspaceId", async () => {
     const name = "test";
-    const encryptedFolderResult = await encryptFolder({
+    const encryptedFolderResult = await encryptFolderName({
       name,
       parentKey: workspaceKey,
     });

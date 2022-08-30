@@ -5,7 +5,7 @@ import {
 
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { encryptFolder } from "@serenity-tools/common";
+import { encryptFolderName } from "@serenity-tools/common";
 import {
   Icon,
   IconButton,
@@ -172,7 +172,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       console.error(error);
       return;
     }
-    const encryptedFolderResult = await encryptFolder({
+    const encryptedFolderResult = await encryptFolderName({
       name,
       parentKey: workspaceKey,
     });
