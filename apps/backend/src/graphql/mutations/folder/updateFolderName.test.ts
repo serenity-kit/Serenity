@@ -1,4 +1,3 @@
-import { encryptFolder } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
@@ -8,7 +7,6 @@ import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { updateFolderName } from "../../../../test/helpers/folder/updateFolderName";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
-import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -99,51 +97,6 @@ test("throw error when folder doesn't exist", async () => {
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
-});
-
-test("throw error on duplicate subkeyId", async () => {
-  const existingFolder = await prisma.folder.findFirst({
-    where: { id: addedFolderId },
-  });
-  const authorizationHeaders = { authorization: sessionKey };
-  const id = addedFolderId;
-  const name = "Updated folder name";
-  const encryptedFolderResult = await encryptFolder({
-    name,
-    parentKey: workspaceKey,
-  });
-  const query = gql`
-    mutation updateFolderName($input: UpdateFolderNameInput!) {
-      updateFolderName(input: $input) {
-        folder {
-          name
-          id
-          encryptedName
-          encryptedNameNonce
-          subkeyId
-          parentFolderId
-          rootFolderId
-          workspaceId
-        }
-      }
-    }
-  `;
-  await expect(
-    (async () =>
-      await graphql.client.request(
-        query,
-        {
-          input: {
-            id,
-            name,
-            encryptedName: encryptedFolderResult.ciphertext,
-            encryptedNameNonce: encryptedFolderResult.publicNonce,
-            subkeyId: existingFolder?.subkeyId,
-          },
-        },
-        authorizationHeaders
-      ))()
-  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("throw error when user doesn't have access", async () => {

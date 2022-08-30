@@ -31,7 +31,7 @@ test("Login without remembering web keys", async ({ page }) => {
 
   // Click "Log in" button
   await page.locator('div[role="button"]:has-text("Log in")').click();
-  delayForSeconds(2);
+  delayForSeconds(3);
   await expect(page).toHaveURL(
     `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
   );
