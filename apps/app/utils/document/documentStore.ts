@@ -10,7 +10,10 @@ import { getFolderKey } from "../folder/getFolderKey";
 interface DocumentState {
   document: Document | null | undefined;
   documentName: string | null;
-  update: (document: Document | null | undefined, urqlClient: Client) => void;
+  update: (
+    document: Document | null | undefined,
+    urqlClient: Client
+  ) => Promise<void>;
 }
 
 export const useDocumentStore = create<DocumentState>((set) => ({
@@ -39,7 +42,7 @@ export const useDocumentStore = create<DocumentState>((set) => ({
         publicNonce: document?.encryptedNameNonce!,
       });
     }
-    set((state) => ({
+    set(() => ({
       document,
       documentName,
     }));

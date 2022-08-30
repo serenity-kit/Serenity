@@ -7,7 +7,6 @@ import {
   DocumentPathQueryVariables,
   Folder,
 } from "../../generated/graphql";
-import { b64emoji } from "../b64emojis";
 import { getDevices } from "../device/getDevices";
 import { getWorkspaceKey } from "../workspace/getWorkspaceKey";
 
@@ -32,7 +31,6 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
     }
   },
   update: async (folders, urqlClient) => {
-    console.log("documentPathStore.update()");
     const devices = await getDevices({ urqlClient });
     if (!devices) {
       throw new Error("No devices found!");
@@ -49,14 +47,6 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
     for (let folder of folders) {
       folderIds.push(folder.id);
       let folderName = "Decrypting...";
-      console.log({
-        action: "decrypting folder path",
-        folderId: folder.id,
-        ciphertext: b64emoji(folder.encryptedName!),
-        nonce: b64emoji(folder.encryptedNameNonce!),
-        subkeyId: folder.subkeyId,
-        workspaceKey: b64emoji(workspaceKey),
-      });
       try {
         folderName = await decryptFolder({
           parentKey: workspaceKey,
@@ -70,8 +60,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
       }
       folderNames[folder.id] = folderName;
     }
-    console.log("end documentPathStore.update()");
-    set((state) => ({
+    set(() => ({
       folders,
       folderIds,
       folderNames,

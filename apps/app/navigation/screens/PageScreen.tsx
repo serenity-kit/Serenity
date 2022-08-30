@@ -1,6 +1,7 @@
 import {
   createDocumentKey,
   encryptDocumentTitle,
+  recreateDocumentKey,
 } from "@serenity-tools/common";
 import { useEffect, useLayoutEffect } from "react";
 import { useWindowDimensions } from "react-native";
@@ -11,22 +12,22 @@ import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRigh
 import { useAuthentication } from "../../context/AuthenticationContext";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 import {
-  DocumentDocument,
-  DocumentQuery,
-  DocumentQueryVariables,
+  Document,
   useUpdateDocumentNameMutation,
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 
 import { useDocumentStore } from "../../utils/document/documentStore";
+import { getDocument } from "../../utils/document/getDocument";
 import { getFolderKey } from "../../utils/folder/getFolderKey";
 import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const workspaceId = useWorkspaceId();
-  const documentStore = useDocumentStore();
+  const updateDocumentStore = useDocumentStore((state) => state.update);
   const pageId = props.route.params.pageId;
+  const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const { sessionKey } = useAuthentication();
   const urqlClient = useClient();
 
@@ -39,25 +40,23 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
       console.error("No sessionKey found. Probably you aren't logged in!");
       return;
     }
-    const documentResult = await urqlClient
-      .query<DocumentQuery, DocumentQueryVariables>(
-        DocumentDocument,
-        { id: docId },
-        {
-          // better to be safe here and always refetch
-          requestPolicy: "network-only",
-        }
-      )
-      .toPromise();
-    if (
-      documentResult.error?.message === "[GraphQL] Document not found" ||
-      documentResult.error?.message === "[GraphQL] Unauthorized"
-    ) {
-      props.navigation.replace("Workspace", {
-        workspaceId,
-        screen: "NoPageExists",
+    try {
+      const document = await getDocument({
+        documentId: docId,
+        urqlClient,
       });
-      return;
+      await updateDocumentStore(document, urqlClient);
+    } catch (error: any) {
+      if (
+        error.message === "[GraphQL] Document not found" ||
+        error.message === "[GraphQL] Unauthorized"
+      ) {
+        props.navigation.replace("Workspace", {
+          workspaceId,
+          screen: "NoPageExists",
+        });
+        return;
+      }
     }
     return true;
   };
@@ -70,19 +69,54 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     });
   }, []);
 
-  const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const updateTitle = async (title: string) => {
+    let document: Document | undefined | null = undefined;
+    try {
+      document = await getDocument({
+        documentId: pageId,
+        urqlClient,
+      });
+      await updateDocumentStore(document, urqlClient);
+    } catch (error: any) {
+      if (
+        error.message === "[GraphQL] Document not found" ||
+        error.message === "[GraphQL] Unauthorized"
+      ) {
+        props.navigation.replace("Workspace", {
+          workspaceId,
+          screen: "NoPageExists",
+        });
+        return;
+      }
+    }
+    if (document?.id !== pageId) {
+      console.error("document ID doesn't match page ID");
+      return;
+    }
     const folderKeyData = await getFolderKey({
-      folderId: documentStore.document?.parentFolderId!,
-      workspaceId: documentStore.document?.workspaceId!,
+      folderId: document?.parentFolderId!,
+      workspaceId: document?.workspaceId!,
       urqlClient,
     });
-    const documentKeyData = await createDocumentKey({
-      folderKey: folderKeyData.key,
-    });
+    let documentSubkeyId = 0;
+    let documentKey = "";
+    if (document?.subkeyId) {
+      const documentKeyData = await createDocumentKey({
+        folderKey: folderKeyData.key,
+      });
+      documentSubkeyId = documentKeyData.subkeyId;
+      documentKey = documentKeyData.key;
+    } else {
+      const documentKeyData = await recreateDocumentKey({
+        folderKey: folderKeyData.key,
+        subkeyId: document?.subkeyId!,
+      });
+      documentSubkeyId = documentKeyData.subkeyId;
+      documentKey = documentKeyData.key;
+    }
     const encryptedDocumentTitle = await encryptDocumentTitle({
       title,
-      key: documentKeyData.key,
+      key: documentKey,
     });
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
@@ -90,13 +124,13 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
         name: title,
         encryptedName: encryptedDocumentTitle.ciphertext,
         encryptedNameNonce: encryptedDocumentTitle.publicNonce,
-        subkeyId: documentKeyData.subkeyId,
+        subkeyId: documentSubkeyId,
       },
     });
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {
-      const document =
+      const updatedDocument =
         updateDocumentNameResult.data.updateDocumentName.document;
-      documentStore.update(document, urqlClient);
+      await updateDocumentStore(updatedDocument, urqlClient);
     }
   };
 

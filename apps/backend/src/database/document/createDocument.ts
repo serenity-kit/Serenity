@@ -23,7 +23,7 @@ export async function createDocument({
   if (name) {
     folderName = name;
   }
-  return prisma.document.create({
+  const document = await prisma.document.create({
     data: {
       id,
       name: folderName,
@@ -34,4 +34,5 @@ export async function createDocument({
       workspaceId,
     },
   });
+  return document;
 }
