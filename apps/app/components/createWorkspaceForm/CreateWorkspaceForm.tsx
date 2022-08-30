@@ -19,7 +19,6 @@ import {
   useDevicesQuery,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { b64emojis } from "../../utils/b64emojis";
 import { createWorkspaceKeyBoxesForDevices } from "../../utils/device/createWorkspaceKeyBoxesForDevices";
 
 type WorkspaceProps = {
@@ -89,14 +88,11 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       console.error("Could not retrieve workspaceKey!");
       return;
     }
-
-    console.log({ worskpaceKey: b64emojis(workspaceKey) });
     const folderName = "Getting started";
     const encryptedFolderResult = await encryptFolder({
       name: folderName,
       parentKey: workspaceKey,
     });
-    console.log({ encryptedFolderResult });
     const documentName = "Introduction";
     const documentKeyData = await createDocumentKey({
       folderKey: encryptedFolderResult.folderSubkey,

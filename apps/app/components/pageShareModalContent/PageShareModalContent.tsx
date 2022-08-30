@@ -33,7 +33,7 @@ export function PageShareModalContent() {
             value={"https://example.com/dummy/link"}
             isDisabled
           />
-          <Button size="small">Copy</Button>
+          <Button size="sm">Copy</Button>
         </>
       ) : null}
     </>

@@ -15,10 +15,11 @@ type WorkspaceInvitation = {
   inviterUsername: string;
   expiresAt: Date;
 };
+
 type Props = {
   workspaceId: string;
-  onWorkspaceInvitationCreated: ({
-    workspaceInvitation: WorkspaceInvitation,
+  onWorkspaceInvitationCreated: (params: {
+    workspaceInvitation: WorkspaceInvitation;
   }) => void;
 };
 

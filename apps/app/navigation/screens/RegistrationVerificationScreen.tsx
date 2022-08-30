@@ -226,7 +226,7 @@ export default function RegistrationVerificationScreen(
           Note: The verification code is prefilled on staging.
         </InfoMessage>
 
-        <Button onPress={onSubmit} size="large">
+        <Button onPress={onSubmit} size="lg">
           Register
         </Button>
       </Box>

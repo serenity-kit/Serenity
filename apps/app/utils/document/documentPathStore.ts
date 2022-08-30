@@ -15,7 +15,7 @@ interface DocumentPathState {
   folderIds: string[];
   folderNames: { [id: string]: string };
   getName: (folderId: string) => string;
-  update: (folders: Folder[], urqlClient: Client) => void;
+  update: (folders: Folder[], urqlClient: Client) => Promise<void>;
 }
 
 export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({

@@ -8,8 +8,11 @@
     "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "dependencies": {
-    "@serenity-tools/libsodium": "*",
     "@naisho/core": "*",
+    "@serenity-tools/libsodium": "*",
     "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@babel/preset-flow": "^7.18.6"
   }
 }

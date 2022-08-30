@@ -240,9 +240,9 @@ export default function DesignSystemScreen() {
           <DSMono variant={"type"}>large</DSMono> .
         </Text>
         <DSExampleArea>
-          <Button size="small">Login</Button>
-          <Button size="medium">Login</Button>
-          <Button size="large">Login</Button>
+          <Button size="sm">Login</Button>
+          <Button size="md">Login</Button>
+          <Button size="lg">Login</Button>
         </DSExampleArea>
         <Heading lvl={3}>Loading State</Heading>
         <Text variant="small">
@@ -251,13 +251,13 @@ export default function DesignSystemScreen() {
           as well.
         </Text>
         <DSExampleArea>
-          <Button size="small" isLoading>
+          <Button size="sm" isLoading>
             Login
           </Button>
-          <Button size="medium" isLoading>
+          <Button size="md" isLoading>
             Login
           </Button>
-          <Button size="large" isLoading>
+          <Button size="lg" isLoading>
             Login
           </Button>
         </DSExampleArea>
@@ -336,8 +336,8 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <IconButton name="double-arrow-left" color="gray-800" />
           <IconButton name="double-arrow-right" color="gray-800" />
-          <IconButton name="double-arrow-left" color="gray-800" large />
-          <IconButton name="double-arrow-right" color="gray-800" large />
+          <IconButton name="double-arrow-left" color="gray-800" size="lg" />
+          <IconButton name="double-arrow-right" color="gray-800" size="lg" />
         </DSExampleArea>
         <Heading lvl={3}>Styling</Heading>
         <Text variant="small">
@@ -347,11 +347,11 @@ export default function DesignSystemScreen() {
           <DSMono variant="type">gray-800</DSMono>.
         </Text>
         <DSExampleArea>
-          <IconButton name="menu" color="gray-400" large />
-          <IconButton name="image-line" color="gray-500" large />
-          <IconButton name="settings-4-line" color="gray-600" large />
-          <IconButton name="double-arrow-left" color="gray-700" large />
-          <IconButton name="double-arrow-right" color="gray-800" large />
+          <IconButton name="menu" color="gray-400" size="lg" />
+          <IconButton name="image-line" color="gray-500" size="lg" />
+          <IconButton name="settings-4-line" color="gray-600" size="lg" />
+          <IconButton name="double-arrow-left" color="gray-700" size="lg" />
+          <IconButton name="double-arrow-right" color="gray-800" size="lg" />
         </DSExampleArea>
         <Heading lvl={3}>Label</Heading>
         <Text variant="small">
@@ -361,7 +361,7 @@ export default function DesignSystemScreen() {
           <DSMono variant="component">Menu</DSMono> .
         </Text>
         <DSExampleArea>
-          <IconButton name="plus" large label="New workspace" />
+          <IconButton name="plus" size="lg" label="New workspace" />
         </DSExampleArea>
         <Heading lvl={3}>Usage</Heading>
         <Text variant="small">
@@ -983,7 +983,7 @@ export default function DesignSystemScreen() {
           <LabeledInput
             label={"Verification Key"}
             value="70909qer798q7987q"
-            disabled
+            isDisabled
           />
         </DSExampleArea>
         <Heading lvl={3}>Hints</Heading>
@@ -1001,7 +1001,7 @@ export default function DesignSystemScreen() {
           <LabeledInput
             label={"Verification Key"}
             value="70909qer798q7987q"
-            disabled
+            isDisabled
             hint="We have already prefilled this field with your key."
           />
         </DSExampleArea>
@@ -1376,7 +1376,6 @@ export default function DesignSystemScreen() {
             onPress={() => {
               setShowModal(true);
             }}
-            size="medium"
             label="New workspace"
             name="plus"
             style={tw`bold`}
@@ -1645,7 +1644,7 @@ export default function DesignSystemScreen() {
               counter = counter + 1;
               showToast(`Copied to clipboard ${counter}`);
             }}
-            size={"medium"}
+            size={"md"}
           >
             Copy
           </Button>

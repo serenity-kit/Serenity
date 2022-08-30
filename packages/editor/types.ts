@@ -73,5 +73,6 @@ declare global {
     updateEditor: (paramsString: string) => void;
     applyYjsUpdate: (update: any) => void;
     applyYAwarenessUpdate: (update: any) => void;
+    blurEditor: () => void;
   }
 }

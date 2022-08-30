@@ -176,7 +176,7 @@ export default function AcceptWorkspaceInvitationScreen(
       {sessionKey ? (
         <Button
           onPress={onAcceptWorkspaceInvitationPress}
-          size="large"
+          size="lg"
           style={tw`self-center`}
         >
           Accept

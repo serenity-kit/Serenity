@@ -4,6 +4,7 @@ const InlineChunkHtmlPlugin = require("react-dev-utils/InlineChunkHtmlPlugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HTMLInlineCSSWebpackPlugin =
   require("html-inline-css-webpack-plugin").default;
+const webpack = require("webpack");
 
 module.exports = {
   mode: "development",
@@ -77,5 +78,9 @@ module.exports = {
       chunkFilename: "[id].css",
     }),
     new HTMLInlineCSSWebpackPlugin(),
+    new webpack.DefinePlugin({
+      // needed since react-native uses it internally
+      __DEV__: JSON.stringify(false),
+    }),
   ],
 };

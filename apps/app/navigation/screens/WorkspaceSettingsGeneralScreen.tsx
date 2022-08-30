@@ -32,7 +32,7 @@ import {
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 export default function WorkspaceSettingsGeneralScreen(
-  props: WorkspaceDrawerScreenProps<"Settings">
+  props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
   const urqlClient = useClient();
   const workspaceId = useWorkspaceId();

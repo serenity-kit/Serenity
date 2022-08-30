@@ -10,7 +10,7 @@ import { Spinner } from "../spinner/Spinner";
 import { View } from "../view/View";
 
 export type ButtonVariants = "primary" | "secondary" | "danger";
-export type ButtonSizes = "small" | "medium" | "large";
+export type ButtonSizes = "sm" | "md" | "lg";
 
 export type ButtonProps = PressableProps & {
   size?: ButtonSizes;
@@ -51,7 +51,7 @@ const computeStyle = ({
 
   let style: any = isFocusVisible
     ? tw.style(
-        size === "large"
+        size === "lg"
           ? "border-3 border-primary-700"
           : "border-2 border-primary-700"
       ) // web only
@@ -90,7 +90,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const {
     variant = "primary",
-    size = "medium",
+    size = "md",
     isLoading = false,
     ...rest
   } = props;
@@ -100,9 +100,9 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
   const wrapperStyle = {
     size: {
       // no py as we v-align the text via flex
-      small: tw`h-8 px-4`,
-      medium: tw`h-10 px-4`,
-      large: tw`form-element-height px-6`,
+      sm: tw`h-8 px-4`,
+      md: tw`h-10 px-4`,
+      lg: tw`form-element-height px-6`,
     },
     variant: {
       primary: tw`bg-primary-500 border-primary-500`,
@@ -114,9 +114,9 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
   // generic text-styles
   const textStyle = {
     size: {
-      small: textSizes[0],
-      medium: textSizes[1],
-      large: textSizes[2],
+      sm: textSizes[0],
+      md: textSizes[1],
+      lg: textSizes[2],
     },
     variant: {
       primary: disabled ? tw`text-primary-300` : tw`text-gray-100`,
@@ -199,11 +199,11 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
               </View>
               <Text
                 onLayout={(event) => {
-                  if (size === "small") {
+                  if (size === "sm") {
                     setSpinnerSize({
                       scale: 0.5,
                     });
-                  } else if (size === "medium") {
+                  } else if (size === "md") {
                     setSpinnerSize({
                       scale: 0.75,
                     });

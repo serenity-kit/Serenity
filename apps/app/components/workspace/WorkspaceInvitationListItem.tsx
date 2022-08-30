@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { StyleSheet } from "react-native";
 import { View, Text, Icon, tw } from "@serenity-tools/ui";
-import { format } from "date-fns";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 type Props = {
@@ -17,10 +16,6 @@ export function WorkspaceInvitationListItem(props: Props) {
   const id = props.id;
   const username = props.username;
   const expiresAt = props.expiresAt;
-
-  const formatDate = (date: Date) => {
-    return format(date, "MMM dd, yyyy");
-  };
 
   return (
     <View style={styles.listItem}>
