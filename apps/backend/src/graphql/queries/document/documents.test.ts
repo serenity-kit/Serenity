@@ -151,9 +151,9 @@ test("user should be able to list documents in a folder when empty", async () =>
     `;
   const result = await graphql.client.request(query, null, authorizationHeader);
   expect(result.documents).toMatchInlineSnapshot(`
-    Object {
-      "edges": Array [],
-      "pageInfo": Object {
+    {
+      "edges": [],
+      "pageInfo": {
         "endCursor": null,
         "hasNextPage": false,
       },
@@ -191,10 +191,10 @@ test("user should be able to list documents in a folder with one item", async ()
     `;
   const result = await graphql.client.request(query, null, authorizationHeader);
   expect(result.documents).toMatchInlineSnapshot(`
-    Object {
-      "edges": Array [
-        Object {
-          "node": Object {
+    {
+      "edges": [
+        {
+          "node": {
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
             "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -203,7 +203,7 @@ test("user should be able to list documents in a folder with one item", async ()
           },
         },
       ],
-      "pageInfo": Object {
+      "pageInfo": {
         "endCursor": "MzUzMGI5ZWQtMTFmMy00NGM3LTllMTYtN2RiYTFlMTQ4MTVm",
         "hasNextPage": false,
       },
@@ -241,10 +241,10 @@ test("user should be able to list documents in a folder with multiple items", as
     `;
   const result = await graphql.client.request(query, null, authorizationHeader);
   expect(result.documents).toMatchInlineSnapshot(`
-    Object {
-      "edges": Array [
-        Object {
-          "node": Object {
+    {
+      "edges": [
+        {
+          "node": {
             "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
             "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -252,8 +252,8 @@ test("user should be able to list documents in a folder with multiple items", as
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
           },
         },
-        Object {
-          "node": Object {
+        {
+          "node": {
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
             "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -262,7 +262,7 @@ test("user should be able to list documents in a folder with multiple items", as
           },
         },
       ],
-      "pageInfo": Object {
+      "pageInfo": {
         "endCursor": "MzUzMGI5ZWQtMTFmMy00NGM3LTllMTYtN2RiYTFlMTQ4MTVm",
         "hasNextPage": false,
       },
@@ -300,10 +300,10 @@ test("user should be able to list without showing subfolder documents", async ()
   `;
   const result = await graphql.client.request(query, null, authorizationHeader);
   expect(result.documents).toMatchInlineSnapshot(`
-    Object {
-      "edges": Array [
-        Object {
-          "node": Object {
+    {
+      "edges": [
+        {
+          "node": {
             "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
             "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -311,8 +311,8 @@ test("user should be able to list without showing subfolder documents", async ()
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
           },
         },
-        Object {
-          "node": Object {
+        {
+          "node": {
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
             "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -321,7 +321,7 @@ test("user should be able to list without showing subfolder documents", async ()
           },
         },
       ],
-      "pageInfo": Object {
+      "pageInfo": {
         "endCursor": "MzUzMGI5ZWQtMTFmMy00NGM3LTllMTYtN2RiYTFlMTQ4MTVm",
         "hasNextPage": false,
       },

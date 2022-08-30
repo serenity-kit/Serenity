@@ -54,7 +54,7 @@ test("user should be able to delete a document", async () => {
   const ids = [addedDocumentId];
   const result = await deleteDocuments({ graphql, ids, authorizationHeader });
   expect(result.deleteDocuments).toMatchInlineSnapshot(`
-    Object {
+    {
       "status": "success",
     }
   `);
@@ -65,7 +65,7 @@ test("Deleting nonexistent document does nothing", async () => {
   const ids = ["badthing"];
   const result = await deleteDocuments({ graphql, ids, authorizationHeader });
   expect(result.deleteDocuments).toMatchInlineSnapshot(`
-    Object {
+    {
       "status": "success",
     }
   `);

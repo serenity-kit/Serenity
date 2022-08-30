@@ -169,8 +169,8 @@ test("user should be able to get a document path", async () => {
     authorizationHeader
   );
   expect(result.documentPath).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "id": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
         "name": "parent folder",
         "parentFolderId": null,
@@ -200,8 +200,8 @@ test("user should be able to get a document path for a deep tree", async () => {
     authorizationHeader
   );
   expect(result.documentPath).toMatchInlineSnapshot(`
-    Array [
-      Object {
+    [
+      {
         "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
         "name": "folder",
         "parentFolderId": null,

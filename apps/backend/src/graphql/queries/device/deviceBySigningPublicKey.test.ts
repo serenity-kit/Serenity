@@ -33,7 +33,7 @@ test("user should be retrieve a device by signingPublicKey", async () => {
   });
   const retrivedDevice = result.deviceBySigningPublicKey.device;
   expect(retrivedDevice).toMatchInlineSnapshot(`
-    Object {
+    {
       "encryptionPublicKey": "${createdDevice.encryptionPublicKey}",
       "encryptionPublicKeySignature": "${createdDevice.encryptionPublicKeySignature}",
       "signingPublicKey": "${createdDevice.signingPublicKey}",
