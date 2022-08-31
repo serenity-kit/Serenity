@@ -18,9 +18,11 @@ export const Checkbox = React.forwardRef(
         ref={ref}
         {...rest}
         style={[styles.default, rest.style]}
-        color="white"
         borderWidth={1}
         borderRadius={2}
+        _icon={{
+          color: "white",
+        }}
         _disabled={{
           style: [tw`bg-white`, styles.disabled],
         }}
