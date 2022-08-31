@@ -62,6 +62,7 @@ export function LinkExternal(props: LinkExternalProps) {
             name="external-link-line"
             color={tw.color("primary-500")}
             size={iconSizes[variant]}
+            mobileSize={iconSizes[variant]}
           />
         </View>
       ) : null}
