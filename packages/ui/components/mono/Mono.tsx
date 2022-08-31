@@ -2,7 +2,7 @@ import React from "react";
 import { Text as RNText, StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
 
-export type MonoVariants = "medium" | "small" | "xs";
+export type MonoVariants = "md" | "sm" | "xs";
 export type MonoColors = "base" | "primary" | "muted";
 
 export type MonoProps = RNText["props"] & {
@@ -11,7 +11,7 @@ export type MonoProps = RNText["props"] & {
 };
 
 export function Mono(props: MonoProps) {
-  const { size = "small", color = "base" } = props;
+  const { size = "sm", color = "base" } = props;
 
   let textColor = "";
   switch (color) {
@@ -28,11 +28,11 @@ export function Mono(props: MonoProps) {
 
   const styles = StyleSheet.create({
     // 1rem (16px)
-    medium: tw.style(`text-base`, {
+    md: tw.style(`text-base`, {
       fontFamily: "space-mono",
     }),
     // 0.875rem (14px)
-    small: tw.style(`text-sm`, {
+    sm: tw.style(`text-sm`, {
       fontFamily: "space-mono",
     }),
     // 0.8125rem (13px)

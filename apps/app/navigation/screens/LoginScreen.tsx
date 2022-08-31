@@ -20,7 +20,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
         <CenterContent serenityBg>
           <Box plush>
             <View>
-              <Text variant="large" bold style={tw`text-center`}>
+              <Text variant="lg" bold style={tw`text-center`}>
                 Welcome back
               </Text>
               <View>

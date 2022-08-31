@@ -359,7 +359,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           mobileSize={5.5}
           color={tw.color("gray-800")}
         />
-        <Text variant="small">Settings</Text>
+        <Text variant="sm">Settings</Text>
       </SidebarLink>
 
       <SidebarLink to={{ screen: "DevDashboard" }}>
@@ -369,7 +369,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           mobileSize={5.5}
           color={tw.color("gray-800")}
         />
-        <Text variant="small">Dev Dashboard</Text>
+        <Text variant="sm">Dev Dashboard</Text>
       </SidebarLink>
       <SidebarDivider />
       <HStack
@@ -377,7 +377,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         alignItems="center"
         style={tw`ml-4 mr-5 mb-4 md:mr-2`}
       >
-        <Text variant={isPermanentLeftSidebar ? "xxs" : "small"} bold>
+        <Text variant={isPermanentLeftSidebar ? "xxs" : "sm"} bold>
           Folders
         </Text>
         {/* offset not working yet as NB has a no-no in their component */}

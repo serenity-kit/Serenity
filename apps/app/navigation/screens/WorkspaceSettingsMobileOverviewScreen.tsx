@@ -15,7 +15,7 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
           mobileSize={5.5}
           color={tw.color("gray-800")}
         />
-        <Text variant="small"> General</Text>
+        <Text variant="sm"> General</Text>
       </SidebarLink>
       <SidebarLink
         to={{
@@ -29,7 +29,7 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
           mobileSize={5.5}
           color={tw.color("gray-800")}
         />
-        <Text variant="small">Members</Text>
+        <Text variant="sm">Members</Text>
       </SidebarLink>
     </>
   );

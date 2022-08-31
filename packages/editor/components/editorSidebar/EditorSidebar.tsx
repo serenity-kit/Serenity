@@ -35,7 +35,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("bold") || false}
             name="bold"
           />
-          <Text variant="small" bold={editor?.isActive("bold") || false}>
+          <Text variant="sm" bold={editor?.isActive("bold") || false}>
             Bold
           </Text>
         </SidebarButton>
@@ -47,7 +47,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("italic") || false}
             name="italic"
           />
-          <Text variant="small" bold={editor?.isActive("italic") || false}>
+          <Text variant="sm" bold={editor?.isActive("italic") || false}>
             Italic
           </Text>
         </SidebarButton>
@@ -59,7 +59,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("code") || false}
             name="code-view"
           />
-          <Text variant="small" bold={editor?.isActive("code") || false}>
+          <Text variant="sm" bold={editor?.isActive("code") || false}>
             Code
           </Text>
         </SidebarButton>
@@ -74,7 +74,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("link") || false}
             name="link"
           />
-          <Text variant="small" bold={editor?.isActive("link") || false}>
+          <Text variant="sm" bold={editor?.isActive("link") || false}>
             Link
           </Text>
         </SidebarButton>
@@ -98,7 +98,7 @@ export default function EditorSidebar({
                 name={`h-${lvl}`}
               />
               <Text
-                variant="small"
+                variant="sm"
                 bold={editor?.isActive("heading", { level: lvl }) || false}
               >
                 Headline {lvl}
@@ -114,7 +114,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("codeBlock") || false}
             name="code-s-slash-line"
           />
-          <Text variant="small" bold={editor?.isActive("codeBlock") || false}>
+          <Text variant="sm" bold={editor?.isActive("codeBlock") || false}>
             Codeblock
           </Text>
         </SidebarButton>
@@ -126,7 +126,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("blockquote") || false}
             name="double-quotes-l"
           />
-          <Text variant="small" bold={editor?.isActive("blockquote") || false}>
+          <Text variant="sm" bold={editor?.isActive("blockquote") || false}>
             Blockquote
           </Text>
         </SidebarButton>
@@ -144,7 +144,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("bulletList") || false}
             name="list-unordered"
           />
-          <Text variant="small" bold={editor?.isActive("bulletList") || false}>
+          <Text variant="sm" bold={editor?.isActive("bulletList") || false}>
             Bullet-List
           </Text>
         </SidebarButton>
@@ -156,7 +156,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("orderedList") || false}
             name="list-ordered"
           />
-          <Text variant="small" bold={editor?.isActive("orderedList") || false}>
+          <Text variant="sm" bold={editor?.isActive("orderedList") || false}>
             Numbered-List
           </Text>
         </SidebarButton>
@@ -168,7 +168,7 @@ export default function EditorSidebar({
             isActive={editor?.isActive("taskList") || false}
             name="list-check-2"
           />
-          <Text variant="small" bold={editor?.isActive("taskList") || false}>
+          <Text variant="sm" bold={editor?.isActive("taskList") || false}>
             Check-List
           </Text>
         </SidebarButton>

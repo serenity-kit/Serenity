@@ -29,7 +29,7 @@ export default function RegisterScreen(
         <CenterContent serenityBg>
           <Box plush>
             <View>
-              <Text variant="large" bold style={tw`text-center`}>
+              <Text variant="lg" bold style={tw`text-center`}>
                 Create your Account
               </Text>
               <Text muted style={tw`text-center`}>

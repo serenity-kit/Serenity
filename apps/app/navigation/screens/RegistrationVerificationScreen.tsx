@@ -195,7 +195,7 @@ export default function RegistrationVerificationScreen(
     <CenterContent serenityBg>
       <Box>
         <View>
-          <Text variant="large" bold style={tw`text-center`}>
+          <Text variant="lg" bold style={tw`text-center`}>
             Verify your Email
           </Text>
           <Text muted style={tw`text-center`}>

@@ -16,16 +16,16 @@ export type LinkExternalProps = TextProps & {
 };
 
 export function LinkExternal(props: LinkExternalProps) {
-  const { variant = "medium", icon } = props;
+  const { variant = "md", icon } = props;
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const styles = createLinkStyles();
 
   const iconSizes = {
     xxs: 3.5,
     xs: 4,
-    small: 4,
-    medium: 5,
-    large: 8,
+    sm: 4,
+    md: 5,
+    lg: 8,
   };
 
   return (

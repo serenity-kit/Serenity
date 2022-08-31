@@ -10,7 +10,7 @@ export type DesignSystemHeadingProps = TextProps & {
 export const DesignSystemHeading = (props: DesignSystemHeadingProps) => {
   const { lvl } = props;
   // TextVariants indexed from 1(0) to  4(3) to fit heading levels
-  const variants: TextVariants[] = ["large", "medium", "medium", "xs"];
+  const variants: TextVariants[] = ["lg", "md", "md", "xs"];
 
   const styles = StyleSheet.create({
     1: tw`mt-12 mb-4 text-4xl`,

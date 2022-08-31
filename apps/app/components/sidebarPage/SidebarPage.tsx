@@ -164,7 +164,7 @@ export default function SidebarPage(props: Props) {
               />
             ) : (
               <Text
-                variant="small"
+                variant="sm"
                 style={[tw`pl-1.5 max-w-${maxWidth}`]}
                 numberOfLines={1}
                 ellipsizeMode="tail"
