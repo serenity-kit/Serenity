@@ -60,7 +60,7 @@ export function LinkExternal(props: LinkExternalProps) {
         <View style={tw`pl-0.5`}>
           <Icon
             name="external-link-line"
-            color={tw.color("primary-500")}
+            color={"primary-500"}
             size={iconSizes[variant]}
             mobileSize={iconSizes[variant]}
           />

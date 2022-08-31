@@ -37,8 +37,8 @@ import {
   DesignSystemExampleArea as DSExampleArea,
   DesignSystemMono as DSMono,
   WorkspaceAvatar,
-  collaborationColors,
   LinkExternal,
+  colors,
 } from "@serenity-tools/ui";
 import React, { useState } from "react";
 import { useWindowDimensions, StyleSheet } from "react-native";
@@ -53,6 +53,7 @@ export default function DesignSystemScreen() {
   const [showModal, setShowModal] = useState(false);
   const [isOpenPopover, setIsOpenPopover] = useState(false);
   const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
+  const collaborationColors = Object.keys(colors.collaboration) as any;
 
   const IconTile = (props) => {
     return (
@@ -381,7 +382,7 @@ export default function DesignSystemScreen() {
                   <View>
                     <Icon
                       name="arrow-right-filled"
-                      color={tw.color("gray-600")}
+                      color={"gray-600"}
                       mobileSize={5}
                       blub={"collaboration-orange"}
                     />
@@ -399,11 +400,8 @@ export default function DesignSystemScreen() {
                   </Text>
                 </HStack>
                 <HStack alignItems="center" space={2}>
-                  <Icon name="more-line" color={tw.color("gray-600")}></Icon>
-                  <Icon
-                    name="file-add-line"
-                    color={tw.color("gray-600")}
-                  ></Icon>
+                  <Icon name="more-line" color={"gray-600"}></Icon>
+                  <Icon name="file-add-line" color={"gray-600"}></Icon>
                 </HStack>
               </View>
             </SidebarButton>
@@ -413,7 +411,7 @@ export default function DesignSystemScreen() {
                   <View>
                     <Icon
                       name="arrow-right-filled"
-                      color={tw.color("gray-600")}
+                      color={"gray-600"}
                       mobileSize={5}
                     />
                   </View>
@@ -430,11 +428,8 @@ export default function DesignSystemScreen() {
                   </Text>
                 </HStack>
                 <HStack alignItems="center" space={2}>
-                  <Icon name="more-line" color={tw.color("gray-600")}></Icon>
-                  <Icon
-                    name="file-add-line"
-                    color={tw.color("gray-600")}
-                  ></Icon>
+                  <Icon name="more-line" color={"gray-600"}></Icon>
+                  <Icon name="file-add-line" color={"gray-600"}></Icon>
                 </HStack>
               </View>
             </SidebarButton>
@@ -727,36 +722,20 @@ export default function DesignSystemScreen() {
           our custom colors by using <DSMono variant="type">tw.color</DSMono>.
         </Text>
         <DSExampleArea>
-          <Icon name="list-check-2" size={8} color={tw.color("primary-200")} />
-          <Icon name="list-check-2" size={8} color={tw.color("primary-300")} />
-          <Icon name="list-check-2" size={8} color={tw.color("primary-400")} />
-          <Icon name="list-check-2" size={8} color={tw.color("primary-500")} />
-          <Icon name="list-check-2" size={8} color={tw.color("primary-600")} />
+          <Icon name="list-check-2" size={8} color={"primary-200"} />
+          <Icon name="list-check-2" size={8} color={"primary-300"} />
+          <Icon name="list-check-2" size={8} color={"primary-400"} />
+          <Icon name="list-check-2" size={8} color={"primary-500"} />
+          <Icon name="list-check-2" size={8} color={"primary-600"} />
+          <Icon name="list-check-2" size={8} color={"collaboration-purple"} />
           <Icon
             name="list-check-2"
             size={8}
-            color={tw.color("collaboration-purple")}
+            color={"collaboration-raspberry"}
           />
-          <Icon
-            name="list-check-2"
-            size={8}
-            color={tw.color("collaboration-raspberry")}
-          />
-          <Icon
-            name="list-check-2"
-            size={8}
-            color={tw.color("collaboration-orange")}
-          />
-          <Icon
-            name="list-check-2"
-            size={8}
-            color={tw.color("collaboration-honey")}
-          />
-          <Icon
-            name="list-check-2"
-            size={8}
-            color={tw.color("collaboration-emerald")}
-          />
+          <Icon name="list-check-2" size={8} color={"collaboration-orange"} />
+          <Icon name="list-check-2" size={8} color={"collaboration-honey"} />
+          <Icon name="list-check-2" size={8} color={"collaboration-emerald"} />
         </DSExampleArea>
         <Heading lvl={3}>Set</Heading>
         <Text variant="sm">
@@ -1425,7 +1404,7 @@ export default function DesignSystemScreen() {
                 name="search-line"
                 size={4.5}
                 mobileSize={5.5}
-                color={tw.color("gray-800")}
+                color={"gray-800"}
               />
               <Text variant="sm">Search...</Text>
             </SidebarButton>
@@ -1434,7 +1413,7 @@ export default function DesignSystemScreen() {
                 name="history-line"
                 size={4.5}
                 mobileSize={5.5}
-                color={tw.color("gray-800")}
+                color={"gray-800"}
               />
               <Text variant="sm">Recently edited</Text>
             </SidebarLink>
@@ -1443,7 +1422,7 @@ export default function DesignSystemScreen() {
                 name="settings-4-line"
                 size={4.5}
                 mobileSize={5.5}
-                color={tw.color("gray-800")}
+                color={"gray-800"}
               />
               <Text variant="sm">Settings</Text>
             </SidebarLink>
@@ -1461,7 +1440,7 @@ export default function DesignSystemScreen() {
                 name="history-line"
                 size={4.5}
                 mobileSize={5.5}
-                color={tw.color("gray-800")}
+                color={"gray-800"}
               />
               <Text variant="sm">Recently edited</Text>
             </SidebarLink>
@@ -1470,7 +1449,7 @@ export default function DesignSystemScreen() {
                 name="settings-4-line"
                 size={4.5}
                 mobileSize={5.5}
-                color={tw.color("gray-800")}
+                color={"gray-800"}
               />
               <Text variant="sm">Settings</Text>
             </SidebarLink>
@@ -1490,7 +1469,7 @@ export default function DesignSystemScreen() {
                   <View>
                     <Icon
                       name="arrow-right-filled"
-                      color={tw.color("gray-600")}
+                      color={"gray-600"}
                       mobileSize={5}
                     />
                   </View>
@@ -1507,11 +1486,8 @@ export default function DesignSystemScreen() {
                   </Text>
                 </HStack>
                 <HStack alignItems="center" space={2}>
-                  <Icon name="more-line" color={tw.color("gray-600")}></Icon>
-                  <Icon
-                    name="file-add-line"
-                    color={tw.color("gray-600")}
-                  ></Icon>
+                  <Icon name="more-line" color={"gray-600"}></Icon>
+                  <Icon name="file-add-line" color={"gray-600"}></Icon>
                 </HStack>
               </View>
             </SidebarButton>
@@ -1673,7 +1649,7 @@ export default function DesignSystemScreen() {
                 name="history-line"
                 size={4.5}
                 mobileSize={5.5}
-                color={tw.color("gray-800")}
+                color={"gray-800"}
               />
               <Text variant="sm">Recently edited</Text>
             </SidebarLink>
@@ -1682,7 +1658,7 @@ export default function DesignSystemScreen() {
                 name="settings-4-line"
                 size={4.5}
                 mobileSize={5.5}
-                color={tw.color("gray-800")}
+                color={"gray-800"}
               />
               <Text variant="sm">Settings</Text>
             </SidebarLink>
@@ -1705,7 +1681,7 @@ export default function DesignSystemScreen() {
                   <View>
                     <Icon
                       name="arrow-right-filled"
-                      color={tw.color("gray-600")}
+                      color={"gray-600"}
                       mobileSize={5}
                     />
                   </View>

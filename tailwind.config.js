@@ -1,61 +1,67 @@
 const defaultTheme = require("tailwindcss/defaultTheme");
 const plugin = require("tailwindcss/plugin");
+
+// custom colors extracted so we can export them seperately for typing
+const customColors = {
+  transparent: "transparent",
+  current: "currentColor",
+  black: "#000000",
+  gray: {
+    100: "#FDFDFD",
+    200: "#EDEDF0",
+    300: "#DCDDE5",
+    400: "#CBCBD3",
+    500: "#B4B4BD",
+    600: "#8A8B96",
+    700: "#666771",
+    800: "#4F5057",
+    900: "#1F1F21",
+  },
+  primary: {
+    100: "#ECEEFF",
+    200: "#CDD3FC",
+    300: "#9DAAFD",
+    400: "#7083FA",
+    500: "#435BF8",
+    600: "#2B44E4",
+    700: "#172FC8",
+    800: "#0A1E9B",
+    900: "#000F70",
+  },
+  white: "#FFFFFF",
+  collaboration: {
+    terracotta: "#EF5245",
+    coral: "#FD7064",
+    raspberry: "#F4216D",
+    rose: "#FF91C9",
+    honey: "#FFB921",
+    orange: "#FF7D2E",
+    emerald: "#47C07A",
+    arctic: "#4ABAC1",
+    sky: "#1E8EDE",
+    serenity: "#435BF8", // primary 500
+    lavender: "#515DCE",
+    purple: "#9E36CF",
+    slate: "#4F5D78",
+  },
+  error: {
+    100: "#FFEDEF",
+    200: "#FFCED4",
+    500: "#F84A56",
+  },
+  warning: {
+    500: "#F09334",
+  },
+  success: {
+    500: "#48AD83",
+  },
+  muted: "#8A8B96",
+};
+
 const customTheme = {
   // custom color scheme
   colors: {
-    transparent: "transparent",
-    current: "currentColor",
-    black: "#000000",
-    gray: {
-      100: "#FDFDFD",
-      200: "#EDEDF0",
-      300: "#DCDDE5",
-      400: "#CBCBD3",
-      500: "#B4B4BD",
-      600: "#8A8B96",
-      700: "#666771",
-      800: "#4F5057",
-      900: "#1F1F21",
-    },
-    primary: {
-      100: "#ECEEFF",
-      200: "#CDD3FC",
-      300: "#9DAAFD",
-      400: "#7083FA",
-      500: "#435BF8",
-      600: "#2B44E4",
-      700: "#172FC8",
-      800: "#0A1E9B",
-      900: "#000F70",
-    },
-    white: "#FFFFFF",
-    collaboration: {
-      terracotta: "#EF5245",
-      coral: "#FD7064",
-      raspberry: "#F4216D",
-      rose: "#FF91C9",
-      honey: "#FFB921",
-      orange: "#FF7D2E",
-      emerald: "#47C07A",
-      arctic: "#4ABAC1",
-      sky: "#1E8EDE",
-      serenity: "#435BF8", // primary 500
-      lavender: "#515DCE",
-      purple: "#9E36CF",
-      slate: "#4F5D78",
-    },
-    error: {
-      100: "#FFEDEF",
-      200: "#FFCED4",
-      500: "#F84A56",
-    },
-    warning: {
-      500: "#F09334",
-    },
-    success: {
-      500: "#48AD83",
-    },
-    muted: "#8A8B96",
+    ...customColors,
   },
   screens: {
     xs: "475px",
@@ -101,6 +107,7 @@ const customTheme = {
 };
 
 module.exports = {
+  customColors,
   theme: customTheme,
   plugins: [
     plugin((params) => {
@@ -125,10 +132,8 @@ module.exports = {
           boxShadow: `0px 0px 0px 0.125rem ${customTheme.colors.error["200"]}`, // web-only
         },
         "p-menu-item": {
-          paddingTop: "0.5rem",
-          paddingRight: "0.75rem",
-          paddingBottom: "0.5rem",
-          paddingLeft: "0.75rem",
+          paddingVertical: 8,
+          paddingHorizontal: 12,
         },
       });
     }),

@@ -10,8 +10,8 @@ export type EditorSidebarIconProps = IconProps & {
 };
 
 export const EditorSidebarIcon = (props: EditorSidebarIconProps) => {
-  const color = props.color || tw.color("gray-800");
-  const activeColor = props.activeColor || tw.color("primary-500");
+  const color = props.color || "gray-800";
+  const activeColor = props.activeColor || "primary-500";
 
   const styles = StyleSheet.create({
     default: tw`items-center justify-center bg-white w-6 h-6 border-solid border border-gray-300 rounded`,

@@ -13,7 +13,7 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
           name="settings-4-line"
           size={4.5}
           mobileSize={5.5}
-          color={tw.color("gray-800")}
+          color={"gray-800"}
         />
         <Text variant="sm"> General</Text>
       </SidebarLink>
@@ -27,7 +27,7 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
           name="settings-4-line"
           size={4.5}
           mobileSize={5.5}
-          color={tw.color("gray-800")}
+          color={"gray-800"}
         />
         <Text variant="sm">Members</Text>
       </SidebarLink>

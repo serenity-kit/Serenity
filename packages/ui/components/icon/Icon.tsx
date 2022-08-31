@@ -104,6 +104,7 @@ import { WarningFill } from "./icons/WarningFill";
 
 import { View } from "react-native";
 import { useIsSmallerThanBreakpoint } from "../../hooks/useIsSmallerThanBreakpoint/useIsSmallerThanBreakpoint";
+import { Color } from "../../types";
 
 export type IconNames =
   | "add-line"
@@ -210,14 +211,15 @@ export type IconNames =
 
 export type IconProps = {
   name: IconNames;
-  color?: string;
+  color?: Color;
   size?: number;
   mobileSize?: number;
+  blub?: Color;
 };
 
 export const Icon = (props: IconProps) => {
   const { name } = props;
-  const color = props.color ?? (tw.color("gray-900") as string);
+  const color = tw.color(props.color ?? "gray-900") as string;
   const actualSize = props.size ?? 4;
   const actualMobileSize = props.mobileSize ?? 5;
 

@@ -63,10 +63,7 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
             ]}
             space={2}
           >
-            <Icon
-              name={name}
-              color={tw.color(isHovered ? "gray-800" : iconColor)}
-            />
+            <Icon name={name} color={isHovered ? "gray-800" : iconColor} />
             {label && (
               <Text
                 variant="xs"

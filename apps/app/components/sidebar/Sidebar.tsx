@@ -251,7 +251,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 >
                   {workspace === null ? " " : workspace.name}
                 </Text>
-                <Icon name="arrow-down-s-line" color={tw.color("gray-400")} />
+                <Icon name="arrow-down-s-line" color={"gray-400"} />
               </HStack>
             </Pressable>
           }
@@ -357,7 +357,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           name="settings-4-line"
           size={4.5}
           mobileSize={5.5}
-          color={tw.color("gray-800")}
+          color={"gray-800"}
         />
         <Text variant="sm">Settings</Text>
       </SidebarLink>
@@ -367,7 +367,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           name="dashboard-line"
           size={4.5}
           mobileSize={5.5}
-          color={tw.color("gray-800")}
+          color={"gray-800"}
         />
         <Text variant="sm">Dev Dashboard</Text>
       </SidebarLink>
@@ -393,7 +393,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       {isCreatingNewFolder && (
         <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
           <View style={tw`ml-0.5 -mr-0.5`}>
-            <Icon name={"arrow-right-filled"} color={tw.color("gray-600")} />
+            <Icon name={"arrow-right-filled"} color={"gray-600"} />
           </View>
           <Icon name="folder" size={5} mobileSize={8} />
           <InlineInput

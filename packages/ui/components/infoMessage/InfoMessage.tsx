@@ -43,7 +43,7 @@ export const InfoMessage = forwardRef((props: InfoMessageProps, ref) => {
       style={[styles.stack, props.style]}
     >
       {icon ? (
-        <Icon name={iconNames[variant]} color={tw.color(iconColors[variant])} />
+        <Icon name={iconNames[variant]} color={iconColors[variant]} />
       ) : null}
       <Text
         style={[styles.text, icon ? tw`text-center` : tw`text-left`]}

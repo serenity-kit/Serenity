@@ -23,7 +23,7 @@ export const WorkspaceAvatar = React.forwardRef(
         {/* TODO show conditionally when no image-source is set */}
         <Icon
           name="serenity-feather"
-          color={tw.color("black/35")}
+          color={"black/35"}
           size={5}
           mobileSize={5}
         />

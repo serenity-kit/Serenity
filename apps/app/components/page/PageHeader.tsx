@@ -27,7 +27,7 @@ export function PageHeader(props: Props) {
             >
               {folder.name}
             </Text>
-            <Icon name="arrow-right-s-line" color={tw.color("gray-600")} />
+            <Icon name="arrow-right-s-line" color={"gray-600"} />
           </HStack>
         ))
       ) : (
