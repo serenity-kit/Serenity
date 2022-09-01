@@ -717,9 +717,11 @@ export default function DesignSystemScreen() {
           <DSMono variant="property">color</DSMono> property.
         </Text>
         <Text variant="sm" style={tw`mt-4`}>
-          For now you can either put in a{" "}
-          <DSMono variant="type">HEX-string</DSMono> directly, or pass one of
-          our custom colors by using <DSMono variant="type">tw.color</DSMono>.
+          You can use all of our custom colors defined for the application by
+          typing the name and if necessary the hue value:{" "}
+          <DSMono variant="type">collaboration-honey</DSMono>,
+          <DSMono variant="type">white</DSMono> , or{" "}
+          <DSMono variant="type">gray-500</DSMono> for example.
         </Text>
         <DSExampleArea>
           <Icon name="list-check-2" size={8} color={"primary-200"} />
