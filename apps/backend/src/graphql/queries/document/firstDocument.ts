@@ -1,4 +1,4 @@
-import { AuthenticationError, UserInputError } from "apollo-server-express";
+import { AuthenticationError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getFirstDocument } from "../../../database/document/getFirstDocument";
 import { Document } from "../../types/document";
@@ -12,9 +12,6 @@ export const firstDocument = queryField((t) => {
     async resolve(root, args, context) {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
-      }
-      if (!args.workspaceId) {
-        throw new UserInputError("Invalid input: workspaceId cannot be null");
       }
       const userId = context.user.id;
       const document = await getFirstDocument({

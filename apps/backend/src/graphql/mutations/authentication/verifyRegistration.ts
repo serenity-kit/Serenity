@@ -1,5 +1,10 @@
-import { UserInputError } from "apollo-server-express";
-import { arg, inputObjectType, mutationField, objectType } from "nexus";
+import {
+  arg,
+  inputObjectType,
+  mutationField,
+  nonNull,
+  objectType,
+} from "nexus";
 import { verifyRegistration } from "../../../database/authentication/verifyRegistration";
 
 export const VerifyRegistrationInput = inputObjectType({
@@ -20,22 +25,13 @@ export const VerifyRegistrationResult = objectType({
 export const verifyRegistrationMutation = mutationField("verifyRegistration", {
   type: VerifyRegistrationResult,
   args: {
-    input: arg({
-      type: VerifyRegistrationInput,
-    }),
+    input: nonNull(
+      arg({
+        type: VerifyRegistrationInput,
+      })
+    ),
   },
   async resolve(root, args, context) {
-    if (!args || !args.input) {
-      throw new UserInputError("Input missing");
-    }
-    if (!args.input.username) {
-      throw new UserInputError("Invalid input: username cannot be null");
-    }
-    if (!args.input.verificationCode) {
-      throw new UserInputError(
-        "Invalid input: verificationCode cannot be null"
-      );
-    }
     const user = await verifyRegistration({
       username: args.input.username,
       confirmationCode: args.input.verificationCode,

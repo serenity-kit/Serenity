@@ -1,5 +1,5 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
-import { queryField, objectType, nonNull, stringArg } from "nexus";
+import { nonNull, objectType, queryField, stringArg } from "nexus";
 import { prisma } from "../../database/prisma";
 
 export const UserIdFromUsernameResult = objectType({
@@ -18,9 +18,6 @@ export const userIdFromUsername = queryField((t) => {
     async resolve(root, args, context) {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
-      }
-      if (!args.username || args.username === "") {
-        throw new UserInputError("Invalid input: username cannot be null");
       }
       const user = await prisma.user.findFirst({
         where: {

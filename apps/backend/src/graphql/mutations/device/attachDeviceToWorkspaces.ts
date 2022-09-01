@@ -1,5 +1,11 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
-import { arg, inputObjectType, mutationField, objectType } from "nexus";
+import {
+  arg,
+  inputObjectType,
+  mutationField,
+  nonNull,
+  objectType,
+} from "nexus";
 import { attachDeviceToWorkspaces } from "../../../database/device/attachDeviceToWorkspaces";
 import { WorkspaceKey } from "../../types/workspace";
 
@@ -37,31 +43,15 @@ export const attachDeviceToWorkspacesMutation = mutationField(
   {
     type: AttachDeviceToWorkspacesResult,
     args: {
-      input: arg({
-        type: AttachDeviceToWorkspacesInput,
-      }),
+      input: nonNull(
+        arg({
+          type: AttachDeviceToWorkspacesInput,
+        })
+      ),
     },
     async resolve(_root, args, context) {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
-      }
-      if (!args.input) {
-        throw new UserInputError("Input missing");
-      }
-      if (!args.input.receiverDeviceSigningPublicKey) {
-        throw new UserInputError(
-          "Invalid input: receiverDeviceSigningPublicKey cannot be null"
-        );
-      }
-      if (!args.input.creatorDeviceSigningPublicKey) {
-        throw new UserInputError(
-          "Invalid input: creatorDeviceSigningPublicKey cannot be null"
-        );
-      }
-      if (!args.input.deviceWorkspaceKeyBoxes) {
-        throw new UserInputError(
-          "Invalid input: deviceWorkspaceKeyBoxes cannot be null"
-        );
       }
       const workspaceKeyBoxes = args.input.deviceWorkspaceKeyBoxes;
       workspaceKeyBoxes.forEach((workspaceKeyBox: any) => {

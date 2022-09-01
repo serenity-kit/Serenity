@@ -1,11 +1,11 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { createDevice } from "../../../../test/helpers/device/createDevice";
-import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { getDevices } from "../../../../test/helpers/device/getDevices";
+import { createDevice as createdDeviceHelper } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
-import { createDevice as createdDeviceHelper } from "@serenity-tools/common";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { createDevice } from "../../../../test/helpers/device/createDevice";
+import { getDevices } from "../../../../test/helpers/device/getDevices";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
 const username1 = "user1";

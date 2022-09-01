@@ -1,9 +1,9 @@
 import { gql } from "graphql-request";
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import sodium from "libsodium-wrappers";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { requestLoginChallengeResponse } from "../../../../test/helpers/authentication/requestLoginChallengeResponse";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
 
 const graphql = setupGraphql();
 const username = "user";
@@ -82,7 +82,7 @@ describe("Input errors", () => {
             message: finishMessage,
           },
         }))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
 
   test("Invalid message", async () => {
@@ -102,7 +102,7 @@ describe("Input errors", () => {
             message: null,
           },
         }))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
 
   test("Invalid input", async () => {
@@ -111,12 +111,12 @@ describe("Input errors", () => {
         await graphql.client.request(query, {
           input: null,
         }))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
 
   test("No input", async () => {
     await expect(
       (async () => await graphql.client.request(query, null))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
 });

@@ -222,6 +222,6 @@ describe("Input errors", () => {
     await expect(
       (async () =>
         await graphql.client.request(query, null, authorizationHeaders))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
 });

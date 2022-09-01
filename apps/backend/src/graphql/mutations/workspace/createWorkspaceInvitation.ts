@@ -1,5 +1,11 @@
-import { AuthenticationError, UserInputError } from "apollo-server-express";
-import { arg, inputObjectType, mutationField, objectType } from "nexus";
+import { AuthenticationError } from "apollo-server-express";
+import {
+  arg,
+  inputObjectType,
+  mutationField,
+  nonNull,
+  objectType,
+} from "nexus";
 import { createWorkspaceInvitation } from "../../../database/workspace/createWorkspaceInvitation";
 import { WorkspaceInvitation } from "../../types/workspace";
 
@@ -22,19 +28,15 @@ export const createWorkspaceInvitationMutation = mutationField(
   {
     type: CreateWorkspaceInvitationResult,
     args: {
-      input: arg({
-        type: CreateWorkspaceInvitationInput,
-      }),
+      input: nonNull(
+        arg({
+          type: CreateWorkspaceInvitationInput,
+        })
+      ),
     },
     async resolve(root, args, context) {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
-      }
-      if (!args.input) {
-        throw new UserInputError("Invalid input");
-      }
-      if (!args.input.workspaceId) {
-        throw new UserInputError("Invalid input: workspaceId cannot be null");
       }
       const workspaceInvitation = await createWorkspaceInvitation({
         workspaceId: args.input.workspaceId,

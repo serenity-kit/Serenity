@@ -1,32 +1,32 @@
 import {
-  ApolloServer,
-  AuthenticationError,
-  UserInputError,
-  ForbiddenError,
-  ValidationError,
-  SyntaxError,
-} from "apollo-server-express";
-import {
-  ApolloServerPluginLandingPageGraphQLPlayground,
-  ApolloServerPluginLandingPageDisabled,
-} from "apollo-server-core";
-import express from "express";
-import cors from "cors";
-import { WebSocketServer } from "ws";
-import { createServer as httpCreateServer } from "http";
-import { schema } from "./schema";
-import { addUpdate, addConnection, removeConnection } from "./store";
-import { getDocument } from "./database/getDocument";
-import { createSnapshot } from "./database/createSnapshot";
-import { createUpdate } from "./database/createUpdate";
-import { getUpdatesForDocument } from "./database/getUpdatesForDocument";
-import { retryAsyncFunction } from "./retryAsyncFunction";
-import {
-  NaishoSnapshotMissesUpdatesError,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
+  NaishoSnapshotMissesUpdatesError,
   UpdateWithServerData,
 } from "@naisho/core";
+import {
+  ApolloServerPluginLandingPageDisabled,
+  ApolloServerPluginLandingPageGraphQLPlayground,
+} from "apollo-server-core";
+import {
+  ApolloServer,
+  AuthenticationError,
+  ForbiddenError,
+  SyntaxError,
+  UserInputError,
+  ValidationError,
+} from "apollo-server-express";
+import cors from "cors";
+import express from "express";
+import { createServer as httpCreateServer } from "http";
+import { WebSocketServer } from "ws";
 import { getSessionIncludingUser } from "./database/authentication/getSessionIncludingUser";
+import { createSnapshot } from "./database/createSnapshot";
+import { createUpdate } from "./database/createUpdate";
+import { getDocument } from "./database/getDocument";
+import { getUpdatesForDocument } from "./database/getUpdatesForDocument";
+import { retryAsyncFunction } from "./retryAsyncFunction";
+import { schema } from "./schema";
+import { addConnection, addUpdate, removeConnection } from "./store";
 import { ExpectedGraphqlError } from "./utils/expectedGraphqlError/expectedGraphqlError";
 
 export default async function createServer() {
@@ -55,10 +55,12 @@ export default async function createServer() {
       if (
         err.originalError instanceof AuthenticationError ||
         err.originalError instanceof ForbiddenError ||
-        err.originalError instanceof ValidationError ||
-        err.originalError instanceof SyntaxError ||
         err.originalError instanceof ExpectedGraphqlError ||
         // need to cover built in and manual thrown errors
+        err.originalError instanceof SyntaxError ||
+        err instanceof SyntaxError ||
+        err.originalError instanceof ValidationError ||
+        err instanceof ValidationError ||
         err.originalError instanceof UserInputError ||
         err instanceof UserInputError
       ) {

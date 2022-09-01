@@ -1,10 +1,10 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
-import { getWorkspace } from "../../../database/workspace/getWorkspace";
-import { v4 as uuidv4 } from "uuid";
 import { gql } from "graphql-request";
+import { v4 as uuidv4 } from "uuid";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { getWorkspace } from "../../../database/workspace/getWorkspace";
 
 const graphql = setupGraphql();
 
@@ -114,5 +114,5 @@ test("Input Error", async () => {
   await expect(
     (async () =>
       await graphql.client.request(query1, null, authorizationHeaders))()
-  ).rejects.toThrowError(/BAD_USER_INPUT/);
+  ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
 });
