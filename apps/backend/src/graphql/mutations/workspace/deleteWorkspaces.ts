@@ -1,5 +1,11 @@
-import { AuthenticationError, UserInputError } from "apollo-server-express";
-import { arg, inputObjectType, mutationField, objectType } from "nexus";
+import { AuthenticationError } from "apollo-server-express";
+import {
+  arg,
+  inputObjectType,
+  mutationField,
+  nonNull,
+  objectType,
+} from "nexus";
 import { deleteWorkspaces } from "../../../database/workspace/deleteWorkspaces";
 
 export const DeleteWorkspacesInput = inputObjectType({
@@ -21,19 +27,15 @@ export const DeleteWorkspacesResult = objectType({
 export const deleteWorkspacesMutation = mutationField("deleteWorkspaces", {
   type: DeleteWorkspacesResult,
   args: {
-    input: arg({
-      type: DeleteWorkspacesInput,
-    }),
+    input: nonNull(
+      arg({
+        type: DeleteWorkspacesInput,
+      })
+    ),
   },
   async resolve(root, args, context) {
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
-    }
-    if (!args.input) {
-      throw new UserInputError("Invalid input");
-    }
-    if (!args.input.ids) {
-      throw new UserInputError("Invalid input: ids cannot be null");
     }
     await deleteWorkspaces({
       workspaceIds: args.input.ids,

@@ -1,11 +1,11 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
-import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
-import { getWorkspace } from "../../../database/workspace/getWorkspace";
-import { prisma } from "../../../database/prisma";
 import { gql } from "graphql-request";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
+import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
+import { prisma } from "../../../database/prisma";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { getWorkspace } from "../../../database/workspace/getWorkspace";
 
 const graphql = setupGraphql();
 const workspaceId = "workspace1";

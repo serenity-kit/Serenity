@@ -18,8 +18,10 @@ export const workspaces = queryField((t) => {
           "Requested too many folders. First value exceeds 50."
         );
       }
-      if (!args.workspaceId) {
-        throw new UserInputError("Invalid input: workspaceId cannot be null");
+      if (args.workspaceId === "") {
+        throw new UserInputError(
+          "Invalid input: workspaceId cannot be an empty string"
+        );
       }
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");

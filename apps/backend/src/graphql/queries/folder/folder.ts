@@ -10,11 +10,11 @@ export const folderQuery = queryField((t) => {
       id: nonNull(idArg()),
     },
     async resolve(root, args, context) {
+      if (args.id === "") {
+        throw new UserInputError("Invalid input: id cannot be an empty string");
+      }
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
-      }
-      if (!args.id) {
-        throw new UserInputError("Invalid input: id cannot be null");
       }
       const userId = context.user.id;
       const folder = await getFolder({

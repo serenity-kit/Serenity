@@ -1,4 +1,4 @@
-import { AuthenticationError, UserInputError } from "apollo-server-express";
+import { AuthenticationError } from "apollo-server-express";
 import { idArg, nonNull, queryField, stringArg } from "nexus";
 import { prisma } from "../../../database/prisma";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
@@ -16,11 +16,6 @@ export const workspaces = queryField((t) => {
     async resolve(root, args, context) {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
-      }
-      if (!args.deviceSigningPublicKey) {
-        throw new UserInputError(
-          "Invalid input: deviceSigningPublicKey cannot be null"
-        );
       }
       const userId = context.user.id;
       if (args.id) {
