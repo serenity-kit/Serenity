@@ -10,3 +10,5 @@ export * from "./encryptDocumentTitle/encryptDocumentTitle";
 export * from "./encryptExistingFolderName/encryptExistingFolderName";
 export * from "./encryptFolderName/encryptFolderName";
 export * from "./recreateDocumentKey/recreateDocumentKey";
+export * from "./types";
+export * from "./verifyDevice/verifyDevice";

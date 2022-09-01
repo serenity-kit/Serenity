@@ -6,28 +6,23 @@ import {
   Input,
   Text,
 } from "@serenity-tools/ui";
-import { detect } from "detect-browser";
 import { useState } from "react";
 import { Platform, useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
-  useCreateDeviceMutation,
   useFinishLoginMutation,
   useStartLoginMutation,
 } from "../../generated/graphql";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
+import { createDeviceWithInfo } from "../../utils/authentication/createDeviceWithInfo";
+import { fetchMainDevice, login } from "../../utils/authentication/loginHelper";
+import { setDevice } from "../../utils/device/deviceStore";
 import {
-  createRegisterAndStoreDevice,
-  fetchMainDevice,
-  login,
-} from "../../utils/authentication/loginHelper";
-import {
-  createWebDevice,
   removeWebDevice,
+  setWebDevice,
 } from "../../utils/device/webDeviceStore";
 import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
-const browser = detect();
 
 type Props = {
   defaultEmail?: string;
@@ -55,44 +50,7 @@ export function LoginForm(props: Props) {
   const { updateAuthentication } = useAuthentication();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
-  const [, createDeviceMutation] = useCreateDeviceMutation();
   const urqlClient = useClient();
-
-  const storeDeviceKeys = async () => {
-    if (Platform.OS === "web") {
-      if (!useExtendedLogin) {
-        await removeWebDevice();
-      }
-      const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
-        await createWebDevice(useExtendedLogin);
-      const deviceInfoJson = {
-        type: "web",
-        os: browser?.os,
-        osVersion: null,
-        browser: browser?.name,
-        browserVersion: browser?.version,
-      };
-      const deviceInfo = JSON.stringify(deviceInfoJson);
-      const newDeviceInfo = {
-        ...webDevice,
-        info: deviceInfo,
-      };
-      await createDeviceMutation({
-        input: newDeviceInfo,
-      });
-    } else if (Platform.OS === "ios") {
-      if (useExtendedLogin) {
-        await registerNewDevice();
-      }
-    }
-    try {
-      await attachDeviceToWorkspaces({ urqlClient });
-    } catch (error) {
-      // TOOD: handle error
-      console.error(error);
-      return;
-    }
-  };
 
   const onFormFilled = (username: string, password: string) => {
     if (props.onFormFilled) {
@@ -112,30 +70,45 @@ export function LoginForm(props: Props) {
     _setPassword(password);
   };
 
-  const registerNewDevice = async () => {
-    const newDeviceInfo = await createRegisterAndStoreDevice();
-    await createDeviceMutation({
-      input: newDeviceInfo,
-    });
-  };
-
   const onLoginPress = async () => {
     try {
       setGqlErrorMessage("");
       setIsLoggingIn(true);
       await clearDeviceAndSessionStorage();
+
+      let unsafedDevice = await createDeviceWithInfo();
+
       const loginResult = await login({
         username,
         password,
         startLoginMutation,
         finishLoginMutation,
         updateAuthentication,
+        device: unsafedDevice,
         urqlClient,
       });
       const exportKey = loginResult.exportKey;
       // reset the password in case the user ends up on this screen again
       await fetchMainDevice({ urqlClient, exportKey });
-      await storeDeviceKeys();
+
+      if (Platform.OS === "web") {
+        if (!useExtendedLogin) {
+          await removeWebDevice();
+        }
+        await setWebDevice(unsafedDevice, useExtendedLogin);
+      } else if (Platform.OS === "ios") {
+        if (useExtendedLogin) {
+          await setDevice(unsafedDevice);
+        }
+      }
+      try {
+        await attachDeviceToWorkspaces({ urqlClient });
+      } catch (error) {
+        // TOOD: handle error
+        console.error(error);
+        return;
+      }
+
       setPassword("");
       setUsername("");
       setIsLoggingIn(false);

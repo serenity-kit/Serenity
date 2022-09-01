@@ -237,8 +237,13 @@ export type DocumentSnapshotPublicDataInput = {
 };
 
 export type FinishLoginInput = {
+  deviceEncryptionPublicKey: Scalars['String'];
+  deviceEncryptionPublicKeySignature: Scalars['String'];
+  deviceInfo: Scalars['String'];
+  deviceSigningPublicKey: Scalars['String'];
   loginId: Scalars['String'];
   message: Scalars['String'];
+  sessionTokenSignature: Scalars['String'];
 };
 
 export type FinishLoginResult = {
@@ -341,102 +346,102 @@ export type Mutation = {
 
 
 export type MutationAcceptWorkspaceInvitationArgs = {
-  input?: InputMaybe<AcceptWorkspaceInvitationInput>;
+  input: AcceptWorkspaceInvitationInput;
 };
 
 
 export type MutationAttachDeviceToWorkspacesArgs = {
-  input?: InputMaybe<AttachDeviceToWorkspacesInput>;
+  input: AttachDeviceToWorkspacesInput;
 };
 
 
 export type MutationCreateDeviceArgs = {
-  input?: InputMaybe<CreateDeviceInput>;
+  input: CreateDeviceInput;
 };
 
 
 export type MutationCreateDocumentArgs = {
-  input?: InputMaybe<CreateDocumentInput>;
+  input: CreateDocumentInput;
 };
 
 
 export type MutationCreateFolderArgs = {
-  input?: InputMaybe<CreateFolderInput>;
+  input: CreateFolderInput;
 };
 
 
 export type MutationCreateInitialWorkspaceStructureArgs = {
-  input?: InputMaybe<CreateInitialWorkspaceStructureInput>;
+  input: CreateInitialWorkspaceStructureInput;
 };
 
 
 export type MutationCreateWorkspaceInvitationArgs = {
-  input?: InputMaybe<CreateWorkspaceInvitationInput>;
+  input: CreateWorkspaceInvitationInput;
 };
 
 
 export type MutationDeleteDevicesArgs = {
-  input?: InputMaybe<DeleteDevicesInput>;
+  input: DeleteDevicesInput;
 };
 
 
 export type MutationDeleteDocumentsArgs = {
-  input?: InputMaybe<DeleteDocumentsInput>;
+  input: DeleteDocumentsInput;
 };
 
 
 export type MutationDeleteFoldersArgs = {
-  input?: InputMaybe<DeleteFoldersInput>;
+  input: DeleteFoldersInput;
 };
 
 
 export type MutationDeleteWorkspaceInvitationsArgs = {
-  input?: InputMaybe<DeleteWorkspaceInvitationsInput>;
+  input: DeleteWorkspaceInvitationsInput;
 };
 
 
 export type MutationDeleteWorkspacesArgs = {
-  input?: InputMaybe<DeleteWorkspacesInput>;
+  input: DeleteWorkspacesInput;
 };
 
 
 export type MutationFinishLoginArgs = {
-  input?: InputMaybe<FinishLoginInput>;
+  input: FinishLoginInput;
 };
 
 
 export type MutationFinishRegistrationArgs = {
-  input?: InputMaybe<FinishRegistrationInput>;
+  input: FinishRegistrationInput;
 };
 
 
 export type MutationStartLoginArgs = {
-  input?: InputMaybe<StartLoginInput>;
+  input: StartLoginInput;
 };
 
 
 export type MutationStartRegistrationArgs = {
-  input?: InputMaybe<StartRegistrationInput>;
+  input: StartRegistrationInput;
 };
 
 
 export type MutationUpdateDocumentNameArgs = {
-  input?: InputMaybe<UpdateDocumentNameInput>;
+  input: UpdateDocumentNameInput;
 };
 
 
 export type MutationUpdateFolderNameArgs = {
-  input?: InputMaybe<UpdateFolderNameInput>;
+  input: UpdateFolderNameInput;
 };
 
 
 export type MutationUpdateWorkspaceArgs = {
-  input?: InputMaybe<UpdateWorkspaceInput>;
+  input: UpdateWorkspaceInput;
 };
 
 
 export type MutationVerifyRegistrationArgs = {
-  input?: InputMaybe<VerifyRegistrationInput>;
+  input: VerifyRegistrationInput;
 };
 
 /** PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
@@ -610,7 +615,7 @@ export type UpdateFolderNameResult = {
 
 export type UpdateWorkspaceInput = {
   id: Scalars['String'];
-  members?: InputMaybe<Array<WorkspaceMemberInput>>;
+  members: Array<WorkspaceMemberInput>;
   name?: InputMaybe<Scalars['String']>;
 };
 

@@ -100,8 +100,8 @@ model Session {
   createdAt              DateTime @default(now())
   user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                 String
-  device                 Device?  @relation(fields: [deviceSigningPublicKey], references: [signingPublicKey], onDelete: Cascade)
-  deviceSigningPublicKey String?
+  device                 Device   @relation(fields: [deviceSigningPublicKey], references: [signingPublicKey], onDelete: Cascade)
+  deviceSigningPublicKey String
 }
 
 model WorkspaceInvitations {
@@ -140,8 +140,7 @@ model Device {
   userId                       String?
   recoveryDevice               RecoveryDevice?
   userForMain                  User?           @relation("mainDevice")
-  // TODO: add a createTime and lastUsed so users can identify which ones they use
-  info                         String?
+  info                         String
   createdAt                    DateTime        @default(now())
   session                      Session[]
 }

@@ -1,14 +1,7 @@
 import { Device } from "../../types/Device";
-import { getItem, setItem, removeItem } from "../storage/storage";
-import { createDevice } from "@serenity-tools/common";
+import { getItem, removeItem, setItem } from "../storage/storage";
 
 export const deviceStorageKey = "device.device";
-
-export const createAndSetDevice = async (): Promise<Device | null> => {
-  const device = await createDevice();
-  await setDevice(device);
-  return device;
-};
 
 export const setDevice = async (device: Device) => {
   await setItem(deviceStorageKey, JSON.stringify(device));
