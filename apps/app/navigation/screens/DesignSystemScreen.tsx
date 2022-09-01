@@ -3,7 +3,7 @@ import {
   tw,
   View,
   Button,
-  Input,
+  RawInput,
   Icon,
   Menu,
   ScrollView,
@@ -937,7 +937,7 @@ export default function DesignSystemScreen() {
           the <DSMono variant="component">LabeledInput</DSMono> component.
         </Text>
         <DSExampleArea>
-          <Input />
+          <RawInput />
         </DSExampleArea>
         <Heading lvl={4} style={h4Styles}>
           Commonly used

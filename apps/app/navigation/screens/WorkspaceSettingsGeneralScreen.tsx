@@ -1,6 +1,6 @@
 import {
   Button,
-  Input,
+  RawInput,
   LabeledInput,
   Modal,
   ModalButtonFooter,
@@ -168,7 +168,7 @@ export default function WorkspaceSettingsGeneralScreen(
               <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
                 Change Name
               </Text>
-              <Input
+              <RawInput
                 placeholder="Workspace name"
                 value={workspaceName}
                 onChangeText={setWorkspaceName}

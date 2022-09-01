@@ -3,9 +3,9 @@ import { StyleSheet } from "react-native";
 import { Input as NbInput, IInputProps } from "native-base";
 import { tw } from "../../tailwind";
 
-export type InputProps = IInputProps & {};
+export type RawInputProps = IInputProps & {};
 
-export const Input = forwardRef((props: InputProps, ref) => {
+export const RawInput = forwardRef((props: RawInputProps, ref) => {
   const styles = StyleSheet.create({
     wrapper: tw`h-form-element rounded`,
     input: tw`px-4 flex justify-center text-input font-input text-gray-900 `,

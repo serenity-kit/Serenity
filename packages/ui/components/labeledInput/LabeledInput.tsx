@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
 import { Text, TextProps } from "../text/Text";
-import { Input, InputProps } from "../input/Input";
+import { RawInput, RawInputProps } from "../rawInput/RawInput";
 import { View } from "../view/View";
 
-export type LabeledInputProps = InputProps & {
+export type LabeledInputProps = RawInputProps & {
   label: string;
   hint?: string;
 };
@@ -34,7 +34,7 @@ export const LabeledInput = React.forwardRef(
         >
           {props.label}
         </Text>
-        <Input
+        <RawInput
           {...props}
           ref={ref}
           onFocus={() => {

@@ -20,7 +20,7 @@ export * from "./components/formWrapper/FormWrapper";
 export * from "./components/inlineInput/InlineInput";
 export * from "./components/iconButton/IconButton";
 export * from "./components/infoMessage/InfoMessage";
-export * from "./components/input/Input";
+export * from "./components/rawInput/RawInput";
 export * from "./components/icon/Icon";
 export * from "./components/editorSidebarIcon/EditorSidebarIcon";
 export * from "./components/labeledInput/LabeledInput";
