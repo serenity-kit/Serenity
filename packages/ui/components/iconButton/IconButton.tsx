@@ -6,10 +6,11 @@ import { Pressable, PressableProps } from "../pressable/Pressable";
 import { Text } from "../text/Text";
 import { Icon, IconNames } from "../icon/Icon";
 import { HStack } from "native-base";
+import { Color } from "../../types";
 
 export type IconButtonProps = PressableProps & {
   name: IconNames;
-  color?: string;
+  color?: Color;
   label?: string;
   size?: "md" | "lg";
 };

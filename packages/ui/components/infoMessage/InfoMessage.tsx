@@ -4,25 +4,31 @@ import { tw } from "../../tailwind";
 import { Text } from "../text/Text";
 import { Icon, IconNames } from "../icon/Icon";
 import { VStack, IStackProps } from "native-base";
+import { Color } from "../../types";
 
 export type InfoMessageProps = IStackProps & {
   variant?: "info" | "error";
   icon?: boolean;
 };
 
+type IconCombination = {
+  name: IconNames;
+  color: Color;
+};
+
+const iconVariants: { [key: string]: IconCombination } = {
+  error: {
+    name: "warning-fill",
+    color: "error-500",
+  },
+  info: {
+    name: "information-line",
+    color: "primary-900",
+  },
+};
+
 export const InfoMessage = forwardRef((props: InfoMessageProps, ref) => {
   const { variant = "info", icon = false, ...rest } = props;
-
-  const iconTypes: IconNames[] = ["information-line", "warning-fill"];
-  const iconNames = {
-    info: iconTypes[0],
-    error: iconTypes[1],
-  };
-
-  const iconColors = {
-    info: "primary-900",
-    error: "error-500",
-  };
 
   const styles = StyleSheet.create({
     stack: tw.style(
@@ -42,9 +48,7 @@ export const InfoMessage = forwardRef((props: InfoMessageProps, ref) => {
       space={2}
       style={[styles.stack, props.style]}
     >
-      {icon ? (
-        <Icon name={iconNames[variant]} color={iconColors[variant]} />
-      ) : null}
+      {icon ? <Icon {...iconVariants[variant]} /> : null}
       <Text
         style={[styles.text, icon ? tw`text-center` : tw`text-left`]}
         variant="xs"

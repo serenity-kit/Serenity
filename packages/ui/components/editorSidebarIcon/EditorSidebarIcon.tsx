@@ -1,12 +1,13 @@
 import * as React from "react";
 import { StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
+import { Color } from "../../types";
 import { Icon, IconProps } from "../icon/Icon";
 import { View } from "../view/View";
 
 export type EditorSidebarIconProps = IconProps & {
   isActive?: boolean;
-  activeColor?: string;
+  activeColor?: Color;
 };
 
 export const EditorSidebarIcon = (props: EditorSidebarIconProps) => {
