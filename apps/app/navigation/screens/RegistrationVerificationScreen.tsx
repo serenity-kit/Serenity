@@ -3,7 +3,7 @@ import {
   Button,
   InfoMessage,
   CenterContent,
-  LabeledInput,
+  Input,
   Text,
   tw,
   View,
@@ -213,7 +213,7 @@ export default function RegistrationVerificationScreen(
           </InfoMessage>
         ) : null}
 
-        <LabeledInput
+        <Input
           label={"Verification Code"}
           value={verificationCode}
           onChangeText={(verificationCode: string) => {

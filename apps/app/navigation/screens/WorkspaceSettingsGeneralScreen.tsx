@@ -1,7 +1,7 @@
 import {
   Button,
   RawInput,
-  LabeledInput,
+  Input,
   Modal,
   ModalButtonFooter,
   ModalHeader,
@@ -195,7 +195,7 @@ export default function WorkspaceSettingsGeneralScreen(
               >
                 <ModalHeader>Delete Workspace?</ModalHeader>
                 <Text>Type the name of this workspace: {workspaceName}</Text>
-                <LabeledInput
+                <Input
                   label={"Workspace Name"}
                   onChangeText={setDeletingWorkspaceName}
                 />

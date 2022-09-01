@@ -11,7 +11,7 @@ import {
   Checkbox,
   Link,
   EditorSidebarIcon,
-  LabeledInput,
+  Input,
   SidebarLink,
   SidebarDivider,
   Modal,
@@ -950,19 +950,19 @@ export default function DesignSystemScreen() {
           <DSMono variant="property">label</DSMono> via property.
         </Text>
         <DSExampleArea vertical>
-          <LabeledInput
+          <Input
             label={"Email"}
             value="jane@example.com"
             keyboardType="email-address"
             placeholder="Enter your email …"
             autoCapitalize="none"
           />
-          <LabeledInput
+          <Input
             label={"Password"}
             secureTextEntry
             placeholder="Enter your password …"
           />
-          <LabeledInput
+          <Input
             label={"Verification Key"}
             value="70909qer798q7987q"
             isDisabled
@@ -974,13 +974,13 @@ export default function DesignSystemScreen() {
           information you want the user to have regarding this input.
         </Text>
         <DSExampleArea vertical>
-          <LabeledInput
+          <Input
             label={"Password"}
             secureTextEntry
             value="password1234"
             placeholder="Enter your password …"
           />
-          <LabeledInput
+          <Input
             label={"Verification Key"}
             value="70909qer798q7987q"
             isDisabled
@@ -1367,7 +1367,7 @@ export default function DesignSystemScreen() {
             onBackdropPress={() => setShowModal(false)}
           >
             <ModalHeader>Create a workspace</ModalHeader>
-            <LabeledInput
+            <Input
               label={"Workspace Name"}
               value="Surf &amp; Chill Co."
               hint="This is the name of your organization, team or private notes. You can invite team members afterwards."

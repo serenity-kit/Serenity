@@ -23,7 +23,7 @@ export * from "./components/infoMessage/InfoMessage";
 export * from "./components/rawInput/RawInput";
 export * from "./components/icon/Icon";
 export * from "./components/editorSidebarIcon/EditorSidebarIcon";
-export * from "./components/labeledInput/LabeledInput";
+export * from "./components/input/Input";
 export * from "./components/menu/Menu";
 export * from "./components/menuButton/MenuButton";
 export * from "./components/modal/Modal";
