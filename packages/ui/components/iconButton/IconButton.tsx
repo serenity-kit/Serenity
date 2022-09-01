@@ -6,10 +6,11 @@ import { Pressable, PressableProps } from "../pressable/Pressable";
 import { Text } from "../text/Text";
 import { Icon, IconNames } from "../icon/Icon";
 import { HStack } from "native-base";
+import { Color } from "../../types";
 
 export type IconButtonProps = PressableProps & {
   name: IconNames;
-  color?: string;
+  color?: Color;
   label?: string;
   size?: "md" | "lg";
 };
@@ -63,10 +64,7 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
             ]}
             space={2}
           >
-            <Icon
-              name={name}
-              color={tw.color(isHovered ? "gray-800" : iconColor)}
-            />
+            <Icon name={name} color={isHovered ? "gray-800" : iconColor} />
             {label && (
               <Text
                 variant="xs"

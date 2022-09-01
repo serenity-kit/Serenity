@@ -46,7 +46,7 @@ export const MenuButton = React.forwardRef(
         }}
       >
         <HStack space={2} alignItems="center" style={tw`flex`}>
-          {icon && <Icon name={icon} color={tw.color(iconColor)} />}
+          {icon && <Icon name={icon} color={iconColor} />}
           <Text variant="xs" style={styles.text}>
             {rest.children}
           </Text>

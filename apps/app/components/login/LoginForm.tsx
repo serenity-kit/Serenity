@@ -3,7 +3,7 @@ import {
   Checkbox,
   FormWrapper,
   InfoMessage,
-  LabeledInput,
+  Input,
   Text,
 } from "@serenity-tools/ui";
 import { detect } from "detect-browser";
@@ -156,7 +156,7 @@ export function LoginForm(props: Props) {
 
   return (
     <FormWrapper>
-      <LabeledInput
+      <Input
         label={"Email"}
         keyboardType="email-address"
         value={username}
@@ -167,7 +167,7 @@ export function LoginForm(props: Props) {
         autoCapitalize="none"
       />
 
-      <LabeledInput
+      <Input
         label={"Password"}
         secureTextEntry
         value={password}

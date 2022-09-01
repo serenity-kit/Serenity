@@ -355,7 +355,7 @@ export default function SidebarFolder(props: Props) {
               <View style={tw`ml-${depth} md:ml-0`}>
                 <Icon
                   name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
-                  color={tw.color(isDesktopDevice ? "gray-600" : "gray-400")}
+                  color={isDesktopDevice ? "gray-600" : "gray-400"}
                   mobileSize={5}
                 />
               </View>
@@ -374,7 +374,7 @@ export default function SidebarFolder(props: Props) {
                 />
               ) : (
                 <Text
-                  variant="small"
+                  variant="sm"
                   style={tw`ml-1.5 max-w-${maxWidth}`}
                   numberOfLines={1}
                   ellipsizeMode="tail"

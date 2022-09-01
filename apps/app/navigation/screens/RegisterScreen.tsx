@@ -29,7 +29,7 @@ export default function RegisterScreen(
         <CenterContent serenityBg>
           <Box plush>
             <View>
-              <Text variant="large" bold style={tw`text-center`}>
+              <Text variant="lg" bold style={tw`text-center`}>
                 Create your Account
               </Text>
               <Text muted style={tw`text-center`}>
@@ -48,7 +48,7 @@ export default function RegisterScreen(
           </Box>
           <View style={tw`absolute left-0 ios:left-4 bottom-0`}>
             <Link to={{ screen: "DevDashboard" }} style={tw`p-4`}>
-              <Icon name="dashboard-line" color={tw.color("gray-500")} />
+              <Icon name="dashboard-line" color={"gray-500"} />
             </Link>
           </View>
         </CenterContent>

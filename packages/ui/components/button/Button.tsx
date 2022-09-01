@@ -28,7 +28,7 @@ type ComputeStyleParams = {
   size?: ButtonSizes | null;
 };
 
-const textSizes: TextVariants[] = ["xxs", "small", "medium"];
+const textSizes: TextVariants[] = ["xxs", "sm", "md"];
 
 const computeStyle = ({
   disabled,
