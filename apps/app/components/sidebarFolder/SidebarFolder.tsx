@@ -371,6 +371,7 @@ export default function SidebarFolder(props: Props) {
                   }}
                   value={folderName}
                   style={tw`ml-0.5 w-${maxWidth}`}
+                  testID={`sidebar-folder-${props.folderId}__edit-name`}
                 />
               ) : (
                 <Text

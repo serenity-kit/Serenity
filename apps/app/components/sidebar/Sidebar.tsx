@@ -402,6 +402,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             onSubmit={createFolder}
             value=""
             style={tw`ml-0.5`}
+            testID={"sidebar-folder__edit-name"}
           />
         </HStack>
       )}

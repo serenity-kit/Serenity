@@ -1,5 +1,12 @@
 import { expect, Page } from "@playwright/test";
+// import { decryptDevice } from "@serenity-tools/common";
+// import {
+//   finishLogin as clientFinishLogin,
+//   startLogin as clientStartLogin,
+// } from "@serenity-tools/opaque";
+// import { getEnvelope } from "../../../src/database/authentication/getEnvelope";
 import { prisma } from "../../../src/database/prisma";
+// import { startLogin as serverStartLogin } from "../../../src/utils/opaque";
 import { delayForSeconds } from "../delayForSeconds";
 
 export type Props = {
@@ -84,8 +91,18 @@ export const e2eRegisterUser = async ({
       name: workspaceName,
       id: workspaceId,
     },
+    include: {
+      workspaceKey: {
+        include: {
+          workspaceKeyBoxes: {
+            where: { deviceSigningPublicKey: user?.mainDeviceSigningPublicKey },
+          },
+        },
+      },
+    },
   });
   expect(workspace).not.toBe(null);
+  const workspaceBox = workspace?.workspaceKey[0].workspaceKeyBoxes[0];
   // a page will have been created
   const document = await prisma.document.findFirst({
     where: { workspaceId },
@@ -102,11 +119,46 @@ export const e2eRegisterUser = async ({
   const mainDevice = await prisma.device.findUnique({
     where: { signingPublicKey: user?.mainDeviceSigningPublicKey },
   });
+
+  // const challenge = await clientStartLogin(password);
+  // const result = await getEnvelope(username);
+
+  // const challengeResponse = serverStartLogin({
+  //   envelope: result.envelop,
+  //   username,
+  //   challenge,
+  // });
+  // const finishLoginResult = serverFinishLogin({
+  //   loginId: challengeResponse.loginId,
+  //   message: challengeResponse.message,
+  // });
+  // const session = await createSession({
+  //   username: finishLoginResult.username,
+  //   sessionKey: finishLoginResult.sessionKey,
+  //   expiresAt: addDays(new Date(), 30),
+  // });
+  // const loginResult = await clientFinishLogin(challengeResponse.message);
+  // const exportKey = loginResult.exportKey;
+  // const mainDeviceKeys = await decryptDevice({
+  //   ciphertext: user?.mainDeviceCiphertext,
+  //   nonce: user?.mainDeviceNonce,
+  //   exportKey,
+  //   encryptionKeySalt: user?.mainDeviceEncryptionKeySalt,
+  // });
+  // const workspaceKey = await decryptWorkspaceKey({
+  //   ciphertext: workspaceBox?.ciphertext!,
+  //   nonce: workspaceBox?.nonce!,
+  //   creatorDeviceEncryptionPublicKey: mainDevice?.encryptionPublicKey!,
+  //   receiverDeviceEncryptionPrivateKey: mainDeviceKeys.encryptionPrivateKey,
+  // });
   return {
     user,
     workspace,
     folder,
     document,
     mainDevice,
+    // workspaceKey,
+    // encryptionPrivateKey: mainDeviceKeys.encryptionPrivateKey,
+    // singnigPrivateKey: mainDeviceKeys.signingPrivateKey,
   };
 };
