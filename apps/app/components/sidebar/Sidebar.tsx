@@ -385,6 +385,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               setIsCreatingNewFolder(true);
             }}
             name="plus"
+            testID="root-create-folder"
           ></IconButton>
         </Tooltip>
       </HStack>

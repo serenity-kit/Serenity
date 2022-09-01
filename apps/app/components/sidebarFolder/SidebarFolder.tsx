@@ -379,6 +379,7 @@ export default function SidebarFolder(props: Props) {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                   bold={documentPathIds.includes(props.folderId)}
+                  testID={`sidebar-folder-${props.folderId}`}
                 >
                   {folderName}
                 </Text>
@@ -415,6 +416,7 @@ export default function SidebarFolder(props: Props) {
                   name="file-add-line"
                   color="gray-600"
                   style={tw`p-2 md:p-0`}
+                  testID={`folder-menu__create-document--${props.folderId}`}
                 ></IconButton>
               </Tooltip>
               {documentsResult.fetching ||
