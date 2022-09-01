@@ -932,9 +932,9 @@ export default function DesignSystemScreen() {
         </Text>
         <Heading lvl={3}>Basic</Heading>
         <Text variant="sm">
-          The basic <DSMono variant="component">Input</DSMono> component is
+          The basic <DSMono variant="component">RawInput</DSMono> component is
           minimal in styling and features, as it is used as a building block for
-          the <DSMono variant="component">LabeledInput</DSMono> component.
+          the actual <DSMono variant="component">Input</DSMono> component.
         </Text>
         <DSExampleArea>
           <RawInput />
@@ -942,10 +942,10 @@ export default function DesignSystemScreen() {
         <Heading lvl={4} style={h4Styles}>
           Commonly used
         </Heading>
-        <Heading lvl={2}>Labeled Input</Heading>
+        <Heading lvl={2}>Input</Heading>
         <Text variant="sm">
-          <DSMono variant="component">LabeledInput</DSMono>s share all the{" "}
-          <DSMono variant="component">InputProps</DSMono> and are used in all
+          <DSMono variant="component">Input</DSMono>s share all the{" "}
+          <DSMono variant="component">RawInputProps</DSMono> and are used in all
           the forms of our application. You can easily add a{" "}
           <DSMono variant="property">label</DSMono> via property.
         </Text>
