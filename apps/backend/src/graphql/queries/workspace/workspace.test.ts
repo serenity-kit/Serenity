@@ -128,6 +128,17 @@ test("user should get a workspace without providing an id", async () => {
   expect(workspaceKeyBox.workspaceKeyId).toBe(workspace.currentWorkspaceKey.id);
 });
 
+test("User should not be able to retrieve a workspace for another device", async () => {
+  await expect(
+    (async () =>
+      await getWorkspace({
+        workspaceId: undefined,
+        authorizationHeader: sessionKey,
+        deviceSigningPublicKey: "abcd",
+      }))()
+  ).rejects.toThrowError(/Internal server error/);
+});
+
 test("Unauthenticated", async () => {
   await expect(
     (async () =>
