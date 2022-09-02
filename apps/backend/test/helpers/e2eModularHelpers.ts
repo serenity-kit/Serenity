@@ -45,6 +45,7 @@ export const openFolderMenu = async (page: Page, folderId: string) => {
   );
   await menuButton.hover();
   await menuButton.click();
+  await delayForSeconds(1);
 };
 
 export const openDocumentMenu = async (page: Page, documentId: string) => {

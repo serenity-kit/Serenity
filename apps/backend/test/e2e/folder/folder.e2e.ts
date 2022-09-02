@@ -1,4 +1,5 @@
 import { test } from "@playwright/test";
+import * as sodium from "@serenity-tools/libsodium";
 import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { decryptWorkspaceKey } from "../../helpers/device/decryptWorkspaceKey";
@@ -14,7 +15,7 @@ import {
 } from "../../helpers/e2eModularHelpers";
 
 const userId = uuidv4();
-const username = "a@a.com";
+const username = `${uuidv4()}@example.com`;
 const password = "pass";
 const workspaceName = "a workspace";
 let createdWorkspace: any = null;
@@ -24,6 +25,7 @@ let firstFolder: any = null;
 let firstDocument: any = null;
 
 test.beforeAll(async () => {
+  await sodium.ready;
   const { workspace, folder, document, device, encryptionPrivateKey } =
     await createUserWithWorkspace({
       id: userId,
