@@ -177,6 +177,7 @@ export default function SidebarPage(props: Props) {
                 onSubmit={updateDocumentName}
                 value={documentTitle}
                 style={tw`ml-0.5 w-${maxWidth}`}
+                testID={`sidebar-document--${props.documentId}__edit-name`}
               />
             ) : (
               <Text
@@ -185,6 +186,7 @@ export default function SidebarPage(props: Props) {
                 numberOfLines={1}
                 ellipsizeMode="tail"
                 bold={document?.id === props.documentId}
+                testID={`sidebar-document--${props.documentId}`}
               >
                 {documentTitle}
               </Text>

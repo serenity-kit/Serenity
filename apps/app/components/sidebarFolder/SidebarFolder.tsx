@@ -371,7 +371,7 @@ export default function SidebarFolder(props: Props) {
                   }}
                   value={folderName}
                   style={tw`ml-0.5 w-${maxWidth}`}
-                  testID={`sidebar-folder-${props.folderId}__edit-name`}
+                  testID={`sidebar-folder--${props.folderId}__edit-name`}
                 />
               ) : (
                 <Text
@@ -380,7 +380,7 @@ export default function SidebarFolder(props: Props) {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                   bold={documentPathIds.includes(props.folderId)}
-                  testID={`sidebar-folder-${props.folderId}`}
+                  testID={`sidebar-folder--${props.folderId}`}
                 >
                   {folderName}
                 </Text>
@@ -417,7 +417,7 @@ export default function SidebarFolder(props: Props) {
                   name="file-add-line"
                   color="gray-600"
                   style={tw`p-2 md:p-0`}
-                  testID={`folder-menu__create-document--${props.folderId}`}
+                  testID={`sidebar-folder--${props.folderId}__create-document`}
                 ></IconButton>
               </Tooltip>
               {documentsResult.fetching ||

@@ -26,7 +26,7 @@ export default function SidebarFolderMenu(props: Props) {
           name="more-line"
           color="gray-600"
           style={tw`p-2 md:p-0`}
-          testID={`sidebar-folder-menu__${props.folderId}--open`}
+          testID={`sidebar-folder-menu--${props.folderId}__open`}
         ></IconButton>
       }
     >
@@ -37,7 +37,7 @@ export default function SidebarFolderMenu(props: Props) {
         }}
         icon="folder-line"
         shortcut={<Shortcut letter="N" />}
-        testID={`sidebar-folder-menu__${props.folderId}--create-subfolder`}
+        testID={`sidebar-folder-menu--${props.folderId}__create-subfolder`}
       >
         Create Folder
       </MenuButton>
@@ -48,7 +48,7 @@ export default function SidebarFolderMenu(props: Props) {
         }}
         icon="font-size-2"
         shortcut={<Shortcut letter="R" />}
-        testID={`sidebar-folder-menu__${props.folderId}--rename`}
+        testID={`sidebar-folder-menu--${props.folderId}__rename`}
       >
         Rename
       </MenuButton>
@@ -59,7 +59,7 @@ export default function SidebarFolderMenu(props: Props) {
         }}
         icon="delete-bin-line"
         danger
-        testID={`sidebar-folder-menu__${props.folderId}--delete`}
+        testID={`sidebar-folder-menu--${props.folderId}__delete`}
       >
         Delete
       </MenuButton>

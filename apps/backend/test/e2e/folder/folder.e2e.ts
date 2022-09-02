@@ -3,13 +3,14 @@ import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { decryptWorkspaceKey } from "../../helpers/device/decryptWorkspaceKey";
 import {
+  createRootFolder,
   createSubFolder,
   deleteFolder,
   expandFolderTree,
   login,
+  register,
   reloadPage,
   renameFolder,
-  testCreateRootFolder,
 } from "../../helpers/e2eModularHelpers";
 
 const userId = uuidv4();
@@ -47,66 +48,45 @@ test.describe("Root folders", () => {
   const createFolderUsername = `${uuidv4()}@test.com`;
   const renameFolderUsername = `${uuidv4()}@test.com`;
   const deleteFolderUsername = `${uuidv4()}@test.com`;
-  // test.describe("After registration", () => {
-  //   test("Create root folder", async ({ page }) => {
-  //     const { workspace, workspaceKey } = await register(
-  //       page,
-  //       createFolderUsername,
-  //       password,
-  //       workspaceName
-  //     );
-  //     addedFolder = await testCreateRootFolder(
-  //       page,
-  //       "Test folder",
-  //       workspace?.id!,
-  //       workspaceKey
-  //     );
-  //   });
-  //   test("Rename root folder", async ({ page }) => {
-  //     const { workspace } = await register(
-  //       page,
-  //       renameFolderUsername,
-  //       password,
-  //       workspaceName
-  //     );
-  //     await renameFolder(
-  //       page,
-  //       addedFolder.id,
-  //       "Renamed folder",
-  //       workspace?.id!,
-  //       workspaceKey
-  //     );
-  //   });
+  test.describe("After registration", () => {
+    test("Create root folder", async ({ page }) => {
+      const { workspace } = await register(
+        page,
+        createFolderUsername,
+        password,
+        workspaceName
+      );
+      addedFolder = await createRootFolder(page, "Test folder", workspace?.id!);
+    });
+    test("Rename root folder", async ({ page }) => {
+      const { folder } = await register(
+        page,
+        renameFolderUsername,
+        password,
+        workspaceName
+      );
+      await renameFolder(page, folder?.id!, "Renamed folder");
+    });
 
-  //   test("Delete a root folder", async ({ page }) => {
-  //     const { workspace } = await register(
-  //       page,
-  //       deleteFolderUsername,
-  //       password,
-  //       workspaceName
-  //     );
-  //     await deleteFolder(page, addedFolder.id, workspace?.id!);
-  //   });
-  // });
+    test("Delete a root folder", async ({ page }) => {
+      const { workspace, folder } = await register(
+        page,
+        deleteFolderUsername,
+        password,
+        workspaceName
+      );
+      await deleteFolder(page, folder?.id!, workspace?.id!);
+    });
+  });
   test.describe("After login", () => {
     test("Create root folder", async ({ page }) => {
       await login(page, username, password);
-      addedFolder = await testCreateRootFolder(
-        page,
-        "Test folder",
-        workspaceId,
-        workspaceKey
-      );
+      addedFolder = await createRootFolder(page, "Test folder", workspaceId);
     });
     test("Rename root folder", async ({ page }) => {
       await login(page, username, password);
-      await renameFolder(
-        page,
-        addedFolder.id,
-        "Renamed folder",
-        workspaceId,
-        workspaceKey
-      );
+
+      await renameFolder(page, addedFolder.id, "Renamed folder");
     });
 
     test("Delete a root folder", async ({ page }) => {
@@ -117,22 +97,11 @@ test.describe("Root folders", () => {
   test.describe("After ephemeral login", () => {
     test("Create root folder", async ({ page }) => {
       await login(page, username, password, false);
-      addedFolder = await testCreateRootFolder(
-        page,
-        "Test folder",
-        workspaceId,
-        workspaceKey
-      );
+      addedFolder = await createRootFolder(page, "Test folder", workspaceId);
     });
     test("Rename root folder", async ({ page }) => {
       await login(page, username, password, false);
-      await renameFolder(
-        page,
-        addedFolder.id,
-        "Renamed folder",
-        workspaceId,
-        workspaceKey
-      );
+      await renameFolder(page, addedFolder.id, "Renamed folder");
     });
 
     test("Delete a root folder", async ({ page }) => {
@@ -145,23 +114,12 @@ test.describe("Root folders", () => {
     test("Create root folder", async ({ page }) => {
       await login(page, username, password);
       await reloadPage(page);
-      addedFolder = await testCreateRootFolder(
-        page,
-        "Test folder",
-        workspaceId,
-        workspaceKey
-      );
+      addedFolder = await createRootFolder(page, "Test folder", workspaceId);
     });
     test("Rename root folder", async ({ page }) => {
       await login(page, username, password);
       await reloadPage(page);
-      await renameFolder(
-        page,
-        addedFolder.id,
-        "Renamed folder",
-        workspaceId,
-        workspaceKey
-      );
+      await renameFolder(page, addedFolder.id, "Renamed folder");
     });
 
     test("Delete a root folder", async ({ page }) => {
@@ -234,12 +192,7 @@ test.describe("Subfolders", () => {
 
     test("Create a subfolder", async ({ page }) => {
       await login(page, username, password);
-      addedSubfolder = await createSubFolder(
-        page,
-        firstFolder.id,
-        workspaceId,
-        workspaceKey
-      );
+      addedSubfolder = await createSubFolder(page, firstFolder.id, workspaceId);
     });
 
     test("Rename a subfolder", async ({ page }) => {
@@ -250,13 +203,7 @@ test.describe("Subfolders", () => {
       if (!isSubfolderVisible) {
         await expandFolderTree(page, firstFolder.id);
       }
-      await renameFolder(
-        page,
-        addedSubfolder.id,
-        "Renamed subfolder",
-        workspaceId,
-        workspaceKey
-      );
+      await renameFolder(page, addedSubfolder.id, "Renamed subfolder");
     });
 
     test("Delete a folder", async ({ page }) => {
@@ -276,12 +223,7 @@ test.describe("Subfolders", () => {
 
     test("Create a subfolder", async ({ page }) => {
       await login(page, username, password, false);
-      addedSubfolder = await createSubFolder(
-        page,
-        firstFolder.id,
-        workspaceId,
-        workspaceKey
-      );
+      addedSubfolder = await createSubFolder(page, firstFolder.id, workspaceId);
     });
 
     test("Rename a subfolder", async ({ page }) => {
@@ -292,13 +234,7 @@ test.describe("Subfolders", () => {
       if (!isSubfolderVisible) {
         await expandFolderTree(page, firstFolder.id);
       }
-      await renameFolder(
-        page,
-        addedSubfolder.id,
-        "Renamed subfolder",
-        workspaceId,
-        workspaceKey
-      );
+      await renameFolder(page, addedSubfolder.id, "Renamed subfolder");
     });
 
     test("Delete a folder", async ({ page }) => {
@@ -319,12 +255,7 @@ test.describe("Subfolders", () => {
     test("Create a subfolder", async ({ page }) => {
       await login(page, username, password);
       await reloadPage(page);
-      addedSubfolder = await createSubFolder(
-        page,
-        firstFolder.id,
-        workspaceId,
-        workspaceKey
-      );
+      addedSubfolder = await createSubFolder(page, firstFolder.id, workspaceId);
     });
 
     test("Rename a subfolder", async ({ page }) => {
@@ -336,13 +267,7 @@ test.describe("Subfolders", () => {
       if (!isSubfolderVisible) {
         await expandFolderTree(page, firstFolder.id);
       }
-      await renameFolder(
-        page,
-        addedSubfolder.id,
-        "Renamed subfolder",
-        workspaceId,
-        workspaceKey
-      );
+      await renameFolder(page, addedSubfolder.id, "Renamed subfolder");
     });
 
     test("Delete a folder", async ({ page }) => {
