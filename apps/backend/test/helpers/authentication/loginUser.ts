@@ -1,5 +1,6 @@
+import { createDevice } from "@serenity-tools/common";
+import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
-import sodium from "libsodium-wrappers";
 import { requestLoginChallengeResponse } from "./requestLoginChallengeResponse";
 
 type Params = {
@@ -19,21 +20,45 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
       sodium.from_base64(startLoginResult.data.challengeResponse)
     )
   );
+
   const finishLoginQuery = gql`
-    mutation {
-      finishLogin(
-        input: {
-          loginId: "${startLoginResult.data.loginId}"
-          message: "${finishMessage}"
-        }
-      ) {
+    mutation finishLogin($input: FinishLoginInput!) {
+      finishLogin(input: $input) {
         expiresAt
       }
     }
   `;
-  const loginResponse = await graphql.client.request(finishLoginQuery);
+
+  const sessionKey = sodium.to_base64(startLoginResult.login.getSessionKey());
+
+  const device = await createDevice();
+  const deviceInfoJson = {
+    type: "web",
+    OS: "MacOS",
+    OsVersion: null,
+    Browser: "chrome",
+    BrowserVersion: "100.0.1",
+  };
+  const deviceInfo = JSON.stringify(deviceInfoJson);
+
+  const sessionTokenSignature = await sodium.crypto_sign_detached(
+    sessionKey,
+    device.signingPrivateKey
+  );
+
+  await graphql.client.request(finishLoginQuery, {
+    input: {
+      loginId: startLoginResult.data.loginId,
+      message: finishMessage,
+      deviceSigningPublicKey: device.signingPublicKey,
+      deviceEncryptionPublicKey: device.encryptionPublicKey,
+      deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
+      deviceInfo: deviceInfo,
+      sessionTokenSignature,
+    },
+  });
 
   return {
-    sessionKey: sodium.to_base64(startLoginResult.login.getSessionKey()),
+    sessionKey,
   };
 };

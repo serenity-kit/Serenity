@@ -91,7 +91,7 @@ export default function RegistrationVerificationScreen(
       setErrorMessage("");
       setIsLoggingIn(true);
 
-      let unsafedDevice = await createDeviceWithInfo();
+      const unsafedDevice = await createDeviceWithInfo();
 
       const loginResult = await login({
         username,

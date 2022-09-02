@@ -6,19 +6,13 @@ import {
   encryptFolderName,
 } from "@serenity-tools/common";
 import * as sodium from "@serenity-tools/libsodium";
-import { Login, Registration } from "@serenity-tools/opaque-server";
+import { Registration } from "@serenity-tools/opaque-server";
 import { v4 as uuidv4 } from "uuid";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
 import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
-import { addDays } from "../../utils/addDays/addDays";
-import {
-  finishLogin,
-  finishRegistration,
-  startLogin,
-  startRegistration,
-} from "../../utils/opaque";
-import { createSession } from "../authentication/createSession";
+import { finishRegistration, startRegistration } from "../../utils/opaque";
 import { prisma } from "../prisma";
+import { createDeviceAndLogin } from "./createDeviceAndLogin";
 
 type Params = {
   id: string;
@@ -141,24 +135,10 @@ export default async function createUserWithWorkspace({
     ],
   });
 
-  const login = new Login();
-  const loginChallenge = login.start(thePassword);
-  const { message: loginMessage, loginId } = startLogin({
+  const { session, sessionKey, webDevice } = await createDeviceAndLogin({
+    username,
+    password: thePassword,
     envelope,
-    username,
-    challenge: sodium.to_base64(loginChallenge),
-  });
-  const loginStartResponse = login.finish(sodium.from_base64(loginMessage));
-
-  const { sessionKey } = finishLogin({
-    loginId,
-    message: sodium.to_base64(loginStartResponse),
-  });
-
-  const session = await createSession({
-    username,
-    sessionKey,
-    expiresAt: addDays(new Date(), 30),
   });
 
   return {
@@ -168,6 +148,9 @@ export default async function createUserWithWorkspace({
     device,
     deviceEncryptionPrivateKey,
     deviceSigningPrivateKey,
+    webDevice,
+    user,
+    envelope,
     workspace: createWorkspaceResult.workspace,
     folder: createWorkspaceResult.folder,
     document: createWorkspaceResult.document,

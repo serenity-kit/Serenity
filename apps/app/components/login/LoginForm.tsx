@@ -76,7 +76,7 @@ export function LoginForm(props: Props) {
       setIsLoggingIn(true);
       await clearDeviceAndSessionStorage();
 
-      let unsafedDevice = await createDeviceWithInfo();
+      const unsafedDevice = await createDeviceWithInfo();
 
       const loginResult = await login({
         username,

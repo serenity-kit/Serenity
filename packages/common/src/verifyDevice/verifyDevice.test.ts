@@ -30,7 +30,7 @@ test("verify device throws an error with ommited signature", async () => {
     (async () =>
       await verifyDevice({
         ...device,
-        // @ts-expected-error desired for the test
+        // @ts-expect-error desired for the test
         encryptionPublicKeySignature: undefined,
       }))()
   ).rejects.toThrowError();

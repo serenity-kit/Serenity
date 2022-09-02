@@ -1,11 +1,10 @@
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { createDevice } from "../../../../test/helpers/device/createDevice";
 import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
 import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { createDeviceAndLogin } from "../../../database/testHelpers/createDeviceAndLogin";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
@@ -13,6 +12,7 @@ const username1 = "user1";
 const username2 = "user2";
 let userAndDevice1: any;
 let userAndDevice2: any;
+let sessionKey = "";
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -24,28 +24,26 @@ beforeAll(async () => {
     id: "7adf9862-a72a-427e-8f7d-0db93f687a44",
     username: username2,
   });
+  const loginResult = await createDeviceAndLogin({
+    username: username1,
+    password: "12345689",
+    envelope: userAndDevice1.envelope,
+  });
+  sessionKey = loginResult.sessionKey;
 });
 
-test("create a device", async () => {
-  const authorizationHeader = userAndDevice1.sessionKey;
-  const createDeviceResult = await createDevice({
-    graphql,
-    authorizationHeader,
-  });
-  const device = createDeviceResult.createDevice.device;
-  const signingPublicKey = device.signingPublicKey;
-  const signingPublicKeys: string[] = [signingPublicKey];
-
+test("delete a device", async () => {
+  const authorizationHeader = sessionKey;
   const numDevicesAfterCreate = await getDevices({
     graphql,
     authorizationHeader,
   });
-  expect(numDevicesAfterCreate.devices.edges.length).toBe(2);
+  expect(numDevicesAfterCreate.devices.edges.length).toBe(3);
 
   // device should exist
   const response = await deleteDevices({
     graphql,
-    signingPublicKeys,
+    signingPublicKeys: [userAndDevice1.webDevice.signingPublicKey],
     authorizationHeader,
   });
   expect(response.deleteDevices.status).toBe("success");
@@ -55,21 +53,21 @@ test("create a device", async () => {
     graphql,
     authorizationHeader,
   });
-  expect(numDevicesAfterDelete.devices.edges.length).toBe(1);
+  expect(numDevicesAfterDelete.devices.edges.length).toBe(2);
 
   // device should not exist
   await expect(
     (async () =>
       await getDeviceBySigningPublicKey({
         graphql,
-        signingPublicKey,
+        signingPublicKey: userAndDevice1.webDevice.signingPublicKey,
         authorizationHeader,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
 });
 
-test("user cannot delete a device that does'nt exist", async () => {
-  const authorizationHeader = userAndDevice1.sessionKey;
+test("user cannot delete a device that doesn't exist", async () => {
+  const authorizationHeader = sessionKey;
   const signingPublicKeys = ["abc123"];
 
   const numDevicesBeforeDeleteResponse = await getDevices({
@@ -94,15 +92,10 @@ test("user cannot delete a device that does'nt exist", async () => {
 });
 
 test("user cannot delete a device they don't own", async () => {
-  const authorizationHeader1 = userAndDevice1.sessionKey;
+  const authorizationHeader1 = sessionKey;
   const authorizationHeader2 = userAndDevice2.sessionKey;
-  const createDeviceResult = await createDevice({
-    graphql,
-    authorizationHeader: authorizationHeader1,
-  });
 
-  const device = createDeviceResult.createDevice.device;
-  const signingPublicKey = device.signingPublicKey;
+  const signingPublicKey = userAndDevice2.webDevice.signingPublicKey;
   const signingPublicKeys = [signingPublicKey];
 
   const numDevicesBeforeDeleteResponse = await getDevices({
@@ -127,21 +120,11 @@ test("user cannot delete a device they don't own", async () => {
 });
 
 test("Unauthenticated", async () => {
-  const authorizationHeader1 = userAndDevice1.sessionKey;
-  const createDeviceResult = await createDevice({
-    graphql,
-    authorizationHeader: authorizationHeader1,
-  });
-
-  const device = createDeviceResult.createDevice.device;
-  const signingPublicKey = device.signingPublicKey;
-  const signingPublicKeys = [signingPublicKey];
-
   await expect(
     (async () =>
       await deleteDevices({
         graphql,
-        signingPublicKeys,
+        signingPublicKeys: ["abc"],
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -158,7 +141,6 @@ describe("Input errors", () => {
       }
     }
   `;
-  const id = uuidv4();
   test("Invalid signingPublicKeys", async () => {
     await expect(
       (async () =>

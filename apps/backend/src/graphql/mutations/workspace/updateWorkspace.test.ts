@@ -84,16 +84,15 @@ test("user won't update the members", async () => {
   const id = "abc";
   const name = "workspace 2";
   const members = undefined;
-  await expect(
-    (async () =>
-      await updateWorkspace({
-        graphql,
-        id,
-        name,
-        members,
-        authorizationHeader,
-      }))()
-  ).rejects.toThrowError(/BAD_USER_INPUT/);
+  const result = await updateWorkspace({
+    graphql,
+    id,
+    name,
+    members,
+    authorizationHeader,
+  });
+  const workspace = result.updateWorkspace.workspace;
+  expect(workspace.members.length).toBe(2);
 });
 
 // WARNING: after this, user is no longer an admin on this workspace
@@ -242,36 +241,7 @@ describe("Input errors", () => {
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid members", async () => {
-    const id = addedWorkspace.id;
-    const name = undefined;
-    const members = [
-      {
-        userId: userId1,
-        isAdmin: false,
-      },
-    ];
-    const authorizationHeaders = {
-      authorization: sessionKey1,
-    };
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          { input: { id, name, members: null } },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
   test("Invalid input", async () => {
-    const id = addedWorkspace.id;
-    const name = undefined;
-    const members = [
-      {
-        userId: userId1,
-        isAdmin: false,
-      },
-    ];
     const authorizationHeaders = {
       authorization: sessionKey1,
     };

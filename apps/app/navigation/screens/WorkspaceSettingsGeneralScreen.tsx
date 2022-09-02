@@ -1,10 +1,10 @@
 import {
   Button,
-  RawInput,
   Input,
   Modal,
   ModalButtonFooter,
   ModalHeader,
+  RawInput,
   Text,
   tw,
   View,
@@ -145,6 +145,7 @@ export default function WorkspaceSettingsGeneralScreen(
       input: {
         id: workspaceId,
         name: workspaceName,
+        members: null,
       },
     });
     if (updateWorkspaceResult.data?.updateWorkspace?.workspace) {

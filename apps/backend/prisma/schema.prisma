@@ -140,7 +140,7 @@ model Device {
   userId                       String?
   recoveryDevice               RecoveryDevice?
   userForMain                  User?           @relation("mainDevice")
-  info                         String
+  info                         String?
   createdAt                    DateTime        @default(now())
   session                      Session[]
 }

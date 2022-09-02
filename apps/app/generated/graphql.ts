@@ -36,18 +36,6 @@ export type AttachDeviceToWorkspacesResult = {
   workspaceKeys: Array<WorkspaceKey>;
 };
 
-export type CreateDeviceInput = {
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
-  info: Scalars['String'];
-  signingPublicKey: Scalars['String'];
-};
-
-export type CreateDeviceResult = {
-  __typename?: 'CreateDeviceResult';
-  device?: Maybe<Device>;
-};
-
 export type CreateDocumentInput = {
   id: Scalars['String'];
   parentFolderId?: InputMaybe<Scalars['String']>;
@@ -324,7 +312,6 @@ export type Mutation = {
   __typename?: 'Mutation';
   acceptWorkspaceInvitation?: Maybe<AcceptWorkspaceInvitationResult>;
   attachDeviceToWorkspaces?: Maybe<AttachDeviceToWorkspacesResult>;
-  createDevice?: Maybe<CreateDeviceResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createFolder?: Maybe<CreateFolderResult>;
   createInitialWorkspaceStructure?: Maybe<CreateInitialWorkspaceStructureResult>;
@@ -352,11 +339,6 @@ export type MutationAcceptWorkspaceInvitationArgs = {
 
 export type MutationAttachDeviceToWorkspacesArgs = {
   input: AttachDeviceToWorkspacesInput;
-};
-
-
-export type MutationCreateDeviceArgs = {
-  input: CreateDeviceInput;
 };
 
 
@@ -615,7 +597,7 @@ export type UpdateFolderNameResult = {
 
 export type UpdateWorkspaceInput = {
   id: Scalars['String'];
-  members: Array<WorkspaceMemberInput>;
+  members?: InputMaybe<Array<WorkspaceMemberInput>>;
   name?: InputMaybe<Scalars['String']>;
 };
 
@@ -749,13 +731,6 @@ export type AttachDeviceToWorkspacesMutationVariables = Exact<{
 
 
 export type AttachDeviceToWorkspacesMutation = { __typename?: 'Mutation', attachDeviceToWorkspaces?: { __typename?: 'AttachDeviceToWorkspacesResult', workspaceKeys: Array<{ __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string } | null }> } | null };
-
-export type CreateDeviceMutationVariables = Exact<{
-  input: CreateDeviceInput;
-}>;
-
-
-export type CreateDeviceMutation = { __typename?: 'Mutation', createDevice?: { __typename?: 'CreateDeviceResult', device?: { __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null } | null } | null };
 
 export type CreateDocumentMutationVariables = Exact<{
   input: CreateDocumentInput;
@@ -1038,23 +1013,6 @@ export const AttachDeviceToWorkspacesDocument = gql`
 
 export function useAttachDeviceToWorkspacesMutation() {
   return Urql.useMutation<AttachDeviceToWorkspacesMutation, AttachDeviceToWorkspacesMutationVariables>(AttachDeviceToWorkspacesDocument);
-};
-export const CreateDeviceDocument = gql`
-    mutation createDevice($input: CreateDeviceInput!) {
-  createDevice(input: $input) {
-    device {
-      userId
-      signingPublicKey
-      encryptionPublicKey
-      encryptionPublicKeySignature
-      info
-    }
-  }
-}
-    `;
-
-export function useCreateDeviceMutation() {
-  return Urql.useMutation<CreateDeviceMutation, CreateDeviceMutationVariables>(CreateDeviceDocument);
 };
 export const CreateDocumentDocument = gql`
     mutation createDocument($input: CreateDocumentInput!) {

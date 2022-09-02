@@ -1,6 +1,6 @@
+import { Login } from "@serenity-tools/opaque-server";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
-import { Login } from "@serenity-tools/opaque-server";
 
 type Params = {
   graphql: any;

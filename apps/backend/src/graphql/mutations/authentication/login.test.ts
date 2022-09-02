@@ -1,5 +1,6 @@
+import { createDevice as createdDeviceHelper } from "@serenity-tools/common";
+import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
-import sodium from "libsodium-wrappers";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { requestLoginChallengeResponse } from "../../../../test/helpers/authentication/requestLoginChallengeResponse";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -39,20 +40,43 @@ test("server should login a user", async () => {
   const finishMessage = sodium.to_base64(
     result.login.finish(sodium.from_base64(result.data.challengeResponse))
   );
+
+  const sessionKey = sodium.to_base64(result.login.getSessionKey());
+
+  const device = await createdDeviceHelper();
+  const deviceInfoJson = {
+    type: "web",
+    OS: "MacOS",
+    OsVersion: null,
+    Browser: "chrome",
+    BrowserVersion: "100.0.1",
+  };
+  const deviceInfo = JSON.stringify(deviceInfoJson);
+
+  const sessionTokenSignature = await sodium.crypto_sign_detached(
+    sessionKey,
+    device.signingPrivateKey
+  );
+
   const query = gql`
-    mutation {
-      finishLogin(
-        input: {
-          loginId: "${result.data.loginId}"
-          message: "${finishMessage}"
-        }
-      ) {
+    mutation finishLogin($input: FinishLoginInput!) {
+      finishLogin(input: $input) {
         expiresAt
       }
     }
   `;
   // client gets login response from server, which contains encrypted data
-  const loginResponse = await graphql.client.request(query);
+  const loginResponse = await graphql.client.request(query, {
+    input: {
+      loginId: result.data.loginId,
+      message: finishMessage,
+      deviceSigningPublicKey: device.signingPublicKey,
+      deviceEncryptionPublicKey: device.encryptionPublicKey,
+      deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
+      deviceInfo: deviceInfo,
+      sessionTokenSignature,
+    },
+  });
   expect(loginResponse.finishLogin.expiresAt).toBeDefined();
 });
 
@@ -91,9 +115,6 @@ describe("Input errors", () => {
       username,
       password,
     });
-    const finishMessage = sodium.to_base64(
-      result.login.finish(sodium.from_base64(result.data.challengeResponse))
-    );
     await expect(
       (async () =>
         await graphql.client.request(query, {
