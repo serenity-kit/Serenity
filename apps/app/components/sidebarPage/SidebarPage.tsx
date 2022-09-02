@@ -163,12 +163,7 @@ export default function SidebarPage(props: Props) {
             alignItems="center"
             style={tw`py-3 md:py-1.5 pl-${5 + depth} md:pl-2.5`}
           >
-            <Icon
-              name="page"
-              size={5}
-              mobileSize={8}
-              color={tw.color("gray-600")}
-            />
+            <Icon name="page" size={5} mobileSize={8} color={"gray-600"} />
             {isEditing ? (
               <InlineInput
                 onCancel={() => {
@@ -181,7 +176,7 @@ export default function SidebarPage(props: Props) {
               />
             ) : (
               <Text
-                variant="small"
+                variant="sm"
                 style={[tw`pl-1.5 max-w-${maxWidth}`]}
                 numberOfLines={1}
                 ellipsizeMode="tail"

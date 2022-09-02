@@ -1,7 +1,12 @@
-import { arg, inputObjectType, mutationField, objectType } from "nexus";
-import { finishRegistration } from "../../../utils/opaque";
+import {
+  arg,
+  inputObjectType,
+  mutationField,
+  nonNull,
+  objectType,
+} from "nexus";
 import { finalizeRegistration } from "../../../database/authentication/finalizeRegistration";
-import { UserInputError } from "apollo-server-express";
+import { finishRegistration } from "../../../utils/opaque";
 
 export const FinishRegistrationDeviceInput = inputObjectType({
   name: "FinishRegistrationDeviceInput",
@@ -36,53 +41,13 @@ export const FinishRegistrationResult = objectType({
 export const finishRegistrationMutation = mutationField("finishRegistration", {
   type: FinishRegistrationResult,
   args: {
-    input: arg({
-      type: FinishRegistrationInput,
-    }),
+    input: nonNull(
+      arg({
+        type: FinishRegistrationInput,
+      })
+    ),
   },
   async resolve(root, args, context) {
-    if (!args || !args.input) {
-      throw new UserInputError("Missing input");
-    }
-    if (!args.input.message) {
-      throw new UserInputError("Invalid input: message cannot be null");
-    }
-    if (!args.input.registrationId) {
-      throw new UserInputError("Invalid input: registrationId cannot be null");
-    }
-    if (!args.input.mainDevice) {
-      throw new UserInputError("Invalid input: mainDevice cannot be null");
-    }
-    if (!args.input.mainDevice.ciphertext) {
-      throw new UserInputError(
-        "Invalid input: mainDevice.ciphertext cannot be null"
-      );
-    }
-    if (!args.input.mainDevice.nonce) {
-      throw new UserInputError(
-        "Invalid input: mainDevice.nonce cannot be null"
-      );
-    }
-    if (!args.input.mainDevice.encryptionKeySalt) {
-      throw new UserInputError(
-        "Invalid input: mainDevice.encryptionKeySalt cannot be null"
-      );
-    }
-    if (!args.input.mainDevice.signingPublicKey) {
-      throw new UserInputError(
-        "Invalid input: mainDevice.signingPublicKey cannot be null"
-      );
-    }
-    if (!args.input.mainDevice.encryptionPublicKey) {
-      throw new UserInputError(
-        "Invalid input: mainDevice.encryptionPublicKey cannot be null"
-      );
-    }
-    if (!args.input.mainDevice.encryptionPublicKeySignature) {
-      throw new UserInputError(
-        "Invalid input: mainDevice.encryptionPublicKeySignature cannot be null"
-      );
-    }
     const { envelope, username } = finishRegistration({
       registrationId: args.input.registrationId,
       message: args.input.message,

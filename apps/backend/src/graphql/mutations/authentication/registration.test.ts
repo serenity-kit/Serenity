@@ -1,10 +1,10 @@
+import { createAndEncryptDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { requestRegistrationChallengeResponse } from "../../../../test/helpers/authentication/requestRegistrationChallengeResponse";
-import { createAndEncryptDevice } from "@serenity-tools/common";
 import { v4 as uuidv4 } from "uuid";
+import { requestRegistrationChallengeResponse } from "../../../../test/helpers/authentication/requestRegistrationChallengeResponse";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();

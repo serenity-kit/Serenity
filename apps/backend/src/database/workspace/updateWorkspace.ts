@@ -1,6 +1,6 @@
-import { prisma } from "../prisma";
-import { Workspace, WorkspaceMember } from "../../types/workspace";
 import { ForbiddenError } from "apollo-server-express";
+import { Workspace, WorkspaceMember } from "../../types/workspace";
+import { prisma } from "../prisma";
 
 export type WorkspaceMemberParams = {
   userId: string;
@@ -11,7 +11,7 @@ type Params = {
   id: string;
   name: string | undefined;
   userId: string;
-  members: WorkspaceMemberParams[] | undefined;
+  members: WorkspaceMemberParams[] | undefined | null;
 };
 
 type UserToWorkspaceData = {
@@ -53,7 +53,7 @@ export async function updateWorkspace({
       if (!workspace) {
         throw new Error("Invalid workspaceId");
       }
-      if (members != undefined) {
+      if (members !== undefined && members !== null) {
         const membersByUserId = {};
         members.forEach(({ userId, isAdmin }) => {
           membersByUserId[userId] = {

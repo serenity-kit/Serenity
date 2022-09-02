@@ -17,7 +17,7 @@ export default function DevDashboardScreen(props) {
           name="dashboard-line"
           size={4.5}
           mobileSize={5.5}
-          color={tw.color("gray-800")}
+          color={"gray-800"}
         />
         <Text>Home</Text>
       </SidebarLink>
@@ -26,7 +26,7 @@ export default function DevDashboardScreen(props) {
           name="dashboard-line"
           size={4.5}
           mobileSize={5.5}
-          color={tw.color("gray-800")}
+          color={"gray-800"}
         />
         <Text>Design System</Text>
       </SidebarLink>
@@ -35,7 +35,7 @@ export default function DevDashboardScreen(props) {
           name="dashboard-line"
           size={4.5}
           mobileSize={5.5}
-          color={tw.color("gray-800")}
+          color={"gray-800"}
         />
         <Text>Libsodium Test Screen</Text>
       </SidebarLink>
@@ -44,7 +44,7 @@ export default function DevDashboardScreen(props) {
           name="dashboard-line"
           size={4.5}
           mobileSize={5.5}
-          color={tw.color("gray-800")}
+          color={"gray-800"}
         />
         <Text>Encrypt / Decrypt Image</Text>
       </SidebarLink>
@@ -53,7 +53,7 @@ export default function DevDashboardScreen(props) {
           name="dashboard-line"
           size={4.5}
           mobileSize={5.5}
-          color={tw.color("gray-800")}
+          color={"gray-800"}
         />
         <Text>User Settings</Text>
       </SidebarLink>

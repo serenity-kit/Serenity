@@ -3,13 +3,14 @@ import { HStack } from "native-base";
 import React, { forwardRef } from "react";
 import { Platform, StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
+import { Color } from "../../types";
 import { Icon, IconNames } from "../icon/Icon";
 import { Pressable, PressableProps } from "../pressable/Pressable";
 import { Text } from "../text/Text";
 
 export type IconButtonProps = PressableProps & {
   name: IconNames;
-  color?: string;
+  color?: Color;
   label?: string;
   size?: "md" | "lg";
 };
@@ -63,10 +64,7 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
             ]}
             space={2}
           >
-            <Icon
-              name={name}
-              color={tw.color(isHovered ? "gray-800" : iconColor)}
-            />
+            <Icon name={name} color={isHovered ? "gray-800" : iconColor} />
             {label && (
               <Text
                 variant="xs"

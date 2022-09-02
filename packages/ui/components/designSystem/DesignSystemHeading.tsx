@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { tw } from "../../tailwind";
 import { Text, TextProps, TextVariants } from "../text/Text";
 
@@ -10,7 +10,7 @@ export type DesignSystemHeadingProps = TextProps & {
 export const DesignSystemHeading = (props: DesignSystemHeadingProps) => {
   const { lvl } = props;
   // TextVariants indexed from 1(0) to  4(3) to fit heading levels
-  const variants: TextVariants[] = ["large", "medium", "medium", "xs"];
+  const variants: TextVariants[] = ["lg", "md", "md", "xs"];
 
   const styles = StyleSheet.create({
     1: tw`mt-12 mb-4 text-4xl`,
@@ -26,7 +26,7 @@ export const DesignSystemHeading = (props: DesignSystemHeadingProps) => {
       style={[styles[lvl], props.style]}
       bold
       // @ts-expect-error react-native-web needs react-native unsupported values here
-      accessibilityRole="heading"
+      accessibilityRole={Platform.OS === "web" ? "heading" : undefined}
       accessibilityLevel={lvl}
     >
       {props.children}

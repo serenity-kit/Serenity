@@ -1,7 +1,6 @@
 import { decryptDevice } from "@serenity-tools/common";
+import sodium from "@serenity-tools/libsodium";
 import { finishLogin, startLogin } from "@serenity-tools/opaque";
-import { detect } from "detect-browser";
-import { Platform } from "react-native";
 import { Client } from "urql";
 import { UpdateAuthenticationFunction } from "../../context/AuthenticationContext";
 import {
@@ -11,15 +10,14 @@ import {
   MeQuery,
   MeQueryVariables,
 } from "../../generated/graphql";
-import { createAndSetDevice } from "../device/deviceStore";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { LocalDeviceInclInfo } from "./createDeviceWithInfo";
 import {
   isUserIdSameAsLastLogin,
   removeLastLogin,
   setLoggedInUserId,
 } from "./lastLoginStore";
-const browser = detect();
 
 const removeLastUsedWorkspaceIdIfLoginChanged = async (userId?: string) => {
   if (!userId) {
@@ -40,6 +38,7 @@ export type LoginParams = {
   startLoginMutation: any;
   finishLoginMutation: any;
   updateAuthentication: UpdateAuthenticationFunction;
+  device: LocalDeviceInclInfo;
   urqlClient: Client;
 };
 export const login = async ({
@@ -48,6 +47,7 @@ export const login = async ({
   startLoginMutation,
   finishLoginMutation,
   updateAuthentication,
+  device,
   urqlClient,
 }: LoginParams) => {
   await updateAuthentication(null);
@@ -66,10 +66,21 @@ export const login = async ({
   const result = await finishLogin(
     startLoginResult.data.startLogin.challengeResponse
   );
+
+  const sessionTokenSignature = await sodium.crypto_sign_detached(
+    result.sessionKey,
+    device.signingPrivateKey
+  );
+
   const finishLoginResult = await finishLoginMutation({
     input: {
       loginId: startLoginResult.data.startLogin.loginId,
       message: result.response,
+      deviceSigningPublicKey: device.signingPublicKey,
+      deviceEncryptionPublicKey: device.encryptionPublicKey,
+      deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
+      deviceInfo: device.info,
+      sessionTokenSignature,
     },
   });
   if (!finishLoginResult.data?.finishLogin) {
@@ -128,39 +139,6 @@ export const fetchMainDevice = async ({
     signingPublicKey: mainDevice.signingPublicKey,
     encryptionPublicKey: mainDevice.encryptionPublicKey,
   });
-};
-
-/**
- * This method creates a new device, stores it in secure storage,
- * creates the JSON device info, and prepares it for registering
- * with graphql.
- *
- * @returns the device information including signing and encryption private keys
- *          and stringified JSON device info
- */
-export const createRegisterAndStoreDevice = async (): Promise<any> => {
-  let type = "device";
-  if (Platform.OS === "web") {
-    type = "web";
-  }
-  const deviceData = await createAndSetDevice();
-  if (deviceData) {
-    const { signingPrivateKey, encryptionPrivateKey, ...platformDevice } =
-      deviceData;
-    const deviceInfoJson = {
-      type,
-      os: Platform.OS,
-      osVersion: Platform.Version,
-      browser: null,
-      browserVersion: null,
-    };
-    const deviceInfo = JSON.stringify(deviceInfoJson);
-    const newDeviceInfo = {
-      ...platformDevice,
-      info: deviceInfo,
-    };
-    return newDeviceInfo;
-  }
 };
 
 /**

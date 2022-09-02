@@ -8,7 +8,7 @@ import sodium from "@serenity-tools/libsodium";
 import {
   Button,
   FormWrapper,
-  LabeledInput,
+  Input,
   ModalButtonFooter,
   ModalHeader,
 } from "@serenity-tools/ui";
@@ -153,7 +153,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   return (
     <FormWrapper>
       <ModalHeader>Create a Workspace</ModalHeader>
-      <LabeledInput
+      <Input
         ref={inputRef}
         label={"Workspace Name"}
         onChangeText={setName}

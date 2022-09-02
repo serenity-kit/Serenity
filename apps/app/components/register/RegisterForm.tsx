@@ -3,7 +3,7 @@ import {
   Text,
   Button,
   Checkbox,
-  LabeledInput,
+  Input,
   LinkExternal,
   InfoMessage,
   FormWrapper,
@@ -116,7 +116,7 @@ export default function RegisterForm(props: Props) {
 
   return (
     <FormWrapper>
-      <LabeledInput
+      <Input
         label={"Email"}
         keyboardType="email-address"
         value={username}
@@ -127,7 +127,7 @@ export default function RegisterForm(props: Props) {
         autoCapitalize="none"
       />
 
-      <LabeledInput
+      <Input
         label={"Password"}
         secureTextEntry
         value={password}

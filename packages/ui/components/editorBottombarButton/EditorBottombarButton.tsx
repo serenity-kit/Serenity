@@ -53,9 +53,7 @@ export const EditorBottombarButton = forwardRef(
             >
               <Icon
                 name={name}
-                color={tw.color(
-                  isActive || isPressed ? "primary-500" : "gray-800"
-                )}
+                color={isActive || isPressed ? "primary-500" : "gray-800"}
               />
             </HStack>
           );

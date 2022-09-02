@@ -31,7 +31,7 @@ const Wrapper = ({ children }) => (
 const LoadingErrorWrapper = ({ children }) => (
   <Wrapper>
     <VStack alignItems="center" space={4} style={tw`text-center`}>
-      <Text variant={"large"} bold>
+      <Text variant={"lg"} bold>
         Hi there!
       </Text>
       {children}
@@ -144,7 +144,7 @@ export default function AcceptWorkspaceInvitationScreen(
   return (
     <Wrapper>
       <VStack alignItems="center" space={4} style={tw`text-center`}>
-        <Text variant={"large"} bold>
+        <Text variant={"lg"} bold>
           Hi there!
         </Text>
         <Text>
@@ -162,7 +162,7 @@ export default function AcceptWorkspaceInvitationScreen(
         </Text>
 
         {!sessionKey ? (
-          <Text variant="small" muted>
+          <Text variant="sm" muted>
             Log in or register to accept the invitation.
           </Text>
         ) : null}

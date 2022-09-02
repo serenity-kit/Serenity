@@ -1,10 +1,10 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { registerUnverifiedUser } from "../../../../test/helpers/authentication/registerUnverifiedUser";
-import { prisma } from "../../../database/prisma";
 import { verifyUser } from "../../../../test/helpers/authentication/verifyUser";
-import { gql } from "graphql-request";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 

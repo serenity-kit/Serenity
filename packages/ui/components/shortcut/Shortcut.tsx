@@ -26,7 +26,7 @@ export const Shortcut = forwardRef((props: ShortcutProps, ref) => {
             name={icon}
             size={3}
             mobileSize={4}
-            color={tw.color("gray-400")}
+            color={"gray-400"}
             key={`icon_${icon}`}
           />
         );

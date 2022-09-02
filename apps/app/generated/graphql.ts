@@ -36,18 +36,6 @@ export type AttachDeviceToWorkspacesResult = {
   workspaceKeys: Array<WorkspaceKey>;
 };
 
-export type CreateDeviceInput = {
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
-  info: Scalars['String'];
-  signingPublicKey: Scalars['String'];
-};
-
-export type CreateDeviceResult = {
-  __typename?: 'CreateDeviceResult';
-  device?: Maybe<Device>;
-};
-
 export type CreateDocumentInput = {
   id: Scalars['String'];
   parentFolderId?: InputMaybe<Scalars['String']>;
@@ -237,8 +225,13 @@ export type DocumentSnapshotPublicDataInput = {
 };
 
 export type FinishLoginInput = {
+  deviceEncryptionPublicKey: Scalars['String'];
+  deviceEncryptionPublicKeySignature: Scalars['String'];
+  deviceInfo: Scalars['String'];
+  deviceSigningPublicKey: Scalars['String'];
   loginId: Scalars['String'];
   message: Scalars['String'];
+  sessionTokenSignature: Scalars['String'];
 };
 
 export type FinishLoginResult = {
@@ -319,7 +312,6 @@ export type Mutation = {
   __typename?: 'Mutation';
   acceptWorkspaceInvitation?: Maybe<AcceptWorkspaceInvitationResult>;
   attachDeviceToWorkspaces?: Maybe<AttachDeviceToWorkspacesResult>;
-  createDevice?: Maybe<CreateDeviceResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createFolder?: Maybe<CreateFolderResult>;
   createInitialWorkspaceStructure?: Maybe<CreateInitialWorkspaceStructureResult>;
@@ -341,102 +333,97 @@ export type Mutation = {
 
 
 export type MutationAcceptWorkspaceInvitationArgs = {
-  input?: InputMaybe<AcceptWorkspaceInvitationInput>;
+  input: AcceptWorkspaceInvitationInput;
 };
 
 
 export type MutationAttachDeviceToWorkspacesArgs = {
-  input?: InputMaybe<AttachDeviceToWorkspacesInput>;
-};
-
-
-export type MutationCreateDeviceArgs = {
-  input?: InputMaybe<CreateDeviceInput>;
+  input: AttachDeviceToWorkspacesInput;
 };
 
 
 export type MutationCreateDocumentArgs = {
-  input?: InputMaybe<CreateDocumentInput>;
+  input: CreateDocumentInput;
 };
 
 
 export type MutationCreateFolderArgs = {
-  input?: InputMaybe<CreateFolderInput>;
+  input: CreateFolderInput;
 };
 
 
 export type MutationCreateInitialWorkspaceStructureArgs = {
-  input?: InputMaybe<CreateInitialWorkspaceStructureInput>;
+  input: CreateInitialWorkspaceStructureInput;
 };
 
 
 export type MutationCreateWorkspaceInvitationArgs = {
-  input?: InputMaybe<CreateWorkspaceInvitationInput>;
+  input: CreateWorkspaceInvitationInput;
 };
 
 
 export type MutationDeleteDevicesArgs = {
-  input?: InputMaybe<DeleteDevicesInput>;
+  input: DeleteDevicesInput;
 };
 
 
 export type MutationDeleteDocumentsArgs = {
-  input?: InputMaybe<DeleteDocumentsInput>;
+  input: DeleteDocumentsInput;
 };
 
 
 export type MutationDeleteFoldersArgs = {
-  input?: InputMaybe<DeleteFoldersInput>;
+  input: DeleteFoldersInput;
 };
 
 
 export type MutationDeleteWorkspaceInvitationsArgs = {
-  input?: InputMaybe<DeleteWorkspaceInvitationsInput>;
+  input: DeleteWorkspaceInvitationsInput;
 };
 
 
 export type MutationDeleteWorkspacesArgs = {
-  input?: InputMaybe<DeleteWorkspacesInput>;
+  input: DeleteWorkspacesInput;
 };
 
 
 export type MutationFinishLoginArgs = {
-  input?: InputMaybe<FinishLoginInput>;
+  input: FinishLoginInput;
 };
 
 
 export type MutationFinishRegistrationArgs = {
-  input?: InputMaybe<FinishRegistrationInput>;
+  input: FinishRegistrationInput;
 };
 
 
 export type MutationStartLoginArgs = {
-  input?: InputMaybe<StartLoginInput>;
+  input: StartLoginInput;
 };
 
 
 export type MutationStartRegistrationArgs = {
-  input?: InputMaybe<StartRegistrationInput>;
+  input: StartRegistrationInput;
 };
 
 
 export type MutationUpdateDocumentNameArgs = {
-  input?: InputMaybe<UpdateDocumentNameInput>;
+  input: UpdateDocumentNameInput;
 };
 
 
 export type MutationUpdateFolderNameArgs = {
-  input?: InputMaybe<UpdateFolderNameInput>;
+  input: UpdateFolderNameInput;
 };
 
 
 export type MutationUpdateWorkspaceArgs = {
-  input?: InputMaybe<UpdateWorkspaceInput>;
+  input: UpdateWorkspaceInput;
 };
 
 
 export type MutationVerifyRegistrationArgs = {
-  input?: InputMaybe<VerifyRegistrationInput>;
+  input: VerifyRegistrationInput;
 };
 
 /** PageInfo cursor, as defined in https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
@@ -745,13 +732,6 @@ export type AttachDeviceToWorkspacesMutationVariables = Exact<{
 
 export type AttachDeviceToWorkspacesMutation = { __typename?: 'Mutation', attachDeviceToWorkspaces?: { __typename?: 'AttachDeviceToWorkspacesResult', workspaceKeys: Array<{ __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string } | null }> } | null };
 
-export type CreateDeviceMutationVariables = Exact<{
-  input: CreateDeviceInput;
-}>;
-
-
-export type CreateDeviceMutation = { __typename?: 'Mutation', createDevice?: { __typename?: 'CreateDeviceResult', device?: { __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null } | null } | null };
-
 export type CreateDocumentMutationVariables = Exact<{
   input: CreateDocumentInput;
 }>;
@@ -1033,23 +1013,6 @@ export const AttachDeviceToWorkspacesDocument = gql`
 
 export function useAttachDeviceToWorkspacesMutation() {
   return Urql.useMutation<AttachDeviceToWorkspacesMutation, AttachDeviceToWorkspacesMutationVariables>(AttachDeviceToWorkspacesDocument);
-};
-export const CreateDeviceDocument = gql`
-    mutation createDevice($input: CreateDeviceInput!) {
-  createDevice(input: $input) {
-    device {
-      userId
-      signingPublicKey
-      encryptionPublicKey
-      encryptionPublicKeySignature
-      info
-    }
-  }
-}
-    `;
-
-export function useCreateDeviceMutation() {
-  return Urql.useMutation<CreateDeviceMutation, CreateDeviceMutationVariables>(CreateDeviceDocument);
 };
 export const CreateDocumentDocument = gql`
     mutation createDocument($input: CreateDocumentInput!) {

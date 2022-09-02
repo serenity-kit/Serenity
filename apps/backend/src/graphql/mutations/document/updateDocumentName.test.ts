@@ -186,7 +186,7 @@ describe("Input errors", () => {
       mutation {
         updateDocumentName(
           input: {
-            id: ""
+            id: 2
             name: "updated name"
             encryptedName: ""
             encryptedNameNonce: ""
@@ -203,7 +203,7 @@ describe("Input errors", () => {
     await expect(
       (async () =>
         await graphql.client.request(query, null, authorizationHeaders))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
   test("Invalid name", async () => {
     const query = gql`
@@ -211,7 +211,7 @@ describe("Input errors", () => {
             updateDocumentName(
             input: {
               id: "${id}"
-              name: ""
+              name: 555
               encryptedName: ""
               encryptedNameNonce: ""
               subkeyId: 1
@@ -227,7 +227,7 @@ describe("Input errors", () => {
     await expect(
       (async () =>
         await graphql.client.request(query, null, authorizationHeaders))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
   test("Invalid subkeyId", async () => {
     const query = gql`
@@ -238,7 +238,7 @@ describe("Input errors", () => {
             name: "updated name"
             encryptedName: "abc123"
             encryptedNameNonce: "abc123"
-            subkeyId: 0
+            subkeyId: "lala"
           }
         ) {
           document {
@@ -251,7 +251,7 @@ describe("Input errors", () => {
     await expect(
       (async () =>
         await graphql.client.request(query, null, authorizationHeaders))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
   test("Invalid input", async () => {
     const query = gql`
@@ -267,6 +267,6 @@ describe("Input errors", () => {
     await expect(
       (async () =>
         await graphql.client.request(query, null, authorizationHeaders))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
 });

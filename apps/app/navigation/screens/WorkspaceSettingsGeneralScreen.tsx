@@ -1,10 +1,10 @@
 import {
   Button,
   Input,
-  LabeledInput,
   Modal,
   ModalButtonFooter,
   ModalHeader,
+  RawInput,
   Text,
   tw,
   View,
@@ -145,6 +145,7 @@ export default function WorkspaceSettingsGeneralScreen(
       input: {
         id: workspaceId,
         name: workspaceName,
+        members: null,
       },
     });
     if (updateWorkspaceResult.data?.updateWorkspace?.workspace) {
@@ -172,7 +173,7 @@ export default function WorkspaceSettingsGeneralScreen(
               <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
                 Change Name
               </Text>
-              <Input
+              <RawInput
                 placeholder="Workspace name"
                 value={workspaceName}
                 onChangeText={setWorkspaceName}
@@ -199,7 +200,7 @@ export default function WorkspaceSettingsGeneralScreen(
               >
                 <ModalHeader>Delete Workspace?</ModalHeader>
                 <Text>Type the name of this workspace: {workspaceName}</Text>
-                <LabeledInput
+                <Input
                   label={"Workspace Name"}
                   onChangeText={setDeletingWorkspaceName}
                 />

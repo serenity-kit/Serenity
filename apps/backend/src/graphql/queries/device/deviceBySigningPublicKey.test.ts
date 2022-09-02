@@ -1,12 +1,14 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { Device } from "@serenity-tools/common";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { createDevice } from "../../../../test/helpers/device/createDevice";
 import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 let sessionKey = "";
+let userId = "";
+let webDevice: Device | null = null;
 
 beforeAll(async () => {
   await deleteAllRecords();
@@ -14,47 +16,43 @@ beforeAll(async () => {
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     username,
   });
+  webDevice = result.webDevice;
   sessionKey = result.sessionKey;
+  userId = result.user.id;
 });
 
 test("user should be retrieve a device by signingPublicKey", async () => {
   const authorizationHeader = sessionKey;
-  const createDeviceResponse = await createDevice({
-    graphql,
-    authorizationHeader,
-  });
-  const createdDevice = createDeviceResponse.createDevice.device;
-  const deviceBySigningPublicKey = createdDevice.signingPublicKey;
+  if (!webDevice) {
+    throw new Error("Missing the web device");
+  }
 
   const result = await getDeviceBySigningPublicKey({
     graphql,
-    signingPublicKey: deviceBySigningPublicKey,
+    signingPublicKey: webDevice.signingPublicKey,
     authorizationHeader,
   });
   const retrivedDevice = result.deviceBySigningPublicKey.device;
   expect(retrivedDevice).toMatchInlineSnapshot(`
     {
-      "encryptionPublicKey": "${createdDevice.encryptionPublicKey}",
-      "encryptionPublicKeySignature": "${createdDevice.encryptionPublicKeySignature}",
-      "signingPublicKey": "${createdDevice.signingPublicKey}",
-      "userId": "${createdDevice.userId}",
+      "encryptionPublicKey": "${webDevice.encryptionPublicKey}",
+      "encryptionPublicKeySignature": "${webDevice.encryptionPublicKeySignature}",
+      "signingPublicKey": "${webDevice.signingPublicKey}",
+      "userId": "${userId}",
     }
   `);
 });
 
 test("Unauthenticated", async () => {
-  const authorizationHeader = sessionKey;
-  const createDeviceResponse = await createDevice({
-    graphql,
-    authorizationHeader,
-  });
-  const createdDevice = createDeviceResponse.createDevice.device;
-  const deviceBySigningPublicKey = createdDevice.signingPublicKey;
+  if (!webDevice) {
+    throw new Error("Missing the web device");
+  }
+
   await expect(
     (async () =>
       await getDeviceBySigningPublicKey({
         graphql,
-        signingPublicKey: deviceBySigningPublicKey,
+        signingPublicKey: webDevice.signingPublicKey,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

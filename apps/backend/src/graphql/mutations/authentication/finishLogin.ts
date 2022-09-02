@@ -1,3 +1,5 @@
+import { verifyDevice } from "@serenity-tools/common";
+import sodium from "@serenity-tools/libsodium";
 import { UserInputError } from "apollo-server-express";
 import {
   arg,
@@ -15,6 +17,11 @@ export const FinishLoginInput = inputObjectType({
   definition(t) {
     t.nonNull.string("loginId");
     t.nonNull.string("message");
+    t.nonNull.string("deviceSigningPublicKey");
+    t.nonNull.string("deviceEncryptionPublicKey");
+    t.nonNull.string("deviceEncryptionPublicKeySignature");
+    t.nonNull.string("deviceInfo");
+    t.nonNull.string("sessionTokenSignature");
   },
 });
 
@@ -28,29 +35,52 @@ export const FinishLoginResult = objectType({
 export const finishLoginMutation = mutationField("finishLogin", {
   type: FinishLoginResult,
   args: {
-    input: arg({
-      type: FinishLoginInput,
-    }),
+    input: nonNull(
+      arg({
+        type: FinishLoginInput,
+      })
+    ),
   },
   async resolve(root, args, context) {
-    if (!args || !args.input) {
-      throw new UserInputError("Missing input");
+    try {
+      verifyDevice({
+        signingPublicKey: args.input.deviceSigningPublicKey,
+        encryptionPublicKey: args.input.deviceEncryptionPublicKey,
+        encryptionPublicKeySignature:
+          args.input.deviceEncryptionPublicKeySignature,
+      });
+    } catch (error) {
+      throw new UserInputError(
+        "Invalid input: encryptionPublicKeySignature verification failed"
+      );
     }
-    if (!args.input.loginId) {
-      throw new UserInputError("Invalid input: loginId cannot be null");
-    }
-    if (!args.input.message) {
-      throw new UserInputError("Invalid input: message cannot be null");
-    }
+
     const finishLoginResult = finishLogin({
       loginId: args.input.loginId,
       message: args.input.message,
     });
 
+    const isValidSessionTokenSignature =
+      await sodium.crypto_sign_verify_detached(
+        args.input.sessionTokenSignature,
+        finishLoginResult.sessionKey,
+        args.input.deviceSigningPublicKey
+      );
+    if (!isValidSessionTokenSignature) {
+      throw new Error("Invalid sessionTokenSignature");
+    }
+
     const session = await createSession({
       username: finishLoginResult.username,
       sessionKey: finishLoginResult.sessionKey,
       expiresAt: addDays(new Date(), 30),
+      device: {
+        signingPublicKey: args.input.deviceSigningPublicKey,
+        encryptionPublicKey: args.input.deviceEncryptionPublicKey,
+        encryptionPublicKeySignature:
+          args.input.deviceEncryptionPublicKeySignature,
+        info: args.input.deviceInfo,
+      },
     });
 
     return {

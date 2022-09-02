@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, LabeledInput, View } from "@serenity-tools/ui";
+import { Button, Input, View } from "@serenity-tools/ui";
 import {
   useWorkspaceInvitationsQuery,
   useCreateWorkspaceInvitationMutation,
@@ -119,7 +119,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       <Button onPress={createWorkspaceInvitation}>Create Invitation</Button>
       {selectedWorkspaceInvitationId !== null && (
         <>
-          <LabeledInput
+          <Input
             nativeID="workspaceInvitationInstructionsInput"
             label="Invitation text"
             value={getWorkspaceInvitationText()}

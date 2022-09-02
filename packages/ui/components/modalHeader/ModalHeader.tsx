@@ -5,7 +5,7 @@ export type ModalHeaderProps = TextProps & {};
 
 export const ModalHeader = forwardRef((props: TextProps, ref) => {
   return (
-    <Text variant="medium" bold>
+    <Text variant="md" bold>
       {props.children}
     </Text>
   );

@@ -2,7 +2,6 @@ import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
-import { createDevice } from "../../../../test/helpers/device/createDevice";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
@@ -71,13 +70,9 @@ test("attach the same device does nothing", async () => {
 
 test("attach a device to a workspace", async () => {
   const authorizationHeader = userAndDevice1.sessionKey;
-  const newDeviceResult = await createDevice({
-    graphql,
-    authorizationHeader,
-  });
-  const newDevice = newDeviceResult.localDevice;
-  const deviceSigningPublicKey = newDevice.signingPublicKey;
-  const deviceEncryptionPublicKey = newDevice.encryptionPublicKey;
+  const deviceSigningPublicKey = userAndDevice1.webDevice.signingPublicKey;
+  const deviceEncryptionPublicKey =
+    userAndDevice1.webDevice.encryptionPublicKey;
   const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
@@ -85,8 +80,8 @@ test("attach a device to a workspace", async () => {
   const workspaceId = userAndDevice1.workspace.id;
   const result = await attachDeviceToWorkspaces({
     graphql,
-    deviceSigningPublicKey: newDevice.signingPublicKey,
-    creatorDeviceSigningPublicKey: userAndDevice1.device.signingPublicKey,
+    deviceSigningPublicKey,
+    creatorDeviceSigningPublicKey: userAndDevice1.device.signingPublicKey, // main device
     deviceWorkspaceKeyBoxes: [
       {
         workspaceId,

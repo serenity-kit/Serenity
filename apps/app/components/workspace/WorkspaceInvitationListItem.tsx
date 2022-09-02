@@ -28,7 +28,7 @@ export function WorkspaceInvitationListItem(props: Props) {
             name="close-circle-fill"
             size={4.5}
             mobileSize={5.5}
-            color={tw.color("gray-800")}
+            color={"gray-800"}
           />
         </TouchableOpacity>
       </View>

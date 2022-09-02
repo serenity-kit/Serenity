@@ -1,50 +1,53 @@
-import React, { forwardRef } from "react";
+import React, { useState } from "react";
 import { StyleSheet } from "react-native";
-import { Input as NbInput, IInputProps } from "native-base";
 import { tw } from "../../tailwind";
+import { Text } from "../text/Text";
+import { RawInput, RawInputProps } from "../rawInput/RawInput";
+import { View } from "../view/View";
 
-export type InputProps = IInputProps & {};
+export type InputProps = RawInputProps & {
+  label: string;
+  hint?: string;
+};
 
-export const Input = forwardRef((props: InputProps, ref) => {
+export const Input = React.forwardRef(({ ...props }: InputProps, ref: any) => {
+  const [isFocused, setIsFocused] = useState(false);
   const styles = StyleSheet.create({
-    wrapper: tw`h-form-element rounded`,
-    input: tw`px-4 flex justify-center text-input font-input text-gray-900 `,
+    default: tw`text-base text-gray-900 dark:text-white`,
+    focus: tw`text-primary-500`,
+    disabled: tw`text-muted`,
+    error: tw`text-error-500`,
+    hint: tw`mt-3`,
   });
 
   return (
-    <NbInput
-      // @ts-ignore
-      ref={ref}
-      {...props}
-      style={[styles.input, props.isDisabled && tw`text-muted`, props.style]}
-      _stack={{
-        style: props.isDisabled
-          ? [styles.wrapper, tw`bg-gray-100 border-gray-400`]
-          : [styles.wrapper, tw`bg-white border-gray-400`],
-      }}
-      _hover={{
-        _stack: {
-          style: props.isDisabled
-            ? [styles.wrapper, tw`bg-gray-100 border-gray-400`]
-            : [styles.wrapper, tw`bg-white border-gray-600`],
-        },
-      }}
-      _focus={{
-        _stack: {
-          style: [
-            styles.wrapper,
-            tw`bg-white border-primary-500 se-outline-focus`,
-          ],
-        },
-        _hover: {
-          _stack: {
-            style: [
-              styles.wrapper,
-              tw`bg-white border-primary-500 se-outline-focus`,
-            ],
-          },
-        },
-      }}
-    />
+    <View style={[styles.default, props.style]}>
+      <Text
+        variant="xs"
+        muted
+        style={[
+          tw`mb-1`,
+          props.isDisabled && styles.disabled,
+          isFocused && styles.focus,
+        ]}
+      >
+        {props.label}
+      </Text>
+      <RawInput
+        {...props}
+        ref={ref}
+        onFocus={() => {
+          setIsFocused(true);
+        }}
+        onBlur={() => {
+          setIsFocused(false);
+        }}
+      />
+      {props.hint && (
+        <Text variant="xxs" bold muted style={styles.hint}>
+          {props.hint}
+        </Text>
+      )}
+    </View>
   );
 });

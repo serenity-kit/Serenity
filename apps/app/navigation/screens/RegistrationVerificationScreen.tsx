@@ -1,28 +1,26 @@
 import {
   Box,
   Button,
-  InfoMessage,
   CenterContent,
-  LabeledInput,
+  InfoMessage,
+  Input,
   Text,
   tw,
   View,
 } from "@serenity-tools/ui";
-import { detect } from "detect-browser";
 import { useState } from "react";
 import { Platform } from "react-native";
 import { useClient } from "urql";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
   useAcceptWorkspaceInvitationMutation,
-  useCreateDeviceMutation,
   useFinishLoginMutation,
   useStartLoginMutation,
   useVerifyRegistrationMutation,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
+import { createDeviceWithInfo } from "../../utils/authentication/createDeviceWithInfo";
 import {
-  createRegisterAndStoreDevice,
   fetchMainDevice,
   login,
   navigateToNextAuthenticatedPage,
@@ -33,15 +31,15 @@ import {
   getStoredUsername,
   isUsernamePasswordStored,
 } from "../../utils/authentication/registrationMemoryStore";
+import { setDevice } from "../../utils/device/deviceStore";
 import {
-  createWebDevice,
   removeWebDevice,
+  setWebDevice,
 } from "../../utils/device/webDeviceStore";
 import { removeLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
 import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
 import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
-const browser = detect();
 
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
@@ -56,7 +54,6 @@ export default function RegistrationVerificationScreen(
   const { updateAuthentication } = useAuthentication();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
-  const [, createDeviceMutation] = useCreateDeviceMutation();
   const [, acceptWorkspaceInvitationMutation] =
     useAcceptWorkspaceInvitationMutation();
   const urqlClient = useClient();
@@ -64,54 +61,6 @@ export default function RegistrationVerificationScreen(
   const navigateToLoginScreen = async () => {
     await removeLastUsedWorkspaceId();
     props.navigation.push("Login", {});
-  };
-
-  const registerNewDevice = async () => {
-    // if (Platform.OS === "ios") { // FIXME: handle webDevices using sessionStorage
-    const newDeviceInfo = await createRegisterAndStoreDevice();
-    await createDeviceMutation({
-      input: newDeviceInfo,
-    });
-    // }
-  };
-
-  const storeDeviceKeys = async () => {
-    // FIXME: allow non-extended login by storing into sessionStorage
-    // for now this is a HACK to support devices and workspaceKeyBoxes
-    const useExtendedLogin = true;
-    if (Platform.OS === "web") {
-      if (!useExtendedLogin) {
-        removeWebDevice();
-      }
-      const { signingPrivateKey, encryptionPrivateKey, ...webDevice } =
-        await createWebDevice(useExtendedLogin);
-      const deviceInfoJson = {
-        type: "web",
-        os: browser?.os,
-        osVersion: null,
-        browser: browser?.name,
-        browserVersion: browser?.version,
-      };
-      const deviceInfo = JSON.stringify(deviceInfoJson);
-      const newDeviceInfo = {
-        ...webDevice,
-        info: deviceInfo,
-      };
-      await createDeviceMutation({
-        input: newDeviceInfo,
-      });
-    } else if (Platform.OS === "ios") {
-      if (useExtendedLogin) {
-        await registerNewDevice();
-      }
-    }
-    try {
-      await attachDeviceToWorkspaces({ urqlClient });
-    } catch (error) {
-      // TOOD: handle error
-      console.error(error);
-      return;
-    }
   };
 
   const acceptPendingWorkspaceInvitation = async () => {
@@ -141,17 +90,41 @@ export default function RegistrationVerificationScreen(
     try {
       setErrorMessage("");
       setIsLoggingIn(true);
+
+      const unsafedDevice = await createDeviceWithInfo();
+
       const loginResult = await login({
         username,
         password,
         startLoginMutation,
         finishLoginMutation,
         updateAuthentication,
+        device: unsafedDevice,
         urqlClient,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
-      await storeDeviceKeys();
-      // await registerNewDevice(); // NOTE: keep this here for when we use sessionStorage to store devices
+
+      // FIXME: allow non-extended login by storing into sessionStorage
+      // for now this is a HACK to support devices and workspaceKeyBoxes
+      const useExtendedLogin = true;
+      if (Platform.OS === "web") {
+        if (!useExtendedLogin) {
+          await removeWebDevice();
+        }
+        await setWebDevice(unsafedDevice, useExtendedLogin);
+      } else if (Platform.OS === "ios") {
+        if (useExtendedLogin) {
+          await setDevice(unsafedDevice);
+        }
+      }
+      try {
+        await attachDeviceToWorkspaces({ urqlClient });
+      } catch (error) {
+        // TOOD: handle error
+        console.error(error);
+        return;
+      }
+
       await acceptPendingWorkspaceInvitation();
       setIsLoggingIn(false);
       navigateToNextAuthenticatedPage({
@@ -195,7 +168,7 @@ export default function RegistrationVerificationScreen(
     <CenterContent serenityBg>
       <Box>
         <View>
-          <Text variant="large" bold style={tw`text-center`}>
+          <Text variant="lg" bold style={tw`text-center`}>
             Verify your Email
           </Text>
           <Text muted style={tw`text-center`}>
@@ -213,7 +186,7 @@ export default function RegistrationVerificationScreen(
           </InfoMessage>
         ) : null}
 
-        <LabeledInput
+        <Input
           label={"Verification Code"}
           value={verificationCode}
           onChangeText={(verificationCode: string) => {

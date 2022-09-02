@@ -1,18 +1,5 @@
 import { create } from "twrnc";
+import { customColors } from "../../tailwind.config.js";
 
 export const tw = create(require(`../../tailwind.config.js`));
-export const collaborationColors = [
-  "terracotta",
-  "coral",
-  "raspberry",
-  "rose",
-  "honey",
-  "orange",
-  "emerald",
-  "arctic",
-  "sky",
-  "serenity",
-  "lavender",
-  "purple",
-  "slate",
-] as const;
+export const colors = customColors;

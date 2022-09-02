@@ -1,10 +1,10 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
-import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { deleteWorkspaceInvitations } from "../../../../test/helpers/workspace/deleteWorkspaceInvitations";
-import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
-import { prisma } from "../../../database/prisma";
 import { gql } from "graphql-request";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
+import { deleteWorkspaceInvitations } from "../../../../test/helpers/workspace/deleteWorkspaceInvitations";
+import { prisma } from "../../../database/prisma";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
 const username1 = "user1";
@@ -172,7 +172,7 @@ describe("Input Errors", () => {
           { input: { ids: null } },
           authorizationHeaders
         ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
   test("Invalid input", async () => {
     const authorizationHeaders = {
@@ -185,7 +185,7 @@ describe("Input Errors", () => {
           { input: null },
           authorizationHeaders
         ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
   test("No input", async () => {
     const authorizationHeaders = {
@@ -194,6 +194,6 @@ describe("Input Errors", () => {
     await expect(
       (async () =>
         await graphql.client.request(query, null, authorizationHeaders))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
+    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
 });
