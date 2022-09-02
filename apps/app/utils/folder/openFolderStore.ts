@@ -8,7 +8,6 @@ interface OpenFolderState {
 export const useOpenFolderStore = create<OpenFolderState>((set) => ({
   folderIds: [],
   update: (folderIds) => {
-    console.log({ folderIds });
     set(() => ({
       folderIds,
     }));
