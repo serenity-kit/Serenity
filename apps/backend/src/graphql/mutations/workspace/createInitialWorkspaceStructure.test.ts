@@ -59,6 +59,7 @@ test("user can create initial workspace structure", async () => {
     graphql,
     workspaceId,
     workspaceName,
+    creatorDeviceSigningPublicKey: deviceSigningPublicKey,
     deviceSigningPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
     deviceEncryptionPrivateKey: encryptionPrivateKey,
@@ -102,6 +103,7 @@ test("Unauthenticated", async () => {
         graphql,
         workspaceId,
         workspaceName,
+        creatorDeviceSigningPublicKey: deviceSigningPublicKey,
         deviceSigningPublicKey,
         deviceEncryptionPublicKey: device.encryptionPublicKey,
         deviceEncryptionPrivateKey: encryptionPrivateKey,
@@ -343,5 +345,66 @@ describe("Test login", () => {
       (async () =>
         await graphql.client.request(query, null, authorizationHeaders))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+
+  test("deviceSigningPublicKey must belong to the user", async () => {
+    // generate a challenge code
+    const authorizationHeader = sessionKey1;
+    const workspaceId = uuidv4();
+    const workspaceName = "New Workspace";
+    const folderId = uuidv4();
+    const folderIdSignature = `TODO+${folderId}`;
+    const folderName = "Getting started";
+    const documentId = uuidv4();
+    const documentName = "Introduction";
+    await expect(
+      (async () =>
+        await createInitialWorkspaceStructure({
+          graphql,
+          workspaceId,
+          workspaceName,
+          deviceSigningPublicKey: "abcd",
+          creatorDeviceSigningPublicKey: device.signingPublicKey,
+          deviceEncryptionPublicKey: device.encryptionPublicKey,
+          deviceEncryptionPrivateKey: encryptionPrivateKey,
+          folderId,
+          folderIdSignature,
+          folderName,
+          documentId,
+          documentName,
+          authorizationHeader,
+        }))()
+    ).rejects.toThrowError(/Internal server error/);
+  });
+
+  test("creatorDeviceSigningPublicKey must belong to the user", async () => {
+    // generate a challenge code
+    const authorizationHeader = sessionKey1;
+    const workspaceId = uuidv4();
+    const workspaceName = "New Workspace";
+    const deviceSigningPublicKey = device.signingPublicKey;
+    const folderId = uuidv4();
+    const folderIdSignature = `TODO+${folderId}`;
+    const folderName = "Getting started";
+    const documentId = uuidv4();
+    const documentName = "Introduction";
+    await expect(
+      (async () =>
+        await createInitialWorkspaceStructure({
+          graphql,
+          workspaceId,
+          workspaceName,
+          deviceSigningPublicKey,
+          creatorDeviceSigningPublicKey: "abcd",
+          deviceEncryptionPublicKey: device.encryptionPublicKey,
+          deviceEncryptionPrivateKey: encryptionPrivateKey,
+          folderId,
+          folderIdSignature,
+          folderName,
+          documentId,
+          documentName,
+          authorizationHeader,
+        }))()
+    ).rejects.toThrowError(/Internal server error/);
   });
 });

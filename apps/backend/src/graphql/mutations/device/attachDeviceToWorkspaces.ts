@@ -1,4 +1,4 @@
-import { AuthenticationError, UserInputError } from "apollo-server-express";
+import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
   inputObjectType,
@@ -53,24 +53,10 @@ export const attachDeviceToWorkspacesMutation = mutationField(
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      const workspaceKeyBoxes = args.input.deviceWorkspaceKeyBoxes;
-      workspaceKeyBoxes.forEach((workspaceKeyBox: any) => {
-        if (!workspaceKeyBox.workspaceId) {
-          throw new UserInputError(
-            "Invalid input: workspaceKeyBoxes[i].workspaceId cannot be null"
-          );
-        }
-        if (!workspaceKeyBox.ciphertext) {
-          throw new UserInputError(
-            "Invalid input: workspaceKeyBoxes[i].ciphertext cannot be null"
-          );
-        }
-        if (!workspaceKeyBox.nonce) {
-          throw new UserInputError(
-            "Invalid input: workspaceKeyBoxes[i].nonce cannot be null"
-          );
-        }
-      });
+      context.assertValidDeviceSigningPublicKeyForThisSession(
+        args.input.creatorDeviceSigningPublicKey
+      );
+
       const workspaceKeys = await attachDeviceToWorkspaces({
         userId: context.user.id,
         receiverDeviceSigningPublicKey:
