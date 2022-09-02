@@ -75,6 +75,7 @@ test("server should login a user", async () => {
       deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
       deviceInfo: deviceInfo,
       sessionTokenSignature,
+      deviceType: "web",
     },
   });
   expect(loginResponse.finishLogin.expiresAt).toBeDefined();

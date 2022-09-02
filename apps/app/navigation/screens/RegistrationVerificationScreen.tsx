@@ -93,6 +93,10 @@ export default function RegistrationVerificationScreen(
 
       const unsafedDevice = await createDeviceWithInfo();
 
+      // FIXME: allow non-extended login by storing into sessionStorage
+      // for now this is a HACK to support devices and workspaceKeyBoxes
+      const useExtendedLogin = true;
+
       const loginResult = await login({
         username,
         password,
@@ -101,12 +105,10 @@ export default function RegistrationVerificationScreen(
         updateAuthentication,
         device: unsafedDevice,
         urqlClient,
+        useExtendedLogin,
       });
       await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
 
-      // FIXME: allow non-extended login by storing into sessionStorage
-      // for now this is a HACK to support devices and workspaceKeyBoxes
-      const useExtendedLogin = true;
       if (Platform.OS === "web") {
         if (!useExtendedLogin) {
           await removeWebDevice();

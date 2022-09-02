@@ -86,6 +86,7 @@ export function LoginForm(props: Props) {
         updateAuthentication,
         device: unsafedDevice,
         urqlClient,
+        useExtendedLogin,
       });
       const exportKey = loginResult.exportKey;
       // reset the password in case the user ends up on this screen again

@@ -229,6 +229,7 @@ export type FinishLoginInput = {
   deviceEncryptionPublicKeySignature: Scalars['String'];
   deviceInfo: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
+  deviceType: Scalars['String'];
   loginId: Scalars['String'];
   message: Scalars['String'];
   sessionTokenSignature: Scalars['String'];
