@@ -87,6 +87,14 @@ export const createInitialWorkspaceStructureMutation = mutationField(
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
+      args.input.deviceWorkspaceKeyBoxes.forEach((deviceWorkspaceKeyBox) => {
+        context.assertValidDeviceSigningPublicKeyForThisSession(
+          deviceWorkspaceKeyBox.creatorDeviceSigningPublicKey
+        );
+        context.assertValidDeviceSigningPublicKeyForThisSession(
+          deviceWorkspaceKeyBox.deviceSigningPublicKey
+        );
+      });
       const workspaceStructure = await createInitialWorkspaceStructure({
         userId: context.user.id,
         workspaceId: args.input.workspaceId,

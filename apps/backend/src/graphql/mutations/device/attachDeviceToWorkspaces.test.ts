@@ -287,7 +287,7 @@ describe("Input errors", () => {
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid creatorDeviceSigningPublicKey", async () => {
+  test("No creatorDeviceSigningPublicKey provided", async () => {
     const { ciphertext, nonce } = await createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
@@ -314,5 +314,33 @@ describe("Input errors", () => {
           { authorization: userAndDevice1.sessionKey }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+
+  test("Invalid creatorDeviceSigningPublicKey", async () => {
+    const authorizationHeader = userAndDevice1.sessionKey;
+    const deviceSigningPublicKey = userAndDevice1.webDevice.signingPublicKey;
+    const deviceEncryptionPublicKey =
+      userAndDevice1.webDevice.encryptionPublicKey;
+    const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
+      receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
+      creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
+    });
+    const workspaceId = userAndDevice1.workspace.id;
+    await expect(
+      (async () =>
+        await attachDeviceToWorkspaces({
+          graphql,
+          deviceSigningPublicKey,
+          creatorDeviceSigningPublicKey: "abc",
+          deviceWorkspaceKeyBoxes: [
+            {
+              workspaceId,
+              nonce,
+              ciphertext,
+            },
+          ],
+          authorizationHeader,
+        }))()
+    ).rejects.toThrowError(/Internal server error/);
   });
 });

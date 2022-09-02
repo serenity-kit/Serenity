@@ -46,6 +46,19 @@ export default async function createServer() {
           return {
             session,
             user: session.user,
+            assertValidDeviceSigningPublicKeyForThisSession: (
+              deviceSigningPublicKey: string
+            ) => {
+              if (
+                deviceSigningPublicKey !== session.deviceSigningPublicKey &&
+                deviceSigningPublicKey !==
+                  session.user.mainDeviceSigningPublicKey
+              ) {
+                throw new Error(
+                  "Invalid deviceSigningPublicKey for this session"
+                );
+              }
+            },
           };
         }
       }

@@ -21,11 +21,9 @@ export const workspaces = queryField((t) => {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      if (!args.deviceSigningPublicKey) {
-        throw new UserInputError(
-          "Invalid input: deviceSigningPublicKey cannot be null"
-        );
-      }
+      context.assertValidDeviceSigningPublicKeyForThisSession(
+        args.deviceSigningPublicKey
+      );
       const userId = context.user.id;
       const cursor = args.after ? { id: args.after } : undefined;
       // prisma will include the cursor if skip: 1 is not set

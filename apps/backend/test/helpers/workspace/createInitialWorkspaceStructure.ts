@@ -12,6 +12,7 @@ type Params = {
   graphql: any;
   workspaceId: string;
   workspaceName: string;
+  creatorDeviceSigningPublicKey?: string;
   deviceSigningPublicKey: string;
   deviceEncryptionPublicKey: string;
   deviceEncryptionPrivateKey: string;
@@ -27,6 +28,7 @@ export const createInitialWorkspaceStructure = async ({
   graphql,
   workspaceName,
   workspaceId,
+  creatorDeviceSigningPublicKey,
   deviceSigningPublicKey,
   deviceEncryptionPublicKey,
   deviceEncryptionPrivateKey,
@@ -134,7 +136,8 @@ export const createInitialWorkspaceStructure = async ({
         deviceWorkspaceKeyBoxes: [
           {
             deviceSigningPublicKey,
-            creatorDeviceSigningPublicKey: deviceSigningPublicKey,
+            creatorDeviceSigningPublicKey:
+              creatorDeviceSigningPublicKey ?? deviceSigningPublicKey,
             nonce,
             ciphertext,
           },
