@@ -61,11 +61,10 @@ export default function SidebarFolder(props: Props) {
   const openFolderIds = useOpenFolderStore((state) => state.folderIds);
   const folderStore = useOpenFolderStore();
   const isDesktopDevice = useIsDesktopDevice();
-  const [isOpen, setIsOpen] = useState(openFolderIds.includes(props.folderId));
   const [isHovered, setIsHovered] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const [isDeleted, setIsDeleted] = useState(false);
-
+  const isOpen = openFolderIds.includes(props.folderId);
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
@@ -98,7 +97,16 @@ export default function SidebarFolder(props: Props) {
   const [folderName, setFolderName] = useState("Decrypting...");
 
   useEffect(() => {
-    setIsOpen(openFolderIds.includes(props.folderId));
+    const isOpen = openFolderIds.indexOf(props.folderId) >= 0;
+    console.log({
+      folderThis: props.folderId,
+      folderOpen: openFolderIds[0],
+      isOpen,
+    });
+    if (isOpen) {
+      refetchFolders();
+      refetchDocuments();
+    }
   }, [openFolderIds, props.folderId]);
 
   useEffect(() => {
@@ -231,7 +239,6 @@ export default function SidebarFolder(props: Props) {
   };
 
   const openFolder = () => {
-    setIsOpen(true);
     const openFolderIds = folderStore.folderIds;
     if (!openFolderIds.includes(props.folderId)) {
       openFolderIds.push(props.folderId);
@@ -240,7 +247,6 @@ export default function SidebarFolder(props: Props) {
   };
 
   const closeFolder = () => {
-    setIsOpen(false);
     const openFolderIds = folderStore.folderIds;
     const position = openFolderIds.indexOf(props.folderId);
     if (position >= 0) {
