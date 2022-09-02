@@ -17,6 +17,10 @@ export const workspaces = queryField((t) => {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
+      context.assertValidDeviceSigningPublicKeyForThisSession(
+        args.deviceSigningPublicKey
+      );
+
       const userId = context.user.id;
       if (args.id) {
         const workspace = await getWorkspace({
