@@ -10,7 +10,16 @@ import {
 } from "nexus";
 import { createSession } from "../../../database/authentication/createSession";
 import { addDays } from "../../../utils/addDays/addDays";
+import { addYears } from "../../../utils/addYears/addYears";
 import { finishLogin } from "../../../utils/opaque";
+
+export const deviceTypes = ["temporary-web", "web", "mobile"] as const;
+
+export type DeviceType = typeof deviceTypes[number];
+
+function isDeviceType(value: string): value is DeviceType {
+  return deviceTypes.includes(value as DeviceType);
+}
 
 export const FinishLoginInput = inputObjectType({
   name: "FinishLoginInput",
@@ -22,6 +31,7 @@ export const FinishLoginInput = inputObjectType({
     t.nonNull.string("deviceEncryptionPublicKeySignature");
     t.nonNull.string("deviceInfo");
     t.nonNull.string("sessionTokenSignature");
+    t.nonNull.string("deviceType");
   },
 });
 
@@ -42,6 +52,12 @@ export const finishLoginMutation = mutationField("finishLogin", {
     ),
   },
   async resolve(root, args, context) {
+    if (!isDeviceType(args.input.deviceType)) {
+      throw new UserInputError(
+        "Invalid input: deviceType must be either temporary-web, web or mobile"
+      );
+    }
+
     try {
       verifyDevice({
         signingPublicKey: args.input.deviceSigningPublicKey,
@@ -70,10 +86,19 @@ export const finishLoginMutation = mutationField("finishLogin", {
       throw new Error("Invalid sessionTokenSignature");
     }
 
+    let expiresAt = new Date();
+    if (args.input.deviceType === "temporary-web") {
+      expiresAt = addDays(new Date(), 1);
+    } else if (args.input.deviceType === "web") {
+      expiresAt = addDays(new Date(), 30);
+    } else if (args.input.deviceType === "mobile") {
+      expiresAt = addYears(new Date(), 1000);
+    }
+
     const session = await createSession({
       username: finishLoginResult.username,
       sessionKey: finishLoginResult.sessionKey,
-      expiresAt: addDays(new Date(), 30),
+      expiresAt,
       device: {
         signingPublicKey: args.input.deviceSigningPublicKey,
         encryptionPublicKey: args.input.deviceEncryptionPublicKey,

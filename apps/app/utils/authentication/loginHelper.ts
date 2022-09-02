@@ -1,6 +1,7 @@
 import { decryptDevice } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { finishLogin, startLogin } from "@serenity-tools/opaque";
+import { Platform } from "react-native";
 import { Client } from "urql";
 import { UpdateAuthenticationFunction } from "../../context/AuthenticationContext";
 import {
@@ -32,6 +33,16 @@ const removeLastUsedWorkspaceIdIfLoginChanged = async (userId?: string) => {
   }
 };
 
+const getDeviceType = (useExtendedLogin: boolean) => {
+  if (Platform.OS === "ios" || Platform.OS === "android") {
+    return "mobile";
+  }
+  if (Platform.OS === "web") {
+    return useExtendedLogin ? "web" : "temporary-web";
+  }
+  throw new Error(`Unsupported platform: ${Platform.OS}`);
+};
+
 export type LoginParams = {
   username: string;
   password: string;
@@ -40,6 +51,7 @@ export type LoginParams = {
   updateAuthentication: UpdateAuthenticationFunction;
   device: LocalDeviceInclInfo;
   urqlClient: Client;
+  useExtendedLogin: boolean;
 };
 export const login = async ({
   username,
@@ -49,6 +61,7 @@ export const login = async ({
   updateAuthentication,
   device,
   urqlClient,
+  useExtendedLogin,
 }: LoginParams) => {
   await updateAuthentication(null);
   const message = await startLogin(password);
@@ -81,6 +94,7 @@ export const login = async ({
       deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
       deviceInfo: device.info,
       sessionTokenSignature,
+      deviceType: getDeviceType(useExtendedLogin),
     },
   });
   if (!finishLoginResult.data?.finishLogin) {
