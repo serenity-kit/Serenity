@@ -20,7 +20,6 @@ export const FinishLoginInput = inputObjectType({
     t.nonNull.string("deviceSigningPublicKey");
     t.nonNull.string("deviceEncryptionPublicKey");
     t.nonNull.string("deviceEncryptionPublicKeySignature");
-    t.nonNull.string("deviceEncryptionPublicKeySignature");
     t.nonNull.string("deviceInfo");
     t.nonNull.string("sessionTokenSignature");
   },
