@@ -1,18 +1,9 @@
 import { Device } from "../../types/Device";
-import { getItem, setItem, removeItem } from "../storage/storage";
-import { createDevice } from "@serenity-tools/common";
+import { getItem, removeItem, setItem } from "../storage/storage";
 
 export const webDeviceStorageKey = "webDevice.device";
 export const webDeviceExpirationStorageKey = "webDevice.expiration";
 export const webDeviceExpirationSeconds = 1000 * 60 * 60 * 24 * 30;
-
-let device: Device | null = null;
-
-export const createWebDevice = async (useExtendedLogin: boolean) => {
-  const webDevice = await createDevice();
-  await setWebDevice(webDevice, useExtendedLogin);
-  return webDevice;
-};
 
 export const setWebDevice = async (
   newDevice: Device,

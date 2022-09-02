@@ -14,7 +14,7 @@ export const UpdateWorkspaceInput = inputObjectType({
   definition(t) {
     t.nonNull.string("id");
     t.string("name");
-    t.nonNull.list.nonNull.field("members", {
+    t.list.nonNull.field("members", {
       type: WorkspaceMemberInput,
     });
   },

@@ -1,9 +1,8 @@
 import { gql } from "graphql-request";
-import setupGraphql from "../../../../test/helpers/setupGraphql";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { createDevice } from "../../../../test/helpers/device/createDevice";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
@@ -20,14 +19,6 @@ beforeAll(async () => {
 
 test("user should be able to list their devices", async () => {
   const authorizationHeader = sessionKey;
-  await createDevice({
-    graphql,
-    authorizationHeader,
-  });
-  await createDevice({
-    graphql,
-    authorizationHeader,
-  });
 
   const result = await getDevices({
     graphql,
@@ -35,7 +26,7 @@ test("user should be able to list their devices", async () => {
   });
 
   const edges = result.devices.edges;
-  expect(edges.length).toBe(3);
+  expect(edges.length).toBe(2);
 });
 
 test("Unauthenticated", async () => {
