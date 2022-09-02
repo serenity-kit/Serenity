@@ -98,11 +98,6 @@ export default function SidebarFolder(props: Props) {
 
   useEffect(() => {
     const isOpen = openFolderIds.indexOf(props.folderId) >= 0;
-    console.log({
-      folderThis: props.folderId,
-      folderOpen: openFolderIds[0],
-      isOpen,
-    });
     if (isOpen) {
       refetchFolders();
       refetchDocuments();

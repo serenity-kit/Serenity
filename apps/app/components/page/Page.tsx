@@ -80,7 +80,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPath = await getDocumentPath(urqlClient, docId);
-    console.log({ documentPath });
     const openFolderIds = folderStore.folderIds;
     if (!documentPath) {
       return;
