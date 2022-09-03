@@ -1,3 +1,4 @@
+import sodium from "@serenity-tools/libsodium";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
@@ -14,10 +15,13 @@ export default function useCachedResources() {
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHideAsync();
-        // Load fonts
-        await Font.loadAsync({
-          "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
-        });
+        await Promise.all([
+          sodium.ready,
+          // Load fonts
+          Font.loadAsync({
+            "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
+          }),
+        ]);
         const sessionKey = await getSessionKey();
         setSessionKey(sessionKey);
         const exportKey = await getExportKey();
