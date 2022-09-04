@@ -55,6 +55,7 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
       deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
       deviceInfo: deviceInfo,
       sessionTokenSignature,
+      deviceType: "web",
     },
   });
 
