@@ -71,7 +71,7 @@ test.describe("Documents", () => {
         createdWorkspace.id
       );
       await renameDocument(page, addedDocument?.id!, "Renamed document");
-      await deleteDocument(page, addedDocument?.id!, workspaceId);
+      await deleteDocument(page, addedDocument?.id!, createdWorkspace.id);
     });
   });
   test.describe("After ephemeral login", () => {
@@ -83,7 +83,7 @@ test.describe("Documents", () => {
         createdWorkspace.id
       );
       await renameDocument(page, addedDocument?.id!, "Renamed document");
-      await deleteDocument(page, addedDocument?.id!, workspaceId);
+      await deleteDocument(page, addedDocument?.id!, createdWorkspace.id);
     });
   });
   test.describe("After reload", () => {
@@ -96,7 +96,7 @@ test.describe("Documents", () => {
         createdWorkspace.id
       );
       await renameDocument(page, addedDocument?.id!, "Renamed document");
-      await deleteDocument(page, addedDocument?.id!, workspaceId);
+      await deleteDocument(page, addedDocument?.id!, createdWorkspace.id);
     });
   });
 });
