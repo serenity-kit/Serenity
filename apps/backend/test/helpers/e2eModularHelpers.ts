@@ -58,7 +58,12 @@ export const openDocumentMenu = async (page: Page, documentId: string) => {
 };
 
 export const expandFolderTree = async (page: Page, folderId: string) => {
-  await page.locator(`data-testid=sidebar-folder--${folderId}`).click();
+  const isVisible = await page
+    .locator(`data-testid=sidebar-folder--${folderId}`)
+    .isVisible();
+  if (!isVisible) {
+    await page.locator(`data-testid=sidebar-folder--${folderId}`).click();
+  }
   await delayForSeconds(2);
 };
 

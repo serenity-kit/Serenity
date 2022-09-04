@@ -1,11 +1,11 @@
 import { test } from "@playwright/test";
+import * as sodium from "@serenity-tools/libsodium";
 import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { decryptWorkspaceKey } from "../../helpers/device/decryptWorkspaceKey";
 import {
   createDocument,
   deleteDocument,
-  expandFolderTree,
   login,
   register,
   reloadPage,
@@ -23,6 +23,7 @@ let firstFolder: any = null;
 let firstDocument: any = null;
 
 test.beforeAll(async () => {
+  await sodium.ready;
   const { workspace, folder, document, device, encryptionPrivateKey } =
     await createUserWithWorkspace({
       id: userId,
@@ -42,103 +43,60 @@ test.beforeAll(async () => {
   });
 });
 
-test.describe.skip("Documents", () => {
-  let addedDocument: any = null;
+test.describe("Documents", () => {
   const createDocumentUsername = `${uuidv4()}@test.com`;
-  const renameDocumentUsername = `${uuidv4()}@test.com`;
-  const deleteDocumentUsername = `${uuidv4()}@test.com`;
   test.describe("After register", () => {
-    test("Create document", async ({ page }) => {
+    test("Create, rename, delete", async ({ page }) => {
       const { workspace, folder } = await register(
         page,
         createDocumentUsername,
         password,
         workspaceName
       );
-      // NOTE: we must toggle the open folder to work around the folder expansion bug
-      expandFolderTree(page, folder?.id!);
-      addedDocument = await createDocument(page, folder?.id!, workspace?.id!);
-    });
-    test("Rename document", async ({ page }) => {
-      const { folder, document } = await register(
+      const addedDocument = await createDocument(
         page,
-        renameDocumentUsername,
-        password,
-        workspaceName
+        folder?.id!,
+        workspace?.id!
       );
-      expandFolderTree(page, folder?.id!);
-      await renameDocument(page, document?.id!, "Renamed document");
-    });
-
-    test("Delete document", async ({ page }) => {
-      const { folder, document, workspace } = await register(
-        page,
-        deleteDocumentUsername,
-        password,
-        workspaceName
-      );
-      expandFolderTree(page, folder?.id!);
-      await deleteDocument(page, document?.id!, workspace?.id!);
+      await renameDocument(page, addedDocument?.id!, "Renamed document");
+      await deleteDocument(page, addedDocument?.id!, workspace?.id!);
     });
   });
   test.describe("After login", () => {
-    test("Create document", async ({ page }) => {
+    test("Create, rename, delete", async ({ page }) => {
       await login(page, username, password);
-      addedDocument = await createDocument(
+      const addedDocument = await createDocument(
         page,
         firstFolder.id,
         createdWorkspace.id
       );
-    });
-    test("Rename document", async ({ page }) => {
-      await login(page, username, password);
-      await renameDocument(page, addedDocument.id, "Renamed document");
-    });
-
-    test("Delete document", async ({ page }) => {
-      await login(page, username, password);
-      await deleteDocument(page, addedDocument.id, workspaceId);
+      await renameDocument(page, addedDocument?.id!, "Renamed document");
+      await deleteDocument(page, addedDocument?.id!, workspaceId);
     });
   });
   test.describe("After ephemeral login", () => {
-    test("Create document", async ({ page }) => {
+    test("Create, rename, delete", async ({ page }) => {
       await login(page, username, password, false);
-      addedDocument = await createDocument(
+      const addedDocument = await createDocument(
         page,
         firstFolder.id,
         createdWorkspace.id
       );
-    });
-    test("Rename document", async ({ page }) => {
-      await login(page, username, password, false);
-      await renameDocument(page, addedDocument.id, "Renamed document");
-    });
-
-    test("Delete document", async ({ page }) => {
-      await login(page, username, password, false);
-      await deleteDocument(page, addedDocument.id, workspaceId);
+      await renameDocument(page, addedDocument?.id!, "Renamed document");
+      await deleteDocument(page, addedDocument?.id!, workspaceId);
     });
   });
   test.describe("After reload", () => {
-    test("Create document", async ({ page }) => {
+    test("Create, rename, delete", async ({ page }) => {
       await login(page, username, password, false);
       await reloadPage(page);
-      addedDocument = await createDocument(
+      const addedDocument = await createDocument(
         page,
         firstFolder.id,
         createdWorkspace.id
       );
-    });
-    test("Rename document", async ({ page }) => {
-      await login(page, username, password, false);
-      await reloadPage(page);
-      await renameDocument(page, addedDocument.id, "Renamed document");
-    });
-
-    test("Delete document", async ({ page }) => {
-      await login(page, username, password, false);
-      await reloadPage(page);
-      await deleteDocument(page, addedDocument.id, workspaceId);
+      await renameDocument(page, addedDocument?.id!, "Renamed document");
+      await deleteDocument(page, addedDocument?.id!, workspaceId);
     });
   });
 });
