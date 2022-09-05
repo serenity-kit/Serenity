@@ -1,5 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
-import { CenterContent, IconButton, tw, View } from "@serenity-tools/ui";
+import {
+  CenterContent,
+  IconButton,
+  tw,
+  useIsEqualOrLargerThanBreakpoint,
+  View,
+} from "@serenity-tools/ui";
 import { KeyboardAvoidingView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -17,12 +23,18 @@ export function OnboardingScreenWrapper({
       <KeyboardAvoidingView behavior="padding" style={tw`flex-auto`}>
         <CenterContent serenityBg>
           {navigation.canGoBack() ? (
-            <View style={tw`absolute left-0 ios:left-4 top-0`}>
+            <View style={tw`absolute left-4 top-4`}>
               <IconButton
                 size="lg"
-                name="double-arrow-left"
-                color={"gray-500"}
+                name="arrow-left-line"
+                color={
+                  useIsEqualOrLargerThanBreakpoint("xs")
+                    ? "primary-300"
+                    : "gray-500"
+                }
                 onPress={() => navigation.goBack()}
+                label="Go back"
+                transparent={useIsEqualOrLargerThanBreakpoint("xs")}
               />
             </View>
           ) : null}
