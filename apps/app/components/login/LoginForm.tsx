@@ -169,7 +169,7 @@ export function LoginForm(props: Props) {
         </InfoMessage>
       ) : null}
 
-      <Button onPress={onLoginPress} size="lg" disabled={isLoggingIn}>
+      <Button onPress={onLoginPress} disabled={isLoggingIn}>
         Log in
       </Button>
     </FormWrapper>
