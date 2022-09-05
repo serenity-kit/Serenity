@@ -23,8 +23,8 @@ export function PageHeaderLeft(props: any) {
   const hasEditorSidebar = useHasEditorSidebar();
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
 
-  // TODO styling depending on if going back/forward is possible
-  const actionIsPossible = true;
+  // TODO disable IconButton depending on if going back/forward is possible
+  const actionIsNotPossible = true;
 
   return (
     <HStack alignItems={"center"}>
@@ -35,10 +35,15 @@ export function PageHeaderLeft(props: any) {
               <IconButton
                 size={"lg"}
                 name="arrow-go-back-line"
-                // TODO
-                color={actionIsPossible ? "gray-800" : "gray-400"}
+                color={"gray-900"}
               ></IconButton>
-              <IconButton size={"lg"} name="arrow-go-forward-line"></IconButton>
+              <IconButton
+                size={"lg"}
+                name="arrow-go-forward-line"
+                color={"gray-900"}
+                // TODO
+                disabled={actionIsNotPossible}
+              ></IconButton>
             </HStack>
           ) : (
             <IconButton
