@@ -28,6 +28,10 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
     iconColor = color ?? "gray-600";
   }
 
+  if (props.disabled) {
+    iconColor = "gray-500";
+  }
+
   const styles = StyleSheet.create({
     pressable: tw.style(dimensions), // defines clickable area
     view: tw.style(

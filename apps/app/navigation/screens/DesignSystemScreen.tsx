@@ -839,6 +839,7 @@ export default function DesignSystemScreen() {
             <IconTile name="arrow-down-s-line" />
             <IconTile name="arrow-up-down-line" />
             <IconTile name="more-line" />
+            <IconTile name="more-2-fill" />
             <IconTile name="more-2-line" />
           </DSTiles>
           <Heading lvl={3}>Actions</Heading>
