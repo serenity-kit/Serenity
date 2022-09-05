@@ -13,11 +13,12 @@ export type IconButtonProps = PressableProps & {
   color?: Color;
   label?: string;
   size?: "md" | "lg";
+  transparent?: boolean;
 };
 
 export const IconButton = forwardRef((props: IconButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
-  const { name, size = "md", color, label, ...rest } = props;
+  const { name, size = "md", color, transparent, label, ...rest } = props;
 
   let dimensions = size === "lg" ? "w-8 h-8" : "w-5 h-5";
   let iconColor = color ?? "gray-400";
@@ -34,8 +35,8 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
         !label ? "justify-center" : ""
       } items-center bg-transparent rounded-md ${label ? `p-1 rounded` : ""}`
     ),
-    hover: tw`bg-gray-200`,
-    pressed: tw`bg-gray-300`,
+    hover: transparent ? tw`bg-${color}/15` : tw`bg-gray-200`,
+    pressed: transparent ? tw`bg-${color}/25` : tw`bg-gray-300`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
 
@@ -64,11 +65,18 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
             ]}
             space={2}
           >
-            <Icon name={name} color={isHovered ? "gray-800" : iconColor} />
+            <Icon
+              name={name}
+              color={isHovered && !transparent ? "gray-800" : iconColor}
+            />
             {label && (
               <Text
                 variant="xs"
-                style={isHovered ? tw`text-gray-800` : tw`text-${iconColor}`}
+                style={
+                  isHovered && !transparent
+                    ? tw`text-gray-800`
+                    : tw`text-${iconColor}`
+                }
               >
                 {props.label}
               </Text>
