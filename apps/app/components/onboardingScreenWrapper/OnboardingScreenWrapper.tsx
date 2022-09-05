@@ -17,6 +17,7 @@ export function OnboardingScreenWrapper({
   children,
 }: OnboardingBackButtonProps) {
   const navigation = useNavigation();
+  const isEqualOrLargerThanXS = useIsEqualOrLargerThanBreakpoint("xs");
 
   return (
     <SafeAreaView style={tw`flex-auto`}>
@@ -27,14 +28,10 @@ export function OnboardingScreenWrapper({
               <IconButton
                 size="lg"
                 name="arrow-left-line"
-                color={
-                  useIsEqualOrLargerThanBreakpoint("xs")
-                    ? "primary-300"
-                    : "gray-500"
-                }
+                color={isEqualOrLargerThanXS ? "primary-300" : "gray-500"}
                 onPress={() => navigation.goBack()}
                 label="Go back"
-                transparent={useIsEqualOrLargerThanBreakpoint("xs")}
+                transparent={isEqualOrLargerThanXS}
               />
             </View>
           ) : null}

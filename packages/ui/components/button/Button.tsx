@@ -89,9 +89,10 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
     scale: number;
   }>(null);
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
+  const isEqualOrLargerThanXS = useIsEqualOrLargerThanBreakpoint("xs");
   const {
     variant = "primary",
-    size = useIsEqualOrLargerThanBreakpoint("xs") ? "md" : "lg",
+    size = isEqualOrLargerThanXS ? "md" : "lg",
     isLoading = false,
     ...rest
   } = props;
