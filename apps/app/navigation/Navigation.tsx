@@ -96,9 +96,7 @@ function WorkspaceDrawerScreen(props) {
           drawerStyle: {
             width: isPermanentLeftSidebar ? 240 : width,
           },
-          headerLeft: isPermanentLeftSidebar
-            ? () => null
-            : () => <PageHeaderLeft navigation={props.navigation} />,
+          headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
           overlayColor: "transparent",
         }}
       >

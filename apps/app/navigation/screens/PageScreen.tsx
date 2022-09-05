@@ -65,7 +65,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     props.navigation.setOptions({
       headerRight: PageHeaderRight,
       headerTitle: PageHeader,
-      headerTitleAlign: "left",
+      headerTitleAlign: "center",
     });
   }, []);
 
