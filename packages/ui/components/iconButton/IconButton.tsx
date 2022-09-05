@@ -35,8 +35,8 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
         !label ? "justify-center" : ""
       } items-center bg-transparent rounded-md ${label ? `p-1 rounded` : ""}`
     ),
-    hover: transparent ? tw`bg-${color}/15` : tw`bg-gray-200`,
-    pressed: transparent ? tw`bg-${color}/25` : tw`bg-gray-300`,
+    hover: transparent ? tw`bg-${iconColor}/15` : tw`bg-gray-200`,
+    pressed: transparent ? tw`bg-${iconColor}/25` : tw`bg-gray-300`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
 
