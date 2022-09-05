@@ -354,6 +354,33 @@ export default function DesignSystemScreen() {
           <IconButton name="double-arrow-left" color="gray-700" size="lg" />
           <IconButton name="double-arrow-right" color="gray-800" size="lg" />
         </DSExampleArea>
+        <Text variant="sm" style={tw`pt-4`}>
+          By adding the <DSMono variant="property">transparent</DSMono> property
+          the background-color for hovering and pressing will derive itself from
+          the set <DSMono variant="property">color</DSMono> which should be used
+          for special cases only.
+        </Text>
+        <DSExampleArea>
+          <IconButton name="menu" color="primary-400" size="lg" transparent />
+          <IconButton
+            name="image-line"
+            color="primary-500"
+            size="lg"
+            transparent
+          />
+          <IconButton
+            name="settings-4-line"
+            color="primary-600"
+            size="lg"
+            transparent
+          />
+          <IconButton
+            name="double-arrow-left"
+            color="primary-700"
+            size="lg"
+            transparent
+          />
+        </DSExampleArea>
         <Heading lvl={3}>Label</Heading>
         <Text variant="sm">
           An <DSMono variant="component">IconButton</DSMono> can have a{" "}
