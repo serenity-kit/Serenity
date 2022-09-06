@@ -21,7 +21,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
           </Text>
           <View>
             <Text muted style={tw`text-center`}>
-              Log in to your Serenity Account
+              Log in to your Serenity account
             </Text>
           </View>
         </View>

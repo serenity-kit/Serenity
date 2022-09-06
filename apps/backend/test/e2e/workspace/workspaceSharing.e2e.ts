@@ -71,7 +71,7 @@ const registerOnPage = async ({
   // Click the "Verify registration" button
   await page
     .locator(
-      'text=Verify your EmailPlease enter the verification code sent to you via Email.Verifi >> div[role="button"]'
+      'text=Verify your emailPlease enter the verification code sent to you via email.Verifi >> div[role="button"]'
     )
     .click();
 };
@@ -88,7 +88,7 @@ const createFirstWorkspace = async ({
   // Fill in the new workspace name
   await page
     .locator(
-      'text=Workspace NameThis is the name of your organization, team or private notes. You  >> input[type="text"]'
+      'text=Workspace nameThis is the name of your organization, team or private notes. You  >> input[type="text"]'
     )
     .fill(workspaceName);
 

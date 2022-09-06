@@ -18,7 +18,7 @@ export default function RegisterScreen(
       <Box plush>
         <View>
           <Text variant="lg" bold style={tw`text-center`}>
-            Create your Account
+            Create your account
           </Text>
           <Text muted style={tw`text-center`}>
             Sign up and start your free trial!

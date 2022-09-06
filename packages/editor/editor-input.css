@@ -64,7 +64,7 @@
 
   .ProseMirror h1:first-child.is-empty::before {
     color: theme("colors.gray.400");
-    content: "Page Title";
+    content: "Page title";
     float: left;
     height: 0;
     pointer-events: none;

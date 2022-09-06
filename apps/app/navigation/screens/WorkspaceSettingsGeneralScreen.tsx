@@ -171,7 +171,7 @@ export default function WorkspaceSettingsGeneralScreen(
           <>
             <View>
               <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
-                Change Name
+                Change name
               </Text>
               <RawInput
                 placeholder="Workspace name"
@@ -190,7 +190,7 @@ export default function WorkspaceSettingsGeneralScreen(
             </View>
             {isAdmin && (
               <Button onPress={() => setShowDeleteWorkspaceModal(true)}>
-                Delete Workspace
+                Delete workspace
               </Button>
             )}
             {isAdmin && (
@@ -198,10 +198,10 @@ export default function WorkspaceSettingsGeneralScreen(
                 isVisible={showDeleteWorkspaceModal}
                 onBackdropPress={() => setShowDeleteWorkspaceModal(false)}
               >
-                <ModalHeader>Delete Workspace?</ModalHeader>
+                <ModalHeader>Delete workspace?</ModalHeader>
                 <Text>Type the name of this workspace: {workspaceName}</Text>
                 <Input
-                  label={"Workspace Name"}
+                  label={"Workspace name"}
                   onChangeText={setDeletingWorkspaceName}
                 />
                 <ModalButtonFooter
