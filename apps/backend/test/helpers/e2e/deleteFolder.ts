@@ -3,6 +3,7 @@ import { prisma } from "../../../src/database/prisma";
 import { delayForSeconds } from "../delayForSeconds";
 import { hoverOnElement } from "./hoverOnElement";
 import { openFolderMenu } from "./openFolderMenu";
+import { reloadPage } from "./reloadPage";
 
 export const deleteFolder = async (
   page: Page,
@@ -33,9 +34,9 @@ export const deleteFolder = async (
     .locator(`data-testid=sidebar-folder--${folderId}`)
     .isVisible();
   expect(isFolderItemVisible).toBe(false);
-  // await reloadPage(page);
-  // const isFolderItemVisible1 = await page
-  //   .locator(`data-testid=sidebar-folder--${folderId}`)
-  //   .isVisible();
-  // expect(isFolderItemVisible1).toBe(false);
+  await reloadPage(page);
+  const isFolderItemVisible1 = await page
+    .locator(`data-testid=sidebar-folder--${folderId}`)
+    .isVisible();
+  expect(isFolderItemVisible1).toBe(false);
 };

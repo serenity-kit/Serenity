@@ -5,26 +5,6 @@ import createUserWithWorkspace from "../../../src/database/testHelpers/createUse
 import { e2eLoginUser } from "../../helpers/authentication/e2eLoginUser";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 
-//type LoginOnPageProps = { page: Page; username: string; password: string };
-// const loginOnPage = async ({ page, username, password }: LoginOnPageProps) => {
-//   // Fill username input
-//   await page
-//     .locator(
-//       'text=EmailPasswordStay logged in for 30 daysLog in >> [placeholder="Enter your email …"]'
-//     )
-//     .fill(username);
-
-//   // Fill password input
-//   await page
-//     .locator(
-//       'text=EmailPasswordStay logged in for 30 daysLog in >> [placeholder="Enter your password …"]'
-//     )
-//     .fill(password);
-
-//   // Click "Log in" button
-//   await page.locator('div[role="button"]:has-text("Log in")').click();
-// };
-
 type RegisterOnPageProps = {
   page: Page;
   username: string;
