@@ -8,6 +8,7 @@ const config: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   globalSetup: require.resolve("./test/config/playwrightGlobalSetup"),
   retries: process.env.CI ? 4 : 0,
+  workers: process.env.CI ? 4 : undefined,
   use: { trace: "on-first-retry" },
   projects: [
     {
