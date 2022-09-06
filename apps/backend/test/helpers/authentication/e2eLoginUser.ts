@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+import { delayForSeconds } from "../delayForSeconds";
 
 export type Props = {
   page: Page;
@@ -37,4 +38,5 @@ export const e2eLoginUser = async ({
 
   // Click "Log in" button
   await page.locator('div[role="button"]:has-text("Log in")').click();
+  await delayForSeconds(2);
 };
