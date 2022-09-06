@@ -379,7 +379,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           Folders
         </Text>
         {/* offset not working yet as NB has a no-no in their component */}
-        <Tooltip label="Create Folder" placement="right" offset={8}>
+        <Tooltip label="Create folder" placement="right" offset={8}>
           <IconButton
             onPress={() => {
               setIsCreatingNewFolder(true);

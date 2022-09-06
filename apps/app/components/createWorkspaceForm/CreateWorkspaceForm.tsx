@@ -152,10 +152,10 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
 
   return (
     <FormWrapper>
-      <ModalHeader>Create a Workspace</ModalHeader>
+      <ModalHeader>Create a workspace</ModalHeader>
       <Input
         ref={inputRef}
-        label={"Workspace Name"}
+        label={"Workspace name"}
         onChangeText={setName}
         autoFocus={true}
         hint="This is the name of your organization, team or private notes. You can invite team members afterwards."
