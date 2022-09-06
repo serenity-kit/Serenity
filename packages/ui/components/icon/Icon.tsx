@@ -81,6 +81,7 @@ import { ListUnordered } from "./icons/ListUnordered";
 import { Menu } from "./icons/Menu";
 import { MicroscopeLine } from "./icons/MicroscopeLine";
 import { More } from "./icons/More";
+import { More2Fill } from "./icons/More2Fill";
 import { More2Line } from "./icons/More2Line";
 import { MoreLine } from "./icons/MoreLine";
 import { MovieLine } from "./icons/MovieLine";
@@ -188,6 +189,7 @@ export type IconNames =
   | "menu"
   | "microscope-line"
   | "more"
+  | "more-2-fill"
   | "more-2-line"
   | "more-line"
   | "movie-line"
@@ -470,6 +472,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "more") {
     icon = <More color={color} size={iconSize} />;
+  }
+  if (name === "more-2-fill") {
+    icon = <More2Fill color={color} size={iconSize} />;
   }
   if (name === "more-2-line") {
     icon = <More2Line color={color} size={iconSize} />;

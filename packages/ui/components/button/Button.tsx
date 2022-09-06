@@ -8,6 +8,7 @@ import { tw } from "../../tailwind";
 import { Text, TextVariants } from "../text/Text";
 import { Spinner } from "../spinner/Spinner";
 import { View } from "../view/View";
+import { useIsEqualOrLargerThanBreakpoint } from "../../hooks/useIsEqualOrLargerThanBreakpoint/useIsEqualOrLargerThanBreakpoint";
 
 export type ButtonVariants = "primary" | "secondary" | "danger";
 export type ButtonSizes = "sm" | "md" | "lg";
@@ -88,9 +89,10 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
     scale: number;
   }>(null);
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
+  const isEqualOrLargerThanXS = useIsEqualOrLargerThanBreakpoint("xs");
   const {
     variant = "primary",
-    size = "md",
+    size = isEqualOrLargerThanXS ? "md" : "lg",
     isLoading = false,
     ...rest
   } = props;

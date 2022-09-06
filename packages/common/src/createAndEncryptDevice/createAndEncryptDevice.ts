@@ -26,10 +26,6 @@ export const createAndEncryptDevice = async (exportKey: string) => {
     encryptionKey
   );
 
-  console.log("register exportKey", exportKey);
-  console.log("register encryptionKeySalt", encryptionKeySalt);
-  console.log("register encryptionKey", encryptionKey);
-
   return {
     ciphertext,
     nonce,

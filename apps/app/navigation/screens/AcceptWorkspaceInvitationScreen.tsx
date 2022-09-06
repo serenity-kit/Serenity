@@ -1,31 +1,31 @@
-import React, { useState } from "react";
 import {
-  Text,
-  View,
-  tw,
   Box,
   Button,
-  LinkButton,
   InfoMessage,
+  LinkButton,
   Spinner,
-  CenterContent,
+  Text,
+  tw,
+  View,
 } from "@serenity-tools/ui";
+import { VStack } from "native-base";
+import { useState } from "react";
 import { useWindowDimensions } from "react-native";
+import { LoginForm } from "../../components/login/LoginForm";
+import { OnboardingScreenWrapper } from "../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
+import RegisterForm from "../../components/register/RegisterForm";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
   useAcceptWorkspaceInvitationMutation,
   useWorkspaceInvitationQuery,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
-import { LoginForm } from "../../components/login/LoginForm";
-import RegisterForm from "../../components/register/RegisterForm";
 import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
-import { VStack } from "native-base";
 
 const Wrapper = ({ children }) => (
-  <CenterContent serenityBg>
+  <OnboardingScreenWrapper>
     <Box plush>{children}</Box>
-  </CenterContent>
+  </OnboardingScreenWrapper>
 );
 
 const LoadingErrorWrapper = ({ children }) => (
@@ -176,7 +176,6 @@ export default function AcceptWorkspaceInvitationScreen(
       {sessionKey ? (
         <Button
           onPress={onAcceptWorkspaceInvitationPress}
-          size="lg"
           style={tw`self-center`}
         >
           Accept

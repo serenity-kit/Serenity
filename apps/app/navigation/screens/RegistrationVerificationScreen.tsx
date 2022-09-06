@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  CenterContent,
   InfoMessage,
   Input,
   Text,
@@ -11,6 +10,7 @@ import {
 import { useState } from "react";
 import { Platform } from "react-native";
 import { useClient } from "urql";
+import { OnboardingScreenWrapper } from "../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import { useAuthentication } from "../../context/AuthenticationContext";
 import {
   useAcceptWorkspaceInvitationMutation,
@@ -167,8 +167,8 @@ export default function RegistrationVerificationScreen(
   };
 
   return (
-    <CenterContent serenityBg>
-      <Box>
+    <OnboardingScreenWrapper>
+      <Box plush>
         <View>
           <Text variant="lg" bold style={tw`text-center`}>
             Verify your Email
@@ -201,10 +201,8 @@ export default function RegistrationVerificationScreen(
           Note: The verification code is prefilled on staging.
         </InfoMessage>
 
-        <Button onPress={onSubmit} size="lg">
-          Register
-        </Button>
+        <Button onPress={onSubmit}>Register</Button>
       </Box>
-    </CenterContent>
+    </OnboardingScreenWrapper>
   );
 }

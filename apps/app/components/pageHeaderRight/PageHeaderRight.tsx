@@ -30,43 +30,50 @@ export function PageHeaderRight() {
         } px-3 border-b border-gray-200`}
         justifyContent="space-between"
         alignItems="center"
-        alignContent={hasEditorSidebar ? "center" : "flex-end"}
       >
-        <AvatarGroup max={hasEditorSidebar ? 3 : 2} _avatar={{ size: "sm" }}>
-          <Avatar customColor="emerald">BE</Avatar>
-          <Avatar customColor="honey">NG</Avatar>
-          <Avatar customColor="orange">AB</Avatar>
-          <Avatar customColor="rose">SK</Avatar>
-          <Avatar customColor="serenity">AD</Avatar>
-        </AvatarGroup>
-        {hasEditorSidebar ? (
-          <Button
-            size="sm"
+        {isInEditingMode && !hasEditorSidebar ? (
+          <IconButton
+            name="check-line"
+            size="lg"
+            color="primary-500"
             onPress={() => {
-              setIsActiveShareModal(true);
+              triggerBlur();
             }}
-          >
-            Share
-          </Button>
+            // TODO transparent
+          />
         ) : (
           <>
-            <IconButton
-              name="more-2-line"
-              size="lg"
-              onPress={() => {
-                alert("TODO");
-              }}
-            />
-            {isInEditingMode ? (
-              <IconButton
-                name="check-line"
-                size="lg"
-                color="primary-500"
+            <AvatarGroup
+              max={hasEditorSidebar ? 3 : 2}
+              _avatar={{ size: "sm" }}
+            >
+              <Avatar customColor="emerald">BE</Avatar>
+              <Avatar customColor="honey">NG</Avatar>
+              <Avatar customColor="orange">AB</Avatar>
+              <Avatar customColor="rose">SK</Avatar>
+              <Avatar customColor="serenity">AD</Avatar>
+            </AvatarGroup>
+            {hasEditorSidebar ? (
+              <Button
+                size="sm"
                 onPress={() => {
-                  triggerBlur();
+                  setIsActiveShareModal(true);
                 }}
-              />
-            ) : null}
+              >
+                Share
+              </Button>
+            ) : (
+              <>
+                <IconButton
+                  name="more-2-fill"
+                  size="lg"
+                  color="gray-900"
+                  onPress={() => {
+                    alert("TODO");
+                  }}
+                />
+              </>
+            )}
           </>
         )}
       </HStack>

@@ -11,33 +11,27 @@ export type AvatarGroupProps = IAvatarGroupProps & {};
 export const AvatarGroup = forwardRef((props: AvatarGroupProps, ref) => {
   const { max = 3 } = props;
   const styles = StyleSheet.create({
-    wrapper: {
-      flex: 1,
-      flexDirection: "row", // needed so reversed Avatars in Group are positioned correctly in their container
-    },
     avatarGroup: tw`flex items-center`,
   });
 
   return (
-    <View style={[styles.wrapper, tw`bg-transparent`]}>
-      <NbAvatar.Group
-        {...props}
-        max={max}
-        style={[styles.avatarGroup, props.style]}
-        _avatar={{
-          borderColor: "white",
-        }}
-        _hiddenAvatarPlaceholder={{
-          style: tw`-ml-2.5 bg-transparent border-transparent`, // nb-overrides
-          _text: {
-            color: "gray.800", // nb-override
-            letterSpacing: "xs", // nb-override so written whitespace "+ <plusAvatars>" isn't too big
-            style: tw`text-xs`,
-          },
-        }}
-      >
-        {props.children}
-      </NbAvatar.Group>
-    </View>
+    <NbAvatar.Group
+      {...props}
+      max={max}
+      style={[styles.avatarGroup, props.style]}
+      _avatar={{
+        borderColor: "white",
+      }}
+      _hiddenAvatarPlaceholder={{
+        style: tw`-ml-2.5 bg-transparent border-transparent`, // nb-overrides
+        _text: {
+          color: "gray.800", // nb-override
+          letterSpacing: "xs", // nb-override so written whitespace "+ <plusAvatars>" isn't too big
+          style: tw`text-xs`,
+        },
+      }}
+    >
+      {props.children}
+    </NbAvatar.Group>
   );
 });

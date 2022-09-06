@@ -168,9 +168,7 @@ export default function RegisterForm(props: Props) {
         </InfoMessage>
       ) : null}
 
-      <Button onPress={onRegisterPress} size="lg">
-        Register
-      </Button>
+      <Button onPress={onRegisterPress}>Register</Button>
     </FormWrapper>
   );
 }
