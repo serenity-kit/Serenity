@@ -813,10 +813,11 @@ export default function DesignSystemScreen() {
           <DSTiles>
             <IconTile name="font-color" />
           </DSTiles>
-          <Heading lvl={3}>Custom</Heading>
+          <Heading lvl={3}>Editor custom</Heading>
           <DSTiles>
             <IconTile name="arrow-go-back-line" />
             <IconTile name="arrow-go-forward-line" />
+            <IconTile name="arrow-up-down-s-line" />
             <IconTile name="attachment-2" />
             <IconTile name="font-size-2" />
             <IconTile name="format-clear" />

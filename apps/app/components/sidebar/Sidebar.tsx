@@ -249,7 +249,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 >
                   {workspace === null ? " " : workspace.name}
                 </Text>
-                <Icon name="arrow-down-s-line" color={"gray-400"} />
+                <Icon name="arrow-up-down-s-line" color={"gray-400"} />
               </HStack>
             </Pressable>
           }
