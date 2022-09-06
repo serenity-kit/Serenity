@@ -172,6 +172,7 @@ export default function SidebarPage(props: Props) {
                 onSubmit={updateDocumentName}
                 value={documentTitle}
                 style={tw`ml-0.5 w-${maxWidth}`}
+                testID={`sidebar-document--${props.documentId}__edit-name`}
               />
             ) : (
               <Text
@@ -180,6 +181,7 @@ export default function SidebarPage(props: Props) {
                 numberOfLines={1}
                 ellipsizeMode="tail"
                 bold={document?.id === props.documentId}
+                testID={`sidebar-document--${props.documentId}`}
               >
                 {documentTitle}
               </Text>
@@ -187,17 +189,21 @@ export default function SidebarPage(props: Props) {
           </HStack>
         </Pressable>
 
-        {(isHovered || !isDesktopDevice) && (
-          <HStack alignItems="center" space={1} style={tw`pr-3 md:pr-2`}>
-            <SidebarPageMenu
-              documentId={props.documentId}
-              refetchDocuments={props.onRefetchDocumentsPress}
-              onUpdateNamePress={() => {
-                setIsEditing(true);
-              }}
-            />
-          </HStack>
-        )}
+        <HStack
+          alignItems="center"
+          space={1}
+          style={tw`pr-3 md:pr-2 ${
+            isHovered || !isDesktopDevice ? "" : "hidden"
+          }`}
+        >
+          <SidebarPageMenu
+            documentId={props.documentId}
+            refetchDocuments={props.onRefetchDocumentsPress}
+            onUpdateNamePress={() => {
+              setIsEditing(true);
+            }}
+          />
+        </HStack>
       </HStack>
     </View>
   );

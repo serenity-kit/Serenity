@@ -1,12 +1,12 @@
-import React, { forwardRef } from "react";
-import { StyleSheet, Platform } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
+import { HStack } from "native-base";
+import React, { forwardRef } from "react";
+import { Platform, StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
+import { Color } from "../../types";
+import { Icon, IconNames } from "../icon/Icon";
 import { Pressable, PressableProps } from "../pressable/Pressable";
 import { Text } from "../text/Text";
-import { Icon, IconNames } from "../icon/Icon";
-import { HStack } from "native-base";
-import { Color } from "../../types";
 
 export type IconButtonProps = PressableProps & {
   name: IconNames;

@@ -1,8 +1,8 @@
-import { test, expect, Page } from "@playwright/test";
-import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
+import { expect, Page, test } from "@playwright/test";
 import { v4 as uuidv4 } from "uuid";
-import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { prisma } from "../../../src/database/prisma";
+import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
+import { delayForSeconds } from "../../helpers/delayForSeconds";
 
 type LoginOnPageProps = { page: Page; username: string; password: string };
 const loginOnPage = async ({ page, username, password }: LoginOnPageProps) => {
@@ -102,7 +102,7 @@ test.describe("Workspace Sharing", () => {
 
   test("User 1 can create a sharing link", async ({ page }) => {
     const userId = uuidv4();
-    const username = "user1@example.com";
+    const username = `${uuidv4()}@example.com`;
     const password = "pass";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
@@ -152,7 +152,7 @@ test.describe("Workspace Sharing", () => {
 
   test("Existing other user can accept workspace", async ({ page }) => {
     const userId = uuidv4();
-    const username = "userb7ce3e17@example.com";
+    const username = `${uuidv4()}@example.com`;
     const password = "pass";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
@@ -182,7 +182,7 @@ test.describe("Workspace Sharing", () => {
 
   test("Unauthenticated other user can accept workspace", async ({ page }) => {
     const userId = uuidv4();
-    const username = "user3@example.com";
+    const username = `${uuidv4()}@example.com`;
     const password = "pass";
     await createUserWithWorkspace({
       id: userId,
@@ -204,7 +204,7 @@ test.describe("Workspace Sharing", () => {
   });
 
   test("Unregistered other user can accept workspace", async ({ page }) => {
-    const username = "user4@example.com";
+    const username = `${uuidv4()}@example.com`;
     const password = "pass";
     const workspaceName = "my workspace";
     await page.goto(workspaceInvitationUrl);

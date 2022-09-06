@@ -371,6 +371,7 @@ export default function SidebarFolder(props: Props) {
                   }}
                   value={folderName}
                   style={tw`ml-0.5 w-${maxWidth}`}
+                  testID={`sidebar-folder--${props.folderId}__edit-name`}
                 />
               ) : (
                 <Text
@@ -379,6 +380,7 @@ export default function SidebarFolder(props: Props) {
                   numberOfLines={1}
                   ellipsizeMode="tail"
                   bold={documentPathIds.includes(props.folderId)}
+                  testID={`sidebar-folder--${props.folderId}`}
                 >
                   {folderName}
                 </Text>
@@ -397,30 +399,35 @@ export default function SidebarFolder(props: Props) {
             />
           )}
 
-          {(isHovered || !isDesktopDevice) && (
-            <HStack alignItems="center" space={1} style={tw`pr-3 md:pr-2`}>
-              <SidebarFolderMenu
-                folderId={props.folderId}
-                refetchFolders={refetchFolders}
-                onUpdateNamePress={editFolderName}
-                onDeletePressed={() => deleteFolder(props.folderId)}
-                onCreateFolderPress={() => {
-                  createFolder(defaultFolderName);
-                }}
-              />
-              {/* offset not working yet as NB has a no-no in their component */}
-              <Tooltip label="New page" placement="right" offset={8}>
-                <IconButton
-                  onPress={createDocument}
-                  name="file-add-line"
-                  color="gray-600"
-                  style={tw`p-2 md:p-0`}
-                ></IconButton>
-              </Tooltip>
-              {documentsResult.fetching ||
-                (foldersResult.fetching && <ActivityIndicator />)}
-            </HStack>
-          )}
+          <HStack
+            alignItems="center"
+            space={1}
+            style={tw`pr-3 md:pr-2 ${
+              isHovered || !isDesktopDevice ? "" : "hidden"
+            }`}
+          >
+            <SidebarFolderMenu
+              folderId={props.folderId}
+              refetchFolders={refetchFolders}
+              onUpdateNamePress={editFolderName}
+              onDeletePressed={() => deleteFolder(props.folderId)}
+              onCreateFolderPress={() => {
+                createFolder(defaultFolderName);
+              }}
+            />
+            {/* offset not working yet as NB has a no-no in their component */}
+            <Tooltip label="New Page" placement="right" offset={8}>
+              <IconButton
+                onPress={createDocument}
+                name="file-add-line"
+                color="gray-600"
+                style={tw`p-2 md:p-0`}
+                testID={`sidebar-folder--${props.folderId}__create-document`}
+              ></IconButton>
+            </Tooltip>
+            {documentsResult.fetching ||
+              (foldersResult.fetching && <ActivityIndicator />)}
+          </HStack>
         </HStack>
       </View>
 
