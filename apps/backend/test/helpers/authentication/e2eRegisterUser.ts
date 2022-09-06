@@ -102,7 +102,6 @@ export const e2eRegisterUser = async ({
   });
   expect(document).not.toBe(null);
   const documentId = document?.id;
-  // TODO: get the workspace id and expect URL to match
   await expect(page).toHaveURL(
     `http://localhost:3000/workspace/${workspaceId}/page/${documentId}`
   );
