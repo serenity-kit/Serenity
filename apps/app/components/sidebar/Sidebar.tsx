@@ -299,6 +299,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                     <WorkspaceAvatar
                       customColor={"honey"}
                       key={`avatar_${workspace.id}`}
+                      size="xxs"
                     />
                     <Text variant="xs">{workspace.name}</Text>
                   </SidebarLink>
