@@ -189,17 +189,21 @@ export default function SidebarPage(props: Props) {
           </HStack>
         </Pressable>
 
-        {(isHovered || !isDesktopDevice) && (
-          <HStack alignItems="center" space={1} style={tw`pr-3 md:pr-2`}>
-            <SidebarPageMenu
-              documentId={props.documentId}
-              refetchDocuments={props.onRefetchDocumentsPress}
-              onUpdateNamePress={() => {
-                setIsEditing(true);
-              }}
-            />
-          </HStack>
-        )}
+        <HStack
+          alignItems="center"
+          space={1}
+          style={tw`pr-3 md:pr-2 ${
+            isHovered || !isDesktopDevice ? "" : "hidden"
+          }`}
+        >
+          <SidebarPageMenu
+            documentId={props.documentId}
+            refetchDocuments={props.onRefetchDocumentsPress}
+            onUpdateNamePress={() => {
+              setIsEditing(true);
+            }}
+          />
+        </HStack>
       </HStack>
     </View>
   );

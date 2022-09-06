@@ -1,4 +1,4 @@
-import { expect, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 import { prisma } from "../../src/database/prisma";
 import { e2eLoginUser } from "./authentication/e2eLoginUser";
 import { e2eRegisterUser } from "./authentication/e2eRegisterUser";
@@ -33,38 +33,97 @@ export const register = async (
   return registerResult;
 };
 
+export const moveMouse = async (page: Page) => {
+  await page.mouse.move(20, 20, { steps: 1 });
+  const viewportSize = page.viewportSize();
+  await delayForSeconds(0.5);
+  await page.mouse.move(
+    viewportSize?.width || 300 - 100,
+    viewportSize?.height || 400 - 100,
+    { steps: 1 }
+  );
+};
+export const hoverOnElement = async (
+  page: Page,
+  element: Locator,
+  resetMousePosition?: boolean
+) => {
+  if (resetMousePosition) {
+    await moveMouse(page);
+  }
+  // move cursor
+  const elementPosition = await element.boundingBox();
+  const elementCenterX =
+    elementPosition?.x || 0 + Math.floor(elementPosition?.width || 1 / 1);
+  const elementCenterY =
+    elementPosition?.y || 0 + Math.floor(elementPosition?.height || 1 / 1);
+  await page.mouse.move(elementCenterX, elementCenterY, { steps: 1 });
+  await delayForSeconds(0.5);
+  await element.hover();
+  await delayForSeconds(0.5);
+};
+
 export const reloadPage = async (page: Page) => {
   await page.reload();
   await delayForSeconds(2);
 };
 
-export const openFolderMenu = async (page: Page, folderId: string) => {
-  await page.locator(`data-testid=sidebar-folder--${folderId}`).hover();
-  const menuButton = page.locator(
-    `data-testid=sidebar-folder-menu--${folderId}__open`
-  );
-  await menuButton.hover();
-  await menuButton.click();
-  await delayForSeconds(1);
-};
-
-export const openDocumentMenu = async (page: Page, documentId: string) => {
-  await page.locator(`data-testid=sidebar-document--${documentId}`).hover();
-  const menuButton = page.locator(
-    `data-testid=sidebar-document-menu--${documentId}__open`
-  );
-  await menuButton.hover();
-  await menuButton.click();
-};
-
 export const expandFolderTree = async (page: Page, folderId: string) => {
+  // 1. locate folder item in sidebar
   const isVisible = await page
     .locator(`data-testid=sidebar-folder--${folderId}`)
     .isVisible();
+  // 2. if this folder item is not visible, recursively expand the folder tree to expose it
   if (!isVisible) {
-    await page.locator(`data-testid=sidebar-folder--${folderId}`).click();
+    const folder = await prisma.folder.findFirst({
+      where: { id: folderId },
+    });
+    if (folder?.parentFolderId) {
+      await expandFolderTree(page, folder.parentFolderId);
+    }
+    const folderItem = page.locator(`data-testid=sidebar-folder--${folderId}`);
+    await hoverOnElement(page, folderItem, true);
+    await folderItem.click();
+    await delayForSeconds(1);
   }
+};
+
+export const openFolderMenu = async (page: Page, folderId: string) => {
+  // 1. locate folder item in sidebar
+  const folderItem = page.locator(`data-testid=sidebar-folder--${folderId}`);
+  const isVisible = await folderItem.isVisible();
+  // 2. if this folder item is not visible, let's expand the tree to expose it
+  if (!isVisible) {
+    await expandFolderTree(page, folderId);
+  }
+  // 3. Hover over the folder item to display the "..." menu
+  await hoverOnElement(page, folderItem, true);
+  await delayForSeconds(1);
+  // 4. Find the "..." menu and click it
+  const menuButton = page.locator(
+    `data-testid=sidebar-folder-menu--${folderId}__open`
+  );
+  const isSubmenuVisible = await menuButton.isVisible();
+  if (!isSubmenuVisible) {
+    await openFolderMenu(page, folderId);
+  }
+  await hoverOnElement(page, menuButton, false);
   await delayForSeconds(2);
+  await menuButton.click();
+  // 5. Wait a second for the UI to update
+  await delayForSeconds(2);
+};
+
+export const openDocumentMenu = async (page: Page, documentId: string) => {
+  const documentItem = page.locator(
+    `data-testid=sidebar-document--${documentId}`
+  );
+  await hoverOnElement(page, documentItem, true);
+  const menuButton = page.locator(
+    `data-testid=sidebar-document-menu--${documentId}__open`
+  );
+  await hoverOnElement(page, menuButton, false);
+  await menuButton.click();
 };
 
 export const renameFolder = async (
@@ -76,7 +135,7 @@ export const renameFolder = async (
   await page
     .locator(`data-testid=sidebar-folder-menu--${folderId}__rename`)
     .click();
-  // await delayForSeconds(2);
+  await delayForSeconds(2);
   await page
     .locator(`data-testid=sidebar-folder--${folderId}__edit-name`)
     .fill(newName);
@@ -109,11 +168,12 @@ export const deleteFolder = async (
     where: { workspaceId },
   });
   await openFolderMenu(page, folderId);
-  await page
-    .locator(`[data-testid=sidebar-folder-menu--${folderId}__delete]`)
-    .click();
+  const deleteMenu = page.locator(
+    `[data-testid=sidebar-folder-menu--${folderId}__delete]`
+  );
+  await hoverOnElement(page, deleteMenu, false);
+  await deleteMenu.click();
   await delayForSeconds(2);
-
   const numFoldersAfterDelete = await prisma.folder.count({
     where: { workspaceId },
   });
@@ -217,12 +277,15 @@ export const createDocument = async (
   const numDocumentsBeforeAdd = await prisma.document.count({
     where: { workspaceId, parentFolderId },
   });
-  await page.locator(`data-testid=sidebar-folder--${parentFolderId}`).hover();
+  const folderItem = page.locator(
+    `data-testid=sidebar-folder--${parentFolderId}`
+  );
+  await hoverOnElement(page, folderItem, true);
   await expandFolderTree(page, parentFolderId);
   let createDocumentButton = page.locator(
     `data-testid=sidebar-folder--${parentFolderId}__create-document`
   );
-  await createDocumentButton.hover();
+  await hoverOnElement(page, createDocumentButton, false);
   await createDocumentButton.click();
   await delayForSeconds(2);
   const numDocumentsAfterAdd = await prisma.document.count({
