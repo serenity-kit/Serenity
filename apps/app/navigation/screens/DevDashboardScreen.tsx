@@ -55,7 +55,7 @@ export default function DevDashboardScreen(props) {
           mobileSize={5.5}
           color={"gray-800"}
         />
-        <Text>User Settings</Text>
+        <Text>User settings</Text>
       </SidebarLink>
     </ScrollSafeAreaView>
   );

@@ -171,10 +171,10 @@ export default function RegistrationVerificationScreen(
       <Box plush>
         <View>
           <Text variant="lg" bold style={tw`text-center`}>
-            Verify your Email
+            Verify your email
           </Text>
           <Text muted style={tw`text-center`}>
-            Please enter the verification code{"\n"}sent to you via Email.
+            Please enter the verification code{"\n"}sent to you via email.
           </Text>
         </View>
 
@@ -189,7 +189,7 @@ export default function RegistrationVerificationScreen(
         ) : null}
 
         <Input
-          label={"Verification Code"}
+          label={"Verification code"}
           value={verificationCode}
           onChangeText={(verificationCode: string) => {
             setVerificationCode(verificationCode);
