@@ -1,9 +1,10 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../../src/database/prisma";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 
 test("Register", async ({ page }) => {
-  const username = "usera9c9322313e2@example.com";
+  const username = `${uuidv4()}@example.com`;
   const password = "password";
   const workspaceName = "my workspace";
 

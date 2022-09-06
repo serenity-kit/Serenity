@@ -4,7 +4,7 @@ import createUserWithWorkspace from "../../../src/database/testHelpers/createUse
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 
 test("Login without remembering web keys", async ({ page }) => {
-  const username = "a@a.com";
+  const username = `${uuidv4()}@example.com`;
   const password = "pass";
   const { workspace, document } = await createUserWithWorkspace({
     id: uuidv4(),

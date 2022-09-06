@@ -13,7 +13,7 @@ import {
 } from "../../helpers/e2eModularHelpers";
 
 const userId = uuidv4();
-const username = "a@a.com";
+const username = `${uuidv4()}@example.com`;
 const password = "pass";
 const workspaceName = "a workspace";
 let createdWorkspace: any = null;
