@@ -153,6 +153,23 @@ export default function App() {
     colors: {
       ...theme.colors,
     },
+    fontSizes: {
+      "3xs": 8,
+    },
+    components: {
+      Avatar: {
+        sizes: {
+          xxs: {
+            width: 4,
+            height: 4,
+            _text: {
+              fontSize: "3xs",
+            },
+            _badgeSize: 2,
+          },
+        },
+      },
+    },
   });
 
   // recreate client and especially the internal cache every time the authentication state changes
