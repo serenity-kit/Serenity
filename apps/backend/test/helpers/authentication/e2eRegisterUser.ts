@@ -14,9 +14,6 @@ export const e2eRegisterUser = async ({
   password,
   workspaceName,
 }: Props) => {
-  await page.goto("http://localhost:3000/register");
-  await delayForSeconds(2);
-
   // Fill username
   await page.locator('[placeholder="Enter your email …"]').fill(username);
 

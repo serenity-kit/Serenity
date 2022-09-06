@@ -2,27 +2,8 @@ import { expect, Page, test } from "@playwright/test";
 import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../../src/database/prisma";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
+import { e2eLoginUser } from "../../helpers/authentication/e2eLoginUser";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
-
-type LoginOnPageProps = { page: Page; username: string; password: string };
-const loginOnPage = async ({ page, username, password }: LoginOnPageProps) => {
-  // Fill username input
-  await page
-    .locator(
-      'text=EmailPasswordStay logged in for 30 daysLog in >> [placeholder="Enter your email …"]'
-    )
-    .fill(username);
-
-  // Fill password input
-  await page
-    .locator(
-      'text=EmailPasswordStay logged in for 30 daysLog in >> [placeholder="Enter your password …"]'
-    )
-    .fill(password);
-
-  // Click "Log in" button
-  await page.locator('div[role="button"]:has-text("Log in")').click();
-};
 
 type RegisterOnPageProps = {
   page: Page;
@@ -115,7 +96,7 @@ test.describe("Workspace Sharing", () => {
     // await page.goto("http://localhost:3000/register");
     // await registerOnPage({ page, username, password, workspaceName });
     await page.goto("http://localhost:3000/login");
-    await loginOnPage({ page, username, password });
+    await e2eLoginUser({ page, username, password });
     await delayForSeconds(2);
     await expect(page).toHaveURL(
       `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
@@ -161,7 +142,7 @@ test.describe("Workspace Sharing", () => {
     });
     await delayForSeconds(2);
     await page.goto("http://localhost:3000/login");
-    await loginOnPage({ page, username, password });
+    await e2eLoginUser({ page, username, password });
     await delayForSeconds(2);
     await expect(page).toHaveURL(
       `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
@@ -192,7 +173,7 @@ test.describe("Workspace Sharing", () => {
     await delayForSeconds(2);
     await page.goto(workspaceInvitationUrl);
     await delayForSeconds(2);
-    await loginOnPage({ page, username, password });
+    await e2eLoginUser({ page, username, password });
     await delayForSeconds(2);
     // expect the new url to include the new workspace ID
     const pageUrl = page.url();
