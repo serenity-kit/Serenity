@@ -109,8 +109,9 @@ export default function DesignSystemScreen() {
         <Heading lvl={3}>Sizes</Heading>
         <Text variant="sm">
           With the <DSMono variant="property">size</DSMono> property you can use
-          the Avatar in 6 different sizes: <DSMono variant={"type"}>xs</DSMono>{" "}
-          , <DSMono variant={"type"}>sm</DSMono> ,{" "}
+          the Avatar in 7 different sizes: <DSMono variant={"type"}>xxs</DSMono>{" "}
+          , <DSMono variant={"type"}>xs</DSMono> ,{" "}
+          <DSMono variant={"type"}>sm</DSMono> ,{" "}
           <DSMono variant={"type"}>md</DSMono> ,{" "}
           <DSMono variant={"type"}>lg</DSMono> ,{" "}
           <DSMono variant={"type"}>xl</DSMono> , or{" "}
@@ -121,6 +122,7 @@ export default function DesignSystemScreen() {
         </Text>
         <DSExampleArea>
           <HStack space={2} alignItems="center" style={tw`pr-2`}>
+            <Avatar size={"xxs"}>BE</Avatar>
             <Avatar size={"xs"}>BE</Avatar>
             <Avatar size={"sm"}>NG</Avatar>
             <Avatar size={"md"}>AB</Avatar>
@@ -130,7 +132,7 @@ export default function DesignSystemScreen() {
           </HStack>
         </DSExampleArea>
         <Heading lvl={3}>Styling</Heading>
-        <Text variant="sm" style={tw`mt-1`}>
+        <Text variant="sm">
           Set one of the many coloring options with the{" "}
           <DSMono variant="property">customColor</DSMono> property.
         </Text>
@@ -164,7 +166,19 @@ export default function DesignSystemScreen() {
           The <DSMono variant="component">WorkspaceAvatar</DSMono> should be
           used for all workspace related representation.
         </Text>
-        <Text variant="sm" style={tw`mt-1`}>
+        <Heading lvl={3}>Sizes</Heading>
+        <Text variant="sm">
+          We use two <DSMono variant="property">size</DSMono>s for now,{" "}
+          <DSMono variant="type">xs</DSMono> is used for the active Workspace
+          inside the <DSMono variant="context">Sidebar</DSMono>s, and{" "}
+          <DSMono variant="type">xxs</DSMono> for selects in Menus.
+        </Text>
+        <DSExampleArea>
+          <WorkspaceAvatar size={"xxs"} />
+          <WorkspaceAvatar size={"xs"} />
+        </DSExampleArea>
+        <Heading lvl={3}>Styling</Heading>
+        <Text variant="sm">
           Set one of the many coloring options with the{" "}
           <DSMono variant="property">customColor</DSMono> property.
         </Text>
