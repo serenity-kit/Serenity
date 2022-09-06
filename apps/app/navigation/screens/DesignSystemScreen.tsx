@@ -1145,7 +1145,7 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <BoxShadow elevation={2} rounded>
             <VStack style={tw`py-1.5 bg-white rounded overflow-hidden`}>
-              <MenuButton>Create Folder</MenuButton>
+              <MenuButton>Create folder</MenuButton>
               <MenuButton>Rename</MenuButton>
             </VStack>
           </BoxShadow>
@@ -1159,7 +1159,7 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <BoxShadow elevation={2} rounded>
             <VStack style={tw`py-1.5 bg-white rounded overflow-hidden`}>
-              <MenuButton>Create Folder</MenuButton>
+              <MenuButton>Create folder</MenuButton>
               <MenuButton>Rename</MenuButton>
               <SidebarDivider collapsed />
               <MenuButton>Delete</MenuButton>
@@ -1180,7 +1180,7 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <BoxShadow elevation={2} rounded>
             <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
-              <MenuButton icon="folder-line">Create Folder</MenuButton>
+              <MenuButton icon="folder-line">Create folder</MenuButton>
               <MenuButton icon="font-size-2">Rename</MenuButton>
               <SidebarDivider collapsed />
               <MenuButton icon="delete-bin-line" danger>
@@ -1219,7 +1219,7 @@ export default function DesignSystemScreen() {
               }}
               icon="folder-line"
             >
-              Create Folder
+              Create folder
             </MenuButton>
             <MenuButton
               onPress={() => {
@@ -1259,7 +1259,7 @@ export default function DesignSystemScreen() {
           <BoxShadow elevation={2} rounded>
             <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
               <MenuButton icon="folder-line" shortcut={<Shortcut letter="N" />}>
-                Create Folder
+                Create folder
               </MenuButton>
               <MenuButton icon="font-size-2" shortcut={<Shortcut letter="R" />}>
                 Rename
@@ -1360,7 +1360,7 @@ export default function DesignSystemScreen() {
           center
         >
           <Box>
-            <ModalHeader>Delete Workspace ?</ModalHeader>
+            <ModalHeader>Delete workspace ?</ModalHeader>
             <Text variant="sm">
               Are you sure you want to delete the workspace{" "}
               <Text variant="sm" bold>
@@ -1370,7 +1370,7 @@ export default function DesignSystemScreen() {
             </Text>
             <ModalButtonFooter
               cancel={<Button variant="secondary">Keep</Button>}
-              confirm={<Button variant="danger">Delete Workspace</Button>}
+              confirm={<Button variant="danger">Delete workspace</Button>}
             />
           </Box>
         </DSExampleArea>
@@ -1396,7 +1396,7 @@ export default function DesignSystemScreen() {
           >
             <ModalHeader>Create a workspace</ModalHeader>
             <Input
-              label={"Workspace Name"}
+              label={"Workspace name"}
               value="Surf &amp; Chill Co."
               hint="This is the name of your organization, team or private notes. You can invite team members afterwards."
             />
@@ -1406,7 +1406,7 @@ export default function DesignSystemScreen() {
                   Cancel
                 </Button>
               }
-              confirm={<Button variant="primary">Create Workspace</Button>}
+              confirm={<Button variant="primary">Create workspace</Button>}
             />
           </Modal>
         </DSExampleArea>
@@ -1701,7 +1701,7 @@ export default function DesignSystemScreen() {
               <Text variant={"xxs"} bold>
                 Folders
               </Text>
-              <Tooltip label="Create Folder" placement="right" offset={8}>
+              <Tooltip label="Create folder" placement="right" offset={8}>
                 <IconButton name="plus" />
               </Tooltip>
             </HStack>

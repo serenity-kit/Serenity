@@ -37,7 +37,7 @@ export default function SidebarFolderMenu(props: Props) {
         icon="folder-line"
         shortcut={<Shortcut letter="N" />}
       >
-        Create Folder
+        Create folder
       </MenuButton>
       <MenuButton
         onPress={() => {

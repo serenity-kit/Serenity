@@ -409,7 +409,7 @@ export default function SidebarFolder(props: Props) {
                 }}
               />
               {/* offset not working yet as NB has a no-no in their component */}
-              <Tooltip label="New Page" placement="right" offset={8}>
+              <Tooltip label="New page" placement="right" offset={8}>
                 <IconButton
                   onPress={createDocument}
                   name="file-add-line"
