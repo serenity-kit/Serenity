@@ -4,6 +4,7 @@ import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
 import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { prisma } from "../../../database/prisma";
 import { createDeviceAndLogin } from "../../../database/testHelpers/createDeviceAndLogin";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
@@ -40,6 +41,14 @@ test("delete a device", async () => {
   });
   expect(numDevicesAfterCreate.devices.edges.length).toBe(3);
 
+  // connected session must exist
+  const session = await prisma.session.findFirst({
+    where: {
+      deviceSigningPublicKey: userAndDevice1.webDevice.signingPublicKey,
+    },
+  });
+  expect(session).not.toBeNull();
+
   // device should exist
   const response = await deleteDevices({
     graphql,
@@ -54,6 +63,14 @@ test("delete a device", async () => {
     authorizationHeader,
   });
   expect(numDevicesAfterDelete.devices.edges.length).toBe(2);
+
+  // connected session must have been deleted
+  const deletedSession = await prisma.session.findFirst({
+    where: {
+      deviceSigningPublicKey: userAndDevice1.webDevice.signingPublicKey,
+    },
+  });
+  expect(deletedSession).toBeNull();
 
   // device should not exist
   await expect(
