@@ -243,7 +243,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 <Text
                   variant="xs"
                   bold
-                  style={tw`-mr-1 max-w-30`} // -mr needed for icon spacing, max-w needed for ellipsis
+                  style={tw`-mr-1 max-w-30 text-gray-900`} // -mr needed for icon spacing, max-w needed for ellipsis
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
@@ -271,12 +271,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 }, 400);
               }
             }}
+            style={tw`py-2 px-3`}
           >
-            <View style={tw`p-menu-item`}>
-              <Text variant="xxs" muted bold>
-                {username}
-              </Text>
-            </View>
+            <Text variant="xxs" muted bold>
+              {username}
+            </Text>
           </SidebarLink>
 
           {workspaces === null ||
@@ -294,7 +293,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                         screen: "WorkspaceRoot",
                       },
                     }}
-                    style={tw`p-menu-item`}
+                    style={tw`py-2 px-3`}
                   >
                     <WorkspaceAvatar
                       customColor={"honey"}
@@ -306,7 +305,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 )
               )}
 
-          <View style={tw`pl-2 pr-3 py-1.5`}>
+          <View style={tw`pl-1.5 pr-3 py-1.5`}>
             <IconButton
               onPress={() => {
                 setIsOpenWorkspaceSwitcher(false);
