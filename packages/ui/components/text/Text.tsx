@@ -29,7 +29,7 @@ export function Text(props: TextProps) {
       fontFamily: bold ? "Inter_600SemiBold" : "Inter_400Regular",
     }),
     // 0.8125rem (13px) - ui hint
-    xs: tw.style(`text-xs text-gray-900 dark:text-white`, {
+    xs: tw.style(`text-xs text-gray-800 dark:text-white leading-snug`, {
       fontFamily: bold ? "Inter_600SemiBold" : "Inter_400Regular",
     }),
     // 0.75rem (12px) - sidebar-headers, input-hints

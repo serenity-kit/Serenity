@@ -358,7 +358,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           mobileSize={5.5}
           color={"gray-800"}
         />
-        <Text variant="sm">Settings</Text>
+        <Text variant="xs">Settings</Text>
       </SidebarLink>
 
       <SidebarLink to={{ screen: "DevDashboard" }}>
@@ -368,7 +368,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           mobileSize={5.5}
           color={"gray-800"}
         />
-        <Text variant="sm">Dev Dashboard</Text>
+        <Text variant="xs">Dev Dashboard</Text>
       </SidebarLink>
       <SidebarDivider />
       <HStack

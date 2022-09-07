@@ -374,7 +374,7 @@ export default function SidebarFolder(props: Props) {
                 />
               ) : (
                 <Text
-                  variant="sm"
+                  variant="xs"
                   style={tw`ml-1.5 max-w-${maxWidth}`}
                   numberOfLines={1}
                   ellipsizeMode="tail"
