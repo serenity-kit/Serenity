@@ -5,7 +5,6 @@ import { prisma } from "../prisma";
 type Params = {
   userId: string;
   id: string;
-  name?: string;
   encryptedName: string;
   encryptedNameNonce: string;
   subkeyId: number;
@@ -16,17 +15,12 @@ type Params = {
 export async function createFolder({
   userId,
   id,
-  name,
   encryptedName,
   encryptedNameNonce,
   subkeyId,
   parentFolderId,
   workspaceId,
 }: Params) {
-  let folderName = "Untitled";
-  if (name) {
-    folderName = name;
-  }
   return await prisma.$transaction(async (prisma) => {
     const folderforId = await prisma.folder.findFirst({
       where: { id },
@@ -76,7 +70,6 @@ export async function createFolder({
       data: {
         id,
         idSignature: "TODO",
-        name: folderName,
         encryptedName,
         encryptedNameNonce,
         subkeyId,

@@ -156,7 +156,6 @@ test("user should be able to get a document path", async () => {
     query documentPath($id: ID!) {
       documentPath(id: $id) {
         id
-        name
         parentFolderId
         rootFolderId
         workspaceId
@@ -172,7 +171,6 @@ test("user should be able to get a document path", async () => {
     [
       {
         "id": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-        "name": "parent folder",
         "parentFolderId": null,
         "rootFolderId": null,
         "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -187,7 +185,6 @@ test("user should be able to get a document path for a deep tree", async () => {
     query documentPath($id: ID!) {
       documentPath(id: $id) {
         id
-        name
         parentFolderId
         rootFolderId
         workspaceId
@@ -203,7 +200,6 @@ test("user should be able to get a document path for a deep tree", async () => {
     [
       {
         "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
-        "name": "folder",
         "parentFolderId": null,
         "rootFolderId": null,
         "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -218,7 +214,6 @@ test("user should not be able to retrieve another user's folder", async () => {
     query documentPath($id: ID!) {
       documentPath(id: $id) {
         id
-        name
         parentFolderId
         rootFolderId
         workspaceId
@@ -241,7 +236,6 @@ test("retrieving a document that doesn't exist should throw an error", async () 
     query documentPath($id: ID!) {
       documentPath(id: $id) {
         id
-        name
         parentFolderId
         rootFolderId
         workspaceId
@@ -264,7 +258,6 @@ test("Unauthenticated", async () => {
     query documentPath($id: ID!) {
       documentPath(id: $id) {
         id
-        name
         parentFolderId
         rootFolderId
         workspaceId
@@ -287,7 +280,6 @@ describe("Input errors", () => {
     query documentPath($id: ID!) {
       documentPath(id: $id) {
         id
-        name
         parentFolderId
         rootFolderId
         workspaceId

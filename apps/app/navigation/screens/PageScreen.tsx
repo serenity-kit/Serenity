@@ -121,7 +121,6 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
         id: pageId,
-        name: title,
         encryptedName: encryptedDocumentTitle.ciphertext,
         encryptedNameNonce: encryptedDocumentTitle.publicNonce,
         subkeyId: documentSubkeyId,

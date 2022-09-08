@@ -186,7 +186,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         input: {
           id,
           workspaceId: route.params.workspaceId,
-          name,
           encryptedName: encryptedFolderResult.ciphertext,
           encryptedNameNonce: encryptedFolderResult.publicNonce,
           subkeyId: encryptedFolderResult.folderSubkeyId,

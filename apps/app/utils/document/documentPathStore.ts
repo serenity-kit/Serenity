@@ -51,8 +51,8 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
         folderName = await decryptFolderName({
           parentKey: workspaceKey,
           subkeyId: folder.subkeyId!,
-          ciphertext: folder.encryptedName!,
-          publicNonce: folder.encryptedNameNonce!,
+          ciphertext: folder.encryptedName,
+          publicNonce: folder.encryptedNameNonce,
         });
       } catch (error) {
         console.error(error);

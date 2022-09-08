@@ -47,9 +47,9 @@ type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
   folderName?: string;
-  encryptedName?: string | null;
-  encryptedNameNonce?: string | null;
-  subkeyId?: number | null;
+  encryptedName: string;
+  encryptedNameNonce?: string;
+  subkeyId: number;
   depth?: number;
   onStructureChange: () => void;
 };
@@ -128,8 +128,8 @@ export default function SidebarFolder(props: Props) {
       const folderName = await decryptFolderName({
         parentKey: workspaceKey,
         subkeyId: props.subkeyId!,
-        ciphertext: props.encryptedName!,
-        publicNonce: props.encryptedNameNonce!,
+        ciphertext: props.encryptedName,
+        publicNonce: props.encryptedNameNonce,
       });
       setFolderName(folderName);
     } catch (error) {
@@ -172,7 +172,6 @@ export default function SidebarFolder(props: Props) {
         input: {
           id,
           workspaceId: route.params.workspaceId,
-          name,
           encryptedName: encryptedFolderResult.ciphertext,
           encryptedNameNonce: encryptedFolderResult.publicNonce,
           subkeyId: encryptedFolderResult.folderSubkeyId,
@@ -275,7 +274,6 @@ export default function SidebarFolder(props: Props) {
     const updateFolderNameResult = await updateFolderNameMutation({
       input: {
         id: props.folderId,
-        name: newFolderName,
         encryptedName: encryptedFolderResult.ciphertext,
         encryptedNameNonce: encryptedFolderResult.publicNonce,
         subkeyId: props.subkeyId!,

@@ -16,12 +16,10 @@ export type Params = {
   workspaceName: string;
   folderId: string;
   folderIdSignature: string;
-  folderName: string;
   encryptedFolderName: string;
   encryptedFolderNameNonce: string;
   folderSubkeyId: number;
   documentId: string;
-  documentName: string;
   encryptedDocumentName: string;
   encryptedDocumentNameNonce: string;
   documentSubkeyId: number;
@@ -40,12 +38,10 @@ export async function createInitialWorkspaceStructure({
   workspaceId,
   workspaceName,
   folderId,
-  folderName,
   encryptedFolderName,
   encryptedFolderNameNonce,
   folderSubkeyId,
   documentId,
-  documentName,
   encryptedDocumentName,
   encryptedDocumentNameNonce,
   documentSubkeyId,
@@ -61,7 +57,6 @@ export async function createInitialWorkspaceStructure({
   const folder = await createFolder({
     userId,
     id: folderId,
-    name: folderName,
     encryptedName: encryptedFolderName,
     encryptedNameNonce: encryptedFolderNameNonce,
     subkeyId: folderSubkeyId,
@@ -70,7 +65,6 @@ export async function createInitialWorkspaceStructure({
   });
   const document = await createDocument({
     id: documentId,
-    name: documentName,
     encryptedName: encryptedDocumentName,
     encryptedNameNonce: encryptedDocumentNameNonce,
     subkeyId: documentSubkeyId,

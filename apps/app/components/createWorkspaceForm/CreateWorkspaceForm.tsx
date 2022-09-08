@@ -106,13 +106,11 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         input: {
           workspaceName: name,
           workspaceId,
-          folderName,
           folderId,
           encryptedFolderName: encryptedFolderResult.ciphertext,
           encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
           folderSubkeyId: encryptedFolderResult.folderSubkeyId,
           folderIdSignature: `TODO+${folderId}`,
-          documentName: "Introduction",
           encryptedDocumentName: encryptedDocumentTitle.ciphertext,
           encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
           documentSubkeyId: documentKeyData.subkeyId,
