@@ -47,9 +47,9 @@ type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
   folderName?: string;
-  encryptedName?: string | null;
-  encryptedNameNonce?: string | null;
-  subkeyId?: number | null;
+  encryptedName: string;
+  encryptedNameNonce?: string;
+  subkeyId: number;
   depth?: number;
   onStructureChange: () => void;
 };
