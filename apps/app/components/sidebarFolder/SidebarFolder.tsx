@@ -353,11 +353,19 @@ export default function SidebarFolder(props: Props) {
               style={tw`py-3 md:py-1.5 pl-3.5 md:pl-2.5`}
             >
               <View style={tw`ml-${depth} md:ml-0`}>
-                <Icon
-                  name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
-                  color={isDesktopDevice ? "gray-600" : "gray-400"}
-                  mobileSize={5}
-                />
+                {documentPathIds.includes(props.folderId) ? (
+                  <Icon
+                    name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
+                    color={"gray-800"}
+                    mobileSize={5}
+                  />
+                ) : (
+                  <Icon
+                    name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
+                    color={isDesktopDevice ? "gray-500" : "gray-400"}
+                    mobileSize={5}
+                  />
+                )}
               </View>
               <View style={tw`-ml-0.5`}>
                 <Icon name="folder" size={5} mobileSize={8} />
@@ -378,7 +386,6 @@ export default function SidebarFolder(props: Props) {
                   style={tw`ml-1.5 max-w-${maxWidth}`}
                   numberOfLines={1}
                   ellipsizeMode="tail"
-                  bold={documentPathIds.includes(props.folderId)}
                 >
                   {folderName}
                 </Text>
