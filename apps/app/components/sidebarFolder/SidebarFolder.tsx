@@ -139,6 +139,7 @@ export default function SidebarFolder(props: Props) {
   };
 
   const createFolder = async (name: string) => {
+    openFolder();
     const id = uuidv4();
     const devices = await getDevices({ urqlClient });
     if (!devices) {
