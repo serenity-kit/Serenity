@@ -13,7 +13,6 @@ export const UpdateFolderNameInput = inputObjectType({
   name: "UpdateFolderNameInput",
   definition(t) {
     t.nonNull.string("id");
-    t.string("name");
     t.nonNull.string("encryptedName");
     t.nonNull.string("encryptedNameNonce");
     t.nonNull.int("subkeyId");
@@ -42,7 +41,6 @@ export const updateFolderNameMutation = mutationField("updateFolderName", {
     }
     const folder = await updateFolderName({
       id: args.input.id,
-      name: args.input.name || "TODO: remove unencrypted name",
       encryptedName: args.input.encryptedName,
       encryptedNameNonce: args.input.encryptedNameNonce,
       subkeyId: args.input.subkeyId,

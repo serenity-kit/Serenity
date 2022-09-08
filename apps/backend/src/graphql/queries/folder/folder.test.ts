@@ -65,7 +65,6 @@ test("user should be retrieve a folder", async () => {
   });
   const retrievedFolder = result.folder;
   expect(retrievedFolder.id).toBe(folderId);
-  expect(retrievedFolder.name).toBe(folderName);
   expect(retrievedFolder.parentFolderId).toBe(null);
   expect(retrievedFolder.workspaceId).toBe(workspaceId);
 });

@@ -108,7 +108,6 @@ export default function SidebarPage(props: Props) {
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
         id: props.documentId,
-        name,
         encryptedName: encryptedDocumentTitle.ciphertext,
         encryptedNameNonce: encryptedDocumentTitle.publicNonce,
         subkeyId: documentKeyData.subkeyId,

@@ -4,7 +4,6 @@ export const Document = objectType({
   name: "Document",
   definition(t) {
     t.nonNull.string("id");
-    t.string("name");
     t.string("encryptedName");
     t.string("encryptedNameNonce");
     t.int("subkeyId");

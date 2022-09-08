@@ -81,7 +81,6 @@ test("user should be retrieve a document", async () => {
   });
   const retrievedDocument = result.document;
   expect(retrievedDocument.id).toBe(documentId);
-  expect(retrievedDocument.name).toBe(documentName);
   expect(retrievedDocument.workspaceId).toBe(workspaceId);
   expect(retrievedDocument.parentFolderId).toBe(null);
   expect(typeof retrievedDocument.encryptedName).toBe("string");

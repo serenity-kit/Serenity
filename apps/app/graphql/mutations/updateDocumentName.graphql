@@ -2,7 +2,6 @@ mutation updateDocumentName($input: UpdateDocumentNameInput!) {
   updateDocumentName(input: $input) {
     document {
       id
-      name
       encryptedName
       encryptedNameNonce
       subkeyId

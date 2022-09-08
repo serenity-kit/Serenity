@@ -18,7 +18,6 @@ export const getDocument = async ({
     query document($id: ID!) {
       document(id: $id) {
         id
-        name
         encryptedName
         encryptedNameNonce
         subkeyId

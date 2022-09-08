@@ -103,7 +103,6 @@ test("user should be able to list folders in a workspace when preloaded with ini
             edges {
                 node {
                     id
-                    name
                     parentFolderId
                     rootFolderId
                     workspaceId
@@ -139,7 +138,6 @@ test("user should be able to list folders in a workspace with one item", async (
             edges {
                 node {
                     id
-                    name
                     parentFolderId
                     rootFolderId
                     workspaceId
@@ -180,7 +178,6 @@ test("user should be able to list folders in a workspace with multiple items", a
             edges {
                 node {
                     id
-                    name
                     parentFolderId
                     rootFolderId
                     workspaceId
@@ -221,7 +218,6 @@ test("user should be able to list without showing subfolders", async () => {
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
@@ -247,7 +243,6 @@ test("retrieving a workspace that doesn't exist throws an error", async () => {
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
@@ -274,7 +269,6 @@ test("listing folders that the user doesn't own throws an error", async () => {
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
@@ -301,7 +295,6 @@ test("Unauthenticated", async () => {
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
@@ -329,7 +322,6 @@ describe("Input errors", () => {
             edges {
                 node {
                     id
-                    name
                     parentFolderId
                     rootFolderId
                     workspaceId
@@ -354,7 +346,6 @@ describe("Input errors", () => {
           edges {
             node {
               id
-              name
               parentFolderId
               rootFolderId
               workspaceId

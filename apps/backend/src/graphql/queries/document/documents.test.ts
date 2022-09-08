@@ -136,7 +136,6 @@ test("user should be able to list documents in a folder when empty", async () =>
             edges {
                 node {
                     id
-                    name
                     parentFolderId
                     rootFolderId
                     workspaceId
@@ -176,7 +175,6 @@ test("user should be able to list documents in a folder with one item", async ()
             edges {
                 node {
                     id
-                    name
                     parentFolderId
                     rootFolderId
                     workspaceId
@@ -196,7 +194,6 @@ test("user should be able to list documents in a folder with one item", async ()
         {
           "node": {
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
-            "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -226,7 +223,6 @@ test("user should be able to list documents in a folder with multiple items", as
             edges {
                 node {
                     id
-                    name
                     parentFolderId
                     rootFolderId
                     workspaceId
@@ -246,7 +242,6 @@ test("user should be able to list documents in a folder with multiple items", as
         {
           "node": {
             "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
-            "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -255,7 +250,6 @@ test("user should be able to list documents in a folder with multiple items", as
         {
           "node": {
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
-            "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -285,7 +279,6 @@ test("user should be able to list without showing subfolder documents", async ()
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
@@ -305,7 +298,6 @@ test("user should be able to list without showing subfolder documents", async ()
         {
           "node": {
             "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
-            "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -314,7 +306,6 @@ test("user should be able to list without showing subfolder documents", async ()
         {
           "node": {
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
-            "name": "Untitled",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
@@ -338,7 +329,6 @@ test("retrieving a folder that doesn't exist throws an error", async () => {
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
@@ -365,7 +355,6 @@ test("listing documents that the user doesn't own throws an error", async () => 
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
@@ -392,7 +381,6 @@ test("Unauthenticated", async () => {
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
@@ -420,7 +408,6 @@ describe("Input Errors", () => {
             edges {
                 node {
                     id
-                    name
                     parentFolderId
                     rootFolderId
                     workspaceId
@@ -445,7 +432,6 @@ describe("Input Errors", () => {
           edges {
             node {
               id
-              name
               parentFolderId
               rootFolderId
               workspaceId
