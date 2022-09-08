@@ -10,7 +10,6 @@ type Params = {
 const toFolderType = (folder: any): Folder => {
   return {
     id: folder.id,
-    name: folder.name,
     encryptedName: folder.encryptedName,
     encryptedNameNonce: folder.encryptedNameNonce,
     subkeyId: folder.subkeyId,

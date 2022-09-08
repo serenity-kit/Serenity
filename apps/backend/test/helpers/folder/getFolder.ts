@@ -18,7 +18,6 @@ export const getFolder = async ({
     query folder($id: ID!) {
       folder(id: $id) {
         id
-        name
         parentFolderId
         rootFolderId
         workspaceId

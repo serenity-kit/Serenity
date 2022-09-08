@@ -187,14 +187,12 @@ describe("Input errors", () => {
         updateDocumentName(
           input: {
             id: 2
-            name: "updated name"
             encryptedName: ""
             encryptedNameNonce: ""
             subkeyId: 1
           }
         ) {
           document {
-            name
             id
           }
         }
@@ -211,14 +209,12 @@ describe("Input errors", () => {
             updateDocumentName(
             input: {
               id: "${id}"
-              name: 555
-              encryptedName: ""
-              encryptedNameNonce: ""
+              encryptedName: null
+              encryptedNameNonce: null
               subkeyId: 1
             }
           ) {
             document {
-              name
               id
             }
           }
@@ -235,14 +231,12 @@ describe("Input errors", () => {
         updateDocumentName(
           input: {
             id: ""
-            name: "updated name"
             encryptedName: "abc123"
             encryptedNameNonce: "abc123"
             subkeyId: "lala"
           }
         ) {
           document {
-            name
             id
           }
         }
@@ -258,7 +252,6 @@ describe("Input errors", () => {
       mutation {
         updateDocumentName(input: null) {
           document {
-            name
             id
           }
         }

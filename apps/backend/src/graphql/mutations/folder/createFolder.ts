@@ -13,7 +13,6 @@ export const CreateFolderInput = inputObjectType({
   name: "CreateFolderInput",
   definition(t) {
     t.nonNull.string("id");
-    t.string("name");
     t.nonNull.string("encryptedName");
     t.nonNull.string("encryptedNameNonce");
     t.nonNull.int("subkeyId");
@@ -45,7 +44,6 @@ export const createFolderMutation = mutationField("createFolder", {
     const folder = await createFolder({
       userId: context.user.id,
       id: args.input.id,
-      name: args.input.name || undefined,
       encryptedName: args.input.encryptedName,
       encryptedNameNonce: args.input.encryptedNameNonce,
       subkeyId: args.input.subkeyId,

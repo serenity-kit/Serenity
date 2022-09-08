@@ -2,7 +2,6 @@ mutation updateFolderName($input: UpdateFolderNameInput!) {
   updateFolderName(input: $input) {
     folder {
       id
-      name
       encryptedName
       encryptedNameNonce
       subkeyId

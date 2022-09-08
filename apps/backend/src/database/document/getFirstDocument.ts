@@ -19,17 +19,15 @@ export async function getFirstDocument({ userId, workspaceId }: Params) {
       if (!userToWorkspace) {
         throw new ForbiddenError("Unauthorized");
       }
-      // fetch the first document
-      const documents = await prisma.document.findFirst({
+      const document = await prisma.document.findFirst({
         where: {
           workspaceId,
         },
         orderBy: {
-          name: "asc",
+          createdAt: "asc",
         },
       });
-
-      return documents;
+      return document;
     });
   } catch (error) {
     throw error;

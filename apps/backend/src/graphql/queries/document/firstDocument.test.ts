@@ -17,6 +17,7 @@ let workspaceKey = "";
 const workspaceId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
 const parentFolderId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
 const folderId = "3530b9ed-11f3-44c7-9e16-7dba1e14815f";
+const firstDocumentId = uuidv4();
 const otherFolderId = "c1c65251-7471-4893-a1b5-e3df937caf66";
 const documentId1 = "3530b9ed-11f3-44c7-9e16-7dba1e14815f";
 const documentId2 = "9e911f29-7a86-480b-89d7-5c647f21317f";
@@ -37,7 +38,7 @@ const setup = async () => {
   const initialWorkspaceStructureResult = await createInitialWorkspaceStructure(
     {
       workspaceName: "workspace 1",
-      workspaceId: workspaceId,
+      workspaceId,
       deviceSigningPublicKey: device.signingPublicKey,
       deviceEncryptionPublicKey: device.encryptionPublicKey,
       deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
@@ -45,12 +46,11 @@ const setup = async () => {
       folderId: uuidv4(),
       folderIdSignature: `TODO+${uuidv4()}`,
       documentName: "Introduction",
-      documentId: uuidv4(),
+      documentId: firstDocumentId,
       graphql,
       authorizationHeader: sessionKey,
     }
   );
-
   workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
     device: registerUserResult.mainDevice,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
@@ -92,7 +92,8 @@ test("user should be able to retrieve the first document", async () => {
     { workspaceId },
     authorizationHeader
   );
-  expect(result.documents).toMatchInlineSnapshot(`undefined`);
+  const firstDocument = result.firstDocument;
+  expect(firstDocument.id).toBe(firstDocumentId);
 });
 
 test("user should not be able to retreive the first document from another workspace", async () => {

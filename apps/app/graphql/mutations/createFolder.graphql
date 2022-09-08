@@ -2,7 +2,6 @@ mutation createFolder($input: CreateFolderInput!) {
   createFolder(input: $input) {
     folder {
       id
-      name
       encryptedName
       encryptedNameNonce
       subkeyId

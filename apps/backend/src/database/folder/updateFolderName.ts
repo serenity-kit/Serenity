@@ -3,7 +3,6 @@ import { prisma } from "../prisma";
 
 type Params = {
   id: string;
-  name?: string;
   encryptedName: string;
   encryptedNameNonce: string;
   subkeyId: number;
@@ -12,7 +11,6 @@ type Params = {
 
 export async function updateFolderName({
   id,
-  name,
   encryptedName,
   encryptedNameNonce,
   subkeyId,
@@ -55,7 +53,6 @@ export async function updateFolderName({
           id,
         },
         data: {
-          name,
           encryptedName,
           encryptedNameNonce,
           subkeyId,

@@ -47,12 +47,10 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
     t.nonNull.string("workspaceName");
     t.nonNull.string("folderId");
     t.nonNull.string("folderIdSignature");
-    t.nonNull.string("folderName");
     t.nonNull.string("encryptedFolderName");
     t.nonNull.string("encryptedFolderNameNonce");
     t.nonNull.int("folderSubkeyId");
     t.nonNull.string("documentId");
-    t.nonNull.string("documentName");
     t.nonNull.string("encryptedDocumentName");
     t.nonNull.string("encryptedDocumentNameNonce");
     t.nonNull.int("documentSubkeyId");
@@ -101,12 +99,10 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         workspaceName: args.input.workspaceName,
         folderId: args.input.folderId,
         folderIdSignature: args.input.folderIdSignature,
-        folderName: args.input.folderName,
         encryptedFolderName: args.input.encryptedFolderName,
         encryptedFolderNameNonce: args.input.encryptedFolderNameNonce,
         folderSubkeyId: args.input.folderSubkeyId,
         documentId: args.input.documentId,
-        documentName: args.input.documentName,
         encryptedDocumentName: args.input.encryptedDocumentName,
         encryptedDocumentNameNonce: args.input.encryptedDocumentNameNonce,
         documentSubkeyId: args.input.documentSubkeyId,

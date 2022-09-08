@@ -38,10 +38,8 @@ export const createDocumentMutation = mutationField("createDocument", {
       throw new AuthenticationError("Not authenticated");
     }
     const parentFolderId = args.input.parentFolderId || null;
-    // FIXME: does this need a userId?
     const document = await createDocument({
       id: args.input.id,
-      name: null,
       encryptedName: null,
       encryptedNameNonce: null,
       subkeyId: null,

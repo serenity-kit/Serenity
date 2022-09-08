@@ -39,8 +39,8 @@ export const useDocumentStore = create<DocumentState>((set) => ({
         });
         documentName = await decryptDocumentTitle({
           key: documentKeyData.key,
-          ciphertext: document?.encryptedName!,
-          publicNonce: document?.encryptedNameNonce!,
+          ciphertext: document?.encryptedName,
+          publicNonce: document?.encryptedNameNonce,
         });
       } catch (error) {
         documentName = "Could not decrypt";

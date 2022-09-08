@@ -110,7 +110,6 @@ test("user should be able to list folders in a workspace when no subfoldes", asy
             edges {
                 node {
                     id
-                    name
                     parentFolderId
                     rootFolderId
                     workspaceId
@@ -144,7 +143,6 @@ test("user should be able to list folders in a workspace with one item", async (
             edges {
                 node {
                     id
-                    name
                     parentFolderId
                     rootFolderId
                     workspaceId
@@ -164,7 +162,6 @@ test("user should be able to list folders in a workspace with one item", async (
       node: { id: string; name: any; parentFolderId: any; rootFolderId: any };
     }) => {
       if (folder.node.id === folderId1) {
-        expect(folder.node.name).toBe("parent folder");
         expect(folder.node.parentFolderId).toBe(parentFolderId);
         expect(folder.node.rootFolderId).toBe(parentFolderId);
       }
@@ -189,7 +186,6 @@ test("user should be able to list folders in a workspace with multiple items", a
             edges {
                 node {
                     id
-                    name
                     parentFolderId
                     rootFolderId
                     workspaceId
@@ -209,7 +205,6 @@ test("user should be able to list folders in a workspace with multiple items", a
       node: { id: string; name: any; parentFolderId: any; rootFolderId: any };
     }) => {
       if (folder.node.id === folderId2) {
-        expect(folder.node.name).toBe("multiple folders");
         expect(folder.node.parentFolderId).toBe(parentFolderId);
         expect(folder.node.rootFolderId).toBe(parentFolderId);
       }
@@ -234,7 +229,6 @@ test("user should be able to list without showing subfolders", async () => {
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
@@ -260,7 +254,6 @@ test("retrieving a folder that doesn't exist throws an error", async () => {
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
@@ -287,7 +280,6 @@ test("listing folders that the user doesn't own throws an error", async () => {
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
@@ -314,7 +306,6 @@ test("Unauthenticated", async () => {
           edges {
               node {
                   id
-                  name
                   parentFolderId
                   rootFolderId
                   workspaceId
