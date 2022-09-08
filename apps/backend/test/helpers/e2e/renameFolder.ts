@@ -20,7 +20,7 @@ export const renameFolder = async (
   await page
     .locator(`data-testid=sidebar-folder--${folderId}__edit-name`)
     .press("Enter");
-  await delayForSeconds(1);
+  await delayForSeconds(3);
   const renamedFolderMenu = page.locator(
     `data-testid=sidebar-folder--${folderId}`
   );

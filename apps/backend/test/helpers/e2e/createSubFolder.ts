@@ -19,7 +19,7 @@ export const createSubFolder = async (
       `[data-testid=sidebar-folder-menu--${parentFolderId}__create-subfolder]`
     )
     .click();
-  await delayForSeconds(2);
+  await delayForSeconds(3);
   const numFoldersAfterAdd = await prisma.folder.count({
     where: { workspaceId },
   });

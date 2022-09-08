@@ -23,7 +23,7 @@ export const createDocument = async (
   );
   await hoverOnElement(page, createDocumentButton, false);
   await createDocumentButton.click();
-  await delayForSeconds(2);
+  await delayForSeconds(3);
   const numDocumentsAfterAdd = await prisma.document.count({
     where: { workspaceId, parentFolderId },
   });

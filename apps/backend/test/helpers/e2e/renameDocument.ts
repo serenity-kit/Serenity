@@ -30,7 +30,7 @@ export const renameDocument = async (
   await page
     .locator(`data-testid=sidebar-document--${documentId}__edit-name`)
     .press("Enter");
-  await delayForSeconds(1);
+  await delayForSeconds(3);
   const renamedDocumentMenu = page.locator(
     `data-testid=sidebar-document--${documentId}`
   );
