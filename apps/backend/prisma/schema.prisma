@@ -156,11 +156,12 @@ model Workspace {
 }
 
 model UsersToWorkspaces {
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId String
-  isAdmin     Boolean
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId             String
+  workspace          Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId        String
+  isAdmin            Boolean
+  isAuthorizedMember Boolean   @default(false)
 
   @@id([userId, workspaceId])
 }
