@@ -1,8 +1,8 @@
-import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
+import { getUnauthorizedMembers } from "../../../../test/helpers/workspace/getUnauthorizedMembers";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { acceptWorkspaceInvitation } from "../../../database/workspace/acceptWorkspaceInvitation";
 
@@ -31,21 +31,11 @@ beforeAll(async () => {
 });
 
 test("no unauthorized members when workspace created", async () => {
-  const authorizationHeader = { authorization: sessionKey };
-  const query = gql`
-    query unauthorizedMembers($workspaceIds: [ID]!) {
-      unauthorizedMembers(workspaceIds: $workspaceIds) {
-        userIds
-      }
-    }
-  `;
-  const result = await graphql.client.request(
-    query,
-    {
-      workspaceIds: [workspace1Id],
-    },
-    authorizationHeader
-  );
+  const result = await getUnauthorizedMembers({
+    graphql,
+    input: { workspaceIds: [workspace1Id] },
+    sessionKey,
+  });
   expect(result.unauthorizedMembers.userIds.length).toBe(0);
 });
 
@@ -67,41 +57,23 @@ test("unauthorized members when workspace added", async () => {
     workspaceInvitationId,
     userId: otherUserId,
   });
-  const authorizationHeader = { authorization: sessionKey };
-  const query = gql`
-    query unauthorizedMembers($workspaceIds: [ID]!) {
-      unauthorizedMembers(workspaceIds: $workspaceIds) {
-        userIds
-      }
-    }
-  `;
-  const result = await graphql.client.request(
-    query,
-    {
-      workspaceIds: [workspace1Id],
-    },
-    authorizationHeader
-  );
+  const result = await getUnauthorizedMembers({
+    graphql,
+    input: { workspaceIds: [workspace1Id] },
+    sessionKey,
+  });
   expect(result.unauthorizedMembers.userIds.length).toBe(1);
   expect(result.unauthorizedMembers.userIds[0]).toBe(otherUserId);
   // TODO: test when user1 accepts workspaceInvitation
 });
 
 test("Unauthenticated", async () => {
-  const authorizationHeader = { authorization: "badauthheader" };
-  const query = gql`
-    query unauthorizedMembers($workspaceIds: [ID]!) {
-      unauthorizedMembers(workspaceIds: $workspaceIds) {
-        userIds
-      }
-    }
-  `;
   await expect(
     (async () =>
-      await graphql.client.request(
-        query,
-        { workspaceIds: [workspace1Id] },
-        authorizationHeader
-      ))()
+      await getUnauthorizedMembers({
+        graphql,
+        input: { workspaceIds: [workspace1Id] },
+        sessionKey: "badauthheader",
+      }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
