@@ -1,6 +1,6 @@
 import { AuthenticationError } from "apollo-server-express";
 import { objectType, queryField } from "nexus";
-import { getDevicesOfUnauthorizedUsers } from "../../../database/device/getDevicesOfUnAuthorizedUsers";
+import { getDevicesOfUnauthorizedUsers } from "../../../database/device/getDevicesOfUnauthorizedUsers";
 import { WorkspaceIdWithDevices } from "../../types/workspace";
 
 export const UnauthorizedDeviceForSharedWorkspacesResult = objectType({
