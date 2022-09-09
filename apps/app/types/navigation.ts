@@ -86,6 +86,7 @@ export type RootStackParamList = {
   AccountSettingsDevices: undefined; // on phones
   WorkspaceSettingsGeneral: undefined; // on phones
   WorkspaceSettingsMembers: undefined; // on phones
+  WorkspaceNotDecrypted: undefined; // on phones
   Root: undefined;
   NotFound: undefined;
 };
