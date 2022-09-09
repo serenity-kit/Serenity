@@ -21,9 +21,6 @@ export const unauthorizedMembers = queryField((t) => {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      //   if (!args.workspaceIds) {
-      //     throw new UserInputError("workspaceIds cannot be null");
-      //   }
       const validWorspaceIds: string[] = [];
       const validWorkspaces = await prisma.usersToWorkspaces.findMany({
         where: {
