@@ -1,4 +1,13 @@
 import { inputObjectType, list, nonNull, objectType } from "nexus";
+import { Device } from "./device";
+
+export const WorkspaceIdWithDevices = objectType({
+  name: "WorkspaceIdWithDevices",
+  definition(t) {
+    t.nonNull.string("workspaceId");
+    t.nonNull.list.nonNull.field("devices", { type: Device });
+  },
+});
 
 export const WorkspaceKeyBox = objectType({
   name: "WorkspaceKeyBox",
