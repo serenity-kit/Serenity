@@ -4,4 +4,5 @@ export type Device = {
   encryptionPublicKeySignature: string;
   info?: string | null | undefined;
   createdAt?: Date;
+  userId?: string | null;
 };
