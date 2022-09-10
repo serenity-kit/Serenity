@@ -273,6 +273,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             }}
             style={tw`py-2 px-3`}
           >
+            <Icon name={"user-settings-line"} color="gray-600" />
             <Text variant="xxs" muted bold>
               {username}
             </Text>
