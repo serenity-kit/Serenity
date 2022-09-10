@@ -57,6 +57,7 @@ import { FontColor } from "./icons/FontColor";
 import { FontSize2 } from "./icons/FontSize2";
 import { FormatClear } from "./icons/FormatClear";
 import { Functions } from "./icons/Functions";
+import { GroupLine } from "./icons/GroupLine";
 import { H1 } from "./icons/H1";
 import { H2 } from "./icons/H2";
 import { H3 } from "./icons/H3";
@@ -102,6 +103,7 @@ import { Strikethrough } from "./icons/Strikethrough";
 import { Table2 } from "./icons/Table2";
 import { Text } from "./icons/Text";
 import { Underline } from "./icons/Underline";
+import { UserSettingsLine } from "./icons/UserSettingsLine";
 import { WarningFill } from "./icons/WarningFill";
 
 import { View } from "react-native";
@@ -166,21 +168,22 @@ export type IconNames =
   | "font-size-2"
   | "format-clear"
   | "functions"
-  | "hashtag"
-  | "heading"
-  | "history-line"
-  | "image-2-line"
-  | "image-line"
-  | "information-fill"
-  | "information-line"
+  | "group-line"
   | "h-1"
   | "h-2"
   | "h-3"
   | "h-4"
   | "h-5"
   | "h-6"
+  | "hashtag"
+  | "heading"
+  | "history-line"
+  | "image-2-line"
+  | "image-line"
   | "indent-decrease"
   | "indent-increase"
+  | "information-fill"
+  | "information-line"
   | "italic"
   | "link"
   | "link-m"
@@ -211,6 +214,7 @@ export type IconNames =
   | "table-2"
   | "text"
   | "underline"
+  | "user-settings-line"
   | "warning-fill";
 
 export type IconProps = {
@@ -403,6 +407,9 @@ export const Icon = (props: IconProps) => {
   if (name === "functions") {
     icon = <Functions color={color} size={iconSize} />;
   }
+  if (name === "group-line") {
+    icon = <GroupLine color={color} size={iconSize} />;
+  }
   if (name === "h-1") {
     icon = <H1 color={color} size={iconSize} />;
   }
@@ -537,6 +544,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "underline") {
     icon = <Underline color={color} size={iconSize} />;
+  }
+  if (name === "user-settings-line") {
+    icon = <UserSettingsLine color={color} size={iconSize} />;
   }
   if (name === "warning-fill") {
     icon = <WarningFill color={color} size={iconSize} />;

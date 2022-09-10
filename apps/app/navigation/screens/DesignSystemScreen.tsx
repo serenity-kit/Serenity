@@ -863,6 +863,8 @@ export default function DesignSystemScreen() {
             <IconTile name="close-circle-fill" />
             <IconTile name="add-line" />
             <IconTile name="settings-4-line" />
+            <IconTile name="user-settings-line" />
+            <IconTile name="group-line" />
             <IconTile name="download-line" />
             <IconTile name="printer-line" />
             <IconTile name="search-line" />
