@@ -39,6 +39,8 @@ import {
   WorkspaceAvatar,
   LinkExternal,
   colors,
+  SidebarIconLeft,
+  SidebarText,
 } from "@serenity-tools/ui";
 import React, { useState } from "react";
 import { useWindowDimensions, StyleSheet } from "react-native";
@@ -1311,11 +1313,11 @@ export default function DesignSystemScreen() {
                 to={{ screen: "EncryptDecryptImageTest" }}
                 style={tw`p-menu-item`}
               >
-                <WorkspaceAvatar customColor="emerald" />
+                <WorkspaceAvatar customColor="emerald" size={"xxs"} />
                 <Text variant="xs">Notes</Text>
               </SidebarLink>
               <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
-                <WorkspaceAvatar customColor="honey" />
+                <WorkspaceAvatar customColor="honey" size={"xxs"} />
                 <Text variant="xs">Project X</Text>
               </SidebarLink>
               <View style={tw`pl-2 pr-3 py-1.5`}>
@@ -1449,31 +1451,16 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
             <SidebarButton>
-              <Icon
-                name="search-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Search...</Text>
+              <SidebarIconLeft name="search-line" />
+              <SidebarText>Search...</SidebarText>
             </SidebarButton>
             <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="history-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Recently edited</Text>
+              <SidebarIconLeft name="history-line" />
+              <SidebarText>Recently edited</SidebarText>
             </SidebarLink>
             <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="settings-4-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Settings</Text>
+              <SidebarIconLeft name="settings-4-line" />
+              <SidebarText>Settings</SidebarText>
             </SidebarLink>
           </VStack>
         </DSExampleArea>
@@ -1485,22 +1472,12 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
             <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="history-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Recently edited</Text>
+              <SidebarIconLeft name="history-line" />
+              <SidebarText>Recently edited</SidebarText>
             </SidebarLink>
             <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="settings-4-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Settings</Text>
+              <SidebarIconLeft name="settings-4-line" />
+              <SidebarText>Settings</SidebarText>
             </SidebarLink>
             <SidebarDivider />
             <HStack
@@ -1694,22 +1671,12 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
             <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="history-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Recently edited</Text>
+              <SidebarIconLeft name="history-line" />
+              <SidebarText>Recently edited</SidebarText>
             </SidebarLink>
             <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="settings-4-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Settings</Text>
+              <SidebarIconLeft name="settings-4-line" />
+              <SidebarText>Settings</SidebarText>
             </SidebarLink>
             <SidebarDivider />
             <HStack
