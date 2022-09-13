@@ -1,4 +1,4 @@
-import { Text, SidebarLink, Icon, View, tw } from "@serenity-tools/ui";
+import { SidebarLink, SidebarIconLeft, SidebarText } from "@serenity-tools/ui";
 
 export default function AccountSettingsMobileOverviewScreen() {
   return (
@@ -8,22 +8,16 @@ export default function AccountSettingsMobileOverviewScreen() {
           screen: "AccountSettingsProfile",
         }}
       >
-        <Icon name="user-line" color={"gray-900"} />
-        <Text>Profile</Text>
-        <View style={tw`ml-auto`}>
-          <Icon name="arrow-right-s-line" color={"gray-900"} />
-        </View>
+        <SidebarIconLeft name="user-line" />
+        <SidebarText>Profile</SidebarText>
       </SidebarLink>
       <SidebarLink
         to={{
           screen: "AccountSettingsDevices",
         }}
       >
-        <Icon name="device-line" color={"gray-900"} />
-        <Text>Devices</Text>
-        <View style={tw`ml-auto`}>
-          <Icon name="arrow-right-s-line" color={"gray-900"} />
-        </View>
+        <SidebarIconLeft name="device-line" />
+        <SidebarText>Devices</SidebarText>
       </SidebarLink>
     </>
   );

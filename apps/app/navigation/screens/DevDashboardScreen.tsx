@@ -2,8 +2,8 @@ import {
   SidebarLink,
   tw,
   ScrollSafeAreaView,
-  Icon,
-  Text,
+  SidebarIconLeft,
+  SidebarText,
 } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
 
@@ -11,51 +11,26 @@ export default function DevDashboardScreen(props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
   return (
-    <ScrollSafeAreaView style={tw`px-4 py-6`}>
+    <ScrollSafeAreaView style={tw`py-6`}>
       <SidebarLink to={{ screen: "Root" }}>
-        <Icon
-          name="dashboard-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={"gray-800"}
-        />
-        <Text>Home</Text>
+        <SidebarIconLeft name="dashboard-line" />
+        <SidebarText>Home</SidebarText>
       </SidebarLink>
       <SidebarLink to={{ screen: "DesignSystem" }}>
-        <Icon
-          name="dashboard-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={"gray-800"}
-        />
-        <Text>Design System</Text>
+        <SidebarIconLeft name="dashboard-line" />
+        <SidebarText>Design System</SidebarText>
       </SidebarLink>
       <SidebarLink to={{ screen: "TestLibsodium" }}>
-        <Icon
-          name="dashboard-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={"gray-800"}
-        />
-        <Text>Libsodium Test Screen</Text>
+        <SidebarIconLeft name="dashboard-line" />
+        <SidebarText>Libsodium Test Screen</SidebarText>
       </SidebarLink>
       <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-        <Icon
-          name="dashboard-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={"gray-800"}
-        />
-        <Text>Encrypt / Decrypt Image</Text>
+        <SidebarIconLeft name="dashboard-line" />
+        <SidebarText>Encrypt / Decrypt Image</SidebarText>
       </SidebarLink>
       <SidebarLink to={{ screen: "AccountSettings" }}>
-        <Icon
-          name="dashboard-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={"gray-800"}
-        />
-        <Text>User settings</Text>
+        <SidebarIconLeft name="dashboard-line" />
+        <SidebarText>User settings</SidebarText>
       </SidebarLink>
     </ScrollSafeAreaView>
   );

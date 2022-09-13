@@ -14,7 +14,9 @@ import {
   Pressable,
   SidebarButton,
   SidebarDivider,
+  SidebarIconLeft,
   SidebarLink,
+  SidebarText,
   Text,
   Tooltip,
   tw,
@@ -352,13 +354,13 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           params: { workspaceId: route.params.workspaceId },
         }}
       >
-        <Icon name="settings-4-line" color={"gray-800"} />
-        <Text variant="xs">Settings</Text>
+        <SidebarIconLeft name={"settings-4-line"} />
+        <SidebarText>Settings</SidebarText>
       </SidebarLink>
 
       <SidebarLink to={{ screen: "DevDashboard" }}>
-        <Icon name="dashboard-line" color={"gray-800"} />
-        <Text variant="xs">Dev Dashboard</Text>
+        <SidebarIconLeft name="dashboard-line" />
+        <SidebarText>Dev Dashboard</SidebarText>
       </SidebarLink>
       <SidebarDivider />
       <HStack

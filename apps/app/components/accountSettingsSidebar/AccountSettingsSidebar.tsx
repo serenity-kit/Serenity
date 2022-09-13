@@ -3,7 +3,12 @@ import {
   DrawerContentScrollView,
 } from "@react-navigation/drawer";
 
-import { Icon, SidebarLink, Text, tw } from "@serenity-tools/ui";
+import {
+  SidebarIconLeft,
+  SidebarLink,
+  SidebarText,
+  tw,
+} from "@serenity-tools/ui";
 
 export default function AccountSettingsSidebar(
   props: DrawerContentComponentProps
@@ -17,10 +22,10 @@ export default function AccountSettingsSidebar(
           params: { screen: "Profile" },
         }}
       >
-        <Icon name="user-line" color={"gray-800"} />
-        <Text variant="xs">
+        <SidebarIconLeft name="user-line" />
+        <SidebarText>
           Profile {currentRouteName === "Profile" ? "(active)" : null}
-        </Text>
+        </SidebarText>
       </SidebarLink>
       <SidebarLink
         to={{
@@ -28,10 +33,10 @@ export default function AccountSettingsSidebar(
           params: { screen: "Devices" },
         }}
       >
-        <Icon name="device-line" color={"gray-800"} />
-        <Text variant="xs">
+        <SidebarIconLeft name="device-line" />
+        <SidebarText>
           Devices {currentRouteName === "Devices" ? "(active)" : null}
-        </Text>
+        </SidebarText>
       </SidebarLink>
     </DrawerContentScrollView>
   );
