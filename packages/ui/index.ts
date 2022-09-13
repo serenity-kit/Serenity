@@ -26,6 +26,7 @@ export * from "./components/editorSidebarIcon/EditorSidebarIcon";
 export * from "./components/input/Input";
 export * from "./components/menu/Menu";
 export * from "./components/menuButton/MenuButton";
+export * from "./components/menuLink/MenuLink";
 export * from "./components/modal/Modal";
 export * from "./components/modalButtonFooter/ModalButtonFooter";
 export * from "./components/modalHeader/ModalHeader";
