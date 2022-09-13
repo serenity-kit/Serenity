@@ -35,6 +35,7 @@ import { CupLine } from "./icons/CupLine";
 import { Cursor } from "./icons/Cursor";
 import { DashboardLine } from "./icons/DashboardLine";
 import { DeleteBinLine } from "./icons/DeleteBinLine";
+import { DeviceLine } from "./icons/DeviceLine";
 import { DoubleArrowLeft } from "./icons/DoubleArrowLeft";
 import { DoubleArrowRight } from "./icons/DoubleArrowRight";
 import { DoubleQuotesL } from "./icons/DoubleQuotesL";
@@ -147,6 +148,7 @@ export type IconNames =
   | "cursor"
   | "dashboard-line"
   | "delete-bin-line"
+  | "device-line"
   | "double-arrow-right"
   | "double-arrow-left"
   | "double-quotes-l"
@@ -342,6 +344,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "delete-bin-line") {
     icon = <DeleteBinLine color={color} size={iconSize} />;
+  }
+  if (name === "device-line") {
+    icon = <DeviceLine color={color} size={iconSize} />;
   }
   if (name === "double-arrow-left") {
     icon = <DoubleArrowLeft color={color} size={iconSize} />;
