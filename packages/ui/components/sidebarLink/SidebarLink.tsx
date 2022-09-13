@@ -7,6 +7,8 @@ import { GestureResponderEvent, TextProps, StyleSheet } from "react-native";
 import { To } from "@react-navigation/native/lib/typescript/src/useLinkTo";
 import { useFocusRing } from "@react-native-aria/focus";
 import { HStack } from "native-base";
+import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
+import { SidebarIconNavRight } from "../sidebarIconNavRight/SidebarIconNavRight";
 
 // copied from react-navigation type definitions
 declare type SidebarLinkProps<ParamList extends ReactNavigation.RootParamList> =
@@ -24,6 +26,7 @@ declare type SidebarLinkProps<ParamList extends ReactNavigation.RootParamList> =
 export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
   props: SidebarLinkProps<ParamList>
 ) {
+  const isDesktopDevice = useIsDesktopDevice();
   const [isHovered, setIsHovered] = React.useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const linkProps = useLinkProps({
@@ -58,6 +61,7 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
     >
       <HStack space={2} alignItems="center" style={[styles.stack, props.style]}>
         {props.children}
+        {!isDesktopDevice ? <SidebarIconNavRight /> : null}
       </HStack>
     </Pressable>
   );
