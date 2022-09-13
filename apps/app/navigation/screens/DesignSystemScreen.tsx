@@ -41,6 +41,7 @@ import {
   colors,
   SidebarIconLeft,
   SidebarText,
+  MenuLink,
 } from "@serenity-tools/ui";
 import React, { useState } from "react";
 import { useWindowDimensions, StyleSheet } from "react-native";
@@ -1295,8 +1296,8 @@ export default function DesignSystemScreen() {
         <Heading lvl={3}>Links and more</Heading>
         <Text variant={"sm"}>
           Besides the <DSMono variant="component">MenuButton</DSMono> you can
-          also use a <DSMono variant="component">SidebarLink</DSMono> as one of
-          the Menu-actions. Just be sure to give it a{" "}
+          also use a <DSMono variant="component">MenuLink</DSMono> as one of the
+          Menu-actions. Just be sure to give it a{" "}
           <DSMono variant="type">p-menu-item</DSMono> class passed via the{" "}
           <DSMono variant="property">style</DSMono> property to mimic the look
           of MenuButtons.
@@ -1309,17 +1310,14 @@ export default function DesignSystemScreen() {
                   jane@example.com
                 </Text>
               </View>
-              <SidebarLink
-                to={{ screen: "EncryptDecryptImageTest" }}
-                style={tw`p-menu-item`}
-              >
+              <MenuLink to={{ screen: "EncryptDecryptImageTest" }}>
                 <WorkspaceAvatar customColor="emerald" size={"xxs"} />
                 <Text variant="xs">Notes</Text>
-              </SidebarLink>
-              <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
+              </MenuLink>
+              <MenuLink to={{ screen: "Login" }}>
                 <WorkspaceAvatar customColor="honey" size={"xxs"} />
                 <Text variant="xs">Project X</Text>
-              </SidebarLink>
+              </MenuLink>
               <View style={tw`pl-2 pr-3 py-1.5`}>
                 <IconButton name="plus" label="New workspace" />
               </View>

@@ -11,6 +11,8 @@ import {
   IconButton,
   InlineInput,
   Menu,
+  MenuButton,
+  MenuLink,
   Pressable,
   SidebarButton,
   SidebarDivider,
@@ -256,7 +258,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             </Pressable>
           }
         >
-          <SidebarLink
+          <MenuLink
             to={{ screen: "AccountSettings" }}
             onPress={(event) => {
               setIsOpenWorkspaceSwitcher(false);
@@ -273,13 +275,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 }, 400);
               }
             }}
-            style={tw`py-2 px-3`}
           >
             <Icon name={"user-settings-line"} color="gray-600" />
             <Text variant="xxs" muted bold>
               {username}
             </Text>
-          </SidebarLink>
+          </MenuLink>
 
           {workspaces === null ||
           workspaces === undefined ||
@@ -287,7 +288,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             ? null
             : workspaces.map((workspace) =>
                 workspace === null || workspace === undefined ? null : (
-                  <SidebarLink
+                  <MenuLink
                     key={workspace.id}
                     to={{
                       screen: "Workspace",
@@ -296,7 +297,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                         screen: "WorkspaceRoot",
                       },
                     }}
-                    style={tw`py-2 px-3`}
                   >
                     <WorkspaceAvatar
                       customColor={"honey"}
@@ -304,7 +304,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                       size="xxs"
                     />
                     <Text variant="xs">{workspace.name}</Text>
-                  </SidebarLink>
+                  </MenuLink>
                 )
               )}
 
@@ -325,7 +325,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           </View>
 
           <SidebarDivider collapsed />
-          <SidebarButton
+          <MenuButton
             onPress={async () => {
               setIsOpenWorkspaceSwitcher(false);
               await updateAuthentication(null);
@@ -333,11 +333,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               // @ts-expect-error navigation ts issue
               props.navigation.push("Login");
             }}
-            px={3}
-            py={2}
           >
-            <Text variant="xs">Logout</Text>
-          </SidebarButton>
+            Logout
+          </MenuButton>
         </Menu>
         {!isPermanentLeftSidebar && (
           <IconButton
