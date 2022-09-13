@@ -103,6 +103,7 @@ import { Strikethrough } from "./icons/Strikethrough";
 import { Table2 } from "./icons/Table2";
 import { Text } from "./icons/Text";
 import { Underline } from "./icons/Underline";
+import { UserLine } from "./icons/UserLine";
 import { UserSettingsLine } from "./icons/UserSettingsLine";
 import { WarningFill } from "./icons/WarningFill";
 
@@ -214,6 +215,7 @@ export type IconNames =
   | "table-2"
   | "text"
   | "underline"
+  | "user-line"
   | "user-settings-line"
   | "warning-fill";
 
@@ -544,6 +546,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "underline") {
     icon = <Underline color={color} size={iconSize} />;
+  }
+  if (name === "user-line") {
+    icon = <UserLine color={color} size={iconSize} />;
   }
   if (name === "user-settings-line") {
     icon = <UserSettingsLine color={color} size={iconSize} />;
