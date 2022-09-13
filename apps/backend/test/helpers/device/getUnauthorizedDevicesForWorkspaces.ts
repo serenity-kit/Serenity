@@ -5,23 +5,26 @@ export type Props = {
   graphql: TestContext;
   sessionKey: string;
 };
-export const getUnauthorizedDevicesForSharedWorkspaces = async ({
+export const getUnauthorizedDevicesForWorkspaces = async ({
   graphql,
   sessionKey,
 }: Props) => {
   const authorizationHeader = { authorization: sessionKey };
   const query = gql`
     {
-      unauthorizedDevicesForSharedWorkspaces {
-        workspacesWithDevices {
-          workspaceId
-          devices {
-            userId
-            signingPublicKey
-            encryptionPublicKey
-            info
-            createdAt
-            encryptionPublicKeySignature
+      unauthorizedDevicesForWorkspaces {
+        unauthorizedMemberDevices {
+          id
+          members {
+            id
+            devices {
+              userId
+              signingPublicKey
+              encryptionPublicKey
+              info
+              createdAt
+              encryptionPublicKeySignature
+            }
           }
         }
       }

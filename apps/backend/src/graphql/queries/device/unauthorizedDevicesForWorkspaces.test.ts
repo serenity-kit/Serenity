@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { getUnauthorizedDevicesForSharedWorkspaces } from "../../../../test/helpers/device/getUnauthorizedDevicesForSharedWorkspaces";
+import { getUnauthorizedDevicesForWorkspaces } from "../../../../test/helpers/device/getUnauthorizedDevicesForWorkspaces";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
 import { getUnauthorizedMembers } from "../../../../test/helpers/workspace/getUnauthorizedMembers";
@@ -30,14 +30,13 @@ beforeAll(async () => {
 });
 
 test("no devices members when workspace created", async () => {
-  const result = await getUnauthorizedDevicesForSharedWorkspaces({
+  const result = await getUnauthorizedDevicesForWorkspaces({
     graphql,
     sessionKey,
   });
-
-  const unauthorizedDevices =
-    result.unauthorizedDevicesForSharedWorkspaces.workspacesWithDevices;
-  expect(unauthorizedDevices.length).toBe(0);
+  const unauthorizedMembers =
+    result.unauthorizedDevicesForWorkspaces.unauthorizedMemberDevices;
+  expect(unauthorizedMembers.length).toBe(0);
 });
 
 test("unauthorized devices when workspace added", async () => {
@@ -60,20 +59,24 @@ test("unauthorized devices when workspace added", async () => {
     workspaceInvitationId,
     userId: otherUserId,
   });
-  const result = await getUnauthorizedDevicesForSharedWorkspaces({
+  const result = await getUnauthorizedDevicesForWorkspaces({
     graphql,
     sessionKey,
   });
-  const unauthorizedDevices =
-    result.unauthorizedDevicesForSharedWorkspaces.workspacesWithDevices;
+  const unauthorizedMembers =
+    result.unauthorizedDevicesForWorkspaces.unauthorizedMemberDevices;
 
-  expect(unauthorizedDevices.length).toBe(1);
-  const workspaceInfo = unauthorizedDevices[0];
+  expect(unauthorizedMembers.length).toBe(1);
+  const workspaceInfo = unauthorizedMembers[0];
 
-  expect(workspaceInfo.workspaceId).toBe(workspace1Id);
-  expect(workspaceInfo.devices.length).toBe(2);
-  for (let unauthorizedDevice of workspaceInfo.devices) {
-    if (unauthorizedDevices.info === null) {
+  expect(workspaceInfo.id).toBe(workspace1Id);
+  expect(workspaceInfo.members.length).toBe(1);
+
+  const unauthorizedMember = workspaceInfo.members[0];
+  expect(unauthorizedMember.id).toBe(otherUserId);
+  expect(unauthorizedMember.devices.length).toBe(2);
+  for (let unauthorizedDevice of unauthorizedMember.devices) {
+    if (unauthorizedDevice.info === null) {
       expect(unauthorizedDevice.signingPublicKey).toBe(
         otherDevice.signingPublicKey
       );

@@ -1,8 +1,13 @@
 import { Device } from "./device";
 
-export type WorkspaceIdWithDevices = {
-  workspaceId: string;
+export type MemberIdWithDevice = {
+  id: string;
   devices: Device[];
+};
+
+export type WorkspaceIdWithMemberDevices = {
+  id: string;
+  members: MemberIdWithDevice[];
 };
 
 export type WorkspaceKeyBox = {

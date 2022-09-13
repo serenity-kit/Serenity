@@ -1,5 +1,8 @@
 import { Device } from "../../../prisma/generated/output";
-import { WorkspaceIdWithDevices } from "../../types/workspace";
+import {
+  MemberIdWithDevice,
+  WorkspaceIdWithMemberDevices,
+} from "../../types/workspace";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -7,7 +10,7 @@ type Params = {
 };
 export async function getDevicesOfUnauthorizedUsers({
   userId,
-}: Params): Promise<WorkspaceIdWithDevices[]> {
+}: Params): Promise<WorkspaceIdWithMemberDevices[]> {
   const userToWorkspaces = await prisma.usersToWorkspaces.findMany({
     where: {
       userId,
@@ -46,29 +49,40 @@ export async function getDevicesOfUnauthorizedUsers({
   // now we have a list of unautharized devices, each with a userid
   // and a workspaceId lookup keyed by userId
   // we want to dump the unauthorized devices into their appropriate workspaces
-  const workspaceDevicesLookup: { [workspaceId: string]: Device[] } = {};
+  const workspaceMemberLookup: {
+    [workspaceId: string]: { [memberId: string]: Device[] };
+  } = {};
+
   for (let unauthorizedDevice of unauthorizedDevices) {
-    if (!unauthorizedDevice.userId) {
-      continue;
-    }
-    const workspaceIds = userIdToWorkspaceIdsLookup[unauthorizedDevice.userId];
+    const memberId = unauthorizedDevice.userId!;
+    const workspaceIds = userIdToWorkspaceIdsLookup[memberId];
     if (!workspaceIds) {
       continue;
     }
     for (let workspaceId of workspaceIds) {
-      if (!(workspaceId in workspaceDevicesLookup)) {
-        workspaceDevicesLookup[workspaceId] = [];
+      if (!(workspaceId in workspaceMemberLookup)) {
+        const memberLookup = {};
+        memberLookup[memberId] = [];
+        workspaceMemberLookup[workspaceId] = memberLookup;
       }
-      workspaceDevicesLookup[workspaceId].push(unauthorizedDevice);
+      workspaceMemberLookup[workspaceId][memberId].push(unauthorizedDevice);
     }
   }
   // format for export to graphql
-  const workspaceDevices: WorkspaceIdWithDevices[] = [];
-  for (const [workspaceId, devices] of Object.entries(workspaceDevicesLookup)) {
-    workspaceDevices.push({
-      workspaceId,
-      devices,
-    });
+  const workspaceMemberDevices: WorkspaceIdWithMemberDevices[] = [];
+  for (const [workspaceId, data] of Object.entries(workspaceMemberLookup)) {
+    const members: MemberIdWithDevice[] = [];
+    const workspaceDevice = {
+      id: workspaceId,
+      members,
+    };
+    for (const [memberId, devices] of Object.entries(data)) {
+      workspaceDevice.members.push({
+        id: memberId,
+        devices,
+      });
+    }
+    workspaceMemberDevices.push(workspaceDevice);
   }
-  return workspaceDevices;
+  return workspaceMemberDevices;
 }
