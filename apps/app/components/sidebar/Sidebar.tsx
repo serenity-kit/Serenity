@@ -352,22 +352,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           params: { workspaceId: route.params.workspaceId },
         }}
       >
-        <Icon
-          name="settings-4-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={"gray-800"}
-        />
+        <Icon name="settings-4-line" color={"gray-800"} />
         <Text variant="xs">Settings</Text>
       </SidebarLink>
 
       <SidebarLink to={{ screen: "DevDashboard" }}>
-        <Icon
-          name="dashboard-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={"gray-800"}
-        />
+        <Icon name="dashboard-line" color={"gray-800"} />
         <Text variant="xs">Dev Dashboard</Text>
       </SidebarLink>
       <SidebarDivider />
