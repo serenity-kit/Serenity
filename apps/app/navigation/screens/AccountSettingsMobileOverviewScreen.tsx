@@ -7,17 +7,17 @@ export default function AccountSettingsMobileOverviewScreen() {
         to={{
           screen: "AccountSettingsProfile",
         }}
+        icon="user-line"
       >
-        <SidebarIconLeft name="user-line" />
-        <SidebarText>Profile</SidebarText>
+        Profile
       </SidebarLink>
       <SidebarLink
         to={{
           screen: "AccountSettingsDevices",
         }}
+        icon="device-line"
       >
-        <SidebarIconLeft name="device-line" />
-        <SidebarText>Devices</SidebarText>
+        Devices
       </SidebarLink>
     </>
   );

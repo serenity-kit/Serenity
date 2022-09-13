@@ -23,22 +23,18 @@ export default function WorkspaceSettingsSidebar(
           screen: "WorkspaceSettings",
           params: { screen: "General", workspaceId },
         }}
+        icon="settings-4-line"
       >
-        <SidebarIconLeft name="settings-4-line" />
-        <SidebarText>
-          General {currentRouteName === "General" ? "(active)" : null}
-        </SidebarText>
+        General {currentRouteName === "General" ? "(active)" : null}
       </SidebarLink>
       <SidebarLink
         to={{
           screen: "WorkspaceSettings",
           params: { screen: "Members", workspaceId },
         }}
+        icon="group-line"
       >
-        <SidebarIconLeft name="group-line" />
-        <SidebarText variant="xs">
-          Members {currentRouteName === "Members" ? "(active)" : null}
-        </SidebarText>
+        Members {currentRouteName === "Members" ? "(active)" : null}
       </SidebarLink>
     </DrawerContentScrollView>
   );

@@ -1452,13 +1452,17 @@ export default function DesignSystemScreen() {
               <SidebarIconLeft name="search-line" />
               <SidebarText>Search...</SidebarText>
             </SidebarButton>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <SidebarIconLeft name="history-line" />
-              <SidebarText>Recently edited</SidebarText>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              icon="history-line"
+            >
+              Recently edited
             </SidebarLink>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <SidebarIconLeft name="settings-4-line" />
-              <SidebarText>Settings</SidebarText>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              icon="settings-4-line"
+            >
+              Settings
             </SidebarLink>
           </VStack>
         </DSExampleArea>
@@ -1469,13 +1473,17 @@ export default function DesignSystemScreen() {
         </Text>
         <DSExampleArea>
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <SidebarIconLeft name="history-line" />
-              <SidebarText>Recently edited</SidebarText>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              icon="history-line"
+            >
+              Recently edited
             </SidebarLink>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <SidebarIconLeft name="settings-4-line" />
-              <SidebarText>Settings</SidebarText>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              icon="settings-4-line"
+            >
+              Settings
             </SidebarLink>
             <SidebarDivider />
             <HStack
@@ -1668,13 +1676,17 @@ export default function DesignSystemScreen() {
         </Text>
         <DSExampleArea>
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <SidebarIconLeft name="history-line" />
-              <SidebarText>Recently edited</SidebarText>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              icon="history-line"
+            >
+              Recently edited
             </SidebarLink>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <SidebarIconLeft name="settings-4-line" />
-              <SidebarText>Settings</SidebarText>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              icon="settings-4-line"
+            >
+              Settings
             </SidebarLink>
             <SidebarDivider />
             <HStack

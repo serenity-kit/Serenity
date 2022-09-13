@@ -9,6 +9,9 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { HStack } from "native-base";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
 import { SidebarIconNavRight } from "../sidebarIconNavRight/SidebarIconNavRight";
+import { IconNames } from "../icon/Icon";
+import { SidebarText } from "../sidebarText/SidebarText";
+import { SidebarIconLeft } from "../sidebarIconLeft/SidebarIconLeft";
 
 // copied from react-navigation type definitions
 declare type SidebarLinkProps<ParamList extends ReactNavigation.RootParamList> =
@@ -21,6 +24,7 @@ declare type SidebarLinkProps<ParamList extends ReactNavigation.RootParamList> =
     ) => void;
   } & (TextProps & {
     children: React.ReactNode;
+    icon: IconNames;
   });
 
 export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
@@ -32,6 +36,7 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
   const linkProps = useLinkProps({
     ...props,
   });
+  const { icon } = props;
 
   const styles = StyleSheet.create({
     link: tw.style(Platform.OS === "web" && { outlineWidth: 0 }),
@@ -60,7 +65,8 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
       onMouseLeave={() => setIsHovered(false)}
     >
       <HStack space={2} alignItems="center" style={[styles.stack, props.style]}>
-        {props.children}
+        {icon ? <SidebarIconLeft name={icon} /> : null}
+        <SidebarText>{props.children}</SidebarText>
         {!isDesktopDevice ? <SidebarIconNavRight /> : null}
       </HStack>
     </Pressable>

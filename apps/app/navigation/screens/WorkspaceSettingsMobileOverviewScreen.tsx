@@ -8,18 +8,18 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
           screen: "WorkspaceSettingsGeneral",
           params: { workspaceId: props.route.params.workspaceId },
         }}
+        icon="settings-4-line"
       >
-        <SidebarIconLeft name="settings-4-line" />
-        <SidebarText>General</SidebarText>
+        General
       </SidebarLink>
       <SidebarLink
         to={{
           screen: "WorkspaceSettingsMembers",
           params: { workspaceId: props.route.params.workspaceId },
         }}
+        icon={"group-line"}
       >
-        <SidebarIconLeft name="group-line" />
-        <SidebarText>Members</SidebarText>
+        Members
       </SidebarLink>
     </>
   );

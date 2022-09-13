@@ -12,25 +12,23 @@ export default function DevDashboardScreen(props) {
 
   return (
     <ScrollSafeAreaView style={tw`py-6`}>
-      <SidebarLink to={{ screen: "Root" }}>
-        <SidebarIconLeft name="dashboard-line" />
-        <SidebarText>Home</SidebarText>
+      <SidebarLink to={{ screen: "Root" }} icon="dashboard-line">
+        Home
       </SidebarLink>
-      <SidebarLink to={{ screen: "DesignSystem" }}>
-        <SidebarIconLeft name="dashboard-line" />
-        <SidebarText>Design System</SidebarText>
+      <SidebarLink to={{ screen: "DesignSystem" }} icon="dashboard-line">
+        Design System
       </SidebarLink>
-      <SidebarLink to={{ screen: "TestLibsodium" }}>
-        <SidebarIconLeft name="dashboard-line" />
-        <SidebarText>Libsodium Test Screen</SidebarText>
+      <SidebarLink to={{ screen: "TestLibsodium" }} icon="dashboard-line">
+        Libsodium Test Screen
       </SidebarLink>
-      <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-        <SidebarIconLeft name="dashboard-line" />
-        <SidebarText>Encrypt / Decrypt Image</SidebarText>
+      <SidebarLink
+        to={{ screen: "EncryptDecryptImageTest" }}
+        icon="dashboard-line"
+      >
+        Encrypt / Decrypt Image
       </SidebarLink>
-      <SidebarLink to={{ screen: "AccountSettings" }}>
-        <SidebarIconLeft name="dashboard-line" />
-        <SidebarText>User settings</SidebarText>
+      <SidebarLink to={{ screen: "AccountSettings" }} icon="dashboard-line">
+        User settings
       </SidebarLink>
     </ScrollSafeAreaView>
   );
