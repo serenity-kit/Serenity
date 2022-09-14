@@ -6,21 +6,21 @@ import { Icon, IconNames } from "../icon/Icon";
 import { tw } from "../../tailwind";
 
 export type ShortcutProps = IStackProps & {
-  icons?: IconNames[];
+  iconNames?: IconNames[];
   letter: string;
 };
 
 export const Shortcut = forwardRef((props: ShortcutProps, ref) => {
-  const { icons } = props;
+  const { iconNames } = props;
   const styles = StyleSheet.create({
     stack: tw``,
   });
 
-  const iconNames = icons ?? ["command-line"];
+  const names = iconNames ?? ["command-line"];
 
   return (
     <HStack {...props} alignItems="center" style={[styles.stack, props.style]}>
-      {iconNames.map((icon) => {
+      {names.map((icon) => {
         return (
           <Icon
             name={icon}
