@@ -75,7 +75,6 @@ export function MenuLink<ParamList extends ReactNavigation.RootParamList>(
           space={4}
         >
           <SidebarText>{props.children}</SidebarText>
-          {!isDesktopDevice ? <SidebarIconNavRight /> : null}
         </HStack>
       </HStack>
     </Pressable>
