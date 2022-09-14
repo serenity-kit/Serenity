@@ -38,7 +38,7 @@ export function MenuLink<ParamList extends ReactNavigation.RootParamList>(
     link:
       tw.style(Platform.OS === "web" && { outlineWidth: 0 }) &&
       tw`pl-5 md:pl-3`,
-    stack: tw.style(`py-3 md:py-2 pr-4 md:pr-3`), // flex needed for correct height calculation
+    stack: tw.style(`py-3 md:py-2 pr-4 md:pr-3`),
     hover: tw`bg-gray-200`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
