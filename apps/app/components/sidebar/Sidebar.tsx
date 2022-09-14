@@ -19,6 +19,7 @@ import {
   Text,
   Tooltip,
   tw,
+  useIsDesktopDevice,
   useIsPermanentLeftSidebar,
   View,
   WorkspaceAvatar,
@@ -56,6 +57,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+  const isDesktopDevice = useIsDesktopDevice();
   const [meResult] = useMeQuery();
   const [username, setUsername] = useState<string>("");
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
@@ -305,8 +307,24 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 )
               )}
 
-          <View style={tw`pl-1.5 pr-3 py-1.5`}>
-            <IconButton
+          {isDesktopDevice ? (
+            <View style={tw`pl-1.5 pr-3 py-1.5`}>
+              <IconButton
+                onPress={() => {
+                  setIsOpenWorkspaceSwitcher(false);
+                  // on mobile Modals can't be open at the same time
+                  // and closing the workspace switcher takes a bit of time
+                  const timeout = Platform.OS === "web" ? 0 : 400;
+                  setTimeout(() => {
+                    setShowCreateWorkspaceModal(true);
+                  }, timeout);
+                }}
+                name="plus"
+                label="Create workspace"
+              />
+            </View>
+          ) : (
+            <MenuButton
               onPress={() => {
                 setIsOpenWorkspaceSwitcher(false);
                 // on mobile Modals can't be open at the same time
@@ -316,10 +334,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   setShowCreateWorkspaceModal(true);
                 }, timeout);
               }}
-              name="plus"
-              label="Create workspace"
-            />
-          </View>
+              iconName="plus"
+            >
+              Create workspace
+            </MenuButton>
+          )}
 
           <SidebarDivider collapsed />
           <MenuButton
