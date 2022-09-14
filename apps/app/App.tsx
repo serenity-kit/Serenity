@@ -11,7 +11,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/inter";
 import { OpaqueBridge } from "@serenity-tools/opaque";
-import { tw } from "@serenity-tools/ui";
+import { tw, useIsDesktopDevice } from "@serenity-tools/ui";
 import { devtoolsExchange } from "@urql/devtools";
 import { authExchange } from "@urql/exchange-auth";
 import { cacheExchange } from "@urql/exchange-graphcache";
@@ -125,6 +125,7 @@ const exchanges = [
 
 export default function App() {
   const { isLoadingComplete, sessionKey, setSessionKey } = useCachedResources();
+  const isDesktopDevice = useIsDesktopDevice();
 
   const updateAuthentication = useCallback(
     async (session: { sessionKey: string; expiresAt: string } | null) => {
@@ -145,8 +146,10 @@ export default function App() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
+
   // 1️opt out of listening to device color scheme events until we support dark mode
   useDeviceContext(tw, { withDeviceColorScheme: false });
+
   // hard-coding the colorScheme to light until we support dark mode
   const [colorScheme] = useAppColorScheme(tw, "light");
   const rnTheme = extendTheme({
@@ -160,8 +163,8 @@ export default function App() {
       Avatar: {
         sizes: {
           xxs: {
-            width: 4,
-            height: 4,
+            width: isDesktopDevice ? 4 : 5,
+            height: isDesktopDevice ? 4 : 5,
             _text: {
               fontSize: "3xs",
             },
