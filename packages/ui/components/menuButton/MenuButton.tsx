@@ -18,9 +18,10 @@ export const MenuButton = React.forwardRef(
   ({ danger, iconName, shortcut, ...rest }: MenuButtonProps, ref: any) => {
     const isDesktopDevice = useIsDesktopDevice();
     const iconColor = danger ? "error-500" : "gray-800";
+    const textColor = isDesktopDevice ? "gray-800" : "gray-900";
 
     const styles = StyleSheet.create({
-      text: danger ? tw`text-error-500` : tw`text-gray-800`,
+      text: danger ? tw`text-error-500` : tw`text-${textColor}`,
       hover: danger ? tw`bg-error-100` : tw`bg-gray-200`,
       disabled: tw`bg-transparent opacity-50`, // TODO opacity tbd
       pressable: tw`py-3 md:py-2 px-5 md:px-3`,
@@ -43,11 +44,7 @@ export const MenuButton = React.forwardRef(
           _web: { style: [{ outlineWidth: 0 }, tw`se-inset-focus-mini`] },
         }}
       >
-        <HStack
-          space={isDesktopDevice ? 2 : 4}
-          alignItems="center"
-          style={tw`flex`}
-        >
+        <HStack space={isDesktopDevice ? 2 : 4} alignItems="center">
           {iconName && <Icon name={iconName} color={iconColor} />}
           <Text variant={isDesktopDevice ? "xs" : "md"} style={styles.text}>
             {rest.children}
