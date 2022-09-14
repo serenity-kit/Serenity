@@ -272,11 +272,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 }, 400);
               }
             }}
+            icon={<Icon name={"user-settings-line"} color="gray-600" />}
           >
-            <Icon name={"user-settings-line"} color="gray-600" />
-            <Text variant="xxs" muted bold>
-              {username}
-            </Text>
+            {username}
           </MenuLink>
 
           {workspaces === null ||
@@ -294,13 +292,15 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                         screen: "WorkspaceRoot",
                       },
                     }}
+                    icon={
+                      <WorkspaceAvatar
+                        customColor={"honey"}
+                        key={`avatar_${workspace.id}`}
+                        size="xxs"
+                      />
+                    }
                   >
-                    <WorkspaceAvatar
-                      customColor={"honey"}
-                      key={`avatar_${workspace.id}`}
-                      size="xxs"
-                    />
-                    <Text variant="xs">{workspace.name}</Text>
+                    {workspace.name}
                   </MenuLink>
                 )
               )}

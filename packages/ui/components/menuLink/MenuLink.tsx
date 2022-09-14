@@ -9,6 +9,7 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { HStack } from "native-base";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
 import { SidebarIconNavRight } from "../sidebarIconNavRight/SidebarIconNavRight";
+import { SidebarText } from "../sidebarText/SidebarText";
 
 // copied from react-navigation type definitions
 declare type MenuLinkProps<ParamList extends ReactNavigation.RootParamList> = {
@@ -20,6 +21,7 @@ declare type MenuLinkProps<ParamList extends ReactNavigation.RootParamList> = {
   ) => void;
 } & (TextProps & {
   children: React.ReactNode;
+  icon?: React.ReactNode;
 });
 
 export function MenuLink<ParamList extends ReactNavigation.RootParamList>(
@@ -33,8 +35,10 @@ export function MenuLink<ParamList extends ReactNavigation.RootParamList>(
   });
 
   const styles = StyleSheet.create({
-    link: tw.style(Platform.OS === "web" && { outlineWidth: 0 }),
-    stack: tw.style(`flex py-2 px-3`), // flex needed for correct height calculation
+    link:
+      tw.style(Platform.OS === "web" && { outlineWidth: 0 }) &&
+      tw`pl-5 md:pl-3`,
+    stack: tw.style(`py-3 md:py-2 pr-4 md:pr-3`), // flex needed for correct height calculation
     hover: tw`bg-gray-200`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
@@ -58,9 +62,21 @@ export function MenuLink<ParamList extends ReactNavigation.RootParamList>(
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <HStack space={2} alignItems="center" style={[styles.stack, props.style]}>
-        {props.children}
-        {!isDesktopDevice ? <SidebarIconNavRight /> : null}
+      <HStack space={isDesktopDevice ? 2 : 4} alignItems="center">
+        {props.icon}
+        <HStack
+          alignItems={"center"}
+          justifyContent={"space-between"}
+          style={[
+            styles.stack,
+            !isDesktopDevice && tw`border-b border-gray-200`,
+            tw`flex-auto`,
+          ]}
+          space={4}
+        >
+          <SidebarText>{props.children}</SidebarText>
+          {!isDesktopDevice ? <SidebarIconNavRight /> : null}
+        </HStack>
       </HStack>
     </Pressable>
   );

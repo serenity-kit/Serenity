@@ -34,7 +34,7 @@ export default function SidebarFolderMenu(props: Props) {
           setIsOpenMenu(false);
           props.onCreateFolderPress();
         }}
-        icon="folder-line"
+        iconName="folder-line"
         shortcut={<Shortcut letter="N" />}
       >
         Create folder
@@ -44,7 +44,7 @@ export default function SidebarFolderMenu(props: Props) {
           setIsOpenMenu(false);
           props.onUpdateNamePress();
         }}
-        icon="font-size-2"
+        iconName="font-size-2"
         shortcut={<Shortcut letter="R" />}
       >
         Rename
@@ -54,7 +54,7 @@ export default function SidebarFolderMenu(props: Props) {
           setIsOpenMenu(false);
           props.onDeletePressed();
         }}
-        icon="delete-bin-line"
+        iconName="delete-bin-line"
         danger
       >
         Delete

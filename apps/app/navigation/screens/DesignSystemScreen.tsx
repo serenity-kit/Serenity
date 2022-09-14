@@ -1202,10 +1202,10 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <BoxShadow elevation={2} rounded>
             <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
-              <MenuButton icon="folder-line">Create folder</MenuButton>
-              <MenuButton icon="font-size-2">Rename</MenuButton>
+              <MenuButton iconName="folder-line">Create folder</MenuButton>
+              <MenuButton iconName="font-size-2">Rename</MenuButton>
               <SidebarDivider collapsed />
-              <MenuButton icon="delete-bin-line" danger>
+              <MenuButton iconName="delete-bin-line" danger>
                 Delete
               </MenuButton>
             </VStack>
@@ -1239,7 +1239,7 @@ export default function DesignSystemScreen() {
               onPress={() => {
                 setIsOpenPopover(false);
               }}
-              icon="folder-line"
+              iconName="folder-line"
             >
               Create folder
             </MenuButton>
@@ -1247,7 +1247,7 @@ export default function DesignSystemScreen() {
               onPress={() => {
                 setIsOpenPopover(false);
               }}
-              icon="font-size-2"
+              iconName="font-size-2"
             >
               Rename
             </MenuButton>
@@ -1256,7 +1256,7 @@ export default function DesignSystemScreen() {
               onPress={() => {
                 setIsOpenPopover(false);
               }}
-              icon="delete-bin-line"
+              iconName="delete-bin-line"
               danger
             >
               Delete
@@ -1280,14 +1280,20 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <BoxShadow elevation={2} rounded>
             <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
-              <MenuButton icon="folder-line" shortcut={<Shortcut letter="N" />}>
+              <MenuButton
+                iconName="folder-line"
+                shortcut={<Shortcut letter="N" />}
+              >
                 Create folder
               </MenuButton>
-              <MenuButton icon="font-size-2" shortcut={<Shortcut letter="R" />}>
+              <MenuButton
+                iconName="font-size-2"
+                shortcut={<Shortcut letter="R" />}
+              >
                 Rename
               </MenuButton>
               <SidebarDivider collapsed />
-              <MenuButton icon="delete-bin-line" danger>
+              <MenuButton iconName="delete-bin-line" danger>
                 Delete
               </MenuButton>
             </VStack>
@@ -1310,13 +1316,18 @@ export default function DesignSystemScreen() {
                   jane@example.com
                 </Text>
               </View>
-              <MenuLink to={{ screen: "EncryptDecryptImageTest" }}>
-                <WorkspaceAvatar customColor="emerald" size={"xxs"} />
-                <Text variant="xs">Notes</Text>
+
+              <MenuLink
+                to={{ screen: "EncryptDecryptImageTest" }}
+                icon={<WorkspaceAvatar customColor="emerald" size={"xxs"} />}
+              >
+                Notes
               </MenuLink>
-              <MenuLink to={{ screen: "Login" }}>
-                <WorkspaceAvatar customColor="honey" size={"xxs"} />
-                <Text variant="xs">Project X</Text>
+              <MenuLink
+                to={{ screen: "Login" }}
+                icon={<WorkspaceAvatar customColor="honey" size={"xxs"} />}
+              >
+                Project X
               </MenuLink>
               <View style={tw`pl-2 pr-3 py-1.5`}>
                 <IconButton name="plus" label="New workspace" />
