@@ -39,9 +39,9 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
   const { iconName } = props;
 
   const styles = StyleSheet.create({
-    link: tw.style(
-      Platform.OS === "web" && { outlineWidth: 0 } && tw`pl-5 md:pl-4`
-    ),
+    link:
+      tw.style(Platform.OS === "web" && { outlineWidth: 0 }) &&
+      tw`pl-5 md:pl-4`,
     stack: tw.style(`py-3 md:py-1.5 pr-4`),
     hover: tw`bg-gray-200`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
