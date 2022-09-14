@@ -1,10 +1,4 @@
-import {
-  SidebarLink,
-  tw,
-  ScrollSafeAreaView,
-  SidebarIconLeft,
-  SidebarText,
-} from "@serenity-tools/ui";
+import { SidebarLink, tw, ScrollSafeAreaView } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
 
 export default function DevDashboardScreen(props) {
@@ -12,22 +6,22 @@ export default function DevDashboardScreen(props) {
 
   return (
     <ScrollSafeAreaView style={tw`py-6`}>
-      <SidebarLink to={{ screen: "Root" }} icon="dashboard-line">
+      <SidebarLink to={{ screen: "Root" }} iconName="dashboard-line">
         Home
       </SidebarLink>
-      <SidebarLink to={{ screen: "DesignSystem" }} icon="dashboard-line">
+      <SidebarLink to={{ screen: "DesignSystem" }} iconName="dashboard-line">
         Design System
       </SidebarLink>
-      <SidebarLink to={{ screen: "TestLibsodium" }} icon="dashboard-line">
+      <SidebarLink to={{ screen: "TestLibsodium" }} iconName="dashboard-line">
         Libsodium Test Screen
       </SidebarLink>
       <SidebarLink
         to={{ screen: "EncryptDecryptImageTest" }}
-        icon="dashboard-line"
+        iconName="dashboard-line"
       >
         Encrypt / Decrypt Image
       </SidebarLink>
-      <SidebarLink to={{ screen: "AccountSettings" }} icon="dashboard-line">
+      <SidebarLink to={{ screen: "AccountSettings" }} iconName="dashboard-line">
         User settings
       </SidebarLink>
     </ScrollSafeAreaView>

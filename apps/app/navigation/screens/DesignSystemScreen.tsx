@@ -1454,13 +1454,13 @@ export default function DesignSystemScreen() {
             </SidebarButton>
             <SidebarLink
               to={{ screen: "EncryptDecryptImageTest" }}
-              icon="history-line"
+              iconName="history-line"
             >
               Recently edited
             </SidebarLink>
             <SidebarLink
               to={{ screen: "EncryptDecryptImageTest" }}
-              icon="settings-4-line"
+              iconName="settings-4-line"
             >
               Settings
             </SidebarLink>
@@ -1475,13 +1475,13 @@ export default function DesignSystemScreen() {
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
             <SidebarLink
               to={{ screen: "EncryptDecryptImageTest" }}
-              icon="history-line"
+              iconName="history-line"
             >
               Recently edited
             </SidebarLink>
             <SidebarLink
               to={{ screen: "EncryptDecryptImageTest" }}
-              icon="settings-4-line"
+              iconName="settings-4-line"
             >
               Settings
             </SidebarLink>
@@ -1678,13 +1678,13 @@ export default function DesignSystemScreen() {
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
             <SidebarLink
               to={{ screen: "EncryptDecryptImageTest" }}
-              icon="history-line"
+              iconName="history-line"
             >
               Recently edited
             </SidebarLink>
             <SidebarLink
               to={{ screen: "EncryptDecryptImageTest" }}
-              icon="settings-4-line"
+              iconName="settings-4-line"
             >
               Settings
             </SidebarLink>

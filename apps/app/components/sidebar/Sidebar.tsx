@@ -348,12 +348,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           screen: "WorkspaceSettings",
           params: { workspaceId: route.params.workspaceId },
         }}
-        icon={"settings-4-line"}
+        iconName={"settings-4-line"}
       >
         Settings
       </SidebarLink>
 
-      <SidebarLink to={{ screen: "DevDashboard" }} icon="dashboard-line">
+      <SidebarLink to={{ screen: "DevDashboard" }} iconName="dashboard-line">
         Dev Dashboard
       </SidebarLink>
       <SidebarDivider />

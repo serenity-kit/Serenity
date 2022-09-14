@@ -16,7 +16,7 @@ export default function AccountSettingsSidebar(
           screen: "AccountSettings",
           params: { screen: "Profile" },
         }}
-        icon="user-line"
+        iconName="user-line"
       >
         Profile {currentRouteName === "Profile" ? "(active)" : null}
       </SidebarLink>
@@ -25,7 +25,7 @@ export default function AccountSettingsSidebar(
           screen: "AccountSettings",
           params: { screen: "Devices" },
         }}
-        icon="device-line"
+        iconName="device-line"
       >
         Devices {currentRouteName === "Devices" ? "(active)" : null}
       </SidebarLink>
