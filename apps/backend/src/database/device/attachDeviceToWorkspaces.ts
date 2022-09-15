@@ -1,4 +1,4 @@
-import { AuthenticationError } from "apollo-server-express";
+import { ForbiddenError } from "apollo-server-express";
 import { v4 as uuidv4 } from "uuid";
 import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
 import { prisma } from "../prisma";
@@ -79,7 +79,7 @@ export async function attachDeviceToWorkspaces({
         where: { signingPublicKey: receiverDeviceSigningPublicKey },
       });
       if (!verifiedDevice || !verifiedDevice.userId) {
-        throw new AuthenticationError("Unauthorized");
+        throw new ForbiddenError("Unauthorized");
       }
       const verifiedDeviceWorkspaces = await prisma.usersToWorkspaces.findMany({
         where: {
@@ -88,7 +88,7 @@ export async function attachDeviceToWorkspaces({
         },
       });
       if (verifiedDeviceWorkspaces.length === 0) {
-        throw new AuthenticationError("Unauthorized");
+        throw new ForbiddenError("Unauthorized");
       }
       const verifiedWorkspaceIds: string[] = [];
       verifiedDeviceWorkspaces.forEach((userToWorkspace) => {
