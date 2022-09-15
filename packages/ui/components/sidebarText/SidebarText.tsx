@@ -7,5 +7,9 @@ export type SidebarTextProps = TextProps & {};
 export const SidebarText = forwardRef((props: SidebarTextProps, ref) => {
   const isDesktopDevice = useIsDesktopDevice();
 
-  return <Text variant={isDesktopDevice ? "xs" : "md"}>{props.children}</Text>;
+  return (
+    <Text variant={isDesktopDevice ? "xs" : "md"} {...props}>
+      {props.children}
+    </Text>
+  );
 });
