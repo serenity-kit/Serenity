@@ -235,16 +235,16 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               _focusVisible={{ _web: { style: { outlineWidth: 0 } } }}
             >
               <HStack
-                space={2}
+                space={isPermanentLeftSidebar ? 2 : 3}
                 alignItems="center"
                 style={[
-                  tw`py-1.5 pr-2`,
+                  tw`py-0.5 md:py-1.5 pr-2`,
                   isFocusVisible && tw`se-inset-focus-mini`,
                 ]}
               >
-                <WorkspaceAvatar />
+                <WorkspaceAvatar size={isPermanentLeftSidebar ? "xs" : "sm"} />
                 <Text
-                  variant="xs"
+                  variant={isPermanentLeftSidebar ? "xs" : "md"}
                   bold
                   style={tw`-mr-1 max-w-30 text-gray-900`} // -mr needed for icon spacing, max-w needed for ellipsis
                   numberOfLines={1}
@@ -359,27 +359,35 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               props.navigation.closeDrawer();
             }}
             name="double-arrow-left"
+            size={"lg"}
           ></IconButton>
         )}
       </HStack>
-      <SidebarLink
-        to={{
-          screen: "WorkspaceSettings",
-          params: { workspaceId: route.params.workspaceId },
-        }}
-        iconName={"settings-4-line"}
-      >
-        Settings
-      </SidebarLink>
 
-      <SidebarLink to={{ screen: "DevDashboard" }} iconName="dashboard-line">
-        Dev Dashboard
-      </SidebarLink>
-      <SidebarDivider />
+      {!isPermanentLeftSidebar ? <SidebarDivider collapsed /> : null}
+
+      <View style={!isPermanentLeftSidebar && tw`pt-5 pb-7`}>
+        <SidebarLink
+          to={{
+            screen: "WorkspaceSettings",
+            params: { workspaceId: route.params.workspaceId },
+          }}
+          iconName={"settings-4-line"}
+        >
+          Settings
+        </SidebarLink>
+
+        <SidebarLink to={{ screen: "DevDashboard" }} iconName="dashboard-line">
+          Dev Dashboard
+        </SidebarLink>
+      </View>
+
+      {isPermanentLeftSidebar ? <SidebarDivider /> : null}
+
       <HStack
         justifyContent="space-between"
         alignItems="center"
-        style={tw`ml-4 mr-5 mb-4 md:mr-2`}
+        style={tw`ml-5 md:ml-4 mb-4 mr-5 md:mr-2`}
       >
         <Text variant={isPermanentLeftSidebar ? "xxs" : "sm"} bold>
           Folders
@@ -391,6 +399,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               setIsCreatingNewFolder(true);
             }}
             name="plus"
+            size={isPermanentLeftSidebar ? "md" : "lg"}
           ></IconButton>
         </Tooltip>
       </HStack>
