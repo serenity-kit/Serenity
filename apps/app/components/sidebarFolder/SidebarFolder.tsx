@@ -341,58 +341,64 @@ export default function SidebarFolder(props: Props) {
             {...focusRingProps} // needed so focus is shown on view-wrapper
             onPress={toggleFolderOpen}
             style={[
-              tw`grow-1 pl-${depth * 3}`, // needed so clickable area is as large as possible
+              tw`grow-1 pl-${depth * (isDesktopDevice ? 3 : 4)}`, // needed so clickable area is as large as possible
             ]}
             // disable default outline styles and add 1 overridden style manually (grow)
             _focusVisible={{
               _web: { style: { outlineWidth: 0, flexGrow: 1 } },
             }}
           >
-            <HStack
-              alignItems="center"
-              style={tw`py-3 md:py-1.5 pl-3.5 md:pl-2.5`}
-            >
-              <View style={tw`ml-${depth} md:ml-0`}>
-                {documentPathIds.includes(props.folderId) ? (
-                  <Icon
-                    name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
-                    color={"gray-800"}
-                    mobileSize={5}
+            <View style={[tw`pl-5 md:pl-2.5`]}>
+              <HStack
+                alignItems="center"
+                style={[
+                  tw`py-2 md:py-1.5`,
+                  !isDesktopDevice && tw`border-b border-gray-200`,
+                ]}
+              >
+                <View style={!isDesktopDevice && tw`-ml-1`}>
+                  {documentPathIds.includes(props.folderId) ? (
+                    <Icon
+                      name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
+                      color={"gray-800"}
+                      mobileSize={5}
+                    />
+                  ) : (
+                    <Icon
+                      name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
+                      color={isDesktopDevice ? "gray-500" : "gray-400"}
+                      mobileSize={5}
+                    />
+                  )}
+                </View>
+                <View style={tw`-ml-0.5`}>
+                  <Icon name="folder" size={5} mobileSize={8} />
+                </View>
+
+                {isEditing === "name" ? (
+                  <InlineInput
+                    onSubmit={updateFolderName}
+                    onCancel={() => {
+                      setIsEditing("none");
+                    }}
+                    value={folderName}
+                    style={tw`ml-0.5 w-${maxWidth}`}
                   />
                 ) : (
-                  <Icon
-                    name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
-                    color={isDesktopDevice ? "gray-500" : "gray-400"}
-                    mobileSize={5}
-                  />
+                  <Text
+                    variant="xs"
+                    style={tw`ml-1.5 max-w-${maxWidth}`}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {folderName}
+                  </Text>
                 )}
-              </View>
-              <View style={tw`-ml-0.5`}>
-                <Icon name="folder" size={5} mobileSize={8} />
-              </View>
-
-              {isEditing === "name" ? (
-                <InlineInput
-                  onSubmit={updateFolderName}
-                  onCancel={() => {
-                    setIsEditing("none");
-                  }}
-                  value={folderName}
-                  style={tw`ml-0.5 w-${maxWidth}`}
-                />
-              ) : (
-                <Text
-                  variant="xs"
-                  style={tw`ml-1.5 max-w-${maxWidth}`}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {folderName}
-                </Text>
-              )}
-            </HStack>
+              </HStack>
+            </View>
           </Pressable>
 
+          {/* TODO mobile : use overlay element */}
           {isEditing === "new" && (
             <InlineInput
               value=""
@@ -405,7 +411,14 @@ export default function SidebarFolder(props: Props) {
           )}
 
           {(isHovered || !isDesktopDevice) && (
-            <HStack alignItems="center" space={1} style={tw`pr-3 md:pr-2`}>
+            <HStack
+              alignItems="center"
+              space={1}
+              style={[
+                tw`pr-5 md:pr-2`,
+                !isDesktopDevice && tw`border-b border-gray-200`,
+              ]}
+            >
               <SidebarFolderMenu
                 folderId={props.folderId}
                 refetchFolders={refetchFolders}

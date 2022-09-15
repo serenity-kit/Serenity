@@ -159,36 +159,50 @@ export default function SidebarPage(props: Props) {
             _web: { style: { outlineWidth: 0, flexGrow: 1 } },
           }}
         >
-          <HStack
-            alignItems="center"
-            style={tw`py-3 md:py-1.5 pl-${5 + depth} md:pl-2.5`}
-          >
-            <Icon name="page" size={5} mobileSize={8} color={"gray-600"} />
-            {isEditing ? (
-              <InlineInput
-                onCancel={() => {
-                  setIsEditing(false);
-                }}
-                onSubmit={updateDocumentName}
-                value={documentTitle}
-                style={tw`ml-0.5 w-${maxWidth}`}
-              />
-            ) : (
-              <Text
-                variant="xs"
-                style={[tw`pl-1.5 max-w-${maxWidth}`]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                bold={document?.id === props.documentId}
-              >
-                {documentTitle}
-              </Text>
-            )}
-          </HStack>
+          <View style={tw`pl-${6 + depth} md:pl-2.5`}>
+            <HStack
+              alignItems="center"
+              style={[
+                tw`py-2 md:py-1.5`,
+                !isDesktopDevice && tw`border-b border-gray-200`,
+              ]}
+            >
+              <View style={!isDesktopDevice && tw`-ml-1`}>
+                <Icon name="page" size={5} mobileSize={8} color={"gray-600"} />
+              </View>
+              {isEditing ? (
+                <InlineInput
+                  onCancel={() => {
+                    setIsEditing(false);
+                  }}
+                  onSubmit={updateDocumentName}
+                  value={documentTitle}
+                  style={tw`ml-0.5 w-${maxWidth}`}
+                />
+              ) : (
+                <Text
+                  variant="xs"
+                  style={[tw`pl-1.5 max-w-${maxWidth}`]}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  bold={document?.id === props.documentId}
+                >
+                  {documentTitle}
+                </Text>
+              )}
+            </HStack>
+          </View>
         </Pressable>
 
         {(isHovered || !isDesktopDevice) && (
-          <HStack alignItems="center" space={1} style={tw`pr-3 md:pr-2`}>
+          <HStack
+            alignItems="center"
+            space={1}
+            style={[
+              tw`pr-5 md:pr-2`,
+              !isDesktopDevice && tw`border-b border-gray-200`,
+            ]}
+          >
             <SidebarPageMenu
               documentId={props.documentId}
               refetchDocuments={props.onRefetchDocumentsPress}
