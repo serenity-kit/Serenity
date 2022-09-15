@@ -5,7 +5,6 @@ import {
 } from "react-native";
 
 import { Spinner, Text, View } from "@serenity-tools/ui";
-import { useEffect } from "react";
 import { Client, useClient } from "urql";
 import {
   IsWorkspaceAuthorizedDocument,
@@ -25,6 +24,7 @@ import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { useInterval } from "../../utils/useInterval";
 
 export default function WorkspaceNotDecryptedScreen({
   navigation,
@@ -37,9 +37,9 @@ export default function WorkspaceNotDecryptedScreen({
   const urqlClient = useClient();
   const secondsBetweenAuthorizationChecks = 10;
 
-  useEffect(() => {
+  useInterval(() => {
     checkForAuthorization();
-  }, []);
+  }, secondsBetweenAuthorizationChecks * 1000);
 
   const getMe = async () => {
     const meResult = await urqlClient
@@ -79,9 +79,6 @@ export default function WorkspaceNotDecryptedScreen({
       });
       return;
     }
-    setTimeout(() => {
-      checkForAuthorization();
-    }, secondsBetweenAuthorizationChecks * 1000);
   };
 
   const isUserAMemberOfWorkspace = async ({
