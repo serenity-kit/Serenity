@@ -50,7 +50,6 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 const AccountSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
 const WorkspaceSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
-const WorkspaceNotDecryptedDrawer = createDrawerNavigator(); // for desktop and tablet
 
 const styles = StyleSheet.create({
   // web prefix needed as this otherwise messes with the height-calculation for mobile
@@ -160,26 +159,6 @@ function AccountSettingsDrawerScreen(props) {
   );
 }
 
-function WorkspaceNotDecryptedDrawerScreen(props) {
-  return (
-    <NavigationDrawerModal {...props}>
-      <WorkspaceNotDecryptedDrawer.Navigator
-        drawerContent={(props) => null}
-        screenOptions={{
-          unmountOnBlur: false,
-          headerShown: false,
-          drawerType: "permanent",
-        }}
-      >
-        <WorkspaceNotDecryptedDrawer.Screen
-          name="AwaitingAuthorization"
-          component={WorkspaceNotDecryptedScreen}
-        />
-      </WorkspaceNotDecryptedDrawer.Navigator>
-    </NavigationDrawerModal>
-  );
-}
-
 function RootNavigator() {
   const dimensions = useWindowDimensions();
 
@@ -228,6 +207,10 @@ function RootNavigator() {
           component={AcceptWorkspaceInvitationScreen}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="WorkspaceNotDecrypted"
+          component={WorkspaceNotDecryptedScreen}
+        />
         {isPhoneDimensions(dimensions.width) ? (
           <>
             <Stack.Screen
@@ -253,10 +236,6 @@ function RootNavigator() {
             <Stack.Screen
               name="WorkspaceSettingsMembers"
               component={WorkspaceSettingsMembersScreen}
-            />
-            <Stack.Screen
-              name="WorkspaceNotDecrypted"
-              component={WorkspaceNotDecryptedScreen}
             />
           </>
         ) : null}
@@ -286,10 +265,6 @@ function RootNavigator() {
             <Stack.Screen
               name="WorkspaceSettings"
               component={WorkspaceSettingsDrawerScreen}
-            />
-            <Stack.Screen
-              name="WorkspaceNotDecrypted"
-              component={WorkspaceNotDecryptedDrawerScreen}
             />
           </>
         ) : null}
@@ -333,19 +308,6 @@ const getLinking = (
         },
       };
 
-  const workspaceNotDecrypted = isPhoneDimensions
-    ? {
-        WorkspaceNotDecrypted: "/workspace/:workspaceId/lobby",
-      }
-    : {
-        WorkspaceNotDecrypted: {
-          path: "/workspace/:workspaceId/lobby",
-          screens: {
-            AwaitingAuthorization: "awaitingauthorization",
-          },
-        },
-      };
-
   return {
     prefixes: [Linking.createURL("/")],
     config: {
@@ -370,8 +332,8 @@ const getLinking = (
           "accept-workspace-invitation/:workspaceInvitationId",
 
         TestLibsodium: "test-libsodium",
+        WorkspaceNotDecrypted: "/workspace/:workspaceId/lobby",
         ...accountSettings,
-        ...workspaceNotDecrypted,
         Root: "",
         NotFound: "*",
       },

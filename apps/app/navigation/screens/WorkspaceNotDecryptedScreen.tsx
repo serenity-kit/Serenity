@@ -6,10 +6,20 @@ import {
 
 import { Spinner, Text, View } from "@serenity-tools/ui";
 import { useEffect } from "react";
-import { useClient } from "urql";
-import { useWorkspaceId } from "../../context/WorkspaceIdContext";
-import { MeDocument, MeQuery, MeQueryVariables } from "../../generated/graphql";
+import { Client, useClient } from "urql";
+import {
+  IsWorkspaceAuthorizedDocument,
+  IsWorkspaceAuthorizedQuery,
+  IsWorkspaceAuthorizedQueryVariables,
+  MeDocument,
+  MeQuery,
+  MeQueryVariables,
+  WorkspaceDocument,
+  WorkspaceQuery,
+  WorkspaceQueryVariables,
+} from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
+import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import {
   getLastUsedWorkspaceId,
   removeLastUsedDocumentId,
@@ -18,9 +28,12 @@ import {
 
 export default function WorkspaceNotDecryptedScreen({
   navigation,
-}: RootStackScreenProps<"NotFound">) {
+  route,
+}: RootStackScreenProps<"WorkspaceNotDecrypted">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const workspaceId = useWorkspaceId();
+  console.log();
+  const workspaceId = route.params?.workspaceId;
+
   const urqlClient = useClient();
   const secondsBetweenAuthorizationChecks = 10;
 
@@ -47,19 +60,83 @@ export default function WorkspaceNotDecryptedScreen({
   const checkForAuthorization = async () => {
     // TODO: check if user is authorized
     const me = await getMe();
-    /*
-    const isAuthorized = await isWorkspaceAuthorized({ graphql, workspaceId});
+    const isUserMember = await isUserAMemberOfWorkspace({
+      urqlClient,
+      workspaceId,
+    });
+    if (!isUserMember) {
+      navigation.replace("WorkspaceNotFound");
+      return;
+    }
+    const isAuthorized = await isWorkspaceAuthorized({
+      urqlClient,
+      workspaceId,
+    });
     if (isAuthorized) {
-        navigation.navigate("Workspace" {
-        workspaceId: workspace!.id,
+      navigation.navigate("Workspace", {
+        workspaceId,
         screen: "WorkspaceRoot",
       });
       return;
     }
-    */
     setTimeout(() => {
       checkForAuthorization();
     }, secondsBetweenAuthorizationChecks * 1000);
+  };
+
+  const isUserAMemberOfWorkspace = async ({
+    urqlClient,
+    workspaceId,
+  }: {
+    urqlClient: Client;
+    workspaceId: string;
+  }) => {
+    const activeDevice = await getActiveDevice();
+    if (!activeDevice) {
+      // TODO create UI for these errors
+      throw new Error("No active device found!");
+    }
+    const deviceSigningPublicKey = activeDevice?.signingPublicKey;
+    const workspaceResult = await urqlClient
+      .query<WorkspaceQuery, WorkspaceQueryVariables>(
+        WorkspaceDocument,
+        {
+          id: workspaceId,
+          deviceSigningPublicKey,
+        },
+        { requestPolicy: "network-only" }
+      )
+      .toPromise();
+    if (workspaceResult.data?.workspace === null) {
+      return false;
+    }
+    return true;
+  };
+
+  const isWorkspaceAuthorized = async ({
+    urqlClient,
+    workspaceId,
+  }: {
+    urqlClient: Client;
+    workspaceId: string;
+  }) => {
+    const isAuthorizedResult = await urqlClient
+      .query<IsWorkspaceAuthorizedQuery, IsWorkspaceAuthorizedQueryVariables>(
+        IsWorkspaceAuthorizedDocument,
+        { workspaceId },
+        {
+          requestPolicy: "network-only",
+        }
+      )
+      .toPromise();
+
+    if (isAuthorizedResult.error) {
+      console.error(isAuthorizedResult.error);
+      // throw new Error(isAuthorizedResult.error.message);
+    }
+    const isAuthorized =
+      isAuthorizedResult.data?.isWorkspaceAuthorized?.isAuthorized || false;
+    return isAuthorized;
   };
 
   const removeLastUsedWorkspaceIdAndNavigateToRoot = async () => {
