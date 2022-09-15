@@ -7,7 +7,7 @@ import { View } from "../view/View";
 
 export type WorkspaceAvatarProps = AvatarProps & {
   customColor?: CollaborationColor; // needs custom Name as otherwise types get mixed
-  size?: "xxs" | "xs";
+  size?: "xxs" | "xs" | "sm";
 };
 
 export const WorkspaceAvatar = React.forwardRef(
@@ -17,6 +17,7 @@ export const WorkspaceAvatar = React.forwardRef(
     const iconSize = {
       xxs: 4,
       xs: 5,
+      sm: 7,
     };
 
     return (
