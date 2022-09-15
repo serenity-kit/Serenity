@@ -1,57 +1,48 @@
-import {
-  NavigationContainer,
-  DefaultTheme,
-  DarkTheme,
-} from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import {
-  ColorSchemeName,
-  Platform,
-  StyleSheet,
-  useWindowDimensions,
-} from "react-native";
-import { LinkingOptions } from "@react-navigation/native";
+  DarkTheme,
+  DefaultTheme,
+  LinkingOptions,
+  NavigationContainer,
+} from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as Linking from "expo-linking";
+import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
 
-import NotFoundScreen from "./screens/NotFoundScreen";
-import { RootStackParamList } from "../types/navigation";
-import NoPageExistsScreen from "./screens/NoPageExistsScreen";
-import DevDashboardScreen from "./screens/DevDashboardScreen";
-import PageScreen from "./screens/PageScreen";
-import LibsodiumTestScreen from "./screens/LibsodiumTestScreen";
-import RegisterScreen from "./screens/RegisterScreen";
-import LoginScreen from "./screens/LoginScreen";
-import DesignSystemScreen from "./screens/DesignSystemScreen";
-import Sidebar from "../components/sidebar/Sidebar";
-import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
-import AcceptWorkspaceInvitationScreen from "./screens/AcceptWorkspaceInvitationScreen";
-import DeviceManagerScreen from "./screens/DeviceManagerScreen";
-import {
-  BoxShadow,
-  Button,
-  Text,
-  tw,
-  useIsPermanentLeftSidebar,
-  View,
-} from "@serenity-tools/ui";
-import RootScreen from "./screens/RootScreen";
-import OnboardingScreen from "./screens/OnboardingScreen";
-import RegistrationVerificationScreen from "./screens/RegistrationVerificationScreen";
-import WorkspaceRootScreen from "./screens/WorkspaceRootScreen";
-import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
-import { useEffect, useLayoutEffect, useRef } from "react";
-import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
-import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
+import { Text, tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
+import { useEffect } from "react";
+import { useClient } from "urql";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
+import NavigationDrawerModal from "../components/navigationDrawerModal/NavigationDrawerModal";
+import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
+import Sidebar from "../components/sidebar/Sidebar";
+import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
+import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
+import { RootStackParamList } from "../types/navigation";
+import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { useInterval } from "../utils/useInterval";
+import { checkForNewMembers } from "../utils/workspace/checkForNewMembers";
+import AcceptWorkspaceInvitationScreen from "./screens/AcceptWorkspaceInvitationScreen";
 import AccountProfileSettingsScreen from "./screens/AccountProfileSettingsScreen";
 import AccountSettingsMobileOverviewScreen from "./screens/AccountSettingsMobileOverviewScreen";
-import WorkspaceSettingsMembersScreen from "./screens/WorkspaceSettingsMembersScreen";
+import DesignSystemScreen from "./screens/DesignSystemScreen";
+import DevDashboardScreen from "./screens/DevDashboardScreen";
+import DeviceManagerScreen from "./screens/DeviceManagerScreen";
+import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
+import LibsodiumTestScreen from "./screens/LibsodiumTestScreen";
+import LoginScreen from "./screens/LoginScreen";
+import NoPageExistsScreen from "./screens/NoPageExistsScreen";
+import NotFoundScreen from "./screens/NotFoundScreen";
+import OnboardingScreen from "./screens/OnboardingScreen";
+import PageScreen from "./screens/PageScreen";
+import RegisterScreen from "./screens/RegisterScreen";
+import RegistrationVerificationScreen from "./screens/RegistrationVerificationScreen";
+import RootScreen from "./screens/RootScreen";
+import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
+import WorkspaceRootScreen from "./screens/WorkspaceRootScreen";
 import WorkspaceSettingsGeneralScreen from "./screens/WorkspaceSettingsGeneralScreen";
+import WorkspaceSettingsMembersScreen from "./screens/WorkspaceSettingsMembersScreen";
 import WorkspaceSettingsMobileOverviewScreen from "./screens/WorkspaceSettingsMobileOverviewScreen";
-import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
-import NavigationDrawerModal from "../components/navigationDrawerModal/NavigationDrawerModal";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.
@@ -72,6 +63,12 @@ const isPhoneDimensions = (width: number) => width < 768;
 function WorkspaceDrawerScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
+  const secondsBetweenNewMemberChecks = 5;
+  const urqlClient = useClient();
+
+  useInterval(() => {
+    checkForNewMembers({ urqlClient });
+  }, secondsBetweenNewMemberChecks * 1000);
 
   useEffect(() => {
     if (props.route.params?.workspaceId) {

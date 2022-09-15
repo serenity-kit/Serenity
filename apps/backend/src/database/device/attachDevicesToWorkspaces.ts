@@ -1,16 +1,13 @@
 import { ForbiddenError } from "apollo-server-express";
 import { v4 as uuidv4 } from "uuid";
-import {
-  WorkspaceKey,
-  WorkspaceKeyBox as GqlWorkspaceKeyBox,
-} from "../../../prisma/generated/output";
+import { WorkspaceKey } from "../../../prisma/generated/output";
+import { WorkspaceKeyBox } from "../../types/workspace";
 import {
   MemberWithWorkspaceKeyBoxes,
   WorkspaceKeyWithMembers,
   WorkspaceMemberDevices,
   WorkspaceMemberKeyBox,
 } from "../../types/workspaceDevice";
-import { WorkspaceKeyBox } from "../../types/workspace";
 import { prisma } from "../prisma";
 
 export type Params = {
@@ -37,7 +34,7 @@ export async function attachDevicesToWorkspaces({
   const validUserWorkspaceIds = validUserWorkspaces.map(
     (workspace) => workspace.workspaceId
   );
-
+  console.log({ validUserWorkspaceIds });
   // match the workspaces to the authorized users
   // we don't want to create keys for users that don't have access
   // to a workspace
@@ -48,6 +45,7 @@ export async function attachDevicesToWorkspaces({
     },
     select: { userId: true, workspaceId: true },
   });
+  console.log({ userWorkspaces });
   const userWorkspaceLookup: { [userId: string]: string[] } = {};
   const verifiedWorkspaceIds: string[] = [];
   userWorkspaces.forEach((userWorkspace) => {
@@ -57,6 +55,7 @@ export async function attachDevicesToWorkspaces({
     userWorkspaceLookup[userWorkspace.userId].push(userWorkspace.workspaceId);
     verifiedWorkspaceIds.push(userWorkspace.workspaceId);
   });
+  console.log({ verifiedWorkspaceIds });
 
   // get the workspaceKeys for the workspaces
   const workspaceKeysForWorkspaces = await prisma.workspaceKey.findMany({
@@ -72,12 +71,15 @@ export async function attachDevicesToWorkspaces({
     workspaceKeyIds.push(workspaceKey.id);
   });
   const workspaceKeyIdUserLookup: { [workspaceKeyId: string]: string[] } = {};
+  const workspaceIdUserIdLookup: { [workspaceId: string]: string[] } = {};
   const userIdKeyBoxCiphertextLoookup: { [userId: string]: string[] } = {};
   const newKeyBoxes: WorkspaceKeyBox[] = [];
   for (let workspaceData of workspaceMemberDevices) {
     const workspaceId = workspaceData.id;
+    workspaceIdUserIdLookup[workspaceId] = [];
     for (let member of workspaceData.members) {
       const receiverUserId = member.id;
+      workspaceIdUserIdLookup[workspaceId].push(member.id);
 
       if (!(receiverUserId in userWorkspaceLookup)) {
         throw new Error("userId not found");
@@ -117,14 +119,21 @@ export async function attachDevicesToWorkspaces({
   await prisma.workspaceKeyBox.createMany({
     data: newKeyBoxes,
   });
+  for (let workspaceId of Object.keys(workspaceIdUserIdLookup)) {
+    const userIds = workspaceIdUserIdLookup[workspaceId];
+    await prisma.usersToWorkspaces.updateMany({
+      data: { isAuthorizedMember: true },
+      where: { workspaceId: workspaceId, userId: { in: userIds } },
+    });
+  }
 
-  const rawworkspaceKeys = await prisma.workspaceKey.findMany({
+  const rawWorkspaceKeys = await prisma.workspaceKey.findMany({
     where: { id: { in: workspaceKeyIds } },
     include: { workspaceKeyBoxes: true },
   });
   const formattedworkspaceMemberDevices: WorkspaceMemberKeyBox[] = [];
   const workspaceIdRowLookup: { [workspaceId: string]: number } = {};
-  rawworkspaceKeys.forEach((workspaceKey) => {
+  rawWorkspaceKeys.forEach((workspaceKey) => {
     const workspaceId = workspaceKey.workspaceId;
     if (!(workspaceId in workspaceIdRowLookup)) {
       const memberWorkspaceKeyBoxes: WorkspaceMemberKeyBox = {
