@@ -21,7 +21,10 @@ import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
 import { RootStackParamList } from "../types/navigation";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { useInterval } from "../utils/useInterval";
-import { checkForNewMembers } from "../utils/workspace/checkForNewMembers";
+import {
+  addNewMembersIfNecessary,
+  secondsBetweenNewMemberChecks,
+} from "../utils/workspace/addNewMembersIfNecessary";
 import AcceptWorkspaceInvitationScreen from "./screens/AcceptWorkspaceInvitationScreen";
 import AccountProfileSettingsScreen from "./screens/AccountProfileSettingsScreen";
 import AccountSettingsMobileOverviewScreen from "./screens/AccountSettingsMobileOverviewScreen";
@@ -63,11 +66,10 @@ const isPhoneDimensions = (width: number) => width < 768;
 function WorkspaceDrawerScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
-  const secondsBetweenNewMemberChecks = 5;
   const urqlClient = useClient();
 
   useInterval(() => {
-    checkForNewMembers({ urqlClient });
+    addNewMembersIfNecessary({ urqlClient });
   }, secondsBetweenNewMemberChecks * 1000);
 
   useEffect(() => {

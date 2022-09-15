@@ -29,6 +29,11 @@ import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { useInterval } from "../../utils/useInterval";
+import {
+  addNewMembersIfNecessary,
+  secondsBetweenNewMemberChecks,
+} from "../../utils/workspace/addNewMembersIfNecessary";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 export default function WorkspaceSettingsGeneralScreen(
@@ -54,6 +59,10 @@ export default function WorkspaceSettingsGeneralScreen(
   const [deletingWorkspaceName, setDeletingWorkspaceName] =
     useState<string>("");
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
+
+  useInterval(() => {
+    addNewMembersIfNecessary({ urqlClient });
+  }, secondsBetweenNewMemberChecks * 1000);
 
   const getMe = async () => {
     const meResult = await urqlClient

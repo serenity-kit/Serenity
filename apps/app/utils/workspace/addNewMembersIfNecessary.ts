@@ -8,8 +8,10 @@ import { getActiveDevice } from "../device/getActiveDevice";
 import { authorizeNewDevices } from "../workspaceDevice/authorizeNewDevices";
 import { getWorkspaces } from "./getWorkspaces";
 
+export const secondsBetweenNewMemberChecks = 5;
+
 export type Props = { urqlClient: Client };
-export const checkForNewMembers = async ({ urqlClient }: Props) => {
+export const addNewMembersIfNecessary = async ({ urqlClient }: Props) => {
   // TODO: fetch all user workspaces
   const activeDevice = await getActiveDevice();
   if (!activeDevice) {
