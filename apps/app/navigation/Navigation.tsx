@@ -41,6 +41,7 @@ import PageScreen from "./screens/PageScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import RegistrationVerificationScreen from "./screens/RegistrationVerificationScreen";
 import RootScreen from "./screens/RootScreen";
+import WorkspaceNotDecryptedScreen from "./screens/WorkspaceNotDecryptedScreen";
 import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
 import WorkspaceRootScreen from "./screens/WorkspaceRootScreen";
 import WorkspaceSettingsGeneralScreen from "./screens/WorkspaceSettingsGeneralScreen";
@@ -109,6 +110,10 @@ function WorkspaceDrawerScreen(props) {
           name="NoPageExists"
           component={NoPageExistsScreen}
           options={{ headerShown: false }}
+        />
+        <Drawer.Screen
+          name="WorkspaceNotDecrypted"
+          component={WorkspaceNotDecryptedScreen}
         />
       </Drawer.Navigator>
     </WorkspaceIdProvider>
@@ -213,7 +218,10 @@ function RootNavigator() {
           component={AcceptWorkspaceInvitationScreen}
           options={{ headerShown: false }}
         />
-
+        <Stack.Screen
+          name="WorkspaceNotDecrypted"
+          component={WorkspaceNotDecryptedScreen}
+        />
         {isPhoneDimensions(dimensions.width) ? (
           <>
             <Stack.Screen
@@ -333,7 +341,9 @@ const getLinking = (
         EncryptDecryptImageTest: "encrypt-decrypt-image-test",
         AcceptWorkspaceInvitation:
           "accept-workspace-invitation/:workspaceInvitationId",
+
         TestLibsodium: "test-libsodium",
+        WorkspaceNotDecrypted: "/workspace/:workspaceId/lobby",
         ...accountSettings,
         Root: "",
         NotFound: "*",
