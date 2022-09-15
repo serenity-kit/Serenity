@@ -171,14 +171,17 @@ export default function DesignSystemScreen() {
         </Text>
         <Heading lvl={3}>Sizes</Heading>
         <Text variant="sm">
-          We use two <DSMono variant="property">size</DSMono>s for now,{" "}
-          <DSMono variant="type">xs</DSMono> is used for the active Workspace
-          inside the <DSMono variant="context">Sidebar</DSMono>s, and{" "}
+          We use three <DSMono variant="property">size</DSMono>s for now, for
+          the active Workspace inside the{" "}
+          <DSMono variant="context">Sidebar</DSMono>s we use{" "}
+          <DSMono variant="type">xs</DSMono> for desktop and{" "}
+          <DSMono variant="type">sm</DSMono> for mobile, and{" "}
           <DSMono variant="type">xxs</DSMono> for selects in Menus.
         </Text>
         <DSExampleArea>
           <WorkspaceAvatar size={"xxs"} />
           <WorkspaceAvatar size={"xs"} />
+          <WorkspaceAvatar size={"sm"} />
         </DSExampleArea>
         <Heading lvl={3}>Styling</Heading>
         <Text variant="sm">
