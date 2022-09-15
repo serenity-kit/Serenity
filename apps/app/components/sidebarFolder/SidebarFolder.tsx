@@ -414,7 +414,7 @@ export default function SidebarFolder(props: Props) {
               alignItems="center"
               space={1}
               style={[
-                tw`pr-5 md:pr-2`,
+                tw`pr-4 md:pr-2`,
                 !isDesktopDevice && tw`border-b border-gray-200`,
               ]}
             >
