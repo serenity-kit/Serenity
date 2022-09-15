@@ -36,6 +36,16 @@ export type AttachDeviceToWorkspacesResult = {
   workspaceKeys: Array<WorkspaceKey>;
 };
 
+export type AttachDevicesToWorkspacesInput = {
+  creatorDeviceSigningPublicKey: Scalars['String'];
+  workspaceMemberDevices: Array<WorkspaceDevicePairingInput>;
+};
+
+export type AttachDevicesToWorkspacesResult = {
+  __typename?: 'AttachDevicesToWorkspacesResult';
+  workspaces: Array<WorkspaceWithWorkspaceKeys>;
+};
+
 export type CreateDocumentInput = {
   id: Scalars['String'];
   parentFolderId?: InputMaybe<Scalars['String']>;
@@ -140,12 +150,12 @@ export type DeleteWorkspacesResult = {
 
 export type Device = {
   __typename?: 'Device';
-  createdAt: Scalars['Date'];
+  createdAt?: Maybe<Scalars['Date']>;
   encryptionPublicKey: Scalars['String'];
   encryptionPublicKeySignature: Scalars['String'];
   info?: Maybe<Scalars['String']>;
   signingPublicKey: Scalars['String'];
-  userId: Scalars['String'];
+  userId?: Maybe<Scalars['String']>;
 };
 
 export type DeviceConnection = {
@@ -287,6 +297,11 @@ export type FolderEdge = {
   node?: Maybe<Folder>;
 };
 
+export type IsWorkspaceAuthorizedResult = {
+  __typename?: 'IsWorkspaceAuthorizedResult';
+  isAuthorized: Scalars['Boolean'];
+};
+
 export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
@@ -304,10 +319,22 @@ export type MeResult = {
   username: Scalars['String'];
 };
 
+export type MemberDeviceParingInput = {
+  id: Scalars['String'];
+  workspaceDevices: Array<WorkspaceDeviceInput>;
+};
+
+export type MemberWithWorkspaceKeyBoxes = {
+  __typename?: 'MemberWithWorkspaceKeyBoxes';
+  id: Scalars['String'];
+  workspaceKeyBoxes: Array<WorkspaceKeyBox>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   acceptWorkspaceInvitation?: Maybe<AcceptWorkspaceInvitationResult>;
   attachDeviceToWorkspaces?: Maybe<AttachDeviceToWorkspacesResult>;
+  attachDevicesToWorkspaces?: Maybe<AttachDevicesToWorkspacesResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createFolder?: Maybe<CreateFolderResult>;
   createInitialWorkspaceStructure?: Maybe<CreateInitialWorkspaceStructureResult>;
@@ -335,6 +362,11 @@ export type MutationAcceptWorkspaceInvitationArgs = {
 
 export type MutationAttachDeviceToWorkspacesArgs = {
   input: AttachDeviceToWorkspacesInput;
+};
+
+
+export type MutationAttachDevicesToWorkspacesArgs = {
+  input: AttachDevicesToWorkspacesInput;
 };
 
 
@@ -450,10 +482,13 @@ export type Query = {
   firstDocument?: Maybe<Document>;
   folder?: Maybe<Folder>;
   folders?: Maybe<FolderConnection>;
+  isWorkspaceAuthorized?: Maybe<IsWorkspaceAuthorizedResult>;
   mainDevice?: Maybe<MainDeviceResult>;
   me?: Maybe<MeResult>;
   pendingWorkspaceInvitation?: Maybe<PendingWorkspaceInvitationResult>;
   rootFolders?: Maybe<FolderConnection>;
+  unauthorizedDevicesForWorkspaces?: Maybe<UnauthorizedDeviceForWorkspacesResult>;
+  unauthorizedMembers?: Maybe<UnauthorizedMembersResult>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
   workspace?: Maybe<Workspace>;
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
@@ -507,10 +542,20 @@ export type QueryFoldersArgs = {
 };
 
 
+export type QueryIsWorkspaceAuthorizedArgs = {
+  workspaceId: Scalars['ID'];
+};
+
+
 export type QueryRootFoldersArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
   workspaceId: Scalars['ID'];
+};
+
+
+export type QueryUnauthorizedMembersArgs = {
+  workspaceIds: Array<Scalars['ID']>;
 };
 
 
@@ -563,6 +608,16 @@ export type StartRegistrationResult = {
   __typename?: 'StartRegistrationResult';
   challengeResponse: Scalars['String'];
   registrationId: Scalars['String'];
+};
+
+export type UnauthorizedDeviceForWorkspacesResult = {
+  __typename?: 'UnauthorizedDeviceForWorkspacesResult';
+  unauthorizedMemberDevices: Array<WorkspaceIdWithMemberDevices>;
+};
+
+export type UnauthorizedMembersResult = {
+  __typename?: 'UnauthorizedMembersResult';
+  userIds: Array<Maybe<Scalars['String']>>;
 };
 
 export type UpdateDocumentNameInput = {
@@ -634,12 +689,35 @@ export type WorkspaceConnection = {
   pageInfo: PageInfo;
 };
 
+export type WorkspaceDeviceInput = {
+  ciphertext: Scalars['String'];
+  nonce: Scalars['String'];
+  receiverDeviceSigningPublicKey: Scalars['String'];
+};
+
+export type WorkspaceDevicePairingInput = {
+  id: Scalars['String'];
+  members: Array<MemberDeviceParingInput>;
+};
+
 export type WorkspaceEdge = {
   __typename?: 'WorkspaceEdge';
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
   cursor: Scalars['String'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Workspace>;
+};
+
+export type WorkspaceIdWithDevices = {
+  __typename?: 'WorkspaceIdWithDevices';
+  devices: Array<Device>;
+  id: Scalars['String'];
+};
+
+export type WorkspaceIdWithMemberDevices = {
+  __typename?: 'WorkspaceIdWithMemberDevices';
+  id: Scalars['String'];
+  members: Array<WorkspaceIdWithDevices>;
 };
 
 export type WorkspaceInput = {
@@ -700,6 +778,13 @@ export type WorkspaceKeyBoxData = {
   workspaceId: Scalars['String'];
 };
 
+export type WorkspaceKeyWithMembers = {
+  __typename?: 'WorkspaceKeyWithMembers';
+  generation: Scalars['Int'];
+  id: Scalars['String'];
+  members: Array<MemberWithWorkspaceKeyBoxes>;
+};
+
 export type WorkspaceMember = {
   __typename?: 'WorkspaceMember';
   isAdmin: Scalars['Boolean'];
@@ -710,6 +795,12 @@ export type WorkspaceMember = {
 export type WorkspaceMemberInput = {
   isAdmin: Scalars['Boolean'];
   userId: Scalars['String'];
+};
+
+export type WorkspaceWithWorkspaceKeys = {
+  __typename?: 'WorkspaceWithWorkspaceKeys';
+  id: Scalars['String'];
+  workspaceKeys: Array<WorkspaceKeyWithMembers>;
 };
 
 export type AcceptWorkspaceInvitationMutationVariables = Exact<{
@@ -850,7 +941,7 @@ export type DeviceBySigningPublicKeyQueryVariables = Exact<{
 }>;
 
 
-export type DeviceBySigningPublicKeyQuery = { __typename?: 'Query', deviceBySigningPublicKey?: { __typename?: 'DeviceResult', device?: { __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt: any } | null } | null };
+export type DeviceBySigningPublicKeyQuery = { __typename?: 'Query', deviceBySigningPublicKey?: { __typename?: 'DeviceResult', device?: { __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt?: any | null } | null } | null };
 
 export type DevicesQueryVariables = Exact<{
   first: Scalars['Int'];
@@ -858,7 +949,7 @@ export type DevicesQueryVariables = Exact<{
 }>;
 
 
-export type DevicesQuery = { __typename?: 'Query', devices?: { __typename?: 'DeviceConnection', nodes?: Array<{ __typename?: 'Device', userId: string, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt: any } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type DevicesQuery = { __typename?: 'Query', devices?: { __typename?: 'DeviceConnection', nodes?: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt?: any | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type DocumentQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -905,6 +996,13 @@ export type FoldersQueryVariables = Exact<{
 
 
 export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+
+export type IsWorkspaceAuthorizedQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+}>;
+
+
+export type IsWorkspaceAuthorizedQuery = { __typename?: 'Query', isWorkspaceAuthorized?: { __typename?: 'IsWorkspaceAuthorizedResult', isAuthorized: boolean } | null };
 
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1409,6 +1507,17 @@ export const FoldersDocument = gql`
 
 export function useFoldersQuery(options: Omit<Urql.UseQueryArgs<FoldersQueryVariables>, 'query'>) {
   return Urql.useQuery<FoldersQuery, FoldersQueryVariables>({ query: FoldersDocument, ...options });
+};
+export const IsWorkspaceAuthorizedDocument = gql`
+    query isWorkspaceAuthorized($workspaceId: ID!) {
+  isWorkspaceAuthorized(workspaceId: $workspaceId) {
+    isAuthorized
+  }
+}
+    `;
+
+export function useIsWorkspaceAuthorizedQuery(options: Omit<Urql.UseQueryArgs<IsWorkspaceAuthorizedQueryVariables>, 'query'>) {
+  return Urql.useQuery<IsWorkspaceAuthorizedQuery, IsWorkspaceAuthorizedQueryVariables>({ query: IsWorkspaceAuthorizedDocument, ...options });
 };
 export const MainDeviceDocument = gql`
     query mainDevice {

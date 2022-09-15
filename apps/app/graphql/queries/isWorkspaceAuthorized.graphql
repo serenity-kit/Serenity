@@ -1,0 +1,5 @@
+query isWorkspaceAuthorized($workspaceId: ID!) {
+  isWorkspaceAuthorized(workspaceId: $workspaceId) {
+    isAuthorized
+  }
+}

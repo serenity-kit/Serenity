@@ -68,6 +68,10 @@ export type WorkspaceInvitationParams = {
   workspaceInvitationId: string;
 };
 
+type WorkspaceNotDecryptedParams = {
+  workspaceId: string;
+};
+
 export type RootStackParamList = {
   Workspace: WorkspaceParams;
   WorkspaceSettings: WorkspaceSettingsParams;
@@ -86,6 +90,7 @@ export type RootStackParamList = {
   AccountSettingsDevices: undefined; // on phones
   WorkspaceSettingsGeneral: undefined; // on phones
   WorkspaceSettingsMembers: undefined; // on phones
+  WorkspaceNotDecrypted: WorkspaceNotDecryptedParams;
   Root: undefined;
   NotFound: undefined;
 };
