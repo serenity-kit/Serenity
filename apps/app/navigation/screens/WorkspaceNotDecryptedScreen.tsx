@@ -7,9 +7,6 @@ import {
 import { Spinner, Text, View } from "@serenity-tools/ui";
 import { Client, useClient } from "urql";
 import {
-  IsWorkspaceAuthorizedDocument,
-  IsWorkspaceAuthorizedQuery,
-  IsWorkspaceAuthorizedQueryVariables,
   MeDocument,
   MeQuery,
   MeQueryVariables,
@@ -25,13 +22,13 @@ import {
   removeLastUsedWorkspaceId,
 } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { useInterval } from "../../utils/useInterval";
+import { isWorkspaceAuthorized } from "../../utils/workspace/isWorkspaceAuthorized";
 
 export default function WorkspaceNotDecryptedScreen({
   navigation,
   route,
 }: RootStackScreenProps<"WorkspaceNotDecrypted">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  console.log();
   const workspaceId = route.params?.workspaceId;
 
   const urqlClient = useClient();
@@ -73,7 +70,7 @@ export default function WorkspaceNotDecryptedScreen({
       workspaceId,
     });
     if (isAuthorized) {
-      navigation.navigate("Workspace", {
+      navigation.replace("Workspace", {
         workspaceId,
         screen: "WorkspaceRoot",
       });
@@ -108,32 +105,6 @@ export default function WorkspaceNotDecryptedScreen({
       return false;
     }
     return true;
-  };
-
-  const isWorkspaceAuthorized = async ({
-    urqlClient,
-    workspaceId,
-  }: {
-    urqlClient: Client;
-    workspaceId: string;
-  }) => {
-    const isAuthorizedResult = await urqlClient
-      .query<IsWorkspaceAuthorizedQuery, IsWorkspaceAuthorizedQueryVariables>(
-        IsWorkspaceAuthorizedDocument,
-        { workspaceId },
-        {
-          requestPolicy: "network-only",
-        }
-      )
-      .toPromise();
-
-    if (isAuthorizedResult.error) {
-      console.error(isAuthorizedResult.error);
-      // throw new Error(isAuthorizedResult.error.message);
-    }
-    const isAuthorized =
-      isAuthorizedResult.data?.isWorkspaceAuthorized?.isAuthorized || false;
-    return isAuthorized;
   };
 
   const removeLastUsedWorkspaceIdAndNavigateToRoot = async () => {

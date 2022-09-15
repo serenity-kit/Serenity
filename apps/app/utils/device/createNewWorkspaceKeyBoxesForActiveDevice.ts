@@ -1,5 +1,6 @@
 import { Client } from "urql";
 import { WorkspaceKeyBox, WorkspaceKeyBoxData } from "../../generated/graphql";
+import { Device } from "../../types/Device";
 import { getWorkspace } from "../workspace/getWorkspace";
 import { getWorkspaces } from "../workspace/getWorkspaces";
 import { decryptWorkspaceKey } from "./decryptWorkspaceKey";
@@ -65,10 +66,16 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
     if (!workspaceKeyBox) {
       throw new Error("Could not find workspaceKeyBox for main device!");
     }
-    const creatorDevice = getLocalDeviceBySigningPublicKey({
-      signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
-      devices,
-    });
+    let creatorDevice: Device | undefined = undefined;
+    try {
+      creatorDevice = getLocalDeviceBySigningPublicKey({
+        signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
+        devices,
+      });
+    } catch (error) {
+      // Do nothing. We don't have access to this workspacekey yet
+      continue;
+    }
     const workspaceKey = await decryptWorkspaceKey({
       ciphertext: workspaceKeyBox.ciphertext,
       nonce: workspaceKeyBox.nonce,

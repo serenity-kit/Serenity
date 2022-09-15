@@ -25,6 +25,7 @@ import {
   addNewMembersIfNecessary,
   secondsBetweenNewMemberChecks,
 } from "../utils/workspace/addNewMembersIfNecessary";
+import { redirectIfNotAuthorized } from "../utils/workspace/redirectIfNotAuthorized";
 import AcceptWorkspaceInvitationScreen from "./screens/AcceptWorkspaceInvitationScreen";
 import AccountProfileSettingsScreen from "./screens/AccountProfileSettingsScreen";
 import AccountSettingsMobileOverviewScreen from "./screens/AccountSettingsMobileOverviewScreen";
@@ -78,9 +79,18 @@ function WorkspaceDrawerScreen(props) {
       setLastUsedWorkspaceId(props.route.params.workspaceId);
     }
   });
-
   if (!props.route.params) {
     return null;
+  }
+
+  if (props.route.params?.workspaceId) {
+    if (props.route.name !== "WorkspaceNotDecrypted") {
+      redirectIfNotAuthorized({
+        urqlClient,
+        workspaceId: props.route.params?.workspaceId,
+        navigation: props.navigation,
+      });
+    }
   }
 
   return (

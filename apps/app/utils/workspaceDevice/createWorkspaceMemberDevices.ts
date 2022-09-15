@@ -28,11 +28,17 @@ export const createWorkspaceMemberDevices = async ({
   }
   const workspaceMemberDevices: WorkspaceMemberDevices[] = [];
   for (let unauthorizedWorkspace of unauthorizedWorkspaceDevices) {
-    const workspaceKey = await getWorkspaceKey({
-      workspaceId: unauthorizedWorkspace.id,
-      devices,
-      urqlClient,
-    });
+    let workspaceKey: string | undefined = undefined;
+    try {
+      workspaceKey = await getWorkspaceKey({
+        workspaceId: unauthorizedWorkspace.id,
+        devices,
+        urqlClient,
+      });
+    } catch (error) {
+      // we don't have access to this workspace yet, can't decrypt
+      continue;
+    }
     const workspace: WorkspaceMemberDevices = {
       id: unauthorizedWorkspace.id,
       members: [],
