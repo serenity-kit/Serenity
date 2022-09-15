@@ -10,7 +10,7 @@ import {
   IconButton,
   InlineInput,
   Pressable,
-  Text,
+  SidebarText,
   Tooltip,
   tw,
   useIsDesktopDevice,
@@ -385,14 +385,13 @@ export default function SidebarFolder(props: Props) {
                     style={tw`ml-0.5 w-${maxWidth}`}
                   />
                 ) : (
-                  <Text
-                    variant="xs"
-                    style={tw`ml-1.5 max-w-${maxWidth}`}
+                  <SidebarText
+                    style={tw`pl-2 md:ml-1.5 max-w-${maxWidth}`}
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
                     {folderName}
-                  </Text>
+                  </SidebarText>
                 )}
               </HStack>
             </View>

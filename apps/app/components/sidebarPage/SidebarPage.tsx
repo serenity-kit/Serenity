@@ -10,7 +10,7 @@ import {
   Icon,
   InlineInput,
   Pressable,
-  Text,
+  SidebarText,
   tw,
   useIsDesktopDevice,
   View,
@@ -180,15 +180,14 @@ export default function SidebarPage(props: Props) {
                   style={tw`ml-0.5 w-${maxWidth}`}
                 />
               ) : (
-                <Text
-                  variant="xs"
-                  style={[tw`pl-1.5 max-w-${maxWidth}`]}
+                <SidebarText
+                  style={[tw`pl-2 md:pl-1.5 max-w-${maxWidth}`]}
                   numberOfLines={1}
                   ellipsizeMode="tail"
                   bold={document?.id === props.documentId}
                 >
                   {documentTitle}
-                </Text>
+                </SidebarText>
               )}
             </HStack>
           </View>
