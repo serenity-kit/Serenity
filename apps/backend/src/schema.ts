@@ -33,12 +33,14 @@ import * as CreateWorkspaceInvitationTypes from "./graphql/mutations/workspace/c
 import * as DeleteWorkspaceInvitationsTypes from "./graphql/mutations/workspace/deleteWorkspaceInvitations";
 import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/deleteWorkspaces";
 import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/updateWorkspace";
+import * as IsWorkspaceAuthorizedTypes from "./graphql/queries/workspace/isWorkspaceAuthorized";
 import * as PendingingWorkspaceInvitationQueryTypes from "./graphql/queries/workspace/pendingWorkspaceInvitation";
-import * as UnauthorizedMembers from "./graphql/queries/workspace/unauthorizedMembers";
+import * as UnauthorizedMembersTypes from "./graphql/queries/workspace/unauthorizedMembers";
 import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspaceInvitation";
 import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspaceInvitations";
 import * as WorkspaceTypes from "./graphql/types/workspace";
 
+import * as AttachDevicesToWorkspacesMutationTypes from "./graphql/mutations/device/attachDevicesToWorkspaces";
 import * as AttachDeviceToWorkspacesMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspaces";
 import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
 import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
@@ -95,7 +97,8 @@ export const schema = makeSchema({
     DeleteWorkspaceInvitationsTypes,
     CreateInitialWorkspaceStructureMutationTypes,
     PendingingWorkspaceInvitationQueryTypes,
-    UnauthorizedMembers,
+    UnauthorizedMembersTypes,
+    IsWorkspaceAuthorizedTypes,
 
     DevicesQueryTypes,
     deviceBySigningPublicKeyQueryTypes,
@@ -103,6 +106,7 @@ export const schema = makeSchema({
     MainDeviceQueryTypes,
     AttachDeviceToWorkspacesMutationTypes,
     UnauthorizedDevicesForWorkspacesTypes,
+    AttachDevicesToWorkspacesMutationTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),
