@@ -34,7 +34,6 @@ export async function attachDevicesToWorkspaces({
   const validUserWorkspaceIds = validUserWorkspaces.map(
     (workspace) => workspace.workspaceId
   );
-  console.log({ validUserWorkspaceIds });
   // match the workspaces to the authorized users
   // we don't want to create keys for users that don't have access
   // to a workspace
@@ -45,7 +44,6 @@ export async function attachDevicesToWorkspaces({
     },
     select: { userId: true, workspaceId: true },
   });
-  console.log({ userWorkspaces });
   const userWorkspaceLookup: { [userId: string]: string[] } = {};
   const verifiedWorkspaceIds: string[] = [];
   userWorkspaces.forEach((userWorkspace) => {
@@ -55,7 +53,6 @@ export async function attachDevicesToWorkspaces({
     userWorkspaceLookup[userWorkspace.userId].push(userWorkspace.workspaceId);
     verifiedWorkspaceIds.push(userWorkspace.workspaceId);
   });
-  console.log({ verifiedWorkspaceIds });
 
   // get the workspaceKeys for the workspaces
   const workspaceKeysForWorkspaces = await prisma.workspaceKey.findMany({

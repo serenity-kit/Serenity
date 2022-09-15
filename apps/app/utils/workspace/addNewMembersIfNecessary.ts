@@ -42,7 +42,6 @@ export const addNewMembersIfNecessary = async ({ urqlClient }: Props) => {
     )
     .toPromise();
   const userIds = unauthorizedMembersResult.data?.unauthorizedMembers?.userIds;
-  console.log({ userIds });
   if (userIds && userIds.length > 0) {
     await authorizeNewDevices({ urqlClient });
   }
