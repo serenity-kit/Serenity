@@ -1,9 +1,11 @@
-import { prisma } from "../prisma";
+import { CreatorDevice } from "../../types/device";
 import {
-  WorkspaceKey,
   Workspace,
+  WorkspaceKey,
+  WorkspaceKeyBox,
   WorkspaceMember,
 } from "../../types/workspace";
+import { prisma } from "../prisma";
 
 type Cursor = {
   id?: string;
@@ -71,6 +73,24 @@ export async function getWorkspaces({
   });
   // attach the .usersToWorkspaces as .members property
   // these lines convert the prisma types to the graphql types
+  const creatorDeviceSigningPublicKeys: string[] = [];
+  rawWorkspaces.forEach((rawWorkspace) => {
+    rawWorkspace.workspaceKey.forEach((workspaceKey) => {
+      workspaceKey.workspaceKeyBoxes.forEach((workspaceKeyBox) => {
+        creatorDeviceSigningPublicKeys.push(
+          workspaceKeyBox.creatorDeviceSigningPublicKey
+        );
+      });
+    });
+  });
+  const creatorDevices = await prisma.device.findMany({
+    where: { signingPublicKey: { in: creatorDeviceSigningPublicKeys } },
+  });
+  const creatorDeviceLookup: { [signingPublicKey: string]: CreatorDevice } = {};
+  creatorDevices.forEach((device) => {
+    creatorDeviceLookup[device.signingPublicKey] = device;
+  });
+
   const workspaces: Workspace[] = [];
   rawWorkspaces.forEach((rawWorkspace) => {
     const members: WorkspaceMember[] = [];
@@ -86,6 +106,15 @@ export async function getWorkspaces({
       currentWorkspaceKey.workspaceKeyBox =
         rawWorkspace.workspaceKey[0].workspaceKeyBoxes[0];
     }
+    rawWorkspace.workspaceKey.forEach((workspaceKey) => {
+      workspaceKey.workspaceKeyBoxes.forEach(
+        (workspaceKeyBox: WorkspaceKeyBox) => {
+          const creatorDevice =
+            creatorDeviceLookup[workspaceKeyBox.creatorDeviceSigningPublicKey];
+          workspaceKeyBox.creatorDevice = creatorDevice;
+        }
+      );
+    });
     const workspace: Workspace = {
       id: rawWorkspace.id,
       name: rawWorkspace.name,

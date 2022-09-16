@@ -16,9 +16,8 @@ export const redirectIfNotAuthorized = async ({
     workspaceId,
   });
   if (!isAuthorized) {
-    navigation.navigate("Workspace", {
+    navigation.navigate("WorkspaceNotDecrypted", {
       workspaceId,
-      screen: "WorkspaceNotDecrypted",
     });
     return;
   }

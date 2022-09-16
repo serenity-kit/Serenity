@@ -17,6 +17,7 @@ export type WorkspaceKeyBox = {
   creatorDeviceSigningPublicKey: string;
   nonce: string;
   ciphertext: string;
+  creatorDevice?: Device | null | undefined;
 };
 
 export type WorkspaceKey = {
