@@ -15,6 +15,11 @@ import {
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { useInterval } from "../../utils/useInterval";
+import {
+  addNewMembersIfNecessary,
+  secondsBetweenNewMemberChecks,
+} from "../../utils/workspace/addNewMembersIfNecessary";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 type Member = {
@@ -33,6 +38,11 @@ function WorkspaceMemberRow({
   onDeletePress,
 }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+  const urqlClient = useClient();
+
+  useInterval(() => {
+    addNewMembersIfNecessary({ urqlClient });
+  }, secondsBetweenNewMemberChecks * 1000);
 
   return (
     <View style={styles.memberListItem}>

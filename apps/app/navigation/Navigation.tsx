@@ -11,6 +11,7 @@ import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
 
 import { Text, tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 import { useEffect } from "react";
+import { useClient } from "urql";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
 import NavigationDrawerModal from "../components/navigationDrawerModal/NavigationDrawerModal";
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
@@ -19,6 +20,12 @@ import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/Wor
 import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
 import { RootStackParamList } from "../types/navigation";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { useInterval } from "../utils/useInterval";
+import {
+  addNewMembersIfNecessary,
+  secondsBetweenNewMemberChecks,
+} from "../utils/workspace/addNewMembersIfNecessary";
+import { redirectIfNotAuthorized } from "../utils/workspace/redirectIfNotAuthorized";
 import AcceptWorkspaceInvitationScreen from "./screens/AcceptWorkspaceInvitationScreen";
 import AccountProfileSettingsScreen from "./screens/AccountProfileSettingsScreen";
 import AccountSettingsMobileOverviewScreen from "./screens/AccountSettingsMobileOverviewScreen";
@@ -61,15 +68,29 @@ const isPhoneDimensions = (width: number) => width < 768;
 function WorkspaceDrawerScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
+  const urqlClient = useClient();
+
+  useInterval(() => {
+    addNewMembersIfNecessary({ urqlClient });
+  }, secondsBetweenNewMemberChecks * 1000);
 
   useEffect(() => {
     if (props.route.params?.workspaceId) {
       setLastUsedWorkspaceId(props.route.params.workspaceId);
     }
   });
-
   if (!props.route.params) {
     return null;
+  }
+
+  if (props.route.params?.workspaceId) {
+    if (props.route.name !== "WorkspaceNotDecrypted") {
+      redirectIfNotAuthorized({
+        urqlClient,
+        workspaceId: props.route.params?.workspaceId,
+        navigation: props.navigation,
+      });
+    }
   }
 
   return (

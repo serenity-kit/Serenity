@@ -817,6 +817,13 @@ export type AttachDeviceToWorkspacesMutationVariables = Exact<{
 
 export type AttachDeviceToWorkspacesMutation = { __typename?: 'Mutation', attachDeviceToWorkspaces?: { __typename?: 'AttachDeviceToWorkspacesResult', workspaceKeys: Array<{ __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string } | null }> } | null };
 
+export type AttachDevicesToWorkspacesMutationVariables = Exact<{
+  input: AttachDevicesToWorkspacesInput;
+}>;
+
+
+export type AttachDevicesToWorkspacesMutation = { __typename?: 'Mutation', attachDevicesToWorkspaces?: { __typename?: 'AttachDevicesToWorkspacesResult', workspaces: Array<{ __typename?: 'WorkspaceWithWorkspaceKeys', id: string, workspaceKeys: Array<{ __typename?: 'WorkspaceKeyWithMembers', id: string, generation: number, members: Array<{ __typename?: 'MemberWithWorkspaceKeyBoxes', id: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string }> }> }> }> } | null };
+
 export type CreateDocumentMutationVariables = Exact<{
   input: CreateDocumentInput;
 }>;
@@ -1028,6 +1035,18 @@ export type RootFoldersQueryVariables = Exact<{
 
 export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
+export type UnauthorizedDevicesForWorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UnauthorizedDevicesForWorkspacesQuery = { __typename?: 'Query', unauthorizedDevicesForWorkspaces?: { __typename?: 'UnauthorizedDeviceForWorkspacesResult', unauthorizedMemberDevices: Array<{ __typename?: 'WorkspaceIdWithMemberDevices', id: string, members: Array<{ __typename?: 'WorkspaceIdWithDevices', id: string, devices: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> }> }> } | null };
+
+export type UnauthorizedMembersQueryVariables = Exact<{
+  workspaceIds: Array<Scalars['ID']> | Scalars['ID'];
+}>;
+
+
+export type UnauthorizedMembersQuery = { __typename?: 'Query', unauthorizedMembers?: { __typename?: 'UnauthorizedMembersResult', userIds: Array<string | null> } | null };
+
 export type UserIdFromUsernameQueryVariables = Exact<{
   username: Scalars['String'];
 }>;
@@ -1105,6 +1124,33 @@ export const AttachDeviceToWorkspacesDocument = gql`
 
 export function useAttachDeviceToWorkspacesMutation() {
   return Urql.useMutation<AttachDeviceToWorkspacesMutation, AttachDeviceToWorkspacesMutationVariables>(AttachDeviceToWorkspacesDocument);
+};
+export const AttachDevicesToWorkspacesDocument = gql`
+    mutation attachDevicesToWorkspaces($input: AttachDevicesToWorkspacesInput!) {
+  attachDevicesToWorkspaces(input: $input) {
+    workspaces {
+      id
+      workspaceKeys {
+        id
+        generation
+        members {
+          id
+          workspaceKeyBoxes {
+            id
+            deviceSigningPublicKey
+            creatorDeviceSigningPublicKey
+            ciphertext
+            nonce
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+export function useAttachDevicesToWorkspacesMutation() {
+  return Urql.useMutation<AttachDevicesToWorkspacesMutation, AttachDevicesToWorkspacesMutationVariables>(AttachDevicesToWorkspacesDocument);
 };
 export const CreateDocumentDocument = gql`
     mutation createDocument($input: CreateDocumentInput!) {
@@ -1580,6 +1626,41 @@ export const RootFoldersDocument = gql`
 
 export function useRootFoldersQuery(options: Omit<Urql.UseQueryArgs<RootFoldersQueryVariables>, 'query'>) {
   return Urql.useQuery<RootFoldersQuery, RootFoldersQueryVariables>({ query: RootFoldersDocument, ...options });
+};
+export const UnauthorizedDevicesForWorkspacesDocument = gql`
+    query unauthorizedDevicesForWorkspaces {
+  unauthorizedDevicesForWorkspaces {
+    unauthorizedMemberDevices {
+      id
+      members {
+        id
+        devices {
+          userId
+          signingPublicKey
+          encryptionPublicKey
+          info
+          createdAt
+          encryptionPublicKeySignature
+        }
+      }
+    }
+  }
+}
+    `;
+
+export function useUnauthorizedDevicesForWorkspacesQuery(options?: Omit<Urql.UseQueryArgs<UnauthorizedDevicesForWorkspacesQueryVariables>, 'query'>) {
+  return Urql.useQuery<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>({ query: UnauthorizedDevicesForWorkspacesDocument, ...options });
+};
+export const UnauthorizedMembersDocument = gql`
+    query unauthorizedMembers($workspaceIds: [ID!]!) {
+  unauthorizedMembers(workspaceIds: $workspaceIds) {
+    userIds
+  }
+}
+    `;
+
+export function useUnauthorizedMembersQuery(options: Omit<Urql.UseQueryArgs<UnauthorizedMembersQueryVariables>, 'query'>) {
+  return Urql.useQuery<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>({ query: UnauthorizedMembersDocument, ...options });
 };
 export const UserIdFromUsernameDocument = gql`
     query userIdFromUsername($username: String!) {

@@ -1,0 +1,18 @@
+query unauthorizedDevicesForWorkspaces {
+  unauthorizedDevicesForWorkspaces {
+    unauthorizedMemberDevices {
+      id
+      members {
+        id
+        devices {
+          userId
+          signingPublicKey
+          encryptionPublicKey
+          info
+          createdAt
+          encryptionPublicKeySignature
+        }
+      }
+    }
+  }
+}
