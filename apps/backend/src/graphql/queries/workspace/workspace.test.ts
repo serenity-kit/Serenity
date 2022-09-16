@@ -80,7 +80,12 @@ const getWorkspace = async ({
             id
             workspaceKeyId
             deviceSigningPublicKey
+            creatorDeviceSigningPublicKey
             ciphertext
+            creatorDevice {
+              signingPublicKey
+              encryptionPublicKey
+            }
           }
         }
       }
@@ -107,6 +112,13 @@ test("user should be able to get a workspace by id", async () => {
   expect(workspace.currentWorkspaceKey.workspaceId).toBe(workspace2Id);
   const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBox;
   expect(workspaceKeyBox.deviceSigningPublicKey).toBe(device.signingPublicKey);
+
+  expect(workspaceKeyBox?.creatorDevice?.signingPublicKey).toBe(
+    workspaceKeyBox?.creatorDeviceSigningPublicKey
+  );
+  expect(workspaceKeyBox?.creatorDevice?.signingPublicKey).toBe(
+    device.signingPublicKey
+  );
   expect(typeof workspaceKeyBox.ciphertext).toBe("string");
   expect(workspaceKeyBox.workspaceKeyId).toBe(workspace.currentWorkspaceKey.id);
 });
@@ -124,6 +136,12 @@ test("user should get a workspace without providing an id", async () => {
   expect(workspace.currentWorkspaceKey.workspaceId).toBe(workspace1Id);
   const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBox;
   expect(workspaceKeyBox.deviceSigningPublicKey).toBe(device.signingPublicKey);
+  expect(workspaceKeyBox?.creatorDevice?.signingPublicKey).toBe(
+    workspaceKeyBox?.creatorDeviceSigningPublicKey
+  );
+  expect(workspaceKeyBox?.creatorDevice?.signingPublicKey).toBe(
+    device.signingPublicKey
+  );
   expect(typeof workspaceKeyBox.ciphertext).toBe("string");
   expect(workspaceKeyBox.workspaceKeyId).toBe(workspace.currentWorkspaceKey.id);
 });

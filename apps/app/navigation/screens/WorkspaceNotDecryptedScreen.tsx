@@ -65,6 +65,7 @@ export default function WorkspaceNotDecryptedScreen({
       navigation.replace("WorkspaceNotFound");
       return;
     }
+    console.log({ workspaceId });
     const isAuthorized = await isWorkspaceAuthorized({
       urqlClient,
       workspaceId,

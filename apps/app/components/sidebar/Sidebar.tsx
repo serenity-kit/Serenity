@@ -38,7 +38,6 @@ import {
 import { RootStackScreenProps } from "../../types/navigation";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
-import { getDevices } from "../../utils/device/getDevices";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
@@ -155,21 +154,20 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
   const createFolder = async (name: string) => {
     const id = uuidv4();
-    const devices = await getDevices({ urqlClient });
-    if (!devices) {
-      console.error("No devices found!");
-      return;
-    }
-    let workspaceKey = "";
+    let workspaceKey: string | undefined = undefined;
     try {
       workspaceKey = await getWorkspaceKey({
         workspaceId: workspaceId,
-        devices,
         urqlClient,
       });
     } catch (error: any) {
       // TODO: handle device not registered error
       console.error(error);
+      return;
+    }
+    if (!workspaceKey) {
+      // TODO: handle device not registered error
+      console.log("Could not get workspace key!");
       return;
     }
     const encryptedFolderResult = await encryptFolderName({

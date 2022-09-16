@@ -14,3 +14,14 @@ export const Device = objectType({
     t.string("info");
   },
 });
+
+export const CreatorDevice = objectType({
+  name: "Device",
+  definition(t) {
+    t.string("userId");
+    t.nonNull.string("signingPublicKey");
+    t.nonNull.string("encryptionPublicKey");
+    t.nonNull.string("encryptionPublicKeySignature");
+    t.field("createdAt", { type: "Date" });
+  },
+});

@@ -6,3 +6,11 @@ export type Device = {
   createdAt?: Date;
   userId?: string | null;
 };
+
+export type CreatorDevice = {
+  signingPublicKey: string;
+  encryptionPublicKey: string;
+  encryptionPublicKeySignature: string;
+  createdAt?: Date;
+  userId?: string | null;
+};

@@ -103,7 +103,12 @@ const getWorkspaces = async ({
               id
               workspaceKeyId
               deviceSigningPublicKey
+              creatorDeviceSigningPublicKey
               ciphertext
+              creatorDevice {
+                signingPublicKey
+                encryptionPublicKey
+              }
             }
           }
         }
@@ -146,6 +151,12 @@ test("user should be able to list workspaces", async () => {
     expect(workspace.currentWorkspaceKey?.workspaceId).toBe(workspace.id);
     const workspaceKeyBox = workspace.currentWorkspaceKey?.workspaceKeyBox;
     expect(workspaceKeyBox?.deviceSigningPublicKey).toBe(
+      device.signingPublicKey
+    );
+    expect(workspaceKeyBox?.creatorDevice?.signingPublicKey).toBe(
+      workspaceKeyBox?.creatorDeviceSigningPublicKey
+    );
+    expect(workspaceKeyBox?.creatorDevice?.signingPublicKey).toBe(
       device.signingPublicKey
     );
     expect(typeof workspaceKeyBox?.ciphertext).toBe("string");

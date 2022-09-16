@@ -26,6 +26,7 @@ export const WorkspaceKeyBox = objectType({
     t.nonNull.string("creatorDeviceSigningPublicKey");
     t.nonNull.string("nonce");
     t.nonNull.string("ciphertext");
+    t.field("creatorDevice", { type: Device });
   },
 });
 

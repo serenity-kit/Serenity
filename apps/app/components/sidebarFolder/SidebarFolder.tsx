@@ -32,7 +32,6 @@ import {
   useUpdateFolderNameMutation,
 } from "../../generated/graphql";
 import { RootStackScreenProps } from "../../types/navigation";
-import { getDevices } from "../../utils/device/getDevices";
 import {
   getDocumentPath,
   useDocumentPathStore,
@@ -114,15 +113,8 @@ export default function SidebarFolder(props: Props) {
       return;
     }
     try {
-      const devices = await getDevices({ urqlClient });
-      if (!devices) {
-        // TODO: handle this error
-        console.error("No devices!");
-        return;
-      }
       const workspaceKey = await getWorkspaceKey({
         workspaceId: props.workspaceId,
-        devices,
         urqlClient,
       });
       const folderName = await decryptFolderName({
@@ -141,16 +133,10 @@ export default function SidebarFolder(props: Props) {
   const createFolder = async (name: string) => {
     openFolder();
     const id = uuidv4();
-    const devices = await getDevices({ urqlClient });
-    if (!devices) {
-      console.error("No devices found!");
-      return;
-    }
     let workspaceKey = "";
     try {
       workspaceKey = await getWorkspaceKey({
         workspaceId: props.workspaceId,
-        devices,
         urqlClient,
       });
     } catch (error: any) {
@@ -249,16 +235,10 @@ export default function SidebarFolder(props: Props) {
     }
   };
   const updateFolderName = async (newFolderName: string) => {
-    const devices = await getDevices({ urqlClient });
-    if (!devices) {
-      console.error("No devices found!");
-      return;
-    }
     let workspaceKey = "";
     try {
       workspaceKey = await getWorkspaceKey({
         workspaceId: props.workspaceId,
-        devices,
         urqlClient,
       });
     } catch (error: any) {
