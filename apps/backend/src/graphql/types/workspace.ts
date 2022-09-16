@@ -38,6 +38,9 @@ export const WorkspaceKey = objectType({
     t.field("workspaceKeyBox", {
       type: WorkspaceKeyBox,
     });
+    t.list.nonNull.field("workspaceKeyBoxes", {
+      type: WorkspaceKeyBox,
+    });
   },
 });
 
