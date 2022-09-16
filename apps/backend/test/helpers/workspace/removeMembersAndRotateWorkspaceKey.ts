@@ -4,14 +4,16 @@ import { WorkspaceDeviceParing } from "../../../src/types/workspaceDevice";
 type Params = {
   graphql: any;
   workspaceId: string;
+  revokedUserIds: string[];
   creatorDeviceSigningPublicKey: string;
   deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[];
   authorizationHeader: string;
 };
 
-export const rotateWorkspaceKey = async ({
+export const removeMembersAndRotateWorkspaceKey = async ({
   graphql,
   workspaceId,
+  revokedUserIds,
   creatorDeviceSigningPublicKey,
   deviceWorkspaceKeyBoxes,
   authorizationHeader,
@@ -20,8 +22,10 @@ export const rotateWorkspaceKey = async ({
     authorization: authorizationHeader,
   };
   const query = gql`
-    mutation rotateWorkspaceKey($input: RotateWorkspaceKeyInput!) {
-      rotateWorkspaceKey(input: $input) {
+    mutation removeMembersAndRotateWorkspaceKey(
+      $input: RemoveMembersAndRotateWorkspaceKeyInput!
+    ) {
+      removeMembersAndRotateWorkspaceKey(input: $input) {
         workspaceKey {
           id
           generation
@@ -42,6 +46,7 @@ export const rotateWorkspaceKey = async ({
     {
       input: {
         creatorDeviceSigningPublicKey,
+        revokedUserIds,
         workspaceId,
         deviceWorkspaceKeyBoxes,
       },
