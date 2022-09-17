@@ -228,7 +228,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               {...focusRingProps}
               // disable default outline styles
               // @ts-expect-error - web only
-              _focusVisible={{ _web: { style: { outlineWidth: 0 } } }}
+              _focusVisible={{ _web: { style: { outlineStyle: "none" } } }}
             >
               <HStack
                 space={2}

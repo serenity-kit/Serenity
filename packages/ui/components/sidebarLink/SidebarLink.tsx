@@ -1,12 +1,17 @@
-import * as React from "react";
-import { Platform, Pressable } from "react-native";
-import { tw } from "../../tailwind";
-import { useLinkProps } from "@react-navigation/native";
-import type { NavigationAction } from "@react-navigation/core";
-import { GestureResponderEvent, TextProps, StyleSheet } from "react-native";
-import { To } from "@react-navigation/native/lib/typescript/src/useLinkTo";
 import { useFocusRing } from "@react-native-aria/focus";
+import type { NavigationAction } from "@react-navigation/core";
+import { useLinkProps } from "@react-navigation/native";
+import { To } from "@react-navigation/native/lib/typescript/src/useLinkTo";
 import { HStack } from "native-base";
+import * as React from "react";
+import {
+  GestureResponderEvent,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TextProps,
+} from "react-native";
+import { tw } from "../../tailwind";
 
 // copied from react-navigation type definitions
 declare type SidebarLinkProps<ParamList extends ReactNavigation.RootParamList> =
@@ -31,7 +36,7 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
   });
 
   const styles = StyleSheet.create({
-    link: tw.style(Platform.OS === "web" && { outlineWidth: 0 }),
+    link: tw.style(Platform.OS === "web" && { outlineStyle: "none" }),
     stack: tw.style(`flex px-5 md:px-4 py-3 md:py-1.5`), // flex needed for correct height calculation
     hover: tw`bg-gray-200`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},

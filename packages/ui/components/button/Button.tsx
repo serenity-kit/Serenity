@@ -1,14 +1,14 @@
 // inspired by https://github.com/GeekyAnts/NativeBase/blob/master/src/components/primitives/Button/Button.tsx
 
-import React, { forwardRef } from "react";
-import { View as RnView, PressableProps, StyleSheet } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
 import { Pressable } from "native-base";
-import { tw } from "../../tailwind";
-import { Text, TextVariants } from "../text/Text";
-import { Spinner } from "../spinner/Spinner";
-import { View } from "../view/View";
+import React, { forwardRef } from "react";
+import { PressableProps, StyleSheet, View as RnView } from "react-native";
 import { useIsEqualOrLargerThanBreakpoint } from "../../hooks/useIsEqualOrLargerThanBreakpoint/useIsEqualOrLargerThanBreakpoint";
+import { tw } from "../../tailwind";
+import { Spinner } from "../spinner/Spinner";
+import { Text, TextVariants } from "../text/Text";
+import { View } from "../view/View";
 
 export type ButtonVariants = "primary" | "secondary" | "danger";
 export type ButtonSizes = "sm" | "md" | "lg";
@@ -155,8 +155,14 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
       // @ts-expect-error - web only
       onBlur={focusRingProps.onBlur}
       // disable default outline styles
-      // @ts-expect-error - web only
-      _focusVisible={{ _web: { style: { outlineWidth: 0 } } }}
+      _focusVisible={{
+        // @ts-expect-error - web only
+        _web: { style: { outlineStyle: "none" } },
+      }}
+      _focus={{
+        // @ts-expect-error - web only
+        _web: { style: { outlineStyle: "none" } },
+      }}
     >
       {({ isPressed, isHovered, isFocused }) => {
         return (

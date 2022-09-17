@@ -344,7 +344,7 @@ export default function SidebarFolder(props: Props) {
             ]}
             // disable default outline styles and add 1 overridden style manually (grow)
             _focusVisible={{
-              _web: { style: { outlineWidth: 0, flexGrow: 1 } },
+              _web: { style: { outlineStyle: "none", flexGrow: 1 } },
             }}
           >
             <HStack
