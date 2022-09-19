@@ -1,6 +1,6 @@
+import { IInputProps, Input as NbInput } from "native-base";
 import React, { forwardRef } from "react";
 import { StyleSheet } from "react-native";
-import { Input as NbInput, IInputProps } from "native-base";
 import { tw } from "../../tailwind";
 
 export type RawInputProps = IInputProps & {};
@@ -30,6 +30,14 @@ export const RawInput = forwardRef((props: RawInputProps, ref) => {
         },
       }}
       _focus={{
+        _web: {
+          style: [
+            styles.input,
+            props.isDisabled && tw`text-muted`,
+            { outlineStyle: "none" },
+            props.style,
+          ],
+        },
         _stack: {
           style: [
             styles.wrapper,
