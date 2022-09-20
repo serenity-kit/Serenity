@@ -1,0 +1,134 @@
+import { v4 as uuidv4 } from "uuid";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { attachDevicesToWorkspaces } from "../../../../test/helpers/device/attachDevicesToWorkspaces";
+import { encryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/encryptWorkspaceKeyForDevice";
+import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
+import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
+import { getWorkspaceDevices } from "../../../../test/helpers/workspace/getWorkspaceDevices";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+
+const graphql = setupGraphql();
+let userData1: any = null;
+let userData2: any = null;
+
+const setup = async () => {
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+  });
+  userData2 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+  });
+};
+
+beforeAll(async () => {
+  await deleteAllRecords();
+  await setup();
+});
+
+test("One key on first run", async () => {
+  const workspaceDevicesResult = await getWorkspaceDevices({
+    graphql,
+    workspaceId: userData1.workspace.id,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const devices = workspaceDevicesResult.workspaceDevices.nodes;
+  expect(devices.length).toBe(1);
+  const device = devices[0];
+  expect(device.signingPublicKey).toBe(userData1.device.signingPublicKey);
+});
+
+// TODO: test after user joins workspace, and their device is added to the devices list
+
+test("new user results in added device", async () => {
+  const invitationResult = await createWorkspaceInvitation({
+    graphql,
+    workspaceId: userData1.workspace.id,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const workspaceInvitationId =
+    invitationResult.createWorkspaceInvitation.workspaceInvitation.id;
+  await acceptWorkspaceInvitation({
+    graphql,
+    workspaceInvitationId,
+    authorizationHeader: userData2.sessionKey,
+  });
+  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: userData1.device,
+    deviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
+    workspace: userData1.workspace,
+  });
+  const { ciphertext, nonce } = await encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: userData2.device.encryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspaceKey,
+  });
+  const workspaceMemberDevices = [
+    {
+      id: userData1.workspace.id,
+      members: [
+        {
+          id: userData2.user.id,
+          workspaceDevices: [
+            {
+              receiverDeviceSigningPublicKey: userData2.device.signingPublicKey,
+              ciphertext,
+              nonce,
+            },
+          ],
+        },
+      ],
+    },
+  ];
+  await attachDevicesToWorkspaces({
+    graphql,
+    creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
+    workspaceMemberDevices,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const workspaceDevicesResult = await getWorkspaceDevices({
+    graphql,
+    workspaceId: userData1.workspace.id,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const devices = workspaceDevicesResult.workspaceDevices.nodes;
+  expect(devices.length).toBe(2);
+  let foundUser1Device = false;
+  let foundUser2Device = false;
+  for (let device of devices) {
+    if (device.signingPublicKey === userData1.device.signingPublicKey) {
+      foundUser1Device = true;
+    } else if (device.signingPublicKey === userData2.device.signingPublicKey) {
+      foundUser2Device = true;
+    } else {
+      throw new Error("Unexpected device found");
+    }
+  }
+  expect(foundUser1Device).toBe(true);
+  expect(foundUser2Device).toBe(true);
+});
+
+test("not workspace member throw error", async () => {
+  await expect(
+    (async () =>
+      await getWorkspaceDevices({
+        graphql,
+        workspaceId: userData2.workspace.id,
+        authorizationHeader: userData1.sessionKey,
+      }))()
+  ).rejects.toThrowError(/FORBIDDEN/);
+});
+
+test("not logged in member throw error", async () => {
+  await expect(
+    (async () =>
+      await getWorkspaceDevices({
+        graphql,
+        workspaceId: userData2.workspace.id,
+        authorizationHeader: "",
+      }))()
+  ).rejects.toThrowError(/Not authenticated/);
+});
