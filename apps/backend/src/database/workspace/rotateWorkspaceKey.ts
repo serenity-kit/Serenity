@@ -1,16 +1,18 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { v4 as uuidv4 } from "uuid";
+import { Prisma } from "../../../prisma/generated/output";
 import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
-import { prisma } from "../prisma";
 
 export type Props = {
+  prisma: Prisma.TransactionClient;
   deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[];
   creatorDeviceSigningPublicKey: string;
   workspaceId: string;
   userId: string;
 };
 export const rotateWorkspaceKey = async ({
+  prisma,
   deviceWorkspaceKeyBoxes,
   creatorDeviceSigningPublicKey,
   workspaceId,
