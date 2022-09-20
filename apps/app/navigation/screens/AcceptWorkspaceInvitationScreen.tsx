@@ -14,7 +14,7 @@ import { useWindowDimensions } from "react-native";
 import { LoginForm } from "../../components/login/LoginForm";
 import { OnboardingScreenWrapper } from "../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import RegisterForm from "../../components/register/RegisterForm";
-import { useAuthentication } from "../../context/AuthenticationContext";
+import { useAppContext } from "../../context/AppContext";
 import {
   useAcceptWorkspaceInvitationMutation,
   useWorkspaceInvitationQuery,
@@ -44,7 +44,7 @@ export default function AcceptWorkspaceInvitationScreen(
 ) {
   const workspaceInvitationId = props.route.params?.workspaceInvitationId;
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const { sessionKey } = useAuthentication();
+  const { sessionKey } = useAppContext();
   const [workspaceInvitationQuery] = useWorkspaceInvitationQuery({
     variables: {
       id: workspaceInvitationId,

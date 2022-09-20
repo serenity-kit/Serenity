@@ -2,7 +2,7 @@ import { CenterContent, Spinner } from "@serenity-tools/ui";
 import { useEffect } from "react";
 import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
-import { useAuthentication } from "../../context/AuthenticationContext";
+import { useAppContext } from "../../context/AppContext";
 import { RootStackScreenProps } from "../../types/navigation";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
@@ -11,7 +11,7 @@ import { getWorkspace } from "../../utils/workspace/getWorkspace";
 export default function RootScreen(props: RootStackScreenProps<"Root">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const urqlClient = useClient();
-  const { sessionKey } = useAuthentication();
+  const { sessionKey } = useAppContext();
 
   useEffect(() => {
     if (sessionKey) {

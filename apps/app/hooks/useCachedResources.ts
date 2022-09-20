@@ -1,31 +1,35 @@
 import sodium from "@serenity-tools/libsodium";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
-import { getExportKey } from "../utils/authentication/exportKeyStore";
+import { useCallback, useEffect, useState } from "react";
+import { Device } from "../types/Device";
+import * as SessionKeyStore from "../utils/authentication/sessionKeyStore";
 import { getSessionKey } from "../utils/authentication/sessionKeyStore";
+import { getActiveDevice } from "../utils/device/getActiveDevice";
+import { getLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
   const [sessionKey, setSessionKey] = useState<null | string>(null);
-  const [exportKey, setExportKey] = useState<null | string>(null);
+  const [activeDevice, setActiveDevice] = useState<null | Device>(null);
 
   // Load any resources or data that we need prior to rendering the app
   useEffect(() => {
     async function loadResourcesAndDataAsync() {
       try {
         SplashScreen.preventAutoHideAsync();
-        await Promise.all([
+        const result = await Promise.all([
+          getActiveDevice(),
+          getLastUsedWorkspaceId(),
           sodium.ready,
           // Load fonts
           Font.loadAsync({
             "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf"),
           }),
         ]);
+        setActiveDevice(result[0]);
         const sessionKey = await getSessionKey();
         setSessionKey(sessionKey);
-        const exportKey = await getExportKey();
-        setExportKey(exportKey);
       } catch (e) {
         // We might want to provide this error information to an error reporting service
         console.warn(e);
@@ -38,11 +42,30 @@ export default function useCachedResources() {
     loadResourcesAndDataAsync();
   }, []);
 
+  const updateAuthentication = useCallback(
+    async (session: { sessionKey: string; expiresAt: string } | null) => {
+      if (session) {
+        setSessionKey(session.sessionKey);
+        await SessionKeyStore.setSessionKey(session.sessionKey);
+      } else {
+        setSessionKey(null);
+        await SessionKeyStore.deleteSessionKey();
+      }
+    },
+    [setSessionKey]
+  );
+
+  const updateActiveDevice = useCallback(async () => {
+    const device = await getActiveDevice();
+    setActiveDevice(device);
+  }, [setActiveDevice]);
+
   return {
     isLoadingComplete,
     sessionKey,
-    exportKey,
-    setSessionKey,
-    setExportKey,
+    activeDevice,
+    setActiveDevice,
+    updateActiveDevice,
+    updateAuthentication,
   };
 }

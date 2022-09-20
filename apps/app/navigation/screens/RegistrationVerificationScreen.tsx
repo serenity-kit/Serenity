@@ -11,7 +11,7 @@ import { useState } from "react";
 import { Platform } from "react-native";
 import { useClient } from "urql";
 import { OnboardingScreenWrapper } from "../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
-import { useAuthentication } from "../../context/AuthenticationContext";
+import { useAppContext } from "../../context/AppContext";
 import {
   useAcceptWorkspaceInvitationMutation,
   useFinishLoginMutation,
@@ -51,7 +51,7 @@ export default function RegistrationVerificationScreen(
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [graphqlError, setGraphqlError] = useState("");
-  const { updateAuthentication } = useAuthentication();
+  const { updateAuthentication, updateActiveDevice } = useAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
   const [, acceptWorkspaceInvitationMutation] =
@@ -114,9 +114,11 @@ export default function RegistrationVerificationScreen(
           await removeWebDevice();
         }
         await setWebDevice(unsafedDevice, useExtendedLogin);
+        await updateActiveDevice();
       } else if (Platform.OS === "ios") {
         if (useExtendedLogin) {
           await setDevice(unsafedDevice);
+          await updateActiveDevice();
         }
       }
       try {
