@@ -1,24 +1,22 @@
-import "expo-dev-client";
-import { StatusBar } from "expo-status-bar";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-
 import {
-  // Inter options can be found here https://github.com/expo/google-fonts/tree/master/font-packages/inter
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
   useFonts,
-} from "@expo-google-fonts/inter";
+} from "@expo-google-fonts/inter"; // Inter options can be found here https://github.com/expo/google-fonts/tree/master/font-packages/inter
 import { OpaqueBridge } from "@serenity-tools/opaque";
 import { tw } from "@serenity-tools/ui";
 import { devtoolsExchange } from "@urql/devtools";
 import { authExchange } from "@urql/exchange-auth";
 import { cacheExchange } from "@urql/exchange-graphcache";
 import Constants from "expo-constants";
+import "expo-dev-client";
+import { StatusBar } from "expo-status-bar";
 import { extendTheme, NativeBaseProvider } from "native-base";
 import { useCallback, useMemo } from "react";
 import { RootSiblingParent } from "react-native-root-siblings";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useAppColorScheme, useDeviceContext } from "twrnc";
 import { createClient, dedupExchange, fetchExchange, Provider } from "urql";
 import { theme } from "../../tailwind.config";

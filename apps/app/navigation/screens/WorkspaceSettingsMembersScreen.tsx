@@ -17,12 +17,12 @@ import {
   Workspace,
   WorkspaceMember,
 } from "../../generated/graphql";
+import { useInterval } from "../../hooks/useInterval";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
 import { encryptWorkspaceKeyForDevice } from "../../utils/device/encryptWorkspaceKeyForDevice";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getDevices } from "../../utils/device/getDevices";
-import { useInterval } from "../../utils/useInterval";
 import {
   addNewMembersIfNecessary,
   secondsBetweenNewMemberChecks,

@@ -18,9 +18,9 @@ import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
 import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
+import { useInterval } from "../hooks/useInterval";
 import { RootStackParamList } from "../types/navigation";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { useInterval } from "../utils/useInterval";
 import {
   addNewMembersIfNecessary,
   secondsBetweenNewMemberChecks,

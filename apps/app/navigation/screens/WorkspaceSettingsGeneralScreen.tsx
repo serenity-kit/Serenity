@@ -23,13 +23,13 @@ import {
   Workspace,
   WorkspaceMember,
 } from "../../generated/graphql";
+import { useInterval } from "../../hooks/useInterval";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { useInterval } from "../../utils/useInterval";
 import {
   addNewMembersIfNecessary,
   secondsBetweenNewMemberChecks,
