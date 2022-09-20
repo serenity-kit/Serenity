@@ -297,6 +297,11 @@ export type FolderEdge = {
   node?: Maybe<Folder>;
 };
 
+export type GetWorkspaceDevicesResult = {
+  __typename?: 'GetWorkspaceDevicesResult';
+  devices: Array<Maybe<Device>>;
+};
+
 export type IsWorkspaceAuthorizedResult = {
   __typename?: 'IsWorkspaceAuthorizedResult';
   isAuthorized: Scalars['Boolean'];
@@ -346,6 +351,7 @@ export type Mutation = {
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
   finishLogin?: Maybe<FinishLoginResult>;
   finishRegistration?: Maybe<FinishRegistrationResult>;
+  removeMembersAndRotateWorkspaceKey?: Maybe<RemoveMembersAndRotateWorkspaceKeyResult>;
   startLogin?: Maybe<StartLoginResult>;
   startRegistration?: Maybe<StartRegistrationResult>;
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
@@ -425,6 +431,11 @@ export type MutationFinishRegistrationArgs = {
 };
 
 
+export type MutationRemoveMembersAndRotateWorkspaceKeyArgs = {
+  input: RemoveMembersAndRotateWorkspaceKeyInput;
+};
+
+
 export type MutationStartLoginArgs = {
   input: StartLoginInput;
 };
@@ -491,6 +502,7 @@ export type Query = {
   unauthorizedMembers?: Maybe<UnauthorizedMembersResult>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
   workspace?: Maybe<Workspace>;
+  workspaceDevices?: Maybe<DeviceConnection>;
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
   workspaces?: Maybe<WorkspaceConnection>;
@@ -570,6 +582,13 @@ export type QueryWorkspaceArgs = {
 };
 
 
+export type QueryWorkspaceDevicesArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  first: Scalars['Int'];
+  workspaceId: Scalars['ID'];
+};
+
+
 export type QueryWorkspaceInvitationArgs = {
   id: Scalars['ID'];
 };
@@ -586,6 +605,18 @@ export type QueryWorkspacesArgs = {
   after?: InputMaybe<Scalars['String']>;
   deviceSigningPublicKey: Scalars['String'];
   first: Scalars['Int'];
+};
+
+export type RemoveMembersAndRotateWorkspaceKeyInput = {
+  creatorDeviceSigningPublicKey: Scalars['String'];
+  deviceWorkspaceKeyBoxes: Array<WorkspaceDeviceInput>;
+  revokedUserIds: Array<Scalars['String']>;
+  workspaceId: Scalars['String'];
+};
+
+export type RemoveMembersAndRotateWorkspaceKeyResult = {
+  __typename?: 'RemoveMembersAndRotateWorkspaceKeyResult';
+  workspaceKey: WorkspaceKey;
 };
 
 export type StartLoginInput = {
@@ -760,6 +791,7 @@ export type WorkspaceKey = {
   id: Scalars['String'];
   workspaceId: Scalars['String'];
   workspaceKeyBox?: Maybe<WorkspaceKeyBox>;
+  workspaceKeyBoxes?: Maybe<Array<WorkspaceKeyBox>>;
 };
 
 export type WorkspaceKeyBox = {
@@ -900,6 +932,13 @@ export type FinishRegistrationMutationVariables = Exact<{
 
 
 export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode: string } | null };
+
+export type RemoveMembersAndRotateWorkspaceKeyMutationVariables = Exact<{
+  input: RemoveMembersAndRotateWorkspaceKeyInput;
+}>;
+
+
+export type RemoveMembersAndRotateWorkspaceKeyMutation = { __typename?: 'Mutation', removeMembersAndRotateWorkspaceKey?: { __typename?: 'RemoveMembersAndRotateWorkspaceKeyResult', workspaceKey: { __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBoxes?: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string }> | null } } | null };
 
 export type StartLoginMutationVariables = Exact<{
   input: StartLoginInput;
@@ -1061,6 +1100,13 @@ export type WorkspaceQueryVariables = Exact<{
 
 
 export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string } | null } | null } | null };
+
+export type WorkspaceDevicesQueryVariables = Exact<{
+  workspaceId: Scalars['ID'];
+}>;
+
+
+export type WorkspaceDevicesQuery = { __typename?: 'Query', workspaceDevices?: { __typename?: 'DeviceConnection', nodes?: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt?: any | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type WorkspaceInvitationQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1315,6 +1361,28 @@ export const FinishRegistrationDocument = gql`
 
 export function useFinishRegistrationMutation() {
   return Urql.useMutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(FinishRegistrationDocument);
+};
+export const RemoveMembersAndRotateWorkspaceKeyDocument = gql`
+    mutation removeMembersAndRotateWorkspaceKey($input: RemoveMembersAndRotateWorkspaceKeyInput!) {
+  removeMembersAndRotateWorkspaceKey(input: $input) {
+    workspaceKey {
+      id
+      generation
+      workspaceId
+      workspaceKeyBoxes {
+        id
+        deviceSigningPublicKey
+        creatorDeviceSigningPublicKey
+        ciphertext
+        nonce
+      }
+    }
+  }
+}
+    `;
+
+export function useRemoveMembersAndRotateWorkspaceKeyMutation() {
+  return Urql.useMutation<RemoveMembersAndRotateWorkspaceKeyMutation, RemoveMembersAndRotateWorkspaceKeyMutationVariables>(RemoveMembersAndRotateWorkspaceKeyDocument);
 };
 export const StartLoginDocument = gql`
     mutation startLogin($input: StartLoginInput!) {
@@ -1701,6 +1769,28 @@ export const WorkspaceDocument = gql`
 
 export function useWorkspaceQuery(options: Omit<Urql.UseQueryArgs<WorkspaceQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspaceQuery, WorkspaceQueryVariables>({ query: WorkspaceDocument, ...options });
+};
+export const WorkspaceDevicesDocument = gql`
+    query workspaceDevices($workspaceId: ID!) {
+  workspaceDevices(workspaceId: $workspaceId, first: 500) {
+    nodes {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      encryptionPublicKeySignature
+      info
+      createdAt
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+    `;
+
+export function useWorkspaceDevicesQuery(options: Omit<Urql.UseQueryArgs<WorkspaceDevicesQueryVariables>, 'query'>) {
+  return Urql.useQuery<WorkspaceDevicesQuery, WorkspaceDevicesQueryVariables>({ query: WorkspaceDevicesDocument, ...options });
 };
 export const WorkspaceInvitationDocument = gql`
     query workspaceInvitation($id: ID!) {
