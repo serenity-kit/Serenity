@@ -82,6 +82,7 @@ export const removeMembersAndRotateWorkspaceKey = async ({
     });
     // rotate keys
     const updatedWorkspaceKey = await rotateWorkspaceKey({
+      prisma,
       deviceWorkspaceKeyBoxes: addableDeviceWorkspaceKeyBoxes,
       creatorDeviceSigningPublicKey,
       workspaceId,
