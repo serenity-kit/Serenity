@@ -37,6 +37,7 @@ import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/upd
 import * as IsWorkspaceAuthorizedTypes from "./graphql/queries/workspace/isWorkspaceAuthorized";
 import * as PendingingWorkspaceInvitationQueryTypes from "./graphql/queries/workspace/pendingWorkspaceInvitation";
 import * as UnauthorizedMembersTypes from "./graphql/queries/workspace/unauthorizedMembers";
+import * as WorkspaceDevicesQueryTypes from "./graphql/queries/workspace/workspaceDevices";
 import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspaceInvitation";
 import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspaceInvitations";
 import * as WorkspaceTypes from "./graphql/types/workspace";
@@ -101,6 +102,7 @@ export const schema = makeSchema({
     UnauthorizedMembersTypes,
     IsWorkspaceAuthorizedTypes,
     RemoveMembersAndRotateWorkspaceKeyMutationTypes,
+    WorkspaceDevicesQueryTypes,
 
     DevicesQueryTypes,
     deviceBySigningPublicKeyQueryTypes,
