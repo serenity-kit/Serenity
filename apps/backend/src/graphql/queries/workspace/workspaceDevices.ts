@@ -13,6 +13,7 @@ export const GetWorkspaceDevicesResult = objectType({
 });
 
 export const workspaceDevicesQuery = queryField((t) => {
+  // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("workspaceDevices", {
     type: Device,
     disableBackwardPagination: true,
