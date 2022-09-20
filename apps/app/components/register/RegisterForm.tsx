@@ -1,23 +1,23 @@
-import React, { useState } from "react";
+import { createAndEncryptDevice } from "@serenity-tools/common";
+import { finishRegistration, registerInitialize } from "@serenity-tools/opaque";
 import {
-  Text,
   Button,
   Checkbox,
+  FormWrapper,
+  InfoMessage,
   Input,
   LinkExternal,
-  InfoMessage,
-  FormWrapper,
+  Text,
 } from "@serenity-tools/ui";
+import { useState } from "react";
+import { useWindowDimensions } from "react-native";
+import { useAppContext } from "../../context/AppContext";
 import {
   useFinishRegistrationMutation,
   useStartRegistrationMutation,
 } from "../../generated/graphql";
-import { useWindowDimensions } from "react-native";
-import { registerInitialize, finishRegistration } from "@serenity-tools/opaque";
-import { createAndEncryptDevice } from "@serenity-tools/common";
-import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { storeUsernamePassword } from "../../utils/authentication/registrationMemoryStore";
-import { useAuthentication } from "../../context/AuthenticationContext";
+import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 
 type Props = {
   pendingWorkspaceInvitationId?: string;
@@ -27,7 +27,7 @@ type Props = {
 
 export default function RegisterForm(props: Props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const { updateAuthentication } = useAuthentication();
+  const { updateAuthentication } = useAppContext();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);

@@ -10,7 +10,8 @@ export const getActiveDevice = async (): Promise<Device | null> => {
     device = await getWebDevice();
   } else if (Platform.OS === "ios") {
     device = await getDevice();
-  } else {
+  }
+  if (!device) {
     device = getMainDevice();
   }
   return device;

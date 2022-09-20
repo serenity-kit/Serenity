@@ -14,13 +14,18 @@ import Constants from "expo-constants";
 import "expo-dev-client";
 import { StatusBar } from "expo-status-bar";
 import { extendTheme, NativeBaseProvider } from "native-base";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useAppColorScheme, useDeviceContext } from "twrnc";
-import { createClient, dedupExchange, fetchExchange, Provider } from "urql";
+import {
+  createClient,
+  dedupExchange,
+  fetchExchange,
+  Provider as UrqlProvider,
+} from "urql";
 import { theme } from "../../tailwind.config";
-import { AuthenticationProvider } from "./context/AuthenticationContext";
+import { AppContextProvider } from "./context/AppContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
 import * as SessionKeyStore from "./utils/authentication/sessionKeyStore";
@@ -122,20 +127,13 @@ const exchanges = [
 ];
 
 export default function App() {
-  const { isLoadingComplete, sessionKey, setSessionKey } = useCachedResources();
-
-  const updateAuthentication = useCallback(
-    async (session: { sessionKey: string; expiresAt: string } | null) => {
-      if (session) {
-        setSessionKey(session.sessionKey);
-        await SessionKeyStore.setSessionKey(session.sessionKey);
-      } else {
-        setSessionKey(null);
-        await SessionKeyStore.deleteSessionKey();
-      }
-    },
-    [setSessionKey]
-  );
+  const {
+    isLoadingComplete,
+    sessionKey,
+    updateAuthentication,
+    activeDevice,
+    updateActiveDevice,
+  } = useCachedResources();
 
   const [isFontLoadingComplete] = useFonts({
     Inter_400Regular,
@@ -143,7 +141,7 @@ export default function App() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
-  // 1️opt out of listening to device color scheme events until we support dark mode
+  // opt out of listening to device color scheme events until we support dark mode
   useDeviceContext(tw, { withDeviceColorScheme: false });
   // hard-coding the colorScheme to light until we support dark mode
   const [colorScheme] = useAppColorScheme(tw, "light");
@@ -154,7 +152,7 @@ export default function App() {
   });
 
   // recreate client and especially the internal cache every time the authentication state changes
-  const client = useMemo(() => {
+  const urqlClient = useMemo(() => {
     return createClient({
       url: Constants.manifest?.extra?.apiUrl,
       requestPolicy: "cache-and-network",
@@ -170,13 +168,15 @@ export default function App() {
   } else {
     return (
       <RootSiblingParent>
-        <AuthenticationProvider
+        <AppContextProvider
           value={{
             updateAuthentication,
+            updateActiveDevice,
             sessionKey,
+            activeDevice,
           }}
         >
-          <Provider value={client}>
+          <UrqlProvider value={urqlClient}>
             <SafeAreaProvider>
               <NativeBaseProvider theme={rnTheme}>
                 <Navigation colorScheme={colorScheme} />
@@ -184,8 +184,8 @@ export default function App() {
                 <OpaqueBridge source={source} />
               </NativeBaseProvider>
             </SafeAreaProvider>
-          </Provider>
-        </AuthenticationProvider>
+          </UrqlProvider>
+        </AppContextProvider>
       </RootSiblingParent>
     );
   }

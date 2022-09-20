@@ -2,7 +2,7 @@ import { CenterContent, Spinner } from "@serenity-tools/ui";
 import { useEffect } from "react";
 import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
-import { useAuthentication } from "../../context/AuthenticationContext";
+import { useAppContext } from "../../context/AppContext";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 import {
   FirstDocumentDocument,
@@ -22,7 +22,7 @@ export default function WorkspaceRootScreen(
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const urqlClient = useClient();
   const workspaceId = useWorkspaceId();
-  const { sessionKey } = useAuthentication();
+  const { sessionKey } = useAppContext();
 
   useEffect(() => {
     (async () => {

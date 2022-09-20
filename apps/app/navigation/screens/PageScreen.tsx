@@ -9,7 +9,7 @@ import { useClient } from "urql";
 import Page from "../../components/page/Page";
 import { PageHeader } from "../../components/page/PageHeader";
 import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
-import { useAuthentication } from "../../context/AuthenticationContext";
+import { useAppContext } from "../../context/AppContext";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 import {
   Document,
@@ -28,7 +28,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   const updateDocumentStore = useDocumentStore((state) => state.update);
   const pageId = props.route.params.pageId;
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
-  const { sessionKey } = useAuthentication();
+  const { sessionKey } = useAppContext();
   const urqlClient = useClient();
 
   const navigateAwayIfUserDoesntHaveAccess = async (
