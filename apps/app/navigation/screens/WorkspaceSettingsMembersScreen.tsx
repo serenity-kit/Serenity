@@ -233,7 +233,6 @@ export default function WorkspaceSettingsMembersScreen(
       }
       const workspaceKey = await getWorkspaceKey({
         workspaceId,
-        devices,
         urqlClient,
       });
       const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
