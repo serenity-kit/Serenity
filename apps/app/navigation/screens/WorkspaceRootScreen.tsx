@@ -2,7 +2,6 @@ import { CenterContent, Spinner } from "@serenity-tools/ui";
 import { useEffect } from "react";
 import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
-import { useAppContext } from "../../context/AppContext";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 import {
   FirstDocumentDocument,
@@ -12,8 +11,8 @@ import {
   WorkspaceQuery,
   WorkspaceQueryVariables,
 } from "../../generated/graphql";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceRootScreen(
@@ -22,20 +21,10 @@ export default function WorkspaceRootScreen(
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const urqlClient = useClient();
   const workspaceId = useWorkspaceId();
-  const { sessionKey } = useAppContext();
+  const { activeDevice } = useWorkspaceContext();
 
   useEffect(() => {
     (async () => {
-      if (!sessionKey) {
-        // TODO: handle this error
-        console.error("No sessionKey found, probably you aren't logged in");
-        return;
-      }
-      const activeDevice = await getActiveDevice();
-      if (!activeDevice) {
-        // TODO: handle this error
-        throw new Error("No active device found!");
-      }
       const deviceSigningPublicKey = activeDevice.signingPublicKey;
       const workspaceResult = await urqlClient
         .query<WorkspaceQuery, WorkspaceQueryVariables>(
@@ -84,7 +73,12 @@ export default function WorkspaceRootScreen(
         props.navigation.replace("WorkspaceNotFound");
       }
     })();
-  }, [urqlClient, props.navigation, workspaceId]);
+  }, [
+    urqlClient,
+    props.navigation,
+    workspaceId,
+    activeDevice.signingPublicKey,
+  ]);
 
   return (
     <CenterContent>

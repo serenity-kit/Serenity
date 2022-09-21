@@ -4,20 +4,19 @@ import {
   UnauthorizedMembersQuery,
   UnauthorizedMembersQueryVariables,
 } from "../../generated/graphql";
-import { getActiveDevice } from "../device/getActiveDevice";
+import { Device } from "../../types/Device";
 import { authorizeNewDevices } from "../workspaceDevice/authorizeNewDevices";
 import { getWorkspaces } from "./getWorkspaces";
 
 export const secondsBetweenNewMemberChecks = 5;
 
-export type Props = { urqlClient: Client };
-export const addNewMembersIfNecessary = async ({ urqlClient }: Props) => {
+export type Props = { urqlClient: Client; activeDevice: Device };
+
+export const addNewMembersIfNecessary = async ({
+  urqlClient,
+  activeDevice,
+}: Props) => {
   // TODO: fetch all user workspaces
-  const activeDevice = await getActiveDevice();
-  if (!activeDevice) {
-    // TODO: deal with this in the UI
-    throw new Error("No active device found");
-  }
   const deviceSigningPublicKey = activeDevice.signingPublicKey;
   const workspaces = await getWorkspaces({
     urqlClient,
@@ -43,6 +42,6 @@ export const addNewMembersIfNecessary = async ({ urqlClient }: Props) => {
     .toPromise();
   const userIds = unauthorizedMembersResult.data?.unauthorizedMembers?.userIds;
   if (userIds && userIds.length > 0) {
-    await authorizeNewDevices({ urqlClient });
+    await authorizeNewDevices({ urqlClient, activeDevice });
   }
 };

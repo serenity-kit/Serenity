@@ -1,17 +1,18 @@
 import { Client } from "urql";
+import { Device } from "../../types/Device";
 import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
-import { getActiveDevice } from "../device/getActiveDevice";
 import { getWorkspace } from "./getWorkspace";
 
 export type Props = {
   workspaceId: string;
   urqlClient: Client;
+  activeDevice: Device;
 };
-export const getWorkspaceKey = async ({ workspaceId, urqlClient }: Props) => {
-  const activeDevice = await getActiveDevice();
-  if (!activeDevice) {
-    throw new Error("No active device!");
-  }
+export const getWorkspaceKey = async ({
+  workspaceId,
+  urqlClient,
+  activeDevice,
+}: Props) => {
   const workspace = await getWorkspace({
     urqlClient,
     deviceSigningPublicKey: activeDevice.signingPublicKey,

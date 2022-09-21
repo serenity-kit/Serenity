@@ -17,16 +17,11 @@ import {
   Workspace,
   WorkspaceMember,
 } from "../../generated/graphql";
-import { useInterval } from "../../hooks/useInterval";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
 import { encryptWorkspaceKeyForDevice } from "../../utils/device/encryptWorkspaceKeyForDevice";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getDevices } from "../../utils/device/getDevices";
-import {
-  addNewMembersIfNecessary,
-  secondsBetweenNewMemberChecks,
-} from "../../utils/workspace/addNewMembersIfNecessary";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceDevices } from "../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
@@ -47,11 +42,6 @@ function WorkspaceMemberRow({
   onDeletePress,
 }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const urqlClient = useClient();
-
-  useInterval(() => {
-    addNewMembersIfNecessary({ urqlClient });
-  }, secondsBetweenNewMemberChecks * 1000);
 
   return (
     <View style={styles.memberListItem}>
@@ -95,6 +85,7 @@ const workspaceMemberStyles = StyleSheet.create({
 export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
+  const { activeDevice } = useWorkspaceContext();
   const urqlClient = useClient();
   const workspaceId = useWorkspaceId();
   const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
@@ -131,15 +122,9 @@ export default function WorkspaceSettingsMembersScreen(
   useEffect(() => {
     (async () => {
       const me = await getMe();
-      const device = await getActiveDevice();
-      if (!device) {
-        // TODO: handle this error
-        console.error("No active device found");
-        return;
-      }
       const workspace = await getWorkspace({
         urqlClient,
-        deviceSigningPublicKey: device.signingPublicKey,
+        deviceSigningPublicKey: activeDevice.signingPublicKey,
       });
       if (workspace) {
         setWorkspace(workspace);
@@ -149,7 +134,7 @@ export default function WorkspaceSettingsMembersScreen(
         return;
       }
     })();
-  }, [urqlClient, props.navigation]);
+  }, [urqlClient, props.navigation, activeDevice.signingPublicKey]);
 
   const updateWorkspaceData = async (
     me: MeResult | null | undefined,
@@ -219,12 +204,6 @@ export default function WorkspaceSettingsMembersScreen(
       setMembers(members);
       delete memberLookup[username];
       setMemberLookup(memberLookup);
-      const activeDevice = await getActiveDevice();
-      if (!activeDevice) {
-        // TODO: show this error in the UI
-        console.error("no active device found!");
-        return;
-      }
       const devices = await getDevices({ urqlClient });
       if (!devices) {
         // TODO: show this error in the UI
@@ -234,6 +213,7 @@ export default function WorkspaceSettingsMembersScreen(
       const workspaceKey = await getWorkspaceKey({
         workspaceId,
         urqlClient,
+        activeDevice,
       });
       const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
       // TODO: getWorkspaceDevices gets all devices attached to a workspace

@@ -122,7 +122,10 @@ export default function RegistrationVerificationScreen(
         }
       }
       try {
-        await attachDeviceToWorkspaces({ urqlClient });
+        await attachDeviceToWorkspaces({
+          urqlClient,
+          activeDevice: unsafedDevice,
+        });
       } catch (error) {
         // TOOD: handle error
         console.error(error);

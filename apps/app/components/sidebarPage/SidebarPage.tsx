@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import { useClient } from "urql";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { getFolderKey } from "../../utils/folder/getFolderKey";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
@@ -38,6 +39,7 @@ type Props = ViewProps & {
 
 export default function SidebarPage(props: Props) {
   const isDesktopDevice = useIsDesktopDevice();
+  const { activeDevice } = useWorkspaceContext();
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [documentTitle, setDocumentTitle] = useState("Decrypting...");
@@ -72,6 +74,7 @@ export default function SidebarPage(props: Props) {
         folderId: props.parentFolderId,
         workspaceId: props.workspaceId,
         urqlClient,
+        activeDevice,
       });
       const documentKeyData = await recreateDocumentKey({
         folderKey: folderKeyData.key,
@@ -97,6 +100,7 @@ export default function SidebarPage(props: Props) {
       folderId: props.parentFolderId,
       workspaceId: props.workspaceId,
       urqlClient,
+      activeDevice,
     });
     const documentKeyData = await createDocumentKey({
       folderKey: folderKeyData.key,
@@ -117,7 +121,7 @@ export default function SidebarPage(props: Props) {
       // TODO show notification
       const document =
         updateDocumentNameResult.data.updateDocumentName.document;
-      documentStore.update(document, urqlClient);
+      documentStore.update(document, urqlClient, activeDevice);
     } else {
       // TODO: show error: couldn't update folder name
       // refetch to revert back to actual name

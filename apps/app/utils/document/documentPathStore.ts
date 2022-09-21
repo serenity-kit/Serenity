@@ -7,6 +7,7 @@ import {
   DocumentPathQueryVariables,
   Folder,
 } from "../../generated/graphql";
+import { Device } from "../../types/Device";
 import { getWorkspaceKey } from "../workspace/getWorkspaceKey";
 
 interface DocumentPathState {
@@ -14,7 +15,11 @@ interface DocumentPathState {
   folderIds: string[];
   folderNames: { [id: string]: string };
   getName: (folderId: string) => string;
-  update: (folders: Folder[], urqlClient: Client) => Promise<void>;
+  update: (
+    folders: Folder[],
+    urqlClient: Client,
+    activeDevice: Device
+  ) => Promise<void>;
 }
 
 export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
@@ -29,12 +34,13 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
       return "Error retrieving name";
     }
   },
-  update: async (folders, urqlClient) => {
+  update: async (folders, urqlClient, activeDevice) => {
     // all documentPath folders should be in the same workspace
     const firstFolder = folders[0];
     const workspaceKey = await getWorkspaceKey({
       workspaceId: firstFolder.workspaceId!,
       urqlClient,
+      activeDevice,
     });
     const folderIds: string[] = [];
     const folderNames: { [id: string]: string } = {};

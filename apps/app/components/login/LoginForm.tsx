@@ -105,7 +105,10 @@ export function LoginForm(props: Props) {
         }
       }
       try {
-        await attachDeviceToWorkspaces({ urqlClient });
+        await attachDeviceToWorkspaces({
+          urqlClient,
+          activeDevice: unsafedDevice,
+        });
       } catch (error) {
         // TOOD: handle error
         console.error(error);
