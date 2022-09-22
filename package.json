@@ -33,5 +33,6 @@
     "prosemirror-state": "1.4.1",
     "prosemirror-transform": "1.7.0",
     "prosemirror-keymap": "1.2.0"
-  }
+  },
+  "dependencies": {}
 }
