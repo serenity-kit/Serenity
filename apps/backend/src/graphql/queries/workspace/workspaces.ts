@@ -21,6 +21,7 @@ export const workspaces = queryField((t) => {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
+      // NOTE: removing this feature to allow login to function smoothly
       // context.assertValidDeviceSigningPublicKeyForThisSession(
       //   args.deviceSigningPublicKey
       // );
