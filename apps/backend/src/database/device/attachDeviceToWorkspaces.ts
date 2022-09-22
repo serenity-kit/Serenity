@@ -1,6 +1,7 @@
 import { ForbiddenError } from "apollo-server-express";
 import { v4 as uuidv4 } from "uuid";
 import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
+import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
 
 export type AttachToDeviceWorkspaceKeyBoxData = {
@@ -56,23 +57,6 @@ export async function attachDeviceToWorkspaces({
           },
         },
       });
-      const userWorkspaceIds: string[] = [];
-      const newWorkspaceKeys: WorkspaceKey[] = [];
-      userToWorkspaces.forEach(async (userToWorkspace) => {
-        userWorkspaceIds.push(userToWorkspace.workspaceId);
-        const workspace = userToWorkspace.workspace;
-        const workspaceKeys = workspace.workspaceKey;
-        if (workspaceKeys.length === 0) {
-          newWorkspaceKeys.push({
-            id: uuidv4(),
-            workspaceId: workspace.id,
-            generation: 0,
-          });
-        }
-      });
-      await prisma.workspaceKey.createMany({
-        data: newWorkspaceKeys,
-      });
 
       // make sure this device belongs to a user that is part of this workspace
       const verifiedDevice = await prisma.device.findFirst({
@@ -90,23 +74,50 @@ export async function attachDeviceToWorkspaces({
       if (verifiedDeviceWorkspaces.length === 0) {
         throw new ForbiddenError("Unauthorized");
       }
+      // make sure the user controls this creatorDevice
+      await getOrCreateCreatorDevice({
+        prisma,
+        userId,
+        signingPublicKey: creatorDeviceSigningPublicKey,
+      });
+      const userWorkspaceIds: string[] = [];
+      const newWorkspaceKeys: WorkspaceKey[] = [];
+      userToWorkspaces.forEach(async (userToWorkspace) => {
+        userWorkspaceIds.push(userToWorkspace.workspaceId);
+        const workspace = userToWorkspace.workspace;
+        const workspaceKeys = workspace.workspaceKey;
+        if (workspaceKeys.length === 0) {
+          newWorkspaceKeys.push({
+            id: uuidv4(),
+            workspaceId: workspace.id,
+            generation: 0,
+          });
+        }
+      });
+      await prisma.workspaceKey.createMany({
+        data: newWorkspaceKeys,
+      });
       const verifiedWorkspaceIds: string[] = [];
       verifiedDeviceWorkspaces.forEach((userToWorkspace) => {
         verifiedWorkspaceIds.push(userToWorkspace.workspaceId);
       });
-
       const workspaces = await prisma.workspace.findMany({
         where: { id: { in: verifiedWorkspaceIds } },
         include: {
           workspaceKey: {
-            include: { workspaceKeyBoxes: true },
+            include: {
+              workspaceKeyBoxes: {
+                include: {
+                  creatorDevice: true,
+                },
+              },
+            },
             orderBy: {
               generation: "desc",
             },
           },
         },
       });
-
       const existingWorkspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
         where: {
           deviceSigningPublicKey: receiverDeviceSigningPublicKey,

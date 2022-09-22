@@ -69,6 +69,10 @@ export const createInitialWorkspaceStructure = async ({
               deviceSigningPublicKey
               ciphertext
               nonce
+              creatorDevice {
+                signingPublicKey
+                encryptionPublicKey
+              }
             }
           }
         }
@@ -130,11 +134,11 @@ export const createInitialWorkspaceStructure = async ({
         encryptedDocumentNameNonce,
         documentSubkeyId,
         documentSnapshot,
+        creatorDeviceSigningPublicKey:
+          creatorDeviceSigningPublicKey ?? deviceSigningPublicKey,
         deviceWorkspaceKeyBoxes: [
           {
             deviceSigningPublicKey,
-            creatorDeviceSigningPublicKey:
-              creatorDeviceSigningPublicKey ?? deviceSigningPublicKey,
             nonce,
             ciphertext,
           },

@@ -32,6 +32,10 @@ export const attachDeviceToWorkspaces = async ({
             creatorDeviceSigningPublicKey
             ciphertext
             nonce
+            creatorDevice {
+              signingPublicKey
+              encryptionPublicKey
+            }
           }
         }
       }

@@ -18,6 +18,10 @@ mutation createInitialWorkspaceStructure(
           workspaceKeyId
           deviceSigningPublicKey
           ciphertext
+          creatorDevice {
+            signingPublicKey
+            encryptionPublicKey
+          }
         }
       }
     }
