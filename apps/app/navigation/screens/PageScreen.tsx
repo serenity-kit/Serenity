@@ -17,6 +17,8 @@ import {
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 
+import { useMachine } from "@xstate/react";
+import { loadInitialDataMachine } from "../../machines/loadInitialData";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { getFolderKey } from "../../utils/folder/getFolderKey";
@@ -30,6 +32,18 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   const pageId = props.route.params.pageId;
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const urqlClient = useClient();
+
+  const [state, send] = useMachine(loadInitialDataMachine, {
+    context: {
+      workspaceId,
+      documentId: pageId,
+      returnOtherWorkspaceIfNotFound: false,
+      returnOtherDocumentIfNotFound: false,
+      navigation: props.navigation,
+    },
+  });
+
+  console.log(state);
 
   const navigateAwayIfUserDoesntHaveAccess = async (
     workspaceId: string,

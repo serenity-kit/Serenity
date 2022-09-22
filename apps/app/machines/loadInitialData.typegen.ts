@@ -3,10 +3,18 @@
 export interface Typegen0 {
   "@@xstate/typegen": true;
   internalEvents: {
+    "": { type: "" };
     "done.invoke.fetch-meWithWorkspaceLoadingInfo": {
       type: "done.invoke.fetch-meWithWorkspaceLoadingInfo";
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
+    };
+    "error.platform.fetch-meWithWorkspaceLoadingInfo": {
+      type: "error.platform.fetch-meWithWorkspaceLoadingInfo";
+      data: unknown;
+    };
+    "xstate.after(2000)#loadInitialData.failure": {
+      type: "xstate.after(2000)#loadInitialData.failure";
     };
     "xstate.init": { type: "xstate.init" };
   };
@@ -17,10 +25,31 @@ export interface Typegen0 {
     guards: never;
     delays: never;
   };
-  eventsCausingActions: {};
+  eventsCausingActions: {
+    redirectToLobby: "";
+    redirectToLogin: "";
+    redirectToNoWorkspaces: "";
+  };
   eventsCausingServices: {};
-  eventsCausingGuards: {};
+  eventsCausingGuards: {
+    hasAccessToWorkspace: "";
+    hasAnyWorkspaces: "";
+    hasNoNetworkError: "done.invoke.fetch-meWithWorkspaceLoadingInfo";
+    isAuthorized: "";
+    isValidSession: "";
+  };
   eventsCausingDelays: {};
-  matchesStates: "failure" | "loaded" | "loading";
+  matchesStates:
+    | "authorized"
+    | "failure"
+    | "hasNoWorkspaces"
+    | "hasWorkspaceAccess"
+    | "invalidSession"
+    | "loaded"
+    | "loading"
+    | "noAccess"
+    | "notAuthorized"
+    | "ready"
+    | "validSession";
   tags: never;
 }
