@@ -25,6 +25,7 @@ import {
   Provider as UrqlProvider,
 } from "urql";
 import { theme } from "../../tailwind.config";
+import { ErrorBoundary } from "./components/errorBoundary/ErrorBoundary";
 import { AppContextProvider } from "./context/AppContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
@@ -167,26 +168,28 @@ export default function App() {
     return null;
   } else {
     return (
-      <RootSiblingParent>
-        <AppContextProvider
-          value={{
-            updateAuthentication,
-            updateActiveDevice,
-            sessionKey,
-            activeDevice,
-          }}
-        >
-          <UrqlProvider value={urqlClient}>
-            <SafeAreaProvider>
-              <NativeBaseProvider theme={rnTheme}>
-                <Navigation colorScheme={colorScheme} />
-                <StatusBar />
-                <OpaqueBridge source={source} />
-              </NativeBaseProvider>
-            </SafeAreaProvider>
-          </UrqlProvider>
-        </AppContextProvider>
-      </RootSiblingParent>
+      <ErrorBoundary>
+        <RootSiblingParent>
+          <AppContextProvider
+            value={{
+              updateAuthentication,
+              updateActiveDevice,
+              sessionKey,
+              activeDevice,
+            }}
+          >
+            <UrqlProvider value={urqlClient}>
+              <SafeAreaProvider>
+                <NativeBaseProvider theme={rnTheme}>
+                  <Navigation colorScheme={colorScheme} />
+                  <StatusBar />
+                  <OpaqueBridge source={source} />
+                </NativeBaseProvider>
+              </SafeAreaProvider>
+            </UrqlProvider>
+          </AppContextProvider>
+        </RootSiblingParent>
+      </ErrorBoundary>
     );
   }
 }

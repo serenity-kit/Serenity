@@ -23,23 +23,19 @@ import {
   Workspace,
   WorkspaceMember,
 } from "../../generated/graphql";
-import { useInterval } from "../../hooks/useInterval";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import {
-  addNewMembersIfNecessary,
-  secondsBetweenNewMemberChecks,
-} from "../../utils/workspace/addNewMembersIfNecessary";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 export default function WorkspaceSettingsGeneralScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
   const urqlClient = useClient();
+  const { activeDevice } = useWorkspaceContext();
   const workspaceId = useWorkspaceId();
   const [, deleteWorkspacesMutation] = useDeleteWorkspacesMutation();
   const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
@@ -59,10 +55,6 @@ export default function WorkspaceSettingsGeneralScreen(
   const [deletingWorkspaceName, setDeletingWorkspaceName] =
     useState<string>("");
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-
-  useInterval(() => {
-    addNewMembersIfNecessary({ urqlClient });
-  }, secondsBetweenNewMemberChecks * 1000);
 
   const getMe = async () => {
     const meResult = await urqlClient
@@ -84,15 +76,9 @@ export default function WorkspaceSettingsGeneralScreen(
   useEffect(() => {
     (async () => {
       const me = await getMe();
-      const device = await getActiveDevice();
-      if (!device) {
-        // TODO: handle this error
-        console.error("No active device found");
-        return;
-      }
       const workspace = await getWorkspace({
         urqlClient,
-        deviceSigningPublicKey: device.signingPublicKey,
+        deviceSigningPublicKey: activeDevice.signingPublicKey,
       });
       if (workspace) {
         setWorkspace(workspace);
@@ -102,7 +88,7 @@ export default function WorkspaceSettingsGeneralScreen(
         return;
       }
     })();
-  }, [urqlClient, props.navigation]);
+  }, [urqlClient, props.navigation, activeDevice.signingPublicKey]);
 
   const updateWorkspaceData = async (
     me: MeResult | null | undefined,

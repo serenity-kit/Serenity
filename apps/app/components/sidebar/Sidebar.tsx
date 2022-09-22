@@ -26,13 +26,13 @@ import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { useClient } from "urql";
 import { v4 as uuidv4 } from "uuid";
-import { useAppContext } from "../../context/AppContext";
 import {
   useCreateFolderMutation,
   useMeQuery,
   useRootFoldersQuery,
   Workspace,
 } from "../../generated/graphql";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
@@ -45,7 +45,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const urqlClient = useClient();
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
-  const { sessionKey, activeDevice } = useAppContext();
+  const { sessionKey, activeDevice, updateAuthentication } =
+    useWorkspaceContext();
   const workspaceId = route.params.workspaceId;
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
@@ -57,16 +58,13 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [workspaces, setWorkspaces] = useState<Workspace[] | null | undefined>(
     null
   );
-
   const [rootFoldersResult, refetchRootFolders] = useRootFoldersQuery({
     variables: {
       workspaceId,
       first: 20,
     },
   });
-
   const [, createFolderMutation] = useCreateFolderMutation();
-  const { updateAuthentication } = useAppContext();
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
 
@@ -154,6 +152,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       workspaceKey = await getWorkspaceKey({
         workspaceId: workspaceId,
         urqlClient,
+        activeDevice,
       });
     } catch (error: any) {
       // TODO: handle device not registered error

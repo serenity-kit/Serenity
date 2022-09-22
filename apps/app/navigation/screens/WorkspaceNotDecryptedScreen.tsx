@@ -1,10 +1,9 @@
+import { Spinner, Text, View } from "@serenity-tools/ui";
 import {
   StyleSheet,
   TouchableOpacity,
   useWindowDimensions,
 } from "react-native";
-
-import { Spinner, Text, View } from "@serenity-tools/ui";
 import { Client, useClient } from "urql";
 import {
   MeDocument,
@@ -15,8 +14,8 @@ import {
   WorkspaceQueryVariables,
 } from "../../generated/graphql";
 import { useInterval } from "../../hooks/useInterval";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import {
   getLastUsedWorkspaceId,
   removeLastUsedDocumentId,
@@ -29,8 +28,8 @@ export default function WorkspaceNotDecryptedScreen({
   route,
 }: RootStackScreenProps<"WorkspaceNotDecrypted">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+  const { activeDevice } = useWorkspaceContext();
   const workspaceId = route.params?.workspaceId;
-
   const urqlClient = useClient();
   const secondsBetweenAuthorizationChecks = 10;
 
@@ -85,12 +84,7 @@ export default function WorkspaceNotDecryptedScreen({
     urqlClient: Client;
     workspaceId: string;
   }) => {
-    const activeDevice = await getActiveDevice();
-    if (!activeDevice) {
-      // TODO create UI for these errors
-      throw new Error("No active device found!");
-    }
-    const deviceSigningPublicKey = activeDevice?.signingPublicKey;
+    const deviceSigningPublicKey = activeDevice.signingPublicKey;
     const workspaceResult = await urqlClient
       .query<WorkspaceQuery, WorkspaceQueryVariables>(
         WorkspaceDocument,
@@ -123,7 +117,7 @@ export default function WorkspaceNotDecryptedScreen({
       </Text>
       <View style={styles.activityIndicatorContainer}>
         <Spinner style={styles.activityIndicator} />
-        Waiting for authorization
+        <Text>Waiting for authorization</Text>
       </View>
       <TouchableOpacity
         onPress={removeLastUsedWorkspaceIdAndNavigateToRoot}

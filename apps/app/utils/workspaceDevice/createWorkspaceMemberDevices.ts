@@ -1,25 +1,22 @@
 import { Client } from "urql";
+import { Device } from "../../types/Device";
 import {
   MemberDevices,
   WorkspaceMemberDevices,
 } from "../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
-import { getActiveDevice } from "../device/getActiveDevice";
 import { getWorkspaceKey } from "../workspace/getWorkspaceKey";
 
 export type Props = {
   unauthorizedWorkspaceDevices: any;
   urqlClient: Client;
+  activeDevice: Device;
 };
 export const createWorkspaceMemberDevices = async ({
+  activeDevice,
   unauthorizedWorkspaceDevices,
   urqlClient,
 }: Props) => {
-  const activeDevice = await getActiveDevice();
-  if (!activeDevice) {
-    // TODO: deal with these errors in the UI
-    throw new Error("No active device found!");
-  }
   const workspaceMemberDevices: WorkspaceMemberDevices[] = [];
   for (let unauthorizedWorkspace of unauthorizedWorkspaceDevices) {
     let workspaceKey: string | undefined = undefined;
@@ -27,6 +24,7 @@ export const createWorkspaceMemberDevices = async ({
       workspaceKey = await getWorkspaceKey({
         workspaceId: unauthorizedWorkspace.id,
         urqlClient,
+        activeDevice,
       });
     } catch (error) {
       // we don't have access to this workspace yet, can't decrypt

@@ -9,12 +9,12 @@ import { useClient } from "urql";
 import Page from "../../components/page/Page";
 import { PageHeader } from "../../components/page/PageHeader";
 import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
-import { useAppContext } from "../../context/AppContext";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 import {
   Document,
   useUpdateDocumentNameMutation,
 } from "../../generated/graphql";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 
 import { useDocumentStore } from "../../utils/document/documentStore";
@@ -24,28 +24,23 @@ import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentS
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+  const { activeDevice } = useWorkspaceContext();
   const workspaceId = useWorkspaceId();
   const updateDocumentStore = useDocumentStore((state) => state.update);
   const pageId = props.route.params.pageId;
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
-  const { sessionKey } = useAppContext();
   const urqlClient = useClient();
 
   const navigateAwayIfUserDoesntHaveAccess = async (
     workspaceId: string,
     docId: string
   ) => {
-    if (!sessionKey) {
-      // TODO: handle this error
-      console.error("No sessionKey found. Probably you aren't logged in!");
-      return;
-    }
     try {
       const document = await getDocument({
         documentId: docId,
         urqlClient,
       });
-      await updateDocumentStore(document, urqlClient);
+      await updateDocumentStore(document, urqlClient, activeDevice);
     } catch (error: any) {
       if (
         error.message === "[GraphQL] Document not found" ||
@@ -76,7 +71,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
         documentId: pageId,
         urqlClient,
       });
-      await updateDocumentStore(document, urqlClient);
+      await updateDocumentStore(document, urqlClient, activeDevice);
     } catch (error: any) {
       if (
         error.message === "[GraphQL] Document not found" ||
@@ -97,6 +92,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
       folderId: document?.parentFolderId!,
       workspaceId: document?.workspaceId!,
       urqlClient,
+      activeDevice,
     });
     let documentSubkeyId = 0;
     let documentKey = "";
@@ -129,7 +125,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {
       const updatedDocument =
         updateDocumentNameResult.data.updateDocumentName.document;
-      await updateDocumentStore(updatedDocument, urqlClient);
+      await updateDocumentStore(updatedDocument, urqlClient, activeDevice);
     }
   };
 

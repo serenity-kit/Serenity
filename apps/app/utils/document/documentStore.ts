@@ -5,6 +5,7 @@ import {
 import { Client } from "urql";
 import create from "zustand";
 import { Document } from "../../generated/graphql";
+import { Device } from "../../types/Device";
 import { getFolderKey } from "../folder/getFolderKey";
 
 interface DocumentState {
@@ -12,14 +13,15 @@ interface DocumentState {
   documentName: string | null;
   update: (
     document: Document | null | undefined,
-    urqlClient: Client
+    urqlClient: Client,
+    activeDevice: Device
   ) => Promise<void>;
 }
 
 export const useDocumentStore = create<DocumentState>((set) => ({
   document: null,
   documentName: null,
-  update: async (document, urqlClient) => {
+  update: async (document, urqlClient, activeDevice) => {
     let documentName: string | null = "Untitled";
     if (
       document &&
@@ -32,6 +34,7 @@ export const useDocumentStore = create<DocumentState>((set) => ({
           folderId: document?.parentFolderId!,
           workspaceId: document?.workspaceId!,
           urqlClient,
+          activeDevice,
         });
         const documentKeyData = await recreateDocumentKey({
           folderKey: folderKeyData.key,

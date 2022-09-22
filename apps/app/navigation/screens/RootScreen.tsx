@@ -4,17 +4,16 @@ import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import { useAppContext } from "../../context/AppContext";
 import { RootStackScreenProps } from "../../types/navigation";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 export default function RootScreen(props: RootStackScreenProps<"Root">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const urqlClient = useClient();
-  const { sessionKey } = useAppContext();
+  const { sessionKey, activeDevice } = useAppContext();
 
   useEffect(() => {
-    if (sessionKey) {
+    if (sessionKey && activeDevice) {
       (async () => {
         const lastUsedWorkspaceId = await getLastUsedWorkspaceId();
         if (lastUsedWorkspaceId) {
@@ -25,15 +24,9 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
           return;
         }
         try {
-          const device = await getActiveDevice();
-          if (!device) {
-            // TODO: handle a no device error
-            console.error("Error fetching active device.");
-            return;
-          }
           const workspace = await getWorkspace({
             urqlClient,
-            deviceSigningPublicKey: device?.signingPublicKey,
+            deviceSigningPublicKey: activeDevice.signingPublicKey,
           });
           if (workspace?.id) {
             // query first document on first workspace and go there
@@ -53,7 +46,7 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
     } else {
       props.navigation.replace("Register");
     }
-  }, [sessionKey, urqlClient, props.navigation]);
+  }, [sessionKey, urqlClient, props.navigation, activeDevice]);
 
   return (
     <CenterContent>

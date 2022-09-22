@@ -39,6 +39,7 @@ import {
   DocumentQuery,
   DocumentQueryVariables,
 } from "../../generated/graphql";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import {
   getDocumentPath,
@@ -61,6 +62,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const docId = route.params.pageId;
   // const workspaceId = route.params.workspaceId;
   const isNew = route.params.isNew ?? false;
+  const { activeDevice } = useWorkspaceContext();
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
@@ -90,7 +92,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       }
     });
     folderStore.update(openFolderIds);
-    documentPathStore.update(documentPath, urqlClient);
+    documentPathStore.update(documentPath, urqlClient, activeDevice);
   };
 
   const updateDocumentName = async (docId: string) => {
@@ -105,7 +107,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       )
       .toPromise();
     const document = documentResult.data?.document as Document;
-    documentStore.update(document, urqlClient);
+    documentStore.update(document, urqlClient, activeDevice);
   };
 
   useEffect(() => {
