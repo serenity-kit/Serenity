@@ -1,18 +1,20 @@
 import React from "react";
 import { tw } from "../../tailwind";
-import { Icon } from "../icon/Icon";
-import { Avatar, AvatarProps } from "../avatar/Avatar";
 import { CollaborationColor } from "../../types";
+import { Avatar, AvatarProps } from "../avatar/Avatar";
+import { Icon } from "../icon/Icon";
 import { View } from "../view/View";
+
+export type SizeVariants = "xxs" | "xs" | "sm";
 
 export type WorkspaceAvatarProps = AvatarProps & {
   customColor?: CollaborationColor; // needs custom Name as otherwise types get mixed
-  size?: "xxs" | "xs" | "sm";
+  size?: SizeVariants;
 };
 
 export const WorkspaceAvatar = React.forwardRef(
   (props: WorkspaceAvatarProps, ref) => {
-    const { size = "xs", customColor = "serenity" } = props;
+    const { size = "xs" as SizeVariants, customColor = "serenity" } = props;
 
     const iconSize = {
       xxs: 4,
