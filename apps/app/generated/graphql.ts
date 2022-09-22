@@ -322,6 +322,13 @@ export type MeResult = {
   __typename?: 'MeResult';
   id: Scalars['String'];
   username: Scalars['String'];
+  workspaceLoadingInfo?: Maybe<WorkspaceLoadingInfo>;
+};
+
+
+export type MeResultWorkspaceLoadingInfoArgs = {
+  documentId?: InputMaybe<Scalars['ID']>;
+  workspaceId?: InputMaybe<Scalars['ID']>;
 };
 
 export type MemberDeviceParingInput = {
@@ -818,6 +825,13 @@ export type WorkspaceKeyWithMembers = {
   members: Array<MemberWithWorkspaceKeyBoxes>;
 };
 
+export type WorkspaceLoadingInfo = {
+  __typename?: 'WorkspaceLoadingInfo';
+  documentId?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  isAuthorized: Scalars['Boolean'];
+};
+
 export type WorkspaceMember = {
   __typename?: 'WorkspaceMember';
   isAdmin: Scalars['Boolean'];
@@ -1056,10 +1070,12 @@ export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string, createdAt: any } | null };
 
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+export type MeQueryVariables = Exact<{
+  workspaceId?: InputMaybe<Scalars['ID']>;
+}>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null } | null } | null };
 
 export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1651,10 +1667,15 @@ export function useMainDeviceQuery(options?: Omit<Urql.UseQueryArgs<MainDeviceQu
   return Urql.useQuery<MainDeviceQuery, MainDeviceQueryVariables>({ query: MainDeviceDocument, ...options });
 };
 export const MeDocument = gql`
-    query me {
+    query me($workspaceId: ID) {
   me {
     id
     username
+    workspaceLoadingInfo(workspaceId: $workspaceId) {
+      id
+      isAuthorized
+      documentId
+    }
   }
 }
     `;

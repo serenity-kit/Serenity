@@ -1,6 +1,21 @@
-query me {
+query me(
+  $workspaceId: ID
+  $documentId: ID
+  $returnOtherWorkspaceIfNotFound: Boolean
+  $returnOtherDocumentIfNotFound: Boolean
+) {
   me {
     id
     username
+    workspaceLoadingInfo(
+      workspaceId: $workspaceId
+      returnOtherWorkspaceIfNotFound: $returnOtherWorkspaceIfNotFound
+      documentId: $documentId
+      returnOtherDocumentIfNotFound: $returnOtherDocumentIfNotFound
+    ) {
+      id
+      isAuthorized
+      documentId
+    }
   }
 }
