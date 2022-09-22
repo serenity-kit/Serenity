@@ -67,6 +67,15 @@ export const Workspace = objectType({
   },
 });
 
+export const WorkspaceLoadingInfo = objectType({
+  name: "WorkspaceLoadingInfo",
+  definition(t) {
+    t.nonNull.string("id");
+    t.nonNull.boolean("isAuthorized");
+    t.string("documentId");
+  },
+});
+
 export const WorkspaceMemberInput = inputObjectType({
   name: "WorkspaceMemberInput",
   definition(t) {
