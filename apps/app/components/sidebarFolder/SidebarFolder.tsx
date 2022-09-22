@@ -31,6 +31,7 @@ import {
   useFoldersQuery,
   useUpdateFolderNameMutation,
 } from "../../generated/graphql";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
 import {
   getDocumentPath,
@@ -90,6 +91,7 @@ export default function SidebarFolder(props: Props) {
   });
   const { depth = 0 } = props;
   const urqlClient = useClient();
+  const { activeDevice } = useWorkspaceContext();
   const documentPathStore = useDocumentPathStore();
   const document = useDocumentStore((state) => state.document);
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
@@ -116,6 +118,7 @@ export default function SidebarFolder(props: Props) {
       const workspaceKey = await getWorkspaceKey({
         workspaceId: props.workspaceId,
         urqlClient,
+        activeDevice,
       });
       const folderName = await decryptFolderName({
         parentKey: workspaceKey,
@@ -138,6 +141,7 @@ export default function SidebarFolder(props: Props) {
       workspaceKey = await getWorkspaceKey({
         workspaceId: props.workspaceId,
         urqlClient,
+        activeDevice,
       });
     } catch (error: any) {
       // TODO: handle device not registered error
@@ -240,6 +244,7 @@ export default function SidebarFolder(props: Props) {
       workspaceKey = await getWorkspaceKey({
         workspaceId: props.workspaceId,
         urqlClient,
+        activeDevice,
       });
     } catch (error: any) {
       // TODO: handle device not registered error
@@ -266,7 +271,7 @@ export default function SidebarFolder(props: Props) {
       // TODO: Optimize by checking if the current folder is in the document path
       if (document && documentPathIds.includes(props.folderId)) {
         const documentPath = await getDocumentPath(urqlClient, document.id);
-        documentPathStore.update(documentPath, urqlClient);
+        documentPathStore.update(documentPath, urqlClient, activeDevice);
       }
     } else {
       // TODO: show error: couldn't update folder name

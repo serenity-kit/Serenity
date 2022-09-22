@@ -1,5 +1,5 @@
-import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 import sodium from "@serenity-tools/libsodium";
+import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 
 type PrivateKeys = {
   encryptionPrivateKey: string;
@@ -16,10 +16,6 @@ export const decryptDevice = async ({
     exportKey,
     encryptionKeySalt
   );
-  console.log("login exportKey", exportKey);
-  console.log("login encryptionKeySalt", encryptionKeySalt);
-  console.log("login encryptionKey", encryptionKey);
-
   const decryptedCiphertextBase64 = await sodium.crypto_secretbox_open_easy(
     ciphertext,
     nonce,

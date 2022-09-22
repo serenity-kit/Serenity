@@ -1,28 +1,32 @@
-import "expo-dev-client";
-import { StatusBar } from "expo-status-bar";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-
 import {
-  // Inter options can be found here https://github.com/expo/google-fonts/tree/master/font-packages/inter
   Inter_400Regular,
   Inter_500Medium,
   Inter_600SemiBold,
   Inter_700Bold,
   useFonts,
-} from "@expo-google-fonts/inter";
+} from "@expo-google-fonts/inter"; // Inter options can be found here https://github.com/expo/google-fonts/tree/master/font-packages/inter
 import { OpaqueBridge } from "@serenity-tools/opaque";
 import { tw } from "@serenity-tools/ui";
 import { devtoolsExchange } from "@urql/devtools";
 import { authExchange } from "@urql/exchange-auth";
 import { cacheExchange } from "@urql/exchange-graphcache";
 import Constants from "expo-constants";
+import "expo-dev-client";
+import { StatusBar } from "expo-status-bar";
 import { extendTheme, NativeBaseProvider } from "native-base";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { RootSiblingParent } from "react-native-root-siblings";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useAppColorScheme, useDeviceContext } from "twrnc";
-import { createClient, dedupExchange, fetchExchange, Provider } from "urql";
+import {
+  createClient,
+  dedupExchange,
+  fetchExchange,
+  Provider as UrqlProvider,
+} from "urql";
 import { theme } from "../../tailwind.config";
-import { AuthenticationProvider } from "./context/AuthenticationContext";
+import { ErrorBoundary } from "./components/errorBoundary/ErrorBoundary";
+import { AppContextProvider } from "./context/AppContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
 import * as SessionKeyStore from "./utils/authentication/sessionKeyStore";
@@ -124,20 +128,13 @@ const exchanges = [
 ];
 
 export default function App() {
-  const { isLoadingComplete, sessionKey, setSessionKey } = useCachedResources();
-
-  const updateAuthentication = useCallback(
-    async (session: { sessionKey: string; expiresAt: string } | null) => {
-      if (session) {
-        setSessionKey(session.sessionKey);
-        await SessionKeyStore.setSessionKey(session.sessionKey);
-      } else {
-        setSessionKey(null);
-        await SessionKeyStore.deleteSessionKey();
-      }
-    },
-    [setSessionKey]
-  );
+  const {
+    isLoadingComplete,
+    sessionKey,
+    updateAuthentication,
+    activeDevice,
+    updateActiveDevice,
+  } = useCachedResources();
 
   const [isFontLoadingComplete] = useFonts({
     Inter_400Regular,
@@ -145,7 +142,7 @@ export default function App() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
-  // 1️opt out of listening to device color scheme events until we support dark mode
+  // opt out of listening to device color scheme events until we support dark mode
   useDeviceContext(tw, { withDeviceColorScheme: false });
   // hard-coding the colorScheme to light until we support dark mode
   const [colorScheme] = useAppColorScheme(tw, "light");
@@ -156,7 +153,7 @@ export default function App() {
   });
 
   // recreate client and especially the internal cache every time the authentication state changes
-  const client = useMemo(() => {
+  const urqlClient = useMemo(() => {
     return createClient({
       url: Constants.manifest?.extra?.apiUrl,
       requestPolicy: "cache-and-network",
@@ -171,24 +168,28 @@ export default function App() {
     return null;
   } else {
     return (
-      <RootSiblingParent>
-        <AuthenticationProvider
-          value={{
-            updateAuthentication,
-            sessionKey,
-          }}
-        >
-          <Provider value={client}>
-            <SafeAreaProvider>
-              <NativeBaseProvider theme={rnTheme}>
-                <Navigation colorScheme={colorScheme} />
-                <StatusBar />
-                <OpaqueBridge source={source} />
-              </NativeBaseProvider>
-            </SafeAreaProvider>
-          </Provider>
-        </AuthenticationProvider>
-      </RootSiblingParent>
+      <ErrorBoundary>
+        <RootSiblingParent>
+          <AppContextProvider
+            value={{
+              updateAuthentication,
+              updateActiveDevice,
+              sessionKey,
+              activeDevice,
+            }}
+          >
+            <UrqlProvider value={urqlClient}>
+              <SafeAreaProvider>
+                <NativeBaseProvider theme={rnTheme}>
+                  <Navigation colorScheme={colorScheme} />
+                  <StatusBar />
+                  <OpaqueBridge source={source} />
+                </NativeBaseProvider>
+              </SafeAreaProvider>
+            </UrqlProvider>
+          </AppContextProvider>
+        </RootSiblingParent>
+      </ErrorBoundary>
     );
   }
 }

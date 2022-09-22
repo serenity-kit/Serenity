@@ -1,9 +1,8 @@
+import { useFocusRing } from "@react-native-aria/focus";
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
 } from "@react-navigation/drawer";
-
-import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { encryptFolderName } from "@serenity-tools/common";
 import {
@@ -27,17 +26,15 @@ import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { useClient } from "urql";
 import { v4 as uuidv4 } from "uuid";
-import { useAuthentication } from "../../context/AuthenticationContext";
 import {
   useCreateFolderMutation,
-  useDevicesQuery,
   useMeQuery,
   useRootFoldersQuery,
   Workspace,
 } from "../../generated/graphql";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
@@ -48,7 +45,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const urqlClient = useClient();
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
-  const sessionKey = useAuthentication();
+  const { sessionKey, activeDevice, updateAuthentication } =
+    useWorkspaceContext();
   const workspaceId = route.params.workspaceId;
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
@@ -60,24 +58,13 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [workspaces, setWorkspaces] = useState<Workspace[] | null | undefined>(
     null
   );
-  const [deviceSigningPublicKey, setDeviceSigningPublicKey] = useState<
-    string | undefined
-  >();
-
   const [rootFoldersResult, refetchRootFolders] = useRootFoldersQuery({
     variables: {
       workspaceId,
       first: 20,
     },
   });
-  const [devicesResult] = useDevicesQuery({
-    variables: {
-      first: 500,
-    },
-  });
-
   const [, createFolderMutation] = useCreateFolderMutation();
-  const { updateAuthentication } = useAuthentication();
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
 
@@ -93,62 +80,68 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
   useEffect(() => {
     (async () => {
-      if (sessionKey) {
-        const device = await getActiveDevice();
-        if (!device) {
-          return;
-        }
-        setDeviceSigningPublicKey(device.signingPublicKey);
-        const deviceSigningPublicKey: string = device?.signingPublicKey;
-        try {
-          const workspace = await getWorkspace({
-            urqlClient,
-            deviceSigningPublicKey,
-            workspaceId,
-          });
-          setWorkspace(workspace);
-          const workspaces = await getWorkspaces({
-            urqlClient,
-            deviceSigningPublicKey,
-          });
-          setWorkspaces(workspaces);
-        } catch (error) {
-          // TODO: handle unauthenticated graphql error
-          // this happens when the user logs out, prior to
-          // being navigated to the login screen
-          console.error(
-            "sidebar tried to get workspace without authentication"
-          );
-        }
+      if (!sessionKey) {
+        throw new Error("Expected sessionKey to be defined");
+      }
+      const deviceSigningPublicKey = activeDevice?.signingPublicKey;
+      if (!deviceSigningPublicKey) {
+        throw new Error("Expected deviceSigningPublicKey to be defined");
+      }
+      try {
+        const workspace = await getWorkspace({
+          urqlClient,
+          deviceSigningPublicKey,
+          workspaceId,
+        });
+        setWorkspace(workspace);
+        const workspaces = await getWorkspaces({
+          urqlClient,
+          deviceSigningPublicKey,
+        });
+        setWorkspaces(workspaces);
+      } catch (error) {
+        // TODO: handle unauthenticated graphql error
+        // this happens when the user logs out, prior to
+        // being navigated to the login screen
+        console.error("sidebar tried to get workspace without authentication");
       }
     })();
-  }, [urqlClient, navigation, workspaceId, sessionKey]);
+  }, [
+    urqlClient,
+    navigation,
+    workspaceId,
+    sessionKey,
+    activeDevice?.signingPublicKey,
+  ]);
 
   const onWorkspaceStructureCreated = async ({
     workspace,
     folder,
     document,
   }) => {
-    if (deviceSigningPublicKey) {
-      const createdWorkspace = await getWorkspace({
-        urqlClient,
-        deviceSigningPublicKey,
-        workspaceId,
+    const deviceSigningPublicKey = activeDevice?.signingPublicKey;
+    if (!deviceSigningPublicKey) {
+      throw new Error("Expected deviceSigningPublicKey to be defined");
+    }
+
+    const createdWorkspace = await getWorkspace({
+      urqlClient,
+      deviceSigningPublicKey,
+      workspaceId,
+    });
+    setWorkspace(createdWorkspace);
+    setShowCreateWorkspaceModal(false);
+    if (createdWorkspace) {
+      navigation.navigate("Workspace", {
+        workspaceId: workspace.id,
+        screen: "Page",
+        params: {
+          pageId: document.id,
+        },
       });
-      setWorkspace(createdWorkspace);
-      setShowCreateWorkspaceModal(false);
-      if (createdWorkspace) {
-        navigation.navigate("Workspace", {
-          workspaceId: workspace.id,
-          screen: "Page",
-          params: {
-            pageId: document.id,
-          },
-        });
-      } else {
-        // TODO: handle this error
-        console.error("No workspace found!");
-      }
+    } else {
+      // TODO: handle this error
+      console.error("No workspace found!");
     }
   };
 
@@ -159,6 +152,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       workspaceKey = await getWorkspaceKey({
         workspaceId: workspaceId,
         urqlClient,
+        activeDevice,
       });
     } catch (error: any) {
       // TODO: handle device not registered error

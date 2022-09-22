@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 import { Platform, useWindowDimensions } from "react-native";
 import { useClient } from "urql";
-import { useAuthentication } from "../../context/AuthenticationContext";
+import { useAppContext } from "../../context/AppContext";
 import {
   useFinishLoginMutation,
   useStartLoginMutation,
@@ -47,7 +47,7 @@ export function LoginForm(props: Props) {
 
   const [gqlErrorMessage, setGqlErrorMessage] = useState("");
 
-  const { updateAuthentication } = useAuthentication();
+  const { updateAuthentication, updateActiveDevice } = useAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
   const urqlClient = useClient();
@@ -97,13 +97,18 @@ export function LoginForm(props: Props) {
           await removeWebDevice();
         }
         await setWebDevice(unsafedDevice, useExtendedLogin);
+        await updateActiveDevice();
       } else if (Platform.OS === "ios") {
         if (useExtendedLogin) {
           await setDevice(unsafedDevice);
+          await updateActiveDevice();
         }
       }
       try {
-        await attachDeviceToWorkspaces({ urqlClient });
+        await attachDeviceToWorkspaces({
+          urqlClient,
+          activeDevice: unsafedDevice,
+        });
       } catch (error) {
         // TOOD: handle error
         console.error(error);

@@ -6,21 +6,22 @@ import {
   NavigationContainer,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import * as Linking from "expo-linking";
-import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
-
 import { Text, tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
+import * as Linking from "expo-linking";
 import { useEffect } from "react";
+import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
 import NavigationDrawerModal from "../components/navigationDrawerModal/NavigationDrawerModal";
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
+import { useAppContext } from "../context/AppContext";
 import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
+import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
+import { useInterval } from "../hooks/useInterval";
 import { RootStackParamList } from "../types/navigation";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { useInterval } from "../utils/useInterval";
 import {
   addNewMembersIfNecessary,
   secondsBetweenNewMemberChecks,
@@ -69,9 +70,12 @@ function WorkspaceDrawerScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
   const urqlClient = useClient();
+  const { activeDevice } = useAppContext();
 
   useInterval(() => {
-    addNewMembersIfNecessary({ urqlClient });
+    if (activeDevice) {
+      addNewMembersIfNecessary({ urqlClient, activeDevice });
+    }
   }, secondsBetweenNewMemberChecks * 1000);
 
   useEffect(() => {
@@ -180,6 +184,32 @@ function AccountSettingsDrawerScreen(props) {
   );
 }
 
+const WorkspaceDrawerScreenWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(WorkspaceDrawerScreen);
+
+const AccountSettingsMobileOverviewScreenWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
+    AccountSettingsMobileOverviewScreen
+  );
+const AccountProfileSettingsScreenWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
+    AccountProfileSettingsScreen
+  );
+const DeviceManagerScreenWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(DeviceManagerScreen);
+const WorkspaceSettingsMobileOverviewScreenWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
+    WorkspaceSettingsMobileOverviewScreen
+  );
+const WorkspaceSettingsGeneralScreenWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
+    WorkspaceSettingsGeneralScreen
+  );
+const WorkspaceSettingsMembersScreenWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
+    WorkspaceSettingsMembersScreen
+  );
+
 function RootNavigator() {
   const dimensions = useWindowDimensions();
 
@@ -193,7 +223,7 @@ function RootNavigator() {
         />
         <Stack.Screen
           name="Workspace"
-          component={WorkspaceDrawerScreen}
+          component={WorkspaceDrawerScreenWithLoginRedirect}
           options={{ headerShown: false }}
         />
         <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
@@ -236,27 +266,27 @@ function RootNavigator() {
           <>
             <Stack.Screen
               name="AccountSettings"
-              component={AccountSettingsMobileOverviewScreen}
+              component={AccountSettingsMobileOverviewScreenWithLoginRedirect}
             />
             <Stack.Screen
               name="AccountSettingsProfile"
-              component={AccountProfileSettingsScreen}
+              component={AccountProfileSettingsScreenWithLoginRedirect}
             />
             <Stack.Screen
               name="AccountSettingsDevices"
-              component={DeviceManagerScreen}
+              component={DeviceManagerScreenWithLoginRedirect}
             />
             <Stack.Screen
               name="WorkspaceSettings"
-              component={WorkspaceSettingsMobileOverviewScreen}
+              component={WorkspaceSettingsMobileOverviewScreenWithLoginRedirect}
             />
             <Stack.Screen
               name="WorkspaceSettingsGeneral"
-              component={WorkspaceSettingsGeneralScreen}
+              component={WorkspaceSettingsGeneralScreenWithLoginRedirect}
             />
             <Stack.Screen
               name="WorkspaceSettingsMembers"
-              component={WorkspaceSettingsMembersScreen}
+              component={WorkspaceSettingsMembersScreenWithLoginRedirect}
             />
           </>
         ) : null}
