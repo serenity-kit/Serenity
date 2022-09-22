@@ -60,3 +60,13 @@ export const WorkspaceWithWorkspaceKeys = objectType({
     });
   },
 });
+
+export const WorkspaceWithWorkspaceDevicesParingInput = inputObjectType({
+  name: "WorkspaceWithWorkspaceDevicesParingInput",
+  definition(t) {
+    t.nonNull.string("id");
+    t.nonNull.list.nonNull.field("workspaceDevices", {
+      type: WorkspaceDeviceInput,
+    });
+  },
+});
