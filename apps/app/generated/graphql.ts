@@ -72,6 +72,7 @@ export type CreateFolderResult = {
 };
 
 export type CreateInitialWorkspaceStructureInput = {
+  creatorDeviceSigningPublicKey: Scalars['String'];
   deviceWorkspaceKeyBoxes: Array<DeviceWorkspaceKeyBoxInput>;
   documentId: Scalars['String'];
   documentSnapshot: DocumentSnapshotInput;
@@ -101,6 +102,14 @@ export type CreateWorkspaceInvitationInput = {
 export type CreateWorkspaceInvitationResult = {
   __typename?: 'CreateWorkspaceInvitationResult';
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
+};
+
+export type CreatorDevice = {
+  __typename?: 'CreatorDevice';
+  createdAt?: Maybe<Scalars['Date']>;
+  encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
+  signingPublicKey: Scalars['String'];
 };
 
 export type DeleteDevicesInput = {
@@ -183,7 +192,6 @@ export type DeviceResult = {
 
 export type DeviceWorkspaceKeyBoxInput = {
   ciphertext: Scalars['String'];
-  creatorDeviceSigningPublicKey: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
   nonce: Scalars['String'];
 };
@@ -797,7 +805,7 @@ export type WorkspaceKey = {
 export type WorkspaceKeyBox = {
   __typename?: 'WorkspaceKeyBox';
   ciphertext: Scalars['String'];
-  creatorDevice?: Maybe<Device>;
+  creatorDevice?: Maybe<CreatorDevice>;
   creatorDeviceSigningPublicKey: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
   id: Scalars['String'];
@@ -848,7 +856,7 @@ export type AttachDeviceToWorkspacesMutationVariables = Exact<{
 }>;
 
 
-export type AttachDeviceToWorkspacesMutation = { __typename?: 'Mutation', attachDeviceToWorkspaces?: { __typename?: 'AttachDeviceToWorkspacesResult', workspaceKeys: Array<{ __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string } | null }> } | null };
+export type AttachDeviceToWorkspacesMutation = { __typename?: 'Mutation', attachDeviceToWorkspaces?: { __typename?: 'AttachDeviceToWorkspacesResult', workspaceKeys: Array<{ __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null }> } | null };
 
 export type AttachDevicesToWorkspacesMutationVariables = Exact<{
   input: AttachDevicesToWorkspacesInput;
@@ -876,7 +884,7 @@ export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
 }>;
 
 
-export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
 
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
@@ -1100,7 +1108,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'Device', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null };
 
 export type WorkspaceDevicesQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1128,7 +1136,7 @@ export type WorkspacesQueryVariables = Exact<{
 }>;
 
 
-export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'Device', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null> | null } | null };
+export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null> | null } | null };
 
 
 export const AcceptWorkspaceInvitationDocument = gql`
@@ -1163,6 +1171,10 @@ export const AttachDeviceToWorkspacesDocument = gql`
         creatorDeviceSigningPublicKey
         ciphertext
         nonce
+        creatorDevice {
+          signingPublicKey
+          encryptionPublicKey
+        }
       }
     }
   }
@@ -1248,6 +1260,10 @@ export const CreateInitialWorkspaceStructureDocument = gql`
           workspaceKeyId
           deviceSigningPublicKey
           ciphertext
+          creatorDevice {
+            signingPublicKey
+            encryptionPublicKey
+          }
         }
       }
     }

@@ -34,7 +34,7 @@ export const attachDeviceToWorkspaces = async ({
       AttachDeviceToWorkspacesDocument,
       {
         input: {
-          creatorDeviceSigningPublicKey: creatorDevice?.signingPublicKey!,
+          creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey!,
           deviceWorkspaceKeyBoxes,
           receiverDeviceSigningPublicKey: receiverDevice.signingPublicKey,
         },

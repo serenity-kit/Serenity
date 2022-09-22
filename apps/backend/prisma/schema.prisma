@@ -91,6 +91,7 @@ model User {
   workspaceInvitations                       WorkspaceInvitations[]
   sessions                                   Session[]
   pendingWorkspaceInvitationId               String?
+  creatorDevices                             CreatorDevice[]
 }
 
 model Session {
@@ -144,6 +145,16 @@ model Device {
   session                      Session[]
 }
 
+model CreatorDevice {
+  signingPublicKey             String            @id @unique
+  encryptionPublicKey          String
+  encryptionPublicKeySignature String
+  user                         User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId                       String?
+  createdAt                    DateTime          @default(now())
+  workspaceKeyBoxes            WorkspaceKeyBox[]
+}
+
 model Workspace {
   id                String                 @id
   idSignature       String
@@ -175,13 +186,14 @@ model WorkspaceKey {
 }
 
 model WorkspaceKeyBox {
-  id                            String       @id @unique @default(uuid())
-  workspaceKey                  WorkspaceKey @relation(fields: [workspaceKeyId], references: [id], onDelete: Cascade)
+  id                            String        @id @unique @default(uuid())
+  workspaceKey                  WorkspaceKey  @relation(fields: [workspaceKeyId], references: [id], onDelete: Cascade)
   workspaceKeyId                String
   deviceSigningPublicKey        String
-  creatorDeviceSigningPublicKey String       @default("invalid")
-  nonce                         String       @default("invalid")
+  creatorDeviceSigningPublicKey String        @default("invalid")
+  nonce                         String        @default("invalid")
   ciphertext                    String
+  creatorDevice                 CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
 }
 
 model Folder {

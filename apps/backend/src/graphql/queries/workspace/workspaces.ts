@@ -21,9 +21,9 @@ export const workspaces = queryField((t) => {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      context.assertValidDeviceSigningPublicKeyForThisSession(
-        args.deviceSigningPublicKey
-      );
+      // context.assertValidDeviceSigningPublicKeyForThisSession(
+      //   args.deviceSigningPublicKey
+      // );
       const userId = context.user.id;
       const cursor = args.after ? { id: args.after } : undefined;
       // prisma will include the cursor if skip: 1 is not set
@@ -31,7 +31,6 @@ export const workspaces = queryField((t) => {
       const skip = cursor ? 1 : undefined;
       // include one extra project to set hasNextPage value
       const take: any = args.first ? args.first + 1 : undefined;
-
       const workspaces = await getWorkspaces({
         userId,
         cursor,

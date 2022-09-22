@@ -15,7 +15,6 @@ export const DeviceWorkspaceKeyBoxInput = inputObjectType({
   name: "DeviceWorkspaceKeyBoxInput",
   definition(t) {
     t.nonNull.string("deviceSigningPublicKey");
-    t.nonNull.string("creatorDeviceSigningPublicKey");
     t.nonNull.string("nonce");
     t.nonNull.string("ciphertext");
   },
@@ -55,6 +54,7 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
     t.nonNull.string("encryptedDocumentNameNonce");
     t.nonNull.int("documentSubkeyId");
     t.nonNull.field("documentSnapshot", { type: DocumentSnapshotInput });
+    t.nonNull.string("creatorDeviceSigningPublicKey");
     t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
       type: DeviceWorkspaceKeyBoxInput,
     });
@@ -85,10 +85,10 @@ export const createInitialWorkspaceStructureMutation = mutationField(
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
+      context.assertValidDeviceSigningPublicKeyForThisSession(
+        args.input.creatorDeviceSigningPublicKey
+      );
       args.input.deviceWorkspaceKeyBoxes.forEach((deviceWorkspaceKeyBox) => {
-        context.assertValidDeviceSigningPublicKeyForThisSession(
-          deviceWorkspaceKeyBox.creatorDeviceSigningPublicKey
-        );
         context.assertValidDeviceSigningPublicKeyForThisSession(
           deviceWorkspaceKeyBox.deviceSigningPublicKey
         );
@@ -107,6 +107,7 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         encryptedDocumentNameNonce: args.input.encryptedDocumentNameNonce,
         documentSubkeyId: args.input.documentSubkeyId,
         documentSnapshot: args.input.documentSnapshot,
+        creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
         deviceWorkspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,
       });
       return workspaceStructure;

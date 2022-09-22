@@ -157,6 +157,10 @@ describe("Input errors", () => {
             creatorDeviceSigningPublicKey
             ciphertext
             nonce
+            creatorDevice {
+              signingPublicKey
+              encryptionPublicKey
+            }
           }
         }
       }
