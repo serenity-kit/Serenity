@@ -16,6 +16,7 @@ import { ArrowRight } from "./icons/ArrowRight";
 import { ArrowRightFilled } from "./icons/ArrowRightFilled";
 import { ArrowRightSLine } from "./icons/ArrowRightSLine";
 import { ArrowUpDownLine } from "./icons/ArrowUpDownLine";
+import { ArrowUpDownSLine } from "./icons/ArrowUpDownSLine";
 import { Attachment2 } from "./icons/Attachment2";
 import { AtLine } from "./icons/AtLine";
 import { Bold } from "./icons/Bold";
@@ -34,6 +35,7 @@ import { CupLine } from "./icons/CupLine";
 import { Cursor } from "./icons/Cursor";
 import { DashboardLine } from "./icons/DashboardLine";
 import { DeleteBinLine } from "./icons/DeleteBinLine";
+import { DeviceLine } from "./icons/DeviceLine";
 import { DoubleArrowLeft } from "./icons/DoubleArrowLeft";
 import { DoubleArrowRight } from "./icons/DoubleArrowRight";
 import { DoubleQuotesL } from "./icons/DoubleQuotesL";
@@ -56,6 +58,7 @@ import { FontColor } from "./icons/FontColor";
 import { FontSize2 } from "./icons/FontSize2";
 import { FormatClear } from "./icons/FormatClear";
 import { Functions } from "./icons/Functions";
+import { GroupLine } from "./icons/GroupLine";
 import { H1 } from "./icons/H1";
 import { H2 } from "./icons/H2";
 import { H3 } from "./icons/H3";
@@ -101,6 +104,8 @@ import { Strikethrough } from "./icons/Strikethrough";
 import { Table2 } from "./icons/Table2";
 import { Text } from "./icons/Text";
 import { Underline } from "./icons/Underline";
+import { UserLine } from "./icons/UserLine";
+import { UserSettingsLine } from "./icons/UserSettingsLine";
 import { WarningFill } from "./icons/WarningFill";
 
 import { View } from "react-native";
@@ -124,6 +129,7 @@ export type IconNames =
   | "arrow-right-filled"
   | "arrow-right-s-line"
   | "arrow-up-down-line"
+  | "arrow-up-down-s-line"
   | "at-line"
   | "attachment-2"
   | "bold"
@@ -142,6 +148,7 @@ export type IconNames =
   | "cursor"
   | "dashboard-line"
   | "delete-bin-line"
+  | "device-line"
   | "double-arrow-right"
   | "double-arrow-left"
   | "double-quotes-l"
@@ -164,21 +171,22 @@ export type IconNames =
   | "font-size-2"
   | "format-clear"
   | "functions"
-  | "hashtag"
-  | "heading"
-  | "history-line"
-  | "image-2-line"
-  | "image-line"
-  | "information-fill"
-  | "information-line"
+  | "group-line"
   | "h-1"
   | "h-2"
   | "h-3"
   | "h-4"
   | "h-5"
   | "h-6"
+  | "hashtag"
+  | "heading"
+  | "history-line"
+  | "image-2-line"
+  | "image-line"
   | "indent-decrease"
   | "indent-increase"
+  | "information-fill"
+  | "information-line"
   | "italic"
   | "link"
   | "link-m"
@@ -209,6 +217,8 @@ export type IconNames =
   | "table-2"
   | "text"
   | "underline"
+  | "user-line"
+  | "user-settings-line"
   | "warning-fill";
 
 export type IconProps = {
@@ -278,6 +288,9 @@ export const Icon = (props: IconProps) => {
   if (name === "arrow-up-down-line") {
     icon = <ArrowUpDownLine color={color} size={iconSize} />;
   }
+  if (name === "arrow-up-down-s-line") {
+    icon = <ArrowUpDownSLine color={color} size={iconSize} />;
+  }
   if (name === "attachment-2") {
     icon = <Attachment2 color={color} size={iconSize} />;
   }
@@ -331,6 +344,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "delete-bin-line") {
     icon = <DeleteBinLine color={color} size={iconSize} />;
+  }
+  if (name === "device-line") {
+    icon = <DeviceLine color={color} size={iconSize} />;
   }
   if (name === "double-arrow-left") {
     icon = <DoubleArrowLeft color={color} size={iconSize} />;
@@ -397,6 +413,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "functions") {
     icon = <Functions color={color} size={iconSize} />;
+  }
+  if (name === "group-line") {
+    icon = <GroupLine color={color} size={iconSize} />;
   }
   if (name === "h-1") {
     icon = <H1 color={color} size={iconSize} />;
@@ -532,6 +551,12 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "underline") {
     icon = <Underline color={color} size={iconSize} />;
+  }
+  if (name === "user-line") {
+    icon = <UserLine color={color} size={iconSize} />;
+  }
+  if (name === "user-settings-line") {
+    icon = <UserSettingsLine color={color} size={iconSize} />;
   }
   if (name === "warning-fill") {
     icon = <WarningFill color={color} size={iconSize} />;

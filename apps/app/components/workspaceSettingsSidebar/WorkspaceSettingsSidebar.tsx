@@ -3,7 +3,7 @@ import {
   DrawerContentScrollView,
 } from "@react-navigation/drawer";
 
-import { SidebarLink, Text, tw } from "@serenity-tools/ui";
+import { SidebarLink, tw } from "@serenity-tools/ui";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 
 export default function WorkspaceSettingsSidebar(
@@ -18,20 +18,18 @@ export default function WorkspaceSettingsSidebar(
           screen: "WorkspaceSettings",
           params: { screen: "General", workspaceId },
         }}
+        iconName="settings-4-line"
       >
-        <Text>
-          General {currentRouteName === "General" ? "(active)" : null}
-        </Text>
+        General {currentRouteName === "General" ? "(active)" : null}
       </SidebarLink>
       <SidebarLink
         to={{
           screen: "WorkspaceSettings",
           params: { screen: "Members", workspaceId },
         }}
+        iconName="group-line"
       >
-        <Text>
-          Members {currentRouteName === "Members" ? "(active)" : null}
-        </Text>
+        Members {currentRouteName === "Members" ? "(active)" : null}
       </SidebarLink>
     </DrawerContentScrollView>
   );

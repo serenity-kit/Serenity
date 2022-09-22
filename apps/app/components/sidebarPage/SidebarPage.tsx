@@ -10,7 +10,7 @@ import {
   Icon,
   InlineInput,
   Pressable,
-  Text,
+  SidebarText,
   tw,
   useIsDesktopDevice,
   View,
@@ -162,42 +162,49 @@ export default function SidebarPage(props: Props) {
             _web: { style: { outlineStyle: "none", flexGrow: 1 } },
           }}
         >
-          <HStack
-            alignItems="center"
-            style={tw`py-3 md:py-1.5 pl-${5 + depth} md:pl-2.5`}
-          >
-            <Icon name="page" size={5} mobileSize={8} color={"gray-600"} />
-            {isEditing ? (
-              <InlineInput
-                onCancel={() => {
-                  setIsEditing(false);
-                }}
-                onSubmit={updateDocumentName}
-                value={documentTitle}
-                style={tw`ml-0.5 w-${maxWidth}`}
-                testID={`sidebar-document--${props.documentId}__edit-name`}
-              />
-            ) : (
-              <Text
-                variant="sm"
-                style={[tw`pl-1.5 max-w-${maxWidth}`]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                bold={document?.id === props.documentId}
-                testID={`sidebar-document--${props.documentId}`}
-              >
-                {documentTitle}
-              </Text>
-            )}
-          </HStack>
+          <View style={tw`pl-${6 + depth} md:pl-2.5`}>
+            <HStack
+              alignItems="center"
+              style={[
+                tw`py-2 md:py-1.5`,
+                !isDesktopDevice && tw`border-b border-gray-200`,
+              ]}
+            >
+              <View style={!isDesktopDevice && tw`-ml-1`}>
+                <Icon name="page" size={5} mobileSize={8} color={"gray-600"} />
+              </View>
+              {isEditing ? (
+                <InlineInput
+                  onCancel={() => {
+                    setIsEditing(false);
+                  }}
+                  onSubmit={updateDocumentName}
+                  value={documentTitle}
+                  style={tw`ml-0.5 w-${maxWidth}`}
+                  testID={`sidebar-document--${props.documentId}__edit-name`}
+                />
+              ) : (
+                <SidebarText
+                  style={[tw`pl-2 md:pl-1.5 max-w-${maxWidth}`]}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  bold={document?.id === props.documentId}
+                  testID={`sidebar-document--${props.documentId}`}
+                >
+                  {documentTitle}
+                </SidebarText>
+              )}
+            </HStack>
+          </View>
         </Pressable>
 
         <HStack
           alignItems="center"
           space={1}
-          style={tw`pr-3 md:pr-2 ${
-            isHovered || !isDesktopDevice ? "" : "hidden"
-          }`}
+          style={[
+            tw`pr-4 md:pr-2 ${isHovered || !isDesktopDevice ? "" : "hidden"}`,
+            !isDesktopDevice && tw`border-b border-gray-200`,
+          ]}
         >
           <SidebarPageMenu
             documentId={props.documentId}

@@ -6,7 +6,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/inter"; // Inter options can be found here https://github.com/expo/google-fonts/tree/master/font-packages/inter
 import { OpaqueBridge } from "@serenity-tools/opaque";
-import { tw } from "@serenity-tools/ui";
+import { tw, useIsDesktopDevice } from "@serenity-tools/ui";
 import { devtoolsExchange } from "@urql/devtools";
 import { authExchange } from "@urql/exchange-auth";
 import { cacheExchange } from "@urql/exchange-graphcache";
@@ -135,6 +135,7 @@ export default function App() {
     activeDevice,
     updateActiveDevice,
   } = useCachedResources();
+  const isDesktopDevice = useIsDesktopDevice();
 
   const [isFontLoadingComplete] = useFonts({
     Inter_400Regular,
@@ -142,13 +143,32 @@ export default function App() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
-  // opt out of listening to device color scheme events until we support dark mode
+
+  // 1️opt out of listening to device color scheme events until we support dark mode
   useDeviceContext(tw, { withDeviceColorScheme: false });
+
   // hard-coding the colorScheme to light until we support dark mode
   const [colorScheme] = useAppColorScheme(tw, "light");
   const rnTheme = extendTheme({
     colors: {
       ...theme.colors,
+    },
+    fontSizes: {
+      "3xs": 8,
+    },
+    components: {
+      Avatar: {
+        sizes: {
+          xxs: {
+            width: isDesktopDevice ? 4 : 5,
+            height: isDesktopDevice ? 4 : 5,
+            _text: {
+              fontSize: "3xs",
+            },
+            _badgeSize: 2,
+          },
+        },
+      },
     },
   });
 

@@ -1,4 +1,4 @@
-import { Text, SidebarLink } from "@serenity-tools/ui";
+import { SidebarLink } from "@serenity-tools/ui";
 
 export default function AccountSettingsMobileOverviewScreen() {
   return (
@@ -7,15 +7,17 @@ export default function AccountSettingsMobileOverviewScreen() {
         to={{
           screen: "AccountSettingsProfile",
         }}
+        iconName="user-line"
       >
-        <Text>Profile</Text>
+        Profile
       </SidebarLink>
       <SidebarLink
         to={{
           screen: "AccountSettingsDevices",
         }}
+        iconName="device-line"
       >
-        <Text>Devices</Text>
+        Devices
       </SidebarLink>
     </>
   );

@@ -37,7 +37,9 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
     view: tw.style(
       `${dimensions} flex ${
         !label ? "justify-center" : ""
-      } items-center bg-transparent rounded-md ${label ? `p-1 rounded` : ""}`
+      } items-center bg-transparent rounded-md ${
+        label ? `pl-1.5 pr-3 py-1 rounded` : ""
+      }`
     ),
     hover: transparent ? tw`bg-${iconColor}/15` : tw`bg-gray-200`,
     pressed: transparent ? tw`bg-${iconColor}/25` : tw`bg-gray-300`,

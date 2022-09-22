@@ -1,39 +1,31 @@
-import { useFocusRing } from "@react-native-aria/focus";
-import type { NavigationAction } from "@react-navigation/core";
-import { useLinkProps } from "@react-navigation/native";
-import { To } from "@react-navigation/native/lib/typescript/src/useLinkTo";
-import { HStack } from "native-base";
 import * as React from "react";
-import {
-  GestureResponderEvent,
-  Platform,
-  Pressable,
-  StyleSheet,
-  TextProps,
-} from "react-native";
-import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
+import { Platform, Pressable } from "react-native";
 import { tw } from "../../tailwind";
-import { IconNames } from "../icon/Icon";
-import { SidebarIconLeft } from "../sidebarIconLeft/SidebarIconLeft";
+import { useLinkProps } from "@react-navigation/native";
+import type { NavigationAction } from "@react-navigation/core";
+import { GestureResponderEvent, TextProps, StyleSheet } from "react-native";
+import { To } from "@react-navigation/native/lib/typescript/src/useLinkTo";
+import { useFocusRing } from "@react-native-aria/focus";
+import { HStack } from "native-base";
+import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
 import { SidebarIconNavRight } from "../sidebarIconNavRight/SidebarIconNavRight";
 import { SidebarText } from "../sidebarText/SidebarText";
 
 // copied from react-navigation type definitions
-declare type SidebarLinkProps<ParamList extends ReactNavigation.RootParamList> =
-  {
-    to: To<ParamList>;
-    action?: NavigationAction;
-    target?: string;
-    onPress?: (
-      e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
-    ) => void;
-  } & (TextProps & {
-    children: React.ReactNode;
-    iconName: IconNames;
-  });
+declare type MenuLinkProps<ParamList extends ReactNavigation.RootParamList> = {
+  to: To<ParamList>;
+  action?: NavigationAction;
+  target?: string;
+  onPress?: (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent> | GestureResponderEvent
+  ) => void;
+} & (TextProps & {
+  children: React.ReactNode;
+  icon?: React.ReactNode;
+});
 
-export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
-  props: SidebarLinkProps<ParamList>
+export function MenuLink<ParamList extends ReactNavigation.RootParamList>(
+  props: MenuLinkProps<ParamList>
 ) {
   const isDesktopDevice = useIsDesktopDevice();
   const [isHovered, setIsHovered] = React.useState(false);
@@ -41,13 +33,12 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
   const linkProps = useLinkProps({
     ...props,
   });
-  const { iconName } = props;
 
   const styles = StyleSheet.create({
     link:
-      tw.style(Platform.OS === "web" && { outlineStyle: "none" }) &&
-      tw`pl-5 md:pl-4`,
-    stack: tw.style(`py-3 md:py-1.5 pr-4`),
+      tw.style(Platform.OS === "web" && { outlineWidth: 0 }) &&
+      tw`pl-5 md:pl-3`,
+    stack: tw.style(`py-3 md:py-2 pr-4 md:pr-3`),
     hover: tw`bg-gray-200`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
@@ -67,13 +58,12 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
         styles.link,
         isHovered && styles.hover,
         isFocusVisible && styles.focusVisible,
-        props.style,
       ]}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <HStack space={isDesktopDevice ? 2 : 4} alignItems="center">
-        {iconName ? <SidebarIconLeft name={iconName} /> : null}
+        {props.icon}
         <HStack
           alignItems={"center"}
           justifyContent={"space-between"}
@@ -85,7 +75,6 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
           space={4}
         >
           <SidebarText>{props.children}</SidebarText>
-          {!isDesktopDevice ? <SidebarIconNavRight /> : null}
         </HStack>
       </HStack>
     </Pressable>

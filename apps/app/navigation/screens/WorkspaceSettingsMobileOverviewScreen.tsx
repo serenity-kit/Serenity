@@ -1,4 +1,4 @@
-import { Icon, SidebarLink, Text, tw } from "@serenity-tools/ui";
+import { SidebarLink } from "@serenity-tools/ui";
 
 export default function WorkspaceSettingsMobileOverviewScreen(props) {
   return (
@@ -8,28 +8,18 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
           screen: "WorkspaceSettingsGeneral",
           params: { workspaceId: props.route.params.workspaceId },
         }}
+        iconName="settings-4-line"
       >
-        <Icon
-          name="settings-4-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={"gray-800"}
-        />
-        <Text variant="sm"> General</Text>
+        General
       </SidebarLink>
       <SidebarLink
         to={{
           screen: "WorkspaceSettingsMembers",
           params: { workspaceId: props.route.params.workspaceId },
         }}
+        iconName={"group-line"}
       >
-        <Icon
-          name="settings-4-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={"gray-800"}
-        />
-        <Text variant="sm">Members</Text>
+        Members
       </SidebarLink>
     </>
   );

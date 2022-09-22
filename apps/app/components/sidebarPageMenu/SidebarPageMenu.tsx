@@ -44,7 +44,7 @@ export default function SidebarPageMenu(props: Props) {
           setIsOpenMenu(false);
           props.onUpdateNamePress();
         }}
-        icon="font-size-2"
+        iconName="font-size-2"
         shortcut={<Shortcut letter="R" />}
         testID={`sidebar-document-menu--${props.documentId}__rename`}
       >
@@ -55,7 +55,7 @@ export default function SidebarPageMenu(props: Props) {
           setIsOpenMenu(false);
           deleteDocument(props.documentId);
         }}
-        icon="delete-bin-line"
+        iconName="delete-bin-line"
         danger
         testID={`sidebar-document-menu--${props.documentId}__delete`}
       >

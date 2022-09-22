@@ -10,13 +10,15 @@ import {
   IconButton,
   InlineInput,
   Menu,
+  MenuButton,
+  MenuLink,
   Pressable,
-  SidebarButton,
   SidebarDivider,
   SidebarLink,
   Text,
   Tooltip,
   tw,
+  useIsDesktopDevice,
   useIsPermanentLeftSidebar,
   View,
   WorkspaceAvatar,
@@ -52,6 +54,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+  const isDesktopDevice = useIsDesktopDevice();
   const [meResult] = useMeQuery();
   const [username, setUsername] = useState<string>("");
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
@@ -223,29 +226,29 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               _focusVisible={{ _web: { style: { outlineStyle: "none" } } }}
             >
               <HStack
-                space={2}
+                space={isPermanentLeftSidebar ? 2 : 3}
                 alignItems="center"
                 style={[
-                  tw`py-1.5 pr-2`,
+                  tw`py-0.5 md:py-1.5 pr-2`,
                   isFocusVisible && tw`se-inset-focus-mini`,
                 ]}
               >
-                <WorkspaceAvatar />
+                <WorkspaceAvatar size={isPermanentLeftSidebar ? "xs" : "sm"} />
                 <Text
-                  variant="xs"
+                  variant={isPermanentLeftSidebar ? "xs" : "md"}
                   bold
-                  style={tw`-mr-1 max-w-30`} // -mr needed for icon spacing, max-w needed for ellipsis
+                  style={tw`-mr-1 max-w-30 text-gray-900`} // -mr needed for icon spacing, max-w needed for ellipsis
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
                   {workspace === null ? " " : workspace.name}
                 </Text>
-                <Icon name="arrow-down-s-line" color={"gray-400"} />
+                <Icon name="arrow-up-down-s-line" color={"gray-400"} />
               </HStack>
             </Pressable>
           }
         >
-          <SidebarLink
+          <MenuLink
             to={{ screen: "AccountSettings" }}
             onPress={(event) => {
               setIsOpenWorkspaceSwitcher(false);
@@ -262,13 +265,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 }, 400);
               }
             }}
+            icon={<Icon name={"user-settings-line"} color="gray-600" />}
           >
-            <View style={tw`p-menu-item`}>
-              <Text variant="xxs" muted bold>
-                {username}
-              </Text>
-            </View>
-          </SidebarLink>
+            {username}
+          </MenuLink>
 
           {workspaces === null ||
           workspaces === undefined ||
@@ -276,7 +276,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             ? null
             : workspaces.map((workspace) =>
                 workspace === null || workspace === undefined ? null : (
-                  <SidebarLink
+                  <MenuLink
                     key={workspace.id}
                     to={{
                       screen: "Workspace",
@@ -285,19 +285,37 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                         screen: "WorkspaceRoot",
                       },
                     }}
-                    style={tw`p-menu-item`}
+                    icon={
+                      <WorkspaceAvatar
+                        customColor={"honey"}
+                        key={`avatar_${workspace.id}`}
+                        size="xxs"
+                      />
+                    }
                   >
-                    <WorkspaceAvatar
-                      customColor={"honey"}
-                      key={`avatar_${workspace.id}`}
-                    />
-                    <Text variant="xs">{workspace.name}</Text>
-                  </SidebarLink>
+                    {workspace.name}
+                  </MenuLink>
                 )
               )}
 
-          <View style={tw`pl-2 pr-3 py-1.5`}>
-            <IconButton
+          {isDesktopDevice ? (
+            <View style={tw`pl-1.5 pr-3 py-1.5`}>
+              <IconButton
+                onPress={() => {
+                  setIsOpenWorkspaceSwitcher(false);
+                  // on mobile Modals can't be open at the same time
+                  // and closing the workspace switcher takes a bit of time
+                  const timeout = Platform.OS === "web" ? 0 : 400;
+                  setTimeout(() => {
+                    setShowCreateWorkspaceModal(true);
+                  }, timeout);
+                }}
+                name="plus"
+                label="Create workspace"
+              />
+            </View>
+          ) : (
+            <MenuButton
               onPress={() => {
                 setIsOpenWorkspaceSwitcher(false);
                 // on mobile Modals can't be open at the same time
@@ -307,13 +325,14 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   setShowCreateWorkspaceModal(true);
                 }, timeout);
               }}
-              name="plus"
-              label="Create workspace"
-            />
-          </View>
+              iconName="plus"
+            >
+              Create workspace
+            </MenuButton>
+          )}
 
           <SidebarDivider collapsed />
-          <SidebarButton
+          <MenuButton
             onPress={async () => {
               setIsOpenWorkspaceSwitcher(false);
               await updateAuthentication(null);
@@ -321,11 +340,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               // @ts-expect-error navigation ts issue
               props.navigation.push("Login");
             }}
-            px={3}
-            py={2}
           >
-            <Text variant="xs">Logout</Text>
-          </SidebarButton>
+            Logout
+          </MenuButton>
         </Menu>
         {!isPermanentLeftSidebar && (
           <IconButton
@@ -333,38 +350,35 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               props.navigation.closeDrawer();
             }}
             name="double-arrow-left"
+            size={"lg"}
           ></IconButton>
         )}
       </HStack>
-      <SidebarLink
-        to={{
-          screen: "WorkspaceSettings",
-          params: { workspaceId: route.params.workspaceId },
-        }}
-      >
-        <Icon
-          name="settings-4-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={"gray-800"}
-        />
-        <Text variant="sm">Settings</Text>
-      </SidebarLink>
 
-      <SidebarLink to={{ screen: "DevDashboard" }}>
-        <Icon
-          name="dashboard-line"
-          size={4.5}
-          mobileSize={5.5}
-          color={"gray-800"}
-        />
-        <Text variant="sm">Dev Dashboard</Text>
-      </SidebarLink>
-      <SidebarDivider />
+      {!isPermanentLeftSidebar ? <SidebarDivider collapsed /> : null}
+
+      <View style={!isPermanentLeftSidebar && tw`pt-5 pb-7`}>
+        <SidebarLink
+          to={{
+            screen: "WorkspaceSettings",
+            params: { workspaceId: route.params.workspaceId },
+          }}
+          iconName={"settings-4-line"}
+        >
+          Settings
+        </SidebarLink>
+
+        <SidebarLink to={{ screen: "DevDashboard" }} iconName="dashboard-line">
+          Dev Dashboard
+        </SidebarLink>
+      </View>
+
+      {isPermanentLeftSidebar ? <SidebarDivider /> : null}
+
       <HStack
         justifyContent="space-between"
         alignItems="center"
-        style={tw`ml-4 mr-5 mb-4 md:mr-2`}
+        style={tw`ml-5 md:ml-4 mb-4 mr-5 md:mr-2`}
       >
         <Text variant={isPermanentLeftSidebar ? "xxs" : "sm"} bold>
           Folders
@@ -376,6 +390,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               setIsCreatingNewFolder(true);
             }}
             name="plus"
+            size={isPermanentLeftSidebar ? "md" : "lg"}
             testID="root-create-folder"
           ></IconButton>
         </Tooltip>
