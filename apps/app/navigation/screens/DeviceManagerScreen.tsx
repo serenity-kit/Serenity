@@ -1,29 +1,89 @@
 import { Text, tw, View } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
+import { useClient } from "urql";
 import DeviceList from "../../components/device/DeviceList";
 import {
-  useDeleteDevicesMutation,
+  useAuthorizeDevicesMutation,
   useDevicesQuery,
 } from "../../generated/graphql";
+import {
+  WorkspaceDeviceParing,
+  WorkspaceWithWorkspaceDevicesParing,
+} from "../../types/workspaceDevice";
+import { createAndEncryptWorkspaceKeyForDevice } from "../../utils/device/createAndEncryptWorkspaceKeyForDevice";
+import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
+import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
 
 export default function DeviceManagerScreen(props) {
   useWindowDimensions();
+  const urqlClient = useClient();
 
   const [devicesResult, fetchDevices] = useDevicesQuery({
     variables: {
-      first: 50,
+      first: 500,
     },
   });
-  const [, deleteDevicesMutation] = useDeleteDevicesMutation();
+  const [, authorizeDevicesMutation] = useAuthorizeDevicesMutation();
 
   const deleteDevice = async (deviceSigningPublicKey: string) => {
     // TODO remove the device also from the storage
-    const deleteDevicesResult = await deleteDevicesMutation({
+    const activeDevice = await getActiveDevice();
+    if (!activeDevice) {
+      // TOOD: show this in the UI
+      console.error("No active device found");
+      return;
+    }
+    const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
+      [];
+    const devices = devicesResult.data?.devices?.nodes;
+    if (!devices) {
+      console.error("No devices found");
+      return;
+    }
+    const workspaces = await getWorkspaces({
+      urqlClient,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
+    if (!workspaces) {
+      console.error("no workspaces found for user");
+      return;
+    }
+    for (let workspace of workspaces) {
+      const workspaceDevicePairing: WorkspaceDeviceParing[] = [];
+      const workspaceKey = await getWorkspaceKey({
+        workspaceId: workspace.id,
+        urqlClient,
+      });
+      for (let device of devices) {
+        if (!device) {
+          continue;
+        }
+        const { ciphertext, nonce } =
+          await createAndEncryptWorkspaceKeyForDevice({
+            receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+            creatorDeviceEncryptionPrivateKey:
+              activeDevice.encryptionPrivateKey!,
+            workspaceKey,
+          });
+        workspaceDevicePairing.push({
+          ciphertext,
+          nonce,
+          receiverDeviceSigningPublicKey: device.encryptionPublicKey,
+        });
+      }
+      newDeviceWorkspaceKeyBoxes.push({
+        id: workspace.id,
+        workspaceDevices: workspaceDevicePairing,
+      });
+    }
+    const authorizeDevicesResult = await authorizeDevicesMutation({
       input: {
-        signingPublicKeys: [deviceSigningPublicKey],
+        creatorSigningPublicKey: activeDevice.signingPublicKey,
+        newDeviceWorkspaceKeyBoxes,
       },
     });
-    if (deleteDevicesResult.data?.deleteDevices) {
+    if (authorizeDevicesResult.data?.authorizeDevices) {
       fetchDevices();
     } else {
       // TODO: show error: couldn't delete device

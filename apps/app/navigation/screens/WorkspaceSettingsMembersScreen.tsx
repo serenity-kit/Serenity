@@ -19,9 +19,8 @@ import {
 } from "../../generated/graphql";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
-import { encryptWorkspaceKeyForDevice } from "../../utils/device/encryptWorkspaceKeyForDevice";
+import { createAndEncryptWorkspaceKeyForDevice } from "../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getActiveDevice } from "../../utils/device/getActiveDevice";
-import { getDevices } from "../../utils/device/getDevices";
 import { useInterval } from "../../utils/useInterval";
 import {
   addNewMembersIfNecessary,
@@ -225,15 +224,8 @@ export default function WorkspaceSettingsMembersScreen(
         console.error("no active device found!");
         return;
       }
-      const devices = await getDevices({ urqlClient });
-      if (!devices) {
-        // TODO: show this error in the UI
-        console.error("no devices found!");
-        return;
-      }
       const workspaceKey = await getWorkspaceKey({
         workspaceId,
-        devices,
         urqlClient,
       });
       const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
@@ -258,12 +250,13 @@ export default function WorkspaceSettingsMembersScreen(
       }
       for (let device of workspaceDevices) {
         if (device.userId !== member.userId) {
-          const { ciphertext, nonce } = await encryptWorkspaceKeyForDevice({
-            receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-            creatorDeviceEncryptionPrivateKey:
-              activeDevice.encryptionPrivateKey!,
-            workspaceKey,
-          });
+          const { ciphertext, nonce } =
+            await createAndEncryptWorkspaceKeyForDevice({
+              receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+              creatorDeviceEncryptionPrivateKey:
+                activeDevice.encryptionPrivateKey!,
+              workspaceKey,
+            });
           deviceWorkspaceKeyBoxes.push({
             ciphertext,
             nonce,

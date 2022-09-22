@@ -46,6 +46,16 @@ export type AttachDevicesToWorkspacesResult = {
   workspaces: Array<WorkspaceWithWorkspaceKeys>;
 };
 
+export type AuthorizeDevicesInput = {
+  creatorSigningPublicKey: Scalars['String'];
+  newDeviceWorkspaceKeyBoxes: Array<WorkspaceWithWorkspaceDevicesParingInput>;
+};
+
+export type AuthorizeDevicesResult = {
+  __typename?: 'AuthorizeDevicesResult';
+  status: Scalars['String'];
+};
+
 export type CreateDocumentInput = {
   id: Scalars['String'];
   parentFolderId?: InputMaybe<Scalars['String']>;
@@ -101,15 +111,6 @@ export type CreateWorkspaceInvitationInput = {
 export type CreateWorkspaceInvitationResult = {
   __typename?: 'CreateWorkspaceInvitationResult';
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
-};
-
-export type DeleteDevicesInput = {
-  signingPublicKeys: Array<Scalars['String']>;
-};
-
-export type DeleteDevicseResult = {
-  __typename?: 'DeleteDevicseResult';
-  status: Scalars['String'];
 };
 
 export type DeleteDocumentsInput = {
@@ -340,11 +341,11 @@ export type Mutation = {
   acceptWorkspaceInvitation?: Maybe<AcceptWorkspaceInvitationResult>;
   attachDeviceToWorkspaces?: Maybe<AttachDeviceToWorkspacesResult>;
   attachDevicesToWorkspaces?: Maybe<AttachDevicesToWorkspacesResult>;
+  authorizeDevices?: Maybe<AuthorizeDevicesResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createFolder?: Maybe<CreateFolderResult>;
   createInitialWorkspaceStructure?: Maybe<CreateInitialWorkspaceStructureResult>;
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
-  deleteDevices?: Maybe<DeleteDevicseResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteFolders?: Maybe<DeleteFoldersResult>;
   deleteWorkspaceInvitations?: Maybe<DeleteWorkspaceInvitationsResult>;
@@ -376,6 +377,11 @@ export type MutationAttachDevicesToWorkspacesArgs = {
 };
 
 
+export type MutationAuthorizeDevicesArgs = {
+  input: AuthorizeDevicesInput;
+};
+
+
 export type MutationCreateDocumentArgs = {
   input: CreateDocumentInput;
 };
@@ -393,11 +399,6 @@ export type MutationCreateInitialWorkspaceStructureArgs = {
 
 export type MutationCreateWorkspaceInvitationArgs = {
   input: CreateWorkspaceInvitationInput;
-};
-
-
-export type MutationDeleteDevicesArgs = {
-  input: DeleteDevicesInput;
 };
 
 
@@ -830,6 +831,11 @@ export type WorkspaceMemberInput = {
   userId: Scalars['String'];
 };
 
+export type WorkspaceWithWorkspaceDevicesParingInput = {
+  id: Scalars['String'];
+  workspaceDevices: Array<WorkspaceDeviceInput>;
+};
+
 export type WorkspaceWithWorkspaceKeys = {
   __typename?: 'WorkspaceWithWorkspaceKeys';
   id: Scalars['String'];
@@ -856,6 +862,13 @@ export type AttachDevicesToWorkspacesMutationVariables = Exact<{
 
 
 export type AttachDevicesToWorkspacesMutation = { __typename?: 'Mutation', attachDevicesToWorkspaces?: { __typename?: 'AttachDevicesToWorkspacesResult', workspaces: Array<{ __typename?: 'WorkspaceWithWorkspaceKeys', id: string, workspaceKeys: Array<{ __typename?: 'WorkspaceKeyWithMembers', id: string, generation: number, members: Array<{ __typename?: 'MemberWithWorkspaceKeyBoxes', id: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string }> }> }> }> } | null };
+
+export type AuthorizeDevicesMutationVariables = Exact<{
+  input: AuthorizeDevicesInput;
+}>;
+
+
+export type AuthorizeDevicesMutation = { __typename?: 'Mutation', authorizeDevices?: { __typename?: 'AuthorizeDevicesResult', status: string } | null };
 
 export type CreateDocumentMutationVariables = Exact<{
   input: CreateDocumentInput;
@@ -884,13 +897,6 @@ export type CreateWorkspaceInvitationMutationVariables = Exact<{
 
 
 export type CreateWorkspaceInvitationMutation = { __typename?: 'Mutation', createWorkspaceInvitation?: { __typename?: 'CreateWorkspaceInvitationResult', workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, expiresAt: any } | null } | null };
-
-export type DeleteDevicesMutationVariables = Exact<{
-  input: DeleteDevicesInput;
-}>;
-
-
-export type DeleteDevicesMutation = { __typename?: 'Mutation', deleteDevices?: { __typename?: 'DeleteDevicseResult', status: string } | null };
 
 export type DeleteDocumentsMutationVariables = Exact<{
   input: DeleteDocumentsInput;
@@ -1199,6 +1205,17 @@ export const AttachDevicesToWorkspacesDocument = gql`
 export function useAttachDevicesToWorkspacesMutation() {
   return Urql.useMutation<AttachDevicesToWorkspacesMutation, AttachDevicesToWorkspacesMutationVariables>(AttachDevicesToWorkspacesDocument);
 };
+export const AuthorizeDevicesDocument = gql`
+    mutation authorizeDevices($input: AuthorizeDevicesInput!) {
+  authorizeDevices(input: $input) {
+    status
+  }
+}
+    `;
+
+export function useAuthorizeDevicesMutation() {
+  return Urql.useMutation<AuthorizeDevicesMutation, AuthorizeDevicesMutationVariables>(AuthorizeDevicesDocument);
+};
 export const CreateDocumentDocument = gql`
     mutation createDocument($input: CreateDocumentInput!) {
   createDocument(input: $input) {
@@ -1284,17 +1301,6 @@ export const CreateWorkspaceInvitationDocument = gql`
 
 export function useCreateWorkspaceInvitationMutation() {
   return Urql.useMutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(CreateWorkspaceInvitationDocument);
-};
-export const DeleteDevicesDocument = gql`
-    mutation deleteDevices($input: DeleteDevicesInput!) {
-  deleteDevices(input: $input) {
-    status
-  }
-}
-    `;
-
-export function useDeleteDevicesMutation() {
-  return Urql.useMutation<DeleteDevicesMutation, DeleteDevicesMutationVariables>(DeleteDevicesDocument);
 };
 export const DeleteDocumentsDocument = gql`
     mutation deleteDocuments($input: DeleteDocumentsInput!) {
