@@ -53,6 +53,6 @@ test("Register then Login", async ({ page }) => {
   await e2eLoginUser({ page, username, password, stayLoggedIn: true });
   delayForSeconds(3);
   await expect(page).toHaveURL(
-    `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
+    `http://localhost:3000/workspace/${workspace?.id}/page/${document?.id}`
   );
 });
