@@ -32,17 +32,23 @@ import * as CreateInitialWorkspaceStructureMutationTypes from "./graphql/mutatio
 import * as CreateWorkspaceInvitationTypes from "./graphql/mutations/workspace/createWorkspaceInvitation";
 import * as DeleteWorkspaceInvitationsTypes from "./graphql/mutations/workspace/deleteWorkspaceInvitations";
 import * as DeleteWorkspacesMutationTypes from "./graphql/mutations/workspace/deleteWorkspaces";
+import * as RemoveMembersAndRotateWorkspaceKeyMutationTypes from "./graphql/mutations/workspace/removeMembersAndRotateWorkspaceKey";
 import * as UpdateWorkspaceMutationTypes from "./graphql/mutations/workspace/updateWorkspace";
+import * as IsWorkspaceAuthorizedTypes from "./graphql/queries/workspace/isWorkspaceAuthorized";
 import * as PendingingWorkspaceInvitationQueryTypes from "./graphql/queries/workspace/pendingWorkspaceInvitation";
+import * as UnauthorizedMembersTypes from "./graphql/queries/workspace/unauthorizedMembers";
+import * as WorkspaceDevicesQueryTypes from "./graphql/queries/workspace/workspaceDevices";
 import * as WorkspaceInvitationTypes from "./graphql/queries/workspace/workspaceInvitation";
 import * as WorkspaceInvitationsTypes from "./graphql/queries/workspace/workspaceInvitations";
 import * as WorkspaceTypes from "./graphql/types/workspace";
 
+import * as AttachDevicesToWorkspacesMutationTypes from "./graphql/mutations/device/attachDevicesToWorkspaces";
 import * as AttachDeviceToWorkspacesMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspaces";
 import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
 import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
 import * as DevicesQueryTypes from "./graphql/queries/device/devices";
 import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
+import * as UnauthorizedDevicesForWorkspacesTypes from "./graphql/queries/device/unauthorizedDevicesForWorkspaces";
 
 import * as DocumentTypes from "./graphql/types/document";
 
@@ -93,12 +99,18 @@ export const schema = makeSchema({
     DeleteWorkspaceInvitationsTypes,
     CreateInitialWorkspaceStructureMutationTypes,
     PendingingWorkspaceInvitationQueryTypes,
+    UnauthorizedMembersTypes,
+    IsWorkspaceAuthorizedTypes,
+    RemoveMembersAndRotateWorkspaceKeyMutationTypes,
+    WorkspaceDevicesQueryTypes,
 
     DevicesQueryTypes,
     deviceBySigningPublicKeyQueryTypes,
     DeleteDevicesMutationTypes,
     MainDeviceQueryTypes,
     AttachDeviceToWorkspacesMutationTypes,
+    UnauthorizedDevicesForWorkspacesTypes,
+    AttachDevicesToWorkspacesMutationTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),

@@ -1,6 +1,6 @@
 import { IconButton, Menu, MenuButton, Shortcut, tw } from "@serenity-tools/ui";
-import { useDeleteDocumentsMutation } from "../../generated/graphql";
 import { useState } from "react";
+import { useDeleteDocumentsMutation } from "../../generated/graphql";
 
 type Props = {
   documentId: string;
@@ -35,6 +35,7 @@ export default function SidebarPageMenu(props: Props) {
           name="more-line"
           color="gray-600"
           style={tw`p-2 md:p-0`}
+          testID={`sidebar-document-menu--${props.documentId}__open`}
         ></IconButton>
       }
     >
@@ -45,6 +46,7 @@ export default function SidebarPageMenu(props: Props) {
         }}
         iconName="font-size-2"
         shortcut={<Shortcut letter="R" />}
+        testID={`sidebar-document-menu--${props.documentId}__rename`}
       >
         Rename
       </MenuButton>
@@ -55,6 +57,7 @@ export default function SidebarPageMenu(props: Props) {
         }}
         iconName="delete-bin-line"
         danger
+        testID={`sidebar-document-menu--${props.documentId}__delete`}
       >
         Delete
       </MenuButton>

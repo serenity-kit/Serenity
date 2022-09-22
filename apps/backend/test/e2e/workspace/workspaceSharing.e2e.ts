@@ -1,28 +1,9 @@
-import { test, expect, Page } from "@playwright/test";
-import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
+import { expect, Page, test } from "@playwright/test";
 import { v4 as uuidv4 } from "uuid";
-import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { prisma } from "../../../src/database/prisma";
-
-type LoginOnPageProps = { page: Page; username: string; password: string };
-const loginOnPage = async ({ page, username, password }: LoginOnPageProps) => {
-  // Fill username input
-  await page
-    .locator(
-      'text=EmailPasswordStay logged in for 30 daysLog in >> [placeholder="Enter your email …"]'
-    )
-    .fill(username);
-
-  // Fill password input
-  await page
-    .locator(
-      'text=EmailPasswordStay logged in for 30 daysLog in >> [placeholder="Enter your password …"]'
-    )
-    .fill(password);
-
-  // Click "Log in" button
-  await page.locator('div[role="button"]:has-text("Log in")').click();
-};
+import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
+import { e2eLoginUser } from "../../helpers/authentication/e2eLoginUser";
+import { delayForSeconds } from "../../helpers/delayForSeconds";
 
 type RegisterOnPageProps = {
   page: Page;
@@ -102,7 +83,7 @@ test.describe("Workspace Sharing", () => {
 
   test("User 1 can create a sharing link", async ({ page }) => {
     const userId = uuidv4();
-    const username = "user1@example.com";
+    const username = `${uuidv4()}@example.com`;
     const password = "pass";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
@@ -115,7 +96,7 @@ test.describe("Workspace Sharing", () => {
     // await page.goto("http://localhost:3000/register");
     // await registerOnPage({ page, username, password, workspaceName });
     await page.goto("http://localhost:3000/login");
-    await loginOnPage({ page, username, password });
+    await e2eLoginUser({ page, username, password });
     await delayForSeconds(2);
     await expect(page).toHaveURL(
       `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
@@ -152,7 +133,7 @@ test.describe("Workspace Sharing", () => {
 
   test("Existing other user can accept workspace", async ({ page }) => {
     const userId = uuidv4();
-    const username = "userb7ce3e17@example.com";
+    const username = `${uuidv4()}@example.com`;
     const password = "pass";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
@@ -161,7 +142,7 @@ test.describe("Workspace Sharing", () => {
     });
     await delayForSeconds(2);
     await page.goto("http://localhost:3000/login");
-    await loginOnPage({ page, username, password });
+    await e2eLoginUser({ page, username, password });
     await delayForSeconds(2);
     await expect(page).toHaveURL(
       `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
@@ -182,7 +163,7 @@ test.describe("Workspace Sharing", () => {
 
   test("Unauthenticated other user can accept workspace", async ({ page }) => {
     const userId = uuidv4();
-    const username = "user3@example.com";
+    const username = `${uuidv4()}@example.com`;
     const password = "pass";
     await createUserWithWorkspace({
       id: userId,
@@ -192,7 +173,7 @@ test.describe("Workspace Sharing", () => {
     await delayForSeconds(2);
     await page.goto(workspaceInvitationUrl);
     await delayForSeconds(2);
-    await loginOnPage({ page, username, password });
+    await e2eLoginUser({ page, username, password });
     await delayForSeconds(2);
     // expect the new url to include the new workspace ID
     const pageUrl = page.url();
@@ -204,7 +185,7 @@ test.describe("Workspace Sharing", () => {
   });
 
   test("Unregistered other user can accept workspace", async ({ page }) => {
-    const username = "user4@example.com";
+    const username = `${uuidv4()}@example.com`;
     const password = "pass";
     const workspaceName = "my workspace";
     await page.goto(workspaceInvitationUrl);

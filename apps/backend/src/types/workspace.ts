@@ -1,3 +1,15 @@
+import { Device } from "./device";
+
+export type MemberIdWithDevice = {
+  id: string;
+  devices: Device[];
+};
+
+export type WorkspaceIdWithMemberDevices = {
+  id: string;
+  members: MemberIdWithDevice[];
+};
+
 export type WorkspaceKeyBox = {
   id: string;
   workspaceKeyId: string;
@@ -5,6 +17,7 @@ export type WorkspaceKeyBox = {
   creatorDeviceSigningPublicKey: string;
   nonce: string;
   ciphertext: string;
+  creatorDevice?: Device | null | undefined;
 };
 
 export type WorkspaceKey = {

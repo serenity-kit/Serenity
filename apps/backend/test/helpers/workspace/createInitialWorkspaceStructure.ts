@@ -74,7 +74,6 @@ export const createInitialWorkspaceStructure = async ({
         }
         folder {
           id
-          name
           encryptedName
           encryptedNameNonce
           subkeyId
@@ -123,12 +122,10 @@ export const createInitialWorkspaceStructure = async ({
         workspaceId,
         folderId,
         folderIdSignature,
-        folderName,
         encryptedFolderName,
         encryptedFolderNameNonce,
         folderSubkeyId,
         documentId,
-        documentName,
         encryptedDocumentName,
         encryptedDocumentNameNonce,
         documentSubkeyId,

@@ -33,7 +33,6 @@ export const updateDocumentName = async ({
     mutation updateDocumentName($input: UpdateDocumentNameInput!) {
       updateDocumentName(input: $input) {
         document {
-          name
           encryptedName
           encryptedNameNonce
           subkeyId
@@ -49,7 +48,6 @@ export const updateDocumentName = async ({
     {
       input: {
         id,
-        name,
         encryptedName: encryptedDocumentResult.ciphertext,
         encryptedNameNonce: encryptedDocumentResult.publicNonce,
         subkeyId: documentSubkey.subkeyId,

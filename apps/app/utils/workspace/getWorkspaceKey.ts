@@ -1,24 +1,18 @@
 import { Client } from "urql";
 import { Device } from "../../types/Device";
 import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
-import { getActiveDevice } from "../device/getActiveDevice";
-import { getLocalDeviceBySigningPublicKey } from "../device/getLocalDeviceBySigningPublicKey";
 import { getWorkspace } from "./getWorkspace";
 
 export type Props = {
   workspaceId: string;
-  devices: Device[];
   urqlClient: Client;
+  activeDevice: Device;
 };
 export const getWorkspaceKey = async ({
   workspaceId,
-  devices,
   urqlClient,
+  activeDevice,
 }: Props) => {
-  const activeDevice = await getActiveDevice();
-  if (!activeDevice) {
-    throw new Error("No active device!");
-  }
   const workspace = await getWorkspace({
     urqlClient,
     deviceSigningPublicKey: activeDevice.signingPublicKey,
@@ -28,14 +22,17 @@ export const getWorkspaceKey = async ({
   if (!workspaceKeyBox) {
     throw new Error("This device isn't registered for this workspace!");
   }
-  const encryptingDevice = getLocalDeviceBySigningPublicKey({
-    signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
-    devices,
-  });
+  const creatorDevice = workspaceKeyBox.creatorDevice;
+  if (!creatorDevice) {
+    // TODO: show this error in the UI
+    throw new Error(
+      `A creator device couldn't be retrieved for workspace ${workspaceId}!`
+    );
+  }
   const workspaceKey = await decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext,
     nonce: workspaceKeyBox.nonce,
-    creatorDeviceEncryptionPublicKey: encryptingDevice.encryptionPublicKey,
+    creatorDeviceEncryptionPublicKey: creatorDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
   });
   return workspaceKey;

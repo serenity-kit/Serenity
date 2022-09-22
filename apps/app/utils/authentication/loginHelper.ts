@@ -3,7 +3,7 @@ import sodium from "@serenity-tools/libsodium";
 import { finishLogin, startLogin } from "@serenity-tools/opaque";
 import { Platform } from "react-native";
 import { Client } from "urql";
-import { UpdateAuthenticationFunction } from "../../context/AuthenticationContext";
+import { UpdateAuthenticationFunction } from "../../context/AppContext";
 import {
   MainDeviceDocument,
   MainDeviceQuery,

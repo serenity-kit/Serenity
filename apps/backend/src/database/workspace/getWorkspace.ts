@@ -1,6 +1,8 @@
+import { CreatorDevice } from "../../types/device";
 import {
   Workspace,
   WorkspaceKey,
+  WorkspaceKeyBox,
   WorkspaceMember,
 } from "../../types/workspace";
 import { prisma } from "../prisma";
@@ -53,6 +55,24 @@ export async function getWorkspace({
       (connection) => connection.userId === userId
     )
   ) {
+    const creatorDeviceSigningPublicKeys: string[] = [];
+    rawWorkspace.workspaceKey.forEach((workspaceKey) => {
+      workspaceKey.workspaceKeyBoxes.forEach((workspaceKeyBox) => {
+        creatorDeviceSigningPublicKeys.push(
+          workspaceKeyBox.creatorDeviceSigningPublicKey
+        );
+      });
+    });
+
+    const creatorDevices = await prisma.device.findMany({
+      where: { signingPublicKey: { in: creatorDeviceSigningPublicKeys } },
+    });
+    const creatorDeviceLookup: { [signingPublicKey: string]: CreatorDevice } =
+      {};
+    creatorDevices.forEach((device) => {
+      creatorDeviceLookup[device.signingPublicKey] = device;
+    });
+
     const workspaceMembers: WorkspaceMember[] = [];
     rawWorkspace.usersToWorkspaces.forEach((userToWorkspace) => {
       const workspaceMember: WorkspaceMember = {
@@ -67,6 +87,15 @@ export async function getWorkspace({
       currentWorkspaceKey.workspaceKeyBox =
         rawWorkspace.workspaceKey[0].workspaceKeyBoxes[0];
     }
+    rawWorkspace.workspaceKey.forEach((workspaceKey) => {
+      workspaceKey.workspaceKeyBoxes.forEach(
+        (workspaceKeyBox: WorkspaceKeyBox) => {
+          const creatorDevice =
+            creatorDeviceLookup[workspaceKeyBox.creatorDeviceSigningPublicKey];
+          workspaceKeyBox.creatorDevice = creatorDevice;
+        }
+      );
+    });
     const workspace: Workspace = {
       id: rawWorkspace.id,
       name: rawWorkspace.name,

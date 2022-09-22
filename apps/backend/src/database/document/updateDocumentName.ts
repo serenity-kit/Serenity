@@ -3,16 +3,14 @@ import { prisma } from "../prisma";
 
 type Params = {
   id: string;
-  name: string;
-  encryptedName?: string;
-  encryptedNameNonce?: string;
-  subkeyId?: number;
+  encryptedName: string;
+  encryptedNameNonce: string;
+  subkeyId: number;
   userId: string;
 };
 
 export async function updateDocumentName({
   id,
-  name,
   encryptedName,
   encryptedNameNonce,
   subkeyId,
@@ -46,7 +44,7 @@ export async function updateDocumentName({
       }
       const updatedDocument = await prisma.document.update({
         where: { id },
-        data: { name, encryptedName, encryptedNameNonce, subkeyId },
+        data: { encryptedName, encryptedNameNonce, subkeyId },
       });
       return updatedDocument;
     });

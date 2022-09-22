@@ -74,7 +74,6 @@ test("user should be able to change a folder name", async () => {
   });
   const updatedFolder = result.updateFolderName.folder;
   expect(updatedFolder.id).toBe(addedFolderId);
-  expect(updatedFolder.name).toBe(name);
   expect(typeof updatedFolder.encryptedName).toBe("string");
   expect(typeof updatedFolder.encryptedNameNonce).toBe("string");
   expect(typeof updatedFolder.subkeyId).toBe("number");
@@ -136,7 +135,7 @@ test("throw error when user doesn't have access", async () => {
     workspaceId: addedWorkspace.id,
   });
   const authorizationHeader = sessionKey;
-  const id = otherUserFolderResult.createFolder.id;
+  const id = otherUserFolderResult.createFolder.folder.id;
   const name = "Unauthorized Name";
   await expect(
     (async () =>
@@ -172,7 +171,6 @@ describe("Input errors", () => {
       mutation updateFolderName($input: UpdateFolderNameInput!) {
         updateFolderName(input: $input) {
           folder {
-            name
             id
             parentFolderId
             rootFolderId
@@ -191,7 +189,6 @@ describe("Input errors", () => {
       mutation updateFolderName($input: UpdateFolderNameInput!) {
         updateFolderName(input: $input) {
           folder {
-            name
             id
             parentFolderId
             rootFolderId
@@ -210,7 +207,6 @@ describe("Input errors", () => {
       mutation {
         updateFolderName(input: null) {
           folder {
-            name
             id
             parentFolderId
             rootFolderId

@@ -1,4 +1,4 @@
-import { type PlaywrightTestConfig, devices } from "@playwright/test";
+import { devices, type PlaywrightTestConfig } from "@playwright/test";
 import dotenv from "dotenv";
 import path from "path";
 
@@ -7,7 +7,8 @@ dotenv.config({ path: path.resolve(__dirname, ".e2e-tests.env") });
 const config: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   globalSetup: require.resolve("./test/config/playwrightGlobalSetup"),
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 4 : 0,
+  workers: process.env.CI ? 2 : undefined,
   use: { trace: "on-first-retry" },
   projects: [
     {
@@ -20,5 +21,6 @@ const config: PlaywrightTestConfig = {
     // },
   ],
   testMatch: /.*\.e2e\.ts/,
+  timeout: 1200000,
 };
 export default config;

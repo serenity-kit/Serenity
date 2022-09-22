@@ -27,7 +27,6 @@ export const updateFolderName = async ({
     mutation updateFolderName($input: UpdateFolderNameInput!) {
       updateFolderName(input: $input) {
         folder {
-          name
           id
           encryptedName
           encryptedNameNonce
@@ -44,7 +43,6 @@ export const updateFolderName = async ({
     {
       input: {
         id,
-        name,
         encryptedName: encryptedFolderResult.ciphertext,
         encryptedNameNonce: encryptedFolderResult.publicNonce,
         subkeyId: encryptedFolderResult.folderSubkeyId,

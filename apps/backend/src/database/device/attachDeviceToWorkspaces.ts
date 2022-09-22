@@ -1,3 +1,4 @@
+import { ForbiddenError } from "apollo-server-express";
 import { v4 as uuidv4 } from "uuid";
 import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
 import { prisma } from "../prisma";
@@ -73,8 +74,29 @@ export async function attachDeviceToWorkspaces({
         data: newWorkspaceKeys,
       });
 
+      // make sure this device belongs to a user that is part of this workspace
+      const verifiedDevice = await prisma.device.findFirst({
+        where: { signingPublicKey: receiverDeviceSigningPublicKey },
+      });
+      if (!verifiedDevice || !verifiedDevice.userId) {
+        throw new ForbiddenError("Unauthorized");
+      }
+      const verifiedDeviceWorkspaces = await prisma.usersToWorkspaces.findMany({
+        where: {
+          userId: verifiedDevice.userId,
+          workspaceId: { in: workspaceIds },
+        },
+      });
+      if (verifiedDeviceWorkspaces.length === 0) {
+        throw new ForbiddenError("Unauthorized");
+      }
+      const verifiedWorkspaceIds: string[] = [];
+      verifiedDeviceWorkspaces.forEach((userToWorkspace) => {
+        verifiedWorkspaceIds.push(userToWorkspace.workspaceId);
+      });
+
       const workspaces = await prisma.workspace.findMany({
-        where: { id: { in: workspaceIds } },
+        where: { id: { in: verifiedWorkspaceIds } },
         include: {
           workspaceKey: {
             include: { workspaceKeyBoxes: true },
@@ -84,6 +106,7 @@ export async function attachDeviceToWorkspaces({
           },
         },
       });
+
       const existingWorkspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
         where: {
           deviceSigningPublicKey: receiverDeviceSigningPublicKey,

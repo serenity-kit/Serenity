@@ -5,17 +5,26 @@ import { useClient } from "urql";
 import { CreateWorkspaceInvitation } from "../../components/workspace/CreateWorkspaceInvitation";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 import {
+  Device,
   MeDocument,
   MeQuery,
   MeQueryVariables,
   MeResult,
+  RemoveMembersAndRotateWorkspaceKeyDocument,
+  RemoveMembersAndRotateWorkspaceKeyMutation,
+  RemoveMembersAndRotateWorkspaceKeyMutationVariables,
   useUpdateWorkspaceMutation,
   Workspace,
   WorkspaceMember,
 } from "../../generated/graphql";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
+import { encryptWorkspaceKeyForDevice } from "../../utils/device/encryptWorkspaceKeyForDevice";
+import { getDevices } from "../../utils/device/getDevices";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { getWorkspaceDevices } from "../../utils/workspace/getWorkspaceDevices";
+import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 
 type Member = {
   userId: string;
@@ -76,6 +85,7 @@ const workspaceMemberStyles = StyleSheet.create({
 export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
+  const { activeDevice } = useWorkspaceContext();
   const urqlClient = useClient();
   const workspaceId = useWorkspaceId();
   const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
@@ -112,15 +122,9 @@ export default function WorkspaceSettingsMembersScreen(
   useEffect(() => {
     (async () => {
       const me = await getMe();
-      const device = await getActiveDevice();
-      if (!device) {
-        // TODO: handle this error
-        console.error("No active device found");
-        return;
-      }
       const workspace = await getWorkspace({
         urqlClient,
-        deviceSigningPublicKey: device.signingPublicKey,
+        deviceSigningPublicKey: activeDevice.signingPublicKey,
       });
       if (workspace) {
         setWorkspace(workspace);
@@ -130,7 +134,7 @@ export default function WorkspaceSettingsMembersScreen(
         return;
       }
     })();
-  }, [urqlClient, props.navigation]);
+  }, [urqlClient, props.navigation, activeDevice.signingPublicKey]);
 
   const updateWorkspaceData = async (
     me: MeResult | null | undefined,
@@ -195,12 +199,77 @@ export default function WorkspaceSettingsMembersScreen(
   const removeMember = async (username: string) => {
     const row = memberLookup[username];
     if (row >= 0) {
+      const member = members[row];
       members.splice(row, 1);
       setMembers(members);
       delete memberLookup[username];
       setMemberLookup(memberLookup);
+      const devices = await getDevices({ urqlClient });
+      if (!devices) {
+        // TODO: show this error in the UI
+        console.error("no devices found!");
+        return;
+      }
+      const workspaceKey = await getWorkspaceKey({
+        workspaceId,
+        urqlClient,
+        activeDevice,
+      });
+      const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
+      // TODO: getWorkspaceDevices gets all devices attached to a workspace
+      let workspaceDevices: Device[] = [];
+      try {
+        const rawWorkspaceDevices = await getWorkspaceDevices({
+          urqlClient,
+          workspaceId,
+        });
+        if (rawWorkspaceDevices) {
+          for (let rawWorkspaceDevice of rawWorkspaceDevices) {
+            if (rawWorkspaceDevice) {
+              workspaceDevices.push(rawWorkspaceDevice);
+            }
+          }
+        }
+      } catch (error) {
+        // TODO: handle this error in the UI
+        console.error(error);
+        throw error;
+      }
+      for (let device of workspaceDevices) {
+        if (device.userId !== member.userId) {
+          const { ciphertext, nonce } = await encryptWorkspaceKeyForDevice({
+            receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+            creatorDeviceEncryptionPrivateKey:
+              activeDevice.encryptionPrivateKey!,
+            workspaceKey,
+          });
+          deviceWorkspaceKeyBoxes.push({
+            ciphertext,
+            nonce,
+            receiverDeviceSigningPublicKey: device.encryptionPublicKey,
+          });
+        }
+      }
+
+      await urqlClient
+        .mutation<
+          RemoveMembersAndRotateWorkspaceKeyMutation,
+          RemoveMembersAndRotateWorkspaceKeyMutationVariables
+        >(
+          RemoveMembersAndRotateWorkspaceKeyDocument,
+          {
+            input: {
+              revokedUserIds: [member.userId],
+              workspaceId,
+              creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
+              deviceWorkspaceKeyBoxes,
+            },
+          },
+          { requestPolicy: "network-only" }
+        )
+        .toPromise();
+      await _updateWorkspaceMemberData(members);
     }
-    await _updateWorkspaceMemberData(members);
   };
 
   return (

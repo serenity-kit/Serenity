@@ -1,0 +1,16 @@
+query workspaceDevices($workspaceId: ID!) {
+  workspaceDevices(workspaceId: $workspaceId, first: 500) {
+    nodes {
+      userId
+      signingPublicKey
+      encryptionPublicKey
+      encryptionPublicKeySignature
+      info
+      createdAt
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}

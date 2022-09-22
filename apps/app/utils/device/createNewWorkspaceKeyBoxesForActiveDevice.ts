@@ -1,10 +1,10 @@
 import { Client } from "urql";
 import { WorkspaceKeyBox, WorkspaceKeyBoxData } from "../../generated/graphql";
+import { Device } from "../../types/Device";
 import { getWorkspace } from "../workspace/getWorkspace";
 import { getWorkspaces } from "../workspace/getWorkspaces";
 import { decryptWorkspaceKey } from "./decryptWorkspaceKey";
 import { encryptWorkspaceKeyForDevice } from "./encryptWorkspaceKeyForDevice";
-import { getActiveDevice } from "./getActiveDevice";
 import { getDevices } from "./getDevices";
 import { getLocalDeviceBySigningPublicKey } from "./getLocalDeviceBySigningPublicKey";
 import { getMainDevice } from "./mainDeviceMemoryStore";
@@ -13,6 +13,7 @@ type GetWorkspaceKeyBoxByDeviceSigningPublicKeyProps = {
   workspaceKeyBoxes: WorkspaceKeyBox[];
   deviceSigningPublicKey: string;
 };
+
 const getWorkspaceKeyBoxByDeviceSigningPublicKey = ({
   workspaceKeyBoxes,
   deviceSigningPublicKey,
@@ -29,9 +30,11 @@ const getWorkspaceKeyBoxByDeviceSigningPublicKey = ({
 
 export type Props = {
   urqlClient: Client;
+  activeDevice: Device;
 };
 export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
   urqlClient,
+  activeDevice,
 }: Props) => {
   const devices = await getDevices({ urqlClient });
   if (!devices) {
@@ -41,14 +44,9 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
   if (!mainDevice) {
     throw new Error("No main device found!");
   }
-  const activeDevice = await getActiveDevice();
-  if (!activeDevice) {
-    // TODO: handle this error
-    throw new Error("No active device!");
-  }
   const workspaces = await getWorkspaces({
     urqlClient,
-    deviceSigningPublicKey: activeDevice.signingPublicKey!,
+    deviceSigningPublicKey: activeDevice.signingPublicKey,
   });
   if (workspaces === null) {
     throw new Error("No workspaces found");
@@ -65,10 +63,16 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
     if (!workspaceKeyBox) {
       throw new Error("Could not find workspaceKeyBox for main device!");
     }
-    const creatorDevice = getLocalDeviceBySigningPublicKey({
-      signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
-      devices,
-    });
+    let creatorDevice: Device | undefined = undefined;
+    try {
+      creatorDevice = getLocalDeviceBySigningPublicKey({
+        signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
+        devices,
+      });
+    } catch (error) {
+      // Do nothing. We don't have access to this workspacekey yet
+      continue;
+    }
     const workspaceKey = await decryptWorkspaceKey({
       ciphertext: workspaceKeyBox.ciphertext,
       nonce: workspaceKeyBox.nonce,

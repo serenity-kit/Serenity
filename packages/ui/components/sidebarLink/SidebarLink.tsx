@@ -1,17 +1,22 @@
-import * as React from "react";
-import { Platform, Pressable } from "react-native";
-import { tw } from "../../tailwind";
-import { useLinkProps } from "@react-navigation/native";
-import type { NavigationAction } from "@react-navigation/core";
-import { GestureResponderEvent, TextProps, StyleSheet } from "react-native";
-import { To } from "@react-navigation/native/lib/typescript/src/useLinkTo";
 import { useFocusRing } from "@react-native-aria/focus";
+import type { NavigationAction } from "@react-navigation/core";
+import { useLinkProps } from "@react-navigation/native";
+import { To } from "@react-navigation/native/lib/typescript/src/useLinkTo";
 import { HStack } from "native-base";
+import * as React from "react";
+import {
+  GestureResponderEvent,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TextProps,
+} from "react-native";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
-import { SidebarIconNavRight } from "../sidebarIconNavRight/SidebarIconNavRight";
+import { tw } from "../../tailwind";
 import { IconNames } from "../icon/Icon";
-import { SidebarText } from "../sidebarText/SidebarText";
 import { SidebarIconLeft } from "../sidebarIconLeft/SidebarIconLeft";
+import { SidebarIconNavRight } from "../sidebarIconNavRight/SidebarIconNavRight";
+import { SidebarText } from "../sidebarText/SidebarText";
 
 // copied from react-navigation type definitions
 declare type SidebarLinkProps<ParamList extends ReactNavigation.RootParamList> =
@@ -40,7 +45,7 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
 
   const styles = StyleSheet.create({
     link:
-      tw.style(Platform.OS === "web" && { outlineWidth: 0 }) &&
+      tw.style(Platform.OS === "web" && { outlineStyle: "none" }) &&
       tw`pl-5 md:pl-4`,
     stack: tw.style(`py-3 md:py-1.5 pr-4`),
     hover: tw`bg-gray-200`,

@@ -2,7 +2,6 @@ query rootFolders($workspaceId: ID!, $first: Int!, $after: String) {
   rootFolders(workspaceId: $workspaceId, first: $first, after: $after) {
     nodes {
       id
-      name
       encryptedName
       encryptedNameNonce
       subkeyId

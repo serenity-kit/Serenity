@@ -81,8 +81,6 @@ test("user can create initial workspace structure", async () => {
   // expect(document.parentFolderId).toBe(folder.id);
   expect(folder.workspaceId).toBe(workspaceId);
   expect(folder.parentFolderId).toBe(null);
-  expect(folder.name).toBe("Getting started");
-  // expect(document.name).toBe("Introduction");
   workspace.members.forEach((member: { userId: string; isAdmin: any }) => {
     expect(member.isAdmin).toBe(true);
   });
@@ -144,7 +142,6 @@ describe("Test login", () => {
         }
         folder {
           id
-          name
           parentFolderId
           rootFolderId
           workspaceId

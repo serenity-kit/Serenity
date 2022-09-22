@@ -37,6 +37,7 @@ export async function createWorkspace({
           create: {
             userId,
             isAdmin: true,
+            isAuthorizedMember: true,
           },
         },
         workspaceKey: {

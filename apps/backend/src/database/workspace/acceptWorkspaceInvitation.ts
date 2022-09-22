@@ -1,6 +1,6 @@
-import { prisma } from "../prisma";
-import { Workspace, formatWorkspace } from "../../types/workspace";
 import { ForbiddenError } from "apollo-server-express";
+import { formatWorkspace, Workspace } from "../../types/workspace";
+import { prisma } from "../prisma";
 
 type Params = {
   workspaceInvitationId: string;
@@ -64,6 +64,7 @@ export async function acceptWorkspaceInvitation({
           userId,
           workspaceId,
           isAdmin: false,
+          isAuthorizedMember: false,
         },
       });
       // and return the workspace

@@ -1,12 +1,12 @@
+import { HStack } from "native-base";
 import React from "react";
 import { StyleSheet } from "react-native";
-import { HStack } from "native-base";
-import { tw } from "../../tailwind";
-import { Pressable, PressableProps } from "../pressable/Pressable";
-import { Icon, IconNames } from "../icon/Icon";
-import { View } from "../view/View";
-import { Text } from "../text/Text";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
+import { tw } from "../../tailwind";
+import { Icon, IconNames } from "../icon/Icon";
+import { Pressable, PressableProps } from "../pressable/Pressable";
+import { Text } from "../text/Text";
+import { View } from "../view/View";
 
 export type MenuButtonProps = PressableProps & {
   iconName?: IconNames;
@@ -41,7 +41,7 @@ export const MenuButton = React.forwardRef(
         }}
         _focusVisible={{
           // disable default outline styles
-          _web: { style: [{ outlineWidth: 0 }, tw`se-inset-focus-mini`] },
+          _web: { style: [{ outlineStyle: "none" }, tw`se-inset-focus-mini`] },
         }}
       >
         <HStack space={isDesktopDevice ? 2 : 4} alignItems="center">

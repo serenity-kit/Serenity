@@ -68,7 +68,6 @@ test("user should be able to create a root folder", async () => {
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
-  expect(folder.name).toBe(name);
   expect(typeof folder.encryptedName).toBe("string");
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
@@ -92,7 +91,6 @@ test("user should be able to create a root folder with a name", async () => {
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
-  expect(folder.name).toBe(name);
   expect(typeof folder.encryptedName).toBe("string");
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
@@ -117,7 +115,6 @@ test("user should be able to create a child folder", async () => {
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
-  expect(folder.name).toBe(name);
   expect(typeof folder.encryptedName).toBe("string");
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
@@ -169,7 +166,6 @@ test("Throw error on duplicate subkeyId, workspaceId", async () => {
       createFolder(input: $input) {
         folder {
           id
-          name
           encryptedName
           encryptedNameNonce
           subkeyId
@@ -289,7 +285,6 @@ describe("Input errors", () => {
         createFolder(input: $input) {
           folder {
             id
-            name
             encryptedName
             encryptedNameNonce
             subkeyId
@@ -333,7 +328,6 @@ describe("Input errors", () => {
         createFolder(input: $input) {
           folder {
             id
-            name
             encryptedName
             encryptedNameNonce
             subkeyId
@@ -369,7 +363,6 @@ describe("Input errors", () => {
         createFolder(input: $input) {
           folder {
             id
-            name
             encryptedName
             encryptedNameNonce
             subkeyId
@@ -397,7 +390,6 @@ describe("Input errors", () => {
         createFolder(input: $input) {
           folder {
             id
-            name
             encryptedName
             encryptedNameNonce
             subkeyId

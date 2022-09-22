@@ -14,6 +14,7 @@ import {
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useAppContext } from "../../context/AppContext";
 import {
   useCreateInitialWorkspaceStructureMutation,
   useDevicesQuery,
@@ -42,6 +43,7 @@ export type CreateWorkspaceFormProps = {
 export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   const inputRef = useRef();
   const [name, setName] = useState<string>("");
+  const { activeDevice } = useAppContext();
   const [, createInitialWorkspaceStructure] =
     useCreateInitialWorkspaceStructureMutation();
 
@@ -61,6 +63,9 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   }, []);
 
   const createWorkspace = async () => {
+    if (!activeDevice) {
+      throw new Error("No active device available");
+    }
     const workspaceId = uuidv4();
     const folderId = uuidv4();
     const documentId = uuidv4();
@@ -82,7 +87,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     }
     const devices = devicesResult.data?.devices?.nodes as Device[];
     const { deviceWorkspaceKeyBoxes, workspaceKey } =
-      await createWorkspaceKeyBoxesForDevices({ devices });
+      await createWorkspaceKeyBoxesForDevices({ devices, activeDevice });
     if (!workspaceKey) {
       // TODO: handle this error
       console.error("Could not retrieve workspaceKey!");
@@ -106,13 +111,11 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         input: {
           workspaceName: name,
           workspaceId,
-          folderName,
           folderId,
           encryptedFolderName: encryptedFolderResult.ciphertext,
           encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
           folderSubkeyId: encryptedFolderResult.folderSubkeyId,
           folderIdSignature: `TODO+${folderId}`,
-          documentName: "Introduction",
           encryptedDocumentName: encryptedDocumentTitle.ciphertext,
           encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
           documentSubkeyId: documentKeyData.subkeyId,

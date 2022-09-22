@@ -31,8 +31,8 @@ import {
   useFoldersQuery,
   useUpdateFolderNameMutation,
 } from "../../generated/graphql";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
-import { getDevices } from "../../utils/device/getDevices";
 import {
   getDocumentPath,
   useDocumentPathStore,
@@ -47,9 +47,9 @@ type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
   folderName?: string;
-  encryptedName?: string | null;
-  encryptedNameNonce?: string | null;
-  subkeyId?: number | null;
+  encryptedName: string;
+  encryptedNameNonce?: string;
+  subkeyId: number;
   depth?: number;
   onStructureChange: () => void;
 };
@@ -91,6 +91,7 @@ export default function SidebarFolder(props: Props) {
   });
   const { depth = 0 } = props;
   const urqlClient = useClient();
+  const { activeDevice } = useWorkspaceContext();
   const documentPathStore = useDocumentPathStore();
   const document = useDocumentStore((state) => state.document);
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
@@ -114,22 +115,16 @@ export default function SidebarFolder(props: Props) {
       return;
     }
     try {
-      const devices = await getDevices({ urqlClient });
-      if (!devices) {
-        // TODO: handle this error
-        console.error("No devices!");
-        return;
-      }
       const workspaceKey = await getWorkspaceKey({
         workspaceId: props.workspaceId,
-        devices,
         urqlClient,
+        activeDevice,
       });
       const folderName = await decryptFolderName({
         parentKey: workspaceKey,
         subkeyId: props.subkeyId!,
-        ciphertext: props.encryptedName!,
-        publicNonce: props.encryptedNameNonce!,
+        ciphertext: props.encryptedName,
+        publicNonce: props.encryptedNameNonce,
       });
       setFolderName(folderName);
     } catch (error) {
@@ -139,18 +134,14 @@ export default function SidebarFolder(props: Props) {
   };
 
   const createFolder = async (name: string) => {
+    openFolder();
     const id = uuidv4();
-    const devices = await getDevices({ urqlClient });
-    if (!devices) {
-      console.error("No devices found!");
-      return;
-    }
     let workspaceKey = "";
     try {
       workspaceKey = await getWorkspaceKey({
         workspaceId: props.workspaceId,
-        devices,
         urqlClient,
+        activeDevice,
       });
     } catch (error: any) {
       // TODO: handle device not registered error
@@ -171,7 +162,6 @@ export default function SidebarFolder(props: Props) {
         input: {
           id,
           workspaceId: route.params.workspaceId,
-          name,
           encryptedName: encryptedFolderResult.ciphertext,
           encryptedNameNonce: encryptedFolderResult.publicNonce,
           subkeyId: encryptedFolderResult.folderSubkeyId,
@@ -249,17 +239,12 @@ export default function SidebarFolder(props: Props) {
     }
   };
   const updateFolderName = async (newFolderName: string) => {
-    const devices = await getDevices({ urqlClient });
-    if (!devices) {
-      console.error("No devices found!");
-      return;
-    }
     let workspaceKey = "";
     try {
       workspaceKey = await getWorkspaceKey({
         workspaceId: props.workspaceId,
-        devices,
         urqlClient,
+        activeDevice,
       });
     } catch (error: any) {
       // TODO: handle device not registered error
@@ -274,7 +259,6 @@ export default function SidebarFolder(props: Props) {
     const updateFolderNameResult = await updateFolderNameMutation({
       input: {
         id: props.folderId,
-        name: newFolderName,
         encryptedName: encryptedFolderResult.ciphertext,
         encryptedNameNonce: encryptedFolderResult.publicNonce,
         subkeyId: props.subkeyId!,
@@ -287,7 +271,7 @@ export default function SidebarFolder(props: Props) {
       // TODO: Optimize by checking if the current folder is in the document path
       if (document && documentPathIds.includes(props.folderId)) {
         const documentPath = await getDocumentPath(urqlClient, document.id);
-        documentPathStore.update(documentPath, urqlClient);
+        documentPathStore.update(documentPath, urqlClient, activeDevice);
       }
     } else {
       // TODO: show error: couldn't update folder name
@@ -345,7 +329,7 @@ export default function SidebarFolder(props: Props) {
             ]}
             // disable default outline styles and add 1 overridden style manually (grow)
             _focusVisible={{
-              _web: { style: { outlineWidth: 0, flexGrow: 1 } },
+              _web: { style: { outlineStyle: "none", flexGrow: 1 } },
             }}
           >
             <View style={[tw`pl-5 md:pl-2.5`]}>
@@ -383,12 +367,14 @@ export default function SidebarFolder(props: Props) {
                     }}
                     value={folderName}
                     style={tw`ml-0.5 w-${maxWidth}`}
+                    testID={`sidebar-folder--${props.folderId}__edit-name`}
                   />
                 ) : (
                   <SidebarText
                     style={tw`pl-2 md:ml-1.5 max-w-${maxWidth}`}
                     numberOfLines={1}
                     ellipsizeMode="tail"
+                    testID={`sidebar-folder--${props.folderId}`}
                   >
                     {folderName}
                   </SidebarText>
@@ -409,37 +395,38 @@ export default function SidebarFolder(props: Props) {
             />
           )}
 
-          {(isHovered || !isDesktopDevice) && (
-            <HStack
-              alignItems="center"
-              space={1}
-              style={[
-                tw`pr-4 md:pr-2`,
-                !isDesktopDevice && tw`border-b border-gray-200`,
-              ]}
-            >
-              <SidebarFolderMenu
-                folderId={props.folderId}
-                refetchFolders={refetchFolders}
-                onUpdateNamePress={editFolderName}
-                onDeletePressed={() => deleteFolder(props.folderId)}
-                onCreateFolderPress={() => {
-                  createFolder(defaultFolderName);
-                }}
-              />
-              {/* offset not working yet as NB has a no-no in their component */}
-              <Tooltip label="New page" placement="right" offset={8}>
-                <IconButton
-                  onPress={createDocument}
-                  name="file-add-line"
-                  color="gray-600"
-                  style={tw`p-2 md:p-0`}
-                ></IconButton>
-              </Tooltip>
-              {documentsResult.fetching ||
-                (foldersResult.fetching && <ActivityIndicator />)}
-            </HStack>
-          )}
+          <HStack
+            alignItems="center"
+            space={1}
+            style={[
+              tw`pr-4 md:pr-2  ${
+                isHovered || !isDesktopDevice ? "" : "hidden"
+              }`,
+              !isDesktopDevice && tw`border-b border-gray-200`,
+            ]}
+          >
+            <SidebarFolderMenu
+              folderId={props.folderId}
+              refetchFolders={refetchFolders}
+              onUpdateNamePress={editFolderName}
+              onDeletePressed={() => deleteFolder(props.folderId)}
+              onCreateFolderPress={() => {
+                createFolder(defaultFolderName);
+              }}
+            />
+            {/* offset not working yet as NB has a no-no in their component */}
+            <Tooltip label="New page" placement="right" offset={8}>
+              <IconButton
+                onPress={createDocument}
+                name="file-add-line"
+                color="gray-600"
+                style={tw`p-2 md:p-0`}
+                testID={`sidebar-folder--${props.folderId}__create-document`}
+              ></IconButton>
+            </Tooltip>
+            {documentsResult.fetching ||
+              (foldersResult.fetching && <ActivityIndicator />)}
+          </HStack>
         </HStack>
       </View>
 

@@ -36,7 +36,6 @@ export const createFolder = async ({
       createFolder(input: $input) {
         folder {
           id
-          name
           encryptedName
           encryptedNameNonce
           subkeyId
@@ -52,7 +51,6 @@ export const createFolder = async ({
     {
       input: {
         id,
-        name,
         encryptedName,
         encryptedNameNonce,
         parentFolderId,
