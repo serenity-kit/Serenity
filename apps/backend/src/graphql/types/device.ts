@@ -16,9 +16,8 @@ export const Device = objectType({
 });
 
 export const CreatorDevice = objectType({
-  name: "Device",
+  name: "CreatorDevice",
   definition(t) {
-    t.string("userId");
     t.nonNull.string("signingPublicKey");
     t.nonNull.string("encryptionPublicKey");
     t.nonNull.string("encryptionPublicKeySignature");

@@ -40,7 +40,6 @@ export const createWorkspaceKeyBoxesForDevices = async ({
       ciphertext,
       nonce,
       deviceSigningPublicKey: receiverDevice.signingPublicKey,
-      creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
     });
   }
   return {

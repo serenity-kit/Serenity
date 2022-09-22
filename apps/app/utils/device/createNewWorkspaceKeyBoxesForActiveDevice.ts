@@ -6,7 +6,6 @@ import { getWorkspaces } from "../workspace/getWorkspaces";
 import { decryptWorkspaceKey } from "./decryptWorkspaceKey";
 import { encryptWorkspaceKeyForDevice } from "./encryptWorkspaceKeyForDevice";
 import { getDevices } from "./getDevices";
-import { getLocalDeviceBySigningPublicKey } from "./getLocalDeviceBySigningPublicKey";
 import { getMainDevice } from "./mainDeviceMemoryStore";
 
 type GetWorkspaceKeyBoxByDeviceSigningPublicKeyProps = {
@@ -63,16 +62,7 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
     if (!workspaceKeyBox) {
       throw new Error("Could not find workspaceKeyBox for main device!");
     }
-    let creatorDevice: Device | undefined = undefined;
-    try {
-      creatorDevice = getLocalDeviceBySigningPublicKey({
-        signingPublicKey: workspaceKeyBox.creatorDeviceSigningPublicKey,
-        devices,
-      });
-    } catch (error) {
-      // Do nothing. We don't have access to this workspacekey yet
-      continue;
-    }
+    const creatorDevice = workspaceKeyBox.creatorDevice;
     const workspaceKey = await decryptWorkspaceKey({
       ciphertext: workspaceKeyBox.ciphertext,
       nonce: workspaceKeyBox.nonce,
@@ -82,7 +72,7 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
     const { nonce, ciphertext } = await encryptWorkspaceKeyForDevice({
       workspaceKey,
       receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
-      creatorDeviceEncryptionPrivateKey: mainDevice?.encryptionPrivateKey!,
+      creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey!,
     });
     deviceWorkspaceKeyBoxes.push({
       ciphertext,

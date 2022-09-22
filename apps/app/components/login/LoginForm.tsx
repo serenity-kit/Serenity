@@ -76,7 +76,7 @@ export function LoginForm(props: Props) {
       setIsLoggingIn(true);
       await clearDeviceAndSessionStorage();
 
-      const unsafedDevice = await createDeviceWithInfo();
+      const unsavedDevice = await createDeviceWithInfo();
 
       const loginResult = await login({
         username,
@@ -84,7 +84,7 @@ export function LoginForm(props: Props) {
         startLoginMutation,
         finishLoginMutation,
         updateAuthentication,
-        device: unsafedDevice,
+        device: unsavedDevice,
         urqlClient,
         useExtendedLogin,
       });
@@ -96,18 +96,18 @@ export function LoginForm(props: Props) {
         if (!useExtendedLogin) {
           await removeWebDevice();
         }
-        await setWebDevice(unsafedDevice, useExtendedLogin);
+        await setWebDevice(unsavedDevice, useExtendedLogin);
         await updateActiveDevice();
       } else if (Platform.OS === "ios") {
         if (useExtendedLogin) {
-          await setDevice(unsafedDevice);
+          await setDevice(unsavedDevice);
           await updateActiveDevice();
         }
       }
       try {
         await attachDeviceToWorkspaces({
           urqlClient,
-          activeDevice: unsafedDevice,
+          activeDevice: unsavedDevice,
         });
       } catch (error) {
         // TOOD: handle error

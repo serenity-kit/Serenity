@@ -121,6 +121,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           documentSubkeyId: documentKeyData.subkeyId,
           documentId,
           documentSnapshot: snapshot,
+          creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
           deviceWorkspaceKeyBoxes,
         },
       });
