@@ -1,0 +1,211 @@
+import { v4 as uuidv4 } from "uuid";
+import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
+import { createAndEncryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
+import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
+import { encryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/encryptWorkspaceKeyForDevice";
+import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { getActiveWorkspaceKeys } from "../../../../test/helpers/workspace/getActiveWorkspaceKeys";
+import { createDeviceAndLogin } from "../../../database/testHelpers/createDeviceAndLogin";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
+import { WorkspaceWithWorkspaceDevicesParing } from "../../../types/workspaceDevice";
+
+const graphql = setupGraphql();
+const username = `${uuidv4()}@example.com`;
+const password = "password";
+
+let userData1: any = undefined;
+let user1Device2: any = undefined;
+
+const setup = async () => {
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username,
+    password,
+  });
+};
+
+beforeAll(async () => {
+  await deleteAllRecords();
+  await setup();
+});
+
+test("initial condition", async () => {
+  const result = await getActiveWorkspaceKeys({
+    graphql,
+    workspaceId: userData1.workspace.id,
+    deviceSigningPublicKey: userData1.device.signingPublicKey,
+    sessionKey: userData1.sessionKey,
+  });
+  const workspaceKeys = result.activeWorkspaceKeys.activeWorkspaceKeys;
+  expect(workspaceKeys.length).toBe(1);
+  const workspaceKey = workspaceKeys[0];
+  expect(workspaceKey.generation).toBe(0);
+  expect(workspaceKey.workspaceId).toBe(userData1.workspace.id);
+  expect(workspaceKey.workspaceKeyBoxes.length).toBe(1);
+  const workspaceKeyBox = workspaceKey.workspaceKeyBoxes[0];
+  expect(workspaceKeyBox.deviceSigningPublicKey).toBe(
+    userData1.device.signingPublicKey
+  );
+  expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+    workspaceKeyBox.creatorDeviceSigningPublicKey
+  );
+  expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+    userData1.device.signingPublicKey
+  );
+  expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+    userData1.device.signingPublicKey
+  );
+});
+
+test("add device", async () => {
+  const loginResult = await createDeviceAndLogin({
+    username: userData1.user.username,
+    password: "password",
+    envelope: userData1.envelope,
+  });
+  user1Device2 = loginResult.webDevice;
+  const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: user1Device2.encryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+  });
+  await attachDeviceToWorkspaces({
+    graphql,
+    deviceSigningPublicKey: user1Device2.signingPublicKey,
+    creatorDeviceSigningPublicKey: userData1.device.signingPublicKey, // main device
+    deviceWorkspaceKeyBoxes: [
+      {
+        workspaceId: userData1.workspace.id,
+        nonce,
+        ciphertext,
+      },
+    ],
+    authorizationHeader: userData1.sessionKey,
+  });
+
+  const result = await getActiveWorkspaceKeys({
+    graphql,
+    workspaceId: userData1.workspace.id,
+    deviceSigningPublicKey: user1Device2.signingPublicKey,
+    sessionKey: userData1.sessionKey,
+  });
+  const workspaceKeys = result.activeWorkspaceKeys.activeWorkspaceKeys;
+  expect(workspaceKeys.length).toBe(1);
+  const workspaceKey = workspaceKeys[0];
+  expect(workspaceKey.generation).toBe(0);
+  expect(workspaceKey.workspaceId).toBe(userData1.workspace.id);
+  expect(workspaceKey.workspaceKeyBoxes.length).toBe(1);
+  const workspaceKeyBox = workspaceKey.workspaceKeyBoxes[0];
+  expect(workspaceKeyBox.deviceSigningPublicKey).toBe(
+    user1Device2.signingPublicKey
+  );
+  expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+    workspaceKeyBox.creatorDeviceSigningPublicKey
+  );
+  expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+    userData1.device.signingPublicKey
+  );
+  expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+    userData1.device.signingPublicKey
+  );
+});
+
+test("delete device", async () => {
+  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: userData1.device,
+    deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspace: userData1.workspace,
+  });
+
+  const loginResult = await createDeviceAndLogin({
+    username: userData1.user.username,
+    password: "password",
+    envelope: userData1.envelope,
+  });
+
+  const user1Device3 = loginResult.webDevice;
+  const workspaceKeyBox1 = await encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspaceKey,
+  });
+  const workspaceKeyBox2 = await encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: userData1.webDevice.encryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspaceKey,
+  });
+  const workspaceKeyBox3 = await encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: user1Device2.encryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspaceKey,
+  });
+  const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
+    {
+      id: userData1.workspace.id,
+      workspaceDevices: [
+        {
+          receiverDeviceSigningPublicKey: userData1.device.signingPublicKey,
+          ciphertext: workspaceKeyBox1.ciphertext,
+          nonce: workspaceKeyBox1.nonce,
+        },
+        {
+          receiverDeviceSigningPublicKey: userData1.webDevice.signingPublicKey,
+          ciphertext: workspaceKeyBox2.ciphertext,
+          nonce: workspaceKeyBox2.nonce,
+        },
+        {
+          receiverDeviceSigningPublicKey: user1Device2.signingPublicKey,
+          ciphertext: workspaceKeyBox3.ciphertext,
+          nonce: workspaceKeyBox3.nonce,
+        },
+      ],
+    },
+  ];
+  await deleteDevices({
+    graphql,
+    creatorSigningPublicKey: userData1.device.signingPublicKey,
+    newDeviceWorkspaceKeyBoxes,
+    deviceSigningPublicKeysToBeDeleted: [user1Device3.signingPublicKey],
+    authorizationHeader: userData1.sessionKey,
+  });
+  const result = await getActiveWorkspaceKeys({
+    graphql,
+    workspaceId: userData1.workspace.id,
+    deviceSigningPublicKey: userData1.device.signingPublicKey,
+    sessionKey: userData1.sessionKey,
+  });
+  const workspaceKeys = result.activeWorkspaceKeys.activeWorkspaceKeys;
+  expect(workspaceKeys.length).toBe(2);
+  const fetchedWorkspaceKey = workspaceKeys[0];
+  expect(fetchedWorkspaceKey.generation).toBe(0);
+  expect(fetchedWorkspaceKey.workspaceId).toBe(userData1.workspace.id);
+  expect(fetchedWorkspaceKey.workspaceKeyBoxes.length).toBe(1);
+  for (let workspaceKeyBox of fetchedWorkspaceKey.workspaceKeyBoxes) {
+    const device = userData1.device;
+    expect(workspaceKeyBox.deviceSigningPublicKey).toBe(
+      device.signingPublicKey
+    );
+    expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+      workspaceKeyBox.creatorDeviceSigningPublicKey
+    );
+    expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+      userData1.device.signingPublicKey
+    );
+    expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+      device.signingPublicKey
+    );
+  }
+});
+
+test("Unauthenticated", async () => {
+  await expect(
+    (async () =>
+      await getActiveWorkspaceKeys({
+        graphql,
+        workspaceId: userData1.workspace.id,
+        deviceSigningPublicKey: userData1.device.signingPublicKey,
+        sessionKey: "badauthheader",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
