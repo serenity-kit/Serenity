@@ -6,23 +6,23 @@ import {
 import { useEffect, useLayoutEffect } from "react";
 import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
-import Page from "../../components/page/Page";
-import { PageHeader } from "../../components/page/PageHeader";
-import { PageHeaderRight } from "../../components/pageHeaderRight/PageHeaderRight";
-import { useWorkspaceId } from "../../context/WorkspaceIdContext";
+import Page from "../../../components/page/Page";
+import { PageHeader } from "../../../components/page/PageHeader";
+import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
+import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
   Document,
   useUpdateDocumentNameMutation,
-} from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+} from "../../../generated/graphql";
+import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 
 import { useMachine } from "@xstate/react";
-import { loadInitialDataMachine } from "../../machines/loadInitialData";
-import { useDocumentStore } from "../../utils/document/documentStore";
-import { getDocument } from "../../utils/document/getDocument";
-import { getFolderKey } from "../../utils/folder/getFolderKey";
-import { setLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { useDocumentStore } from "../../../utils/document/documentStore";
+import { getDocument } from "../../../utils/document/getDocument";
+import { getFolderKey } from "../../../utils/folder/getFolderKey";
+import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { loadPageMachine } from "./loadPageMachine";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -33,12 +33,10 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const urqlClient = useClient();
 
-  const [state, send] = useMachine(loadInitialDataMachine, {
+  const [state, send] = useMachine(loadPageMachine, {
     context: {
       workspaceId,
       documentId: pageId,
-      returnOtherWorkspaceIfNotFound: false,
-      returnOtherDocumentIfNotFound: false,
       navigation: props.navigation,
     },
   });

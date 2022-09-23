@@ -39,7 +39,7 @@ import LoginScreen from "./screens/LoginScreen";
 import NoPageExistsScreen from "./screens/NoPageExistsScreen";
 import NotFoundScreen from "./screens/NotFoundScreen";
 import OnboardingScreen from "./screens/OnboardingScreen";
-import PageScreen from "./screens/PageScreen";
+import PageScreen from "./screens/pageScreen/PageScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import RegistrationVerificationScreen from "./screens/RegistrationVerificationScreen";
 import RootScreen from "./screens/RootScreen";

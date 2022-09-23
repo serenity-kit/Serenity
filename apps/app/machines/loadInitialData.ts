@@ -19,7 +19,6 @@ type Context = {
 };
 
 const fetchMeWithWorkspaceLoadingInfo = async (context) => {
-  await new Promise((r) => setTimeout(r, 2000));
   const result = await urqlClient
     .query<MeQuery, MeQueryVariables>(
       MeDocument,
@@ -145,7 +144,7 @@ export const loadInitialDataMachine =
     },
     {
       guards: {
-        // @ts-ignore TODO
+        // @ts-ignore need to properly type this event
         hasNoNetworkError: (context, event: { data: QueryResult }) => {
           return !event.data?.error?.networkError;
         },
