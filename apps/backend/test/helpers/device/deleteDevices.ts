@@ -5,21 +5,23 @@ type Params = {
   graphql: any;
   creatorSigningPublicKey: string;
   newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[];
+  deviceSigningPublicKeysToBeDeleted: string[];
   authorizationHeader: string;
 };
 
-export const authorizeDevices = async ({
+export const deleteDevices = async ({
   graphql,
   creatorSigningPublicKey,
   newDeviceWorkspaceKeyBoxes,
   authorizationHeader,
+  deviceSigningPublicKeysToBeDeleted,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
   const query = gql`
-    mutation authorizeDevices($input: AuthorizeDevicesInput!) {
-      authorizeDevices(input: $input) {
+    mutation deleteDevices($input: DeleteDevicesInput!) {
+      deleteDevices(input: $input) {
         status
       }
     }
@@ -30,6 +32,7 @@ export const authorizeDevices = async ({
       input: {
         creatorSigningPublicKey,
         newDeviceWorkspaceKeyBoxes,
+        deviceSigningPublicKeysToBeDeleted,
       },
     },
     authorizationHeaders

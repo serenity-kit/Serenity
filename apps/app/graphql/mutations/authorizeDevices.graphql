@@ -1,5 +1,0 @@
-mutation authorizeDevices($input: AuthorizeDevicesInput!) {
-  authorizeDevices(input: $input) {
-    status
-  }
-}

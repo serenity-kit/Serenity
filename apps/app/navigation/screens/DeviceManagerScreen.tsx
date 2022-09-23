@@ -3,7 +3,7 @@ import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import DeviceList from "../../components/device/DeviceList";
 import {
-  useAuthorizeDevicesMutation,
+  useDeleteDevicesMutation,
   useDevicesQuery,
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
@@ -26,7 +26,7 @@ export default function DeviceManagerScreen(props) {
       first: 500,
     },
   });
-  const [, authorizeDevicesMutation] = useAuthorizeDevicesMutation();
+  const [, deleteDevicesMutation] = useDeleteDevicesMutation();
 
   const deleteDevice = async (deviceSigningPublicKey: string) => {
     const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
@@ -80,13 +80,14 @@ export default function DeviceManagerScreen(props) {
         workspaceDevices: workspaceDevicePairing,
       });
     }
-    const authorizeDevicesResult = await authorizeDevicesMutation({
+    const deleteDevicesResult = await deleteDevicesMutation({
       input: {
         creatorSigningPublicKey: activeDevice.signingPublicKey,
         newDeviceWorkspaceKeyBoxes,
+        deviceSigningPublicKeysToBeDeleted: [deviceSigningPublicKey],
       },
     });
-    if (authorizeDevicesResult.data?.authorizeDevices) {
+    if (deleteDevicesResult.data?.deleteDevices) {
       fetchDevices();
     } else {
       // TODO: show error: couldn't delete device

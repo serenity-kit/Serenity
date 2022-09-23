@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { authorizeDevices } from "../../../../test/helpers/device/authorizeDevices";
+import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
 import { encryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/encryptWorkspaceKeyForDevice";
 import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
 import { getDevices } from "../../../../test/helpers/device/getDevices";
@@ -47,6 +47,46 @@ beforeAll(async () => {
   await setup();
 });
 
+test("delete and keep devices mismatch", async () => {
+  const authorizationHeader1 = userData1.sessionKey;
+  const numDevicesBeforeDeleteResponse = await getDevices({
+    graphql,
+    authorizationHeader: authorizationHeader1,
+  });
+  const expectedNumDevices =
+    numDevicesBeforeDeleteResponse.devices.edges.length;
+
+  const workspaceKeyBox1 = await encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspaceKey,
+  });
+  const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] = [
+    {
+      id: userData1.workspace.id,
+      workspaceDevices: [
+        {
+          receiverDeviceSigningPublicKey: userData1.device.signingPublicKey,
+          ciphertext: workspaceKeyBox1.ciphertext,
+          nonce: workspaceKeyBox1.nonce,
+        },
+      ],
+    },
+  ];
+
+  // device should not exist
+  await expect(
+    (async () =>
+      await deleteDevices({
+        graphql,
+        creatorSigningPublicKey: userData1.device.signingPublicKey,
+        newDeviceWorkspaceKeyBoxes,
+        deviceSigningPublicKeysToBeDeleted: [user1Device2.signingPublicKey],
+        authorizationHeader: authorizationHeader1,
+      }))()
+  ).rejects.toThrowError(/Missing newWorkspaceDevicekeyBox workspaceDevice/);
+});
+
 test("delete a device", async () => {
   const authorizationHeader = userData1.sessionKey;
   const numDevicesAfterCreate = await getDevices({
@@ -82,11 +122,6 @@ test("delete a device", async () => {
           nonce: workspaceKeyBox1.nonce,
         },
         {
-          receiverDeviceSigningPublicKey: userData1.device.signingPublicKey,
-          ciphertext: workspaceKeyBox1.ciphertext,
-          nonce: workspaceKeyBox1.nonce,
-        },
-        {
           receiverDeviceSigningPublicKey: userData1.webDevice.signingPublicKey,
           ciphertext: workspaceKeyBox2.ciphertext,
           nonce: workspaceKeyBox2.nonce,
@@ -95,13 +130,14 @@ test("delete a device", async () => {
     },
   ];
   // device should exist
-  const response = await authorizeDevices({
+  const response = await deleteDevices({
     graphql,
     creatorSigningPublicKey: userData1.device.signingPublicKey,
     newDeviceWorkspaceKeyBoxes,
+    deviceSigningPublicKeysToBeDeleted: [user1Device2.signingPublicKey],
     authorizationHeader,
   });
-  expect(response.authorizeDevices.status).toBe("success");
+  expect(response.deleteDevices.status).toBe("success");
 
   // check if device still exists
   const numDevicesAfterDelete = await getDevices({
@@ -129,7 +165,7 @@ test("delete a device", async () => {
   ).rejects.toThrowError(/FORBIDDEN/);
 });
 
-test("won't authorized a device they don't own", async () => {
+test("won't delete a device they don't own", async () => {
   const authorizationHeader1 = userData1.sessionKey;
   const numDevicesBeforeDeleteResponse = await getDevices({
     graphql,
@@ -176,13 +212,14 @@ test("won't authorized a device they don't own", async () => {
     },
   ];
   // device should exist
-  const response = await authorizeDevices({
+  const response = await deleteDevices({
     graphql,
     creatorSigningPublicKey: userData1.device.signingPublicKey,
     newDeviceWorkspaceKeyBoxes,
+    deviceSigningPublicKeysToBeDeleted: [],
     authorizationHeader: authorizationHeader1,
   });
-  expect(response.authorizeDevices.status).toBe("success");
+  expect(response.deleteDevices.status).toBe("success");
 
   // check if device still exists
   const numDevicesAfterDelete = await getDevices({
@@ -225,13 +262,14 @@ test("delete login device clears session", async () => {
     },
   ];
   // device should exist
-  const response = await authorizeDevices({
+  const response = await deleteDevices({
     graphql,
     creatorSigningPublicKey: userData1.device.signingPublicKey,
     newDeviceWorkspaceKeyBoxes,
+    deviceSigningPublicKeysToBeDeleted: [userData1.webDevice.signingPublicKey],
     authorizationHeader,
   });
-  expect(response.authorizeDevices.status).toBe("success");
+  expect(response.deleteDevices.status).toBe("success");
 
   // // check if device still exists
   const numDevicesAfterDelete = await prisma.device.count({
@@ -261,10 +299,11 @@ test("delete login device clears session", async () => {
 test("Unauthenticated", async () => {
   await expect(
     (async () =>
-      await authorizeDevices({
+      await deleteDevices({
         graphql,
         creatorSigningPublicKey: userData1.device.signingPublicKey,
         newDeviceWorkspaceKeyBoxes: [],
+        deviceSigningPublicKeysToBeDeleted: [],
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -275,8 +314,8 @@ describe("Input errors", () => {
     authorization: "somesessionkey",
   };
   const query = gql`
-    mutation authorizeDevices($input: AuthorizeDevicesInput!) {
-      authorizeDevices(input: $input) {
+    mutation deleteDevices($input: DeleteDevicesInput!) {
+      deleteDevices(input: $input) {
         status
       }
     }

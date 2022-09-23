@@ -11,12 +11,14 @@ type Params = {
   userId: string;
   newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[];
   creatorDeviceSigningPublicKey: string;
+  deviceSigningPublicKeysToBeDeleted: string[];
 };
 
-export async function authorizeDevices({
+export async function deleteDevices({
   userId,
   creatorDeviceSigningPublicKey,
   newDeviceWorkspaceKeyBoxes,
+  deviceSigningPublicKeysToBeDeleted,
 }: Params): Promise<WorkspaceKey[]> {
   return await prisma.$transaction(async (prisma) => {
     // make sure the user owns the requested devices
@@ -88,6 +90,7 @@ export async function authorizeDevices({
     );
 
     const deletingDeviceSigningPublicKeys: string[] = [];
+    const allDeviceSigningPublicKeysExceptDeletablesArray: string[] = [];
     for (let userDevice of allUserDevices) {
       if (
         !allPossibleRequestedDeviceSigningPublicKeys.has(
@@ -96,7 +99,19 @@ export async function authorizeDevices({
       ) {
         deletingDeviceSigningPublicKeys.push(userDevice.signingPublicKey);
       }
+      allDeviceSigningPublicKeysExceptDeletablesArray.push(
+        userDevice.signingPublicKey
+      );
     }
+
+    const allDeviceSigningPublicKeysExceptDeletables = new Set(
+      allDeviceSigningPublicKeysExceptDeletablesArray
+    );
+    deviceSigningPublicKeysToBeDeleted.forEach((signingPublicKey) => {
+      if (allDeviceSigningPublicKeysExceptDeletables.has(signingPublicKey)) {
+        allDeviceSigningPublicKeysExceptDeletables.delete(signingPublicKey);
+      }
+    });
 
     const verifiedDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
       [];
@@ -118,6 +133,9 @@ export async function authorizeDevices({
           "mainDevice is not included in all newDeviceWorkspaceKeyBoxes"
         );
       }
+      const leftoverSigningPublicKeys = new Set(
+        allDeviceSigningPublicKeysExceptDeletables
+      );
       const addableDeviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
       for (let workspaceDevice of newDeviceWorkspaceKeyBox.workspaceDevices) {
         // userDeviceSigningPublicKeys
@@ -128,6 +146,14 @@ export async function authorizeDevices({
         ) {
           addableDeviceWorkspaceKeyBoxes.push(workspaceDevice);
         }
+        leftoverSigningPublicKeys.delete(
+          workspaceDevice.receiverDeviceSigningPublicKey
+        );
+      }
+      if (leftoverSigningPublicKeys.size > 0) {
+        throw new UserInputError(
+          `Missing newWorkspaceDevicekeyBox workspaceDevice for workspace ${workspaceId}`
+        );
       }
       verifiedDeviceWorkspaceKeyBoxes.push({
         id: workspaceId,

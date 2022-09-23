@@ -6,32 +6,33 @@ import {
   nonNull,
   objectType,
 } from "nexus";
-import { authorizeDevices } from "../../../database/device/authorizeDevices";
+import { deleteDevices } from "../../../database/device/deleteDevices";
 import { WorkspaceWithWorkspaceDevicesParingInput } from "../../types/workspaceDevice";
 
-export const AuthorizeDevicesResult = objectType({
-  name: "AuthorizeDevicesResult",
+export const DeleteDevicesResult = objectType({
+  name: "DeleteDevicesResult",
   definition(t) {
     t.nonNull.string("status");
   },
 });
 
-export const AuthorizeDevicesInput = inputObjectType({
-  name: "AuthorizeDevicesInput",
+export const DeleteDevicesInput = inputObjectType({
+  name: "DeleteDevicesInput",
   definition(t) {
     t.nonNull.string("creatorSigningPublicKey");
+    t.nonNull.list.nonNull.string("deviceSigningPublicKeysToBeDeleted");
     t.nonNull.list.nonNull.field("newDeviceWorkspaceKeyBoxes", {
       type: WorkspaceWithWorkspaceDevicesParingInput,
     });
   },
 });
 
-export const authorizeDevicesMutation = mutationField("authorizeDevices", {
-  type: AuthorizeDevicesResult,
+export const deleteDevicesMutation = mutationField("deleteDevices", {
+  type: DeleteDevicesResult,
   args: {
     input: nonNull(
       arg({
-        type: AuthorizeDevicesInput,
+        type: DeleteDevicesInput,
       })
     ),
   },
@@ -39,10 +40,12 @@ export const authorizeDevicesMutation = mutationField("authorizeDevices", {
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
     }
-    await authorizeDevices({
+    await deleteDevices({
       userId: context.user.id,
       creatorDeviceSigningPublicKey: args.input.creatorSigningPublicKey,
       newDeviceWorkspaceKeyBoxes: args.input.newDeviceWorkspaceKeyBoxes,
+      deviceSigningPublicKeysToBeDeleted:
+        args.input.deviceSigningPublicKeysToBeDeleted,
     });
     return {
       status: "success",
