@@ -24,6 +24,7 @@ import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { getFolderKey } from "../../utils/folder/getFolderKey";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
 type Props = ViewProps & {
@@ -96,6 +97,11 @@ export default function SidebarPage(props: Props) {
   const { depth = 0 } = props;
 
   const updateDocumentName = async (name: string) => {
+    const workspace = await getWorkspace({
+      workspaceId: props.workspaceId,
+      urqlClient,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
     const folderKeyData = await getFolderKey({
       folderId: props.parentFolderId,
       workspaceId: props.workspaceId,
@@ -114,6 +120,7 @@ export default function SidebarPage(props: Props) {
         id: props.documentId,
         encryptedName: encryptedDocumentTitle.ciphertext,
         encryptedNameNonce: encryptedDocumentTitle.publicNonce,
+        workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
         subkeyId: documentKeyData.subkeyId,
       },
     });

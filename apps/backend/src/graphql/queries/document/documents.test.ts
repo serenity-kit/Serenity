@@ -142,6 +142,8 @@ test("user should be able to list documents in a folder when empty", async () =>
                     id
                     parentFolderId
                     rootFolderId
+                    workspaceKeyId
+                    subkeyId
                     workspaceId
                 }
             }
@@ -181,6 +183,8 @@ test("user should be able to list documents in a folder with one item", async ()
                     id
                     parentFolderId
                     rootFolderId
+                    workspaceKeyId
+                    subkeyId
                     workspaceId
                 }
             }
@@ -200,7 +204,9 @@ test("user should be able to list documents in a folder with one item", async ()
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
+            "subkeyId": null,
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+            "workspaceKeyId": null,
           },
         },
       ],
@@ -229,6 +235,8 @@ test("user should be able to list documents in a folder with multiple items", as
                     id
                     parentFolderId
                     rootFolderId
+                    workspaceKeyId
+                    subkeyId
                     workspaceId
                 }
             }
@@ -248,7 +256,9 @@ test("user should be able to list documents in a folder with multiple items", as
             "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
+            "subkeyId": null,
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+            "workspaceKeyId": null,
           },
         },
         {
@@ -256,7 +266,9 @@ test("user should be able to list documents in a folder with multiple items", as
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
+            "subkeyId": null,
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+            "workspaceKeyId": null,
           },
         },
       ],
@@ -285,6 +297,8 @@ test("user should be able to list without showing subfolder documents", async ()
                   id
                   parentFolderId
                   rootFolderId
+                  workspaceKeyId
+                  subkeyId
                   workspaceId
               }
           }
@@ -304,7 +318,9 @@ test("user should be able to list without showing subfolder documents", async ()
             "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
+            "subkeyId": null,
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+            "workspaceKeyId": null,
           },
         },
         {
@@ -312,7 +328,9 @@ test("user should be able to list without showing subfolder documents", async ()
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
+            "subkeyId": null,
             "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
+            "workspaceKeyId": null,
           },
         },
       ],
@@ -335,6 +353,8 @@ test("retrieving a folder that doesn't exist throws an error", async () => {
                   id
                   parentFolderId
                   rootFolderId
+                  workspaceKeyId
+                  subkeyId
                   workspaceId
               }
           }
@@ -361,6 +381,8 @@ test("listing documents that the user doesn't own throws an error", async () => 
                   id
                   parentFolderId
                   rootFolderId
+                  workspaceKeyId
+                  subkeyId
                   workspaceId
               }
           }
@@ -387,6 +409,8 @@ test("Unauthenticated", async () => {
                   id
                   parentFolderId
                   rootFolderId
+                  workspaceKeyId
+                  subkeyId
                   workspaceId
               }
           }
@@ -414,6 +438,8 @@ describe("Input Errors", () => {
                     id
                     parentFolderId
                     rootFolderId
+                    workspaceKeyId
+                    subkeyId
                     workspaceId
                 }
             }
@@ -438,6 +464,8 @@ describe("Input Errors", () => {
               id
               parentFolderId
               rootFolderId
+              workspaceKeyId
+              subkeyId
               workspaceId
             }
           }
