@@ -19,8 +19,6 @@ export async function authorizeDevices({
   newDeviceWorkspaceKeyBoxes,
 }: Params): Promise<WorkspaceKey[]> {
   return await prisma.$transaction(async (prisma) => {
-    // verify that the user owns the devices and workspaceIds
-
     // make sure the user owns the requested devices
     const user = await prisma.user.findFirst({
       where: { id: userId },
@@ -32,7 +30,6 @@ export async function authorizeDevices({
     const allUserDeviceSigningPublicKeys = allUserDevices.map(
       (userDevice) => userDevice.signingPublicKey
     );
-
     // build a table to look up user ownership of
     // workspaces and devices
     const requestedWorkspaceIds = new Set<string>();
@@ -73,7 +70,6 @@ export async function authorizeDevices({
         }
       );
     });
-
     const deletingDeviceSigningPublicKeys: string[] = [];
     for (let userDevice of allUserDevices) {
       if (

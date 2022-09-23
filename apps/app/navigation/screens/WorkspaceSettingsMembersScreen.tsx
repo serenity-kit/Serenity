@@ -213,6 +213,7 @@ export default function WorkspaceSettingsMembersScreen(
       const workspaceKey = await getWorkspaceKey({
         workspaceId,
         urqlClient,
+        activeDevice,
       });
       const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
       // TODO: getWorkspaceDevices gets all devices attached to a workspace

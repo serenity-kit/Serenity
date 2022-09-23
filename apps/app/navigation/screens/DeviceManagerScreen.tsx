@@ -6,16 +6,17 @@ import {
   useAuthorizeDevicesMutation,
   useDevicesQuery,
 } from "../../generated/graphql";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import {
   WorkspaceDeviceParing,
   WorkspaceWithWorkspaceDevicesParing,
 } from "../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../utils/device/createAndEncryptWorkspaceKeyForDevice";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
 
 export default function DeviceManagerScreen(props) {
+  const { activeDevice } = useWorkspaceContext();
   useWindowDimensions();
   const urqlClient = useClient();
 
@@ -27,13 +28,6 @@ export default function DeviceManagerScreen(props) {
   const [, authorizeDevicesMutation] = useAuthorizeDevicesMutation();
 
   const deleteDevice = async (deviceSigningPublicKey: string) => {
-    // TODO remove the device also from the storage
-    const activeDevice = await getActiveDevice();
-    if (!activeDevice) {
-      // TOOD: show this in the UI
-      console.error("No active device found");
-      return;
-    }
     const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
       [];
     const devices = devicesResult.data?.devices?.nodes;
@@ -54,9 +48,13 @@ export default function DeviceManagerScreen(props) {
       const workspaceKey = await getWorkspaceKey({
         workspaceId: workspace.id,
         urqlClient,
+        activeDevice,
       });
       for (let device of devices) {
         if (!device) {
+          continue;
+        }
+        if (device.signingPublicKey === deviceSigningPublicKey) {
           continue;
         }
         const { ciphertext, nonce } =
@@ -69,7 +67,7 @@ export default function DeviceManagerScreen(props) {
         workspaceDevicePairing.push({
           ciphertext,
           nonce,
-          receiverDeviceSigningPublicKey: device.encryptionPublicKey,
+          receiverDeviceSigningPublicKey: device.signingPublicKey,
         });
       }
       newDeviceWorkspaceKeyBoxes.push({
@@ -100,6 +98,7 @@ export default function DeviceManagerScreen(props) {
             (device) => device !== null
           ) || []
         }
+        activeDevice={activeDevice}
         onDeletePress={deleteDevice}
       />
     </View>

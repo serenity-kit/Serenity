@@ -1,6 +1,5 @@
-import { ViewProps, View, Text, Icon, tw } from "@serenity-tools/ui";
+import { Icon, Text, View, ViewProps } from "@serenity-tools/ui";
 import { StyleSheet } from "react-native";
-import { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 type Props = ViewProps & {
@@ -8,6 +7,7 @@ type Props = ViewProps & {
   encryptionPublicKey: string;
   encryptionPublicKeySignature: string | undefined; // TODO always return encryptionPublicKeySignature
   info?: string | null;
+  isActiveDevice: boolean;
   createdAt?: Date;
   onDeletePress: () => void;
 };
@@ -34,6 +34,7 @@ export default function DeviceListItem(props: Props) {
               <Text>Version: {deviceInfoJson.browserVersion}</Text>
               <Text>Created At {props.createdAt}</Text>
               <Text>Signing Public Key: {props.signingPublicKey}</Text>
+              {props.isActiveDevice && <Text>(this device)</Text>}
             </View>
           )}
           {deviceInfoJson.type == "device" && (
@@ -43,16 +44,18 @@ export default function DeviceListItem(props: Props) {
               <Text>Version: {deviceInfoJson.osVersion}</Text>
               <Text>Created At {props.createdAt}</Text>
               <Text>Signing Public Key: {props.signingPublicKey}</Text>
+              {props.isActiveDevice && <Text>(this device)</Text>}
             </View>
           )}
-          {(deviceInfoJson.type === "web" ||
-            deviceInfoJson.type === "device") && (
-            <View>
-              <TouchableOpacity onPress={props.onDeletePress}>
-                <Icon name="close-circle-fill" color={"gray-800"} />
-              </TouchableOpacity>
-            </View>
-          )}
+          {!props.isActiveDevice &&
+            (deviceInfoJson.type === "web" ||
+              deviceInfoJson.type === "device") && (
+              <View>
+                <TouchableOpacity onPress={props.onDeletePress}>
+                  <Icon name="close-circle-fill" color={"gray-800"} />
+                </TouchableOpacity>
+              </View>
+            )}
         </>
       )}
     </View>
