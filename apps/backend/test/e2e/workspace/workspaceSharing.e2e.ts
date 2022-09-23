@@ -154,10 +154,8 @@ test.describe("Workspace Sharing", () => {
     await delayForSeconds(5);
     // expect the new url to include the new workspace ID
     const pageUrl = page.url();
-    const lastIndexOfSlash = pageUrl.lastIndexOf("/");
-    const pageUrlStart = pageUrl.substring(0, lastIndexOfSlash + 1);
-    expect(pageUrlStart).toBe(
-      `http://localhost:3000/workspace/${sharedWorkspaceId}/page/`
+    expect(pageUrl).toBe(
+      `http://localhost:3000/workspace/${sharedWorkspaceId}/lobby`
     );
   });
 
@@ -178,9 +176,8 @@ test.describe("Workspace Sharing", () => {
     // expect the new url to include the new workspace ID
     const pageUrl = page.url();
     const lastIndexOfSlash = pageUrl.lastIndexOf("/");
-    const pageUrlStart = pageUrl.substring(0, lastIndexOfSlash + 1);
-    expect(pageUrlStart).toBe(
-      `http://localhost:3000/workspace/${sharedWorkspaceId}/page/`
+    expect(pageUrl).toBe(
+      `http://localhost:3000/workspace/${sharedWorkspaceId}/lobby`
     );
   });
 
@@ -198,9 +195,8 @@ test.describe("Workspace Sharing", () => {
     // expect new URL to include the shared workspace ID
     const pageUrl = page.url();
     const lastIndexOfSlash = pageUrl.lastIndexOf("/");
-    const pageUrlStart = pageUrl.substring(0, lastIndexOfSlash + 1);
-    expect(pageUrlStart).toBe(
-      `http://localhost:3000/workspace/${sharedWorkspaceId}/page/`
+    expect(pageUrl).toBe(
+      `http://localhost:3000/workspace/${sharedWorkspaceId}/lobby`
     );
   });
 });

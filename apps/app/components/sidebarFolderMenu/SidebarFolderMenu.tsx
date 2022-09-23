@@ -35,7 +35,7 @@ export default function SidebarFolderMenu(props: Props) {
           setIsOpenMenu(false);
           props.onCreateFolderPress();
         }}
-        icon="folder-line"
+        iconName="folder-line"
         shortcut={<Shortcut letter="N" />}
         testID={`sidebar-folder-menu--${props.folderId}__create-subfolder`}
       >
@@ -46,7 +46,7 @@ export default function SidebarFolderMenu(props: Props) {
           setIsOpenMenu(false);
           props.onUpdateNamePress();
         }}
-        icon="font-size-2"
+        iconName="font-size-2"
         shortcut={<Shortcut letter="R" />}
         testID={`sidebar-folder-menu--${props.folderId}__rename`}
       >
@@ -57,7 +57,7 @@ export default function SidebarFolderMenu(props: Props) {
           setIsOpenMenu(false);
           props.onDeletePressed();
         }}
-        icon="delete-bin-line"
+        iconName="delete-bin-line"
         danger
         testID={`sidebar-folder-menu--${props.folderId}__delete`}
       >

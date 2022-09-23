@@ -39,6 +39,9 @@ import {
   WorkspaceAvatar,
   LinkExternal,
   colors,
+  SidebarIconLeft,
+  SidebarText,
+  MenuLink,
 } from "@serenity-tools/ui";
 import React, { useState } from "react";
 import { useWindowDimensions, StyleSheet } from "react-native";
@@ -109,8 +112,9 @@ export default function DesignSystemScreen() {
         <Heading lvl={3}>Sizes</Heading>
         <Text variant="sm">
           With the <DSMono variant="property">size</DSMono> property you can use
-          the Avatar in 6 different sizes: <DSMono variant={"type"}>xs</DSMono>{" "}
-          , <DSMono variant={"type"}>sm</DSMono> ,{" "}
+          the Avatar in 7 different sizes: <DSMono variant={"type"}>xxs</DSMono>{" "}
+          , <DSMono variant={"type"}>xs</DSMono> ,{" "}
+          <DSMono variant={"type"}>sm</DSMono> ,{" "}
           <DSMono variant={"type"}>md</DSMono> ,{" "}
           <DSMono variant={"type"}>lg</DSMono> ,{" "}
           <DSMono variant={"type"}>xl</DSMono> , or{" "}
@@ -121,6 +125,7 @@ export default function DesignSystemScreen() {
         </Text>
         <DSExampleArea>
           <HStack space={2} alignItems="center" style={tw`pr-2`}>
+            <Avatar size={"xxs"}>BE</Avatar>
             <Avatar size={"xs"}>BE</Avatar>
             <Avatar size={"sm"}>NG</Avatar>
             <Avatar size={"md"}>AB</Avatar>
@@ -130,7 +135,7 @@ export default function DesignSystemScreen() {
           </HStack>
         </DSExampleArea>
         <Heading lvl={3}>Styling</Heading>
-        <Text variant="sm" style={tw`mt-1`}>
+        <Text variant="sm">
           Set one of the many coloring options with the{" "}
           <DSMono variant="property">customColor</DSMono> property.
         </Text>
@@ -164,7 +169,22 @@ export default function DesignSystemScreen() {
           The <DSMono variant="component">WorkspaceAvatar</DSMono> should be
           used for all workspace related representation.
         </Text>
-        <Text variant="sm" style={tw`mt-1`}>
+        <Heading lvl={3}>Sizes</Heading>
+        <Text variant="sm">
+          We use three <DSMono variant="property">size</DSMono>s for now, for
+          the active Workspace inside the{" "}
+          <DSMono variant="context">Sidebar</DSMono>s we use{" "}
+          <DSMono variant="type">xs</DSMono> for desktop and{" "}
+          <DSMono variant="type">sm</DSMono> for mobile, and{" "}
+          <DSMono variant="type">xxs</DSMono> for selects in Menus.
+        </Text>
+        <DSExampleArea>
+          <WorkspaceAvatar size={"xxs"} />
+          <WorkspaceAvatar size={"xs"} />
+          <WorkspaceAvatar size={"sm"} />
+        </DSExampleArea>
+        <Heading lvl={3}>Styling</Heading>
+        <Text variant="sm">
           Set one of the many coloring options with the{" "}
           <DSMono variant="property">customColor</DSMono> property.
         </Text>
@@ -813,10 +833,11 @@ export default function DesignSystemScreen() {
           <DSTiles>
             <IconTile name="font-color" />
           </DSTiles>
-          <Heading lvl={3}>Custom</Heading>
+          <Heading lvl={3}>Editor custom</Heading>
           <DSTiles>
             <IconTile name="arrow-go-back-line" />
             <IconTile name="arrow-go-forward-line" />
+            <IconTile name="arrow-up-down-s-line" />
             <IconTile name="attachment-2" />
             <IconTile name="font-size-2" />
             <IconTile name="format-clear" />
@@ -848,6 +869,10 @@ export default function DesignSystemScreen() {
             <IconTile name="close-circle-fill" />
             <IconTile name="add-line" />
             <IconTile name="settings-4-line" />
+            <IconTile name="user-line" />
+            <IconTile name="user-settings-line" />
+            <IconTile name="group-line" />
+            <IconTile name="device-line" />
             <IconTile name="download-line" />
             <IconTile name="printer-line" />
             <IconTile name="search-line" />
@@ -1180,10 +1205,10 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <BoxShadow elevation={2} rounded>
             <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
-              <MenuButton icon="folder-line">Create folder</MenuButton>
-              <MenuButton icon="font-size-2">Rename</MenuButton>
+              <MenuButton iconName="folder-line">Create folder</MenuButton>
+              <MenuButton iconName="font-size-2">Rename</MenuButton>
               <SidebarDivider collapsed />
-              <MenuButton icon="delete-bin-line" danger>
+              <MenuButton iconName="delete-bin-line" danger>
                 Delete
               </MenuButton>
             </VStack>
@@ -1217,7 +1242,7 @@ export default function DesignSystemScreen() {
               onPress={() => {
                 setIsOpenPopover(false);
               }}
-              icon="folder-line"
+              iconName="folder-line"
             >
               Create folder
             </MenuButton>
@@ -1225,7 +1250,7 @@ export default function DesignSystemScreen() {
               onPress={() => {
                 setIsOpenPopover(false);
               }}
-              icon="font-size-2"
+              iconName="font-size-2"
             >
               Rename
             </MenuButton>
@@ -1234,7 +1259,7 @@ export default function DesignSystemScreen() {
               onPress={() => {
                 setIsOpenPopover(false);
               }}
-              icon="delete-bin-line"
+              iconName="delete-bin-line"
               danger
             >
               Delete
@@ -1258,14 +1283,20 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <BoxShadow elevation={2} rounded>
             <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
-              <MenuButton icon="folder-line" shortcut={<Shortcut letter="N" />}>
+              <MenuButton
+                iconName="folder-line"
+                shortcut={<Shortcut letter="N" />}
+              >
                 Create folder
               </MenuButton>
-              <MenuButton icon="font-size-2" shortcut={<Shortcut letter="R" />}>
+              <MenuButton
+                iconName="font-size-2"
+                shortcut={<Shortcut letter="R" />}
+              >
                 Rename
               </MenuButton>
               <SidebarDivider collapsed />
-              <MenuButton icon="delete-bin-line" danger>
+              <MenuButton iconName="delete-bin-line" danger>
                 Delete
               </MenuButton>
             </VStack>
@@ -1274,8 +1305,8 @@ export default function DesignSystemScreen() {
         <Heading lvl={3}>Links and more</Heading>
         <Text variant={"sm"}>
           Besides the <DSMono variant="component">MenuButton</DSMono> you can
-          also use a <DSMono variant="component">SidebarLink</DSMono> as one of
-          the Menu-actions. Just be sure to give it a{" "}
+          also use a <DSMono variant="component">MenuLink</DSMono> as one of the
+          Menu-actions. Just be sure to give it a{" "}
           <DSMono variant="type">p-menu-item</DSMono> class passed via the{" "}
           <DSMono variant="property">style</DSMono> property to mimic the look
           of MenuButtons.
@@ -1288,17 +1319,19 @@ export default function DesignSystemScreen() {
                   jane@example.com
                 </Text>
               </View>
-              <SidebarLink
+
+              <MenuLink
                 to={{ screen: "EncryptDecryptImageTest" }}
-                style={tw`p-menu-item`}
+                icon={<WorkspaceAvatar customColor="emerald" size={"xxs"} />}
               >
-                <WorkspaceAvatar customColor="emerald" />
-                <Text variant="xs">Notes</Text>
-              </SidebarLink>
-              <SidebarLink to={{ screen: "Login" }} style={tw`p-menu-item`}>
-                <WorkspaceAvatar customColor="honey" />
-                <Text variant="xs">Project X</Text>
-              </SidebarLink>
+                Notes
+              </MenuLink>
+              <MenuLink
+                to={{ screen: "Login" }}
+                icon={<WorkspaceAvatar customColor="honey" size={"xxs"} />}
+              >
+                Project X
+              </MenuLink>
               <View style={tw`pl-2 pr-3 py-1.5`}>
                 <IconButton name="plus" label="New workspace" />
               </View>
@@ -1430,31 +1463,20 @@ export default function DesignSystemScreen() {
         <DSExampleArea>
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
             <SidebarButton>
-              <Icon
-                name="search-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Search...</Text>
+              <SidebarIconLeft name="search-line" />
+              <SidebarText>Search...</SidebarText>
             </SidebarButton>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="history-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Recently edited</Text>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              iconName="history-line"
+            >
+              Recently edited
             </SidebarLink>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="settings-4-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Settings</Text>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              iconName="settings-4-line"
+            >
+              Settings
             </SidebarLink>
           </VStack>
         </DSExampleArea>
@@ -1465,23 +1487,17 @@ export default function DesignSystemScreen() {
         </Text>
         <DSExampleArea>
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="history-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Recently edited</Text>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              iconName="history-line"
+            >
+              Recently edited
             </SidebarLink>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="settings-4-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Settings</Text>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              iconName="settings-4-line"
+            >
+              Settings
             </SidebarLink>
             <SidebarDivider />
             <HStack
@@ -1674,23 +1690,17 @@ export default function DesignSystemScreen() {
         </Text>
         <DSExampleArea>
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="history-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Recently edited</Text>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              iconName="history-line"
+            >
+              Recently edited
             </SidebarLink>
-            <SidebarLink to={{ screen: "EncryptDecryptImageTest" }}>
-              <Icon
-                name="settings-4-line"
-                size={4.5}
-                mobileSize={5.5}
-                color={"gray-800"}
-              />
-              <Text variant="sm">Settings</Text>
+            <SidebarLink
+              to={{ screen: "EncryptDecryptImageTest" }}
+              iconName="settings-4-line"
+            >
+              Settings
             </SidebarLink>
             <SidebarDivider />
             <HStack

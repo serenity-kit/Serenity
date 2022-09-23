@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Prisma } from "../../../prisma/generated/output";
 import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
+import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 
 export type Props = {
   prisma: Prisma.TransactionClient;
@@ -37,6 +38,14 @@ export const rotateWorkspaceKey = async ({
   if (!verifedUserWorkspace) {
     throw new ForbiddenError("Unauthorized");
   }
+
+  // make sure the user controls this creatorDevice
+  const creatorDevice = await getOrCreateCreatorDevice({
+    prisma,
+    userId,
+    signingPublicKey: creatorDeviceSigningPublicKey,
+  });
+
   // make sure the user is including their mainDevice!
   // TODO: make sure the user includes their recovery device if it exists
   let isMainDeviceBeingUpdated = false;

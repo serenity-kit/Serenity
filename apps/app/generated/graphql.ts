@@ -82,6 +82,7 @@ export type CreateFolderResult = {
 };
 
 export type CreateInitialWorkspaceStructureInput = {
+  creatorDeviceSigningPublicKey: Scalars['String'];
   deviceWorkspaceKeyBoxes: Array<DeviceWorkspaceKeyBoxInput>;
   documentId: Scalars['String'];
   documentSnapshot: DocumentSnapshotInput;
@@ -111,6 +112,14 @@ export type CreateWorkspaceInvitationInput = {
 export type CreateWorkspaceInvitationResult = {
   __typename?: 'CreateWorkspaceInvitationResult';
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
+};
+
+export type CreatorDevice = {
+  __typename?: 'CreatorDevice';
+  createdAt?: Maybe<Scalars['Date']>;
+  encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
+  signingPublicKey: Scalars['String'];
 };
 
 export type DeleteDocumentsInput = {
@@ -184,7 +193,6 @@ export type DeviceResult = {
 
 export type DeviceWorkspaceKeyBoxInput = {
   ciphertext: Scalars['String'];
-  creatorDeviceSigningPublicKey: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
   nonce: Scalars['String'];
 };
@@ -323,6 +331,15 @@ export type MeResult = {
   __typename?: 'MeResult';
   id: Scalars['String'];
   username: Scalars['String'];
+  workspaceLoadingInfo?: Maybe<WorkspaceLoadingInfo>;
+};
+
+
+export type MeResultWorkspaceLoadingInfoArgs = {
+  documentId?: InputMaybe<Scalars['ID']>;
+  returnOtherDocumentIfNotFound?: InputMaybe<Scalars['Boolean']>;
+  returnOtherWorkspaceIfNotFound?: InputMaybe<Scalars['Boolean']>;
+  workspaceId?: InputMaybe<Scalars['ID']>;
 };
 
 export type MemberDeviceParingInput = {
@@ -798,7 +815,7 @@ export type WorkspaceKey = {
 export type WorkspaceKeyBox = {
   __typename?: 'WorkspaceKeyBox';
   ciphertext: Scalars['String'];
-  creatorDevice?: Maybe<Device>;
+  creatorDevice?: Maybe<CreatorDevice>;
   creatorDeviceSigningPublicKey: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
   id: Scalars['String'];
@@ -817,6 +834,13 @@ export type WorkspaceKeyWithMembers = {
   generation: Scalars['Int'];
   id: Scalars['String'];
   members: Array<MemberWithWorkspaceKeyBoxes>;
+};
+
+export type WorkspaceLoadingInfo = {
+  __typename?: 'WorkspaceLoadingInfo';
+  documentId?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  isAuthorized: Scalars['Boolean'];
 };
 
 export type WorkspaceMember = {
@@ -854,7 +878,7 @@ export type AttachDeviceToWorkspacesMutationVariables = Exact<{
 }>;
 
 
-export type AttachDeviceToWorkspacesMutation = { __typename?: 'Mutation', attachDeviceToWorkspaces?: { __typename?: 'AttachDeviceToWorkspacesResult', workspaceKeys: Array<{ __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string } | null }> } | null };
+export type AttachDeviceToWorkspacesMutation = { __typename?: 'Mutation', attachDeviceToWorkspaces?: { __typename?: 'AttachDeviceToWorkspacesResult', workspaceKeys: Array<{ __typename?: 'WorkspaceKey', id: string, generation: number, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null }> } | null };
 
 export type AttachDevicesToWorkspacesMutationVariables = Exact<{
   input: AttachDevicesToWorkspacesInput;
@@ -889,7 +913,7 @@ export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
 }>;
 
 
-export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
 
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
@@ -1062,10 +1086,15 @@ export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string, createdAt: any } | null };
 
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+export type MeQueryVariables = Exact<{
+  workspaceId?: InputMaybe<Scalars['ID']>;
+  documentId?: InputMaybe<Scalars['ID']>;
+  returnOtherWorkspaceIfNotFound?: InputMaybe<Scalars['Boolean']>;
+  returnOtherDocumentIfNotFound?: InputMaybe<Scalars['Boolean']>;
+}>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null } | null } | null };
 
 export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1106,7 +1135,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'Device', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null };
 
 export type WorkspaceDevicesQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1134,7 +1163,7 @@ export type WorkspacesQueryVariables = Exact<{
 }>;
 
 
-export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'Device', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null> | null } | null };
+export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null> | null } | null };
 
 
 export const AcceptWorkspaceInvitationDocument = gql`
@@ -1169,6 +1198,10 @@ export const AttachDeviceToWorkspacesDocument = gql`
         creatorDeviceSigningPublicKey
         ciphertext
         nonce
+        creatorDevice {
+          signingPublicKey
+          encryptionPublicKey
+        }
       }
     }
   }
@@ -1265,6 +1298,10 @@ export const CreateInitialWorkspaceStructureDocument = gql`
           workspaceKeyId
           deviceSigningPublicKey
           ciphertext
+          creatorDevice {
+            signingPublicKey
+            encryptionPublicKey
+          }
         }
       }
     }
@@ -1657,10 +1694,20 @@ export function useMainDeviceQuery(options?: Omit<Urql.UseQueryArgs<MainDeviceQu
   return Urql.useQuery<MainDeviceQuery, MainDeviceQueryVariables>({ query: MainDeviceDocument, ...options });
 };
 export const MeDocument = gql`
-    query me {
+    query me($workspaceId: ID, $documentId: ID, $returnOtherWorkspaceIfNotFound: Boolean, $returnOtherDocumentIfNotFound: Boolean) {
   me {
     id
     username
+    workspaceLoadingInfo(
+      workspaceId: $workspaceId
+      returnOtherWorkspaceIfNotFound: $returnOtherWorkspaceIfNotFound
+      documentId: $documentId
+      returnOtherDocumentIfNotFound: $returnOtherDocumentIfNotFound
+    ) {
+      id
+      isAuthorized
+      documentId
+    }
   }
 }
     `;

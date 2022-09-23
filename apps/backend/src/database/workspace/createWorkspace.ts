@@ -5,11 +5,11 @@ import {
   WorkspaceKeyBox,
   WorkspaceMember,
 } from "../../types/workspace";
+import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
 
 export type DeviceWorkspaceKeyBoxParams = {
   deviceSigningPublicKey: string;
-  creatorDeviceSigningPublicKey: string;
   nonce: string;
   ciphertext: string;
 };
@@ -18,6 +18,7 @@ type Params = {
   id: string;
   name: string;
   userId: string;
+  creatorDeviceSigningPublicKey: string;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
 };
 
@@ -25,6 +26,7 @@ export async function createWorkspace({
   id,
   name,
   userId,
+  creatorDeviceSigningPublicKey,
   deviceWorkspaceKeyBoxes,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
@@ -48,6 +50,14 @@ export async function createWorkspace({
         },
       },
     });
+
+    // make sure the user controls this creatorDevice
+    const creatorDevice = await getOrCreateCreatorDevice({
+      prisma,
+      userId,
+      signingPublicKey: creatorDeviceSigningPublicKey,
+    });
+
     const currentWorkspaceKey = await prisma.workspaceKey.findFirst({
       where: {
         workspaceId: rawWorkspace.id,
@@ -63,9 +73,11 @@ export async function createWorkspace({
           id: uuidv4(),
           workspaceKeyId: currentWorkspaceKey.id,
           ...deviceWorkspaceKeyBox,
+          creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
         });
       }
     );
+
     await prisma.workspaceKeyBox.createMany({
       data: workspaceKeyBoxes,
     });

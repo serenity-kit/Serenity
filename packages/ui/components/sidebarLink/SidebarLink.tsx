@@ -11,7 +11,12 @@ import {
   StyleSheet,
   TextProps,
 } from "react-native";
+import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
 import { tw } from "../../tailwind";
+import { IconNames } from "../icon/Icon";
+import { SidebarIconLeft } from "../sidebarIconLeft/SidebarIconLeft";
+import { SidebarIconNavRight } from "../sidebarIconNavRight/SidebarIconNavRight";
+import { SidebarText } from "../sidebarText/SidebarText";
 
 // copied from react-navigation type definitions
 declare type SidebarLinkProps<ParamList extends ReactNavigation.RootParamList> =
@@ -24,20 +29,25 @@ declare type SidebarLinkProps<ParamList extends ReactNavigation.RootParamList> =
     ) => void;
   } & (TextProps & {
     children: React.ReactNode;
+    iconName: IconNames;
   });
 
 export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
   props: SidebarLinkProps<ParamList>
 ) {
+  const isDesktopDevice = useIsDesktopDevice();
   const [isHovered, setIsHovered] = React.useState(false);
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const linkProps = useLinkProps({
     ...props,
   });
+  const { iconName } = props;
 
   const styles = StyleSheet.create({
-    link: tw.style(Platform.OS === "web" && { outlineStyle: "none" }),
-    stack: tw.style(`flex px-5 md:px-4 py-3 md:py-1.5`), // flex needed for correct height calculation
+    link:
+      tw.style(Platform.OS === "web" && { outlineStyle: "none" }) &&
+      tw`pl-5 md:pl-4`,
+    stack: tw.style(`py-3 md:py-1.5 pr-4`),
     hover: tw`bg-gray-200`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
@@ -57,12 +67,26 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
         styles.link,
         isHovered && styles.hover,
         isFocusVisible && styles.focusVisible,
+        props.style,
       ]}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <HStack space={2} alignItems="center" style={[styles.stack, props.style]}>
-        {props.children}
+      <HStack space={isDesktopDevice ? 2 : 4} alignItems="center">
+        {iconName ? <SidebarIconLeft name={iconName} /> : null}
+        <HStack
+          alignItems={"center"}
+          justifyContent={"space-between"}
+          style={[
+            styles.stack,
+            !isDesktopDevice && tw`border-b border-gray-200`,
+            tw`flex-auto`,
+          ]}
+          space={4}
+        >
+          <SidebarText>{props.children}</SidebarText>
+          {!isDesktopDevice ? <SidebarIconNavRight /> : null}
+        </HStack>
       </HStack>
     </Pressable>
   );

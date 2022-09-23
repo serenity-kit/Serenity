@@ -198,16 +198,18 @@ test("user can query by paginating cursor", async () => {
   expect(workspace.name).toBe(workspace2Name);
 });
 
-test("User should not be able to retrieve workspaces for another device", async () => {
-  await expect(async () => {
-    await getWorkspaces({
-      graphql,
-      deviceSigningPublicKey: "abcde",
-      first: 50,
-      authorizationHeader: sessionKey,
-    });
-  }).rejects.toThrowError(/Internal server error/);
-});
+// NOTE: removing this feature until we update the front-end UI
+// to only retrieve workspaces after login and device registration
+// test("User should not be able to retrieve workspaces for another device", async () => {
+//   await expect(async () => {
+//     await getWorkspaces({
+//       graphql,
+//       deviceSigningPublicKey: "abcde",
+//       first: 50,
+//       authorizationHeader: sessionKey,
+//     });
+//   }).rejects.toThrowError(/Internal server error/);
+// });
 
 test("Unauthenticated", async () => {
   await expect(async () => {

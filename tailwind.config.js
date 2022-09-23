@@ -55,7 +55,7 @@ const customColors = {
   success: {
     500: "#48AD83",
   },
-  muted: "#8A8B96",
+  muted: "#8A8B96", // gray 600
 };
 
 const customTheme = {

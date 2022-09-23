@@ -1,5 +1,5 @@
 import { inputObjectType, list, nonNull, objectType } from "nexus";
-import { Device } from "./device";
+import { CreatorDevice, Device } from "./device";
 
 export const MemberIdWithDevice = objectType({
   name: "WorkspaceIdWithDevices",
@@ -26,7 +26,7 @@ export const WorkspaceKeyBox = objectType({
     t.nonNull.string("creatorDeviceSigningPublicKey");
     t.nonNull.string("nonce");
     t.nonNull.string("ciphertext");
-    t.field("creatorDevice", { type: Device });
+    t.field("creatorDevice", { type: CreatorDevice });
   },
 });
 
@@ -64,6 +64,15 @@ export const Workspace = objectType({
     });
     t.list.nonNull.field("workspaceKeys", { type: WorkspaceKey });
     t.list.nonNull.field("members", { type: WorkspaceMember });
+  },
+});
+
+export const WorkspaceLoadingInfo = objectType({
+  name: "WorkspaceLoadingInfo",
+  definition(t) {
+    t.nonNull.string("id");
+    t.nonNull.boolean("isAuthorized");
+    t.string("documentId");
   },
 });
 

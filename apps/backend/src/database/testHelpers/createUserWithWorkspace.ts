@@ -123,10 +123,10 @@ export default async function createUserWithWorkspace({
     encryptedDocumentNameNonce: encryptedDocumentTitleResult.publicNonce,
     documentSubkeyId: docmentKeyResult.subkeyId,
     documentSnapshot,
+    creatorDeviceSigningPublicKey: device.signingPublicKey,
     deviceWorkspaceKeyBoxes: [
       {
         deviceSigningPublicKey: device.signingPublicKey,
-        creatorDeviceSigningPublicKey: device.signingPublicKey,
         nonce,
         ciphertext,
       },

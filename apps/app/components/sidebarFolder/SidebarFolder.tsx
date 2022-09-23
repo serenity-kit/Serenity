@@ -10,7 +10,7 @@ import {
   IconButton,
   InlineInput,
   Pressable,
-  Text,
+  SidebarText,
   Tooltip,
   tw,
   useIsDesktopDevice,
@@ -325,53 +325,65 @@ export default function SidebarFolder(props: Props) {
             {...focusRingProps} // needed so focus is shown on view-wrapper
             onPress={toggleFolderOpen}
             style={[
-              tw`grow-1 pl-${depth * 3}`, // needed so clickable area is as large as possible
+              tw`grow-1 pl-${depth * (isDesktopDevice ? 3 : 4)}`, // needed so clickable area is as large as possible
             ]}
             // disable default outline styles and add 1 overridden style manually (grow)
             _focusVisible={{
               _web: { style: { outlineStyle: "none", flexGrow: 1 } },
             }}
           >
-            <HStack
-              alignItems="center"
-              style={tw`py-3 md:py-1.5 pl-3.5 md:pl-2.5`}
-            >
-              <View style={tw`ml-${depth} md:ml-0`}>
-                <Icon
-                  name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
-                  color={isDesktopDevice ? "gray-600" : "gray-400"}
-                  mobileSize={5}
-                />
-              </View>
-              <View style={tw`-ml-0.5`}>
-                <Icon name="folder" size={5} mobileSize={8} />
-              </View>
+            <View style={[tw`pl-5 md:pl-2.5`]}>
+              <HStack
+                alignItems="center"
+                style={[
+                  tw`py-2 md:py-1.5`,
+                  !isDesktopDevice && tw`border-b border-gray-200`,
+                ]}
+              >
+                <View style={!isDesktopDevice && tw`-ml-1`}>
+                  {documentPathIds.includes(props.folderId) ? (
+                    <Icon
+                      name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
+                      color={"gray-800"}
+                      mobileSize={5}
+                    />
+                  ) : (
+                    <Icon
+                      name={isOpen ? "arrow-down-filled" : "arrow-right-filled"}
+                      color={isDesktopDevice ? "gray-500" : "gray-400"}
+                      mobileSize={5}
+                    />
+                  )}
+                </View>
+                <View style={tw`-ml-0.5`}>
+                  <Icon name="folder" size={5} mobileSize={8} />
+                </View>
 
-              {isEditing === "name" ? (
-                <InlineInput
-                  onSubmit={updateFolderName}
-                  onCancel={() => {
-                    setIsEditing("none");
-                  }}
-                  value={folderName}
-                  style={tw`ml-0.5 w-${maxWidth}`}
-                  testID={`sidebar-folder--${props.folderId}__edit-name`}
-                />
-              ) : (
-                <Text
-                  variant="sm"
-                  style={tw`ml-1.5 max-w-${maxWidth}`}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  bold={documentPathIds.includes(props.folderId)}
-                  testID={`sidebar-folder--${props.folderId}`}
-                >
-                  {folderName}
-                </Text>
-              )}
-            </HStack>
+                {isEditing === "name" ? (
+                  <InlineInput
+                    onSubmit={updateFolderName}
+                    onCancel={() => {
+                      setIsEditing("none");
+                    }}
+                    value={folderName}
+                    style={tw`ml-0.5 w-${maxWidth}`}
+                    testID={`sidebar-folder--${props.folderId}__edit-name`}
+                  />
+                ) : (
+                  <SidebarText
+                    style={tw`pl-2 md:ml-1.5 max-w-${maxWidth}`}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    testID={`sidebar-folder--${props.folderId}`}
+                  >
+                    {folderName}
+                  </SidebarText>
+                )}
+              </HStack>
+            </View>
           </Pressable>
 
+          {/* TODO mobile : use overlay element */}
           {isEditing === "new" && (
             <InlineInput
               value=""
@@ -386,9 +398,12 @@ export default function SidebarFolder(props: Props) {
           <HStack
             alignItems="center"
             space={1}
-            style={tw`pr-3 md:pr-2 ${
-              isHovered || !isDesktopDevice ? "" : "hidden"
-            }`}
+            style={[
+              tw`pr-4 md:pr-2  ${
+                isHovered || !isDesktopDevice ? "" : "hidden"
+              }`,
+              !isDesktopDevice && tw`border-b border-gray-200`,
+            ]}
           >
             <SidebarFolderMenu
               folderId={props.folderId}
@@ -400,7 +415,7 @@ export default function SidebarFolder(props: Props) {
               }}
             />
             {/* offset not working yet as NB has a no-no in their component */}
-            <Tooltip label="New Page" placement="right" offset={8}>
+            <Tooltip label="New page" placement="right" offset={8}>
               <IconButton
                 onPress={createDocument}
                 name="file-add-line"
