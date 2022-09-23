@@ -1,4 +1,4 @@
-import { Text, Button } from "@serenity-tools/ui";
+import { Text } from "@serenity-tools/ui";
 
 export default function AccountProfileSettingsScreen() {
   return (
