@@ -113,11 +113,13 @@ export type CreatorDevice = {
 };
 
 export type DeleteDevicesInput = {
-  signingPublicKeys: Array<Scalars['String']>;
+  creatorSigningPublicKey: Scalars['String'];
+  deviceSigningPublicKeysToBeDeleted: Array<Scalars['String']>;
+  newDeviceWorkspaceKeyBoxes: Array<WorkspaceWithWorkspaceDevicesParingInput>;
 };
 
-export type DeleteDevicseResult = {
-  __typename?: 'DeleteDevicseResult';
+export type DeleteDevicesResult = {
+  __typename?: 'DeleteDevicesResult';
   status: Scalars['String'];
 };
 
@@ -361,7 +363,7 @@ export type Mutation = {
   createFolder?: Maybe<CreateFolderResult>;
   createInitialWorkspaceStructure?: Maybe<CreateInitialWorkspaceStructureResult>;
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
-  deleteDevices?: Maybe<DeleteDevicseResult>;
+  deleteDevices?: Maybe<DeleteDevicesResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteFolders?: Maybe<DeleteFoldersResult>;
   deleteWorkspaceInvitations?: Maybe<DeleteWorkspaceInvitationsResult>;
@@ -854,6 +856,11 @@ export type WorkspaceMemberInput = {
   userId: Scalars['String'];
 };
 
+export type WorkspaceWithWorkspaceDevicesParingInput = {
+  id: Scalars['String'];
+  workspaceDevices: Array<WorkspaceDeviceInput>;
+};
+
 export type WorkspaceWithWorkspaceKeys = {
   __typename?: 'WorkspaceWithWorkspaceKeys';
   id: Scalars['String'];
@@ -914,7 +921,7 @@ export type DeleteDevicesMutationVariables = Exact<{
 }>;
 
 
-export type DeleteDevicesMutation = { __typename?: 'Mutation', deleteDevices?: { __typename?: 'DeleteDevicseResult', status: string } | null };
+export type DeleteDevicesMutation = { __typename?: 'Mutation', deleteDevices?: { __typename?: 'DeleteDevicesResult', status: string } | null };
 
 export type DeleteDocumentsMutationVariables = Exact<{
   input: DeleteDocumentsInput;

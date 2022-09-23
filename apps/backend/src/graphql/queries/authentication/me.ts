@@ -27,8 +27,10 @@ export const MeResult = objectType({
           userId,
           workspaceId: args.workspaceId || undefined,
           documentId: args.documentId || undefined,
-          returnOtherWorkspaceIfNotFound: args.returnOtherWorkspaceIfNotFound,
-          returnOtherDocumentIfNotFound: args.returnOtherDocumentIfNotFound,
+          returnOtherWorkspaceIfNotFound:
+            args.returnOtherWorkspaceIfNotFound || false,
+          returnOtherDocumentIfNotFound:
+            args.returnOtherDocumentIfNotFound || false,
         });
         if (!workspace) {
           return null;

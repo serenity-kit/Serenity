@@ -1,10 +1,11 @@
-import { View, Text } from "@serenity-tools/ui";
-import { StyleSheet, FlatList } from "react-native";
+import { Text, View } from "@serenity-tools/ui";
+import { FlatList, StyleSheet } from "react-native";
 import { Device } from "../../types/Device";
 import DeviceListItem from "./DeviceListItem";
 
 type Props = {
   devices: Device[] | null;
+  activeDevice: Device;
   onDeletePress: (deviceSigningPublicKey: string) => void;
 };
 
@@ -15,6 +16,9 @@ export default function DeviceList(props: Props) {
       keyExtractor={(item) => item.signingPublicKey}
       renderItem={({ item }) => (
         <DeviceListItem
+          isActiveDevice={
+            props.activeDevice.signingPublicKey === item.signingPublicKey
+          }
           signingPublicKey={item.signingPublicKey}
           encryptionPublicKey={item.encryptionPublicKey}
           encryptionPublicKeySignature={item.encryptionPublicKeySignature}

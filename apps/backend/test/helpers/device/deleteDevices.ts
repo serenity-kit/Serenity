@@ -1,33 +1,40 @@
 import { gql } from "graphql-request";
+import { WorkspaceWithWorkspaceDevicesParing } from "../../../src/types/workspaceDevice";
 
 type Params = {
   graphql: any;
-  signingPublicKeys: string[];
+  creatorSigningPublicKey: string;
+  newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[];
+  deviceSigningPublicKeysToBeDeleted: string[];
   authorizationHeader: string;
 };
 
 export const deleteDevices = async ({
   graphql,
-  signingPublicKeys,
+  creatorSigningPublicKey,
+  newDeviceWorkspaceKeyBoxes,
   authorizationHeader,
+  deviceSigningPublicKeysToBeDeleted,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
   const query = gql`
-  mutation {
-    deleteDevices(
-      input: {
-        signingPublicKeys: "${signingPublicKeys}"
+    mutation deleteDevices($input: DeleteDevicesInput!) {
+      deleteDevices(input: $input) {
+        status
       }
-    ) {
-      status
     }
-  }
-`;
+  `;
   const result = await graphql.client.request(
     query,
-    null,
+    {
+      input: {
+        creatorSigningPublicKey,
+        newDeviceWorkspaceKeyBoxes,
+        deviceSigningPublicKeysToBeDeleted,
+      },
+    },
     authorizationHeaders
   );
   return result;

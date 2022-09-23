@@ -20,7 +20,7 @@ import {
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
-import { encryptWorkspaceKeyForDevice } from "../../utils/device/encryptWorkspaceKeyForDevice";
+import { createAndEncryptWorkspaceKeyForDevice } from "../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getDevices } from "../../utils/device/getDevices";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceDevices } from "../../utils/workspace/getWorkspaceDevices";
@@ -237,12 +237,13 @@ export default function WorkspaceSettingsMembersScreen(
       }
       for (let device of workspaceDevices) {
         if (device.userId !== member.userId) {
-          const { ciphertext, nonce } = await encryptWorkspaceKeyForDevice({
-            receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-            creatorDeviceEncryptionPrivateKey:
-              activeDevice.encryptionPrivateKey!,
-            workspaceKey,
-          });
+          const { ciphertext, nonce } =
+            await createAndEncryptWorkspaceKeyForDevice({
+              receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+              creatorDeviceEncryptionPrivateKey:
+                activeDevice.encryptionPrivateKey!,
+              workspaceKey,
+            });
           deviceWorkspaceKeyBoxes.push({
             ciphertext,
             nonce,

@@ -30,3 +30,8 @@ export type WorkspaceMemberKeyBox = {
   id: string; // memberId;
   workspaceKeys: WorkspaceKeyWithMembers[];
 };
+
+export type WorkspaceWithWorkspaceDevicesParing = {
+  id: string; // workspaceId;
+  workspaceDevices: WorkspaceDeviceParing[];
+};

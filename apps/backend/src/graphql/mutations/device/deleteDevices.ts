@@ -7,9 +7,10 @@ import {
   objectType,
 } from "nexus";
 import { deleteDevices } from "../../../database/device/deleteDevices";
+import { WorkspaceWithWorkspaceDevicesParingInput } from "../../types/workspaceDevice";
 
 export const DeleteDevicesResult = objectType({
-  name: "DeleteDevicseResult",
+  name: "DeleteDevicesResult",
   definition(t) {
     t.nonNull.string("status");
   },
@@ -18,8 +19,10 @@ export const DeleteDevicesResult = objectType({
 export const DeleteDevicesInput = inputObjectType({
   name: "DeleteDevicesInput",
   definition(t) {
-    t.nonNull.list.nonNull.field("signingPublicKeys", {
-      type: "String",
+    t.nonNull.string("creatorSigningPublicKey");
+    t.nonNull.list.nonNull.string("deviceSigningPublicKeysToBeDeleted");
+    t.nonNull.list.nonNull.field("newDeviceWorkspaceKeyBoxes", {
+      type: WorkspaceWithWorkspaceDevicesParingInput,
     });
   },
 });
@@ -39,7 +42,10 @@ export const deleteDevicesMutation = mutationField("deleteDevices", {
     }
     await deleteDevices({
       userId: context.user.id,
-      signingPublicKeys: args.input.signingPublicKeys,
+      creatorDeviceSigningPublicKey: args.input.creatorSigningPublicKey,
+      newDeviceWorkspaceKeyBoxes: args.input.newDeviceWorkspaceKeyBoxes,
+      deviceSigningPublicKeysToBeDeleted:
+        args.input.deviceSigningPublicKeysToBeDeleted,
     });
     return {
       status: "success",
