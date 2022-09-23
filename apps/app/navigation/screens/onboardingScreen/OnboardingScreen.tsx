@@ -1,9 +1,7 @@
-import React, { useEffect } from "react";
-import { StyleSheet, useWindowDimensions } from "react-native";
 import { CenterContent, tw, View } from "@serenity-tools/ui";
-import { CreateWorkspaceForm } from "../../components/createWorkspaceForm/CreateWorkspaceForm";
-import { KeyboardAvoidingView } from "react-native";
+import { KeyboardAvoidingView, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { CreateWorkspaceForm } from "../../../components/createWorkspaceForm/CreateWorkspaceForm";
 
 export default function OnboardingScreen({ navigation }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing

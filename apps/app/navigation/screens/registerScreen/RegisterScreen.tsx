@@ -1,7 +1,7 @@
 import { Box, Icon, Link, Text, tw, View } from "@serenity-tools/ui";
-import { OnboardingScreenWrapper } from "../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
-import RegisterForm from "../../components/register/RegisterForm";
-import { RootStackScreenProps } from "../../types/navigation";
+import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
+import RegisterForm from "../../../components/register/RegisterForm";
+import { RootStackScreenProps } from "../../../types/navigation";
 
 export default function RegisterScreen(
   props: RootStackScreenProps<"Register">

@@ -11,16 +11,16 @@ import {
 import { VStack } from "native-base";
 import { useState } from "react";
 import { useWindowDimensions } from "react-native";
-import { LoginForm } from "../../components/login/LoginForm";
-import { OnboardingScreenWrapper } from "../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
-import RegisterForm from "../../components/register/RegisterForm";
-import { useAppContext } from "../../context/AppContext";
+import { LoginForm } from "../../../components/login/LoginForm";
+import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
+import RegisterForm from "../../../components/register/RegisterForm";
+import { useAppContext } from "../../../context/AppContext";
 import {
   useAcceptWorkspaceInvitationMutation,
   useWorkspaceInvitationQuery,
-} from "../../generated/graphql";
-import { RootStackScreenProps } from "../../types/navigation";
-import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
+} from "../../../generated/graphql";
+import { RootStackScreenProps } from "../../../types/navigation";
+import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
 
 const Wrapper = ({ children }) => (
   <OnboardingScreenWrapper>

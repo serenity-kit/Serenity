@@ -2,8 +2,8 @@ import { Button, Checkbox, Text, tw, View } from "@serenity-tools/ui";
 import { useEffect, useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { useClient } from "urql";
-import { CreateWorkspaceInvitation } from "../../components/workspace/CreateWorkspaceInvitation";
-import { useWorkspaceId } from "../../context/WorkspaceIdContext";
+import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
+import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
   Device,
   MeDocument,
@@ -16,15 +16,15 @@ import {
   useUpdateWorkspaceMutation,
   Workspace,
   WorkspaceMember,
-} from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
-import { createAndEncryptWorkspaceKeyForDevice } from "../../utils/device/createAndEncryptWorkspaceKeyForDevice";
-import { getDevices } from "../../utils/device/getDevices";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
-import { getWorkspaceDevices } from "../../utils/workspace/getWorkspaceDevices";
-import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
+} from "../../../generated/graphql";
+import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
+import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
+import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
+import { getDevices } from "../../../utils/device/getDevices";
+import { getWorkspace } from "../../../utils/workspace/getWorkspace";
+import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
+import { getWorkspaceKey } from "../../../utils/workspace/getWorkspaceKey";
 
 type Member = {
   userId: string;

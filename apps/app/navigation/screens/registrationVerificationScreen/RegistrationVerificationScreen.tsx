@@ -10,36 +10,36 @@ import {
 import { useState } from "react";
 import { Platform } from "react-native";
 import { useClient } from "urql";
-import { OnboardingScreenWrapper } from "../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
-import { useAppContext } from "../../context/AppContext";
+import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
+import { useAppContext } from "../../../context/AppContext";
 import {
   useAcceptWorkspaceInvitationMutation,
   useFinishLoginMutation,
   useStartLoginMutation,
   useVerifyRegistrationMutation,
-} from "../../generated/graphql";
-import { RootStackScreenProps } from "../../types/navigation";
-import { createDeviceWithInfo } from "../../utils/authentication/createDeviceWithInfo";
+} from "../../../generated/graphql";
+import { RootStackScreenProps } from "../../../types/navigation";
+import { createDeviceWithInfo } from "../../../utils/authentication/createDeviceWithInfo";
 import {
   fetchMainDevice,
   login,
   navigateToNextAuthenticatedPage,
-} from "../../utils/authentication/loginHelper";
+} from "../../../utils/authentication/loginHelper";
 import {
   deleteStoredUsernamePassword,
   getStoredPassword,
   getStoredUsername,
   isUsernamePasswordStored,
-} from "../../utils/authentication/registrationMemoryStore";
-import { setDevice } from "../../utils/device/deviceStore";
+} from "../../../utils/authentication/registrationMemoryStore";
+import { setDevice } from "../../../utils/device/deviceStore";
 import {
   removeWebDevice,
   setWebDevice,
-} from "../../utils/device/webDeviceStore";
-import { removeLastUsedWorkspaceId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { acceptWorkspaceInvitation } from "../../utils/workspace/acceptWorkspaceInvitation";
-import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
-import { getPendingWorkspaceInvitationId } from "../../utils/workspace/getPendingWorkspaceInvitationId";
+} from "../../../utils/device/webDeviceStore";
+import { removeLastUsedWorkspaceId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
+import { attachDeviceToWorkspaces } from "../../../utils/workspace/attachDeviceToWorkspaces";
+import { getPendingWorkspaceInvitationId } from "../../../utils/workspace/getPendingWorkspaceInvitationId";
 
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
