@@ -3,6 +3,11 @@
 export interface Typegen0 {
   "@@xstate/typegen": true;
   internalEvents: {
+    "done.invoke.loadInitialDataMachine": {
+      type: "done.invoke.loadInitialDataMachine";
+      data: unknown;
+      __tip: "See the XState TS docs to learn how to strongly type this.";
+    };
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {};
@@ -14,8 +19,10 @@ export interface Typegen0 {
   };
   eventsCausingActions: {};
   eventsCausingServices: {};
-  eventsCausingGuards: {};
+  eventsCausingGuards: {
+    hasDocumentAccess: "done.invoke.loadInitialDataMachine";
+  };
   eventsCausingDelays: {};
-  matchesStates: "loadingInitalData";
+  matchesStates: "hasNoAccess" | "loadDocument" | "loadingInitalData";
   tags: never;
 }

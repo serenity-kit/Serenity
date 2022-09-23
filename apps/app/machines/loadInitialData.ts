@@ -1,8 +1,8 @@
-import { assign, createMachine } from "xstate";
+import { assign, createMachine, sendParent } from "xstate";
 import { MeDocument, MeQuery, MeQueryVariables } from "../generated/graphql";
 import { urqlClient } from "../utils/urqlClient/urqlClient";
 
-type QueryResult = {
+export type MeWithWorkspaceLoadingInfoQueryResult = {
   data?: MeQuery;
   error?: {
     networkError?: any;
@@ -15,7 +15,7 @@ type Context = {
   returnOtherWorkspaceIfNotFound?: boolean;
   returnOtherDocumentIfNotFound?: boolean;
   navigation: any;
-  queryResult?: QueryResult;
+  queryResult?: MeWithWorkspaceLoadingInfoQueryResult;
 };
 
 const fetchMeWithWorkspaceLoadingInfo = async (context) => {
@@ -38,7 +38,7 @@ const fetchMeWithWorkspaceLoadingInfo = async (context) => {
 };
 
 export const loadInitialDataMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2BDCBJAdgSwBc91kARdA9AOjUzxygGIJUcwr6A3VAa3YDMwBAMYALALQBbMAHVComagBOPWAAd0wsABkMEelFz9UiUGtSxCeVqZAAPRACYAzAEYqAdg8AOAJzfvD2c3ABZHVwAaEABPRHEABipXeMcw3w8AVlcMgDYsnNdXAF8iqNpsfCISckoaPQNGMCUlZSo1ZApjJUkqQREJaTkCBWVVDS1dOgYjEyQQc0siGzmHBHDvKj9nP29HDN9972co2LXvDKp473jfR3jnK-j4kJKyvVwraopqcshGWwWVmWoFWPkSIXiORcOQOziyGWOMUQyXcIVcvhhGRCGQ89xyOQ8rxA5Q+VTI3166DwyAArkowIw7LBKAR2Oh+KylAAKO5PACUjBJlWI5Nq-CptPpAIsQJwtlWzl8lxCeRCHlceTuWL2J0QzghVAJjkc6Tc9yuGSJQs+ouonBIeAgAGU4JZWP85oClnKVsjXI4Nr5ggF7llHDk4bqENlnFQITlnkGIViIzkre9hV9augacNlHgAF5-aWLaw+kHIvwXXzZI7+DLxVy7KOuNGeDK5dJBqEeAPpzCkkU1aiidCwRQqdSaMAAQWEWlgsA9Zhl3vlyIbjioAdc+oK3ihHZbbcynY83ccve8JVKIBwqAgcFs1rJw7qUygJdl64Q8Sj+yoXwgKAtw9kvFxr1vF8hwpX4IC-NdfQQCMt22C0fBhDFHBbFIqH2XscmxE0rhNSC3gHTNbUpak6TABCyx-CMQkAjsXDVGtjWcHIoxcC5zg8EJsSuLw-GNfsKhtN8uAdZ1XQYz1V3kisEEyJVdi41Iwm8bFzijOEPHbFIghuLtnnEwcsztGSXUXJT5kU4F7GRFINgjFJu20nJAm8KMQiVZ4-DchMI13F4oIzSSKRzPMlELSB6Mc1ZXEyVyCRrXw-LCY1uKRaMwk2AN1RRIJ0VyczKLfe8CBnXNRHzIt4IU0tEo3AD1QPTiMRSQi9ME7cNWyK44QeS803CijItqelMFOFdmvLJy1nRRJeyxB4HieeJexbOF2wyS9zx2djCXGiTXwpUdYAAOVQCcxmneAmu-JCmyyONtI7Ak-ONIJepyS4gL8ULDwbS1TosqjLruqctDnBdHrm57lP9INDQPDUgJxZ5Ml8-yQkCh5grcfVysm6h7zh10EoWpKm1jG4VQ7bx-VrXxeuY9UEX9VJUmePJSfOyhqZ-cRUijcRe0uKtFQygpBMEm8iiAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2BDCBJAdgSwBc91kARdA9AOjUzxygGIJUcwr6A3VAa3YDMwBAMYALALJgA6oVFTUAJx6wADumFgAMhgj0oufqkSgVqWITytjIAB6IATPYCcVAAwBGABwA2AKw+nJwBmD1dvABoQAE9Eb28qewB2ABYg71dXX3cndMTEgF98yNpsfCISckoaHT1GMAUFRSoVZApDBQBbKkERCWlZeSVVdS0ahgMjJBBTcyIrKbsEd1dkqk9XRKd3ZMSsna2gyJiEZ1X3d0TvT0dfK6ygwuKdXAsKimoSyEZrGYt50EWiXWVGSYXsaScviCWShR0Qy3cIOy3khyV8iVcaW8BSKIBKL3KZHe3XQeGQAFcFGBGDZYJQCOx0PwGQoABT2DKuACUjHxZWIRKq-FJFKpPzMfxw1kWAFpvEEqMt5esclc4u44Qg0okqNj0ckDUFIfZkibHnjnvy3lVOCQ8BAAMpwcysb5TX5zKULeHueyeKjBIKedbQ33y3ya9xQkFhFbBUG+ZLy7zmvmvQXUdDkgiiRR4ABeX3Fs0sXoB8M8kIDUc8Rs8vg810jyURu1uTk2aSSftTlvTlWoonQsEGyjUGgAgsINLBYG6TBLPdL4Q37AlPO4gkmvN57L4I9F4S2qG2UZ3d4ke+acKgIHBrGnCQPqnQGMXJcuEDLsjqgvZN36gTeOcGyauiAYhNsTipBkjieMkvaYASArPp8EDvku3oIPKa5Bq49ZAiiOT2JGrhrr4Hb2N4aLOPhzieIhpT9sSwpkpSYAYaWn7yqskK+OC+y+uCESHic0JrPqaL4XklaOIxyHWtQXB2o6zpce6i7qeWCC7C41xdgafpovWmrQjquxkYkISBJsKzyVaGZULayD2k6s5adMmn-LY8Jkf68pkcEVxJp4QKaskLgrJWAXpPKm4Ibij4ocSWY5nmhboRpJbeYsFz+Lq2JbNB0GOFRzZrtcoUgRcQTZLc9nMVUN4EBO2a5goBaQJxOUrhRJ47o4RrpFRySmQaCTuMBDa1lClkpolfZPsSVKYMcC7ZWWPknNkrgnnuMEhJyl6RuJbZJJslbwZsOJPEhDnPkOsAAHKoKOwwzt1m25fWiLJPB+7YhFjhWWN8SuIElbxbu+6ZA1S1VI9b3jmAU4zvAWUflhvrBLqPiTYE6IrLs4WRX9OQhLFtVbnDyVNagqPOp9n7nLWbjQX4-i+jWThjasiRRrVjimqCSa+DTilM1hMqOIif4AZWOQgYkmrS2uwTXOi-F3Ok8GFIUQA */
   createMachine(
     {
       context: { navigation: null } as Context,
@@ -48,8 +48,8 @@ export const loadInitialDataMachine =
       states: {
         loading: {
           invoke: {
-            src: fetchMeWithWorkspaceLoadingInfo,
-            id: "fetch-meWithWorkspaceLoadingInfo",
+            src: "fetchMeWithWorkspaceLoadingInfo",
+            id: "fetchMeWithWorkspaceLoadingInfo",
             onDone: [
               {
                 actions: assign({
@@ -118,7 +118,9 @@ export const loadInitialDataMachine =
           type: "final",
         },
         ready: {
+          entry: "ready",
           type: "final",
+          data: (context) => context.queryResult,
         },
         hasNoWorkspaces: {
           entry: "redirectToNoWorkspaces",
@@ -166,9 +168,19 @@ export const loadInitialDataMachine =
         },
       },
       actions: {
+        ready: sendParent((context) => ({
+          type: "loadInitialDataSuccess",
+          data: {
+            workspaceId:
+              context.queryResult?.data?.me?.workspaceLoadingInfo?.id,
+            documentId:
+              context.queryResult?.data?.me?.workspaceLoadingInfo?.documentId,
+          },
+        })),
         redirectToLogin: (context) => {
           context.navigation.replace("Login", {});
         },
+        // @ts-ignore seems to be an issue with xstate type generation
         redirectToNoWorkspaceAccess: (context) => {
           context.navigation.replace("WorkspaceNotFoundScreen", {
             workspaceId:
@@ -184,6 +196,9 @@ export const loadInitialDataMachine =
         redirectToNoWorkspaces: (context) => {
           context.navigation.replace("Onboarding");
         },
+      },
+      services: {
+        fetchMeWithWorkspaceLoadingInfo: fetchMeWithWorkspaceLoadingInfo,
       },
     }
   );

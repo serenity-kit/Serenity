@@ -4,13 +4,13 @@ export interface Typegen0 {
   "@@xstate/typegen": true;
   internalEvents: {
     "": { type: "" };
-    "done.invoke.fetch-meWithWorkspaceLoadingInfo": {
-      type: "done.invoke.fetch-meWithWorkspaceLoadingInfo";
+    "done.invoke.fetchMeWithWorkspaceLoadingInfo": {
+      type: "done.invoke.fetchMeWithWorkspaceLoadingInfo";
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
-    "error.platform.fetch-meWithWorkspaceLoadingInfo": {
-      type: "error.platform.fetch-meWithWorkspaceLoadingInfo";
+    "error.platform.fetchMeWithWorkspaceLoadingInfo": {
+      type: "error.platform.fetchMeWithWorkspaceLoadingInfo";
       data: unknown;
     };
     "xstate.after(2000)#loadInitialData.failure": {
@@ -18,7 +18,9 @@ export interface Typegen0 {
     };
     "xstate.init": { type: "xstate.init" };
   };
-  invokeSrcNameMap: {};
+  invokeSrcNameMap: {
+    fetchMeWithWorkspaceLoadingInfo: "done.invoke.fetchMeWithWorkspaceLoadingInfo";
+  };
   missingImplementations: {
     actions: never;
     services: never;
@@ -26,15 +28,20 @@ export interface Typegen0 {
     delays: never;
   };
   eventsCausingActions: {
+    ready: "";
     redirectToLobby: "";
     redirectToLogin: "";
     redirectToNoWorkspaces: "";
   };
-  eventsCausingServices: {};
+  eventsCausingServices: {
+    fetchMeWithWorkspaceLoadingInfo:
+      | "xstate.after(2000)#loadInitialData.failure"
+      | "xstate.init";
+  };
   eventsCausingGuards: {
     hasAccessToWorkspace: "";
     hasAnyWorkspaces: "";
-    hasNoNetworkError: "done.invoke.fetch-meWithWorkspaceLoadingInfo";
+    hasNoNetworkError: "done.invoke.fetchMeWithWorkspaceLoadingInfo";
     isAuthorized: "";
     isValidSession: "";
   };

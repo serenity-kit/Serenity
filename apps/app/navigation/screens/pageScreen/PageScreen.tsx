@@ -17,6 +17,7 @@ import {
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 
+import { CenterContent, Spinner, Text } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useDocumentStore } from "../../../utils/document/documentStore";
 import { getDocument } from "../../../utils/document/getDocument";
@@ -33,40 +34,13 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const urqlClient = useClient();
 
-  const [state, send] = useMachine(loadPageMachine, {
+  const [state] = useMachine(loadPageMachine, {
     context: {
       workspaceId,
       documentId: pageId,
       navigation: props.navigation,
     },
   });
-
-  console.log(state);
-
-  const navigateAwayIfUserDoesntHaveAccess = async (
-    workspaceId: string,
-    docId: string
-  ) => {
-    try {
-      const document = await getDocument({
-        documentId: docId,
-        urqlClient,
-      });
-      await updateDocumentStore(document, urqlClient, activeDevice);
-    } catch (error: any) {
-      if (
-        error.message === "[GraphQL] Document not found" ||
-        error.message === "[GraphQL] Unauthorized"
-      ) {
-        props.navigation.replace("Workspace", {
-          workspaceId,
-          screen: "NoPageExists",
-        });
-        return;
-      }
-    }
-    return true;
-  };
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
@@ -78,24 +52,11 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
 
   const updateTitle = async (title: string) => {
     let document: Document | undefined | null = undefined;
-    try {
-      document = await getDocument({
-        documentId: pageId,
-        urqlClient,
-      });
-      await updateDocumentStore(document, urqlClient, activeDevice);
-    } catch (error: any) {
-      if (
-        error.message === "[GraphQL] Document not found" ||
-        error.message === "[GraphQL] Unauthorized"
-      ) {
-        props.navigation.replace("Workspace", {
-          workspaceId,
-          screen: "NoPageExists",
-        });
-        return;
-      }
-    }
+    document = await getDocument({
+      documentId: pageId,
+      urqlClient,
+    });
+    await updateDocumentStore(document, urqlClient, activeDevice);
     if (document?.id !== pageId) {
       console.error("document ID doesn't match page ID");
       return;
@@ -144,20 +105,33 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   useEffect(() => {
     setLastUsedDocumentId(pageId, workspaceId);
     // removing the isNew param right after the first render so users don't have it after a refresh
-    props.navigation.setParams({ isNew: undefined });
-    (async () => {
-      if (pageId) {
-        await navigateAwayIfUserDoesntHaveAccess(workspaceId, pageId);
-      }
-    })();
-  }, [pageId]);
+    if (state.matches("loadDocument")) {
+      props.navigation.setParams({ isNew: undefined });
+    }
+  }, [pageId, workspaceId, props.navigation, state]);
 
-  return (
-    <Page
-      {...props}
-      // to force unmount and mount the page
-      key={pageId}
-      updateTitle={updateTitle}
-    />
-  );
+  if (state.matches("hasNoAccess")) {
+    return (
+      <CenterContent>
+        <Text>
+          This page does not exist or you don't have access to it anymore.
+        </Text>
+      </CenterContent>
+    );
+  } else if (state.matches("loadDocument")) {
+    return (
+      <Page
+        {...props}
+        // to force unmount and mount the page
+        key={pageId}
+        updateTitle={updateTitle}
+      />
+    );
+  } else {
+    return (
+      <CenterContent>
+        <Spinner fadeIn />
+      </CenterContent>
+    );
+  }
 }

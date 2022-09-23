@@ -36,7 +36,6 @@ import DeviceManagerScreen from "./screens/DeviceManagerScreen";
 import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
 import LibsodiumTestScreen from "./screens/LibsodiumTestScreen";
 import LoginScreen from "./screens/LoginScreen";
-import NoPageExistsScreen from "./screens/NoPageExistsScreen";
 import NotFoundScreen from "./screens/NotFoundScreen";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import PageScreen from "./screens/pageScreen/PageScreen";
@@ -118,11 +117,6 @@ function WorkspaceDrawerScreen(props) {
         <Drawer.Screen
           name="WorkspaceRoot"
           component={WorkspaceRootScreen}
-          options={{ headerShown: false }}
-        />
-        <Drawer.Screen
-          name="NoPageExists"
-          component={NoPageExistsScreen}
           options={{ headerShown: false }}
         />
         <Drawer.Screen
@@ -367,7 +361,6 @@ const getLinking = (
         Workspace: {
           path: "/workspace/:workspaceId",
           screens: {
-            NoPageExists: "no-page-exits",
             Page: "page/:pageId",
             WorkspaceRoot: "",
           },
