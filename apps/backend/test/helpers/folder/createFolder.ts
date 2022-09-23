@@ -7,6 +7,7 @@ type Params = {
   name: string;
   parentFolderId: string | null | undefined;
   workspaceId: string;
+  workspaceKeyId: string;
   parentKey: string;
   authorizationHeader: string;
 };
@@ -16,6 +17,7 @@ export const createFolder = async ({
   id,
   name,
   parentKey,
+  workspaceKeyId,
   parentFolderId,
   workspaceId,
   authorizationHeader,
@@ -54,6 +56,7 @@ export const createFolder = async ({
         encryptedName,
         encryptedNameNonce,
         parentFolderId,
+        workspaceKeyId: workspaceKeyId,
         subkeyId,
         workspaceId,
       },

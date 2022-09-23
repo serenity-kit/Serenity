@@ -39,6 +39,7 @@ import {
 } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 import SidebarPage from "../sidebarPage/SidebarPage";
@@ -137,6 +138,11 @@ export default function SidebarFolder(props: Props) {
     openFolder();
     const id = uuidv4();
     let workspaceKey = "";
+    const workspace = await getWorkspace({
+      urqlClient,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+      workspaceId: props.workspaceId,
+    });
     try {
       workspaceKey = await getWorkspaceKey({
         workspaceId: props.workspaceId,
@@ -164,6 +170,7 @@ export default function SidebarFolder(props: Props) {
           workspaceId: route.params.workspaceId,
           encryptedName: encryptedFolderResult.ciphertext,
           encryptedNameNonce: encryptedFolderResult.publicNonce,
+          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
           subkeyId: encryptedFolderResult.folderSubkeyId,
           parentFolderId: props.folderId,
         },
@@ -239,6 +246,11 @@ export default function SidebarFolder(props: Props) {
     }
   };
   const updateFolderName = async (newFolderName: string) => {
+    let workspace = await getWorkspace({
+      workspaceId: props.workspaceId,
+      urqlClient,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
     let workspaceKey = "";
     try {
       workspaceKey = await getWorkspaceKey({
@@ -261,6 +273,7 @@ export default function SidebarFolder(props: Props) {
         id: props.folderId,
         encryptedName: encryptedFolderResult.ciphertext,
         encryptedNameNonce: encryptedFolderResult.publicNonce,
+        workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
         subkeyId: props.subkeyId!,
       },
     });

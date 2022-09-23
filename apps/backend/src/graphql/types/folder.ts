@@ -1,4 +1,5 @@
 import { objectType } from "nexus";
+import { WorkspaceKey } from "./workspace";
 
 export const Folder = objectType({
   name: "Folder",
@@ -10,5 +11,7 @@ export const Folder = objectType({
     t.string("parentFolderId");
     t.string("rootFolderId");
     t.string("workspaceId");
+    t.string("workspaceKeyId");
+    t.field("workspaceKey", { type: WorkspaceKey });
   },
 });

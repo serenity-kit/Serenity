@@ -183,6 +183,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           workspaceId: route.params.workspaceId,
           encryptedName: encryptedFolderResult.ciphertext,
           encryptedNameNonce: encryptedFolderResult.publicNonce,
+          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
           subkeyId: encryptedFolderResult.folderSubkeyId,
         },
       });

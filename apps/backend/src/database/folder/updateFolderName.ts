@@ -5,6 +5,7 @@ type Params = {
   id: string;
   encryptedName: string;
   encryptedNameNonce: string;
+  workspaceKeyId: string;
   subkeyId: number;
   userId: string;
 };
@@ -13,6 +14,7 @@ export async function updateFolderName({
   id,
   encryptedName,
   encryptedNameNonce,
+  workspaceKeyId,
   subkeyId,
   userId,
 }: Params) {
@@ -55,6 +57,7 @@ export async function updateFolderName({
         data: {
           encryptedName,
           encryptedNameNonce,
+          workspaceKeyId,
           subkeyId,
         },
       });

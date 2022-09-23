@@ -66,6 +66,7 @@ const setup = async () => {
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: workspaceId,
+    workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
   const createFolderResult = await createFolder({
     graphql,
@@ -75,6 +76,7 @@ const setup = async () => {
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: workspaceId,
+    workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
   const createChildFolderResult = await createFolder({
     graphql,
@@ -84,6 +86,7 @@ const setup = async () => {
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: workspaceId,
+    workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
   await createDocument({
     graphql,
@@ -135,6 +138,7 @@ const setup = async () => {
     parentKey: workspaceKey2,
     authorizationHeader: sessionKey2,
     workspaceId: otherWorkspaceId,
+    workspaceKeyId: workspace2.currentWorkspaceKey.id,
   });
   await createDocument({
     graphql,

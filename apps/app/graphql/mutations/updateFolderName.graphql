@@ -4,6 +4,7 @@ mutation updateFolderName($input: UpdateFolderNameInput!) {
       id
       encryptedName
       encryptedNameNonce
+      workspaceKeyId
       subkeyId
       parentFolderId
       rootFolderId

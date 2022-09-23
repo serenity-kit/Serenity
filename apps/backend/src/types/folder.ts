@@ -1,3 +1,5 @@
+import { WorkspaceKey } from "./workspace";
+
 export type Folder = {
   id: string;
   encryptedName: string;
@@ -7,5 +9,7 @@ export type Folder = {
   parentFolderId: string | null;
   rootFolderId: string | null;
   workspaceId: string;
+  workspaceKeyId: string;
+  workspaceKey?: WorkspaceKey | null;
   parentFolders: Folder[] | null;
 };

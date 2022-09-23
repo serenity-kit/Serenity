@@ -51,11 +51,12 @@ const setup = async () => {
       authorizationHeader: sessionKey,
     }
   );
+  const workspace =
+    initialWorkspaceStructureResult.createInitialWorkspaceStructure.workspace;
   workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
     device: registerUserResult.mainDevice,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    workspace:
-      initialWorkspaceStructureResult.createInitialWorkspaceStructure.workspace,
+    workspace,
   });
   const parentFolderName = "parent folder";
   const folderName = "folder";
@@ -67,6 +68,7 @@ const setup = async () => {
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: workspaceId,
+    workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
   const createFolderResult = await createFolder({
     graphql,
@@ -76,6 +78,7 @@ const setup = async () => {
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: workspaceId,
+    workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
   didRegisterUser = true;
 };
