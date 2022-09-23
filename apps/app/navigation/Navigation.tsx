@@ -381,9 +381,9 @@ const getLinking = (
         EncryptDecryptImageTest: "encrypt-decrypt-image-test",
         AcceptWorkspaceInvitation:
           "accept-workspace-invitation/:workspaceInvitationId",
-
         TestLibsodium: "test-libsodium",
         WorkspaceNotDecrypted: "/workspace/:workspaceId/lobby",
+        WorkspaceNotFound: "/workspace/:workspaceId/not-found",
         ...accountSettings,
         Root: "",
         NotFound: "*",

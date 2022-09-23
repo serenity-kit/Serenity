@@ -19,7 +19,6 @@ type Context = {
 };
 
 const fetchMeWithWorkspaceLoadingInfo = async (context) => {
-  console.log("fetchMeWithWorkspaceLoadingInfo");
   await new Promise((r) => setTimeout(r, 2000));
   const result = await urqlClient
     .query<MeQuery, MeQueryVariables>(
@@ -40,7 +39,7 @@ const fetchMeWithWorkspaceLoadingInfo = async (context) => {
 };
 
 export const loadInitialDataMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2BDCBJAdgSwBc91kARdA9AOjUzxygGIJUcwr6A3VAa3YDMwBAMYALALQBbMAHVComagBOPWAAd0wsABkMEelFz9UiUGtSxCeVqZAAPRACYAzAEYqAdg8AOAJzfvD2c3ABZHVwAaEABPRHEABipXeMcw3w8AVlcMgDYsnNdXAF8iqNpsfCISckoaPQNGMCUlZSo1ZApjJUkqQREJaTkCBWVVDS1dOgYjEyQQc0siGzmHBHDvKj9nP29HDN9972co2LXvDKp473jfR3jnK-j4kJKyvVwraopqcshGWwWVmWoFWPkSIXiORcOQOziyGWOMUQyXcIVcvhhGRCGQ89xyOQ8rxA5Q+VTI3166DwyAArkowIw7LBKAR2Oh+KylAAKO5PACUjBJlWI5Nq-CptPpAIsQJwtlWzl8lxCeRCHlceTuWL2J0QzghVAJjkc6Tc9yuGSJQs+ouonBIeAgAGU4JZWP85oClnKVsjXI4Nr5ggF7llHDk4bqENlnFQITlnkGIViIzkre9hV9augacNlHgAF5-aWLaw+kHIvwXXzZI7+DLxVy7KOuNGeDK5dJBqEeAPpzCkkU1aiidCwRQqdSaMAAQWEWlgsA9Zhl3vlyIbjioAdc+oK3ihHZbbcynY83ccve8JVKIBwqAgcFs1rJw7qUygJdl64Q8Sj+yoXwgKAtw9kvFxr1vF8hwpX4IC-NdfQQCMt22C0fBhDFHBbFIqH2XscmxE0rhNSC3gHTNbUpak6TABCyx-CMQkAjsXDVGtjWcHIoxcC5zg8EJsSuLw-GNfsKhtN8uAdZ1XQYz1V3kisEEyJVdi41Iwm8bFzijOEPHbFIghuLtnnEwcsztGSXUXJT5kU4F7GRFINgjFJu20nJAm8KMQiVZ4-DchMI13F4oIzSSKRzPMlELSB6Mc1ZXEyVyCRrXw-LCY1uKRaMwk2AN1RRIJ0VyczKLfe8CBnXNRHzIt4IU0tEuRIjt32G5zhxS9I1yvdLiAvxQsPBtLXCijItqelMFOFdmvLJy1nRRJeyxB4HieeJexbOF2wyS9zx2djCXGiTXwpUdYAAOVQCcxmneAmu-JCmyyONtI7Ak-ONII9JVAb-BrPc9lG8rJpHMc7qnLQ5wXR65ue5T-SDQ0Dw1ICcWeTJfP8kJAoeYK3H1MHztqe9YddBKFqSptYxuFUO28f1a18P7mPVBF-VSVJnjyEmYMoKmf3EVIo3EXtLkC7FnDufV4gySCSiAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2BDCBJAdgSwBc91kARdA9AOjUzxygGIJUcwr6A3VAa3YDMwBAMYALALQBbMAHVComagBOPWAAd0wsABkMEelFz9UiUGtSxCeVqZAAPRACYAzAEYqAdg8AOAJzfvD2c3ABZHVwAaEABPRHEABipXeMcw3w8AVlcMgDYsnNdXAF8iqNpsfCISckoaPQNGMCUlZSo1ZApjJUkqQREJaTkCBWVVDS1dOgYjEyQQc0siGzmHBHDvKj9nP29HDN9972co2LXvDKp473jfR3jnK-j4kJKyvVwraopqcshGWwWVmWoFWPkSIXiORcOQOziyGWOMUQyXcIVcvhhGRCGQ89xyOQ8rxA5Q+VTI3166DwyAArkowIw7LBKAR2Oh+KylAAKO5PACUjBJlWI5Nq-CptPpAIsQJwtlWzl8lxCeRCHlceTuWL2J0QzghVAJjkc6Tc9yuGSJQs+ouonBIeAgAGU4JZWP85oClnKVsjXI4Nr5ggF7llHDk4bqENlnFQITlnkGIViIzkre9hV9augacNlHgAF5-aWLaw+kHIvwXXzZI7+DLxVy7KOuNGeDK5dJBqEeAPpzCkkU1aiidCwRQqdSaMAAQWEWlgsA9Zhl3vlyIbjioAdc+oK3ihHZbbcynY83ccve8JVKIBwqAgcFs1rJw7qUygJdl64Q8Sj+yoXwgKAtw9kvFxr1vF8hwpX4IC-NdfQQCMt22C0fBhDFHBbFIqH2XscmxE0rhNSC3gHTNbUpak6TABCyx-CMQkAjsXDVGtjWcHIoxcC5zg8EJsSuLw-GNfsKhtN8uAdZ1XQYz1V3kisEEyJVdi41Iwm8bFzijOEPHbFIghuLtnnEwcsztGSXUXJT5kU4F7GRFINgjFJu20nJAm8KMQiVZ4-DchMI13F4oIzSSKRzPMlELSB6Mc1ZXEyVyCRrXw-LCY1uKRaMwk2AN1RRIJ0VyczKLfe8CBnXNRHzIt4IU0tEo3AD1QPTiMRSQi9ME7cNWyK44QeS803CijItqelMFOFdmvLJy1nRRJeyxB4HieeJexbOF2wyS9zx2djCXGiTXwpUdYAAOVQCcxmneAmu-JCmyyONtI7Ak-ONIJepyS4gL8ULDwbS1TosqjLruqctDnBdHrm57lP9INDQPDUgJxZ5Ml8-yQkCh5grcfVysm6h7zh10EoWpKm1jG4VQ7bx-VrXxeuY9UEX9VJUmePJSfOyhqZ-cRUijcRe0uKtFQygpBMEm8iiAA */
   createMachine(
     {
       context: { navigation: null } as Context,
@@ -50,28 +49,7 @@ export const loadInitialDataMachine =
       states: {
         loading: {
           invoke: {
-            src: async (context) => {
-              console.log("fetchMeWithWorkspaceLoadingInfo");
-              await new Promise((r) => setTimeout(r, 2000));
-              const result = await urqlClient
-                .query<MeQuery, MeQueryVariables>(
-                  MeDocument,
-                  {
-                    workspaceId: context.workspaceId,
-                    documentId: context.documentId,
-                    returnOtherWorkspaceIfNotFound:
-                      context.returnOtherWorkspaceIfNotFound,
-                    returnOtherDocumentIfNotFound:
-                      context.returnOtherDocumentIfNotFound,
-                  },
-                  {
-                    // better to be safe here and always refetch
-                    requestPolicy: "network-only",
-                  }
-                )
-                .toPromise();
-              return result;
-            },
+            src: fetchMeWithWorkspaceLoadingInfo,
             id: "fetch-meWithWorkspaceLoadingInfo",
             onDone: [
               {
@@ -160,6 +138,7 @@ export const loadInitialDataMachine =
         },
         noAccess: {
           entry: "redirectToNoWorkspaceAccess",
+          type: "final",
         },
       },
       id: "loadInitialData",
@@ -173,7 +152,7 @@ export const loadInitialDataMachine =
         isValidSession: (context) => {
           return Boolean(context.queryResult?.data?.me?.id);
         },
-        hasAccessToWorkspace: (context, event: { data: QueryResult }) => {
+        hasAccessToWorkspace: (context) => {
           return Boolean(
             context.queryResult?.data?.me?.workspaceLoadingInfo?.id
           );
@@ -191,10 +170,11 @@ export const loadInitialDataMachine =
         redirectToLogin: (context) => {
           context.navigation.replace("Login", {});
         },
-        hasAccessToNoWorkspaceAccess: (context) => {
-          // TODO create page for this case and redirect to it here
-          // context.navigation.replace("NoWorkspaceAccess", {});
-          return false;
+        redirectToNoWorkspaceAccess: (context) => {
+          context.navigation.replace("WorkspaceNotFoundScreen", {
+            workspaceId:
+              context.queryResult?.data?.me?.workspaceLoadingInfo?.id,
+          });
         },
         redirectToLobby: (context) => {
           context.navigation.replace("WorkspaceNotDecrypted", {
