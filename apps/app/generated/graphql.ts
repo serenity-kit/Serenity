@@ -336,6 +336,8 @@ export type MeResult = {
 
 export type MeResultWorkspaceLoadingInfoArgs = {
   documentId?: InputMaybe<Scalars['ID']>;
+  returnOtherDocumentIfNotFound?: InputMaybe<Scalars['Boolean']>;
+  returnOtherWorkspaceIfNotFound?: InputMaybe<Scalars['Boolean']>;
   workspaceId?: InputMaybe<Scalars['ID']>;
 };
 
@@ -1080,6 +1082,9 @@ export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?
 
 export type MeQueryVariables = Exact<{
   workspaceId?: InputMaybe<Scalars['ID']>;
+  documentId?: InputMaybe<Scalars['ID']>;
+  returnOtherWorkspaceIfNotFound?: InputMaybe<Scalars['Boolean']>;
+  returnOtherDocumentIfNotFound?: InputMaybe<Scalars['Boolean']>;
 }>;
 
 
@@ -1683,11 +1688,16 @@ export function useMainDeviceQuery(options?: Omit<Urql.UseQueryArgs<MainDeviceQu
   return Urql.useQuery<MainDeviceQuery, MainDeviceQueryVariables>({ query: MainDeviceDocument, ...options });
 };
 export const MeDocument = gql`
-    query me($workspaceId: ID) {
+    query me($workspaceId: ID, $documentId: ID, $returnOtherWorkspaceIfNotFound: Boolean, $returnOtherDocumentIfNotFound: Boolean) {
   me {
     id
     username
-    workspaceLoadingInfo(workspaceId: $workspaceId) {
+    workspaceLoadingInfo(
+      workspaceId: $workspaceId
+      returnOtherWorkspaceIfNotFound: $returnOtherWorkspaceIfNotFound
+      documentId: $documentId
+      returnOtherDocumentIfNotFound: $returnOtherDocumentIfNotFound
+    ) {
       id
       isAuthorized
       documentId

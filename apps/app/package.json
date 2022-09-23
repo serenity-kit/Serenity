@@ -12,7 +12,7 @@
     "dev:e2e": "yarn setup && IS_E2E_TEST=true API_URL=http://localhost:4001/graphql expo start:web --port=3000",
     "dev:electron-web": "yarn setup && EXPO_ELECTRON_MODE=true expo start --web --dev-client",
     "dev:electron-main": "yarn && electron ./electron/main/index.ts",
-    "build:xstate-types": " xstate typegen \"machines/**/*.ts?(x)\"",
+    "build:xstate-types": " xstate typegen \"./**/*.ts?(x)\"",
     "build:graphql-types": "graphql-codegen --config codegen.yml",
     "build:web": "yarn setup && expo build:web --no-pwa && cp _redirects ./web-build/_redirects",
     "build:web:e2e": "yarn setup && IS_E2E_TEST=true API_URL=http://localhost:4001/graphql expo build:web --no-pwa && cp _redirects ./web-build/_redirects",
@@ -83,7 +83,6 @@
     "urql": "^3.0.3",
     "uuid": "^9.0.0",
     "xstate": "^4.33.6",
-    "xstate-react": "^0.1.1",
     "y-protocols": "^1.0.5",
     "yjs": "^13.5.41",
     "zustand": "^4.1.1"

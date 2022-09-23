@@ -35,7 +35,6 @@ type RegistrationVerificationParams = {
 };
 
 export type WorkspaceDrawerParamList = {
-  NoPageExists: undefined;
   Page: PageParams;
   Settings: undefined;
   WorkspaceRoot: undefined;
