@@ -5,6 +5,7 @@ type Params = {
   id: string;
   encryptedName: string;
   encryptedNameNonce: string;
+  workspaceKeyId: string;
   subkeyId: number;
   userId: string;
 };
@@ -13,6 +14,7 @@ export async function updateDocumentName({
   id,
   encryptedName,
   encryptedNameNonce,
+  workspaceKeyId,
   subkeyId,
   userId,
 }: Params) {
@@ -44,7 +46,7 @@ export async function updateDocumentName({
       }
       const updatedDocument = await prisma.document.update({
         where: { id },
-        data: { encryptedName, encryptedNameNonce, subkeyId },
+        data: { encryptedName, encryptedNameNonce, workspaceKeyId, subkeyId },
       });
       return updatedDocument;
     });

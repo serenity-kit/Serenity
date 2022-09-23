@@ -15,6 +15,7 @@ export const UpdateDocumentNameInput = inputObjectType({
     t.nonNull.string("id");
     t.nonNull.string("encryptedName");
     t.nonNull.string("encryptedNameNonce");
+    t.nonNull.string("workspaceKeyId");
     t.nonNull.int("subkeyId");
   },
 });
@@ -43,6 +44,7 @@ export const updateDocumentNameMutation = mutationField("updateDocumentName", {
       id: args.input.id,
       encryptedName: args.input.encryptedName,
       encryptedNameNonce: args.input.encryptedNameNonce,
+      workspaceKeyId: args.input.workspaceKeyId,
       subkeyId: args.input.subkeyId,
       userId: context.user.id,
     });
