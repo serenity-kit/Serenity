@@ -23,6 +23,7 @@ let sessionKey = "";
 let workspaceKey = "";
 let addedFolder: any = null;
 let folderKey = "";
+let addedWorkspace: any = null;
 
 const setup = async () => {
   const result = await createUserWithWorkspace({
@@ -32,7 +33,7 @@ const setup = async () => {
   userId = result.user.id;
   device = result.device;
   sessionKey = result.sessionKey;
-  const addedWorkspace = result.workspace;
+  addedWorkspace = result.workspace;
   const workspaceKeyBox = addedWorkspace.currentWorkspaceKey?.workspaceKeyBox;
   workspaceKey = await decryptWorkspaceKey({
     ciphertext: workspaceKeyBox?.ciphertext!,
@@ -61,13 +62,14 @@ test("user should be retrieve a document", async () => {
     graphql,
     id: documentId,
     parentFolderId: null,
-    workspaceId: workspaceId,
+    workspaceId,
     authorizationHeader,
   });
   await updateDocumentName({
     graphql,
     id: documentId,
     name: documentName,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     folderKey,
     authorizationHeader,
   });

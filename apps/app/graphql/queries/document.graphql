@@ -3,6 +3,7 @@ query document($id: ID!) {
     id
     encryptedName
     encryptedNameNonce
+    workspaceKeyId
     subkeyId
     parentFolderId
     workspaceId

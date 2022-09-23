@@ -82,6 +82,7 @@ test("user should be able to change a document name", async () => {
     graphql,
     id,
     name,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     folderKey,
     authorizationHeader,
   });
@@ -112,6 +113,7 @@ test("Throw error when document doesn't exist", async () => {
         graphql,
         id,
         name,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader,
       }))()
@@ -155,6 +157,7 @@ test("Throw error when user doesn't have access", async () => {
         graphql,
         id,
         name,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader,
       }))()
@@ -170,6 +173,7 @@ test("Unauthenticated", async () => {
         graphql,
         id,
         name,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader: "badauthheader",
       }))()

@@ -11,14 +11,16 @@ generator client {
 }
 
 model Document {
-  id                 String     @id
-  activeSnapshot     Snapshot?  @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
-  activeSnapshotId   String?    @unique
+  id                 String        @id
+  activeSnapshot     Snapshot?     @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
+  activeSnapshotId   String?       @unique
   snapshots          Snapshot[]
-  createdAt          DateTime   @default(now())
-  workspace          Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt          DateTime      @default(now())
+  workspace          Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceKeyId     String?
+  workspaceKey       WorkspaceKey? @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
   workspaceId        String
-  parentFolder       Folder?    @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
+  parentFolder       Folder?       @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
   parentFolderId     String?
   encryptedName      String?
   encryptedNameNonce String?
@@ -183,6 +185,7 @@ model WorkspaceKey {
   workspace         Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId       String
   generation        Int               @default(0)
+  documents         Document[]
 }
 
 model WorkspaceKeyBox {

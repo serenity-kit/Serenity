@@ -23,6 +23,7 @@ import { useDocumentStore } from "../../../utils/document/documentStore";
 import { getDocument } from "../../../utils/document/getDocument";
 import { getFolderKey } from "../../../utils/folder/getFolderKey";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { loadPageMachine } from "./loadPageMachine";
 
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
@@ -52,6 +53,11 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
 
   const updateTitle = async (title: string) => {
     let document: Document | undefined | null = undefined;
+    const workspace = await getWorkspace({
+      workspaceId,
+      urqlClient,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
     document = await getDocument({
       documentId: pageId,
       urqlClient,
@@ -92,6 +98,7 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
         id: pageId,
         encryptedName: encryptedDocumentTitle.ciphertext,
         encryptedNameNonce: encryptedDocumentTitle.publicNonce,
+        workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
         subkeyId: documentSubkeyId,
       },
     });

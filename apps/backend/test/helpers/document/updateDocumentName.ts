@@ -9,6 +9,7 @@ type Params = {
   id: string;
   name: string;
   folderKey: string;
+  workspaceKeyId: string;
   authorizationHeader: string;
 };
 
@@ -17,6 +18,7 @@ export const updateDocumentName = async ({
   id,
   name,
   folderKey,
+  workspaceKeyId,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -35,6 +37,7 @@ export const updateDocumentName = async ({
         document {
           encryptedName
           encryptedNameNonce
+          workspaceKeyId
           subkeyId
           id
           parentFolderId
@@ -50,6 +53,7 @@ export const updateDocumentName = async ({
         id,
         encryptedName: encryptedDocumentResult.ciphertext,
         encryptedNameNonce: encryptedDocumentResult.publicNonce,
+        workspaceKeyId,
         subkeyId: documentSubkey.subkeyId,
       },
     },
