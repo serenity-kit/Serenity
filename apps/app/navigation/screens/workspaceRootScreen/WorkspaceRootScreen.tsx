@@ -2,7 +2,7 @@ import { CenterContent, Spinner } from "@serenity-tools/ui";
 import { useEffect } from "react";
 import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
-import { useWorkspaceId } from "../../context/WorkspaceIdContext";
+import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
   FirstDocumentDocument,
   FirstDocumentQuery,
@@ -10,10 +10,10 @@ import {
   WorkspaceDocument,
   WorkspaceQuery,
   WorkspaceQueryVariables,
-} from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
-import { getLastUsedDocumentId } from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+} from "../../../generated/graphql";
+import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
+import { getLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceRootScreen(
   props: WorkspaceDrawerScreenProps<"WorkspaceRoot">

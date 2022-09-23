@@ -5,12 +5,12 @@ import {
 } from "react-native";
 
 import { Text, View } from "@serenity-tools/ui";
-import { RootStackScreenProps } from "../../types/navigation";
+import { RootStackScreenProps } from "../../../types/navigation";
 import {
   getLastUsedWorkspaceId,
-  removeLastUsedWorkspaceId,
   removeLastUsedDocumentId,
-} from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+  removeLastUsedWorkspaceId,
+} from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceNotFoundScreen({
   navigation,

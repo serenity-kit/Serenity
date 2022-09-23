@@ -1,20 +1,20 @@
 import { Text, tw, View } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
-import DeviceList from "../../components/device/DeviceList";
+import DeviceList from "../../../components/device/DeviceList";
 import {
   useDeleteDevicesMutation,
   useDevicesQuery,
-} from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
+} from "../../../generated/graphql";
+import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import {
   WorkspaceDeviceParing,
   WorkspaceWithWorkspaceDevicesParing,
-} from "../../types/workspaceDevice";
-import { createAndEncryptWorkspaceKeyForDevice } from "../../utils/device/createAndEncryptWorkspaceKeyForDevice";
-import { getWorkspaceDevices } from "../../utils/workspace/getWorkspaceDevices";
-import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
-import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
+} from "../../../types/workspaceDevice";
+import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
+import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
+import { getWorkspaceKey } from "../../../utils/workspace/getWorkspaceKey";
+import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
 
 export default function DeviceManagerScreen(props) {
   const { activeDevice } = useWorkspaceContext();
