@@ -27,9 +27,7 @@ export async function authorizeDevices({
       where: { userId },
       select: { signingPublicKey: true },
     });
-    const allUserDeviceSigningPublicKeys = allUserDevices.map(
-      (userDevice) => userDevice.signingPublicKey
-    );
+
     // build a table to look up user ownership of
     // workspaces and devices
     const requestedWorkspaceIds = new Set<string>();
@@ -70,6 +68,25 @@ export async function authorizeDevices({
         }
       );
     });
+
+    // make sure to check `isAuthorizedMember: true` because
+    // the user won't be able to create keyboxes fro workspaces
+    // that they don't yet have access to
+    const userWorkspaces = await prisma.usersToWorkspaces.findMany({
+      where: { userId },
+      select: { workspaceId: true, isAuthorizedMember: true },
+    });
+    const verifiedWorkspaceIds = userWorkspaces.map(
+      (userWorkspace) => userWorkspace.workspaceId
+    );
+    const allWorkspacesKeyBoxes = await prisma.workspaceKeyBox.findMany({
+      where: { workspaceKey: { workspaceId: { in: verifiedWorkspaceIds } } },
+      select: { deviceSigningPublicKey: true },
+    });
+    const allWorkspaceDeviceSigningPublicKeys = allWorkspacesKeyBoxes.map(
+      (keyBox) => keyBox.deviceSigningPublicKey
+    );
+
     const deletingDeviceSigningPublicKeys: string[] = [];
     for (let userDevice of allUserDevices) {
       if (
@@ -81,13 +98,6 @@ export async function authorizeDevices({
       }
     }
 
-    // make sure to check `isAuthorizedMember: true` because
-    // the user won't be able to create keyboxes fro workspaces
-    // that they don't yet have access to
-    const userWorkspaces = await prisma.usersToWorkspaces.findMany({
-      where: { userId },
-      select: { workspaceId: true, isAuthorizedMember: true },
-    });
     const verifiedDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
       [];
     for (let userWorkspace of userWorkspaces) {
@@ -112,7 +122,7 @@ export async function authorizeDevices({
       for (let workspaceDevice of newDeviceWorkspaceKeyBox.workspaceDevices) {
         // userDeviceSigningPublicKeys
         if (
-          allUserDeviceSigningPublicKeys.includes(
+          allWorkspaceDeviceSigningPublicKeys.includes(
             workspaceDevice.receiverDeviceSigningPublicKey
           )
         ) {

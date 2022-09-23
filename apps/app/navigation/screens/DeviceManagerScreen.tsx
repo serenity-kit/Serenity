@@ -12,6 +12,7 @@ import {
   WorkspaceWithWorkspaceDevicesParing,
 } from "../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../utils/device/createAndEncryptWorkspaceKeyForDevice";
+import { getWorkspaceDevices } from "../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
 
@@ -30,11 +31,6 @@ export default function DeviceManagerScreen(props) {
   const deleteDevice = async (deviceSigningPublicKey: string) => {
     const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
       [];
-    const devices = devicesResult.data?.devices?.nodes;
-    if (!devices) {
-      console.error("No devices found");
-      return;
-    }
     const workspaces = await getWorkspaces({
       urqlClient,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
@@ -44,9 +40,18 @@ export default function DeviceManagerScreen(props) {
       return;
     }
     for (let workspace of workspaces) {
+      const workspaceId = workspace.id;
+      const devices = await getWorkspaceDevices({
+        urqlClient,
+        workspaceId,
+      });
+      if (!devices) {
+        console.error("No devices found");
+        return;
+      }
       const workspaceDevicePairing: WorkspaceDeviceParing[] = [];
       const workspaceKey = await getWorkspaceKey({
-        workspaceId: workspace.id,
+        workspaceId,
         urqlClient,
         activeDevice,
       });
