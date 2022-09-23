@@ -12,7 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useClient } from "urql";
-import { useWorkspaceId } from "../../context/WorkspaceIdContext";
+import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
   MeDocument,
   MeQuery,
@@ -22,14 +22,14 @@ import {
   useUpdateWorkspaceMutation,
   Workspace,
   WorkspaceMember,
-} from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+} from "../../../generated/graphql";
+import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
-} from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
+} from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 
 export default function WorkspaceSettingsGeneralScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }

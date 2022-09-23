@@ -27,27 +27,27 @@ import {
   secondsBetweenNewMemberChecks,
 } from "../utils/workspace/addNewMembersIfNecessary";
 import { redirectIfNotAuthorized } from "../utils/workspace/redirectIfNotAuthorized";
-import AcceptWorkspaceInvitationScreen from "./screens/AcceptWorkspaceInvitationScreen";
-import AccountProfileSettingsScreen from "./screens/AccountProfileSettingsScreen";
-import AccountSettingsMobileOverviewScreen from "./screens/AccountSettingsMobileOverviewScreen";
-import DesignSystemScreen from "./screens/DesignSystemScreen";
-import DevDashboardScreen from "./screens/DevDashboardScreen";
-import DeviceManagerScreen from "./screens/DeviceManagerScreen";
-import EncryptDecryptImageTestScreen from "./screens/EncryptDecryptImageTestScreen";
-import LibsodiumTestScreen from "./screens/LibsodiumTestScreen";
-import LoginScreen from "./screens/LoginScreen";
-import NotFoundScreen from "./screens/NotFoundScreen";
-import OnboardingScreen from "./screens/OnboardingScreen";
+import AcceptWorkspaceInvitationScreen from "./screens/acceptWorkspaceInvitationScreen/AcceptWorkspaceInvitationScreen";
+import AccountProfileSettingsScreen from "./screens/accountProfileSettingsScreen/AccountProfileSettingsScreen";
+import AccountSettingsMobileOverviewScreen from "./screens/accountSettingsMobileOverviewScreen/AccountSettingsMobileOverviewScreen";
+import DesignSystemScreen from "./screens/designSystemScreen/DesignSystemScreen";
+import DevDashboardScreen from "./screens/devDashboardScreen/DevDashboardScreen";
+import DeviceManagerScreen from "./screens/deviceManagerScreen/DeviceManagerScreen";
+import EncryptDecryptImageTestScreen from "./screens/encryptDecryptImageTestScreen/EncryptDecryptImageTestScreen";
+import LibsodiumTestScreen from "./screens/libsodiumTestScreen/LibsodiumTestScreen";
+import LoginScreen from "./screens/loginScreen/LoginScreen";
+import NotFoundScreen from "./screens/notFoundScreen/NotFoundScreen";
+import OnboardingScreen from "./screens/onboardingScreen/OnboardingScreen";
 import PageScreen from "./screens/pageScreen/PageScreen";
-import RegisterScreen from "./screens/RegisterScreen";
-import RegistrationVerificationScreen from "./screens/RegistrationVerificationScreen";
-import RootScreen from "./screens/RootScreen";
-import WorkspaceNotDecryptedScreen from "./screens/WorkspaceNotDecryptedScreen";
-import WorkspaceNotFoundScreen from "./screens/WorkspaceNotFoundScreen";
-import WorkspaceRootScreen from "./screens/WorkspaceRootScreen";
-import WorkspaceSettingsGeneralScreen from "./screens/WorkspaceSettingsGeneralScreen";
-import WorkspaceSettingsMembersScreen from "./screens/WorkspaceSettingsMembersScreen";
-import WorkspaceSettingsMobileOverviewScreen from "./screens/WorkspaceSettingsMobileOverviewScreen";
+import RegisterScreen from "./screens/registerScreen/RegisterScreen";
+import RegistrationVerificationScreen from "./screens/registrationVerificationScreen/RegistrationVerificationScreen";
+import RootScreen from "./screens/rootScreen/RootScreen";
+import WorkspaceNotDecryptedScreen from "./screens/workspaceNotDecryptedScreen/WorkspaceNotDecryptedScreen";
+import WorkspaceNotFoundScreen from "./screens/workspaceNotFoundScreen/WorkspaceNotFoundScreen";
+import WorkspaceRootScreen from "./screens/workspaceRootScreen/WorkspaceRootScreen";
+import WorkspaceSettingsGeneralScreen from "./screens/workspaceSettingsGeneralScreen/WorkspaceSettingsGeneralScreen";
+import WorkspaceSettingsMembersScreen from "./screens/workspaceSettingsMembersScreen/WorkspaceSettingsMembersScreen";
+import WorkspaceSettingsMobileOverviewScreen from "./screens/workspaceSettingsMobileOverviewScreen/WorkspaceSettingsMobileOverviewScreen";
 
 /**
  * A root stack navigator is often used for displaying modals on top of all other content.

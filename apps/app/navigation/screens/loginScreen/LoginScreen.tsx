@@ -1,8 +1,8 @@
 import { Box, Link, Text, tw, View } from "@serenity-tools/ui";
-import { LoginForm } from "../../components/login/LoginForm";
-import { OnboardingScreenWrapper } from "../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
-import { RootStackScreenProps } from "../../types/navigation";
-import { navigateToNextAuthenticatedPage } from "../../utils/authentication/loginHelper";
+import { LoginForm } from "../../../components/login/LoginForm";
+import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
+import { RootStackScreenProps } from "../../../types/navigation";
+import { navigateToNextAuthenticatedPage } from "../../../utils/authentication/loginHelper";
 
 export default function LoginScreen(props: RootStackScreenProps<"Login">) {
   const onLoginSuccess = async () => {

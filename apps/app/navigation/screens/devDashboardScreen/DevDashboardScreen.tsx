@@ -1,4 +1,4 @@
-import { SidebarLink, tw, ScrollSafeAreaView } from "@serenity-tools/ui";
+import { ScrollSafeAreaView, SidebarLink, tw } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
 
 export default function DevDashboardScreen(props) {

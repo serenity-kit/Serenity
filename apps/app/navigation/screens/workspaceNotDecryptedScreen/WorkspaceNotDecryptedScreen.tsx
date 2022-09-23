@@ -12,16 +12,16 @@ import {
   WorkspaceDocument,
   WorkspaceQuery,
   WorkspaceQueryVariables,
-} from "../../generated/graphql";
-import { useInterval } from "../../hooks/useInterval";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { RootStackScreenProps } from "../../types/navigation";
+} from "../../../generated/graphql";
+import { useInterval } from "../../../hooks/useInterval";
+import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { RootStackScreenProps } from "../../../types/navigation";
 import {
   getLastUsedWorkspaceId,
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
-} from "../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { isWorkspaceAuthorized } from "../../utils/workspace/isWorkspaceAuthorized";
+} from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { isWorkspaceAuthorized } from "../../../utils/workspace/isWorkspaceAuthorized";
 
 export default function WorkspaceNotDecryptedScreen({
   navigation,
