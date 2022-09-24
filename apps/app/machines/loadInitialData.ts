@@ -1,9 +1,9 @@
 import { assign, createMachine } from "xstate";
-import { MeQuery } from "../generated/graphql";
+import { MeWithWorkspaceLoadingInfoQuery } from "../generated/graphql";
 import { fetchMeWithWorkspaceLoadingInfo } from "../graphql/fetchUtils/fetchMeWithWorkspaceLoadingInfo";
 
 export type MeWithWorkspaceLoadingInfoQueryResult = {
-  data?: MeQuery;
+  data?: MeWithWorkspaceLoadingInfoQuery;
   error?: {
     networkError?: any;
   };

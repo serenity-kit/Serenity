@@ -1099,7 +1099,12 @@ export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string, createdAt: any } | null };
 
-export type MeQueryVariables = Exact<{
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null };
+
+export type MeWithWorkspaceLoadingInfoQueryVariables = Exact<{
   workspaceId?: InputMaybe<Scalars['ID']>;
   documentId?: InputMaybe<Scalars['ID']>;
   returnOtherWorkspaceIfNotFound?: InputMaybe<Scalars['Boolean']>;
@@ -1107,7 +1112,7 @@ export type MeQueryVariables = Exact<{
 }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null } | null } | null };
+export type MeWithWorkspaceLoadingInfoQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null } | null } | null };
 
 export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1707,7 +1712,19 @@ export function useMainDeviceQuery(options?: Omit<Urql.UseQueryArgs<MainDeviceQu
   return Urql.useQuery<MainDeviceQuery, MainDeviceQueryVariables>({ query: MainDeviceDocument, ...options });
 };
 export const MeDocument = gql`
-    query me($workspaceId: ID, $documentId: ID, $returnOtherWorkspaceIfNotFound: Boolean, $returnOtherDocumentIfNotFound: Boolean) {
+    query me {
+  me {
+    id
+    username
+  }
+}
+    `;
+
+export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
+  return Urql.useQuery<MeQuery, MeQueryVariables>({ query: MeDocument, ...options });
+};
+export const MeWithWorkspaceLoadingInfoDocument = gql`
+    query meWithWorkspaceLoadingInfo($workspaceId: ID, $documentId: ID, $returnOtherWorkspaceIfNotFound: Boolean, $returnOtherDocumentIfNotFound: Boolean) {
   me {
     id
     username
@@ -1725,8 +1742,8 @@ export const MeDocument = gql`
 }
     `;
 
-export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
-  return Urql.useQuery<MeQuery, MeQueryVariables>({ query: MeDocument, ...options });
+export function useMeWithWorkspaceLoadingInfoQuery(options?: Omit<Urql.UseQueryArgs<MeWithWorkspaceLoadingInfoQueryVariables>, 'query'>) {
+  return Urql.useQuery<MeWithWorkspaceLoadingInfoQuery, MeWithWorkspaceLoadingInfoQueryVariables>({ query: MeWithWorkspaceLoadingInfoDocument, ...options });
 };
 export const PendingWorkspaceInvitationDocument = gql`
     query pendingWorkspaceInvitation {
