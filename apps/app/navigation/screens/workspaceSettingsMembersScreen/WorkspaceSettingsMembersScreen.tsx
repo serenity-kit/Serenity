@@ -1,6 +1,15 @@
-import { Button, Checkbox, Text, tw, View } from "@serenity-tools/ui";
+import {
+  Button,
+  CenterContent,
+  Checkbox,
+  InfoMessage,
+  Spinner,
+  Text,
+  tw,
+  View,
+} from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
@@ -16,7 +25,7 @@ import {
   WorkspaceMember,
 } from "../../../generated/graphql";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
-import { workspaceSettingsScreenMachine } from "../../../machines/workspaceSettingsScreenMachine";
+import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
@@ -84,17 +93,17 @@ export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
   const workspaceId = useWorkspaceId();
-  const [state] = useMachine(workspaceSettingsScreenMachine, {
+  const { activeDevice } = useWorkspaceContext();
+  const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
       workspaceId: workspaceId,
       navigation: props.navigation,
+      activeDevice,
     },
   });
 
-  const { activeDevice } = useWorkspaceContext();
   const urqlClient = useClient();
   const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
-  const [workspaceName, setWorkspaceName] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [memberLookup, setMemberLookup] = useState<{
@@ -102,14 +111,25 @@ export default function WorkspaceSettingsMembersScreen(
   }>({});
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
+
+  useEffect(() => {
+    if (
+      state.value === "loadWorkspaceSuccess" &&
+      state.context.workspaceQueryResult?.data?.workspace
+    ) {
+      console.log(state.context);
+      updateWorkspaceData(
+        state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
+        // @ts-expect-error need to fix the generation
+        state.context.workspaceQueryResult?.data?.workspace
+      );
+    }
+  }, [state]);
 
   const updateWorkspaceData = async (
     me: MeResult | null | undefined,
     workspace: Workspace
   ) => {
-    const workspaceName = workspace.name || "";
-    setWorkspaceName(workspaceName);
     const members: WorkspaceMember[] = workspace.members || [];
     setMembers(members);
     const memberLookup = {} as { [username: string]: number };
@@ -139,7 +159,7 @@ export default function WorkspaceSettingsMembersScreen(
     });
     if (updateWorkspaceResult.data?.updateWorkspace?.workspace) {
       updateWorkspaceData(
-        state.context.meWithWorkspaceLoadingInfoQueryResult.data?.me,
+        state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
         updateWorkspaceResult.data?.updateWorkspace?.workspace
       );
     } else if (updateWorkspaceResult?.error) {
@@ -245,8 +265,17 @@ export default function WorkspaceSettingsMembersScreen(
         </View>
       )}
       <View style={tw`mt-20 px-4`}>
-        {workspace === null ? (
-          <Text>Loading...</Text>
+        {state.value !== "loadWorkspaceSuccess" ? (
+          <CenterContent>
+            {state.value === "loadWorkspaceFailed" ? (
+              <InfoMessage variant="error">
+                Failed to load workspace data. Please try again or contact
+                support.
+              </InfoMessage>
+            ) : (
+              <Spinner fadeIn />
+            )}
+          </CenterContent>
         ) : (
           <>
             <View>
@@ -275,13 +304,13 @@ export default function WorkspaceSettingsMembersScreen(
                   username={member.username}
                   isAdmin={member.isAdmin}
                   adminUserId={
-                    state.context.meWithWorkspaceLoadingInfoQueryResult.data?.me
-                      ?.id
+                    state.context.meWithWorkspaceLoadingInfoQueryResult?.data
+                      ?.me?.id
                   }
                   allowEditing={
                     isAdmin &&
                     member.userId !==
-                      state.context.meWithWorkspaceLoadingInfoQueryResult.data
+                      state.context.meWithWorkspaceLoadingInfoQueryResult?.data
                         ?.me?.id
                   }
                   onAdminStatusChange={(isMemberAdmin: boolean) => {

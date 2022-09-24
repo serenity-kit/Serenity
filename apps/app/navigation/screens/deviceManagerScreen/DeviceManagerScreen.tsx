@@ -9,7 +9,7 @@ import {
   useDevicesQuery,
 } from "../../../generated/graphql";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
-import { workspaceSettingsScreenMachine } from "../../../machines/workspaceSettingsScreenMachine";
+import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import {
   WorkspaceDeviceParing,
   WorkspaceWithWorkspaceDevicesParing,
@@ -21,7 +21,7 @@ import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
 
 export default function DeviceManagerScreen(props) {
   const workspaceId = useWorkspaceId();
-  useMachine(workspaceSettingsScreenMachine, {
+  useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
       workspaceId: workspaceId,
       navigation: props.navigation,

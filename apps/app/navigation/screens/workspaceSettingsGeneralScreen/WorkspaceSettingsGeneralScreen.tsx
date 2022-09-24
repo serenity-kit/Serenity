@@ -1,16 +1,19 @@
 import {
   Button,
+  CenterContent,
+  InfoMessage,
   Input,
   Modal,
   ModalButtonFooter,
   ModalHeader,
   RawInput,
+  Spinner,
   Text,
   tw,
   View,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
@@ -20,7 +23,8 @@ import {
   Workspace,
   WorkspaceMember,
 } from "../../../generated/graphql";
-import { workspaceSettingsScreenMachine } from "../../../machines/workspaceSettingsScreenMachine";
+import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import {
   removeLastUsedDocumentId,
@@ -31,10 +35,12 @@ export default function WorkspaceSettingsGeneralScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
   const workspaceId = useWorkspaceId();
-  const [state] = useMachine(workspaceSettingsScreenMachine, {
+  const { activeDevice } = useWorkspaceContext();
+  const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
       workspaceId: workspaceId,
       navigation: props.navigation,
+      activeDevice,
     },
   });
   const [, deleteWorkspacesMutation] = useDeleteWorkspacesMutation();
@@ -53,7 +59,20 @@ export default function WorkspaceSettingsGeneralScreen(
     useState<boolean>(false);
   const [deletingWorkspaceName, setDeletingWorkspaceName] =
     useState<string>("");
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
+
+  useEffect(() => {
+    if (
+      state.value === "loadWorkspaceSuccess" &&
+      state.context.workspaceQueryResult?.data?.workspace
+    ) {
+      console.log(state.context);
+      updateWorkspaceData(
+        state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
+        // @ts-expect-error need to fix the generation
+        state.context.workspaceQueryResult?.data?.workspace
+      );
+    }
+  }, [state]);
 
   const updateWorkspaceData = async (
     me: MeResult | null | undefined,
@@ -110,7 +129,7 @@ export default function WorkspaceSettingsGeneralScreen(
     });
     if (updateWorkspaceResult.data?.updateWorkspace?.workspace) {
       updateWorkspaceData(
-        state.context.meWithWorkspaceLoadingInfoQueryResult.data?.me,
+        state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
         updateWorkspaceResult.data?.updateWorkspace?.workspace
       );
     }
@@ -125,8 +144,16 @@ export default function WorkspaceSettingsGeneralScreen(
         </View>
       )}
       <View style={tw`mt-20 px-4`}>
-        {workspace === null ? (
-          <Text>Loading...</Text>
+        {state.value !== "loadWorkspaceSuccess" ? (
+          <CenterContent>
+            {state.value === "loadWorkspaceFailed" ? (
+              <InfoMessage variant="error">
+                Failed to load workspace. Please try again or contact support.
+              </InfoMessage>
+            ) : (
+              <Spinner fadeIn />
+            )}
+          </CenterContent>
         ) : (
           <>
             <View>

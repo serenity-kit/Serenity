@@ -1,4 +1,4 @@
-import { assign, createMachine, sendParent } from "xstate";
+import { assign, createMachine } from "xstate";
 import { MeDocument, MeQuery, MeQueryVariables } from "../generated/graphql";
 import { urqlClient } from "../utils/urqlClient/urqlClient";
 
@@ -118,7 +118,6 @@ export const loadInitialDataMachine =
           type: "final",
         },
         ready: {
-          entry: "ready",
           type: "final",
           data: (context) => context.queryResult,
         },
@@ -168,15 +167,6 @@ export const loadInitialDataMachine =
         },
       },
       actions: {
-        ready: sendParent((context) => ({
-          type: "loadInitialDataSuccess",
-          data: {
-            workspaceId:
-              context.queryResult?.data?.me?.workspaceLoadingInfo?.id,
-            documentId:
-              context.queryResult?.data?.me?.workspaceLoadingInfo?.documentId,
-          },
-        })),
         redirectToLogin: (context) => {
           context.navigation.replace("Login", {});
         },

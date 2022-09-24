@@ -25,6 +25,11 @@ export type AcceptWorkspaceInvitationResult = {
   workspace?: Maybe<Workspace>;
 };
 
+export type ActiveWorkspaceKeysResult = {
+  __typename?: 'ActiveWorkspaceKeysResult';
+  activeWorkspaceKeys: Array<WorkspaceKey>;
+};
+
 export type AttachDeviceToWorkspacesInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
   deviceWorkspaceKeyBoxes: Array<WorkspaceKeyBoxData>;
@@ -504,6 +509,7 @@ export type PendingWorkspaceInvitationResult = {
 
 export type Query = {
   __typename?: 'Query';
+  activeWorkspaceKeys?: Maybe<ActiveWorkspaceKeysResult>;
   deviceBySigningPublicKey?: Maybe<DeviceResult>;
   devices?: Maybe<DeviceConnection>;
   document?: Maybe<Document>;
@@ -525,6 +531,12 @@ export type Query = {
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
   workspaces?: Maybe<WorkspaceConnection>;
+};
+
+
+export type QueryActiveWorkspaceKeysArgs = {
+  deviceSigningPublicKey: Scalars['String'];
+  workspaceId: Scalars['ID'];
 };
 
 

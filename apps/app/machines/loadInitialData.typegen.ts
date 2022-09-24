@@ -28,7 +28,6 @@ export interface Typegen0 {
     delays: never;
   };
   eventsCausingActions: {
-    ready: "";
     redirectToLobby: "";
     redirectToLogin: "";
     redirectToNoWorkspaces: "";

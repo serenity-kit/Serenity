@@ -1,9 +1,9 @@
 import { SidebarLink } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { workspaceSettingsScreenMachine } from "../../../machines/workspaceSettingsScreenMachine";
+import { workspaceSettingsAccessMachine } from "../../../machines/workspaceSettingsAccessMachine";
 
 export default function WorkspaceSettingsMobileOverviewScreen(props) {
-  useMachine(workspaceSettingsScreenMachine, {
+  useMachine(workspaceSettingsAccessMachine, {
     context: {
       workspaceId: props.route.params.workspaceId,
       navigation: props.navigation,
