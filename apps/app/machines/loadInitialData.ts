@@ -15,7 +15,7 @@ type Context = {
   returnOtherWorkspaceIfNotFound?: boolean;
   returnOtherDocumentIfNotFound?: boolean;
   navigation: any;
-  queryResult?: MeWithWorkspaceLoadingInfoQueryResult;
+  meWithWorkspaceLoadingInfoQueryResult?: MeWithWorkspaceLoadingInfoQueryResult;
 };
 
 export const loadInitialDataMachine =
@@ -34,7 +34,8 @@ export const loadInitialDataMachine =
             onDone: [
               {
                 actions: assign({
-                  queryResult: (_, event) => event.data,
+                  meWithWorkspaceLoadingInfoQueryResult: (_, event) =>
+                    event.data,
                 }),
                 cond: "hasNoNetworkError",
                 target: "loaded",
@@ -115,16 +116,20 @@ export const loadInitialDataMachine =
           return !event.data?.error?.networkError;
         },
         isValidSession: (context) => {
-          return Boolean(context.queryResult?.data?.me?.id);
+          return Boolean(
+            context.meWithWorkspaceLoadingInfoQueryResult?.data?.me?.id
+          );
         },
         hasAccessToWorkspace: (context) => {
           return Boolean(
-            context.queryResult?.data?.me?.workspaceLoadingInfo?.id
+            context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
+              ?.workspaceLoadingInfo?.id
           );
         },
         isAuthorized: (context) => {
           return Boolean(
-            context.queryResult?.data?.me?.workspaceLoadingInfo?.isAuthorized
+            context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
+              ?.workspaceLoadingInfo?.isAuthorized
           );
         },
       },
@@ -138,14 +143,16 @@ export const loadInitialDataMachine =
           } else {
             context.navigation.replace("WorkspaceNotFoundScreen", {
               workspaceId:
-                context.queryResult?.data?.me?.workspaceLoadingInfo?.id,
+                context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
+                  ?.workspaceLoadingInfo?.id,
             });
           }
         },
         redirectToLobby: (context) => {
           context.navigation.replace("WorkspaceNotDecrypted", {
             workspaceId:
-              context.queryResult?.data?.me?.workspaceLoadingInfo?.id,
+              context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
+                ?.workspaceLoadingInfo?.id,
           });
         },
       },
