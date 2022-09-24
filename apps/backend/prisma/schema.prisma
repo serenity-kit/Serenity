@@ -185,6 +185,7 @@ model WorkspaceKey {
   workspace         Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId       String
   generation        Int               @default(0)
+  folders           Folder[]
   documents         Document[]
 }
 
@@ -200,20 +201,22 @@ model WorkspaceKeyBox {
 }
 
 model Folder {
-  id                 String     @id @unique
+  id                 String        @id @unique
   idSignature        String
   encryptedName      String
   encryptedNameNonce String
   subkeyId           Int
-  workspace          Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace          Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId        String
-  parentFolder       Folder?    @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
+  workspaceKey       WorkspaceKey? @relation(fields: [workspaceKeyId], references: [id], onDelete: SetDefault)
+  workspaceKeyId     String        @default("invalid")
+  parentFolder       Folder?       @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
   parentFolderId     String?
-  rootFolder         Folder?    @relation(name: "rootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
+  rootFolder         Folder?       @relation(name: "rootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
   rootFolderId       String?
-  createdAt          DateTime   @default(now())
-  childFolders       Folder[]   @relation("parentFolder")
-  descendent         Folder[]   @relation("rootFolder")
+  createdAt          DateTime      @default(now())
+  childFolders       Folder[]      @relation("parentFolder")
+  descendent         Folder[]      @relation("rootFolder")
   documents          Document[]
 
   @@unique([subkeyId, workspaceId])

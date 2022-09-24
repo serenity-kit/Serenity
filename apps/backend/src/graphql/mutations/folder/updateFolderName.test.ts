@@ -51,6 +51,7 @@ const setup = async () => {
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
   });
   addedFolder = createFolderResult.createFolder.folder;
   addedFolderId = createFolderResult.createFolder.folder.id;
@@ -70,6 +71,7 @@ test("user should be able to change a folder name", async () => {
     id,
     name,
     workspaceKey,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     authorizationHeader,
   });
   const updatedFolder = result.updateFolderName.folder;
@@ -93,6 +95,7 @@ test("throw error when folder doesn't exist", async () => {
         id,
         name,
         workspaceKey,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -133,6 +136,7 @@ test("throw error when user doesn't have access", async () => {
     parentKey: workspaceKey,
     authorizationHeader: registerUserResult.sessionKey,
     workspaceId: addedWorkspace.id,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
   });
   const authorizationHeader = sessionKey;
   const id = otherUserFolderResult.createFolder.folder.id;
@@ -144,6 +148,7 @@ test("throw error when user doesn't have access", async () => {
         id,
         name,
         workspaceKey,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -157,6 +162,7 @@ test("Unauthenticated", async () => {
         id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
         name: "renamed",
         workspaceKey,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

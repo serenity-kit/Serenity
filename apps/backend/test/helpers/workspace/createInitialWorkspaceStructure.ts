@@ -81,6 +81,7 @@ export const createInitialWorkspaceStructure = async ({
           encryptedName
           encryptedNameNonce
           subkeyId
+          workspaceKeyId
           parentFolderId
           rootFolderId
           workspaceId

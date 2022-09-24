@@ -57,11 +57,13 @@ export async function createInitialWorkspaceStructure({
     creatorDeviceSigningPublicKey,
     deviceWorkspaceKeyBoxes,
   });
+  const workspaceKey = workspace.currentWorkspaceKey;
   const folder = await createFolder({
     userId,
     id: folderId,
     encryptedName: encryptedFolderName,
     encryptedNameNonce: encryptedFolderNameNonce,
+    workspaceKeyId: workspaceKey?.id!,
     subkeyId: folderSubkeyId,
     parentFolderId: undefined,
     workspaceId: workspace.id,

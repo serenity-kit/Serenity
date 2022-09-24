@@ -64,6 +64,7 @@ test("user should be able to create a root folder", async () => {
     parentFolderId,
     parentKey: workspaceKey,
     workspaceId: addedWorkspace.id,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     authorizationHeader,
   });
   const folder = result.createFolder.folder;
@@ -87,6 +88,7 @@ test("user should be able to create a root folder with a name", async () => {
     parentFolderId,
     parentKey: workspaceKey,
     workspaceId: addedWorkspace.id,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     authorizationHeader,
   });
   const folder = result.createFolder.folder;
@@ -111,6 +113,7 @@ test("user should be able to create a child folder", async () => {
     parentKey: workspaceKey,
     parentFolderId,
     workspaceId: addedWorkspace.id,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     authorizationHeader,
   });
   const folder = result.createFolder.folder;
@@ -134,6 +137,7 @@ test("duplicate ID throws an error", async () => {
     parentKey: workspaceKey,
     parentFolderId,
     workspaceId: addedWorkspace.id,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     authorizationHeader,
   });
   await expect(
@@ -145,6 +149,7 @@ test("duplicate ID throws an error", async () => {
         parentKey: workspaceKey,
         parentFolderId,
         workspaceId: addedWorkspace.id,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Invalid input: duplicate id");
@@ -210,6 +215,7 @@ test("Throw error when the parent folder doesn't exist", async () => {
         parentKey: workspaceKey,
         parentFolderId,
         workspaceId: addedWorkspace.id,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
@@ -246,6 +252,7 @@ test("Throw error when user doesn't have access", async () => {
         parentKey: workspaceKey,
         parentFolderId: null,
         workspaceId: otherAddedWorkspace.id,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader: sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -262,6 +269,7 @@ test("Unauthenticated", async () => {
         parentKey: workspaceKey,
         parentFolderId: null,
         workspaceId: addedWorkspace.id,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

@@ -55,6 +55,7 @@ const setup = async () => {
     parentKey: workspaceKey,
     parentFolderId: null,
     authorizationHeader: sessionKey,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
   addedFolderId = createFolderResult.createFolder.folder.id;
@@ -103,6 +104,7 @@ test("user can delete a folder", async () => {
     parentKey: workspaceKey,
     parentFolderId: null,
     authorizationHeader: sessionKey,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
   expect(createFolderResult.createFolder.folder.id).toBe(folderId);
@@ -131,6 +133,7 @@ test("deleting a parent folder will cascade to children", async () => {
     parentFolderId: null,
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
   const createChildFolderResult = await createFolder({
@@ -140,6 +143,7 @@ test("deleting a parent folder will cascade to children", async () => {
     parentFolderId: parentFolderId,
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
   expect(createParentFolderResult.createFolder.folder.id).toBe(parentFolderId);
@@ -174,6 +178,7 @@ test("user can delete multiple folders", async () => {
     parentFolderId: null,
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
   const createFolderResult2 = await createFolder({
@@ -183,6 +188,7 @@ test("user can delete multiple folders", async () => {
     parentFolderId: null,
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
   expect(createFolderResult1.createFolder.folder.id).toBe(folderId1);
@@ -219,6 +225,7 @@ test("user can delete multiple folders", async () => {
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: addedWorkspace.id,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
   });
   const createParentFolderResult2 = await createFolder({
     graphql,
@@ -227,6 +234,7 @@ test("user can delete multiple folders", async () => {
     parentFolderId: null,
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
   const createChildFolderResult1 = await createFolder({
@@ -236,6 +244,7 @@ test("user can delete multiple folders", async () => {
     parentKey: workspaceKey,
     parentFolderId: parentFolderId1,
     authorizationHeader: sessionKey,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
   const createChildFolderResult2 = await createFolder({
@@ -245,6 +254,7 @@ test("user can delete multiple folders", async () => {
     parentKey: workspaceKey,
     parentFolderId: parentFolderId2,
     authorizationHeader: sessionKey,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
   expect(createParentFolderResult1.createFolder.folder.id).toBe(
@@ -283,6 +293,7 @@ test("user can't delete folders they don't own", async () => {
     parentKey: workspaceKey,
     parentFolderId: null,
     authorizationHeader: sessionKey2,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: otherUserWorkspaceId,
   });
   expect(createFoldeResult.createFolder.folder.id).toBe(folderId);

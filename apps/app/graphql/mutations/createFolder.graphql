@@ -4,6 +4,7 @@ mutation createFolder($input: CreateFolderInput!) {
       id
       encryptedName
       encryptedNameNonce
+      workspaceKeyId
       subkeyId
       parentFolderId
       rootFolderId
