@@ -9,37 +9,36 @@ import {
   tw,
   View,
 } from "@serenity-tools/ui";
-import { useEffect, useState } from "react";
+import { useMachine } from "@xstate/react";
+import { useState } from "react";
 import { StyleSheet } from "react-native";
-import { useClient } from "urql";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
-  MeDocument,
-  MeQuery,
-  MeQueryVariables,
   MeResult,
   useDeleteWorkspacesMutation,
   useUpdateWorkspaceMutation,
   Workspace,
   WorkspaceMember,
 } from "../../../generated/graphql";
-import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { workspaceSettingsScreenMachine } from "../../../machines/workspaceSettingsScreenMachine";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 
 export default function WorkspaceSettingsGeneralScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
-  const urqlClient = useClient();
-  const { activeDevice } = useWorkspaceContext();
   const workspaceId = useWorkspaceId();
+  const [state] = useMachine(workspaceSettingsScreenMachine, {
+    context: {
+      workspaceId: workspaceId,
+      navigation: props.navigation,
+    },
+  });
   const [, deleteWorkspacesMutation] = useDeleteWorkspacesMutation();
   const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
-  const [me, setMe] = useState<MeResult | null>();
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
@@ -55,40 +54,6 @@ export default function WorkspaceSettingsGeneralScreen(
   const [deletingWorkspaceName, setDeletingWorkspaceName] =
     useState<string>("");
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-
-  const getMe = async () => {
-    const meResult = await urqlClient
-      .query<MeQuery, MeQueryVariables>(
-        MeDocument,
-        {},
-        {
-          requestPolicy: "network-only",
-        }
-      )
-      .toPromise();
-    if (meResult.error) {
-      throw new Error(meResult.error.message);
-    }
-    setMe(meResult.data?.me);
-    return meResult.data?.me;
-  };
-
-  useEffect(() => {
-    (async () => {
-      const me = await getMe();
-      const workspace = await getWorkspace({
-        urqlClient,
-        deviceSigningPublicKey: activeDevice.signingPublicKey,
-      });
-      if (workspace) {
-        setWorkspace(workspace);
-        updateWorkspaceData(me, workspace);
-      } else {
-        props.navigation.replace("WorkspaceNotFound");
-        return;
-      }
-    })();
-  }, [urqlClient, props.navigation, activeDevice.signingPublicKey]);
 
   const updateWorkspaceData = async (
     me: MeResult | null | undefined,
@@ -145,7 +110,7 @@ export default function WorkspaceSettingsGeneralScreen(
     });
     if (updateWorkspaceResult.data?.updateWorkspace?.workspace) {
       updateWorkspaceData(
-        me,
+        state.context.meWithWorkspaceLoadingInfoQueryResult.data?.me,
         updateWorkspaceResult.data?.updateWorkspace?.workspace
       );
     }

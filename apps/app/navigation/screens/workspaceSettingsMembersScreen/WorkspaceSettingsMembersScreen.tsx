@@ -1,14 +1,12 @@
 import { Button, Checkbox, Text, tw, View } from "@serenity-tools/ui";
-import { useEffect, useState } from "react";
+import { useMachine } from "@xstate/react";
+import { useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
   Device,
-  MeDocument,
-  MeQuery,
-  MeQueryVariables,
   MeResult,
   RemoveMembersAndRotateWorkspaceKeyDocument,
   RemoveMembersAndRotateWorkspaceKeyMutation,
@@ -18,11 +16,11 @@ import {
   WorkspaceMember,
 } from "../../../generated/graphql";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { workspaceSettingsScreenMachine } from "../../../machines/workspaceSettingsScreenMachine";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getDevices } from "../../../utils/device/getDevices";
-import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaceKey } from "../../../utils/workspace/getWorkspaceKey";
 
@@ -85,62 +83,31 @@ const workspaceMemberStyles = StyleSheet.create({
 export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
+  const workspaceId = useWorkspaceId();
+  const [state] = useMachine(workspaceSettingsScreenMachine, {
+    context: {
+      workspaceId: workspaceId,
+      navigation: props.navigation,
+    },
+  });
+
   const { activeDevice } = useWorkspaceContext();
   const urqlClient = useClient();
-  const workspaceId = useWorkspaceId();
   const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
-  const [me, setMe] = useState<MeResult | null>();
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [memberLookup, setMemberLookup] = useState<{
     [username: string]: number;
   }>({});
-  const [isLoadingWorkspaceData, setIsLoadingWorkspaceData] =
-    useState<boolean>(false);
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
-
-  const getMe = async () => {
-    const meResult = await urqlClient
-      .query<MeQuery, MeQueryVariables>(
-        MeDocument,
-        {},
-        {
-          requestPolicy: "network-only",
-        }
-      )
-      .toPromise();
-    if (meResult.error) {
-      throw new Error(meResult.error.message);
-    }
-    setMe(meResult.data?.me);
-    return meResult.data?.me;
-  };
-
-  useEffect(() => {
-    (async () => {
-      const me = await getMe();
-      const workspace = await getWorkspace({
-        urqlClient,
-        deviceSigningPublicKey: activeDevice.signingPublicKey,
-      });
-      if (workspace) {
-        setWorkspace(workspace);
-        updateWorkspaceData(me, workspace);
-      } else {
-        props.navigation.replace("WorkspaceNotFound");
-        return;
-      }
-    })();
-  }, [urqlClient, props.navigation, activeDevice.signingPublicKey]);
 
   const updateWorkspaceData = async (
     me: MeResult | null | undefined,
     workspace: Workspace
   ) => {
-    setIsLoadingWorkspaceData(true);
     const workspaceName = workspace.name || "";
     setWorkspaceName(workspaceName);
     const members: WorkspaceMember[] = workspace.members || [];
@@ -153,11 +120,9 @@ export default function WorkspaceSettingsMembersScreen(
       }
     });
     setMemberLookup(memberLookup);
-    setIsLoadingWorkspaceData(false);
   };
 
   const _updateWorkspaceMemberData = async (members: WorkspaceMember[]) => {
-    setIsLoadingWorkspaceData(true);
     // do graphql stuff
     const graphqlMembers: any[] = [];
     members.forEach((member: Member) => {
@@ -174,14 +139,13 @@ export default function WorkspaceSettingsMembersScreen(
     });
     if (updateWorkspaceResult.data?.updateWorkspace?.workspace) {
       updateWorkspaceData(
-        me,
+        state.context.meWithWorkspaceLoadingInfoQueryResult.data?.me,
         updateWorkspaceResult.data?.updateWorkspace?.workspace
       );
     } else if (updateWorkspaceResult?.error) {
       setHasGraphqlError(true);
       setGraphqlError(updateWorkspaceResult?.error.message);
     }
-    setIsLoadingWorkspaceData(false);
   };
 
   const updateMember = async (
@@ -310,8 +274,16 @@ export default function WorkspaceSettingsMembersScreen(
                   userId={member.userId}
                   username={member.username}
                   isAdmin={member.isAdmin}
-                  adminUserId={me?.id}
-                  allowEditing={isAdmin && member.userId !== me?.id}
+                  adminUserId={
+                    state.context.meWithWorkspaceLoadingInfoQueryResult.data?.me
+                      ?.id
+                  }
+                  allowEditing={
+                    isAdmin &&
+                    member.userId !==
+                      state.context.meWithWorkspaceLoadingInfoQueryResult.data
+                        ?.me?.id
+                  }
                   onAdminStatusChange={(isMemberAdmin: boolean) => {
                     updateMember(member, isMemberAdmin);
                   }}

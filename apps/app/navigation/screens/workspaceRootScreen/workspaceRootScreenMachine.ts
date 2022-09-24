@@ -25,6 +25,14 @@ export const workspaceRootScreenMachine =
           invoke: {
             src: loadInitialDataMachine,
             id: "loadInitialDataMachine",
+            data: (context) => {
+              return {
+                returnOtherWorkspaceIfNotFound: false,
+                returnOtherDocumentIfNotFound: true,
+                workspaceId: context.workspaceId,
+                navigation: context.navigation,
+              };
+            },
             onDone: [
               {
                 actions: assign({

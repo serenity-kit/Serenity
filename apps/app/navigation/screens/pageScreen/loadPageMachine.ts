@@ -24,6 +24,15 @@ export const loadPageMachine =
           invoke: {
             src: loadInitialDataMachine,
             id: "loadInitialDataMachine",
+            data: (context) => {
+              return {
+                returnOtherWorkspaceIfNotFound: false,
+                returnOtherDocumentIfNotFound: false,
+                workspaceId: context.workspaceId,
+                documentId: context.documentId,
+                navigation: context.navigation,
+              };
+            },
             onDone: [
               {
                 actions: assign({
