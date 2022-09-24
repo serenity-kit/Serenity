@@ -1,6 +1,6 @@
 import { assign, createMachine } from "xstate";
-import { MeDocument, MeQuery, MeQueryVariables } from "../generated/graphql";
-import { urqlClient } from "../utils/urqlClient/urqlClient";
+import { MeQuery } from "../generated/graphql";
+import { fetchMeWithWorkspaceLoadingInfo } from "../graphql/fetchUtils/fetchMeWithWorkspaceLoadingInfo";
 
 export type MeWithWorkspaceLoadingInfoQueryResult = {
   data?: MeQuery;
@@ -16,25 +16,6 @@ type Context = {
   returnOtherDocumentIfNotFound?: boolean;
   navigation: any;
   queryResult?: MeWithWorkspaceLoadingInfoQueryResult;
-};
-
-const fetchMeWithWorkspaceLoadingInfo = async (context) => {
-  const result = await urqlClient
-    .query<MeQuery, MeQueryVariables>(
-      MeDocument,
-      {
-        workspaceId: context.workspaceId,
-        documentId: context.documentId,
-        returnOtherWorkspaceIfNotFound: context.returnOtherWorkspaceIfNotFound,
-        returnOtherDocumentIfNotFound: context.returnOtherDocumentIfNotFound,
-      },
-      {
-        // better to be safe here and always refetch
-        requestPolicy: "network-only",
-      }
-    )
-    .toPromise();
-  return result;
 };
 
 export const loadInitialDataMachine =
@@ -188,7 +169,16 @@ export const loadInitialDataMachine =
         },
       },
       services: {
-        fetchMeWithWorkspaceLoadingInfo: fetchMeWithWorkspaceLoadingInfo,
+        fetchMeWithWorkspaceLoadingInfo: (context) => {
+          return fetchMeWithWorkspaceLoadingInfo({
+            workspaceId: context.workspaceId,
+            documentId: context.documentId,
+            returnOtherWorkspaceIfNotFound:
+              context.returnOtherWorkspaceIfNotFound,
+            returnOtherDocumentIfNotFound:
+              context.returnOtherDocumentIfNotFound,
+          });
+        },
       },
     }
   );
