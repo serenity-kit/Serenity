@@ -30,7 +30,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     redirectToLobby: "";
     redirectToLogin: "";
-    redirectToNoWorkspaces: "";
+    redirectToNotFoundOrNoWorkspaces: "";
   };
   eventsCausingServices: {
     fetchMeWithWorkspaceLoadingInfo:
@@ -39,16 +39,13 @@ export interface Typegen0 {
   };
   eventsCausingGuards: {
     hasAccessToWorkspace: "";
-    hasAnyWorkspaces: "";
     hasNoNetworkError: "done.invoke.fetchMeWithWorkspaceLoadingInfo";
     isAuthorized: "";
     isValidSession: "";
   };
   eventsCausingDelays: {};
   matchesStates:
-    | "authorized"
     | "failure"
-    | "hasNoWorkspaces"
     | "hasWorkspaceAccess"
     | "invalidSession"
     | "loaded"

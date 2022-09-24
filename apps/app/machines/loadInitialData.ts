@@ -19,7 +19,7 @@ type Context = {
 };
 
 export const loadInitialDataMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2BDCBJAdgSwBc91kARdA9AOjUzxygGIJUcwr6A3VAa3YDMwBAMYALALJgA6oVFTUAJx6wADumFgAMhgj0oufqkSgVqWITytjIAB6IATPYCcVAAwBGABwA2AKw+nJwBmD1dvABoQAE9Eb28qewB2ABYg71dXX3cndMTEgF98yNpsfCISckoaHT1GMAUFRSoVZApDBQBbKkERCWlZeSVVdS0ahgMjJBBTcyIrKbsEd1dkqk9XRKd3ZMSsna2gyJiEZ1X3d0TvT0dfK6ygwuKdXAsKimoSyEZrGYt50EWiXWVGSYXsaScviCWShR0Qy3cIOy3khyV8iVcaW8BSKIBKL3KZHe3XQeGQAFcFGBGDZYJQCOx0PwGQoABT2DKuACUjHxZWIRKq-FJFKpPzMfxw1kWAFpvEEqMt5esclc4u44Qg0okqNj0ckDUFIfZkibHnjnvy3lVOCQ8BAAMpwcysb5TX5zKULeHueyeKjBIKedbQ33y3ya9xQkFhFbBUG+ZLy7zmvmvQXUdDkgiiRR4ABeX3Fs0sXoB8M8kIDUc8Rs8vg810jyURu1uTk2aSSftTlvTlWoonQsEGyjUGgAgsINLBYG6TBLPdL4Q37AlPO4gkmvN57L4I9F4S2qG2UZ3d4ke+acKgIHBrGnCQPqnQGMXJcuEDLsjqgvZN36gTeOcGyauiAYhNsTipBkjieMkvaYASArPp8EDvku3oIPKa5Bq49ZAiiOT2JGrhrr4Hb2N4aLOPhzieIhpT9sSwpkpSYAYaWn7yqskK+OC+y+uCESHic0JrPqaL4XklaOIxyHWtQXB2o6zpce6i7qeWCC7C41xdgafpovWmrQjquxkYkISBJsKzyVaGZULayD2k6s5adMmn-LY8Jkf68pkcEVxJp4QKaskLgrJWAXpPKm4Ibij4ocSWY5nmhboRpJbeYsFz+Lq2JbNB0GOFRzZrtcoUgRcQTZLc9nMVUN4EBO2a5goBaQJxOUrhRJ47o4RrpFRySmQaCTuMBDa1lClkpolfZPsSVKYMcC7ZWWPknNkrgnnuMEhJyl6RuJbZJJslbwZsOJPEhDnPkOsAAHKoKOwwzt1m25fWiLJPB+7YhFjhWWN8SuIElbxbu+6ZA1S1VI9b3jmAU4zvAWUflhvrBLqPiTYE6IrLs4WRX9OQhLFtVbnDyVNagqPOp9n7nLWbjQX4-i+jWThjasiRRrVjimqCSa+DTilM1hMqOIif4AZWOQgYkmrS2uwTXOi-F3Ok8GFIUQA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2BDCBJAdgSwBc91kARdA9AOjUzxygGIJUcwr6A3VAa3YDMwBAMYALALJgA6oVFTUAJx6wADumFgAMhgj0oufqkSgVqWITytjIAB6IATPYCcVAAwBGABwA2AKw+nJwBmD1dvABoQAE9Eb28qewB2ABYg71dXX3cndMTEgF98yNpsfCISckoaHT1GMAUFRSoVZApDBQBbKkERCWlZeSVVdS0ahgMjJBBTcyIrKbsEd1dkqk9XRKd3ZMSsna2gyJiEZ1X3d0TvT0dfK6ygwuKdXAsKimoSyEZrGYt50EWiXWVGSYXsaScviCWShR0Qy3cIOy3khyV8iVcaW8BSKIBKL3KZHe3XQeGQAFcFGBGDZYJQCOx0PwGQoABT2DKuACUjHxZWIRKq-FJFKpPzMfxw1kWAFpvEEqMt5esclc4u44Qg0okqNj0ckDUFIfZkibHnjnvy3lVOCQ8BAAMpwcysb5TX5zKULeHueyeKjBIKedbQ33y3ya9xQkFhFbBUG+ZLy7zmvmvQXUUToWCDZRqDQAQWEGlgsDdJglnul8N8rnsCU87iCSa83nsvgj0XhyURu1uTk2aSSfsKuJwqAgcGsacJlQ+Yyg4tmli9AMQMuyOqC9ibfsC3nOG016IDIW2TlSGUcnmSqct6bn1UwkCXkurCHl9aDrk86ICOXsSM6yoXwB3sbw0WcH9nE8O9MAJAVH2FMlKTAV8q29D9mwDDtwX2X1wQiLsTmhNZ9TRH88k8JxHDg0oH2JLg7UdZ0V3QtjMN2FxriHA0-TRX9NWhHVdjrRIQkCTYVjohDrWoW1kHtJ1Sw4itl3+Wx4Trf15TrYIriTTwgU1ZIXBWajdPSeUm1vXEZ0Q4lxwIAtyQIURFDwAAvF93UrVTNKWfxEW3dZrlC2t-CEg0qESKNwQ7OJTSCNIZKtDMqCpTBjjUt9MK8aKdzwiLEg5DtNRvGLgkomidjCC9UoYqosxzRQ8xGIsS3gXz1NXAKmwgmL-Eg2La3y49fF1CEIOyX0Bw8BrZ0c1AOuddiNMWZZgVBVIoTRbEd0OYjhMGsSJIHJxpLs+9FsoNbetlRxgoOvcckPRJNRlRxT2uXxnF0rIgVHfIgA */
   createMachine(
     {
       context: { navigation: null } as Context,
@@ -79,18 +79,7 @@ export const loadInitialDataMachine =
               target: "hasWorkspaceAccess",
             },
             {
-              target: "hasWorkspaceAccess",
-            },
-          ],
-        },
-        authorized: {
-          always: [
-            {
-              cond: "hasAnyWorkspaces",
-              target: "ready",
-            },
-            {
-              target: "hasNoWorkspaces",
+              target: "noAccess",
             },
           ],
         },
@@ -100,17 +89,12 @@ export const loadInitialDataMachine =
         },
         ready: {
           type: "final",
-          data: (context) => context.queryResult,
-        },
-        hasNoWorkspaces: {
-          entry: "redirectToNoWorkspaces",
-          type: "final",
         },
         hasWorkspaceAccess: {
           always: [
             {
               cond: "isAuthorized",
-              target: "authorized",
+              target: "ready",
             },
             {
               target: "notAuthorized",
@@ -118,7 +102,7 @@ export const loadInitialDataMachine =
           ],
         },
         noAccess: {
-          entry: "redirectToNoWorkspaceAccess",
+          entry: "redirectToNotFoundOrNoWorkspaces",
           type: "final",
         },
       },
@@ -143,29 +127,26 @@ export const loadInitialDataMachine =
             context.queryResult?.data?.me?.workspaceLoadingInfo?.isAuthorized
           );
         },
-        hasAnyWorkspaces: (context) => {
-          return true;
-        },
       },
       actions: {
         redirectToLogin: (context) => {
           context.navigation.replace("Login", {});
         },
-        // @ts-ignore seems to be an issue with xstate type generation
-        redirectToNoWorkspaceAccess: (context) => {
-          context.navigation.replace("WorkspaceNotFoundScreen", {
-            workspaceId:
-              context.queryResult?.data?.me?.workspaceLoadingInfo?.id,
-          });
+        redirectToNotFoundOrNoWorkspaces: (context) => {
+          if (context.returnOtherWorkspaceIfNotFound === true) {
+            context.navigation.replace("Onboarding");
+          } else {
+            context.navigation.replace("WorkspaceNotFoundScreen", {
+              workspaceId:
+                context.queryResult?.data?.me?.workspaceLoadingInfo?.id,
+            });
+          }
         },
         redirectToLobby: (context) => {
           context.navigation.replace("WorkspaceNotDecrypted", {
             workspaceId:
               context.queryResult?.data?.me?.workspaceLoadingInfo?.id,
           });
-        },
-        redirectToNoWorkspaces: (context) => {
-          context.navigation.replace("Onboarding");
         },
       },
       services: {
