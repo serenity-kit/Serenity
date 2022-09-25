@@ -60,7 +60,7 @@ export const loadPageMachine =
     },
     {
       guards: {
-        hasDocumentAccess: (_, event) => {
+        hasDocumentAccess: (context, event) => {
           // @ts-ignore no sure how to type it
           if (event.data?.data?.me?.workspaceLoadingInfo?.documentId) {
             return true;

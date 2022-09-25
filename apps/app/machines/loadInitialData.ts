@@ -90,6 +90,9 @@ export const loadInitialDataMachine =
         },
         ready: {
           type: "final",
+          data: (context) => {
+            return context.meWithWorkspaceLoadingInfoQueryResult;
+          },
         },
         hasWorkspaceAccess: {
           always: [
