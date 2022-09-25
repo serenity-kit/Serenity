@@ -317,11 +317,6 @@ export type GetWorkspaceDevicesResult = {
   devices: Array<Maybe<Device>>;
 };
 
-export type IsWorkspaceAuthorizedResult = {
-  __typename?: 'IsWorkspaceAuthorizedResult';
-  isAuthorized: Scalars['Boolean'];
-};
-
 export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
@@ -518,7 +513,6 @@ export type Query = {
   firstDocument?: Maybe<Document>;
   folder?: Maybe<Folder>;
   folders?: Maybe<FolderConnection>;
-  isWorkspaceAuthorized?: Maybe<IsWorkspaceAuthorizedResult>;
   mainDevice?: Maybe<MainDeviceResult>;
   me?: Maybe<MeResult>;
   pendingWorkspaceInvitation?: Maybe<PendingWorkspaceInvitationResult>;
@@ -582,11 +576,6 @@ export type QueryFoldersArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
   parentFolderId: Scalars['ID'];
-};
-
-
-export type QueryIsWorkspaceAuthorizedArgs = {
-  workspaceId: Scalars['ID'];
 };
 
 
@@ -1086,13 +1075,6 @@ export type FoldersQueryVariables = Exact<{
 
 
 export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
-
-export type IsWorkspaceAuthorizedQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
-}>;
-
-
-export type IsWorkspaceAuthorizedQuery = { __typename?: 'Query', isWorkspaceAuthorized?: { __typename?: 'IsWorkspaceAuthorizedResult', isAuthorized: boolean } | null };
 
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1683,17 +1665,6 @@ export const FoldersDocument = gql`
 
 export function useFoldersQuery(options: Omit<Urql.UseQueryArgs<FoldersQueryVariables>, 'query'>) {
   return Urql.useQuery<FoldersQuery, FoldersQueryVariables>({ query: FoldersDocument, ...options });
-};
-export const IsWorkspaceAuthorizedDocument = gql`
-    query isWorkspaceAuthorized($workspaceId: ID!) {
-  isWorkspaceAuthorized(workspaceId: $workspaceId) {
-    isAuthorized
-  }
-}
-    `;
-
-export function useIsWorkspaceAuthorizedQuery(options: Omit<Urql.UseQueryArgs<IsWorkspaceAuthorizedQueryVariables>, 'query'>) {
-  return Urql.useQuery<IsWorkspaceAuthorizedQuery, IsWorkspaceAuthorizedQueryVariables>({ query: IsWorkspaceAuthorizedDocument, ...options });
 };
 export const MainDeviceDocument = gql`
     query mainDevice {
