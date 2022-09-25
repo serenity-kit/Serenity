@@ -80,7 +80,8 @@ function WorkspaceDrawerScreen(props) {
     if (props.route.params?.workspaceId) {
       setLastUsedWorkspaceId(props.route.params.workspaceId);
     }
-  });
+  }, [props.route.params?.workspaceId]);
+
   if (!props.route.params) {
     return null;
   }
