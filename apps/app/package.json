@@ -17,7 +17,7 @@
     "build:web": "yarn setup && expo build:web --no-pwa && cp _redirects ./web-build/_redirects",
     "build:web:e2e": "yarn setup && IS_E2E_TEST=true API_URL=http://localhost:4001/graphql expo build:web --no-pwa && cp _redirects ./web-build/_redirects",
     "start:e2e": "yarn serve web-build --single -p 3000",
-    "test": "echo TODO",
+    "test": "jest",
     "ts:check": "node ../../add-ts-no-check.js && yarn tsc --noEmit",
     "lint": "eslint --ext .tsx --ext .ts ./"
   },
