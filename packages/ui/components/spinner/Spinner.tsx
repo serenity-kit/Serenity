@@ -1,6 +1,6 @@
-import React, { useEffect, useState, forwardRef } from "react";
+import { ISpinnerProps, Spinner as NativeBaseSpinner } from "native-base";
+import React, { forwardRef, useEffect, useState } from "react";
 import { Animated, Platform } from "react-native";
-import { Spinner as NativeBaseSpinner, ISpinnerProps } from "native-base";
 
 export type SpinnerProps = ISpinnerProps & {
   fadeIn?: boolean;
@@ -16,7 +16,7 @@ export const Spinner = forwardRef((props: SpinnerProps, ref) => {
       duration: 1500,
       delay: 200,
     }).start();
-  }, []);
+  }, [fadeAnim]);
 
   return (
     <Animated.View

@@ -16,6 +16,9 @@ export interface Typegen0 {
     "xstate.after(2000)#loadInitialData.failure": {
       type: "xstate.after(2000)#loadInitialData.failure";
     };
+    "xstate.after(5000)#loadInitialData.notAuthorized": {
+      type: "xstate.after(5000)#loadInitialData.notAuthorized";
+    };
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {
@@ -28,13 +31,14 @@ export interface Typegen0 {
     delays: never;
   };
   eventsCausingActions: {
-    redirectToLobby: "";
+    redirectToDocument: "";
     redirectToLogin: "";
     redirectToNotFoundOrNoWorkspaces: "";
   };
   eventsCausingServices: {
     fetchMeWithWorkspaceLoadingInfo:
       | "xstate.after(2000)#loadInitialData.failure"
+      | "xstate.after(5000)#loadInitialData.notAuthorized"
       | "xstate.init";
   };
   eventsCausingGuards: {
@@ -52,7 +56,7 @@ export interface Typegen0 {
     | "loading"
     | "noAccess"
     | "notAuthorized"
-    | "ready"
+    | "redirectToDocument"
     | "validSession";
   tags: never;
 }

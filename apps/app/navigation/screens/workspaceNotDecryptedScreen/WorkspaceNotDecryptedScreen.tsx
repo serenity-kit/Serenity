@@ -1,130 +1,35 @@
 import { Spinner, Text, View } from "@serenity-tools/ui";
-import {
-  StyleSheet,
-  TouchableOpacity,
-  useWindowDimensions,
-} from "react-native";
-import { Client, useClient } from "urql";
-import {
-  MeDocument,
-  MeQuery,
-  MeQueryVariables,
-  WorkspaceDocument,
-  WorkspaceQuery,
-  WorkspaceQueryVariables,
-} from "../../../generated/graphql";
-import { useInterval } from "../../../hooks/useInterval";
-import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { useMachine } from "@xstate/react";
+import { StyleSheet, useWindowDimensions } from "react-native";
 import { RootStackScreenProps } from "../../../types/navigation";
-import {
-  getLastUsedWorkspaceId,
-  removeLastUsedDocumentId,
-  removeLastUsedWorkspaceId,
-} from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { isWorkspaceAuthorized } from "../../../utils/workspace/isWorkspaceAuthorized";
+import { workspaceNotDecryptedScreenMachine } from "./workspaceNotDecryptedScreenMachine";
 
 export default function WorkspaceNotDecryptedScreen({
   navigation,
   route,
 }: RootStackScreenProps<"WorkspaceNotDecrypted">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const { activeDevice } = useWorkspaceContext();
+
   const workspaceId = route.params?.workspaceId;
-  const urqlClient = useClient();
-  const secondsBetweenAuthorizationChecks = 10;
-
-  useInterval(() => {
-    checkForAuthorization();
-  }, secondsBetweenAuthorizationChecks * 1000);
-
-  const getMe = async () => {
-    const meResult = await urqlClient
-      .query<MeQuery, MeQueryVariables>(
-        MeDocument,
-        {},
-        {
-          requestPolicy: "network-only",
-        }
-      )
-      .toPromise();
-    if (meResult.error) {
-      throw new Error(meResult.error.message);
-    }
-    return meResult.data?.me;
-  };
-
-  const checkForAuthorization = async () => {
-    // TODO: check if user is authorized
-    const me = await getMe();
-    const isUserMember = await isUserAMemberOfWorkspace({
-      urqlClient,
+  // TODO show error message in case there is network error
+  // TODO communicate when the next check attempt is happening
+  const [state] = useMachine(workspaceNotDecryptedScreenMachine, {
+    context: {
       workspaceId,
-    });
-    if (!isUserMember) {
-      navigation.replace("WorkspaceNotFound");
-      return;
-    }
-    const isAuthorized = await isWorkspaceAuthorized({
-      urqlClient,
-      workspaceId,
-    });
-    if (isAuthorized) {
-      navigation.replace("Workspace", {
-        workspaceId,
-        screen: "WorkspaceRoot",
-      });
-      return;
-    }
-  };
-
-  const isUserAMemberOfWorkspace = async ({
-    urqlClient,
-    workspaceId,
-  }: {
-    urqlClient: Client;
-    workspaceId: string;
-  }) => {
-    const deviceSigningPublicKey = activeDevice.signingPublicKey;
-    const workspaceResult = await urqlClient
-      .query<WorkspaceQuery, WorkspaceQueryVariables>(
-        WorkspaceDocument,
-        {
-          id: workspaceId,
-          deviceSigningPublicKey,
-        },
-        { requestPolicy: "network-only" }
-      )
-      .toPromise();
-    if (workspaceResult.data?.workspace === null) {
-      return false;
-    }
-    return true;
-  };
-
-  const removeLastUsedWorkspaceIdAndNavigateToRoot = async () => {
-    const workspaceId = await getLastUsedWorkspaceId();
-    if (workspaceId) {
-      removeLastUsedDocumentId(workspaceId);
-    }
-    await removeLastUsedWorkspaceId();
-    navigation.replace("Root");
-  };
+      navigation,
+    },
+  });
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
-        You must wait for your workspace to be decrypted by another member.
+        You joined the workspace. You now need to wait for any other workspace
+        member to make the workspace content available to you.
       </Text>
       <View style={styles.activityIndicatorContainer}>
         <Spinner style={styles.activityIndicator} />
         <Text>Waiting for authorization</Text>
       </View>
-      <TouchableOpacity
-        onPress={removeLastUsedWorkspaceIdAndNavigateToRoot}
-        style={styles.link}
-      >
-        <Text style={styles.linkText}>Go to home</Text>
-      </TouchableOpacity>
     </View>
   );
 }

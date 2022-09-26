@@ -1,4 +1,5 @@
 import { Text, tw, View } from "@serenity-tools/ui";
+import { useMachine } from "@xstate/react";
 import { useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import DeviceList from "../../../components/device/DeviceList";
@@ -7,6 +8,7 @@ import {
   useDevicesQuery,
 } from "../../../generated/graphql";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { loadMeAndVerifyMachine } from "../../../machines/loadMeAndVerifyMachine";
 import {
   WorkspaceDeviceParing,
   WorkspaceWithWorkspaceDevicesParing,
@@ -17,6 +19,12 @@ import { getWorkspaceKey } from "../../../utils/workspace/getWorkspaceKey";
 import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
 
 export default function DeviceManagerScreen(props) {
+  useMachine(loadMeAndVerifyMachine, {
+    context: {
+      navigation: props.navigation,
+    },
+  });
+
   const { activeDevice } = useWorkspaceContext();
   useWindowDimensions();
   const urqlClient = useClient();

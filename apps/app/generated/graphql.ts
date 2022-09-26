@@ -25,6 +25,11 @@ export type AcceptWorkspaceInvitationResult = {
   workspace?: Maybe<Workspace>;
 };
 
+export type ActiveWorkspaceKeysResult = {
+  __typename?: 'ActiveWorkspaceKeysResult';
+  activeWorkspaceKeys: Array<WorkspaceKey>;
+};
+
 export type AttachDeviceToWorkspacesInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
   deviceWorkspaceKeyBoxes: Array<WorkspaceKeyBoxData>;
@@ -317,11 +322,6 @@ export type GetWorkspaceDevicesResult = {
   devices: Array<Maybe<Device>>;
 };
 
-export type IsWorkspaceAuthorizedResult = {
-  __typename?: 'IsWorkspaceAuthorizedResult';
-  isAuthorized: Scalars['Boolean'];
-};
-
 export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
@@ -509,6 +509,7 @@ export type PendingWorkspaceInvitationResult = {
 
 export type Query = {
   __typename?: 'Query';
+  activeWorkspaceKeys?: Maybe<ActiveWorkspaceKeysResult>;
   deviceBySigningPublicKey?: Maybe<DeviceResult>;
   devices?: Maybe<DeviceConnection>;
   document?: Maybe<Document>;
@@ -517,7 +518,6 @@ export type Query = {
   firstDocument?: Maybe<Document>;
   folder?: Maybe<Folder>;
   folders?: Maybe<FolderConnection>;
-  isWorkspaceAuthorized?: Maybe<IsWorkspaceAuthorizedResult>;
   mainDevice?: Maybe<MainDeviceResult>;
   me?: Maybe<MeResult>;
   pendingWorkspaceInvitation?: Maybe<PendingWorkspaceInvitationResult>;
@@ -530,6 +530,12 @@ export type Query = {
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
   workspaces?: Maybe<WorkspaceConnection>;
+};
+
+
+export type QueryActiveWorkspaceKeysArgs = {
+  deviceSigningPublicKey: Scalars['String'];
+  workspaceId: Scalars['ID'];
 };
 
 
@@ -575,11 +581,6 @@ export type QueryFoldersArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
   parentFolderId: Scalars['ID'];
-};
-
-
-export type QueryIsWorkspaceAuthorizedArgs = {
-  workspaceId: Scalars['ID'];
 };
 
 
@@ -1082,19 +1083,17 @@ export type FoldersQueryVariables = Exact<{
 
 export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
-export type IsWorkspaceAuthorizedQueryVariables = Exact<{
-  workspaceId: Scalars['ID'];
-}>;
-
-
-export type IsWorkspaceAuthorizedQuery = { __typename?: 'Query', isWorkspaceAuthorized?: { __typename?: 'IsWorkspaceAuthorizedResult', isAuthorized: boolean } | null };
-
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string, createdAt: any } | null };
 
-export type MeQueryVariables = Exact<{
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null };
+
+export type MeWithWorkspaceLoadingInfoQueryVariables = Exact<{
   workspaceId?: InputMaybe<Scalars['ID']>;
   documentId?: InputMaybe<Scalars['ID']>;
   returnOtherWorkspaceIfNotFound?: InputMaybe<Scalars['Boolean']>;
@@ -1102,7 +1101,7 @@ export type MeQueryVariables = Exact<{
 }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null } | null } | null };
+export type MeWithWorkspaceLoadingInfoQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null } | null } | null };
 
 export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1683,17 +1682,6 @@ export const FoldersDocument = gql`
 export function useFoldersQuery(options: Omit<Urql.UseQueryArgs<FoldersQueryVariables>, 'query'>) {
   return Urql.useQuery<FoldersQuery, FoldersQueryVariables>({ query: FoldersDocument, ...options });
 };
-export const IsWorkspaceAuthorizedDocument = gql`
-    query isWorkspaceAuthorized($workspaceId: ID!) {
-  isWorkspaceAuthorized(workspaceId: $workspaceId) {
-    isAuthorized
-  }
-}
-    `;
-
-export function useIsWorkspaceAuthorizedQuery(options: Omit<Urql.UseQueryArgs<IsWorkspaceAuthorizedQueryVariables>, 'query'>) {
-  return Urql.useQuery<IsWorkspaceAuthorizedQuery, IsWorkspaceAuthorizedQueryVariables>({ query: IsWorkspaceAuthorizedDocument, ...options });
-};
 export const MainDeviceDocument = gql`
     query mainDevice {
   mainDevice {
@@ -1711,7 +1699,19 @@ export function useMainDeviceQuery(options?: Omit<Urql.UseQueryArgs<MainDeviceQu
   return Urql.useQuery<MainDeviceQuery, MainDeviceQueryVariables>({ query: MainDeviceDocument, ...options });
 };
 export const MeDocument = gql`
-    query me($workspaceId: ID, $documentId: ID, $returnOtherWorkspaceIfNotFound: Boolean, $returnOtherDocumentIfNotFound: Boolean) {
+    query me {
+  me {
+    id
+    username
+  }
+}
+    `;
+
+export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
+  return Urql.useQuery<MeQuery, MeQueryVariables>({ query: MeDocument, ...options });
+};
+export const MeWithWorkspaceLoadingInfoDocument = gql`
+    query meWithWorkspaceLoadingInfo($workspaceId: ID, $documentId: ID, $returnOtherWorkspaceIfNotFound: Boolean, $returnOtherDocumentIfNotFound: Boolean) {
   me {
     id
     username
@@ -1729,8 +1729,8 @@ export const MeDocument = gql`
 }
     `;
 
-export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
-  return Urql.useQuery<MeQuery, MeQueryVariables>({ query: MeDocument, ...options });
+export function useMeWithWorkspaceLoadingInfoQuery(options?: Omit<Urql.UseQueryArgs<MeWithWorkspaceLoadingInfoQueryVariables>, 'query'>) {
+  return Urql.useQuery<MeWithWorkspaceLoadingInfoQuery, MeWithWorkspaceLoadingInfoQueryVariables>({ query: MeWithWorkspaceLoadingInfoDocument, ...options });
 };
 export const PendingWorkspaceInvitationDocument = gql`
     query pendingWorkspaceInvitation {

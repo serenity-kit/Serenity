@@ -1,22 +1,22 @@
 import {
   Button,
+  CenterContent,
+  InfoMessage,
   Input,
   Modal,
   ModalButtonFooter,
   ModalHeader,
   RawInput,
+  Spinner,
   Text,
   tw,
   View,
 } from "@serenity-tools/ui";
+import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import { useClient } from "urql";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
-  MeDocument,
-  MeQuery,
-  MeQueryVariables,
   MeResult,
   useDeleteWorkspacesMutation,
   useUpdateWorkspaceMutation,
@@ -24,22 +24,27 @@ import {
   WorkspaceMember,
 } from "../../../generated/graphql";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 
 export default function WorkspaceSettingsGeneralScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
-  const urqlClient = useClient();
-  const { activeDevice } = useWorkspaceContext();
   const workspaceId = useWorkspaceId();
+  const { activeDevice } = useWorkspaceContext();
+  const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
+    context: {
+      workspaceId: workspaceId,
+      navigation: props.navigation,
+      activeDevice,
+    },
+  });
   const [, deleteWorkspacesMutation] = useDeleteWorkspacesMutation();
   const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
-  const [me, setMe] = useState<MeResult | null>();
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
@@ -54,41 +59,20 @@ export default function WorkspaceSettingsGeneralScreen(
     useState<boolean>(false);
   const [deletingWorkspaceName, setDeletingWorkspaceName] =
     useState<string>("");
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
-
-  const getMe = async () => {
-    const meResult = await urqlClient
-      .query<MeQuery, MeQueryVariables>(
-        MeDocument,
-        {},
-        {
-          requestPolicy: "network-only",
-        }
-      )
-      .toPromise();
-    if (meResult.error) {
-      throw new Error(meResult.error.message);
-    }
-    setMe(meResult.data?.me);
-    return meResult.data?.me;
-  };
 
   useEffect(() => {
-    (async () => {
-      const me = await getMe();
-      const workspace = await getWorkspace({
-        urqlClient,
-        deviceSigningPublicKey: activeDevice.signingPublicKey,
-      });
-      if (workspace) {
-        setWorkspace(workspace);
-        updateWorkspaceData(me, workspace);
-      } else {
-        props.navigation.replace("WorkspaceNotFound");
-        return;
-      }
-    })();
-  }, [urqlClient, props.navigation, activeDevice.signingPublicKey]);
+    if (
+      state.value === "loadWorkspaceSuccess" &&
+      state.context.workspaceQueryResult?.data?.workspace
+    ) {
+      console.log(state.context);
+      updateWorkspaceData(
+        state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
+        // @ts-expect-error need to fix the generation
+        state.context.workspaceQueryResult?.data?.workspace
+      );
+    }
+  }, [state]);
 
   const updateWorkspaceData = async (
     me: MeResult | null | undefined,
@@ -145,7 +129,7 @@ export default function WorkspaceSettingsGeneralScreen(
     });
     if (updateWorkspaceResult.data?.updateWorkspace?.workspace) {
       updateWorkspaceData(
-        me,
+        state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
         updateWorkspaceResult.data?.updateWorkspace?.workspace
       );
     }
@@ -160,8 +144,16 @@ export default function WorkspaceSettingsGeneralScreen(
         </View>
       )}
       <View style={tw`mt-20 px-4`}>
-        {workspace === null ? (
-          <Text>Loading...</Text>
+        {state.value !== "loadWorkspaceSuccess" ? (
+          <CenterContent>
+            {state.value === "loadWorkspaceFailed" ? (
+              <InfoMessage variant="error">
+                Failed to load workspace. Please try again or contact support.
+              </InfoMessage>
+            ) : (
+              <Spinner fadeIn />
+            )}
+          </CenterContent>
         ) : (
           <>
             <View>

@@ -1,6 +1,6 @@
 import { assign, createMachine } from "xstate";
-import { MeWithWorkspaceLoadingInfoQuery } from "../generated/graphql";
-import { fetchMeWithWorkspaceLoadingInfo } from "../graphql/fetchUtils/fetchMeWithWorkspaceLoadingInfo";
+import { MeWithWorkspaceLoadingInfoQuery } from "../../../generated/graphql";
+import { fetchMeWithWorkspaceLoadingInfo } from "../../../graphql/fetchUtils/fetchMeWithWorkspaceLoadingInfo";
 
 export type MeWithWorkspaceLoadingInfoQueryResult = {
   data?: MeWithWorkspaceLoadingInfoQuery;
@@ -18,12 +18,13 @@ type Context = {
   meWithWorkspaceLoadingInfoQueryResult?: MeWithWorkspaceLoadingInfoQueryResult;
 };
 
-export const loadInitialDataMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2BDCBJAdgSwBc91kARdA9AOjUzxygGIJUcwr6A3VAa3YDMwBAMYALALJgA6oVFTUAJx6wADumFgAMhgj0oufqkSgVqWITytjIAB6IATPYCcVAAwBGABwA2AKw+nJwBmD1dvABoQAE9Eb28qewB2ABYg71dXX3cndMTEgF98yNpsfCISckoaHT1GMAUFRSoVZApDBQBbKkERCWlZeSVVdS0ahgMjJBBTcyIrKbsEd1dkqk9XRKd3ZMSsna2gyJiEZ1X3d0TvT0dfK6ygwuKdXAsKimoSyEZrGYt50EWiXWVGSYXsaScviCWShR0Qy3cIOy3khyV8iVcaW8BSKIBKL3KZHe3XQeGQAFcFGBGDZYJQCOx0PwGQoABT2DKuACUjHxZWIRKq-FJFKpPzMfxw1kWAFpvEEqMt5esclc4u44Qg0okqNj0ckDUFIfZkibHnjnvy3lVOCQ8BAAMpwcysb5TX5zKULeHueyeKjBIKedbQ33y3ya9xQkFhFbBUG+ZLy7zmvmvQXUUToWCDZRqDQAQWEGlgsDdJglnul8N8rnsCU87iCSa83nsvgj0XhyURu1uTk2aSSfsKuJwqAgcGsacJlQ+Yyg4tmli9AMQMuyOqC9ibfsC3nOG016IDIW2TlSGUcnmSqct6bn1UwkCXkurCHl9aDrk86ICOXsSM6yoXwB3sbw0WcH9nE8O9MAJAVH2FMlKTAV8q29D9mwDDtwX2X1wQiLsTmhNZ9TRH88k8JxHDg0oH2JLg7UdZ0V3QtjMN2FxriHA0-TRX9NWhHVdjrRIQkCTYVjohDrWoW1kHtJ1Sw4itl3+Wx4Trf15TrYIriTTwgU1ZIXBWajdPSeUm1vXEZ0Q4lxwIAtyQIURFDwAAvF93UrVTNKWfxEW3dZrlC2t-CEg0qESKNwQ7OJTSCNIZKtDMqCpTBjjUt9MK8aKdzwiLEg5DtNRvGLgkomidjCC9UoYqosxzRQ8xGIsS3gXz1NXAKmwgmL-Eg2La3y49fF1CEIOyX0Bw8BrZ0c1AOuddiNMWZZgVBVIoTRbEd0OYjhMGsSJIHJxpLs+9FsoNbetlRxgoOvcckPRJNRlRxT2uXxnF0rIgVHfIgA */
+export const workspaceNotDecryptedScreenMachine =
+  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2BDCBJAdgSwBc91kARdA9AOjUzxygGIJUcwr6A3VAa3YDMwBAMYALALJgA6oVFTUAJx6wADumFgAMhgj0oufqkSgVqWITytjIAB6IALAAYAzFQBsAJi8BWbwA5vAEYPbwB2AE5nABoQAE9EDzdQqnDAwPsPPw9HbNDnN3sAX0KY2mx8IhJyShodPUYwBQVFKhVkCkMFAFsqQREJaVl5JVV1LTqGAyMkEFNzIisZuwRA8I8qQLdnQNC3APCAvJj4hG9Uqg9A-3tnbPt7P2di0p1cCyqKajLIRms5i0WoGWa3sFz8j18Ll2YVCx0QzmcfhSgT8eVRl28zns4TczxAZTelTIn166DwyAArgowIwbLBKAR2Oh+IyFAAKbKORwASkYBIqxGJNX4ZMp1L+ZgBOGsywAtM5HO40kEEZzUfY9nCEDdAlQNaFspi-FzLm5vHj+e8hdROCQ8BAAMpwcysX4zf4LaVLRDBVEpPIeewo8KhUJZQJahFI1KoxEGq5YnEW14Cj41HCoAgAQQpBFEijwAC8fnSGUyWY02d4uTy+SmrdVqBns7n8woi5AJfNLF6gYg-CGqArMn4dRl7N4tdl1s4Q6kMo4nN5suFk5hCYLG1RROhYMNlGoNFnhBpYLA3SZJZ6ZT6w8lwbcguDAs5-JO4vDEcjY+iE9jcXiGYQHA1iWkSW5lHoXZSjeCCygaSrhJiyHhBqzhHB+CCXOsITYlkr7eFsOyhGu5QNiS3wQNB17egg4ZUMaeyZIiHi7IukaoXqjirC+2KXI8SSkRuabUCK5JUmA1E9rBVzeO4uzBIRr6OGajxahqbhUI4fieI4BzGhObgAS866ptaHA4LayD2k6Z7Se6V72X2CCpLqXhBrO4R6cREaYYRoKopsy4qcamJCWZW5WTZzpObMjmArYPrpMkGShOOaRYgiHGgk4PGJvx+QkSU+L1uBJLNjmeYFsWVEOd2CXLKskQpMaqEIrcA6XFOCGOKEelhoVGpnOaxVgZuJLUro1LCAQAAqqCkKgwgUl0YA4AQUkNQkL6af4+TLml2yZZGoRyTiCLeBOGo4n4mzheRNQ7nuigHmMx6nvAdUwbRVy3RcBo4iGmwPBq2VcasZyJAEy5JqNpXjemqDvc6m29olKxeDhwWhiEXkGh4Wq+OEFwhNsBxuJEEQjSZZFlZQqOwbKOKIchr6oVsGEnC+ipBr16TbJsRl+MUxRAA */
   createMachine(
     {
       context: { navigation: null } as Context,
-      tsTypes: {} as import("./loadInitialData.typegen").Typegen0,
+      tsTypes:
+        {} as import("./workspaceNotDecryptedScreenMachine.typegen").Typegen0,
       predictableActionArguments: true,
       initial: "loading",
       states: {
@@ -85,20 +86,21 @@ export const loadInitialDataMachine =
           ],
         },
         notAuthorized: {
-          entry: "redirectToLobby",
-          type: "final",
-        },
-        ready: {
-          type: "final",
-          data: (context) => {
-            return context.meWithWorkspaceLoadingInfoQueryResult;
+          after: {
+            "5000": {
+              target: "loading",
+            },
           },
+        },
+        redirectToDocument: {
+          entry: "redirectToDocument",
+          type: "final",
         },
         hasWorkspaceAccess: {
           always: [
             {
               cond: "isAuthorized",
-              target: "ready",
+              target: "redirectToDocument",
             },
             {
               target: "notAuthorized",
@@ -151,23 +153,33 @@ export const loadInitialDataMachine =
             });
           }
         },
-        redirectToLobby: (context) => {
-          context.navigation.replace("WorkspaceNotDecrypted", {
-            workspaceId:
-              context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
-                ?.workspaceLoadingInfo?.id,
-          });
+        redirectToDocument: (context) => {
+          if (
+            context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
+              ?.workspaceLoadingInfo
+          ) {
+            context.navigation.replace("Workspace", {
+              workspaceId:
+                context.meWithWorkspaceLoadingInfoQueryResult.data.me
+                  .workspaceLoadingInfo.id,
+              screen: "Page",
+              params: {
+                pageId:
+                  context.meWithWorkspaceLoadingInfoQueryResult.data.me
+                    .workspaceLoadingInfo.documentId,
+              },
+            });
+          } else {
+            throw new Error("workspaceLoadingInfo was not defined");
+          }
         },
       },
       services: {
         fetchMeWithWorkspaceLoadingInfo: (context) => {
           return fetchMeWithWorkspaceLoadingInfo({
             workspaceId: context.workspaceId,
-            documentId: context.documentId,
-            returnOtherWorkspaceIfNotFound:
-              context.returnOtherWorkspaceIfNotFound,
-            returnOtherDocumentIfNotFound:
-              context.returnOtherDocumentIfNotFound,
+            returnOtherWorkspaceIfNotFound: false,
+            returnOtherDocumentIfNotFound: true,
           });
         },
       },

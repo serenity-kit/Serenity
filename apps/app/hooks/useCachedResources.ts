@@ -6,7 +6,6 @@ import { Device } from "../types/Device";
 import * as SessionKeyStore from "../utils/authentication/sessionKeyStore";
 import { getSessionKey } from "../utils/authentication/sessionKeyStore";
 import { getActiveDevice } from "../utils/device/getActiveDevice";
-import { getLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
@@ -20,7 +19,6 @@ export default function useCachedResources() {
         SplashScreen.preventAutoHideAsync();
         const result = await Promise.all([
           getActiveDevice(),
-          getLastUsedWorkspaceId(),
           sodium.ready,
           // Load fonts
           Font.loadAsync({

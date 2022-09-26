@@ -24,6 +24,15 @@ export const loadPageMachine =
           invoke: {
             src: loadInitialDataMachine,
             id: "loadInitialDataMachine",
+            data: (context) => {
+              return {
+                returnOtherWorkspaceIfNotFound: false,
+                returnOtherDocumentIfNotFound: false,
+                workspaceId: context.workspaceId,
+                documentId: context.documentId,
+                navigation: context.navigation,
+              };
+            },
             onDone: [
               {
                 actions: assign({
@@ -51,7 +60,7 @@ export const loadPageMachine =
     },
     {
       guards: {
-        hasDocumentAccess: (_, event) => {
+        hasDocumentAccess: (context, event) => {
           // @ts-ignore no sure how to type it
           if (event.data?.data?.me?.workspaceLoadingInfo?.documentId) {
             return true;

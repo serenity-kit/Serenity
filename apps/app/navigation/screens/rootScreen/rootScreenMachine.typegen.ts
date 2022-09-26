@@ -9,8 +9,17 @@ export interface Typegen0 {
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
+    "done.invoke.getLastUsedWorkspaceAndDocumentId": {
+      type: "done.invoke.getLastUsedWorkspaceAndDocumentId";
+      data: unknown;
+      __tip: "See the XState TS docs to learn how to strongly type this.";
+    };
     "error.platform.fetchMeWithWorkspaceLoadingInfo": {
       type: "error.platform.fetchMeWithWorkspaceLoadingInfo";
+      data: unknown;
+    };
+    "error.platform.getLastUsedWorkspaceAndDocumentId": {
+      type: "error.platform.getLastUsedWorkspaceAndDocumentId";
       data: unknown;
     };
     "xstate.after(2000)#loadInitialData.failure": {
@@ -20,6 +29,7 @@ export interface Typegen0 {
   };
   invokeSrcNameMap: {
     fetchMeWithWorkspaceLoadingInfo: "done.invoke.fetchMeWithWorkspaceLoadingInfo";
+    getLastUsedWorkspaceAndDocumentId: "done.invoke.getLastUsedWorkspaceAndDocumentId";
   };
   missingImplementations: {
     actions: never;
@@ -28,14 +38,17 @@ export interface Typegen0 {
     delays: never;
   };
   eventsCausingActions: {
+    redirectToDocument: "";
     redirectToLobby: "";
     redirectToLogin: "";
-    redirectToNotFoundOrNoWorkspaces: "";
+    redirectToNoWorkspaces: "";
   };
   eventsCausingServices: {
     fetchMeWithWorkspaceLoadingInfo:
-      | "xstate.after(2000)#loadInitialData.failure"
-      | "xstate.init";
+      | "done.invoke.getLastUsedWorkspaceAndDocumentId"
+      | "error.platform.getLastUsedWorkspaceAndDocumentId"
+      | "xstate.after(2000)#loadInitialData.failure";
+    getLastUsedWorkspaceAndDocumentId: "xstate.init";
   };
   eventsCausingGuards: {
     hasAccessToWorkspace: "";
@@ -46,13 +59,14 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   matchesStates:
     | "failure"
+    | "hasNoWorkspaces"
     | "hasWorkspaceAccess"
     | "invalidSession"
     | "loaded"
     | "loading"
-    | "noAccess"
+    | "loadingLastUsedWorkspaceAndDocumentId"
     | "notAuthorized"
-    | "ready"
+    | "redirectToDocument"
     | "validSession";
   tags: never;
 }
