@@ -564,6 +564,7 @@ export type QueryDocumentsArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
   parentFolderId: Scalars['ID'];
+  usingOldKeys?: InputMaybe<Scalars['Boolean']>;
 };
 
 
@@ -756,7 +757,7 @@ export type WorkspaceDeviceInput = {
 
 export type WorkspaceDevicePairingInput = {
   id: Scalars['String'];
-  members: Array<MemberDeviceParingInput>;
+  workspaceKeysMembers: Array<WorkspaceKeyDeviceInput>;
 };
 
 export type WorkspaceEdge = {
@@ -836,6 +837,11 @@ export type WorkspaceKeyBox = {
 export type WorkspaceKeyBoxData = {
   workspaceId: Scalars['String'];
   workspaceKeyDevicePairs: Array<WorkspaceKeyDevicePair>;
+};
+
+export type WorkspaceKeyDeviceInput = {
+  id: Scalars['String'];
+  members: Array<MemberDeviceParingInput>;
 };
 
 export type WorkspaceKeyDevicePair = {
