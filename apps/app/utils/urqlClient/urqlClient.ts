@@ -21,6 +21,8 @@ const exchanges = [
   cacheExchange({
     keys: {
       WorkspaceMember: () => null, // since it has no unique key
+      CreatorDevice: () => null, // since it has no unique key
+      UnauthorizedMembersResult: () => null, // since it has no unique key
       // @ts-expect-error the type seems to be wrong
       MainDeviceResult: (mainDevice) => {
         return mainDevice.signingPublicKey;
