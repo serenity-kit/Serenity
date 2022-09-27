@@ -12,8 +12,6 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
     },
   });
 
-  console.log("RootScreen", state.value);
-
   return (
     <CenterContent>
       <Spinner fadeIn size="lg" />
