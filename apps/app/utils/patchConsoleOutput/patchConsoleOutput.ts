@@ -3,6 +3,7 @@ export const patchConsoleOutput = () => {
   console.error = (...args) => {
     if (
       (args[0] &&
+        typeof args[0] === "string" &&
         args[0].includes(
           "Warning: React has detected a change in the order of Hooks called by %s"
         ) &&
@@ -13,6 +14,7 @@ export const patchConsoleOutput = () => {
           'Warning: Each child in a list should have a unique "key" prop.'
         ) &&
         args[1] &&
+        typeof args[1] === "string" &&
         args[1].includes(
           "Check the render method of `ForwardRef(AvatarGroup)`"
         ))
