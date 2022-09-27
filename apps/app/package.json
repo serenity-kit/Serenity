@@ -98,7 +98,6 @@
     "@serenity-tools/eslint-config": "*",
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.64.12",
-    "@typescript-eslint/parser": "^5.38.1",
     "@xstate/cli": "^0.3.3",
     "eas-cli": "^2.1.0",
     "electron": "^17.1.0",
