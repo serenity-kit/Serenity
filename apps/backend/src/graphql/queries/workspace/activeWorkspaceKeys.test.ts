@@ -7,6 +7,7 @@ import { encryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/en
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { getActiveWorkspaceKeys } from "../../../../test/helpers/workspace/getActiveWorkspaceKeys";
+import { prisma } from "../../../database/prisma";
 import { createDeviceAndLogin } from "../../../database/testHelpers/createDeviceAndLogin";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { WorkspaceWithWorkspaceDevicesParing } from "../../../types/workspaceDevice";
@@ -196,6 +197,52 @@ test("delete device", async () => {
       device.signingPublicKey
     );
   }
+
+  const newWorkspaceKey = await prisma.workspaceKey.findFirst({
+    where: { workspaceId: userData1.workspace.id },
+    orderBy: { generation: "desc" },
+  });
+
+  // TODO: actually re-encrypt documents and folders
+  // to test that old workspaceKeyIds are not returned
+  await prisma.document.updateMany({
+    where: { workspaceId: userData1.workspace.id },
+    data: {
+      workspaceKeyId: newWorkspaceKey?.id,
+    },
+  });
+  await prisma.folder.updateMany({
+    where: { workspaceId: userData1.workspace.id },
+    data: {
+      workspaceKeyId: newWorkspaceKey?.id,
+    },
+  });
+
+  const resultAfterUpdate = await getActiveWorkspaceKeys({
+    graphql,
+    workspaceId: userData1.workspace.id,
+    deviceSigningPublicKey: userData1.device.signingPublicKey,
+    sessionKey: userData1.sessionKey,
+  });
+  const updatedWorkspaceKeys =
+    resultAfterUpdate.activeWorkspaceKeys.activeWorkspaceKeys;
+  expect(updatedWorkspaceKeys.length).toBe(1);
+  const updatedWorkspaceKey = updatedWorkspaceKeys[0];
+  expect(updatedWorkspaceKey.id).toBe(newWorkspaceKey?.id);
+  expect(updatedWorkspaceKey.generation).toBe(1);
+  const workspaceKeyBox = updatedWorkspaceKey.workspaceKeyBoxes[0];
+  expect(workspaceKeyBox.deviceSigningPublicKey).toBe(
+    userData1.device.signingPublicKey
+  );
+  expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+    workspaceKeyBox.creatorDeviceSigningPublicKey
+  );
+  expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+    userData1.device.signingPublicKey
+  );
+  expect(workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+    userData1.device.signingPublicKey
+  );
 });
 
 test("Unauthenticated", async () => {
