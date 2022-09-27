@@ -24,6 +24,7 @@ export const getActiveWorkspaceKeys = async ({
         deviceSigningPublicKey: $deviceSigningPublicKey
       ) {
         activeWorkspaceKeys {
+          id
           generation
           workspaceId
           workspaceKeyBoxes {
