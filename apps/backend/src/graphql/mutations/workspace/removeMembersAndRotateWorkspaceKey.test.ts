@@ -135,8 +135,13 @@ test("user can remove another user", async () => {
   const user2DeviceKeyBoxes = [
     {
       workspaceId: userData1.workspace.id,
-      nonce: user2DeviceKeyBox.nonce,
-      ciphertext: user2DeviceKeyBox.nonce,
+      workspaceKeyDevicePairs: [
+        {
+          workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+          nonce: user2DeviceKeyBox.nonce,
+          ciphertext: user2DeviceKeyBox.nonce,
+        },
+      ],
     },
   ];
   await attachDeviceToWorkspaces({
@@ -232,8 +237,13 @@ test("user can rotate key for multiple devices", async () => {
   const user2DeviceKeyBoxes = [
     {
       workspaceId: userData1.workspace.id,
-      nonce: user2DeviceKeyBox.nonce,
-      ciphertext: user2DeviceKeyBox.nonce,
+      workspaceKeyDevicePairs: [
+        {
+          workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+          nonce: user2DeviceKeyBox.nonce,
+          ciphertext: user2DeviceKeyBox.nonce,
+        },
+      ],
     },
   ];
   await attachDeviceToWorkspaces({
