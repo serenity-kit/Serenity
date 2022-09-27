@@ -31,6 +31,7 @@ test("attach the same device does nothing", async () => {
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
   });
+  const workspaceKeyId = userAndDevice1.workspace.currentWorkspaceKey.id;
   const result = await attachDeviceToWorkspaces({
     graphql,
     deviceSigningPublicKey,
@@ -38,8 +39,13 @@ test("attach the same device does nothing", async () => {
     deviceWorkspaceKeyBoxes: [
       {
         workspaceId,
-        nonce,
-        ciphertext,
+        workspaceKeyDevicePairs: [
+          {
+            workspaceKeyId,
+            nonce,
+            ciphertext,
+          },
+        ],
       },
     ],
     authorizationHeader,
@@ -78,6 +84,7 @@ test("attach a device to a workspace", async () => {
     creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
   });
   const workspaceId = userAndDevice1.workspace.id;
+  const workspaceKeyId = userAndDevice1.workspace.currentWorkspaceKey.id;
   const result = await attachDeviceToWorkspaces({
     graphql,
     deviceSigningPublicKey,
@@ -85,8 +92,13 @@ test("attach a device to a workspace", async () => {
     deviceWorkspaceKeyBoxes: [
       {
         workspaceId,
-        nonce,
-        ciphertext,
+        workspaceKeyDevicePairs: [
+          {
+            workspaceKeyId,
+            nonce,
+            ciphertext,
+          },
+        ],
       },
     ],
     authorizationHeader,
@@ -125,6 +137,7 @@ test("Unauthenticated", async () => {
     creatorDeviceEncryptionPrivateKey:
       userAndDevice1.deviceEncryptionPrivateKey,
   });
+  const workspaceKeyId = userAndDevice1.workspace.currentWorkspaceKey.id;
   await expect(
     (async () =>
       await attachDeviceToWorkspaces({
@@ -134,8 +147,13 @@ test("Unauthenticated", async () => {
         deviceWorkspaceKeyBoxes: [
           {
             workspaceId,
-            nonce,
-            ciphertext,
+            workspaceKeyDevicePairs: [
+              {
+                workspaceKeyId,
+                nonce,
+                ciphertext,
+              },
+            ],
           },
         ],
         authorizationHeader,
@@ -330,6 +348,7 @@ describe("Input errors", () => {
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
     const workspaceId = userAndDevice1.workspace.id;
+    const workspaceKeyId = userAndDevice1.workspace.currentWorkspaceKey.id;
     await expect(
       (async () =>
         await attachDeviceToWorkspaces({
@@ -339,8 +358,13 @@ describe("Input errors", () => {
           deviceWorkspaceKeyBoxes: [
             {
               workspaceId,
-              nonce,
-              ciphertext,
+              workspaceKeyDevicePairs: [
+                {
+                  workspaceKeyId,
+                  nonce,
+                  ciphertext,
+                },
+              ],
             },
           ],
           authorizationHeader,

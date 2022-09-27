@@ -1,5 +1,9 @@
 import { Client } from "urql";
-import { WorkspaceKeyBox, WorkspaceKeyBoxData } from "../../generated/graphql";
+import {
+  WorkspaceKeyBox,
+  WorkspaceKeyBoxData,
+  WorkspaceKeyDevicePair,
+} from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { getWorkspace } from "../workspace/getWorkspace";
 import { getWorkspaces } from "../workspace/getWorkspaces";
@@ -57,27 +61,39 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
       deviceSigningPublicKey: mainDevice?.signingPublicKey,
       urqlClient,
     });
-    const workspaceKeyBox =
-      workspaceWithMainWorkspaceKeyBox?.currentWorkspaceKey?.workspaceKeyBox;
-    if (!workspaceKeyBox) {
-      throw new Error("Could not find workspaceKeyBox for main device!");
+    const workspaceKeys = workspaceWithMainWorkspaceKeyBox?.workspaceKeys;
+    if (!workspaceKeys) {
+      // TODO: handle this error
+      throw new Error("No workspace keys found for workspace");
     }
-    const creatorDevice = workspaceKeyBox.creatorDevice;
-    const workspaceKey = await decryptWorkspaceKey({
-      ciphertext: workspaceKeyBox.ciphertext,
-      nonce: workspaceKeyBox.nonce,
-      receiverDeviceEncryptionPrivateKey: mainDevice?.encryptionPrivateKey!,
-      creatorDeviceEncryptionPublicKey: creatorDevice?.encryptionPublicKey!,
-    });
-    const { nonce, ciphertext } = await encryptWorkspaceKeyForDevice({
-      workspaceKey,
-      receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
-      creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey!,
-    });
+    const workspaceKeyDevicePairs: WorkspaceKeyDevicePair[] = [];
+    for (let workspaceKey of workspaceKeys) {
+      const workspaceKeyBox =
+        workspaceWithMainWorkspaceKeyBox?.currentWorkspaceKey?.workspaceKeyBox;
+      if (!workspaceKeyBox) {
+        throw new Error("Could not find workspaceKeyBox for main device!");
+      }
+      const creatorDevice = workspaceKeyBox.creatorDevice;
+      const workspaceKeyString = await decryptWorkspaceKey({
+        ciphertext: workspaceKeyBox.ciphertext,
+        nonce: workspaceKeyBox.nonce,
+        receiverDeviceEncryptionPrivateKey: mainDevice?.encryptionPrivateKey!,
+        creatorDeviceEncryptionPublicKey: creatorDevice?.encryptionPublicKey!,
+      });
+      const { nonce, ciphertext } = await encryptWorkspaceKeyForDevice({
+        workspaceKey: workspaceKeyString,
+        receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
+        creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey!,
+      });
+      workspaceKeyDevicePairs.push({
+        workspaceKeyId: workspaceKey.id,
+        ciphertext,
+        nonce,
+      });
+    }
     deviceWorkspaceKeyBoxes.push({
-      ciphertext,
-      nonce,
       workspaceId: workspace.id,
+      workspaceKeyDevicePairs,
     });
   }
   return {

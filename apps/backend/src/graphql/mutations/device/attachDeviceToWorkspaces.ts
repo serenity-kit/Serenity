@@ -9,12 +9,22 @@ import {
 import { attachDeviceToWorkspaces } from "../../../database/device/attachDeviceToWorkspaces";
 import { WorkspaceKey } from "../../types/workspace";
 
+export const WorkspaceKeyDevicePair = inputObjectType({
+  name: "WorkspaceKeyDevicePair",
+  definition(t) {
+    t.nonNull.string("workspaceKeyId");
+    t.nonNull.string("nonce");
+    t.nonNull.string("ciphertext");
+  },
+});
+
 export const DeviceWorkspaceKeyBoxInput = inputObjectType({
   name: "WorkspaceKeyBoxData",
   definition(t) {
     t.nonNull.string("workspaceId");
-    t.nonNull.string("nonce");
-    t.nonNull.string("ciphertext");
+    t.nonNull.list.nonNull.field("workspaceKeyDevicePairs", {
+      type: WorkspaceKeyDevicePair,
+    });
   },
 });
 
