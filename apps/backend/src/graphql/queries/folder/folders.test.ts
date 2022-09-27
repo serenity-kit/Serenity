@@ -25,6 +25,42 @@ let sessionKey = "";
 let initialWorkspaceStructureResult: any = null;
 let workspace: any = null;
 
+type GetFoldersProps = {
+  parentFolderId: string;
+  usingOldKeys: boolean;
+  authorizationHeader: string;
+};
+const getFolders = async ({
+  parentFolderId,
+  usingOldKeys,
+  authorizationHeader,
+}: GetFoldersProps) => {
+  const authorizationHeaders = { authorization: authorizationHeader };
+  const query = gql`
+  {
+      folders(parentFolderId: "${parentFolderId}", first: 50, usingOldKeys: ${usingOldKeys}) {
+          edges {
+              node {
+                  id
+                  parentFolderId
+                  rootFolderId
+                  workspaceId
+              }
+          }
+          pageInfo {
+              hasNextPage
+              endCursor
+          }
+      }
+  }`;
+  const result = await graphql.client.request(
+    query,
+    null,
+    authorizationHeaders
+  );
+  return result;
+};
+
 const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
   sessionKey = registerUserResult.sessionKey;
@@ -104,32 +140,15 @@ beforeAll(async () => {
 });
 
 test("user should be able to list folders in a workspace when no subfoldes", async () => {
-  const authorizationHeader = { authorization: sessionKey };
-  // get root folders from graphql
-  const query = gql`
-    {
-        folders(parentFolderId: "${parentFolderId}", first: 50) {
-            edges {
-                node {
-                    id
-                    parentFolderId
-                    rootFolderId
-                    workspaceId
-                }
-            }
-            pageInfo {
-                hasNextPage
-                endCursor
-            }
-        }
-    }
-    `;
-  const result = await graphql.client.request(query, null, authorizationHeader);
+  const result = await getFolders({
+    parentFolderId,
+    usingOldKeys: false,
+    authorizationHeader: sessionKey,
+  });
   expect(result.folders.edges.length).toBe(0);
 });
 
 test("user should be able to list folders in a workspace with one item", async () => {
-  const authorizationHeader = { authorization: sessionKey };
   const createParentFolderResult = await createFolder({
     graphql,
     id: folderId1,
@@ -140,25 +159,11 @@ test("user should be able to list folders in a workspace with one item", async (
     workspaceId: workspaceId,
     workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
-  const query = gql`
-    {
-        folders(parentFolderId: "${parentFolderId}", first: 50) {
-            edges {
-                node {
-                    id
-                    parentFolderId
-                    rootFolderId
-                    workspaceId
-                }
-            }
-            pageInfo {
-                hasNextPage
-                endCursor
-            }
-        }
-    }
-    `;
-  const result = await graphql.client.request(query, null, authorizationHeader);
+  const result = await getFolders({
+    parentFolderId,
+    usingOldKeys: false,
+    authorizationHeader: sessionKey,
+  });
   expect(result.folders.edges.length).toBe(1);
   result.folders.edges.forEach(
     (folder: {
@@ -173,7 +178,6 @@ test("user should be able to list folders in a workspace with one item", async (
 });
 
 test("user should be able to list folders in a workspace with multiple items", async () => {
-  const authorizationHeader = { authorization: sessionKey };
   const createFolderResult = await createFolder({
     graphql,
     id: folderId2,
@@ -184,25 +188,11 @@ test("user should be able to list folders in a workspace with multiple items", a
     workspaceId: workspaceId,
     workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
-  const query = gql`
-    {
-        folders(parentFolderId: "${parentFolderId}", first: 50) {
-            edges {
-                node {
-                    id
-                    parentFolderId
-                    rootFolderId
-                    workspaceId
-                }
-            }
-            pageInfo {
-                hasNextPage
-                endCursor
-            }
-        }
-    }
-    `;
-  const result = await graphql.client.request(query, null, authorizationHeader);
+  const result = await getFolders({
+    parentFolderId,
+    usingOldKeys: false,
+    authorizationHeader: sessionKey,
+  });
   expect(result.folders.edges.length).toBe(2);
   result.folders.edges.forEach(
     (folder: {
@@ -217,7 +207,6 @@ test("user should be able to list folders in a workspace with multiple items", a
 });
 
 test("user should be able to list without showing subfolders", async () => {
-  const authorizationHeader = { authorization: sessionKey };
   const createFolderResult = await createFolder({
     graphql,
     id: childFolderId,
@@ -228,103 +217,53 @@ test("user should be able to list without showing subfolders", async () => {
     workspaceId: workspaceId,
     workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
-  const query = gql`
-  {
-      folders(parentFolderId: "${parentFolderId}", first: 50) {
-          edges {
-              node {
-                  id
-                  parentFolderId
-                  rootFolderId
-                  workspaceId
-              }
-          }
-          pageInfo {
-              hasNextPage
-              endCursor
-          }
-      }
-  }
-  `;
-  const result = await graphql.client.request(query, null, authorizationHeader);
+  const result = await getFolders({
+    parentFolderId,
+    usingOldKeys: false,
+    authorizationHeader: sessionKey,
+  });
   expect(result.folders.edges.length).toBe(2);
 });
 
+test("old workpace keys", async () => {
+  const result = await getFolders({
+    parentFolderId,
+    usingOldKeys: true,
+    authorizationHeader: sessionKey,
+  });
+  expect(result.folders.edges.length).toBe(0);
+});
+
 test("retrieving a folder that doesn't exist throws an error", async () => {
-  const authorizationHeader = { authorization: sessionKey };
   const fakeFolderId = "2bd63f0b-66f4-491c-8808-0a1de192cb67";
-  const query = gql`
-  {
-      folders(parentFolderId: "${fakeFolderId}", first: 50) {
-          edges {
-              node {
-                  id
-                  parentFolderId
-                  rootFolderId
-                  workspaceId
-              }
-          }
-          pageInfo {
-              hasNextPage
-              endCursor
-          }
-      }
-  }
-  `;
   await expect(
     (async () =>
-      await graphql.client.request(query, null, authorizationHeader))()
+      await getFolders({
+        parentFolderId: fakeFolderId,
+        usingOldKeys: false,
+        authorizationHeader: sessionKey,
+      }))()
   ).rejects.toThrow("Unauthorized");
 });
 
 test("listing folders that the user doesn't own throws an error", async () => {
-  const authorizationHeader = { authorization: sessionKey };
-  const query = gql`
-  {
-      folders(parentFolderId: "${otherFolderId}", first: 50) {
-          edges {
-              node {
-                  id
-                  parentFolderId
-                  rootFolderId
-                  workspaceId
-              }
-          }
-          pageInfo {
-              hasNextPage
-              endCursor
-          }
-      }
-  }
-  `;
   await expect(
     (async () =>
-      await graphql.client.request(query, null, authorizationHeader))()
+      await getFolders({
+        parentFolderId: otherFolderId,
+        usingOldKeys: false,
+        authorizationHeader: sessionKey,
+      }))()
   ).rejects.toThrow("Unauthorized");
 });
 
 test("Unauthenticated", async () => {
-  const authorizationHeader = { authorization: "badauthheader" };
-  const query = gql`
-  {
-      folders(parentFolderId: "${otherFolderId}", first: 50) {
-          edges {
-              node {
-                  id
-                  parentFolderId
-                  rootFolderId
-                  workspaceId
-              }
-          }
-          pageInfo {
-              hasNextPage
-              endCursor
-          }
-      }
-  }
-  `;
   await expect(
     (async () =>
-      await graphql.client.request(query, null, authorizationHeader))()
+      await getFolders({
+        parentFolderId,
+        usingOldKeys: false,
+        authorizationHeader: "badauthheader",
+      }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

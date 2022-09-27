@@ -1,5 +1,5 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
-import { idArg, nonNull, queryField } from "nexus";
+import { booleanArg, idArg, nonNull, queryField } from "nexus";
 import { getSubfolders } from "../../../database/folder/getSubfolders";
 import { Folder } from "../../types/folder";
 
@@ -11,6 +11,7 @@ export const folders = queryField((t) => {
     cursorFromNode: (node) => node?.id ?? "",
     additionalArgs: {
       parentFolderId: nonNull(idArg()),
+      usingOldKeys: booleanArg(),
     },
     async nodes(root, args, context) {
       if (args.first > 50) {
@@ -34,10 +35,11 @@ export const folders = queryField((t) => {
       // include one extra project to set hasNextPage value
       const take: any = args.first ? args.first + 1 : undefined;
       const parentFolderId = args.parentFolderId;
-
+      const usingOldKeys = args.usingOldKeys || false;
       const folders = await getSubfolders({
         userId,
         parentFolderId,
+        usingOldKeys,
         cursor,
         skip,
         take,
