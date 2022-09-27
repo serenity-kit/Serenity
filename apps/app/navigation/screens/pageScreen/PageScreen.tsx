@@ -26,12 +26,12 @@ import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocume
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { loadPageMachine } from "./loadPageMachine";
 
-export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
+const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+  const pageId = props.route.params.pageId;
   const { activeDevice } = useWorkspaceContext();
   const workspaceId = useWorkspaceId();
   const updateDocumentStore = useDocumentStore((state) => state.update);
-  const pageId = props.route.params.pageId;
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const urqlClient = useClient();
 
@@ -141,4 +141,12 @@ export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
       </CenterContent>
     );
   }
+};
+
+// By remounting the component we make sure that a fresh state machine gets started.
+// As an alternative we could also have an action that resets the state machine,
+// but with all the side-effects remounting seemed to be the stabler choice for now.
+export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
+  const pageId = props.route.params.pageId;
+  return <PageRemountWrapper key={pageId} {...props} />;
 }
