@@ -72,15 +72,20 @@ test("Existing workspace does nothing", async () => {
   const workspaceMemberDevices: WorkspaceMemberDevices[] = [
     {
       id: workspaceId,
-      members: [
+      workspaceKeysMembers: [
         {
-          id: userAndDevice2.user.id,
-          workspaceDevices: [
+          id: workspaceKey.id,
+          members: [
             {
-              receiverDeviceSigningPublicKey:
-                userAndDevice2.device.signingPublicKey,
-              nonce,
-              ciphertext,
+              id: userAndDevice2.user.id,
+              workspaceDevices: [
+                {
+                  receiverDeviceSigningPublicKey:
+                    userAndDevice2.device.signingPublicKey,
+                  nonce,
+                  ciphertext,
+                },
+              ],
             },
           ],
         },

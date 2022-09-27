@@ -10,9 +10,15 @@ export type MemberDevices = {
   id: string; // userId
   workspaceDevices: WorkspaceDeviceParing[];
 };
+
+export type WorskpaceKeyMembers = {
+  id: string; // workspaceKeyId;
+  members: MemberDevices[];
+};
+
 export type WorkspaceMemberDevices = {
   id: string; // workspaceId
-  members: MemberDevices[];
+  workspaceKeysMembers: WorskpaceKeyMembers[];
 };
 
 export type MemberWithWorkspaceKeyBoxes = {
