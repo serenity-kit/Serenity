@@ -78,8 +78,13 @@ test("add device", async () => {
     deviceWorkspaceKeyBoxes: [
       {
         workspaceId: userData1.workspace.id,
-        nonce,
-        ciphertext,
+        workspaceKeyDevicePairs: [
+          {
+            workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+            nonce,
+            ciphertext,
+          },
+        ],
       },
     ],
     authorizationHeader: userData1.sessionKey,

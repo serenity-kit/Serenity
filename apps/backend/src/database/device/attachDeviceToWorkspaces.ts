@@ -4,10 +4,15 @@ import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
 
-export type AttachToDeviceWorkspaceKeyBoxData = {
-  workspaceId: string;
+export type WorkspaceKeyDevicePair = {
+  workspaceKeyId: string;
   nonce: string;
   ciphertext: string;
+};
+
+export type AttachToDeviceWorkspaceKeyBoxData = {
+  workspaceId: string;
+  workspaceKeyDevicePairs: WorkspaceKeyDevicePair[];
 };
 
 type Params = {
@@ -133,18 +138,23 @@ export async function attachDeviceToWorkspaces({
       });
       const workspaceKeyBoxes: WorkspaceKeyBox[] = [];
       workspaces.forEach((workspace) => {
-        const workspaceKey = workspace.workspaceKey[0];
+        // const workspaceKey = workspace.workspaceKey[0];
         const currentWorkspaceKeyBoxData = workspaceKeyBoxLookup[workspace.id];
-        if (!(workspaceKey.id in existingWorkspaceKeyBoxLookup)) {
-          workspaceKeyBoxes.push({
-            id: uuidv4(),
-            workspaceKeyId: workspaceKey.id,
-            deviceSigningPublicKey: receiverDeviceSigningPublicKey,
-            creatorDeviceSigningPublicKey,
-            nonce: currentWorkspaceKeyBoxData.nonce,
-            ciphertext: currentWorkspaceKeyBoxData.ciphertext,
-          });
-        }
+        currentWorkspaceKeyBoxData.workspaceKeyDevicePairs.forEach(
+          (workspaceKeyDevicePair) => {
+            const workspaceKeyId = workspaceKeyDevicePair.workspaceKeyId;
+            if (!(workspaceKeyId in existingWorkspaceKeyBoxLookup)) {
+              workspaceKeyBoxes.push({
+                id: uuidv4(),
+                workspaceKeyId: workspaceKeyId,
+                deviceSigningPublicKey: receiverDeviceSigningPublicKey,
+                creatorDeviceSigningPublicKey,
+                nonce: workspaceKeyDevicePair.nonce,
+                ciphertext: workspaceKeyDevicePair.ciphertext,
+              });
+            }
+          }
+        );
       });
       await prisma.workspaceKeyBox.createMany({
         data: workspaceKeyBoxes,

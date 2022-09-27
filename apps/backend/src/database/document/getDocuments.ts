@@ -8,6 +8,7 @@ type Cursor = {
 type Params = {
   parentFolderId: string;
   userId: string;
+  usingOldKeys?: boolean;
   cursor?: Cursor;
   skip?: number;
   take: number;
@@ -16,6 +17,7 @@ type Params = {
 export async function getDocuments({
   userId,
   parentFolderId,
+  usingOldKeys,
   cursor,
   skip,
   take,
@@ -41,12 +43,33 @@ export async function getDocuments({
       if (!userToWorkspace) {
         throw new ForbiddenError("Unauthorized");
       }
+      const latestWorkspaceKey = await prisma.workspaceKey.findFirst({
+        where: { workspaceId: userToWorkspace.workspaceId },
+        select: { generation: true },
+        orderBy: { generation: "desc" },
+      });
+      console.log({ latestWorkspaceKey });
+      if (!latestWorkspaceKey) {
+        throw new Error("No workspaceKeys found");
+      }
+      const whereQuery: { [key: string]: any } = {
+        workspaceId: parentFolder.workspaceId,
+        parentFolderId: parentFolder.id,
+        workspaceKey: {
+          generation: {
+            lt: latestWorkspaceKey.generation,
+          },
+        },
+      };
+      if (!usingOldKeys) {
+        delete whereQuery.workspaceKey;
+      }
+      console.log({ usingOldKeys });
+      console.log({ whereQuery });
+
       // then fetch the documents in that folder
       const documents = await prisma.document.findMany({
-        where: {
-          workspaceId: parentFolder.workspaceId,
-          parentFolderId: parentFolder.id,
-        },
+        where: whereQuery,
         cursor,
         skip,
         take,

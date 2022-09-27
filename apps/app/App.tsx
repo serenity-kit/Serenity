@@ -20,8 +20,11 @@ import { ErrorBoundary } from "./components/errorBoundary/ErrorBoundary";
 import { AppContextProvider } from "./context/AppContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
+import { patchConsoleOutput } from "./utils/patchConsoleOutput/patchConsoleOutput";
 import { recreateClient } from "./utils/urqlClient/urqlClient";
 import { source } from "./webviews/opaque/source";
+
+patchConsoleOutput();
 
 // import { clearDeviceAndSessionStorage } from "./utils/authentication/clearDeviceAndSessionStorage";
 // clearDeviceAndSessionStorage();
