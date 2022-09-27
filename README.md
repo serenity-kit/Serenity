@@ -165,3 +165,11 @@ Frontend deployment is setup in Netlify.
 - Folders start with a lower case character.
 - TypeScript, Json and other files start with a lower case character.
   - React components are the only exception as they start with an upper case character.
+
+## License
+
+Copyright 2022–2022 Naisho GmbH
+
+Licensed under the AGPLv3: https://opensource.org/licenses/agpl-3.0
+
+The package `react-native-sodium-expo-plugin` is licensed under the ISC license.
