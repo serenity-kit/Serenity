@@ -188,7 +188,7 @@ export default function DesignSystemScreen() {
         </Text>
         <DSExampleArea>
           {collaborationColors.map((color) => {
-            return <WorkspaceAvatar customColor={color} />;
+            return <WorkspaceAvatar key={color} customColor={color} />;
           })}
         </DSExampleArea>
 
@@ -1419,7 +1419,6 @@ export default function DesignSystemScreen() {
             }}
             label="New workspace"
             name="plus"
-            style={tw`bold`}
           />
           <Modal
             isVisible={showModal}
