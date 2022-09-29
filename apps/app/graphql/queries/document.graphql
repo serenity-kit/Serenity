@@ -5,6 +5,7 @@ query document($id: ID!) {
     encryptedNameNonce
     workspaceKeyId
     subkeyId
+    contentSubkeyId
     parentFolderId
     workspaceId
   }

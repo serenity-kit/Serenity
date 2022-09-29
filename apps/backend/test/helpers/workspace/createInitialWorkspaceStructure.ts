@@ -102,18 +102,27 @@ export const createInitialWorkspaceStructure = async ({
   const documentKeyResult = await createDocumentKey({
     folderKey,
   });
+  const documentKey = documentKeyResult.key;
+  const documentSubkeyId = documentKeyResult.subkeyId;
   const encryptedDocumentTitleResult = await encryptDocumentTitle({
     title: documentName,
-    key: documentKeyResult.key,
+    key: documentKey,
   });
   const encryptedDocumentName = encryptedDocumentTitleResult.ciphertext;
   const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;
-  const documentSubkeyId = documentKeyResult.subkeyId;
 
   // currently hard-coded until we enable e2e encryption per workspace
+  // const documentEncryptionKey = sodium.from_base64(
+  //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
+  // );
+  const documentContentKeyResult = await createDocumentKey({
+    folderKey,
+  });
+  const documentContentSubkeyId = documentContentKeyResult.subkeyId;
   const documentEncryptionKey = sodium.from_base64(
-    "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
+    documentContentKeyResult.key
   );
+
   const documentSnapshot = await createIntroductionDocumentSnapshot({
     documentId,
     documentEncryptionKey,
@@ -134,6 +143,7 @@ export const createInitialWorkspaceStructure = async ({
         encryptedDocumentName,
         encryptedDocumentNameNonce,
         documentSubkeyId,
+        documentContentSubkeyId,
         documentSnapshot,
         creatorDeviceSigningPublicKey:
           creatorDeviceSigningPublicKey ?? deviceSigningPublicKey,

@@ -69,15 +69,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     const workspaceId = uuidv4();
     const folderId = uuidv4();
     const documentId = uuidv4();
-    // currently hard-coded until we enable e2e encryption per workspace
-    const documentEncryptionKey = sodium.from_base64(
-      "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
-    );
-    const snapshot = await createIntroductionDocumentSnapshot({
-      documentId,
-      documentEncryptionKey,
-    });
-
     // grab all devices for this user
     //
     if (!devicesResult.data?.devices?.nodes) {
@@ -106,6 +97,21 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       title: documentName,
       key: documentKeyData.key,
     });
+    // currently hard-coded until we enable e2e encryption per workspace
+    // const documentEncryptionKey = sodium.from_base64(
+    //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
+    // );
+    const documentContentKeyData = await createDocumentKey({
+      folderKey: encryptedFolderResult.folderSubkey,
+    });
+    const documentEncryptionKey = sodium.from_base64(
+      documentContentKeyData.key
+    );
+    const snapshot = await createIntroductionDocumentSnapshot({
+      documentId,
+      documentEncryptionKey,
+    });
+
     const createInitialWorkspaceStructureResult =
       await createInitialWorkspaceStructure({
         input: {
@@ -119,6 +125,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           encryptedDocumentName: encryptedDocumentTitle.ciphertext,
           encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
           documentSubkeyId: documentKeyData.subkeyId,
+          documentContentSubkeyId: documentContentKeyData.subkeyId,
           documentId,
           documentSnapshot: snapshot,
           creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,

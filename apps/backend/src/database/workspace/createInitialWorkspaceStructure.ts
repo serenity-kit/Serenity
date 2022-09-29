@@ -23,6 +23,7 @@ export type Params = {
   encryptedDocumentName: string;
   encryptedDocumentNameNonce: string;
   documentSubkeyId: number;
+  documentContentSubkeyId: number;
   documentSnapshot: Snapshot;
   creatorDeviceSigningPublicKey: string;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
@@ -46,6 +47,7 @@ export async function createInitialWorkspaceStructure({
   encryptedDocumentName,
   encryptedDocumentNameNonce,
   documentSubkeyId,
+  documentContentSubkeyId,
   documentSnapshot,
   creatorDeviceSigningPublicKey,
   deviceWorkspaceKeyBoxes,
@@ -74,6 +76,7 @@ export async function createInitialWorkspaceStructure({
     encryptedNameNonce: encryptedDocumentNameNonce,
     workspaceKeyId: workspace.currentWorkspaceKey?.id,
     subkeyId: documentSubkeyId,
+    contentSubkeyId: documentContentSubkeyId,
     parentFolderId: folder.id,
     workspaceId: workspaceId,
   });

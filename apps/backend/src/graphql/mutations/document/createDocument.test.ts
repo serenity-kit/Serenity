@@ -1,7 +1,13 @@
+import {
+  createDocumentKey,
+  folderDerivedKeyContext,
+} from "@serenity-tools/common";
+import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
@@ -9,20 +15,22 @@ import { createInitialWorkspaceStructure } from "../../../../test/helpers/worksp
 const graphql = setupGraphql();
 const username = "user1";
 const password = "password";
+let userData: any = null;
 let addedWorkspace: any = null;
 let addedDocumentId: any = null;
+let addedFolder: any = null;
 let sessionKey = "";
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  sessionKey = registerUserResult.sessionKey;
-  const device = registerUserResult.mainDevice;
+  userData = await registerUser(graphql, username, password);
+  sessionKey = userData.sessionKey;
+  const device = userData.mainDevice;
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     workspaceName: "workspace 1",
     workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    deviceEncryptionPrivateKey: userData.encryptionPrivateKey,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -33,6 +41,7 @@ const setup = async () => {
   });
   addedWorkspace =
     createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  addedFolder = createWorkspaceResult.createInitialWorkspaceStructure.folder;
 };
 
 beforeAll(async () => {
@@ -42,12 +51,26 @@ beforeAll(async () => {
 
 test("user should be able to create a document", async () => {
   const id = uuidv4();
+  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: userData.mainDevice,
+    deviceEncryptionPrivateKey: userData.encryptionPrivateKey,
+    workspace: addedWorkspace,
+  });
+  const folderKeyResult = await kdfDeriveFromKey({
+    key: workspaceKey,
+    context: folderDerivedKeyContext,
+    subkeyId: addedFolder.subkeyId,
+  });
+  let documentContentKeyResult = await createDocumentKey({
+    folderKey: folderKeyResult.key,
+  });
   const result = await createDocument({
     id,
     graphql,
     authorizationHeader: sessionKey,
     parentFolderId: null,
     workspaceId: addedWorkspace.id,
+    contentSubkeyId: documentContentKeyResult.subkeyId,
   });
   expect(result.createDocument.id).toBe(id);
 });
@@ -60,6 +83,7 @@ test("Unauthenticated", async () => {
         graphql,
         authorizationHeader: "badauthkey",
         parentFolderId: null,
+        contentSubkeyId: 1,
         workspaceId: addedWorkspace.id,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
