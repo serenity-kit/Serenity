@@ -157,14 +157,12 @@ export default function SidebarFolder(props: Props) {
       console.error(error);
       return;
     }
-    console.log({ workspaceKey });
     const parentFolderKeyData = await getFolderKey({
       folderId: props.folderId,
       workspaceId: props.workspaceId,
       urqlClient,
       activeDevice,
     });
-    console.log({ parentFolderKeyData });
     const encryptedFolderResult = await encryptFolderName({
       name,
       parentKey: parentFolderKeyData.key,
