@@ -1,8 +1,8 @@
 import { Text, tw, View } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { useWindowDimensions } from "react-native";
+import { FlatList, StyleSheet, useWindowDimensions } from "react-native";
 import { useClient } from "urql";
-import DeviceList from "../../../components/device/DeviceList";
+import DeviceListItem from "../../../components/deviceListItem/DeviceListItem";
 import {
   useDeleteDevicesMutation,
   useDevicesQuery,
@@ -17,6 +17,11 @@ import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/cre
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaceKey } from "../../../utils/workspace/getWorkspaceKey";
 import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
+
+// inspired by https://stackoverflow.com/a/46700791
+function notNull<TypeValue>(value: TypeValue | null): value is TypeValue {
+  return value !== null;
+}
 
 export default function DeviceManagerScreen(props) {
   useMachine(loadMeAndVerifyMachine, {
@@ -105,16 +110,36 @@ export default function DeviceManagerScreen(props) {
   return (
     <View style={tw`mt-20`}>
       <Text bold>Devices</Text>
-      <DeviceList
-        // @ts-expect-error filter out null values
-        devices={
-          devicesResult.data?.devices?.nodes?.filter(
-            (device) => device !== null
-          ) || []
-        }
-        activeDevice={activeDevice}
-        onDeletePress={deleteDevice}
+      <FlatList
+        data={devicesResult.data?.devices?.nodes?.filter(notNull) || []}
+        keyExtractor={(item) => item.signingPublicKey}
+        renderItem={({ item }) => (
+          <DeviceListItem
+            isActiveDevice={
+              activeDevice.signingPublicKey === item.signingPublicKey
+            }
+            signingPublicKey={item.signingPublicKey}
+            encryptionPublicKey={item.encryptionPublicKey}
+            encryptionPublicKeySignature={item.encryptionPublicKeySignature}
+            createdAt={item.createdAt}
+            info={item.info}
+            onDeletePress={() => deleteDevice(item.signingPublicKey)}
+          />
+        )}
+        ListEmptyComponent={() => (
+          <View style={styles.listItem}>
+            <Text>No devices</Text>
+          </View>
+        )}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  listItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderWidth: 1,
+  },
+});

@@ -68,4 +68,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     borderWidth: 1,
   },
+  listItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderWidth: 1,
+  },
 });
