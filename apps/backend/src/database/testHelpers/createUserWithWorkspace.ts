@@ -78,14 +78,6 @@ export default async function createUserWithWorkspace({
 
   const documentId = uuidv4();
   const documentName = "Introduction";
-  const documentEncryptionKey = sodium.from_base64(
-    "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
-  );
-  const documentSnapshot = await createIntroductionDocumentSnapshot({
-    documentId,
-    documentEncryptionKey,
-  });
-
   const user = result.user;
   const device = result.device;
   const deviceEncryptionPrivateKey = result.encryptionPrivateKey;
@@ -105,10 +97,23 @@ export default async function createUserWithWorkspace({
   const docmentKeyResult = await createDocumentKey({
     folderKey,
   });
+  const documentKey = docmentKeyResult.key;
   const encryptedDocumentTitleResult = await encryptDocumentTitle({
     title: documentName,
-    key: docmentKeyResult.key,
+    key: documentKey,
   });
+  // const documentEncryptionKey = sodium.from_base64(
+  //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
+  // );
+  const docmenContentKeyResult = await createDocumentKey({
+    folderKey,
+  });
+  const documentEncryptionKey = sodium.from_base64(docmenContentKeyResult.key);
+  const documentSnapshot = await createIntroductionDocumentSnapshot({
+    documentId,
+    documentEncryptionKey,
+  });
+
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
     workspaceId: id,
@@ -122,6 +127,7 @@ export default async function createUserWithWorkspace({
     encryptedDocumentName: encryptedDocumentTitleResult.ciphertext,
     encryptedDocumentNameNonce: encryptedDocumentTitleResult.publicNonce,
     documentSubkeyId: docmentKeyResult.subkeyId,
+    documentContentSubkeyId: docmenContentKeyResult.subkeyId,
     documentSnapshot,
     creatorDeviceSigningPublicKey: device.signingPublicKey,
     deviceWorkspaceKeyBoxes: [

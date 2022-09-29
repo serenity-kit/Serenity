@@ -21,6 +21,7 @@ import {
   verifyAndDecryptSnapshot,
   verifyAndDecryptUpdate,
 } from "@naisho/core";
+import { recreateDocumentKey } from "@serenity-tools/common";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { useEffect, useRef } from "react";
 import { useClient } from "urql";
@@ -46,6 +47,7 @@ import {
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
+import { getFolderKey } from "../../utils/folder/getFolderKey";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 
 const reconnectTimeout = 2000;
@@ -79,6 +81,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const folderStore = useOpenFolderStore();
   const documentPathStore = useDocumentPathStore();
   const documentStore = useDocumentStore();
+  const document = useDocumentStore((state) => state.document);
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPath = await getDocumentPath(urqlClient, docId);
@@ -222,9 +225,20 @@ export default function Page({ navigation, route, updateTitle }: Props) {
 
       // TODO get key from navigation
       // const key = sodium.from_base64(window.location.hash.slice(1));
-      const key = sodium.from_base64(
-        "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
-      );
+      // const key = sodium.from_base64(
+      //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
+      // );
+      const folderKeyData = await getFolderKey({
+        folderId: document?.parentFolderId!,
+        workspaceId: document?.workspaceId!,
+        urqlClient,
+        activeDevice,
+      });
+      const documentKey = await recreateDocumentKey({
+        folderKey: folderKeyData.key,
+        subkeyId: document?.contentSubkeyId!,
+      });
+      const key = sodium.from_base64(documentKey.key);
 
       signatureKeyPairRef.current = await createSignatureKeyPair();
 
@@ -475,7 +489,9 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       });
     }
 
-    initDocument();
+    if (document) {
+      initDocument();
+    }
 
     return () => {
       removeAwarenessStates(
@@ -487,7 +503,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       shouldReconnectWebsocketConnectionRef.current = false;
       websocketConnectionRef.current?.close();
     };
-  }, []);
+  }, [document]);
 
   return (
     <Editor

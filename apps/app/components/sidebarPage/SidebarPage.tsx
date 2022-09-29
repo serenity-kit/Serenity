@@ -1,7 +1,6 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useLinkProps } from "@react-navigation/native";
 import {
-  createDocumentKey,
   decryptDocumentTitle,
   encryptDocumentTitle,
   recreateDocumentKey,
@@ -108,8 +107,9 @@ export default function SidebarPage(props: Props) {
       urqlClient,
       activeDevice,
     });
-    const documentKeyData = await createDocumentKey({
+    const documentKeyData = await recreateDocumentKey({
       folderKey: folderKeyData.key,
+      subkeyId: document?.subkeyId!,
     });
     const encryptedDocumentTitle = await encryptDocumentTitle({
       title: name,
