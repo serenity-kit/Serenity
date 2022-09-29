@@ -17,17 +17,28 @@ export const getFolderKey = async ({
   urqlClient,
   activeDevice,
 }: Props) => {
-  const workspaceKey = await getWorkspaceKey({
-    workspaceId: workspaceId!,
-    urqlClient,
-    activeDevice,
-  });
+  let parentKey = "";
   const folder = await getFolder({
     id: folderId,
     urqlClient,
   });
+  if (folder.parentFolderId) {
+    const parentFolderKeyData = await getFolderKey({
+      folderId: folder.parentFolderId,
+      workspaceId,
+      urqlClient,
+      activeDevice,
+    });
+    parentKey = parentFolderKeyData.key;
+  } else {
+    parentKey = await getWorkspaceKey({
+      workspaceId,
+      urqlClient,
+      activeDevice,
+    });
+  }
   const folderKeyData = await kdfDeriveFromKey({
-    key: workspaceKey,
+    key: parentKey,
     context: folderDerivedKeyContext,
     subkeyId: folder.subkeyId!,
   });
