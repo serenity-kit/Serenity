@@ -84,41 +84,45 @@ export async function attachDevicesToWorkspaces({
     for (let workspaceData of workspaceMemberDevices) {
       const workspaceId = workspaceData.id;
       workspaceIdUserIdLookup[workspaceId] = [];
-      for (let member of workspaceData.members) {
-        const receiverUserId = member.id;
-        workspaceIdUserIdLookup[workspaceId].push(member.id);
+      for (let member of workspaceData.workspaceKeysMembers) {
+        const workspaceId = workspaceData.id;
+        for (let workspaceKeyDeviceMembers of workspaceData.workspaceKeysMembers) {
+          const workspaceKeyId = workspaceKeyDeviceMembers.id;
+          for (let member of workspaceKeyDeviceMembers.members) {
+            const receiverUserId = member.id;
+            workspaceIdUserIdLookup[workspaceId].push(member.id);
 
-        if (!(receiverUserId in userWorkspaceLookup)) {
-          throw new Error("userId not found");
-          // continue;
-        }
-        if (!(workspaceId in workspaceKeyBoxLookup)) {
-          throw new Error("workspace not found");
-          // continue;
-        }
-        const workspaceKeys = workspaceKeyBoxLookup[workspaceId];
-        for (let workspaceKey of workspaceKeys) {
-          for (let workspaceDevice of member.workspaceDevices) {
-            const newKeyBox: WorkspaceKeyBox = {
-              id: uuidv4(),
-              workspaceKeyId: workspaceKey.id,
-              creatorDeviceSigningPublicKey,
-              deviceSigningPublicKey:
-                workspaceDevice.receiverDeviceSigningPublicKey,
-              ciphertext: workspaceDevice.ciphertext,
-              nonce: workspaceDevice.nonce,
-            };
-            newKeyBoxes.push(newKeyBox);
-            if (!(workspaceKey.id in workspaceKeyIdUserLookup)) {
-              workspaceKeyIdUserLookup[workspaceKey.id] = [];
+            if (!(receiverUserId in userWorkspaceLookup)) {
+              throw new Error("userId not found");
+              // continue;
             }
-            workspaceKeyIdUserLookup[workspaceKey.id].push(receiverUserId);
-            if (!(receiverUserId in userIdKeyBoxCiphertextLoookup)) {
-              userIdKeyBoxCiphertextLoookup[receiverUserId] = [];
+            if (!(workspaceId in workspaceKeyBoxLookup)) {
+              throw new Error("workspace not found");
+              // continue;
             }
-            userIdKeyBoxCiphertextLoookup[receiverUserId].push(
-              workspaceDevice.ciphertext
-            );
+            // const workspaceKeys = workspaceKeyBoxLookup[workspaceId];
+            for (let workspaceDevice of member.workspaceDevices) {
+              const newKeyBox: WorkspaceKeyBox = {
+                id: uuidv4(),
+                workspaceKeyId,
+                creatorDeviceSigningPublicKey,
+                deviceSigningPublicKey:
+                  workspaceDevice.receiverDeviceSigningPublicKey,
+                ciphertext: workspaceDevice.ciphertext,
+                nonce: workspaceDevice.nonce,
+              };
+              newKeyBoxes.push(newKeyBox);
+              if (!(workspaceKeyId in workspaceKeyIdUserLookup)) {
+                workspaceKeyIdUserLookup[workspaceKeyId] = [];
+              }
+              workspaceKeyIdUserLookup[workspaceKeyId].push(receiverUserId);
+              if (!(receiverUserId in userIdKeyBoxCiphertextLoookup)) {
+                userIdKeyBoxCiphertextLoookup[receiverUserId] = [];
+              }
+              userIdKeyBoxCiphertextLoookup[receiverUserId].push(
+                workspaceDevice.ciphertext
+              );
+            }
           }
         }
       }

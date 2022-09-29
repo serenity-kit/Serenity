@@ -1,12 +1,22 @@
 import { inputObjectType, objectType } from "nexus";
 import { WorkspaceKeyBox } from "./workspace";
 
+export const MemberWorkspaceKeyDevices = inputObjectType({
+  name: "WorkspaceKeyDeviceInput",
+  definition(t) {
+    t.nonNull.string("id"); // workspaceKeyId
+    t.nonNull.list.nonNull.field("members", {
+      type: MemberDeviceParingInput,
+    });
+  },
+});
+
 export const WorkspaceDeviceInput = inputObjectType({
   name: "WorkspaceDeviceInput",
   definition(t) {
     t.nonNull.string("receiverDeviceSigningPublicKey");
-    t.nonNull.string("nonce");
     t.nonNull.string("ciphertext");
+    t.nonNull.string("nonce");
   },
 });
 
@@ -23,9 +33,9 @@ export const MemberDeviceParingInput = inputObjectType({
 export const WorkspaceDevicePairingInput = inputObjectType({
   name: "WorkspaceDevicePairingInput",
   definition(t) {
-    t.nonNull.string("id");
-    t.nonNull.list.nonNull.field("members", {
-      type: MemberDeviceParingInput,
+    t.nonNull.string("id"); // workspaceId
+    t.nonNull.list.nonNull.field("workspaceKeysMembers", {
+      type: MemberWorkspaceKeyDevices,
     });
   },
 });
