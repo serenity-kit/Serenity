@@ -1,11 +1,12 @@
 import { Client } from "urql";
-import { Device } from "../../types/Device";
 import {
-  MemberDevices,
-  WorkspaceMemberDevices,
-} from "../../types/workspaceDevice";
+  WorkspaceDevicePairingInput,
+  WorkspaceKeyDeviceInput,
+} from "../../generated/graphql";
+import { Device } from "../../types/Device";
+import { MemberDevices } from "../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
-import { getWorkspaceKey } from "../workspace/getWorkspaceKey";
+import { getWorkspaceKeys } from "../workspace/getWorskpaceKeys";
 
 export type Props = {
   unauthorizedWorkspaceDevices: any;
@@ -16,12 +17,13 @@ export const createWorkspaceMemberDevices = async ({
   activeDevice,
   unauthorizedWorkspaceDevices,
   urqlClient,
-}: Props) => {
-  const workspaceMemberDevices: WorkspaceMemberDevices[] = [];
+}: Props): Promise<WorkspaceDevicePairingInput[]> => {
+  const workspaceMemberDevices: WorkspaceDevicePairingInput[] = [];
   for (let unauthorizedWorkspace of unauthorizedWorkspaceDevices) {
-    let workspaceKey: string | undefined = undefined;
+    let workspaceKeys: { [workspaceKeyId: string]: string } | undefined =
+      undefined;
     try {
-      workspaceKey = await getWorkspaceKey({
+      workspaceKeys = await getWorkspaceKeys({
         workspaceId: unauthorizedWorkspace.id,
         urqlClient,
         activeDevice,
@@ -30,34 +32,41 @@ export const createWorkspaceMemberDevices = async ({
       // we don't have access to this workspace yet, can't decrypt
       continue;
     }
-    const workspace: WorkspaceMemberDevices = {
+    const workspaceMemberDevice: WorkspaceDevicePairingInput = {
       id: unauthorizedWorkspace.id,
-      members: [],
+      workspaceKeysMembers: [],
     };
-    for (let unauthorizedMember of unauthorizedWorkspace.members) {
-      const member: MemberDevices = {
-        id: unauthorizedMember.id,
-        workspaceDevices: [],
+    for (let workspaceKeyId of Object.keys(workspaceKeys)) {
+      const workspaceKeyMember: WorkspaceKeyDeviceInput = {
+        id: workspaceKeyId,
+        members: [],
       };
-      for (let receiverDevice of unauthorizedMember.devices) {
-        const { nonce, ciphertext } =
-          await createAndEncryptWorkspaceKeyForDevice({
-            receiverDeviceEncryptionPublicKey:
-              receiverDevice.encryptionPublicKey,
-            creatorDeviceEncryptionPrivateKey:
-              activeDevice.encryptionPrivateKey!,
-            workspaceKey,
+      const workspaceKeyString = workspaceKeys[workspaceKeyId];
+      for (let unauthorizedMember of unauthorizedWorkspace.members) {
+        const member: MemberDevices = {
+          id: unauthorizedMember.id,
+          workspaceDevices: [],
+        };
+        for (let receiverDevice of unauthorizedMember.devices) {
+          const { nonce, ciphertext } =
+            await createAndEncryptWorkspaceKeyForDevice({
+              receiverDeviceEncryptionPublicKey:
+                receiverDevice.encryptionPublicKey,
+              creatorDeviceEncryptionPrivateKey:
+                activeDevice.encryptionPrivateKey!,
+              workspaceKey: workspaceKeyString,
+            });
+          member.workspaceDevices.push({
+            receiverDeviceSigningPublicKey: receiverDevice.signingPublicKey,
+            ciphertext,
+            nonce,
           });
-        member.workspaceDevices.push({
-          receiverDeviceSigningPublicKey: receiverDevice.signingPublicKey,
-          ciphertext,
-          nonce,
-        });
+        }
+        workspaceKeyMember.members.push(member);
       }
-
-      workspace.members.push(member);
+      workspaceMemberDevice.workspaceKeysMembers.push(workspaceKeyMember);
     }
-    workspaceMemberDevices.push(workspace);
+    workspaceMemberDevices.push(workspaceMemberDevice);
   }
   return workspaceMemberDevices;
 };

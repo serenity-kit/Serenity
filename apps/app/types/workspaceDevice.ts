@@ -11,7 +11,7 @@ export type MemberDevices = {
   workspaceDevices: WorkspaceDeviceParing[];
 };
 export type WorkspaceMemberDevices = {
-  id: string; // workspaceId
+  id: string; // workspaceKeyId
   members: MemberDevices[];
 };
 

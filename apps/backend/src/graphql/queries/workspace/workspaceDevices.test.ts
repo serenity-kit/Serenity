@@ -69,14 +69,20 @@ test("new user results in added device", async () => {
   const workspaceMemberDevices = [
     {
       id: userData1.workspace.id,
-      members: [
+      workspaceKeysMembers: [
         {
-          id: userData2.user.id,
-          workspaceDevices: [
+          id: userData1.workspace.currentWorkspaceKey.id,
+          members: [
             {
-              receiverDeviceSigningPublicKey: userData2.device.signingPublicKey,
-              ciphertext,
-              nonce,
+              id: userData2.user.id,
+              workspaceDevices: [
+                {
+                  receiverDeviceSigningPublicKey:
+                    userData2.device.signingPublicKey,
+                  ciphertext,
+                  nonce,
+                },
+              ],
             },
           ],
         },

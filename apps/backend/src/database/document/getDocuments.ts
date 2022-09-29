@@ -48,7 +48,6 @@ export async function getDocuments({
         select: { generation: true },
         orderBy: { generation: "desc" },
       });
-      console.log({ latestWorkspaceKey });
       if (!latestWorkspaceKey) {
         throw new Error("No workspaceKeys found");
       }
@@ -64,8 +63,6 @@ export async function getDocuments({
       if (!usingOldKeys) {
         delete whereQuery.workspaceKey;
       }
-      console.log({ usingOldKeys });
-      console.log({ whereQuery });
 
       // then fetch the documents in that folder
       const documents = await prisma.document.findMany({
