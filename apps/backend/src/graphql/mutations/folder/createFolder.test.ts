@@ -1,4 +1,8 @@
-import { encryptFolderName } from "@serenity-tools/common";
+import {
+  encryptFolderName,
+  folderDerivedKeyContext,
+} from "@serenity-tools/common";
+import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
@@ -7,6 +11,7 @@ import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/d
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -106,11 +111,19 @@ test("user should be able to create a child folder", async () => {
   const parentFolderId = "c103a784-35cb-4aee-b366-d10398b6dd95";
   const name = "Untitled";
 
+  const parentFolder = await prisma.folder.findFirst({
+    where: { id: parentFolderId },
+  });
+  const parentFolderKey = await kdfDeriveFromKey({
+    key: workspaceKey,
+    context: folderDerivedKeyContext,
+    subkeyId: parentFolder?.subkeyId,
+  });
   const result = await createFolder({
     graphql,
     id,
     name,
-    parentKey: workspaceKey,
+    parentKey: parentFolderKey.key,
     parentFolderId,
     workspaceId: addedWorkspace.id,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
