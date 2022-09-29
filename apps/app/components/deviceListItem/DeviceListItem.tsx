@@ -1,11 +1,10 @@
-import { Icon, Text, View, ViewProps } from "@serenity-tools/ui";
-import { StyleSheet } from "react-native";
+import { Icon, Text, tw, View, ViewProps } from "@serenity-tools/ui";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 type Props = ViewProps & {
   signingPublicKey: string;
   encryptionPublicKey: string;
-  encryptionPublicKeySignature: string | undefined; // TODO always return encryptionPublicKeySignature
+  encryptionPublicKeySignature: string;
   info?: string | null;
   isActiveDevice: boolean;
   createdAt?: Date;
@@ -16,7 +15,7 @@ export default function DeviceListItem(props: Props) {
   const deviceInfoJson = JSON.parse(props.info!);
 
   return (
-    <View style={styles.listItem}>
+    <View style={tw`border-b p-4`}>
       {deviceInfoJson && (
         <>
           {deviceInfoJson.type === "main" && (
@@ -61,11 +60,3 @@ export default function DeviceListItem(props: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  listItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderWidth: 1,
-  },
-});

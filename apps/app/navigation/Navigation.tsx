@@ -27,11 +27,11 @@ import {
   secondsBetweenNewMemberChecks,
 } from "../utils/workspace/addNewMembersIfNecessary";
 import AcceptWorkspaceInvitationScreen from "./screens/acceptWorkspaceInvitationScreen/AcceptWorkspaceInvitationScreen";
+import AccountDevicesSettingsScreen from "./screens/accountDevicesSettingsScreen/AccountDevicesSettingsScreen";
 import AccountProfileSettingsScreen from "./screens/accountProfileSettingsScreen/AccountProfileSettingsScreen";
 import AccountSettingsMobileOverviewScreen from "./screens/accountSettingsMobileOverviewScreen/AccountSettingsMobileOverviewScreen";
 import DesignSystemScreen from "./screens/designSystemScreen/DesignSystemScreen";
 import DevDashboardScreen from "./screens/devDashboardScreen/DevDashboardScreen";
-import DeviceManagerScreen from "./screens/deviceManagerScreen/DeviceManagerScreen";
 import EncryptDecryptImageTestScreen from "./screens/encryptDecryptImageTestScreen/EncryptDecryptImageTestScreen";
 import LibsodiumTestScreen from "./screens/libsodiumTestScreen/LibsodiumTestScreen";
 import LoginScreen from "./screens/loginScreen/LoginScreen";
@@ -161,7 +161,7 @@ function AccountSettingsDrawerScreen(props) {
         />
         <AccountSettingsDrawer.Screen
           name="Devices"
-          component={DeviceManagerScreen}
+          component={AccountDevicesSettingsScreen}
         />
       </AccountSettingsDrawer.Navigator>
     </NavigationDrawerModal>
@@ -179,8 +179,10 @@ const AccountProfileSettingsScreenWithLoginRedirect =
   redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
     AccountProfileSettingsScreen
   );
-const DeviceManagerScreenWithLoginRedirect =
-  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(DeviceManagerScreen);
+const AccountDevicesSettingsScreenWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
+    AccountDevicesSettingsScreen
+  );
 const WorkspaceSettingsMobileOverviewScreenWithLoginRedirect =
   redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
     WorkspaceSettingsMobileOverviewScreen
@@ -258,7 +260,7 @@ function RootNavigator() {
             />
             <Stack.Screen
               name="AccountSettingsDevices"
-              component={DeviceManagerScreenWithLoginRedirect}
+              component={AccountDevicesSettingsScreenWithLoginRedirect}
             />
             <Stack.Screen
               name="WorkspaceSettings"
