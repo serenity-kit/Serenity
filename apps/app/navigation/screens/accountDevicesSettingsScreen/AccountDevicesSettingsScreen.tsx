@@ -1,6 +1,6 @@
 import { Text, tw, View } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { FlatList, StyleSheet, useWindowDimensions } from "react-native";
+import { FlatList, useWindowDimensions } from "react-native";
 import { useClient } from "urql";
 import DeviceListItem from "../../../components/deviceListItem/DeviceListItem";
 import {
@@ -127,7 +127,7 @@ export default function DeviceManagerScreen(props) {
           />
         )}
         ListEmptyComponent={() => (
-          <View style={styles.listItem}>
+          <View>
             <Text>No devices</Text>
           </View>
         )}
@@ -135,11 +135,3 @@ export default function DeviceManagerScreen(props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  listItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    borderWidth: 1,
-  },
-});
