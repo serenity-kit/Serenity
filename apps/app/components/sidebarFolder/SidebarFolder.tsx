@@ -27,7 +27,6 @@ import {
   useCreateDocumentMutation,
   useCreateFolderMutation,
   useDeleteFoldersMutation,
-  useDevicesQuery,
   useDocumentsQuery,
   useFoldersQuery,
   useUpdateFolderNameMutation,
@@ -86,11 +85,6 @@ export default function SidebarFolder(props: Props) {
     variables: {
       parentFolderId: props.folderId,
       first: 50,
-    },
-  });
-  const [devicesResult] = useDevicesQuery({
-    variables: {
-      first: 500,
     },
   });
   const { depth = 0 } = props;
