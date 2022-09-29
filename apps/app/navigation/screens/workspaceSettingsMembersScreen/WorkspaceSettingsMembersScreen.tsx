@@ -51,7 +51,10 @@ function WorkspaceMemberRow({
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
   return (
-    <View style={styles.memberListItem}>
+    <View
+      style={styles.memberListItem}
+      testID={`workspace-member-row__${adminUserId}`}
+    >
       <Text style={styles.memberListItemLabel}>
         {username}
         {userId === adminUserId && (
@@ -64,10 +67,18 @@ function WorkspaceMemberRow({
           isDisabled={!allowEditing}
           onChange={onAdminStatusChange}
           value={username}
+          testID={`workspace-member-row__${userId}--isAdmin`}
         >
           <Text>Admin</Text>
         </Checkbox>
-        {allowEditing && <Button onPress={onDeletePress}>Remove</Button>}
+        {allowEditing && (
+          <Button
+            onPress={onDeletePress}
+            testID={`workspace-member-row__${userId}--remove`}
+          >
+            Remove
+          </Button>
+        )}
       </View>
     </View>
   );
