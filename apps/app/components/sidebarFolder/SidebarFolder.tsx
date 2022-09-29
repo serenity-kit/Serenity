@@ -1,6 +1,7 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
+  createDocumentKey,
   decryptFolderName,
   encryptExistingFolderName,
   encryptFolderName,
@@ -38,6 +39,8 @@ import {
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
 import { useDocumentStore } from "../../utils/document/documentStore";
+import { getFolderKey } from "../../utils/folder/getFolderKey";
+import { getParentFolderKey } from "../../utils/folder/getParentFolderKey";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
@@ -116,13 +119,14 @@ export default function SidebarFolder(props: Props) {
       return;
     }
     try {
-      const workspaceKey = await getWorkspaceKey({
+      const parentKey = await getParentFolderKey({
+        folderId: props.folderId,
         workspaceId: props.workspaceId,
         urqlClient,
         activeDevice,
       });
       const folderName = await decryptFolderName({
-        parentKey: workspaceKey,
+        parentKey,
         subkeyId: props.subkeyId!,
         ciphertext: props.encryptedName,
         publicNonce: props.encryptedNameNonce,
@@ -154,9 +158,15 @@ export default function SidebarFolder(props: Props) {
       console.error(error);
       return;
     }
+    const parentFolderKeyData = await getFolderKey({
+      folderId: props.folderId,
+      workspaceId: props.workspaceId,
+      urqlClient,
+      activeDevice,
+    });
     const encryptedFolderResult = await encryptFolderName({
       name,
-      parentKey: workspaceKey,
+      parentKey: parentFolderKeyData.key,
     });
     let didCreateFolderSucceed = false;
     let numCreateFolderAttempts = 0;
@@ -193,11 +203,21 @@ export default function SidebarFolder(props: Props) {
 
   const createDocument = async () => {
     const id = uuidv4();
+    const folderKeyResult = await getFolderKey({
+      folderId: props.folderId,
+      workspaceId: props.workspaceId,
+      urqlClient,
+      activeDevice,
+    });
+    const documentContentKeyResult = await createDocumentKey({
+      folderKey: folderKeyResult.key,
+    });
     const result = await createDocumentMutation({
       input: {
         id,
         workspaceId: props.workspaceId,
         parentFolderId: props.folderId,
+        contentSubkeyId: documentContentKeyResult.subkeyId,
       },
     });
     if (result.data?.createDocument?.id) {
@@ -251,21 +271,15 @@ export default function SidebarFolder(props: Props) {
       urqlClient,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
-    let workspaceKey = "";
-    try {
-      workspaceKey = await getWorkspaceKey({
-        workspaceId: props.workspaceId,
-        urqlClient,
-        activeDevice,
-      });
-    } catch (error: any) {
-      // TODO: handle device not registered error
-      console.error(error);
-      return;
-    }
+    const parentKey = await getParentFolderKey({
+      folderId: props.folderId,
+      workspaceId: props.workspaceId,
+      urqlClient,
+      activeDevice,
+    });
     const encryptedFolderResult = await encryptExistingFolderName({
       name: newFolderName,
-      parentKey: workspaceKey,
+      parentKey,
       subkeyId: props.subkeyId!,
     });
     const updateFolderNameResult = await updateFolderNameMutation({

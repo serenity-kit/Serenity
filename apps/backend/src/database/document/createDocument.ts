@@ -6,6 +6,7 @@ type Params = {
   encryptedNameNonce?: string | null;
   workspaceKeyId?: string | null;
   subkeyId?: number | null;
+  contentSubkeyId?: number | null;
   parentFolderId?: string | null;
   workspaceId: string;
 };
@@ -16,6 +17,7 @@ export async function createDocument({
   encryptedNameNonce,
   workspaceKeyId,
   subkeyId,
+  contentSubkeyId,
   parentFolderId,
   workspaceId,
 }: Params) {
@@ -26,6 +28,7 @@ export async function createDocument({
       encryptedNameNonce,
       workspaceKeyId,
       subkeyId,
+      contentSubkeyId,
       parentFolderId,
       workspaceId,
     },

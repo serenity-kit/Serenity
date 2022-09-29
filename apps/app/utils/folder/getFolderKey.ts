@@ -2,8 +2,8 @@ import { folderDerivedKeyContext } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { Client } from "urql";
 import { Device } from "../../types/Device";
-import { getWorkspaceKey } from "../workspace/getWorkspaceKey";
 import { getFolder } from "./getFolder";
+import { getParentFolderKey } from "./getParentFolderKey";
 
 export type Props = {
   folderId: string;
@@ -17,8 +17,9 @@ export const getFolderKey = async ({
   urqlClient,
   activeDevice,
 }: Props) => {
-  const workspaceKey = await getWorkspaceKey({
-    workspaceId: workspaceId!,
+  let parentKey = await getParentFolderKey({
+    folderId,
+    workspaceId,
     urqlClient,
     activeDevice,
   });
@@ -27,7 +28,7 @@ export const getFolderKey = async ({
     urqlClient,
   });
   const folderKeyData = await kdfDeriveFromKey({
-    key: workspaceKey,
+    key: parentKey,
     context: folderDerivedKeyContext,
     subkeyId: folder.subkeyId!,
   });
