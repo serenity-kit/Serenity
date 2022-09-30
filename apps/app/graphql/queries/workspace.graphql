@@ -10,30 +10,36 @@ query workspace($id: ID, $deviceSigningPublicKey: String!) {
     currentWorkspaceKey {
       id
       workspaceId
+      generation
       workspaceKeyBox {
         id
         workspaceKeyId
         deviceSigningPublicKey
+        creatorDeviceSigningPublicKey
         ciphertext
         nonce
         creatorDevice {
           signingPublicKey
           encryptionPublicKey
+          encryptionPublicKeySignature
         }
       }
     }
     workspaceKeys {
       id
       workspaceId
+      generation
       workspaceKeyBox {
         id
         workspaceKeyId
         deviceSigningPublicKey
+        creatorDeviceSigningPublicKey
         ciphertext
         nonce
         creatorDevice {
           signingPublicKey
           encryptionPublicKey
+          encryptionPublicKeySignature
         }
       }
     }

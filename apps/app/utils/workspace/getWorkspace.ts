@@ -5,6 +5,7 @@ import {
   WorkspaceQuery,
   WorkspaceQueryVariables,
 } from "../../generated/graphql";
+import { setWorskpaceKeysForWorkspace } from "../workspaceKey/workspaceKeyStore";
 
 export type Props = {
   urqlClient: Client;
@@ -29,8 +30,10 @@ export const getWorkspace = async ({
   if (workspaceResult.error) {
     throw new Error(workspaceResult.error?.message);
   }
-  if (workspaceResult.data?.workspace) {
-    return workspaceResult.data?.workspace as Workspace;
+  const workspace = workspaceResult.data?.workspace;
+  if (workspace) {
+    await setWorskpaceKeysForWorkspace(workspace.id, workspace.workspaceKeys!);
+    return workspace as Workspace;
   } else {
     return null;
   }
