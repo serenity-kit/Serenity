@@ -17,9 +17,9 @@ import {
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 
-import { CenterContent, Spinner, Text } from "@serenity-tools/ui";
+import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { useDocumentStore } from "../../../utils/document/documentStore";
+import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../../utils/document/getDocument";
 import { getFolderKey } from "../../../utils/folder/getFolderKey";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
@@ -31,7 +31,9 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
   const pageId = props.route.params.pageId;
   const { activeDevice } = useWorkspaceContext();
   const workspaceId = useWorkspaceId();
-  const updateDocumentStore = useDocumentStore((state) => state.update);
+  const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
+    (state) => state.update
+  );
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const urqlClient = useClient();
 
@@ -62,7 +64,8 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       documentId: pageId,
       urqlClient,
     });
-    await updateDocumentStore(document, urqlClient, activeDevice);
+    // this is necessary to propagate document name update to the sidebar and header
+    await updateActiveDocumentInfoStore(document, activeDevice);
     if (document?.id !== pageId) {
       console.error("document ID doesn't match page ID");
       return;
@@ -105,7 +108,7 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {
       const updatedDocument =
         updateDocumentNameResult.data.updateDocumentName.document;
-      await updateDocumentStore(updatedDocument, urqlClient, activeDevice);
+      await updateActiveDocumentInfoStore(updatedDocument, activeDevice);
     }
   };
 
@@ -120,9 +123,9 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
   if (state.matches("hasNoAccess")) {
     return (
       <CenterContent>
-        <Text>
-          This page does not exist or you don't have access to it anymore.
-        </Text>
+        <InfoMessage variant="error">
+          This page does not exist or you don't have access anymore.
+        </InfoMessage>
       </CenterContent>
     );
   } else if (state.matches("loadDocument")) {

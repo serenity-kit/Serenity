@@ -21,7 +21,7 @@ import { Platform, StyleSheet } from "react-native";
 import { useClient } from "urql";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { useDocumentStore } from "../../utils/document/documentStore";
+import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getFolderKey } from "../../utils/folder/getFolderKey";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
@@ -44,8 +44,10 @@ export default function SidebarPage(props: Props) {
   const [isHovered, setIsHovered] = useState(false);
   const [documentTitle, setDocumentTitle] = useState("Decrypting...");
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
-  const document = useDocumentStore((state) => state.document);
-  const documentStore = useDocumentStore();
+  const document = useActiveDocumentInfoStore((state) => state.document);
+  const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
+    (state) => state.update
+  );
   const urqlClient = useClient();
   const linkProps = useLinkProps({
     to: {
@@ -128,7 +130,7 @@ export default function SidebarPage(props: Props) {
       // TODO show notification
       const document =
         updateDocumentNameResult.data.updateDocumentName.document;
-      documentStore.update(document, urqlClient, activeDevice);
+      updateActiveDocumentInfoStore(document, activeDevice);
     } else {
       // TODO: show error: couldn't update folder name
       // refetch to revert back to actual name
