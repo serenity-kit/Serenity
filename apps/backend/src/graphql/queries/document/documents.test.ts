@@ -53,7 +53,6 @@ const getDocuments = async ({
                     rootFolderId
                     workspaceKeyId
                     subkeyId
-                    contentSubkeyId
                     workspaceId
                 }
             }
@@ -200,7 +199,6 @@ test("user should be able to list documents in a folder with one item", async ()
     id: documentId1,
     parentFolderId,
     workspaceId,
-    contentSubkeyId: 1,
     authorizationHeader: sessionKey,
   });
   const result = await getDocuments({
@@ -214,7 +212,6 @@ test("user should be able to list documents in a folder with one item", async ()
       "edges": [
         {
           "node": {
-            "contentSubkeyId": 1,
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
@@ -238,7 +235,6 @@ test("user should be able to list documents in a folder with multiple items", as
     id: documentId2,
     parentFolderId,
     workspaceId,
-    contentSubkeyId: 2,
     authorizationHeader: sessionKey,
   });
   const result = await getDocuments({
@@ -252,7 +248,6 @@ test("user should be able to list documents in a folder with multiple items", as
       "edges": [
         {
           "node": {
-            "contentSubkeyId": 2,
             "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
@@ -263,7 +258,6 @@ test("user should be able to list documents in a folder with multiple items", as
         },
         {
           "node": {
-            "contentSubkeyId": 1,
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
@@ -287,7 +281,6 @@ test("user should be able to list without showing subfolder documents", async ()
     id: childDocumentId,
     parentFolderId: folderId,
     workspaceId,
-    contentSubkeyId: 3,
     authorizationHeader: sessionKey,
   });
   const result = await getDocuments({
@@ -301,7 +294,6 @@ test("user should be able to list without showing subfolder documents", async ()
       "edges": [
         {
           "node": {
-            "contentSubkeyId": 2,
             "id": "9e911f29-7a86-480b-89d7-5c647f21317f",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
@@ -312,7 +304,6 @@ test("user should be able to list without showing subfolder documents", async ()
         },
         {
           "node": {
-            "contentSubkeyId": 1,
             "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
             "parentFolderId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
             "rootFolderId": null,
@@ -398,7 +389,6 @@ describe("Input Errors", () => {
                     rootFolderId
                     workspaceKeyId
                     subkeyId
-                    contentSubkeyId
                     workspaceId
                 }
             }
@@ -425,7 +415,6 @@ describe("Input Errors", () => {
               rootFolderId
               workspaceKeyId
               subkeyId
-              contentSubkeyId
               workspaceId
             }
           }

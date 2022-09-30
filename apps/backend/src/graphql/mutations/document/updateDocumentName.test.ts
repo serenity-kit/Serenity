@@ -1,5 +1,4 @@
 import {
-  createDocumentKey,
   decryptDocumentTitle,
   folderDerivedKeyContext,
   recreateDocumentKey,
@@ -45,7 +44,14 @@ const setup = async () => {
   });
   addedWorkspace =
     createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-
+  const createDocumentResult = await createDocument({
+    id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+    graphql,
+    authorizationHeader: sessionKey,
+    parentFolderId: null,
+    workspaceId: addedWorkspace.id,
+  });
+  addedDocumentId = createDocumentResult.createDocument.id;
   const workspaceKeyBox = addedWorkspace.currentWorkspaceKey.workspaceKeyBox;
   workspaceKey = await decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext,
@@ -61,18 +67,6 @@ const setup = async () => {
     subkeyId: addedFolder.subkeyId,
   });
   folderKey = folderKeyResult.key;
-  let documentContentKeyResult = await createDocumentKey({
-    folderKey,
-  });
-  const createDocumentResult = await createDocument({
-    id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    graphql,
-    authorizationHeader: sessionKey,
-    parentFolderId: null,
-    contentSubkeyId: documentContentKeyResult.subkeyId,
-    workspaceId: addedWorkspace.id,
-  });
-  addedDocumentId = createDocumentResult.createDocument.id;
 };
 
 beforeAll(async () => {
@@ -152,7 +146,6 @@ test("Throw error when user doesn't have access", async () => {
     graphql,
     authorizationHeader: registerUserResult.sessionKey,
     parentFolderId: null,
-    contentSubkeyId: 1,
     workspaceId: addedWorkspace.id,
   });
   const authorizationHeader = sessionKey;

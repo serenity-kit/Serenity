@@ -52,7 +52,6 @@ export type AttachDevicesToWorkspacesResult = {
 };
 
 export type CreateDocumentInput = {
-  contentSubkeyId: Scalars['Int'];
   id: Scalars['String'];
   parentFolderId?: InputMaybe<Scalars['String']>;
   workspaceId: Scalars['String'];
@@ -81,7 +80,6 @@ export type CreateFolderResult = {
 export type CreateInitialWorkspaceStructureInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
   deviceWorkspaceKeyBoxes: Array<DeviceWorkspaceKeyBoxInput>;
-  documentContentSubkeyId: Scalars['Int'];
   documentId: Scalars['String'];
   documentSnapshot: DocumentSnapshotInput;
   documentSubkeyId: Scalars['Int'];
@@ -208,7 +206,6 @@ export type DeviceWorkspaceKeyBoxInput = {
 
 export type Document = {
   __typename?: 'Document';
-  contentSubkeyId?: Maybe<Scalars['Int']>;
   encryptedName?: Maybe<Scalars['String']>;
   encryptedNameNonce?: Maybe<Scalars['String']>;
   id: Scalars['String'];
@@ -1014,7 +1011,7 @@ export type UpdateDocumentNameMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null } | null } | null };
+export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null } | null } | null };
 
 export type UpdateFolderNameMutationVariables = Exact<{
   input: UpdateFolderNameInput;
@@ -1057,7 +1054,7 @@ export type DocumentQueryVariables = Exact<{
 }>;
 
 
-export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null } | null };
+export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null } | null };
 
 export type DocumentPathQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1073,7 +1070,7 @@ export type DocumentsQueryVariables = Exact<{
 }>;
 
 
-export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type FirstDocumentQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1485,7 +1482,6 @@ export const UpdateDocumentNameDocument = gql`
       encryptedNameNonce
       workspaceKeyId
       subkeyId
-      contentSubkeyId
       parentFolderId
       workspaceId
     }
@@ -1593,7 +1589,6 @@ export const DocumentDocument = gql`
     encryptedNameNonce
     workspaceKeyId
     subkeyId
-    contentSubkeyId
     parentFolderId
     workspaceId
   }
@@ -1630,7 +1625,6 @@ export const DocumentsDocument = gql`
       encryptedNameNonce
       workspaceKeyId
       subkeyId
-      contentSubkeyId
       parentFolderId
       rootFolderId
       workspaceId

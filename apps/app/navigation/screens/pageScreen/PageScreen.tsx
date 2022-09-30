@@ -76,15 +76,15 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     let documentSubkeyId = 0;
     let documentKey = "";
     if (document?.subkeyId) {
-      documentSubkeyId = document.subkeyId;
-      const documentKeyData = await recreateDocumentKey({
-        folderKey: folderKeyData.key,
-        subkeyId: document.subkeyId,
-      });
-      documentKey = documentKeyData.key;
-    } else {
       const documentKeyData = await createDocumentKey({
         folderKey: folderKeyData.key,
+      });
+      documentSubkeyId = documentKeyData.subkeyId;
+      documentKey = documentKeyData.key;
+    } else {
+      const documentKeyData = await recreateDocumentKey({
+        folderKey: folderKeyData.key,
+        subkeyId: document?.subkeyId!,
       });
       documentSubkeyId = documentKeyData.subkeyId;
       documentKey = documentKeyData.key;

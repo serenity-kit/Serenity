@@ -25,7 +25,6 @@ model Document {
   encryptedName      String?
   encryptedNameNonce String?
   subkeyId           Int?
-  contentSubkeyId    Int?
 
   @@unique([subkeyId, workspaceId])
 }

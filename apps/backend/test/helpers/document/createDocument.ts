@@ -5,7 +5,6 @@ type Params = {
   id: string;
   parentFolderId: string | null;
   workspaceId: string;
-  contentSubkeyId: number;
   authorizationHeader: string;
 };
 
@@ -14,7 +13,6 @@ export const createDocument = async ({
   id,
   parentFolderId,
   workspaceId,
-  contentSubkeyId,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -34,7 +32,6 @@ export const createDocument = async ({
         id,
         parentFolderId,
         workspaceId,
-        contentSubkeyId,
       },
     },
     authorizationHeaders

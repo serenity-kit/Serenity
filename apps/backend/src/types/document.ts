@@ -7,7 +7,6 @@ export type Document = {
   workspaceKeyId?: string | null;
   workspaceKey?: WorkspaceKey | null;
   subkeyId?: number | null;
-  contentSubkeyId?: number | null;
   parentFolderId: string | null;
   workspaceId: string;
   createdAt?: Date;

@@ -1,7 +1,6 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
-  createDocumentKey,
   decryptFolderName,
   encryptExistingFolderName,
   encryptFolderName,
@@ -197,21 +196,11 @@ export default function SidebarFolder(props: Props) {
 
   const createDocument = async () => {
     const id = uuidv4();
-    const folderKeyResult = await getFolderKey({
-      folderId: props.folderId,
-      workspaceId: props.workspaceId,
-      urqlClient,
-      activeDevice,
-    });
-    const documentContentKeyResult = await createDocumentKey({
-      folderKey: folderKeyResult.key,
-    });
     const result = await createDocumentMutation({
       input: {
         id,
         workspaceId: props.workspaceId,
         parentFolderId: props.folderId,
-        contentSubkeyId: documentContentKeyResult.subkeyId,
       },
     });
     if (result.data?.createDocument?.id) {

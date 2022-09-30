@@ -29,7 +29,7 @@ const setup = async () => {
   encryptionPrivateKey = registerUserResult1.encryptionPrivateKey;
   signingPrivateKey = registerUserResult1.signingPrivateKey;
 
-  // hard-code the encryptionKey just so we have a document to run tests on
+  // currently hard-coded until we enable e2e encryption per workspace
   const documentEncryptionKey = sodium.from_base64(
     "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
   );

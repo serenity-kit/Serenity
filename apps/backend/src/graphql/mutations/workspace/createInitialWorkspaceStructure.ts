@@ -53,7 +53,6 @@ export const CreateInitialWorkspaceStructureInput = inputObjectType({
     t.nonNull.string("encryptedDocumentName");
     t.nonNull.string("encryptedDocumentNameNonce");
     t.nonNull.int("documentSubkeyId");
-    t.nonNull.int("documentContentSubkeyId");
     t.nonNull.field("documentSnapshot", { type: DocumentSnapshotInput });
     t.nonNull.string("creatorDeviceSigningPublicKey");
     t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
@@ -107,7 +106,6 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         encryptedDocumentName: args.input.encryptedDocumentName,
         encryptedDocumentNameNonce: args.input.encryptedDocumentNameNonce,
         documentSubkeyId: args.input.documentSubkeyId,
-        documentContentSubkeyId: args.input.documentContentSubkeyId,
         documentSnapshot: args.input.documentSnapshot,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
         deviceWorkspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,

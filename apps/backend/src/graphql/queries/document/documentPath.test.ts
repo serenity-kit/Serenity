@@ -93,7 +93,6 @@ const setup = async () => {
     id: parentDocumentId,
     parentFolderId: parentFolderId,
     workspaceId,
-    contentSubkeyId: 1,
     authorizationHeader: sessionKey,
   });
   await createDocument({
@@ -101,7 +100,6 @@ const setup = async () => {
     id: documentId,
     parentFolderId: folderId,
     workspaceId,
-    contentSubkeyId: 2,
     authorizationHeader: sessionKey,
   });
 
@@ -147,7 +145,6 @@ const setup = async () => {
     id: otherDocumentId,
     parentFolderId: otherFolderId,
     workspaceId: otherWorkspaceId,
-    contentSubkeyId: 3,
     authorizationHeader: sessionKey2,
   });
 };

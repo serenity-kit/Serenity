@@ -10,7 +10,6 @@ export const Document = objectType({
     t.string("workspaceKeyId");
     t.field("workspaceKey", { type: WorkspaceKey });
     t.int("subkeyId");
-    t.int("contentSubkeyId");
     t.string("parentFolderId");
     t.string("rootFolderId");
     t.string("workspaceId");

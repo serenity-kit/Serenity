@@ -6,7 +6,6 @@ mutation updateDocumentName($input: UpdateDocumentNameInput!) {
       encryptedNameNonce
       workspaceKeyId
       subkeyId
-      contentSubkeyId
       parentFolderId
       workspaceId
     }

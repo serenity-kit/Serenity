@@ -63,7 +63,6 @@ test("user should be retrieve a document", async () => {
     id: documentId,
     parentFolderId: null,
     workspaceId,
-    contentSubkeyId: 1,
     authorizationHeader,
   });
   await updateDocumentName({
