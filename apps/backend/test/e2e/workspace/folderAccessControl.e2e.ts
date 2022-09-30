@@ -152,13 +152,7 @@ test.describe("Workspace Sharing", () => {
       sharedWorkspaceId: user1.data.workspace.id,
     });
     await delayForSeconds(5);
-    // const user2HasFolderAccess = hasFolderAccess({
-    //   page,
-    //   folderId: user1.data.folder.id,
-    //   name: "Getting Started",
-    // });
-    // expect(user2HasFolderAccess).toBe(true);
-    await renameFolder(user2Page, user1.data.folder.id, "user2 renamed");
+    // await renameFolder(user2Page, user1.data.folder.id, "user2 renamed");
 
     // can this user read the folders?
     const user3Context = await browser.newContext();
@@ -176,13 +170,7 @@ test.describe("Workspace Sharing", () => {
       sharedWorkspaceId: user1.data.workspace.id,
     });
     await delayForSeconds(5);
-    // const user3HasFolderAccess = hasFolderAccess({
-    //   page,
-    //   folderId: user1.data.folder.id,
-    //   name: "Getting Started",
-    // });
-    // expect(user3HasFolderAccess).toBe(true);
-    await renameFolder(user3Page, user1.data.folder.id, "user3 renamed");
+    // await renameFolder(user3Page, user1.data.folder.id, "user3 renamed");
 
     // now remove access to user3
     await page.reload();
@@ -203,5 +191,6 @@ test.describe("Workspace Sharing", () => {
       "text=This page does not exist or you don't have access to it anymore."
     );
     await renameFolder(user2Page, user1.data.folder.id, "user2 re-renamed");
+    await delayForSeconds(1000);
   });
 });

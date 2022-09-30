@@ -30,6 +30,7 @@ import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getDevices } from "../../../utils/device/getDevices";
+import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaceKey } from "../../../utils/workspace/getWorkspaceKey";
 
@@ -266,6 +267,19 @@ export default function WorkspaceSettingsMembersScreen(
         )
         .toPromise();
     }
+    const workspace = await getWorkspace({
+      urqlClient,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+      workspaceId,
+    });
+    if (!workspace) {
+      console.error("No workspace found");
+      return;
+    }
+    // updateWorkspaceData(
+    //   state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
+    //   workspace
+    // );
   };
 
   return (
