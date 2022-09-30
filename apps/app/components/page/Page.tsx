@@ -42,6 +42,7 @@ import {
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import {
   getDocumentPath,
   useDocumentPathStore,
@@ -79,6 +80,9 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const urqlClient = useClient();
   const folderStore = useOpenFolderStore();
   const documentPathStore = useDocumentPathStore();
+  const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
+    (state) => state.update
+  );
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPath = await getDocumentPath(urqlClient, docId);
@@ -233,6 +237,9 @@ export default function Page({ navigation, route, updateTitle }: Props) {
         )
         .toPromise();
       const document = documentResult.data?.document as Document;
+      // communicate to other components e.g. sidebar or topbar
+      // the currently active document
+      updateActiveDocumentInfoStore(document, activeDevice);
 
       const folderKeyData = await getFolderKey({
         folderId: document.parentFolderId!,
