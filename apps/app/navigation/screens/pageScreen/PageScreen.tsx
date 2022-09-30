@@ -62,6 +62,7 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       documentId: pageId,
       urqlClient,
     });
+    // this is necessary to propagate document name update to the sidebar and header
     await updateDocumentStore(document, urqlClient, activeDevice);
     if (document?.id !== pageId) {
       console.error("document ID doesn't match page ID");
