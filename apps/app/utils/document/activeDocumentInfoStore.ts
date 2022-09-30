@@ -2,26 +2,25 @@ import {
   decryptDocumentTitle,
   recreateDocumentKey,
 } from "@serenity-tools/common";
-import { Client } from "urql";
 import create from "zustand";
 import { Document } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { getFolderKey } from "../folder/getFolderKey";
+import { urqlClient } from "../urqlClient/urqlClient";
 
 interface DocumentState {
   document: Document | null | undefined;
   documentName: string | null;
   update: (
     document: Document | null | undefined,
-    urqlClient: Client,
     activeDevice: Device
   ) => Promise<void>;
 }
 
-export const useDocumentStore = create<DocumentState>((set) => ({
+export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
   document: null,
   documentName: null,
-  update: async (document, urqlClient, activeDevice) => {
+  update: async (document, activeDevice) => {
     let documentName: string | null = "Untitled";
     if (
       document &&

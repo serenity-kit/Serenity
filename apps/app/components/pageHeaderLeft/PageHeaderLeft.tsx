@@ -1,24 +1,24 @@
-import {
-  tw,
-  View,
-  IconButton,
-  useHasEditorSidebar,
-  Text,
-  Icon,
-  useIsPermanentLeftSidebar,
-} from "@serenity-tools/ui";
-import React from "react";
 import { DrawerActions } from "@react-navigation/native";
-import { useEditorStore } from "../../utils/editorStore/editorStore";
+import {
+  Icon,
+  IconButton,
+  Text,
+  tw,
+  useHasEditorSidebar,
+  useIsPermanentLeftSidebar,
+  View,
+} from "@serenity-tools/ui";
 import { HStack } from "native-base";
+import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { useDocumentPathStore } from "../../utils/document/documentPathStore";
-import { useDocumentStore } from "../../utils/document/documentStore";
+import { useEditorStore } from "../../utils/editorStore/editorStore";
 
 export function PageHeaderLeft(props: any) {
   const documentPathList = useDocumentPathStore((state) => state.folders);
   const { getName } = useDocumentPathStore();
-  const document = useDocumentStore((state) => state.document);
-  const documentName = useDocumentStore((state) => state.documentName);
+  const documentName = useActiveDocumentInfoStore(
+    (state) => state.documentName
+  );
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const hasEditorSidebar = useHasEditorSidebar();
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
@@ -84,7 +84,7 @@ export function PageHeaderLeft(props: any) {
               ... /
             </Text>
           )}
-          {document ? (
+          {documentName ? (
             <Text
               variant="xxs"
               bold={hasEditorSidebar}

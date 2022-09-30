@@ -42,11 +42,11 @@ import {
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
-import { useDocumentStore } from "../../utils/document/documentStore";
 import { getFolderKey } from "../../utils/folder/getFolderKey";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 
@@ -80,8 +80,9 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const urqlClient = useClient();
   const folderStore = useOpenFolderStore();
   const documentPathStore = useDocumentPathStore();
-  const documentStore = useDocumentStore();
-  const document = useDocumentStore((state) => state.document);
+  const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
+    (state) => state.update
+  );
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPath = await getDocumentPath(urqlClient, docId);
@@ -98,69 +99,65 @@ export default function Page({ navigation, route, updateTitle }: Props) {
     documentPathStore.update(documentPath, urqlClient, activeDevice);
   };
 
-  const updateDocumentName = async (docId: string) => {
-    const documentResult = await urqlClient
-      .query<DocumentQuery, DocumentQueryVariables>(
-        DocumentDocument,
-        { id: docId },
-        {
-          // better to be safe here and always refetch
-          requestPolicy: "network-only",
-        }
-      )
-      .toPromise();
-    const document = documentResult.data?.document as Document;
-    documentStore.update(document, urqlClient, activeDevice);
-  };
-
   useEffect(() => {
     if (docIdRef.current !== docId) {
-      updateDocumentName(docId);
       updateDocumentFolderPath(docId);
     }
     docIdRef.current = docId;
   });
 
   const applySnapshot = async (snapshot, key) => {
-    activeSnapshotIdRef.current = snapshot.publicData.snapshotId;
-    const initialResult = await verifyAndDecryptSnapshot(
-      snapshot,
-      key,
-      sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-    );
-    if (initialResult) {
-      Yjs.applyUpdate(
-        yDocRef.current,
-        sodium.from_base64(initialResult),
-        "naisho-remote"
+    try {
+      activeSnapshotIdRef.current = snapshot.publicData.snapshotId;
+      const initialResult = await verifyAndDecryptSnapshot(
+        snapshot,
+        key,
+        sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
       );
+      if (initialResult) {
+        Yjs.applyUpdate(
+          yDocRef.current,
+          sodium.from_base64(initialResult),
+          "naisho-remote"
+        );
+      }
+    } catch (err) {
+      // TODO
+      console.log("Apply updates failed. TODO handle error");
+      console.error(err);
     }
   };
 
   const applyUpdates = async (updates, key) => {
-    await Promise.all(
-      updates.map(async (update) => {
-        console.log(
-          update.serverData.version,
-          update.publicData.pubKey,
-          update.publicData.clock
-        );
-        const updateResult = await verifyAndDecryptUpdate(
-          update,
-          key,
-          sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-        );
-        // when reconnecting the server might send already processed data updates. these then are ignored
-        if (updateResult) {
-          Yjs.applyUpdate(
-            yDocRef.current,
-            sodium.from_base64(updateResult),
-            "naisho-remote"
+    try {
+      await Promise.all(
+        updates.map(async (update) => {
+          console.log(
+            update.serverData.version,
+            update.publicData.pubKey,
+            update.publicData.clock
           );
-          latestServerVersionRef.current = update.serverData.version;
-        }
-      })
-    );
+          const updateResult = await verifyAndDecryptUpdate(
+            update,
+            key,
+            sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+          );
+          // when reconnecting the server might send already processed data updates. these then are ignored
+          if (updateResult) {
+            Yjs.applyUpdate(
+              yDocRef.current,
+              sodium.from_base64(updateResult),
+              "naisho-remote"
+            );
+            latestServerVersionRef.current = update.serverData.version;
+          }
+        })
+      );
+    } catch (err) {
+      // TODO
+      console.log("Apply updates failed. TODO handle error");
+      console.error(err);
+    }
   };
 
   const createAndSendSnapshot = async (key) => {
@@ -228,15 +225,31 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       // const key = sodium.from_base64(
       //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
       // );
+
+      const documentResult = await urqlClient
+        .query<DocumentQuery, DocumentQueryVariables>(
+          DocumentDocument,
+          { id: docId },
+          {
+            // better to be safe here and always refetch
+            requestPolicy: "network-only",
+          }
+        )
+        .toPromise();
+      const document = documentResult.data?.document as Document;
+      // communicate to other components e.g. sidebar or topbar
+      // the currently active document
+      updateActiveDocumentInfoStore(document, activeDevice);
+
       const folderKeyData = await getFolderKey({
-        folderId: document?.parentFolderId!,
-        workspaceId: document?.workspaceId!,
+        folderId: document.parentFolderId!,
+        workspaceId: document.workspaceId!,
         urqlClient,
         activeDevice,
       });
       const documentKey = await recreateDocumentKey({
         folderKey: folderKeyData.key,
-        subkeyId: document?.contentSubkeyId!,
+        subkeyId: document.contentSubkeyId!,
       });
       const key = sodium.from_base64(documentKey.key);
 
@@ -489,9 +502,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       });
     }
 
-    if (document) {
-      initDocument();
-    }
+    initDocument();
 
     return () => {
       removeAwarenessStates(
@@ -503,7 +514,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       shouldReconnectWebsocketConnectionRef.current = false;
       websocketConnectionRef.current?.close();
     };
-  }, [document]);
+  }, []);
 
   return (
     <Editor

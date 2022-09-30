@@ -8,6 +8,7 @@ import {
   Folder,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
+import { getParentFolderKey } from "../folder/getParentFolderKey";
 import { getWorkspaceKey } from "../workspace/getWorkspaceKey";
 
 interface DocumentPathState {
@@ -48,8 +49,14 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
       folderIds.push(folder.id);
       let folderName = "Decrypting...";
       try {
+        const parentKey = await getParentFolderKey({
+          folderId: folder.id,
+          workspaceId: folder.workspaceId!,
+          urqlClient,
+          activeDevice,
+        });
         folderName = await decryptFolderName({
-          parentKey: workspaceKey,
+          parentKey,
           subkeyId: folder.subkeyId!,
           ciphertext: folder.encryptedName,
           publicNonce: folder.encryptedNameNonce,

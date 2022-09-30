@@ -33,11 +33,11 @@ import {
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
+import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
-import { useDocumentStore } from "../../utils/document/documentStore";
 import { getFolderKey } from "../../utils/folder/getFolderKey";
 import { getParentFolderKey } from "../../utils/folder/getParentFolderKey";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
@@ -91,7 +91,7 @@ export default function SidebarFolder(props: Props) {
   const urqlClient = useClient();
   const { activeDevice } = useWorkspaceContext();
   const documentPathStore = useDocumentPathStore();
-  const document = useDocumentStore((state) => state.document);
+  const document = useActiveDocumentInfoStore((state) => state.document);
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
   const [folderName, setFolderName] = useState("Decrypting...");
 

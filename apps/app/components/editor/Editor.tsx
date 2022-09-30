@@ -1,40 +1,31 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  Keyboard,
-  Platform,
-  SafeAreaView,
-  useWindowDimensions,
-} from "react-native";
+import { Animated, Keyboard, useWindowDimensions } from "react-native";
 import { WebView } from "react-native-webview";
-import { Asset } from "expo-asset";
-import * as FileSystem from "expo-file-system";
-import {
-  CenterContent,
-  Spinner,
-  tw,
-  View,
-  useHasEditorSidebar,
-} from "@serenity-tools/ui";
-import * as Y from "yjs";
-import { EditorProps } from "./types";
-import { source } from "../../webviews/editor/source";
-import {
-  applyAwarenessUpdate,
-  encodeAwarenessUpdate,
-} from "y-protocols/awareness";
-import {
-  EditorBottombar,
-  EditorBottombarProps,
-} from "../editorBottombar/EditorBottombar";
+// import { Asset } from "expo-asset";
+// import * as FileSystem from "expo-file-system";
+import { useHeaderHeight } from "@react-navigation/elements";
 import {
   EditorBottombarState,
   UpdateEditorParams,
 } from "@serenity-tools/editor";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useHeaderHeight } from "@react-navigation/elements";
-import { initialEditorBottombarState } from "./initialEditorBottombarState";
+import {
+  CenterContent,
+  Spinner,
+  useHasEditorSidebar,
+} from "@serenity-tools/ui";
+import {
+  applyAwarenessUpdate,
+  encodeAwarenessUpdate,
+} from "y-protocols/awareness";
+import * as Y from "yjs";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
+import { source } from "../../webviews/editor/source";
+import {
+  EditorBottombar,
+  EditorBottombarProps,
+} from "../editorBottombar/EditorBottombar";
+import { initialEditorBottombarState } from "./initialEditorBottombarState";
+import { EditorProps } from "./types";
 
 // // TODO see if this works instead on Android https://reactnativecode.com/react-native-webview-load-local-html-file/
 // export async function loadEditorSourceForAndroid() {
@@ -57,9 +48,6 @@ const BottombarWrapper = ({
   onUpdate,
 }: BottombarWrapperProps) => {
   const [bottom] = useState(new Animated.Value(0));
-
-  console.log("keyboardHeight", keyboardHeight);
-  console.log("keyboardAnimationDuration", keyboardAnimationDuration);
 
   useEffect(() => {
     Animated.timing(bottom, {
