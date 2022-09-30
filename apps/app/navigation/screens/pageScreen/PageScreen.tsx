@@ -17,7 +17,7 @@ import {
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 
-import { CenterContent, Spinner, Text } from "@serenity-tools/ui";
+import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useDocumentStore } from "../../../utils/document/documentStore";
 import { getDocument } from "../../../utils/document/getDocument";
@@ -120,9 +120,9 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
   if (state.matches("hasNoAccess")) {
     return (
       <CenterContent>
-        <Text>
-          This page does not exist or you don't have access to it anymore.
-        </Text>
+        <InfoMessage variant="error">
+          This page does not exist or you don't have access anymore.
+        </InfoMessage>
       </CenterContent>
     );
   } else if (state.matches("loadDocument")) {
