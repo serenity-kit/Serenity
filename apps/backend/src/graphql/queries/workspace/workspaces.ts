@@ -21,10 +21,9 @@ export const workspaces = queryField((t) => {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      // NOTE: removing this feature to allow login to function smoothly
-      // context.assertValidDeviceSigningPublicKeyForThisSession(
-      //   args.deviceSigningPublicKey
-      // );
+      context.assertValidDeviceSigningPublicKeyForThisSession(
+        args.deviceSigningPublicKey
+      );
       const userId = context.user.id;
       const cursor = args.after ? { id: args.after } : undefined;
       // prisma will include the cursor if skip: 1 is not set
