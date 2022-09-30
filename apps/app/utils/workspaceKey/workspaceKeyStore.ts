@@ -8,15 +8,57 @@ export const workspaceKeyWorkspaceLookupPrefix = "workspace.workspaceKey.";
 export const currentWorkspaceKeyWorkspaceLookupPrefix =
   "workspace.currentWorkspaceKey.";
 
+// currentWorkspaceKey: string
+
 const getCurrentWorkspaceStorageWorkspaceLookupKey = (
   workspaceId: string
 ): string => {
   return `${currentWorkspaceKeyWorkspaceLookupPrefix}${workspaceId}`;
 };
 
+const setCurrentWorkspaceKeyIdForWorkspace = async (
+  workspaceId: string,
+  workspaceKey: WorkspaceKey
+): Promise<void> => {
+  const workspaceKeyId = workspaceKey.id;
+  const lookupKey = getCurrentWorkspaceStorageWorkspaceLookupKey(workspaceId);
+  await SecureStore.setItemAsync(lookupKey, workspaceKeyId);
+};
+
+const getCurrentWorkspaceKeyIdForWorkspace = async (
+  workspaceId: string
+): Promise<string | null> => {
+  const lookupKey = getCurrentWorkspaceStorageWorkspaceLookupKey(workspaceId);
+  const workspaceKeyId = await SecureStore.getItemAsync(lookupKey);
+  return workspaceKeyId;
+};
+
+export const getCurrentWorkspaceKeyForWorkspace = async (
+  workspaceId: string
+): Promise<WorkspaceKey | null> => {
+  const workspaceKeyId = await getCurrentWorkspaceKeyIdForWorkspace(
+    workspaceId
+  );
+  if (!workspaceKeyId) {
+    return null;
+  }
+  return getWorkspaceKey(workspaceId, workspaceKeyId);
+};
+
+const removeCurrentWorkspaceKeyForWorskpace = async (
+  workspaceId: string
+): Promise<void> => {
+  const lookupKey = getCurrentWorkspaceStorageWorkspaceLookupKey(workspaceId);
+  await SecureStore.deleteItemAsync(lookupKey);
+};
+
+// workspackeKeys for workspace: {[workspaceKey: string]: string}
+
 const getWorkspaceStorageWorkspaceLookupKey = (workspaceId: string): string => {
   return `${workspaceKeyWorkspaceLookupPrefix}${workspaceId}`;
 };
+
+// workspaceKeys: {[workspaceKeyId: string]: WorkspaceKey}
 
 const getWorkspaceStorageKey = (workspaceKey: string): string => {
   return `${workspaceKeyStorageKeyPrefix}${workspaceKey}`;
@@ -138,40 +180,4 @@ export const setWorskpaceKeysForWorkspace = async (
     setCurrentWorkspaceKeyIdForWorkspace(workspaceId, latestWorkspaceKey);
   }
   await setWorkspaceKeyIdsForWorkspace(workspaceId, workspaceKeyIds);
-};
-
-const setCurrentWorkspaceKeyIdForWorkspace = async (
-  workspaceId: string,
-  workspaceKey: WorkspaceKey
-): Promise<void> => {
-  const workspaceKeyId = workspaceKey.id;
-  const lookupKey = getCurrentWorkspaceStorageWorkspaceLookupKey(workspaceId);
-  await SecureStore.setItemAsync(lookupKey, workspaceKeyId);
-};
-
-const getCurrentWorkspaceKeyIdForWorkspace = async (
-  workspaceId: string
-): Promise<string | null> => {
-  const lookupKey = getCurrentWorkspaceStorageWorkspaceLookupKey(workspaceId);
-  const workspaceKeyId = await SecureStore.getItemAsync(lookupKey);
-  return workspaceKeyId;
-};
-
-export const getCurrentWorkspaceKeyForWorkspace = async (
-  workspaceId: string
-): Promise<WorkspaceKey | null> => {
-  const workspaceKeyId = await getCurrentWorkspaceKeyIdForWorkspace(
-    workspaceId
-  );
-  if (!workspaceKeyId) {
-    return null;
-  }
-  return getWorkspaceKey(workspaceId, workspaceKeyId);
-};
-
-const removeCurrentWorkspaceKeyForWorskpace = async (
-  workspaceId: string
-): Promise<void> => {
-  const lookupKey = getCurrentWorkspaceStorageWorkspaceLookupKey(workspaceId);
-  await SecureStore.deleteItemAsync(lookupKey);
 };
