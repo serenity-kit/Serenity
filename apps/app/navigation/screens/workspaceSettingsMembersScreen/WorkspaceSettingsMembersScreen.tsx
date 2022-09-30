@@ -20,7 +20,7 @@ import {
   RemoveMembersAndRotateWorkspaceKeyDocument,
   RemoveMembersAndRotateWorkspaceKeyMutation,
   RemoveMembersAndRotateWorkspaceKeyMutationVariables,
-  useUpdateWorkspaceMutation,
+  useUpdateWorkspaceMembersRolesMutation,
   Workspace,
   WorkspaceMember,
 } from "../../../generated/graphql";
@@ -114,7 +114,8 @@ export default function WorkspaceSettingsMembersScreen(
   });
 
   const urqlClient = useClient();
-  const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
+  const [, updateWorkspaceMembersRolesMutation] =
+    useUpdateWorkspaceMembersRolesMutation();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [memberLookup, setMemberLookup] = useState<{
@@ -162,16 +163,16 @@ export default function WorkspaceSettingsMembersScreen(
         isAdmin: member.isAdmin,
       });
     });
-    const updateWorkspaceResult = await updateWorkspaceMutation({
+    const updateWorkspaceResult = await updateWorkspaceMembersRolesMutation({
       input: {
         id: workspaceId,
         members: graphqlMembers,
       },
     });
-    if (updateWorkspaceResult.data?.updateWorkspace?.workspace) {
+    if (updateWorkspaceResult.data?.updateWorkspaceMembersRoles?.workspace) {
       updateWorkspaceData(
         state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
-        updateWorkspaceResult.data?.updateWorkspace?.workspace
+        updateWorkspaceResult.data?.updateWorkspaceMembersRoles?.workspace
       );
     } else if (updateWorkspaceResult?.error) {
       setHasGraphqlError(true);
@@ -264,7 +265,6 @@ export default function WorkspaceSettingsMembersScreen(
           { requestPolicy: "network-only" }
         )
         .toPromise();
-      await _updateWorkspaceMemberData(members);
     }
   };
 

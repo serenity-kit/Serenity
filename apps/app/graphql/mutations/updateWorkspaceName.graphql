@@ -1,5 +1,5 @@
-mutation updateWorkspace($input: UpdateWorkspaceInput!) {
-  updateWorkspace(input: $input) {
+mutation updateWorkspaceName($input: UpdateWorkspaceNameInput!) {
+  updateWorkspaceName(input: $input) {
     workspace {
       id
       name

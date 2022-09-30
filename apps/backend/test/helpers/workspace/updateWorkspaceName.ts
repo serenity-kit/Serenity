@@ -1,19 +1,16 @@
 import { gql } from "graphql-request";
-import { WorkspaceMemberParams } from "../../../src/database/workspace/updateWorkspace";
 
 type Params = {
   graphql: any;
   id: string;
   name: string | undefined;
-  members: WorkspaceMemberParams[] | undefined;
   authorizationHeader: string;
 };
 
-export const updateWorkspace = async ({
+export const updateWorkspaceName = async ({
   graphql,
   id,
   name,
-  members,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -21,8 +18,8 @@ export const updateWorkspace = async ({
   };
 
   const query = gql`
-    mutation updateWorkspace($input: UpdateWorkspaceInput!) {
-      updateWorkspace(input: $input) {
+    mutation updateWorkspaceName($input: UpdateWorkspaceNameInput!) {
+      updateWorkspaceName(input: $input) {
         workspace {
           id
           name
@@ -36,7 +33,7 @@ export const updateWorkspace = async ({
   `;
   const result = await graphql.client.request(
     query,
-    { input: { id, name, members } },
+    { input: { id, name } },
     authorizationHeaders
   );
   return result;

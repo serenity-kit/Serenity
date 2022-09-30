@@ -383,7 +383,8 @@ export type Mutation = {
   startRegistration?: Maybe<StartRegistrationResult>;
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
   updateFolderName?: Maybe<UpdateFolderNameResult>;
-  updateWorkspace?: Maybe<UpdateWorkspaceResult>;
+  updateWorkspaceMembersRoles?: Maybe<UpdateWorkspaceMembersRolesResult>;
+  updateWorkspaceName?: Maybe<UpdateWorkspaceNameResult>;
   verifyRegistration?: Maybe<VerifyRegistrationResult>;
 };
 
@@ -483,8 +484,13 @@ export type MutationUpdateFolderNameArgs = {
 };
 
 
-export type MutationUpdateWorkspaceArgs = {
-  input: UpdateWorkspaceInput;
+export type MutationUpdateWorkspaceMembersRolesArgs = {
+  input: UpdateWorkspaceMembersRolesInput;
+};
+
+
+export type MutationUpdateWorkspaceNameArgs = {
+  input: UpdateWorkspaceNameInput;
 };
 
 
@@ -707,14 +713,23 @@ export type UpdateFolderNameResult = {
   folder?: Maybe<Folder>;
 };
 
-export type UpdateWorkspaceInput = {
+export type UpdateWorkspaceMembersRolesInput = {
   id: Scalars['String'];
-  members?: InputMaybe<Array<WorkspaceMemberInput>>;
+  members: Array<WorkspaceMemberInput>;
+};
+
+export type UpdateWorkspaceMembersRolesResult = {
+  __typename?: 'UpdateWorkspaceMembersRolesResult';
+  workspace?: Maybe<Workspace>;
+};
+
+export type UpdateWorkspaceNameInput = {
+  id: Scalars['String'];
   name?: InputMaybe<Scalars['String']>;
 };
 
-export type UpdateWorkspaceResult = {
-  __typename?: 'UpdateWorkspaceResult';
+export type UpdateWorkspaceNameResult = {
+  __typename?: 'UpdateWorkspaceNameResult';
   workspace?: Maybe<Workspace>;
 };
 
@@ -1023,12 +1038,19 @@ export type UpdateFolderNameMutationVariables = Exact<{
 
 export type UpdateFolderNameMutation = { __typename?: 'Mutation', updateFolderName?: { __typename?: 'UpdateFolderNameResult', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null } | null } | null };
 
-export type UpdateWorkspaceMutationVariables = Exact<{
-  input: UpdateWorkspaceInput;
+export type UpdateWorkspaceMembersRolesMutationVariables = Exact<{
+  input: UpdateWorkspaceMembersRolesInput;
 }>;
 
 
-export type UpdateWorkspaceMutation = { __typename?: 'Mutation', updateWorkspace?: { __typename?: 'UpdateWorkspaceResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null } | null } | null };
+export type UpdateWorkspaceMembersRolesMutation = { __typename?: 'Mutation', updateWorkspaceMembersRoles?: { __typename?: 'UpdateWorkspaceMembersRolesResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null } | null } | null };
+
+export type UpdateWorkspaceNameMutationVariables = Exact<{
+  input: UpdateWorkspaceNameInput;
+}>;
+
+
+export type UpdateWorkspaceNameMutation = { __typename?: 'Mutation', updateWorkspaceName?: { __typename?: 'UpdateWorkspaceNameResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null } | null } | null };
 
 export type VerifyRegistrationMutationVariables = Exact<{
   input: VerifyRegistrationInput;
@@ -1064,7 +1086,7 @@ export type DocumentPathQueryVariables = Exact<{
 }>;
 
 
-export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null };
+export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null };
 
 export type DocumentsQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -1515,9 +1537,9 @@ export const UpdateFolderNameDocument = gql`
 export function useUpdateFolderNameMutation() {
   return Urql.useMutation<UpdateFolderNameMutation, UpdateFolderNameMutationVariables>(UpdateFolderNameDocument);
 };
-export const UpdateWorkspaceDocument = gql`
-    mutation updateWorkspace($input: UpdateWorkspaceInput!) {
-  updateWorkspace(input: $input) {
+export const UpdateWorkspaceMembersRolesDocument = gql`
+    mutation updateWorkspaceMembersRoles($input: UpdateWorkspaceMembersRolesInput!) {
+  updateWorkspaceMembersRoles(input: $input) {
     workspace {
       id
       name
@@ -1531,8 +1553,27 @@ export const UpdateWorkspaceDocument = gql`
 }
     `;
 
-export function useUpdateWorkspaceMutation() {
-  return Urql.useMutation<UpdateWorkspaceMutation, UpdateWorkspaceMutationVariables>(UpdateWorkspaceDocument);
+export function useUpdateWorkspaceMembersRolesMutation() {
+  return Urql.useMutation<UpdateWorkspaceMembersRolesMutation, UpdateWorkspaceMembersRolesMutationVariables>(UpdateWorkspaceMembersRolesDocument);
+};
+export const UpdateWorkspaceNameDocument = gql`
+    mutation updateWorkspaceName($input: UpdateWorkspaceNameInput!) {
+  updateWorkspaceName(input: $input) {
+    workspace {
+      id
+      name
+      members {
+        userId
+        username
+        isAdmin
+      }
+    }
+  }
+}
+    `;
+
+export function useUpdateWorkspaceNameMutation() {
+  return Urql.useMutation<UpdateWorkspaceNameMutation, UpdateWorkspaceNameMutationVariables>(UpdateWorkspaceNameDocument);
 };
 export const VerifyRegistrationDocument = gql`
     mutation verifyRegistration($input: VerifyRegistrationInput!) {
@@ -1610,7 +1651,6 @@ export const DocumentPathDocument = gql`
     encryptedName
     encryptedNameNonce
     workspaceKeyId
-    subkeyId
     parentFolderId
     rootFolderId
     workspaceId
