@@ -3,8 +3,8 @@ import { objectType, queryField } from "nexus";
 import { getDevicesOfUnauthorizedUsers } from "../../../database/device/getDevicesOfUnauthorizedUsers";
 import { WorkspaceIdWithMemberDevices } from "../../types/workspace";
 
-export const UnauthorizedDeviceForWorkspacesResult = objectType({
-  name: "UnauthorizedDeviceForWorkspacesResult",
+export const UnauthorizedDevicesForWorkspacesResult = objectType({
+  name: "UnauthorizedDevicesForWorkspacesResult",
   definition(t) {
     t.nonNull.list.nonNull.field("unauthorizedMemberDevices", {
       type: WorkspaceIdWithMemberDevices,
@@ -14,7 +14,7 @@ export const UnauthorizedDeviceForWorkspacesResult = objectType({
 
 export const unauthorizedDevicesForWorkspacesQuery = queryField((t) => {
   t.field("unauthorizedDevicesForWorkspaces", {
-    type: UnauthorizedDeviceForWorkspacesResult,
+    type: UnauthorizedDevicesForWorkspacesResult,
     async resolve(_root, _args, context) {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
