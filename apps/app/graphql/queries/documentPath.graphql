@@ -7,5 +7,6 @@ query documentPath($id: ID!) {
     parentFolderId
     rootFolderId
     workspaceId
+    subkeyId
   }
 }
