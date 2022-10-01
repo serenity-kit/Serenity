@@ -29,7 +29,6 @@ import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspa
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
-import { getDevices } from "../../../utils/device/getDevices";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaceKey } from "../../../utils/workspace/getWorkspaceKey";
@@ -130,7 +129,6 @@ export default function WorkspaceSettingsMembersScreen(
       state.value === "loadWorkspaceSuccess" &&
       state.context.workspaceQueryResult?.data?.workspace
     ) {
-      console.log(state.context);
       updateWorkspaceData(
         state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
         // @ts-expect-error need to fix the generation
@@ -201,17 +199,12 @@ export default function WorkspaceSettingsMembersScreen(
       setMembers(members);
       delete memberLookup[username];
       setMemberLookup(memberLookup);
-      const devices = await getDevices({ urqlClient });
-      if (!devices) {
-        // TODO: show this error in the UI
-        console.error("no devices found!");
-        return;
-      }
       const workspaceKey = await getWorkspaceKey({
         workspaceId,
         urqlClient,
         activeDevice,
       });
+
       const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
       // TODO: getWorkspaceDevices gets all devices attached to a workspace
       let workspaceDevices: Device[] = [];
@@ -244,7 +237,7 @@ export default function WorkspaceSettingsMembersScreen(
           deviceWorkspaceKeyBoxes.push({
             ciphertext,
             nonce,
-            receiverDeviceSigningPublicKey: device.encryptionPublicKey,
+            receiverDeviceSigningPublicKey: device.signingPublicKey,
           });
         }
       }
