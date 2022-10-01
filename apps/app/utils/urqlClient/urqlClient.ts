@@ -24,7 +24,8 @@ const exchanges = [
       CreatorDevice: () => null, // since it has no unique key
       UnauthorizedMembersResult: () => null, // since it has no unique key
       PendingWorkspaceInvitationResult: () => null, // since it is just an id
-      // @ts-expect-error the type seems to be wrong
+      UnauthorizedDevicesForWorkspacesResult: () => null, // should be normalised
+      // @ts-expect-error the type seems to be wrong,
       MainDeviceResult: (mainDevice) => {
         return mainDevice.signingPublicKey;
       },

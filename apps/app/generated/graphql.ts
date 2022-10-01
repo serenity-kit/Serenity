@@ -525,7 +525,7 @@ export type Query = {
   me?: Maybe<MeResult>;
   pendingWorkspaceInvitation?: Maybe<PendingWorkspaceInvitationResult>;
   rootFolders?: Maybe<FolderConnection>;
-  unauthorizedDevicesForWorkspaces?: Maybe<UnauthorizedDeviceForWorkspacesResult>;
+  unauthorizedDevicesForWorkspaces?: Maybe<UnauthorizedDevicesForWorkspacesResult>;
   unauthorizedMembers?: Maybe<UnauthorizedMembersResult>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
   workspace?: Maybe<Workspace>;
@@ -671,8 +671,8 @@ export type StartRegistrationResult = {
   registrationId: Scalars['String'];
 };
 
-export type UnauthorizedDeviceForWorkspacesResult = {
-  __typename?: 'UnauthorizedDeviceForWorkspacesResult';
+export type UnauthorizedDevicesForWorkspacesResult = {
+  __typename?: 'UnauthorizedDevicesForWorkspacesResult';
   unauthorizedMemberDevices: Array<WorkspaceIdWithMemberDevices>;
 };
 
@@ -1135,7 +1135,7 @@ export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typenam
 export type UnauthorizedDevicesForWorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UnauthorizedDevicesForWorkspacesQuery = { __typename?: 'Query', unauthorizedDevicesForWorkspaces?: { __typename?: 'UnauthorizedDeviceForWorkspacesResult', unauthorizedMemberDevices: Array<{ __typename?: 'WorkspaceIdWithMemberDevices', id: string, members: Array<{ __typename?: 'WorkspaceIdWithDevices', id: string, devices: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> }> }> } | null };
+export type UnauthorizedDevicesForWorkspacesQuery = { __typename?: 'Query', unauthorizedDevicesForWorkspaces?: { __typename?: 'UnauthorizedDevicesForWorkspacesResult', unauthorizedMemberDevices: Array<{ __typename?: 'WorkspaceIdWithMemberDevices', id: string, members: Array<{ __typename?: 'WorkspaceIdWithDevices', id: string, devices: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, info?: string | null, createdAt?: any | null, encryptionPublicKeySignature: string }> }> }> } | null };
 
 export type UnauthorizedMembersQueryVariables = Exact<{
   workspaceIds: Array<Scalars['ID']> | Scalars['ID'];
