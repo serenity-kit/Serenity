@@ -1,0 +1,15 @@
+mutation updateWorkspaceMembersRoles(
+  $input: UpdateWorkspaceMembersRolesInput!
+) {
+  updateWorkspaceMembersRoles(input: $input) {
+    workspace {
+      id
+      name
+      members {
+        userId
+        username
+        isAdmin
+      }
+    }
+  }
+}
