@@ -1,4 +1,3 @@
-import { useFocusRing } from "@react-native-aria/focus";
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -9,23 +8,16 @@ import {
   Icon,
   IconButton,
   InlineInput,
-  Menu,
-  MenuButton,
-  MenuLink,
-  Pressable,
   SidebarDivider,
   SidebarLink,
   Text,
   Tooltip,
   tw,
-  useIsDesktopDevice,
   useIsPermanentLeftSidebar,
   View,
-  WorkspaceAvatar,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
-import { Platform } from "react-native";
 import { useClient } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -36,10 +28,10 @@ import {
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
-import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
+import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 
@@ -47,14 +39,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const urqlClient = useClient();
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
-  const { sessionKey, activeDevice, updateAuthentication } =
-    useWorkspaceContext();
+  const { sessionKey, activeDevice } = useWorkspaceContext();
   const workspaceId = route.params.workspaceId;
-  const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
-  const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
-  const isDesktopDevice = useIsDesktopDevice();
   const [meResult] = useMeQuery();
   const [username, setUsername] = useState<string>("");
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
@@ -208,143 +196,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         justifyContent="space-between"
         style={tw`py-1.5 px-5 md:px-4`}
       >
-        <Menu
-          placement="bottom left"
-          // we could solve this via additional margin but that's kinda hacky and messes with the BoxShadow component
-          // style={tw`ml-4`}
-          offset={2}
-          // can never be more than half the trigger width !! should be something like 16+24+8+labellength*12-24
-          // or we only use the icon as the trigger (worsens ux)
-          crossOffset={120}
-          isOpen={isOpenWorkspaceSwitcher}
-          onChange={setIsOpenWorkspaceSwitcher}
-          trigger={
-            <Pressable
-              accessibilityLabel="More options menu"
-              {...focusRingProps}
-              // disable default outline styles
-              // @ts-expect-error - web only
-              _focusVisible={{ _web: { style: { outlineStyle: "none" } } }}
-            >
-              <HStack
-                space={isPermanentLeftSidebar ? 2 : 3}
-                alignItems="center"
-                style={[
-                  tw`py-0.5 md:py-1.5 pr-2`,
-                  isFocusVisible && tw`se-inset-focus-mini`,
-                ]}
-              >
-                <WorkspaceAvatar size={isPermanentLeftSidebar ? "xs" : "sm"} />
-                <Text
-                  variant={isPermanentLeftSidebar ? "xs" : "md"}
-                  bold
-                  style={tw`-mr-1 max-w-30 text-gray-900`} // -mr needed for icon spacing, max-w needed for ellipsis
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {workspace === null ? " " : workspace.name}
-                </Text>
-                <Icon name="arrow-up-down-s-line" color={"gray-400"} />
-              </HStack>
-            </Pressable>
-          }
-        >
-          <MenuLink
-            to={{ screen: "AccountSettings" }}
-            onPress={(event) => {
-              setIsOpenWorkspaceSwitcher(false);
-              // on iOS Modals can't be open at the same time
-              // and closing the workspace switcher takes a bit of time
-              // technically we only need it for tables and larger, but
-              // don't want to complicate things for now
-              if (Platform.OS === "ios") {
-                event.preventDefault();
-                setTimeout(() => {
-                  props.navigation.navigate("AccountSettings", {
-                    screen: "Profile",
-                  });
-                }, 400);
-              }
-            }}
-            icon={<Icon name={"user-settings-line"} color="gray-600" />}
-          >
-            {username}
-          </MenuLink>
-
-          {workspaces === null ||
-          workspaces === undefined ||
-          workspaces.length === 0
-            ? null
-            : workspaces.map((workspace) =>
-                workspace === null || workspace === undefined ? null : (
-                  <MenuLink
-                    key={workspace.id}
-                    to={{
-                      screen: "Workspace",
-                      params: {
-                        workspaceId: workspace.id,
-                        screen: "WorkspaceRoot",
-                      },
-                    }}
-                    icon={
-                      <WorkspaceAvatar
-                        customColor={"honey"}
-                        key={`avatar_${workspace.id}`}
-                        size="xxs"
-                      />
-                    }
-                  >
-                    {workspace.name}
-                  </MenuLink>
-                )
-              )}
-
-          {isDesktopDevice ? (
-            <View style={tw`pl-1.5 pr-3 py-1.5`}>
-              <IconButton
-                onPress={() => {
-                  setIsOpenWorkspaceSwitcher(false);
-                  // on mobile Modals can't be open at the same time
-                  // and closing the workspace switcher takes a bit of time
-                  const timeout = Platform.OS === "web" ? 0 : 400;
-                  setTimeout(() => {
-                    setShowCreateWorkspaceModal(true);
-                  }, timeout);
-                }}
-                name="plus"
-                label="Create workspace"
-              />
-            </View>
-          ) : (
-            <MenuButton
-              onPress={() => {
-                setIsOpenWorkspaceSwitcher(false);
-                // on mobile Modals can't be open at the same time
-                // and closing the workspace switcher takes a bit of time
-                const timeout = Platform.OS === "web" ? 0 : 400;
-                setTimeout(() => {
-                  setShowCreateWorkspaceModal(true);
-                }, timeout);
-              }}
-              iconName="plus"
-            >
-              Create workspace
-            </MenuButton>
-          )}
-
-          <SidebarDivider collapsed />
-          <MenuButton
-            onPress={async () => {
-              setIsOpenWorkspaceSwitcher(false);
-              await updateAuthentication(null);
-              clearDeviceAndSessionStorage();
-              // @ts-expect-error navigation ts issue
-              props.navigation.push("Login");
-            }}
-          >
-            Logout
-          </MenuButton>
-        </Menu>
+        <AccountMenu
+          workspace={workspace}
+          username={username}
+          workspaces={workspaces}
+          showCreateWorkspaceModal={() => setShowCreateWorkspaceModal(true)}
+        />
         {!isPermanentLeftSidebar && (
           <IconButton
             onPress={() => {
