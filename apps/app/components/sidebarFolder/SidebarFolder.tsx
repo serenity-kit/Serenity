@@ -93,7 +93,7 @@ export default function SidebarFolder(props: Props) {
   const documentPathStore = useDocumentPathStore();
   const document = useActiveDocumentInfoStore((state) => state.document);
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
-  const [folderName, setFolderName] = useState("Decrypting...");
+  const [folderName, setFolderName] = useState("decrypting…");
 
   useEffect(() => {
     const isOpen = openFolderIds.indexOf(props.folderId) >= 0;
@@ -128,7 +128,7 @@ export default function SidebarFolder(props: Props) {
       setFolderName(folderName);
     } catch (error) {
       console.error(error);
-      setFolderName("Decryption error");
+      setFolderName("decryption error");
     }
   };
 
