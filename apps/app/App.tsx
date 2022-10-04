@@ -75,7 +75,7 @@ export default function App() {
   });
 
   // recreate client and especially the internal cache every time the authentication state changes
-  const urqlClient = useMemo(() => {
+  const urqlRef = useMemo(() => {
     return recreateClient();
   }, [sessionKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -93,7 +93,7 @@ export default function App() {
               activeDevice,
             }}
           >
-            <UrqlProvider value={urqlClient}>
+            <UrqlProvider value={urqlRef.urqlClient}>
               <SafeAreaProvider>
                 <NativeBaseProvider theme={rnTheme}>
                   <Navigation colorScheme={colorScheme} />

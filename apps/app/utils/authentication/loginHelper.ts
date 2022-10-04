@@ -100,11 +100,11 @@ export const login = async ({
   if (!finishLoginResult.data?.finishLogin) {
     throw new Error("Failed to finish login");
   }
-  await updateAuthentication({
+  const authenticatedUrqlClient = await updateAuthentication({
     sessionKey: result.sessionKey,
     expiresAt: finishLoginResult.data.finishLogin.expiresAt,
   });
-  const meResult = await urqlClient
+  const meResult = await authenticatedUrqlClient
     .query<MeQuery, MeQueryVariables>(
       MeDocument,
       {},
@@ -117,7 +117,7 @@ export const login = async ({
   const userId = meResult.data?.me?.id;
   // if the user has changed, remove the previous lastusedworkspaceId and lastUsedDocumentId
   await removeLastUsedWorkspaceIdIfLoginChanged(userId);
-  return result;
+  return { result, urqlClient: authenticatedUrqlClient };
 };
 
 export type FetchMainDeviceParams = {

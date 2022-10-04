@@ -107,12 +107,14 @@ export default function RegistrationVerificationScreen(
         urqlClient,
         useExtendedLogin,
       });
-      await fetchMainDevice({ urqlClient, exportKey: loginResult.exportKey });
+      const authenticatedUrqlClient = loginResult.urqlClient;
+      await fetchMainDevice({
+        urqlClient: authenticatedUrqlClient,
+        exportKey: loginResult.result.exportKey,
+      });
 
       if (Platform.OS === "web") {
-        if (!useExtendedLogin) {
-          await removeWebDevice();
-        }
+        await removeWebDevice();
         await setWebDevice(unsafedDevice, useExtendedLogin);
         await updateActiveDevice();
       } else if (Platform.OS === "ios") {
@@ -123,7 +125,7 @@ export default function RegistrationVerificationScreen(
       }
       try {
         await attachDeviceToWorkspaces({
-          urqlClient,
+          urqlClient: authenticatedUrqlClient,
           activeDevice: unsafedDevice,
         });
       } catch (error) {

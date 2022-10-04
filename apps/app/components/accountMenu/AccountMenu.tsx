@@ -181,8 +181,8 @@ export default function AccountMenu({
       <MenuButton
         onPress={async () => {
           setIsOpenWorkspaceSwitcher(false);
-          await updateAuthentication(null);
           clearDeviceAndSessionStorage();
+          await updateAuthentication(null);
           // @ts-expect-error navigation ts issue
           props.navigation.push("Login");
         }}

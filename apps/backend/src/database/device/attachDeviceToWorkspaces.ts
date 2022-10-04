@@ -77,7 +77,7 @@ export async function attachDeviceToWorkspaces({
         },
       });
       if (verifiedDeviceWorkspaces.length === 0) {
-        throw new ForbiddenError("Unauthorized");
+        return [];
       }
       // make sure the user controls this creatorDevice
       await getOrCreateCreatorDevice({
