@@ -38,8 +38,10 @@ import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
-import { getFolderKey } from "../../utils/folder/getFolderKey";
-import { getParentFolderKey } from "../../utils/folder/getParentFolderKey";
+import {
+  getFolderKey,
+  getParentFolderKey,
+} from "../../utils/folder/getFolderKey";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
