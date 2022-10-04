@@ -8,7 +8,7 @@ import {
   Folder,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { getParentFolderKey } from "../folder/getParentFolderKey";
+import { getParentFolderKey } from "../folder/getFolderKey";
 import { getWorkspaceKey } from "../workspace/getWorkspaceKey";
 
 interface DocumentPathState {
