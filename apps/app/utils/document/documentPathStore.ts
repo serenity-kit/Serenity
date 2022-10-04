@@ -8,8 +8,7 @@ import {
   Folder,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { getParentFolderKey } from "../folder/getFolderKey";
-import { getWorkspaceKey } from "../workspace/getWorkspaceKey";
+import { getParentFolderKey } from "../folder/getParentFolderKey";
 
 interface DocumentPathState {
   folders: Folder[];
@@ -37,17 +36,11 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
   },
   update: async (folders, urqlClient, activeDevice) => {
     // all documentPath folders should be in the same workspace
-    const firstFolder = folders[0];
-    const workspaceKey = await getWorkspaceKey({
-      workspaceId: firstFolder.workspaceId!,
-      urqlClient,
-      activeDevice,
-    });
     const folderIds: string[] = [];
     const folderNames: { [id: string]: string } = {};
     for (let folder of folders) {
       folderIds.push(folder.id);
-      let folderName = "Decrypting...";
+      let folderName = "decrypting…";
       try {
         const parentKey = await getParentFolderKey({
           folderId: folder.id,
@@ -63,7 +56,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
         });
       } catch (error) {
         console.error(error);
-        folderName = "Decryption error";
+        folderName = "decryption error";
       }
       folderNames[folder.id] = folderName;
     }

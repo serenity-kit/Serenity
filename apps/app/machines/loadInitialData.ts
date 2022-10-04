@@ -152,10 +152,11 @@ export const loadInitialDataMachine =
           }
         },
         redirectToLobby: (context) => {
-          context.navigation.replace("WorkspaceNotDecrypted", {
+          context.navigation.replace("Workspace", {
             workspaceId:
               context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
                 ?.workspaceLoadingInfo?.id,
+            screen: "WorkspaceNotDecrypted",
           });
         },
       },

@@ -191,6 +191,5 @@ test.describe("Workspace Sharing", () => {
       "text=This page does not exist or you don't have access to it anymore."
     );
     await renameFolder(user2Page, user1.data.folder.id, "user2 re-renamed");
-    await delayForSeconds(1000);
   });
 });

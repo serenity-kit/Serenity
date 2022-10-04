@@ -232,7 +232,7 @@ export default function WorkspaceSettingsMembersScreen(
               receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
               creatorDeviceEncryptionPrivateKey:
                 activeDevice.encryptionPrivateKey!,
-              workspaceKey,
+              workspaceKey: workspaceKey.workspaceKey,
             });
           deviceWorkspaceKeyBoxes.push({
             ciphertext,

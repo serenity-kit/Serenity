@@ -95,7 +95,7 @@ export default function SidebarFolder(props: Props) {
   const documentPathStore = useDocumentPathStore();
   const document = useActiveDocumentInfoStore((state) => state.document);
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
-  const [folderName, setFolderName] = useState("Decrypting...");
+  const [folderName, setFolderName] = useState("decrypting…");
 
   useEffect(() => {
     const isOpen = openFolderIds.indexOf(props.folderId) >= 0;
@@ -130,7 +130,7 @@ export default function SidebarFolder(props: Props) {
       setFolderName(folderName);
     } catch (error) {
       console.error(error);
-      setFolderName("Decryption error");
+      setFolderName("decryption error");
     }
   };
 
@@ -144,11 +144,12 @@ export default function SidebarFolder(props: Props) {
       workspaceId: props.workspaceId,
     });
     try {
-      workspaceKey = await getWorkspaceKey({
+      const result = await getWorkspaceKey({
         workspaceId: props.workspaceId,
         urqlClient,
         activeDevice,
       });
+      workspaceKey = result.workspaceKey;
     } catch (error: any) {
       // TODO: handle device not registered error
       console.error(error);
