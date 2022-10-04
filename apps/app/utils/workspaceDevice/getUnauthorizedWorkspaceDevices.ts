@@ -4,6 +4,7 @@ import {
   UnauthorizedDevicesForWorkspacesQuery,
   UnauthorizedDevicesForWorkspacesQueryVariables,
 } from "../../generated/graphql";
+import { urqlRef } from "../urqlClient/urqlClient";
 
 export type Props = {
   urqlClient: Client;
@@ -11,7 +12,7 @@ export type Props = {
 export const getUnauthorizedWorkspaceDevices = async ({
   urqlClient,
 }: Props) => {
-  const unauthorizedDevicesResult = await urqlClient
+  const unauthorizedDevicesResult = await urqlRef.urqlClient
     .query<
       UnauthorizedDevicesForWorkspacesQuery,
       UnauthorizedDevicesForWorkspacesQueryVariables

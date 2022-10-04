@@ -76,9 +76,7 @@ export default function App() {
   });
 
   // recreate client and especially the internal cache every time the authentication state changes
-  const urqlClient = useMemo(() => {
-    console.log("sessionKey changed, recreating client");
-    console.log(`at the time of recreation, the session key is: ${sessionKey}`);
+  const urqlRef = useMemo(() => {
     getSessionKey().then((sessionKey) => {
       console.log(
         `at the time of recreation, the session key is: ${sessionKey}`
@@ -101,7 +99,7 @@ export default function App() {
               activeDevice,
             }}
           >
-            <UrqlProvider value={urqlClient}>
+            <UrqlProvider value={urqlRef.urqlClient}>
               <SafeAreaProvider>
                 <NativeBaseProvider theme={rnTheme}>
                   <Navigation colorScheme={colorScheme} />

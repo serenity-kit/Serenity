@@ -90,14 +90,14 @@ export function LoginForm(props: Props) {
         urqlClient,
         useExtendedLogin,
       });
-      const exportKey = loginResult.exportKey;
+      const exportKey = loginResult.result.exportKey;
+      const authenticatedUrqlClient = loginResult.urqlClient;
+      console.log({ authenticatedUrqlClient });
       // reset the password in case the user ends up on this screen again
-      await fetchMainDevice({ urqlClient, exportKey });
+      await fetchMainDevice({ exportKey, urqlClient: authenticatedUrqlClient });
       console.log({ mainDevice: getMainDevice() });
       if (Platform.OS === "web") {
-        if (!useExtendedLogin) {
-          await removeWebDevice();
-        }
+        await removeWebDevice();
         await setWebDevice(unsavedDevice, useExtendedLogin);
         await updateActiveDevice();
       } else if (Platform.OS === "ios") {
@@ -108,7 +108,7 @@ export function LoginForm(props: Props) {
       }
       try {
         await attachDeviceToWorkspaces({
-          urqlClient,
+          urqlClient: authenticatedUrqlClient,
           activeDevice: unsavedDevice,
         });
       } catch (error) {
