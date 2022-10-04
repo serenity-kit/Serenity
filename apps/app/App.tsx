@@ -20,7 +20,6 @@ import { ErrorBoundary } from "./components/errorBoundary/ErrorBoundary";
 import { AppContextProvider } from "./context/AppContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
-import { getSessionKey } from "./utils/authentication/sessionKeyStore";
 import { patchConsoleOutput } from "./utils/patchConsoleOutput/patchConsoleOutput";
 import { recreateClient } from "./utils/urqlClient/urqlClient";
 import { source } from "./webviews/opaque/source";
@@ -77,11 +76,6 @@ export default function App() {
 
   // recreate client and especially the internal cache every time the authentication state changes
   const urqlRef = useMemo(() => {
-    getSessionKey().then((sessionKey) => {
-      console.log(
-        `at the time of recreation, the session key is: ${sessionKey}`
-      );
-    });
     return recreateClient();
   }, [sessionKey]); // eslint-disable-line react-hooks/exhaustive-deps
 

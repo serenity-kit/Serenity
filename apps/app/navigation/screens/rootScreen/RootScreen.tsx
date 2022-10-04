@@ -11,7 +11,6 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
       navigation: props.navigation,
     },
   });
-  console.log(state.value);
 
   return (
     <CenterContent>

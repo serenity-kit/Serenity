@@ -62,7 +62,6 @@ const exchanges = [
         // check for login
         try {
           const sessionKey = await SessionKeyStore.getSessionKey();
-          console.log(`sessionKey found: ${sessionKey}`);
           if (sessionKey) {
             return { sessionKey };
           }

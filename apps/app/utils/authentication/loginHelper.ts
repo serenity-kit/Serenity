@@ -79,7 +79,6 @@ export const login = async ({
   const result = await finishLogin(
     startLoginResult.data.startLogin.challengeResponse
   );
-  console.log(`finishLogin: ${result.sessionKey}`);
 
   const sessionTokenSignature = await sodium.crypto_sign_detached(
     result.sessionKey,
