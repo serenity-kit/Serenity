@@ -59,7 +59,7 @@ const exchanges = [
         );
       } else {
         const sessionKey = SessionKeyStore.quickGetSessionKey();
-        if (authState?.sessionKey != sessionKey) {
+        if (authState.sessionKey != sessionKey) {
           console.log("Warning! urqClient authState.sessionKey is expired");
         }
         // verify the sessionKey is still up-to-date
