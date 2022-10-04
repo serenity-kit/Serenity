@@ -17,20 +17,17 @@ import {
   View,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useClient } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateFolderMutation,
-  useMeQuery,
   useRootFoldersQuery,
-  Workspace,
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
-import { getWorkspaces } from "../../utils/workspace/getWorkspaces";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
@@ -39,16 +36,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const urqlClient = useClient();
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
-  const { sessionKey, activeDevice } = useWorkspaceContext();
+  const { activeDevice } = useWorkspaceContext();
   const workspaceId = route.params.workspaceId;
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
-  const [meResult] = useMeQuery();
-  const [username, setUsername] = useState<string>("");
-  const [workspace, setWorkspace] = useState<Workspace | null>(null);
-  const [workspaces, setWorkspaces] = useState<Workspace[] | null | undefined>(
-    null
-  );
   const [rootFoldersResult, refetchRootFolders] = useRootFoldersQuery({
     variables: {
       workspaceId,
@@ -58,52 +49,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [, createFolderMutation] = useCreateFolderMutation();
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
-
-  useEffect(() => {
-    if (meResult.data && meResult.data.me) {
-      if (meResult.data.me.username) {
-        setUsername(meResult.data.me.username);
-      } else {
-        // TODO: error! Couldn't fetch user
-      }
-    }
-  }, [meResult.fetching, meResult.data]);
-
-  useEffect(() => {
-    (async () => {
-      if (!sessionKey) {
-        throw new Error("Expected sessionKey to be defined");
-      }
-      const deviceSigningPublicKey = activeDevice?.signingPublicKey;
-      if (!deviceSigningPublicKey) {
-        throw new Error("Expected deviceSigningPublicKey to be defined");
-      }
-      try {
-        const workspace = await getWorkspace({
-          urqlClient,
-          deviceSigningPublicKey,
-          workspaceId,
-        });
-        setWorkspace(workspace);
-        const workspaces = await getWorkspaces({
-          urqlClient,
-          deviceSigningPublicKey,
-        });
-        setWorkspaces(workspaces);
-      } catch (error) {
-        // TODO: handle unauthenticated graphql error
-        // this happens when the user logs out, prior to
-        // being navigated to the login screen
-        console.error("sidebar tried to get workspace without authentication");
-      }
-    })();
-  }, [
-    urqlClient,
-    navigation,
-    workspaceId,
-    sessionKey,
-    activeDevice?.signingPublicKey,
-  ]);
 
   const onWorkspaceStructureCreated = async ({
     workspace,
@@ -120,7 +65,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       deviceSigningPublicKey,
       workspaceId,
     });
-    setWorkspace(createdWorkspace);
     setShowCreateWorkspaceModal(false);
     if (createdWorkspace) {
       navigation.navigate("Workspace", {
@@ -139,12 +83,15 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const createFolder = async (name: string) => {
     const id = uuidv4();
     let workspaceKey: string | undefined = undefined;
+    let workspaceKeyId: string | undefined = undefined;
     try {
-      workspaceKey = await getWorkspaceKey({
+      const result = await getWorkspaceKey({
         workspaceId: workspaceId,
         urqlClient,
         activeDevice,
       });
+      workspaceKey = result.workspaceKey;
+      workspaceKeyId = result.id;
     } catch (error: any) {
       // TODO: handle device not registered error
       console.error(error);
@@ -171,7 +118,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           workspaceId: route.params.workspaceId,
           encryptedName: encryptedFolderResult.ciphertext,
           encryptedNameNonce: encryptedFolderResult.publicNonce,
-          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+          workspaceKeyId,
           subkeyId: encryptedFolderResult.folderSubkeyId,
         },
       });
@@ -197,9 +144,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         style={tw`py-1.5 px-5 md:px-4`}
       >
         <AccountMenu
-          workspace={workspace}
-          username={username}
-          workspaces={workspaces}
+          workspaceId={workspaceId}
           showCreateWorkspaceModal={() => setShowCreateWorkspaceModal(true)}
         />
         {!isPermanentLeftSidebar && (
@@ -219,7 +164,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         <SidebarLink
           to={{
             screen: "WorkspaceSettings",
-            params: { workspaceId: route.params.workspaceId },
+            params: { workspaceId },
           }}
           iconName={"settings-4-line"}
         >
@@ -286,7 +231,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               encryptedName={folder.encryptedName}
               encryptedNameNonce={folder.encryptedNameNonce}
               subkeyId={folder.subkeyId}
-              workspaceId={route.params.workspaceId}
+              workspaceId={workspaceId}
               onStructureChange={refetchRootFolders}
             />
           );

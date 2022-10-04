@@ -18,21 +18,21 @@ import {
 import { HStack } from "native-base";
 import { useState } from "react";
 import { Platform } from "react-native";
-import { Workspace } from "../../generated/graphql";
+import {
+  useMeQuery,
+  useWorkspaceQuery,
+  useWorkspacesQuery,
+} from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 
 type Props = {
-  workspace: Workspace | null;
-  workspaces: Workspace[] | null | undefined;
-  username: string;
+  workspaceId: string;
   showCreateWorkspaceModal: () => void;
 };
 
 export default function AccountMenu({
-  workspace,
-  workspaces,
-  username,
+  workspaceId,
   showCreateWorkspaceModal,
 }: Props) {
   const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
@@ -41,6 +41,17 @@ export default function AccountMenu({
   const isDesktopDevice = useIsDesktopDevice();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const navigation = useNavigation();
+  const { activeDevice } = useWorkspaceContext();
+  const [meResult] = useMeQuery();
+  const [workspaceResult] = useWorkspaceQuery({
+    variables: {
+      id: workspaceId,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    },
+  });
+  const [workspacesResult] = useWorkspacesQuery({
+    variables: { deviceSigningPublicKey: activeDevice.signingPublicKey },
+  });
 
   return (
     <Menu
@@ -77,7 +88,7 @@ export default function AccountMenu({
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {workspace === null ? " " : workspace.name}
+              {workspaceResult.data?.workspace?.name || " "}
             </Text>
             <Icon name="arrow-up-down-s-line" color={"gray-400"} />
           </HStack>
@@ -103,14 +114,12 @@ export default function AccountMenu({
         }}
         icon={<Icon name={"user-settings-line"} color="gray-600" />}
       >
-        {username}
+        {meResult?.data?.me?.username}
       </MenuLink>
 
-      {workspaces === null ||
-      workspaces === undefined ||
-      workspaces.length === 0
-        ? null
-        : workspaces.map((workspace) =>
+      {workspacesResult?.data?.workspaces?.nodes &&
+      workspacesResult.data.workspaces.nodes.length >= 1
+        ? workspacesResult.data.workspaces.nodes.map((workspace) =>
             workspace === null || workspace === undefined ? null : (
               <MenuLink
                 key={workspace.id}
@@ -132,7 +141,8 @@ export default function AccountMenu({
                 {workspace.name}
               </MenuLink>
             )
-          )}
+          )
+        : null}
 
       {isDesktopDevice ? (
         <View style={tw`pl-1.5 pr-3 py-1.5`}>
