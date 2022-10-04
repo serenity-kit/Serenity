@@ -18,7 +18,6 @@ import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDe
 import { createDeviceWithInfo } from "../../utils/authentication/createDeviceWithInfo";
 import { fetchMainDevice, login } from "../../utils/authentication/loginHelper";
 import { setDevice } from "../../utils/device/deviceStore";
-import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import {
   removeWebDevice,
   setWebDevice,
@@ -76,10 +75,7 @@ export function LoginForm(props: Props) {
       setGqlErrorMessage("");
       setIsLoggingIn(true);
       await clearDeviceAndSessionStorage();
-
       const unsavedDevice = await createDeviceWithInfo();
-      console.log({ unsavedDevice });
-
       const loginResult = await login({
         username,
         password,
@@ -92,10 +88,8 @@ export function LoginForm(props: Props) {
       });
       const exportKey = loginResult.result.exportKey;
       const authenticatedUrqlClient = loginResult.urqlClient;
-      console.log({ authenticatedUrqlClient });
       // reset the password in case the user ends up on this screen again
       await fetchMainDevice({ exportKey, urqlClient: authenticatedUrqlClient });
-      console.log({ mainDevice: getMainDevice() });
       if (Platform.OS === "web") {
         await removeWebDevice();
         await setWebDevice(unsavedDevice, useExtendedLogin);
