@@ -50,6 +50,7 @@ test("Register then Login", async ({ page }) => {
     workspaceName: uuidv4(),
   });
   await page.goto("http://localhost:3000/login");
+  delayForSeconds(3);
   await e2eLoginUser({ page, username, password, stayLoggedIn: true });
   delayForSeconds(3);
   await expect(page).toHaveURL(

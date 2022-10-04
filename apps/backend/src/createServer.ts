@@ -42,6 +42,8 @@ export default async function createServer() {
         const session = await getSessionIncludingUser({
           sessionKey: request.req.headers.authorization,
         });
+        console.log({ sessionKey: request.req.headers.authorization });
+        console.log({ session });
         if (session && session.user) {
           return {
             session,
@@ -49,15 +51,24 @@ export default async function createServer() {
             assertValidDeviceSigningPublicKeyForThisSession: (
               deviceSigningPublicKey: string
             ) => {
+              console.log(
+                "-------- assertValidDeviceSigningPublicKeyForThisSession ---------"
+              );
+              console.log({ deviceSigningPublicKey });
               if (
                 deviceSigningPublicKey !== session.deviceSigningPublicKey &&
                 deviceSigningPublicKey !==
                   session.user.mainDeviceSigningPublicKey
               ) {
+                console.log("Invalid deviceSigningPublicKey for this session");
+
                 throw new Error(
                   "Invalid deviceSigningPublicKey for this session"
                 );
               }
+              console.log(
+                "deviceSigningPublicKey doesn't match session or main"
+              );
             },
           };
         }

@@ -13,6 +13,9 @@ export const workspaces = queryField((t) => {
       deviceSigningPublicKey: nonNull(stringArg()),
     },
     async nodes(root, args, context) {
+      console.log("======== workspaces graphql query =======");
+      console.log("muhahahaha");
+      console.log({ context, args });
       if (args.first > 50) {
         throw new UserInputError(
           "Requested too many workspaces. First value exceeds 50."
@@ -21,9 +24,11 @@ export const workspaces = queryField((t) => {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
+      console.log("verifying device signing public key");
       context.assertValidDeviceSigningPublicKeyForThisSession(
         args.deviceSigningPublicKey
       );
+      console.log("signing public key ok");
       const userId = context.user.id;
       const cursor = args.after ? { id: args.after } : undefined;
       // prisma will include the cursor if skip: 1 is not set
@@ -31,13 +36,21 @@ export const workspaces = queryField((t) => {
       const skip = cursor ? 1 : undefined;
       // include one extra project to set hasNextPage value
       const take: any = args.first ? args.first + 1 : undefined;
+      const deviceSigningPublicKey = args.deviceSigningPublicKey;
+      console.log({ userId, cursor, skip, take, deviceSigningPublicKey });
       const workspaces = await getWorkspaces({
         userId,
         cursor,
         skip,
         take,
-        deviceSigningPublicKey: args.deviceSigningPublicKey,
+        deviceSigningPublicKey,
       });
+      console.log({ workspaces });
+      if (workspaces.length > 0) {
+        console.log({ members: workspaces[0].members });
+        console.log({ workspaceKeys: workspaces[0].workspaceKeys });
+        console.log({ currentWorkspaceKey: workspaces[0].currentWorkspaceKey });
+      }
       return workspaces;
     },
   });

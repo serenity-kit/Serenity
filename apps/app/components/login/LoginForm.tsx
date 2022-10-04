@@ -18,6 +18,7 @@ import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDe
 import { createDeviceWithInfo } from "../../utils/authentication/createDeviceWithInfo";
 import { fetchMainDevice, login } from "../../utils/authentication/loginHelper";
 import { setDevice } from "../../utils/device/deviceStore";
+import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import {
   removeWebDevice,
   setWebDevice,
@@ -77,6 +78,7 @@ export function LoginForm(props: Props) {
       await clearDeviceAndSessionStorage();
 
       const unsavedDevice = await createDeviceWithInfo();
+      console.log({ unsavedDevice });
 
       const loginResult = await login({
         username,
@@ -91,7 +93,7 @@ export function LoginForm(props: Props) {
       const exportKey = loginResult.exportKey;
       // reset the password in case the user ends up on this screen again
       await fetchMainDevice({ urqlClient, exportKey });
-
+      console.log({ mainDevice: getMainDevice() });
       if (Platform.OS === "web") {
         if (!useExtendedLogin) {
           await removeWebDevice();

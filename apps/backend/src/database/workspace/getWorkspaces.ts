@@ -28,6 +28,7 @@ export async function getWorkspaces({
       userId,
     },
   });
+  console.log({ userToWorkspaces });
   const rawWorkspaces = await prisma.workspace.findMany({
     where: {
       id: {
@@ -72,6 +73,7 @@ export async function getWorkspaces({
       },
     },
   });
+  console.log({ rawWorkspaces });
 
   const workspaces: Workspace[] = [];
   rawWorkspaces.forEach((rawWorkspace) => {
@@ -98,5 +100,6 @@ export async function getWorkspaces({
     };
     workspaces.push(workspace);
   });
+  console.log({ workspaces });
   return workspaces;
 }

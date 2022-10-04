@@ -44,6 +44,7 @@ export default function RegisterForm(props: Props) {
     try {
       // TODO the getServerChallenge should include a signature of the challenge response and be verified that it belongs to
       // the server public to make sure it wasn't tampered with
+      console.log("--------- updateAuthentication: null -------------");
       await updateAuthentication(null);
       const challenge = await registerInitialize(password);
       const startRegistrationResult = await startRegistrationMutation({

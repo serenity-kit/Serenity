@@ -63,6 +63,7 @@ export const login = async ({
   urqlClient,
   useExtendedLogin,
 }: LoginParams) => {
+  console.log("--------- updateAuthentication: null -------------");
   await updateAuthentication(null);
   const message = await startLogin(password);
   const startLoginResult = await startLoginMutation({
@@ -100,6 +101,8 @@ export const login = async ({
   if (!finishLoginResult.data?.finishLogin) {
     throw new Error("Failed to finish login");
   }
+  console.log("--------- updateAuthentication: sessionKey -------------");
+  console.log({ session: result });
   await updateAuthentication({
     sessionKey: result.sessionKey,
     expiresAt: finishLoginResult.data.finishLogin.expiresAt,

@@ -42,6 +42,8 @@ export default function useCachedResources() {
 
   const updateAuthentication = useCallback(
     async (session: { sessionKey: string; expiresAt: string } | null) => {
+      console.log("------- updateAuthentication ---------");
+      console.log({ session });
       if (session) {
         setSessionKey(session.sessionKey);
         await SessionKeyStore.setSessionKey(session.sessionKey);

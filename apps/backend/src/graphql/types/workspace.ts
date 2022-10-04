@@ -59,11 +59,10 @@ export const Workspace = objectType({
   definition(t) {
     t.nonNull.string("id");
     t.string("name");
-    t.field("currentWorkspaceKey", {
-      type: WorkspaceKey,
-    });
-    t.list.nonNull.field("workspaceKeys", { type: WorkspaceKey });
+    t.string("idSignature");
     t.list.nonNull.field("members", { type: WorkspaceMember });
+    t.list.nonNull.field("workspaceKeys", { type: WorkspaceKey });
+    t.field("currentWorkspaceKey", { type: WorkspaceKey });
   },
 });
 
