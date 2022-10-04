@@ -36,7 +36,7 @@ export const getParentFolderKey = async ({
       urqlClient,
       activeDevice,
     });
-    parentKey = workspaceKey;
+    parentKey = workspaceKey.workspaceKey;
   }
   return parentKey;
 };
