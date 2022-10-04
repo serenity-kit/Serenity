@@ -1,16 +1,24 @@
-import { Spinner, Text, View } from "@serenity-tools/ui";
+import {
+  CenterContent,
+  InfoMessage,
+  Spinner,
+  Text,
+  tw,
+  View,
+} from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { StyleSheet, useWindowDimensions } from "react-native";
-import { RootStackScreenProps } from "../../../types/navigation";
+import { useWindowDimensions } from "react-native";
+import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import { workspaceNotDecryptedScreenMachine } from "./workspaceNotDecryptedScreenMachine";
 
 export default function WorkspaceNotDecryptedScreen({
   navigation,
   route,
-}: RootStackScreenProps<"WorkspaceNotDecrypted">) {
+}: WorkspaceDrawerScreenProps<"WorkspaceNotDecrypted">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
+  const workspaceId = useWorkspaceId();
 
-  const workspaceId = route.params?.workspaceId;
   // TODO show error message in case there is network error
   // TODO communicate when the next check attempt is happening
   const [state] = useMachine(workspaceNotDecryptedScreenMachine, {
@@ -21,44 +29,15 @@ export default function WorkspaceNotDecryptedScreen({
   });
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        You joined the workspace. You now need to wait for any other workspace
-        member to make the workspace content available to you.
-      </Text>
-      <View style={styles.activityIndicatorContainer}>
-        <Spinner style={styles.activityIndicator} />
-        <Text>Waiting for authorization</Text>
+    <CenterContent style={tw`px-4`}>
+      <InfoMessage variant="info" style={tw`max-w-xs`}>
+        You joined the workspace. In order to access the workspace content you
+        need to wait for an existing workspace member to authorize you.
+      </InfoMessage>
+      <View style={tw`flex-row mt-8`}>
+        <Spinner />
+        <Text style={tw`pl-4`}>Waiting for authorization</Text>
       </View>
-    </View>
+    </CenterContent>
   );
 }
-
-const styles = StyleSheet.create({
-  activityIndicatorContainer: {
-    justifyContent: "center",
-    flexDirection: "row",
-    paddingVertical: 15,
-  },
-  activityIndicator: {
-    marginRight: 15,
-  },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-  linkText: {
-    fontSize: 14,
-    color: "#2e78b7",
-  },
-});

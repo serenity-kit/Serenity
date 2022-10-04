@@ -22,6 +22,7 @@ import { useClient } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateFolderMutation,
+  useMeWithWorkspaceLoadingInfoQuery,
   useRootFoldersQuery,
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
@@ -40,6 +41,16 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const workspaceId = route.params.workspaceId;
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+
+  const [meWithWorkspaceLoadingInfo] = useMeWithWorkspaceLoadingInfoQuery({
+    variables: {
+      workspaceId,
+      returnOtherWorkspaceIfNotFound: false,
+    },
+  });
+  const isAuthorizedForThisWorkspace =
+    meWithWorkspaceLoadingInfo.data?.me?.workspaceLoadingInfo?.isAuthorized ||
+    false;
   const [rootFoldersResult, refetchRootFolders] = useRootFoldersQuery({
     variables: {
       workspaceId,
@@ -167,6 +178,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             params: { workspaceId },
           }}
           iconName={"settings-4-line"}
+          // @ts-expect-error needs fixing in the SidebarLink types
+          disabled={!isAuthorizedForThisWorkspace}
         >
           Settings
         </SidebarLink>
@@ -178,64 +191,69 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
       {isPermanentLeftSidebar ? <SidebarDivider /> : null}
 
-      <HStack
-        justifyContent="space-between"
-        alignItems="center"
-        style={tw`ml-5 md:ml-4 mb-4 mr-5 md:mr-2`}
-      >
-        <Text variant={isPermanentLeftSidebar ? "xxs" : "sm"} bold>
-          Folders
-        </Text>
-        {/* offset not working yet as NB has a no-no in their component */}
-        <Tooltip label="Create folder" placement="right" offset={8}>
-          <IconButton
-            onPress={() => {
-              setIsCreatingNewFolder(true);
-            }}
-            name="plus"
-            size={isPermanentLeftSidebar ? "md" : "lg"}
-            testID="root-create-folder"
-          ></IconButton>
-        </Tooltip>
-      </HStack>
-      {isCreatingNewFolder && (
-        <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
-          <View style={tw`ml-0.5 -mr-0.5`}>
-            <Icon name={"arrow-right-filled"} color={"gray-600"} />
-          </View>
-          <Icon name="folder" size={5} mobileSize={8} />
-          <InlineInput
-            onCancel={() => {
-              setIsCreatingNewFolder(false);
-            }}
-            onSubmit={createFolder}
-            value=""
-            style={tw`ml-0.5`}
-            testID={"sidebar-folder__edit-name"}
-          />
-        </HStack>
-      )}
-      {rootFoldersResult.fetching ? (
-        <Text variant="xs" muted style={tw`py-1.5 pl-4`}>
-          Loading Folders…
-        </Text>
-      ) : rootFoldersResult.data?.rootFolders?.nodes ? (
-        rootFoldersResult.data?.rootFolders?.nodes.map((folder) => {
-          if (folder === null) {
-            return null;
-          }
-          return (
-            <Folder
-              key={folder.id}
-              folderId={folder.id}
-              encryptedName={folder.encryptedName}
-              encryptedNameNonce={folder.encryptedNameNonce}
-              subkeyId={folder.subkeyId}
-              workspaceId={workspaceId}
-              onStructureChange={refetchRootFolders}
-            />
-          );
-        })
+      {isAuthorizedForThisWorkspace ? (
+        <>
+          <HStack
+            justifyContent="space-between"
+            alignItems="center"
+            style={tw`ml-5 md:ml-4 mb-4 mr-5 md:mr-2`}
+          >
+            <Text variant={isPermanentLeftSidebar ? "xxs" : "sm"} bold>
+              Folders
+            </Text>
+            {/* offset not working yet as NB has a no-no in their component */}
+            <Tooltip label="Create folder" placement="right" offset={8}>
+              <IconButton
+                onPress={() => {
+                  setIsCreatingNewFolder(true);
+                }}
+                name="plus"
+                size={isPermanentLeftSidebar ? "md" : "lg"}
+                testID="root-create-folder"
+              ></IconButton>
+            </Tooltip>
+          </HStack>
+          {isCreatingNewFolder && (
+            <HStack alignItems="center" style={tw`py-1.5 pl-2.5`}>
+              <View style={tw`ml-0.5 -mr-0.5`}>
+                <Icon name={"arrow-right-filled"} color={"gray-600"} />
+              </View>
+              <Icon name="folder" size={5} mobileSize={8} />
+              <InlineInput
+                onCancel={() => {
+                  setIsCreatingNewFolder(false);
+                }}
+                onSubmit={createFolder}
+                value=""
+                style={tw`ml-0.5`}
+                testID={"sidebar-folder__edit-name"}
+              />
+            </HStack>
+          )}
+
+          {rootFoldersResult.fetching ? (
+            <Text variant="xs" muted style={tw`py-1.5 pl-4`}>
+              Loading Folders…
+            </Text>
+          ) : rootFoldersResult.data?.rootFolders?.nodes ? (
+            rootFoldersResult.data?.rootFolders?.nodes.map((folder) => {
+              if (folder === null) {
+                return null;
+              }
+              return (
+                <Folder
+                  key={folder.id}
+                  folderId={folder.id}
+                  encryptedName={folder.encryptedName}
+                  encryptedNameNonce={folder.encryptedNameNonce}
+                  subkeyId={folder.subkeyId}
+                  workspaceId={workspaceId}
+                  onStructureChange={refetchRootFolders}
+                />
+              );
+            })
+          ) : null}
+        </>
       ) : null}
       <CreateWorkspaceModal
         isVisible={showCreateWorkspaceModal}

@@ -65,7 +65,6 @@ export default function WorkspaceSettingsGeneralScreen(
       state.value === "loadWorkspaceSuccess" &&
       state.context.workspaceQueryResult?.data?.workspace
     ) {
-      console.log(state.context);
       updateWorkspaceData(
         state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
         // @ts-expect-error need to fix the generation
