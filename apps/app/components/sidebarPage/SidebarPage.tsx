@@ -42,7 +42,7 @@ export default function SidebarPage(props: Props) {
   const { activeDevice } = useWorkspaceContext();
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [documentTitle, setDocumentTitle] = useState("Decrypting...");
+  const [documentTitle, setDocumentTitle] = useState("decrypting…");
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const document = useActiveDocumentInfoStore((state) => state.document);
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
@@ -90,7 +90,7 @@ export default function SidebarPage(props: Props) {
       setDocumentTitle(documentTitle);
     } catch (error) {
       console.error(error);
-      setDocumentTitle("Decryption error");
+      setDocumentTitle("decryption error");
     }
   };
 

@@ -4,9 +4,9 @@ query documentPath($id: ID!) {
     encryptedName
     encryptedNameNonce
     workspaceKeyId
-    contentSubkeyId
     parentFolderId
     rootFolderId
     workspaceId
+    subkeyId
   }
 }

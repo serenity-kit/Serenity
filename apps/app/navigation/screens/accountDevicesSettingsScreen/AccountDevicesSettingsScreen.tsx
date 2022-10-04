@@ -80,7 +80,7 @@ export default function DeviceManagerScreen(props) {
             receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
             creatorDeviceEncryptionPrivateKey:
               activeDevice.encryptionPrivateKey!,
-            workspaceKey,
+            workspaceKey: workspaceKey.workspaceKey,
           });
         workspaceDevicePairing.push({
           ciphertext,

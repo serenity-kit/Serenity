@@ -4,7 +4,7 @@ import { registerUser } from "../../../../test/helpers/authentication/registerUs
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
-import { updateWorkspace } from "../../../../test/helpers/workspace/updateWorkspace";
+import { updateWorkspaceName } from "../../../../test/helpers/workspace/updateWorkspaceName";
 
 const graphql = setupGraphql();
 let userId1 = "";
@@ -53,81 +53,29 @@ test("user won't update the name when not set", async () => {
   const authorizationHeader = sessionKey1;
   const id = "abc";
   const name = undefined;
-  const members = [
-    {
-      userId: userId1,
-      isAdmin: true,
-    },
-    {
-      userId: userId2,
-      isAdmin: true,
-    },
-  ];
-  const result = await updateWorkspace({
+  const result = await updateWorkspaceName({
     graphql,
     id,
     name,
-    members,
     authorizationHeader,
   });
-  const workspace = result.updateWorkspace.workspace;
+  const workspace = result.updateWorkspaceName.workspace;
   expect(workspace.name).toBe(addedWorkspace.name);
-  expect(workspace.members.length).toBe(2);
-  workspace.members.forEach((member: { userId: string; isAdmin: any }) => {
-    expect(member.isAdmin).toBe(true);
-  });
 });
 
-test("user won't update the members", async () => {
+test("user can change workspace name", async () => {
   // generate a challenge code
   const authorizationHeader = sessionKey1;
   const id = "abc";
   const name = "workspace 2";
-  const members = undefined;
-  const result = await updateWorkspace({
+  const result = await updateWorkspaceName({
     graphql,
     id,
     name,
-    members,
     authorizationHeader,
   });
-  const workspace = result.updateWorkspace.workspace;
-  expect(workspace.members.length).toBe(2);
-});
-
-// WARNING: after this, user is no longer an admin on this workspace
-test("user should be able to update a workspace, but not their own access level", async () => {
-  // generate a challenge code
-  const authorizationHeader = sessionKey1;
-  const id = "abc";
-  const name = "renamed workspace";
-  const members = [
-    {
-      userId: userId1,
-      isAdmin: false,
-    },
-    {
-      userId: userId2,
-      isAdmin: false,
-    },
-  ];
-  const result = await updateWorkspace({
-    graphql,
-    id,
-    name,
-    members,
-    authorizationHeader,
-  });
-  const workspace = result.updateWorkspace.workspace;
+  const workspace = result.updateWorkspaceName.workspace;
   expect(workspace.name).toBe(name);
-  expect(workspace.members.length).toBe(2);
-  workspace.members.forEach((member: { userId: string; isAdmin: any }) => {
-    if (member.userId === userId1) {
-      expect(member.isAdmin).toBe(true);
-    } else {
-      expect(member.isAdmin).toBe(false);
-    }
-  });
 });
 
 test("user should not be able to update a workspace they don't own", async () => {
@@ -135,23 +83,12 @@ test("user should not be able to update a workspace they don't own", async () =>
   const authorizationHeader = sessionKey2;
   const id = "abc";
   const name = "unauthorized workspace";
-  const members = [
-    {
-      userId: userId1,
-      isAdmin: true,
-    },
-    {
-      userId: userId2,
-      isAdmin: true,
-    },
-  ];
   await expect(
     (async () =>
-      await updateWorkspace({
+      await updateWorkspaceName({
         graphql,
         id,
         name,
-        members,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -162,23 +99,12 @@ test("user should not be able to update a workspace for a workspace that doesn't
   const authorizationHeader = sessionKey1;
   const id = "hahahaha";
   const name = "nonexistent workspace";
-  const members = [
-    {
-      userId: userId1,
-      isAdmin: false,
-    },
-    {
-      userId: userId2,
-      isAdmin: true,
-    },
-  ];
   await expect(
     (async () =>
-      await updateWorkspace({
+      await updateWorkspaceName({
         graphql,
         id,
         name,
-        members,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -187,19 +113,12 @@ test("user should not be able to update a workspace for a workspace that doesn't
 test("Unauthenticated", async () => {
   const id = addedWorkspace.id;
   const name = "unautharized workspace";
-  const members = [
-    {
-      userId: userId1,
-      isAdmin: false,
-    },
-  ];
   await expect(
     (async () =>
-      await updateWorkspace({
+      await updateWorkspaceName({
         graphql,
         id,
         name,
-        members,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -207,8 +126,8 @@ test("Unauthenticated", async () => {
 
 describe("Input errors", () => {
   const query = gql`
-    mutation updateWorkspace($input: UpdateWorkspaceInput!) {
-      updateWorkspace(input: $input) {
+    mutation updateWorkspaceName($input: UpdateWorkspaceNameInput!) {
+      updateWorkspaceName(input: $input) {
         workspace {
           id
           name
@@ -223,12 +142,6 @@ describe("Input errors", () => {
   test("Invalid id", async () => {
     const id = addedWorkspace.id;
     const name = undefined;
-    const members = [
-      {
-        userId: userId1,
-        isAdmin: false,
-      },
-    ];
     const authorizationHeaders = {
       authorization: sessionKey1,
     };
@@ -236,7 +149,7 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(
           query,
-          { input: { id: null, name, members } },
+          { input: { id: null, name } },
           authorizationHeaders
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);

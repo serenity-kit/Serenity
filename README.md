@@ -154,6 +154,12 @@ The tests on the CI run with production build. The commands are available in the
 When writing e2e tests don't rely on generated CSS classes since they might be different on the production build which is used for running the e2e tests
 on the CI servers.
 
+You can see the E2E test DB content using Prisma Studio by running
+
+```sh
+yarn workspace backend prisma:e2etest:studio
+```
+
 ## Deploy
 
 Backend deployment icluding running migrations is done via Github Actions.

@@ -105,13 +105,14 @@ function WorkspaceDrawerScreen(props) {
       >
         <Drawer.Screen name="Page" component={PageScreen} />
         <Drawer.Screen
+          name="WorkspaceNotDecrypted"
+          component={WorkspaceNotDecryptedScreen}
+          options={{ headerTitle: "" }}
+        />
+        <Drawer.Screen
           name="WorkspaceRoot"
           component={WorkspaceRootScreen}
           options={{ headerShown: false }}
-        />
-        <Drawer.Screen
-          name="WorkspaceNotDecrypted"
-          component={WorkspaceNotDecryptedScreen}
         />
       </Drawer.Navigator>
     </WorkspaceIdProvider>
@@ -244,10 +245,6 @@ function RootNavigator() {
           component={AcceptWorkspaceInvitationScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="WorkspaceNotDecrypted"
-          component={WorkspaceNotDecryptedScreen}
-        />
         {isPhoneDimensions(dimensions.width) ? (
           <>
             <Stack.Screen
@@ -354,6 +351,7 @@ const getLinking = (
           path: "/workspace/:workspaceId",
           screens: {
             Page: "page/:pageId",
+            WorkspaceNotDecrypted: "lobby",
             WorkspaceRoot: "",
           },
         },
@@ -367,8 +365,7 @@ const getLinking = (
         AcceptWorkspaceInvitation:
           "accept-workspace-invitation/:workspaceInvitationId",
         TestLibsodium: "test-libsodium",
-        WorkspaceNotDecrypted: "/workspace/:workspaceId/lobby",
-        WorkspaceNotFound: "/workspace/:workspaceId/not-found",
+        WorkspaceNotFound: "workspace/:workspaceId/not-found",
         ...accountSettings,
         Root: "",
         NotFound: "*",

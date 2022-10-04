@@ -18,6 +18,11 @@ export const getWorkspaceKey = async ({
     deviceSigningPublicKey: activeDevice.signingPublicKey,
     workspaceId: workspaceId,
   });
+  if (!workspace?.currentWorkspaceKey?.id) {
+    throw new Error(
+      "The currentWorkspaceKey has no ID. This should never happen."
+    );
+  }
   const workspaceKeyBox = workspace?.currentWorkspaceKey?.workspaceKeyBox;
   if (!workspaceKeyBox) {
     throw new Error("This device isn't registered for this workspace!");
@@ -35,5 +40,8 @@ export const getWorkspaceKey = async ({
     creatorDeviceEncryptionPublicKey: creatorDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
   });
-  return workspaceKey;
+  return {
+    id: workspace?.currentWorkspaceKey?.id,
+    workspaceKey,
+  };
 };

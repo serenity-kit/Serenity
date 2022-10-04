@@ -19,7 +19,7 @@ import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
   MeResult,
   useDeleteWorkspacesMutation,
-  useUpdateWorkspaceMutation,
+  useUpdateWorkspaceNameMutation,
   Workspace,
   WorkspaceMember,
 } from "../../../generated/graphql";
@@ -44,7 +44,7 @@ export default function WorkspaceSettingsGeneralScreen(
     },
   });
   const [, deleteWorkspacesMutation] = useDeleteWorkspacesMutation();
-  const [, updateWorkspaceMutation] = useUpdateWorkspaceMutation();
+  const [, updateWorkspaceNameMutation] = useUpdateWorkspaceNameMutation();
   const [workspaceName, setWorkspaceName] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
@@ -65,7 +65,6 @@ export default function WorkspaceSettingsGeneralScreen(
       state.value === "loadWorkspaceSuccess" &&
       state.context.workspaceQueryResult?.data?.workspace
     ) {
-      console.log(state.context);
       updateWorkspaceData(
         state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
         // @ts-expect-error need to fix the generation
@@ -120,17 +119,16 @@ export default function WorkspaceSettingsGeneralScreen(
 
   const updateWorkspaceName = async () => {
     setIsLoadingWorkspaceData(true);
-    const updateWorkspaceResult = await updateWorkspaceMutation({
+    const updateWorkspaceResult = await updateWorkspaceNameMutation({
       input: {
         id: workspaceId,
         name: workspaceName,
-        members: null,
       },
     });
-    if (updateWorkspaceResult.data?.updateWorkspace?.workspace) {
+    if (updateWorkspaceResult.data?.updateWorkspaceName?.workspace) {
       updateWorkspaceData(
         state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
-        updateWorkspaceResult.data?.updateWorkspace?.workspace
+        updateWorkspaceResult.data?.updateWorkspaceName?.workspace
       );
     }
     setIsLoadingWorkspaceData(false);
