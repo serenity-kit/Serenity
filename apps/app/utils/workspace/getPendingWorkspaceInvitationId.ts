@@ -1,17 +1,15 @@
 import {
+  PendingWorkspaceInvitationDocument,
   PendingWorkspaceInvitationQuery,
   PendingWorkspaceInvitationQueryVariables,
-  PendingWorkspaceInvitationDocument,
 } from "../../generated/graphql";
-import { Client } from "urql";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 
-export type Props = {
-  urqlClient: Client;
-};
-export const getPendingWorkspaceInvitationId = async ({
-  urqlClient,
-}: Props): Promise<string | undefined | null> => {
-  const pendingWorkspaceInvitationResult = await urqlClient
+export type Props = {};
+export const getPendingWorkspaceInvitationId = async ({}: Props): Promise<
+  string | undefined | null
+> => {
+  const pendingWorkspaceInvitationResult = await getUrqlClient()
     .query<
       PendingWorkspaceInvitationQuery,
       PendingWorkspaceInvitationQueryVariables

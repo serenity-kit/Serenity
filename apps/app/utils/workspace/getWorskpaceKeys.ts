@@ -1,20 +1,16 @@
-import { Client } from "urql";
 import { Device } from "../../types/Device";
 import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
 import { getWorkspace } from "./getWorkspace";
 
 export type Props = {
   workspaceId: string;
-  urqlClient: Client;
   activeDevice: Device;
 };
 export const getWorkspaceKeys = async ({
   workspaceId,
-  urqlClient,
   activeDevice,
 }: Props): Promise<{ [workspaceKeyId: string]: string }> => {
   const workspace = await getWorkspace({
-    urqlClient,
     deviceSigningPublicKey: activeDevice.signingPublicKey,
     workspaceId: workspaceId,
   });

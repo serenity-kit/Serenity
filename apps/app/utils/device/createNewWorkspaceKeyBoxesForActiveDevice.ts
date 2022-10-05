@@ -1,4 +1,3 @@
-import { Client } from "urql";
 import {
   WorkspaceKeyBox,
   WorkspaceKeyBoxData,
@@ -32,14 +31,12 @@ const getWorkspaceKeyBoxByDeviceSigningPublicKey = ({
 };
 
 export type Props = {
-  urqlClient: Client;
   activeDevice: Device;
 };
 export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
-  urqlClient,
   activeDevice,
 }: Props) => {
-  const devices = await getDevices({ urqlClient });
+  const devices = await getDevices({});
   if (!devices) {
     throw new Error("No devices found");
   }
@@ -48,7 +45,6 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
     throw new Error("No main device found!");
   }
   const workspaces = await getWorkspaces({
-    urqlClient,
     deviceSigningPublicKey: activeDevice.signingPublicKey,
   });
   if (workspaces === null) {
@@ -59,7 +55,6 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
     const workspaceWithMainWorkspaceKeyBox = await getWorkspace({
       workspaceId: workspace.id,
       deviceSigningPublicKey: mainDevice?.signingPublicKey,
-      urqlClient,
     });
     const workspaceKeys = workspaceWithMainWorkspaceKeyBox?.workspaceKeys;
     if (!workspaceKeys) {

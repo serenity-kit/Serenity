@@ -1,16 +1,15 @@
-import { Client } from "urql";
 import {
   DocumentDocument,
   DocumentQuery,
   DocumentQueryVariables,
 } from "../../generated/graphql";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 
 export type Props = {
   documentId: string;
-  urqlClient: Client;
 };
-export const getDocument = async ({ documentId, urqlClient }: Props) => {
-  const documentResult = await urqlClient
+export const getDocument = async ({ documentId }: Props) => {
+  const documentResult = await getUrqlClient()
     .query<DocumentQuery, DocumentQueryVariables>(
       DocumentDocument,
       { id: documentId },

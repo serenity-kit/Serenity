@@ -24,7 +24,6 @@ import {
 import { recreateDocumentKey } from "@serenity-tools/common";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { useEffect, useRef } from "react";
-import { useClient } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import {
   applyAwarenessUpdate,
@@ -49,6 +48,7 @@ import {
 } from "../../utils/document/documentPathStore";
 import { getFolderKey } from "../../utils/folder/getFolderKey";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
 
 const reconnectTimeout = 2000;
 
@@ -77,7 +77,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const websocketState = useWebsocketState();
 
   const docIdRef = useRef<string | null>(null);
-  const urqlClient = useClient();
   const folderStore = useOpenFolderStore();
   const documentPathStore = useDocumentPathStore();
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
@@ -85,7 +84,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   );
 
   const updateDocumentFolderPath = async (docId: string) => {
-    const documentPath = await getDocumentPath(urqlClient, docId);
+    const documentPath = await getDocumentPath(docId);
     const openFolderIds = folderStore.folderIds;
     if (!documentPath) {
       return;
@@ -96,7 +95,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       }
     });
     folderStore.update(openFolderIds);
-    documentPathStore.update(documentPath, urqlClient, activeDevice);
+    documentPathStore.update(documentPath, activeDevice);
   };
 
   useEffect(() => {
@@ -226,7 +225,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
       // );
 
-      const documentResult = await urqlClient
+      const documentResult = await getUrqlClient()
         .query<DocumentQuery, DocumentQueryVariables>(
           DocumentDocument,
           { id: docId },
@@ -244,7 +243,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       const folderKeyData = await getFolderKey({
         folderId: document.parentFolderId!,
         workspaceId: document.workspaceId!,
-        urqlClient,
         activeDevice,
       });
       const documentKey = await recreateDocumentKey({

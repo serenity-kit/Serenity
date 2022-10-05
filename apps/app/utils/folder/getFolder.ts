@@ -1,17 +1,16 @@
-import { Client } from "urql";
 import {
   Folder,
   FolderDocument,
   FolderQuery,
   FolderQueryVariables,
 } from "../../generated/graphql";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 
 export type Props = {
   id: string;
-  urqlClient: Client;
 };
-export const getFolder = async ({ id, urqlClient }: Props): Promise<Folder> => {
-  const folderResult = await urqlClient
+export const getFolder = async ({ id }: Props): Promise<Folder> => {
+  const folderResult = await getUrqlClient()
     .query<FolderQuery, FolderQueryVariables>(
       FolderDocument,
       { id },
