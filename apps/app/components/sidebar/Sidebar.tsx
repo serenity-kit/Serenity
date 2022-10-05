@@ -196,7 +196,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           <HStack
             justifyContent="space-between"
             alignItems="center"
-            style={tw`ml-5 md:ml-4 mb-4 mr-5 md:mr-2`}
+            style={tw`ml-5 md:ml-4 mb-4 mr-4.5 md:mr-2`}
           >
             <Text variant={isPermanentLeftSidebar ? "xxs" : "sm"} bold>
               Folders
@@ -210,6 +210,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 name="plus"
                 size={isPermanentLeftSidebar ? "md" : "lg"}
                 testID="root-create-folder"
+                color={isPermanentLeftSidebar ? "gray-400" : "gray-600"}
               ></IconButton>
             </Tooltip>
           </HStack>
