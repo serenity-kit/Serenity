@@ -150,7 +150,10 @@ export default function AcceptWorkspaceInvitationScreen(
         <Description variant="login">
           You have been invited to join workspace{" "}
           <Description variant="login" bold>
-            {workspaceInvitationQueryResult.data?.workspaceInvitation?.workspaceName}
+            {
+              workspaceInvitationQueryResult.data?.workspaceInvitation
+                ?.workspaceName
+            }
           </Description>{" "}
           by{" "}
           <Description variant="login" bold>
