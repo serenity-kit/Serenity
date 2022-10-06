@@ -5,15 +5,18 @@ import {
   Text,
   tw,
   useHasEditorSidebar,
+  useIsDesktopDevice,
   useIsPermanentLeftSidebar,
   View,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
+import { useWindowDimensions } from "react-native";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { useDocumentPathStore } from "../../utils/document/documentPathStore";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 
 export function PageHeaderLeft(props: any) {
+  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const documentPathList = useDocumentPathStore((state) => state.folders);
   const { getName } = useDocumentPathStore();
   const documentName = useActiveDocumentInfoStore(
@@ -21,6 +24,7 @@ export function PageHeaderLeft(props: any) {
   );
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const hasEditorSidebar = useHasEditorSidebar();
+  const isDesktopDevice = useIsDesktopDevice();
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
 
   // TODO disable IconButton depending on if going back/forward is possible
@@ -29,7 +33,7 @@ export function PageHeaderLeft(props: any) {
   return (
     <HStack alignItems={"center"}>
       {!isPermanentLeftSidebar ? (
-        <View style={hasEditorSidebar ? tw`pl-2` : tw`pl-3`}>
+        <View style={isDesktopDevice ? tw`pl-3` : tw`pl-2`}>
           {isInEditingMode ? (
             <HStack>
               <IconButton
@@ -52,8 +56,8 @@ export function PageHeaderLeft(props: any) {
               }}
               name="arrow-left-line"
               color={"gray-900"}
-              size={hasEditorSidebar ? "lg" : "md"}
-              style={hasEditorSidebar ? tw`-mr-3` : tw``}
+              size={isDesktopDevice ? "md" : "lg"}
+              style={isDesktopDevice ? tw`` : tw`-mr-3`}
             />
           )}
         </View>
