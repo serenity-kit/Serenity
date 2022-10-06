@@ -4,7 +4,6 @@ import {
   DefaultTheme,
   LinkingOptions,
   NavigationContainer,
-  useNavigation,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Text, tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
@@ -197,16 +196,15 @@ const WorkspaceSettingsMembersScreenWithLoginRedirect =
     WorkspaceSettingsMembersScreen
   );
 
-function RootNavigator(props) {
+function RootNavigator() {
   const dimensions = useWindowDimensions();
-  const navigation = useNavigation();
 
   return (
     <Stack.Navigator
       screenOptions={{
         headerStyle: [styles.header],
         headerLeft(props) {
-          return <HeaderLeft {...props} defaultNavigate="Root" />;
+          return <HeaderLeft {...props} />;
         },
       }}
     >
@@ -258,15 +256,15 @@ function RootNavigator(props) {
             <Stack.Screen
               name="AccountSettings"
               component={AccountSettingsMobileOverviewScreenWithLoginRedirect}
+              options={{ headerTitle: "Account settings" }}
             />
             <Stack.Screen
               name="AccountSettingsProfile"
               component={AccountProfileSettingsScreenWithLoginRedirect}
               options={{
+                headerTitle: "Profile",
                 headerLeft(props) {
-                  return (
-                    <HeaderLeft {...props} defaultNavigate="AccountSettings" />
-                  );
+                  return <HeaderLeft {...props} navigateTo="AccountSettings" />;
                 },
               }}
             />
@@ -274,10 +272,9 @@ function RootNavigator(props) {
               name="AccountSettingsDevices"
               component={AccountDevicesSettingsScreenWithLoginRedirect}
               options={{
+                headerTitle: "Devices",
                 headerLeft(props) {
-                  return (
-                    <HeaderLeft {...props} defaultNavigate="AccountSettings" />
-                  );
+                  return <HeaderLeft {...props} navigateTo="AccountSettings" />;
                 },
               }}
             />
@@ -285,10 +282,9 @@ function RootNavigator(props) {
               name="WorkspaceSettings"
               component={WorkspaceSettingsMobileOverviewScreenWithLoginRedirect}
               options={{
+                headerTitle: "Workspace settings",
                 headerLeft(props) {
-                  return (
-                    <HeaderLeft {...props} defaultNavigate="WorkspaceRoot" />
-                  );
+                  return <HeaderLeft {...props} navigateTo="WorkspaceRoot" />;
                 },
               }}
             />
@@ -296,12 +292,10 @@ function RootNavigator(props) {
               name="WorkspaceSettingsGeneral"
               component={WorkspaceSettingsGeneralScreenWithLoginRedirect}
               options={{
+                headerTitle: "General",
                 headerLeft(props) {
                   return (
-                    <HeaderLeft
-                      {...props}
-                      defaultNavigate="WorkspaceSettings"
-                    />
+                    <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
                   );
                 },
               }}
@@ -310,12 +304,10 @@ function RootNavigator(props) {
               name="WorkspaceSettingsMembers"
               component={WorkspaceSettingsMembersScreenWithLoginRedirect}
               options={{
+                headerTitle: "Members",
                 headerLeft(props) {
                   return (
-                    <HeaderLeft
-                      {...props}
-                      defaultNavigate="WorkspaceSettings"
-                    />
+                    <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
                   );
                 },
               }}

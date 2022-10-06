@@ -5,14 +5,10 @@ import { useWindowDimensions } from "react-native";
 
 type Props = {
   canGoBack: boolean;
-  defaultNavigate:
-    | "WorkspaceSettings"
-    | "AccountSettings"
-    | "WorkspaceRoot"
-    | "Root";
+  navigateTo?: "WorkspaceSettings" | "AccountSettings" | "WorkspaceRoot";
 };
 
-export function HeaderLeft({ canGoBack, defaultNavigate }: Props) {
+export function HeaderLeft({ canGoBack, navigateTo }: Props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const navigation = useNavigation();
   const route = useRoute();
@@ -22,28 +18,31 @@ export function HeaderLeft({ canGoBack, defaultNavigate }: Props) {
       <View style={tw`web:pl-3`}>
         <IconButton
           onPress={() => {
-            if (canGoBack) {
-              navigation.goBack();
-            } else {
-              // this case only happens if you directly navigate to a screen via a deep link on a mobile device
+            // When starting on a deep link you might run into a situation where
+            // goBack would be the wrong action. E.g. you start on a deep link
+            // in Account Device Settings. If you go back you would end up in
+            // Account Settings which is correct. But from there the goBack would
+            // back to Account Device Settings which is not correct.
+            // That's why we enforce back button navigation using the navigateTo
+            // props.
 
+            if (navigateTo) {
               // @ts-expect-error workspaceId is only defined in certain cases
               const workspaceId = route.params?.workspaceId || undefined;
-              if (defaultNavigate === "AccountSettings") {
+              if (navigateTo === "AccountSettings") {
                 navigation.navigate("AccountSettings");
-              } else if (
-                defaultNavigate === "WorkspaceSettings" &&
-                workspaceId
-              ) {
+              } else if (navigateTo === "WorkspaceSettings" && workspaceId) {
                 navigation.navigate("WorkspaceSettings", { workspaceId });
-              } else if (defaultNavigate === "WorkspaceRoot" && workspaceId) {
+              } else if (navigateTo === "WorkspaceRoot" && workspaceId) {
                 navigation.navigate("Workspace", {
                   workspaceId,
                   screen: "WorkspaceRoot",
                 });
-              } else {
-                navigation.navigate("Root");
               }
+            } else if (canGoBack) {
+              navigation.goBack();
+            } else {
+              navigation.navigate("Root");
             }
           }}
           name="arrow-left-line"
