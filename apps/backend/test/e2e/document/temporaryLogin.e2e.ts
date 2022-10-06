@@ -28,7 +28,7 @@ test.beforeAll(async () => {
 
 test.describe("After temporary login", () => {
   test("Create, rename, delete document", async ({ page }) => {
-    await login(page, username, password, false);
+    await login({ page, username, password, stayLoggedIn: false });
     const addedDocument = await createDocument(
       page,
       firstFolder.id,

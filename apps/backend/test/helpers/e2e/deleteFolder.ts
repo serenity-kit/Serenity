@@ -34,7 +34,7 @@ export const deleteFolder = async (
     .locator(`data-testid=sidebar-folder--${folderId}`)
     .isVisible();
   expect(isFolderItemVisible).toBe(false);
-  await reloadPage(page);
+  await reloadPage({ page });
   const isFolderItemVisible1 = await page
     .locator(`data-testid=sidebar-folder--${folderId}`)
     .isVisible();

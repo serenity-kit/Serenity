@@ -36,7 +36,7 @@ export const renameDocument = async (
   );
   const renamedFolderMenuText = await renamedDocumentMenu.textContent();
   expect(renamedFolderMenuText).toBe(newName);
-  await reloadPage(page);
+  await reloadPage({ page });
   await expandFolderTree(page, parentFolder?.id!);
   const renamedDocumentMenu1 = page.locator(
     `data-testid=sidebar-document--${documentId}`

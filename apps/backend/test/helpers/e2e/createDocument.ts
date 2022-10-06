@@ -39,7 +39,7 @@ export const createDocument = async (
   );
   const newDocumentName = await newDocumentItem.textContent();
   expect(newDocumentName).toBe("Untitled");
-  await reloadPage(page);
+  await reloadPage({ page });
   await expandFolderTree(page, parentFolderId);
   const newDocumentItem1 = page.locator(
     `data-testid=sidebar-document--${document?.id}`
