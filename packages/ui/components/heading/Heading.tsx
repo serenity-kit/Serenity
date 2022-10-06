@@ -40,7 +40,7 @@ export const Heading = (props: HeadingProps) => {
       style={[
         styles[lvl],
         props.accessibilityOnly ? styles.accessibilityOnly : undefined,
-        props.center && tw`justify-center`,
+        props.center && tw`justify-center text-center`, // justify for web, text-center for iOS
         props.style,
       ]}
       // @ts-expect-error react-native-web needs react-native unsupported values here
