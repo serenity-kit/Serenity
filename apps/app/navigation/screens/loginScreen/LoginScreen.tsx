@@ -1,4 +1,12 @@
-import { Box, Link, Text, tw, View } from "@serenity-tools/ui";
+import {
+  Box,
+  Description,
+  Heading,
+  Link,
+  Text,
+  tw,
+  View,
+} from "@serenity-tools/ui";
 import { LoginForm } from "../../../components/login/LoginForm";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import { RootStackScreenProps } from "../../../types/navigation";
@@ -16,13 +24,13 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
     <OnboardingScreenWrapper>
       <Box plush>
         <View>
-          <Text variant="lg" bold style={tw`text-center`}>
+          <Heading lvl={1} center>
             Welcome back
-          </Text>
+          </Heading>
           <View>
-            <Text muted style={tw`text-center`}>
+            <Description variant="login" style={tw`text-center`}>
               Log in to your Serenity account
-            </Text>
+            </Description>
           </View>
         </View>
         <LoginForm onLoginSuccess={onLoginSuccess} />

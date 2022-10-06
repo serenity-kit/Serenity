@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Description,
+  Heading,
   InfoMessage,
   LinkButton,
   Spinner,
@@ -31,9 +33,7 @@ const Wrapper = ({ children }) => (
 const LoadingErrorWrapper = ({ children }) => (
   <Wrapper>
     <VStack alignItems="center" space={4} style={tw`text-center`}>
-      <Text variant={"lg"} bold>
-        Hi there!
-      </Text>
+      <Heading lvl={1}>Hi there!</Heading>
       {children}
     </VStack>
   </Wrapper>
@@ -144,22 +144,20 @@ export default function AcceptWorkspaceInvitationScreen(
   return (
     <Wrapper>
       <VStack alignItems="center" space={4} style={tw`text-center`}>
-        <Text variant={"lg"} bold>
-          Hi there!
-        </Text>
-        <Text>
+        <Heading lvl={1}>Hi there!</Heading>
+        <Description variant="login">
           You have been invited to join workspace{" "}
-          <Text bold>
+          <Description variant="login" bold>
             {workspaceInvitationQuery.data?.workspaceInvitation?.workspaceName}
-          </Text>{" "}
+          </Description>{" "}
           by{" "}
-          <Text bold>
+          <Description variant="login" bold>
             {
               workspaceInvitationQuery.data?.workspaceInvitation
                 ?.inviterUsername
             }
-          </Text>
-        </Text>
+          </Description>
+        </Description>
 
         {!sessionKey ? (
           <Text variant="sm" muted>
