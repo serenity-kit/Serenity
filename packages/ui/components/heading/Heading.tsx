@@ -4,6 +4,7 @@ import { tw } from "../../tailwind";
 
 export type HeadingProps = RNText["props"] & {
   lvl: 1 | 2 | 3 | 4;
+  center?: boolean;
   accessibilityOnly?: boolean; // set to visually hide element but leave it in for accessibility reasons
 };
 
@@ -39,6 +40,7 @@ export const Heading = (props: HeadingProps) => {
       style={[
         styles[lvl],
         props.accessibilityOnly ? styles.accessibilityOnly : undefined,
+        props.center && tw`justify-center`,
         props.style,
       ]}
       // @ts-expect-error react-native-web needs react-native unsupported values here
