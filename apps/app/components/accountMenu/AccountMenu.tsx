@@ -27,7 +27,7 @@ import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 
 type Props = {
-  workspaceId: string;
+  workspaceId?: string;
   showCreateWorkspaceModal: () => void;
 };
 
@@ -48,6 +48,7 @@ export default function AccountMenu({
       id: workspaceId,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     },
+    pause: !workspaceId,
   });
   const [workspacesResult] = useWorkspacesQuery({
     variables: { deviceSigningPublicKey: activeDevice.signingPublicKey },
@@ -88,7 +89,9 @@ export default function AccountMenu({
               numberOfLines={1}
               ellipsizeMode="tail"
             >
-              {workspaceResult.data?.workspace?.name || " "}
+              {workspaceId
+                ? workspaceResult.data?.workspace?.name || " "
+                : "No workspace"}
             </Text>
             <Icon name="arrow-up-down-s-line" color={"gray-400"} />
           </HStack>
@@ -184,7 +187,7 @@ export default function AccountMenu({
           clearDeviceAndSessionStorage();
           await updateAuthentication(null);
           // @ts-expect-error navigation ts issue
-          props.navigation.push("Login");
+          navigation.push("Login");
         }}
       >
         Logout
