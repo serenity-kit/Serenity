@@ -152,7 +152,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       >
         <AccountMenu
           workspaceId={workspaceId}
-          showCreateWorkspaceModal={() => setShowCreateWorkspaceModal(true)}
+          openCreateWorkspace={() => setShowCreateWorkspaceModal(true)}
         />
         {!isPermanentLeftSidebar && (
           <IconButton

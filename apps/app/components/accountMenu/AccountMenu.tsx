@@ -28,14 +28,14 @@ import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDe
 
 type Props = {
   workspaceId?: string;
-  showCreateWorkspaceModal: () => void;
+  openCreateWorkspace: () => void;
 };
 
 export default function AccountMenu({
   workspaceId,
-  showCreateWorkspaceModal,
+  openCreateWorkspace,
 }: Props) {
-  const [isOpenWorkspaceSwitcher, setIsOpenWorkspaceSwitcher] = useState(false);
+  const [isOpenAccountMenu, setIsOpenAccountMenu] = useState(false);
   const { updateAuthentication } = useWorkspaceContext();
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const isDesktopDevice = useIsDesktopDevice();
@@ -63,8 +63,8 @@ export default function AccountMenu({
       // can never be more than half the trigger width !! should be something like 16+24+8+labellength*12-24
       // or we only use the icon as the trigger (worsens ux)
       crossOffset={120}
-      isOpen={isOpenWorkspaceSwitcher}
-      onChange={setIsOpenWorkspaceSwitcher}
+      isOpen={isOpenAccountMenu}
+      onChange={setIsOpenAccountMenu}
       trigger={
         <Pressable
           accessibilityLabel="More options menu"
@@ -101,7 +101,7 @@ export default function AccountMenu({
       <MenuLink
         to={{ screen: "AccountSettings" }}
         onPress={(event) => {
-          setIsOpenWorkspaceSwitcher(false);
+          setIsOpenAccountMenu(false);
           // on iOS Modals can't be open at the same time
           // and closing the workspace switcher takes a bit of time
           // technically we only need it for tables and larger, but
@@ -151,12 +151,12 @@ export default function AccountMenu({
         <View style={tw`pl-1.5 pr-3 py-1.5`}>
           <IconButton
             onPress={() => {
-              setIsOpenWorkspaceSwitcher(false);
+              setIsOpenAccountMenu(false);
               // on mobile Modals can't be open at the same time
               // and closing the workspace switcher takes a bit of time
               const timeout = Platform.OS === "web" ? 0 : 400;
               setTimeout(() => {
-                showCreateWorkspaceModal();
+                openCreateWorkspace();
               }, timeout);
             }}
             name="plus"
@@ -166,12 +166,12 @@ export default function AccountMenu({
       ) : (
         <MenuButton
           onPress={() => {
-            setIsOpenWorkspaceSwitcher(false);
+            setIsOpenAccountMenu(false);
             // on mobile Modals can't be open at the same time
             // and closing the workspace switcher takes a bit of time
             const timeout = Platform.OS === "web" ? 0 : 400;
             setTimeout(() => {
-              showCreateWorkspaceModal();
+              openCreateWorkspace();
             }, timeout);
           }}
           iconName="plus"
@@ -183,7 +183,7 @@ export default function AccountMenu({
       <SidebarDivider collapsed />
       <MenuButton
         onPress={async () => {
-          setIsOpenWorkspaceSwitcher(false);
+          setIsOpenAccountMenu(false);
           clearDeviceAndSessionStorage();
           await updateAuthentication(null);
           // @ts-expect-error navigation ts issue

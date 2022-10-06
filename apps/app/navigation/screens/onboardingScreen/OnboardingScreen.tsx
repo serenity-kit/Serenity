@@ -20,7 +20,11 @@ export default function OnboardingScreen({ navigation }) {
   return (
     <SafeAreaView style={tw`flex-auto`}>
       <View style={tw`py-1.5 px-5 md:px-4`}>
-        <AccountMenu showCreateWorkspaceModal={() => undefined} />
+        <AccountMenu
+          openCreateWorkspace={() => {
+            navigation.push("Onboarding");
+          }}
+        />
       </View>
       <KeyboardAvoidingView behavior="padding" style={tw`flex-auto`}>
         <CenterContent>

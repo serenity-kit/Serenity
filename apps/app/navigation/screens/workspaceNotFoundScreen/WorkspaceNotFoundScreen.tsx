@@ -5,13 +5,19 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AccountMenu from "../../../components/accountMenu/AccountMenu";
 import { RootStackScreenProps } from "../../../types/navigation";
 
-export default function WorkspaceNotFoundScreen({}: RootStackScreenProps<"NotFound">) {
+export default function WorkspaceNotFoundScreen({
+  navigation,
+}: RootStackScreenProps<"NotFound">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
   return (
     <SafeAreaView style={tw`flex-auto`}>
       <View style={tw`py-1.5 px-5 md:px-4`}>
-        <AccountMenu showCreateWorkspaceModal={() => undefined} />
+        <AccountMenu
+          openCreateWorkspace={() => {
+            navigation.push("Onboarding");
+          }}
+        />
       </View>
       <KeyboardAvoidingView behavior="padding" style={tw`flex-auto`}>
         <CenterContent>
