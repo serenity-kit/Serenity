@@ -89,6 +89,13 @@ const customTheme = {
           letterSpacing: "-0.02rem",
         },
       ],
+      lg: [
+        "1.125rem",
+        {
+          lineHeight: "1.375rem",
+          letterSpacing: "-0.02rem",
+        },
+      ],
       xs: "0.8125rem",
       xxs: [
         "0.75rem",
