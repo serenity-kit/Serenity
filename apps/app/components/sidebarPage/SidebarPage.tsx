@@ -18,7 +18,6 @@ import {
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
-import { useClient } from "urql";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
@@ -48,7 +47,6 @@ export default function SidebarPage(props: Props) {
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
-  const urqlClient = useClient();
   const linkProps = useLinkProps({
     to: {
       screen: "Workspace",
@@ -75,7 +73,6 @@ export default function SidebarPage(props: Props) {
       const folderKeyData = await getFolderKey({
         folderId: props.parentFolderId,
         workspaceId: props.workspaceId,
-        urqlClient,
         activeDevice,
       });
       const documentKeyData = await recreateDocumentKey({
@@ -100,13 +97,11 @@ export default function SidebarPage(props: Props) {
   const updateDocumentName = async (name: string) => {
     const workspace = await getWorkspace({
       workspaceId: props.workspaceId,
-      urqlClient,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
     const folderKeyData = await getFolderKey({
       folderId: props.parentFolderId,
       workspaceId: props.workspaceId,
-      urqlClient,
       activeDevice,
     });
     const documentKeyData = await recreateDocumentKey({

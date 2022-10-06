@@ -1,19 +1,15 @@
-import { Client } from "urql";
 import {
   WorkspaceDevicesDocument,
   WorkspaceDevicesQuery,
   WorkspaceDevicesQueryVariables,
 } from "../../generated/graphql";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 
 export type Props = {
-  urqlClient: Client;
   workspaceId: string;
 };
-export const getWorkspaceDevices = async ({
-  urqlClient,
-  workspaceId,
-}: Props) => {
-  const result = await urqlClient
+export const getWorkspaceDevices = async ({ workspaceId }: Props) => {
+  const result = await getUrqlClient()
     .query<WorkspaceDevicesQuery, WorkspaceDevicesQueryVariables>(
       WorkspaceDevicesDocument,
       {

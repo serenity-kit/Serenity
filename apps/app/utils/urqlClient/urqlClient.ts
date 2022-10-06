@@ -2,7 +2,7 @@ import { devtoolsExchange } from "@urql/devtools";
 import { authExchange } from "@urql/exchange-auth";
 import { cacheExchange } from "@urql/exchange-graphcache";
 import Constants from "expo-constants";
-import { createClient, dedupExchange, fetchExchange } from "urql";
+import { Client, createClient, dedupExchange, fetchExchange } from "urql";
 import * as SessionKeyStore from "../authentication/sessionKeyStore";
 
 type AuthState = {
@@ -55,7 +55,6 @@ const exchanges = [
           })
         );
       }
-
       return false;
     },
     getAuth: async ({ authState }) => {
@@ -71,7 +70,6 @@ const exchanges = [
           console.error(err);
         }
       }
-
       return null;
     },
     addAuthToOperation: ({ authState, operation }) => {
@@ -111,7 +109,9 @@ const createUrqlClient = () =>
         : exchanges,
   });
 
-export let urqlClient = createUrqlClient();
+let urqlClient: Client = createUrqlClient();
+
+export const getUrqlClient = () => urqlClient;
 
 export const recreateClient = () => {
   urqlClient = createUrqlClient();

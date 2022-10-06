@@ -7,7 +7,8 @@ export const setSessionKey = async (sessionKey: string) => {
 };
 
 export const getSessionKey = async (): Promise<string | null> => {
-  return storage.getItem(sessionKeyStorageKey);
+  const sessionKey = await storage.getItem(sessionKeyStorageKey);
+  return sessionKey;
 };
 
 export const deleteSessionKey = async () => {

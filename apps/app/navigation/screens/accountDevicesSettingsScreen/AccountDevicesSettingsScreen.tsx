@@ -1,7 +1,6 @@
 import { Text, tw, View } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { FlatList, useWindowDimensions } from "react-native";
-import { useClient } from "urql";
 import DeviceListItem from "../../../components/deviceListItem/DeviceListItem";
 import {
   useDeleteDevicesMutation,
@@ -32,7 +31,6 @@ export default function DeviceManagerScreen(props) {
 
   const { activeDevice } = useWorkspaceContext();
   useWindowDimensions();
-  const urqlClient = useClient();
 
   const [devicesResult, fetchDevices] = useDevicesQuery({
     variables: {
@@ -45,7 +43,6 @@ export default function DeviceManagerScreen(props) {
     const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
       [];
     const workspaces = await getWorkspaces({
-      urqlClient,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
     if (!workspaces) {
@@ -55,7 +52,6 @@ export default function DeviceManagerScreen(props) {
     for (let workspace of workspaces) {
       const workspaceId = workspace.id;
       const devices = await getWorkspaceDevices({
-        urqlClient,
         workspaceId,
       });
       if (!devices) {
@@ -65,7 +61,6 @@ export default function DeviceManagerScreen(props) {
       const workspaceDevicePairing: WorkspaceDeviceParing[] = [];
       const workspaceKey = await getWorkspaceKey({
         workspaceId,
-        urqlClient,
         activeDevice,
       });
       for (let device of devices) {

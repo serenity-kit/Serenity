@@ -5,7 +5,7 @@ import {
   WorkspaceQueryVariables,
 } from "../generated/graphql";
 import { Device } from "../types/Device";
-import { urqlClient } from "../utils/urqlClient/urqlClient";
+import { getUrqlClient } from "../utils/urqlClient/urqlClient";
 import {
   loadInitialDataMachine,
   MeWithWorkspaceLoadingInfoQueryResult,
@@ -27,7 +27,7 @@ type Context = {
 };
 
 const fetchWorkspace = async (context) => {
-  const result = await urqlClient
+  const result = await getUrqlClient()
     .query<WorkspaceQuery, WorkspaceQueryVariables>(
       WorkspaceDocument,
       {

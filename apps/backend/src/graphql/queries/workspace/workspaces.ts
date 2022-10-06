@@ -31,12 +31,13 @@ export const workspaces = queryField((t) => {
       const skip = cursor ? 1 : undefined;
       // include one extra project to set hasNextPage value
       const take: any = args.first ? args.first + 1 : undefined;
+      const deviceSigningPublicKey = args.deviceSigningPublicKey;
       const workspaces = await getWorkspaces({
         userId,
         cursor,
         skip,
         take,
-        deviceSigningPublicKey: args.deviceSigningPublicKey,
+        deviceSigningPublicKey,
       });
       return workspaces;
     },

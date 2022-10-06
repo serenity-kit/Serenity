@@ -167,10 +167,11 @@ export const rootScreenMachine =
           context.navigation.replace("Login", {});
         },
         redirectToLobby: (context) => {
-          context.navigation.replace("WorkspaceNotDecrypted", {
+          context.navigation.replace("Workspace", {
             workspaceId:
               context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
                 ?.workspaceLoadingInfo?.id,
+            screen: "WorkspaceNotDecrypted",
           });
         },
         redirectToNoWorkspaces: (context) => {

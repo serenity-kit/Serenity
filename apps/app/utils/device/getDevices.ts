@@ -1,18 +1,14 @@
-import { Client } from "urql";
 import {
   Device,
   DevicesDocument,
   DevicesQuery,
   DevicesQueryVariables,
 } from "../../generated/graphql";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 
-export type Props = {
-  urqlClient: Client;
-};
-export const getDevices = async ({
-  urqlClient,
-}: Props): Promise<Device[] | null> => {
-  const devicesResult = await urqlClient
+export type Props = {};
+export const getDevices = async ({}: Props): Promise<Device[] | null> => {
+  const devicesResult = await getUrqlClient()
     .query<DevicesQuery, DevicesQueryVariables>(
       DevicesDocument,
       { first: 500 },

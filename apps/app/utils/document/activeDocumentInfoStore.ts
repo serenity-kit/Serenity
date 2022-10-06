@@ -6,7 +6,6 @@ import create from "zustand";
 import { Document } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { getFolderKey } from "../folder/getFolderKey";
-import { urqlClient } from "../urqlClient/urqlClient";
 
 interface DocumentState {
   document: Document | null | undefined;
@@ -32,7 +31,6 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
         const folderKeyData = await getFolderKey({
           folderId: document?.parentFolderId!,
           workspaceId: document?.workspaceId!,
-          urqlClient,
           activeDevice,
         });
         const documentKeyData = await recreateDocumentKey({

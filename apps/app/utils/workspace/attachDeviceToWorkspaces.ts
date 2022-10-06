@@ -1,4 +1,3 @@
-import { Client } from "urql";
 import {
   AttachDeviceToWorkspacesDocument,
   AttachDeviceToWorkspacesMutation,
@@ -7,26 +6,22 @@ import {
 import { Device } from "../../types/Device";
 import { createNewWorkspaceKeyBoxesForActiveDevice } from "../device/createNewWorkspaceKeyBoxesForActiveDevice";
 import { getDevices } from "../device/getDevices";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 
 export type Props = {
-  urqlClient: Client;
   activeDevice: Device;
 };
-export const attachDeviceToWorkspaces = async ({
-  urqlClient,
-  activeDevice,
-}: Props) => {
-  const devices = await getDevices({ urqlClient });
+export const attachDeviceToWorkspaces = async ({ activeDevice }: Props) => {
+  const devices = await getDevices({});
   if (!devices) {
     // TODO: handle this erros
     throw new Error("No devices found!");
   }
   const { deviceWorkspaceKeyBoxes, creatorDevice, receiverDevice } =
     await createNewWorkspaceKeyBoxesForActiveDevice({
-      urqlClient,
       activeDevice,
     });
-  await urqlClient
+  await getUrqlClient()
     .mutation<
       AttachDeviceToWorkspacesMutation,
       AttachDeviceToWorkspacesMutationVariables

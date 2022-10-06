@@ -2,10 +2,12 @@ import sodium from "@serenity-tools/libsodium";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useState } from "react";
+import { Client } from "urql";
 import { Device } from "../types/Device";
 import * as SessionKeyStore from "../utils/authentication/sessionKeyStore";
 import { getSessionKey } from "../utils/authentication/sessionKeyStore";
 import { getActiveDevice } from "../utils/device/getActiveDevice";
+import { recreateClient } from "../utils/urqlClient/urqlClient";
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
@@ -41,7 +43,9 @@ export default function useCachedResources() {
   }, []);
 
   const updateAuthentication = useCallback(
-    async (session: { sessionKey: string; expiresAt: string } | null) => {
+    async (
+      session: { sessionKey: string; expiresAt: string } | null
+    ): Promise<Client> => {
       if (session) {
         setSessionKey(session.sessionKey);
         await SessionKeyStore.setSessionKey(session.sessionKey);
@@ -49,6 +53,8 @@ export default function useCachedResources() {
         setSessionKey(null);
         await SessionKeyStore.deleteSessionKey();
       }
+      const urqlClient = recreateClient();
+      return urqlClient;
     },
     [setSessionKey]
   );

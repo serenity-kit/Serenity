@@ -77,9 +77,7 @@ const hasFolderAccess = async ({
   folderId,
   name,
 }: HasFolderAccessProps) => {
-  console.log({ folderId });
   const folderItem = page.locator(`data-testid=sidebar-folder--${folderId}`);
-  console.log({ folderItem });
   const folderItemText = await folderItem.textContent();
   return folderItemText === name;
 };
@@ -175,9 +173,6 @@ test.describe("Workspace Sharing", () => {
     // now remove access to user3
     await page.reload();
     await delayForSeconds(2);
-    console.log({
-      testId: `data-testid=workspace-member-row__${user3.data.user.id}--remove`,
-    });
     await page
       .locator(
         `data-testid=workspace-member-row__${user3.data.user.id}--remove`

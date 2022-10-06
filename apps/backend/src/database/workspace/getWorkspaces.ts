@@ -72,7 +72,6 @@ export async function getWorkspaces({
       },
     },
   });
-
   const workspaces: Workspace[] = [];
   rawWorkspaces.forEach((rawWorkspace) => {
     const members: WorkspaceMember[] = [];

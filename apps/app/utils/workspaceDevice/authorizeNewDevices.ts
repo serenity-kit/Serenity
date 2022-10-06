@@ -1,24 +1,20 @@
-import { Client } from "urql";
 import {
   AttachDevicesToWorkspacesDocument,
   AttachDevicesToWorkspacesMutation,
   AttachDevicesToWorkspacesMutationVariables,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 import { createWorkspaceMemberDevices } from "./createWorkspaceMemberDevices";
 import { getUnauthorizedWorkspaceDevices } from "./getUnauthorizedWorkspaceDevices";
 
 export type Props = {
-  urqlClient: Client;
   activeDevice: Device;
 };
-export const authorizeNewDevices = async ({
-  urqlClient,
-  activeDevice,
-}: Props) => {
-  const unauthorizedWorkspaceDevices = await getUnauthorizedWorkspaceDevices({
-    urqlClient,
-  });
+export const authorizeNewDevices = async ({ activeDevice }: Props) => {
+  const unauthorizedWorkspaceDevices = await getUnauthorizedWorkspaceDevices(
+    {}
+  );
   if (
     !unauthorizedWorkspaceDevices ||
     unauthorizedWorkspaceDevices.length === 0
@@ -28,10 +24,9 @@ export const authorizeNewDevices = async ({
   }
   const workspaceMemberDevices = await createWorkspaceMemberDevices({
     unauthorizedWorkspaceDevices,
-    urqlClient,
     activeDevice,
   });
-  await urqlClient
+  await getUrqlClient()
     .mutation<
       AttachDevicesToWorkspacesMutation,
       AttachDevicesToWorkspacesMutationVariables
