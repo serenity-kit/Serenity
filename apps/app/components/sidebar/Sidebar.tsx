@@ -41,7 +41,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const workspaceId = route.params.workspaceId;
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
-  const [verifPasswordModalVisible, setVerifPasswordModalVisible] =
+  const [verifyPasswordModalVisible, setVerifyPasswordModalVisible] =
     useState(false);
 
   const [meWithWorkspaceLoadingInfo] = useMeWithWorkspaceLoadingInfoQuery({
@@ -110,7 +110,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     }
     if (!workspaceKey) {
       // TODO: handle device not registered error
-      console.log("Could not get workspace key!");
+      console.error("Could not get workspace key!");
       return;
     }
     const encryptedFolderResult = await encryptFolderName({
@@ -188,8 +188,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           Dev Dashboard
         </SidebarLink>
 
-        <Pressable onPress={() => setVerifPasswordModalVisible(true)}>
-          Verify Password
+        <Pressable onPress={() => setVerifyPasswordModalVisible(true)}>
+          <Text>Verify Password</Text>
         </Pressable>
       </View>
 
@@ -266,8 +266,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       />
       <VerifyPasswordModal
         description="Verify your password to access your workspace"
-        isVisible={verifPasswordModalVisible}
-        onCancel={() => setVerifPasswordModalVisible(false)}
+        isVisible={verifyPasswordModalVisible}
+        onCancel={() => setVerifyPasswordModalVisible(false)}
+        onSuccess={() => {
+          setVerifyPasswordModalVisible(false);
+        }}
       />
     </DrawerContentScrollView>
   );
