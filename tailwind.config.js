@@ -90,7 +90,12 @@ const customTheme = {
         },
       ],
       xs: "0.8125rem",
-      xxs: "0.75rem",
+      xxs: [
+        "0.75rem",
+        {
+          lineHeight: "0.875rem",
+        },
+      ],
     },
     fontFamily: {
       button: "Inter_600SemiBold",
