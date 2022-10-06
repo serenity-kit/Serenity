@@ -5,6 +5,7 @@ import {
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { encryptFolderName } from "@serenity-tools/common";
 import {
+  Heading,
   Icon,
   IconButton,
   InlineInput,
@@ -196,11 +197,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           <HStack
             justifyContent="space-between"
             alignItems="center"
-            style={tw`ml-5 md:ml-4 mb-4 mr-4.5 md:mr-2`}
+            style={tw`ml-5 md:ml-4 mb-3 md:mb-2.5 mr-4.5 md:mr-2`}
           >
-            <Text variant={isPermanentLeftSidebar ? "xxs" : "sm"} bold>
-              Folders
-            </Text>
+            <Heading lvl={4}>Folders</Heading>
             {/* offset not working yet as NB has a no-no in their component */}
             <Tooltip label="Create folder" placement="right" offset={8}>
               <IconButton

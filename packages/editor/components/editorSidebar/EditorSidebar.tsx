@@ -1,6 +1,7 @@
 import React from "react";
 import {
   EditorSidebarIcon,
+  Heading,
   SidebarButton,
   SidebarDivider,
   Text,
@@ -24,9 +25,9 @@ export default function EditorSidebar({
       style={tw`w-sidebar h-full border-l border-gray-200 bg-gray-100 pt-4`}
     >
       <div>
-        <Text variant="xxs" bold style={tw`flex ml-4 mb-2`}>
+        <Heading lvl={4} style={tw`ml-4 mb-2`}>
           Formats
-        </Text>
+        </Heading>
 
         <SidebarButton
           onPress={() => editor?.chain().focus().toggleBold().run()}
@@ -81,9 +82,9 @@ export default function EditorSidebar({
 
         <SidebarDivider />
 
-        <Text variant="xxs" bold style={tw`flex ml-4 mb-2`}>
+        <Heading lvl={4} style={tw`ml-4 mb-2`}>
           Blocks
-        </Text>
+        </Heading>
 
         {headingLevels.map((lvl) => {
           return (
@@ -133,9 +134,9 @@ export default function EditorSidebar({
 
         <SidebarDivider />
 
-        <Text variant="xxs" bold style={tw`flex ml-4 mb-2`}>
+        <Heading lvl={4} style={tw`ml-4 mb-2`}>
           Lists
-        </Text>
+        </Heading>
 
         <SidebarButton
           onPress={() => editor?.chain().focus().toggleBulletList().run()}
