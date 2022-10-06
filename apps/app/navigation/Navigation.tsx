@@ -10,7 +10,6 @@ import { Text, tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
 import * as Linking from "expo-linking";
 import { useEffect } from "react";
 import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
-import { useClient } from "urql";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
 import NavigationDrawerModal from "../components/navigationDrawerModal/NavigationDrawerModal";
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
@@ -67,12 +66,11 @@ const isPhoneDimensions = (width: number) => width < 768;
 function WorkspaceDrawerScreen(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
-  const urqlClient = useClient();
   const { activeDevice } = useAppContext();
 
   useInterval(() => {
     if (activeDevice) {
-      addNewMembersIfNecessary({ urqlClient, activeDevice });
+      addNewMembersIfNecessary({ activeDevice });
     }
   }, secondsBetweenNewMemberChecks * 1000);
 

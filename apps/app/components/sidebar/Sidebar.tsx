@@ -19,7 +19,6 @@ import {
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";
-import { useClient } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateFolderMutation,
@@ -35,7 +34,6 @@ import Folder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
-  const urqlClient = useClient();
   const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const navigation = useNavigation();
   const { activeDevice } = useWorkspaceContext();
@@ -73,7 +71,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     }
 
     const createdWorkspace = await getWorkspace({
-      urqlClient,
       deviceSigningPublicKey,
       workspaceId,
     });
@@ -99,7 +96,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     try {
       const result = await getWorkspaceKey({
         workspaceId: workspaceId,
-        urqlClient,
         activeDevice,
       });
       workspaceKey = result.workspaceKey;

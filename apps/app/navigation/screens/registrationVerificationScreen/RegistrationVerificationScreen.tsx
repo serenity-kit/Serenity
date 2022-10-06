@@ -10,7 +10,6 @@ import {
 } from "@serenity-tools/ui";
 import { useState } from "react";
 import { Platform } from "react-native";
-import { useClient } from "urql";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import { useAppContext } from "../../../context/AppContext";
 import {
@@ -57,7 +56,6 @@ export default function RegistrationVerificationScreen(
   const [, finishLoginMutation] = useFinishLoginMutation();
   const [, acceptWorkspaceInvitationMutation] =
     useAcceptWorkspaceInvitationMutation();
-  const urqlClient = useClient();
 
   const navigateToLoginScreen = async () => {
     await removeLastUsedWorkspaceId();
@@ -65,9 +63,9 @@ export default function RegistrationVerificationScreen(
   };
 
   const acceptPendingWorkspaceInvitation = async () => {
-    const pendingWorkspaceInvitationId = await getPendingWorkspaceInvitationId({
-      urqlClient,
-    });
+    const pendingWorkspaceInvitationId = await getPendingWorkspaceInvitationId(
+      {}
+    );
     if (pendingWorkspaceInvitationId) {
       try {
         await acceptWorkspaceInvitation({
@@ -105,12 +103,9 @@ export default function RegistrationVerificationScreen(
         finishLoginMutation,
         updateAuthentication,
         device: unsafedDevice,
-        urqlClient,
         useExtendedLogin,
       });
-      const authenticatedUrqlClient = loginResult.urqlClient;
       await fetchMainDevice({
-        urqlClient: authenticatedUrqlClient,
         exportKey: loginResult.result.exportKey,
       });
 
@@ -126,7 +121,6 @@ export default function RegistrationVerificationScreen(
       }
       try {
         await attachDeviceToWorkspaces({
-          urqlClient: authenticatedUrqlClient,
           activeDevice: unsafedDevice,
         });
       } catch (error) {

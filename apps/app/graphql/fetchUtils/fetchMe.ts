@@ -1,8 +1,8 @@
 import { MeDocument, MeQuery, MeQueryVariables } from "../../generated/graphql";
-import { urqlRef } from "../../utils/urqlClient/urqlClient";
+import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
 
 export const fetchMe = async () => {
-  const result = await urqlRef.urqlClient
+  const result = await getUrqlClient()
     .query<MeQuery, MeQueryVariables>(
       MeDocument,
       {},

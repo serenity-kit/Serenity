@@ -11,7 +11,6 @@ import {
 import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
-import { useClient } from "urql";
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
@@ -29,6 +28,7 @@ import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspa
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
+import { getUrqlClient } from "../../../utils/urqlClient/urqlClient";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaceKey } from "../../../utils/workspace/getWorkspaceKey";
@@ -113,7 +113,6 @@ export default function WorkspaceSettingsMembersScreen(
     },
   });
 
-  const urqlClient = useClient();
   const [, updateWorkspaceMembersRolesMutation] =
     useUpdateWorkspaceMembersRolesMutation();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -201,7 +200,6 @@ export default function WorkspaceSettingsMembersScreen(
       setMemberLookup(memberLookup);
       const workspaceKey = await getWorkspaceKey({
         workspaceId,
-        urqlClient,
         activeDevice,
       });
 
@@ -210,7 +208,6 @@ export default function WorkspaceSettingsMembersScreen(
       let workspaceDevices: Device[] = [];
       try {
         const rawWorkspaceDevices = await getWorkspaceDevices({
-          urqlClient,
           workspaceId,
         });
         if (rawWorkspaceDevices) {
@@ -242,7 +239,7 @@ export default function WorkspaceSettingsMembersScreen(
         }
       }
 
-      await urqlClient
+      await getUrqlClient()
         .mutation<
           RemoveMembersAndRotateWorkspaceKeyMutation,
           RemoveMembersAndRotateWorkspaceKeyMutationVariables
@@ -261,7 +258,6 @@ export default function WorkspaceSettingsMembersScreen(
         .toPromise();
     }
     const workspace = await getWorkspace({
-      urqlClient,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
       workspaceId,
     });

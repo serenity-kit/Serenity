@@ -1,19 +1,17 @@
-import { Client } from "urql";
 import {
   DeviceBySigningPublicKeyDocument,
   DeviceBySigningPublicKeyQuery,
   DeviceBySigningPublicKeyQueryVariables,
 } from "../../generated/graphql";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 
 export type Props = {
-  urqlClient: Client;
   signingPublicKey: string;
 };
 export const getRemoteDeviceBySigningPublicKey = async ({
-  urqlClient,
   signingPublicKey,
 }: Props) => {
-  const deviceResult = await urqlClient
+  const deviceResult = await getUrqlClient()
     .query<
       DeviceBySigningPublicKeyQuery,
       DeviceBySigningPublicKeyQueryVariables

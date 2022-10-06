@@ -53,8 +53,8 @@ export default function useCachedResources() {
         setSessionKey(null);
         await SessionKeyStore.deleteSessionKey();
       }
-      const urqlRef = recreateClient();
-      return urqlRef.urqlClient;
+      const urqlClient = recreateClient();
+      return urqlClient;
     },
     [setSessionKey]
   );

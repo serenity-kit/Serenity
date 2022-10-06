@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Client } from "urql";
 import { Device } from "../types/Device";
-import { urqlRef } from "../utils/urqlClient/urqlClient";
+import { getUrqlClient } from "../utils/urqlClient/urqlClient";
 
 export type UpdateAuthenticationFunction = (
   params: { sessionKey: string; expiresAt: string } | null
@@ -16,7 +16,7 @@ export type AppContext = {
 
 const appContext = React.createContext<AppContext>({
   sessionKey: null,
-  updateAuthentication: async () => urqlRef.urqlClient,
+  updateAuthentication: async () => getUrqlClient(),
   updateActiveDevice: async () => undefined,
   activeDevice: null,
 });

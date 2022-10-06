@@ -2,7 +2,6 @@ import { decryptDevice } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { finishLogin, startLogin } from "@serenity-tools/opaque";
 import { Platform } from "react-native";
-import { Client } from "urql";
 import { UpdateAuthenticationFunction } from "../../context/AppContext";
 import {
   MainDeviceDocument,
@@ -13,6 +12,7 @@ import {
 } from "../../generated/graphql";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 import { LocalDeviceInclInfo } from "./createDeviceWithInfo";
 import {
   isUserIdSameAsLastLogin,
@@ -50,7 +50,6 @@ export type LoginParams = {
   finishLoginMutation: any;
   updateAuthentication: UpdateAuthenticationFunction;
   device: LocalDeviceInclInfo;
-  urqlClient: Client;
   useExtendedLogin: boolean;
 };
 export const login = async ({
@@ -60,7 +59,6 @@ export const login = async ({
   finishLoginMutation,
   updateAuthentication,
   device,
-  urqlClient,
   useExtendedLogin,
 }: LoginParams) => {
   await updateAuthentication(null);
@@ -104,7 +102,7 @@ export const login = async ({
     sessionKey: result.sessionKey,
     expiresAt: finishLoginResult.data.finishLogin.expiresAt,
   });
-  const meResult = await authenticatedUrqlClient
+  const meResult = await getUrqlClient()
     .query<MeQuery, MeQueryVariables>(
       MeDocument,
       {},
@@ -121,14 +119,10 @@ export const login = async ({
 };
 
 export type FetchMainDeviceParams = {
-  urqlClient: Client;
   exportKey: string;
 };
-export const fetchMainDevice = async ({
-  urqlClient,
-  exportKey,
-}: FetchMainDeviceParams) => {
-  const mainDeviceResult = await urqlClient
+export const fetchMainDevice = async ({ exportKey }: FetchMainDeviceParams) => {
+  const mainDeviceResult = await getUrqlClient()
     .query<MainDeviceQuery>(MainDeviceDocument, undefined, {
       // better to be safe here and always refetch
       requestPolicy: "network-only",
