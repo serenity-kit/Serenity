@@ -41,7 +41,7 @@ export function VerifyPasswordModal(props: Props) {
     }
   };
 
-  const onVerifyPasswordPress = async () => {
+  const onVerifyPasswordPress = async (password: string) => {
     console.log("onVerifyPasswordPress");
     console.log({ password });
     setIsPasswordInvalid(false);
@@ -169,15 +169,18 @@ export function VerifyPasswordModal(props: Props) {
         label={"Password"}
         secureTextEntry
         value={password}
-        onChangeText={(password: string) => {
-          setPassword(password);
+        onChangeText={(text: string) => {
+          setPassword(text);
         }}
         placeholder="Enter your password …"
       />
       <Text muted variant="sm">
         {props.description}
       </Text>
-      <Button onPress={onVerifyPasswordPress} disabled={isVerifyingPassword}>
+      <Button
+        onPress={() => onVerifyPasswordPress(password)}
+        disabled={isVerifyingPassword}
+      >
         Verify
       </Button>
     </Modal>
