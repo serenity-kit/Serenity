@@ -5,7 +5,6 @@ import {
 } from "@serenity-tools/common";
 import { useEffect, useLayoutEffect } from "react";
 import { useWindowDimensions } from "react-native";
-import { useClient } from "urql";
 import Page from "../../../components/page/Page";
 import { PageHeader } from "../../../components/page/PageHeader";
 import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
@@ -35,7 +34,6 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     (state) => state.update
   );
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
-  const urqlClient = useClient();
 
   const [state] = useMachine(loadPageMachine, {
     context: {
@@ -57,12 +55,10 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     let document: Document | undefined | null = undefined;
     const workspace = await getWorkspace({
       workspaceId,
-      urqlClient,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
     document = await getDocument({
       documentId: pageId,
-      urqlClient,
     });
     // this is necessary to propagate document name update to the sidebar and header
     await updateActiveDocumentInfoStore(document, activeDevice);
@@ -73,7 +69,6 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     const folderKeyData = await getFolderKey({
       folderId: document?.parentFolderId!,
       workspaceId: document?.workspaceId!,
-      urqlClient,
       activeDevice,
     });
     let documentSubkeyId = 0;

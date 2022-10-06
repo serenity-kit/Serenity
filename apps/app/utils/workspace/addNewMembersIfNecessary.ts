@@ -1,25 +1,21 @@
-import { Client } from "urql";
 import {
   UnauthorizedMembersDocument,
   UnauthorizedMembersQuery,
   UnauthorizedMembersQueryVariables,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 import { authorizeNewDevices } from "../workspaceDevice/authorizeNewDevices";
 import { getWorkspaces } from "./getWorkspaces";
 
 export const secondsBetweenNewMemberChecks = 5;
 
-export type Props = { urqlClient: Client; activeDevice: Device };
+export type Props = { activeDevice: Device };
 
-export const addNewMembersIfNecessary = async ({
-  urqlClient,
-  activeDevice,
-}: Props) => {
+export const addNewMembersIfNecessary = async ({ activeDevice }: Props) => {
   // TODO: fetch all user workspaces
   const deviceSigningPublicKey = activeDevice.signingPublicKey;
   const workspaces = await getWorkspaces({
-    urqlClient,
     deviceSigningPublicKey,
   });
   if (!workspaces) {
@@ -30,7 +26,7 @@ export const addNewMembersIfNecessary = async ({
   workspaces.forEach((workspace) => {
     workspaceIds.push(workspace.id);
   });
-  const unauthorizedMembersResult = await urqlClient
+  const unauthorizedMembersResult = await getUrqlClient()
     .query<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>(
       UnauthorizedMembersDocument,
       { workspaceIds },
@@ -42,6 +38,6 @@ export const addNewMembersIfNecessary = async ({
     .toPromise();
   const userIds = unauthorizedMembersResult.data?.unauthorizedMembers?.userIds;
   if (userIds && userIds.length > 0) {
-    await authorizeNewDevices({ urqlClient, activeDevice });
+    await authorizeNewDevices({ activeDevice });
   }
 };

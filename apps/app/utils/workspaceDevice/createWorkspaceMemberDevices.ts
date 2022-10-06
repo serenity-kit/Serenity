@@ -1,4 +1,3 @@
-import { Client } from "urql";
 import {
   WorkspaceDevicePairingInput,
   WorkspaceKeyDeviceInput,
@@ -10,13 +9,11 @@ import { getWorkspaceKeys } from "../workspace/getWorskpaceKeys";
 
 export type Props = {
   unauthorizedWorkspaceDevices: any;
-  urqlClient: Client;
   activeDevice: Device;
 };
 export const createWorkspaceMemberDevices = async ({
   activeDevice,
   unauthorizedWorkspaceDevices,
-  urqlClient,
 }: Props): Promise<WorkspaceDevicePairingInput[]> => {
   const workspaceMemberDevices: WorkspaceDevicePairingInput[] = [];
   for (let unauthorizedWorkspace of unauthorizedWorkspaceDevices) {
@@ -25,7 +22,6 @@ export const createWorkspaceMemberDevices = async ({
     try {
       workspaceKeys = await getWorkspaceKeys({
         workspaceId: unauthorizedWorkspace.id,
-        urqlClient,
         activeDevice,
       });
     } catch (error) {

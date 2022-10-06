@@ -109,12 +109,11 @@ const createUrqlClient = () =>
         : exchanges,
   });
 
-export type UrqlReference = {
-  urqlClient: Client;
-};
-export const urqlRef: UrqlReference = { urqlClient: createUrqlClient() };
+let urqlClient: Client = createUrqlClient();
+
+export const getUrqlClient = () => urqlClient;
 
 export const recreateClient = () => {
-  urqlRef.urqlClient = createUrqlClient();
-  return urqlRef;
+  urqlClient = createUrqlClient();
+  return urqlClient;
 };

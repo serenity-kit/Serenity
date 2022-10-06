@@ -1,5 +1,4 @@
 import { decryptFolderName } from "@serenity-tools/common";
-import { Client } from "urql";
 import create from "zustand";
 import {
   DocumentPathDocument,
@@ -9,17 +8,14 @@ import {
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { getParentFolderKey } from "../folder/getFolderKey";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 
 interface DocumentPathState {
   folders: Folder[];
   folderIds: string[];
   folderNames: { [id: string]: string };
   getName: (folderId: string) => string;
-  update: (
-    folders: Folder[],
-    urqlClient: Client,
-    activeDevice: Device
-  ) => Promise<void>;
+  update: (folders: Folder[], activeDevice: Device) => Promise<void>;
 }
 
 export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
@@ -34,7 +30,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
       return "Error retrieving name";
     }
   },
-  update: async (folders, urqlClient, activeDevice) => {
+  update: async (folders, activeDevice) => {
     // all documentPath folders should be in the same workspace
     const folderIds: string[] = [];
     const folderNames: { [id: string]: string } = {};
@@ -45,7 +41,6 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
         const parentKey = await getParentFolderKey({
           folderId: folder.id,
           workspaceId: folder.workspaceId!,
-          urqlClient,
           activeDevice,
         });
         folderName = await decryptFolderName({
@@ -69,10 +64,9 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
 }));
 
 export const getDocumentPath = async (
-  urqlClient: Client,
   documentId: string
 ): Promise<Folder[]> => {
-  const documentPathResult = await urqlClient
+  const documentPathResult = await getUrqlClient()
     .query<DocumentPathQuery, DocumentPathQueryVariables>(
       DocumentPathDocument,
       { id: documentId },

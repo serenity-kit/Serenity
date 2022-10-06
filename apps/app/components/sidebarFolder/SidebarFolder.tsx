@@ -21,7 +21,6 @@ import {
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, StyleSheet } from "react-native";
-import { useClient } from "urql";
 import { v4 as uuidv4 } from "uuid";
 import {
   useCreateDocumentMutation,
@@ -90,7 +89,6 @@ export default function SidebarFolder(props: Props) {
     },
   });
   const { depth = 0 } = props;
-  const urqlClient = useClient();
   const { activeDevice } = useWorkspaceContext();
   const documentPathStore = useDocumentPathStore();
   const document = useActiveDocumentInfoStore((state) => state.document);
@@ -118,7 +116,6 @@ export default function SidebarFolder(props: Props) {
       const parentKey = await getParentFolderKey({
         folderId: props.folderId,
         workspaceId: props.workspaceId,
-        urqlClient,
         activeDevice,
       });
       const folderName = await decryptFolderName({
@@ -139,14 +136,12 @@ export default function SidebarFolder(props: Props) {
     const id = uuidv4();
     let workspaceKey = "";
     const workspace = await getWorkspace({
-      urqlClient,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
       workspaceId: props.workspaceId,
     });
     try {
       const result = await getWorkspaceKey({
         workspaceId: props.workspaceId,
-        urqlClient,
         activeDevice,
       });
       workspaceKey = result.workspaceKey;
@@ -158,7 +153,6 @@ export default function SidebarFolder(props: Props) {
     const parentFolderKeyData = await getFolderKey({
       folderId: props.folderId,
       workspaceId: props.workspaceId,
-      urqlClient,
       activeDevice,
     });
     const encryptedFolderResult = await encryptFolderName({
@@ -203,7 +197,6 @@ export default function SidebarFolder(props: Props) {
     const folderKeyResult = await getFolderKey({
       folderId: props.folderId,
       workspaceId: props.workspaceId,
-      urqlClient,
       activeDevice,
     });
     const documentContentKeyResult = await createDocumentKey({
@@ -265,13 +258,11 @@ export default function SidebarFolder(props: Props) {
   const updateFolderName = async (newFolderName: string) => {
     let workspace = await getWorkspace({
       workspaceId: props.workspaceId,
-      urqlClient,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
     const parentKey = await getParentFolderKey({
       folderId: props.folderId,
       workspaceId: props.workspaceId,
-      urqlClient,
       activeDevice,
     });
     const encryptedFolderResult = await encryptExistingFolderName({
@@ -294,8 +285,8 @@ export default function SidebarFolder(props: Props) {
       // refetch the document path
       // TODO: Optimize by checking if the current folder is in the document path
       if (document && documentPathIds.includes(props.folderId)) {
-        const documentPath = await getDocumentPath(urqlClient, document.id);
-        documentPathStore.update(documentPath, urqlClient, activeDevice);
+        const documentPath = await getDocumentPath(document.id);
+        documentPathStore.update(documentPath, activeDevice);
       }
     } else {
       // TODO: show error: couldn't update folder name
