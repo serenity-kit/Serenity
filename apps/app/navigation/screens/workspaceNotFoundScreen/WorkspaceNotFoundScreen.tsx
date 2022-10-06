@@ -12,7 +12,8 @@ export default function WorkspaceNotFoundScreen({
 
   return (
     <SafeAreaView style={tw`flex-auto`}>
-      <View style={tw`py-1.5 px-5 md:px-4`}>
+      {/* flex needed for Menu-overlay positioning */}
+      <View style={tw`flex items-start py-1.5 px-5 md:px-4`}>
         <AccountMenu
           openCreateWorkspace={() => {
             navigation.push("Onboarding");
