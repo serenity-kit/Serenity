@@ -667,7 +667,7 @@ export default function DesignSystemScreen() {
                 .
               </Text>
             </Checkbox>
-            <Button style={tw`full`}>Register</Button>
+            <Button style={tw`w-full`}>Register</Button>
           </Box>
         </DSExampleArea>
 
