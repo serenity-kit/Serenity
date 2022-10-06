@@ -629,7 +629,7 @@ export default function DesignSystemScreen() {
               <DSMarker>
                 <Description variant={"login"}>
                   Type in your email and choose a password.
-                  <br />
+                  {"\n"}
                   No credit card required.
                 </Description>
               </DSMarker>
