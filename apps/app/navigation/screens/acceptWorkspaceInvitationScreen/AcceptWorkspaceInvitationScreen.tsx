@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   InfoMessage,
+  Link,
   LinkButton,
   Spinner,
   Text,
@@ -14,7 +15,6 @@ import { useWindowDimensions } from "react-native";
 import { LoginForm } from "../../../components/login/LoginForm";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import RegisterForm from "../../../components/register/RegisterForm";
-import { useAppContext } from "../../../context/AppContext";
 import {
   useAcceptWorkspaceInvitationMutation,
   useWorkspaceInvitationQuery,
@@ -28,7 +28,7 @@ const Wrapper = ({ children }) => (
   </OnboardingScreenWrapper>
 );
 
-const LoadingErrorWrapper = ({ children }) => (
+const ErrorWrapper = ({ children }) => (
   <Wrapper>
     <VStack alignItems="center" space={4} style={tw`text-center`}>
       <Text variant={"lg"} bold>
@@ -44,8 +44,7 @@ export default function AcceptWorkspaceInvitationScreen(
 ) {
   const workspaceInvitationId = props.route.params?.workspaceInvitationId;
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const { sessionKey } = useAppContext();
-  const [workspaceInvitationQuery] = useWorkspaceInvitationQuery({
+  const [workspaceInvitationQueryResult] = useWorkspaceInvitationQuery({
     variables: {
       id: workspaceInvitationId,
     },
@@ -95,49 +94,52 @@ export default function AcceptWorkspaceInvitationScreen(
     await acceptAndGoToWorkspace();
   };
 
-  if (workspaceInvitationQuery.fetching) {
+  if (workspaceInvitationQueryResult.fetching) {
     return (
-      <LoadingErrorWrapper>
-        <Spinner fadeIn style={tw`mt-4`} />
-      </LoadingErrorWrapper>
+      <Wrapper>
+        <VStack alignItems="center" space={4} style={tw`text-center`}>
+          <Spinner fadeIn style={tw`mt-4`} />
+        </VStack>
+      </Wrapper>
     );
   }
 
-  if (workspaceInvitationQuery.error) {
+  if (workspaceInvitationQueryResult.error) {
     return (
-      <LoadingErrorWrapper>
+      <ErrorWrapper>
         <InfoMessage variant="error" icon>
           Unfortunately there was an error retrieving your invitation. Please
           try again later or contact our support at hi@serenity.li.
         </InfoMessage>
-      </LoadingErrorWrapper>
+      </ErrorWrapper>
     );
   }
 
-  if (workspaceInvitationQuery.data?.workspaceInvitation === null) {
+  if (workspaceInvitationQueryResult.data?.workspaceInvitation === null) {
     return (
-      <LoadingErrorWrapper>
+      <ErrorWrapper>
         <InfoMessage variant="error" icon>
           Unfortunately the invitation doesn't exist or was deleted. Please
           contact the person that invited you, to send you a new invitation
           link.
         </InfoMessage>
-      </LoadingErrorWrapper>
+      </ErrorWrapper>
     );
   }
 
   if (
-    workspaceInvitationQuery.data?.workspaceInvitation?.expiresAt &&
-    new Date(workspaceInvitationQuery.data?.workspaceInvitation?.expiresAt) <=
-      new Date()
+    workspaceInvitationQueryResult.data?.workspaceInvitation?.expiresAt &&
+    new Date(
+      workspaceInvitationQueryResult.data?.workspaceInvitation?.expiresAt
+    ) <= new Date()
   ) {
     return (
-      <LoadingErrorWrapper>
+      <ErrorWrapper>
         <InfoMessage variant="error" icon>
           Unfortunately the invitation already expired. Please contact the
           person that invited you, to send you a new invitation link.
         </InfoMessage>
-      </LoadingErrorWrapper>
+      </ErrorWrapper>
     );
   }
 
@@ -150,22 +152,25 @@ export default function AcceptWorkspaceInvitationScreen(
         <Text>
           You have been invited to join workspace{" "}
           <Text bold>
-            {workspaceInvitationQuery.data?.workspaceInvitation?.workspaceName}
+            {
+              workspaceInvitationQueryResult.data?.workspaceInvitation
+                ?.workspaceName
+            }
           </Text>{" "}
           by{" "}
           <Text bold>
             {
-              workspaceInvitationQuery.data?.workspaceInvitation
+              workspaceInvitationQueryResult.data?.workspaceInvitation
                 ?.inviterUsername
             }
           </Text>
         </Text>
 
-        {!sessionKey ? (
+        {workspaceInvitationQueryResult.data?.me?.id ? null : (
           <Text variant="sm" muted>
             Log in or register to accept the invitation.
           </Text>
-        ) : null}
+        )}
         {hasGraphqlError ? (
           <InfoMessage variant="error" icon>
             Failed to accept the invitation. Please try again later or contact
@@ -173,13 +178,18 @@ export default function AcceptWorkspaceInvitationScreen(
           </InfoMessage>
         ) : null}
       </VStack>
-      {sessionKey ? (
-        <Button
-          onPress={onAcceptWorkspaceInvitationPress}
-          style={tw`self-center`}
-        >
-          Accept
-        </Button>
+      {workspaceInvitationQueryResult.data?.me?.id ? (
+        <>
+          <Button
+            onPress={onAcceptWorkspaceInvitationPress}
+            style={tw`self-center mt-2`}
+          >
+            Accept invitation
+          </Button>
+          <View style={tw`mt-2 text-center`}>
+            <Link to={{ screen: "Root" }}>Ignore invitation</Link>
+          </View>
+        </>
       ) : (
         <>
           {authForm === "login" ? (

@@ -1,4 +1,4 @@
-import { AuthenticationError, UserInputError } from "apollo-server-express";
+import { UserInputError } from "apollo-server-express";
 import { booleanArg, idArg, objectType, queryField } from "nexus";
 import { getWorkspaceLoadingInfo } from "../../../database/workspace/getWorkspaceLoadingInfo";
 import { WorkspaceLoadingInfo } from "../../types/workspace";
@@ -52,7 +52,7 @@ export const folders = queryField((t) => {
     args: null,
     async resolve(root, args, context) {
       if (!context.user) {
-        throw new AuthenticationError("Not authenticated");
+        return null;
       }
       const id = context.user.id;
       const username = context.user.username;
