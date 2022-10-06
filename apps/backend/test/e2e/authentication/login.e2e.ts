@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
-import { e2eLoginUser } from "../../helpers/authentication/e2eLoginUser";
-import { e2eRegisterUser } from "../../helpers/authentication/e2eRegisterUser";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
+import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
+import { e2eRegisterUser } from "../../helpers/e2e/e2eRegisterUser";
 
 test("Login without remembering web keys", async ({ page }) => {
   const username = `${uuidv4()}@example.com`;

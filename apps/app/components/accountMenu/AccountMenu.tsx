@@ -71,6 +71,7 @@ export default function AccountMenu({
           // disable default outline styles
           // @ts-expect-error - web only
           _focusVisible={{ _web: { style: { outlineStyle: "none" } } }}
+          testID="account-menu-trigger"
         >
           <HStack
             space={isPermanentLeftSidebar ? 2 : 3}
@@ -186,6 +187,7 @@ export default function AccountMenu({
           // @ts-expect-error navigation ts issue
           props.navigation.push("Login");
         }}
+        testID="account-menu__logout-button"
       >
         Logout
       </MenuButton>

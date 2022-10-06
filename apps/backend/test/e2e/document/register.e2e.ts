@@ -16,12 +16,12 @@ test.beforeAll(async () => {
 
 test.describe("After register", () => {
   test("Create, rename, delete document", async ({ page }) => {
-    const { workspace, folder } = await register(
+    const { workspace, folder } = await register({
       page,
       username,
       password,
-      workspaceName
-    );
+      workspaceName,
+    });
     const addedDocument = await createDocument(
       page,
       folder?.id!,
