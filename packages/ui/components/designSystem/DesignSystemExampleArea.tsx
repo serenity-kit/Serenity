@@ -33,7 +33,7 @@ export const DesignSystemExampleArea = (
       </Stack>
       {label ? (
         <View style={[styles.label]}>
-          <Mono size={"xs"} style={tw`text-gray-500 leading-snug`}>
+          <Mono size={"xs"} style={tw`text-gray-500`}>
             {label}
           </Mono>
         </View>
