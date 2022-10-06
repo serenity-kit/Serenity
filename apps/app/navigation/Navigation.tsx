@@ -199,7 +199,11 @@ function RootNavigator() {
   const dimensions = useWindowDimensions();
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: [styles.header],
+      }}
+    >
       <Stack.Group>
         <Stack.Screen
           name="Root"
