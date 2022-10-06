@@ -1,63 +1,35 @@
-import {
-  StyleSheet,
-  TouchableOpacity,
-  useWindowDimensions,
-} from "react-native";
+import { KeyboardAvoidingView, useWindowDimensions } from "react-native";
 
-import { Text, View } from "@serenity-tools/ui";
+import { CenterContent, Link, Text, tw, View } from "@serenity-tools/ui";
+import { SafeAreaView } from "react-native-safe-area-context";
+import AccountMenu from "../../../components/accountMenu/AccountMenu";
 import { RootStackScreenProps } from "../../../types/navigation";
-import {
-  getLastUsedWorkspaceId,
-  removeLastUsedDocumentId,
-  removeLastUsedWorkspaceId,
-} from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceNotFoundScreen({
   navigation,
 }: RootStackScreenProps<"NotFound">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
-  const removeLastUsedWorkspaceIdAndNavigateToRoot = async () => {
-    const workspaceId = await getLastUsedWorkspaceId();
-    if (workspaceId) {
-      removeLastUsedDocumentId(workspaceId);
-    }
-    await removeLastUsedWorkspaceId();
-    navigation.replace("Root");
-  };
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        This workspace doesn't exist or you no longer have access.
-      </Text>
-      <TouchableOpacity
-        onPress={removeLastUsedWorkspaceIdAndNavigateToRoot}
-        style={styles.link}
-      >
-        <Text style={styles.linkText}>Go to home!</Text>
-      </TouchableOpacity>
-    </View>
+    <SafeAreaView style={tw`flex-auto`}>
+      {/* flex needed for Menu-overlay positioning */}
+      <View style={tw`flex items-start py-1.5 px-5 md:px-4`}>
+        <AccountMenu
+          openCreateWorkspace={() => {
+            navigation.push("Onboarding");
+          }}
+        />
+      </View>
+      <KeyboardAvoidingView behavior="padding" style={tw`flex-auto`}>
+        <CenterContent>
+          <Text style={tw`px-4`}>
+            This workspace doesn't exist or you no longer have access.
+          </Text>
+          <Link style={tw`mt-2`} to={{ screen: "Root" }}>
+            Go to home
+          </Link>
+        </CenterContent>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-  linkText: {
-    fontSize: 14,
-    color: "#2e78b7",
-  },
-});
