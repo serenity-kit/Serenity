@@ -28,7 +28,7 @@ export const createRootFolder = async (
   const folderItem = page.locator(`data-testid=sidebar-folder--${folder?.id}`);
   const folderItemText = await folderItem.textContent();
   expect(folderItemText).toBe(name);
-  await reloadPage(page);
+  await reloadPage({ page });
   const folderItem1 = page.locator(`data-testid=sidebar-folder--${folder?.id}`);
   const folderItemText1 = await folderItem1.textContent();
   expect(folderItemText1).toBe(name);

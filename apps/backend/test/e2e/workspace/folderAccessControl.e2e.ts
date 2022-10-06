@@ -2,8 +2,8 @@ import { expect, Page, test } from "@playwright/test";
 import * as sodium from "@serenity-tools/libsodium";
 import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
-import { e2eLoginUser } from "../../helpers/authentication/e2eLoginUser";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
+import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
 import { renameFolder } from "../../helpers/e2e/renameFolder";
 
@@ -179,8 +179,8 @@ test.describe("Workspace Sharing", () => {
       )
       .click();
     await delayForSeconds(2);
-    await reloadPage(user2Page);
-    await reloadPage(user3Page);
+    await reloadPage({ page: user2Page });
+    await reloadPage({ page: user3Page });
     await delayForSeconds(2);
     page.locator(
       "text=This page does not exist or you don't have access to it anymore."
