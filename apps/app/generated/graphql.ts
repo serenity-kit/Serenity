@@ -752,6 +752,7 @@ export type Workspace = {
   __typename?: 'Workspace';
   currentWorkspaceKey?: Maybe<WorkspaceKey>;
   id: Scalars['String'];
+  idSignature?: Maybe<Scalars['String']>;
   members?: Maybe<Array<WorkspaceMember>>;
   name?: Maybe<Scalars['String']>;
   workspaceKeys?: Maybe<Array<WorkspaceKey>>;
@@ -1193,7 +1194,7 @@ export type WorkspaceInvitationQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceInvitationQuery = { __typename?: 'Query', workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, workspaceName?: string | null, expiresAt: any } | null };
+export type WorkspaceInvitationQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null, workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, workspaceName?: string | null, expiresAt: any } | null };
 
 export type WorkspaceInvitationsQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1943,6 +1944,10 @@ export function useWorkspaceDevicesQuery(options: Omit<Urql.UseQueryArgs<Workspa
 };
 export const WorkspaceInvitationDocument = gql`
     query workspaceInvitation($id: ID!) {
+  me {
+    id
+    username
+  }
   workspaceInvitation(id: $id) {
     id
     workspaceId

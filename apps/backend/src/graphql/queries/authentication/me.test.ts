@@ -217,8 +217,10 @@ test("documentId provided but not the workspaceId", async () => {
 
 test("Unauthenticated", async () => {
   const authorizationHeader = { authorization: "lala" };
-  await expect(
-    (async () =>
-      await graphql.client.request(meQuery, null, authorizationHeader))()
-  ).rejects.toThrowError(/UNAUTHENTICATED/);
+  const result = await graphql.client.request(
+    meQuery,
+    null,
+    authorizationHeader
+  );
+  expect(result.me).toEqual(null);
 });

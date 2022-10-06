@@ -1,4 +1,8 @@
 query workspaceInvitation($id: ID!) {
+  me {
+    id
+    username
+  }
   workspaceInvitation(id: $id) {
     id
     workspaceId
