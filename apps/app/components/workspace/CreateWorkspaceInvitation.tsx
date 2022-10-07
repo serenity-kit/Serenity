@@ -1,11 +1,13 @@
-import React, { useState } from "react";
 import { Button, Input, View } from "@serenity-tools/ui";
+import * as Clipboard from "expo-clipboard";
+import { useState } from "react";
 import {
-  useWorkspaceInvitationsQuery,
   useCreateWorkspaceInvitationMutation,
   useDeleteWorkspaceInvitationsMutation,
+  useWorkspaceInvitationsQuery,
 } from "../../generated/graphql";
-import * as Clipboard from "expo-clipboard";
+import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { WorkspaceInvitationList } from "./WorkspaceInvitationList";
 
 type WorkspaceInvitation = {
@@ -44,6 +46,7 @@ export function CreateWorkspaceInvitation(props: Props) {
     useState<boolean>(false);
   const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
   const [graphqlError, setGraphqlError] = useState<string>("");
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [isClipboardNoticeActive, setIsClipboardNoticeActive] =
     useState<boolean>(false);
   const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 2;
@@ -71,6 +74,15 @@ export function CreateWorkspaceInvitation(props: Props) {
         : "https://www.serenity.li";
 
     return `You are invited to a Serenity Workspace. To join, go to ${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}`;
+  };
+
+  const createWorkspaceInvitationPreflight = async () => {
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      setIsPasswordModalVisible(true);
+      return;
+    }
+    createWorkspaceInvitation();
   };
 
   const createWorkspaceInvitation = async () => {
@@ -115,36 +127,51 @@ export function CreateWorkspaceInvitation(props: Props) {
   };
 
   return (
-    <View>
-      <Button onPress={createWorkspaceInvitation}>Create Invitation</Button>
-      {selectedWorkspaceInvitationId !== null && (
-        <>
-          <Input
-            nativeID="workspaceInvitationInstructionsInput"
-            label="Invitation text"
-            value={getWorkspaceInvitationText()}
+    <>
+      <View>
+        <Button onPress={createWorkspaceInvitationPreflight}>
+          Create Invitation
+        </Button>
+        {selectedWorkspaceInvitationId !== null && (
+          <>
+            <Input
+              nativeID="workspaceInvitationInstructionsInput"
+              label="Invitation text"
+              value={getWorkspaceInvitationText()}
+            />
+            {isClipboardNoticeActive ? (
+              <Button disabled>Copied</Button>
+            ) : (
+              <Button onPress={copyInvitationText}>Copy</Button>
+            )}
+          </>
+        )}
+        {workspaceInvitationsResult.fetching ? (
+          <Button disabled>Loading...</Button>
+        ) : (
+          <WorkspaceInvitationList
+            nativeID="workspaceInviteeList"
+            workspaceInvitations={
+              workspaceInvitationsResult.data?.workspaceInvitations?.nodes || []
+            }
+            onDeletePress={deleteWorkspaceInvitation}
+            onSelect={(id: string) => {
+              setSelectedWorkspaceInvitationId(id);
+            }}
           />
-          {isClipboardNoticeActive ? (
-            <Button disabled>Copied</Button>
-          ) : (
-            <Button onPress={copyInvitationText}>Copy</Button>
-          )}
-        </>
-      )}
-      {workspaceInvitationsResult.fetching ? (
-        <Button disabled>Loading...</Button>
-      ) : (
-        <WorkspaceInvitationList
-          nativeID="workspaceInviteeList"
-          workspaceInvitations={
-            workspaceInvitationsResult.data?.workspaceInvitations?.nodes || []
-          }
-          onDeletePress={deleteWorkspaceInvitation}
-          onSelect={(id: string) => {
-            setSelectedWorkspaceInvitationId(id);
-          }}
-        />
-      )}
-    </View>
+        )}
+      </View>
+      <VerifyPasswordModal
+        isVisible={isPasswordModalVisible}
+        description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"
+        onSuccess={() => {
+          setIsPasswordModalVisible(false);
+          createWorkspaceInvitation();
+        }}
+        onBackdropPress={() => {
+          setIsPasswordModalVisible(false);
+        }}
+      />
+    </>
   );
 }

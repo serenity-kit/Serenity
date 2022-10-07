@@ -1,7 +1,9 @@
 import { Text, tw, View } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
+import { useState } from "react";
 import { FlatList, useWindowDimensions } from "react-native";
 import DeviceListItem from "../../../components/deviceListItem/DeviceListItem";
+import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import {
   useDeleteDevicesMutation,
   useDevicesQuery,
@@ -13,6 +15,7 @@ import {
   WorkspaceWithWorkspaceDevicesParing,
 } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
+import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaceKey } from "../../../utils/workspace/getWorkspaceKey";
 import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
@@ -28,7 +31,9 @@ export default function DeviceManagerScreen(props) {
       navigation: props.navigation,
     },
   });
-
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const [signingPublicKeyToBeDeleted, setSigningPublicKeyToBeDeleted] =
+    useState<string | undefined>(undefined);
   const { activeDevice } = useWorkspaceContext();
   useWindowDimensions();
 
@@ -39,6 +44,17 @@ export default function DeviceManagerScreen(props) {
     },
   });
   const [, deleteDevicesMutation] = useDeleteDevicesMutation();
+
+  const deleteDevicePreflight = async (deviceSigningPublicKey: string) => {
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      setIsPasswordModalVisible(true);
+      setSigningPublicKeyToBeDeleted(deviceSigningPublicKey);
+      return;
+    }
+    await deleteDevice(deviceSigningPublicKey);
+  };
+
   const deleteDevice = async (deviceSigningPublicKey: string) => {
     const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
       [];
@@ -47,6 +63,7 @@ export default function DeviceManagerScreen(props) {
     });
     if (!workspaces) {
       console.error("no workspaces found for user");
+      setSigningPublicKeyToBeDeleted(undefined);
       return;
     }
     for (let workspace of workspaces) {
@@ -56,6 +73,7 @@ export default function DeviceManagerScreen(props) {
       });
       if (!devices) {
         console.error("No devices found");
+        setSigningPublicKeyToBeDeleted(undefined);
         return;
       }
       const workspaceDevicePairing: WorkspaceDeviceParing[] = [];
@@ -100,34 +118,51 @@ export default function DeviceManagerScreen(props) {
     } else {
       // TODO: show error: couldn't delete device
     }
+    setSigningPublicKeyToBeDeleted(undefined);
   };
 
   return (
-    <View style={tw`mt-20`}>
-      <Text bold>Devices</Text>
-      <FlatList
-        data={devicesResult.data?.devices?.nodes?.filter(notNull) || []}
-        keyExtractor={(item) => item.signingPublicKey}
-        renderItem={({ item }) => (
-          <DeviceListItem
-            isActiveDevice={
-              activeDevice.signingPublicKey === item.signingPublicKey
-            }
-            signingPublicKey={item.signingPublicKey}
-            encryptionPublicKey={item.encryptionPublicKey}
-            encryptionPublicKeySignature={item.encryptionPublicKeySignature}
-            createdAt={item.createdAt}
-            expiresAt={item.mostRecentSession?.expiresAt}
-            info={item.info}
-            onDeletePress={() => deleteDevice(item.signingPublicKey)}
-          />
-        )}
-        ListEmptyComponent={() => (
-          <View>
-            <Text>No devices</Text>
-          </View>
-        )}
+    <>
+      <View style={tw`mt-20`}>
+        <Text bold>Devices</Text>
+        <FlatList
+          data={devicesResult.data?.devices?.nodes?.filter(notNull) || []}
+          keyExtractor={(item) => item.signingPublicKey}
+          renderItem={({ item }) => (
+            <DeviceListItem
+              isActiveDevice={
+                activeDevice.signingPublicKey === item.signingPublicKey
+              }
+              signingPublicKey={item.signingPublicKey}
+              encryptionPublicKey={item.encryptionPublicKey}
+              encryptionPublicKeySignature={item.encryptionPublicKeySignature}
+              createdAt={item.createdAt}
+              expiresAt={item.mostRecentSession?.expiresAt}
+              info={item.info}
+              onDeletePress={() => deleteDevicePreflight(item.signingPublicKey)}
+            />
+          )}
+          ListEmptyComponent={() => (
+            <View>
+              <Text>No devices</Text>
+            </View>
+          )}
+        />
+      </View>
+      <VerifyPasswordModal
+        isVisible={isPasswordModalVisible}
+        description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"
+        onSuccess={() => {
+          setIsPasswordModalVisible(false);
+          if (signingPublicKeyToBeDeleted) {
+            deleteDevice(signingPublicKeyToBeDeleted);
+          }
+        }}
+        onBackdropPress={() => {
+          setSigningPublicKeyToBeDeleted(undefined);
+          setIsPasswordModalVisible(false);
+        }}
       />
-    </View>
+    </>
   );
 }
