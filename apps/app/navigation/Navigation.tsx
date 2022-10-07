@@ -34,6 +34,7 @@ import DevDashboardScreen from "./screens/devDashboardScreen/DevDashboardScreen"
 import EncryptDecryptImageTestScreen from "./screens/encryptDecryptImageTestScreen/EncryptDecryptImageTestScreen";
 import LibsodiumTestScreen from "./screens/libsodiumTestScreen/LibsodiumTestScreen";
 import LoginScreen from "./screens/loginScreen/LoginScreen";
+import LogoutInProgressScreen from "./screens/logoutInProgressScreen/LogoutInProgressScreen";
 import NotFoundScreen from "./screens/notFoundScreen/NotFoundScreen";
 import OnboardingScreen from "./screens/onboardingScreen/OnboardingScreen";
 import PageScreen from "./screens/pageScreen/PageScreen";
@@ -272,6 +273,11 @@ function RootNavigator() {
           </>
         ) : null}
         <Stack.Screen
+          name="LogoutInProgress"
+          component={LogoutInProgressScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="WorkspaceNotFound"
           component={WorkspaceNotFoundScreen}
           options={{ headerShown: false }}
@@ -359,6 +365,7 @@ const getLinking = (
         Register: "register",
         RegistrationVerification: "registration-verification",
         Login: "login",
+        LogoutInProgress: "logging-out",
         EncryptDecryptImageTest: "encrypt-decrypt-image-test",
         AcceptWorkspaceInvitation:
           "accept-workspace-invitation/:workspaceInvitationId",

@@ -186,10 +186,18 @@ export default function AccountMenu({
       <SidebarDivider collapsed />
       <MenuButton
         onPress={async () => {
-          setIsOpenAccountMenu(false);
-          navigation.navigate("Login");
-          clearDeviceAndSessionStorage();
-          await updateAuthentication(null);
+          try {
+            setIsOpenAccountMenu(false);
+            navigation.navigate("LogoutInProgress");
+            clearDeviceAndSessionStorage();
+            await updateAuthentication(null);
+          } catch (error) {
+            alert(
+              "Failed to destroy the local data. Please login and try again."
+            );
+          } finally {
+            navigation.navigate("Login");
+          }
         }}
         testID="account-menu__logout-button"
       >

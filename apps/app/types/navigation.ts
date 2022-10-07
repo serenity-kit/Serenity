@@ -79,6 +79,7 @@ export type RootStackParamList = {
   AcceptWorkspaceInvitation: WorkspaceInvitationParams;
   WorkspaceNotFound: undefined;
   Login: LoginParams | undefined;
+  LogoutInProgress: undefined;
   EncryptDecryptImageTest: undefined;
   TestLibsodium: undefined;
   AccountSettings: AccountSettingsParams;
