@@ -5,10 +5,10 @@ import { useWindowDimensions } from "react-native";
 
 type Props = {
   canGoBack: boolean;
-  defaultNavigateTo?: "WorkspaceSettings" | "AccountSettings" | "WorkspaceRoot";
+  navigateTo?: "WorkspaceSettings" | "AccountSettings";
 };
 
-export function HeaderLeft({ canGoBack, defaultNavigateTo }: Props) {
+export function HeaderLeft({ canGoBack, navigateTo }: Props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const navigation = useNavigation();
   const route = useRoute();
@@ -18,32 +18,34 @@ export function HeaderLeft({ canGoBack, defaultNavigateTo }: Props) {
       <View style={tw`web:pl-3`}>
         <IconButton
           onPress={() => {
-            // When starting on a deep link you might run into a situation where
-            // goBack would be the wrong action. E.g. you start on a deep link
-            // in Account Device Settings. If you go back you would end up in
-            // Account Settings which is correct. But from there the goBack would
-            // back to Account Device Settings which is not correct. That's we
-            // need special conditions based on the previous routes.
-
             // @ts-expect-error workspaceId is only defined in certain cases
             const workspaceId = route.params?.workspaceId || undefined;
-            if (defaultNavigateTo === "AccountSettings") {
-              navigation.navigate("AccountSettings");
-            } else if (
-              defaultNavigateTo === "WorkspaceSettings" &&
-              workspaceId
+
+            if (
+              // When starting on a deep link you might run into a situation where
+              // goBack would be the wrong action. E.g. you start on a deep link
+              // in Account Devices Settings. If you go back you would end up in
+              // Account Settings which is correct. But from there the goBack would
+              // back to Account Devices Settings which is not correct. That's why
+              // we need to handle this case explicitly.
+              // We don't want it by default since goBack has the best default
+              // behavior e.g. when going back on iOS you end up again in the open
+              // drawer instead of the page where the drawer would close right away.
+              route.name === "AccountSettings" &&
+              navigation.getState().routes[0].name.startsWith("AccountSettings")
             ) {
-              navigation.navigate("WorkspaceSettings", { workspaceId });
+              navigation.navigate("Root");
             } else if (
-              defaultNavigateTo === "WorkspaceRoot" &&
-              workspaceId &&
-              // This is a special case to have better UX.
-              // We prefer canGoBack over defaultNavigateTo, but have to make sure
-              // in case the go back would go to a settings screen we need to
-              // overwrite the back behaviour.
-              // in order to make sure we go back to the open drawer on mobile
-              // rather then redirect to the workspace root which feels
-              // broken on Mobile devices.
+              // When starting on a deep link you might run into a situation where
+              // goBack would be the wrong action. E.g. you start on a deep link
+              // in Workspace Members Settings. If you go back you would end up in
+              // Workspace Settings which is correct. But from there the goBack would
+              // back to Workspace Members Settings which is not correct. That's why
+              // we need to handle this case explicitly.
+              // We don't want it by default since goBack has the best default
+              // behavior e.g. when going back on iOS you end up again in the open
+              // drawer instead of the page where the drawer would close right away.
+              route.name === "WorkspaceSettings" &&
               navigation
                 .getState()
                 .routes[0].name.startsWith("WorkspaceSettings")
@@ -52,6 +54,10 @@ export function HeaderLeft({ canGoBack, defaultNavigateTo }: Props) {
                 workspaceId,
                 screen: "WorkspaceRoot",
               });
+            } else if (navigateTo === "AccountSettings") {
+              navigation.navigate("AccountSettings");
+            } else if (navigateTo === "WorkspaceSettings" && workspaceId) {
+              navigation.navigate("WorkspaceSettings", { workspaceId });
             } else if (canGoBack) {
               navigation.goBack();
             } else {

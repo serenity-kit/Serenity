@@ -270,12 +270,7 @@ function RootNavigator() {
               options={{
                 title: "Profile",
                 headerLeft(props) {
-                  return (
-                    <HeaderLeft
-                      {...props}
-                      defaultNavigateTo="AccountSettings"
-                    />
-                  );
+                  return <HeaderLeft {...props} navigateTo="AccountSettings" />;
                 },
               }}
             />
@@ -285,12 +280,7 @@ function RootNavigator() {
               options={{
                 title: "Devices",
                 headerLeft(props) {
-                  return (
-                    <HeaderLeft
-                      {...props}
-                      defaultNavigateTo="AccountSettings"
-                    />
-                  );
+                  return <HeaderLeft {...props} navigateTo="AccountSettings" />;
                 },
               }}
             />
@@ -299,11 +289,6 @@ function RootNavigator() {
               component={WorkspaceSettingsMobileOverviewScreenWithLoginRedirect}
               options={{
                 title: "Workspace settings",
-                headerLeft(props) {
-                  return (
-                    <HeaderLeft {...props} defaultNavigateTo="WorkspaceRoot" />
-                  );
-                },
               }}
             />
             <Stack.Screen
@@ -313,10 +298,7 @@ function RootNavigator() {
                 title: "General",
                 headerLeft(props) {
                   return (
-                    <HeaderLeft
-                      {...props}
-                      defaultNavigateTo="WorkspaceSettings"
-                    />
+                    <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
                   );
                 },
               }}
@@ -328,10 +310,7 @@ function RootNavigator() {
                 title: "Members",
                 headerLeft(props) {
                   return (
-                    <HeaderLeft
-                      {...props}
-                      defaultNavigateTo="WorkspaceSettings"
-                    />
+                    <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
                   );
                 },
               }}
