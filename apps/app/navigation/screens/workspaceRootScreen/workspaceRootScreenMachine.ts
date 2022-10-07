@@ -21,7 +21,7 @@ export const workspaceRootScreenMachine =
       predictableActionArguments: true,
       initial: "loadLastUsedDocumentId",
       states: {
-        loadingInitalData: {
+        loadingInitialData: {
           invoke: {
             src: loadInitialDataMachine,
             id: "loadInitialDataMachine",
@@ -65,12 +65,12 @@ export const workspaceRootScreenMachine =
                     return event.data;
                   },
                 }),
-                target: "loadingInitalData",
+                target: "loadingInitialData",
               },
             ],
             onError: [
               {
-                target: "loadingInitalData",
+                target: "loadingInitialData",
               },
             ],
           },
