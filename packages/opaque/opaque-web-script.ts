@@ -1,4 +1,4 @@
-import { Registration, Login } from "opaque-wasm";
+import { Login, Registration } from "opaque-wasm";
 
 const toBase64 = (data: Uint8Array) => {
   return btoa(String.fromCharCode.apply(null, [...data]));
@@ -8,12 +8,13 @@ const fromBase64 = (value: string) => {
   return Uint8Array.from(atob(value), (c) => c.charCodeAt(0));
 };
 
-const registration = new Registration();
-const login = new Login();
+let registration = new Registration();
+let login = new Login();
 
 window._opaque = {};
 
 window._opaque.registerInitialize = function (password: string) {
+  registration = new Registration();
   const message = registration.start(password);
   return toBase64(message);
 };
@@ -27,6 +28,7 @@ window._opaque.finishRegistration = function (challengeResponse: string) {
 };
 
 window._opaque.startLogin = function (password: string) {
+  login = new Login();
   const message = login.start(password);
   return toBase64(message);
 };

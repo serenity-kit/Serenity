@@ -3,13 +3,8 @@ import sodium from "@serenity-tools/libsodium";
 import { finishLogin, startLogin } from "@serenity-tools/opaque";
 import { Platform } from "react-native";
 import { UpdateAuthenticationFunction } from "../../context/AppContext";
-import {
-  MainDeviceDocument,
-  MainDeviceQuery,
-  MeDocument,
-  MeQuery,
-  MeQueryVariables,
-} from "../../generated/graphql";
+import { MainDeviceDocument, MainDeviceQuery } from "../../generated/graphql";
+import { fetchMe } from "../../graphql/fetchUtils/fetchMe";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { getUrqlClient } from "../urqlClient/urqlClient";
@@ -102,17 +97,16 @@ export const login = async ({
     sessionKey: result.sessionKey,
     expiresAt: finishLoginResult.data.finishLogin.expiresAt,
   });
-  const meResult = await getUrqlClient()
-    .query<MeQuery, MeQueryVariables>(
-      MeDocument,
-      {},
-      {
-        // better to be safe here and always refetch
-        requestPolicy: "network-only",
-      }
-    )
-    .toPromise();
-  const userId = meResult.data?.me?.id;
+  const meResult = await fetchMe();
+  if (meResult.error) {
+    // TODO: handle this error in the UI
+    throw new Error(meResult.error.message);
+  }
+  if (!meResult.data?.me) {
+    // TODO: handle this error in the UI
+    throw new Error("Could not query me. Probably not logged in");
+  }
+  const userId = meResult.data.me.username;
   // if the user has changed, remove the previous lastusedworkspaceId and lastUsedDocumentId
   await removeLastUsedWorkspaceIdIfLoginChanged(userId);
   return { result, urqlClient: authenticatedUrqlClient };
