@@ -35,7 +35,7 @@ export function VerifyPasswordModal(props: Props) {
   const [, startLoginMutation] = useStartLoginMutation();
   const [, verifyPasswordMutation] = useVerifyPasswordMutation();
 
-  const onDismiss = () => {
+  const onModalHide = () => {
     setPassword("");
     setIsPasswordInvalid(false);
     setIsVerifyingPassword(false);
@@ -159,7 +159,7 @@ export function VerifyPasswordModal(props: Props) {
     <Modal
       isVisible={props.isVisible}
       onBackdropPress={onBackdropPress}
-      onDismiss={onDismiss}
+      onModalHide={onModalHide}
     >
       <ModalHeader>Verify Password</ModalHeader>
       {isPasswordInvalid && (

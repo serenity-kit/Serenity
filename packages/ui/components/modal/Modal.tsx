@@ -9,12 +9,14 @@ import { Box } from "../box/Box";
 
 type ModalProps = Pick<
   ReactNativeModalProps,
-  "isVisible" | "onBackdropPress" | "style" | "children" | "onDismiss"
->;
+  "isVisible" | "onBackdropPress" | "style" | "children"
+> & {
+  onModalHide?: () => void;
+};
 
 export const Modal = React.forwardRef(
   (
-    { children, isVisible, onBackdropPress, onDismiss, ...rest }: ModalProps,
+    { children, isVisible, onBackdropPress, onModalHide, ...rest }: ModalProps,
     ref: any
   ) => {
     const styles = StyleSheet.create({
@@ -43,7 +45,7 @@ export const Modal = React.forwardRef(
       <ReactNativeModal
         ref={ref}
         {...rest}
-        onDismiss={onDismiss}
+        onModalHide={onModalHide}
         onBackdropPress={onBackdropPress}
         isVisible={isVisible}
         animationIn="fadeIn"
