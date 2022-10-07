@@ -29,7 +29,7 @@ test.beforeAll(async () => {
 
 test.describe("After temporary login", () => {
   test("Create, rename, delete root folder", async ({ page }) => {
-    await login(page, username, password, false);
+    await login({ page, username, password, stayLoggedIn: false });
     const addedFolder = await createRootFolder(
       page,
       "Test folder",
@@ -40,7 +40,7 @@ test.describe("After temporary login", () => {
   });
 
   test("Create, rename, delete a subfolder", async ({ page }) => {
-    await login(page, username, password, false);
+    await login({ page, username, password, stayLoggedIn: false });
     const addedSubfolder = await createSubFolder(
       page,
       firstFolder.id,

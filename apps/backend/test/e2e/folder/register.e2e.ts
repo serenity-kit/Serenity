@@ -16,12 +16,12 @@ test.beforeAll(async () => {
 
 test.describe("After register", () => {
   test("Create, rename, delete root folder", async ({ page }) => {
-    const { workspace } = await register(
+    const { workspace } = await register({
       page,
-      `${uuidv4()}@example.com`,
+      username: `${uuidv4()}@example.com`,
       password,
-      workspaceName
-    );
+      workspaceName,
+    });
     const addedFolder = await createRootFolder(
       page,
       "Test folder",
@@ -32,12 +32,12 @@ test.describe("After register", () => {
   });
 
   test("Create, rename, delete sub folder", async ({ page }) => {
-    const { workspace, folder } = await register(
+    const { workspace, folder } = await register({
       page,
-      `${uuidv4()}@example.com`,
+      username: `${uuidv4()}@example.com`,
       password,
-      workspaceName
-    );
+      workspaceName,
+    });
     const addedFolder = await createSubFolder(
       page,
       folder?.id!,

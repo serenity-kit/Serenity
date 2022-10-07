@@ -1,4 +1,13 @@
-import { Box, Icon, Link, Text, tw, View } from "@serenity-tools/ui";
+import {
+  Box,
+  Description,
+  Heading,
+  Icon,
+  Link,
+  Text,
+  tw,
+  View,
+} from "@serenity-tools/ui";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import RegisterForm from "../../../components/register/RegisterForm";
 import { RootStackScreenProps } from "../../../types/navigation";
@@ -17,14 +26,14 @@ export default function RegisterScreen(
     <OnboardingScreenWrapper>
       <Box plush>
         <View>
-          <Text variant="lg" bold style={tw`text-center`}>
+          <Heading lvl={1} center>
             Create your account
-          </Text>
-          <Text muted style={tw`text-center`}>
+          </Heading>
+          <Description variant="login" style={tw`text-center`}>
             Sign up and start your free trial!
             {"\n"}
             No credit card required.
-          </Text>
+          </Description>
         </View>
         <RegisterForm onRegisterSuccess={onRegisterSuccess} />
         <View style={tw`text-center`}>

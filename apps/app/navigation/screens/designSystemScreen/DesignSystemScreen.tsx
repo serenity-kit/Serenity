@@ -8,12 +8,14 @@ import {
   CenterContent,
   Checkbox,
   colors,
+  Description,
   DesignSystemExampleArea as DSExampleArea,
   DesignSystemHeading as Heading,
   DesignSystemMono as DSMono,
   EditorBottombarButton,
   EditorBottombarDivider,
   EditorSidebarIcon,
+  Heading as UIHeading,
   Icon,
   IconButton,
   InfoMessage,
@@ -87,6 +89,17 @@ export default function DesignSystemScreen() {
         {props.children}
         <TilesFiller />
       </HStack>
+    );
+  };
+
+  const DSMarker = (props) => {
+    return (
+      <View
+        {...props}
+        style={tw`-my-1.5 -mx-2 py-1.5 px-2 border border-dashed border-gray-200`}
+      >
+        {props.children}
+      </View>
     );
   };
 
@@ -583,6 +596,164 @@ export default function DesignSystemScreen() {
           </Checkbox>
         </DSExampleArea>
 
+        <Heading lvl={1}>Descriptions</Heading>
+        <Text>
+          A{" "}
+          <DSMono variant={"component"} size="md">
+            Description
+          </DSMono>{" "}
+          component adds further information to a form or modal.
+        </Text>
+
+        <Heading lvl={3}>Variants</Heading>
+        <Text variant="sm">
+          Depending on the use-case the{" "}
+          <DSMono variant="property">variant</DSMono> property is set to either:{" "}
+          <DSMono variant={"type"}>login</DSMono> ,{" "}
+          <DSMono variant={"type"}>modal</DSMono> , or{" "}
+          <DSMono variant={"type"}>form</DSMono> , which differ in size and
+          color.
+        </Text>
+
+        <DSExampleArea
+          style={tw`mb-4 py-12 bg-primary-900 items-center`}
+          vertical
+          center
+          label={"login"}
+        >
+          <Box plush>
+            <View style={tw`text-center`}>
+              <UIHeading lvl={1} style={tw`mb-3`}>
+                Create your Account
+              </UIHeading>
+              <DSMarker>
+                <Description variant={"login"}>
+                  Type in your email and choose a password.
+                  {"\n"}
+                  No credit card required.
+                </Description>
+              </DSMarker>
+            </View>
+            <Input
+              label={"Email"}
+              keyboardType="email-address"
+              placeholder="Enter your email …"
+              autoCapitalize="none"
+            />
+            <Input
+              label={"Password"}
+              secureTextEntry
+              placeholder="Enter your password …"
+            />
+            <Checkbox
+              value={"hasAcceptedTerms"}
+              accessibilityLabel="This is the terms and condition checkbox"
+            >
+              <Text variant="xs" muted>
+                Yes, I do agree to Serenity's{" "}
+                <LinkExternal
+                  variant="xs"
+                  href="https://www.serenity.re/en/notes/terms-of-service"
+                >
+                  terms of services
+                </LinkExternal>{" "}
+                and{" "}
+                <LinkExternal
+                  variant="xs"
+                  href="https://www.serenity.re/en/notes/privacy-policy"
+                >
+                  privacy policy
+                </LinkExternal>
+                .
+              </Text>
+            </Checkbox>
+            <Button style={tw`w-full`}>Register</Button>
+          </Box>
+        </DSExampleArea>
+
+        <DSExampleArea
+          style={tw`mb-4 py-12 bg-gray-900/30 items-center`}
+          vertical
+          center
+          label={"modal"}
+        >
+          <Box>
+            <ModalHeader>Delete workspace ?</ModalHeader>
+            <DSMarker>
+              <Description variant="modal">
+                Are you sure you want to delete the workspace “Paula's
+                Workspace” with all its pages and folders? You can't undo this
+                action.
+              </Description>
+            </DSMarker>
+            <ModalButtonFooter
+              cancel={<Button variant="secondary">Keep</Button>}
+              confirm={<Button variant="danger">Delete workspace</Button>}
+            />
+          </Box>
+        </DSExampleArea>
+
+        <DSExampleArea
+          style={tw`py-12 bg-gray-900/30 items-center`}
+          vertical
+          center
+          label={"form"}
+        >
+          <BoxShadow elevation={1} rounded>
+            <View style={tw`bg-white rounded overflow-hidden`}>
+              <HStack>
+                <VStack
+                  style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}
+                >
+                  <UIHeading lvl={4} style={tw`px-4 pb-2`}>
+                    Account Settings
+                  </UIHeading>
+                  <SidebarLink
+                    to={{ screen: "EncryptDecryptImageTest" }}
+                    iconName="user-line"
+                  >
+                    Profile
+                  </SidebarLink>
+                  <SidebarLink
+                    to={{ screen: "EncryptDecryptImageTest" }}
+                    iconName="device-line"
+                  >
+                    Devices
+                  </SidebarLink>
+                  <SidebarDivider style={tw`my-2`} />
+                  <SidebarLink
+                    to={{ screen: "EncryptDecryptImageTest" }}
+                    iconName="history-line"
+                  >
+                    Workspace Settings
+                  </SidebarLink>
+                </VStack>
+                <View>
+                  <View style={tw`py-4.5 px-10 border-b border-gray-200`}>
+                    <UIHeading lvl={2}>Devices</UIHeading>
+                  </View>
+                  <View style={tw`pt-8 pb-5 px-10`}>
+                    <UIHeading lvl={3} style={tw`mb-2`}>
+                      Manage Devices
+                    </UIHeading>
+                    <DSMarker>
+                      <Description variant={"form"}>
+                        The following list shows all the devices which are
+                        currently linked to your account.
+                      </Description>
+                    </DSMarker>
+                    <Text style={tw`mt-5`}>...</Text>
+                  </View>
+                </View>
+              </HStack>
+            </View>
+          </BoxShadow>
+        </DSExampleArea>
+        <Text style={tw`mt-4`} variant="xxs" muted>
+          All variants shown in their context, marked with a dashed outline -
+          documentation only - for reasons of clarity and comprehensibility.
+        </Text>
+
         <Heading lvl={1}>EditorBottombar</Heading>
         <Text>
           The{" "}
@@ -717,6 +888,37 @@ export default function DesignSystemScreen() {
             </SidebarButton>
           </VStack>
         </DSExampleArea>
+
+        <Heading lvl={1}>Headings</Heading>
+        <Text>
+          <DSMono variant={"component"} size="md">
+            Headings
+          </DSMono>{" "}
+          are used as titles for pages, context, form-sections and lists.
+        </Text>
+        <Heading lvl={3}>Levels</Heading>
+        <Text variant="sm">
+          For now we use levels <DSMono variant={"type"}>1</DSMono> to{" "}
+          <DSMono variant={"type"}>4</DSMono> set via the
+          <DSMono variant="property">lvl</DSMono> property.
+        </Text>
+        <DSExampleArea vertical>
+          <UIHeading lvl={1}>Create your Account</UIHeading>
+          <UIHeading lvl={2}>Devices</UIHeading>
+          <UIHeading lvl={3}>Manage Devices</UIHeading>
+          <UIHeading lvl={4}>Folders</UIHeading>
+          <UIHeading lvl={4} accessibilityOnly>
+            Folders
+          </UIHeading>
+        </DSExampleArea>
+        <Heading lvl={3}>Accessibility</Heading>
+        <Text variant="sm">
+          To enhance the accessibility of our application, A{" "}
+          <DSMono variant="component">Heading</DSMono> can also be added hidden
+          by setting the <DSMono variant={"property"}>accessibilityOnly</DSMono>{" "}
+          property. With this we can ensure neatly structured guides even if we
+          don't need them as a visual aid.
+        </Text>
 
         <Heading lvl={1}>Icons</Heading>
         <Text>
@@ -1365,7 +1567,7 @@ export default function DesignSystemScreen() {
           Footers <DSMono variant="property">confirm</DSMono> property.
         </Text>
         <DSExampleArea
-          style={tw`py-12 bg-gray-900/40 items-center`}
+          style={tw`py-12 bg-gray-900/30 items-center`}
           vertical
           center
         >
@@ -1386,7 +1588,7 @@ export default function DesignSystemScreen() {
           <DSMono variant="component">ModalHeader</DSMono> component.
         </Text>
         <DSExampleArea
-          style={tw`py-12 bg-gray-900/40 items-center`}
+          style={tw`py-12 bg-gray-900/30 items-center`}
           vertical
           center
         >

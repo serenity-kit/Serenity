@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../../src/database/prisma";
-import { e2eRegisterUser } from "../../helpers/authentication/e2eRegisterUser";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
+import { e2eRegisterUser } from "../../helpers/e2e/e2eRegisterUser";
 
 test("Register", async ({ page }) => {
   const username = `${uuidv4()}@example.com`;

@@ -75,8 +75,34 @@ const customTheme = {
       input: ["1rem", "1.25rem"], // iOS specific fix for vertical Alignment of Text inside input
       // custom fontSize multiplier for better scalability (represents a default size of 17px)
       mobile: "1.0625rem", // editor specific
+      "3xl": [
+        "1.75rem",
+        {
+          lineHeight: "2.125rem",
+          letterSpacing: "-0.02rem",
+        },
+      ],
+      "2xl": [
+        "1.5rem",
+        {
+          lineHeight: "1.875rem",
+          letterSpacing: "-0.02rem",
+        },
+      ],
+      lg: [
+        "1.125rem",
+        {
+          lineHeight: "1.375rem",
+          letterSpacing: "-0.02rem",
+        },
+      ],
       xs: "0.8125rem",
-      xxs: "0.75rem",
+      xxs: [
+        "0.75rem",
+        {
+          lineHeight: "0.875rem",
+        },
+      ],
     },
     fontFamily: {
       button: "Inter_600SemiBold",

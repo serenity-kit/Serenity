@@ -36,7 +36,7 @@ export const createSubFolder = async (
   expect(newFolderMenu).not.toBe(undefined);
   const newFolderName = await newFolderMenu.textContent();
   expect(newFolderName).toBe("Untitled");
-  await reloadPage(page);
+  await reloadPage({ page });
   await expandFolderTree(page, parentFolderId);
   const newFolderMenu1 = page.locator(
     `data-testid=sidebar-folder--${folder?.id}`

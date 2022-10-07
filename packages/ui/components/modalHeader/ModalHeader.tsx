@@ -4,9 +4,5 @@ import { Text, TextProps } from "../text/Text";
 export type ModalHeaderProps = TextProps & {};
 
 export const ModalHeader = forwardRef((props: TextProps, ref) => {
-  return (
-    <Text variant="md" bold>
-      {props.children}
-    </Text>
-  );
+  return <Text variant="lg">{props.children}</Text>;
 });

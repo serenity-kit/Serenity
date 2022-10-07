@@ -35,7 +35,7 @@ export const deleteDocument = async (
     .locator(`data-testid=sidebar-folder--${documentId}`)
     .isVisible();
   expect(isDocumentItemVisible).toBe(false);
-  await reloadPage(page);
+  await reloadPage({ page });
   const isDocumentItemVisible2 = await page
     .locator(`data-testid=sidebar-folder--${documentId}`)
     .isVisible();

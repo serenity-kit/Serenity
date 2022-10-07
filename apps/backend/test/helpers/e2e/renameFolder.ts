@@ -26,7 +26,7 @@ export const renameFolder = async (
   );
   const renamedFolderMenuText = await renamedFolderMenu.textContent();
   expect(renamedFolderMenuText).toBe(newName);
-  await reloadPage(page);
+  await reloadPage({ page });
   await expandFolderTree(page, folderId);
   const renamedFolderMenu1 = page.locator(
     `data-testid=sidebar-folder--${folderId}`

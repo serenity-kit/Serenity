@@ -144,10 +144,8 @@ export const loadInitialDataMachine =
           if (context.returnOtherWorkspaceIfNotFound === true) {
             context.navigation.replace("Onboarding");
           } else {
-            context.navigation.replace("WorkspaceNotFoundScreen", {
-              workspaceId:
-                context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
-                  ?.workspaceLoadingInfo?.id,
+            context.navigation.replace("WorkspaceNotFound", {
+              workspaceId: context.workspaceId,
             });
           }
         },

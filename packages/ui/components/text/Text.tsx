@@ -16,8 +16,8 @@ export type TextProps = RNText["props"] & {
 export function Text(props: TextProps) {
   const { variant = "md", bold = false } = props;
   const styles = StyleSheet.create({
-    // 2rem (32px) - header
-    lg: tw.style(`text-h1 text-gray-900 dark:text-white`, {
+    // 1.125rem (18px) - modal header
+    lg: tw.style(`text-lg text-gray-900 dark:text-white`, {
       fontFamily: bold ? "Inter_700Bold" : "Inter_600SemiBold",
     }),
     // 1rem (16px) - basic text
@@ -32,7 +32,7 @@ export function Text(props: TextProps) {
     xs: tw.style(`text-xs text-gray-800 dark:text-white leading-snug`, {
       fontFamily: bold ? "Inter_600SemiBold" : "Inter_400Regular",
     }),
-    // 0.75rem (12px) - sidebar-headers, input-hints
+    // 0.75rem (12px) - input-hints
     xxs: tw.style(`text-xxs text-gray-900 dark:text-white`, {
       fontFamily: bold ? "Inter_500Medium" : "Inter_400Regular",
     }),

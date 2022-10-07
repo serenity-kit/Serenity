@@ -386,7 +386,7 @@ export default function SidebarFolder(props: Props) {
                   />
                 ) : (
                   <SidebarText
-                    style={tw`pl-2 md:ml-1.5 max-w-${maxWidth}`}
+                    style={tw`pl-2 md:pl-1.5 max-w-${maxWidth}`}
                     numberOfLines={1}
                     ellipsizeMode="tail"
                     testID={`sidebar-folder--${props.folderId}`}

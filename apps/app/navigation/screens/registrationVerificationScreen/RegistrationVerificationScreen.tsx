@@ -1,9 +1,10 @@
 import {
   Box,
   Button,
+  Description,
+  Heading,
   InfoMessage,
   Input,
-  Text,
   tw,
   View,
 } from "@serenity-tools/ui";
@@ -171,12 +172,12 @@ export default function RegistrationVerificationScreen(
     <OnboardingScreenWrapper>
       <Box plush>
         <View>
-          <Text variant="lg" bold style={tw`text-center`}>
+          <Heading lvl={1} center>
             Verify your email
-          </Text>
-          <Text muted style={tw`text-center`}>
+          </Heading>
+          <Description variant="login" style={tw`text-center`}>
             Please enter the verification code{"\n"}sent to you via email.
-          </Text>
+          </Description>
         </View>
 
         {graphqlError !== "" && (
