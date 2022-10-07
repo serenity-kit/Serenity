@@ -42,8 +42,6 @@ export function VerifyPasswordModal(props: Props) {
   };
 
   const onVerifyPasswordPress = async (password: string) => {
-    console.log("onVerifyPasswordPress");
-    console.log({ password });
     setIsPasswordInvalid(false);
     setIsVerifyingPassword(true);
     // TODO: create a method that verifies the password
@@ -60,21 +58,18 @@ export function VerifyPasswordModal(props: Props) {
       const username = meResult.data.me.username;
       let message: any = undefined;
       message = await startLogin(password);
-      console.log({ message });
       const startLoginResult = await startLoginMutation({
         input: {
           username,
           challenge: message,
         },
       });
-      // console.log({ startLoginResult });
       if (!startLoginResult.data?.startLogin) {
         // probably invalid username or sessionkey
         // TODO: show this error to user
         throw new Error("Could not start login");
       }
       const sessionKey = await getSessionKey();
-      console.log({ sessionKey });
       if (!sessionKey) {
         // TODO: handle this error in the UI
         throw new Error("No session key found!");
@@ -84,14 +79,12 @@ export function VerifyPasswordModal(props: Props) {
         // TODO: handle this error in the UI
         throw new Error("No active device found!");
       }
-      console.log({ activeDevice });
       let finishLoginResponse: any = undefined;
       try {
         finishLoginResponse = await finishLogin(
           startLoginResult.data.startLogin.challengeResponse
         );
       } catch (error) {
-        console.log(error);
         setIsPasswordInvalid(true);
         setIsVerifyingPassword(false);
         if (props.onFail) {
@@ -146,7 +139,6 @@ export function VerifyPasswordModal(props: Props) {
         props.onSuccess();
       }
     } catch (error) {
-      console.log(error);
       setIsPasswordInvalid(true);
       if (props.onFail) {
         props.onFail();

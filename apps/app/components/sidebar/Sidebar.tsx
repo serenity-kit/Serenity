@@ -8,7 +8,6 @@ import {
   Icon,
   IconButton,
   InlineInput,
-  Pressable,
   SidebarDivider,
   SidebarLink,
   Text,
@@ -187,10 +186,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         <SidebarLink to={{ screen: "DevDashboard" }} iconName="dashboard-line">
           Dev Dashboard
         </SidebarLink>
-
-        <Pressable onPress={() => setVerifyPasswordModalVisible(true)}>
-          <Text>Verify Password</Text>
-        </Pressable>
       </View>
 
       {isPermanentLeftSidebar ? <SidebarDivider /> : null}
