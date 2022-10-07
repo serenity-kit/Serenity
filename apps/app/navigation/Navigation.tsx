@@ -6,7 +6,12 @@ import {
   NavigationContainer,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Text, tw, useIsPermanentLeftSidebar } from "@serenity-tools/ui";
+import {
+  Heading,
+  Text,
+  tw,
+  useIsPermanentLeftSidebar,
+} from "@serenity-tools/ui";
 import * as Linking from "expo-linking";
 import { useEffect } from "react";
 import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
@@ -106,7 +111,7 @@ function WorkspaceDrawerScreen(props) {
         <Drawer.Screen
           name="WorkspaceNotDecrypted"
           component={WorkspaceNotDecryptedScreen}
-          options={{ headerTitle: "" }}
+          options={{ title: "" }}
         />
         <Drawer.Screen
           name="WorkspaceRoot"
@@ -202,7 +207,8 @@ function RootNavigator() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: [styles.header],
+        headerStyle: styles.header,
+        headerTitle: (props) => <Heading lvl={3}>{props.children}</Heading>,
         headerLeft(props) {
           return <HeaderLeft {...props} />;
         },
@@ -256,13 +262,13 @@ function RootNavigator() {
             <Stack.Screen
               name="AccountSettings"
               component={AccountSettingsMobileOverviewScreenWithLoginRedirect}
-              options={{ headerTitle: "Account settings" }}
+              options={{ title: "Account settings" }}
             />
             <Stack.Screen
               name="AccountSettingsProfile"
               component={AccountProfileSettingsScreenWithLoginRedirect}
               options={{
-                headerTitle: "Profile",
+                title: "Profile",
                 headerLeft(props) {
                   return (
                     <HeaderLeft
@@ -277,7 +283,7 @@ function RootNavigator() {
               name="AccountSettingsDevices"
               component={AccountDevicesSettingsScreenWithLoginRedirect}
               options={{
-                headerTitle: "Devices",
+                title: "Devices",
                 headerLeft(props) {
                   return (
                     <HeaderLeft
@@ -292,7 +298,7 @@ function RootNavigator() {
               name="WorkspaceSettings"
               component={WorkspaceSettingsMobileOverviewScreenWithLoginRedirect}
               options={{
-                headerTitle: "Workspace settings",
+                title: "Workspace settings",
                 headerLeft(props) {
                   return (
                     <HeaderLeft {...props} defaultNavigateTo="WorkspaceRoot" />
@@ -304,7 +310,7 @@ function RootNavigator() {
               name="WorkspaceSettingsGeneral"
               component={WorkspaceSettingsGeneralScreenWithLoginRedirect}
               options={{
-                headerTitle: "General",
+                title: "General",
                 headerLeft(props) {
                   return (
                     <HeaderLeft
@@ -319,7 +325,7 @@ function RootNavigator() {
               name="WorkspaceSettingsMembers"
               component={WorkspaceSettingsMembersScreenWithLoginRedirect}
               options={{
-                headerTitle: "Members",
+                title: "Members",
                 headerLeft(props) {
                   return (
                     <HeaderLeft
