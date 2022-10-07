@@ -1,6 +1,7 @@
 import { Button, Input, View } from "@serenity-tools/ui";
 import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
+import { Platform } from "react-native";
 import {
   useCreateWorkspaceInvitationMutation,
   useDeleteWorkspaceInvitationsMutation,
@@ -34,34 +35,12 @@ export function CreateWorkspaceInvitation(props: Props) {
     useCreateWorkspaceInvitationMutation();
   const [, deleteWorkspaceInvitationsMutation] =
     useDeleteWorkspaceInvitationsMutation();
-  const [workspaceInvitations, _setWorkspaceInvitations] = useState<
-    WorkspaceInvitation[]
-  >([]);
-  const [workspaceInvitationsLookup, setWorkspaceInvitationsLookup] = useState(
-    {}
-  );
   const [selectedWorkspaceInvitationId, setSelectedWorkspaceInvitationId] =
     useState<string | null>(null);
-  const [isLoadingWorkspaceInvitations, setIsLoadingWorkspaceInvitations] =
-    useState<boolean>(false);
-  const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
-  const [graphqlError, setGraphqlError] = useState<string>("");
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [isClipboardNoticeActive, setIsClipboardNoticeActive] =
     useState<boolean>(false);
   const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 2;
-
-  const setWorkspaceInvitations = (workspaceInvitations: any[]) => {
-    // create a lookup table with the string id pointing to the row number
-    const lookup = {};
-    workspaceInvitations.forEach(
-      (workspaceInvitation: WorkspaceInvitation, row: number) => {
-        lookup[workspaceInvitation.id] = row;
-      }
-    );
-    setWorkspaceInvitationsLookup(lookup);
-    _setWorkspaceInvitations(workspaceInvitations);
-  };
 
   const getWorkspaceInvitationText = () => {
     if (!selectedWorkspaceInvitationId) {
@@ -70,7 +49,10 @@ export function CreateWorkspaceInvitation(props: Props) {
     const rootUrl =
       process.env.NODE_ENV === "development" ||
       process.env.IS_E2E_TEST === "true"
-        ? `http://${window.location.host}`
+        ? Platform.OS === "web"
+          ? `http://${window.location.host}`
+          : // on iOS window.location.host is not available
+            `http://localhost:19006/`
         : "https://www.serenity.li";
 
     return `You are invited to a Serenity Workspace. To join, go to ${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}`;

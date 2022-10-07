@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
+import { Icon, Text, View } from "@serenity-tools/ui";
 import { StyleSheet } from "react-native";
-import { View, Text, Icon, tw } from "@serenity-tools/ui";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 type Props = {
