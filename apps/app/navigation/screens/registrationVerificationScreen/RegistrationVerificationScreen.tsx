@@ -59,7 +59,7 @@ export default function RegistrationVerificationScreen(
 
   const navigateToLoginScreen = async () => {
     await removeLastUsedWorkspaceId();
-    props.navigation.push("Login", {});
+    props.navigation.push("Login");
   };
 
   const acceptPendingWorkspaceInvitation = async () => {
