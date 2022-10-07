@@ -2,10 +2,15 @@ import { gql } from "graphql-request";
 
 type Params = {
   graphql: any;
+  hasNonExpiredSession: boolean;
   authorizationHeader: string;
 };
 
-export const getDevices = async ({ graphql, authorizationHeader }: Params) => {
+export const getDevices = async ({
+  graphql,
+  hasNonExpiredSession,
+  authorizationHeader,
+}: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
@@ -13,7 +18,7 @@ export const getDevices = async ({ graphql, authorizationHeader }: Params) => {
   // get root folders from graphql
   const query = gql`
     {
-      devices(first: 50) {
+      devices(hasNonExpiredSession: ${hasNonExpiredSession}, first: 50) {
         edges {
           node {
             userId
@@ -21,6 +26,9 @@ export const getDevices = async ({ graphql, authorizationHeader }: Params) => {
             encryptionPublicKey
             encryptionPublicKeySignature
             info
+            mostRecentSession {
+              expiresAt
+            }
           }
         }
         pageInfo {

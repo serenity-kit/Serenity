@@ -8,6 +8,7 @@ type Props = ViewProps & {
   info?: string | null;
   isActiveDevice: boolean;
   createdAt?: Date;
+  expiresAt?: Date;
   onDeletePress: () => void;
 };
 
@@ -32,6 +33,7 @@ export default function DeviceListItem(props: Props) {
               <Text>Browser: {deviceInfoJson.browser}</Text>
               <Text>Version: {deviceInfoJson.browserVersion}</Text>
               <Text>Created At {props.createdAt}</Text>
+              {props.createdAt && <Text>Expires At {props.expiresAt}</Text>}
               <Text>Signing Public Key: {props.signingPublicKey}</Text>
               {props.isActiveDevice && <Text>(this device)</Text>}
             </View>
@@ -42,6 +44,7 @@ export default function DeviceListItem(props: Props) {
               <Text>OS: {deviceInfoJson.os}</Text>
               <Text>Version: {deviceInfoJson.osVersion}</Text>
               <Text>Created At {props.createdAt}</Text>
+              {props.createdAt && <Text>Expires At {props.expiresAt}</Text>}
               <Text>Signing Public Key: {props.signingPublicKey}</Text>
               {props.isActiveDevice && <Text>(this device)</Text>}
             </View>

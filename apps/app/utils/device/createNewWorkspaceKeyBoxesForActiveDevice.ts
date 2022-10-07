@@ -36,7 +36,7 @@ export type Props = {
 export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
   activeDevice,
 }: Props) => {
-  const devices = await getDevices({});
+  const devices = await getDevices({ hasNonExpiredSession: true });
   if (!devices) {
     throw new Error("No devices found");
   }

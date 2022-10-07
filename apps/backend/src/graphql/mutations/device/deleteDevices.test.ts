@@ -51,6 +51,7 @@ test("delete and keep devices mismatch", async () => {
   const authorizationHeader1 = userData1.sessionKey;
   const numDevicesBeforeDeleteResponse = await getDevices({
     graphql,
+    hasNonExpiredSession: true,
     authorizationHeader: authorizationHeader1,
   });
   const expectedNumDevices =
@@ -91,6 +92,7 @@ test("delete a device", async () => {
   const authorizationHeader = userData1.sessionKey;
   const numDevicesAfterCreate = await getDevices({
     graphql,
+    hasNonExpiredSession: true,
     authorizationHeader,
   });
   expect(numDevicesAfterCreate.devices.edges.length).toBe(3);
@@ -142,6 +144,7 @@ test("delete a device", async () => {
   // check if device still exists
   const numDevicesAfterDelete = await getDevices({
     graphql,
+    hasNonExpiredSession: true,
     authorizationHeader,
   });
   expect(numDevicesAfterDelete.devices.edges.length).toBe(2);
@@ -169,6 +172,7 @@ test("won't delete a device they don't own", async () => {
   const authorizationHeader1 = userData1.sessionKey;
   const numDevicesBeforeDeleteResponse = await getDevices({
     graphql,
+    hasNonExpiredSession: true,
     authorizationHeader: authorizationHeader1,
   });
   const expectedNumDevices =
@@ -224,6 +228,7 @@ test("won't delete a device they don't own", async () => {
   // check if device still exists
   const numDevicesAfterDelete = await getDevices({
     graphql,
+    hasNonExpiredSession: true,
     authorizationHeader: authorizationHeader1,
   });
   expect(numDevicesAfterDelete.devices.edges.length).toBe(expectedNumDevices);
@@ -233,6 +238,7 @@ test("delete login device clears session", async () => {
   const authorizationHeader = userData1.sessionKey;
   const numDevicesAfterCreate = await getDevices({
     graphql,
+    hasNonExpiredSession: true,
     authorizationHeader,
   });
   expect(numDevicesAfterCreate.devices.edges.length).toBe(2);

@@ -12,7 +12,7 @@ export type Props = {
   activeDevice: Device;
 };
 export const attachDeviceToWorkspaces = async ({ activeDevice }: Props) => {
-  const devices = await getDevices({});
+  const devices = await getDevices({ hasNonExpiredSession: true });
   if (!devices) {
     // TODO: handle this erros
     throw new Error("No devices found!");

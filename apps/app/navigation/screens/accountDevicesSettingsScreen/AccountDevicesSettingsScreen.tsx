@@ -34,11 +34,11 @@ export default function DeviceManagerScreen(props) {
 
   const [devicesResult, fetchDevices] = useDevicesQuery({
     variables: {
+      hasNonExpiredSession: true,
       first: 500,
     },
   });
   const [, deleteDevicesMutation] = useDeleteDevicesMutation();
-
   const deleteDevice = async (deviceSigningPublicKey: string) => {
     const newDeviceWorkspaceKeyBoxes: WorkspaceWithWorkspaceDevicesParing[] =
       [];
@@ -117,6 +117,7 @@ export default function DeviceManagerScreen(props) {
             encryptionPublicKey={item.encryptionPublicKey}
             encryptionPublicKeySignature={item.encryptionPublicKeySignature}
             createdAt={item.createdAt}
+            expiresAt={item.mostRecentSession?.expiresAt}
             info={item.info}
             onDeletePress={() => deleteDevice(item.signingPublicKey)}
           />
