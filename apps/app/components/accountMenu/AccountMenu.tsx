@@ -29,12 +29,15 @@ import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDe
 type Props = {
   workspaceId?: string;
   openCreateWorkspace: () => void;
+  testID?: string;
 };
 
 export default function AccountMenu({
   workspaceId,
   openCreateWorkspace,
+  testID,
 }: Props) {
+  const testIdPrefix = testID ? `${testID}__` : "";
   const [isOpenAccountMenu, setIsOpenAccountMenu] = useState(false);
   const { updateAuthentication } = useWorkspaceContext();
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
@@ -72,7 +75,7 @@ export default function AccountMenu({
           // disable default outline styles
           // @ts-expect-error - web only
           _focusVisible={{ _web: { style: { outlineStyle: "none" } } }}
-          testID="account-menu-trigger"
+          testID={`${testIdPrefix}account-menu--trigger`}
         >
           <HStack
             space={isPermanentLeftSidebar ? 2 : 3}
@@ -162,6 +165,7 @@ export default function AccountMenu({
             }}
             name="plus"
             label="Create workspace"
+            testID={`${testIdPrefix}account-menu--create-workspace`}
           />
         </View>
       ) : (
@@ -190,7 +194,7 @@ export default function AccountMenu({
           // @ts-expect-error navigation ts issue
           navigation.push("Login");
         }}
-        testID="account-menu__logout-button"
+        testID={`${testIdPrefix}account-menu--logout`}
       >
         Logout
       </MenuButton>

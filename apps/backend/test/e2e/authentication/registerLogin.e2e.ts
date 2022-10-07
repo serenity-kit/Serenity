@@ -92,7 +92,9 @@ test("Register, logout, remember login", async ({ page }) => {
   expect(registrationResult.workspace).not.toBe(null);
   expect(registrationResult.workspace).not.toBe(null);
   await logout({ page });
+  await delayForSeconds(2);
   await login({ page, username, password, stayLoggedIn });
+  await delayForSeconds(2);
   await expectResults({
     page,
     user: registrationResult.user!,
@@ -117,7 +119,9 @@ test("Register, logout, don't remember login", async ({ page }) => {
   expect(registrationResult.workspace).not.toBe(null);
   expect(registrationResult.workspace).not.toBe(null);
   await logout({ page });
+  await delayForSeconds(2);
   await login({ page, username, password, stayLoggedIn });
+  await delayForSeconds(2);
   await expectResults({
     page,
     user: registrationResult.user!,

@@ -105,11 +105,15 @@ const workspaceMemberStyles = StyleSheet.create({
 export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
-  const workspaceId = useWorkspaceId();
+  let workspaceId = useWorkspaceId();
+  if (workspaceId === "") {
+    const params = props.route.params! as { workspaceId: string };
+    workspaceId = params.workspaceId;
+  }
   const { activeDevice } = useWorkspaceContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
-      workspaceId: workspaceId,
+      workspaceId,
       navigation: props.navigation,
       activeDevice,
     },
@@ -207,6 +211,7 @@ export default function WorkspaceSettingsMembersScreen(
   };
 
   const removeMember = async (username: string) => {
+    setUsernameToRemove(username);
     const row = memberLookup[username];
     if (row >= 0) {
       const member = members[row];
@@ -281,10 +286,10 @@ export default function WorkspaceSettingsMembersScreen(
       console.error("No workspace found");
       return;
     }
-    // updateWorkspaceData(
-    //   state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
-    //   workspace
-    // );
+    updateWorkspaceData(
+      state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
+      workspace
+    );
   };
 
   return (
