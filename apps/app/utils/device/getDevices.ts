@@ -6,12 +6,16 @@ import {
 } from "../../generated/graphql";
 import { getUrqlClient } from "../urqlClient/urqlClient";
 
-export type Props = {};
-export const getDevices = async ({}: Props): Promise<Device[] | null> => {
+export type Props = {
+  hasNonExpiredSession: boolean;
+};
+export const getDevices = async ({
+  hasNonExpiredSession,
+}: Props): Promise<Device[] | null> => {
   const devicesResult = await getUrqlClient()
     .query<DevicesQuery, DevicesQueryVariables>(
       DevicesDocument,
-      { first: 500 },
+      { hasNonExpiredSession, first: 500 },
       {
         requestPolicy: "network-only",
       }

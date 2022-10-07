@@ -33,6 +33,11 @@ const exchanges = [
       Device: (device) => {
         return device.signingPublicKey;
       },
+      // @ts-expect-error the type seems to be wrong
+      DeviceWithRecentSession: (device) => {
+        return device.signingPublicKey;
+      },
+      Session: () => null,
     },
   }),
   authExchange<AuthState>({

@@ -200,6 +200,35 @@ export type DeviceResult = {
   device?: Maybe<Device>;
 };
 
+export type DeviceWithRecentSession = {
+  __typename?: 'DeviceWithRecentSession';
+  createdAt?: Maybe<Scalars['Date']>;
+  encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
+  info?: Maybe<Scalars['String']>;
+  mostRecentSession?: Maybe<Session>;
+  signingPublicKey: Scalars['String'];
+  userId?: Maybe<Scalars['String']>;
+};
+
+export type DeviceWithRecentSessionConnection = {
+  __typename?: 'DeviceWithRecentSessionConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<DeviceWithRecentSessionEdge>>>;
+  /** Flattened list of DeviceWithRecentSession type */
+  nodes?: Maybe<Array<Maybe<DeviceWithRecentSession>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type DeviceWithRecentSessionEdge = {
+  __typename?: 'DeviceWithRecentSessionEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<DeviceWithRecentSession>;
+};
+
 export type DeviceWorkspaceKeyBoxInput = {
   ciphertext: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
@@ -526,7 +555,7 @@ export type Query = {
   __typename?: 'Query';
   activeWorkspaceKeys?: Maybe<ActiveWorkspaceKeysResult>;
   deviceBySigningPublicKey?: Maybe<DeviceResult>;
-  devices?: Maybe<DeviceConnection>;
+  devices?: Maybe<DeviceWithRecentSessionConnection>;
   document?: Maybe<Document>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documents?: Maybe<DocumentConnection>;
@@ -562,6 +591,7 @@ export type QueryDeviceBySigningPublicKeyArgs = {
 export type QueryDevicesArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
+  hasNonExpiredSession: Scalars['Boolean'];
 };
 
 
@@ -659,6 +689,11 @@ export type RemoveMembersAndRotateWorkspaceKeyInput = {
 export type RemoveMembersAndRotateWorkspaceKeyResult = {
   __typename?: 'RemoveMembersAndRotateWorkspaceKeyResult';
   workspaceKey: WorkspaceKey;
+};
+
+export type Session = {
+  __typename?: 'Session';
+  expiresAt: Scalars['Date'];
 };
 
 export type StartLoginInput = {
@@ -1093,12 +1128,13 @@ export type DeviceBySigningPublicKeyQueryVariables = Exact<{
 export type DeviceBySigningPublicKeyQuery = { __typename?: 'Query', deviceBySigningPublicKey?: { __typename?: 'DeviceResult', device?: { __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt?: any | null } | null } | null };
 
 export type DevicesQueryVariables = Exact<{
+  hasNonExpiredSession: Scalars['Boolean'];
   first: Scalars['Int'];
   after?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type DevicesQuery = { __typename?: 'Query', devices?: { __typename?: 'DeviceConnection', nodes?: Array<{ __typename?: 'Device', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt?: any | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type DevicesQuery = { __typename?: 'Query', devices?: { __typename?: 'DeviceWithRecentSessionConnection', nodes?: Array<{ __typename?: 'DeviceWithRecentSession', userId?: string | null, signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, info?: string | null, createdAt?: any | null, mostRecentSession?: { __typename?: 'Session', expiresAt: any } | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type DocumentQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1642,8 +1678,12 @@ export function useDeviceBySigningPublicKeyQuery(options: Omit<Urql.UseQueryArgs
   return Urql.useQuery<DeviceBySigningPublicKeyQuery, DeviceBySigningPublicKeyQueryVariables>({ query: DeviceBySigningPublicKeyDocument, ...options });
 };
 export const DevicesDocument = gql`
-    query devices($first: Int!, $after: String) {
-  devices(first: $first, after: $after) {
+    query devices($hasNonExpiredSession: Boolean!, $first: Int!, $after: String) {
+  devices(
+    hasNonExpiredSession: $hasNonExpiredSession
+    first: $first
+    after: $after
+  ) {
     nodes {
       userId
       signingPublicKey
@@ -1651,6 +1691,9 @@ export const DevicesDocument = gql`
       encryptionPublicKeySignature
       info
       createdAt
+      mostRecentSession {
+        expiresAt
+      }
     }
     pageInfo {
       hasNextPage

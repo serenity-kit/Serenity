@@ -17,16 +17,26 @@ beforeAll(async () => {
   sessionKey = result.sessionKey;
 });
 
-test("user should be able to list their devices", async () => {
+test("all user devices", async () => {
   const authorizationHeader = sessionKey;
-
   const result = await getDevices({
     graphql,
+    hasNonExpiredSession: true,
     authorizationHeader,
   });
-
   const edges = result.devices.edges;
   expect(edges.length).toBe(2);
+});
+
+test("only active sessions", async () => {
+  const authorizationHeader = sessionKey;
+  const result = await getDevices({
+    graphql,
+    hasNonExpiredSession: false,
+    authorizationHeader,
+  });
+  const edges = result.devices.edges;
+  expect(edges.length).toBe(1);
 });
 
 test("Unauthenticated", async () => {
@@ -34,6 +44,7 @@ test("Unauthenticated", async () => {
     (async () =>
       await getDevices({
         graphql,
+        hasNonExpiredSession: true,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -47,7 +58,7 @@ test("Input Errors", async () => {
   // get root folders from graphql
   const query = gql`
     {
-      devices(first: 501) {
+      devices(hasNonExpiredSession: true, first: 501) {
         edges {
           node {
             userId

@@ -1,5 +1,9 @@
-query devices($first: Int!, $after: String) {
-  devices(first: $first, after: $after) {
+query devices($hasNonExpiredSession: Boolean!, $first: Int!, $after: String) {
+  devices(
+    hasNonExpiredSession: $hasNonExpiredSession
+    first: $first
+    after: $after
+  ) {
     nodes {
       userId
       signingPublicKey
@@ -7,6 +11,9 @@ query devices($first: Int!, $after: String) {
       encryptionPublicKeySignature
       info
       createdAt
+      mostRecentSession {
+        expiresAt
+      }
     }
     pageInfo {
       hasNextPage

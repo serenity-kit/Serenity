@@ -1,3 +1,5 @@
+import { Session } from "./session";
+
 export type Device = {
   signingPublicKey: string;
   encryptionPublicKey: string;
@@ -5,6 +7,10 @@ export type Device = {
   info?: string | null | undefined;
   createdAt?: Date;
   userId?: string | null;
+};
+
+export type DeviceWithRecentSession = Device & {
+  mostRecentSession?: Session | null;
 };
 
 export type CreatorDevice = {
