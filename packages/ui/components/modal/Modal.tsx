@@ -1,19 +1,24 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
+import { Platform, StyleSheet } from "react-native";
 import {
-  ReactNativeModal,
   ModalProps as ReactNativeModalProps,
+  ReactNativeModal,
 } from "react-native-modal";
-import { StyleSheet, Platform } from "react-native";
-import { Box } from "../box/Box";
 import { tw } from "../../tailwind";
+import { Box } from "../box/Box";
 
 type ModalProps = Pick<
   ReactNativeModalProps,
   "isVisible" | "onBackdropPress" | "style" | "children"
->;
+> & {
+  onModalHide?: () => void;
+};
 
 export const Modal = React.forwardRef(
-  ({ children, isVisible, onBackdropPress, ...rest }: ModalProps, ref: any) => {
+  (
+    { children, isVisible, onBackdropPress, onModalHide, ...rest }: ModalProps,
+    ref: any
+  ) => {
     const styles = StyleSheet.create({
       modal: tw`items-center`, // needed to horizontally center the box
       box: tw``,
@@ -40,6 +45,7 @@ export const Modal = React.forwardRef(
       <ReactNativeModal
         ref={ref}
         {...rest}
+        onModalHide={onModalHide}
         onBackdropPress={onBackdropPress}
         isVisible={isVisible}
         animationIn="fadeIn"

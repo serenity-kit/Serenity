@@ -107,7 +107,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     }
     if (!workspaceKey) {
       // TODO: handle device not registered error
-      console.log("Could not get workspace key!");
+      console.error("Could not get workspace key!");
       return;
     }
     const encryptedFolderResult = await encryptFolderName({

@@ -35,7 +35,12 @@ export const startLoginMutation = mutationField("startLogin", {
   },
   async resolve(root, args, context) {
     const username = args.input.username;
-    const result = await getEnvelope(username);
+    let result: any = undefined;
+    try {
+      result = await getEnvelope(username);
+    } catch (error) {
+      throw new Error("Failed to initiate login");
+    }
     try {
       const challengeResponse = startLogin({
         envelope: result.envelop,
