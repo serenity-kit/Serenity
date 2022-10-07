@@ -40,6 +40,6 @@ export interface Typegen0 {
     | "loadWorkspace"
     | "loadWorkspaceFailed"
     | "loadWorkspaceSuccess"
-    | "loadingInitalData";
+    | "loadingInitialData";
   tags: never;
 }

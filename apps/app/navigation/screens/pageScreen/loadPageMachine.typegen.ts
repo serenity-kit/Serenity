@@ -23,6 +23,6 @@ export interface Typegen0 {
     hasDocumentAccess: "done.invoke.loadInitialDataMachine";
   };
   eventsCausingDelays: {};
-  matchesStates: "hasNoAccess" | "loadDocument" | "loadingInitalData";
+  matchesStates: "hasNoAccess" | "loadDocument" | "loadingInitialData";
   tags: never;
 }

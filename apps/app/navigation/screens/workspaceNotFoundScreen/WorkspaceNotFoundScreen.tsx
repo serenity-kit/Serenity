@@ -18,6 +18,7 @@ export default function WorkspaceNotFoundScreen({
           openCreateWorkspace={() => {
             navigation.push("Onboarding");
           }}
+          testID="workspace-not-found"
         />
       </View>
       <KeyboardAvoidingView behavior="padding" style={tw`flex-auto`}>

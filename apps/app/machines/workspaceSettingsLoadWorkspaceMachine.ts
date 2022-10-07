@@ -51,9 +51,9 @@ export const workspaceSettingsLoadWorkspaceMachine =
       tsTypes:
         {} as import("./workspaceSettingsLoadWorkspaceMachine.typegen").Typegen0,
       predictableActionArguments: true,
-      initial: "loadingInitalData",
+      initial: "loadingInitialData",
       states: {
-        loadingInitalData: {
+        loadingInitialData: {
           invoke: {
             src: loadInitialDataMachine,
             id: "loadInitialDataMachine",

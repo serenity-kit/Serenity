@@ -26,7 +26,7 @@ type WorkspacePageParams = {
 };
 
 type LoginParams = {
-  next?: string;
+  next: string;
 };
 
 type RegistrationVerificationParams = {
@@ -78,10 +78,11 @@ export type RootStackParamList = {
   RegistrationVerification: RegistrationVerificationParams;
   AcceptWorkspaceInvitation: WorkspaceInvitationParams;
   WorkspaceNotFound: undefined;
-  Login: LoginParams;
+  Login: LoginParams | undefined;
+  LogoutInProgress: undefined;
   EncryptDecryptImageTest: undefined;
   TestLibsodium: undefined;
-  AccountSettings: AccountSettingsParams;
+  AccountSettings: AccountSettingsParams | undefined;
   AccountSettingsProfile: undefined; // on phones
   AccountSettingsDevices: undefined; // on phones
   WorkspaceSettingsGeneral: undefined; // on phones

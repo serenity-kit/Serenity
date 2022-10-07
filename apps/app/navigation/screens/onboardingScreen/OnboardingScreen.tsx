@@ -25,6 +25,7 @@ export default function OnboardingScreen({ navigation }) {
           openCreateWorkspace={() => {
             navigation.push("Onboarding");
           }}
+          testID="onboarding"
         />
       </View>
       <KeyboardAvoidingView behavior="padding" style={tw`flex-auto`}>
