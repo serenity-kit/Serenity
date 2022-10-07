@@ -18,40 +18,45 @@ import {
 import { HStack } from "native-base";
 import { useState } from "react";
 import { Platform } from "react-native";
+import { useAppContext } from "../../context/AppContext";
 import {
   useMeQuery,
   useWorkspaceQuery,
   useWorkspacesQuery,
 } from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
 
 type Props = {
   workspaceId?: string;
   openCreateWorkspace: () => void;
+  testID?: string;
 };
 
 export default function AccountMenu({
   workspaceId,
   openCreateWorkspace,
+  testID,
 }: Props) {
+  const testIdPrefix = testID ? `${testID}__` : "";
   const [isOpenAccountMenu, setIsOpenAccountMenu] = useState(false);
-  const { updateAuthentication } = useWorkspaceContext();
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const isDesktopDevice = useIsDesktopDevice();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const navigation = useNavigation();
-  const { activeDevice } = useWorkspaceContext();
+  const { activeDevice, updateAuthentication } = useAppContext();
   const [meResult] = useMeQuery();
   const [workspaceResult] = useWorkspaceQuery({
     variables: {
       id: workspaceId,
-      deviceSigningPublicKey: activeDevice.signingPublicKey,
+      // fine since the query would not fire if pause is active
+      deviceSigningPublicKey: activeDevice?.signingPublicKey!,
     },
-    pause: !workspaceId,
+    pause: !workspaceId || !activeDevice,
   });
   const [workspacesResult] = useWorkspacesQuery({
-    variables: { deviceSigningPublicKey: activeDevice.signingPublicKey },
+    // fine since the query would not fire if pause is active
+    variables: { deviceSigningPublicKey: activeDevice?.signingPublicKey! },
+    pause: !activeDevice,
   });
 
   return (
@@ -72,7 +77,7 @@ export default function AccountMenu({
           // disable default outline styles
           // @ts-expect-error - web only
           _focusVisible={{ _web: { style: { outlineStyle: "none" } } }}
-          testID="account-menu-trigger"
+          testID={`${testIdPrefix}account-menu--trigger`}
         >
           <HStack
             space={isPermanentLeftSidebar ? 2 : 3}
@@ -162,6 +167,7 @@ export default function AccountMenu({
             }}
             name="plus"
             label="Create workspace"
+            testID={`${testIdPrefix}account-menu--create-workspace`}
           />
         </View>
       ) : (
@@ -184,13 +190,20 @@ export default function AccountMenu({
       <SidebarDivider collapsed />
       <MenuButton
         onPress={async () => {
-          setIsOpenAccountMenu(false);
-          clearDeviceAndSessionStorage();
-          await updateAuthentication(null);
-          // @ts-expect-error navigation ts issue
-          navigation.push("Login");
+          try {
+            setIsOpenAccountMenu(false);
+            navigation.navigate("LogoutInProgress");
+            clearDeviceAndSessionStorage();
+            await updateAuthentication(null);
+          } catch (error) {
+            alert(
+              "Failed to destroy the local data. Please login and try again."
+            );
+          } finally {
+            navigation.navigate("Login");
+          }
         }}
-        testID="account-menu__logout-button"
+        testID={`${testIdPrefix}account-menu--logout`}
       >
         Logout
       </MenuButton>

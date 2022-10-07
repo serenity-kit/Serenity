@@ -8,7 +8,7 @@ import {
   ModalHeader,
   Text,
 } from "@serenity-tools/ui";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MainDeviceDocument,
   MainDeviceQuery,
@@ -25,10 +25,10 @@ export type Props = {
   isVisible: boolean;
   description: string;
   onSuccess?: () => void;
-  onFail?: () => void;
-  onCancel?: () => void;
+  onBackdropPress?: () => void;
 };
 export function VerifyPasswordModal(props: Props) {
+  const inputRef = useRef();
   const [password, setPassword] = useState("");
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
   const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
@@ -41,10 +41,19 @@ export function VerifyPasswordModal(props: Props) {
     setIsVerifyingPassword(false);
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (inputRef.current) {
+        // @ts-expect-error focus() not defined since .current can be undefined
+        inputRef.current.focus();
+      }
+    }, 250);
+  }, []);
+
   const onBackdropPress = () => {
     setPassword("");
-    if (props.onCancel) {
-      props.onCancel();
+    if (props.onBackdropPress) {
+      props.onBackdropPress();
     }
   };
 
@@ -94,9 +103,6 @@ export function VerifyPasswordModal(props: Props) {
       } catch (error) {
         setIsPasswordInvalid(true);
         setIsVerifyingPassword(false);
-        if (props.onFail) {
-          props.onFail();
-        }
         return;
       }
       const sessionTokenSignature = await sodium.crypto_sign_detached(
@@ -147,9 +153,6 @@ export function VerifyPasswordModal(props: Props) {
       }
     } catch (error) {
       setIsPasswordInvalid(true);
-      if (props.onFail) {
-        props.onFail();
-      }
     }
     setPassword("");
     setIsVerifyingPassword(false);
@@ -166,6 +169,8 @@ export function VerifyPasswordModal(props: Props) {
         <InfoMessage variant="error">Invalid password</InfoMessage>
       )}
       <Input
+        ref={inputRef}
+        autoFocus={true}
         label={"Password"}
         secureTextEntry
         value={password}

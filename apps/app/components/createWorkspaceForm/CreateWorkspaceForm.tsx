@@ -21,6 +21,8 @@ import {
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { createWorkspaceKeyBoxesForDevices } from "../../utils/device/createWorkspaceKeyBoxesForDevices";
+import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 
 type WorkspaceProps = {
   id: string;
@@ -33,6 +35,7 @@ type DocumentProps = {
 };
 
 export type CreateWorkspaceFormProps = {
+  onBackdropPress?: () => void;
   onWorkspaceStructureCreated: (params: {
     workspace: WorkspaceProps;
     folder: FolderProps;
@@ -43,9 +46,20 @@ export type CreateWorkspaceFormProps = {
 export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   const inputRef = useRef();
   const [name, setName] = useState<string>("");
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const { activeDevice } = useAppContext();
   const [, createInitialWorkspaceStructure] =
     useCreateInitialWorkspaceStructureMutation();
+
+  const openPasswordModalIfNecessary = async () => {
+    if (!isPasswordModalVisible) {
+      const mainDevice = getMainDevice();
+      if (!mainDevice) {
+        // TODO: focus the input
+        setIsPasswordModalVisible(true);
+      }
+    }
+  };
 
   const [devicesResult] = useDevicesQuery({
     variables: {
@@ -59,6 +73,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       if (inputRef.current) {
         // @ts-expect-error focus() not defined since .current can be undefined
         inputRef.current.focus();
+        openPasswordModalIfNecessary();
       }
     }, 250);
   }, []);
@@ -163,28 +178,44 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   };
 
   return (
-    <FormWrapper>
-      <ModalHeader>Create a workspace</ModalHeader>
-      <Input
-        ref={inputRef}
-        label={"Workspace name"}
-        onChangeText={setName}
-        autoFocus={true}
-        hint="This is the name of your organization, team or private notes. You can invite team members afterwards."
+    <>
+      <FormWrapper>
+        <ModalHeader>Create a workspace</ModalHeader>
+        <Input
+          ref={inputRef}
+          label={"Workspace name"}
+          onChangeText={setName}
+          autoFocus={true}
+          hint="This is the name of your organization, team or private notes. You can invite team members afterwards."
+        />
+        <ModalButtonFooter
+          confirm={
+            <Button
+              disabled={
+                name === "" &&
+                devicesResult.data?.devices?.nodes?.length !== undefined
+              }
+              onPress={createWorkspace}
+            >
+              Create
+            </Button>
+          }
+        />
+      </FormWrapper>
+      <VerifyPasswordModal
+        isVisible={isPasswordModalVisible}
+        description="Creating a new workspace requires access to the main account and therefore verifying your password is required"
+        onSuccess={() => {
+          setIsPasswordModalVisible(false);
+        }}
+        onBackdropPress={() => {
+          setIsPasswordModalVisible(false);
+          console.log(props.onBackdropPress);
+          if (props.onBackdropPress) {
+            props.onBackdropPress();
+          }
+        }}
       />
-      <ModalButtonFooter
-        confirm={
-          <Button
-            disabled={
-              name === "" &&
-              devicesResult.data?.devices?.nodes?.length !== undefined
-            }
-            onPress={createWorkspace}
-          >
-            Create
-          </Button>
-        }
-      />
-    </FormWrapper>
+    </>
   );
 }

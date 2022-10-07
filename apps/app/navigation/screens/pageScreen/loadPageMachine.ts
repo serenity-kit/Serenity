@@ -18,9 +18,9 @@ export const loadPageMachine =
       context: { navigation: null } as Context,
       tsTypes: {} as import("./loadPageMachine.typegen").Typegen0,
       predictableActionArguments: true,
-      initial: "loadingInitalData",
+      initial: "loadingInitialData",
       states: {
-        loadingInitalData: {
+        loadingInitialData: {
           invoke: {
             src: loadInitialDataMachine,
             id: "loadInitialDataMachine",

@@ -40,7 +40,7 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   matchesStates:
     | "loadLastUsedDocumentId"
-    | "loadingInitalData"
+    | "loadingInitialData"
     | "noDocumentsAvailable"
     | "redirectToDocument";
   tags: never;

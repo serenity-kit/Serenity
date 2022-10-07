@@ -6,7 +6,7 @@ export const redirectToLoginIfMissingTheActiveDeviceOrSessionKey =
     const navigation = useNavigation();
     const { activeDevice, sessionKey } = useAppContext();
     if (!activeDevice || !sessionKey) {
-      navigation.navigate("Login", {});
+      navigation.navigate("Login");
       return null;
     }
 
