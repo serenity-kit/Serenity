@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { Text, View } from "@serenity-tools/ui";
 import { FlatList, StyleSheet } from "react-native";
-import { View, Text } from "@serenity-tools/ui";
-import { WorkspaceInvitationListItem } from "./WorkspaceInvitationListItem";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { WorkspaceInvitationListItem } from "./WorkspaceInvitationListItem";
 
 type Props = {
   workspaceInvitations: any[];
@@ -19,7 +18,6 @@ export function WorkspaceInvitationList(props: Props) {
           <Text style={styles.headerText}>ID</Text>
           <Text style={styles.headerText}>Inviter</Text>
           <Text style={styles.headerText}>Expires At</Text>
-          <View></View>
         </View>
       </View>
       <FlatList

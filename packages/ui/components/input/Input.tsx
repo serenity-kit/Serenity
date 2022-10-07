@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
-import { Text } from "../text/Text";
 import { RawInput, RawInputProps } from "../rawInput/RawInput";
+import { Text } from "../text/Text";
 import { View } from "../view/View";
 
 export type InputProps = RawInputProps & {
