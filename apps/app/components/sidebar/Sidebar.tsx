@@ -30,7 +30,7 @@ import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
-import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal1";
+import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
