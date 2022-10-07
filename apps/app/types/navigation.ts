@@ -81,7 +81,7 @@ export type RootStackParamList = {
   Login: LoginParams;
   EncryptDecryptImageTest: undefined;
   TestLibsodium: undefined;
-  AccountSettings: AccountSettingsParams;
+  AccountSettings: AccountSettingsParams | undefined;
   AccountSettingsProfile: undefined; // on phones
   AccountSettingsDevices: undefined; // on phones
   WorkspaceSettingsGeneral: undefined; // on phones
