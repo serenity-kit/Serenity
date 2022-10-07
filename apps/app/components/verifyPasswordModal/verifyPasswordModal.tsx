@@ -49,7 +49,6 @@ export function VerifyPasswordModal(props: Props) {
     // TODO: create a method that verifies the password
     try {
       const meResult = await fetchMe();
-      console.log({ meResult });
       if (meResult.error) {
         // TODO: handle this error in the UI
         throw new Error(meResult.error.message);
@@ -60,11 +59,7 @@ export function VerifyPasswordModal(props: Props) {
       }
       const username = meResult.data.me.username;
       let message: any = undefined;
-      try {
-        message = await startLogin(password);
-      } catch (error) {
-        console.log({ error });
-      }
+      message = await startLogin(password);
       console.log({ message });
       const startLoginResult = await startLoginMutation({
         input: {
@@ -72,7 +67,7 @@ export function VerifyPasswordModal(props: Props) {
           challenge: message,
         },
       });
-      console.log({ startLoginResult });
+      // console.log({ startLoginResult });
       if (!startLoginResult.data?.startLogin) {
         // probably invalid username or sessionkey
         // TODO: show this error to user
@@ -151,6 +146,7 @@ export function VerifyPasswordModal(props: Props) {
         props.onSuccess();
       }
     } catch (error) {
+      console.log(error);
       setIsPasswordInvalid(true);
       if (props.onFail) {
         props.onFail();
