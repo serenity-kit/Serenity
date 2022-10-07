@@ -30,7 +30,6 @@ import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
-import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
@@ -40,8 +39,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const workspaceId = route.params.workspaceId;
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
-  const [verifyPasswordModalVisible, setVerifyPasswordModalVisible] =
-    useState(false);
 
   const [meWithWorkspaceLoadingInfo] = useMeWithWorkspaceLoadingInfoQuery({
     variables: {
@@ -258,14 +255,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         isVisible={showCreateWorkspaceModal}
         onBackdropPress={() => setShowCreateWorkspaceModal(false)}
         onWorkspaceStructureCreated={onWorkspaceStructureCreated}
-      />
-      <VerifyPasswordModal
-        description="Verify your password to access your workspace"
-        isVisible={verifyPasswordModalVisible}
-        onCancel={() => setVerifyPasswordModalVisible(false)}
-        onSuccess={() => {
-          setVerifyPasswordModalVisible(false);
-        }}
       />
     </DrawerContentScrollView>
   );
