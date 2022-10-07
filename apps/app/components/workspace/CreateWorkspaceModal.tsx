@@ -1,6 +1,5 @@
-import React from "react";
-import { ModalProps as ReactNativeModalProps } from "react-native-modal";
 import { Modal } from "@serenity-tools/ui";
+import { ModalProps as ReactNativeModalProps } from "react-native-modal";
 import {
   CreateWorkspaceForm,
   CreateWorkspaceFormProps,
@@ -16,6 +15,7 @@ export function CreateWorkspaceModal(props: ModalProps) {
   return (
     <Modal isVisible={props.isVisible} onBackdropPress={props.onBackdropPress}>
       <CreateWorkspaceForm
+        onBackdropPress={props.onBackdropPress}
         onWorkspaceStructureCreated={props.onWorkspaceStructureCreated}
       />
     </Modal>
