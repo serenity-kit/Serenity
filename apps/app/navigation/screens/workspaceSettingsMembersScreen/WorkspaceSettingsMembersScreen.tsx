@@ -11,6 +11,7 @@ import {
 import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
+import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
@@ -28,6 +29,7 @@ import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspa
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
+import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { getUrqlClient } from "../../../utils/urqlClient/urqlClient";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
@@ -103,11 +105,15 @@ const workspaceMemberStyles = StyleSheet.create({
 export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
-  const workspaceId = useWorkspaceId();
+  let workspaceId = useWorkspaceId();
+  if (workspaceId === "") {
+    const params = props.route.params! as { workspaceId: string };
+    workspaceId = params.workspaceId;
+  }
   const { activeDevice } = useWorkspaceContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
-      workspaceId: workspaceId,
+      workspaceId,
       navigation: props.navigation,
       activeDevice,
     },
@@ -115,13 +121,17 @@ export default function WorkspaceSettingsMembersScreen(
 
   const [, updateWorkspaceMembersRolesMutation] =
     useUpdateWorkspaceMembersRolesMutation();
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [members, setMembers] = useState<WorkspaceMember[]>([]);
   const [memberLookup, setMemberLookup] = useState<{
     [username: string]: number;
   }>({});
-  const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
-  const [graphqlError, setGraphqlError] = useState<string>("");
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const [usernameToRemove, setUsernameToRemove] = useState<string | undefined>(
+    undefined
+  );
+  const [hasGraphqlError, setHasGraphqlError] = useState(false);
+  const [graphqlError, setGraphqlError] = useState("");
 
   useEffect(() => {
     if (
@@ -190,7 +200,18 @@ export default function WorkspaceSettingsMembersScreen(
     }
   };
 
+  const removeMemberPreflight = (username: string) => {
+    const mainDevice = getMainDevice();
+    if (mainDevice) {
+      removeMember(username);
+      return;
+    }
+    setUsernameToRemove(username);
+    setIsPasswordModalVisible(true);
+  };
+
   const removeMember = async (username: string) => {
+    setUsernameToRemove(username);
     const row = memberLookup[username];
     if (row >= 0) {
       const member = members[row];
@@ -265,10 +286,10 @@ export default function WorkspaceSettingsMembersScreen(
       console.error("No workspace found");
       return;
     }
-    // updateWorkspaceData(
-    //   state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
-    //   workspace
-    // );
+    updateWorkspaceData(
+      state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me,
+      workspace
+    );
   };
 
   return (
@@ -331,7 +352,7 @@ export default function WorkspaceSettingsMembersScreen(
                     updateMember(member, isMemberAdmin);
                   }}
                   onDeletePress={() => {
-                    removeMember(member.userId);
+                    removeMemberPreflight(member.userId);
                   }}
                 />
               ))}
@@ -352,6 +373,20 @@ export default function WorkspaceSettingsMembersScreen(
           </>
         )}
       </View>
+      <VerifyPasswordModal
+        isVisible={isPasswordModalVisible}
+        description="Creating a new workspace requires access to the main account and therefore verifying your password is required"
+        onSuccess={() => {
+          setIsPasswordModalVisible(false);
+          if (usernameToRemove) {
+            removeMember(usernameToRemove);
+          }
+        }}
+        onBackdropPress={() => {
+          setUsernameToRemove(undefined);
+          setIsPasswordModalVisible(false);
+        }}
+      />
     </>
   );
 }

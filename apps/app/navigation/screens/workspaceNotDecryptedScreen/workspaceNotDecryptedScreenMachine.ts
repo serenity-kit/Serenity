@@ -146,7 +146,7 @@ export const workspaceNotDecryptedScreenMachine =
           if (context.returnOtherWorkspaceIfNotFound === true) {
             context.navigation.replace("Onboarding");
           } else {
-            context.navigation.replace("WorkspaceNotFoundScreen", {
+            context.navigation.replace("WorkspaceNotFound", {
               workspaceId:
                 context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
                   ?.workspaceLoadingInfo?.id,
