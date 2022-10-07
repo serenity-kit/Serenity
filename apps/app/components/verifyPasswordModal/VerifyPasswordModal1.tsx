@@ -8,7 +8,7 @@ import {
   ModalHeader,
   Text,
 } from "@serenity-tools/ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MainDeviceDocument,
   MainDeviceQuery,
@@ -35,7 +35,14 @@ export function VerifyPasswordModal(props: Props) {
   const [, startLoginMutation] = useStartLoginMutation();
   const [, verifyPasswordMutation] = useVerifyPasswordMutation();
 
+  useEffect(() => {
+    setPassword("");
+    setIsPasswordInvalid(false);
+    setIsVerifyingPassword(false);
+  }, [props.isVisible]);
+
   const onBackdropPress = () => {
+    setPassword("");
     if (props.onCancel) {
       props.onCancel();
     }
@@ -139,11 +146,13 @@ export function VerifyPasswordModal(props: Props) {
         props.onSuccess();
       }
     } catch (error) {
+      setPassword("");
       setIsPasswordInvalid(true);
       if (props.onFail) {
         props.onFail();
       }
     }
+    setPassword("");
     setIsVerifyingPassword(false);
   };
 
