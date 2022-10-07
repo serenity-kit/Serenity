@@ -8,7 +8,6 @@ import {
   Icon,
   IconButton,
   InlineInput,
-  Pressable,
   SidebarDivider,
   SidebarLink,
   Text,
@@ -31,7 +30,6 @@ import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
-import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
@@ -41,8 +39,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const workspaceId = route.params.workspaceId;
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
-  const [verifyPasswordModalVisible, setVerifyPasswordModalVisible] =
-    useState(false);
 
   const [meWithWorkspaceLoadingInfo] = useMeWithWorkspaceLoadingInfoQuery({
     variables: {
@@ -187,13 +183,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         <SidebarLink to={{ screen: "DevDashboard" }} iconName="dashboard-line">
           Dev Dashboard
         </SidebarLink>
-        <Pressable
-          onPress={() => {
-            setVerifyPasswordModalVisible(true);
-          }}
-        >
-          <Text>Verify Password</Text>
-        </Pressable>
       </View>
 
       {isPermanentLeftSidebar ? <SidebarDivider /> : null}
@@ -266,14 +255,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         isVisible={showCreateWorkspaceModal}
         onBackdropPress={() => setShowCreateWorkspaceModal(false)}
         onWorkspaceStructureCreated={onWorkspaceStructureCreated}
-      />
-      <VerifyPasswordModal
-        description="Verify your password to access your workspace"
-        isVisible={verifyPasswordModalVisible}
-        onCancel={() => setVerifyPasswordModalVisible(false)}
-        onSuccess={() => {
-          setVerifyPasswordModalVisible(false);
-        }}
       />
     </DrawerContentScrollView>
   );
