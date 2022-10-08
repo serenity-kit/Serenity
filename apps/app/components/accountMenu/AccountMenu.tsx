@@ -108,17 +108,9 @@ export default function AccountMenu({
         to={{ screen: "AccountSettings" }}
         onPress={(event) => {
           setIsOpenAccountMenu(false);
-          // on iOS Modals can't be open at the same time
-          // and closing the workspace switcher takes a bit of time
-          // technically we only need it for tables and larger, but
-          // don't want to complicate things for now
           if (Platform.OS === "ios") {
             event.preventDefault();
-            setTimeout(() => {
-              navigation.navigate("AccountSettings", {
-                screen: "Profile",
-              });
-            }, 400);
+            navigation.navigate("AccountSettings");
           }
         }}
         icon={<Icon name={"user-settings-line"} color="gray-600" />}
@@ -158,12 +150,7 @@ export default function AccountMenu({
           <IconButton
             onPress={() => {
               setIsOpenAccountMenu(false);
-              // on mobile Modals can't be open at the same time
-              // and closing the workspace switcher takes a bit of time
-              const timeout = Platform.OS === "web" ? 0 : 400;
-              setTimeout(() => {
-                openCreateWorkspace();
-              }, timeout);
+              openCreateWorkspace();
             }}
             name="plus"
             label="Create workspace"
@@ -174,12 +161,7 @@ export default function AccountMenu({
         <MenuButton
           onPress={() => {
             setIsOpenAccountMenu(false);
-            // on mobile Modals can't be open at the same time
-            // and closing the workspace switcher takes a bit of time
-            const timeout = Platform.OS === "web" ? 0 : 400;
-            setTimeout(() => {
-              openCreateWorkspace();
-            }, timeout);
+            openCreateWorkspace();
           }}
           iconName="plus"
         >

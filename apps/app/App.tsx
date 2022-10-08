@@ -11,6 +11,7 @@ import "expo-dev-client";
 import { StatusBar } from "expo-status-bar";
 import { extendTheme, NativeBaseProvider } from "native-base";
 import { useMemo } from "react";
+import { OverlayProvider } from "react-native-popper";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useAppColorScheme, useDeviceContext } from "twrnc";
@@ -96,9 +97,11 @@ export default function App() {
             <UrqlProvider value={urqlClient}>
               <SafeAreaProvider>
                 <NativeBaseProvider theme={rnTheme}>
-                  <Navigation colorScheme={colorScheme} />
-                  <StatusBar />
-                  <OpaqueBridge source={source} />
+                  <OverlayProvider>
+                    <Navigation colorScheme={colorScheme} />
+                    <StatusBar />
+                    <OpaqueBridge source={source} />
+                  </OverlayProvider>
                 </NativeBaseProvider>
               </SafeAreaProvider>
             </UrqlProvider>
