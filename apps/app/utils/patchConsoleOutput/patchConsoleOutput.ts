@@ -46,6 +46,11 @@ export const patchConsoleOutput = () => {
           typeof args[0] === "string" &&
           args[0].includes(
             "setNativeProps is deprecated. Please update props using React state instead."
+          )) ||
+        (args[0] &&
+          typeof args[0] === "string" &&
+          args[0].includes(
+            "Attempted to read state from uninitialized service "
           ))
       ) {
         // ignored
