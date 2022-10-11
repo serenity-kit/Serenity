@@ -3,7 +3,7 @@ import {
   DrawerContentScrollView,
 } from "@react-navigation/drawer";
 
-import { SidebarLink, tw } from "@serenity-tools/ui";
+import { Heading, SidebarLink, tw } from "@serenity-tools/ui";
 import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 
 export default function WorkspaceSettingsSidebar(
@@ -12,7 +12,10 @@ export default function WorkspaceSettingsSidebar(
   const currentRouteName = props.state.routeNames[props.state.index];
   const workspaceId = useWorkspaceId();
   return (
-    <DrawerContentScrollView {...props} style={tw`bg-gray-100 -mt-1 pb-4`}>
+    <DrawerContentScrollView {...props} style={tw`bg-gray-100 py-4`}>
+      <Heading lvl={4} style={tw`px-4 pb-4`}>
+        Workspace Settings
+      </Heading>
       <SidebarLink
         to={{
           screen: "WorkspaceSettings",
