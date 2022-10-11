@@ -7,6 +7,7 @@ import {
   ModalButtonFooter,
   ModalHeader,
   RawInput,
+  SettingsContentWrapper,
   Spinner,
   Text,
   tw,
@@ -141,7 +142,7 @@ export default function WorkspaceSettingsGeneralScreen(
           <Text style={styles.errorText}>{graphqlError}</Text>
         </View>
       )}
-      <View style={tw`mt-20 px-4`}>
+      <SettingsContentWrapper title="General">
         {state.value !== "loadWorkspaceSuccess" ? (
           <CenterContent>
             {state.value === "loadWorkspaceFailed" ? (
@@ -154,25 +155,23 @@ export default function WorkspaceSettingsGeneralScreen(
           </CenterContent>
         ) : (
           <>
-            <View>
-              <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
-                Change name
-              </Text>
-              <RawInput
-                placeholder="Workspace name"
-                value={workspaceName}
-                onChangeText={setWorkspaceName}
-                editable={isAdmin && !isLoadingWorkspaceData}
-              />
-              {isAdmin && (
-                <Button
-                  onPress={updateWorkspaceName}
-                  disabled={isLoadingWorkspaceData}
-                >
-                  Update
-                </Button>
-              )}
-            </View>
+            <Text style={tw`mb-4 font-700 text-xl text-center`}>
+              Change name
+            </Text>
+            <RawInput
+              placeholder="Workspace name"
+              value={workspaceName}
+              onChangeText={setWorkspaceName}
+              editable={isAdmin && !isLoadingWorkspaceData}
+            />
+            {isAdmin && (
+              <Button
+                onPress={updateWorkspaceName}
+                disabled={isLoadingWorkspaceData}
+              >
+                Update
+              </Button>
+            )}
             {isAdmin && (
               <Button onPress={() => setShowDeleteWorkspaceModal(true)}>
                 Delete workspace
@@ -205,7 +204,7 @@ export default function WorkspaceSettingsGeneralScreen(
             )}
           </>
         )}
-      </View>
+      </SettingsContentWrapper>
     </>
   );
 }

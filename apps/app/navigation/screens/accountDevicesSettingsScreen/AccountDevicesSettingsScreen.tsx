@@ -1,4 +1,4 @@
-import { Text, tw, View } from "@serenity-tools/ui";
+import { SettingsContentWrapper, Text, View } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useState } from "react";
 import { FlatList, useWindowDimensions } from "react-native";
@@ -123,8 +123,7 @@ export default function DeviceManagerScreen(props) {
 
   return (
     <>
-      <View style={tw`mt-20`}>
-        <Text bold>Devices</Text>
+      <SettingsContentWrapper title={"Devices"}>
         <FlatList
           data={devicesResult.data?.devices?.nodes?.filter(notNull) || []}
           keyExtractor={(item) => item.signingPublicKey}
@@ -148,7 +147,7 @@ export default function DeviceManagerScreen(props) {
             </View>
           )}
         />
-      </View>
+      </SettingsContentWrapper>
       <VerifyPasswordModal
         isVisible={isPasswordModalVisible}
         description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"

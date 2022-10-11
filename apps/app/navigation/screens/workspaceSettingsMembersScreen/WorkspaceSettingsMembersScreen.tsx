@@ -3,6 +3,7 @@ import {
   CenterContent,
   Checkbox,
   InfoMessage,
+  SettingsContentWrapper,
   Spinner,
   Text,
   tw,
@@ -299,7 +300,7 @@ export default function WorkspaceSettingsMembersScreen(
           <Text style={styles.errorText}>{graphqlError}</Text>
         </View>
       )}
-      <View style={tw`mt-20 px-4`}>
+      <SettingsContentWrapper title="Members">
         {state.value !== "loadWorkspaceSuccess" ? (
           <CenterContent>
             {state.value === "loadWorkspaceFailed" ? (
@@ -313,66 +314,63 @@ export default function WorkspaceSettingsMembersScreen(
           </CenterContent>
         ) : (
           <>
-            <View>
-              <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
-                Invitations
-              </Text>
-              {isAdmin && (
-                <View>
-                  <CreateWorkspaceInvitation
-                    workspaceId={workspaceId}
-                    onWorkspaceInvitationCreated={(
-                      workspaceInvitation: any
-                    ) => {
-                      // do nothing
-                    }}
-                  />
-                  <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
-                    Members
-                  </Text>
-                </View>
-              )}
-              {members.map((member: any) => (
-                <WorkspaceMemberRow
-                  key={member.userId}
-                  userId={member.userId}
-                  username={member.username}
-                  isAdmin={member.isAdmin}
-                  adminUserId={
-                    state.context.meWithWorkspaceLoadingInfoQueryResult?.data
-                      ?.me?.id
-                  }
-                  allowEditing={
-                    isAdmin &&
-                    member.userId !==
-                      state.context.meWithWorkspaceLoadingInfoQueryResult?.data
-                        ?.me?.id
-                  }
-                  onAdminStatusChange={(isMemberAdmin: boolean) => {
-                    updateMember(member, isMemberAdmin);
-                  }}
-                  onDeletePress={() => {
-                    removeMemberPreflight(member.userId);
+            <Text style={tw`mb-4 font-700 text-xl text-center`}>
+              Invitations
+            </Text>
+            {isAdmin && (
+              <View>
+                <CreateWorkspaceInvitation
+                  workspaceId={workspaceId}
+                  onWorkspaceInvitationCreated={(workspaceInvitation: any) => {
+                    // do nothing
                   }}
                 />
-              ))}
-              {isAdmin ? (
-                <>
-                  <Text style={styles.memberListItemLabel}>
-                    You are an admin of this workspace
-                  </Text>
-                </>
-              ) : (
-                <>
-                  <Text style={styles.memberListItemLabel}>
-                    You are not an admin of this workspace
-                  </Text>
-                </>
-              )}
-            </View>
+                <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
+                  Members
+                </Text>
+              </View>
+            )}
+            {members.map((member: any) => (
+              <WorkspaceMemberRow
+                key={member.userId}
+                userId={member.userId}
+                username={member.username}
+                isAdmin={member.isAdmin}
+                adminUserId={
+                  state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
+                    ?.id
+                }
+                allowEditing={
+                  isAdmin &&
+                  member.userId !==
+                    state.context.meWithWorkspaceLoadingInfoQueryResult?.data
+                      ?.me?.id
+                }
+                onAdminStatusChange={(isMemberAdmin: boolean) => {
+                  updateMember(member, isMemberAdmin);
+                }}
+                onDeletePress={() => {
+                  removeMemberPreflight(member.userId);
+                }}
+              />
+            ))}
+            {isAdmin ? (
+              <>
+                <Text style={styles.memberListItemLabel}>
+                  You are an admin of this workspace
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.memberListItemLabel}>
+                  You are not an admin of this workspace
+                </Text>
+              </>
+            )}
           </>
         )}
-      </View>
+      </SettingsContentWrapper>
+
       <VerifyPasswordModal
         isVisible={isPasswordModalVisible}
         description="Creating a new workspace requires access to the main account and therefore verifying your password is required"
