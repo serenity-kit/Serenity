@@ -26,8 +26,9 @@ export default function AccountSettingsSidebar(
           params: { screen: "Profile" },
         }}
         iconName="user-line"
+        active={currentRouteName === "Profile"}
       >
-        Profile {currentRouteName === "Profile" ? "(active)" : null}
+        Profile
       </SidebarLink>
       <SidebarLink
         to={{
@@ -35,8 +36,9 @@ export default function AccountSettingsSidebar(
           params: { screen: "Devices" },
         }}
         iconName="device-line"
+        active={currentRouteName === "Devices"}
       >
-        Devices {currentRouteName === "Devices" ? "(active)" : null}
+        Devices
       </SidebarLink>
     </DrawerContentScrollView>
   );

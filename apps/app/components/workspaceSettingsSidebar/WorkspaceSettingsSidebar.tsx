@@ -22,8 +22,9 @@ export default function WorkspaceSettingsSidebar(
           params: { screen: "General", workspaceId },
         }}
         iconName="settings-4-line"
+        active={currentRouteName === "General"}
       >
-        General {currentRouteName === "General" ? "(active)" : null}
+        General
       </SidebarLink>
       <SidebarLink
         to={{
@@ -31,8 +32,9 @@ export default function WorkspaceSettingsSidebar(
           params: { screen: "Members", workspaceId },
         }}
         iconName="group-line"
+        active={currentRouteName === "Members"}
       >
-        Members {currentRouteName === "Members" ? "(active)" : null}
+        Members
       </SidebarLink>
     </DrawerContentScrollView>
   );
