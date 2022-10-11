@@ -7,12 +7,13 @@ import { Device } from "../types/Device";
 import * as SessionKeyStore from "../utils/authentication/sessionKeyStore";
 import { getSessionKey } from "../utils/authentication/sessionKeyStore";
 import { getActiveDevice } from "../utils/device/getActiveDevice";
-import { recreateClient } from "../utils/urqlClient/urqlClient";
+import { getUrqlClient, recreateClient } from "../utils/urqlClient/urqlClient";
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
   const [sessionKey, setSessionKey] = useState<null | string>(null);
   const [activeDevice, setActiveDevice] = useState<null | Device>(null);
+  const [urqlClient, setUrqlClient] = useState<Client>(getUrqlClient());
 
   // Load any resources or data that we need prior to rendering the app
   useEffect(() => {
@@ -47,14 +48,15 @@ export default function useCachedResources() {
       session: { sessionKey: string; expiresAt: string } | null
     ): Promise<Client> => {
       if (session) {
-        setSessionKey(session.sessionKey);
         await SessionKeyStore.setSessionKey(session.sessionKey);
+        setSessionKey(session.sessionKey);
       } else {
-        setSessionKey(null);
         await SessionKeyStore.deleteSessionKey();
+        setSessionKey(null);
       }
-      const urqlClient = recreateClient();
-      return urqlClient;
+      const newUrqlClient = recreateClient(); // the sessionKey
+      setUrqlClient(newUrqlClient);
+      return newUrqlClient;
     },
     [setSessionKey]
   );
@@ -71,5 +73,6 @@ export default function useCachedResources() {
     setActiveDevice,
     updateActiveDevice,
     updateAuthentication,
+    urqlClient,
   };
 }

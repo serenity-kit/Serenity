@@ -22,8 +22,8 @@ export interface Typegen0 {
       type: "error.platform.getLastUsedWorkspaceAndDocumentId";
       data: unknown;
     };
-    "xstate.after(2000)#loadInitialData.failure": {
-      type: "xstate.after(2000)#loadInitialData.failure";
+    "xstate.after(2000)#rootScreen.failure": {
+      type: "xstate.after(2000)#rootScreen.failure";
     };
     "xstate.init": { type: "xstate.init" };
   };
@@ -47,7 +47,7 @@ export interface Typegen0 {
     fetchMeWithWorkspaceLoadingInfo:
       | "done.invoke.getLastUsedWorkspaceAndDocumentId"
       | "error.platform.getLastUsedWorkspaceAndDocumentId"
-      | "xstate.after(2000)#loadInitialData.failure";
+      | "xstate.after(2000)#rootScreen.failure";
     getLastUsedWorkspaceAndDocumentId: "xstate.init";
   };
   eventsCausingGuards: {

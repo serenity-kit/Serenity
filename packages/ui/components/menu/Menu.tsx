@@ -25,7 +25,7 @@ export const Menu = ({
   });
 
   return (
-    <Popover {...rest} isOpen={isOpen} onOpenChange={onChange}>
+    <Popover {...rest} mode="multiple" isOpen={isOpen} onOpenChange={onChange}>
       <Popover.Backdrop />
       <Popover.Content>
         <TouchableWithoutFeedback

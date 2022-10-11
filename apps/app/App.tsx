@@ -10,7 +10,7 @@ import { tw, useIsDesktopDevice } from "@serenity-tools/ui";
 import "expo-dev-client";
 import { StatusBar } from "expo-status-bar";
 import { extendTheme, NativeBaseProvider } from "native-base";
-import { useMemo } from "react";
+import { OverlayProvider } from "react-native-popper";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useAppColorScheme, useDeviceContext } from "twrnc";
@@ -21,7 +21,6 @@ import { AppContextProvider } from "./context/AppContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
 import { patchConsoleOutput } from "./utils/patchConsoleOutput/patchConsoleOutput";
-import { recreateClient } from "./utils/urqlClient/urqlClient";
 import { source } from "./webviews/opaque/source";
 
 patchConsoleOutput();
@@ -36,6 +35,7 @@ export default function App() {
     updateAuthentication,
     activeDevice,
     updateActiveDevice,
+    urqlClient,
   } = useCachedResources();
   const isDesktopDevice = useIsDesktopDevice();
 
@@ -74,11 +74,6 @@ export default function App() {
     },
   });
 
-  // recreate client and especially the internal cache every time the authentication state changes
-  const urqlClient = useMemo(() => {
-    return recreateClient();
-  }, [sessionKey]); // eslint-disable-line react-hooks/exhaustive-deps
-
   if (!isLoadingComplete || !isFontLoadingComplete) {
     return null;
   } else {
@@ -96,9 +91,11 @@ export default function App() {
             <UrqlProvider value={urqlClient}>
               <SafeAreaProvider>
                 <NativeBaseProvider theme={rnTheme}>
-                  <Navigation colorScheme={colorScheme} />
-                  <StatusBar />
-                  <OpaqueBridge source={source} />
+                  <OverlayProvider>
+                    <Navigation colorScheme={colorScheme} />
+                    <StatusBar />
+                    <OpaqueBridge source={source} />
+                  </OverlayProvider>
                 </NativeBaseProvider>
               </SafeAreaProvider>
             </UrqlProvider>
