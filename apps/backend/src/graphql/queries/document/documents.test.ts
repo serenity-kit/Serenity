@@ -76,6 +76,7 @@ const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
   sessionKey = registerUserResult.sessionKey;
   const device = registerUserResult.mainDevice;
+  const webDevice = registerUserResult.webDevice;
   const initialWorkspaceStructureResult = await createInitialWorkspaceStructure(
     {
       workspaceName: "workspace 1",
@@ -83,6 +84,7 @@ const setup = async () => {
       deviceSigningPublicKey: device.signingPublicKey,
       deviceEncryptionPublicKey: device.encryptionPublicKey,
       deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+      webDevice,
       folderName: "Getting started",
       folderId: uuidv4(),
       folderIdSignature: `TODO+${uuidv4()}`,
@@ -142,6 +144,7 @@ const setup = async () => {
       deviceSigningPublicKey: device2.signingPublicKey,
       deviceEncryptionPublicKey: device2.encryptionPublicKey,
       deviceEncryptionPrivateKey: registerUserResult2.encryptionPrivateKey,
+      webDevice: registerUserResult2.webDevice,
       folderName: "Getting started",
       folderId: uuidv4(),
       folderIdSignature: `TODO+${uuidv4()}`,

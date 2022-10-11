@@ -31,6 +31,7 @@ const setup = async () => {
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
     deviceEncryptionPrivateKey: registerUserResult1.encryptionPrivateKey,
+    webDevice: registerUserResult1.webDevice,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
