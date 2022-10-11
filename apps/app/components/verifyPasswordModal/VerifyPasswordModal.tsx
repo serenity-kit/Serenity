@@ -7,6 +7,7 @@ import {
   Modal,
   ModalHeader,
   Text,
+  View,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -164,30 +165,34 @@ export function VerifyPasswordModal(props: Props) {
       onBackdropPress={onBackdropPress}
       onModalHide={onModalHide}
     >
-      <ModalHeader>Verify Password</ModalHeader>
-      {isPasswordInvalid && (
-        <InfoMessage variant="error">Invalid password</InfoMessage>
-      )}
-      <Input
-        ref={inputRef}
-        autoFocus={true}
-        label={"Password"}
-        secureTextEntry
-        value={password}
-        onChangeText={(text: string) => {
-          setPassword(text);
-        }}
-        placeholder="Enter your password …"
-      />
-      <Text muted variant="sm">
-        {props.description}
-      </Text>
-      <Button
-        onPress={() => onVerifyPasswordPress(password)}
-        disabled={isVerifyingPassword}
-      >
-        Verify
-      </Button>
+      <View testID="verify-password-modal">
+        <ModalHeader>Verify Password</ModalHeader>
+        {isPasswordInvalid && (
+          <InfoMessage variant="error">Invalid password</InfoMessage>
+        )}
+        <Input
+          ref={inputRef}
+          autoFocus={true}
+          label={"Password"}
+          secureTextEntry
+          value={password}
+          onChangeText={(text: string) => {
+            setPassword(text);
+          }}
+          placeholder="Enter your password …"
+          testID="verify-password-modal__password-input"
+        />
+        <Text muted variant="sm">
+          {props.description}
+        </Text>
+        <Button
+          onPress={() => onVerifyPasswordPress(password)}
+          disabled={isVerifyingPassword}
+          testID="verify-password-modal__submit-button"
+        >
+          Verify
+        </Button>
+      </View>
     </Modal>
   );
 }
