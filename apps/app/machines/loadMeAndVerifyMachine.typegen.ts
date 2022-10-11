@@ -10,8 +10,8 @@ export interface Typegen0 {
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
     "error.platform.fetchMe": { type: "error.platform.fetchMe"; data: unknown };
-    "xstate.after(2000)#loadInitialData.failure": {
-      type: "xstate.after(2000)#loadInitialData.failure";
+    "xstate.after(2000)#loadMeAndVerify.failure": {
+      type: "xstate.after(2000)#loadMeAndVerify.failure";
     };
     "xstate.init": { type: "xstate.init" };
   };
@@ -28,7 +28,7 @@ export interface Typegen0 {
     redirectToLogin: "";
   };
   eventsCausingServices: {
-    fetchMe: "xstate.after(2000)#loadInitialData.failure" | "xstate.init";
+    fetchMe: "xstate.after(2000)#loadMeAndVerify.failure" | "xstate.init";
   };
   eventsCausingGuards: {
     hasNoNetworkError: "done.invoke.fetchMe";

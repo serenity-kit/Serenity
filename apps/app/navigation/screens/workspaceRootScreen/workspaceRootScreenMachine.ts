@@ -13,7 +13,7 @@ type Context = {
 };
 
 export const workspaceRootScreenMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2BDCAFdMB0amAlgHZQCSJRALusgCLq0DEEqJYepAbqgNadCESjSJ1GtALLoAxgAtSYRKAAOqWKPbKQAD0QAmAJwAGPAGYALAA59N4zYtmAbPoA0IAJ6IAjPv15DfTMAVmsnYNCzM28LAF9Y9yEcfCFSCipaBiZ0ZjAAJzzUPLwVZCYAMyKAWwIMYQyxLKlZBQ5tNQ1qIi0kXUQrAHYAqxCrUKsLJ0cBs3cvBDN9Jzxg4wtI-QHNifjEuuTBOoAZdFhqAFVYSHpUGQBXKrASanIIVnZOHn5DzAPazBOZ0u11uDyeLwgCC+MiY3RIAG1jABddrqTQkbR6BAAWiMpgs3mMTicxkMg2MwX0Fgscx8JLwxkJxmMVMWVicEysuxASVwPwggIuVwgN3uj2er1yBSKJTK1EqeRqvJSx1OQpBYvBryhJF4MK67ERKN6HXRmMQuJG5jMAxJ9iCNoGE1pCH0wTMeAsA0CwUMZhM3m8Vgp8QSIBIqAgcG0yv5aREmQk6FRnTh5oQ3g91OsVl8WwG3i2bpdvisKyDwQGq0GhbMLO5sbweUgRGbMmoABVUKKwc8U2belinIs8GNBhYiVYpxyaZ46d4VoYCcTrNTghMBg39nz-gK1cCRaDxRD+waMYOLeFgit-VZAlXguEoiXbOWxlX7AWZiGw42Iz3j1gABBbh0CIMoACNkCUE00TPdNhwsFZvXsYdA29SkXUWQxPUJAYLCCMlfW8Jct1+PlTzTC8cScb0bzJe8IifWY5wQVYAmcf0SLJQt8P0UNYiAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QHcD2AnA1rADgQwGMwAlVVAFwGUD0wwA7AOgBtU8IBLeqASXo-Ic8zACJ5yeAMQRU9MIy4A3VJnmt2fAUNHi8AWUIALLmESgcqWFtlmQAD0QBGACwBORgGZHrgEy+ADIGuzv6OADQgAJ5OAOzuAKz+Hj4AHL7xqSkAbD4+AL55EWhYuIQkZFQ0dEzqnNyagsJiEpJg6OgYjDjM4gBmGAC2LGwQDdrN+kYmthZWgjZI9ogAtD7xHoy5Wc4eWXseri5ZHhHRCDsxjN4+yc4+-lmuMX5ZBUUY2PhEpBTUtAzDdgAGTwsHIAFVYJARKgCABXAYMcg8CDSWTyJQqeTFT5lH6Vf41EYgsGQ6GwhFIlEITEEcQcWQAbX8AF0ZpZrPRbA4EMtdilGK5-CkDq51s5ts5nPFTogbpd-PEYnEYik1qlXCkYm8QDjSt8Kn9qoCICSIVCIDD4Yj6MjUW0Ouguj1yP10EM9V9yr8qgDamayZaKTa7TT6Mo6fN6My2YtZpzuSsPDtPP57il-Mq08msrKEI5k54so5tvFjo4fMcPAVCiB6KgIHBbJ68YbfUT2FxePxGjoJOy5gyuYsecssgKK+t4tL-HcYvFHDKonKpVctRWbgdvPF4ikdS2DT7CYxaJxaARyAAVVBWym2gcJkeIY4+RgpXcxELjlLZFLOPMlo4jDxMEJbbH+0p-tqtYHt6BLGv6oLmuS1pUhAD5RomvIxBWgoeAu-iuMEPgVh4MR5jcWSbL4HjZHs84-vuHz6nBRoAvWt4hrAACCih4BwPQAEbMKYcYcphT4IMczjAXEwrlo4cQZHmyTuM4jiZncBzvocwRMSUXr4mxw7mOJQ5YcsMS7HhBFEXcpHkcuUmvmRUoeIqIraRKNZ5EAA */
   createMachine(
     {
       context: { navigation: null } as Context,
@@ -25,14 +25,6 @@ export const workspaceRootScreenMachine =
           invoke: {
             src: loadInitialDataMachine,
             id: "loadInitialDataMachine",
-            data: (context) => {
-              return {
-                returnOtherWorkspaceIfNotFound: false,
-                returnOtherDocumentIfNotFound: true,
-                workspaceId: context.workspaceId,
-                navigation: context.navigation,
-              };
-            },
             onDone: [
               {
                 actions: assign({
@@ -79,7 +71,7 @@ export const workspaceRootScreenMachine =
           type: "final",
         },
       },
-      id: "loadPage",
+      id: "workspaceRootScreen",
     },
     {
       guards: {

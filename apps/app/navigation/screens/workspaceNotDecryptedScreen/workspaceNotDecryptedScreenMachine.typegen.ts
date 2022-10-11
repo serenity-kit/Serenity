@@ -13,11 +13,11 @@ export interface Typegen0 {
       type: "error.platform.fetchMeWithWorkspaceLoadingInfo";
       data: unknown;
     };
-    "xstate.after(2000)#loadInitialData.failure": {
-      type: "xstate.after(2000)#loadInitialData.failure";
+    "xstate.after(2000)#workspaceNotDecrypted.failure": {
+      type: "xstate.after(2000)#workspaceNotDecrypted.failure";
     };
-    "xstate.after(5000)#loadInitialData.notAuthorized": {
-      type: "xstate.after(5000)#loadInitialData.notAuthorized";
+    "xstate.after(5000)#workspaceNotDecrypted.notAuthorized": {
+      type: "xstate.after(5000)#workspaceNotDecrypted.notAuthorized";
     };
     "xstate.init": { type: "xstate.init" };
   };
@@ -37,8 +37,8 @@ export interface Typegen0 {
   };
   eventsCausingServices: {
     fetchMeWithWorkspaceLoadingInfo:
-      | "xstate.after(2000)#loadInitialData.failure"
-      | "xstate.after(5000)#loadInitialData.notAuthorized"
+      | "xstate.after(2000)#workspaceNotDecrypted.failure"
+      | "xstate.after(5000)#workspaceNotDecrypted.notAuthorized"
       | "xstate.init";
   };
   eventsCausingGuards: {

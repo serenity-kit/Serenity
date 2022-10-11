@@ -8,19 +8,19 @@ export interface Typegen0 {
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
-    "done.invoke.loadPage.loadLastUsedDocumentId:invocation[0]": {
-      type: "done.invoke.loadPage.loadLastUsedDocumentId:invocation[0]";
+    "done.invoke.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]": {
+      type: "done.invoke.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]";
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
-    "error.platform.loadPage.loadLastUsedDocumentId:invocation[0]": {
-      type: "error.platform.loadPage.loadLastUsedDocumentId:invocation[0]";
+    "error.platform.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]": {
+      type: "error.platform.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]";
       data: unknown;
     };
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {
-    getLastUsedDocumentId: "done.invoke.loadPage.loadLastUsedDocumentId:invocation[0]";
+    getLastUsedDocumentId: "done.invoke.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]";
   };
   missingImplementations: {
     actions: never;
