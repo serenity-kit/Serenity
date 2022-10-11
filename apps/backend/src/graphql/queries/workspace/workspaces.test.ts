@@ -14,6 +14,7 @@ let sessionKey = "";
 const username = "user";
 const password = "password";
 let device: any;
+let webDevice: any;
 
 const workspace1Id = uuidv4();
 const workspace2Id = uuidv4();
@@ -23,6 +24,7 @@ let firstWorkspaceCursor = "";
 
 const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
+  webDevice = registerUserResult.webDevice;
   userId = registerUserResult.userId;
   sessionKey = registerUserResult.sessionKey;
   device = registerUserResult.mainDevice;
@@ -32,6 +34,7 @@ const setup = async () => {
     deviceSigningPublicKey: registerUserResult.mainDevice.signingPublicKey,
     deviceEncryptionPublicKey: registerUserResult.encryptionPrivateKey,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    webDevice,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",
@@ -46,6 +49,7 @@ const setup = async () => {
     deviceSigningPublicKey: registerUserResult.mainDevice.signingPublicKey,
     deviceEncryptionPublicKey: registerUserResult.encryptionPrivateKey,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    webDevice,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",

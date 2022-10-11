@@ -9,6 +9,7 @@ export * from "./decryptFolderName/decryptFolderName";
 export * from "./encryptDocumentTitle/encryptDocumentTitle";
 export * from "./encryptExistingFolderName/encryptExistingFolderName";
 export * from "./encryptFolderName/encryptFolderName";
+export * from "./equalArrayContent/equalArrayContent";
 export * from "./recreateDocumentKey/recreateDocumentKey";
 export * from "./types";
 export * from "./verifyDevice/verifyDevice";

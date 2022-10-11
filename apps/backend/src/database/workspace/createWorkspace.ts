@@ -1,3 +1,4 @@
+import { equalArrayContent } from "@serenity-tools/common";
 import { v4 as uuidv4 } from "uuid";
 import {
   Workspace,
@@ -30,6 +31,30 @@ export async function createWorkspace({
   deviceWorkspaceKeyBoxes,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
+    const allDeviceSigningPublicKeys = deviceWorkspaceKeyBoxes.map(
+      (workspaceKeyBox) => workspaceKeyBox.deviceSigningPublicKey
+    );
+    const devices = await prisma.device.findMany({
+      where: {
+        userId,
+        session: { every: { expiresAt: { gte: new Date() } } },
+      },
+      select: { signingPublicKey: true },
+    });
+    const actualDeviceSigningPublicKeys = devices.map(
+      (item) => item.signingPublicKey
+    );
+    if (
+      !equalArrayContent(
+        allDeviceSigningPublicKeys,
+        actualDeviceSigningPublicKeys
+      )
+    ) {
+      throw new Error(
+        "Invalid deviceWorkspaceKeyBoxes since it doesn't match all devices of the user"
+      );
+    }
+
     const rawWorkspace = await prisma.workspace.create({
       data: {
         id,

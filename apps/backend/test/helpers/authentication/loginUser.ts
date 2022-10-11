@@ -61,5 +61,6 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
 
   return {
     sessionKey,
+    device,
   };
 };

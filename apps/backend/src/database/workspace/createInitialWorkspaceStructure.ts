@@ -3,8 +3,8 @@ import { Document } from "../../types/document";
 import { Folder } from "../../types/folder";
 import { Workspace } from "../../types/workspace";
 import { createSnapshot } from "../createSnapshot";
-import { createDocument } from "../document/createDocument";
 import { createFolder } from "../folder/createFolder";
+import { prisma } from "../prisma";
 import {
   createWorkspace,
   DeviceWorkspaceKeyBoxParams,
@@ -70,15 +70,17 @@ export async function createInitialWorkspaceStructure({
     parentFolderId: undefined,
     workspaceId: workspace.id,
   });
-  const document = await createDocument({
-    id: documentId,
-    encryptedName: encryptedDocumentName,
-    encryptedNameNonce: encryptedDocumentNameNonce,
-    workspaceKeyId: workspace.currentWorkspaceKey?.id,
-    subkeyId: documentSubkeyId,
-    contentSubkeyId: documentContentSubkeyId,
-    parentFolderId: folder.id,
-    workspaceId: workspaceId,
+  const document = await prisma.document.create({
+    data: {
+      id: documentId,
+      encryptedName: encryptedDocumentName,
+      encryptedNameNonce: encryptedDocumentNameNonce,
+      workspaceKeyId: workspace.currentWorkspaceKey?.id,
+      subkeyId: documentSubkeyId,
+      contentSubkeyId: documentContentSubkeyId,
+      parentFolderId: folder.id,
+      workspaceId: workspaceId,
+    },
   });
   await createSnapshot(documentSnapshot);
   return {
