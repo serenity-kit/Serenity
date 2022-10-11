@@ -56,6 +56,7 @@ const customColors = {
     500: "#48AD83",
   },
   muted: "#8A8B96", // gray 600
+  backdrop: "#1F1F2140", // backdrop color including opacity
 };
 
 const customTheme = {
