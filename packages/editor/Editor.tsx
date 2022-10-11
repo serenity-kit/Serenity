@@ -1,21 +1,21 @@
-import "./editor-output.css";
-import "./awareness.css";
-import React, { useRef, useState } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
 import { tw, useHasEditorSidebar, View } from "@serenity-tools/ui";
-import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
-import { Level } from "@tiptap/extension-heading";
+import { EditorEvents } from "@tiptap/core";
 import Collaboration from "@tiptap/extension-collaboration";
-import * as Y from "yjs";
+import { Level } from "@tiptap/extension-heading";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import TaskItem from "@tiptap/extension-task-item";
+import TaskList from "@tiptap/extension-task-list";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import React, { useRef, useState } from "react";
 import { Awareness } from "y-protocols/awareness";
+import * as Y from "yjs";
+import "./awareness.css";
+import EditorSidebar from "./components/editorSidebar/EditorSidebar";
+import "./editor-output.css";
 import { AwarnessExtension } from "./naisho-awareness-extension";
 import { SerenityScrollIntoViewExtension } from "./scroll-into-view-extensions";
-import TaskList from "@tiptap/extension-task-list";
-import TaskItem from "@tiptap/extension-task-item";
-import Placeholder from "@tiptap/extension-placeholder";
-import EditorSidebar from "./components/editorSidebar/EditorSidebar";
-import { EditorEvents } from "@tiptap/core";
 
 type EditorProps = {
   documentId: string;

@@ -11,17 +11,18 @@ export const SerenityScrollIntoViewExtension = Extension.create<
   name: "serenityScrollIntoViewExtension",
 
   addCommands() {
+    alert("add COMMANDS");
     return {
       scrollIntoView:
         () =>
         ({ commands }) => {
           let { from, to } = this.editor.state.selection;
-          console.log("scrollIntoView");
           // let start = this.editor.view.coordsAtPos(from);
           let end = this.editor.view.coordsAtPos(to);
+          alert("scrollIntoView");
           this.editor.view.dom.parentElement?.parentElement?.scrollTo(
             0,
-            end.top
+            end.top + 200 // covers the editor toolbar plus some space to not end up at the very bottom
           );
           return true;
         },
