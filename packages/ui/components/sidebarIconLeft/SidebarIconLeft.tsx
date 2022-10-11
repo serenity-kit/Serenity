@@ -4,17 +4,18 @@ import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopD
 
 export type SidebarIconLeftProps = IconProps & {
   name: IconNames;
+  active?: boolean;
 };
 
 export const SidebarIconLeft = forwardRef(
   (props: SidebarIconLeftProps, ref) => {
+    const { name, active } = props;
     const isDesktopDevice = useIsDesktopDevice();
 
+    const iconColor = active ? "primary-500" : "gray-800";
+
     return (
-      <Icon
-        name={props.name}
-        color={isDesktopDevice ? "gray-800" : "gray-900"}
-      />
+      <Icon name={name} color={isDesktopDevice ? iconColor : "gray-900"} />
     );
   }
 );
