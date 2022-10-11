@@ -1,4 +1,4 @@
-import { Page, test } from "@playwright/test";
+import { expect, Page, test } from "@playwright/test";
 import * as sodium from "@serenity-tools/libsodium";
 import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
@@ -78,9 +78,10 @@ test.describe("Workspace Sharing", () => {
     });
     await delayForSeconds(2);
 
-    const { url: workspaceInvitationUrl } = await createWorkspaceInvitation({
+    const workspaceInvitationResult = await createWorkspaceInvitation({
       page,
     });
+    workspaceInvitationUrl = workspaceInvitationResult.url;
 
     // now accept for both users
     const user2Context = await browser.newContext();
@@ -129,12 +130,15 @@ test.describe("Workspace Sharing", () => {
     await delayForSeconds(2);
     await reloadPage({ page: user2Page });
     await reloadPage({ page: user3Page });
-    await delayForSeconds(2);
+    await delayForSeconds(4);
+    const user3Url = user3Page.url();
+    const expectedUser3Url = `http://localhost:3000/workspace/${user1.data.workspace.id}/not-found`;
     const invalidAccessMessage = user3Page.locator(
       "data-testid=no-access-to-workspace-error"
     );
     const doesInvalidAccessMessageExist =
       await invalidAccessMessage.isVisible();
+    expect(user3Url).toBe(expectedUser3Url);
     expect(doesInvalidAccessMessageExist).toBe(true);
     await renameFolder(user2Page, user1.data.folder.id, "user2 re-renamed");
   });
