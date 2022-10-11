@@ -89,11 +89,6 @@ export const createInitialWorkspaceStructureMutation = mutationField(
       context.assertValidDeviceSigningPublicKeyForThisSession(
         args.input.creatorDeviceSigningPublicKey
       );
-      args.input.deviceWorkspaceKeyBoxes.forEach((deviceWorkspaceKeyBox) => {
-        context.assertValidDeviceSigningPublicKeyForThisSession(
-          deviceWorkspaceKeyBox.deviceSigningPublicKey
-        );
-      });
       const workspaceStructure = await createInitialWorkspaceStructure({
         userId: context.user.id,
         workspaceId: args.input.workspaceId,

@@ -14,6 +14,7 @@ const username = "user";
 const password = "password";
 let sessionKey1 = "";
 let device: any = null;
+let webDevice: any = null;
 let encryptionPrivateKey = "";
 let signingPrivateKey = "";
 let workspaceKey = "";
@@ -26,6 +27,7 @@ const setup = async () => {
   sessionKey1 = registerUserResult1.sessionKey;
   userId1 = registerUserResult1.userId;
   device = registerUserResult1.mainDevice;
+  webDevice = registerUserResult1.webDevice;
   encryptionPrivateKey = registerUserResult1.encryptionPrivateKey;
   signingPrivateKey = registerUserResult1.signingPrivateKey;
 
@@ -63,6 +65,7 @@ test("user can create initial workspace structure", async () => {
     deviceSigningPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
     deviceEncryptionPrivateKey: encryptionPrivateKey,
+    webDevice,
     folderId,
     folderIdSignature,
     folderName,
@@ -105,6 +108,7 @@ test("Unauthenticated", async () => {
         deviceSigningPublicKey,
         deviceEncryptionPublicKey: device.encryptionPublicKey,
         deviceEncryptionPrivateKey: encryptionPrivateKey,
+        webDevice,
         folderId,
         folderIdSignature,
         folderName,
@@ -364,6 +368,7 @@ describe("Test login", () => {
           creatorDeviceSigningPublicKey: device.signingPublicKey,
           deviceEncryptionPublicKey: device.encryptionPublicKey,
           deviceEncryptionPrivateKey: encryptionPrivateKey,
+          webDevice,
           folderId,
           folderIdSignature,
           folderName,
@@ -395,6 +400,7 @@ describe("Test login", () => {
           creatorDeviceSigningPublicKey: "abcd",
           deviceEncryptionPublicKey: device.encryptionPublicKey,
           deviceEncryptionPrivateKey: encryptionPrivateKey,
+          webDevice,
           folderId,
           folderIdSignature,
           folderName,
