@@ -28,9 +28,12 @@ export const Heading = (props: HeadingProps) => {
       fontFamily: "Inter_600SemiBold",
     }),
     // 0.75rem (12px) - sidebar-headers (e.g. "Folders" in Sidebar)
-    4: tw.style(`flex text-sm md:text-xxs text-gray-900 dark:text-white`, {
-      fontFamily: "Inter_500Medium",
-    }),
+    4: tw.style(
+      `flex text-sm md:text-xxs text-gray-900 md:text-gray-800 dark:text-white`,
+      {
+        fontFamily: "Inter_500Medium",
+      }
+    ),
     accessibilityOnly: tw`hidden`,
   });
 
