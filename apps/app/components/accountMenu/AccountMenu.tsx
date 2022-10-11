@@ -25,6 +25,7 @@ import {
   useWorkspacesQuery,
 } from "../../generated/graphql";
 import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
+import { userWorkspaceKeyStore } from "../../utils/workspace/workspaceKeyStore";
 
 type Props = {
   workspaceId?: string;
@@ -58,6 +59,7 @@ export default function AccountMenu({
     variables: { deviceSigningPublicKey: activeDevice?.signingPublicKey! },
     pause: !activeDevice,
   });
+  const clearWorkspaceKeyStore = userWorkspaceKeyStore((state) => state.clear);
 
   return (
     <Menu
@@ -175,7 +177,7 @@ export default function AccountMenu({
           try {
             setIsOpenAccountMenu(false);
             navigation.navigate("LogoutInProgress");
-            clearDeviceAndSessionStorage();
+            clearDeviceAndSessionStorage(clearWorkspaceKeyStore);
             await updateAuthentication(null);
           } catch (error) {
             alert(

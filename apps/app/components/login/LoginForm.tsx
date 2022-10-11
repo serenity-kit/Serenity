@@ -23,6 +23,7 @@ import {
   setWebDevice,
 } from "../../utils/device/webDeviceStore";
 import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWorkspaces";
+import { userWorkspaceKeyStore } from "../../utils/workspace/workspaceKeyStore";
 
 type Props = {
   defaultEmail?: string;
@@ -51,6 +52,7 @@ export function LoginForm(props: Props) {
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
   const urqlClient = useClient();
+  const clearWorkspaceKeyStore = userWorkspaceKeyStore((state) => state.clear);
 
   const onFormFilled = (username: string, password: string) => {
     if (props.onFormFilled) {
@@ -74,7 +76,7 @@ export function LoginForm(props: Props) {
     try {
       setGqlErrorMessage("");
       setIsLoggingIn(true);
-      await clearDeviceAndSessionStorage();
+      await clearDeviceAndSessionStorage(clearWorkspaceKeyStore);
       const unsavedDevice = await createDeviceWithInfo();
       const loginResult = await login({
         username,
