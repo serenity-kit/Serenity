@@ -1,8 +1,10 @@
-import { expect, Page, test } from "@playwright/test";
+import { Page, test } from "@playwright/test";
 import * as sodium from "@serenity-tools/libsodium";
 import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
+import { acceptWorkspaceInvitation } from "../../helpers/e2e/acceptWorkspaceInvitation";
+import { createWorkspaceInvitation } from "../../helpers/e2e/createWorkspaceInvitation";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
 import { renameFolder } from "../../helpers/e2e/renameFolder";
@@ -30,41 +32,6 @@ const user3: UserData = {
   username: `${uuidv4()}@example.com`,
   password: "pass",
   data: undefined,
-};
-
-type AcceptWorkspaceInvitationProps = {
-  page: Page;
-  workspaceInvitationUrl: string;
-  sharedWorkspaceId: string;
-};
-const acceptWorkspaceInvitation = async ({
-  page,
-  workspaceInvitationUrl,
-  sharedWorkspaceId,
-}: AcceptWorkspaceInvitationProps) => {
-  await page.goto(workspaceInvitationUrl);
-  await delayForSeconds(2);
-  // click "accept"
-  await page.locator('div[role="button"]:has-text("Accept")').click();
-  await delayForSeconds(2);
-  // expect the new url to include the new workspace ID
-  let inLobby = true;
-  const lobbyUrl = `http://localhost:3000/workspace/${sharedWorkspaceId}/lobby`;
-  while (inLobby) {
-    const pageUrl = page.url();
-    if (pageUrl === lobbyUrl) {
-      await delayForSeconds(1);
-    } else {
-      inLobby = false;
-    }
-  }
-  const pageUrl = page.url();
-  const urlAsExpected = pageUrl.startsWith(
-    `http://localhost:3000/workspace/${sharedWorkspaceId}/page`
-  );
-  expect(urlAsExpected).toBe(true);
-  // now wait for decryption
-  await delayForSeconds(5);
 };
 
 type HasFolderAccessProps = {
@@ -109,30 +76,10 @@ test.describe("Workspace Sharing", () => {
       password: user2.password,
     });
     await delayForSeconds(2);
-    // click on workspace settings
-    await page.locator("text=Settings").click();
-    delayForSeconds(2);
-    await page.locator("text=Members").click();
 
-    // click "create invitation"
-    await page
-      .locator('div[role="button"]:has-text("Create Invitation")')
-      .click();
-    await delayForSeconds(2);
-
-    // get invitation text
-    const linkInfoDiv = page
-      .locator("//input[@id='workspaceInvitationInstructionsInput']")
-      .first();
-    const linkInfoText = await linkInfoDiv.inputValue();
-    // parse url and store into variable
-    const linkInfoWords = linkInfoText.split(" ");
-    workspaceInvitationUrl = linkInfoWords[linkInfoWords.length - 1];
-    // expect there to be one invitation in the list
-    const numInvitations = await page
-      .locator("//div[@id='workspaceInviteeList']/div/div")
-      .count();
-    expect(numInvitations).toBe(1);
+    const { url: workspaceInvitationUrl } = await createWorkspaceInvitation({
+      page,
+    });
 
     // now accept for both users
     const user2Context = await browser.newContext();
