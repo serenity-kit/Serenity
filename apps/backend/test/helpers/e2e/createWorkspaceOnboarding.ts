@@ -1,16 +1,21 @@
 import { expect, Page } from "@playwright/test";
 import { prisma } from "../../../src/database/prisma";
 import { delayForSeconds } from "../delayForSeconds";
+import { verifyPassword } from "./verifyPassword";
 
 export type Props = {
   page: Page;
   username: string;
+  password: string;
   workspaceName: string;
+  throwIfVerifyPasswordNotOpen?: boolean;
 };
 export const createWorkspaceOnOnboarding = async ({
   page,
   username,
+  password,
   workspaceName,
+  throwIfVerifyPasswordNotOpen,
 }: Props) => {
   // Fill in the new workspace name
   await page
@@ -18,7 +23,11 @@ export const createWorkspaceOnOnboarding = async ({
       'text=Workspace NameThis is the name of your organization, team or private notes. You  >> input[type="text"]'
     )
     .fill(workspaceName);
-
+  await verifyPassword({
+    page,
+    password,
+    throwIfNotOpen: throwIfVerifyPasswordNotOpen,
+  });
   // Click the "create" button
   await page.locator('div[role="button"]:has-text("Create")').click();
 

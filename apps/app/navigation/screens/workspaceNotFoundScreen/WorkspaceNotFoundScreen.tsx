@@ -22,7 +22,7 @@ export default function WorkspaceNotFoundScreen({
         />
       </View>
       <KeyboardAvoidingView behavior="padding" style={tw`flex-auto`}>
-        <CenterContent>
+        <CenterContent testID="no-access-to-workspace-error">
           <Text style={tw`px-4`}>
             This workspace doesn't exist or you no longer have access.
           </Text>

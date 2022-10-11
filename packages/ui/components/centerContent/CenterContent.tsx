@@ -1,11 +1,12 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import { View, ViewProps } from "../view/View";
 import { tw } from "../../tailwind";
+import { View, ViewProps } from "../view/View";
 
 export type CenterContentProps = ViewProps & {
   serenityBg?: boolean;
   onScreen?: boolean;
+  testID?: string;
 };
 
 export const CenterContent = (props: CenterContentProps) => {
@@ -17,7 +18,10 @@ export const CenterContent = (props: CenterContentProps) => {
   });
 
   return (
-    <View style={[serenityBg && styles.serenityBg, styles.center, props.style]}>
+    <View
+      testID={props.testID}
+      style={[serenityBg && styles.serenityBg, styles.center, props.style]}
+    >
       {props.children}
     </View>
   );
