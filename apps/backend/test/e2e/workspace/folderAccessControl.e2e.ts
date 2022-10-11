@@ -5,6 +5,7 @@ import createUserWithWorkspace from "../../../src/database/testHelpers/createUse
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
+import { removeMemberFromWorkspace } from "../../helpers/e2e/removeMemberFromWorkspace";
 import { renameFolder } from "../../helpers/e2e/renameFolder";
 
 type UserData = {
@@ -106,7 +107,7 @@ test.describe("Workspace Sharing", () => {
     await e2eLoginUser({
       page,
       username: user1.username,
-      password: user2.password,
+      password: user1.password,
     });
     await delayForSeconds(2);
     // click on workspace settings
@@ -173,18 +174,22 @@ test.describe("Workspace Sharing", () => {
     // now remove access to user3
     await page.reload();
     await delayForSeconds(2);
-    await page
-      .locator(
-        `data-testid=workspace-member-row__${user3.data.user.id}--remove`
-      )
-      .click();
+    await removeMemberFromWorkspace({
+      page,
+      userId: user3.data.user.id,
+      password: user1.password,
+    });
     await delayForSeconds(2);
     await reloadPage({ page: user2Page });
     await reloadPage({ page: user3Page });
     await delayForSeconds(2);
-    page.locator(
-      "text=This page does not exist or you don't have access to it anymore."
+    const invalidAccessMessage = user3Page.locator(
+      "data-testid=no-access-to-workspace-error"
     );
+    const doesInvalidAccessMessageExist =
+      await invalidAccessMessage.isVisible();
+    console.log({ doesInvalidAccessMessageExist });
+    expect(doesInvalidAccessMessageExist).toBe(true);
     await renameFolder(user2Page, user1.data.folder.id, "user2 re-renamed");
   });
 });
