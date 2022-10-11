@@ -110,8 +110,8 @@ export const crypto_box_keypair = async (): Promise<StringKeyPair> => {
   const result = await sodium.crypto_box_keypair();
   return {
     keyType: "curve25519",
-    privateKey: urlSafeBase64ToBase64(result.sk),
-    publicKey: urlSafeBase64ToBase64(result.pk),
+    privateKey: base64ToUrlSafeBase64(result.sk),
+    publicKey: base64ToUrlSafeBase64(result.pk),
   };
 };
 
