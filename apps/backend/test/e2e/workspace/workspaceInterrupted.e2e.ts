@@ -55,6 +55,7 @@ test("Register and reload before onboarding", async ({ page }) => {
     username,
     password,
     workspaceName,
+    throwIfVerifyPasswordNotOpen: true,
   });
   expect(registrationResult).not.toBeUndefined();
   await expectResults({

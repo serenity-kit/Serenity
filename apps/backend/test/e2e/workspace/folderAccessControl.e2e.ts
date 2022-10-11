@@ -188,7 +188,6 @@ test.describe("Workspace Sharing", () => {
     );
     const doesInvalidAccessMessageExist =
       await invalidAccessMessage.isVisible();
-    console.log({ doesInvalidAccessMessageExist });
     expect(doesInvalidAccessMessageExist).toBe(true);
     await renameFolder(user2Page, user1.data.folder.id, "user2 re-renamed");
   });

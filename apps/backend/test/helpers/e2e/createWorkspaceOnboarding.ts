@@ -8,12 +8,14 @@ export type Props = {
   username: string;
   password: string;
   workspaceName: string;
+  throwIfVerifyPasswordNotOpen?: boolean;
 };
 export const createWorkspaceOnOnboarding = async ({
   page,
   username,
   password,
   workspaceName,
+  throwIfVerifyPasswordNotOpen,
 }: Props) => {
   // Fill in the new workspace name
   await page
@@ -24,6 +26,7 @@ export const createWorkspaceOnOnboarding = async ({
   await verifyPassword({
     page,
     password,
+    throwIfNotOpen: throwIfVerifyPasswordNotOpen,
   });
   // Click the "create" button
   await page.locator('div[role="button"]:has-text("Create")').click();
