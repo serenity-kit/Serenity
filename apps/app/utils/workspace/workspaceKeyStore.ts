@@ -65,9 +65,8 @@ export const userWorkspaceKeyStore = create<WorkspaceKeyState>((set, get) => ({
         workspaceId,
         activeDevice,
       });
-      workspaceKeyLookupForWorkspace[workspaceId] = {
-        workspaceKeyId: workspaceKey.workspaceKey,
-      };
+      workspaceKeyLookupForWorkspace[workspaceId][workspaceKeyId] =
+        workspaceKey.workspaceKey;
       set({ workspaceKeyLookupForWorkspace });
       return workspaceKey.workspaceKey;
     }
