@@ -3,6 +3,7 @@ import {
   createIntroductionDocumentSnapshot,
   encryptDocumentTitle,
   encryptFolderName,
+  LocalDevice,
 } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
@@ -16,6 +17,7 @@ type Params = {
   deviceSigningPublicKey: string;
   deviceEncryptionPublicKey: string;
   deviceEncryptionPrivateKey: string;
+  webDevice: LocalDevice;
   folderId: string;
   folderIdSignature: string;
   folderName: string;
@@ -32,6 +34,7 @@ export const createInitialWorkspaceStructure = async ({
   deviceSigningPublicKey,
   deviceEncryptionPublicKey,
   deviceEncryptionPrivateKey,
+  webDevice,
   folderId,
   folderIdSignature,
   folderName,
@@ -47,6 +50,11 @@ export const createInitialWorkspaceStructure = async ({
       receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
     });
+  const webDeviceWorkspaceKey = await createAndEncryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
+  });
+
   const query = gql`
     mutation createInitialWorkspaceStructure(
       $input: CreateInitialWorkspaceStructureInput!
@@ -152,6 +160,11 @@ export const createInitialWorkspaceStructure = async ({
             deviceSigningPublicKey,
             nonce,
             ciphertext,
+          },
+          {
+            deviceSigningPublicKey: webDevice.signingPublicKey,
+            nonce: webDeviceWorkspaceKey.nonce,
+            ciphertext: webDeviceWorkspaceKey.ciphertext,
           },
         ],
       },
