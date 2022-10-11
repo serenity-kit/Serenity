@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+import { delayForSeconds } from "../delayForSeconds";
 
 export type Props = {
   page: Page;
@@ -23,5 +24,6 @@ export const verifyPassword = async ({
     await page
       .locator("data-testid=verify-password-modal__submit-button")
       .click();
+    await delayForSeconds(2);
   }
 };

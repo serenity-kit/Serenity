@@ -33,7 +33,7 @@ const expectResults = async ({
   );
 };
 
-test.skip("Register and reload before onboarding", async ({ page }) => {
+test("Register and reload before onboarding", async ({ page }) => {
   const username = `${uuidv4()}@example.com`;
   const password = "password";
   const workspaceName = "my workspace";
@@ -53,9 +53,9 @@ test.skip("Register and reload before onboarding", async ({ page }) => {
   const createWorkspaceResult = await createWorkspaceOnOnboarding({
     page,
     username,
+    password,
     workspaceName,
   });
-  // TODO: expect a verify password modal
   expect(registrationResult).not.toBeUndefined();
   await expectResults({
     page,
@@ -65,7 +65,7 @@ test.skip("Register and reload before onboarding", async ({ page }) => {
   });
 });
 
-test.skip("Register and re-login before onboarding", async ({ page }) => {
+test("Register and re-login before onboarding", async ({ page }) => {
   const username = `${uuidv4()}@example.com`;
   const password = "password";
   const workspaceName = "my workspace";
@@ -86,6 +86,7 @@ test.skip("Register and re-login before onboarding", async ({ page }) => {
   const createWorkspaceResult = await createWorkspaceOnOnboarding({
     page,
     username,
+    password,
     workspaceName,
   });
   expect(registrationResult).not.toBeUndefined();

@@ -22,6 +22,7 @@ export const e2eRegisterUser = async ({
   const registrationResult = await createWorkspaceOnOnboarding({
     page,
     username,
+    password,
     workspaceName,
   });
   return registrationResult;
