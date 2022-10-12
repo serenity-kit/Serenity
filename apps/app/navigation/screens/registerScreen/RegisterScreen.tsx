@@ -26,7 +26,7 @@ export default function RegisterScreen(
     <OnboardingScreenWrapper>
       <Box plush>
         <View>
-          <Heading lvl={1} center>
+          <Heading lvl={1} center padded>
             Create your account
           </Heading>
           <Description variant="login" style={tw`text-center`}>

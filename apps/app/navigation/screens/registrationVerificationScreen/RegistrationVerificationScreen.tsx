@@ -172,7 +172,7 @@ export default function RegistrationVerificationScreen(
     <OnboardingScreenWrapper>
       <Box plush>
         <View>
-          <Heading lvl={1} center>
+          <Heading lvl={1} center padded>
             Verify your email
           </Heading>
           <Description variant="login" style={tw`text-center`}>
