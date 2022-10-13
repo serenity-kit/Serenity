@@ -4,15 +4,32 @@ export interface ExtensionOptions {}
 
 type Storage = {};
 
-export const SerenityScrollIntoViewExtension = Extension.create<
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    customExtension: {
+      scrollIntoViewOnEditMode: () => ReturnType;
+    };
+  }
+}
+
+const isIos = [
+  "iPad Simulator",
+  "iPhone Simulator",
+  "iPod Simulator",
+  "iPad",
+  "iPhone",
+  "iPod",
+].includes(navigator.platform);
+
+export const SerenityScrollIntoViewOnEditModeExtension = Extension.create<
   ExtensionOptions,
   Storage
 >({
-  name: "serenityScrollIntoViewExtension",
+  name: "serenityScrollIntoViewOnEditModeExtension",
 
   addCommands() {
     return {
-      scrollIntoView:
+      scrollIntoViewOnEditMode:
         () =>
         ({ commands, editor }) => {
           const { from, to } = editor.state.selection;
@@ -22,8 +39,12 @@ export const SerenityScrollIntoViewExtension = Extension.create<
           const editorBoundaries = editor.view.dom.getBoundingClientRect();
           console.log("end", end);
 
-          // only scroll if it's below the keynboard + toolbar
-          if (end.top > editorBoundaries.height - 352 - 50) {
+          // only scroll if it's below the keyboard + toolbar
+          if (
+            isIos
+              ? end.top > editorBoundaries.height - 352 - 50
+              : end.top > editorBoundaries.height - 50
+          ) {
             const scrollTop =
               editor.view.dom.parentElement?.parentElement?.scrollTop || 0;
 

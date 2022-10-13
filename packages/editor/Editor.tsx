@@ -15,7 +15,7 @@ import "./awareness.css";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
 import { AwarnessExtension } from "./naisho-awareness-extension";
-import { SerenityScrollIntoViewExtension } from "./scroll-into-view-extensions";
+import { SerenityScrollIntoViewOnEditModeExtension } from "./scroll-into-view-on-edit-mode-extensions";
 
 type EditorProps = {
   documentId: string;
@@ -90,7 +90,7 @@ export const Editor = (props: EditorProps) => {
         AwarnessExtension.configure({
           awareness: props.yAwarenessRef.current,
         }),
-        SerenityScrollIntoViewExtension.configure({}),
+        SerenityScrollIntoViewOnEditModeExtension.configure({}),
       ],
       onCreate: (params) => {
         if (isNew) {
@@ -129,7 +129,7 @@ export const Editor = (props: EditorProps) => {
         // timeout to make sure the selection has time to be set
         // before we scroll into view
         setTimeout(() => {
-          params.editor.chain().scrollIntoView().run();
+          params.editor.chain().scrollIntoViewOnEditMode().run();
         }, 50);
       },
       onBlur: (params) => {
