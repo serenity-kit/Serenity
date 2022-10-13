@@ -1,7 +1,6 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
 import { prisma } from "../prisma";
-import { removeStaleWorkspaceKeys } from "./removeStaleWorkspaceKeys";
 import { rotateWorkspaceKey } from "./rotateWorkspaceKey";
 
 export type Props = {
@@ -104,11 +103,6 @@ export const removeMembersAndRotateWorkspaceKey = async ({
       creatorDeviceSigningPublicKey,
       workspaceId,
       userId,
-    });
-    await removeStaleWorkspaceKeys({
-      prisma,
-      userId,
-      workspaceIds: [workspaceId],
     });
     return updatedWorkspaceKey;
   });
