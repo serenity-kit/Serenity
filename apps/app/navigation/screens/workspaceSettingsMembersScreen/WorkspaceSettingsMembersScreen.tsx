@@ -2,6 +2,8 @@ import {
   Button,
   CenterContent,
   Checkbox,
+  Description,
+  Heading,
   InfoMessage,
   SettingsContentWrapper,
   Spinner,
@@ -314,22 +316,27 @@ export default function WorkspaceSettingsMembersScreen(
           </CenterContent>
         ) : (
           <>
-            <Text style={tw`mb-4 font-700 text-xl text-center`}>
-              Invitations
-            </Text>
             {isAdmin && (
               <View>
+                <Heading lvl={3} padded>
+                  Invitations
+                </Heading>
+                <Description variant="form">
+                  Send invitation links to new workspace members. Only Admins
+                  can see and invite new members.{"\n"}New members must accept
+                  your invitation within 3 days.
+                </Description>
                 <CreateWorkspaceInvitation
                   workspaceId={workspaceId}
                   onWorkspaceInvitationCreated={(workspaceInvitation: any) => {
                     // do nothing
                   }}
                 />
-                <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
-                  Members
-                </Text>
               </View>
             )}
+            <Heading lvl={3} padded>
+              Members
+            </Heading>
             {members.map((member: any) => (
               <WorkspaceMemberRow
                 key={member.userId}

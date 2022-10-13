@@ -1,5 +1,13 @@
-import { SettingsContentWrapper, Text, View } from "@serenity-tools/ui";
+import {
+  Description,
+  Heading,
+  InfoMessage,
+  SettingsContentWrapper,
+  Text,
+  View,
+} from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
+import { VStack } from "native-base";
 import { useState } from "react";
 import { FlatList, useWindowDimensions } from "react-native";
 import DeviceListItem from "../../../components/deviceListItem/DeviceListItem";
@@ -124,29 +132,48 @@ export default function DeviceManagerScreen(props) {
   return (
     <>
       <SettingsContentWrapper title={"Devices"}>
-        <FlatList
-          data={devicesResult.data?.devices?.nodes?.filter(notNull) || []}
-          keyExtractor={(item) => item.signingPublicKey}
-          renderItem={({ item }) => (
-            <DeviceListItem
-              isActiveDevice={
-                activeDevice.signingPublicKey === item.signingPublicKey
-              }
-              signingPublicKey={item.signingPublicKey}
-              encryptionPublicKey={item.encryptionPublicKey}
-              encryptionPublicKeySignature={item.encryptionPublicKeySignature}
-              createdAt={item.createdAt}
-              expiresAt={item.mostRecentSession?.expiresAt}
-              info={item.info}
-              onDeletePress={() => deleteDevicePreflight(item.signingPublicKey)}
-            />
-          )}
-          ListEmptyComponent={() => (
-            <View>
-              <Text>No devices</Text>
-            </View>
-          )}
-        />
+        <VStack space={5}>
+          <View>
+            <Heading lvl={3} padded>
+              Manage Devices
+            </Heading>
+            <Description variant={"form"}>
+              The following list shows all the devices which are currently
+              linked to your account.
+            </Description>
+          </View>
+          <FlatList
+            data={devicesResult.data?.devices?.nodes?.filter(notNull) || []}
+            keyExtractor={(item) => item.signingPublicKey}
+            renderItem={({ item }) => (
+              <DeviceListItem
+                isActiveDevice={
+                  activeDevice.signingPublicKey === item.signingPublicKey
+                }
+                signingPublicKey={item.signingPublicKey}
+                encryptionPublicKey={item.encryptionPublicKey}
+                encryptionPublicKeySignature={item.encryptionPublicKeySignature}
+                createdAt={item.createdAt}
+                expiresAt={item.mostRecentSession?.expiresAt}
+                info={item.info}
+                onDeletePress={() =>
+                  deleteDevicePreflight(item.signingPublicKey)
+                }
+              />
+            )}
+            ListEmptyComponent={() => (
+              <View>
+                <Text>No devices</Text>
+              </View>
+            )}
+          />
+          <InfoMessage>
+            Devices using the mobile application are always active, web devices
+            on the other hand expire automatically after max 30 days after
+            login, which means you will be asked for your password again after
+            the given time period.
+          </InfoMessage>
+        </VStack>
       </SettingsContentWrapper>
       <VerifyPasswordModal
         isVisible={isPasswordModalVisible}

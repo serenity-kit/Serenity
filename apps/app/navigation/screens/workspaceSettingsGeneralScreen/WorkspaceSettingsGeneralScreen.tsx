@@ -1,16 +1,16 @@
 import {
   Button,
   CenterContent,
+  Description,
+  Heading,
   InfoMessage,
   Input,
   Modal,
   ModalButtonFooter,
   ModalHeader,
-  RawInput,
   SettingsContentWrapper,
   Spinner,
   Text,
-  tw,
   View,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
@@ -155,14 +155,18 @@ export default function WorkspaceSettingsGeneralScreen(
           </CenterContent>
         ) : (
           <>
-            <Text style={tw`mb-4 font-700 text-xl text-center`}>
-              Change name
-            </Text>
-            <RawInput
-              placeholder="Workspace name"
+            <Heading lvl={3} padded>
+              Manage workspace
+            </Heading>
+            <Description variant="form">
+              Here you can rename or delete your workspace.
+            </Description>
+            <Input
+              placeholder="New name"
               value={workspaceName}
               onChangeText={setWorkspaceName}
               editable={isAdmin && !isLoadingWorkspaceData}
+              label={"Workspace name"}
             />
             {isAdmin && (
               <Button
