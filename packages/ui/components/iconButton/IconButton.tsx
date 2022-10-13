@@ -6,6 +6,7 @@ import { tw } from "../../tailwind";
 import { Color } from "../../types";
 import { Icon, IconNames } from "../icon/Icon";
 import { Pressable, PressableProps } from "../pressable/Pressable";
+import { Spinner } from "../spinner/Spinner";
 import { Text } from "../text/Text";
 
 export type IconButtonProps = PressableProps & {
@@ -14,11 +15,20 @@ export type IconButtonProps = PressableProps & {
   label?: string;
   size?: "md" | "lg";
   transparent?: boolean;
+  isLoading?: boolean;
 };
 
 export const IconButton = forwardRef((props: IconButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
-  const { name, size = "md", color, transparent, label, ...rest } = props;
+  const {
+    name,
+    size = "md",
+    color,
+    transparent,
+    label,
+    isLoading,
+    ...rest
+  } = props;
 
   let dimensions = size === "lg" ? "w-8 h-8" : "w-5 h-5";
   let iconColor = color ?? "gray-400";
@@ -65,16 +75,32 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
           <HStack
             style={[
               styles.view,
-              isHovered && styles.hover,
-              isPressed && styles.pressed,
+              isHovered && !isLoading && styles.hover,
+              isPressed && !isLoading && styles.pressed,
               isFocusVisible && styles.focusVisible,
             ]}
             space={2}
           >
-            <Icon
-              name={name}
-              color={isHovered && !transparent ? "gray-800" : iconColor}
-            />
+            {isLoading ? (
+              <Spinner
+                fadeIn
+                style={[
+                  {
+                    transform: [
+                      {
+                        scale: 0.7,
+                      },
+                    ],
+                  },
+                ]}
+              />
+            ) : (
+              <Icon
+                name={name}
+                color={isHovered && !transparent ? "gray-800" : iconColor}
+              />
+            )}
+
             {label && (
               <Text
                 variant="xs"
