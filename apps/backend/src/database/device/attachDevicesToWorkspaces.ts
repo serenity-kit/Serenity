@@ -1,6 +1,9 @@
 import { ForbiddenError } from "apollo-server-express";
 import { v4 as uuidv4 } from "uuid";
-import { WorkspaceKey } from "../../../prisma/generated/output";
+import {
+  WorkspaceKey,
+  WorkspaceKeyBox as WorkspaceKeyBoxCreateArgs,
+} from "../../../prisma/generated/output";
 import { WorkspaceKeyBox } from "../../types/workspace";
 import {
   MemberWithWorkspaceKeyBoxes,
@@ -70,13 +73,14 @@ export async function attachDevicesToWorkspaces({
       workspaceKeyIds.push(workspaceKey.id);
     });
 
-    // make sure the user controls this creatorDevice
+    // create a new, permanent "creator device" if one doesn't exist
     const creatorDevice = await getOrCreateCreatorDevice({
       prisma,
       userId,
       signingPublicKey: creatorDeviceSigningPublicKey,
     });
 
+    // build the list of new workspaceKeyBoxes
     const workspaceKeyIdUserLookup: { [workspaceKeyId: string]: string[] } = {};
     const workspaceIdUserIdLookup: { [workspaceId: string]: string[] } = {};
     const userIdKeyBoxCiphertextLoookup: { [userId: string]: string[] } = {};
@@ -84,45 +88,41 @@ export async function attachDevicesToWorkspaces({
     for (let workspaceData of workspaceMemberDevices) {
       const workspaceId = workspaceData.id;
       workspaceIdUserIdLookup[workspaceId] = [];
-      for (let member of workspaceData.workspaceKeysMembers) {
-        const workspaceId = workspaceData.id;
-        for (let workspaceKeyDeviceMembers of workspaceData.workspaceKeysMembers) {
-          const workspaceKeyId = workspaceKeyDeviceMembers.id;
-          for (let member of workspaceKeyDeviceMembers.members) {
-            const receiverUserId = member.id;
-            workspaceIdUserIdLookup[workspaceId].push(member.id);
-
-            if (!(receiverUserId in userWorkspaceLookup)) {
-              throw new Error("userId not found");
-              // continue;
+      for (let workspaceKeyDeviceMembers of workspaceData.workspaceKeysMembers) {
+        const workspaceKeyId = workspaceKeyDeviceMembers.id;
+        for (let member of workspaceKeyDeviceMembers.members) {
+          const receiverUserId = member.id;
+          workspaceIdUserIdLookup[workspaceId].push(member.id);
+          if (!(receiverUserId in userWorkspaceLookup)) {
+            throw new Error("userId not found");
+            // continue;
+          }
+          if (!(workspaceId in workspaceKeyBoxLookup)) {
+            throw new Error("workspace not found");
+            // continue;
+          }
+          // const workspaceKeys = workspaceKeyBoxLookup[workspaceId];
+          for (let workspaceDevice of member.workspaceDevices) {
+            const newKeyBox: WorkspaceKeyBoxCreateArgs = {
+              id: uuidv4(),
+              workspaceKeyId,
+              creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
+              deviceSigningPublicKey:
+                workspaceDevice.receiverDeviceSigningPublicKey,
+              ciphertext: workspaceDevice.ciphertext,
+              nonce: workspaceDevice.nonce,
+            };
+            newKeyBoxes.push(newKeyBox);
+            if (!(workspaceKeyId in workspaceKeyIdUserLookup)) {
+              workspaceKeyIdUserLookup[workspaceKeyId] = [];
             }
-            if (!(workspaceId in workspaceKeyBoxLookup)) {
-              throw new Error("workspace not found");
-              // continue;
+            workspaceKeyIdUserLookup[workspaceKeyId].push(receiverUserId);
+            if (!(receiverUserId in userIdKeyBoxCiphertextLoookup)) {
+              userIdKeyBoxCiphertextLoookup[receiverUserId] = [];
             }
-            // const workspaceKeys = workspaceKeyBoxLookup[workspaceId];
-            for (let workspaceDevice of member.workspaceDevices) {
-              const newKeyBox: WorkspaceKeyBox = {
-                id: uuidv4(),
-                workspaceKeyId,
-                creatorDeviceSigningPublicKey,
-                deviceSigningPublicKey:
-                  workspaceDevice.receiverDeviceSigningPublicKey,
-                ciphertext: workspaceDevice.ciphertext,
-                nonce: workspaceDevice.nonce,
-              };
-              newKeyBoxes.push(newKeyBox);
-              if (!(workspaceKeyId in workspaceKeyIdUserLookup)) {
-                workspaceKeyIdUserLookup[workspaceKeyId] = [];
-              }
-              workspaceKeyIdUserLookup[workspaceKeyId].push(receiverUserId);
-              if (!(receiverUserId in userIdKeyBoxCiphertextLoookup)) {
-                userIdKeyBoxCiphertextLoookup[receiverUserId] = [];
-              }
-              userIdKeyBoxCiphertextLoookup[receiverUserId].push(
-                workspaceDevice.ciphertext
-              );
-            }
+            userIdKeyBoxCiphertextLoookup[receiverUserId].push(
+              workspaceDevice.ciphertext
+            );
           }
         }
       }
@@ -134,17 +134,18 @@ export async function attachDevicesToWorkspaces({
       const userIds = workspaceIdUserIdLookup[workspaceId];
       await prisma.usersToWorkspaces.updateMany({
         data: { isAuthorizedMember: true },
-        where: { workspaceId: workspaceId, userId: { in: userIds } },
+        where: { workspaceId, userId: { in: userIds } },
       });
     }
-
+    // Return the resulting keys to the client
     const rawWorkspaceKeys = await prisma.workspaceKey.findMany({
       where: { id: { in: workspaceKeyIds } },
       include: { workspaceKeyBoxes: true },
+      orderBy: { generation: "asc" },
     });
     const formattedworkspaceMemberDevices: WorkspaceMemberKeyBox[] = [];
     const workspaceIdRowLookup: { [workspaceId: string]: number } = {};
-    rawWorkspaceKeys.forEach((workspaceKey) => {
+    for (let workspaceKey of rawWorkspaceKeys) {
       const workspaceId = workspaceKey.workspaceId;
       if (!(workspaceId in workspaceIdRowLookup)) {
         const memberWorkspaceKeyBoxes: WorkspaceMemberKeyBox = {
@@ -164,8 +165,11 @@ export async function attachDevicesToWorkspaces({
       const memberWorkspaceKeyBoxes =
         formattedworkspaceMemberDevices[workspaceIdRowLookup[workspaceId]];
       // add members
-      const userIds = workspaceKeyIdUserLookup[workspaceKey.id];
-      userIds.forEach((receiverUserId) => {
+      const receiverUserIds = workspaceKeyIdUserLookup[workspaceKey.id];
+      if (receiverUserIds === undefined) {
+        continue;
+      }
+      receiverUserIds.forEach((receiverUserId) => {
         const workspaceMember: MemberWithWorkspaceKeyBoxes = {
           id: receiverUserId,
           workspaceKeyBoxes: [],
@@ -180,7 +184,7 @@ export async function attachDevicesToWorkspaces({
         workspaceWithMember.members.push(workspaceMember);
       });
       memberWorkspaceKeyBoxes.workspaceKeys.push(workspaceWithMember);
-    });
+    }
 
     return formattedworkspaceMemberDevices;
   });
