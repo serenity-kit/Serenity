@@ -22,7 +22,8 @@ export const getWorkspaceKeys = async ({
   for (let workspaceKey of workspaceKeys) {
     const workspaceKeyBox = workspaceKey.workspaceKeyBox;
     if (!workspaceKeyBox) {
-      throw new Error("This device isn't registered for this workspace!");
+      // This device isn't registered for this workspace
+      continue;
     }
     const creatorDevice = workspaceKeyBox.creatorDevice;
     if (!creatorDevice) {
@@ -38,6 +39,9 @@ export const getWorkspaceKeys = async ({
       receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
     });
     decryptedWorskpaceKeys[workspaceKey.id] = workspaceKeyString;
+  }
+  if (Object.keys(decryptedWorskpaceKeys).length === 0) {
+    throw new Error("No workspaceKeys found for workspace");
   }
   return decryptedWorskpaceKeys;
 };

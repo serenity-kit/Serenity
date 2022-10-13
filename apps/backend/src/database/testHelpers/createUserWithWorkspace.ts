@@ -55,6 +55,7 @@ export default async function createUserWithWorkspace({
 
     const user = await prisma.user.create({
       data: {
+        id: username, // FIXME: remove this line
         username,
         opaqueEnvelope: envelope,
         mainDeviceCiphertext: mainDevice.ciphertext,

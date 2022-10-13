@@ -1,6 +1,5 @@
 import { expect, Page, test } from "@playwright/test";
 import * as sodium from "@serenity-tools/libsodium";
-import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { acceptWorkspaceInvitation } from "../../helpers/e2e/acceptWorkspaceInvitation";
@@ -17,20 +16,20 @@ type UserData = {
   data: any;
 };
 const user1: UserData = {
-  id: uuidv4(),
-  username: `${uuidv4()}@example.com`,
+  id: "user1",
+  username: `user1@example.com`,
   password: "pass",
   data: undefined,
 };
 const user2: UserData = {
-  id: uuidv4(),
-  username: `${uuidv4()}@example.com`,
+  id: "user2",
+  username: `user2@example.com`,
   password: "pass",
   data: undefined,
 };
 const user3: UserData = {
-  id: uuidv4(),
-  username: `${uuidv4()}@example.com`,
+  id: "user3",
+  username: `user3@example.com`,
   password: "pass",
   data: undefined,
 };
@@ -137,5 +136,15 @@ test.describe("Workspace Sharing", () => {
       await invalidAccessMessage.isVisible();
     expect(doesInvalidAccessMessageExist).toBe(true);
     await renameFolder(user2Page, user1.data.folder.id, "user2 re-renamed");
+
+    // re-add user3
+    await user3Page.goto(workspaceInvitationUrl);
+    await acceptWorkspaceInvitation({
+      page: user3Page,
+      workspaceInvitationUrl,
+      sharedWorkspaceId: user1.data.workspace.id,
+    });
+    await delayForSeconds(2);
+    await renameFolder(user3Page, user1.data.folder.id, "user3 re-added");
   });
 });
