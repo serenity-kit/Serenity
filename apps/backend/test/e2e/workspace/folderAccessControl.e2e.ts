@@ -1,5 +1,6 @@
 import { expect, Page, test } from "@playwright/test";
 import * as sodium from "@serenity-tools/libsodium";
+import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { acceptWorkspaceInvitation } from "../../helpers/e2e/acceptWorkspaceInvitation";
@@ -16,20 +17,20 @@ type UserData = {
   data: any;
 };
 const user1: UserData = {
-  id: "user1",
-  username: `user1@example.com`,
+  id: uuidv4(),
+  username: `${uuidv4()}@example.com`,
   password: "pass",
   data: undefined,
 };
 const user2: UserData = {
-  id: "user2",
-  username: `user2@example.com`,
+  id: uuidv4(),
+  username: `${uuidv4()}@example.com`,
   password: "pass",
   data: undefined,
 };
 const user3: UserData = {
-  id: "user3",
-  username: `user3@example.com`,
+  id: uuidv4(),
+  username: `${uuidv4()}@example.com`,
   password: "pass",
   data: undefined,
 };
