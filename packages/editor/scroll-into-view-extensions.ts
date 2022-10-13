@@ -34,6 +34,7 @@ export const SerenityScrollIntoViewExtension = Extension.create<
             });
             return true;
           }
+          return true;
         },
     };
   },

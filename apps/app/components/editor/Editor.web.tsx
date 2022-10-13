@@ -4,17 +4,16 @@ import {
   getEditorBottombarStateFromEditor,
   updateEditor,
 } from "@serenity-tools/editor";
-import { tw, View, useHasEditorSidebar } from "@serenity-tools/ui";
-import { useRef, useState } from "react";
-import { useWindowDimensions } from "react-native";
-import { useHeaderHeight } from "@react-navigation/elements";
+import { tw, useHasEditorSidebar, View } from "@serenity-tools/ui";
 import { Editor as TipTapEditor } from "@tiptap/core";
+import { useEffect, useRef, useState } from "react";
+import { View as RNView } from "react-native";
 import {
   EditorBottombar,
   editorBottombarHeight,
 } from "../editorBottombar/EditorBottombar";
-import { EditorProps } from "./types";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
+import { EditorProps } from "./types";
 
 export default function Editor({
   yDocRef,
@@ -24,26 +23,45 @@ export default function Editor({
   isNew,
   updateTitle,
 }: EditorProps) {
-  const headerHeight = useHeaderHeight();
-  const dimensions = useWindowDimensions();
-  const [isEditorBottombarVisible, setIsEditorBottombarVisible] =
-    useState(false);
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
   const tipTapEditorRef = useRef<TipTapEditor | null>(null);
   const editorBottombarRef = useRef<null | HTMLElement>(null);
   const hasEditorSidebar = useHasEditorSidebar();
+  const editorBottombarWrapperRef = useRef<RNView>(null);
+  const editorIsFocusedRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    const showAndPositionToolbar = function () {
+      if (editorBottombarWrapperRef.current && editorIsFocusedRef.current) {
+        const topPos =
+          // @ts-expect-error - only works in web only
+          window.visualViewport.height +
+          window.pageYOffset -
+          editorBottombarHeight +
+          2;
+        // @ts-expect-error - this is a div
+        editorBottombarWrapperRef.current.style.top = `${topPos}px`;
+        // @ts-expect-error - this is a div
+        editorBottombarWrapperRef.current.style.display = "block";
+      }
+    };
+
+    // @ts-expect-error - only works in web only
+    window.visualViewport.addEventListener("resize", showAndPositionToolbar);
+
+    return () =>
+      // @ts-expect-error - only works in web only
+      window.visualViewport.removeEventListener(
+        "resize",
+        showAndPositionToolbar
+      );
+  }, []);
 
   return (
     // needed so hidden elements with borders don't trigger scrolling behaviour
     <View style={tw`flex-1 overflow-hidden`}>
-      <View
-        style={{
-          height: isEditorBottombarVisible
-            ? dimensions.height - editorBottombarHeight - headerHeight
-            : undefined,
-        }}
-      >
+      <View>
         <SerenityEditor
           documentId={documentId}
           yDocRef={yDocRef}
@@ -52,7 +70,7 @@ export default function Editor({
           openDrawer={openDrawer}
           updateTitle={updateTitle}
           onFocus={() => {
-            setIsEditorBottombarVisible(true);
+            editorIsFocusedRef.current = true;
           }}
           onBlur={(params) => {
             if (
@@ -62,7 +80,10 @@ export default function Editor({
                 editorBottombarRef.current?.contains(params.event.relatedTarget)
               )
             ) {
-              setIsEditorBottombarVisible(false);
+              editorIsFocusedRef.current = false;
+              if (editorBottombarWrapperRef.current) {
+                editorBottombarWrapperRef.current.style.display = "none";
+              }
             }
           }}
           onCreate={(params) => (tipTapEditorRef.current = params.editor)}
@@ -74,15 +95,23 @@ export default function Editor({
         />
       </View>
       {!hasEditorSidebar && (
-        <EditorBottombar
-          ref={editorBottombarRef}
-          editorBottombarState={editorBottombarState}
-          onUpdate={(params) => {
-            if (tipTapEditorRef.current) {
-              updateEditor(tipTapEditorRef.current, params);
-            }
+        <View
+          ref={editorBottombarWrapperRef}
+          style={{
+            position: "absolute",
+            display: "none",
           }}
-        />
+        >
+          <EditorBottombar
+            ref={editorBottombarRef}
+            editorBottombarState={editorBottombarState}
+            onUpdate={(params) => {
+              if (tipTapEditorRef.current) {
+                updateEditor(tipTapEditorRef.current, params);
+              }
+            }}
+          />
+        </View>
       )}
     </View>
   );
