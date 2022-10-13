@@ -1,6 +1,7 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
 import { prisma } from "../prisma";
+import { removeStaleWorkspaceKeys } from "./removeStaleWorkspaceKeys";
 import { rotateWorkspaceKey } from "./rotateWorkspaceKey";
 
 export type Props = {
@@ -77,17 +78,9 @@ export const removeMembersAndRotateWorkspaceKey = async ({
       });
     });
     // remove user from workspace
-    const what1 = await prisma.usersToWorkspaces.findMany({
+    await prisma.usersToWorkspaces.deleteMany({
       where: { workspaceId, userId: { in: revokedUserIds } },
     });
-    console.log({ what1 });
-    const numDeletes = await prisma.usersToWorkspaces.deleteMany({
-      where: { workspaceId, userId: { in: revokedUserIds } },
-    });
-    const what2 = await prisma.usersToWorkspaces.findMany({
-      where: { workspaceId, userId: { in: revokedUserIds } },
-    });
-    console.log({ what2 });
     // rotate keys
     const updatedWorkspaceKey = await rotateWorkspaceKey({
       prisma,
@@ -95,6 +88,11 @@ export const removeMembersAndRotateWorkspaceKey = async ({
       creatorDeviceSigningPublicKey,
       workspaceId,
       userId,
+    });
+    await removeStaleWorkspaceKeys({
+      prisma,
+      userId,
+      workspaceIds: [workspaceId],
     });
     return updatedWorkspaceKey;
   });

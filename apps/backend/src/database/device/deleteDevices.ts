@@ -5,6 +5,7 @@ import {
   WorkspaceWithWorkspaceDevicesParing,
 } from "../../types/workspaceDevice";
 import { prisma } from "../prisma";
+import { removeStaleWorkspaceKeys } from "../workspace/removeStaleWorkspaceKeys";
 import { rotateWorkspaceKey } from "../workspace/rotateWorkspaceKey";
 
 type Params = {
@@ -188,6 +189,20 @@ export async function deleteDevices({
         },
         userId,
       },
+    });
+
+    // delete all related workspace keyboxes
+    await prisma.workspaceKeyBox.deleteMany({
+      where: {
+        deviceSigningPublicKey: {
+          in: deletingDeviceSigningPublicKeys,
+        },
+      },
+    });
+    await removeStaleWorkspaceKeys({
+      prisma,
+      userId,
+      workspaceIds: verifiedWorkspaceIds,
     });
     return updatedWorkspaceKeys;
   });
