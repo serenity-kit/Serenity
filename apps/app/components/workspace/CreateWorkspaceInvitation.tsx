@@ -1,7 +1,16 @@
-import { Button, Input, View } from "@serenity-tools/ui";
+import {
+  Button,
+  Input,
+  tw,
+  View,
+  Text,
+  IconButton,
+  Tooltip,
+} from "@serenity-tools/ui";
 import * as Clipboard from "expo-clipboard";
+import { VStack } from "native-base";
 import { useState } from "react";
-import { Platform } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import {
   useCreateWorkspaceInvitationMutation,
   useDeleteWorkspaceInvitationsMutation,
@@ -108,41 +117,83 @@ export function CreateWorkspaceInvitation(props: Props) {
     }, CLIPBOARD_NOTICE_TIMEOUT_SECONDS * 1000);
   };
 
+  const styles = StyleSheet.create({
+    invitationWrapper: tw`relative mb-2 py-4 px-5 border rounded ${
+      selectedWorkspaceInvitationId !== null
+        ? `bg-primary-100/40 border-primary-200`
+        : `bg-gray-100 border-gray-200`
+    }`,
+    invitationText:
+      selectedWorkspaceInvitationId !== null
+        ? tw`text-primary-900`
+        : tw`text-gray-400`,
+    invitationButton: tw`mb-5 self-start`,
+    invitationList: tw``,
+  });
+
   return (
     <>
-      <View>
-        <Button onPress={createWorkspaceInvitationPreflight}>
-          Create Invitation
-        </Button>
-        {selectedWorkspaceInvitationId !== null && (
-          <>
-            <Input
-              nativeID="workspaceInvitationInstructionsInput"
-              label="Invitation text"
-              value={getWorkspaceInvitationText()}
-            />
-            {isClipboardNoticeActive ? (
-              <Button disabled>Copied</Button>
-            ) : (
-              <Button onPress={copyInvitationText}>Copy</Button>
-            )}
-          </>
-        )}
-        {workspaceInvitationsResult.fetching ? (
-          <Button disabled>Loading...</Button>
-        ) : (
-          <WorkspaceInvitationList
-            nativeID="workspaceInviteeList"
-            workspaceInvitations={
-              workspaceInvitationsResult.data?.workspaceInvitations?.nodes || []
-            }
-            onDeletePress={deleteWorkspaceInvitation}
-            onSelect={(id: string) => {
-              setSelectedWorkspaceInvitationId(id);
-            }}
-          />
-        )}
+      <View style={styles.invitationWrapper}>
+        <Text
+          variant="xs"
+          style={styles.invitationText}
+          nativeID="workspaceInvitationInstructionsText"
+          selectable={selectedWorkspaceInvitationId !== null}
+        >
+          {selectedWorkspaceInvitationId !== null
+            ? getWorkspaceInvitationText()
+            : 'The invitation text and link will be generated here\nClick on "Create invitation" to generate a new invitation'}
+        </Text>
+        {selectedWorkspaceInvitationId !== null ? (
+          <View style={tw`absolute right-3 top-3`}>
+            <Tooltip
+              label={
+                isClipboardNoticeActive ? "Copying..." : "Copy to clipboard"
+              }
+              placement={"left"}
+            >
+              <IconButton
+                name="file-copy-line"
+                color={"primary-300"}
+                transparent
+                onPress={copyInvitationText}
+                isLoading={isClipboardNoticeActive}
+              />
+            </Tooltip>
+          </View>
+        ) : null}
       </View>
+      <Button
+        onPress={createWorkspaceInvitationPreflight}
+        style={styles.invitationButton}
+      >
+        Create Invitation
+      </Button>
+      {workspaceInvitationsResult.fetching ? (
+        <Button disabled>Loading...</Button>
+      ) : (
+        <WorkspaceInvitationList
+          nativeID="workspaceInviteeList"
+          workspaceInvitations={
+            workspaceInvitationsResult.data?.workspaceInvitations?.nodes || []
+          }
+          onDeletePress={deleteWorkspaceInvitation}
+          onSelect={(id: string) => {
+            setSelectedWorkspaceInvitationId(id);
+          }}
+        />
+      )}
+      {selectedWorkspaceInvitationId !== null && (
+        <>
+          {/* this should not be an input field */}
+          {/* TODO remove element when tests are fixed */}
+          <Input
+            nativeID="workspaceInvitationInstructionsInput"
+            label="Invitation text"
+            value={getWorkspaceInvitationText()}
+          />
+        </>
+      )}
       <VerifyPasswordModal
         isVisible={isPasswordModalVisible}
         description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"
