@@ -68,11 +68,14 @@ export default function NavigationDrawerModal(props: Props) {
         <BoxShadow elevation={2} rounded>
           <View
             ref={contentRef}
-            style={{
-              backgroundColor: "white",
-              width: dimensions.width * 0.8,
-              height: dimensions.height * 0.8,
-            }}
+            style={[
+              tw`max-w-navigation-drawer-modal`,
+              {
+                backgroundColor: "white",
+                width: dimensions.width * 0.95,
+                height: dimensions.height * 0.8,
+              },
+            ]}
           >
             {props.children}
           </View>
