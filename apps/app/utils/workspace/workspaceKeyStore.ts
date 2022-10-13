@@ -58,24 +58,24 @@ export const userWorkspaceKeyStore = create<WorkspaceKeyState>((set, get) => ({
       set({ workspaceKeyLookupForWorkspace });
       return workspaceKey.workspaceKey;
     }
-    if (workspaceKeyId in workspaceKeyLookup) {
-      return workspaceKeyLookup[workspaceKeyId];
-    } else {
+    const workspaceKeyString = workspaceKeyLookup[workspaceKeyId];
+    if (!workspaceKeyString) {
       const workspaceKey = await fetchWorkspaceKey({
         workspaceId,
         activeDevice,
       });
-      workspaceKeyLookupForWorkspace[workspaceId] = {
-        workspaceKeyId: workspaceKey.workspaceKey,
-      };
+      workspaceKeyLookupForWorkspace[workspaceId][workspaceKeyId] =
+        workspaceKey.workspaceKey;
       set({ workspaceKeyLookupForWorkspace });
       return workspaceKey.workspaceKey;
     }
+    return workspaceKeyString;
   },
   setWorkspaceKey: async ({ workspaceId, workspaceKeyId, workspaceKey }) => {
     // all documentPath folders should be in the same workspace
     const workspaceKeyLookupForWorkspace = get().workspaceKeyLookupForWorkspace;
-    if (!workspaceKeyLookupForWorkspace[workspaceId]) {
+    const workspaceKeyLookup = workspaceKeyLookupForWorkspace[workspaceId];
+    if (!workspaceKeyLookup) {
       workspaceKeyLookupForWorkspace[workspaceId] = {};
     }
     workspaceKeyLookupForWorkspace[workspaceId][workspaceKeyId] = workspaceKey;
