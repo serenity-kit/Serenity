@@ -2,7 +2,7 @@ import React from "react";
 import { View, ViewProps } from "../view/View";
 import { tw } from "../../tailwind";
 import { ScrollView } from "../scrollView/ScrollView";
-import { HStack } from "native-base";
+import { HStack, VStack } from "native-base";
 import { Heading } from "../heading/Heading";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
 
@@ -25,7 +25,9 @@ export function SettingsContentWrapper(props: SettingsContentWrapperProps) {
           <Heading lvl={2}>{title}</Heading>
         </HStack>
       ) : null}
-      <ScrollView style={tw`py-8 px-10`}>{props.children}</ScrollView>
+      <ScrollView style={tw`py-8 px-10`}>
+        <VStack space={5}>{props.children}</VStack>
+      </ScrollView>
     </View>
   );
 }

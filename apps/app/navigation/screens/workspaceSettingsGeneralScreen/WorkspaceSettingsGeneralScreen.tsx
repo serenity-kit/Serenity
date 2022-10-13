@@ -155,12 +155,14 @@ export default function WorkspaceSettingsGeneralScreen(
           </CenterContent>
         ) : (
           <>
-            <Heading lvl={3} padded>
-              Manage workspace
-            </Heading>
-            <Description variant="form">
-              Here you can rename or delete your workspace.
-            </Description>
+            <View>
+              <Heading lvl={3} padded>
+                Manage workspace
+              </Heading>
+              <Description variant="form">
+                Here you can rename or delete your workspace.
+              </Description>
+            </View>
             <Input
               placeholder="New name"
               value={workspaceName}

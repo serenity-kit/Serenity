@@ -317,22 +317,24 @@ export default function WorkspaceSettingsMembersScreen(
         ) : (
           <>
             {isAdmin && (
-              <View>
-                <Heading lvl={3} padded>
-                  Invitations
-                </Heading>
-                <Description variant="form">
-                  Send invitation links to new workspace members. Only Admins
-                  can see and invite new members.{"\n"}New members must accept
-                  your invitation within 3 days.
-                </Description>
+              <>
+                <View>
+                  <Heading lvl={3} padded>
+                    Invitations
+                  </Heading>
+                  <Description variant="form">
+                    Send invitation links to new workspace members. Only Admins
+                    can see and invite new members.{"\n"}New members must accept
+                    your invitation within 3 days.
+                  </Description>
+                </View>
                 <CreateWorkspaceInvitation
                   workspaceId={workspaceId}
                   onWorkspaceInvitationCreated={(workspaceInvitation: any) => {
                     // do nothing
                   }}
                 />
-              </View>
+              </>
             )}
             <Heading lvl={3} padded>
               Members
