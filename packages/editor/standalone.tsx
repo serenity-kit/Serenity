@@ -1,17 +1,16 @@
+import { NativeBaseProvider } from "native-base";
 import React from "react";
 import ReactDOM from "react-dom";
-import { NativeBaseProvider } from "native-base";
-import { Editor } from "./Editor";
-import * as Y from "yjs";
 import {
+  applyAwarenessUpdate,
   Awareness,
   encodeAwarenessUpdate,
-  applyAwarenessUpdate,
-  removeAwarenessStates,
 } from "y-protocols/awareness";
+import * as Y from "yjs";
+import { Editor } from "./Editor";
+import { getEditorBottombarStateFromEditor } from "./getEditorBottombarStateFromEditor";
 import { UpdateEditorParams } from "./types";
 import { updateEditor } from "./updateEditor";
-import { getEditorBottombarStateFromEditor } from "./getEditorBottombarStateFromEditor";
 
 const ydoc = new Y.Doc();
 window.ydoc = ydoc;

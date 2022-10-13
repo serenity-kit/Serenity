@@ -174,7 +174,7 @@ export default function Editor({
         // avoid showing the form next/prev & Done button on iOS
         // when the keyboard is shown
         hideKeyboardAccessoryView={true}
-        scrollEnabled={true}
+        scrollEnabled={false}
         renderLoading={() => (
           <CenterContent>
             <Spinner fadeIn size="lg" />

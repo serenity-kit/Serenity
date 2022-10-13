@@ -126,6 +126,11 @@ export const Editor = (props: EditorProps) => {
         if (props.onFocus) {
           props.onFocus(params);
         }
+        // timeout to make sure the selection has time to be set
+        // before we scroll into view
+        setTimeout(() => {
+          params.editor.chain().scrollIntoView().run();
+        }, 50);
       },
       onBlur: (params) => {
         if (props.onBlur) {
@@ -143,9 +148,12 @@ export const Editor = (props: EditorProps) => {
           <EditorContent
             // 100% needed to expand the editor to it's full height even when empty
             style={{
-              height: props.editorHeight ?? "100%",
+              height: props.editorHeight ?? undefined,
             }}
             editor={editor}
+            className={
+              hasEditorSidebar ? "has-editor-sidebar" : "has-editor-bottombar"
+            }
           />
         </div>
       </View>
