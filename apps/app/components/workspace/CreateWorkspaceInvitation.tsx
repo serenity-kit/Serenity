@@ -55,7 +55,7 @@ export function CreateWorkspaceInvitation(props: Props) {
             `http://localhost:19006/`
         : "https://www.serenity.li";
 
-    return `You are invited to a Serenity Workspace. To join, go to ${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}`;
+    return `You are invited to a Serenity Workspace. To join, use this link to accept the invitation:\n${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}`;
   };
 
   const createWorkspaceInvitationPreflight = async () => {
