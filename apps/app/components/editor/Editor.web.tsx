@@ -1,3 +1,4 @@
+import { useHeaderHeight } from "@react-navigation/elements";
 import {
   Editor as SerenityEditor,
   EditorBottombarState,
@@ -23,6 +24,7 @@ export default function Editor({
   isNew,
   updateTitle,
 }: EditorProps) {
+  const headerHeight = useHeaderHeight();
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
   const tipTapEditorRef = useRef<TipTapEditor | null>(null);
@@ -31,27 +33,28 @@ export default function Editor({
   const editorBottombarWrapperRef = useRef<RNView>(null);
   const editorIsFocusedRef = useRef<boolean>(false);
 
-  useEffect(() => {
-    const showAndPositionToolbar = function () {
-      if (editorBottombarWrapperRef.current && editorIsFocusedRef.current) {
-        const topPos =
-          // @ts-expect-error - only works in web only
-          window.visualViewport.height +
-          window.pageYOffset -
-          editorBottombarHeight +
-          2;
-        // @ts-expect-error - this is a div
-        editorBottombarWrapperRef.current.style.top = `${topPos}px`;
-        // @ts-expect-error - this is a div
-        editorBottombarWrapperRef.current.style.display = "block";
-      }
-    };
+  const showAndPositionToolbar = function () {
+    if (editorBottombarWrapperRef.current && editorIsFocusedRef.current) {
+      const topPos =
+        // @ts-expect-error - works in web only
+        window.visualViewport.height +
+        window.pageYOffset - // needed for iOS safari scroll page offset
+        editorBottombarHeight -
+        headerHeight +
+        2;
+      // @ts-expect-error - this is a div
+      editorBottombarWrapperRef.current.style.top = `${topPos}px`;
+      // @ts-expect-error - this is a div
+      editorBottombarWrapperRef.current.style.display = "block";
+    }
+  };
 
-    // @ts-expect-error - only works in web only
+  useEffect(() => {
+    // @ts-expect-error - works in web only
     window.visualViewport.addEventListener("resize", showAndPositionToolbar);
 
     return () =>
-      // @ts-expect-error - only works in web only
+      // @ts-expect-error - works in web only
       window.visualViewport.removeEventListener(
         "resize",
         showAndPositionToolbar
@@ -59,8 +62,8 @@ export default function Editor({
   }, []);
 
   return (
-    // needed so hidden elements with borders don't trigger scrolling behaviour
-    <View style={tw`flex-1 overflow-hidden`}>
+    // overflow-hidden needed so hidden elements with borders don't trigger scrolling behaviour
+    <View style={tw`overflow-hidden`}>
       <View>
         <SerenityEditor
           documentId={documentId}
@@ -71,6 +74,7 @@ export default function Editor({
           updateTitle={updateTitle}
           onFocus={() => {
             editorIsFocusedRef.current = true;
+            showAndPositionToolbar();
           }}
           onBlur={(params) => {
             if (
@@ -82,6 +86,7 @@ export default function Editor({
             ) {
               editorIsFocusedRef.current = false;
               if (editorBottombarWrapperRef.current) {
+                // @ts-expect-error - it's a div
                 editorBottombarWrapperRef.current.style.display = "none";
               }
             }
