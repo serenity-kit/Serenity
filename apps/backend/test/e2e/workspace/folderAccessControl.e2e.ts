@@ -141,5 +141,15 @@ test.describe("Workspace Sharing", () => {
     expect(user3Url).toBe(expectedUser3Url);
     expect(doesInvalidAccessMessageExist).toBe(true);
     await renameFolder(user2Page, user1.data.folder.id, "user2 re-renamed");
+
+    // re-add user3
+    await user3Page.goto(workspaceInvitationUrl);
+    await acceptWorkspaceInvitation({
+      page: user3Page,
+      workspaceInvitationUrl,
+      sharedWorkspaceId: user1.data.workspace.id,
+    });
+    await delayForSeconds(2);
+    await renameFolder(user3Page, user1.data.folder.id, "user3 re-added");
   });
 });
