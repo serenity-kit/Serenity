@@ -27,7 +27,6 @@ import {
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
@@ -59,35 +58,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [, createFolderMutation] = useCreateFolderMutation();
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
-
-  const onWorkspaceStructureCreated = async ({
-    workspace,
-    folder,
-    document,
-  }) => {
-    const deviceSigningPublicKey = activeDevice?.signingPublicKey;
-    if (!deviceSigningPublicKey) {
-      throw new Error("Expected deviceSigningPublicKey to be defined");
-    }
-
-    const createdWorkspace = await getWorkspace({
-      deviceSigningPublicKey,
-      workspaceId,
-    });
-    setShowCreateWorkspaceModal(false);
-    if (createdWorkspace) {
-      navigation.navigate("Workspace", {
-        workspaceId: workspace.id,
-        screen: "Page",
-        params: {
-          pageId: document.id,
-        },
-      });
-    } else {
-      // TODO: handle this error
-      console.error("No workspace found!");
-    }
-  };
 
   const createFolder = async (name: string) => {
     const id = uuidv4();
@@ -259,7 +229,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <CreateWorkspaceModal
         isVisible={showCreateWorkspaceModal}
         onBackdropPress={() => setShowCreateWorkspaceModal(false)}
-        onWorkspaceStructureCreated={onWorkspaceStructureCreated}
+        onWorkspaceStructureCreated={() => {
+          setShowCreateWorkspaceModal(false);
+        }}
       />
     </DrawerContentScrollView>
   );

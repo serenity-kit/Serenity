@@ -7,16 +7,6 @@ import { CreateWorkspaceForm } from "../../../components/createWorkspaceForm/Cre
 export default function OnboardingScreen({ navigation }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
-  const onWorkspaceStructureCreated = ({ workspace, document }) => {
-    navigation.navigate("Workspace", {
-      workspaceId: workspace.id,
-      screen: "Page",
-      params: {
-        pageId: document.id,
-      },
-    });
-  };
-
   return (
     <SafeAreaView style={tw`flex-auto`}>
       {/* flex needed for Menu-overlay positioning */}
@@ -31,9 +21,7 @@ export default function OnboardingScreen({ navigation }) {
       <KeyboardAvoidingView behavior="padding" style={tw`flex-auto`}>
         <CenterContent>
           <View style={tw`max-w-sm p-6`}>
-            <CreateWorkspaceForm
-              onWorkspaceStructureCreated={onWorkspaceStructureCreated}
-            />
+            <CreateWorkspaceForm />
           </View>
         </CenterContent>
       </KeyboardAvoidingView>

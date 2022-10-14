@@ -382,7 +382,7 @@ export default function WorkspaceSettingsMembersScreen(
             removeMember(usernameToRemove);
           }
         }}
-        onBackdropPress={() => {
+        onCancel={() => {
           setUsernameToRemove(undefined);
           setIsPasswordModalVisible(false);
         }}

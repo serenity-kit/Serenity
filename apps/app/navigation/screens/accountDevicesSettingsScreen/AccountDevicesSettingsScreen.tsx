@@ -158,7 +158,7 @@ export default function DeviceManagerScreen(props) {
             deleteDevice(signingPublicKeyToBeDeleted);
           }
         }}
-        onBackdropPress={() => {
+        onCancel={() => {
           setSigningPublicKeyToBeDeleted(undefined);
           setIsPasswordModalVisible(false);
         }}
