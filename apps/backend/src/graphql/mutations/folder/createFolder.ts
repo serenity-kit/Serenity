@@ -7,6 +7,7 @@ import {
   objectType,
 } from "nexus";
 import { createFolder } from "../../../database/folder/createFolder";
+import { KeyDerivationTrace } from "../../../types/folder";
 import { Folder } from "../../types/folder";
 
 export const KeyDerivationTraceParentFolderInput = inputObjectType({
@@ -73,6 +74,11 @@ export const createFolderMutation = mutationField("createFolder", {
       workspaceId: args.input.workspaceId,
       keyDerivationTrace: args.input.keyDerivationTrace,
     });
-    return { folder };
+    return {
+      folder: {
+        ...folder,
+        keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace,
+      },
+    };
   },
 });

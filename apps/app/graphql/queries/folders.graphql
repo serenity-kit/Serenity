@@ -9,6 +9,14 @@ query folders($parentFolderId: ID!, $first: Int!, $after: String) {
       parentFolderId
       rootFolderId
       workspaceId
+      keyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
     pageInfo {
       hasNextPage

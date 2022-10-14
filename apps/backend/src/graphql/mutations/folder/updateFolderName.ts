@@ -7,6 +7,7 @@ import {
   objectType,
 } from "nexus";
 import { updateFolderName } from "../../../database/folder/updateFolderName";
+import { KeyDerivationTrace } from "../../../types/folder";
 import { Folder } from "../../types/folder";
 import { KeyDerivationTraceInput } from "./createFolder";
 
@@ -51,6 +52,11 @@ export const updateFolderNameMutation = mutationField("updateFolderName", {
       userId: context.user.id,
       keyDerivationTrace: args.input.keyDerivationTrace,
     });
-    return { folder };
+    return {
+      folder: {
+        ...folder,
+        keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace,
+      },
+    };
   },
 });

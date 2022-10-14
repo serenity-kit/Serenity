@@ -1,6 +1,5 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import { Folder } from "../../types/folder";
-import { KeyDerivationTrace } from "../../types/workspace";
+import { Folder, KeyDerivationTrace } from "../../types/folder";
 import { prisma } from "../prisma";
 
 type Params = {

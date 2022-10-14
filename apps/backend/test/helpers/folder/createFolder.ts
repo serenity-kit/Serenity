@@ -52,6 +52,14 @@ export const createFolder = async ({
           rootFolderId
           workspaceId
           workspaceKeyId
+          keyDerivationTrace {
+            workspaceKeyId
+            parentFolders {
+              folderId
+              subkeyId
+              parentFolderId
+            }
+          }
         }
       }
     }

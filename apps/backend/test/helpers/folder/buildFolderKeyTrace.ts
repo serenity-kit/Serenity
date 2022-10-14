@@ -2,7 +2,7 @@ import { prisma } from "../../../src/database/prisma";
 import {
   KeyDerivationTrace,
   KeyDerivationTraceParentFolder,
-} from "../../../src/types/workspace";
+} from "../../../src/types/folder";
 
 export type Params = {
   workspaceKeyId: string;

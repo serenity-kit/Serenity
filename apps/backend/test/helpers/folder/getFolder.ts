@@ -25,6 +25,14 @@ export const getFolder = async ({
         encryptedNameNonce
         subkeyId
         workspaceKeyId
+        keyDerivationTrace {
+          workspaceKeyId
+          parentFolders {
+            folderId
+            subkeyId
+            parentFolderId
+          }
+        }
       }
     }
   `;

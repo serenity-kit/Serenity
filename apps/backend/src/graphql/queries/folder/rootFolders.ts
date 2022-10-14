@@ -1,6 +1,7 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getWorkspaceFolders } from "../../../database/folder/getWorkspaceFolders";
+import { formatFolder } from "../../../types/folder";
 import { Folder } from "../../types/folder";
 
 export const workspaces = queryField((t) => {
@@ -35,13 +36,14 @@ export const workspaces = queryField((t) => {
       const take: any = args.first ? args.first + 1 : undefined;
       const workspaceId = args.workspaceId;
 
-      const folders = await getWorkspaceFolders({
+      const rawFolders = await getWorkspaceFolders({
         userId,
         workspaceId,
         cursor,
         skip,
         take,
       });
+      const folders = rawFolders.map((folder) => formatFolder(folder));
       return folders;
     },
   });

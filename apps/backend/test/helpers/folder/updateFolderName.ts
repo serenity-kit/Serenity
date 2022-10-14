@@ -45,6 +45,14 @@ export const updateFolderName = async ({
           parentFolderId
           rootFolderId
           workspaceId
+          keyDerivationTrace {
+            workspaceKeyId
+            parentFolders {
+              folderId
+              subkeyId
+              parentFolderId
+            }
+          }
         }
       }
     }

@@ -1,4 +1,15 @@
-import { KeyDerivationTrace, WorkspaceKey } from "./workspace";
+import { WorkspaceKey } from "./workspace";
+
+export type KeyDerivationTraceParentFolder = {
+  folderId: string;
+  subkeyId: number;
+  parentFolderId?: string | undefined | null;
+};
+
+export type KeyDerivationTrace = {
+  workspaceKeyId: string;
+  parentFolders: KeyDerivationTraceParentFolder[];
+};
 
 export type Folder = {
   id: string;
@@ -12,5 +23,12 @@ export type Folder = {
   workspaceKeyId: string;
   workspaceKey?: WorkspaceKey | null;
   parentFolders: Folder[] | null;
-  keyDerivationTrace?: KeyDerivationTrace;
+  keyDerivationTrace: KeyDerivationTrace;
+};
+
+export const formatFolder = (folder: any): Folder => {
+  return {
+    ...folder,
+    keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace,
+  };
 };
