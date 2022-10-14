@@ -8,5 +8,13 @@ query documentPath($id: ID!) {
     rootFolderId
     workspaceId
     subkeyId
+    keyDerivationTrace {
+      workspaceKeyId
+      parentFolders {
+        folderId
+        subkeyId
+        parentFolderId
+      }
+    }
   }
 }

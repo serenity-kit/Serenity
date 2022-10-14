@@ -1,6 +1,7 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getFolder } from "../../../database/folder/getFolder";
+import { formatFolder } from "../../../types/folder";
 import { Folder } from "../../types/folder";
 
 export const folderQuery = queryField((t) => {
@@ -21,7 +22,7 @@ export const folderQuery = queryField((t) => {
         userId,
         id: args.id,
       });
-      return folder;
+      return formatFolder(folder);
     },
   });
 });

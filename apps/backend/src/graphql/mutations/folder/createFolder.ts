@@ -7,7 +7,27 @@ import {
   objectType,
 } from "nexus";
 import { createFolder } from "../../../database/folder/createFolder";
+import { KeyDerivationTrace } from "../../../types/folder";
 import { Folder } from "../../types/folder";
+
+export const KeyDerivationTraceParentFolderInput = inputObjectType({
+  name: "KeyDerivationTraceParentFolderInput",
+  definition(t) {
+    t.nonNull.string("folderId");
+    t.nonNull.int("subkeyId");
+    t.string("parentFolderId");
+  },
+});
+
+export const KeyDerivationTraceInput = inputObjectType({
+  name: "KeyDerivationTraceInput",
+  definition(t) {
+    t.nonNull.string("workspaceKeyId");
+    t.nonNull.list.nonNull.field("parentFolders", {
+      type: KeyDerivationTraceParentFolderInput,
+    });
+  },
+});
 
 export const CreateFolderInput = inputObjectType({
   name: "CreateFolderInput",
@@ -19,6 +39,7 @@ export const CreateFolderInput = inputObjectType({
     t.nonNull.int("subkeyId");
     t.string("parentFolderId");
     t.nonNull.string("workspaceId");
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
   },
 });
 
@@ -51,7 +72,13 @@ export const createFolderMutation = mutationField("createFolder", {
       subkeyId: args.input.subkeyId,
       parentFolderId: args.input.parentFolderId || undefined,
       workspaceId: args.input.workspaceId,
+      keyDerivationTrace: args.input.keyDerivationTrace,
     });
-    return { folder };
+    return {
+      folder: {
+        ...folder,
+        keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace,
+      },
+    };
   },
 });

@@ -69,6 +69,10 @@ export async function createInitialWorkspaceStructure({
     subkeyId: folderSubkeyId,
     parentFolderId: undefined,
     workspaceId: workspace.id,
+    keyDerivationTrace: {
+      workspaceKeyId: workspaceKey?.id!,
+      parentFolders: [],
+    },
   });
   const document = await prisma.document.create({
     data: {

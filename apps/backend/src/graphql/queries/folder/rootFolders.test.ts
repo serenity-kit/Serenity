@@ -112,6 +112,16 @@ test("user should be able to list folders in a workspace when preloaded with ini
                     parentFolderId
                     rootFolderId
                     workspaceId
+                    encryptedName
+                    encryptedNameNonce
+                    keyDerivationTrace {
+                      workspaceKeyId
+                      parentFolders {
+                        folderId
+                        subkeyId
+                        parentFolderId
+                      }
+                    }
                 }
             }
             pageInfo {
@@ -148,6 +158,16 @@ test("user should be able to list folders in a workspace with one item", async (
                     parentFolderId
                     rootFolderId
                     workspaceId
+                    encryptedName
+                    encryptedNameNonce
+                    keyDerivationTrace {
+                      workspaceKeyId
+                      parentFolders {
+                        folderId
+                        subkeyId
+                        parentFolderId
+                      }
+                    }
                 }
             }
             pageInfo {

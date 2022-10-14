@@ -73,7 +73,7 @@ const setup = async () => {
     graphql,
     id: folderId,
     name: folderName,
-    parentFolderId: null,
+    parentFolderId: parentFolderId,
     parentKey: workspaceKey,
     authorizationHeader: sessionKey,
     workspaceId: workspaceId,
@@ -168,6 +168,16 @@ test("user should be able to get a document path", async () => {
         parentFolderId
         rootFolderId
         workspaceId
+        encryptedName
+        encryptedNameNonce
+        keyDerivationTrace {
+          workspaceKeyId
+          parentFolders {
+            folderId
+            subkeyId
+            parentFolderId
+          }
+        }
       }
     }
   `;
@@ -176,16 +186,16 @@ test("user should be able to get a document path", async () => {
     { id: parentDocumentId },
     authorizationHeader
   );
-  expect(result.documentPath).toMatchInlineSnapshot(`
-    [
-      {
-        "id": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-        "parentFolderId": null,
-        "rootFolderId": null,
-        "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-      },
-    ]
-  `);
+  const documentPath = result.documentPath;
+  expect(documentPath.length).toBe(1);
+  for (const documentPathItem of documentPath) {
+    expect(documentPathItem.id).toBe(parentFolderId);
+    expect(documentPathItem.parentFolderId).toBe(null);
+    expect(documentPathItem.rootFolderId).toBe(null);
+    expect(documentPathItem.workspaceId).toBe(workspaceId);
+    expect(typeof documentPathItem.encryptedName).toBe("string");
+    expect(typeof documentPathItem.encryptedNameNonce).toBe("string");
+  }
 });
 
 test("user should be able to get a document path for a deep tree", async () => {
@@ -197,6 +207,16 @@ test("user should be able to get a document path for a deep tree", async () => {
         parentFolderId
         rootFolderId
         workspaceId
+        encryptedName
+        encryptedNameNonce
+        keyDerivationTrace {
+          workspaceKeyId
+          parentFolders {
+            folderId
+            subkeyId
+            parentFolderId
+          }
+        }
       }
     }
   `;
@@ -205,16 +225,23 @@ test("user should be able to get a document path for a deep tree", async () => {
     { id: documentId },
     authorizationHeader
   );
-  expect(result.documentPath).toMatchInlineSnapshot(`
-    [
-      {
-        "id": "3530b9ed-11f3-44c7-9e16-7dba1e14815f",
-        "parentFolderId": null,
-        "rootFolderId": null,
-        "workspaceId": "4e9a4c29-2295-471c-84b5-5bf55169ff8c",
-      },
-    ]
-  `);
+
+  const documentPath = result.documentPath;
+  expect(documentPath.length).toBe(2);
+  for (const documentPathItem of documentPath) {
+    expect(typeof documentPathItem.encryptedName).toBe("string");
+    expect(typeof documentPathItem.encryptedNameNonce).toBe("string");
+    expect(documentPathItem.workspaceId).toBe(workspaceId);
+    if (documentPathItem.id === parentFolderId) {
+      expect(documentPathItem.id).toBe(parentFolderId);
+      expect(documentPathItem.rootFolderId).toBe(null);
+    } else if (documentPathItem.id === folderId) {
+      expect(documentPathItem.id).toBe(folderId);
+      expect(documentPathItem.rootFolderId).toBe(parentFolderId);
+    } else {
+      throw new Error("unexpected document path item");
+    }
+  }
 });
 
 test("user should not be able to retrieve another user's folder", async () => {

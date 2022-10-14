@@ -111,7 +111,6 @@ test("user should be able to create a child folder", async () => {
   const id = "c3d28056-b619-41c4-be51-ce89ed5b8be4";
   const parentFolderId = "c103a784-35cb-4aee-b366-d10398b6dd95";
   const name = "Untitled";
-
   const parentFolder = await prisma.folder.findFirst({
     where: { id: parentFolderId },
   });

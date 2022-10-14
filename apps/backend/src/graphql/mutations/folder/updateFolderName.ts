@@ -7,7 +7,9 @@ import {
   objectType,
 } from "nexus";
 import { updateFolderName } from "../../../database/folder/updateFolderName";
+import { KeyDerivationTrace } from "../../../types/folder";
 import { Folder } from "../../types/folder";
+import { KeyDerivationTraceInput } from "./createFolder";
 
 export const UpdateFolderNameInput = inputObjectType({
   name: "UpdateFolderNameInput",
@@ -17,6 +19,7 @@ export const UpdateFolderNameInput = inputObjectType({
     t.nonNull.string("encryptedNameNonce");
     t.nonNull.string("workspaceKeyId");
     t.nonNull.int("subkeyId");
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
   },
 });
 
@@ -47,7 +50,13 @@ export const updateFolderNameMutation = mutationField("updateFolderName", {
       workspaceKeyId: args.input.workspaceKeyId,
       subkeyId: args.input.subkeyId,
       userId: context.user.id,
+      keyDerivationTrace: args.input.keyDerivationTrace,
     });
-    return { folder };
+    return {
+      folder: {
+        ...folder,
+        keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace,
+      },
+    };
   },
 });

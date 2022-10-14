@@ -1,6 +1,7 @@
 import { AuthenticationError } from "apollo-server-express";
 import { idArg, list, nonNull, queryField } from "nexus";
 import { getDocumentPath } from "../../../database/document/getDocumentPath";
+import { formatFolder } from "../../../types/folder";
 import { Folder } from "../../types/folder";
 
 export const documentPath = queryField((t) => {
@@ -14,11 +15,12 @@ export const documentPath = queryField((t) => {
         throw new AuthenticationError("Not authenticated");
       }
       const userId = context.user.id;
-      const folderList = await getDocumentPath({
+      const rawFolders = await getDocumentPath({
         userId,
         id: args.id,
       });
-      return folderList;
+      const folders = rawFolders.map((folder) => formatFolder(folder));
+      return folders;
     },
   });
 });

@@ -80,6 +80,7 @@ export const removeMembersAndRotateWorkspaceKey = async ({
     await prisma.usersToWorkspaces.deleteMany({
       where: { workspaceId, userId: { in: revokedUserIds } },
     });
+    // rotate keys
     const updatedWorkspaceKey = await rotateWorkspaceKey({
       prisma,
       deviceWorkspaceKeyBoxes: addableDeviceWorkspaceKeyBoxes,

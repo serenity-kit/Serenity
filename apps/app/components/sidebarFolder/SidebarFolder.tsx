@@ -174,6 +174,10 @@ export default function SidebarFolder(props: Props) {
           workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
           subkeyId: encryptedFolderResult.folderSubkeyId,
           parentFolderId: props.folderId,
+          keyDerivationTrace: {
+            workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+            parentFolders: [],
+          },
         },
       });
       if (result.data?.createFolder?.folder?.id) {
@@ -277,6 +281,10 @@ export default function SidebarFolder(props: Props) {
         encryptedNameNonce: encryptedFolderResult.publicNonce,
         workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
         subkeyId: props.subkeyId!,
+        keyDerivationTrace: {
+          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+          parentFolders: [],
+        },
       },
     });
     const folder = updateFolderNameResult.data?.updateFolderName?.folder;

@@ -1,6 +1,7 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { booleanArg, idArg, nonNull, queryField } from "nexus";
 import { getSubfolders } from "../../../database/folder/getSubfolders";
+import { formatFolder } from "../../../types/folder";
 import { Folder } from "../../types/folder";
 
 export const folders = queryField((t) => {
@@ -36,7 +37,7 @@ export const folders = queryField((t) => {
       const take: any = args.first ? args.first + 1 : undefined;
       const parentFolderId = args.parentFolderId;
       const usingOldKeys = args.usingOldKeys || false;
-      const folders = await getSubfolders({
+      const rawFolders = await getSubfolders({
         userId,
         parentFolderId,
         usingOldKeys,
@@ -44,6 +45,7 @@ export const folders = queryField((t) => {
         skip,
         take,
       });
+      const folders = rawFolders.map((folder) => formatFolder(folder));
       return folders;
     },
   });

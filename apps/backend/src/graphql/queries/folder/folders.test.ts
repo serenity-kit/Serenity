@@ -45,6 +45,16 @@ const getFolders = async ({
                   parentFolderId
                   rootFolderId
                   workspaceId
+                  encryptedName
+                  encryptedNameNonce
+                  keyDerivationTrace {
+                    workspaceKeyId
+                    parentFolders {
+                      folderId
+                      subkeyId
+                      parentFolderId
+                    }
+                  }
               }
           }
           pageInfo {
