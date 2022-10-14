@@ -68,7 +68,6 @@ declare global {
     ydoc: any;
     editor: any;
     isNew: boolean;
-    editorHeight: number;
     initialContent: any;
     updateEditor: (paramsString: string) => void;
     applyYjsUpdate: (update: any) => void;
