@@ -3,6 +3,7 @@ export * from "./createDevice/createDevice";
 export * from "./createDocumentKey/createDocumentKey";
 export * from "./createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 export * from "./createIntroductionDocumentSnapshot/createIntroductionDocumentSnapshot";
+export * from "./debounce/debounce";
 export * from "./decryptDevice/decryptDevice";
 export * from "./decryptDocumentTitle/decryptDocumentTitle";
 export * from "./decryptFolderName/decryptFolderName";

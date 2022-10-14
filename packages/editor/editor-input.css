@@ -43,6 +43,10 @@
     @apply pb-10 md:pb-14;
   }
 
+  .has-editor-bottombar .ProseMirror > *:last-child {
+    @apply pb-96; /* space for the keyboard on mobile */
+  }
+
   /* needed to make all area of the editor clickable which enables activating the cursor on each written line */
   .ProseMirror > * {
     @apply mx-auto w-full max-w-prose-rem;
