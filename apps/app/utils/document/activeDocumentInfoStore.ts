@@ -34,7 +34,7 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
           activeDevice,
         });
         const documentKeyData = await recreateDocumentKey({
-          folderKey: folderKeyData.key,
+          folderKey: folderKeyData.folderKeyData.key,
           subkeyId: document?.subkeyId!,
         });
         documentName = await decryptDocumentTitle({

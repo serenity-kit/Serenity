@@ -37,10 +37,8 @@ import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
-import {
-  getFolderKey,
-  getParentFolderKey,
-} from "../../utils/folder/getFolderKey";
+import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
+import { getParentFolderKey } from "../../utils/folder/getFolderKey";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
@@ -94,6 +92,7 @@ export default function SidebarFolder(props: Props) {
   const document = useActiveDocumentInfoStore((state) => state.document);
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
   const [folderName, setFolderName] = useState("decrypting…");
+  const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
 
   useEffect(() => {
     const isOpen = openFolderIds.indexOf(props.folderId) >= 0;
@@ -119,7 +118,7 @@ export default function SidebarFolder(props: Props) {
         activeDevice,
       });
       const folderName = await decryptFolderName({
-        parentKey,
+        parentKey: parentKey.keyData.key,
         subkeyId: props.subkeyId!,
         ciphertext: props.encryptedName,
         publicNonce: props.encryptedNameNonce,
@@ -139,6 +138,11 @@ export default function SidebarFolder(props: Props) {
       deviceSigningPublicKey: activeDevice.signingPublicKey,
       workspaceId: props.workspaceId,
     });
+    if (!workspace?.currentWorkspaceKey) {
+      // TODO: handle error in UI
+      console.error("Workspace or workspaceKeys not found");
+      return;
+    }
     try {
       const result = await getWorkspaceKey({
         workspaceId: props.workspaceId,
@@ -150,14 +154,17 @@ export default function SidebarFolder(props: Props) {
       console.error(error);
       return;
     }
-    const parentFolderKeyData = await getFolderKey({
+    const parentFolderKeyString = await getFolderKey({
       folderId: props.folderId,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
       workspaceId: props.workspaceId,
+      folderSubkeyId: props.subkeyId,
       activeDevice,
     });
+
     const encryptedFolderResult = await encryptFolderName({
       name,
-      parentKey: parentFolderKeyData.key,
+      parentKey: parentFolderKeyString,
     });
     let didCreateFolderSucceed = false;
     let numCreateFolderAttempts = 0;
@@ -198,13 +205,23 @@ export default function SidebarFolder(props: Props) {
 
   const createDocument = async () => {
     const id = uuidv4();
-    const folderKeyResult = await getFolderKey({
-      folderId: props.folderId,
+    const workspace = await getWorkspace({
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
       workspaceId: props.workspaceId,
+    });
+    if (!workspace?.currentWorkspaceKey) {
+      console.error("Workspace or workspaceKeys not found");
+      return;
+    }
+    const folderKeyString = await getFolderKey({
+      folderId: props.folderId,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
+      workspaceId: props.workspaceId,
+      folderSubkeyId: props.subkeyId,
       activeDevice,
     });
     const documentContentKeyResult = await createDocumentKey({
-      folderKey: folderKeyResult.key,
+      folderKey: folderKeyString,
     });
     const result = await createDocumentMutation({
       input: {
@@ -271,7 +288,7 @@ export default function SidebarFolder(props: Props) {
     });
     const encryptedFolderResult = await encryptExistingFolderName({
       name: newFolderName,
-      parentKey,
+      parentKey: parentKey.keyData.key,
       subkeyId: props.subkeyId!,
     });
     const updateFolderNameResult = await updateFolderNameMutation({
