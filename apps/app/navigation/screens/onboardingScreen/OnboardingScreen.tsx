@@ -21,7 +21,13 @@ export default function OnboardingScreen({ navigation }) {
       <KeyboardAvoidingView behavior="padding" style={tw`flex-auto`}>
         <CenterContent>
           <View style={tw`max-w-sm p-6`}>
-            <CreateWorkspaceForm />
+            <CreateWorkspaceForm
+              onCancel={() => {
+                alert(
+                  "Password verification is required. Please refresh the page and try again."
+                );
+              }}
+            />
           </View>
         </CenterContent>
       </KeyboardAvoidingView>

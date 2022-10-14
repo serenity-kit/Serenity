@@ -228,7 +228,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       ) : null}
       <CreateWorkspaceModal
         isVisible={showCreateWorkspaceModal}
-        onBackdropPress={() => setShowCreateWorkspaceModal(false)}
+        onCancel={() => setShowCreateWorkspaceModal(false)}
         onWorkspaceStructureCreated={() => {
           setShowCreateWorkspaceModal(false);
         }}

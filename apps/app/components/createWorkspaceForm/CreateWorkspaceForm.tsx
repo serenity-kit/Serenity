@@ -9,6 +9,7 @@ import sodium from "@serenity-tools/libsodium";
 import {
   Button,
   FormWrapper,
+  InfoMessage,
   Input,
   ModalButtonFooter,
   ModalHeader,
@@ -27,7 +28,7 @@ import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 
 export type CreateWorkspaceFormProps = {
-  onBackdropPress?: () => void;
+  onCancel?: () => void;
   onWorkspaceStructureCreated?: () => void;
 };
 
@@ -35,6 +36,8 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   const inputRef = useRef<TextInput>();
   const [name, setName] = useState<string>("");
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const [isCreatingWorkspace, setIsCreatingWorkspace] = useState(false);
+  const [hasCreateWorkspaceError, setHasCreateWorkspaceError] = useState(false);
   const { activeDevice } = useAppContext();
   const navigation = useNavigation();
   const [, createInitialWorkspaceStructure] =
@@ -63,102 +66,102 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   }, []);
 
   const createWorkspace = async () => {
-    if (!activeDevice) {
-      throw new Error("No active device available");
-    }
-    const workspaceId = uuidv4();
-    const folderId = uuidv4();
-    const documentId = uuidv4();
-    // grab all devices for this user
-    //
-    if (!devicesResult.data?.devices?.nodes) {
-      // TODO: Handle this error
-      console.error("No devices found!");
-      return;
-    }
-    const devices = devicesResult.data?.devices?.nodes as Device[];
-    const { deviceWorkspaceKeyBoxes, workspaceKey } =
-      await createWorkspaceKeyBoxesForDevices({ devices, activeDevice });
-    if (!workspaceKey) {
-      // TODO: handle this error
-      console.error("Could not retrieve workspaceKey!");
-      return;
-    }
-    const folderName = "Getting started";
-    const encryptedFolderResult = await encryptFolderName({
-      name: folderName,
-      parentKey: workspaceKey,
-    });
-    const documentName = "Introduction";
-    const documentKeyData = await createDocumentKey({
-      folderKey: encryptedFolderResult.folderSubkey,
-    });
-    const encryptedDocumentTitle = await encryptDocumentTitle({
-      title: documentName,
-      key: documentKeyData.key,
-    });
-    // currently hard-coded until we enable e2e encryption per workspace
-    // const documentEncryptionKey = sodium.from_base64(
-    //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
-    // );
-    const documentContentKeyData = await createDocumentKey({
-      folderKey: encryptedFolderResult.folderSubkey,
-    });
-    const documentEncryptionKey = sodium.from_base64(
-      documentContentKeyData.key
-    );
-    const snapshot = await createIntroductionDocumentSnapshot({
-      documentId,
-      documentEncryptionKey,
-    });
+    setIsCreatingWorkspace(true);
+    try {
+      if (!activeDevice) {
+        throw new Error("No active device available");
+      }
+      const workspaceId = uuidv4();
+      const folderId = uuidv4();
+      const documentId = uuidv4();
+      // grab all devices for this user
+      if (!devicesResult.data?.devices?.nodes) {
+        throw new Error("No devices found!");
+      }
+      const devices = devicesResult.data?.devices?.nodes as Device[];
+      const { deviceWorkspaceKeyBoxes, workspaceKey } =
+        await createWorkspaceKeyBoxesForDevices({ devices, activeDevice });
+      if (!workspaceKey) {
+        throw new Error("Could not retrieve workspaceKey!");
+      }
+      const folderName = "Getting started";
+      const encryptedFolderResult = await encryptFolderName({
+        name: folderName,
+        parentKey: workspaceKey,
+      });
+      const documentName = "Introduction";
+      const documentKeyData = await createDocumentKey({
+        folderKey: encryptedFolderResult.folderSubkey,
+      });
+      const encryptedDocumentTitle = await encryptDocumentTitle({
+        title: documentName,
+        key: documentKeyData.key,
+      });
+      const documentContentKeyData = await createDocumentKey({
+        folderKey: encryptedFolderResult.folderSubkey,
+      });
+      const documentEncryptionKey = sodium.from_base64(
+        documentContentKeyData.key
+      );
+      const snapshot = await createIntroductionDocumentSnapshot({
+        documentId,
+        documentEncryptionKey,
+      });
 
-    const createInitialWorkspaceStructureResult =
-      await createInitialWorkspaceStructure({
-        input: {
-          workspaceName: name,
-          workspaceId,
-          folderId,
-          encryptedFolderName: encryptedFolderResult.ciphertext,
-          encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
-          folderSubkeyId: encryptedFolderResult.folderSubkeyId,
-          folderIdSignature: `TODO+${folderId}`,
-          encryptedDocumentName: encryptedDocumentTitle.ciphertext,
-          encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
-          documentSubkeyId: documentKeyData.subkeyId,
-          documentContentSubkeyId: documentContentKeyData.subkeyId,
-          documentId,
-          documentSnapshot: snapshot,
-          creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
-          deviceWorkspaceKeyBoxes,
+      // throw new Error("Debug error");
+
+      const createInitialWorkspaceStructureResult =
+        await createInitialWorkspaceStructure({
+          input: {
+            workspaceName: name,
+            workspaceId,
+            folderId,
+            encryptedFolderName: encryptedFolderResult.ciphertext,
+            encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
+            folderSubkeyId: encryptedFolderResult.folderSubkeyId,
+            folderIdSignature: `TODO+${folderId}`,
+            encryptedDocumentName: encryptedDocumentTitle.ciphertext,
+            encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
+            documentSubkeyId: documentKeyData.subkeyId,
+            documentContentSubkeyId: documentContentKeyData.subkeyId,
+            documentId,
+            documentSnapshot: snapshot,
+            creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
+            deviceWorkspaceKeyBoxes,
+          },
+        });
+      if (
+        !createInitialWorkspaceStructureResult.data
+          ?.createInitialWorkspaceStructure?.workspace ||
+        !createInitialWorkspaceStructureResult.data
+          ?.createInitialWorkspaceStructure?.folder ||
+        !createInitialWorkspaceStructureResult.data
+          ?.createInitialWorkspaceStructure?.document
+      ) {
+        throw new Error("Could not create workspace structure!");
+      }
+      const workspace =
+        createInitialWorkspaceStructureResult.data
+          .createInitialWorkspaceStructure.workspace;
+      const document =
+        createInitialWorkspaceStructureResult.data
+          .createInitialWorkspaceStructure.document;
+
+      navigation.navigate("Workspace", {
+        workspaceId: workspace.id,
+        screen: "Page",
+        params: {
+          pageId: document.id,
         },
       });
-    if (
-      !createInitialWorkspaceStructureResult.data
-        ?.createInitialWorkspaceStructure?.workspace ||
-      !createInitialWorkspaceStructureResult.data
-        ?.createInitialWorkspaceStructure?.folder ||
-      !createInitialWorkspaceStructureResult.data
-        ?.createInitialWorkspaceStructure?.document
-    ) {
-      // TODO: handle error
-      return;
-    }
-    const workspace =
-      createInitialWorkspaceStructureResult.data.createInitialWorkspaceStructure
-        .workspace;
-    const document =
-      createInitialWorkspaceStructureResult.data.createInitialWorkspaceStructure
-        .document;
-
-    navigation.navigate("Workspace", {
-      workspaceId: workspace.id,
-      screen: "Page",
-      params: {
-        pageId: document.id,
-      },
-    });
-    if (props.onWorkspaceStructureCreated) {
-      props.onWorkspaceStructureCreated();
+      if (props.onWorkspaceStructureCreated) {
+        props.onWorkspaceStructureCreated();
+      }
+    } catch (err) {
+      console.error(err);
+      setHasCreateWorkspaceError(true);
+    } finally {
+      setIsCreatingWorkspace(false);
     }
   };
 
@@ -172,16 +175,22 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           onChangeText={setName}
           hint="This is the name of your organization, team or private notes. You can invite team members afterwards."
         />
+        {hasCreateWorkspaceError && (
+          <InfoMessage variant="error">
+            Failed to create the workspace. Please try again later.
+          </InfoMessage>
+        )}
         <ModalButtonFooter
           confirm={
             <Button
               disabled={
-                name === "" &&
+                name.trim() === "" &&
                 devicesResult.data?.devices?.nodes?.length !== undefined
               }
               onPress={createWorkspace}
+              isLoading={isCreatingWorkspace}
             >
-              Create
+              Create workspace
             </Button>
           }
         />
@@ -200,8 +209,8 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         }}
         onCancel={() => {
           setIsPasswordModalVisible(false);
-          if (props.onBackdropPress) {
-            props.onBackdropPress();
+          if (props.onCancel) {
+            props.onCancel();
           }
         }}
       />

@@ -5,17 +5,21 @@ import {
   CreateWorkspaceFormProps,
 } from "../createWorkspaceForm/CreateWorkspaceForm";
 
-type ModalProps = Pick<
-  ReactNativeModalProps,
-  "isVisible" | "onBackdropPress" | "style"
-> &
+type ModalProps = Pick<ReactNativeModalProps, "isVisible" | "style"> &
   CreateWorkspaceFormProps;
 
 export function CreateWorkspaceModal(props: ModalProps) {
   return (
-    <Modal isVisible={props.isVisible} onBackdropPress={props.onBackdropPress}>
+    <Modal
+      isVisible={props.isVisible}
+      onBackdropPress={() => {
+        if (props.onCancel) {
+          props.onCancel();
+        }
+      }}
+    >
       <CreateWorkspaceForm
-        onBackdropPress={props.onBackdropPress}
+        onCancel={props.onCancel}
         onWorkspaceStructureCreated={props.onWorkspaceStructureCreated}
       />
     </Modal>
