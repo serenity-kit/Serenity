@@ -12,6 +12,7 @@ export const Folder = objectType({
     t.string("rootFolderId");
     t.string("workspaceId");
     t.string("workspaceKeyId");
+    // t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTrace });
     t.field("workspaceKey", { type: WorkspaceKey });
   },
 });

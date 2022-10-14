@@ -67,6 +67,7 @@ export type CreateFolderInput = {
   encryptedName: Scalars['String'];
   encryptedNameNonce: Scalars['String'];
   id: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTraceInput;
   parentFolderId?: InputMaybe<Scalars['String']>;
   subkeyId: Scalars['Int'];
   workspaceId: Scalars['String'];
@@ -352,6 +353,17 @@ export type FolderEdge = {
 export type GetWorkspaceDevicesResult = {
   __typename?: 'GetWorkspaceDevicesResult';
   devices: Array<Maybe<Device>>;
+};
+
+export type KeyDerivationTraceInput = {
+  parentFolders: Array<KeyDerivationTraceParentFolderInput>;
+  workspaceKeyId: Scalars['String'];
+};
+
+export type KeyDerivationTraceParentFolderInput = {
+  folderId: Scalars['String'];
+  parentFolderId?: InputMaybe<Scalars['String']>;
+  subkeyId: Scalars['Int'];
 };
 
 export type MainDeviceResult = {
@@ -745,6 +757,7 @@ export type UpdateFolderNameInput = {
   encryptedName: Scalars['String'];
   encryptedNameNonce: Scalars['String'];
   id: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTraceInput;
   subkeyId: Scalars['Int'];
   workspaceKeyId: Scalars['String'];
 };

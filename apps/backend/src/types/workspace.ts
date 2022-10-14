@@ -10,6 +10,17 @@ export type WorkspaceIdWithMemberDevices = {
   members: MemberIdWithDevice[];
 };
 
+export type KeyDerivationTraceParentFolder = {
+  folderId: string;
+  subkeyId: number;
+  parentFolderId?: string | undefined | null;
+};
+
+export type KeyDerivationTrace = {
+  workspaceKeyId: string;
+  parentFolders: KeyDerivationTraceParentFolder[];
+};
+
 export type WorkspaceKeyBox = {
   id: string;
   workspaceKeyId: string;

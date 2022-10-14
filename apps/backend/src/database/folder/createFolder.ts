@@ -1,5 +1,6 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Folder } from "../../types/folder";
+import { KeyDerivationTrace } from "../../types/workspace";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -11,6 +12,7 @@ type Params = {
   subkeyId: number;
   parentFolderId?: string;
   workspaceId: string;
+  keyDerivationTrace: KeyDerivationTrace;
 };
 
 export async function createFolder({
@@ -22,6 +24,7 @@ export async function createFolder({
   subkeyId,
   parentFolderId,
   workspaceId,
+  keyDerivationTrace,
 }: Params) {
   return await prisma.$transaction(async (prisma) => {
     const folderforId = await prisma.folder.findFirst({
@@ -79,10 +82,13 @@ export async function createFolder({
         parentFolderId,
         rootFolderId,
         workspaceId,
+        keyDerivationTrace,
       },
     });
     const folder: Folder = {
       ...rawFolder,
+      keyDerivationTrace:
+        (rawFolder.keyDerivationTrace as KeyDerivationTrace) || null,
       parentFolders: [],
     };
     return folder;

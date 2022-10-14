@@ -128,6 +128,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           encryptedNameNonce: encryptedFolderResult.publicNonce,
           workspaceKeyId,
           subkeyId: encryptedFolderResult.folderSubkeyId,
+          keyDerivationTrace: {
+            workspaceKeyId,
+            parentFolders: [],
+          },
         },
       });
       if (result.data?.createFolder?.folder?.id) {

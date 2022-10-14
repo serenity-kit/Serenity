@@ -1,4 +1,4 @@
-import { WorkspaceKey } from "./workspace";
+import { KeyDerivationTrace, WorkspaceKey } from "./workspace";
 
 export type Folder = {
   id: string;
@@ -12,4 +12,5 @@ export type Folder = {
   workspaceKeyId: string;
   workspaceKey?: WorkspaceKey | null;
   parentFolders: Folder[] | null;
+  keyDerivationTrace?: KeyDerivationTrace;
 };
