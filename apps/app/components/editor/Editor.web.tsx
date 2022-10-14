@@ -33,7 +33,7 @@ export default function Editor({
   const editorBottombarWrapperRef = useRef<RNView>(null);
   const editorIsFocusedRef = useRef<boolean>(false);
 
-  const showAndPositionToolbar = function () {
+  const positionToolbar = () => {
     if (editorBottombarWrapperRef.current && editorIsFocusedRef.current) {
       const topPos =
         // @ts-expect-error - works in web only
@@ -44,6 +44,12 @@ export default function Editor({
         2;
       // @ts-expect-error - this is a div
       editorBottombarWrapperRef.current.style.top = `${topPos}px`;
+    }
+  };
+
+  const showAndPositionToolbar = function () {
+    if (editorBottombarWrapperRef.current && editorIsFocusedRef.current) {
+      positionToolbar();
       // @ts-expect-error - this is a div
       editorBottombarWrapperRef.current.style.display = "block";
     }
@@ -52,13 +58,16 @@ export default function Editor({
   useEffect(() => {
     // @ts-expect-error - works in web only
     window.visualViewport.addEventListener("resize", showAndPositionToolbar);
+    window.addEventListener("scroll", positionToolbar);
 
-    return () =>
+    return () => {
       // @ts-expect-error - works in web only
       window.visualViewport.removeEventListener(
         "resize",
         showAndPositionToolbar
       );
+      window.removeEventListener("scroll", positionToolbar);
+    };
   }, []);
 
   return (
@@ -91,7 +100,9 @@ export default function Editor({
               }
             }
           }}
-          onCreate={(params) => (tipTapEditorRef.current = params.editor)}
+          onCreate={(params) => {
+            tipTapEditorRef.current = params.editor;
+          }}
           onTransaction={(params) => {
             setEditorBottombarState(
               getEditorBottombarStateFromEditor(params.editor)
