@@ -1,4 +1,3 @@
-import { useHeaderHeight } from "@react-navigation/elements";
 import {
   Editor as SerenityEditor,
   EditorBottombarState,
@@ -24,7 +23,6 @@ export default function Editor({
   isNew,
   updateTitle,
 }: EditorProps) {
-  const headerHeight = useHeaderHeight();
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
   const tipTapEditorRef = useRef<TipTapEditor | null>(null);
@@ -38,9 +36,9 @@ export default function Editor({
       const topPos =
         // @ts-expect-error - works in web only
         window.visualViewport.height +
-        window.pageYOffset - // needed for iOS safari scroll page offset
+        window.scrollY - // needed for iOS safari scroll page offset
         editorBottombarHeight -
-        headerHeight +
+        48 + // header height (top-bar) since it's 3 rem
         2;
       // @ts-expect-error - this is a div
       editorBottombarWrapperRef.current.style.top = `${topPos}px`;

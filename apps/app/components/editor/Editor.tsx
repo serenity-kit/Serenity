@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Keyboard, useWindowDimensions } from "react-native";
+import { Animated, Keyboard } from "react-native";
 import { WebView } from "react-native-webview";
 // import { Asset } from "expo-asset";
 // import * as FileSystem from "expo-file-system";
-import { useHeaderHeight } from "@react-navigation/elements";
 import {
   EditorBottombarState,
   UpdateEditorParams,
@@ -79,11 +78,6 @@ export default function Editor({
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
   // seem to not inject the initial isNew, but the current value
   const isNewRef = useRef<boolean>(isNew);
-  const dimensions = useWindowDimensions();
-  const headerHeight = useHeaderHeight();
-
-  const editorHeight = dimensions.height - headerHeight;
-
   const [isEditorBottombarVisible, setIsEditorBottombarVisible] =
     useState(false);
   const hasEditorSidebar = useHasEditorSidebar();
@@ -211,8 +205,6 @@ export default function Editor({
             setEditorBottombarState(message.content);
           }
         }}
-        // style={[tw`flex-auto bg-primary-200`]}
-        // containerStyle={{ flex: 0, height: editorHeight }}
         // Needed for .focus() to work
         keyboardDisplayRequiresUserAction={false}
         injectedJavaScriptBeforeContentLoaded={`
@@ -220,7 +212,6 @@ export default function Editor({
           window.initialContent = ${JSON.stringify(
             Array.apply([], Y.encodeStateAsUpdateV2(yDocRef.current))
           )};
-          window.editorHeight = ${editorHeight};
           true; // this is required, or you'll sometimes get silent failures
         `}
         onLoad={() => {

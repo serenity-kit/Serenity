@@ -22,7 +22,7 @@ type EditorProps = {
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef: React.MutableRefObject<Awareness>;
   isNew?: boolean;
-  editorHeight?: number;
+  scrollIntoViewOnEditModeDelay?: number;
   openDrawer: () => void;
   updateTitle: (title: string) => void;
   onTransaction?: (params: EditorEvents["transaction"]) => void;
@@ -39,6 +39,8 @@ export const Editor = (props: EditorProps) => {
   const [isNew] = useState(props.isNew ?? false);
   const newTitleRef = useRef("");
   const shouldCommitNewTitleRef = useRef(isNew);
+  const scrollIntoViewOnEditModeDelay =
+    props.scrollIntoViewOnEditModeDelay ?? 150; // 150ms works well on iOS Safari
 
   const editor = useEditor(
     {
@@ -130,7 +132,7 @@ export const Editor = (props: EditorProps) => {
         // before we scroll into view
         setTimeout(() => {
           params.editor.chain().scrollIntoViewOnEditMode().run();
-        }, 50);
+        }, scrollIntoViewOnEditModeDelay);
       },
       onBlur: (params) => {
         if (props.onBlur) {
@@ -146,9 +148,11 @@ export const Editor = (props: EditorProps) => {
       <View style={tw`flex-auto text-gray-900 dark:text-white`}>
         <div className="flex-auto overflow-y-auto overflow-x-hidden">
           <EditorContent
-            // 100% needed to expand the editor to it's full height even when empty
             style={{
-              height: props.editorHeight ?? undefined,
+              // needed to expand the editor into the unsafe area
+              // on iOS native App in case the client is not in edit mode
+              // to make sure the content expands till the bottom
+              height: "-webkit-fill-available",
             }}
             editor={editor}
             className={

@@ -77,13 +77,13 @@ const domContainer = document.querySelector("#editor");
 ReactDOM.render(
   <NativeBaseProvider>
     <Editor
+      scrollIntoViewOnEditModeDelay={50}
       documentId={"dummyDocumentId"}
       yDocRef={{ current: ydoc }}
       yAwarenessRef={{ current: yAwareness }}
       openDrawer={openDrawer}
       updateTitle={updateTitle}
       isNew={window.isNew}
-      editorHeight={window.editorHeight}
       onCreate={(params) => (window.editor = params.editor)}
       onTransaction={({ editor }) => {
         window.ReactNativeWebView.postMessage(
