@@ -211,7 +211,9 @@ export default function SidebarPage(props: Props) {
           ]}
         >
           <SidebarPageMenu
+            workspaceId={props.workspaceId}
             documentId={props.documentId}
+            documentTitle={documentTitle}
             refetchDocuments={props.onRefetchDocumentsPress}
             onUpdateNamePress={() => {
               setIsEditing(true);
