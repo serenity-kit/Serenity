@@ -21,7 +21,7 @@ import { Platform, StyleSheet } from "react-native";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
-import { getFolderKey } from "../../utils/folder/getFolderKey";
+import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
@@ -47,6 +47,8 @@ export default function SidebarPage(props: Props) {
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
+  const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
+
   const linkProps = useLinkProps({
     to: {
       screen: "Workspace",
@@ -70,13 +72,15 @@ export default function SidebarPage(props: Props) {
       return;
     }
     try {
-      const folderKeyData = await getFolderKey({
+      const folderKeyString = await getFolderKey({
         folderId: props.parentFolderId,
+        workspaceKeyId: undefined,
         workspaceId: props.workspaceId,
+        folderSubkeyId: props.subkeyId,
         activeDevice,
       });
       const documentKeyData = await recreateDocumentKey({
-        folderKey: folderKeyData.key,
+        folderKey: folderKeyString,
         subkeyId: props.subkeyId,
       });
       const documentTitle = await decryptDocumentTitle({
@@ -99,13 +103,20 @@ export default function SidebarPage(props: Props) {
       workspaceId: props.workspaceId,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
-    const folderKeyData = await getFolderKey({
+    if (!workspace?.currentWorkspaceKey) {
+      // TODO: handle error in UI
+      console.error("Workspace or workspaceKeys not found");
+      return;
+    }
+    const folderKeyString = await getFolderKey({
       folderId: props.parentFolderId,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
       workspaceId: props.workspaceId,
+      folderSubkeyId: props.subkeyId,
       activeDevice,
     });
     const documentKeyData = await recreateDocumentKey({
-      folderKey: folderKeyData.key,
+      folderKey: folderKeyString,
       subkeyId: document?.subkeyId!,
     });
     const encryptedDocumentTitle = await encryptDocumentTitle({

@@ -20,7 +20,7 @@ import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../../utils/document/getDocument";
-import { getFolderKey } from "../../../utils/folder/getFolderKey";
+import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { loadPageMachine } from "./loadPageMachine";
@@ -34,6 +34,7 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     (state) => state.update
   );
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
+  const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
 
   const [state] = useMachine(loadPageMachine, {
     context: {
@@ -57,6 +58,11 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       workspaceId,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
+    if (!workspace?.currentWorkspaceKey) {
+      // TODO: handle error in UI
+      console.error("Workspace or workspaceKeys not found");
+      return;
+    }
     document = await getDocument({
       documentId: pageId,
     });
@@ -66,9 +72,11 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       console.error("document ID doesn't match page ID");
       return;
     }
-    const folderKeyData = await getFolderKey({
+    const folderKeyString = await getFolderKey({
       folderId: document?.parentFolderId!,
       workspaceId: document?.workspaceId!,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
+      folderSubkeyId: document?.subkeyId,
       activeDevice,
     });
     let documentSubkeyId = 0;
@@ -76,13 +84,13 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     if (document?.subkeyId) {
       documentSubkeyId = document.subkeyId;
       const documentKeyData = await recreateDocumentKey({
-        folderKey: folderKeyData.key,
+        folderKey: folderKeyString,
         subkeyId: document.subkeyId,
       });
       documentKey = documentKeyData.key;
     } else {
       const documentKeyData = await createDocumentKey({
-        folderKey: folderKeyData.key,
+        folderKey: folderKeyString,
       });
       documentSubkeyId = documentKeyData.subkeyId;
       documentKey = documentKeyData.key;

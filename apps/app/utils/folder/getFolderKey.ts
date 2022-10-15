@@ -14,25 +14,39 @@ export const getParentFolderKey = async ({
   workspaceId,
   activeDevice,
 }: GetParentFolderKeyProps) => {
-  let parentKey = "";
+  let keyData = {
+    key: "",
+    subkeyId: -1,
+  };
   const folder = await getFolder({
     id: folderId,
   });
+  let keyChain: any[] = [];
   if (folder.parentFolderId) {
     const parentFolderKeyData = await getFolderKey({
       folderId: folder.parentFolderId,
       workspaceId: workspaceId,
       activeDevice,
     });
-    parentKey = parentFolderKeyData.key;
+    keyData = parentFolderKeyData.folderKeyData;
+    keyChain = parentFolderKeyData.keyChain;
+    if (keyData.subkeyId >= 0) {
+      keyChain.push({
+        ...keyData,
+        folderId,
+      });
+    }
   } else {
     const workspaceKey = await getWorkspaceKey({
       workspaceId: workspaceId,
       activeDevice,
     });
-    parentKey = workspaceKey.workspaceKey;
+    keyData = {
+      key: workspaceKey.workspaceKey,
+      subkeyId: -1,
+    };
   }
-  return parentKey;
+  return { keyData, keyChain };
 };
 
 export type GetFolderKeyProps = {
@@ -45,18 +59,20 @@ export const getFolderKey = async ({
   workspaceId,
   activeDevice,
 }: GetFolderKeyProps) => {
-  let parentKey = await getParentFolderKey({
+  let parentKeyData = await getParentFolderKey({
     folderId,
     workspaceId,
     activeDevice,
   });
+  const keyChain = parentKeyData.keyChain;
+  const parentKey = parentKeyData.keyData;
   const folder = await getFolder({
     id: folderId,
   });
   const folderKeyData = await kdfDeriveFromKey({
-    key: parentKey,
+    key: parentKey.key,
     context: folderDerivedKeyContext,
     subkeyId: folder.subkeyId!,
   });
-  return folderKeyData;
+  return { folderKeyData, keyChain };
 };

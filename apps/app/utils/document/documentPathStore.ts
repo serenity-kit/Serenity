@@ -44,7 +44,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
           activeDevice,
         });
         folderName = await decryptFolderName({
-          parentKey,
+          parentKey: parentKey.keyData.key,
           subkeyId: folder.subkeyId!,
           ciphertext: folder.encryptedName,
           publicNonce: folder.encryptedNameNonce,

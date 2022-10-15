@@ -46,7 +46,8 @@ import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
-import { getFolderKey } from "../../utils/folder/getFolderKey";
+import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
+// import { getFolderKey } from "../../utils/folder/getFolderKey";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
 
@@ -82,6 +83,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
+  const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPath = await getDocumentPath(docId);
@@ -240,13 +242,15 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       // the currently active document
       updateActiveDocumentInfoStore(document, activeDevice);
 
-      const folderKeyData = await getFolderKey({
+      const folderKeyString = await getFolderKey({
         folderId: document.parentFolderId!,
+        workspaceKeyId: document.workspaceKeyId!,
         workspaceId: document.workspaceId!,
+        folderSubkeyId: undefined,
         activeDevice,
       });
       const documentKey = await recreateDocumentKey({
-        folderKey: folderKeyData.key,
+        folderKey: folderKeyString,
         subkeyId: document.contentSubkeyId!,
       });
       const key = sodium.from_base64(documentKey.key);
