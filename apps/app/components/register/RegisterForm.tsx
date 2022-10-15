@@ -22,7 +22,6 @@ import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 type Props = {
   pendingWorkspaceInvitationId?: string;
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
-  onRegisterFail?: () => void;
 };
 
 export default function RegisterForm(props: Props) {
@@ -30,6 +29,7 @@ export default function RegisterForm(props: Props) {
   const { updateAuthentication } = useAppContext();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const [, finishRegistrationMutation] = useFinishRegistrationMutation();
   const [, startRegistrationMutation] = useStartRegistrationMutation();
@@ -41,6 +41,7 @@ export default function RegisterForm(props: Props) {
       return;
     }
     setErrorMessage("");
+    setIsRegistering(true);
     try {
       // TODO the getServerChallenge should include a signature of the challenge response and be verified that it belongs to
       // the server public to make sure it wasn't tampered with
@@ -83,8 +84,8 @@ export default function RegisterForm(props: Props) {
               finishRegistrationResult.data?.finishRegistration.verificationCode
             );
           }
-          // reset since the user might end up on this screen again
           storeUsernamePassword(username, password);
+          // reset since the user might end up on this screen again
           setPassword("");
           setUsername("");
         } else if (finishRegistrationResult.error) {
@@ -108,9 +109,8 @@ export default function RegisterForm(props: Props) {
       }
     } catch (error) {
       setErrorMessage(error.message);
-      if (props.onRegisterFail) {
-        props.onRegisterFail();
-      }
+    } finally {
+      setIsRegistering(false);
     }
   };
 
@@ -168,7 +168,9 @@ export default function RegisterForm(props: Props) {
         </InfoMessage>
       ) : null}
 
-      <Button onPress={onRegisterPress}>Register</Button>
+      <Button onPress={onRegisterPress} isLoading={isRegistering}>
+        Register
+      </Button>
     </FormWrapper>
   );
 }
