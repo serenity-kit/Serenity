@@ -33,17 +33,15 @@ export const SerenityScrollIntoViewOnEditModeExtension = Extension.create<
         () =>
         ({ commands, editor }) => {
           const { from, to } = editor.state.selection;
-
           const end = editor.view.coordsAtPos(to);
-
           const editorBoundaries = editor.view.dom.getBoundingClientRect();
-          console.log("end", end);
 
-          // only scroll if it's below the keyboard + toolbar
           if (
             isIos
-              ? end.top > editorBoundaries.height - 352 - 50
-              : end.top > editorBoundaries.height - 50
+              ? // only scroll if it would be below the keyboard + toolbar
+                end.top > editorBoundaries.height - 352 - 50
+              : // only scroll if it would be below the toolbar
+                end.top > editorBoundaries.height - 50
           ) {
             const scrollTop =
               editor.view.dom.parentElement?.parentElement?.scrollTop || 0;
