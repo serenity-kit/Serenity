@@ -76,6 +76,22 @@ export const removeMembersAndRotateWorkspaceKey = async ({
           deviceKeyBox.receiverDeviceSigningPublicKey,
       });
     });
+    // remove workspaceKeyBoxes for revoked users
+    const revokedUserDevices = await prisma.device.findMany({
+      where: { userId: { in: revokedUserIds } },
+      select: { signingPublicKey: true },
+    });
+    const revokedUserDeviceSigningPublicKeys = revokedUserDevices.map(
+      (device) => device.signingPublicKey
+    );
+    await prisma.workspaceKeyBox.deleteMany({
+      where: {
+        workspaceKey: { workspaceId },
+        deviceSigningPublicKey: {
+          in: revokedUserDeviceSigningPublicKeys,
+        },
+      },
+    });
     // remove user from workspace
     await prisma.usersToWorkspaces.deleteMany({
       where: { workspaceId, userId: { in: revokedUserIds } },
