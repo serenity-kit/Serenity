@@ -1,5 +1,5 @@
 import { useFocusRing } from "@react-native-aria/focus";
-import { useNavigation } from "@react-navigation/native";
+import { StackActions, useNavigation } from "@react-navigation/native";
 import {
   Icon,
   IconButton,
@@ -174,6 +174,11 @@ export default function AccountMenu({
         onPress={() => {
           setIsOpenAccountMenu(false);
           initiateLogout();
+          // making sure there are screens hanging around that would re-render
+          // on logout and cause issues
+          if (navigation.canGoBack()) {
+            navigation.dispatch(StackActions.popToTop());
+          }
           navigation.navigate("LogoutInProgress");
         }}
         testID={`${testIdPrefix}account-menu--logout`}
