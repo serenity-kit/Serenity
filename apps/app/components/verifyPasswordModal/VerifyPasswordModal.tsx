@@ -154,6 +154,7 @@ export function VerifyPasswordModal(props: Props) {
       <View testID="verify-password-modal">
         <FormWrapper>
           <ModalHeader>Verify Password</ModalHeader>
+          <Description variant="modal">{props.description}</Description>
           <Input
             ref={inputRef}
             label={"Password"}
@@ -168,7 +169,6 @@ export function VerifyPasswordModal(props: Props) {
           {isPasswordInvalid && (
             <InfoMessage variant="error">Invalid password</InfoMessage>
           )}
-          <Description variant="modal">{props.description}</Description>
           <ModalButtonFooter
             confirm={
               <Button
