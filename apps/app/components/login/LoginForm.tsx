@@ -8,7 +8,6 @@ import {
 } from "@serenity-tools/ui";
 import { useState } from "react";
 import { Platform, useWindowDimensions } from "react-native";
-import { useClient } from "urql";
 import { useAppContext } from "../../context/AppContext";
 import {
   useFinishLoginMutation,
@@ -26,51 +25,20 @@ import { attachDeviceToWorkspaces } from "../../utils/workspace/attachDeviceToWo
 import { userWorkspaceKeyStore } from "../../utils/workspace/workspaceKeyStore";
 
 type Props = {
-  defaultEmail?: string;
   onLoginSuccess?: () => void;
-  onLoginFail?: () => void;
-  onEmailChangeText?: (username: string) => void;
-  onFormFilled?: () => void;
 };
 
 export function LoginForm(props: Props) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  let defaultUseExtendedLogin = true;
-  if (Platform.OS === "ios") {
-    defaultUseExtendedLogin = true;
-  }
-  const [username, _setUsername] = useState("");
-  const [password, _setPassword] = useState("");
-  const [useExtendedLogin, setUseExtendedLogin] = useState(
-    defaultUseExtendedLogin
-  );
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [useExtendedLogin, setUseExtendedLogin] = useState(true);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-
   const [gqlErrorMessage, setGqlErrorMessage] = useState("");
-
   const { updateAuthentication, updateActiveDevice } = useAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
-  const urqlClient = useClient();
   const clearWorkspaceKeyStore = userWorkspaceKeyStore((state) => state.clear);
-
-  const onFormFilled = (username: string, password: string) => {
-    if (props.onFormFilled) {
-      props.onFormFilled();
-    }
-  };
-
-  const setUsername = (username: string) => {
-    _setUsername(username);
-    if (props.onEmailChangeText) {
-      props.onEmailChangeText(username);
-    }
-    onFormFilled(username, password);
-  };
-
-  const setPassword = (password: string) => {
-    _setPassword(password);
-  };
 
   const onLoginPress = async () => {
     try {
@@ -105,8 +73,11 @@ export function LoginForm(props: Props) {
           activeDevice: unsavedDevice,
         });
       } catch (error) {
-        // TOOD: handle error
         console.error(error);
+        setGqlErrorMessage(
+          "Successfully logged in, but failed to active the session. Please try again."
+        );
+        setIsLoggingIn(false);
         return;
       }
 
@@ -122,9 +93,6 @@ export function LoginForm(props: Props) {
         "Failed to login due incorrect credentials or a network issue. Please try again."
       );
       setIsLoggingIn(false);
-      if (props.onLoginFail) {
-        props.onLoginFail();
-      }
     }
   };
 
@@ -169,7 +137,7 @@ export function LoginForm(props: Props) {
         </InfoMessage>
       ) : null}
 
-      <Button onPress={onLoginPress} disabled={isLoggingIn}>
+      <Button onPress={onLoginPress} isLoading={isLoggingIn}>
         Log in
       </Button>
     </FormWrapper>

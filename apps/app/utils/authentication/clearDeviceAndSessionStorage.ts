@@ -4,7 +4,7 @@ import { removeWebDevice } from "../device/webDeviceStore";
 import { deleteSessionKey } from "./sessionKeyStore";
 
 export const clearDeviceAndSessionStorage = async (
-  clearWorkspaceKeyStore?: () => void
+  clearWorkspaceKeyStore: () => void
 ) => {
   if (Platform.OS === "web") {
     await removeWebDevice();
