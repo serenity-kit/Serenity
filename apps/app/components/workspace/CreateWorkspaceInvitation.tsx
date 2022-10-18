@@ -6,9 +6,10 @@ import {
   Text,
   IconButton,
   Tooltip,
+  Description,
+  Heading,
 } from "@serenity-tools/ui";
 import * as Clipboard from "expo-clipboard";
-import { VStack } from "native-base";
 import { useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import {
@@ -127,8 +128,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       selectedWorkspaceInvitationId !== null
         ? tw`text-primary-900`
         : tw`text-gray-400`,
-    invitationButton: tw`mb-5 self-start`,
-    invitationList: tw``,
+    invitationButton: tw`mb-8 self-start`,
   });
 
   return (
@@ -169,6 +169,14 @@ export function CreateWorkspaceInvitation(props: Props) {
       >
         Create Invitation
       </Button>
+      <View style={tw`mb-5`}>
+        <Heading lvl={3} padded>
+          Invite Links
+        </Heading>
+        <Description variant="form">
+          sorted by time until expiration.
+        </Description>
+      </View>
       {workspaceInvitationsResult.fetching ? (
         <Button disabled>Loading...</Button>
       ) : (
@@ -185,8 +193,6 @@ export function CreateWorkspaceInvitation(props: Props) {
       )}
       {selectedWorkspaceInvitationId !== null && (
         <>
-          {/* this should not be an input field */}
-          {/* TODO remove element when tests are fixed */}
           <Input
             nativeID="workspaceInvitationInstructionsInput"
             label="Invitation text"
