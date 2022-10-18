@@ -25,7 +25,7 @@ export function SettingsContentWrapper(props: SettingsContentWrapperProps) {
           <Heading lvl={2}>{title}</Heading>
         </HStack>
       ) : null}
-      <ScrollView style={tw`py-8 px-10`}>
+      <ScrollView style={tw`py-8 px-6 md:px-10`}>
         <VStack space={5}>{props.children}</VStack>
       </ScrollView>
     </View>
