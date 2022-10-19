@@ -1,3 +1,4 @@
+import { useIsFocused } from "@react-navigation/native";
 import {
   Box,
   Description,
@@ -15,6 +16,7 @@ import { RootStackScreenProps } from "../../../types/navigation";
 export default function RegisterScreen(
   props: RootStackScreenProps<"Register">
 ) {
+  const isFocused = useIsFocused();
   const onRegisterSuccess = (username: string, verificationCode?: string) => {
     props.navigation.push("RegistrationVerification", {
       username,
@@ -35,7 +37,10 @@ export default function RegisterScreen(
             No credit card required.
           </Description>
         </View>
-        <RegisterForm onRegisterSuccess={onRegisterSuccess} />
+        <RegisterForm
+          onRegisterSuccess={onRegisterSuccess}
+          isFocused={isFocused}
+        />
         <View style={tw`text-center`}>
           <Text variant="xs" muted>
             Already have an account?

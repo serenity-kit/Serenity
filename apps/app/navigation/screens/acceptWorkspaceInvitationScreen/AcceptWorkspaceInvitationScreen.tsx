@@ -182,7 +182,10 @@ export default function AcceptWorkspaceInvitationScreen(
         <>
           {authForm === "login" ? (
             <>
-              <LoginForm onLoginSuccess={acceptAndGoToWorkspace} />
+              <LoginForm
+                onLoginSuccess={acceptAndGoToWorkspace}
+                isFocused={true}
+              />
               <View style={tw`text-center`}>
                 <Text variant="xs" muted>
                   Don't have an account?
@@ -199,6 +202,7 @@ export default function AcceptWorkspaceInvitationScreen(
                   props.route.params.workspaceInvitationId
                 }
                 onRegisterSuccess={onRegisterSuccess}
+                isFocused={true}
               />
               <View style={tw`text-center`}>
                 <Text variant="xs" muted>

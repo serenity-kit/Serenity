@@ -1,3 +1,4 @@
+import { useIsFocused } from "@react-navigation/native";
 import {
   Box,
   Description,
@@ -19,6 +20,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
       pendingWorkspaceInvitationId: null,
     });
   };
+  const isFocused = useIsFocused();
 
   return (
     <OnboardingScreenWrapper>
@@ -33,7 +35,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
             </Description>
           </View>
         </View>
-        <LoginForm onLoginSuccess={onLoginSuccess} />
+        <LoginForm onLoginSuccess={onLoginSuccess} isFocused={isFocused} />
         <View style={tw`text-center`}>
           <Text variant="xs" muted>
             Don't have an account?
