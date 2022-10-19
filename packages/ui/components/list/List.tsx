@@ -29,7 +29,7 @@ export const List = (props: ListProps) => {
   const styles = StyleSheet.create({
     mainColumn: isDesktopDevice ? tw`w-${mainWidth}` : tw`w-${mainWidthMobile}`,
     list: tw.style(
-      `rounded border border-gray-200 overflow-hidde`,
+      isDesktopDevice && `rounded border border-gray-200 overflow-hidden`,
       isEmpty && `py-2 px-4 bg-gray-100`
     ),
     headerRow: tw`p-2 bg-gray-100`,

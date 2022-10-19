@@ -20,7 +20,7 @@ export const ListItem = (props: ListItemProps) => {
   const isDesktopDevice = useIsDesktopDevice();
 
   const styles = StyleSheet.create({
-    row: tw`py-3 px-2 border-t border-gray-200`,
+    row: tw`py-3 pl-3 pr-6 md:px-2 -mr-6 md:mr-0 border-b md:border-t md:border-b-0 border-gray-200`,
     mainColumn: isDesktopDevice ? tw`w-${mainWidth}` : tw`w-${mainWidthMobile}`,
     action: tw`w-5`,
   });
