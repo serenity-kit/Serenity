@@ -1,8 +1,7 @@
-import { HStack } from "native-base";
 import React from "react";
 import { StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
-import { Text, TextProps, TextVariants } from "../text/Text";
+import { Text, TextProps } from "../text/Text";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
 
 export type ListTextProps = TextProps & {
