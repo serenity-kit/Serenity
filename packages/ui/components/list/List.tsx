@@ -4,25 +4,36 @@ import { StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
 import { View, ViewProps } from "../view/View";
 import { Text } from "../text/Text";
+import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
 
 export type ListProps = ViewProps & {
   data: Object;
   empty: React.ReactNode;
   headerData?: Array<string>;
+  mainWidth?: string;
+  mainWidthMobile?: string;
 };
 
 export const List = (props: ListProps) => {
-  const { data, empty, headerData, ...rest } = props;
+  const {
+    data,
+    empty,
+    headerData,
+    mainWidth = "1/2",
+    mainWidthMobile = "1/2",
+    ...rest
+  } = props;
+  const isDesktopDevice = useIsDesktopDevice();
 
   const styles = StyleSheet.create({
-    mainColumn: tw`w-1/2`,
+    mainColumn: isDesktopDevice ? tw`w-${mainWidth}` : tw`w-${mainWidthMobile}`,
     list: tw`rounded border border-gray-200 overflow-hidden`,
     headerRow: tw`p-2 bg-gray-100`,
   });
 
   return (
     <View {...rest} style={styles.list}>
-      {headerData ? (
+      {headerData && isDesktopDevice ? (
         <HStack style={styles.headerRow}>
           {headerData.map((item, i) => {
             return (
