@@ -7,8 +7,8 @@ import { Text } from "../text/Text";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
 
 export type ListProps = ViewProps & {
-  data: Object;
-  empty: React.ReactNode;
+  data: Array<string>;
+  emptyString: string;
   headerData?: Array<string>;
   mainWidth?: string;
   mainWidthMobile?: string;
@@ -17,7 +17,7 @@ export type ListProps = ViewProps & {
 export const List = (props: ListProps) => {
   const {
     data,
-    empty,
+    emptyString,
     headerData,
     mainWidth = "1/2",
     mainWidthMobile = "1/2",
@@ -27,13 +27,15 @@ export const List = (props: ListProps) => {
 
   const styles = StyleSheet.create({
     mainColumn: isDesktopDevice ? tw`w-${mainWidth}` : tw`w-${mainWidthMobile}`,
-    list: tw`rounded border border-gray-200 overflow-hidden`,
+    list: tw`rounded border border-gray-200 overflow-hidden ${
+      emptyString && `py-2 px-4 bg-gray-100`
+    }`,
     headerRow: tw`p-2 bg-gray-100`,
   });
 
   return (
     <View {...rest} style={styles.list}>
-      {headerData && isDesktopDevice ? (
+      {data.length && headerData && isDesktopDevice ? (
         <HStack style={styles.headerRow}>
           {headerData.map((item, i) => {
             return (
@@ -46,7 +48,13 @@ export const List = (props: ListProps) => {
           })}
         </HStack>
       ) : null}
-      {data ? props.children : empty}
+      {data.length ? (
+        props.children
+      ) : (
+        <Text variant="xs" style={tw`text-gray-500`}>
+          {emptyString}
+        </Text>
+      )}
     </View>
   );
 };

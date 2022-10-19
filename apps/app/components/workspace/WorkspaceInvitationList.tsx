@@ -46,7 +46,7 @@ export function WorkspaceInvitationList(props: Props) {
     <View>
       <List
         data={props.workspaceInvitations}
-        empty={<Text>No invitations</Text>}
+        emptyString={"No active invitations"}
         headerData={["Active invite Links"]}
       >
         {props.workspaceInvitations.map((invitation) => {
