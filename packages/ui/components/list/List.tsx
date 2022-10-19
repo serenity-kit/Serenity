@@ -24,18 +24,20 @@ export const List = (props: ListProps) => {
     ...rest
   } = props;
   const isDesktopDevice = useIsDesktopDevice();
+  const isEmpty = data.length < 1;
 
   const styles = StyleSheet.create({
     mainColumn: isDesktopDevice ? tw`w-${mainWidth}` : tw`w-${mainWidthMobile}`,
-    list: tw`rounded border border-gray-200 overflow-hidden ${
-      emptyString && `py-2 px-4 bg-gray-100`
-    }`,
+    list: tw.style(
+      `rounded border border-gray-200 overflow-hidde`,
+      isEmpty && `py-2 px-4 bg-gray-100`
+    ),
     headerRow: tw`p-2 bg-gray-100`,
   });
 
   return (
     <View {...rest} style={styles.list}>
-      {data.length && headerData && isDesktopDevice ? (
+      {!isEmpty && headerData && isDesktopDevice ? (
         <HStack style={styles.headerRow}>
           {headerData.map((item, i) => {
             return (
@@ -48,12 +50,12 @@ export const List = (props: ListProps) => {
           })}
         </HStack>
       ) : null}
-      {data.length ? (
-        props.children
-      ) : (
+      {isEmpty ? (
         <Text variant="xs" style={tw`text-gray-500`}>
           {emptyString}
         </Text>
+      ) : (
+        props.children
       )}
     </View>
   );
