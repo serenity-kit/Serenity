@@ -49,7 +49,7 @@ export default function RegistrationVerificationScreen(
     props.route.params.verification || ""
   );
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [graphqlError, setGraphqlError] = useState("");
   const { updateAuthentication, updateActiveDevice } = useAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
@@ -88,7 +88,6 @@ export default function RegistrationVerificationScreen(
     }
     try {
       setErrorMessage("");
-      setIsLoggingIn(true);
 
       const unsafedDevice = await createDeviceWithInfo();
 
@@ -130,7 +129,6 @@ export default function RegistrationVerificationScreen(
       }
 
       await acceptPendingWorkspaceInvitation();
-      setIsLoggingIn(false);
       navigateToNextAuthenticatedPage({
         navigation: props.navigation,
         pendingWorkspaceInvitationId: null,
@@ -138,7 +136,6 @@ export default function RegistrationVerificationScreen(
     } catch (error) {
       console.error(error);
       setErrorMessage("Failed to login.");
-      setIsLoggingIn(false);
     }
   };
 
@@ -148,6 +145,7 @@ export default function RegistrationVerificationScreen(
       return;
     }
     try {
+      setIsSubmitting(true);
       const verifyRegistrationResult = await verifyRegistrationMutation({
         input: {
           username: props.route.params.username,
@@ -165,6 +163,8 @@ export default function RegistrationVerificationScreen(
       }
     } catch (err) {
       setErrorMessage("Verification failed.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -203,7 +203,9 @@ export default function RegistrationVerificationScreen(
           Note: The verification code is prefilled on staging.
         </InfoMessage>
 
-        <Button onPress={onSubmit}>Register</Button>
+        <Button onPress={onSubmit} isLoading={isSubmitting}>
+          Register
+        </Button>
       </Box>
     </OnboardingScreenWrapper>
   );
