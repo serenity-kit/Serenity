@@ -42,13 +42,7 @@ import {
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
-import {
-  getDocumentPath,
-  useDocumentPathStore,
-} from "../../utils/document/documentPathStore";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
-// import { getFolderKey } from "../../utils/folder/getFolderKey";
-import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
 
 const reconnectTimeout = 2000;
@@ -77,35 +71,10 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const editorInitializedRef = useRef<boolean>(false);
   const websocketState = useWebsocketState();
 
-  const docIdRef = useRef<string | null>(null);
-  const folderStore = useOpenFolderStore();
-  const documentPathStore = useDocumentPathStore();
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
   const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
-
-  const updateDocumentFolderPath = async (docId: string) => {
-    const documentPath = await getDocumentPath(docId);
-    const openFolderIds = folderStore.folderIds;
-    if (!documentPath) {
-      return;
-    }
-    documentPath.forEach((folder) => {
-      if (folder) {
-        openFolderIds.push(folder.id);
-      }
-    });
-    folderStore.update(openFolderIds);
-    documentPathStore.update(documentPath, activeDevice);
-  };
-
-  useEffect(() => {
-    if (docIdRef.current !== docId) {
-      updateDocumentFolderPath(docId);
-    }
-    docIdRef.current = docId;
-  });
 
   const applySnapshot = async (snapshot, key) => {
     try {
@@ -220,12 +189,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       yAwarenessRef.current.setLocalStateField("user", {
         name: `User ${yDocRef.current.clientID}`,
       });
-
-      // TODO get key from navigation
-      // const key = sodium.from_base64(window.location.hash.slice(1));
-      // const key = sodium.from_base64(
-      //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
-      // );
 
       const documentResult = await getUrqlClient()
         .query<DocumentQuery, DocumentQueryVariables>(

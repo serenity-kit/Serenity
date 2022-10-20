@@ -19,8 +19,13 @@ import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
+import {
+  getDocumentPath,
+  useDocumentPathStore,
+} from "../../../utils/document/documentPathStore";
 import { getDocument } from "../../../utils/document/getDocument";
 import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
+import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { loadPageMachine } from "./loadPageMachine";
@@ -35,6 +40,8 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
   );
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
+  const folderStore = useOpenFolderStore();
+  const documentPathStore = useDocumentPathStore();
 
   const [state] = useMachine(loadPageMachine, {
     context: {
@@ -51,6 +58,21 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       headerTitleAlign: "center",
     });
   }, []);
+
+  const updateDocumentFolderPath = async (docId: string) => {
+    const documentPath = await getDocumentPath(docId);
+    const openFolderIds = folderStore.folderIds;
+    if (!documentPath) {
+      return;
+    }
+    documentPath.forEach((folder) => {
+      if (folder) {
+        openFolderIds.push(folder.id);
+      }
+    });
+    folderStore.update(openFolderIds);
+    documentPathStore.update(documentPath, activeDevice);
+  };
 
   const updateTitle = async (title: string) => {
     let document: Document | undefined | null = undefined;
@@ -117,6 +139,8 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
 
   useEffect(() => {
     setLastUsedDocumentId(pageId, workspaceId);
+    updateDocumentFolderPath(pageId);
+
     // removing the isNew param right after the first render so users don't have it after a refresh
     if (state.matches("loadDocument")) {
       props.navigation.setParams({ isNew: undefined });
