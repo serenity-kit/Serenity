@@ -27,8 +27,8 @@ import {
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
+import { deriveCurrentWorkspaceKey } from "../../utils/workspace/deriveCurrentWorkspaceKey";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
-import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
@@ -94,7 +94,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     let workspaceKey: string | undefined = undefined;
     let workspaceKeyId: string | undefined = undefined;
     try {
-      const result = await getWorkspaceKey({
+      const result = await deriveCurrentWorkspaceKey({
         workspaceId: workspaceId,
         activeDevice,
       });

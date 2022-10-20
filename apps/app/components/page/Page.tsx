@@ -47,6 +47,7 @@ import {
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
+import { getFolder } from "../../utils/folder/getFolder";
 // import { getFolderKey } from "../../utils/folder/getFolderKey";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
@@ -97,7 +98,7 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       }
     });
     folderStore.update(openFolderIds);
-    documentPathStore.update(documentPath, activeDevice);
+    documentPathStore.update(documentPath, activeDevice, getFolderKey);
   };
 
   useEffect(() => {
@@ -242,11 +243,12 @@ export default function Page({ navigation, route, updateTitle }: Props) {
       // the currently active document
       updateActiveDocumentInfoStore(document, activeDevice);
 
+      const folder = await getFolder({ id: document.parentFolderId! });
       const folderKeyString = await getFolderKey({
-        folderId: document.parentFolderId!,
+        folderId: folder.id!,
         workspaceKeyId: document.workspaceKeyId!,
         workspaceId: document.workspaceId!,
-        folderSubkeyId: undefined,
+        folderSubkeyId: folder.subkeyId,
         activeDevice,
       });
       const documentKey = await recreateDocumentKey({

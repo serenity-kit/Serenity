@@ -22,6 +22,7 @@ import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
+import { getFolder } from "../../utils/folder/getFolder";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
@@ -72,15 +73,16 @@ export default function SidebarPage(props: Props) {
       return;
     }
     try {
-      const folderKeyString = await getFolderKey({
-        folderId: props.parentFolderId,
+      const folder = await getFolder({ id: props.parentFolderId });
+      const folderKey = await getFolderKey({
+        folderId: folder.id,
         workspaceKeyId: undefined,
         workspaceId: props.workspaceId,
-        folderSubkeyId: props.subkeyId,
+        folderSubkeyId: folder.subkeyId,
         activeDevice,
       });
       const documentKeyData = await recreateDocumentKey({
-        folderKey: folderKeyString,
+        folderKey,
         subkeyId: props.subkeyId,
       });
       const documentTitle = await decryptDocumentTitle({
@@ -108,11 +110,12 @@ export default function SidebarPage(props: Props) {
       console.error("Workspace or workspaceKeys not found");
       return;
     }
+    const folder = await getFolder({ id: props.parentFolderId });
     const folderKeyString = await getFolderKey({
-      folderId: props.parentFolderId,
+      folderId: folder.id,
       workspaceKeyId: workspace.currentWorkspaceKey.id,
       workspaceId: props.workspaceId,
-      folderSubkeyId: props.subkeyId,
+      folderSubkeyId: folder.subkeyId,
       activeDevice,
     });
     const documentKeyData = await recreateDocumentKey({

@@ -1,6 +1,6 @@
 import create from "zustand";
 import { Device } from "../../types/Device";
-import { getWorkspaceKey as fetchWorkspaceKey } from "./getWorkspaceKey";
+import { deriveWorkspaceKey } from "./deriveWorkspaceKey";
 
 export type WorskpaceKeyLookup = {
   [workspaceKeyId: string]: string;
@@ -48,8 +48,9 @@ export const userWorkspaceKeyStore = create<WorkspaceKeyState>((set, get) => ({
     const workspaceKeyLookupForWorkspace = get().workspaceKeyLookupForWorkspace;
     const workspaceKeyLookup = workspaceKeyLookupForWorkspace[workspaceId];
     if (!workspaceKeyLookup) {
-      const workspaceKey = await fetchWorkspaceKey({
+      const workspaceKey = await deriveWorkspaceKey({
         workspaceId,
+        workspaceKeyId,
         activeDevice,
       });
       workspaceKeyLookupForWorkspace[workspaceId] = {
@@ -60,8 +61,9 @@ export const userWorkspaceKeyStore = create<WorkspaceKeyState>((set, get) => ({
     }
     const workspaceKeyString = workspaceKeyLookup[workspaceKeyId];
     if (!workspaceKeyString) {
-      const workspaceKey = await fetchWorkspaceKey({
+      const workspaceKey = await deriveWorkspaceKey({
         workspaceId,
+        workspaceKeyId,
         activeDevice,
       });
       workspaceKeyLookupForWorkspace[workspaceId][workspaceKeyId] =

@@ -21,6 +21,7 @@ import { useMachine } from "@xstate/react";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../../utils/document/getDocument";
 import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
+import { getFolder } from "../../../utils/folder/getFolder";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { loadPageMachine } from "./loadPageMachine";
@@ -72,11 +73,12 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       console.error("document ID doesn't match page ID");
       return;
     }
+    const folder = await getFolder({ id: document.parentFolderId! });
     const folderKeyString = await getFolderKey({
-      folderId: document?.parentFolderId!,
-      workspaceId: document?.workspaceId!,
+      folderId: folder.id!,
+      workspaceId: document.workspaceId!,
       workspaceKeyId: workspace.currentWorkspaceKey.id,
-      folderSubkeyId: document?.subkeyId,
+      folderSubkeyId: folder.subkeyId,
       activeDevice,
     });
     let documentSubkeyId = 0;

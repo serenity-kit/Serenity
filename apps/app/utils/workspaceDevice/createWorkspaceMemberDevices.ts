@@ -26,12 +26,14 @@ export const createWorkspaceMemberDevices = async ({
       });
     } catch (error) {
       // we don't have access to this workspace yet, can't decrypt
+      console.log("Couldn't get workspace keys for this workspace.");
       continue;
     }
     const workspaceMemberDevice: WorkspaceDevicePairingInput = {
       id: unauthorizedWorkspace.id,
       workspaceKeysMembers: [],
     };
+
     for (let workspaceKeyId of Object.keys(workspaceKeys)) {
       const workspaceKeyMember: WorkspaceKeyDeviceInput = {
         id: workspaceKeyId,

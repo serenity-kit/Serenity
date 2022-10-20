@@ -48,7 +48,7 @@ export const createWorkspaceOnOnboarding = async ({
       id: workspaceId,
     },
     include: {
-      workspaceKey: {
+      workspaceKeys: {
         include: {
           workspaceKeyBoxes: {
             where: { deviceSigningPublicKey: user?.mainDeviceSigningPublicKey },
@@ -58,7 +58,7 @@ export const createWorkspaceOnOnboarding = async ({
     },
   });
   expect(workspace).not.toBe(null);
-  const workspaceBox = workspace?.workspaceKey[0].workspaceKeyBoxes[0];
+  const workspaceBox = workspace?.workspaceKeys[0].workspaceKeyBoxes[0];
   // a page will have been created
   const document = await prisma.document.findFirst({
     where: { workspaceId },

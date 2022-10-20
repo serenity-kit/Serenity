@@ -15,7 +15,6 @@ import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/Ver
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
-  Device,
   MeResult,
   RemoveMembersAndRotateWorkspaceKeyDocument,
   RemoveMembersAndRotateWorkspaceKeyMutation,
@@ -24,6 +23,7 @@ import {
   Workspace,
   WorkspaceMember,
 } from "../../../generated/graphql";
+import { useInterval } from "../../../hooks/useInterval";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
@@ -31,9 +31,13 @@ import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { getUrqlClient } from "../../../utils/urqlClient/urqlClient";
+import {
+  addNewMembersIfNecessary,
+  secondsBetweenNewMemberChecks,
+} from "../../../utils/workspace/addNewMembersIfNecessary";
+import { deriveCurrentWorkspaceKey } from "../../../utils/workspace/deriveCurrentWorkspaceKey";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
-import { getWorkspaceKey } from "../../../utils/workspace/getWorkspaceKey";
 
 type Member = {
   userId: string;
@@ -133,6 +137,12 @@ export default function WorkspaceSettingsMembersScreen(
   const [hasGraphqlError, setHasGraphqlError] = useState(false);
   const [graphqlError, setGraphqlError] = useState("");
 
+  useInterval(() => {
+    if (activeDevice) {
+      addNewMembersIfNecessary({ activeDevice });
+    }
+  }, secondsBetweenNewMemberChecks * 1000);
+
   useEffect(() => {
     if (
       state.value === "loadWorkspaceSuccess" &&
@@ -214,37 +224,29 @@ export default function WorkspaceSettingsMembersScreen(
     setUsernameToRemove(username);
     const row = memberLookup[username];
     if (row >= 0) {
-      const member = members[row];
+      const removingMember = members[row];
       members.splice(row, 1);
       setMembers(members);
       delete memberLookup[username];
       setMemberLookup(memberLookup);
-      const workspaceKey = await getWorkspaceKey({
+      const workspaceKey = await deriveCurrentWorkspaceKey({
         workspaceId,
         activeDevice,
       });
 
       const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
       // TODO: getWorkspaceDevices gets all devices attached to a workspace
-      let workspaceDevices: Device[] = [];
-      try {
-        const rawWorkspaceDevices = await getWorkspaceDevices({
-          workspaceId,
-        });
-        if (rawWorkspaceDevices) {
-          for (let rawWorkspaceDevice of rawWorkspaceDevices) {
-            if (rawWorkspaceDevice) {
-              workspaceDevices.push(rawWorkspaceDevice);
-            }
-          }
-        }
-      } catch (error) {
-        // TODO: handle this error in the UI
-        console.error(error);
-        throw error;
+      let workspaceDevices = await getWorkspaceDevices({
+        workspaceId,
+      });
+      if (!workspaceDevices || workspaceDevices.length === 0) {
+        throw new Error("No devices found for workspace");
       }
       for (let device of workspaceDevices) {
-        if (device.userId !== member.userId) {
+        if (!device) {
+          continue;
+        }
+        if (device.userId !== removingMember.userId) {
           const { ciphertext, nonce } =
             await createAndEncryptWorkspaceKeyForDevice({
               receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
@@ -268,7 +270,7 @@ export default function WorkspaceSettingsMembersScreen(
           RemoveMembersAndRotateWorkspaceKeyDocument,
           {
             input: {
-              revokedUserIds: [member.userId],
+              revokedUserIds: [removingMember.userId],
               workspaceId,
               creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
               deviceWorkspaceKeyBoxes,

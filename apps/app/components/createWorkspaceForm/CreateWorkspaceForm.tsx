@@ -95,55 +95,50 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
     const devices = devicesResult.data?.devices?.nodes as Device[];
     const { deviceWorkspaceKeyBoxes, workspaceKey } =
       await createWorkspaceKeyBoxesForDevices({ devices, activeDevice });
-    if (!workspaceKey) {
-      // TODO: handle this error
-      console.error("Could not retrieve workspaceKey!");
-      return;
-    }
     const folderName = "Getting started";
     const encryptedFolderResult = await encryptFolderName({
       name: folderName,
       parentKey: workspaceKey,
     });
+    const folderKey = encryptedFolderResult.folderSubkey;
     const documentName = "Introduction";
-    const documentKeyData = await createDocumentKey({
-      folderKey: encryptedFolderResult.folderSubkey,
+    const documentTitleKeyData = await createDocumentKey({
+      folderKey,
     });
+    const documentTitleKey = documentTitleKeyData.key;
     const encryptedDocumentTitle = await encryptDocumentTitle({
       title: documentName,
-      key: documentKeyData.key,
+      key: documentTitleKey,
     });
-    // currently hard-coded until we enable e2e encryption per workspace
-    // const documentEncryptionKey = sodium.from_base64(
-    //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
-    // );
     const documentContentKeyData = await createDocumentKey({
-      folderKey: encryptedFolderResult.folderSubkey,
+      folderKey,
     });
-    const documentEncryptionKey = sodium.from_base64(
-      documentContentKeyData.key
-    );
+    const documentContentKey = sodium.from_base64(documentContentKeyData.key);
     const snapshot = await createIntroductionDocumentSnapshot({
       documentId,
-      documentEncryptionKey,
+      documentEncryptionKey: documentContentKey,
     });
 
     const createInitialWorkspaceStructureResult =
       await createInitialWorkspaceStructure({
         input: {
+          /* Workspace data */
           workspaceName: name,
           workspaceId,
+          /* Folder data */
           folderId,
           encryptedFolderName: encryptedFolderResult.ciphertext,
           encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
           folderSubkeyId: encryptedFolderResult.folderSubkeyId,
           folderIdSignature: `TODO+${folderId}`,
+          /* Document data */
           encryptedDocumentName: encryptedDocumentTitle.ciphertext,
           encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
-          documentSubkeyId: documentKeyData.subkeyId,
+          documentSubkeyId: documentTitleKeyData.subkeyId,
           documentContentSubkeyId: documentContentKeyData.subkeyId,
           documentId,
           documentSnapshot: snapshot,
+          /* Device and encryption data */
           creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
           deviceWorkspaceKeyBoxes,
         },

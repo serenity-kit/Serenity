@@ -7,6 +7,7 @@ import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/d
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
+import { getWorkspace } from "../../../../test/helpers/workspace/getWorkspace";
 import { removeMembersAndRotateWorkspaceKey } from "../../../../test/helpers/workspace/removeMembersAndRotateWorkspaceKey";
 import { prisma } from "../../../database/prisma";
 import { createDeviceAndLogin } from "../../../database/testHelpers/createDeviceAndLogin";
@@ -115,6 +116,7 @@ test("user can remove another user", async () => {
     deviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspace: userData1.workspace,
   });
+
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
     workspaceId: userData1.workspace.id,
@@ -209,6 +211,31 @@ test("user can remove another user", async () => {
     workspaceUserIdsAfter.indexOf(userData1.user.id)
   ).toBeGreaterThanOrEqual(0);
   expect(workspaceUserIdsAfter.indexOf(userData2.user.id)).toBe(-1);
+
+  const workspaceResult = await getWorkspace({
+    graphql,
+    workspaceId: userData1.workspace.id,
+    deviceSigningPublicKey: userData1.device.signingPublicKey,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const workspace = workspaceResult.workspace;
+  expect(workspace.currentWorkspaceKey.id).toBe(resultingWorkspaceKey.id);
+  expect(workspace.workspaceKeys.length).toBe(2);
+  for (let i = 0; i < workspace.workspaceKeys.length; i++) {
+    const workspaceKey = workspace.workspaceKeys[i];
+    if (i === 0) {
+      expect(workspaceKey.generation).toBe(1);
+      expect(workspaceKey.id).toBe(workspace.currentWorkspaceKey.id);
+    } else {
+      expect(workspaceKey.generation).toBe(0);
+      expect(workspaceKey.id).toBe(userData1.workspace.currentWorkspaceKey.id);
+    }
+    expect(workspaceKey.workspaceKeyBox).not.toBe(null);
+    const workspaceKeyBox = workspaceKey.workspaceKeyBox;
+    expect(workspaceKeyBox.deviceSigningPublicKey).toBe(
+      userData1.device.signingPublicKey
+    );
+  }
 });
 
 test("user can rotate key for multiple devices", async () => {
@@ -346,6 +373,38 @@ test("user can rotate key for multiple devices", async () => {
     workspaceUserIdsAfter.indexOf(userData1.user.id)
   ).toBeGreaterThanOrEqual(0);
   expect(workspaceUserIdsAfter.indexOf(userData2.user.id)).toBe(-1);
+
+  const workspaceResult = await getWorkspace({
+    graphql,
+    workspaceId: userData1.workspace.id,
+    deviceSigningPublicKey: userData1.device.signingPublicKey,
+    authorizationHeader: userData1.sessionKey,
+  });
+
+  const workspace = workspaceResult.workspace;
+  expect(workspace.currentWorkspaceKey.id).toBe(resultingWorkspaceKey.id);
+  expect(workspace.workspaceKeys.length).toBe(3);
+  for (let i = 0; i < workspace.workspaceKeys.length; i++) {
+    const workspaceKey = workspace.workspaceKeys[i];
+    if (i === 0) {
+      expect(workspaceKey.generation).toBe(2);
+      expect(workspaceKey.id).toBe(workspace.currentWorkspaceKey.id);
+    } else if (i === 1) {
+      expect(workspaceKey.generation).toBe(1);
+      expect(workspaceKey.id).not.toBe(
+        userData1.workspace.currentWorkspaceKey.id
+      );
+      expect(workspaceKey.id).not.toBe(workspace.currentWorkspaceKey.id);
+    } else {
+      expect(workspaceKey.generation).toBe(0);
+      expect(workspaceKey.id).toBe(userData1.workspace.currentWorkspaceKey.id);
+    }
+    expect(workspaceKey.workspaceKeyBox).not.toBe(null);
+    const workspaceKeyBox = workspaceKey.workspaceKeyBox;
+    expect(workspaceKeyBox.deviceSigningPublicKey).toBe(
+      userData1.device.signingPublicKey
+    );
+  }
 });
 
 test("Unauthenticated", async () => {

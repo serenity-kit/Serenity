@@ -1,9 +1,7 @@
 import { AuthenticationError } from "apollo-server-express";
 import { idArg, nonNull, queryField, stringArg } from "nexus";
-import { prisma } from "../../../database/prisma";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
 import { getWorkspaces } from "../../../database/workspace/getWorkspaces";
-import { WorkspaceMember } from "../../../types/workspace";
 import { Workspace } from "../../types/workspace";
 
 export const workspaces = queryField((t) => {
@@ -20,7 +18,6 @@ export const workspaces = queryField((t) => {
       context.assertValidDeviceSigningPublicKeyForThisSession(
         args.deviceSigningPublicKey
       );
-
       const userId = context.user.id;
       if (args.id) {
         const workspace = await getWorkspace({
@@ -42,31 +39,7 @@ export const workspaces = queryField((t) => {
         deviceSigningPublicKey: args.deviceSigningPublicKey,
       });
       if (workspaces.length > 0) {
-        const workspace = workspaces[0];
-        const rawWorkspaceMembers = await prisma.usersToWorkspaces.findMany({
-          where: {
-            workspaceId: workspace.id,
-          },
-          select: {
-            userId: true,
-            isAdmin: true,
-            user: {
-              select: {
-                username: true,
-              },
-            },
-          },
-        });
-        const members: WorkspaceMember[] = [];
-        rawWorkspaceMembers.forEach((workspaceMember) => {
-          members.push({
-            userId: workspaceMember.userId,
-            username: workspaceMember.user.username,
-            isAdmin: workspaceMember.isAdmin,
-          });
-        });
-        workspace.members = members;
-        return workspace;
+        return workspaces[0];
       }
       return null;
     },

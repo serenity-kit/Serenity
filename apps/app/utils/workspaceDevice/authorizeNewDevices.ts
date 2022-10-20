@@ -20,6 +20,7 @@ export const authorizeNewDevices = async ({ activeDevice }: Props) => {
     unauthorizedWorkspaceDevices.length === 0
   ) {
     // nothing to do
+    console.log("No unauthorized devices found");
     return;
   }
   const workspaceMemberDevices = await createWorkspaceMemberDevices({
