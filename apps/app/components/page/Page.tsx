@@ -63,7 +63,6 @@ export default function Page({
     throw new Error("Page ID was not set");
   }
   const docId = route.params.pageId;
-  // const workspaceId = route.params.workspaceId;
   const isNew = route.params.isNew ?? false;
   const { activeDevice } = useWorkspaceContext();
   const activeSnapshotIdRef = useRef<string | null>(null);
