@@ -13,7 +13,6 @@ import { Platform } from "react-native";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import { useAppContext } from "../../../context/AppContext";
 import {
-  useAcceptWorkspaceInvitationMutation,
   useFinishLoginMutation,
   useStartLoginMutation,
   useVerifyRegistrationMutation,
@@ -54,8 +53,6 @@ export default function RegistrationVerificationScreen(
   const { updateAuthentication, updateActiveDevice } = useAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
-  const [, acceptWorkspaceInvitationMutation] =
-    useAcceptWorkspaceInvitationMutation();
 
   const navigateToLoginScreen = async () => {
     await removeLastUsedWorkspaceId();
@@ -70,7 +67,6 @@ export default function RegistrationVerificationScreen(
       try {
         await acceptWorkspaceInvitation({
           workspaceInvitationId: pendingWorkspaceInvitationId,
-          acceptWorkspaceInvitationMutation,
         });
       } catch (error) {
         setGraphqlError(error.message);
