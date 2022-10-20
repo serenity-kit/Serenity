@@ -3,7 +3,7 @@ import {
   encryptDocumentTitle,
   recreateDocumentKey,
 } from "@serenity-tools/common";
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 import Page from "../../../components/page/Page";
 import { PageHeader } from "../../../components/page/PageHeader";
@@ -16,6 +16,7 @@ import {
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 
+import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
@@ -147,6 +148,14 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     }
   }, [pageId, workspaceId, props.navigation, state]);
 
+  const signatureKeyPair: KeyPair = useMemo(() => {
+    return {
+      publicKey: sodium.from_base64(activeDevice.signingPublicKey),
+      privateKey: sodium.from_base64(activeDevice.signingPrivateKey!),
+      keyType: "ed25519",
+    };
+  }, [activeDevice]);
+
   if (state.matches("hasNoAccess")) {
     return (
       <CenterContent>
@@ -162,6 +171,7 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
         // to force unmount and mount the page
         key={pageId}
         updateTitle={updateTitle}
+        signatureKeyPair={signatureKeyPair}
       />
     );
   } else {

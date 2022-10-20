@@ -5,7 +5,6 @@ import {
   addUpdateToInProgressQueue,
   cleanupUpdates,
   createAwarenessUpdate,
-  createSignatureKeyPair,
   createSnapshot,
   createUpdate,
   dispatchWebsocketState,
@@ -49,9 +48,15 @@ const reconnectTimeout = 2000;
 
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
   updateTitle: (title: string) => void;
+  signatureKeyPair: KeyPair;
 };
 
-export default function Page({ navigation, route, updateTitle }: Props) {
+export default function Page({
+  navigation,
+  route,
+  updateTitle,
+  signatureKeyPair,
+}: Props) {
   if (!route.params?.pageId) {
     // should never happen
     throw new Error("Page ID was not set");
@@ -66,7 +71,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const websocketConnectionRef = useRef<WebSocket>(null);
   const shouldReconnectWebsocketConnectionRef = useRef(true);
   const createSnapshotRef = useRef<boolean>(false); // only used for the UI
-  const signatureKeyPairRef = useRef<KeyPair | null>(null);
   const latestServerVersionRef = useRef<number | null>(null);
   const editorInitializedRef = useRef<boolean>(false);
   const websocketState = useWebsocketState();
@@ -135,15 +139,13 @@ export default function Page({ navigation, route, updateTitle }: Props) {
     const publicData = {
       snapshotId: uuidv4(),
       docId,
-      // @ts-expect-error TODO handle later
-      pubKey: sodium.to_base64(signatureKeyPairRef.current.publicKey),
+      pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     };
     const snapshot = await createSnapshot(
       yDocState,
       publicData,
       key,
-      // @ts-expect-error TODO handle later
-      signatureKeyPairRef.current
+      signatureKeyPair
     );
 
     addSnapshotToInProgress(snapshot);
@@ -163,15 +165,14 @@ export default function Page({ navigation, route, updateTitle }: Props) {
     const publicData = {
       refSnapshotId: activeSnapshotIdRef.current,
       docId,
-      // @ts-expect-error TODO handle later
-      pubKey: sodium.to_base64(signatureKeyPairRef.current.publicKey),
+      pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     };
     const updateToSend = await createUpdate(
       update,
       // @ts-expect-error TODO handle later
       publicData,
       key,
-      signatureKeyPairRef.current,
+      signatureKeyPair,
       clockOverwrite
     );
 
@@ -217,8 +218,6 @@ export default function Page({ navigation, route, updateTitle }: Props) {
         subkeyId: document.contentSubkeyId!,
       });
       const key = sodium.from_base64(documentKey.key);
-
-      signatureKeyPairRef.current = await createSignatureKeyPair();
 
       const onWebsocketMessage = async (event) => {
         const data = JSON.parse(event.data);
@@ -421,15 +420,13 @@ export default function Page({ navigation, route, updateTitle }: Props) {
           );
           const publicData = {
             docId,
-            // @ts-expect-error TODO handle later
-            pubKey: sodium.to_base64(signatureKeyPairRef.current.publicKey),
+            pubKey: sodium.to_base64(signatureKeyPair.publicKey),
           };
           const awarenessUpdate = await createAwarenessUpdate(
             yAwarenessUpdate,
             publicData,
             key,
-            // @ts-expect-error TODO handle later
-            signatureKeyPairRef.current
+            signatureKeyPair
           );
           console.log("send awarenessUpdate");
           // @ts-expect-error TODO handle later
