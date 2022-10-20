@@ -62,7 +62,9 @@ export const Modal = React.forwardRef(
           style={[
             styles.box,
             {
-              maxWidth: dimensions.width - 16, // making sure it doesn't go off screen on mobile
+              // dimensions.width - 16: making sure it doesn't go off screen on mobile
+              // 448: previous maxWidth of the modal
+              maxWidth: Math.min(dimensions.width - 16, 448),
             },
           ]}
         >
