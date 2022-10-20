@@ -62,6 +62,7 @@ test.describe("Edit document", () => {
       password: user1.password,
       stayLoggedIn: true,
     });
+    await delayForSeconds(2); // wait a bit until the editor loads
     const editorAfterLogin = page.locator("div[class='ProseMirror']");
     const afterLoginContent = await editorAfterLogin.innerHTML();
     expect(afterLoginContent).toBe(endingContent);
