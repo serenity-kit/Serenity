@@ -38,6 +38,7 @@ import {
   DocumentQuery,
   DocumentQueryVariables,
 } from "../../generated/graphql";
+import { fetchMe } from "../../graphql/fetchUtils/fetchMe";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
@@ -187,8 +188,10 @@ export default function Page({
     async function initDocument() {
       await sodium.ready;
 
+      const me = await fetchMe();
+
       yAwarenessRef.current.setLocalStateField("user", {
-        name: `User ${yDocRef.current.clientID}`,
+        name: me.data?.me?.username ?? "Unknown user",
       });
 
       const documentResult = await getUrqlClient()
