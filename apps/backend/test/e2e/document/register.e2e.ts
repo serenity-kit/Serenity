@@ -35,7 +35,7 @@ test.describe("After register", () => {
   test("Create, rename, delete document in subfolder", async ({ page }) => {
     const { workspace, folder } = await register({
       page,
-      username,
+      username: `${uuidv4()}@example.com`,
       password,
       workspaceName,
     });
