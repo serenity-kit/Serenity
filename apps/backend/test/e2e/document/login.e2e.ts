@@ -3,6 +3,7 @@ import * as sodium from "@serenity-tools/libsodium";
 import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { createDocument } from "../../helpers/e2e/createDocument";
+import { createSubFolder } from "../../helpers/e2e/createSubFolder";
 import { deleteDocument } from "../../helpers/e2e/deleteDocument";
 import { login } from "../../helpers/e2e/login";
 import { renameDocument } from "../../helpers/e2e/renameDocument";
@@ -32,6 +33,25 @@ test.describe("After login", () => {
     const addedDocument = await createDocument(
       page,
       firstFolder.id,
+      createdWorkspace.id
+    );
+    await renameDocument(page, addedDocument?.id!, "Renamed document");
+    await deleteDocument(page, addedDocument?.id!, createdWorkspace.id);
+  });
+
+  test("Create, rename, delete document in subfolder", async ({ page }) => {
+    await login({ page, username, password, stayLoggedIn: true });
+    const addedFolder = await createSubFolder(
+      page,
+      firstFolder.id,
+      createdWorkspace.id
+    );
+    if (!addedFolder) {
+      throw new Error("Folder not found");
+    }
+    const addedDocument = await createDocument(
+      page,
+      addedFolder.id,
       createdWorkspace.id
     );
     await renameDocument(page, addedDocument?.id!, "Renamed document");

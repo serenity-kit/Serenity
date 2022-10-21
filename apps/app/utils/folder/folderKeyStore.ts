@@ -112,6 +112,9 @@ export const useFolderKeyStore = create<FolderKeyState>((set, get) => ({
     const folderKeyChain = derivedFolderKeyData.keyChain;
     folderSubkeyKeyLookup[folderSubkeyId] = folderKey;
     for (const folderKeyLink of folderKeyChain) {
+      if (!folderSubkeyKeyLookup[folderKeyLink.folderId]) {
+        folderSubkeyKeyLookup[folderKeyLink.folderId] = {};
+      }
       folderSubkeyKeyLookup[folderKeyLink.folderId][folderKeyLink.subkeyId] =
         folderKeyLink.key;
     }
