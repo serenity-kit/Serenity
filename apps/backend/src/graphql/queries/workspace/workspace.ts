@@ -12,8 +12,6 @@ export const workspaces = queryField((t) => {
       deviceSigningPublicKey: nonNull(stringArg()),
     },
     async resolve(root, args, context) {
-      console.log("query workspace()");
-      console.log({ args });
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }

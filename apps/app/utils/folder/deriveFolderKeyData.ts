@@ -99,7 +99,6 @@ export const deriveFolderKey = async ({
   const folder = await getFolder({
     id: folderId,
   });
-  console.log(parentKey);
   const folderKeyData = await kdfDeriveFromKey({
     key: parentKey.key,
     context: folderDerivedKeyContext,
