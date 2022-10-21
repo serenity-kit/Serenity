@@ -168,7 +168,7 @@ model Workspace {
   documents         Document[]
   usersToWorkspaces UsersToWorkspaces[]
   invitations       WorkspaceInvitations[]
-  workspaceKey      WorkspaceKey[]
+  workspaceKeys     WorkspaceKey[]
 }
 
 model UsersToWorkspaces {

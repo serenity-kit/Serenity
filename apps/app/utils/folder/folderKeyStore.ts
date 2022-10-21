@@ -1,8 +1,8 @@
 import create from "zustand";
 import { Device } from "../../types/Device";
 import { getWorkspace } from "../workspace/getWorkspace";
+import { deriveFolderKey } from "./deriveFolderKeyData";
 import { getFolder } from "./getFolder";
-import { getFolderKey as fetchFolderKey } from "./getFolderKey";
 
 /*
 workspaceId
@@ -92,23 +92,24 @@ export const useFolderKeyStore = create<FolderKeyState>((set, get) => ({
       folderWorkspaceKeyIdLookup[folderId] = {};
       folderSubkeyKeyLookup = folderWorkspaceKeyIdLookup[folderId];
     }
-    let usingFoldeSubkeyId = folderSubkeyId;
-    if (usingFoldeSubkeyId === undefined) {
+    let usingFolderSubkeyId = folderSubkeyId;
+    if (usingFolderSubkeyId === undefined) {
       const folder = await getFolder({ id: folderId });
-      usingFoldeSubkeyId = folder.subkeyId;
+      usingFolderSubkeyId = folder.subkeyId;
     }
     let folderKey = folderSubkeyKeyLookup[folderSubkeyId];
     if (folderKey) {
       return folderKey;
     }
     // TODO: optimize by creating a single graphql query to get all folders
-    const fetchedFolderKeyData = await fetchFolderKey({
+    const derivedFolderKeyData = await deriveFolderKey({
       workspaceId,
+      workspaceKeyId: usingWorkspaceKeyId,
       folderId,
       activeDevice,
     });
-    folderKey = fetchedFolderKeyData.folderKeyData.key;
-    const folderKeyChain = fetchedFolderKeyData.keyChain;
+    folderKey = derivedFolderKeyData.folderKeyData.key;
+    const folderKeyChain = derivedFolderKeyData.keyChain;
     folderSubkeyKeyLookup[folderSubkeyId] = folderKey;
     for (const folderKeyLink of folderKeyChain) {
       folderSubkeyKeyLookup[folderKeyLink.folderId][folderKeyLink.subkeyId] =

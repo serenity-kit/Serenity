@@ -13,7 +13,6 @@ export const secondsBetweenNewMemberChecks = 5;
 export type Props = { activeDevice: Device };
 
 export const addNewMembersIfNecessary = async ({ activeDevice }: Props) => {
-  // TODO: fetch all user workspaces
   const deviceSigningPublicKey = activeDevice.signingPublicKey;
   const workspaces = await getWorkspaces({
     deviceSigningPublicKey,

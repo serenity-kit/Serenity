@@ -53,7 +53,7 @@ export async function attachDeviceToWorkspaces({
         include: {
           workspace: {
             include: {
-              workspaceKey: {
+              workspaceKeys: {
                 orderBy: {
                   generation: "desc",
                 },
@@ -90,7 +90,7 @@ export async function attachDeviceToWorkspaces({
       userToWorkspaces.forEach(async (userToWorkspace) => {
         userWorkspaceIds.push(userToWorkspace.workspaceId);
         const workspace = userToWorkspace.workspace;
-        const workspaceKeys = workspace.workspaceKey;
+        const workspaceKeys = workspace.workspaceKeys;
         if (workspaceKeys.length === 0) {
           newWorkspaceKeys.push({
             id: uuidv4(),
@@ -109,7 +109,7 @@ export async function attachDeviceToWorkspaces({
       const workspaces = await prisma.workspace.findMany({
         where: { id: { in: verifiedWorkspaceIds } },
         include: {
-          workspaceKey: {
+          workspaceKeys: {
             include: {
               workspaceKeyBoxes: {
                 include: {

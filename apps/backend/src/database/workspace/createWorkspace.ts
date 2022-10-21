@@ -67,7 +67,7 @@ export async function createWorkspace({
             isAuthorizedMember: true,
           },
         },
-        workspaceKey: {
+        workspaceKeys: {
           create: {
             id: uuidv4(),
             generation: 0,

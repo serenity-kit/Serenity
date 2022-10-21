@@ -64,8 +64,20 @@ export const formatWorkspace = (workspace: any): Workspace => {
       members.push(workspaceMember);
     }
   );
+  let currentWorkspaceKey: WorkspaceKey | undefined = undefined;
+  if (workspace.workspaceKeys) {
+    for (let workspaceKey of workspace.workspaceKeys) {
+      if (!currentWorkspaceKey) {
+        currentWorkspaceKey = workspaceKey;
+      }
+      if (workspaceKey.workspaceKeyBoxes) {
+        workspaceKey.workspaceKeyBox = workspaceKey.workspaceKeyBoxes[0];
+      }
+    }
+  }
   return {
     ...workspace,
     members: members,
+    currentWorkspaceKey: currentWorkspaceKey,
   };
 };
