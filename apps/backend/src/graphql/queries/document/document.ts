@@ -23,7 +23,6 @@ export const documentQuery = queryField((t) => {
         id: args.id,
       });
       const formattedDocument = formatDocument(document);
-      console.log({ formattedDocument });
       return formattedDocument;
     },
   });

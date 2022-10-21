@@ -17,14 +17,6 @@ mutation updateDocumentName($input: UpdateDocumentNameInput!) {
           parentFolderId
         }
       }
-      contentKeyDerivationTrace {
-        workspaceKeyId
-        parentFolders {
-          folderId
-          subkeyId
-          parentFolderId
-        }
-      }
     }
   }
 }

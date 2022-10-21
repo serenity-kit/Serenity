@@ -59,14 +59,6 @@ export const updateDocumentName = async ({
               parentFolderId
             }
           }
-          contentKeyDerivationTrace {
-            workspaceKeyId
-            parentFolders {
-              folderId
-              subkeyId
-              parentFolderId
-            }
-          }
         }
       }
     }

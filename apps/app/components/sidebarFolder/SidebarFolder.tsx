@@ -252,7 +252,6 @@ export default function SidebarFolder(props: Props) {
         nameKeyDerivationTrace,
       },
     });
-    console.log({ result });
     if (result.data?.createDocument?.id) {
       navigation.navigate("Workspace", {
         workspaceId: route.params.workspaceId,

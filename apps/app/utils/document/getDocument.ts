@@ -19,7 +19,6 @@ export const getDocument = async ({ documentId }: Props) => {
       }
     )
     .toPromise();
-  console.log({ documentResult });
   if (documentResult.error) {
     throw new Error(documentResult.error?.message);
   } else {

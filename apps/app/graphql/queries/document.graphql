@@ -16,13 +16,5 @@ query document($id: ID!) {
         parentFolderId
       }
     }
-    contentKeyDerivationTrace {
-      workspaceKeyId
-      parentFolders {
-        folderId
-        subkeyId
-        parentFolderId
-      }
-    }
   }
 }

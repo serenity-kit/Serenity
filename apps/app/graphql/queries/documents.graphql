@@ -18,14 +18,6 @@ query documents($parentFolderId: ID!, $first: Int! = 100, $after: String) {
           parentFolderId
         }
       }
-      contentKeyDerivationTrace {
-        workspaceKeyId
-        parentFolders {
-          folderId
-          subkeyId
-          parentFolderId
-        }
-      }
     }
     pageInfo {
       hasNextPage

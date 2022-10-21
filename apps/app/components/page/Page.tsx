@@ -188,7 +188,6 @@ export default function Page({
       yAwarenessRef.current.setLocalStateField("user", {
         name: me.data?.me?.username ?? "Unknown user",
       });
-      console.log({ docId });
       let document: Document | undefined = undefined;
       try {
         const fetchedDocument = await getDocument({
@@ -203,7 +202,6 @@ export default function Page({
         console.error("Document not found");
         return;
       }
-      console.log({ document });
       // communicate to other components e.g. sidebar or topbar
       // the currently active document
       updateActiveDocumentInfoStore(document, activeDevice);

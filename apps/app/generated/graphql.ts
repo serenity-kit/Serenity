@@ -1114,7 +1114,7 @@ export type UpdateDocumentNameMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> }, contentKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null } | null };
+export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null } | null };
 
 export type UpdateFolderNameMutationVariables = Exact<{
   input: UpdateFolderNameInput;
@@ -1172,7 +1172,7 @@ export type DocumentQueryVariables = Exact<{
 }>;
 
 
-export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> }, contentKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null };
+export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null };
 
 export type DocumentPathQueryVariables = Exact<{
   id: Scalars['ID'];
@@ -1188,7 +1188,7 @@ export type DocumentsQueryVariables = Exact<{
 }>;
 
 
-export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> }, contentKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type FirstDocumentQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1619,14 +1619,6 @@ export const UpdateDocumentNameDocument = gql`
           parentFolderId
         }
       }
-      contentKeyDerivationTrace {
-        workspaceKeyId
-        parentFolders {
-          folderId
-          subkeyId
-          parentFolderId
-        }
-      }
     }
   }
 }
@@ -1788,14 +1780,6 @@ export const DocumentDocument = gql`
         parentFolderId
       }
     }
-    contentKeyDerivationTrace {
-      workspaceKeyId
-      parentFolders {
-        folderId
-        subkeyId
-        parentFolderId
-      }
-    }
   }
 }
     `;
@@ -1843,14 +1827,6 @@ export const DocumentsDocument = gql`
       rootFolderId
       workspaceId
       nameKeyDerivationTrace {
-        workspaceKeyId
-        parentFolders {
-          folderId
-          subkeyId
-          parentFolderId
-        }
-      }
-      contentKeyDerivationTrace {
         workspaceKeyId
         parentFolders {
           folderId

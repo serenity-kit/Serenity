@@ -32,14 +32,6 @@ export const getDocument = async ({
             parentFolderId
           }
         }
-        contentKeyDerivationTrace {
-          workspaceKeyId
-          parentFolders {
-            folderId
-            subkeyId
-            parentFolderId
-          }
-        }
       }
     }
   `;
