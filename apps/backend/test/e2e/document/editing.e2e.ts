@@ -217,11 +217,6 @@ test.describe("Edit document in subfolder", () => {
       password: user1.password,
       stayLoggedIn: true,
     });
-    user2.data = await createUserWithWorkspace({
-      id: user2.id,
-      username: user2.username,
-      password: user2.password,
-    });
     const workspaceInvitationResult = await createWorkspaceInvitation({ page });
     const workspaceInvitationUrl = workspaceInvitationResult.url;
     await page.goBack();

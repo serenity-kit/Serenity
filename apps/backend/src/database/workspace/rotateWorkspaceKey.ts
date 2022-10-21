@@ -82,7 +82,7 @@ export const rotateWorkspaceKey = async ({
     workspaceKeyBoxData.push({
       id: uuidv4(),
       workspaceKeyId: newWorkspaceKey.id,
-      creatorDeviceSigningPublicKey,
+      creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
       deviceSigningPublicKey: keyBoxData.receiverDeviceSigningPublicKey,
       ciphertext: keyBoxData.ciphertext,
       nonce: keyBoxData.nonce,

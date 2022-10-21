@@ -8,7 +8,7 @@ import { Device } from "../../types/device";
 export const GetWorkspaceDevicesResult = objectType({
   name: "GetWorkspaceDevicesResult",
   definition(t) {
-    t.nonNull.list.field("devices", { type: Device });
+    t.nonNull.list.nonNull.field("devices", { type: Device });
   },
 });
 

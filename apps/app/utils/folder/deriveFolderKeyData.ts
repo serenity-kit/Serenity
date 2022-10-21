@@ -1,19 +1,33 @@
 import { folderDerivedKeyContext } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { Device } from "../../types/Device";
-import { getWorkspaceKey } from "../workspace/getWorkspaceKey";
+import { deriveWorkspaceKey } from "../workspace/deriveWorkspaceKey";
+import { getWorkspace } from "../workspace/getWorkspace";
 import { getFolder } from "./getFolder";
 
 export type GetParentFolderKeyProps = {
   folderId: string;
   workspaceId: string;
+  workspaceKeyId?: string;
   activeDevice: Device;
 };
-export const getParentFolderKey = async ({
+export const deriveParentFolderKey = async ({
   folderId,
   workspaceId,
+  workspaceKeyId,
   activeDevice,
 }: GetParentFolderKeyProps) => {
+  let usingWorkspaceKeyId = workspaceKeyId;
+  if (!usingWorkspaceKeyId) {
+    const workspace = await getWorkspace({
+      workspaceId,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
+    if (!workspace?.currentWorkspaceKey?.id) {
+      throw new Error("Workspace key not found");
+    }
+    usingWorkspaceKeyId = workspace.currentWorkspaceKey.id;
+  }
   let keyData = {
     key: "",
     subkeyId: -1,
@@ -23,8 +37,9 @@ export const getParentFolderKey = async ({
   });
   let keyChain: any[] = [];
   if (folder.parentFolderId) {
-    const parentFolderKeyData = await getFolderKey({
+    const parentFolderKeyData = await deriveFolderKey({
       folderId: folder.parentFolderId,
+      workspaceKeyId: usingWorkspaceKeyId,
       workspaceId: workspaceId,
       activeDevice,
     });
@@ -37,8 +52,9 @@ export const getParentFolderKey = async ({
       });
     }
   } else {
-    const workspaceKey = await getWorkspaceKey({
+    const workspaceKey = await deriveWorkspaceKey({
       workspaceId: workspaceId,
+      workspaceKeyId: usingWorkspaceKeyId,
       activeDevice,
     });
     keyData = {
@@ -49,18 +65,32 @@ export const getParentFolderKey = async ({
   return { keyData, keyChain };
 };
 
-export type GetFolderKeyProps = {
+export type DeriveFolderKeyProps = {
   folderId: string;
+  workspaceKeyId?: string;
   workspaceId: string;
   activeDevice: Device;
 };
-export const getFolderKey = async ({
+export const deriveFolderKey = async ({
   folderId,
   workspaceId,
+  workspaceKeyId,
   activeDevice,
-}: GetFolderKeyProps) => {
-  let parentKeyData = await getParentFolderKey({
+}: DeriveFolderKeyProps) => {
+  let usingWorkspaceKeyId = workspaceKeyId;
+  if (!usingWorkspaceKeyId) {
+    const workspace = await getWorkspace({
+      workspaceId,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
+    if (!workspace?.currentWorkspaceKey?.id) {
+      throw new Error("Workspace key not found");
+    }
+    usingWorkspaceKeyId = workspace.currentWorkspaceKey.id;
+  }
+  let parentKeyData = await deriveParentFolderKey({
     folderId,
+    workspaceKeyId: usingWorkspaceKeyId,
     workspaceId,
     activeDevice,
   });

@@ -1,22 +1,32 @@
+import { WorkspaceKeyBox } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
 import { getWorkspace } from "./getWorkspace";
 
 export type Props = {
   workspaceId: string;
+  workspaceKeyId: string;
   activeDevice: Device;
 };
-export const getWorkspaceKey = async ({ workspaceId, activeDevice }: Props) => {
+export const deriveWorkspaceKey = async ({
+  workspaceId,
+  workspaceKeyId,
+  activeDevice,
+}: Props) => {
   const workspace = await getWorkspace({
     deviceSigningPublicKey: activeDevice.signingPublicKey,
     workspaceId: workspaceId,
   });
-  if (!workspace?.currentWorkspaceKey?.id) {
-    throw new Error(
-      "The currentWorkspaceKey has no ID. This should never happen."
-    );
+  if (!workspace?.workspaceKeys) {
+    throw new Error("No workspace keys found for this device.");
   }
-  const workspaceKeyBox = workspace?.currentWorkspaceKey?.workspaceKeyBox;
+  let workspaceKeyBox: WorkspaceKeyBox | undefined = undefined;
+  for (let workspaceKey of workspace.workspaceKeys) {
+    if (workspaceKey.id === workspaceKeyId && workspaceKey.workspaceKeyBox) {
+      workspaceKeyBox = workspaceKey.workspaceKeyBox;
+      break;
+    }
+  }
   if (!workspaceKeyBox) {
     throw new Error("This device isn't registered for this workspace!");
   }

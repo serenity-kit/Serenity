@@ -12,6 +12,9 @@ export const createWorkspaceInvitation = async ({ page }: Props) => {
     .locator('div[role="button"]:has-text("Create Invitation")')
     .click();
   await delayForSeconds(2);
+  const expectedNumInvitations = await page
+    .locator("//div[@id='workspaceInviteeList']/div/div")
+    .count();
   const linkInfoDiv = page
     .locator("//input[@id='workspaceInvitationInstructionsInput']")
     .first();
@@ -21,6 +24,6 @@ export const createWorkspaceInvitation = async ({ page }: Props) => {
   const numInvitations = await page
     .locator("//div[@id='workspaceInviteeList']/div/div")
     .count();
-  expect(numInvitations).toBe(1);
+  expect(numInvitations).toBe(expectedNumInvitations);
   return { url: workspaceInvitationUrl };
 };
