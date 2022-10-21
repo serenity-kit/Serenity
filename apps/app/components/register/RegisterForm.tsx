@@ -9,7 +9,7 @@ import {
   LinkExternal,
   Text,
 } from "@serenity-tools/ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { useAppContext } from "../../context/AppContext";
 import {
@@ -22,6 +22,7 @@ import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 type Props = {
   pendingWorkspaceInvitationId?: string;
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
+  isFocused: boolean;
 };
 
 export default function RegisterForm(props: Props) {
@@ -34,6 +35,19 @@ export default function RegisterForm(props: Props) {
   const [, finishRegistrationMutation] = useFinishRegistrationMutation();
   const [, startRegistrationMutation] = useStartRegistrationMutation();
   const [errorMessage, setErrorMessage] = useState("");
+
+  // we want to reset the form when the user navigates away from the screen
+  // to avoid having the form filled and potentially allowing someone else to
+  // steal the login data with brief access to the client
+  useEffect(() => {
+    if (!props.isFocused) {
+      setUsername("");
+      setPassword("");
+      setErrorMessage("");
+      setIsRegistering(false);
+      setHasAcceptedTerms(false);
+    }
+  }, [props.isFocused]);
 
   const onRegisterPress = async () => {
     if (!hasAcceptedTerms) {

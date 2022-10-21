@@ -28,7 +28,6 @@ import {
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
 import { deriveCurrentWorkspaceKey } from "../../utils/workspace/deriveCurrentWorkspaceKey";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
@@ -59,35 +58,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [, createFolderMutation] = useCreateFolderMutation();
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
-
-  const onWorkspaceStructureCreated = async ({
-    workspace,
-    folder,
-    document,
-  }) => {
-    const deviceSigningPublicKey = activeDevice?.signingPublicKey;
-    if (!deviceSigningPublicKey) {
-      throw new Error("Expected deviceSigningPublicKey to be defined");
-    }
-
-    const createdWorkspace = await getWorkspace({
-      deviceSigningPublicKey,
-      workspaceId,
-    });
-    setShowCreateWorkspaceModal(false);
-    if (createdWorkspace) {
-      navigation.navigate("Workspace", {
-        workspaceId: workspace.id,
-        screen: "Page",
-        params: {
-          pageId: document.id,
-        },
-      });
-    } else {
-      // TODO: handle this error
-      console.error("No workspace found!");
-    }
-  };
 
   const createFolder = async (name: string) => {
     const id = uuidv4();
@@ -258,8 +228,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       ) : null}
       <CreateWorkspaceModal
         isVisible={showCreateWorkspaceModal}
-        onBackdropPress={() => setShowCreateWorkspaceModal(false)}
-        onWorkspaceStructureCreated={onWorkspaceStructureCreated}
+        onCancel={() => setShowCreateWorkspaceModal(false)}
+        onWorkspaceStructureCreated={() => {
+          setShowCreateWorkspaceModal(false);
+        }}
       />
     </DrawerContentScrollView>
   );

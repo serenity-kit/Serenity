@@ -6,7 +6,7 @@ import {
   Input,
   Text,
 } from "@serenity-tools/ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Platform, useWindowDimensions } from "react-native";
 import { useAppContext } from "../../context/AppContext";
 import {
@@ -26,6 +26,7 @@ import { userWorkspaceKeyStore } from "../../utils/workspace/workspaceKeyStore";
 
 type Props = {
   onLoginSuccess?: () => void;
+  isFocused: boolean;
 };
 
 export function LoginForm(props: Props) {
@@ -39,6 +40,18 @@ export function LoginForm(props: Props) {
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
   const clearWorkspaceKeyStore = userWorkspaceKeyStore((state) => state.clear);
+
+  // we want to reset the form when the user navigates away from the screen
+  // to avoid having the form filled and potentially allowing someone else to
+  // steal the login data with brief access to the client
+  useEffect(() => {
+    if (!props.isFocused) {
+      setUsername("");
+      setPassword("");
+      setGqlErrorMessage("");
+      setIsLoggingIn(false);
+    }
+  }, [props.isFocused]);
 
   const onLoginPress = async () => {
     try {

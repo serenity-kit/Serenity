@@ -3,7 +3,7 @@ import {
   encryptDocumentTitle,
   recreateDocumentKey,
 } from "@serenity-tools/common";
-import { useEffect, useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 import Page from "../../../components/page/Page";
 import { PageHeader } from "../../../components/page/PageHeader";
@@ -16,12 +16,18 @@ import {
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 
+import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
+import {
+  getDocumentPath,
+  useDocumentPathStore,
+} from "../../../utils/document/documentPathStore";
 import { getDocument } from "../../../utils/document/getDocument";
 import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
 import { getFolder } from "../../../utils/folder/getFolder";
+import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { loadPageMachine } from "./loadPageMachine";
@@ -36,6 +42,8 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
   );
   const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
+  const folderStore = useOpenFolderStore();
+  const documentPathStore = useDocumentPathStore();
 
   const [state] = useMachine(loadPageMachine, {
     context: {
@@ -52,6 +60,21 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       headerTitleAlign: "center",
     });
   }, []);
+
+  const updateDocumentFolderPath = async (docId: string) => {
+    const documentPath = await getDocumentPath(docId);
+    const openFolderIds = folderStore.folderIds;
+    if (!documentPath) {
+      return;
+    }
+    documentPath.forEach((folder) => {
+      if (folder) {
+        openFolderIds.push(folder.id);
+      }
+    });
+    folderStore.update(openFolderIds);
+    documentPathStore.update(documentPath, activeDevice, getFolderKey);
+  };
 
   const updateTitle = async (title: string) => {
     let document: Document | undefined | null = undefined;
@@ -119,11 +142,21 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
 
   useEffect(() => {
     setLastUsedDocumentId(pageId, workspaceId);
+    updateDocumentFolderPath(pageId);
+
     // removing the isNew param right after the first render so users don't have it after a refresh
     if (state.matches("loadDocument")) {
       props.navigation.setParams({ isNew: undefined });
     }
   }, [pageId, workspaceId, props.navigation, state]);
+
+  const signatureKeyPair: KeyPair = useMemo(() => {
+    return {
+      publicKey: sodium.from_base64(activeDevice.signingPublicKey),
+      privateKey: sodium.from_base64(activeDevice.signingPrivateKey!),
+      keyType: "ed25519",
+    };
+  }, [activeDevice]);
 
   if (state.matches("hasNoAccess")) {
     return (
@@ -140,6 +173,7 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
         // to force unmount and mount the page
         key={pageId}
         updateTitle={updateTitle}
+        signatureKeyPair={signatureKeyPair}
       />
     );
   } else {

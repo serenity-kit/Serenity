@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet, useWindowDimensions } from "react-native";
 import {
   ModalProps as ReactNativeModalProps,
   ReactNativeModal,
@@ -19,6 +19,7 @@ export const Modal = React.forwardRef(
     { children, isVisible, onBackdropPress, onModalHide, ...rest }: ModalProps,
     ref: any
   ) => {
+    const dimensions = useWindowDimensions();
     const styles = StyleSheet.create({
       modal: tw`items-center`, // needed to horizontally center the box
       box: tw``,
@@ -54,9 +55,21 @@ export const Modal = React.forwardRef(
         animationOutTiming={150}
         backdropOpacity={0.5}
         useNativeDriverForBackdrop
-        style={[rest.style, styles.modal]}
+        avoidKeyboard // makes sure the modal animates up when the virtual keyboard is open
+        style={[styles.modal, rest.style]}
       >
-        <Box style={styles.box}>{children}</Box>
+        <Box
+          style={[
+            styles.box,
+            {
+              // dimensions.width - 16: making sure it doesn't go off screen on mobile
+              // 448: previous maxWidth of the modal
+              maxWidth: Math.min(dimensions.width - 16, 448),
+            },
+          ]}
+        >
+          {children}
+        </Box>
       </ReactNativeModal>
     );
   }

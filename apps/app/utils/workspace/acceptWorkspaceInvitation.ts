@@ -1,16 +1,33 @@
-import { Workspace } from "../../generated/graphql";
+import {
+  AcceptWorkspaceInvitationDocument,
+  AcceptWorkspaceInvitationMutation,
+  AcceptWorkspaceInvitationMutationVariables,
+  Workspace,
+} from "../../generated/graphql";
+import { getUrqlClient } from "../urqlClient/urqlClient";
 
 export type Props = {
   workspaceInvitationId: string;
-  acceptWorkspaceInvitationMutation: any;
 };
+
 export const acceptWorkspaceInvitation = async ({
   workspaceInvitationId,
-  acceptWorkspaceInvitationMutation,
 }: Props): Promise<Workspace | undefined> => {
-  const result = await acceptWorkspaceInvitationMutation({
-    input: { workspaceInvitationId },
-  });
+  const result = await getUrqlClient()
+    .mutation<
+      AcceptWorkspaceInvitationMutation,
+      AcceptWorkspaceInvitationMutationVariables
+    >(
+      AcceptWorkspaceInvitationDocument,
+      {
+        input: { workspaceInvitationId },
+      },
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+      }
+    )
+    .toPromise();
   if (result.error) {
     throw new Error(result.error.message);
   }

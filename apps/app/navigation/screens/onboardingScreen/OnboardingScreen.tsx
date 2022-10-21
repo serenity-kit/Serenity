@@ -7,16 +7,6 @@ import { CreateWorkspaceForm } from "../../../components/createWorkspaceForm/Cre
 export default function OnboardingScreen({ navigation }) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
-  const onWorkspaceStructureCreated = ({ workspace, document }) => {
-    navigation.navigate("Workspace", {
-      workspaceId: workspace.id,
-      screen: "Page",
-      params: {
-        pageId: document.id,
-      },
-    });
-  };
-
   return (
     <SafeAreaView style={tw`flex-auto`}>
       {/* flex needed for Menu-overlay positioning */}
@@ -32,7 +22,11 @@ export default function OnboardingScreen({ navigation }) {
         <CenterContent>
           <View style={tw`max-w-sm p-6`}>
             <CreateWorkspaceForm
-              onWorkspaceStructureCreated={onWorkspaceStructureCreated}
+              onCancel={() => {
+                alert(
+                  "Password verification is required. Please refresh the page and try again."
+                );
+              }}
             />
           </View>
         </CenterContent>
