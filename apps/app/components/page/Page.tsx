@@ -43,6 +43,7 @@ import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
+import { getFolder } from "../../utils/folder/getFolder";
 import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
 
 const reconnectTimeout = 2000;
@@ -208,11 +209,12 @@ export default function Page({
       // the currently active document
       updateActiveDocumentInfoStore(document, activeDevice);
 
+      const folder = await getFolder({ id: document.parentFolderId! });
       const folderKeyString = await getFolderKey({
-        folderId: document.parentFolderId!,
+        folderId: folder.id!,
         workspaceKeyId: document.workspaceKeyId!,
         workspaceId: document.workspaceId!,
-        folderSubkeyId: undefined,
+        folderSubkeyId: folder.subkeyId,
         activeDevice,
       });
       const documentKey = await recreateDocumentKey({

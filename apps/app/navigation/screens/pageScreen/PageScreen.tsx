@@ -26,6 +26,7 @@ import {
 } from "../../../utils/document/documentPathStore";
 import { getDocument } from "../../../utils/document/getDocument";
 import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
+import { getFolder } from "../../../utils/folder/getFolder";
 import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
@@ -72,7 +73,7 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       }
     });
     folderStore.update(openFolderIds);
-    documentPathStore.update(documentPath, activeDevice);
+    documentPathStore.update(documentPath, activeDevice, getFolderKey);
   };
 
   const updateTitle = async (title: string) => {
@@ -95,11 +96,12 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       console.error("document ID doesn't match page ID");
       return;
     }
+    const folder = await getFolder({ id: document.parentFolderId! });
     const folderKeyString = await getFolderKey({
-      folderId: document?.parentFolderId!,
-      workspaceId: document?.workspaceId!,
+      folderId: folder.id!,
+      workspaceId: document.workspaceId!,
       workspaceKeyId: workspace.currentWorkspaceKey.id,
-      folderSubkeyId: document?.subkeyId,
+      folderSubkeyId: folder.subkeyId,
       activeDevice,
     });
     let documentSubkeyId = 0;

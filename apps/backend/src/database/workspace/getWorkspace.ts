@@ -1,8 +1,5 @@
-import {
-  Workspace,
-  WorkspaceKey,
-  WorkspaceMember,
-} from "../../types/workspace";
+import { ForbiddenError } from "apollo-server-express";
+import { formatWorkspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -15,6 +12,16 @@ export async function getWorkspace({
   id,
   deviceSigningPublicKey,
 }: Params) {
+  const userWorkspace = await prisma.usersToWorkspaces.findFirst({
+    where: {
+      userId,
+      workspaceId: id,
+    },
+    select: { workspace: true },
+  });
+  if (!userWorkspace) {
+    throw new ForbiddenError("Unauthorized");
+  }
   // include userstoworkspaces but in descending alphabetical order by userId
   const rawWorkspace = await prisma.workspace.findUnique({
     include: {
@@ -30,7 +37,7 @@ export async function getWorkspace({
           },
         },
       },
-      workspaceKey: {
+      workspaceKeys: {
         include: {
           workspaceKeyBoxes: {
             where: {
@@ -51,34 +58,5 @@ export async function getWorkspace({
   if (!rawWorkspace) {
     return null;
   }
-  if (
-    rawWorkspace.usersToWorkspaces.some(
-      (connection) => connection.userId === userId
-    )
-  ) {
-    const workspaceMembers: WorkspaceMember[] = [];
-    rawWorkspace.usersToWorkspaces.forEach((userToWorkspace) => {
-      const workspaceMember: WorkspaceMember = {
-        userId: userToWorkspace.userId,
-        username: userToWorkspace.user.username,
-        isAdmin: userToWorkspace.isAdmin,
-      };
-      workspaceMembers.push(workspaceMember);
-    });
-    let currentWorkspaceKey: WorkspaceKey = rawWorkspace.workspaceKey[0];
-    if (currentWorkspaceKey) {
-      currentWorkspaceKey.workspaceKeyBox =
-        rawWorkspace.workspaceKey[0].workspaceKeyBoxes[0];
-    }
-    const workspace: Workspace = {
-      id: rawWorkspace.id,
-      name: rawWorkspace.name,
-      idSignature: rawWorkspace.idSignature,
-      members: workspaceMembers,
-      workspaceKeys: rawWorkspace.workspaceKey,
-      currentWorkspaceKey: currentWorkspaceKey,
-    };
-    return workspace;
-  }
-  return null;
+  return formatWorkspace(rawWorkspace);
 }

@@ -7,15 +7,26 @@ import {
   Folder,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { getParentFolderKey } from "../folder/getFolderKey";
+import { GetFolderKeyProps } from "../folder/folderKeyStore";
 import { getUrqlClient } from "../urqlClient/urqlClient";
+import { getWorkspaceKeys } from "../workspace/getWorskpaceKeys";
 
 interface DocumentPathState {
   folders: Folder[];
   folderIds: string[];
   folderNames: { [id: string]: string };
   getName: (folderId: string) => string;
-  update: (folders: Folder[], activeDevice: Device) => Promise<void>;
+  update: (
+    folders: Folder[],
+    activeDevice: Device,
+    getFolderKey: ({
+      workspaceId,
+      workspaceKeyId,
+      folderId,
+      folderSubkeyId,
+      activeDevice,
+    }: GetFolderKeyProps) => Promise<string>
+  ) => Promise<void>;
 }
 
 export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
@@ -30,7 +41,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
       return "Error retrieving name";
     }
   },
-  update: async (folders, activeDevice) => {
+  update: async (folders, activeDevice, getFolderKey) => {
     // all documentPath folders should be in the same workspace
     const folderIds: string[] = [];
     const folderNames: { [id: string]: string } = {};
@@ -38,13 +49,28 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
       folderIds.push(folder.id);
       let folderName = "decrypting…";
       try {
-        const parentKey = await getParentFolderKey({
-          folderId: folder.id,
-          workspaceId: folder.workspaceId!,
-          activeDevice,
-        });
+        // TODO: optimize key derivation to look up
+        // parent keys and workspace keys more easily
+        let parentKey = "";
+        if (folder.parentFolderId) {
+          parentKey = await getFolderKey({
+            workspaceId: folder.workspaceId!,
+            workspaceKeyId: folder.workspaceKeyId,
+            folderId: folder.parentFolderId,
+            activeDevice,
+          });
+        } else {
+          const workspaceKeys = await getWorkspaceKeys({
+            workspaceId: folder.workspaceId!,
+            activeDevice,
+          });
+          if (!workspaceKeys[folder.workspaceKeyId!]) {
+            throw new Error("Workspace key not found");
+          }
+          parentKey = workspaceKeys[folder.workspaceKeyId!];
+        }
         folderName = await decryptFolderName({
-          parentKey: parentKey.keyData.key,
+          parentKey: parentKey,
           subkeyId: folder.subkeyId!,
           ciphertext: folder.encryptedName,
           publicNonce: folder.encryptedNameNonce,

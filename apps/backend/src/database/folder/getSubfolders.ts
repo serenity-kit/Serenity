@@ -65,7 +65,6 @@ export async function getSubfolders({
           },
         },
       };
-
       if (usingOldKeys) {
         delete whereQuery.workspaceKey.generation.lte;
       } else {
