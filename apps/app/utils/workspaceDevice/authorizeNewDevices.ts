@@ -22,10 +22,12 @@ export const authorizeNewDevices = async ({ activeDevice }: Props) => {
     // nothing to do
     return;
   }
+  console.log({ unauthorizedWorkspaceDevices });
   const workspaceMemberDevices = await createWorkspaceMemberDevices({
     unauthorizedWorkspaceDevices,
     activeDevice,
   });
+  console.log({ workspaceMemberDevices });
   await getUrqlClient()
     .mutation<
       AttachDevicesToWorkspacesMutation,

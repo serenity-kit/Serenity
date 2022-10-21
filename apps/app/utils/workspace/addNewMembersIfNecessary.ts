@@ -13,6 +13,7 @@ export const secondsBetweenNewMemberChecks = 5;
 export type Props = { activeDevice: Device };
 
 export const addNewMembersIfNecessary = async ({ activeDevice }: Props) => {
+  console.log("addNewMembersIfNecessary()");
   // TODO: fetch all user workspaces
   const deviceSigningPublicKey = activeDevice.signingPublicKey;
   const workspaces = await getWorkspaces({
@@ -36,7 +37,9 @@ export const addNewMembersIfNecessary = async ({ activeDevice }: Props) => {
       }
     )
     .toPromise();
+  console.log({ unauthorizedMembersResult });
   const userIds = unauthorizedMembersResult.data?.unauthorizedMembers?.userIds;
+  console.log({ userIds });
   if (userIds && userIds.length > 0) {
     await authorizeNewDevices({ activeDevice });
   }

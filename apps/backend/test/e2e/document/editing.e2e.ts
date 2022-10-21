@@ -173,6 +173,13 @@ test.describe("Edit document", () => {
 
 test.describe("Edit document in subfolder", () => {
   test("Add content", async ({ page }) => {
+    const newContent = "\nHello World!";
+    await login({
+      page,
+      username: user1.username,
+      password: user1.password,
+      stayLoggedIn: true,
+    });
     const folder = await createSubFolder(
       page,
       user1.data.folder.id,
@@ -182,13 +189,6 @@ test.describe("Edit document in subfolder", () => {
       throw new Error("Could not create folder");
     }
     await createDocument(page, folder.id, user1.data.workspace.id);
-    const newContent = "\nHello World!";
-    await login({
-      page,
-      username: user1.username,
-      password: user1.password,
-      stayLoggedIn: true,
-    });
     const editor = page.locator("div[class='ProseMirror']");
     const startingContent = await editor.innerHTML();
     await page.type("div[class='ProseMirror']", newContent);
