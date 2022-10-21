@@ -1,4 +1,5 @@
 import { ForbiddenError } from "apollo-server-express";
+import { KeyDerivationTrace } from "../../types/folder";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -8,6 +9,7 @@ type Params = {
   workspaceKeyId: string;
   subkeyId: number;
   userId: string;
+  nameKeyDerivationTrace: KeyDerivationTrace;
 };
 
 export async function updateDocumentName({
@@ -17,6 +19,7 @@ export async function updateDocumentName({
   workspaceKeyId,
   subkeyId,
   userId,
+  nameKeyDerivationTrace,
 }: Params) {
   try {
     return await prisma.$transaction(async (prisma) => {
@@ -46,7 +49,13 @@ export async function updateDocumentName({
       }
       const updatedDocument = await prisma.document.update({
         where: { id },
-        data: { encryptedName, encryptedNameNonce, workspaceKeyId, subkeyId },
+        data: {
+          encryptedName,
+          encryptedNameNonce,
+          workspaceKeyId,
+          subkeyId,
+          nameKeyDerivationTrace,
+        },
       });
       return updatedDocument;
     });

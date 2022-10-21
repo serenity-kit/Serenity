@@ -1,6 +1,7 @@
 import { AuthenticationError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getFirstDocument } from "../../../database/document/getFirstDocument";
+import { formatDocument } from "../../../types/document";
 import { Document } from "../../types/document";
 
 export const firstDocument = queryField((t) => {
@@ -18,7 +19,7 @@ export const firstDocument = queryField((t) => {
         userId,
         workspaceId: args.workspaceId,
       });
-      return document;
+      return formatDocument(document);
     },
   });
 });

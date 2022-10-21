@@ -16,6 +16,8 @@ const username2 = "68776484-0e46-4027-a6f4-8bdeef185b73@example.com";
 const password = "password";
 let sessionKey = "";
 let sessionKey2 = "";
+let user1Data: any = undefined;
+let user2Data: any = undefined;
 
 let workspaceKey = "";
 let workspaceKey2 = "";
@@ -94,6 +96,7 @@ const setup = async () => {
       authorizationHeader: sessionKey,
     }
   );
+  user1Data = initialWorkspaceStructureResult.createInitialWorkspaceStructure;
   const workspace =
     initialWorkspaceStructureResult.createInitialWorkspaceStructure.workspace;
   workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
@@ -153,7 +156,7 @@ const setup = async () => {
       graphql,
       authorizationHeader: sessionKey2,
     });
-
+  user2Data = initialWorkspaceStructureResult2.createInitialWorkspaceStructure;
   const workspace2 =
     initialWorkspaceStructureResult2.createInitialWorkspaceStructure.workspace;
   workspaceKey2 = await getWorkspaceKeyForWorkspaceAndDevice({
@@ -205,6 +208,7 @@ test("user should be able to list documents in a folder with one item", async ()
     workspaceId,
     contentSubkeyId: 1,
     authorizationHeader: sessionKey,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
   });
   const result = await getDocuments({
     graphql,
@@ -243,6 +247,7 @@ test("user should be able to list documents in a folder with multiple items", as
     workspaceId,
     contentSubkeyId: 2,
     authorizationHeader: sessionKey,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
   });
   const result = await getDocuments({
     graphql,
@@ -292,6 +297,7 @@ test("user should be able to list without showing subfolder documents", async ()
     workspaceId,
     contentSubkeyId: 3,
     authorizationHeader: sessionKey,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
   });
   const result = await getDocuments({
     graphql,

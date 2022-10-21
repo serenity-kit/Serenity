@@ -37,6 +37,7 @@ import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
+import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
 import { deriveParentFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { getFolder } from "../../utils/folder/getFolder";
@@ -238,14 +239,20 @@ export default function SidebarFolder(props: Props) {
     const documentContentKeyResult = await createDocumentKey({
       folderKey: folderKeyString,
     });
+    const nameKeyDerivationTrace = await buildKeyDerivationTrace({
+      folderId: props.folderId,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
+    });
     const result = await createDocumentMutation({
       input: {
         id,
         workspaceId: props.workspaceId,
         parentFolderId: props.folderId,
         contentSubkeyId: documentContentKeyResult.subkeyId,
+        nameKeyDerivationTrace,
       },
     });
+    console.log({ result });
     if (result.data?.createDocument?.id) {
       navigation.navigate("Workspace", {
         workspaceId: route.params.workspaceId,

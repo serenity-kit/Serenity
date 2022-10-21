@@ -9,6 +9,22 @@ mutation updateDocumentName($input: UpdateDocumentNameInput!) {
       contentSubkeyId
       parentFolderId
       workspaceId
+      nameKeyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
+      contentKeyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
   }
 }

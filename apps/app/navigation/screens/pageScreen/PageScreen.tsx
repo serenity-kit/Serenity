@@ -25,6 +25,7 @@ import {
   useDocumentPathStore,
 } from "../../../utils/document/documentPathStore";
 import { getDocument } from "../../../utils/document/getDocument";
+import { buildKeyDerivationTrace } from "../../../utils/folder/buildKeyDerivationTrace";
 import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
 import { getFolder } from "../../../utils/folder/getFolder";
 import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
@@ -124,6 +125,10 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       title,
       key: documentKey,
     });
+    const nameKeyDerivationTrace = await buildKeyDerivationTrace({
+      folderId: document.parentFolderId!,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
+    });
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
         id: pageId,
@@ -131,6 +136,7 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
         encryptedNameNonce: encryptedDocumentTitle.publicNonce,
         workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
         subkeyId: documentSubkeyId,
+        nameKeyDerivationTrace,
       },
     });
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {

@@ -21,6 +21,7 @@ import { Platform, StyleSheet } from "react-native";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
+import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { getFolder } from "../../utils/folder/getFolder";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
@@ -126,6 +127,10 @@ export default function SidebarPage(props: Props) {
       title: name,
       key: documentKeyData.key,
     });
+    const nameKeyDerivationTrace = await buildKeyDerivationTrace({
+      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+      folderId: document?.parentFolderId!,
+    });
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
         id: props.documentId,
@@ -133,6 +138,7 @@ export default function SidebarPage(props: Props) {
         encryptedNameNonce: encryptedDocumentTitle.publicNonce,
         workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
         subkeyId: documentKeyData.subkeyId,
+        nameKeyDerivationTrace,
       },
     });
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {
