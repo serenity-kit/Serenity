@@ -5,7 +5,8 @@ import {
 import { Device } from "../../types/Device";
 import { MemberDevices } from "../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
-import { getWorkspaceKeys } from "../workspace/getWorskpaceKeys";
+import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
+import { getWorkspaces } from "../workspace/getWorkspaces";
 
 export type Props = {
   unauthorizedWorkspaceDevices: any;
@@ -15,20 +16,46 @@ export const createWorkspaceMemberDevices = async ({
   activeDevice,
   unauthorizedWorkspaceDevices,
 }: Props): Promise<WorkspaceDevicePairingInput[]> => {
-  const workspaceMemberDevices: WorkspaceDevicePairingInput[] = [];
-  for (let unauthorizedWorkspace of unauthorizedWorkspaceDevices) {
-    let workspaceKeys: { [workspaceKeyId: string]: string } | undefined =
-      undefined;
-    try {
-      workspaceKeys = await getWorkspaceKeys({
-        workspaceId: unauthorizedWorkspace.id,
-        activeDevice,
-      });
-    } catch (error) {
-      // we don't have access to this workspace yet, can't decrypt
-      console.log("Couldn't get workspace keys for this workspace.");
+  // derive all workspace keys for all workspaces
+  const workspaces = await getWorkspaces({
+    deviceSigningPublicKey: activeDevice.signingPublicKey,
+  });
+  if (!workspaces) {
+    throw new Error("No workspaces found");
+  }
+  const workspaceKeyLookup: {
+    [workspaceId: string]: { [workspaceKeyId: string]: string };
+  } = {};
+  for (let workspace of workspaces) {
+    if (!workspace.workspaceKeys) {
+      // TODO: handle error. This workspace has no workspaceKeys
       continue;
     }
+    const workspaceId = workspace.id;
+    if (!workspaceKeyLookup[workspaceId]) {
+      workspaceKeyLookup[workspaceId] = {};
+    }
+    for (let workspaceKey of workspace.workspaceKeys) {
+      const workspaceKeyId = workspaceKey.id;
+      const workspaceKeyBox = workspaceKey.workspaceKeyBox;
+      if (!workspaceKeyBox) {
+        // This device isn't registered for this workspace
+        continue;
+      }
+      const workspaceKeyString = await decryptWorkspaceKey({
+        ciphertext: workspaceKeyBox.ciphertext,
+        nonce: workspaceKeyBox.nonce,
+        creatorDeviceEncryptionPublicKey:
+          workspaceKeyBox.creatorDevice?.encryptionPublicKey!,
+        receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+      });
+      workspaceKeyLookup[workspaceId][workspaceKeyId] = workspaceKeyString;
+    }
+  }
+  // create workspaceDevicePairingInputs for all unauthorizedWorkspaceDevices
+  const workspaceMemberDevices: WorkspaceDevicePairingInput[] = [];
+  for (let unauthorizedWorkspace of unauthorizedWorkspaceDevices) {
+    const workspaceKeys = workspaceKeyLookup[unauthorizedWorkspace.id];
     const workspaceMemberDevice: WorkspaceDevicePairingInput = {
       id: unauthorizedWorkspace.id,
       workspaceKeysMembers: [],

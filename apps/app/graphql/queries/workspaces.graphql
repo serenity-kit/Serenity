@@ -22,6 +22,21 @@ query workspaces($deviceSigningPublicKey: String!) {
           }
         }
       }
+      workspaceKeys {
+        id
+        workspaceId
+        workspaceKeyBox {
+          id
+          workspaceKeyId
+          deviceSigningPublicKey
+          ciphertext
+          nonce
+          creatorDevice {
+            signingPublicKey
+            encryptionPublicKey
+          }
+        }
+      }
     }
   }
 }

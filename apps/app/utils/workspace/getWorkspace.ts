@@ -14,27 +14,22 @@ export const getWorkspace = async ({
   workspaceId,
   deviceSigningPublicKey,
 }: Props): Promise<Workspace | null> => {
-  try {
-    const workspaceResult = await getUrqlClient()
-      .query<WorkspaceQuery, WorkspaceQueryVariables>(
-        WorkspaceDocument,
-        {
-          id: workspaceId,
-          deviceSigningPublicKey,
-        },
-        { requestPolicy: "network-only" }
-      )
-      .toPromise();
-    if (workspaceResult.error) {
-      throw new Error(workspaceResult.error?.message);
-    }
-    if (workspaceResult.data?.workspace) {
-      return workspaceResult.data?.workspace as Workspace;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error(error);
-    throw error;
+  const workspaceResult = await getUrqlClient()
+    .query<WorkspaceQuery, WorkspaceQueryVariables>(
+      WorkspaceDocument,
+      {
+        id: workspaceId,
+        deviceSigningPublicKey,
+      },
+      { requestPolicy: "network-only" }
+    )
+    .toPromise();
+  if (workspaceResult.error) {
+    throw new Error(workspaceResult.error?.message);
+  }
+  if (workspaceResult.data?.workspace) {
+    return workspaceResult.data?.workspace as Workspace;
+  } else {
+    return null;
   }
 };
