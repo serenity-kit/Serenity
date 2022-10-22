@@ -47,6 +47,7 @@ import * as WorkspaceTypes from "./graphql/types/workspace";
 import * as AttachDevicesToWorkspacesMutationTypes from "./graphql/mutations/device/attachDevicesToWorkspaces";
 import * as AttachDeviceToWorkspacesMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspaces";
 import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
+import * as InitiateFileUploadMutationTypes from "./graphql/mutations/file/initiateFileUpload";
 import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
 import * as DevicesQueryTypes from "./graphql/queries/device/devices";
 import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
@@ -107,6 +108,8 @@ export const schema = makeSchema({
     RemoveMembersAndRotateWorkspaceKeyMutationTypes,
     WorkspaceDevicesQueryTypes,
     ActiveWorkspaceKeysQueryTypes,
+
+    InitiateFileUploadMutationTypes,
 
     DevicesQueryTypes,
     deviceBySigningPublicKeyQueryTypes,

@@ -21,9 +21,12 @@
     "test:e2e": "POSTGRES_URL=postgres://prisma:prisma@localhost:5432/serenity_e2e_tests npx playwright test",
     "test:e2e:headed": "POSTGRES_URL=postgres://prisma:prisma@localhost:5432/serenity_e2e_tests npx playwright test --headed",
     "test": "jest --runInBand",
-    "lint": "eslint --ext .tsx --ext .ts ./"
+    "lint": "eslint --ext .tsx --ext .ts ./",
+    "r2:enable-cors": "ts-node ./scripts/enableCorsForR2Bucket.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.193.0",
+    "@aws-sdk/s3-request-presigner": "^3.194.0",
     "@naisho/core": "*",
     "@prisma/client": "^4.4.0",
     "@serenity-tools/common": "*",

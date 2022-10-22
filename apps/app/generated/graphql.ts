@@ -1,6 +1,6 @@
+import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
-import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -359,6 +359,12 @@ export type GetWorkspaceDevicesResult = {
   devices: Array<Device>;
 };
 
+export type InitiateFileUploadResult = {
+  __typename?: 'InitiateFileUploadResult';
+  fileUrl?: Maybe<Scalars['String']>;
+  uploadUrl: Scalars['String'];
+};
+
 export type KeyDerivationTrace = {
   __typename?: 'KeyDerivationTrace';
   parentFolders: Array<KeyDerivationTraceParentFolder>;
@@ -436,6 +442,7 @@ export type Mutation = {
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
   finishLogin?: Maybe<FinishLoginResult>;
   finishRegistration?: Maybe<FinishRegistrationResult>;
+  initiateFileUpload?: Maybe<InitiateFileUploadResult>;
   removeMembersAndRotateWorkspaceKey?: Maybe<RemoveMembersAndRotateWorkspaceKeyResult>;
   startLogin?: Maybe<StartLoginResult>;
   startRegistration?: Maybe<StartRegistrationResult>;
@@ -1088,6 +1095,11 @@ export type FinishRegistrationMutationVariables = Exact<{
 
 export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode: string } | null };
 
+export type InitiateFileUploadMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type InitiateFileUploadMutation = { __typename?: 'Mutation', initiateFileUpload?: { __typename?: 'InitiateFileUploadResult', uploadUrl: string, fileUrl?: string | null } | null };
+
 export type RemoveMembersAndRotateWorkspaceKeyMutationVariables = Exact<{
   input: RemoveMembersAndRotateWorkspaceKeyInput;
 }>;
@@ -1552,6 +1564,18 @@ export const FinishRegistrationDocument = gql`
 
 export function useFinishRegistrationMutation() {
   return Urql.useMutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(FinishRegistrationDocument);
+};
+export const InitiateFileUploadDocument = gql`
+    mutation initiateFileUpload {
+  initiateFileUpload {
+    uploadUrl
+    fileUrl
+  }
+}
+    `;
+
+export function useInitiateFileUploadMutation() {
+  return Urql.useMutation<InitiateFileUploadMutation, InitiateFileUploadMutationVariables>(InitiateFileUploadDocument);
 };
 export const RemoveMembersAndRotateWorkspaceKeyDocument = gql`
     mutation removeMembersAndRotateWorkspaceKey($input: RemoveMembersAndRotateWorkspaceKeyInput!) {
@@ -2401,6 +2425,20 @@ export const runFinishRegistrationMutation = async (variables: FinishRegistratio
   return await getUrqlClient()
     .mutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(
       FinishRegistrationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runInitiateFileUploadMutation = async (variables: InitiateFileUploadMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<InitiateFileUploadMutation, InitiateFileUploadMutationVariables>(
+      InitiateFileUploadDocument,
       variables,
       {
         // better to be safe here and always refetch
