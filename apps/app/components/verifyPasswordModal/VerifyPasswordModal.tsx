@@ -16,10 +16,10 @@ import { TextInput } from "react-native";
 import {
   MainDeviceDocument,
   MainDeviceQuery,
+  runMeQuery,
   useStartLoginMutation,
   useVerifyPasswordMutation,
 } from "../../generated/graphql";
-import { fetchMe } from "../../graphql/fetchUtils/fetchMe";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
@@ -64,7 +64,7 @@ export function VerifyPasswordModal(props: Props) {
     setIsVerifyingPassword(true);
     // TODO: create a method that verifies the password
     try {
-      const meResult = await fetchMe();
+      const meResult = await runMeQuery({});
       if (meResult.error) {
         // TODO: handle this error in the UI
         throw new Error(meResult.error.message);

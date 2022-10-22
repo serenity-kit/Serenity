@@ -1,5 +1,6 @@
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
+import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -2212,4 +2213,620 @@ export const WorkspacesDocument = gql`
 
 export function useWorkspacesQuery(options: Omit<Urql.UseQueryArgs<WorkspacesQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspacesQuery, WorkspacesQueryVariables>({ query: WorkspacesDocument, ...options });
+};
+
+export const runAcceptWorkspaceInvitationMutation = async (variables: AcceptWorkspaceInvitationMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<AcceptWorkspaceInvitationMutation, AcceptWorkspaceInvitationMutationVariables>(
+      AcceptWorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runAttachDeviceToWorkspacesMutation = async (variables: AttachDeviceToWorkspacesMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<AttachDeviceToWorkspacesMutation, AttachDeviceToWorkspacesMutationVariables>(
+      AttachDeviceToWorkspacesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runAttachDevicesToWorkspacesMutation = async (variables: AttachDevicesToWorkspacesMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<AttachDevicesToWorkspacesMutation, AttachDevicesToWorkspacesMutationVariables>(
+      AttachDevicesToWorkspacesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runCreateDocumentMutation = async (variables: CreateDocumentMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<CreateDocumentMutation, CreateDocumentMutationVariables>(
+      CreateDocumentDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runCreateFolderMutation = async (variables: CreateFolderMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<CreateFolderMutation, CreateFolderMutationVariables>(
+      CreateFolderDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runCreateInitialWorkspaceStructureMutation = async (variables: CreateInitialWorkspaceStructureMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<CreateInitialWorkspaceStructureMutation, CreateInitialWorkspaceStructureMutationVariables>(
+      CreateInitialWorkspaceStructureDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runCreateWorkspaceInvitationMutation = async (variables: CreateWorkspaceInvitationMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(
+      CreateWorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteDevicesMutation = async (variables: DeleteDevicesMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteDevicesMutation, DeleteDevicesMutationVariables>(
+      DeleteDevicesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteDocumentsMutation = async (variables: DeleteDocumentsMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteDocumentsMutation, DeleteDocumentsMutationVariables>(
+      DeleteDocumentsDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteFoldersMutation = async (variables: DeleteFoldersMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteFoldersMutation, DeleteFoldersMutationVariables>(
+      DeleteFoldersDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteWorkspaceInvitationsMutation = async (variables: DeleteWorkspaceInvitationsMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteWorkspaceInvitationsMutation, DeleteWorkspaceInvitationsMutationVariables>(
+      DeleteWorkspaceInvitationsDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteWorkspacesMutation = async (variables: DeleteWorkspacesMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteWorkspacesMutation, DeleteWorkspacesMutationVariables>(
+      DeleteWorkspacesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFinishLoginMutation = async (variables: FinishLoginMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<FinishLoginMutation, FinishLoginMutationVariables>(
+      FinishLoginDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFinishRegistrationMutation = async (variables: FinishRegistrationMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(
+      FinishRegistrationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runRemoveMembersAndRotateWorkspaceKeyMutation = async (variables: RemoveMembersAndRotateWorkspaceKeyMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<RemoveMembersAndRotateWorkspaceKeyMutation, RemoveMembersAndRotateWorkspaceKeyMutationVariables>(
+      RemoveMembersAndRotateWorkspaceKeyDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runStartLoginMutation = async (variables: StartLoginMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<StartLoginMutation, StartLoginMutationVariables>(
+      StartLoginDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runStartRegistrationMutation = async (variables: StartRegistrationMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<StartRegistrationMutation, StartRegistrationMutationVariables>(
+      StartRegistrationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUpdateDocumentNameMutation = async (variables: UpdateDocumentNameMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<UpdateDocumentNameMutation, UpdateDocumentNameMutationVariables>(
+      UpdateDocumentNameDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUpdateFolderNameMutation = async (variables: UpdateFolderNameMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<UpdateFolderNameMutation, UpdateFolderNameMutationVariables>(
+      UpdateFolderNameDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUpdateWorkspaceMembersRolesMutation = async (variables: UpdateWorkspaceMembersRolesMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<UpdateWorkspaceMembersRolesMutation, UpdateWorkspaceMembersRolesMutationVariables>(
+      UpdateWorkspaceMembersRolesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUpdateWorkspaceNameMutation = async (variables: UpdateWorkspaceNameMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<UpdateWorkspaceNameMutation, UpdateWorkspaceNameMutationVariables>(
+      UpdateWorkspaceNameDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runVerifyPasswordMutation = async (variables: VerifyPasswordMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<VerifyPasswordMutation, VerifyPasswordMutationVariables>(
+      VerifyPasswordDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runVerifyRegistrationMutation = async (variables: VerifyRegistrationMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(
+      VerifyRegistrationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeviceBySigningPublicKeyQuery = async (variables: DeviceBySigningPublicKeyQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DeviceBySigningPublicKeyQuery, DeviceBySigningPublicKeyQueryVariables>(
+      DeviceBySigningPublicKeyDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDevicesQuery = async (variables: DevicesQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DevicesQuery, DevicesQueryVariables>(
+      DevicesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDocumentQuery = async (variables: DocumentQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DocumentQuery, DocumentQueryVariables>(
+      DocumentDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDocumentPathQuery = async (variables: DocumentPathQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DocumentPathQuery, DocumentPathQueryVariables>(
+      DocumentPathDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDocumentsQuery = async (variables: DocumentsQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DocumentsQuery, DocumentsQueryVariables>(
+      DocumentsDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFirstDocumentQuery = async (variables: FirstDocumentQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<FirstDocumentQuery, FirstDocumentQueryVariables>(
+      FirstDocumentDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFolderQuery = async (variables: FolderQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<FolderQuery, FolderQueryVariables>(
+      FolderDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFoldersQuery = async (variables: FoldersQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<FoldersQuery, FoldersQueryVariables>(
+      FoldersDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runMainDeviceQuery = async (variables: MainDeviceQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<MainDeviceQuery, MainDeviceQueryVariables>(
+      MainDeviceDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runMeQuery = async (variables: MeQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<MeQuery, MeQueryVariables>(
+      MeDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runMeWithWorkspaceLoadingInfoQuery = async (variables: MeWithWorkspaceLoadingInfoQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<MeWithWorkspaceLoadingInfoQuery, MeWithWorkspaceLoadingInfoQueryVariables>(
+      MeWithWorkspaceLoadingInfoDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runPendingWorkspaceInvitationQuery = async (variables: PendingWorkspaceInvitationQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<PendingWorkspaceInvitationQuery, PendingWorkspaceInvitationQueryVariables>(
+      PendingWorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runRootFoldersQuery = async (variables: RootFoldersQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<RootFoldersQuery, RootFoldersQueryVariables>(
+      RootFoldersDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUnauthorizedDevicesForWorkspacesQuery = async (variables: UnauthorizedDevicesForWorkspacesQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>(
+      UnauthorizedDevicesForWorkspacesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUnauthorizedMembersQuery = async (variables: UnauthorizedMembersQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>(
+      UnauthorizedMembersDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUserIdFromUsernameQuery = async (variables: UserIdFromUsernameQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<UserIdFromUsernameQuery, UserIdFromUsernameQueryVariables>(
+      UserIdFromUsernameDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runWorkspaceQuery = async (variables: WorkspaceQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceQuery, WorkspaceQueryVariables>(
+      WorkspaceDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runWorkspaceDevicesQuery = async (variables: WorkspaceDevicesQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceDevicesQuery, WorkspaceDevicesQueryVariables>(
+      WorkspaceDevicesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runWorkspaceInvitationQuery = async (variables: WorkspaceInvitationQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceInvitationQuery, WorkspaceInvitationQueryVariables>(
+      WorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runWorkspaceInvitationsQuery = async (variables: WorkspaceInvitationsQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceInvitationsQuery, WorkspaceInvitationsQueryVariables>(
+      WorkspaceInvitationsDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runWorkspacesQuery = async (variables: WorkspacesQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspacesQuery, WorkspacesQueryVariables>(
+      WorkspacesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
 };
