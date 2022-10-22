@@ -32,19 +32,14 @@ import {
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
-import {
-  Document,
-  DocumentDocument,
-  DocumentQuery,
-  DocumentQueryVariables,
-} from "../../generated/graphql";
+import { Document } from "../../generated/graphql";
 import { fetchMe } from "../../graphql/fetchUtils/fetchMe";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
+import { getDocument } from "../../utils/document/getDocument";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { getFolder } from "../../utils/folder/getFolder";
-import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
 
 const reconnectTimeout = 2000;
 
@@ -193,18 +188,20 @@ export default function Page({
       yAwarenessRef.current.setLocalStateField("user", {
         name: me.data?.me?.username ?? "Unknown user",
       });
-
-      const documentResult = await getUrqlClient()
-        .query<DocumentQuery, DocumentQueryVariables>(
-          DocumentDocument,
-          { id: docId },
-          {
-            // better to be safe here and always refetch
-            requestPolicy: "network-only",
-          }
-        )
-        .toPromise();
-      const document = documentResult.data?.document as Document;
+      let document: Document | undefined = undefined;
+      try {
+        const fetchedDocument = await getDocument({
+          documentId: docId,
+        });
+        document = fetchedDocument as Document;
+      } catch (err) {
+        // TODO
+        console.error(err);
+      }
+      if (!document) {
+        console.error("Document not found");
+        return;
+      }
       // communicate to other components e.g. sidebar or topbar
       // the currently active document
       updateActiveDocumentInfoStore(document, activeDevice);

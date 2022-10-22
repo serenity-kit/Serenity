@@ -1,5 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import { prisma } from "../../../src/database/prisma";
+import { formatDocument } from "../../../src/types/document";
 import { delayForSeconds } from "../delayForSeconds";
 import { expandFolderTree } from "./expandFolderTree";
 import { hoverOnElement } from "./hoverOnElement";
@@ -46,5 +47,5 @@ export const createDocument = async (
   );
   const newDocumentName1 = await newDocumentItem1.textContent();
   expect(newDocumentName1).toBe("Untitled");
-  return document;
+  return formatDocument(document);
 };

@@ -1,6 +1,6 @@
 import { Snapshot } from "@naisho/core";
-import { Document } from "../../types/document";
-import { Folder } from "../../types/folder";
+import { Document, formatDocument } from "../../types/document";
+import { Folder, formatFolder } from "../../types/folder";
 import { Workspace } from "../../types/workspace";
 import { createSnapshot } from "../createSnapshot";
 import { createFolder } from "../folder/createFolder";
@@ -84,12 +84,20 @@ export async function createInitialWorkspaceStructure({
       contentSubkeyId: documentContentSubkeyId,
       parentFolderId: folder.id,
       workspaceId: workspaceId,
+      nameKeyDerivationTrace: {
+        workspaceKeyId: workspaceKey?.id!,
+        parentFolders: [],
+      },
+      contentKeyDerivationTrace: {
+        workspaceKeyId: workspaceKey?.id!,
+        parentFolders: [],
+      },
     },
   });
   await createSnapshot(documentSnapshot);
   return {
     workspace,
-    document,
-    folder,
+    document: formatDocument(document),
+    folder: formatFolder(folder),
   };
 }

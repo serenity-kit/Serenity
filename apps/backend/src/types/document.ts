@@ -1,3 +1,4 @@
+import { KeyDerivationTrace } from "./folder";
 import { WorkspaceKey } from "./workspace";
 
 export type Document = {
@@ -12,4 +13,16 @@ export type Document = {
   workspaceId: string;
   createdAt?: Date;
   updatedAt?: Date;
+  nameKeyDerivationTrace: KeyDerivationTrace;
+  // contentKeyDerivationTrace: KeyDerivationTrace;
+};
+
+export const formatDocument = (document: any): Document => {
+  return {
+    ...document,
+    nameKeyDerivationTrace:
+      document.nameKeyDerivationTrace as KeyDerivationTrace,
+    // contentKeyDerivationTrace:
+    // document.contentKeyDerivationTrace as KeyDerivationTrace,
+  };
 };

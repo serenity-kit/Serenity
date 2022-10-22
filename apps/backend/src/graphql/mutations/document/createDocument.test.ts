@@ -69,7 +69,8 @@ test("user should be able to create a document", async () => {
     id,
     graphql,
     authorizationHeader: sessionKey,
-    parentFolderId: null,
+    parentFolderId: addedFolder.parentFolderId,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
     contentSubkeyId: documentContentKeyResult.subkeyId,
   });
@@ -83,7 +84,8 @@ test("Unauthenticated", async () => {
         id: uuidv4(),
         graphql,
         authorizationHeader: "badauthkey",
-        parentFolderId: null,
+        parentFolderId: addedFolder.parentFolderId,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         contentSubkeyId: 1,
         workspaceId: addedWorkspace.id,
       }))()

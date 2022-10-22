@@ -26,8 +26,8 @@ model Document {
   encryptedNameNonce        String?
   subkeyId                  Int?
   contentSubkeyId           Int?
-  nameKeyDerivationTrace    Json?
-  contentKeyDerivationTrace Json?
+  nameKeyDerivationTrace    Json          @default("{}")
+  contentKeyDerivationTrace Json          @default("{}")
 
   @@unique([subkeyId, workspaceId])
 }

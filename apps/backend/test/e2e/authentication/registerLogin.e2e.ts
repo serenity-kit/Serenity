@@ -1,6 +1,7 @@
 import { expect, Page, test } from "@playwright/test";
 import { v4 as uuidv4 } from "uuid";
-import { Document, User, Workspace } from "../../../prisma/generated/output";
+import { User, Workspace } from "../../../prisma/generated/output";
+import { Document } from "../../../src/types/document";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { login } from "../../helpers/e2e/login";
 import { logout } from "../../helpers/e2e/logout";

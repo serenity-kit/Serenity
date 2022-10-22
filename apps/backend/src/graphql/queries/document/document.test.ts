@@ -61,15 +61,17 @@ test("user should be retrieve a document", async () => {
   const createDocumentResponse = await createDocument({
     graphql,
     id: documentId,
-    parentFolderId: null,
+    parentFolderId: addedFolder.parentFolderId,
     workspaceId,
     contentSubkeyId: 1,
     authorizationHeader,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
   });
   await updateDocumentName({
     graphql,
     id: documentId,
     name: documentName,
+    parentFolderId: addedFolder.parentFolderId,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     folderKey,
     authorizationHeader,

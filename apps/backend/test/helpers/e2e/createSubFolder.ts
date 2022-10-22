@@ -1,5 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import { prisma } from "../../../src/database/prisma";
+import { formatFolder } from "../../../src/types/folder";
 import { delayForSeconds } from "../delayForSeconds";
 import { expandFolderTree } from "./expandFolderTree";
 import { openFolderMenu } from "./openFolderMenu";
@@ -43,5 +44,5 @@ export const createSubFolder = async (
   );
   const newFolderName1 = await newFolderMenu1.textContent();
   expect(newFolderName1).toBe("Untitled");
-  return folder;
+  return formatFolder(folder);
 };
