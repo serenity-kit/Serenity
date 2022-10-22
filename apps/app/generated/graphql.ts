@@ -239,7 +239,6 @@ export type DeviceWorkspaceKeyBoxInput = {
 
 export type Document = {
   __typename?: 'Document';
-  contentKeyDerivationTrace: KeyDerivationTrace;
   contentSubkeyId?: Maybe<Scalars['Int']>;
   encryptedName?: Maybe<Scalars['String']>;
   encryptedNameNonce?: Maybe<Scalars['String']>;

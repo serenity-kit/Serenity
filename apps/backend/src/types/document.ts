@@ -14,7 +14,7 @@ export type Document = {
   createdAt?: Date;
   updatedAt?: Date;
   nameKeyDerivationTrace: KeyDerivationTrace;
-  contentKeyDerivationTrace: KeyDerivationTrace;
+  // contentKeyDerivationTrace: KeyDerivationTrace;
 };
 
 export const formatDocument = (document: any): Document => {
@@ -22,7 +22,7 @@ export const formatDocument = (document: any): Document => {
     ...document,
     nameKeyDerivationTrace:
       document.nameKeyDerivationTrace as KeyDerivationTrace,
-    contentKeyDerivationTrace:
-      document.contentKeyDerivationTrace as KeyDerivationTrace,
+    // contentKeyDerivationTrace:
+    // document.contentKeyDerivationTrace as KeyDerivationTrace,
   };
 };

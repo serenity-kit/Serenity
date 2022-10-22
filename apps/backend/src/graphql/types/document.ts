@@ -16,7 +16,7 @@ export const Document = objectType({
     t.string("rootFolderId");
     t.string("workspaceId");
     t.nonNull.field("nameKeyDerivationTrace", { type: KeyDerivationTrace });
-    t.nonNull.field("contentKeyDerivationTrace", { type: KeyDerivationTrace });
+    // t.nonNull.field("contentKeyDerivationTrace", { type: KeyDerivationTrace });
     t.field("workspaceKey", { type: WorkspaceKey });
   },
 });
