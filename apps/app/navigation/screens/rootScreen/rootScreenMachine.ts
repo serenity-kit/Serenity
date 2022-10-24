@@ -1,6 +1,8 @@
 import { assign, createMachine } from "xstate";
-import { MeWithWorkspaceLoadingInfoQuery } from "../../../generated/graphql";
-import { fetchMeWithWorkspaceLoadingInfo } from "../../../graphql/fetchUtils/fetchMeWithWorkspaceLoadingInfo";
+import {
+  MeWithWorkspaceLoadingInfoQuery,
+  runMeWithWorkspaceLoadingInfoQuery,
+} from "../../../generated/graphql";
 import {
   getLastUsedDocumentId,
   getLastUsedWorkspaceId,
@@ -215,7 +217,7 @@ export const rootScreenMachine =
           };
         },
         fetchMeWithWorkspaceLoadingInfo: (context) => {
-          return fetchMeWithWorkspaceLoadingInfo({
+          return runMeWithWorkspaceLoadingInfoQuery({
             workspaceId: context.workspaceId,
             documentId: context.documentId,
             returnOtherWorkspaceIfNotFound:

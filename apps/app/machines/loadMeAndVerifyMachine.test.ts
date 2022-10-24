@@ -1,4 +1,4 @@
-jest.mock("../graphql/fetchUtils/fetchMe", () => ({
+jest.mock("../generated/graphql", () => ({
   __esModule: true,
   // default: jest.fn(),
   // namedExport: jest.fn(),

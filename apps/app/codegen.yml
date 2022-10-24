@@ -9,3 +9,4 @@ generates:
       - "typescript"
       - "typescript-operations"
       - "typescript-urql"
+      - "@serenity-tools/graphql-codegen-urql"

@@ -3,8 +3,11 @@ import sodium from "@serenity-tools/libsodium";
 import { finishLogin, startLogin } from "@serenity-tools/opaque";
 import { Platform } from "react-native";
 import { UpdateAuthenticationFunction } from "../../context/AppContext";
-import { MainDeviceDocument, MainDeviceQuery } from "../../generated/graphql";
-import { fetchMe } from "../../graphql/fetchUtils/fetchMe";
+import {
+  MainDeviceDocument,
+  MainDeviceQuery,
+  runMeQuery,
+} from "../../generated/graphql";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { getUrqlClient } from "../urqlClient/urqlClient";
@@ -97,7 +100,7 @@ export const login = async ({
     sessionKey: result.sessionKey,
     expiresAt: finishLoginResult.data.finishLogin.expiresAt,
   });
-  const meResult = await fetchMe();
+  const meResult = await runMeQuery({});
   if (meResult.error) {
     // TODO: handle this error in the UI
     throw new Error(meResult.error.message);

@@ -32,8 +32,7 @@ import {
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
-import { Document } from "../../generated/graphql";
-import { fetchMe } from "../../graphql/fetchUtils/fetchMe";
+import { Document, runMeQuery } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
@@ -183,7 +182,7 @@ export default function Page({
     async function initDocument() {
       await sodium.ready;
 
-      const me = await fetchMe();
+      const me = await runMeQuery({});
 
       yAwarenessRef.current.setLocalStateField("user", {
         name: me.data?.me?.username ?? "Unknown user",
