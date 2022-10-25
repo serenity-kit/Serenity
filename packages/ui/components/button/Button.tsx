@@ -146,6 +146,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
 
   return (
     <Pressable
+      testID={props.testID}
       ref={ref}
       disabled={disabled}
       {...rest}

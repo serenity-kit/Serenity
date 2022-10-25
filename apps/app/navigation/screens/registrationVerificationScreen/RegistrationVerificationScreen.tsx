@@ -157,10 +157,11 @@ export default function RegistrationVerificationScreen(
       });
       if (!verifyRegistrationResult.data?.verifyRegistration) {
         setErrorMessage("");
+        const errorMessage = verifyRegistrationResult.error?.message;
         if (errorMessage === "[GraphQL] Invalid user") {
           setVerificationError("invalidUser");
         } else if (
-          errorMessage === "[GraphQL] Invalid confirmation code. Code reset."
+          errorMessage === "[GraphQL] Too many attempts. Code reset."
         ) {
           setVerificationError("maxRetries");
         } else {
@@ -205,25 +206,33 @@ export default function RegistrationVerificationScreen(
         ) : null}
 
         {verificationError === "invalidCode" && (
-          <InfoMessage variant="error" icon>
+          <InfoMessage
+            variant="error"
+            icon
+            testID="verify-registration__invalidCodeError"
+          >
             The verification code was wrong.
           </InfoMessage>
         )}
 
         {verificationError === "invalidUser" && (
-          <InfoMessage variant="error" icon>
-            <InfoMessage>
-              The username you provided wasn't registered.
-            </InfoMessage>
+          <InfoMessage
+            variant="error"
+            icon
+            testID="verify-registration__invalidUserError"
+          >
+            The username you provided wasn't registered.
           </InfoMessage>
         )}
 
         {verificationError === "maxRetries" && (
-          <InfoMessage variant="error" icon>
-            <InfoMessage>
-              The code was wrong. We reset your confirmation code and sent you a
-              new email. Please try again with the new code.
-            </InfoMessage>
+          <InfoMessage
+            variant="error"
+            icon
+            testID="verify-registration__maxRetriesError"
+          >
+            The code was wrong. We reset your confirmation code and sent you a
+            new email. Please try again with the new code.
           </InfoMessage>
         )}
 
@@ -234,13 +243,18 @@ export default function RegistrationVerificationScreen(
             setVerificationCode(verificationCode);
           }}
           placeholder="Enter the verification code …"
+          testID="verify-registration__input"
         />
 
         <InfoMessage>
           Note: The verification code is prefilled on staging.
         </InfoMessage>
 
-        <Button onPress={onSubmit} isLoading={isSubmitting}>
+        <Button
+          onPress={onSubmit}
+          isLoading={isSubmitting}
+          testID="verify-registration__button"
+        >
           Register
         </Button>
       </Box>

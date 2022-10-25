@@ -23,7 +23,6 @@ const resetConfirmationCode = async (
   const updatedUnverifiedUser = await prisma.unverifiedUser.findFirst({
     where: { username },
   });
-  console.log({ updatedUnverifiedUser });
   return updatedUnverifiedUser;
 };
 
@@ -36,11 +35,6 @@ const setConfirmationTryCounter = async (
     where: { username },
     data: { confirmationTryCounter: count },
   });
-
-  const updatedUnverifiedUser = await prisma.unverifiedUser.findFirst({
-    where: { username },
-  });
-  console.log({ updatedUnverifiedUser });
 };
 
 const createDevicesAndUser = async (
@@ -129,7 +123,7 @@ export async function verifyRegistration({
     console.log(
       `New user confirmation code: ${updatedUnverifiedUser!.confirmationCode}`
     );
-    throw new UserInputError("Too many attempts. Code reset");
+    throw new UserInputError("Too many attempts. Code reset.");
   }
   const newConfirmationTryCounter =
     unverifiedUserWithIncorrectConfirmationCode.confirmationTryCounter + 1;
