@@ -14,13 +14,17 @@ export const buildKeyDerivationTrace = async ({
 }: Props) => {
   const folderKeyData: KeyDerivationTraceParentFolder[] = [];
   let folder: Folder | undefined;
+  let folderIdToFetch = folderId;
   do {
-    folder = await getFolder({ id: folderId });
+    folder = await getFolder({ id: folderIdToFetch });
     folderKeyData.push({
       folderId: folder.id,
       subkeyId: folder.subkeyId,
       parentFolderId: folder.parentFolderId,
     });
+    if (folder.parentFolderId) {
+      folderIdToFetch = folder.parentFolderId;
+    }
   } while (folder.parentFolderId);
   return {
     workspaceKeyId,
