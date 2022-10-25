@@ -3,6 +3,7 @@ import { delayForSeconds } from "../delayForSeconds";
 import { expandFolderTree } from "./expandFolderTree";
 import { openFolderMenu } from "./openFolderMenu";
 import { reloadPage } from "./reloadPage";
+import { waitForElementTextChange } from "./utils/waitForElementTextChange";
 
 export const renameFolder = async (
   page: Page,
@@ -31,16 +32,9 @@ export const renameFolder = async (
   const renamedFolderMenu1 = page.locator(
     `data-testid=sidebar-folder--${folderId}`
   );
-  let renamedFolderMenuText1: string | null = null;
-  const maxSecondsWait = 5;
-  let numSecondsWait = 0;
-  do {
-    await delayForSeconds(1);
-    renamedFolderMenuText1 = await renamedFolderMenu1.textContent();
-    numSecondsWait += 1;
-  } while (
-    renamedFolderMenuText1 == "decrypting..." &&
-    numSecondsWait <= maxSecondsWait
-  );
+  const renamedFolderMenuText1 = await waitForElementTextChange({
+    element: renamedFolderMenu1,
+    initialText: "decrypting...",
+  });
   expect(renamedFolderMenuText1).toBe(newName);
 };

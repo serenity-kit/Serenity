@@ -4,6 +4,7 @@ import { delayForSeconds } from "../delayForSeconds";
 import { expandFolderTree } from "./expandFolderTree";
 import { openDocumentMenu } from "./openDocumentMenu";
 import { reloadPage } from "./reloadPage";
+import { waitForElementTextChange } from "./utils/waitForElementTextChange";
 
 export const renameDocument = async (
   page: Page,
@@ -41,16 +42,9 @@ export const renameDocument = async (
   const renamedDocumentMenu1 = page.locator(
     `data-testid=sidebar-document--${documentId}`
   );
-  let renamedDocumentMenuText1: string | null = null;
-  const maxSecondsWait = 5;
-  let numSecondsWait = 0;
-  do {
-    await delayForSeconds(1);
-    renamedDocumentMenuText1 = await renamedDocumentMenu1.textContent();
-    numSecondsWait += 1;
-  } while (
-    renamedDocumentMenuText1 == "decrypting..." &&
-    numSecondsWait <= maxSecondsWait
-  );
+  const renamedDocumentMenuText1 = await waitForElementTextChange({
+    element: renamedDocumentMenu1,
+    initialText: "decrypting...",
+  });
   expect(renamedDocumentMenuText1).toBe(newName);
 };

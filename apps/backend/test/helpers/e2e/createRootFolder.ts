@@ -3,6 +3,7 @@ import { prisma } from "../../../src/database/prisma";
 import { formatFolder } from "../../../src/types/folder";
 import { delayForSeconds } from "../delayForSeconds";
 import { reloadPage } from "./reloadPage";
+import { waitForElementTextChange } from "./utils/waitForElementTextChange";
 
 export const createRootFolder = async (
   page: Page,
@@ -31,17 +32,10 @@ export const createRootFolder = async (
   expect(folderItemText).toBe(name);
   await reloadPage({ page });
   const folderItem1 = page.locator(`data-testid=sidebar-folder--${folder?.id}`);
-  let folderItemText1: string | null = null;
-  const maxSecondsWait = 5;
-  let numSecondsWait = 0;
-  do {
-    await delayForSeconds(1);
-    folderItemText1 = await folderItem1.textContent();
-    numSecondsWait += 1;
-  } while (
-    folderItemText1 == "decrypting..." &&
-    numSecondsWait <= maxSecondsWait
-  );
+  const folderItemText1 = await waitForElementTextChange({
+    element: folderItem1,
+    initialText: "decrypting...",
+  });
   expect(folderItemText1).toBe(name);
   return formatFolder(folder);
 };

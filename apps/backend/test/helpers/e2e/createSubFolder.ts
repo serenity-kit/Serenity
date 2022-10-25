@@ -5,6 +5,7 @@ import { delayForSeconds } from "../delayForSeconds";
 import { expandFolderTree } from "./expandFolderTree";
 import { openFolderMenu } from "./openFolderMenu";
 import { reloadPage } from "./reloadPage";
+import { waitForElementTextChange } from "./utils/waitForElementTextChange";
 
 export const createSubFolder = async (
   page: Page,
@@ -42,17 +43,10 @@ export const createSubFolder = async (
   const newFolderMenu1 = page.locator(
     `data-testid=sidebar-folder--${folder?.id}`
   );
-  let newFolderName1: string | null = null;
-  const maxSecondsWait = 5;
-  let numSecondsWait = 0;
-  do {
-    await delayForSeconds(1);
-    newFolderName1 = await newFolderMenu1.textContent();
-    numSecondsWait += 1;
-  } while (
-    newFolderName1 == "decrypting..." &&
-    numSecondsWait <= maxSecondsWait
-  );
+  const newFolderName1 = await waitForElementTextChange({
+    element: newFolderMenu1,
+    initialText: "decrypting...",
+  });
   expect(newFolderName1).toBe("Untitled");
   return formatFolder(folder);
 };
