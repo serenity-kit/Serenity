@@ -31,6 +31,16 @@ export const renameFolder = async (
   const renamedFolderMenu1 = page.locator(
     `data-testid=sidebar-folder--${folderId}`
   );
-  const renamedFolderMenuText1 = await renamedFolderMenu1.textContent();
+  let renamedFolderMenuText1: string | null = null;
+  const maxSecondsWait = 5;
+  let numSecondsWait = 0;
+  do {
+    await delayForSeconds(1);
+    renamedFolderMenuText1 = await renamedFolderMenu1.textContent();
+    numSecondsWait += 1;
+  } while (
+    renamedFolderMenuText1 == "decrypting..." &&
+    numSecondsWait <= maxSecondsWait
+  );
   expect(renamedFolderMenuText1).toBe(newName);
 };

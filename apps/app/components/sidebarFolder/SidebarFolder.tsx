@@ -186,6 +186,10 @@ export default function SidebarFolder(props: Props) {
     let numCreateFolderAttempts = 0;
     let folderId: string | undefined = undefined;
     let result: any = undefined;
+    const keyDerivationTrace = await buildKeyDerivationTrace({
+      folderId: props.folderId,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
+    });
     do {
       numCreateFolderAttempts += 1;
       result = await createFolderMutation({
@@ -197,10 +201,7 @@ export default function SidebarFolder(props: Props) {
           workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
           subkeyId: encryptedFolderResult.folderSubkeyId,
           parentFolderId: props.folderId,
-          keyDerivationTrace: {
-            workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-            parentFolders: [],
-          },
+          keyDerivationTrace,
         },
       });
       if (result.data?.createFolder?.folder?.id) {
@@ -313,6 +314,11 @@ export default function SidebarFolder(props: Props) {
       parentKey: parentKey.keyData.key,
       subkeyId: props.subkeyId!,
     });
+    const sourceFolder = await getFolder({ id: props.folderId });
+    const keyDerivationTrace = await buildKeyDerivationTrace({
+      folderId: sourceFolder.parentFolderId,
+      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+    });
     const updateFolderNameResult = await updateFolderNameMutation({
       input: {
         id: props.folderId,
@@ -320,10 +326,7 @@ export default function SidebarFolder(props: Props) {
         encryptedNameNonce: encryptedFolderResult.publicNonce,
         workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
         subkeyId: props.subkeyId!,
-        keyDerivationTrace: {
-          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-          parentFolders: [],
-        },
+        keyDerivationTrace,
       },
     });
     const folder = updateFolderNameResult.data?.updateFolderName?.folder;

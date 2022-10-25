@@ -41,6 +41,16 @@ export const renameDocument = async (
   const renamedDocumentMenu1 = page.locator(
     `data-testid=sidebar-document--${documentId}`
   );
-  const renamedFolderMenuText1 = await renamedDocumentMenu1.textContent();
-  expect(renamedFolderMenuText1).toBe(newName);
+  let renamedDocumentMenuText1: string | null = null;
+  const maxSecondsWait = 5;
+  let numSecondsWait = 0;
+  do {
+    await delayForSeconds(1);
+    renamedDocumentMenuText1 = await renamedDocumentMenu1.textContent();
+    numSecondsWait += 1;
+  } while (
+    renamedDocumentMenuText1 == "decrypting..." &&
+    numSecondsWait <= maxSecondsWait
+  );
+  expect(renamedDocumentMenuText1).toBe(newName);
 };

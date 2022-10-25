@@ -45,7 +45,17 @@ export const createDocument = async (
   const newDocumentItem1 = page.locator(
     `data-testid=sidebar-document--${document?.id}`
   );
-  const newDocumentName1 = await newDocumentItem1.textContent();
+  let newDocumentName1: string | null = null;
+  const maxSecondsWait = 5;
+  let numSecondsWait = 0;
+  do {
+    await delayForSeconds(1);
+    newDocumentName1 = await newDocumentItem1.textContent();
+    numSecondsWait += 1;
+  } while (
+    newDocumentName1 == "decrypting..." &&
+    numSecondsWait <= maxSecondsWait
+  );
   expect(newDocumentName1).toBe("Untitled");
   return formatDocument(document);
 };
