@@ -2,6 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { CenterContent, Text } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
 import { useAppContext } from "../../../context/AppContext";
+import { runLogoutMutation } from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigation";
 import { clearDeviceAndSessionStorage } from "../../../utils/authentication/clearDeviceAndSessionStorage";
 import { userWorkspaceKeyStore } from "../../../utils/workspace/workspaceKeyStore";
@@ -17,7 +18,7 @@ export default function LogoutInProgress({
 }: RootStackScreenProps<"LogoutInProgress">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const clearWorkspaceKeyStore = userWorkspaceKeyStore((state) => state.clear);
-  const { updateAuthentication } = useAppContext();
+  const { updateAuthentication, sessionKey, activeDevice } = useAppContext();
 
   useFocusEffect(() => {
     async function logout() {
@@ -27,13 +28,32 @@ export default function LogoutInProgress({
         navigation.navigate("Root");
         return;
       }
+      logoutInitiated = false;
+
+      let localCleanupSuccessful = false;
+      let remoteCleanupSuccessful = false;
       try {
+        const logoutResult = await runLogoutMutation({}, {});
+        remoteCleanupSuccessful = logoutResult.data?.logout?.success || false;
         clearDeviceAndSessionStorage(clearWorkspaceKeyStore);
         await updateAuthentication(null);
-      } catch {
-        alert("Failed to destroy the local data. Please login and try again.");
+        localCleanupSuccessful = true;
+      } catch (err) {
+        console.error(err);
       } finally {
-        logoutInitiated = false;
+        if (!localCleanupSuccessful && !remoteCleanupSuccessful) {
+          alert(
+            "Failed to logout on the server and cleanup the local session data. Please reload and try again."
+          );
+        } else if (localCleanupSuccessful && !remoteCleanupSuccessful) {
+          alert(
+            "Failed to logout on the server and but removed local session data. Please login from another device and remove the device manually from the account settings."
+          );
+        } else if (!localCleanupSuccessful && remoteCleanupSuccessful) {
+          alert(
+            "Failed to cleanup the local session data but logged out on the server. Please login and try again to log out on this device."
+          );
+        }
         navigation.navigate("Login");
       }
     }

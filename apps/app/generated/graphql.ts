@@ -1,6 +1,6 @@
+import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
-import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -383,6 +383,11 @@ export type KeyDerivationTraceParentFolderInput = {
   subkeyId: Scalars['Int'];
 };
 
+export type LogoutResult = {
+  __typename?: 'LogoutResult';
+  success: Scalars['Boolean'];
+};
+
 export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
@@ -436,6 +441,7 @@ export type Mutation = {
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
   finishLogin?: Maybe<FinishLoginResult>;
   finishRegistration?: Maybe<FinishRegistrationResult>;
+  logout?: Maybe<LogoutResult>;
   removeMembersAndRotateWorkspaceKey?: Maybe<RemoveMembersAndRotateWorkspaceKeyResult>;
   startLogin?: Maybe<StartLoginResult>;
   startRegistration?: Maybe<StartRegistrationResult>;
@@ -1088,6 +1094,11 @@ export type FinishRegistrationMutationVariables = Exact<{
 
 export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode: string } | null };
 
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout?: { __typename?: 'LogoutResult', success: boolean } | null };
+
 export type RemoveMembersAndRotateWorkspaceKeyMutationVariables = Exact<{
   input: RemoveMembersAndRotateWorkspaceKeyInput;
 }>;
@@ -1552,6 +1563,17 @@ export const FinishRegistrationDocument = gql`
 
 export function useFinishRegistrationMutation() {
   return Urql.useMutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(FinishRegistrationDocument);
+};
+export const LogoutDocument = gql`
+    mutation logout {
+  logout {
+    success
+  }
+}
+    `;
+
+export function useLogoutMutation() {
+  return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
 export const RemoveMembersAndRotateWorkspaceKeyDocument = gql`
     mutation removeMembersAndRotateWorkspaceKey($input: RemoveMembersAndRotateWorkspaceKeyInput!) {
@@ -2401,6 +2423,20 @@ export const runFinishRegistrationMutation = async (variables: FinishRegistratio
   return await getUrqlClient()
     .mutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(
       FinishRegistrationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runLogoutMutation = async (variables: LogoutMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<LogoutMutation, LogoutMutationVariables>(
+      LogoutDocument,
       variables,
       {
         // better to be safe here and always refetch
