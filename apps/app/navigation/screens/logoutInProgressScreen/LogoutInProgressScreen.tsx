@@ -29,18 +29,31 @@ export default function LogoutInProgress({
         return;
       }
       logoutInitiated = false;
+
+      let localCleanupSuccessful = false;
+      let remoteCleanupSuccessful = false;
       try {
         const logoutResult = await runLogoutMutation({}, {});
-        if (logoutResult.error) {
-          console.error(logoutResult.error);
-          return;
-        } else {
-          clearDeviceAndSessionStorage(clearWorkspaceKeyStore);
-          await updateAuthentication(null);
-        }
-      } catch {
-        alert("Failed to destroy the local data. Please login and try again.");
+        remoteCleanupSuccessful = logoutResult.data?.logout?.success || false;
+        clearDeviceAndSessionStorage(clearWorkspaceKeyStore);
+        await updateAuthentication(null);
+        localCleanupSuccessful = true;
+      } catch (err) {
+        console.error(err);
       } finally {
+        if (!localCleanupSuccessful && !remoteCleanupSuccessful) {
+          alert(
+            "Failed to logout on the server and cleanup the local session data. Please reload and try again."
+          );
+        } else if (localCleanupSuccessful && !remoteCleanupSuccessful) {
+          alert(
+            "Failed to logout on the server and but removed local session data. Please login from another device and remove the device manually from the account settings."
+          );
+        } else if (!localCleanupSuccessful && remoteCleanupSuccessful) {
+          alert(
+            "Failed to cleanup the local session data but logged out on the server. Please login and try again to log out on this device."
+          );
+        }
         navigation.navigate("Login");
       }
     }
