@@ -49,6 +49,9 @@ export default function RegistrationVerificationScreen(
   );
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [invalidCodeError, setInvalidCodeError] = useState(false);
+  const [maxRetriesError, setMaxRetriesError] = useState(false);
+  const [invalidUserError, setInvalidUserError] = useState(false);
   const [graphqlError, setGraphqlError] = useState("");
   const { updateAuthentication, updateActiveDevice } = useAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
@@ -149,8 +152,27 @@ export default function RegistrationVerificationScreen(
         },
       });
       if (!verifyRegistrationResult.data?.verifyRegistration) {
-        setErrorMessage("Verification failed.");
+        setErrorMessage("");
+        if (errorMessage === "[GraphQL] Invalid user") {
+          setInvalidCodeError(false);
+          setMaxRetriesError(false);
+          setInvalidUserError(true);
+        } else if (
+          errorMessage === "[GraphQL] Invalid confirmation code. Code reset."
+        ) {
+          setInvalidCodeError(false);
+          setMaxRetriesError(true);
+          setInvalidUserError(false);
+        } else {
+          setInvalidCodeError(true);
+          setMaxRetriesError(false);
+          setInvalidUserError(false);
+        }
         return;
+      } else {
+        setInvalidCodeError(false);
+        setMaxRetriesError(false);
+        setInvalidUserError(false);
       }
       if (isUsernamePasswordStored()) {
         await loginWithStoredUsernamePassword();
@@ -183,6 +205,29 @@ export default function RegistrationVerificationScreen(
         {errorMessage ? (
           <InfoMessage variant="error" icon>
             {errorMessage}
+          </InfoMessage>
+        ) : null}
+
+        {invalidUserError ? (
+          <InfoMessage variant="error" icon>
+            <InfoMessage>
+              The username you provided wasn't registered.
+            </InfoMessage>
+          </InfoMessage>
+        ) : null}
+
+        {invalidCodeError ? (
+          <InfoMessage variant="error" icon>
+            <InfoMessage>The verification code was wrong.</InfoMessage>
+          </InfoMessage>
+        ) : null}
+
+        {maxRetriesError ? (
+          <InfoMessage variant="error" icon>
+            <InfoMessage>
+              The code was wrong. We reset your confirmation code and sent you a
+              new email. Please try again with the new code.
+            </InfoMessage>
           </InfoMessage>
         ) : null}
 

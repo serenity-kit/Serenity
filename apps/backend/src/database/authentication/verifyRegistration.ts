@@ -1,10 +1,92 @@
+import { PrismaClient } from "@prisma/client";
+import { UserInputError } from "apollo-server-express";
+import { Prisma, UnverifiedUser } from "../../../prisma/generated/output";
+import { createConfirmationCode } from "../../utils/confirmationCode";
 import { prisma } from "../prisma";
+
+export const MAX_UNVERIFIED_USER_CONFIRMATION_ATTEMPTS = 5;
+
+const resetConfirmationCode = async (
+  prisma: PrismaClient,
+  username: string
+) => {
+  const confirmationCode = await createConfirmationCode();
+  await prisma.unverifiedUser.updateMany({
+    where: {
+      username,
+    },
+    data: {
+      confirmationCode,
+      confirmationTryCounter: 0,
+    },
+  });
+  const updatedUnverifiedUser = await prisma.unverifiedUser.findFirst({
+    where: { username },
+  });
+  console.log({ updatedUnverifiedUser });
+  return updatedUnverifiedUser;
+};
+
+const setConfirmationTryCounter = async (
+  prisma: PrismaClient,
+  username: string,
+  count: number
+) => {
+  await prisma.unverifiedUser.updateMany({
+    where: { username },
+    data: { confirmationTryCounter: count },
+  });
+
+  const updatedUnverifiedUser = await prisma.unverifiedUser.findFirst({
+    where: { username },
+  });
+  console.log({ updatedUnverifiedUser });
+};
+
+const createDevicesAndUser = async (
+  prisma: Prisma.TransactionClient,
+  unverifiedUser: UnverifiedUser
+) => {
+  const device = await prisma.device.create({
+    data: {
+      encryptionPublicKey: unverifiedUser.mainDeviceEncryptionPublicKey,
+      signingPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
+      encryptionPublicKeySignature:
+        unverifiedUser.mainDeviceEncryptionPublicKeySignature,
+      info: JSON.stringify({ type: "main" }),
+    },
+  });
+  const user = await prisma.user.create({
+    data: {
+      username: unverifiedUser.username,
+      opaqueEnvelope: unverifiedUser.opaqueEnvelope,
+      mainDeviceCiphertext: unverifiedUser.mainDeviceCiphertext,
+      mainDeviceNonce: unverifiedUser.mainDeviceNonce,
+      mainDeviceSigningPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
+      mainDeviceEncryptionKeySalt: unverifiedUser.mainDeviceEncryptionKeySalt,
+      devices: {
+        connect: {
+          signingPublicKey: device.signingPublicKey,
+        },
+      },
+      pendingWorkspaceInvitationId: unverifiedUser.pendingWorkspaceInvitationId,
+    },
+  });
+  await prisma.unverifiedUser.delete({
+    where: {
+      id: unverifiedUser.id,
+    },
+  });
+  return {
+    device,
+    user,
+  };
+};
 
 type Props = {
   username: string;
   confirmationCode: string;
 };
-
 // NOTE: we can force a login for this user before they confirm their account
 // if we modify the login to check for unverifiedUser
 export async function verifyRegistration({
@@ -20,54 +102,41 @@ export async function verifyRegistration({
   if (existingUserData) {
     throw new Error("This username has already been registered");
   }
-  try {
+  const unverifiedUser = await prisma.unverifiedUser.findFirst({
+    where: {
+      username,
+      confirmationCode,
+    },
+  });
+  if (unverifiedUser) {
     return await prisma.$transaction(async (prisma) => {
-      const unverifiedUser = await prisma.unverifiedUser.findFirst({
-        where: {
-          username,
-          confirmationCode,
-        },
-      });
-      if (!unverifiedUser) {
-        throw new Error("Invalid user or confirmation code");
-      }
-      const device = await prisma.device.create({
-        data: {
-          encryptionPublicKey: unverifiedUser.mainDeviceEncryptionPublicKey,
-          signingPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
-          encryptionPublicKeySignature:
-            unverifiedUser.mainDeviceEncryptionPublicKeySignature,
-          info: JSON.stringify({ type: "main" }),
-        },
-      });
-      const user = await prisma.user.create({
-        data: {
-          username: unverifiedUser.username,
-          opaqueEnvelope: unverifiedUser.opaqueEnvelope,
-          mainDeviceCiphertext: unverifiedUser.mainDeviceCiphertext,
-          mainDeviceNonce: unverifiedUser.mainDeviceNonce,
-          mainDeviceSigningPublicKey: unverifiedUser.mainDeviceSigningPublicKey,
-          mainDeviceEncryptionKeySalt:
-            unverifiedUser.mainDeviceEncryptionKeySalt,
-          devices: {
-            connect: {
-              signingPublicKey: device.signingPublicKey,
-            },
-          },
-          pendingWorkspaceInvitationId:
-            unverifiedUser.pendingWorkspaceInvitationId,
-        },
-      });
-      await prisma.unverifiedUser.delete({
-        where: {
-          id: unverifiedUser.id,
-        },
-      });
+      const { user } = await createDevicesAndUser(prisma, unverifiedUser);
       return user;
     });
-  } catch (error) {
-    console.error("Error saving user");
-    console.log(error);
-    throw error;
   }
+  const unverifiedUserWithIncorrectConfirmationCode =
+    await prisma.unverifiedUser.findFirst({
+      where: { username },
+    });
+  if (!unverifiedUserWithIncorrectConfirmationCode) {
+    throw new Error("Invalid user");
+  }
+  if (
+    unverifiedUserWithIncorrectConfirmationCode.confirmationTryCounter >=
+    MAX_UNVERIFIED_USER_CONFIRMATION_ATTEMPTS - 1
+  ) {
+    const updatedUnverifiedUser = await resetConfirmationCode(prisma, username);
+    console.log(
+      `New user confirmation code: ${updatedUnverifiedUser!.confirmationCode}`
+    );
+    throw new UserInputError("Too many attempts. Code reset");
+  }
+  const newConfirmationTryCounter =
+    unverifiedUserWithIncorrectConfirmationCode.confirmationTryCounter + 1;
+  await setConfirmationTryCounter(prisma, username, newConfirmationTryCounter);
+  const numAttemptsRemaining =
+    MAX_UNVERIFIED_USER_CONFIRMATION_ATTEMPTS - newConfirmationTryCounter;
+  throw new UserInputError(
+    `Invalid confirmation code. ${numAttemptsRemaining} attempts remaining`
+  );
 }
