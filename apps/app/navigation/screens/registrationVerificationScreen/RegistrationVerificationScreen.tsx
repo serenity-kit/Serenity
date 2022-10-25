@@ -206,7 +206,7 @@ export default function RegistrationVerificationScreen(
 
         {verificationError === "invalidCode" && (
           <InfoMessage variant="error" icon>
-            <InfoMessage>The verification code was wrong.</InfoMessage>
+            The verification code was wrong.
           </InfoMessage>
         )}
 
