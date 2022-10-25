@@ -40,6 +40,8 @@ import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorksp
 import { attachDeviceToWorkspaces } from "../../../utils/workspace/attachDeviceToWorkspaces";
 import { getPendingWorkspaceInvitationId } from "../../../utils/workspace/getPendingWorkspaceInvitationId";
 
+type VerificationError = "none" | "invalidCode" | "maxRetries" | "invalidUser";
+
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
 ) {
@@ -52,6 +54,8 @@ export default function RegistrationVerificationScreen(
   const [invalidCodeError, setInvalidCodeError] = useState(false);
   const [maxRetriesError, setMaxRetriesError] = useState(false);
   const [invalidUserError, setInvalidUserError] = useState(false);
+  const [verificationError, setVerificationError] =
+    useState<VerificationError>("none");
   const [graphqlError, setGraphqlError] = useState("");
   const { updateAuthentication, updateActiveDevice } = useAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
@@ -154,25 +158,17 @@ export default function RegistrationVerificationScreen(
       if (!verifyRegistrationResult.data?.verifyRegistration) {
         setErrorMessage("");
         if (errorMessage === "[GraphQL] Invalid user") {
-          setInvalidCodeError(false);
-          setMaxRetriesError(false);
-          setInvalidUserError(true);
+          setVerificationError("invalidUser");
         } else if (
           errorMessage === "[GraphQL] Invalid confirmation code. Code reset."
         ) {
-          setInvalidCodeError(false);
-          setMaxRetriesError(true);
-          setInvalidUserError(false);
+          setVerificationError("maxRetries");
         } else {
-          setInvalidCodeError(true);
-          setMaxRetriesError(false);
-          setInvalidUserError(false);
+          setVerificationError("invalidCode");
         }
         return;
       } else {
-        setInvalidCodeError(false);
-        setMaxRetriesError(false);
-        setInvalidUserError(false);
+        setVerificationError("none");
       }
       if (isUsernamePasswordStored()) {
         await loginWithStoredUsernamePassword();
@@ -208,28 +204,26 @@ export default function RegistrationVerificationScreen(
           </InfoMessage>
         ) : null}
 
-        {invalidUserError ? (
+        {verificationError === "invalidCode" && (
+          <InfoMessage variant="error" icon>
+            <InfoMessage>The verification code was wrong.</InfoMessage>
+          </InfoMessage>
+        )}
+        {verificationError === "invalidUser" && (
           <InfoMessage variant="error" icon>
             <InfoMessage>
               The username you provided wasn't registered.
             </InfoMessage>
           </InfoMessage>
-        ) : null}
-
-        {invalidCodeError ? (
-          <InfoMessage variant="error" icon>
-            <InfoMessage>The verification code was wrong.</InfoMessage>
-          </InfoMessage>
-        ) : null}
-
-        {maxRetriesError ? (
+        )}
+        {verificationError === "maxRetries" && (
           <InfoMessage variant="error" icon>
             <InfoMessage>
               The code was wrong. We reset your confirmation code and sent you a
               new email. Please try again with the new code.
             </InfoMessage>
           </InfoMessage>
-        ) : null}
+        )}
 
         <Input
           label={"Verification code"}
