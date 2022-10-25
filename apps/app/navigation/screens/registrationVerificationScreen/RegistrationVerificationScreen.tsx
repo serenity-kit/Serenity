@@ -209,6 +209,7 @@ export default function RegistrationVerificationScreen(
             <InfoMessage>The verification code was wrong.</InfoMessage>
           </InfoMessage>
         )}
+
         {verificationError === "invalidUser" && (
           <InfoMessage variant="error" icon>
             <InfoMessage>
@@ -216,6 +217,7 @@ export default function RegistrationVerificationScreen(
             </InfoMessage>
           </InfoMessage>
         )}
+
         {verificationError === "maxRetries" && (
           <InfoMessage variant="error" icon>
             <InfoMessage>
