@@ -31,7 +31,17 @@ export const createRootFolder = async (
   expect(folderItemText).toBe(name);
   await reloadPage({ page });
   const folderItem1 = page.locator(`data-testid=sidebar-folder--${folder?.id}`);
-  const folderItemText1 = await folderItem1.textContent();
+  let folderItemText1: string | null = null;
+  const maxSecondsWait = 5;
+  let numSecondsWait = 0;
+  do {
+    await delayForSeconds(1);
+    folderItemText1 = await folderItem1.textContent();
+    numSecondsWait += 1;
+  } while (
+    folderItemText1 == "decrypting..." &&
+    numSecondsWait <= maxSecondsWait
+  );
   expect(folderItemText1).toBe(name);
   return formatFolder(folder);
 };
