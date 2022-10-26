@@ -93,11 +93,11 @@ export default function FileUploadTestScreen() {
       folderSubkeyId: folder.subkeyId,
       activeDevice,
     });
-    const imageTitleKey = await createDocumentKey({ folderKey });
+    const imageUrlKey = await createDocumentKey({ folderKey });
 
-    const encryptedNameData = await encryptDocumentTitle({
+    const encryptedUrlData = await encryptDocumentTitle({
       title: filePickerResult.fileName!,
-      key: imageTitleKey.key,
+      key: imageUrlKey.key,
       publicData: null,
     });
     const result = await runInitiateFileUploadMutation(
@@ -105,9 +105,9 @@ export default function FileUploadTestScreen() {
         initiateFileUpload: {
           documentId,
           workspaceId,
-          // encryptedName: encryptedNameData.cipherText,
-          // encryptedNameNonce: encryptedNameData.publicNonce,
-          // subkeyId: keyData.subkeyId,
+          // encryptedUrl: encryptedUrlData.cipherText,
+          // encryptedUrlNonce: encryptedUrlData.publicNonce,
+          // subkeyId: imageUrlKey.subkeyId,
           // keyDerivationTrace,
         },
       },
