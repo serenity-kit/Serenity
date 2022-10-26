@@ -6,6 +6,7 @@ import { UpdateAuthenticationFunction } from "../../context/AppContext";
 import {
   MainDeviceDocument,
   MainDeviceQuery,
+  runLogoutMutation,
   runMeQuery,
 } from "../../generated/graphql";
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
@@ -59,6 +60,12 @@ export const login = async ({
   device,
   useExtendedLogin,
 }: LoginParams) => {
+  const logoutResult = await runLogoutMutation({}, {});
+  const remoteCleanupSuccessful = logoutResult.data?.logout?.success || false;
+  if (!remoteCleanupSuccessful) {
+    // todo: report to user
+    console.error("Remote logout failed");
+  }
   await updateAuthentication(null);
   const message = await startLogin(password);
   const startLoginResult = await startLoginMutation({
