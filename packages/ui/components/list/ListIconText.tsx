@@ -1,21 +1,21 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
-import { Text, TextProps } from "../text/Text";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
-import { View } from "../view/View";
 import { HStack, IStackProps } from "native-base";
 import { Icon, IconNames } from "../icon/Icon";
 import { ListText } from "./ListText";
 
+// TODO either iconName or avatar
 export type ListIconTextProps = IStackProps & {
   main: string;
-  iconName: IconNames;
+  iconName?: IconNames;
+  avatar?: React.ReactNode;
   secondary?: string;
 };
 
 export const ListIconText = (props: ListIconTextProps) => {
-  const { ...rest } = props;
+  const { avatar, iconName, ...rest } = props;
   const isDesktopDevice = useIsDesktopDevice();
 
   const styles = StyleSheet.create({
@@ -29,10 +29,14 @@ export const ListIconText = (props: ListIconTextProps) => {
 
   return (
     <HStack {...rest} style={[styles.wrapper]} space={2}>
-      <Icon
-        name={props.iconName}
-        color={isDesktopDevice ? "gray-700" : "primary-400"}
-      />
+      {iconName ? (
+        <Icon
+          name={iconName}
+          color={isDesktopDevice ? "gray-700" : "primary-400"}
+        />
+      ) : (
+        avatar
+      )}
       <HStack alignItems={"center"} style={[styles.stack]} space={4}>
         <ListText variant="xs">{props.main}</ListText>
         <ListText
