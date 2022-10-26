@@ -7,6 +7,7 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@playwright/test": "^1.27.1",
     "eslint": "^8.23.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
@@ -32,6 +33,5 @@
     "prosemirror-state": "1.4.1",
     "prosemirror-transform": "1.7.0",
     "prosemirror-keymap": "1.2.0"
-  },
-  "dependencies": {}
+  }
 }
