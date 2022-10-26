@@ -9,7 +9,7 @@ import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopD
 export type ListProps = ViewProps & {
   data: Array<string>;
   emptyString: string;
-  headerData?: Array<string>;
+  header?: React.ReactNode;
   mainWidth?: string;
   mainWidthMobile?: string;
 };
@@ -18,7 +18,6 @@ export const List = (props: ListProps) => {
   const {
     data,
     emptyString,
-    headerData,
     mainWidth = "1/2",
     mainWidthMobile = "1/2",
     ...rest
@@ -38,19 +37,7 @@ export const List = (props: ListProps) => {
 
   return (
     <View {...rest} style={styles.list}>
-      {!isEmpty && headerData && isDesktopDevice ? (
-        <HStack style={styles.headerRow}>
-          {headerData.map((item, i) => {
-            return (
-              <View style={i === 0 && styles.mainColumn} key={"header_" + i}>
-                <Text variant="xxs" style={tw`uppercase`} bold>
-                  {item}
-                </Text>
-              </View>
-            );
-          })}
-        </HStack>
-      ) : null}
+      {props.header && !isEmpty && isDesktopDevice ? props.header : null}
       {isEmpty ? (
         <Text variant="xs" style={tw`text-gray-500`}>
           {emptyString}

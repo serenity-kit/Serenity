@@ -1,8 +1,8 @@
 import {
   IconButton,
   List,
+  ListHeader,
   ListItem,
-  Text,
   tw,
   useIsDesktopDevice,
   View,
@@ -42,12 +42,13 @@ export function WorkspaceInvitationList(props: Props) {
   };
 
   const styles = StyleSheet.create({});
+
   return (
     <View>
       <List
         data={props.workspaceInvitations}
         emptyString={"No active invitations"}
-        headerData={["Active invite Links"]}
+        header={<ListHeader data={["Name", "Email", "Role"]} />}
       >
         {props.workspaceInvitations.map((invitation) => {
           const expired = isInvitationExpired(invitation.expiresAt);
