@@ -3,7 +3,10 @@ import { Button, Text, View } from "@serenity-tools/ui";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Image, useWindowDimensions } from "react-native";
-import { useInitiateFileUploadMutation } from "../../../generated/graphql";
+import {
+  runInitiateFileUploadMutation,
+  useInitiateFileUploadMutation,
+} from "../../../generated/graphql";
 
 export default function FileUploadTestScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -44,7 +47,18 @@ export default function FileUploadTestScreen() {
         key
       );
 
-    const result = await initiateFileUploadMutation({});
+    const documentId = "invalid";
+    const workspaceId = "invalid";
+
+    const result = await runInitiateFileUploadMutation(
+      {
+        initiateFileUpload: {
+          documentId,
+          workspaceId,
+        },
+      },
+      {}
+    );
     const uploadUrl = result.data?.initiateFileUpload?.uploadUrl;
     const fileUrl = result.data?.initiateFileUpload?.fileUrl;
     if (!uploadUrl || !fileUrl) {

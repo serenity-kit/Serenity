@@ -359,6 +359,11 @@ export type GetWorkspaceDevicesResult = {
   devices: Array<Device>;
 };
 
+export type InitiateFileUploadInput = {
+  documentId: Scalars['String'];
+  workspaceId: Scalars['String'];
+};
+
 export type InitiateFileUploadResult = {
   __typename?: 'InitiateFileUploadResult';
   fileUrl?: Maybe<Scalars['String']>;
@@ -522,6 +527,11 @@ export type MutationFinishLoginArgs = {
 
 export type MutationFinishRegistrationArgs = {
   input: FinishRegistrationInput;
+};
+
+
+export type MutationInitiateFileUploadArgs = {
+  input: InitiateFileUploadInput;
 };
 
 
@@ -1095,7 +1105,9 @@ export type FinishRegistrationMutationVariables = Exact<{
 
 export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode: string } | null };
 
-export type InitiateFileUploadMutationVariables = Exact<{ [key: string]: never; }>;
+export type InitiateFileUploadMutationVariables = Exact<{
+  initiateFileUpload: InitiateFileUploadInput;
+}>;
 
 
 export type InitiateFileUploadMutation = { __typename?: 'Mutation', initiateFileUpload?: { __typename?: 'InitiateFileUploadResult', uploadUrl: string, fileUrl?: string | null } | null };
@@ -1566,8 +1578,8 @@ export function useFinishRegistrationMutation() {
   return Urql.useMutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(FinishRegistrationDocument);
 };
 export const InitiateFileUploadDocument = gql`
-    mutation initiateFileUpload {
-  initiateFileUpload {
+    mutation initiateFileUpload($initiateFileUpload: InitiateFileUploadInput!) {
+  initiateFileUpload(input: $initiateFileUpload) {
     uploadUrl
     fileUrl
   }

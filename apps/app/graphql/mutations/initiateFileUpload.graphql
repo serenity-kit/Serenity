@@ -1,5 +1,5 @@
-mutation initiateFileUpload {
-  initiateFileUpload {
+mutation initiateFileUpload($initiateFileUpload: InitiateFileUploadInput!) {
+  initiateFileUpload(input: $initiateFileUpload) {
     uploadUrl
     fileUrl
   }

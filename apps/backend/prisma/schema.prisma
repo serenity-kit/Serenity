@@ -28,6 +28,7 @@ model Document {
   contentSubkeyId           Int?
   nameKeyDerivationTrace    Json          @default("{}")
   contentKeyDerivationTrace Json          @default("{}")
+  linkedFiles               LinkedFile[]
 
   @@unique([subkeyId, workspaceId])
 }
@@ -169,6 +170,7 @@ model Workspace {
   usersToWorkspaces UsersToWorkspaces[]
   invitations       WorkspaceInvitations[]
   workspaceKeys     WorkspaceKey[]
+  linkedFiles       LinkedFile[]
 }
 
 model UsersToWorkspaces {
@@ -190,6 +192,7 @@ model WorkspaceKey {
   generation        Int               @default(0)
   folders           Folder[]
   documents         Document[]
+  LinkedFile        LinkedFile[]
 }
 
 model WorkspaceKeyBox {
@@ -224,4 +227,15 @@ model Folder {
   documents          Document[]
 
   @@unique([subkeyId, workspaceId])
+}
+
+model LinkedFile {
+  id             String        @id @unique
+  documentId     String
+  document       Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  workspaceId    String
+  workspace      Workspace?    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceKey   WorkspaceKey? @relation(fields: [workspaceKeyId], references: [id], onDelete: SetDefault)
+  workspaceKeyId String        @default("invalid")
+  createdAt      DateTime      @default(now())
 }

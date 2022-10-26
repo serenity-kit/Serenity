@@ -2,7 +2,13 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 // @ts-ignore
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { AuthenticationError } from "apollo-server-express";
-import { mutationField, objectType } from "nexus";
+import {
+  arg,
+  inputObjectType,
+  mutationField,
+  nonNull,
+  objectType,
+} from "nexus";
 import { v4 as uuidv4 } from "uuid";
 
 if (
@@ -24,6 +30,14 @@ const s3Client = new S3Client({
   },
 });
 
+export const InitiateFileUploadInput = inputObjectType({
+  name: "InitiateFileUploadInput",
+  definition(t) {
+    t.nonNull.string("workspaceId");
+    t.nonNull.string("documentId");
+  },
+});
+
 export const InitiateFileUploadResult = objectType({
   name: "InitiateFileUploadResult",
   definition(t) {
@@ -34,6 +48,13 @@ export const InitiateFileUploadResult = objectType({
 
 export const initiateFileUploadMutation = mutationField("initiateFileUpload", {
   type: InitiateFileUploadResult,
+  args: {
+    input: nonNull(
+      arg({
+        type: InitiateFileUploadInput,
+      })
+    ),
+  },
   async resolve(root, args, context) {
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
@@ -48,6 +69,13 @@ export const initiateFileUploadMutation = mutationField("initiateFileUpload", {
       }),
       { expiresIn: 3600 }
     );
+
+    const uploadedFile = await context.prisma.linkedFile.create({
+      data: {
+        workspaceId: args.input.workspaceId,
+        documentId: args.input.documentId,
+      },
+    });
 
     return { uploadUrl, fileUrl: `${bucketUrl}/${fileName}` };
   },
