@@ -394,6 +394,11 @@ export type KeyDerivationTraceParentFolderInput = {
   subkeyId: Scalars['Int'];
 };
 
+export type LogoutResult = {
+  __typename?: 'LogoutResult';
+  success: Scalars['Boolean'];
+};
+
 export type MainDeviceResult = {
   __typename?: 'MainDeviceResult';
   ciphertext: Scalars['String'];
@@ -448,6 +453,7 @@ export type Mutation = {
   finishLogin?: Maybe<FinishLoginResult>;
   finishRegistration?: Maybe<FinishRegistrationResult>;
   initiateFileUpload?: Maybe<InitiateFileUploadResult>;
+  logout?: Maybe<LogoutResult>;
   removeMembersAndRotateWorkspaceKey?: Maybe<RemoveMembersAndRotateWorkspaceKeyResult>;
   startLogin?: Maybe<StartLoginResult>;
   startRegistration?: Maybe<StartRegistrationResult>;
@@ -1112,6 +1118,11 @@ export type InitiateFileUploadMutationVariables = Exact<{
 
 export type InitiateFileUploadMutation = { __typename?: 'Mutation', initiateFileUpload?: { __typename?: 'InitiateFileUploadResult', uploadUrl: string, fileUrl?: string | null } | null };
 
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout?: { __typename?: 'LogoutResult', success: boolean } | null };
+
 export type RemoveMembersAndRotateWorkspaceKeyMutationVariables = Exact<{
   input: RemoveMembersAndRotateWorkspaceKeyInput;
 }>;
@@ -1588,6 +1599,17 @@ export const InitiateFileUploadDocument = gql`
 
 export function useInitiateFileUploadMutation() {
   return Urql.useMutation<InitiateFileUploadMutation, InitiateFileUploadMutationVariables>(InitiateFileUploadDocument);
+};
+export const LogoutDocument = gql`
+    mutation logout {
+  logout {
+    success
+  }
+}
+    `;
+
+export function useLogoutMutation() {
+  return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
 export const RemoveMembersAndRotateWorkspaceKeyDocument = gql`
     mutation removeMembersAndRotateWorkspaceKey($input: RemoveMembersAndRotateWorkspaceKeyInput!) {
@@ -2451,6 +2473,20 @@ export const runInitiateFileUploadMutation = async (variables: InitiateFileUploa
   return await getUrqlClient()
     .mutation<InitiateFileUploadMutation, InitiateFileUploadMutationVariables>(
       InitiateFileUploadDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runLogoutMutation = async (variables: LogoutMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<LogoutMutation, LogoutMutationVariables>(
+      LogoutDocument,
       variables,
       {
         // better to be safe here and always refetch

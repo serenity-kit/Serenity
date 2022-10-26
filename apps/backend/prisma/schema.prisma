@@ -68,6 +68,7 @@ model UnverifiedUser {
   passwordResetOneTimePassword               String?
   passwordResetOneTimePasswordExpireDateTime DateTime?
   confirmationCode                           String    @default(uuid())
+  confirmationTryCounter                     Int       @default(0)
   mainDeviceNonce                            String    @unique
   mainDeviceCiphertext                       String
   mainDeviceEncryptionKeySalt                String

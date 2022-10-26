@@ -21,6 +21,7 @@ import * as RootFoldersQueryTypes from "./graphql/queries/folder/rootFolders";
 
 import * as FinishLoginTypes from "./graphql/mutations/authentication/finishLogin";
 import * as FinishRegistrationTypes from "./graphql/mutations/authentication/finishRegistration";
+import * as LogoutTypes from "./graphql/mutations/authentication/logout";
 import * as StartLoginTypes from "./graphql/mutations/authentication/startLogin";
 import * as StartRegistrationTypes from "./graphql/mutations/authentication/startRegistration";
 import * as VerifyPasswordTypes from "./graphql/mutations/authentication/verifyPassword";
@@ -90,6 +91,7 @@ export const schema = makeSchema({
     MeQueryTypes,
     UserIdFromUsernameQueryTypes,
     VerifyPasswordTypes,
+    LogoutTypes,
 
     DeleteWorkspacesMutationTypes,
     UpdateWorkspaceNameMutationTypes,
