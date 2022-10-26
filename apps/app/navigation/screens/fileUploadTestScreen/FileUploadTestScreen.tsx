@@ -1,12 +1,20 @@
+import {
+  createDocumentKey,
+  encryptDocumentTitle,
+} from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { Button, Text, View } from "@serenity-tools/ui";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Image, useWindowDimensions } from "react-native";
-import {
-  runInitiateFileUploadMutation,
-  useInitiateFileUploadMutation,
-} from "../../../generated/graphql";
+import { runInitiateFileUploadMutation } from "../../../generated/graphql";
+import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
+import { buildKeyDerivationTrace } from "../../../utils/folder/buildKeyDerivationTrace";
+import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
+import { getFolder } from "../../../utils/folder/getFolder";
+import { getLastUsedWorkspaceId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
+import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 
 export default function FileUploadTestScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -16,7 +24,12 @@ export default function FileUploadTestScreen() {
   const [chaChaEncryptedImageData, setChaChaEncryptedImageData] = useState("");
   const [base64ImageData, setBase64ImageData] = useState("");
   const [r2FileUrl, setR2FileUrl] = useState("");
-  const [, initiateFileUploadMutation] = useInitiateFileUploadMutation();
+
+  // get document and workspace stuff
+  const workspaceId = getLastUsedWorkspaceId();
+  const document = useActiveDocumentInfoStore((state) => state.document);
+  const { activeDevice } = useWorkspaceContext();
+  const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
 
   const [testChaChaEncryptedImageData, setTestChaChaEncryptedImageData] =
     useState("");
@@ -57,12 +70,45 @@ export default function FileUploadTestScreen() {
 
     const documentId = "invalid";
     const workspaceId = "invalid";
+    const workspace = await getWorkspace({
+      workspaceId,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
+    if (!workspace) {
+      console.error("No workspace defined. Try logging in again");
+      return;
+    }
+    if (!document) {
+      console.error("No document defined. Try selecting a document");
+    }
+    const keyDerivationTrace = await buildKeyDerivationTrace({
+      workspaceKeyId: workspace.currentWorkspaceKey?.id!,
+      folderId: document?.parentFolderId,
+    });
+    const folder = await getFolder({ id: document?.parentFolderId! });
+    const folderKey = await getFolderKey({
+      folderId: folder.id,
+      workspaceKeyId: undefined,
+      workspaceId: workspaceId,
+      folderSubkeyId: folder.subkeyId,
+      activeDevice,
+    });
+    const imageTitleKey = await createDocumentKey({ folderKey });
 
+    const encryptedNameData = await encryptDocumentTitle({
+      title: filePickerResult.fileName!,
+      key: imageTitleKey.key,
+      publicData: null,
+    });
     const result = await runInitiateFileUploadMutation(
       {
         initiateFileUpload: {
           documentId,
           workspaceId,
+          // encryptedName: encryptedNameData.cipherText,
+          // encryptedNameNonce: encryptedNameData.publicNonce,
+          // subkeyId: keyData.subkeyId,
+          // keyDerivationTrace,
         },
       },
       {}
