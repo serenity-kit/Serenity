@@ -192,7 +192,6 @@ model WorkspaceKey {
   generation        Int               @default(0)
   folders           Folder[]
   documents         Document[]
-  LinkedFile        LinkedFile[]
 }
 
 model WorkspaceKeyBox {
@@ -230,12 +229,10 @@ model Folder {
 }
 
 model LinkedFile {
-  id             String        @id @unique
-  documentId     String
-  document       Document?     @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  workspaceId    String
-  workspace      Workspace?    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceKey   WorkspaceKey? @relation(fields: [workspaceKeyId], references: [id], onDelete: SetDefault)
-  workspaceKeyId String        @default("invalid")
-  createdAt      DateTime      @default(now())
+  id          String     @id @unique @default(uuid())
+  documentId  String
+  document    Document?  @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  workspaceId String
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
 }
