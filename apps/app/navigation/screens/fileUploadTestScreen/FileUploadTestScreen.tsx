@@ -12,9 +12,15 @@ export default function FileUploadTestScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [chaChaNonce, setChaChaNonce] = useState("");
   const [chaChaKey, setChaChaKey] = useState("");
+  const [chaChaDecryptedImageData, setChaChaDecryptedImageData] = useState("");
+  const [chaChaEncryptedImageData, setChaChaEncryptedImageData] = useState("");
   const [base64ImageData, setBase64ImageData] = useState("");
   const [r2FileUrl, setR2FileUrl] = useState("");
   const [, initiateFileUploadMutation] = useInitiateFileUploadMutation();
+
+  const [testChaChaEncryptedImageData, setTestChaChaEncryptedImageData] =
+    useState("");
+  // const [testChaChaNonce, setTestChaChaNonce] = useState("");
 
   const pickImage = async () => {
     const filePickerResult = await ImagePicker.launchImageLibraryAsync({
@@ -47,6 +53,8 @@ export default function FileUploadTestScreen() {
         key
       );
 
+    setTestChaChaEncryptedImageData(encryptedImageData);
+
     const documentId = "invalid";
     const workspaceId = "invalid";
 
@@ -59,6 +67,7 @@ export default function FileUploadTestScreen() {
       },
       {}
     );
+    console.log({ result });
     const uploadUrl = result.data?.initiateFileUpload?.uploadUrl;
     const fileUrl = result.data?.initiateFileUpload?.fileUrl;
     if (!uploadUrl || !fileUrl) {
@@ -78,28 +87,33 @@ export default function FileUploadTestScreen() {
     setR2FileUrl(fileUrl);
   };
 
-  const getImage = (base64ImageData: string): string => {
+  const formatInlineImage = (base64ImageData: string): string => {
     return `data:image/jpeg;base64,${base64ImageData}`;
   };
 
   const downloadAndDecrypt = async () => {
-    const response = await fetch(r2FileUrl);
-
-    console.log("response", response);
-
-    // const additionalData = "";
-    // const decryptedImageData =
-    //   await sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
-    //     null,
-    //     chaChaEncryptedImageData,
-    //     additionalData,
-    //     chaChaNonce,
-    //     chaChaKey
-    //   );
-    // console.log(sodium.from_base64_to_string(decryptedImageData));
-    // setChaChaDecryptedImageData(
-    //   sodium.from_base64_to_string(decryptedImageData)
-    // );
+    // const response = await fetch(r2FileUrl);
+    // console.log({ response });
+    // const arrayBuffer = await response.arrayBuffer();
+    const encryptedImageBytes = new Uint8Array(
+      Buffer.from(testChaChaEncryptedImageData)
+    );
+    const chaChaEncryptedImageData =
+      Buffer.from(encryptedImageBytes).toString("utf-8");
+    const additionalData = "";
+    const decryptedImageData =
+      await sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
+        null,
+        chaChaEncryptedImageData,
+        additionalData,
+        chaChaNonce,
+        chaChaKey
+      );
+    console.log(sodium.from_base64_to_string(decryptedImageData));
+    setChaChaEncryptedImageData(chaChaEncryptedImageData);
+    setChaChaDecryptedImageData(
+      sodium.from_base64_to_string(decryptedImageData)
+    );
   };
 
   return (
@@ -108,7 +122,7 @@ export default function FileUploadTestScreen() {
       <Button onPress={pickImage}>Choose, encrypt and upload Image</Button>
       {base64ImageData != "" && (
         <Image
-          source={{ uri: getImage(base64ImageData) }}
+          source={{ uri: formatInlineImage(base64ImageData) }}
           style={{ width: 200, height: 200 }}
         />
       )}
@@ -116,12 +130,12 @@ export default function FileUploadTestScreen() {
       {r2FileUrl !== "" && (
         <Button onPress={downloadAndDecrypt}>Download & decrypt image</Button>
       )}
-      {/* {chaChaEncryptedImageData !== "" && (
+      {chaChaEncryptedImageData !== "" && (
         <Image
-          source={{ uri: getImage(chaChaDecryptedImageData) }}
+          source={{ uri: formatInlineImage(chaChaDecryptedImageData) }}
           style={{ width: 200, height: 200 }}
         />
-      )} */}
+      )}
     </View>
   );
 }
