@@ -23,6 +23,7 @@ export * from "./components/link/Link";
 export * from "./components/linkButton/LinkButton";
 export * from "./components/linkExternal/LinkExternal";
 export * from "./components/list/List";
+export * from "./components/list/ListHeader";
 export * from "./components/list/ListIconText";
 export * from "./components/list/ListItem";
 export * from "./components/list/ListText";
