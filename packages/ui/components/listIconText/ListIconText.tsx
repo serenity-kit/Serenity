@@ -4,7 +4,7 @@ import { tw } from "../../tailwind";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
 import { HStack, IStackProps } from "native-base";
 import { Icon, IconNames } from "../icon/Icon";
-import { ListText } from "./ListText";
+import { ListText } from "../listText/ListText";
 
 // TODO either iconName or avatar
 export type ListIconTextProps = IStackProps & {

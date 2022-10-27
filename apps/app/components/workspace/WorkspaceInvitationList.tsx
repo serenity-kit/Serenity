@@ -3,11 +3,11 @@ import {
   List,
   ListHeader,
   ListItem,
+  ListText,
   tw,
   useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
-import { ListText } from "@serenity-tools/ui/components/list/ListText";
 import { formatDistance, parseJSON } from "date-fns";
 import { isPast } from "date-fns/esm";
 import { StyleSheet } from "react-native";
