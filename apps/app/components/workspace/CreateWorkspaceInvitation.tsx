@@ -191,15 +191,6 @@ export function CreateWorkspaceInvitation(props: Props) {
           }}
         />
       )}
-      {selectedWorkspaceInvitationId !== null && (
-        <>
-          <Input
-            nativeID="workspaceInvitationInstructionsInput"
-            label="Invitation text"
-            value={getWorkspaceInvitationText()}
-          />
-        </>
-      )}
       <VerifyPasswordModal
         isVisible={isPasswordModalVisible}
         description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"
