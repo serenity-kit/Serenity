@@ -1,10 +1,10 @@
 import { HStack, IStackProps } from "native-base";
 import React from "react";
 import { StyleSheet } from "react-native";
-import { tw } from "../../tailwind";
-import { View } from "../view/View";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { tw } from "../../tailwind";
+import { Pressable } from "../pressable/Pressable";
+import { View } from "../view/View";
 
 export type ListItemProps = IStackProps & {
   mainWidth?: string;
@@ -33,9 +33,9 @@ export const ListItem = (props: ListItemProps) => {
       style={[styles.row, props.style]}
     >
       <View style={styles.mainColumn}>
-        <TouchableOpacity onPress={props.onSelect} style={tw`flex-row`}>
+        <Pressable onPress={props.onSelect} style={tw`flex-row`}>
           {props.mainItem}
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <View>{props.secondaryItem}</View>
       <View style={styles.action}>{props.actionItem}</View>
