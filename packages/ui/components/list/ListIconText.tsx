@@ -22,7 +22,7 @@ export const ListIconText = (props: ListIconTextProps) => {
     wrapper: tw`w-full items-center`,
     stack: isDesktopDevice
       ? tw`flex-auto items-center justify-between`
-      : tw`items-start flex-col`,
+      : tw`flex-auto items-start flex-col`,
     mainText: isDesktopDevice ? tw`w-2/5 shrink` : tw``, // width same as for ListHeader
     secondaryText: isDesktopDevice ? tw`w-2/5 text-center` : tw``, // width same as for ListHeader
   });
