@@ -81,6 +81,7 @@ export type RootStackParamList = {
   Login: LoginParams | undefined;
   LogoutInProgress: undefined;
   EncryptDecryptImageTest: undefined;
+  FileUploadTest: undefined;
   TestLibsodium: undefined;
   AccountSettings: AccountSettingsParams | undefined;
   AccountSettingsProfile: undefined; // on phones

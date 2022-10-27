@@ -284,6 +284,12 @@ export type DocumentSnapshotPublicDataInput = {
   snapshotId: Scalars['String'];
 };
 
+export type File = {
+  __typename?: 'File';
+  downloadUrl: Scalars['String'];
+  id: Scalars['String'];
+};
+
 export type FinishLoginInput = {
   deviceEncryptionPublicKey: Scalars['String'];
   deviceEncryptionPublicKeySignature: Scalars['String'];
@@ -357,6 +363,17 @@ export type FolderEdge = {
 export type GetWorkspaceDevicesResult = {
   __typename?: 'GetWorkspaceDevicesResult';
   devices: Array<Device>;
+};
+
+export type InitiateFileUploadInput = {
+  documentId: Scalars['String'];
+  workspaceId: Scalars['String'];
+};
+
+export type InitiateFileUploadResult = {
+  __typename?: 'InitiateFileUploadResult';
+  fileId: Scalars['String'];
+  uploadUrl: Scalars['String'];
 };
 
 export type KeyDerivationTrace = {
@@ -441,6 +458,7 @@ export type Mutation = {
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
   finishLogin?: Maybe<FinishLoginResult>;
   finishRegistration?: Maybe<FinishRegistrationResult>;
+  initiateFileUpload?: Maybe<InitiateFileUploadResult>;
   logout?: Maybe<LogoutResult>;
   removeMembersAndRotateWorkspaceKey?: Maybe<RemoveMembersAndRotateWorkspaceKeyResult>;
   startLogin?: Maybe<StartLoginResult>;
@@ -524,6 +542,11 @@ export type MutationFinishRegistrationArgs = {
 };
 
 
+export type MutationInitiateFileUploadArgs = {
+  input: InitiateFileUploadInput;
+};
+
+
 export type MutationRemoveMembersAndRotateWorkspaceKeyArgs = {
   input: RemoveMembersAndRotateWorkspaceKeyInput;
 };
@@ -594,6 +617,7 @@ export type Query = {
   document?: Maybe<Document>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documents?: Maybe<DocumentConnection>;
+  fileUrl?: Maybe<File>;
   firstDocument?: Maybe<Document>;
   folder?: Maybe<Folder>;
   folders?: Maybe<FolderConnection>;
@@ -645,6 +669,13 @@ export type QueryDocumentsArgs = {
   first: Scalars['Int'];
   parentFolderId: Scalars['ID'];
   usingOldKeys?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+export type QueryFileUrlArgs = {
+  documentId: Scalars['ID'];
+  fileId: Scalars['ID'];
+  workspaceId: Scalars['ID'];
 };
 
 
@@ -1094,6 +1125,13 @@ export type FinishRegistrationMutationVariables = Exact<{
 
 export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode: string } | null };
 
+export type InitiateFileUploadMutationVariables = Exact<{
+  initiateFileUpload: InitiateFileUploadInput;
+}>;
+
+
+export type InitiateFileUploadMutation = { __typename?: 'Mutation', initiateFileUpload?: { __typename?: 'InitiateFileUploadResult', uploadUrl: string, fileId: string } | null };
+
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1200,6 +1238,15 @@ export type DocumentsQueryVariables = Exact<{
 
 
 export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+
+export type FileUrlQueryVariables = Exact<{
+  fileId: Scalars['ID'];
+  workspaceId: Scalars['ID'];
+  documentId: Scalars['ID'];
+}>;
+
+
+export type FileUrlQuery = { __typename?: 'Query', fileUrl?: { __typename?: 'File', id: string, downloadUrl: string } | null };
 
 export type FirstDocumentQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1564,6 +1611,18 @@ export const FinishRegistrationDocument = gql`
 export function useFinishRegistrationMutation() {
   return Urql.useMutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(FinishRegistrationDocument);
 };
+export const InitiateFileUploadDocument = gql`
+    mutation initiateFileUpload($initiateFileUpload: InitiateFileUploadInput!) {
+  initiateFileUpload(input: $initiateFileUpload) {
+    uploadUrl
+    fileId
+  }
+}
+    `;
+
+export function useInitiateFileUploadMutation() {
+  return Urql.useMutation<InitiateFileUploadMutation, InitiateFileUploadMutationVariables>(InitiateFileUploadDocument);
+};
 export const LogoutDocument = gql`
     mutation logout {
   logout {
@@ -1869,6 +1928,18 @@ export const DocumentsDocument = gql`
 
 export function useDocumentsQuery(options: Omit<Urql.UseQueryArgs<DocumentsQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentsQuery, DocumentsQueryVariables>({ query: DocumentsDocument, ...options });
+};
+export const FileUrlDocument = gql`
+    query fileUrl($fileId: ID!, $workspaceId: ID!, $documentId: ID!) {
+  fileUrl(fileId: $fileId, workspaceId: $workspaceId, documentId: $documentId) {
+    id
+    downloadUrl
+  }
+}
+    `;
+
+export function useFileUrlQuery(options: Omit<Urql.UseQueryArgs<FileUrlQueryVariables>, 'query'>) {
+  return Urql.useQuery<FileUrlQuery, FileUrlQueryVariables>({ query: FileUrlDocument, ...options });
 };
 export const FirstDocumentDocument = gql`
     query firstDocument($workspaceId: ID!) {
@@ -2433,6 +2504,20 @@ export const runFinishRegistrationMutation = async (variables: FinishRegistratio
     .toPromise();
 };
 
+export const runInitiateFileUploadMutation = async (variables: InitiateFileUploadMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<InitiateFileUploadMutation, InitiateFileUploadMutationVariables>(
+      InitiateFileUploadDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
 export const runLogoutMutation = async (variables: LogoutMutationVariables, options: any) => {
   return await getUrqlClient()
     .mutation<LogoutMutation, LogoutMutationVariables>(
@@ -2633,6 +2718,20 @@ export const runDocumentsQuery = async (variables: DocumentsQueryVariables, opti
   return await getUrqlClient()
     .query<DocumentsQuery, DocumentsQueryVariables>(
       DocumentsDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFileUrlQuery = async (variables: FileUrlQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<FileUrlQuery, FileUrlQueryVariables>(
+      FileUrlDocument,
       variables,
       {
         // better to be safe here and always refetch

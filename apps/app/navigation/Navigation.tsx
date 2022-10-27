@@ -38,6 +38,7 @@ import AccountSettingsMobileOverviewScreen from "./screens/accountSettingsMobile
 import DesignSystemScreen from "./screens/designSystemScreen/DesignSystemScreen";
 import DevDashboardScreen from "./screens/devDashboardScreen/DevDashboardScreen";
 import EncryptDecryptImageTestScreen from "./screens/encryptDecryptImageTestScreen/EncryptDecryptImageTestScreen";
+import FileUploadTestScreen from "./screens/fileUploadTestScreen/FileUploadTestScreen";
 import LibsodiumTestScreen from "./screens/libsodiumTestScreen/LibsodiumTestScreen";
 import LoginScreen from "./screens/loginScreen/LoginScreen";
 import LogoutInProgressScreen from "./screens/logoutInProgressScreen/LogoutInProgressScreen";
@@ -251,6 +252,7 @@ function RootNavigator() {
           name="EncryptDecryptImageTest"
           component={EncryptDecryptImageTestScreen}
         />
+        <Stack.Screen name="FileUploadTest" component={FileUploadTestScreen} />
         <Stack.Screen name="TestLibsodium" component={LibsodiumTestScreen} />
         <Stack.Screen name="DevDashboard" component={DevDashboardScreen} />
         <Stack.Screen
@@ -413,6 +415,7 @@ const getLinking = (
         Login: "login",
         LogoutInProgress: "logging-out",
         EncryptDecryptImageTest: "encrypt-decrypt-image-test",
+        FileUploadTest: "file-upload-test",
         AcceptWorkspaceInvitation:
           "accept-workspace-invitation/:workspaceInvitationId",
         TestLibsodium: "test-libsodium",
