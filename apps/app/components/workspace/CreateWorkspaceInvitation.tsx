@@ -1,13 +1,12 @@
 import {
   Button,
-  Input,
-  tw,
-  View,
-  Text,
-  IconButton,
-  Tooltip,
   Description,
   Heading,
+  IconButton,
+  Text,
+  Tooltip,
+  tw,
+  View,
 } from "@serenity-tools/ui";
 import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
@@ -137,7 +136,7 @@ export function CreateWorkspaceInvitation(props: Props) {
         <Text
           variant="xs"
           style={styles.invitationText}
-          nativeID="workspaceInvitationInstructionsText"
+          testID="workspaceInvitationInstructionsText"
           selectable={selectedWorkspaceInvitationId !== null}
         >
           {selectedWorkspaceInvitationId !== null
@@ -181,7 +180,7 @@ export function CreateWorkspaceInvitation(props: Props) {
         <Button disabled>Loading...</Button>
       ) : (
         <WorkspaceInvitationList
-          nativeID="workspaceInviteeList"
+          testID="workspaceInviteeList"
           workspaceInvitations={
             workspaceInvitationsResult.data?.workspaceInvitations?.nodes || []
           }

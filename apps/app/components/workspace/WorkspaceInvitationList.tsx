@@ -14,7 +14,7 @@ import { StyleSheet } from "react-native";
 
 type Props = {
   workspaceInvitations: any[];
-  nativeID?: string;
+  testID?: string;
   onDeletePress: (id: string) => void;
   onSelect: (id: string) => void;
 };
@@ -44,7 +44,7 @@ export function WorkspaceInvitationList(props: Props) {
   const styles = StyleSheet.create({});
 
   return (
-    <View>
+    <View testID={props.testID}>
       <List
         data={props.workspaceInvitations}
         emptyString={"No active invitations"}

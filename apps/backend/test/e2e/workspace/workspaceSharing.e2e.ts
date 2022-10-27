@@ -46,20 +46,24 @@ test.describe("Workspace Sharing", () => {
 
     // get invitation text
     const linkInfoDiv = page
-      .locator("//input[@id='workspaceInvitationInstructionsInput']")
+      .locator("//div[@data-testid='workspaceInvitationInstructionsText']")
       .first();
-    const linkInfoText = await linkInfoDiv.inputValue();
+    const linkInfoText = await linkInfoDiv.textContent();
+    if (!linkInfoText) {
+      throw new Error("No link info text!");
+    }
     // parse url and store into variable
-    const linkInfoWords = linkInfoText.split(" ");
+    const linkInfoWords = linkInfoText.replace(/\n/g, " ").split(" ");
     workspaceInvitationUrl = linkInfoWords[linkInfoWords.length - 1];
     // expect there to be one invitation in the list
     const numInvitations = await page
-      .locator("//div[@id='workspaceInviteeList']/div/div")
+      .locator("//div[@data-testid='workspaceInviteeList']/div/div")
       .count();
-    expect(numInvitations).toBe(1);
+    expect(numInvitations).toBe(2); // 1st row is the header
   });
 
   test("Existing other user can accept workspace", async ({ page }) => {
+    console.log({ workspaceInvitationUrl });
     const userId = uuidv4();
     const username = `${uuidv4()}@example.com`;
     const password = "pass";

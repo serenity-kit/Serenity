@@ -130,7 +130,7 @@ test.describe("Workspace Sharing", () => {
     workspaceInvitationUrl = linkInfoWords[linkInfoWords.length - 1];
     // expect there to be one invitation in the list
     const numInvitations = await page
-      .locator("//div[@id='workspaceInviteeList']/div/div")
+      .locator("//div[@data-testid='workspaceInviteeList']/div/div")
       .count();
     expect(numInvitations).toBe(1);
 
