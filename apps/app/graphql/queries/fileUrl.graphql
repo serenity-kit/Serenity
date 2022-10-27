@@ -1,0 +1,6 @@
+query fileUrl($fileId: ID!) {
+  fileUrl(fileId: $fileId) {
+    id
+    downloadUrl
+  }
+}

@@ -1,6 +1,6 @@
 mutation initiateFileUpload($initiateFileUpload: InitiateFileUploadInput!) {
   initiateFileUpload(input: $initiateFileUpload) {
     uploadUrl
-    fileUrl
+    fileId
   }
 }

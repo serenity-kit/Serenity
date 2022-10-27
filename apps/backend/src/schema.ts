@@ -53,6 +53,7 @@ import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/de
 import * as DevicesQueryTypes from "./graphql/queries/device/devices";
 import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
 import * as UnauthorizedDevicesForWorkspacesTypes from "./graphql/queries/device/unauthorizedDevicesForWorkspaces";
+import * as FileUrlQueryTypes from "./graphql/queries/file/fileUrl";
 
 import * as DocumentTypes from "./graphql/types/document";
 
@@ -112,6 +113,7 @@ export const schema = makeSchema({
     ActiveWorkspaceKeysQueryTypes,
 
     InitiateFileUploadMutationTypes,
+    FileUrlQueryTypes,
 
     DevicesQueryTypes,
     deviceBySigningPublicKeyQueryTypes,

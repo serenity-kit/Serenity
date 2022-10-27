@@ -284,6 +284,12 @@ export type DocumentSnapshotPublicDataInput = {
   snapshotId: Scalars['String'];
 };
 
+export type File = {
+  __typename?: 'File';
+  downloadUrl: Scalars['String'];
+  id: Scalars['String'];
+};
+
 export type FinishLoginInput = {
   deviceEncryptionPublicKey: Scalars['String'];
   deviceEncryptionPublicKeySignature: Scalars['String'];
@@ -366,7 +372,7 @@ export type InitiateFileUploadInput = {
 
 export type InitiateFileUploadResult = {
   __typename?: 'InitiateFileUploadResult';
-  fileUrl?: Maybe<Scalars['String']>;
+  fileId: Scalars['String'];
   uploadUrl: Scalars['String'];
 };
 
@@ -611,6 +617,7 @@ export type Query = {
   document?: Maybe<Document>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documents?: Maybe<DocumentConnection>;
+  fileUrl?: Maybe<File>;
   firstDocument?: Maybe<Document>;
   folder?: Maybe<Folder>;
   folders?: Maybe<FolderConnection>;
@@ -662,6 +669,11 @@ export type QueryDocumentsArgs = {
   first: Scalars['Int'];
   parentFolderId: Scalars['ID'];
   usingOldKeys?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+export type QueryFileUrlArgs = {
+  fileId: Scalars['ID'];
 };
 
 
@@ -1116,7 +1128,7 @@ export type InitiateFileUploadMutationVariables = Exact<{
 }>;
 
 
-export type InitiateFileUploadMutation = { __typename?: 'Mutation', initiateFileUpload?: { __typename?: 'InitiateFileUploadResult', uploadUrl: string, fileUrl?: string | null } | null };
+export type InitiateFileUploadMutation = { __typename?: 'Mutation', initiateFileUpload?: { __typename?: 'InitiateFileUploadResult', uploadUrl: string, fileId: string } | null };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -1224,6 +1236,13 @@ export type DocumentsQueryVariables = Exact<{
 
 
 export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+
+export type FileUrlQueryVariables = Exact<{
+  fileId: Scalars['ID'];
+}>;
+
+
+export type FileUrlQuery = { __typename?: 'Query', fileUrl?: { __typename?: 'File', id: string, downloadUrl: string } | null };
 
 export type FirstDocumentQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1592,7 +1611,7 @@ export const InitiateFileUploadDocument = gql`
     mutation initiateFileUpload($initiateFileUpload: InitiateFileUploadInput!) {
   initiateFileUpload(input: $initiateFileUpload) {
     uploadUrl
-    fileUrl
+    fileId
   }
 }
     `;
@@ -1905,6 +1924,18 @@ export const DocumentsDocument = gql`
 
 export function useDocumentsQuery(options: Omit<Urql.UseQueryArgs<DocumentsQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentsQuery, DocumentsQueryVariables>({ query: DocumentsDocument, ...options });
+};
+export const FileUrlDocument = gql`
+    query fileUrl($fileId: ID!) {
+  fileUrl(fileId: $fileId) {
+    id
+    downloadUrl
+  }
+}
+    `;
+
+export function useFileUrlQuery(options: Omit<Urql.UseQueryArgs<FileUrlQueryVariables>, 'query'>) {
+  return Urql.useQuery<FileUrlQuery, FileUrlQueryVariables>({ query: FileUrlDocument, ...options });
 };
 export const FirstDocumentDocument = gql`
     query firstDocument($workspaceId: ID!) {
@@ -2683,6 +2714,20 @@ export const runDocumentsQuery = async (variables: DocumentsQueryVariables, opti
   return await getUrqlClient()
     .query<DocumentsQuery, DocumentsQueryVariables>(
       DocumentsDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFileUrlQuery = async (variables: FileUrlQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<FileUrlQuery, FileUrlQueryVariables>(
+      FileUrlDocument,
       variables,
       {
         // better to be safe here and always refetch

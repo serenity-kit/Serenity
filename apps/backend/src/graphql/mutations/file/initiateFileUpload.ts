@@ -42,7 +42,7 @@ export const InitiateFileUploadResult = objectType({
   name: "InitiateFileUploadResult",
   definition(t) {
     t.nonNull.string("uploadUrl");
-    t.string("fileUrl");
+    t.nonNull.string("fileId");
   },
 });
 
@@ -61,17 +61,17 @@ export const initiateFileUploadMutation = mutationField("initiateFileUpload", {
       throw new AuthenticationError("Not authenticated");
     }
 
-    const fileName = `test/me/${uuidv4()}.v1.blob`;
+    const fileId = uuidv4();
+    const fileName = `${args.input.workspaceId}/${args.input.documentId}/${fileId}.blob`;
     const uploadUrl = await getSignedUrl(
       s3Client,
       new PutObjectCommand({
         Bucket: process.env.FILE_STORAGE_BUCKET,
         Key: fileName,
       }),
-      { expiresIn: 3600 }
+      { expiresIn: 60 } // seconds
     );
 
-    console.log("uploading file...");
     // const uploadedFile = await prisma.linkedFile.create({
     //   data: {
     //     documentId: args.input.documentId,
@@ -80,6 +80,6 @@ export const initiateFileUploadMutation = mutationField("initiateFileUpload", {
     // });
     // console.log({ uploadedFile });
 
-    return { uploadUrl, fileUrl: `${bucketUrl}/${fileName}` };
+    return { uploadUrl, fileId };
   },
 });

@@ -1,20 +1,16 @@
-import {
-  createDocumentKey,
-  encryptDocumentTitle,
-} from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { Button, Text, View } from "@serenity-tools/ui";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Image, useWindowDimensions } from "react-native";
-import { runInitiateFileUploadMutation } from "../../../generated/graphql";
+import {
+  runFileUrlQuery,
+  runInitiateFileUploadMutation,
+} from "../../../generated/graphql";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
-import { buildKeyDerivationTrace } from "../../../utils/folder/buildKeyDerivationTrace";
 import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
-import { getFolder } from "../../../utils/folder/getFolder";
 import { getLastUsedWorkspaceId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 
 export default function FileUploadTestScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -23,7 +19,7 @@ export default function FileUploadTestScreen() {
   const [chaChaDecryptedImageData, setChaChaDecryptedImageData] = useState("");
   const [chaChaEncryptedImageData, setChaChaEncryptedImageData] = useState("");
   const [base64ImageData, setBase64ImageData] = useState("");
-  const [r2FileUrl, setR2FileUrl] = useState("");
+  const [FileId, setFileId] = useState("");
 
   // get document and workspace stuff
   const workspaceId = getLastUsedWorkspaceId();
@@ -66,71 +62,38 @@ export default function FileUploadTestScreen() {
         key
       );
 
-    setTestChaChaEncryptedImageData(encryptedImageData);
+    // setTestChaChaEncryptedImageData(encryptedImageData);
 
     const documentId = "invalid";
     const workspaceId = "invalid";
-    const workspace = await getWorkspace({
-      workspaceId,
-      deviceSigningPublicKey: activeDevice.signingPublicKey,
-    });
-    if (!workspace) {
-      console.error("No workspace defined. Try logging in again");
-      return;
-    }
-    if (!document) {
-      console.error("No document defined. Try selecting a document");
-    }
-    const keyDerivationTrace = await buildKeyDerivationTrace({
-      workspaceKeyId: workspace.currentWorkspaceKey?.id!,
-      folderId: document?.parentFolderId,
-    });
-    const folder = await getFolder({ id: document?.parentFolderId! });
-    const folderKey = await getFolderKey({
-      folderId: folder.id,
-      workspaceKeyId: undefined,
-      workspaceId: workspaceId,
-      folderSubkeyId: folder.subkeyId,
-      activeDevice,
-    });
-    const imageUrlKey = await createDocumentKey({ folderKey });
 
-    const encryptedUrlData = await encryptDocumentTitle({
-      title: filePickerResult.fileName!,
-      key: imageUrlKey.key,
-      publicData: null,
-    });
     const result = await runInitiateFileUploadMutation(
       {
         initiateFileUpload: {
           documentId,
           workspaceId,
-          // encryptedUrl: encryptedUrlData.cipherText,
-          // encryptedUrlNonce: encryptedUrlData.publicNonce,
-          // subkeyId: imageUrlKey.subkeyId,
-          // keyDerivationTrace,
         },
       },
       {}
     );
-    console.log({ result });
     const uploadUrl = result.data?.initiateFileUpload?.uploadUrl;
-    const fileUrl = result.data?.initiateFileUpload?.fileUrl;
-    if (!uploadUrl || !fileUrl) {
-      alert("Missing upload Url");
-      console.error("Missing upload Url");
+    const fileId = result.data?.initiateFileUpload?.fileId;
+    if (!uploadUrl || !fileId) {
+      alert("Missing upload Url or fileId");
+      console.error("Missing upload Url or fileId");
       return;
     }
-    const formData = new FormData();
-    formData.append("data", encryptedImageData);
+    // const formData = new FormData();
+    // formData.append("data", encryptedImageData);
+    // formData.append("data", new Blob([sodium.from_base64(encryptedImageData)]));
 
     const response = await fetch(uploadUrl, {
       method: "PUT",
-      body: formData,
+      body: encryptedImageData,
     });
     // TODO check on response if it fails
 
-    setR2FileUrl(fileUrl);
+    setFileId(fileId);
   };
 
   const formatInlineImage = (base64ImageData: string): string => {
@@ -138,24 +101,37 @@ export default function FileUploadTestScreen() {
   };
 
   const downloadAndDecrypt = async () => {
-    // const response = await fetch(r2FileUrl);
+    const result = await runFileUrlQuery({ fileId: FileId });
+
+    if (!result.data?.fileUrl?.downloadUrl) {
+      alert("Failed to get the file URL");
+      console.error("Failed to get the file URL");
+      return;
+    }
+
+    const response = await fetch(result.data?.fileUrl.downloadUrl);
+
+    console.log(response);
+
     // console.log({ response });
     // const arrayBuffer = await response.arrayBuffer();
-    const encryptedImageBytes = new Uint8Array(
-      Buffer.from(testChaChaEncryptedImageData)
-    );
-    const chaChaEncryptedImageData =
-      Buffer.from(encryptedImageBytes).toString("utf-8");
+    // console.log("arrayBuffer", arrayBuffer);
+    // const encryptedImageBytes = new Uint8Array(Buffer.from(arrayBuffer));
+    // console.log("encryptedImageBytes", encryptedImageBytes);
+    // const chaChaEncryptedImageData =
+    //   Buffer.from(encryptedImageBytes).toString("utf-8");
+    const text = await response.text();
+    console.log("OOOOOOO", text);
     const additionalData = "";
     const decryptedImageData =
       await sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
         null,
-        chaChaEncryptedImageData,
+        text,
         additionalData,
         chaChaNonce,
         chaChaKey
       );
-    console.log(sodium.from_base64_to_string(decryptedImageData));
+    console.log("OOOOOOO2", sodium.from_base64_to_string(decryptedImageData));
     setChaChaEncryptedImageData(chaChaEncryptedImageData);
     setChaChaDecryptedImageData(
       sodium.from_base64_to_string(decryptedImageData)
@@ -172,8 +148,8 @@ export default function FileUploadTestScreen() {
           style={{ width: 200, height: 200 }}
         />
       )}
-      <Text>R2 File URL: {r2FileUrl}</Text>
-      {r2FileUrl !== "" && (
+      <Text>R2 File URL: {FileId}</Text>
+      {FileId !== "" && (
         <Button onPress={downloadAndDecrypt}>Download & decrypt image</Button>
       )}
       {chaChaEncryptedImageData !== "" && (
