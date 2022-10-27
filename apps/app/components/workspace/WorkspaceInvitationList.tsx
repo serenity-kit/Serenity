@@ -48,7 +48,7 @@ export function WorkspaceInvitationList(props: Props) {
       <List
         data={props.workspaceInvitations}
         emptyString={"No active invitations"}
-        header={<ListHeader data={["Name", "Email", "Role"]} />}
+        header={<ListHeader data={["Active Links", "Expiration"]} />}
       >
         {props.workspaceInvitations.map((invitation) => {
           const expired = isInvitationExpired(invitation.expiresAt);

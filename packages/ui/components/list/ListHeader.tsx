@@ -35,7 +35,7 @@ export const ListHeader = (props: ListHeaderProps) => {
       {data.map((item, i) => {
         let headerStyle = mainIsSplit ? tw`${splitWidth}` : styles.mainColumn;
 
-        if ((mainIsSplit && i <= 1) || (!mainIsSplit && i < 1)) {
+        if ((mainIsSplit && i <= 1) || (!mainIsSplit && i > 0)) {
           headerStyle = tw``;
         }
 
@@ -47,6 +47,10 @@ export const ListHeader = (props: ListHeaderProps) => {
           </View>
         );
       })}
+      {/* dummy the same width as the action column to ensure the right header position */}
+      <View style={tw`w-5`}>
+        <Text variant="xxs" style={tw`uppercase`} bold></Text>
+      </View>
     </HStack>
   );
 };
