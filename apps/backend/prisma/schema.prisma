@@ -28,7 +28,6 @@ model Document {
   contentSubkeyId           Int?
   nameKeyDerivationTrace    Json          @default("{}")
   contentKeyDerivationTrace Json          @default("{}")
-  linkedFiles               LinkedFile[]
 
   @@unique([subkeyId, workspaceId])
 }
@@ -171,7 +170,6 @@ model Workspace {
   usersToWorkspaces UsersToWorkspaces[]
   invitations       WorkspaceInvitations[]
   workspaceKeys     WorkspaceKey[]
-  linkedFiles       LinkedFile[]
 }
 
 model UsersToWorkspaces {
@@ -227,13 +225,4 @@ model Folder {
   documents          Document[]
 
   @@unique([subkeyId, workspaceId])
-}
-
-model LinkedFile {
-  id          String     @id @unique @default(uuid())
-  documentId  String
-  document    Document?  @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  workspaceId String
-  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  createdAt   DateTime   @default(now())
 }

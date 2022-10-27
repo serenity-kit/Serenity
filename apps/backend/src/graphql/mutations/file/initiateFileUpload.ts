@@ -56,7 +56,6 @@ export const initiateFileUploadMutation = mutationField("initiateFileUpload", {
     ),
   },
   async resolve(root, args, context) {
-    console.log({ args });
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
     }
@@ -68,17 +67,10 @@ export const initiateFileUploadMutation = mutationField("initiateFileUpload", {
       new PutObjectCommand({
         Bucket: process.env.FILE_STORAGE_BUCKET,
         Key: fileName,
+        ContentType: "application/octet-stream",
       }),
       { expiresIn: 60 } // seconds
     );
-
-    // const uploadedFile = await prisma.linkedFile.create({
-    //   data: {
-    //     documentId: args.input.documentId,
-    //     workspaceId: args.input.workspaceId,
-    //   },
-    // });
-    // console.log({ uploadedFile });
 
     return { uploadUrl, fileId };
   },
