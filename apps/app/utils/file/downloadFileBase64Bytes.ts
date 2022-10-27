@@ -11,10 +11,12 @@ export type Props = {
 };
 export const downloadFileBase64Bytes = async ({
   fileId,
+  documentId,
+  workspaceId,
   publicNonce,
   key,
 }: Props): Promise<string> => {
-  const result = await runFileUrlQuery({ fileId });
+  const result = await runFileUrlQuery({ fileId, documentId, workspaceId }, {});
   if (!result.data?.fileUrl?.downloadUrl) {
     throw new Error("Failed to get the file URL");
   }

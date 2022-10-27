@@ -673,7 +673,9 @@ export type QueryDocumentsArgs = {
 
 
 export type QueryFileUrlArgs = {
+  documentId: Scalars['ID'];
   fileId: Scalars['ID'];
+  workspaceId: Scalars['ID'];
 };
 
 
@@ -1239,6 +1241,8 @@ export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 
 
 export type FileUrlQueryVariables = Exact<{
   fileId: Scalars['ID'];
+  workspaceId: Scalars['ID'];
+  documentId: Scalars['ID'];
 }>;
 
 
@@ -1926,8 +1930,8 @@ export function useDocumentsQuery(options: Omit<Urql.UseQueryArgs<DocumentsQuery
   return Urql.useQuery<DocumentsQuery, DocumentsQueryVariables>({ query: DocumentsDocument, ...options });
 };
 export const FileUrlDocument = gql`
-    query fileUrl($fileId: ID!) {
-  fileUrl(fileId: $fileId) {
+    query fileUrl($fileId: ID!, $workspaceId: ID!, $documentId: ID!) {
+  fileUrl(fileId: $fileId, workspaceId: $workspaceId, documentId: $documentId) {
     id
     downloadUrl
   }

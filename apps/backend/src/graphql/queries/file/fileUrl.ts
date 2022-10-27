@@ -1,5 +1,5 @@
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { AuthenticationError, UserInputError } from "apollo-server-express";
+import { AuthenticationError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { File } from "../../types/file";
 // @ts-ignore
@@ -29,17 +29,16 @@ export const fileUrlQuery = queryField((t) => {
     type: File,
     args: {
       fileId: nonNull(idArg()),
+      documentId: nonNull(idArg()),
+      workspaceId: nonNull(idArg()),
     },
     async resolve(root, args, context) {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
-      if (!args.fileId) {
-        throw new UserInputError("Invalid input: id cannot be null");
-      }
-
-      const workspaceId = "invalid";
-      const documentId = "invalid";
+      const workspaceId = args.workspaceId;
+      const documentId = args.documentId;
+      // TODO: verify that the user has access to the document
       const fileName = `${workspaceId}/${documentId}/${args.fileId}.blob`;
       const downloadUrl = await getSignedUrl(
         s3Client,
