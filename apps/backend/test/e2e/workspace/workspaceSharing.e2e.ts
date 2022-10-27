@@ -63,7 +63,6 @@ test.describe("Workspace Sharing", () => {
   });
 
   test("Existing other user can accept workspace", async ({ page }) => {
-    console.log({ workspaceInvitationUrl });
     const userId = uuidv4();
     const username = `${uuidv4()}@example.com`;
     const password = "pass";
