@@ -21,7 +21,9 @@ import { Platform, StyleSheet } from "react-native";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
-import { getFolderKey } from "../../utils/folder/getFolderKey";
+import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
+import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
+import { getFolder } from "../../utils/folder/getFolder";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
@@ -47,6 +49,8 @@ export default function SidebarPage(props: Props) {
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
+  const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
+
   const linkProps = useLinkProps({
     to: {
       screen: "Workspace",
@@ -70,13 +74,16 @@ export default function SidebarPage(props: Props) {
       return;
     }
     try {
-      const folderKeyData = await getFolderKey({
-        folderId: props.parentFolderId,
+      const folder = await getFolder({ id: props.parentFolderId });
+      const folderKey = await getFolderKey({
+        folderId: folder.id,
+        workspaceKeyId: undefined,
         workspaceId: props.workspaceId,
+        folderSubkeyId: folder.subkeyId,
         activeDevice,
       });
       const documentKeyData = await recreateDocumentKey({
-        folderKey: folderKeyData.key,
+        folderKey,
         subkeyId: props.subkeyId,
       });
       const documentTitle = await decryptDocumentTitle({
@@ -99,18 +106,30 @@ export default function SidebarPage(props: Props) {
       workspaceId: props.workspaceId,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
-    const folderKeyData = await getFolderKey({
-      folderId: props.parentFolderId,
+    if (!workspace?.currentWorkspaceKey) {
+      // TODO: handle error in UI
+      console.error("Workspace or workspaceKeys not found");
+      return;
+    }
+    const folder = await getFolder({ id: props.parentFolderId });
+    const folderKeyString = await getFolderKey({
+      folderId: folder.id,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
       workspaceId: props.workspaceId,
+      folderSubkeyId: folder.subkeyId,
       activeDevice,
     });
     const documentKeyData = await recreateDocumentKey({
-      folderKey: folderKeyData.key,
+      folderKey: folderKeyString,
       subkeyId: document?.subkeyId!,
     });
     const encryptedDocumentTitle = await encryptDocumentTitle({
       title: name,
       key: documentKeyData.key,
+    });
+    const nameKeyDerivationTrace = await buildKeyDerivationTrace({
+      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+      folderId: document?.parentFolderId!,
     });
     const updateDocumentNameResult = await updateDocumentNameMutation({
       input: {
@@ -119,6 +138,7 @@ export default function SidebarPage(props: Props) {
         encryptedNameNonce: encryptedDocumentTitle.publicNonce,
         workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
         subkeyId: documentKeyData.subkeyId,
+        nameKeyDerivationTrace,
       },
     });
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {
@@ -211,7 +231,9 @@ export default function SidebarPage(props: Props) {
           ]}
         >
           <SidebarPageMenu
+            workspaceId={props.workspaceId}
             documentId={props.documentId}
+            documentTitle={documentTitle}
             refetchDocuments={props.onRefetchDocumentsPress}
             onUpdateNamePress={() => {
               setIsEditing(true);

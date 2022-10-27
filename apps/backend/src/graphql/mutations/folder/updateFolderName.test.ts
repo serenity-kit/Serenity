@@ -27,6 +27,7 @@ const setup = async () => {
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    webDevice: registerUserResult.webDevice,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -72,6 +73,7 @@ test("user should be able to change a folder name", async () => {
     name,
     workspaceKey,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    parentFolderId: addedFolder.parentFolderId,
     authorizationHeader,
   });
   const updatedFolder = result.updateFolderName.folder;
@@ -96,6 +98,7 @@ test("throw error when folder doesn't exist", async () => {
         name,
         workspaceKey,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        parentFolderId: null,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -113,6 +116,7 @@ test("throw error when user doesn't have access", async () => {
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    webDevice: registerUserResult.webDevice,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -123,6 +127,8 @@ test("throw error when user doesn't have access", async () => {
   });
   addedWorkspace =
     createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  const newFolder =
+    createWorkspaceResult.createInitialWorkspaceStructure.folder;
   const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
     device: registerUserResult.mainDevice,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
@@ -149,6 +155,7 @@ test("throw error when user doesn't have access", async () => {
         name,
         workspaceKey,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        parentFolderId: newFolder.parentFolderId,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -163,6 +170,7 @@ test("Unauthenticated", async () => {
         name: "renamed",
         workspaceKey,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        parentFolderId: null,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

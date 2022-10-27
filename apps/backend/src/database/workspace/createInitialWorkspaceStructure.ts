@@ -1,10 +1,10 @@
 import { Snapshot } from "@naisho/core";
-import { Document } from "../../types/document";
-import { Folder } from "../../types/folder";
+import { Document, formatDocument } from "../../types/document";
+import { Folder, formatFolder } from "../../types/folder";
 import { Workspace } from "../../types/workspace";
 import { createSnapshot } from "../createSnapshot";
-import { createDocument } from "../document/createDocument";
 import { createFolder } from "../folder/createFolder";
+import { prisma } from "../prisma";
 import {
   createWorkspace,
   DeviceWorkspaceKeyBoxParams,
@@ -69,21 +69,35 @@ export async function createInitialWorkspaceStructure({
     subkeyId: folderSubkeyId,
     parentFolderId: undefined,
     workspaceId: workspace.id,
+    keyDerivationTrace: {
+      workspaceKeyId: workspaceKey?.id!,
+      parentFolders: [],
+    },
   });
-  const document = await createDocument({
-    id: documentId,
-    encryptedName: encryptedDocumentName,
-    encryptedNameNonce: encryptedDocumentNameNonce,
-    workspaceKeyId: workspace.currentWorkspaceKey?.id,
-    subkeyId: documentSubkeyId,
-    contentSubkeyId: documentContentSubkeyId,
-    parentFolderId: folder.id,
-    workspaceId: workspaceId,
+  const document = await prisma.document.create({
+    data: {
+      id: documentId,
+      encryptedName: encryptedDocumentName,
+      encryptedNameNonce: encryptedDocumentNameNonce,
+      workspaceKeyId: workspace.currentWorkspaceKey?.id,
+      subkeyId: documentSubkeyId,
+      contentSubkeyId: documentContentSubkeyId,
+      parentFolderId: folder.id,
+      workspaceId: workspaceId,
+      nameKeyDerivationTrace: {
+        workspaceKeyId: workspaceKey?.id!,
+        parentFolders: [],
+      },
+      contentKeyDerivationTrace: {
+        workspaceKeyId: workspaceKey?.id!,
+        parentFolders: [],
+      },
+    },
   });
   await createSnapshot(documentSnapshot);
   return {
     workspace,
-    document,
-    folder,
+    document: formatDocument(document),
+    folder: formatFolder(folder),
   };
 }

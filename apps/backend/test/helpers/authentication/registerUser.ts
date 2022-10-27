@@ -50,11 +50,16 @@ export const registerUser = async (
     verificationCode: registrationResponse.finishRegistration.verificationCode,
   });
 
-  const { sessionKey } = await loginUser({ graphql, username, password });
+  const { sessionKey, device } = await loginUser({
+    graphql,
+    username,
+    password,
+  });
   return {
     userId: verifyRegistrationResponse.verifyRegistration.id,
     mainDeviceSigningPublicKey: mainDevice.signingPublicKey,
     mainDevice: mainDevice,
+    webDevice: device,
     encryptionPrivateKey,
     signingPrivateKey,
     sessionKey,

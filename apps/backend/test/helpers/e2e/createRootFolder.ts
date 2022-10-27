@@ -1,7 +1,9 @@
 import { expect, Page } from "@playwright/test";
 import { prisma } from "../../../src/database/prisma";
+import { formatFolder } from "../../../src/types/folder";
 import { delayForSeconds } from "../delayForSeconds";
 import { reloadPage } from "./reloadPage";
+import { waitForElementTextChange } from "./utils/waitForElementTextChange";
 
 export const createRootFolder = async (
   page: Page,
@@ -30,7 +32,10 @@ export const createRootFolder = async (
   expect(folderItemText).toBe(name);
   await reloadPage({ page });
   const folderItem1 = page.locator(`data-testid=sidebar-folder--${folder?.id}`);
-  const folderItemText1 = await folderItem1.textContent();
+  const folderItemText1 = await waitForElementTextChange({
+    element: folderItem1,
+    initialText: "decrypting...",
+  });
   expect(folderItemText1).toBe(name);
-  return folder;
+  return formatFolder(folder);
 };

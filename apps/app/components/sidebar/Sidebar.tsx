@@ -27,8 +27,7 @@ import {
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
-import { getWorkspaceKey } from "../../utils/workspace/getWorkspaceKey";
+import { deriveCurrentWorkspaceKey } from "../../utils/workspace/deriveCurrentWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
@@ -60,41 +59,12 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
 
-  const onWorkspaceStructureCreated = async ({
-    workspace,
-    folder,
-    document,
-  }) => {
-    const deviceSigningPublicKey = activeDevice?.signingPublicKey;
-    if (!deviceSigningPublicKey) {
-      throw new Error("Expected deviceSigningPublicKey to be defined");
-    }
-
-    const createdWorkspace = await getWorkspace({
-      deviceSigningPublicKey,
-      workspaceId,
-    });
-    setShowCreateWorkspaceModal(false);
-    if (createdWorkspace) {
-      navigation.navigate("Workspace", {
-        workspaceId: workspace.id,
-        screen: "Page",
-        params: {
-          pageId: document.id,
-        },
-      });
-    } else {
-      // TODO: handle this error
-      console.error("No workspace found!");
-    }
-  };
-
   const createFolder = async (name: string) => {
     const id = uuidv4();
     let workspaceKey: string | undefined = undefined;
     let workspaceKeyId: string | undefined = undefined;
     try {
-      const result = await getWorkspaceKey({
+      const result = await deriveCurrentWorkspaceKey({
         workspaceId: workspaceId,
         activeDevice,
       });
@@ -128,6 +98,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           encryptedNameNonce: encryptedFolderResult.publicNonce,
           workspaceKeyId,
           subkeyId: encryptedFolderResult.folderSubkeyId,
+          keyDerivationTrace: {
+            workspaceKeyId,
+            parentFolders: [],
+          },
         },
       });
       if (result.data?.createFolder?.folder?.id) {
@@ -254,8 +228,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       ) : null}
       <CreateWorkspaceModal
         isVisible={showCreateWorkspaceModal}
-        onBackdropPress={() => setShowCreateWorkspaceModal(false)}
-        onWorkspaceStructureCreated={onWorkspaceStructureCreated}
+        onCancel={() => setShowCreateWorkspaceModal(false)}
+        onWorkspaceStructureCreated={() => {
+          setShowCreateWorkspaceModal(false);
+        }}
       />
     </DrawerContentScrollView>
   );

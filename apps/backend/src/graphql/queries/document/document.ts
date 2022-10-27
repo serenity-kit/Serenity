@@ -1,6 +1,7 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getDocument } from "../../../database/document/getDocument";
+import { formatDocument } from "../../../types/document";
 import { Document } from "../../types/document";
 
 export const documentQuery = queryField((t) => {
@@ -21,7 +22,8 @@ export const documentQuery = queryField((t) => {
         userId,
         id: args.id,
       });
-      return document;
+      const formattedDocument = formatDocument(document);
+      return formattedDocument;
     },
   });
 });

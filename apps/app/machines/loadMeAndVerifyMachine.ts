@@ -1,6 +1,5 @@
 import { assign, createMachine } from "xstate";
-import { MeQuery } from "../generated/graphql";
-import { fetchMe } from "../graphql/fetchUtils/fetchMe";
+import { MeQuery, runMeQuery } from "../generated/graphql";
 
 export type MeQueryResult = {
   data?: MeQuery;
@@ -91,7 +90,7 @@ export const loadMeAndVerifyMachine =
       },
       services: {
         fetchMe: (context) => {
-          return fetchMe();
+          return runMeQuery({});
         },
       },
     }

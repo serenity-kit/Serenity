@@ -31,6 +31,7 @@ export async function getDocument({ userId, id }: Params) {
       return document;
     });
   } catch (error) {
+    console.log(error);
     throw error;
   }
 }

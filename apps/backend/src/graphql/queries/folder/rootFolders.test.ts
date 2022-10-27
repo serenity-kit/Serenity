@@ -30,12 +30,14 @@ const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
   sessionKey = registerUserResult.sessionKey;
   const device = registerUserResult.mainDevice;
+  const webDevice = registerUserResult.webDevice;
   initialWorkspaceStructureResult = await createInitialWorkspaceStructure({
     workspaceName: "workspace 1",
     workspaceId: workspaceId,
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    webDevice,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",
@@ -55,6 +57,7 @@ const setup = async () => {
   const registerUserResult2 = await registerUser(graphql, username2, password);
   sessionKey2 = registerUserResult2.sessionKey;
   const device2 = registerUserResult2.mainDevice;
+  const webDevice2 = registerUserResult2.webDevice;
   const initialWorkspaceStructureResult2 =
     await createInitialWorkspaceStructure({
       workspaceName: "other user workspace",
@@ -62,6 +65,7 @@ const setup = async () => {
       deviceSigningPublicKey: device2.signingPublicKey,
       deviceEncryptionPublicKey: device2.encryptionPublicKey,
       deviceEncryptionPrivateKey: registerUserResult2.encryptionPrivateKey,
+      webDevice: webDevice2,
       folderId: uuidv4(),
       folderIdSignature: `TODO+${uuidv4()}`,
       folderName: "Getting started",
@@ -108,6 +112,16 @@ test("user should be able to list folders in a workspace when preloaded with ini
                     parentFolderId
                     rootFolderId
                     workspaceId
+                    encryptedName
+                    encryptedNameNonce
+                    keyDerivationTrace {
+                      workspaceKeyId
+                      parentFolders {
+                        folderId
+                        subkeyId
+                        parentFolderId
+                      }
+                    }
                 }
             }
             pageInfo {
@@ -144,6 +158,16 @@ test("user should be able to list folders in a workspace with one item", async (
                     parentFolderId
                     rootFolderId
                     workspaceId
+                    encryptedName
+                    encryptedNameNonce
+                    keyDerivationTrace {
+                      workspaceKeyId
+                      parentFolders {
+                        folderId
+                        subkeyId
+                        parentFolderId
+                      }
+                    }
                 }
             }
             pageInfo {

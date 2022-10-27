@@ -1,27 +1,28 @@
-import "./editor-output.css";
-import "./awareness.css";
-import React, { useRef, useState } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
 import { tw, useHasEditorSidebar, View } from "@serenity-tools/ui";
-import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
-import { Level } from "@tiptap/extension-heading";
-import Collaboration from "@tiptap/extension-collaboration";
-import * as Y from "yjs";
-import { Awareness } from "y-protocols/awareness";
-import { AwarnessExtension } from "./naisho-awareness-extension";
-import TaskList from "@tiptap/extension-task-list";
-import TaskItem from "@tiptap/extension-task-item";
-import Placeholder from "@tiptap/extension-placeholder";
-import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import { EditorEvents } from "@tiptap/core";
+import Collaboration from "@tiptap/extension-collaboration";
+import { Level } from "@tiptap/extension-heading";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import TaskItem from "@tiptap/extension-task-item";
+import TaskList from "@tiptap/extension-task-list";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import React, { useRef, useState } from "react";
+import { Awareness } from "y-protocols/awareness";
+import * as Y from "yjs";
+import "./awareness.css";
+import EditorSidebar from "./components/editorSidebar/EditorSidebar";
+import "./editor-output.css";
+import { AwarnessExtension } from "./naisho-awareness-extension";
+import { SerenityScrollIntoViewOnEditModeExtension } from "./scroll-into-view-on-edit-mode-extensions";
 
 type EditorProps = {
   documentId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef: React.MutableRefObject<Awareness>;
   isNew?: boolean;
-  editorHeight?: number;
+  scrollIntoViewOnEditModeDelay?: number;
   openDrawer: () => void;
   updateTitle: (title: string) => void;
   onTransaction?: (params: EditorEvents["transaction"]) => void;
@@ -38,6 +39,8 @@ export const Editor = (props: EditorProps) => {
   const [isNew] = useState(props.isNew ?? false);
   const newTitleRef = useRef("");
   const shouldCommitNewTitleRef = useRef(isNew);
+  const scrollIntoViewOnEditModeDelay =
+    props.scrollIntoViewOnEditModeDelay ?? 150; // 150ms works well on iOS Safari
 
   const editor = useEditor(
     {
@@ -89,6 +92,7 @@ export const Editor = (props: EditorProps) => {
         AwarnessExtension.configure({
           awareness: props.yAwarenessRef.current,
         }),
+        SerenityScrollIntoViewOnEditModeExtension.configure({}),
       ],
       onCreate: (params) => {
         if (isNew) {
@@ -124,6 +128,11 @@ export const Editor = (props: EditorProps) => {
         if (props.onFocus) {
           props.onFocus(params);
         }
+        // timeout to make sure the selection has time to be set
+        // before we scroll into view
+        setTimeout(() => {
+          params.editor.chain().scrollIntoViewOnEditMode().run();
+        }, scrollIntoViewOnEditModeDelay);
       },
       onBlur: (params) => {
         if (props.onBlur) {
@@ -139,11 +148,16 @@ export const Editor = (props: EditorProps) => {
       <View style={tw`flex-auto text-gray-900 dark:text-white`}>
         <div className="flex-auto overflow-y-auto overflow-x-hidden">
           <EditorContent
-            // 100% needed to expand the editor to it's full height even when empty
             style={{
-              height: props.editorHeight ?? "100%",
+              // needed to expand the editor into the unsafe area
+              // on iOS native App in case the client is not in edit mode
+              // to make sure the content expands till the bottom
+              height: "-webkit-fill-available",
             }}
             editor={editor}
+            className={
+              hasEditorSidebar ? "has-editor-sidebar" : "has-editor-bottombar"
+            }
           />
         </div>
       </View>

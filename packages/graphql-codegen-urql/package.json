@@ -1,0 +1,17 @@
+{
+  "name": "@serenity-tools/graphql-codegen-urql",
+  "version": "0.0.1",
+  "main": "src/index",
+  "scripts": {
+    "ts:check": "yarn tsc --noEmit",
+    "test": "echo 'No tests to run'",
+    "lint": "eslint --ext .tsx --ext .ts --ext .js ./"
+  },
+  "dependencies": {
+    "@graphql-codegen/plugin-helpers": "^2.7.1"
+  },
+  "devDependencies": {},
+  "jest": {
+    "preset": "react-native"
+  }
+}

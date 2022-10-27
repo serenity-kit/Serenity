@@ -1,0 +1,6 @@
+query fileUrl($fileId: ID!, $workspaceId: ID!, $documentId: ID!) {
+  fileUrl(fileId: $fileId, workspaceId: $workspaceId, documentId: $documentId) {
+    id
+    downloadUrl
+  }
+}

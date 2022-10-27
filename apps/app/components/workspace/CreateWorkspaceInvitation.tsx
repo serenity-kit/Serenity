@@ -197,7 +197,7 @@ export function CreateWorkspaceInvitation(props: Props) {
           setIsPasswordModalVisible(false);
           createWorkspaceInvitation();
         }}
-        onBackdropPress={() => {
+        onCancel={() => {
           setIsPasswordModalVisible(false);
         }}
       />

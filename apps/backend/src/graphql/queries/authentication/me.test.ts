@@ -63,6 +63,7 @@ const setup = async () => {
     deviceEncryptionPublicKey:
       registerUserResult.mainDevice.encryptionPublicKey,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    webDevice: registerUserResult.webDevice,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",
@@ -78,6 +79,7 @@ const setup = async () => {
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     deviceEncryptionPublicKey:
       registerUserResult.mainDevice.encryptionPublicKey,
+    webDevice: registerUserResult.webDevice,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",

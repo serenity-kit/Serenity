@@ -11,21 +11,23 @@ generator client {
 }
 
 model Document {
-  id                 String        @id
-  activeSnapshot     Snapshot?     @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
-  activeSnapshotId   String?       @unique
-  snapshots          Snapshot[]
-  createdAt          DateTime      @default(now())
-  workspace          Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceKeyId     String?
-  workspaceKey       WorkspaceKey? @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
-  workspaceId        String
-  parentFolder       Folder?       @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
-  parentFolderId     String?
-  encryptedName      String?
-  encryptedNameNonce String?
-  subkeyId           Int?
-  contentSubkeyId    Int?
+  id                        String        @id
+  activeSnapshot            Snapshot?     @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
+  activeSnapshotId          String?       @unique
+  snapshots                 Snapshot[]
+  createdAt                 DateTime      @default(now())
+  workspace                 Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceKeyId            String?
+  workspaceKey              WorkspaceKey? @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
+  workspaceId               String
+  parentFolder              Folder?       @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
+  parentFolderId            String?
+  encryptedName             String?
+  encryptedNameNonce        String?
+  subkeyId                  Int?
+  contentSubkeyId           Int?
+  nameKeyDerivationTrace    Json          @default("{}")
+  contentKeyDerivationTrace Json          @default("{}")
 
   @@unique([subkeyId, workspaceId])
 }
@@ -65,6 +67,7 @@ model UnverifiedUser {
   passwordResetOneTimePassword               String?
   passwordResetOneTimePasswordExpireDateTime DateTime?
   confirmationCode                           String    @default(uuid())
+  confirmationTryCounter                     Int       @default(0)
   mainDeviceNonce                            String    @unique
   mainDeviceCiphertext                       String
   mainDeviceEncryptionKeySalt                String
@@ -166,7 +169,7 @@ model Workspace {
   documents         Document[]
   usersToWorkspaces UsersToWorkspaces[]
   invitations       WorkspaceInvitations[]
-  workspaceKey      WorkspaceKey[]
+  workspaceKeys     WorkspaceKey[]
 }
 
 model UsersToWorkspaces {
@@ -213,6 +216,7 @@ model Folder {
   workspaceKeyId     String        @default("invalid")
   parentFolder       Folder?       @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
   parentFolderId     String?
+  keyDerivationTrace Json          @default("{}")
   rootFolder         Folder?       @relation(name: "rootFolder", fields: [rootFolderId], references: [id], onDelete: Cascade)
   rootFolderId       String?
   createdAt          DateTime      @default(now())

@@ -1934,6 +1934,17 @@ export default function DesignSystemScreen() {
           </Button>
         </DSExampleArea>
 
+        <DSExampleArea>
+          <Button
+            onPress={() => {
+              showToast("Failed to delete the page.", "error");
+            }}
+            size={"md"}
+          >
+            Error
+          </Button>
+        </DSExampleArea>
+
         <Heading lvl={1}>Tooltip</Heading>
         <Text>
           The{" "}

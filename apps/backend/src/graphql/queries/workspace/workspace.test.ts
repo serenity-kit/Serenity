@@ -1,15 +1,16 @@
-import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import { getWorkspace } from "../../../../test/helpers/workspace/getWorkspace";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
 const password = "password";
 let sessionKey = "";
 let device: any = null;
+let webDevice: any;
 
 const workspace1Name = "workspace 1";
 const workspace2Name = "workspace 2";
@@ -20,6 +21,7 @@ const setup = async () => {
   const registerUserResult = await registerUser(graphql, username, password);
   sessionKey = registerUserResult.sessionKey;
   device = registerUserResult.mainDevice;
+  webDevice = registerUserResult.webDevice;
   await createInitialWorkspaceStructure({
     workspaceName: workspace1Name,
     workspaceId: workspace1Id,
@@ -27,6 +29,7 @@ const setup = async () => {
     deviceEncryptionPublicKey:
       registerUserResult.mainDevice.encryptionPublicKey,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    webDevice,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",
@@ -42,6 +45,7 @@ const setup = async () => {
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
     deviceEncryptionPublicKey:
       registerUserResult.mainDevice.encryptionPublicKey,
+    webDevice,
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
     folderName: "Getting started",
@@ -57,50 +61,9 @@ beforeAll(async () => {
   await setup();
 });
 
-type GetWorkspaceProps = {
-  workspaceId?: string;
-  deviceSigningPublicKey: string;
-  authorizationHeader: string;
-};
-const getWorkspace = async ({
-  workspaceId,
-  deviceSigningPublicKey,
-  authorizationHeader,
-}: GetWorkspaceProps) => {
-  const headers = { authorization: authorizationHeader };
-  const query = gql`
-    query workspace($id: ID, $deviceSigningPublicKey: String!) {
-      workspace(id: $id, deviceSigningPublicKey: $deviceSigningPublicKey) {
-        id
-        name
-        currentWorkspaceKey {
-          id
-          workspaceId
-          workspaceKeyBox {
-            id
-            workspaceKeyId
-            deviceSigningPublicKey
-            creatorDeviceSigningPublicKey
-            ciphertext
-            creatorDevice {
-              signingPublicKey
-              encryptionPublicKey
-            }
-          }
-        }
-      }
-    }
-  `;
-  const result = await graphql.client.request(
-    query,
-    { id: workspaceId, deviceSigningPublicKey },
-    headers
-  );
-  return result;
-};
-
 test("user should be able to get a workspace by id", async () => {
   const result = await getWorkspace({
+    graphql,
     workspaceId: workspace2Id,
     authorizationHeader: sessionKey,
     deviceSigningPublicKey: device.signingPublicKey,
@@ -125,6 +88,7 @@ test("user should be able to get a workspace by id", async () => {
 
 test("user should get a workspace without providing an id", async () => {
   const result = await getWorkspace({
+    graphql,
     workspaceId: undefined,
     authorizationHeader: sessionKey,
     deviceSigningPublicKey: device.signingPublicKey,
@@ -150,6 +114,7 @@ test("User should not be able to retrieve a workspace for another device", async
   await expect(
     (async () =>
       await getWorkspace({
+        graphql,
         workspaceId: undefined,
         authorizationHeader: sessionKey,
         deviceSigningPublicKey: "abcd",
@@ -161,6 +126,7 @@ test("Unauthenticated", async () => {
   await expect(
     (async () =>
       await getWorkspace({
+        graphql,
         workspaceId: undefined,
         authorizationHeader: "badauthtoken",
         deviceSigningPublicKey: device.signingPublicKey,

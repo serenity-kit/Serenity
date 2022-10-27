@@ -10,6 +10,14 @@ query documents($parentFolderId: ID!, $first: Int! = 100, $after: String) {
       parentFolderId
       rootFolderId
       workspaceId
+      nameKeyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
     pageInfo {
       hasNextPage

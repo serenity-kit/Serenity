@@ -35,6 +35,7 @@ const setup = async () => {
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    webDevice: registerUserResult.webDevice,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -68,8 +69,9 @@ const setup = async () => {
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     graphql,
     authorizationHeader: sessionKey,
-    parentFolderId: null,
+    parentFolderId: addedFolder.parentFolderId,
     contentSubkeyId: documentContentKeyResult.subkeyId,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
   addedDocumentId = createDocumentResult.createDocument.id;
@@ -88,6 +90,7 @@ test("user should be able to change a document name", async () => {
     graphql,
     id,
     name,
+    parentFolderId: addedFolder.parentFolderId,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     folderKey,
     authorizationHeader,
@@ -119,6 +122,7 @@ test("Throw error when document doesn't exist", async () => {
         graphql,
         id,
         name,
+        parentFolderId: addedFolder.parentFolderId,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader,
@@ -137,6 +141,7 @@ test("Throw error when user doesn't have access", async () => {
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    webDevice: registerUserResult.webDevice,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -154,6 +159,7 @@ test("Throw error when user doesn't have access", async () => {
     parentFolderId: null,
     contentSubkeyId: 1,
     workspaceId: addedWorkspace.id,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
   });
   const authorizationHeader = sessionKey;
   const id = otherUserDocumentResult.createDocument.id;
@@ -164,6 +170,7 @@ test("Throw error when user doesn't have access", async () => {
         graphql,
         id,
         name,
+        parentFolderId: addedFolder.parentFolderId,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader,
@@ -180,6 +187,7 @@ test("Unauthenticated", async () => {
         graphql,
         id,
         name,
+        parentFolderId: addedFolder.parentFolderId,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader: "badauthheader",

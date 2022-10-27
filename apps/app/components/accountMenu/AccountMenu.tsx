@@ -24,7 +24,7 @@ import {
   useWorkspaceQuery,
   useWorkspacesQuery,
 } from "../../generated/graphql";
-import { clearDeviceAndSessionStorage } from "../../utils/authentication/clearDeviceAndSessionStorage";
+import { initiateLogout } from "../../navigation/screens/logoutInProgressScreen/LogoutInProgressScreen";
 
 type Props = {
   workspaceId?: string;
@@ -43,7 +43,7 @@ export default function AccountMenu({
   const isDesktopDevice = useIsDesktopDevice();
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const navigation = useNavigation();
-  const { activeDevice, updateAuthentication } = useAppContext();
+  const { activeDevice } = useAppContext();
   const [meResult] = useMeQuery();
   const [workspaceResult] = useWorkspaceQuery({
     variables: {
@@ -171,19 +171,25 @@ export default function AccountMenu({
 
       <SidebarDivider collapsed />
       <MenuButton
-        onPress={async () => {
-          try {
-            setIsOpenAccountMenu(false);
-            navigation.navigate("LogoutInProgress");
-            clearDeviceAndSessionStorage();
-            await updateAuthentication(null);
-          } catch (error) {
-            alert(
-              "Failed to destroy the local data. Please login and try again."
-            );
-          } finally {
-            navigation.navigate("Login");
-          }
+        onPress={() => {
+          setIsOpenAccountMenu(false);
+          initiateLogout();
+          // making sure there are screens hanging around that would re-render
+          // on logout and cause issues
+          navigation.reset({
+            stale: false,
+            type: "stack",
+            key: "stack-logout",
+            index: 0,
+            routeNames: navigation.getState().routeNames,
+            routes: [
+              {
+                name: "LogoutInProgress",
+                path: "/logging-out",
+                key: "LogoutInProgress-logout",
+              },
+            ],
+          });
         }}
         testID={`${testIdPrefix}account-menu--logout`}
       >

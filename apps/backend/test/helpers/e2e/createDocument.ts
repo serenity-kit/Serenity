@@ -1,9 +1,11 @@
 import { expect, Page } from "@playwright/test";
 import { prisma } from "../../../src/database/prisma";
+import { formatDocument } from "../../../src/types/document";
 import { delayForSeconds } from "../delayForSeconds";
 import { expandFolderTree } from "./expandFolderTree";
 import { hoverOnElement } from "./hoverOnElement";
 import { reloadPage } from "./reloadPage";
+import { waitForElementTextChange } from "./utils/waitForElementTextChange";
 
 export const createDocument = async (
   page: Page,
@@ -44,7 +46,10 @@ export const createDocument = async (
   const newDocumentItem1 = page.locator(
     `data-testid=sidebar-document--${document?.id}`
   );
-  const newDocumentName1 = await newDocumentItem1.textContent();
+  const newDocumentName1 = await waitForElementTextChange({
+    element: newDocumentItem1,
+    initialText: "decrypting...",
+  });
   expect(newDocumentName1).toBe("Untitled");
-  return document;
+  return formatDocument(document);
 };

@@ -7,6 +7,7 @@ import {
   objectType,
 } from "nexus";
 import { createDocument } from "../../../database/document/createDocument";
+import { KeyDerivationTraceInput } from "../folder/createFolder";
 
 export const CreateDocumentInput = inputObjectType({
   name: "CreateDocumentInput",
@@ -15,6 +16,9 @@ export const CreateDocumentInput = inputObjectType({
     t.string("parentFolderId");
     t.nonNull.string("workspaceId");
     t.nonNull.int("contentSubkeyId");
+    t.nonNull.field("nameKeyDerivationTrace", {
+      type: KeyDerivationTraceInput,
+    });
   },
 });
 
@@ -48,6 +52,7 @@ export const createDocumentMutation = mutationField("createDocument", {
       contentSubkeyId: args.input.contentSubkeyId,
       parentFolderId,
       workspaceId: args.input.workspaceId,
+      nameKeyDerivationTrace: args.input.nameKeyDerivationTrace,
     });
     return {
       id: document.id,

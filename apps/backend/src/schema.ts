@@ -21,6 +21,7 @@ import * as RootFoldersQueryTypes from "./graphql/queries/folder/rootFolders";
 
 import * as FinishLoginTypes from "./graphql/mutations/authentication/finishLogin";
 import * as FinishRegistrationTypes from "./graphql/mutations/authentication/finishRegistration";
+import * as LogoutTypes from "./graphql/mutations/authentication/logout";
 import * as StartLoginTypes from "./graphql/mutations/authentication/startLogin";
 import * as StartRegistrationTypes from "./graphql/mutations/authentication/startRegistration";
 import * as VerifyPasswordTypes from "./graphql/mutations/authentication/verifyPassword";
@@ -47,10 +48,12 @@ import * as WorkspaceTypes from "./graphql/types/workspace";
 import * as AttachDevicesToWorkspacesMutationTypes from "./graphql/mutations/device/attachDevicesToWorkspaces";
 import * as AttachDeviceToWorkspacesMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspaces";
 import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
+import * as InitiateFileUploadMutationTypes from "./graphql/mutations/file/initiateFileUpload";
 import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
 import * as DevicesQueryTypes from "./graphql/queries/device/devices";
 import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
 import * as UnauthorizedDevicesForWorkspacesTypes from "./graphql/queries/device/unauthorizedDevicesForWorkspaces";
+import * as FileUrlQueryTypes from "./graphql/queries/file/fileUrl";
 
 import * as DocumentTypes from "./graphql/types/document";
 
@@ -89,6 +92,7 @@ export const schema = makeSchema({
     MeQueryTypes,
     UserIdFromUsernameQueryTypes,
     VerifyPasswordTypes,
+    LogoutTypes,
 
     DeleteWorkspacesMutationTypes,
     UpdateWorkspaceNameMutationTypes,
@@ -107,6 +111,9 @@ export const schema = makeSchema({
     RemoveMembersAndRotateWorkspaceKeyMutationTypes,
     WorkspaceDevicesQueryTypes,
     ActiveWorkspaceKeysQueryTypes,
+
+    InitiateFileUploadMutationTypes,
+    FileUrlQueryTypes,
 
     DevicesQueryTypes,
     deviceBySigningPublicKeyQueryTypes,

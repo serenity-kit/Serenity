@@ -1,16 +1,23 @@
 import { expect, Page } from "@playwright/test";
 import { prisma } from "../../../src/database/prisma";
+import { formatDocument } from "../../../src/types/document";
+import { formatFolder } from "../../../src/types/folder";
 import { delayForSeconds } from "../delayForSeconds";
+import { verifyPassword } from "./verifyPassword";
 
 export type Props = {
   page: Page;
   username: string;
+  password: string;
   workspaceName: string;
+  throwIfVerifyPasswordNotOpen?: boolean;
 };
 export const createWorkspaceOnOnboarding = async ({
   page,
   username,
+  password,
   workspaceName,
+  throwIfVerifyPasswordNotOpen,
 }: Props) => {
   // Fill in the new workspace name
   await page
@@ -18,7 +25,11 @@ export const createWorkspaceOnOnboarding = async ({
       'text=Workspace NameThis is the name of your organization, team or private notes. You  >> input[type="text"]'
     )
     .fill(workspaceName);
-
+  await verifyPassword({
+    page,
+    password,
+    throwIfNotOpen: throwIfVerifyPasswordNotOpen,
+  });
   // Click the "create" button
   await page.locator('div[role="button"]:has-text("Create")').click();
 
@@ -39,7 +50,7 @@ export const createWorkspaceOnOnboarding = async ({
       id: workspaceId,
     },
     include: {
-      workspaceKey: {
+      workspaceKeys: {
         include: {
           workspaceKeyBoxes: {
             where: { deviceSigningPublicKey: user?.mainDeviceSigningPublicKey },
@@ -49,7 +60,7 @@ export const createWorkspaceOnOnboarding = async ({
     },
   });
   expect(workspace).not.toBe(null);
-  const workspaceBox = workspace?.workspaceKey[0].workspaceKeyBoxes[0];
+  const workspaceBox = workspace?.workspaceKeys[0].workspaceKeyBoxes[0];
   // a page will have been created
   const document = await prisma.document.findFirst({
     where: { workspaceId },
@@ -71,11 +82,13 @@ export const createWorkspaceOnOnboarding = async ({
   await expect(page).toHaveURL(
     `http://localhost:3000/workspace/${workspaceId}/page/${documentId}`
   );
+  const formattedFolder = formatFolder(folder);
+  const formattedDocument = formatDocument(document);
   return {
     user,
     workspace,
-    folder,
-    document,
+    folder: formattedFolder,
+    document: formattedDocument,
     mainDevice,
   };
 };

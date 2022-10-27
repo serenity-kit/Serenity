@@ -189,6 +189,15 @@ export async function deleteDevices({
         userId,
       },
     });
+
+    // delete all related workspace keyboxes
+    await prisma.workspaceKeyBox.deleteMany({
+      where: {
+        deviceSigningPublicKey: {
+          in: deletingDeviceSigningPublicKeys,
+        },
+      },
+    });
     return updatedWorkspaceKeys;
   });
 }

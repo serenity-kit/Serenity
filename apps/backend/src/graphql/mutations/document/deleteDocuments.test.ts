@@ -24,6 +24,7 @@ const setup = async () => {
     deviceSigningPublicKey: device.signingPublicKey,
     deviceEncryptionPublicKey: device.encryptionPublicKey,
     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    webDevice: registerUserResult.webDevice,
     folderName: "Getting started",
     folderId: uuidv4(),
     folderIdSignature: `TODO+${uuidv4()}`,
@@ -38,9 +39,11 @@ const setup = async () => {
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     graphql,
     authorizationHeader: sessionKey,
-    parentFolderId: null,
+    parentFolderId:
+      createWorkspaceResult.createInitialWorkspaceStructure.folder.id,
     contentSubkeyId: 1,
     workspaceId: addedWorkspace.id,
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
   });
   addedDocumentId = createDocumentResult.createDocument.id;
 };

@@ -8,6 +8,14 @@ mutation updateFolderName($input: UpdateFolderNameInput!) {
       subkeyId
       parentFolderId
       rootFolderId
+      keyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
   }
 }

@@ -1,6 +1,7 @@
 import { expect, Page } from "@playwright/test";
 import { prisma } from "../../../src/database/prisma";
 import { delayForSeconds } from "../delayForSeconds";
+import { verifyRegistration } from "./verifyRegistration";
 
 type RegisterOnPageProps = {
   page: Page;
@@ -40,16 +41,5 @@ export const registerOnPage = async ({
   )}&verification=${encodeURIComponent(confirmationCode)}`;
 
   await expect(page).toHaveURL(confirmRegistrationUrl);
-
-  // TODO: fill in the verification code from data retrieved from user table
-  await page
-    .locator('[placeholder="Enter the verification code …"]')
-    .fill(confirmationCode);
-
-  // Click the "Verify registration" button
-  await page
-    .locator(
-      'text=Verify your emailPlease enter the verification code sent to you via email.Verifi >> div[role="button"]'
-    )
-    .click();
+  await verifyRegistration({ page, confirmationCode });
 };

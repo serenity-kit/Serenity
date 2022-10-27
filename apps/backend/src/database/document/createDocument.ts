@@ -1,3 +1,4 @@
+import { KeyDerivationTrace } from "../../types/folder";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -9,6 +10,7 @@ type Params = {
   contentSubkeyId?: number | null;
   parentFolderId?: string | null;
   workspaceId: string;
+  nameKeyDerivationTrace: KeyDerivationTrace;
 };
 
 export async function createDocument({
@@ -20,6 +22,7 @@ export async function createDocument({
   contentSubkeyId,
   parentFolderId,
   workspaceId,
+  nameKeyDerivationTrace,
 }: Params) {
   const document = await prisma.document.create({
     data: {
@@ -31,6 +34,7 @@ export async function createDocument({
       contentSubkeyId,
       parentFolderId,
       workspaceId,
+      nameKeyDerivationTrace,
     },
   });
   return document;

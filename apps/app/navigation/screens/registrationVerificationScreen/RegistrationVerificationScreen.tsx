@@ -13,7 +13,6 @@ import { Platform } from "react-native";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import { useAppContext } from "../../../context/AppContext";
 import {
-  useAcceptWorkspaceInvitationMutation,
   useFinishLoginMutation,
   useStartLoginMutation,
   useVerifyRegistrationMutation,
@@ -41,6 +40,8 @@ import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorksp
 import { attachDeviceToWorkspaces } from "../../../utils/workspace/attachDeviceToWorkspaces";
 import { getPendingWorkspaceInvitationId } from "../../../utils/workspace/getPendingWorkspaceInvitationId";
 
+type VerificationError = "none" | "invalidCode" | "maxRetries" | "invalidUser";
+
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
 ) {
@@ -49,13 +50,16 @@ export default function RegistrationVerificationScreen(
     props.route.params.verification || ""
   );
   const [errorMessage, setErrorMessage] = useState("");
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [invalidCodeError, setInvalidCodeError] = useState(false);
+  const [maxRetriesError, setMaxRetriesError] = useState(false);
+  const [invalidUserError, setInvalidUserError] = useState(false);
+  const [verificationError, setVerificationError] =
+    useState<VerificationError>("none");
   const [graphqlError, setGraphqlError] = useState("");
   const { updateAuthentication, updateActiveDevice } = useAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
-  const [, acceptWorkspaceInvitationMutation] =
-    useAcceptWorkspaceInvitationMutation();
 
   const navigateToLoginScreen = async () => {
     await removeLastUsedWorkspaceId();
@@ -70,7 +74,6 @@ export default function RegistrationVerificationScreen(
       try {
         await acceptWorkspaceInvitation({
           workspaceInvitationId: pendingWorkspaceInvitationId,
-          acceptWorkspaceInvitationMutation,
         });
       } catch (error) {
         setGraphqlError(error.message);
@@ -88,7 +91,6 @@ export default function RegistrationVerificationScreen(
     }
     try {
       setErrorMessage("");
-      setIsLoggingIn(true);
 
       const unsafedDevice = await createDeviceWithInfo();
 
@@ -130,7 +132,6 @@ export default function RegistrationVerificationScreen(
       }
 
       await acceptPendingWorkspaceInvitation();
-      setIsLoggingIn(false);
       navigateToNextAuthenticatedPage({
         navigation: props.navigation,
         pendingWorkspaceInvitationId: null,
@@ -138,7 +139,6 @@ export default function RegistrationVerificationScreen(
     } catch (error) {
       console.error(error);
       setErrorMessage("Failed to login.");
-      setIsLoggingIn(false);
     }
   };
 
@@ -148,6 +148,7 @@ export default function RegistrationVerificationScreen(
       return;
     }
     try {
+      setIsSubmitting(true);
       const verifyRegistrationResult = await verifyRegistrationMutation({
         input: {
           username: props.route.params.username,
@@ -155,8 +156,20 @@ export default function RegistrationVerificationScreen(
         },
       });
       if (!verifyRegistrationResult.data?.verifyRegistration) {
-        setErrorMessage("Verification failed.");
+        setErrorMessage("");
+        const errorMessage = verifyRegistrationResult.error?.message;
+        if (errorMessage === "[GraphQL] Invalid user") {
+          setVerificationError("invalidUser");
+        } else if (
+          errorMessage === "[GraphQL] Too many attempts. Code reset."
+        ) {
+          setVerificationError("maxRetries");
+        } else {
+          setVerificationError("invalidCode");
+        }
         return;
+      } else {
+        setVerificationError("none");
       }
       if (isUsernamePasswordStored()) {
         await loginWithStoredUsernamePassword();
@@ -165,6 +178,8 @@ export default function RegistrationVerificationScreen(
       }
     } catch (err) {
       setErrorMessage("Verification failed.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -190,6 +205,37 @@ export default function RegistrationVerificationScreen(
           </InfoMessage>
         ) : null}
 
+        {verificationError === "invalidCode" && (
+          <InfoMessage
+            variant="error"
+            icon
+            testID="verify-registration__invalidCodeError"
+          >
+            The verification code was wrong.
+          </InfoMessage>
+        )}
+
+        {verificationError === "invalidUser" && (
+          <InfoMessage
+            variant="error"
+            icon
+            testID="verify-registration__invalidUserError"
+          >
+            The username you provided wasn't registered.
+          </InfoMessage>
+        )}
+
+        {verificationError === "maxRetries" && (
+          <InfoMessage
+            variant="error"
+            icon
+            testID="verify-registration__maxRetriesError"
+          >
+            The code was wrong. We reset your confirmation code and sent you a
+            new email. Please try again with the new code.
+          </InfoMessage>
+        )}
+
         <Input
           label={"Verification code"}
           value={verificationCode}
@@ -197,13 +243,20 @@ export default function RegistrationVerificationScreen(
             setVerificationCode(verificationCode);
           }}
           placeholder="Enter the verification code …"
+          testID="verify-registration__input"
         />
 
         <InfoMessage>
           Note: The verification code is prefilled on staging.
         </InfoMessage>
 
-        <Button onPress={onSubmit}>Register</Button>
+        <Button
+          onPress={onSubmit}
+          isLoading={isSubmitting}
+          testID="verify-registration__button"
+        >
+          Register
+        </Button>
       </Box>
     </OnboardingScreenWrapper>
   );

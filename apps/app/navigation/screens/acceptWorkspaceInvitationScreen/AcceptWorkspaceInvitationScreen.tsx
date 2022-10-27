@@ -17,10 +17,7 @@ import { useWindowDimensions } from "react-native";
 import { LoginForm } from "../../../components/login/LoginForm";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import RegisterForm from "../../../components/register/RegisterForm";
-import {
-  useAcceptWorkspaceInvitationMutation,
-  useWorkspaceInvitationQuery,
-} from "../../../generated/graphql";
+import { useWorkspaceInvitationQuery } from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigation";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
 
@@ -51,17 +48,15 @@ export default function AcceptWorkspaceInvitationScreen(
       id: workspaceInvitationId,
     },
   });
-  const [, acceptWorkspaceInvitationMutation] =
-    useAcceptWorkspaceInvitationMutation();
-  const [hasGraphqlError, setHasGraphqlError] = useState<boolean>(false);
-  const [graphqlError, setGraphqlError] = useState<string>("");
+  const [hasGraphqlError, setHasGraphqlError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [authForm, setAuthForm] = useState<"login" | "register">("login");
 
   const acceptAndGoToWorkspace = async () => {
     try {
+      setIsSubmitting(true);
       const workspace = await acceptWorkspaceInvitation({
         workspaceInvitationId,
-        acceptWorkspaceInvitationMutation,
       });
       props.navigation.navigate("Workspace", {
         workspaceId: workspace!.id,
@@ -69,7 +64,9 @@ export default function AcceptWorkspaceInvitationScreen(
       });
     } catch (error) {
       setHasGraphqlError(true);
-      setGraphqlError(error.message);
+      console.error(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -86,14 +83,6 @@ export default function AcceptWorkspaceInvitationScreen(
       username,
       verification: verificationCode,
     });
-  };
-
-  const onLoginSuccess = async () => {
-    await acceptAndGoToWorkspace();
-  };
-
-  const onAcceptWorkspaceInvitationPress = async () => {
-    await acceptAndGoToWorkspace();
   };
 
   if (workspaceInvitationQueryResult.fetching) {
@@ -181,8 +170,9 @@ export default function AcceptWorkspaceInvitationScreen(
       {workspaceInvitationQueryResult.data?.me?.id ? (
         <>
           <Button
-            onPress={onAcceptWorkspaceInvitationPress}
+            onPress={acceptAndGoToWorkspace}
             style={tw`self-center mt-2`}
+            isLoading={isSubmitting}
           >
             Accept invitation
           </Button>
@@ -194,7 +184,10 @@ export default function AcceptWorkspaceInvitationScreen(
         <>
           {authForm === "login" ? (
             <>
-              <LoginForm onLoginSuccess={onLoginSuccess} />
+              <LoginForm
+                onLoginSuccess={acceptAndGoToWorkspace}
+                isFocused={true}
+              />
               <View style={tw`text-center`}>
                 <Text variant="xs" muted>
                   Don't have an account?
@@ -211,6 +204,7 @@ export default function AcceptWorkspaceInvitationScreen(
                   props.route.params.workspaceInvitationId
                 }
                 onRegisterSuccess={onRegisterSuccess}
+                isFocused={true}
               />
               <View style={tw`text-center`}>
                 <Text variant="xs" muted>

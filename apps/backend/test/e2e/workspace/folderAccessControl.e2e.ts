@@ -3,8 +3,10 @@ import * as sodium from "@serenity-tools/libsodium";
 import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
+import { acceptWorkspaceInvitation } from "../../helpers/e2e/acceptWorkspaceInvitation";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
+import { removeMemberFromWorkspace } from "../../helpers/e2e/removeMemberFromWorkspace";
 import { renameFolder } from "../../helpers/e2e/renameFolder";
 
 type UserData = {
@@ -30,41 +32,6 @@ const user3: UserData = {
   username: `${uuidv4()}@example.com`,
   password: "pass",
   data: undefined,
-};
-
-type AcceptWorkspaceInvitationProps = {
-  page: Page;
-  workspaceInvitationUrl: string;
-  sharedWorkspaceId: string;
-};
-const acceptWorkspaceInvitation = async ({
-  page,
-  workspaceInvitationUrl,
-  sharedWorkspaceId,
-}: AcceptWorkspaceInvitationProps) => {
-  await page.goto(workspaceInvitationUrl);
-  await delayForSeconds(2);
-  // click "accept"
-  await page.locator('div[role="button"]:has-text("Accept")').click();
-  await delayForSeconds(2);
-  // expect the new url to include the new workspace ID
-  let inLobby = true;
-  const lobbyUrl = `http://localhost:3000/workspace/${sharedWorkspaceId}/lobby`;
-  while (inLobby) {
-    const pageUrl = page.url();
-    if (pageUrl === lobbyUrl) {
-      await delayForSeconds(1);
-    } else {
-      inLobby = false;
-    }
-  }
-  const pageUrl = page.url();
-  const urlAsExpected = pageUrl.startsWith(
-    `http://localhost:3000/workspace/${sharedWorkspaceId}/page`
-  );
-  expect(urlAsExpected).toBe(true);
-  // now wait for decryption
-  await delayForSeconds(5);
 };
 
 type HasFolderAccessProps = {
@@ -106,13 +73,9 @@ test.describe("Workspace Sharing", () => {
     await e2eLoginUser({
       page,
       username: user1.username,
-      password: user2.password,
+      password: user1.password,
     });
     await delayForSeconds(2);
-    // click on workspace settings
-    await page.locator("text=Settings").click();
-    delayForSeconds(2);
-    await page.locator("text=Members").click();
 
     // click "create invitation"
     await page
@@ -173,18 +136,34 @@ test.describe("Workspace Sharing", () => {
     // now remove access to user3
     await page.reload();
     await delayForSeconds(2);
-    await page
-      .locator(
-        `data-testid=workspace-member-row__${user3.data.user.id}--remove`
-      )
-      .click();
+    await removeMemberFromWorkspace({
+      page,
+      userId: user3.data.user.id,
+      password: user1.password,
+    });
     await delayForSeconds(2);
     await reloadPage({ page: user2Page });
     await reloadPage({ page: user3Page });
-    await delayForSeconds(2);
-    page.locator(
-      "text=This page does not exist or you don't have access to it anymore."
+    await delayForSeconds(4);
+    const user3Url = user3Page.url();
+    const expectedUser3Url = `http://localhost:3000/workspace/${user1.data.workspace.id}/not-found`;
+    const invalidAccessMessage = user3Page.locator(
+      "data-testid=no-access-to-workspace-error"
     );
+    const doesInvalidAccessMessageExist =
+      await invalidAccessMessage.isVisible();
+    expect(user3Url).toBe(expectedUser3Url);
+    expect(doesInvalidAccessMessageExist).toBe(true);
     await renameFolder(user2Page, user1.data.folder.id, "user2 re-renamed");
+
+    // re-add user3
+    await user3Page.goto(workspaceInvitationUrl);
+    await acceptWorkspaceInvitation({
+      page: user3Page,
+      workspaceInvitationUrl,
+      sharedWorkspaceId: user1.data.workspace.id,
+    });
+    await delayForSeconds(2);
+    await renameFolder(user3Page, user1.data.folder.id, "user3 re-added");
   });
 });

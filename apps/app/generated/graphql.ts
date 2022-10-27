@@ -1,3 +1,4 @@
+import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
 export type Maybe<T> = T | null;
@@ -54,6 +55,7 @@ export type AttachDevicesToWorkspacesResult = {
 export type CreateDocumentInput = {
   contentSubkeyId: Scalars['Int'];
   id: Scalars['String'];
+  nameKeyDerivationTrace: KeyDerivationTraceInput;
   parentFolderId?: InputMaybe<Scalars['String']>;
   workspaceId: Scalars['String'];
 };
@@ -67,6 +69,7 @@ export type CreateFolderInput = {
   encryptedName: Scalars['String'];
   encryptedNameNonce: Scalars['String'];
   id: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTraceInput;
   parentFolderId?: InputMaybe<Scalars['String']>;
   subkeyId: Scalars['Int'];
   workspaceId: Scalars['String'];
@@ -241,6 +244,7 @@ export type Document = {
   encryptedName?: Maybe<Scalars['String']>;
   encryptedNameNonce?: Maybe<Scalars['String']>;
   id: Scalars['String'];
+  nameKeyDerivationTrace: KeyDerivationTrace;
   parentFolderId?: Maybe<Scalars['String']>;
   rootFolderId?: Maybe<Scalars['String']>;
   subkeyId?: Maybe<Scalars['Int']>;
@@ -278,6 +282,12 @@ export type DocumentSnapshotPublicDataInput = {
   docId: Scalars['String'];
   pubKey: Scalars['String'];
   snapshotId: Scalars['String'];
+};
+
+export type File = {
+  __typename?: 'File';
+  downloadUrl: Scalars['String'];
+  id: Scalars['String'];
 };
 
 export type FinishLoginInput = {
@@ -323,6 +333,7 @@ export type Folder = {
   encryptedName: Scalars['String'];
   encryptedNameNonce: Scalars['String'];
   id: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTrace;
   parentFolderId?: Maybe<Scalars['String']>;
   rootFolderId?: Maybe<Scalars['String']>;
   subkeyId: Scalars['Int'];
@@ -351,7 +362,47 @@ export type FolderEdge = {
 
 export type GetWorkspaceDevicesResult = {
   __typename?: 'GetWorkspaceDevicesResult';
-  devices: Array<Maybe<Device>>;
+  devices: Array<Device>;
+};
+
+export type InitiateFileUploadInput = {
+  documentId: Scalars['String'];
+  workspaceId: Scalars['String'];
+};
+
+export type InitiateFileUploadResult = {
+  __typename?: 'InitiateFileUploadResult';
+  fileId: Scalars['String'];
+  uploadUrl: Scalars['String'];
+};
+
+export type KeyDerivationTrace = {
+  __typename?: 'KeyDerivationTrace';
+  parentFolders: Array<KeyDerivationTraceParentFolder>;
+  workspaceKeyId: Scalars['String'];
+};
+
+export type KeyDerivationTraceInput = {
+  parentFolders: Array<KeyDerivationTraceParentFolderInput>;
+  workspaceKeyId: Scalars['String'];
+};
+
+export type KeyDerivationTraceParentFolder = {
+  __typename?: 'KeyDerivationTraceParentFolder';
+  folderId: Scalars['String'];
+  parentFolderId?: Maybe<Scalars['String']>;
+  subkeyId: Scalars['Int'];
+};
+
+export type KeyDerivationTraceParentFolderInput = {
+  folderId: Scalars['String'];
+  parentFolderId?: InputMaybe<Scalars['String']>;
+  subkeyId: Scalars['Int'];
+};
+
+export type LogoutResult = {
+  __typename?: 'LogoutResult';
+  success: Scalars['Boolean'];
 };
 
 export type MainDeviceResult = {
@@ -407,6 +458,8 @@ export type Mutation = {
   deleteWorkspaces?: Maybe<DeleteWorkspacesResult>;
   finishLogin?: Maybe<FinishLoginResult>;
   finishRegistration?: Maybe<FinishRegistrationResult>;
+  initiateFileUpload?: Maybe<InitiateFileUploadResult>;
+  logout?: Maybe<LogoutResult>;
   removeMembersAndRotateWorkspaceKey?: Maybe<RemoveMembersAndRotateWorkspaceKeyResult>;
   startLogin?: Maybe<StartLoginResult>;
   startRegistration?: Maybe<StartRegistrationResult>;
@@ -489,6 +542,11 @@ export type MutationFinishRegistrationArgs = {
 };
 
 
+export type MutationInitiateFileUploadArgs = {
+  input: InitiateFileUploadInput;
+};
+
+
 export type MutationRemoveMembersAndRotateWorkspaceKeyArgs = {
   input: RemoveMembersAndRotateWorkspaceKeyInput;
 };
@@ -559,6 +617,7 @@ export type Query = {
   document?: Maybe<Document>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
   documents?: Maybe<DocumentConnection>;
+  fileUrl?: Maybe<File>;
   firstDocument?: Maybe<Document>;
   folder?: Maybe<Folder>;
   folders?: Maybe<FolderConnection>;
@@ -610,6 +669,13 @@ export type QueryDocumentsArgs = {
   first: Scalars['Int'];
   parentFolderId: Scalars['ID'];
   usingOldKeys?: InputMaybe<Scalars['Boolean']>;
+};
+
+
+export type QueryFileUrlArgs = {
+  documentId: Scalars['ID'];
+  fileId: Scalars['ID'];
+  workspaceId: Scalars['ID'];
 };
 
 
@@ -732,6 +798,7 @@ export type UpdateDocumentNameInput = {
   encryptedName: Scalars['String'];
   encryptedNameNonce: Scalars['String'];
   id: Scalars['String'];
+  nameKeyDerivationTrace: KeyDerivationTraceInput;
   subkeyId: Scalars['Int'];
   workspaceKeyId: Scalars['String'];
 };
@@ -745,6 +812,7 @@ export type UpdateFolderNameInput = {
   encryptedName: Scalars['String'];
   encryptedNameNonce: Scalars['String'];
   id: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTraceInput;
   subkeyId: Scalars['Int'];
   workspaceKeyId: Scalars['String'];
 };
@@ -992,7 +1060,7 @@ export type CreateFolderMutationVariables = Exact<{
 }>;
 
 
-export type CreateFolderMutation = { __typename?: 'Mutation', createFolder?: { __typename?: 'CreateFolderResult', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null } | null };
+export type CreateFolderMutation = { __typename?: 'Mutation', createFolder?: { __typename?: 'CreateFolderResult', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null } | null };
 
 export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
   input: CreateInitialWorkspaceStructureInput;
@@ -1057,6 +1125,18 @@ export type FinishRegistrationMutationVariables = Exact<{
 
 export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode: string } | null };
 
+export type InitiateFileUploadMutationVariables = Exact<{
+  initiateFileUpload: InitiateFileUploadInput;
+}>;
+
+
+export type InitiateFileUploadMutation = { __typename?: 'Mutation', initiateFileUpload?: { __typename?: 'InitiateFileUploadResult', uploadUrl: string, fileId: string } | null };
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout?: { __typename?: 'LogoutResult', success: boolean } | null };
+
 export type RemoveMembersAndRotateWorkspaceKeyMutationVariables = Exact<{
   input: RemoveMembersAndRotateWorkspaceKeyInput;
 }>;
@@ -1083,14 +1163,14 @@ export type UpdateDocumentNameMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null } | null } | null };
+export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null } | null };
 
 export type UpdateFolderNameMutationVariables = Exact<{
   input: UpdateFolderNameInput;
 }>;
 
 
-export type UpdateFolderNameMutation = { __typename?: 'Mutation', updateFolderName?: { __typename?: 'UpdateFolderNameResult', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null } | null } | null };
+export type UpdateFolderNameMutation = { __typename?: 'Mutation', updateFolderName?: { __typename?: 'UpdateFolderNameResult', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null } | null };
 
 export type UpdateWorkspaceMembersRolesMutationVariables = Exact<{
   input: UpdateWorkspaceMembersRolesInput;
@@ -1141,14 +1221,14 @@ export type DocumentQueryVariables = Exact<{
 }>;
 
 
-export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null } | null };
+export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null };
 
 export type DocumentPathQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, subkeyId: number } | null> | null };
+export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, subkeyId: number, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null };
 
 export type DocumentsQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -1157,7 +1237,16 @@ export type DocumentsQueryVariables = Exact<{
 }>;
 
 
-export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+
+export type FileUrlQueryVariables = Exact<{
+  fileId: Scalars['ID'];
+  workspaceId: Scalars['ID'];
+  documentId: Scalars['ID'];
+}>;
+
+
+export type FileUrlQuery = { __typename?: 'Query', fileUrl?: { __typename?: 'File', id: string, downloadUrl: string } | null };
 
 export type FirstDocumentQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1171,7 +1260,7 @@ export type FolderQueryVariables = Exact<{
 }>;
 
 
-export type FolderQuery = { __typename?: 'Query', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, workspaceId?: string | null } | null };
+export type FolderQuery = { __typename?: 'Query', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null };
 
 export type FoldersQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -1180,7 +1269,7 @@ export type FoldersQueryVariables = Exact<{
 }>;
 
 
-export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1214,7 +1303,7 @@ export type RootFoldersQueryVariables = Exact<{
 }>;
 
 
-export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type UnauthorizedDevicesForWorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1241,7 +1330,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null }> | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null }> | null } | null };
 
 export type WorkspaceDevicesQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -1269,7 +1358,7 @@ export type WorkspacesQueryVariables = Exact<{
 }>;
 
 
-export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null> | null } | null };
+export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, isAdmin: boolean }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null }> | null } | null> | null } | null };
 
 
 export const AcceptWorkspaceInvitationDocument = gql`
@@ -1367,6 +1456,14 @@ export const CreateFolderDocument = gql`
       parentFolderId
       rootFolderId
       workspaceId
+      keyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
   }
 }
@@ -1514,6 +1611,29 @@ export const FinishRegistrationDocument = gql`
 export function useFinishRegistrationMutation() {
   return Urql.useMutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(FinishRegistrationDocument);
 };
+export const InitiateFileUploadDocument = gql`
+    mutation initiateFileUpload($initiateFileUpload: InitiateFileUploadInput!) {
+  initiateFileUpload(input: $initiateFileUpload) {
+    uploadUrl
+    fileId
+  }
+}
+    `;
+
+export function useInitiateFileUploadMutation() {
+  return Urql.useMutation<InitiateFileUploadMutation, InitiateFileUploadMutationVariables>(InitiateFileUploadDocument);
+};
+export const LogoutDocument = gql`
+    mutation logout {
+  logout {
+    success
+  }
+}
+    `;
+
+export function useLogoutMutation() {
+  return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
+};
 export const RemoveMembersAndRotateWorkspaceKeyDocument = gql`
     mutation removeMembersAndRotateWorkspaceKey($input: RemoveMembersAndRotateWorkspaceKeyInput!) {
   removeMembersAndRotateWorkspaceKey(input: $input) {
@@ -1572,6 +1692,14 @@ export const UpdateDocumentNameDocument = gql`
       contentSubkeyId
       parentFolderId
       workspaceId
+      nameKeyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
   }
 }
@@ -1591,6 +1719,14 @@ export const UpdateFolderNameDocument = gql`
       subkeyId
       parentFolderId
       rootFolderId
+      keyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
   }
 }
@@ -1717,6 +1853,14 @@ export const DocumentDocument = gql`
     contentSubkeyId
     parentFolderId
     workspaceId
+    nameKeyDerivationTrace {
+      workspaceKeyId
+      parentFolders {
+        folderId
+        subkeyId
+        parentFolderId
+      }
+    }
   }
 }
     `;
@@ -1735,6 +1879,14 @@ export const DocumentPathDocument = gql`
     rootFolderId
     workspaceId
     subkeyId
+    keyDerivationTrace {
+      workspaceKeyId
+      parentFolders {
+        folderId
+        subkeyId
+        parentFolderId
+      }
+    }
   }
 }
     `;
@@ -1755,6 +1907,14 @@ export const DocumentsDocument = gql`
       parentFolderId
       rootFolderId
       workspaceId
+      nameKeyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
     pageInfo {
       hasNextPage
@@ -1768,6 +1928,18 @@ export const DocumentsDocument = gql`
 
 export function useDocumentsQuery(options: Omit<Urql.UseQueryArgs<DocumentsQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentsQuery, DocumentsQueryVariables>({ query: DocumentsDocument, ...options });
+};
+export const FileUrlDocument = gql`
+    query fileUrl($fileId: ID!, $workspaceId: ID!, $documentId: ID!) {
+  fileUrl(fileId: $fileId, workspaceId: $workspaceId, documentId: $documentId) {
+    id
+    downloadUrl
+  }
+}
+    `;
+
+export function useFileUrlQuery(options: Omit<Urql.UseQueryArgs<FileUrlQueryVariables>, 'query'>) {
+  return Urql.useQuery<FileUrlQuery, FileUrlQueryVariables>({ query: FileUrlDocument, ...options });
 };
 export const FirstDocumentDocument = gql`
     query firstDocument($workspaceId: ID!) {
@@ -1790,6 +1962,14 @@ export const FolderDocument = gql`
     subkeyId
     parentFolderId
     workspaceId
+    keyDerivationTrace {
+      workspaceKeyId
+      parentFolders {
+        folderId
+        subkeyId
+        parentFolderId
+      }
+    }
   }
 }
     `;
@@ -1809,6 +1989,14 @@ export const FoldersDocument = gql`
       parentFolderId
       rootFolderId
       workspaceId
+      keyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
     pageInfo {
       hasNextPage
@@ -1894,6 +2082,14 @@ export const RootFoldersDocument = gql`
       parentFolderId
       rootFolderId
       workspaceId
+      keyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
     pageInfo {
       hasNextPage
@@ -1980,6 +2176,7 @@ export const WorkspaceDocument = gql`
     workspaceKeys {
       id
       workspaceId
+      generation
       workspaceKeyBox {
         id
         workspaceKeyId
@@ -2087,6 +2284,21 @@ export const WorkspacesDocument = gql`
           }
         }
       }
+      workspaceKeys {
+        id
+        workspaceId
+        workspaceKeyBox {
+          id
+          workspaceKeyId
+          deviceSigningPublicKey
+          ciphertext
+          nonce
+          creatorDevice {
+            signingPublicKey
+            encryptionPublicKey
+          }
+        }
+      }
     }
   }
 }
@@ -2094,4 +2306,662 @@ export const WorkspacesDocument = gql`
 
 export function useWorkspacesQuery(options: Omit<Urql.UseQueryArgs<WorkspacesQueryVariables>, 'query'>) {
   return Urql.useQuery<WorkspacesQuery, WorkspacesQueryVariables>({ query: WorkspacesDocument, ...options });
+};
+
+export const runAcceptWorkspaceInvitationMutation = async (variables: AcceptWorkspaceInvitationMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<AcceptWorkspaceInvitationMutation, AcceptWorkspaceInvitationMutationVariables>(
+      AcceptWorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runAttachDeviceToWorkspacesMutation = async (variables: AttachDeviceToWorkspacesMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<AttachDeviceToWorkspacesMutation, AttachDeviceToWorkspacesMutationVariables>(
+      AttachDeviceToWorkspacesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runAttachDevicesToWorkspacesMutation = async (variables: AttachDevicesToWorkspacesMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<AttachDevicesToWorkspacesMutation, AttachDevicesToWorkspacesMutationVariables>(
+      AttachDevicesToWorkspacesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runCreateDocumentMutation = async (variables: CreateDocumentMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<CreateDocumentMutation, CreateDocumentMutationVariables>(
+      CreateDocumentDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runCreateFolderMutation = async (variables: CreateFolderMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<CreateFolderMutation, CreateFolderMutationVariables>(
+      CreateFolderDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runCreateInitialWorkspaceStructureMutation = async (variables: CreateInitialWorkspaceStructureMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<CreateInitialWorkspaceStructureMutation, CreateInitialWorkspaceStructureMutationVariables>(
+      CreateInitialWorkspaceStructureDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runCreateWorkspaceInvitationMutation = async (variables: CreateWorkspaceInvitationMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(
+      CreateWorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteDevicesMutation = async (variables: DeleteDevicesMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteDevicesMutation, DeleteDevicesMutationVariables>(
+      DeleteDevicesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteDocumentsMutation = async (variables: DeleteDocumentsMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteDocumentsMutation, DeleteDocumentsMutationVariables>(
+      DeleteDocumentsDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteFoldersMutation = async (variables: DeleteFoldersMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteFoldersMutation, DeleteFoldersMutationVariables>(
+      DeleteFoldersDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteWorkspaceInvitationsMutation = async (variables: DeleteWorkspaceInvitationsMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteWorkspaceInvitationsMutation, DeleteWorkspaceInvitationsMutationVariables>(
+      DeleteWorkspaceInvitationsDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteWorkspacesMutation = async (variables: DeleteWorkspacesMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteWorkspacesMutation, DeleteWorkspacesMutationVariables>(
+      DeleteWorkspacesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFinishLoginMutation = async (variables: FinishLoginMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<FinishLoginMutation, FinishLoginMutationVariables>(
+      FinishLoginDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFinishRegistrationMutation = async (variables: FinishRegistrationMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(
+      FinishRegistrationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runInitiateFileUploadMutation = async (variables: InitiateFileUploadMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<InitiateFileUploadMutation, InitiateFileUploadMutationVariables>(
+      InitiateFileUploadDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runLogoutMutation = async (variables: LogoutMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<LogoutMutation, LogoutMutationVariables>(
+      LogoutDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runRemoveMembersAndRotateWorkspaceKeyMutation = async (variables: RemoveMembersAndRotateWorkspaceKeyMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<RemoveMembersAndRotateWorkspaceKeyMutation, RemoveMembersAndRotateWorkspaceKeyMutationVariables>(
+      RemoveMembersAndRotateWorkspaceKeyDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runStartLoginMutation = async (variables: StartLoginMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<StartLoginMutation, StartLoginMutationVariables>(
+      StartLoginDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runStartRegistrationMutation = async (variables: StartRegistrationMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<StartRegistrationMutation, StartRegistrationMutationVariables>(
+      StartRegistrationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUpdateDocumentNameMutation = async (variables: UpdateDocumentNameMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<UpdateDocumentNameMutation, UpdateDocumentNameMutationVariables>(
+      UpdateDocumentNameDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUpdateFolderNameMutation = async (variables: UpdateFolderNameMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<UpdateFolderNameMutation, UpdateFolderNameMutationVariables>(
+      UpdateFolderNameDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUpdateWorkspaceMembersRolesMutation = async (variables: UpdateWorkspaceMembersRolesMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<UpdateWorkspaceMembersRolesMutation, UpdateWorkspaceMembersRolesMutationVariables>(
+      UpdateWorkspaceMembersRolesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUpdateWorkspaceNameMutation = async (variables: UpdateWorkspaceNameMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<UpdateWorkspaceNameMutation, UpdateWorkspaceNameMutationVariables>(
+      UpdateWorkspaceNameDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runVerifyPasswordMutation = async (variables: VerifyPasswordMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<VerifyPasswordMutation, VerifyPasswordMutationVariables>(
+      VerifyPasswordDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runVerifyRegistrationMutation = async (variables: VerifyRegistrationMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(
+      VerifyRegistrationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeviceBySigningPublicKeyQuery = async (variables: DeviceBySigningPublicKeyQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DeviceBySigningPublicKeyQuery, DeviceBySigningPublicKeyQueryVariables>(
+      DeviceBySigningPublicKeyDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDevicesQuery = async (variables: DevicesQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DevicesQuery, DevicesQueryVariables>(
+      DevicesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDocumentQuery = async (variables: DocumentQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DocumentQuery, DocumentQueryVariables>(
+      DocumentDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDocumentPathQuery = async (variables: DocumentPathQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DocumentPathQuery, DocumentPathQueryVariables>(
+      DocumentPathDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDocumentsQuery = async (variables: DocumentsQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DocumentsQuery, DocumentsQueryVariables>(
+      DocumentsDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFileUrlQuery = async (variables: FileUrlQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<FileUrlQuery, FileUrlQueryVariables>(
+      FileUrlDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFirstDocumentQuery = async (variables: FirstDocumentQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<FirstDocumentQuery, FirstDocumentQueryVariables>(
+      FirstDocumentDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFolderQuery = async (variables: FolderQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<FolderQuery, FolderQueryVariables>(
+      FolderDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runFoldersQuery = async (variables: FoldersQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<FoldersQuery, FoldersQueryVariables>(
+      FoldersDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runMainDeviceQuery = async (variables: MainDeviceQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<MainDeviceQuery, MainDeviceQueryVariables>(
+      MainDeviceDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runMeQuery = async (variables: MeQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<MeQuery, MeQueryVariables>(
+      MeDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runMeWithWorkspaceLoadingInfoQuery = async (variables: MeWithWorkspaceLoadingInfoQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<MeWithWorkspaceLoadingInfoQuery, MeWithWorkspaceLoadingInfoQueryVariables>(
+      MeWithWorkspaceLoadingInfoDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runPendingWorkspaceInvitationQuery = async (variables: PendingWorkspaceInvitationQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<PendingWorkspaceInvitationQuery, PendingWorkspaceInvitationQueryVariables>(
+      PendingWorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runRootFoldersQuery = async (variables: RootFoldersQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<RootFoldersQuery, RootFoldersQueryVariables>(
+      RootFoldersDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUnauthorizedDevicesForWorkspacesQuery = async (variables: UnauthorizedDevicesForWorkspacesQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>(
+      UnauthorizedDevicesForWorkspacesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUnauthorizedMembersQuery = async (variables: UnauthorizedMembersQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>(
+      UnauthorizedMembersDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runUserIdFromUsernameQuery = async (variables: UserIdFromUsernameQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<UserIdFromUsernameQuery, UserIdFromUsernameQueryVariables>(
+      UserIdFromUsernameDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runWorkspaceQuery = async (variables: WorkspaceQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceQuery, WorkspaceQueryVariables>(
+      WorkspaceDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runWorkspaceDevicesQuery = async (variables: WorkspaceDevicesQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceDevicesQuery, WorkspaceDevicesQueryVariables>(
+      WorkspaceDevicesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runWorkspaceInvitationQuery = async (variables: WorkspaceInvitationQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceInvitationQuery, WorkspaceInvitationQueryVariables>(
+      WorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runWorkspaceInvitationsQuery = async (variables: WorkspaceInvitationsQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspaceInvitationsQuery, WorkspaceInvitationsQueryVariables>(
+      WorkspaceInvitationsDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runWorkspacesQuery = async (variables: WorkspacesQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<WorkspacesQuery, WorkspacesQueryVariables>(
+      WorkspacesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
 };

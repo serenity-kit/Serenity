@@ -24,8 +24,8 @@ import {
 } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
+import { deriveCurrentWorkspaceKey } from "../../../utils/workspace/deriveCurrentWorkspaceKey";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
-import { getWorkspaceKey } from "../../../utils/workspace/getWorkspaceKey";
 import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
 
 // inspired by https://stackoverflow.com/a/46700791
@@ -85,7 +85,7 @@ export default function DeviceManagerScreen(props) {
         return;
       }
       const workspaceDevicePairing: WorkspaceDeviceParing[] = [];
-      const workspaceKey = await getWorkspaceKey({
+      const workspaceKey = await deriveCurrentWorkspaceKey({
         workspaceId,
         activeDevice,
       });
@@ -180,7 +180,7 @@ export default function DeviceManagerScreen(props) {
             deleteDevice(signingPublicKeyToBeDeleted);
           }
         }}
-        onBackdropPress={() => {
+        onCancel={() => {
           setSigningPublicKeyToBeDeleted(undefined);
           setIsPasswordModalVisible(false);
         }}

@@ -2,36 +2,40 @@ import sodium from "@serenity-tools/libsodium";
 import { finishLogin, startLogin } from "@serenity-tools/opaque";
 import {
   Button,
+  Description,
+  FormWrapper,
   InfoMessage,
   Input,
   Modal,
+  ModalButtonFooter,
   ModalHeader,
-  Text,
+  View,
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
+import { TextInput } from "react-native";
 import {
   MainDeviceDocument,
   MainDeviceQuery,
+  runMeQuery,
   useStartLoginMutation,
   useVerifyPasswordMutation,
 } from "../../generated/graphql";
-import { fetchMe } from "../../graphql/fetchUtils/fetchMe";
-import { getSessionKey } from "../../utils/authentication/sessionKeyStore";
-import { getActiveDevice } from "../../utils/device/getActiveDevice";
+import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
 
 export type Props = {
   isVisible: boolean;
   description: string;
-  onSuccess?: () => void;
-  onBackdropPress?: () => void;
+  onSuccess: () => void;
+  onCancel: () => void;
 };
 export function VerifyPasswordModal(props: Props) {
-  const inputRef = useRef();
+  const inputRef = useRef<TextInput>();
   const [password, setPassword] = useState("");
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
   const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
+  const { activeDevice, sessionKey } = useWorkspaceContext();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, verifyPasswordMutation] = useVerifyPasswordMutation();
 
@@ -44,16 +48,14 @@ export function VerifyPasswordModal(props: Props) {
   useEffect(() => {
     setTimeout(() => {
       if (inputRef.current) {
-        // @ts-expect-error focus() not defined since .current can be undefined
         inputRef.current.focus();
       }
     }, 250);
   }, []);
 
-  const onBackdropPress = () => {
-    setPassword("");
-    if (props.onBackdropPress) {
-      props.onBackdropPress();
+  const cancel = () => {
+    if (props.onCancel) {
+      props.onCancel();
     }
   };
 
@@ -62,7 +64,7 @@ export function VerifyPasswordModal(props: Props) {
     setIsVerifyingPassword(true);
     // TODO: create a method that verifies the password
     try {
-      const meResult = await fetchMe();
+      const meResult = await runMeQuery({});
       if (meResult.error) {
         // TODO: handle this error in the UI
         throw new Error(meResult.error.message);
@@ -85,25 +87,13 @@ export function VerifyPasswordModal(props: Props) {
         // TODO: show this error to user
         throw new Error("Could not start login");
       }
-      const sessionKey = await getSessionKey();
-      if (!sessionKey) {
-        // TODO: handle this error in the UI
-        throw new Error("No session key found!");
-      }
-      const activeDevice = await getActiveDevice();
-      if (!activeDevice) {
-        // TODO: handle this error in the UI
-        throw new Error("No active device found!");
-      }
       let finishLoginResponse: any = undefined;
       try {
         finishLoginResponse = await finishLogin(
           startLoginResult.data.startLogin.challengeResponse
         );
       } catch (error) {
-        setIsPasswordInvalid(true);
-        setIsVerifyingPassword(false);
-        return;
+        throw error;
       }
       const sessionTokenSignature = await sodium.crypto_sign_detached(
         sessionKey,
@@ -118,19 +108,12 @@ export function VerifyPasswordModal(props: Props) {
         },
       });
       if (verifyPasswordResponse.error) {
-        // TODO: handle this error in the UI
-        setIsPasswordInvalid(true);
-        setIsVerifyingPassword(false);
         throw new Error(verifyPasswordResponse.error.message);
       }
       const isPasswordValid =
         verifyPasswordResponse.data?.verifyPassword?.isValid;
       if (isPasswordValid !== true) {
-        // password is not valid.
-        // TODO: alert user and let them retype password?
-        setIsPasswordInvalid(true);
-        setIsVerifyingPassword(false);
-        return;
+        throw new Error("Password is not valid");
       }
       // verify login
       const mainDeviceResult = await getUrqlClient()
@@ -151,43 +134,65 @@ export function VerifyPasswordModal(props: Props) {
       if (props.onSuccess) {
         props.onSuccess();
       }
+      setPassword("");
+      setIsVerifyingPassword(false);
     } catch (error) {
       setIsPasswordInvalid(true);
+      setIsVerifyingPassword(false);
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     }
-    setPassword("");
-    setIsVerifyingPassword(false);
   };
 
   return (
     <Modal
       isVisible={props.isVisible}
-      onBackdropPress={onBackdropPress}
+      onBackdropPress={cancel}
       onModalHide={onModalHide}
     >
-      <ModalHeader>Verify Password</ModalHeader>
-      {isPasswordInvalid && (
-        <InfoMessage variant="error">Invalid password</InfoMessage>
-      )}
-      <Input
-        ref={inputRef}
-        autoFocus={true}
-        label={"Password"}
-        secureTextEntry
-        value={password}
-        onChangeText={(text: string) => {
-          setPassword(text);
-        }}
-        placeholder="Enter your password …"
-      />
-      <Text muted variant="sm">
-        {props.description}
-      </Text>
-      <Button
-        onPress={() => onVerifyPasswordPress(password)}
-        disabled={isVerifyingPassword}
-      >
-        Verify
-      </Button>
+      <View testID="verify-password-modal">
+        <FormWrapper>
+          <ModalHeader>Verify Password</ModalHeader>
+          <Description variant="modal">{props.description}</Description>
+          <Input
+            ref={inputRef}
+            label={"Password"}
+            secureTextEntry
+            value={password}
+            onChangeText={(text: string) => {
+              setPassword(text);
+            }}
+            placeholder="Enter your password …"
+            testID="verify-password-modal__password-input"
+          />
+          {isPasswordInvalid && (
+            <InfoMessage variant="error">Invalid password</InfoMessage>
+          )}
+          <ModalButtonFooter
+            confirm={
+              <Button
+                onPress={() => onVerifyPasswordPress(password)}
+                isLoading={isVerifyingPassword}
+                testID="verify-password-modal__submit-button"
+              >
+                Verify
+              </Button>
+            }
+            cancel={
+              <Button
+                onPress={() => {
+                  cancel();
+                }}
+                variant="secondary"
+                disabled={isVerifyingPassword}
+              >
+                Cancel
+              </Button>
+            }
+          />
+        </FormWrapper>
+      </View>
     </Modal>
   );
 }

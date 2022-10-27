@@ -5,7 +5,6 @@ import {
   addUpdateToInProgressQueue,
   cleanupUpdates,
   createAwarenessUpdate,
-  createSignatureKeyPair,
   createSnapshot,
   createUpdate,
   dispatchWebsocketState,
@@ -33,36 +32,32 @@ import {
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
-import {
-  Document,
-  DocumentDocument,
-  DocumentQuery,
-  DocumentQueryVariables,
-} from "../../generated/graphql";
+import { Document, runMeQuery } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
-import {
-  getDocumentPath,
-  useDocumentPathStore,
-} from "../../utils/document/documentPathStore";
-import { getFolderKey } from "../../utils/folder/getFolderKey";
-import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
-import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
+import { getDocument } from "../../utils/document/getDocument";
+import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
+import { getFolder } from "../../utils/folder/getFolder";
 
 const reconnectTimeout = 2000;
 
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
   updateTitle: (title: string) => void;
+  signatureKeyPair: KeyPair;
 };
 
-export default function Page({ navigation, route, updateTitle }: Props) {
+export default function Page({
+  navigation,
+  route,
+  updateTitle,
+  signatureKeyPair,
+}: Props) {
   if (!route.params?.pageId) {
     // should never happen
     throw new Error("Page ID was not set");
   }
   const docId = route.params.pageId;
-  // const workspaceId = route.params.workspaceId;
   const isNew = route.params.isNew ?? false;
   const { activeDevice } = useWorkspaceContext();
   const activeSnapshotIdRef = useRef<string | null>(null);
@@ -71,39 +66,14 @@ export default function Page({ navigation, route, updateTitle }: Props) {
   const websocketConnectionRef = useRef<WebSocket>(null);
   const shouldReconnectWebsocketConnectionRef = useRef(true);
   const createSnapshotRef = useRef<boolean>(false); // only used for the UI
-  const signatureKeyPairRef = useRef<KeyPair | null>(null);
   const latestServerVersionRef = useRef<number | null>(null);
   const editorInitializedRef = useRef<boolean>(false);
   const websocketState = useWebsocketState();
 
-  const docIdRef = useRef<string | null>(null);
-  const folderStore = useOpenFolderStore();
-  const documentPathStore = useDocumentPathStore();
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
-
-  const updateDocumentFolderPath = async (docId: string) => {
-    const documentPath = await getDocumentPath(docId);
-    const openFolderIds = folderStore.folderIds;
-    if (!documentPath) {
-      return;
-    }
-    documentPath.forEach((folder) => {
-      if (folder) {
-        openFolderIds.push(folder.id);
-      }
-    });
-    folderStore.update(openFolderIds);
-    documentPathStore.update(documentPath, activeDevice);
-  };
-
-  useEffect(() => {
-    if (docIdRef.current !== docId) {
-      updateDocumentFolderPath(docId);
-    }
-    docIdRef.current = docId;
-  });
+  const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
 
   const applySnapshot = async (snapshot, key) => {
     try {
@@ -164,15 +134,13 @@ export default function Page({ navigation, route, updateTitle }: Props) {
     const publicData = {
       snapshotId: uuidv4(),
       docId,
-      // @ts-expect-error TODO handle later
-      pubKey: sodium.to_base64(signatureKeyPairRef.current.publicKey),
+      pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     };
     const snapshot = await createSnapshot(
       yDocState,
       publicData,
       key,
-      // @ts-expect-error TODO handle later
-      signatureKeyPairRef.current
+      signatureKeyPair
     );
 
     addSnapshotToInProgress(snapshot);
@@ -192,15 +160,14 @@ export default function Page({ navigation, route, updateTitle }: Props) {
     const publicData = {
       refSnapshotId: activeSnapshotIdRef.current,
       docId,
-      // @ts-expect-error TODO handle later
-      pubKey: sodium.to_base64(signatureKeyPairRef.current.publicKey),
+      pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     };
     const updateToSend = await createUpdate(
       update,
       // @ts-expect-error TODO handle later
       publicData,
       key,
-      signatureKeyPairRef.current,
+      signatureKeyPair,
       clockOverwrite
     );
 
@@ -215,43 +182,42 @@ export default function Page({ navigation, route, updateTitle }: Props) {
     async function initDocument() {
       await sodium.ready;
 
+      const me = await runMeQuery({});
+
       yAwarenessRef.current.setLocalStateField("user", {
-        name: `User ${yDocRef.current.clientID}`,
+        name: me.data?.me?.username ?? "Unknown user",
       });
-
-      // TODO get key from navigation
-      // const key = sodium.from_base64(window.location.hash.slice(1));
-      // const key = sodium.from_base64(
-      //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
-      // );
-
-      const documentResult = await getUrqlClient()
-        .query<DocumentQuery, DocumentQueryVariables>(
-          DocumentDocument,
-          { id: docId },
-          {
-            // better to be safe here and always refetch
-            requestPolicy: "network-only",
-          }
-        )
-        .toPromise();
-      const document = documentResult.data?.document as Document;
+      let document: Document | undefined = undefined;
+      try {
+        const fetchedDocument = await getDocument({
+          documentId: docId,
+        });
+        document = fetchedDocument as Document;
+      } catch (err) {
+        // TODO
+        console.error(err);
+      }
+      if (!document) {
+        console.error("Document not found");
+        return;
+      }
       // communicate to other components e.g. sidebar or topbar
       // the currently active document
       updateActiveDocumentInfoStore(document, activeDevice);
 
-      const folderKeyData = await getFolderKey({
-        folderId: document.parentFolderId!,
+      const folder = await getFolder({ id: document.parentFolderId! });
+      const folderKeyString = await getFolderKey({
+        folderId: folder.id!,
+        workspaceKeyId: document.workspaceKeyId!,
         workspaceId: document.workspaceId!,
+        folderSubkeyId: folder.subkeyId,
         activeDevice,
       });
       const documentKey = await recreateDocumentKey({
-        folderKey: folderKeyData.key,
+        folderKey: folderKeyString,
         subkeyId: document.contentSubkeyId!,
       });
       const key = sodium.from_base64(documentKey.key);
-
-      signatureKeyPairRef.current = await createSignatureKeyPair();
 
       const onWebsocketMessage = async (event) => {
         const data = JSON.parse(event.data);
@@ -454,15 +420,13 @@ export default function Page({ navigation, route, updateTitle }: Props) {
           );
           const publicData = {
             docId,
-            // @ts-expect-error TODO handle later
-            pubKey: sodium.to_base64(signatureKeyPairRef.current.publicKey),
+            pubKey: sodium.to_base64(signatureKeyPair.publicKey),
           };
           const awarenessUpdate = await createAwarenessUpdate(
             yAwarenessUpdate,
             publicData,
             key,
-            // @ts-expect-error TODO handle later
-            signatureKeyPairRef.current
+            signatureKeyPair
           );
           console.log("send awarenessUpdate");
           // @ts-expect-error TODO handle later

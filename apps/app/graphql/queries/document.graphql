@@ -8,5 +8,13 @@ query document($id: ID!) {
     contentSubkeyId
     parentFolderId
     workspaceId
+    nameKeyDerivationTrace {
+      workspaceKeyId
+      parentFolders {
+        folderId
+        subkeyId
+        parentFolderId
+      }
+    }
   }
 }
