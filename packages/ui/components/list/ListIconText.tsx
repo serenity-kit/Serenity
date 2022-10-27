@@ -19,12 +19,12 @@ export const ListIconText = (props: ListIconTextProps) => {
   const isDesktopDevice = useIsDesktopDevice();
 
   const styles = StyleSheet.create({
-    wrapper: tw`grow items-center`,
+    wrapper: tw`w-full items-center`,
     stack: isDesktopDevice
-      ? tw`grow items-center justify-between`
+      ? tw`flex-auto items-center justify-between`
       : tw`items-start flex-col`,
-    mainText: isDesktopDevice ? tw`w-1/2` : tw``,
-    secondaryText: isDesktopDevice ? tw`w-1/2 text-center` : tw``,
+    mainText: isDesktopDevice ? tw`w-2/5 shrink` : tw``, // width same as for ListHeader
+    secondaryText: isDesktopDevice ? tw`w-2/5 text-center` : tw``, // width same as for ListHeader
   });
 
   return (
@@ -38,7 +38,9 @@ export const ListIconText = (props: ListIconTextProps) => {
         avatar
       )}
       <HStack alignItems={"center"} style={[styles.stack]} space={4}>
-        <ListText variant="xs">{props.main}</ListText>
+        <ListText variant="xs" style={styles.mainText}>
+          {props.main}
+        </ListText>
         <ListText
           variant={isDesktopDevice ? "xs" : "xxs"}
           style={styles.secondaryText}
