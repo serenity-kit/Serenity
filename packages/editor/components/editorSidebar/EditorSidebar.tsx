@@ -1,4 +1,10 @@
-import React from "react";
+import {
+  EncryptAndUploadFunction,
+  initiateImagePicker,
+  InsertImageParams,
+  updateImageAttributes,
+  UpdateImageAttributesParams,
+} from "@serenity-tools/editor-image-extension";
 import {
   EditorSidebarIcon,
   Heading,
@@ -8,17 +14,20 @@ import {
   tw,
   View,
 } from "@serenity-tools/ui";
-import { Editor } from "@tiptap/react";
 import { Level } from "@tiptap/extension-heading";
+import { Editor } from "@tiptap/react";
+import React from "react";
 
 type EditorSidebarProps = {
   editor: Editor | null;
   headingLevels: Level[];
+  encryptAndUpload: EncryptAndUploadFunction;
 };
 
 export default function EditorSidebar({
   editor,
   headingLevels,
+  encryptAndUpload,
 }: EditorSidebarProps) {
   return (
     <View
@@ -171,6 +180,44 @@ export default function EditorSidebar({
           />
           <Text variant="xs" bold={editor?.isActive("taskList") || false}>
             Check-List
+          </Text>
+        </SidebarButton>
+
+        <SidebarDivider />
+
+        <Heading lvl={4} style={tw`ml-4`} padded>
+          Images
+        </Heading>
+
+        <SidebarButton
+          onPress={() => {
+            initiateImagePicker({
+              encryptAndUpload,
+              insertImage: ({ uploadId, width, height }: InsertImageParams) => {
+                if (!editor) {
+                  return;
+                }
+                editor.commands.insertContent({
+                  type: "image",
+                  attrs: {
+                    uploadId,
+                    width,
+                    height,
+                  },
+                });
+              },
+              updateImageAttributes: (params: UpdateImageAttributesParams) => {
+                if (!editor) {
+                  return;
+                }
+                updateImageAttributes({ ...params, view: editor.view });
+              },
+            });
+          }}
+        >
+          <EditorSidebarIcon isActive={false} name="image-line" />
+          <Text variant="xs" bold={false}>
+            Upload Image
           </Text>
         </SidebarButton>
       </div>

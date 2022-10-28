@@ -1,5 +1,4 @@
 import { Text, View } from "@serenity-tools/ui";
-import { Editor as SerenityEditor } from "@serenity-tools/editor";
 import { EditorProps } from "./types";
 
 export default function Editor({
@@ -13,14 +12,14 @@ export default function Editor({
   return (
     <View>
       <Text>Electron Editor</Text>
-      <SerenityEditor
+      {/* <SerenityEditor
         documentId={documentId}
         yDocRef={yDocRef}
         yAwarenessRef={yAwarenessRef}
         openDrawer={openDrawer}
         updateTitle={updateTitle}
         isNew={isNew}
-      />
+      /> */}
     </View>
   );
 }

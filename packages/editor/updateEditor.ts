@@ -1,3 +1,4 @@
+import { updateImageAttributes } from "@serenity-tools/editor-image-extension";
 import { Editor } from "@tiptap/core";
 import { UpdateEditorParams } from "./types";
 
@@ -27,5 +28,12 @@ export const updateEditor = (editor: Editor, params: UpdateEditorParams) => {
     editor.chain().focus().toggleOrderedList().run();
   } else if (params.variant === "toggle-task-list") {
     editor.chain().focus().toggleTaskList().run();
+  } else if (params.variant === "insert-image") {
+    editor.commands.insertContent({
+      type: "image",
+      attrs: params.params,
+    });
+  } else if (params.variant === "update-image-attributes") {
+    updateImageAttributes({ ...params.params, view: editor.view });
   }
 };

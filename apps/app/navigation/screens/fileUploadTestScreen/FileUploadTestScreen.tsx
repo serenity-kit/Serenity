@@ -1,10 +1,10 @@
+import { guessMimeType } from "@serenity-tools/editor-image-extension";
 import { Button, Text, View } from "@serenity-tools/ui";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Image, useWindowDimensions } from "react-native";
 import { downloadFileBase64Bytes } from "../../../utils/file/downloadFileBase64Bytes";
 import { encryptAndUploadFile } from "../../../utils/file/encryptAndUploadFile";
-import { guessMimeType } from "../../../utils/file/guessMimeType";
 
 export default function FileUploadTestScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing

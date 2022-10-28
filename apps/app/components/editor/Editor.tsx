@@ -18,11 +18,13 @@ import {
 } from "y-protocols/awareness";
 import * as Y from "yjs";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
+import { downloadFileBase64Bytes } from "../../utils/file/downloadFileBase64Bytes";
 import { source } from "../../webviews/editor/source";
 import {
   EditorBottombar,
   EditorBottombarProps,
 } from "../editorBottombar/EditorBottombar";
+import { encryptAndUpload } from "./encryptAndUpload";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -45,6 +47,7 @@ const BottombarWrapper = ({
   keyboardAnimationDuration,
   editorBottombarState,
   onUpdate,
+  encryptAndUpload,
 }: BottombarWrapperProps) => {
   const [bottom] = useState(new Animated.Value(0));
 
@@ -62,6 +65,7 @@ const BottombarWrapper = ({
       <EditorBottombar
         editorBottombarState={editorBottombarState}
         onUpdate={onUpdate}
+        encryptAndUpload={encryptAndUpload}
       />
     </Animated.View>
   );
@@ -204,6 +208,21 @@ export default function Editor({
           if (message.type === "update-editor-toolbar-state") {
             setEditorBottombarState(message.content);
           }
+          if (message.type === "requestImage") {
+            try {
+              const result = await downloadFileBase64Bytes({ ...message });
+              webViewRef.current?.injectJavaScript(`
+                window.resolveImageRequest("${message.fileId}", "${result}");
+                true;
+              `);
+            } catch (err) {
+              console.error("Image download error:", err);
+              webViewRef.current?.injectJavaScript(`
+                window.rejectImageRequest("${message.fileId}", "Failed to download and decrypt the image");
+                true;
+              `);
+            }
+          }
         }}
         // Needed for .focus() to work
         keyboardDisplayRequiresUserAction={false}
@@ -244,6 +263,7 @@ export default function Editor({
           true;
         `);
           }}
+          encryptAndUpload={encryptAndUpload}
         />
       ) : null}
     </>

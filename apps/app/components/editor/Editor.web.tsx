@@ -8,10 +8,12 @@ import { tw, useHasEditorSidebar, View } from "@serenity-tools/ui";
 import { Editor as TipTapEditor } from "@tiptap/core";
 import { useEffect, useRef, useState } from "react";
 import { View as RNView } from "react-native";
+import { downloadFileBase64Bytes } from "../../utils/file/downloadFileBase64Bytes";
 import {
   EditorBottombar,
   editorBottombarHeight,
 } from "../editorBottombar/EditorBottombar";
+import { encryptAndUpload } from "./encryptAndUpload";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -79,6 +81,7 @@ export default function Editor({
           isNew={isNew}
           openDrawer={openDrawer}
           updateTitle={updateTitle}
+          downloadAndDecryptFile={downloadFileBase64Bytes}
           onFocus={() => {
             editorIsFocusedRef.current = true;
             showAndPositionToolbar();
@@ -106,6 +109,7 @@ export default function Editor({
               getEditorBottombarStateFromEditor(params.editor)
             );
           }}
+          encryptAndUpload={encryptAndUpload}
         />
       </View>
       {!hasEditorSidebar && (
@@ -124,6 +128,7 @@ export default function Editor({
                 updateEditor(tipTapEditorRef.current, params);
               }
             }}
+            encryptAndUpload={encryptAndUpload}
           />
         </View>
       )}

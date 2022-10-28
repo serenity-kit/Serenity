@@ -1,22 +1,32 @@
-import React, { forwardRef } from "react";
+import { EditorBottombarState, UpdateEditor } from "@serenity-tools/editor";
+import {
+  EncryptAndUploadFunction,
+  initiateImagePicker,
+  InsertImageParams,
+  UpdateImageAttributesParams,
+} from "@serenity-tools/editor-image-extension";
 import {
   EditorBottombarButton,
   EditorBottombarDivider,
   ScrollView,
   tw,
 } from "@serenity-tools/ui";
-import { EditorBottombarState, UpdateEditor } from "@serenity-tools/editor";
 import { HStack } from "native-base";
+import { forwardRef } from "react";
 
 export type EditorBottombarProps = {
   onUpdate: UpdateEditor;
   editorBottombarState: EditorBottombarState;
+  encryptAndUpload: EncryptAndUploadFunction;
 };
 
 export const editorBottombarHeight = 48;
 
 export const EditorBottombar = forwardRef(
-  ({ onUpdate, editorBottombarState }: EditorBottombarProps, ref) => {
+  (
+    { onUpdate, editorBottombarState, encryptAndUpload }: EditorBottombarProps,
+    ref
+  ) => {
     return (
       <ScrollView
         horizontal={true}
@@ -25,6 +35,26 @@ export const EditorBottombar = forwardRef(
         ref={ref}
       >
         <HStack space={2} alignItems="center">
+          <EditorBottombarButton
+            onPress={(event) => {
+              initiateImagePicker({
+                encryptAndUpload,
+                insertImage: (params: InsertImageParams) => {
+                  onUpdate({ variant: "insert-image", params });
+                },
+                updateImageAttributes: (
+                  params: UpdateImageAttributesParams
+                ) => {
+                  onUpdate({ variant: "update-image-attributes", params });
+                },
+              });
+            }}
+            name="image-line"
+            isActive={false}
+          />
+
+          <EditorBottombarDivider />
+
           <EditorBottombarButton
             onPress={(event) => {
               onUpdate({ variant: "toggle-bold" });

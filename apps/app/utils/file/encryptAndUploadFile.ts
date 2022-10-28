@@ -2,16 +2,27 @@ import * as sodium from "@serenity-tools/libsodium";
 import { runInitiateFileUploadMutation } from "../../generated/graphql";
 import { encryptFile } from "./encryptFile";
 
-export type Props = {
+export type FileInfo = {
+  fileId: string;
+  publicNonce: string;
+  key: string;
+};
+
+export type EncryptAndUploadFunctionParams = {
   base64FileData: string;
   documentId: string;
   workspaceId: string;
 };
-export const encryptAndUploadFile = async ({
+
+export type EncryptAndUploadFunction = (
+  props: EncryptAndUploadFunctionParams
+) => Promise<FileInfo>;
+
+export const encryptAndUploadFile: EncryptAndUploadFunction = async ({
   base64FileData,
   documentId,
   workspaceId,
-}: Props) => {
+}) => {
   const key = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
   const { encryptedBase64ImageData, publicNonce } = await encryptFile({
     base64FileData,

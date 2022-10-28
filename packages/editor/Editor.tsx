@@ -11,6 +11,11 @@ import StarterKit from "@tiptap/starter-kit";
 import React, { useRef, useState } from "react";
 import { Awareness } from "y-protocols/awareness";
 import * as Y from "yjs";
+import {
+  DownloadAndDecryptFileFunction,
+  EncryptAndUploadFunction,
+  ImageNodeExtension,
+} from "../editor-image-extension/src";
 import "./awareness.css";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
@@ -29,6 +34,8 @@ type EditorProps = {
   onFocus?: (params: EditorEvents["focus"]) => void;
   onBlur?: (params: EditorEvents["blur"]) => void;
   onCreate?: (params: EditorEvents["create"]) => void;
+  encryptAndUpload: EncryptAndUploadFunction;
+  downloadAndDecryptFile: DownloadAndDecryptFileFunction;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -93,6 +100,10 @@ export const Editor = (props: EditorProps) => {
           awareness: props.yAwarenessRef.current,
         }),
         SerenityScrollIntoViewOnEditModeExtension.configure({}),
+        ImageNodeExtension.configure({
+          encryptAndUpload: props.encryptAndUpload,
+          downloadAndDecryptFile: props.downloadAndDecryptFile,
+        }),
       ],
       onCreate: (params) => {
         if (isNew) {
@@ -162,7 +173,11 @@ export const Editor = (props: EditorProps) => {
         </div>
       </View>
       {hasEditorSidebar && (
-        <EditorSidebar editor={editor} headingLevels={headingLevels} />
+        <EditorSidebar
+          editor={editor}
+          headingLevels={headingLevels}
+          encryptAndUpload={props.encryptAndUpload}
+        />
       )}
     </div>
   );
