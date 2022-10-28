@@ -21,6 +21,7 @@ export const Avatar = forwardRef((props: AvatarProps, ref) => {
       style={[styles.avatar, props.style]}
       _text={{
         fontFamily: "Inter_600SemiBold",
+        style: tw`uppercase`,
       }}
       bg={`collaboration.${customColor}`}
     >
