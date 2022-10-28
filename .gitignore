@@ -28,6 +28,3 @@ apps/app/webviews/opaque/index.html
 /test-results/
 /playwright-report/
 /playwright/.cache/
-/test-results/
-/playwright-report/
-/playwright/.cache/
