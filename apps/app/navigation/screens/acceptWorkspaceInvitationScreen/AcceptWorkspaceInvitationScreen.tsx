@@ -30,7 +30,9 @@ const Wrapper = ({ children }) => (
 const ErrorWrapper = ({ children }) => (
   <Wrapper>
     <VStack alignItems="center" space={4} style={tw`text-center`}>
-      <Heading lvl={1}>Hi there!</Heading>
+      <Heading lvl={1} padded>
+        Hi there!
+      </Heading>
       {children}
     </VStack>
   </Wrapper>

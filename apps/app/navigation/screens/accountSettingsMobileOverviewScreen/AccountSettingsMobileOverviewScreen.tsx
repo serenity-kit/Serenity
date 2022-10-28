@@ -1,4 +1,4 @@
-import { SidebarLink } from "@serenity-tools/ui";
+import { SidebarLink, tw, View } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useWindowDimensions } from "react-native";
 import { loadMeAndVerifyMachine } from "../../../machines/loadMeAndVerifyMachine";
@@ -12,7 +12,7 @@ export default function AccountSettingsMobileOverviewScreen(props) {
   });
 
   return (
-    <>
+    <View style={tw`py-5`}>
       <SidebarLink
         to={{
           screen: "AccountSettingsProfile",
@@ -29,6 +29,6 @@ export default function AccountSettingsMobileOverviewScreen(props) {
       >
         Devices
       </SidebarLink>
-    </>
+    </View>
   );
 }

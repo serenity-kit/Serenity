@@ -1,15 +1,16 @@
 import {
   Button,
   CenterContent,
+  Description,
+  Heading,
   InfoMessage,
   Input,
   Modal,
   ModalButtonFooter,
   ModalHeader,
-  RawInput,
+  SettingsContentWrapper,
   Spinner,
   Text,
-  tw,
   View,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
@@ -141,7 +142,7 @@ export default function WorkspaceSettingsGeneralScreen(
           <Text style={styles.errorText}>{graphqlError}</Text>
         </View>
       )}
-      <View style={tw`mt-20 px-4`}>
+      <SettingsContentWrapper title="General">
         {state.value !== "loadWorkspaceSuccess" ? (
           <CenterContent>
             {state.value === "loadWorkspaceFailed" ? (
@@ -155,24 +156,28 @@ export default function WorkspaceSettingsGeneralScreen(
         ) : (
           <>
             <View>
-              <Text style={tw`mt-6 mb-4 font-700 text-xl text-center`}>
-                Change name
-              </Text>
-              <RawInput
-                placeholder="Workspace name"
-                value={workspaceName}
-                onChangeText={setWorkspaceName}
-                editable={isAdmin && !isLoadingWorkspaceData}
-              />
-              {isAdmin && (
-                <Button
-                  onPress={updateWorkspaceName}
-                  disabled={isLoadingWorkspaceData}
-                >
-                  Update
-                </Button>
-              )}
+              <Heading lvl={3} padded>
+                Manage workspace
+              </Heading>
+              <Description variant="form">
+                Here you can rename or delete your workspace.
+              </Description>
             </View>
+            <Input
+              placeholder="New name"
+              value={workspaceName}
+              onChangeText={setWorkspaceName}
+              editable={isAdmin && !isLoadingWorkspaceData}
+              label={"Workspace name"}
+            />
+            {isAdmin && (
+              <Button
+                onPress={updateWorkspaceName}
+                disabled={isLoadingWorkspaceData}
+              >
+                Update
+              </Button>
+            )}
             {isAdmin && (
               <Button onPress={() => setShowDeleteWorkspaceModal(true)}>
                 Delete workspace
@@ -205,7 +210,7 @@ export default function WorkspaceSettingsGeneralScreen(
             )}
           </>
         )}
-      </View>
+      </SettingsContentWrapper>
     </>
   );
 }

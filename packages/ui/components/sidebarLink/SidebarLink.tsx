@@ -30,6 +30,7 @@ declare type SidebarLinkProps<ParamList extends ReactNavigation.RootParamList> =
   } & (TextProps & {
     children: React.ReactNode;
     iconName: IconNames;
+    active?: boolean;
   });
 
 export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
@@ -41,14 +42,16 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
   const linkProps = useLinkProps({
     ...props,
   });
-  const { iconName } = props;
+  const { iconName, active } = props;
 
   const styles = StyleSheet.create({
     link:
       tw.style(Platform.OS === "web" && { outlineStyle: "none" }) &&
-      tw`pl-5 md:pl-4`,
+      tw`pl-5 md:pl-4 ${
+        active ? "md:pl-3.25 border-l-3 border-primary-500/85" : ""
+      }`,
     stack: tw.style(`py-3 md:py-1.5 pr-4`),
-    hover: tw`bg-gray-200`,
+    hover: active ? tw`` : tw`bg-gray-200`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
   });
 
@@ -73,7 +76,7 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
       onMouseLeave={() => setIsHovered(false)}
     >
       <HStack space={isDesktopDevice ? 2 : 4} alignItems="center">
-        {iconName ? <SidebarIconLeft name={iconName} /> : null}
+        {iconName ? <SidebarIconLeft name={iconName} active={active} /> : null}
         <HStack
           alignItems={"center"}
           justifyContent={"space-between"}
@@ -84,7 +87,9 @@ export function SidebarLink<ParamList extends ReactNavigation.RootParamList>(
           ]}
           space={4}
         >
-          <SidebarText>{props.children}</SidebarText>
+          <SidebarText style={active && tw`text-primary-500`}>
+            {props.children}
+          </SidebarText>
           {!isDesktopDevice ? <SidebarIconNavRight /> : null}
         </HStack>
       </HStack>

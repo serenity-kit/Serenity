@@ -56,6 +56,7 @@ const customColors = {
     500: "#48AD83",
   },
   muted: "#8A8B96", // gray 600
+  backdrop: "#1F1F2140", // backdrop color including opacity
 };
 
 const customTheme = {
@@ -96,7 +97,12 @@ const customTheme = {
           letterSpacing: "-0.02rem",
         },
       ],
-      xs: "0.8125rem",
+      xs: [
+        "0.8125rem",
+        {
+          lineHeight: "1.125rem",
+        },
+      ],
       xxs: [
         "0.75rem",
         {
@@ -122,6 +128,7 @@ const customTheme = {
     },
     maxWidth: {
       "prose-rem": "36.5rem", // editor specific .. needed as representation of a 65ch content-width as the "ch"-unit would only work on text-elements
+      "navigation-drawer-modal": "61rem",
     },
     width: {
       sidebar: "15rem",

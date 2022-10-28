@@ -25,7 +25,7 @@ export default function EditorSidebar({
       style={tw`w-sidebar h-full border-l border-gray-200 bg-gray-100 pt-4`}
     >
       <div>
-        <Heading lvl={4} style={tw`ml-4 mb-2`}>
+        <Heading lvl={4} style={tw`ml-4`} padded>
           Formats
         </Heading>
 
@@ -82,7 +82,7 @@ export default function EditorSidebar({
 
         <SidebarDivider />
 
-        <Heading lvl={4} style={tw`ml-4 mb-2`}>
+        <Heading lvl={4} style={tw`ml-4`} padded>
           Blocks
         </Heading>
 
@@ -134,7 +134,7 @@ export default function EditorSidebar({
 
         <SidebarDivider />
 
-        <Heading lvl={4} style={tw`ml-4 mb-2`}>
+        <Heading lvl={4} style={tw`ml-4`} padded>
           Lists
         </Heading>
 

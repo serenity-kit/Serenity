@@ -623,7 +623,7 @@ export default function DesignSystemScreen() {
         >
           <Box plush>
             <View style={tw`text-center`}>
-              <UIHeading lvl={1} style={tw`mb-3`}>
+              <UIHeading lvl={1} padded center>
                 Create your Account
               </UIHeading>
               <DSMarker>
@@ -705,7 +705,7 @@ export default function DesignSystemScreen() {
                 <VStack
                   style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}
                 >
-                  <UIHeading lvl={4} style={tw`px-4 pb-2`}>
+                  <UIHeading lvl={4} style={tw`px-4`} padded>
                     Account Settings
                   </UIHeading>
                   <SidebarLink
@@ -733,7 +733,7 @@ export default function DesignSystemScreen() {
                     <UIHeading lvl={2}>Devices</UIHeading>
                   </View>
                   <View style={tw`pt-8 pb-5 px-10`}>
-                    <UIHeading lvl={3} style={tw`mb-2`}>
+                    <UIHeading lvl={3} padded>
                       Manage Devices
                     </UIHeading>
                     <DSMarker>
@@ -910,6 +910,68 @@ export default function DesignSystemScreen() {
           <UIHeading lvl={4} accessibilityOnly>
             Folders
           </UIHeading>
+        </DSExampleArea>
+        <Heading lvl={3}>Spacing</Heading>
+        <Text variant="sm">
+          Depending on the useage you might want to add a little space between
+          the Heading and the following element.{"\n"}If the following element
+          is any variation of a <DSMono variant={"component"}>Text</DSMono>{" "}
+          component - Text, Description, e.g. - use the{" "}
+          <DSMono variant={"property"}>padded</DSMono> property to set a bottom
+          margin and keep the applications look &amp; feel nice and consistent.
+        </Text>
+        <DSExampleArea vertical>
+          <View>
+            <UIHeading lvl={1} padded>
+              Create your Account
+            </UIHeading>
+            <Description variant="login">
+              Type in your email and choose a password.
+              {"\n"}
+              No credit card required.
+            </Description>
+          </View>
+          <View>
+            <UIHeading lvl={2} padded>
+              Profile
+            </UIHeading>
+            <Text variant="sm">
+              We do not have a use-case for this with lvl-2 but that's what it
+              could look like.
+            </Text>
+          </View>
+          <View>
+            <UIHeading lvl={3} padded>
+              Manage Devices
+            </UIHeading>
+            <Description variant={"form"}>
+              The following list shows all the devices which are currently
+              linked to your account.
+            </Description>
+          </View>
+          <View>
+            <VStack
+              style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}
+            >
+              <UIHeading lvl={4} style={tw`px-4`} padded>
+                Formats
+              </UIHeading>
+              <SidebarButton>
+                <EditorSidebarIcon name="bold" />
+                <Text variant="sm">Bold</Text>
+              </SidebarButton>
+              <SidebarButton>
+                <EditorSidebarIcon name="italic" />
+                <Text variant="sm">Italic</Text>
+              </SidebarButton>
+              <SidebarButton>
+                <EditorSidebarIcon name="code-view" isActive />
+                <Text variant="sm" bold>
+                  Code
+                </Text>
+              </SidebarButton>
+            </VStack>
+          </View>
         </DSExampleArea>
         <Heading lvl={3}>Accessibility</Heading>
         <Text variant="sm">

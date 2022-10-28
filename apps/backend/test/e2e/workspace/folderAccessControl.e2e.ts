@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { acceptWorkspaceInvitation } from "../../helpers/e2e/acceptWorkspaceInvitation";
-import { createWorkspaceInvitation } from "../../helpers/e2e/createWorkspaceInvitation";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
 import { removeMemberFromWorkspace } from "../../helpers/e2e/removeMemberFromWorkspace";
@@ -78,10 +77,25 @@ test.describe("Workspace Sharing", () => {
     });
     await delayForSeconds(2);
 
-    const workspaceInvitationResult = await createWorkspaceInvitation({
-      page,
-    });
-    workspaceInvitationUrl = workspaceInvitationResult.url;
+    // click "create invitation"
+    await page
+      .locator('div[role="button"]:has-text("Create Invitation")')
+      .click();
+    await delayForSeconds(2);
+
+    // get invitation text
+    const linkInfoDiv = page
+      .locator("//input[@id='workspaceInvitationInstructionsInput']")
+      .first();
+    const linkInfoText = await linkInfoDiv.inputValue();
+    // parse url and store into variable
+    const linkInfoWords = linkInfoText.split(" ");
+    workspaceInvitationUrl = linkInfoWords[linkInfoWords.length - 1];
+    // expect there to be one invitation in the list
+    const numInvitations = await page
+      .locator("//div[@data-testid='workspaceInviteeList']/div/div")
+      .count();
+    expect(numInvitations).toBe(1);
 
     // now accept for both users
     const user2Context = await browser.newContext();

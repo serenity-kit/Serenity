@@ -135,6 +135,9 @@ function WorkspaceSettingsDrawerScreen(props) {
             unmountOnBlur: true,
             headerShown: false,
             drawerType: "permanent",
+            drawerStyle: {
+              width: 240,
+            },
           }}
         >
           <WorkspaceSettingsDrawer.Screen
@@ -160,6 +163,9 @@ function AccountSettingsDrawerScreen(props) {
           unmountOnBlur: true,
           headerShown: false,
           drawerType: "permanent",
+          drawerStyle: {
+            width: 240,
+          },
         }}
       >
         <AccountSettingsDrawer.Screen

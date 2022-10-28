@@ -180,7 +180,6 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
                 size,
               }),
               { cursor: disabled ? "not-allowed" : "pointer" }, // web only
-              props.style,
             ]}
           >
             <View style={tw`flex flex-row justify-center`}>

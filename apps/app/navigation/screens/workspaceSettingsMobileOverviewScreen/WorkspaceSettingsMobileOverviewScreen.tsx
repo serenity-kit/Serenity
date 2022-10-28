@@ -1,4 +1,4 @@
-import { SidebarLink } from "@serenity-tools/ui";
+import { SidebarLink, tw, View } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { workspaceSettingsAccessMachine } from "../../../machines/workspaceSettingsAccessMachine";
 
@@ -11,7 +11,7 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
   });
 
   return (
-    <>
+    <View style={tw`py-5`}>
       <SidebarLink
         to={{
           screen: "WorkspaceSettingsGeneral",
@@ -30,6 +30,6 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
       >
         Members
       </SidebarLink>
-    </>
+    </View>
   );
 }

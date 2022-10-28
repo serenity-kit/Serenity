@@ -1,5 +1,13 @@
-import { Text, tw, View } from "@serenity-tools/ui";
+import {
+  Description,
+  Heading,
+  InfoMessage,
+  SettingsContentWrapper,
+  Text,
+  View,
+} from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
+import { VStack } from "native-base";
 import { useState } from "react";
 import { FlatList, useWindowDimensions } from "react-native";
 import DeviceListItem from "../../../components/deviceListItem/DeviceListItem";
@@ -123,8 +131,16 @@ export default function DeviceManagerScreen(props) {
 
   return (
     <>
-      <View style={tw`mt-20`}>
-        <Text bold>Devices</Text>
+      <SettingsContentWrapper title={"Devices"}>
+        <View>
+          <Heading lvl={3} padded>
+            Manage Devices
+          </Heading>
+          <Description variant={"form"}>
+            The following list shows all the devices which are currently linked
+            to your account.
+          </Description>
+        </View>
         <FlatList
           data={devicesResult.data?.devices?.nodes?.filter(notNull) || []}
           keyExtractor={(item) => item.signingPublicKey}
@@ -148,7 +164,13 @@ export default function DeviceManagerScreen(props) {
             </View>
           )}
         />
-      </View>
+        <InfoMessage>
+          Devices using the mobile application are always active, web devices on
+          the other hand expire automatically after max 30 days after login,
+          which means you will be asked for your password again after the given
+          time period.
+        </InfoMessage>
+      </SettingsContentWrapper>
       <VerifyPasswordModal
         isVisible={isPasswordModalVisible}
         description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"

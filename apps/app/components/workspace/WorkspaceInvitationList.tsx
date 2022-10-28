@@ -1,57 +1,89 @@
-import { Text, View } from "@serenity-tools/ui";
-import { FlatList, StyleSheet } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { WorkspaceInvitationListItem } from "./WorkspaceInvitationListItem";
+import {
+  IconButton,
+  List,
+  ListHeader,
+  ListItem,
+  ListText,
+  tw,
+  useIsDesktopDevice,
+  View,
+} from "@serenity-tools/ui";
+import { formatDistance, parseJSON, isPast } from "date-fns";
+import { StyleSheet } from "react-native";
 
 type Props = {
   workspaceInvitations: any[];
-  nativeID?: string;
+  testID?: string;
   onDeletePress: (id: string) => void;
   onSelect: (id: string) => void;
 };
 
 export function WorkspaceInvitationList(props: Props) {
+  const isDesktopDevice = useIsDesktopDevice();
+
+  const isInvitationExpired = (date: string) => {
+    return isPast(parseJSON(date));
+  };
+
+  const getExpiredTextFromString = (date: string) => {
+    if (isInvitationExpired(date)) {
+      return "Expired";
+    }
+
+    const prefix = isDesktopDevice ? "Expires " : "";
+
+    return (
+      prefix +
+      formatDistance(parseJSON(date), new Date(), {
+        addSuffix: true,
+      })
+    );
+  };
+
+  const styles = StyleSheet.create({});
+
   return (
-    <View>
-      <View>
-        <View style={styles.listItem}>
-          <Text style={styles.headerText}>ID</Text>
-          <Text style={styles.headerText}>Inviter</Text>
-          <Text style={styles.headerText}>Expires At</Text>
-        </View>
-      </View>
-      <FlatList
-        nativeID={props.nativeID}
+    <View testID={props.testID}>
+      <List
         data={props.workspaceInvitations}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => props.onSelect(item.id)}>
-            <WorkspaceInvitationListItem
-              key={item.id}
-              id={item.id}
-              workspaceId={item.workspaceId}
-              username={item.inviterUsername}
-              inviterUserId={item.inviterUserId}
-              expiresAt={item.expiresAt}
-              onDeletePress={() => props.onDeletePress(item.id)}
+        emptyString={"No active invitations"}
+        header={<ListHeader data={["Active Links"]} />}
+      >
+        {props.workspaceInvitations.map((invitation) => {
+          const expired = isInvitationExpired(invitation.expiresAt);
+          return (
+            <ListItem
+              key={invitation.id}
+              onSelect={() => props.onSelect(invitation.id)}
+              mainItem={
+                <>
+                  <ListText style={[tw`w-1/2 md:w-2/3`]}>
+                    https://serenity.re/accept-workspace-invitation
+                  </ListText>
+                  <ListText>/</ListText>
+                  <ListText style={[tw`w-1/2 md:w-1/4`]} bold>
+                    {invitation.id}
+                  </ListText>
+                </>
+              }
+              secondaryItem={
+                <ListText muted={expired} secondary>
+                  {getExpiredTextFromString(invitation.expiresAt)}
+                </ListText>
+              }
+              actionItem={
+                !expired ? (
+                  <IconButton
+                    name={"delete-bin-line"}
+                    color={isDesktopDevice ? "gray-900" : "gray-700"}
+                    onPress={() => props.onDeletePress(invitation.id)}
+                  />
+                ) : null
+              }
             />
-          </TouchableOpacity>
-        )}
-        ListEmptyComponent={() => (
-          <View style={styles.listItem}>
-            <Text>No invitations</Text>
-          </View>
-        )}
-      />
+          );
+        })}
+      </List>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  listItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  headerText: {
-    fontWeight: "bold",
-  },
-});

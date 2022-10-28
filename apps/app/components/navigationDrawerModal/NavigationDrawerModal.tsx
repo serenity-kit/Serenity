@@ -1,4 +1,4 @@
-import { BoxShadow, View } from "@serenity-tools/ui";
+import { BoxShadow, tw, View } from "@serenity-tools/ui";
 import { useLayoutEffect, useRef } from "react";
 import { Platform, useWindowDimensions } from "react-native";
 
@@ -28,7 +28,7 @@ export default function NavigationDrawerModal(props: Props) {
         previousScreen.style.display = "block";
       }
       if (modalGroup) {
-        modalGroup.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
+        modalGroup.style.backgroundColor = tw.color("backdrop");
       }
 
       const overlayClickHandler = (event) => {
@@ -68,11 +68,14 @@ export default function NavigationDrawerModal(props: Props) {
         <BoxShadow elevation={2} rounded>
           <View
             ref={contentRef}
-            style={{
-              backgroundColor: "white",
-              width: dimensions.width * 0.8,
-              height: dimensions.height * 0.8,
-            }}
+            style={[
+              tw`max-w-navigation-drawer-modal`,
+              {
+                backgroundColor: "white",
+                width: dimensions.width * 0.95,
+                height: dimensions.height * 0.8,
+              },
+            ]}
           >
             {props.children}
           </View>

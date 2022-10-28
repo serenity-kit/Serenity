@@ -168,7 +168,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           <HStack
             justifyContent="space-between"
             alignItems="center"
-            style={tw`ml-5 md:ml-4 mb-3 md:mb-2.5 mr-4.5 md:mr-2`}
+            style={tw`ml-5 md:ml-4 mb-3 md:mb-2 mr-4.5 md:mr-2`}
           >
             <Heading lvl={4}>Folders</Heading>
             {/* offset not working yet as NB has a no-no in their component */}

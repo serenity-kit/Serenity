@@ -53,7 +53,8 @@ export const Modal = React.forwardRef(
         animationOut="fadeOut"
         animationInTiming={150}
         animationOutTiming={150}
-        backdropOpacity={0.5}
+        backdropOpacity={1}
+        backdropColor={tw.color("backdrop")}
         useNativeDriverForBackdrop
         avoidKeyboard // makes sure the modal animates up when the virtual keyboard is open
         style={[styles.modal, rest.style]}

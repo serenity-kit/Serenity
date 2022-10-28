@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
-import { createWorkspaceInvitation } from "../../helpers/e2e/createWorkspaceInvitation";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { registerOnPage } from "../../helpers/e2e/registerOnPage";
 
@@ -31,8 +30,36 @@ test.describe("Workspace Sharing", () => {
       `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
     );
 
-    const workspaceInvitationResult = await createWorkspaceInvitation({ page });
-    workspaceInvitationUrl = workspaceInvitationResult.url;
+    // click on workspace settings
+    await page.locator("text=Settings").click();
+    delayForSeconds(2);
+    await expect(page).toHaveURL(
+      `http://localhost:3000/workspace/${workspace.id}/settings/general`
+    );
+    await page.locator("text=Members").click();
+
+    // click "create invitation"
+    await page
+      .locator('div[role="button"]:has-text("Create Invitation")')
+      .click();
+    await delayForSeconds(2);
+
+    // get invitation text
+    const linkInfoDiv = page
+      .locator("//div[@data-testid='workspaceInvitationInstructionsText']")
+      .first();
+    const linkInfoText = await linkInfoDiv.textContent();
+    if (!linkInfoText) {
+      throw new Error("No link info text!");
+    }
+    // parse url and store into variable
+    const linkInfoWords = linkInfoText.replace(/\n/g, " ").split(" ");
+    workspaceInvitationUrl = linkInfoWords[linkInfoWords.length - 1];
+    // expect there to be one invitation in the list
+    const numInvitations = await page
+      .locator("//div[@data-testid='workspaceInviteeList']/div/div")
+      .count();
+    expect(numInvitations).toBe(2); // 1st row is the header
   });
 
   test("Existing other user can accept workspace", async ({ page }) => {

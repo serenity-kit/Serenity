@@ -26,7 +26,7 @@ export default function LoginScreen(props: RootStackScreenProps<"Login">) {
     <OnboardingScreenWrapper>
       <Box plush>
         <View>
-          <Heading lvl={1} center>
+          <Heading lvl={1} center padded>
             Welcome back
           </Heading>
           <View>
