@@ -41,11 +41,7 @@ export const ListIconText = (props: ListIconTextProps) => {
         <ListText variant="xs" style={styles.mainText}>
           {props.main}
         </ListText>
-        <ListText
-          variant={isDesktopDevice ? "xs" : "xxs"}
-          style={styles.secondaryText}
-          muted={!isDesktopDevice}
-        >
+        <ListText style={styles.secondaryText} secondary>
           {props.secondary}
         </ListText>
       </HStack>
