@@ -1,14 +1,22 @@
 import {
+  Avatar,
   Button,
   CenterContent,
   Checkbox,
   Description,
   Heading,
+  IconButton,
   InfoMessage,
+  List,
+  ListHeader,
+  ListIconText,
+  ListItem,
+  ListText,
   SettingsContentWrapper,
   Spinner,
   Text,
   tw,
+  useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
@@ -139,6 +147,7 @@ export default function WorkspaceSettingsMembersScreen(
   );
   const [hasGraphqlError, setHasGraphqlError] = useState(false);
   const [graphqlError, setGraphqlError] = useState("");
+  const isDesktopDevice = useIsDesktopDevice();
 
   useInterval(() => {
     if (activeDevice) {
@@ -299,12 +308,12 @@ export default function WorkspaceSettingsMembersScreen(
 
   return (
     <>
-      {hasGraphqlError && (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>{graphqlError}</Text>
-        </View>
-      )}
       <SettingsContentWrapper title="Members">
+        {hasGraphqlError && (
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorText}>{graphqlError}</Text>
+          </View>
+        )}
         {state.value !== "loadWorkspaceSuccess" ? (
           <CenterContent>
             {state.value === "loadWorkspaceFailed" ? (
@@ -338,9 +347,72 @@ export default function WorkspaceSettingsMembersScreen(
                 />
               </>
             )}
-            <Heading lvl={3} padded>
+            <Heading lvl={3} style={tw`mt-3`}>
               Members
             </Heading>
+
+            <List
+              data={members}
+              emptyString={"No members available"}
+              header={
+                <ListHeader data={["Name", "Email", "Role"]} mainIsIconText />
+              }
+            >
+              {members.map((member: any) => {
+                const adminUserId =
+                  state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
+                    ?.id;
+                // TODO acutally use username if available
+                const username = member.username.slice(
+                  0,
+                  member.username.indexOf("@")
+                );
+                // TODO actually use initials when we have a username
+                const initials = username.substring(0, 2);
+                const email = member.username;
+
+                const allowEditing = isAdmin && member.userId !== adminUserId;
+
+                return (
+                  <ListItem
+                    testID={`workspace-member-row__${adminUserId}`}
+                    key={member.userId}
+                    mainItem={
+                      <ListIconText
+                        main={
+                          username +
+                          (member.userId === adminUserId ? " (you)" : "")
+                        }
+                        secondary={email}
+                        avatar={
+                          <Avatar size={isDesktopDevice ? "xs" : "sm"}>
+                            {initials}
+                          </Avatar>
+                        }
+                      />
+                    }
+                    secondaryItem={
+                      <ListText secondary>
+                        {member.isAdmin ? "Admin" : "Editor"}
+                      </ListText>
+                    }
+                    actionItem={
+                      allowEditing ? (
+                        <IconButton
+                          testID={`workspace-member-row__${member.userId}--remove`}
+                          name={"delete-bin-line"}
+                          color={isDesktopDevice ? "gray-900" : "gray-700"}
+                          onPress={() => removeMemberPreflight(member.userId)}
+                        />
+                      ) : null
+                    }
+                  />
+                );
+              })}
+            </List>
+
+            <View style={tw`h-10`}></View>
+
             {members.map((member: any) => (
               <WorkspaceMemberRow
                 key={member.userId}
@@ -365,19 +437,6 @@ export default function WorkspaceSettingsMembersScreen(
                 }}
               />
             ))}
-            {isAdmin ? (
-              <>
-                <Text style={styles.memberListItemLabel}>
-                  You are an admin of this workspace
-                </Text>
-              </>
-            ) : (
-              <>
-                <Text style={styles.memberListItemLabel}>
-                  You are not an admin of this workspace
-                </Text>
-              </>
-            )}
           </>
         )}
       </SettingsContentWrapper>
@@ -408,9 +467,6 @@ const styles = StyleSheet.create({
   },
   memberListItemLabel: {
     flexGrow: 1,
-  },
-  addMemberContainer: {
-    flexDirection: "row",
   },
   formError: {
     color: "red",
