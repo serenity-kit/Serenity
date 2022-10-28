@@ -8,8 +8,7 @@ import {
   useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
-import { formatDistance, parseJSON } from "date-fns";
-import { isPast } from "date-fns/esm";
+import { formatDistance, parseJSON, isPast } from "date-fns";
 import { StyleSheet } from "react-native";
 
 type Props = {
