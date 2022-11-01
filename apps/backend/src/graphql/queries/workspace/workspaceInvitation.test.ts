@@ -111,7 +111,7 @@ test("not admin should throw error", async () => {
           id: workspaceId,
         },
       },
-      role: Role.VIEWER,
+      role: Role.EDITOR,
     },
   });
   await expect(
@@ -142,7 +142,7 @@ test("not logged in user should throw an authentication error", async () => {
           id: workspaceId,
         },
       },
-      role: Role.VIEWER,
+      role: Role.EDITOR,
     },
   });
   await expect(

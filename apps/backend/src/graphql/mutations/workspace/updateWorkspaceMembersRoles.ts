@@ -38,7 +38,6 @@ export const updateWorkspaceMembersRolesMutation = mutationField(
       ),
     },
     async resolve(root, args, context) {
-      console.log({ members: args.input.members });
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }

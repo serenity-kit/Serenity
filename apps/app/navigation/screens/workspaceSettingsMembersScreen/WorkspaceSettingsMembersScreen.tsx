@@ -355,7 +355,7 @@ export default function WorkspaceSettingsMembersScreen(
                       ?.me?.id
                 }
                 onAdminStatusChange={(isMemberAdmin: boolean) => {
-                  let memberRole: Role = Role.Viewer;
+                  let memberRole: Role = Role.Editor;
                   if (isMemberAdmin) {
                     memberRole = Role.Admin;
                   }

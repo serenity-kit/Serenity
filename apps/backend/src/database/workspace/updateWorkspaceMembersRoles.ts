@@ -20,7 +20,6 @@ export async function updateWorkspaceMembersRoles({
   members,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
-    console.log({ members });
     // 1. retrieve workspace if owned by user
     // 2. update usersToWorkspaces with new member structures
     const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
@@ -69,15 +68,13 @@ export async function updateWorkspaceMembersRoles({
         validViewerUserIds.push(userToWorkspace.userId);
       }
     });
-    console.log({ validAdminUserIds });
-    console.log({ validViewerUserIds });
     await prisma.usersToWorkspaces.updateMany({
       where: { userId: { in: validAdminUserIds } },
       data: { role: Role.ADMIN },
     });
     await prisma.usersToWorkspaces.updateMany({
       where: { workspaceId: id, userId: { in: validViewerUserIds } },
-      data: { role: Role.VIEWER },
+      data: { role: Role.EDITOR },
     });
     const updatedWorkspace = await prisma.workspace.findFirst({
       where: { id },

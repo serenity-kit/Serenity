@@ -1,3 +1,4 @@
+import { Role } from "../../prisma/generated/output";
 import { CreatorDevice, Device } from "./device";
 
 export type MemberIdWithDevice = {
@@ -27,13 +28,6 @@ export type WorkspaceKey = {
   workspaceKeyBox?: WorkspaceKeyBox;
   workspaceKeyBoxes?: WorkspaceKeyBox[];
 };
-
-export enum Role {
-  ADMIN = "ADMIN",
-  EDITOR = "EDITOR",
-  COMMENTER = "COMMENTER",
-  VIEWER = "VIEWER",
-}
 
 export type WorkspaceMember = {
   userId: string;

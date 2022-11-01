@@ -108,7 +108,7 @@ test("user should not be able to delete a workspace invitation if they aren't ad
           id: workspace2,
         },
       },
-      role: Role.VIEWER,
+      role: Role.EDITOR,
     },
   });
   // user2 shares workspace

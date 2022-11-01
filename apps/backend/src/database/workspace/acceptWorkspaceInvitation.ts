@@ -64,7 +64,7 @@ export async function acceptWorkspaceInvitation({
         data: {
           userId,
           workspaceId,
-          role: Role.VIEWER,
+          role: Role.EDITOR,
           isAuthorizedMember: false,
         },
       });

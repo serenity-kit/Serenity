@@ -63,11 +63,11 @@ test("user should be able to update a workspace, but not their own access level"
   const members = [
     {
       userId: userData1.user.id,
-      role: Role.VIEWER,
+      role: Role.EDITOR,
     },
     {
       userId: userData2.user.id,
-      role: Role.VIEWER,
+      role: Role.EDITOR,
     },
   ];
   const result = await updateWorkspaceMembersRoles({
@@ -118,7 +118,7 @@ test("user should not be able to update a workspace for a workspace that doesn't
   const members = [
     {
       userId: userData1.user.id,
-      role: Role.VIEWER,
+      role: Role.EDITOR,
     },
     {
       userId: userData1.user.id,
@@ -141,7 +141,7 @@ test("Unauthenticated", async () => {
   const members = [
     {
       userId: userData1.user.id,
-      role: Role.VIEWER,
+      role: Role.EDITOR,
     },
   ];
   await expect(
