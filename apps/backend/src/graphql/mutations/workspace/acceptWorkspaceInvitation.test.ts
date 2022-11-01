@@ -1,4 +1,5 @@
 import { gql } from "graphql-request";
+import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
@@ -55,11 +56,11 @@ test("user should be able to accept an invitation", async () => {
   expect(sharedWorkspace.name).toBe(sharedWorkspace.name);
   expect(sharedWorkspace.members.length).toBe(2);
   sharedWorkspace.members.forEach(
-    (member: { username: string; isAdmin: any }) => {
+    (member: { username: string; role: Role }) => {
       if (member.username === inviteeUsername) {
-        expect(member.isAdmin).toBe(false);
+        expect(member.role).not.toBe(Role.ADMIN);
       } else if (member.username === inviterUserName) {
-        expect(member.isAdmin).toBe(true);
+        expect(member.role).toBe(Role.ADMIN);
       }
     }
   );
@@ -76,13 +77,11 @@ test("double-accepting invitation does nothing", async () => {
   expect(typeof sharedWorkspace.id).toBe("string");
   expect(sharedWorkspace.name).toBe(sharedWorkspace.name);
   expect(sharedWorkspace.members.length).toBe(2);
-  sharedWorkspace.members.forEach(
-    (member: { userId: string; isAdmin: any }) => {
-      if (member.userId === inviteeUsername) {
-        expect(member.isAdmin).toBe(false);
-      }
+  sharedWorkspace.members.forEach((member: { userId: string; role: Role }) => {
+    if (member.userId === inviteeUsername) {
+      expect(member.role).not.toBe(Role.ADMIN);
     }
-  );
+  });
 });
 
 test("invalid invitation id should throw error", async () => {
@@ -139,7 +138,7 @@ describe("Input errors", () => {
           members {
             userId
             username
-            isAdmin
+            role
           }
         }
       }

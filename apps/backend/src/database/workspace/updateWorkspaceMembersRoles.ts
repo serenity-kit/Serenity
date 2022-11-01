@@ -1,10 +1,11 @@
 import { ForbiddenError } from "apollo-server-express";
+import { Role } from "../../../prisma/generated/output";
 import { formatWorkspace, Workspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 
 export type WorkspaceMemberParams = {
   userId: string;
-  isAdmin: boolean;
+  role: Role;
 };
 
 type Params = {
@@ -19,20 +20,21 @@ export async function updateWorkspaceMembersRoles({
   members,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
+    console.log({ members });
     // 1. retrieve workspace if owned by user
     // 2. update usersToWorkspaces with new member structures
     const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
       where: {
         userId,
-        isAdmin: true,
+        role: Role.ADMIN,
         workspaceId: id,
       },
       select: {
         workspaceId: true,
-        isAdmin: true,
+        role: true,
       },
     });
-    if (!userToWorkspace || !userToWorkspace.isAdmin) {
+    if (!userToWorkspace || !userToWorkspace.role) {
       throw new ForbiddenError("Unauthorized");
     }
     const workspace = await prisma.workspace.findFirst({
@@ -58,25 +60,24 @@ export async function updateWorkspaceMembersRoles({
       select: { userId: true },
     });
     const validAdminUserIds: string[] = [];
-    const validNonAdminUserIds: string[] = [];
+    const validViewerUserIds: string[] = [];
     usersToWorkspace.forEach((userToWorkspace) => {
       const member = memberIdLookup[userToWorkspace.userId];
-      if (member.isAdmin) {
+      if (member.role === Role.ADMIN) {
         validAdminUserIds.push(userToWorkspace.userId);
       } else {
-        validNonAdminUserIds.push(userToWorkspace.userId);
+        validViewerUserIds.push(userToWorkspace.userId);
       }
     });
-    const validUserIds = usersToWorkspace.map(
-      (userToWorkspace) => userToWorkspace.userId
-    );
+    console.log({ validAdminUserIds });
+    console.log({ validViewerUserIds });
     await prisma.usersToWorkspaces.updateMany({
       where: { userId: { in: validAdminUserIds } },
-      data: { isAdmin: true },
+      data: { role: Role.ADMIN },
     });
     await prisma.usersToWorkspaces.updateMany({
-      where: { workspaceId: id, userId: { in: validNonAdminUserIds } },
-      data: { isAdmin: false },
+      where: { workspaceId: id, userId: { in: validViewerUserIds } },
+      data: { role: Role.VIEWER },
     });
     const updatedWorkspace = await prisma.workspace.findFirst({
       where: { id },

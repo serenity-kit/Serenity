@@ -3,6 +3,7 @@ import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -84,8 +85,8 @@ test("user can create initial workspace structure", async () => {
   // expect(document.parentFolderId).toBe(folder.id);
   expect(folder.workspaceId).toBe(workspaceId);
   expect(folder.parentFolderId).toBe(null);
-  workspace.members.forEach((member: { userId: string; isAdmin: any }) => {
-    expect(member.isAdmin).toBe(true);
+  workspace.members.forEach((member: { userId: string; role: Role }) => {
+    expect(member.role).toBe(Role.ADMIN);
   });
 });
 
@@ -141,7 +142,7 @@ describe("Test login", () => {
           name
           members {
             userId
-            isAdmin
+            role
           }
         }
         folder {

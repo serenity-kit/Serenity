@@ -5,7 +5,7 @@ query workspaces($deviceSigningPublicKey: String!) {
       name
       members {
         userId
-        isAdmin
+        role
       }
       currentWorkspaceKey {
         id

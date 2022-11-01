@@ -45,7 +45,7 @@ export const WorkspaceKey = objectType({
   },
 });
 
-const RoleEnum = enumType({
+const MemberRoleEnum = enumType({
   name: "Role",
   members: {
     ADMIN: "ADMIN",
@@ -60,7 +60,7 @@ export const WorkspaceMember = objectType({
   definition(t) {
     t.nonNull.string("userId");
     t.string("username");
-    t.nonNull.field("role", { type: RoleEnum });
+    t.nonNull.field("role", { type: MemberRoleEnum });
   },
 });
 
@@ -89,7 +89,7 @@ export const WorkspaceMemberInput = inputObjectType({
   name: "WorkspaceMemberInput",
   definition(t) {
     t.nonNull.string("userId");
-    t.nonNull.string("role");
+    t.nonNull.field("role", { type: MemberRoleEnum });
   },
 });
 

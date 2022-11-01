@@ -1,5 +1,6 @@
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
@@ -62,11 +63,11 @@ test("user should be able to update a workspace, but not their own access level"
   const members = [
     {
       userId: userData1.user.id,
-      isAdmin: false,
+      role: Role.VIEWER,
     },
     {
       userId: userData2.user.id,
-      isAdmin: false,
+      role: Role.VIEWER,
     },
   ];
   const result = await updateWorkspaceMembersRoles({
@@ -77,11 +78,11 @@ test("user should be able to update a workspace, but not their own access level"
   });
   const workspace = result.updateWorkspaceMembersRoles.workspace;
   expect(workspace.members.length).toBe(2);
-  workspace.members.forEach((member: { userId: string; isAdmin: any }) => {
+  workspace.members.forEach((member: { userId: string; role: Role }) => {
     if (member.userId === userData1.user.id) {
-      expect(member.isAdmin).toBe(true);
+      expect(member.role).toBe(Role.ADMIN);
     } else {
-      expect(member.isAdmin).toBe(false);
+      expect(member.role).not.toBe(Role.ADMIN);
     }
   });
 });
@@ -92,11 +93,11 @@ test("user should not be able to update a workspace they don't own", async () =>
   const members = [
     {
       userId: userData1.user.id,
-      isAdmin: true,
+      role: Role.ADMIN,
     },
     {
       userId: userData2.user.id,
-      isAdmin: true,
+      role: Role.ADMIN,
     },
   ];
   await expect(
@@ -117,11 +118,11 @@ test("user should not be able to update a workspace for a workspace that doesn't
   const members = [
     {
       userId: userData1.user.id,
-      isAdmin: false,
+      role: Role.VIEWER,
     },
     {
       userId: userData1.user.id,
-      isAdmin: true,
+      role: Role.ADMIN,
     },
   ];
   await expect(
@@ -140,7 +141,7 @@ test("Unauthenticated", async () => {
   const members = [
     {
       userId: userData1.user.id,
-      isAdmin: false,
+      role: Role.VIEWER,
     },
   ];
   await expect(
@@ -165,7 +166,7 @@ describe("Input errors", () => {
           name
           members {
             userId
-            isAdmin
+            role
           }
         }
       }
@@ -175,7 +176,7 @@ describe("Input errors", () => {
     const members = [
       {
         userId: userData1.user.id,
-        isAdmin: false,
+        role: Role.ADMIN,
       },
     ];
     const authorizationHeaders = {

@@ -134,7 +134,7 @@ describe("Input errors", () => {
           name
           members {
             userId
-            isAdmin
+            role
           }
         }
       }

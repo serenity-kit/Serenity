@@ -28,7 +28,12 @@ export type WorkspaceKey = {
   workspaceKeyBoxes?: WorkspaceKeyBox[];
 };
 
-export type Role = "ADMIN" | "EDITOR" | "COMMENTER" | "VIEWER";
+export enum Role {
+  ADMIN = "ADMIN",
+  EDITOR = "EDITOR",
+  COMMENTER = "COMMENTER",
+  VIEWER = "VIEWER",
+}
 
 export type WorkspaceMember = {
   userId: string;

@@ -7,7 +7,7 @@ mutation createInitialWorkspaceStructure(
       name
       members {
         userId
-        isAdmin
+        role
       }
       currentWorkspaceKey {
         id

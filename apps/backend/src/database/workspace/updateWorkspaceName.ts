@@ -1,10 +1,11 @@
 import { ForbiddenError } from "apollo-server-express";
+import { Role } from "../../../prisma/generated/output";
 import { formatWorkspace, Workspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 
 export type WorkspaceMemberParams = {
   userId: string;
-  isAdmin: boolean;
+  role: Role;
 };
 
 type Params = {
@@ -16,7 +17,7 @@ type Params = {
 type UserToWorkspaceData = {
   userId: string;
   workspaceId: string;
-  isAdmin: boolean;
+  role: Role;
 };
 
 export async function updateWorkspaceName({
@@ -28,15 +29,15 @@ export async function updateWorkspaceName({
     const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
       where: {
         userId,
-        isAdmin: true,
+        role: Role.ADMIN,
         workspaceId: id,
       },
       select: {
         workspaceId: true,
-        isAdmin: true,
+        role: true,
       },
     });
-    if (!userToWorkspace || !userToWorkspace.isAdmin) {
+    if (!userToWorkspace || !userToWorkspace.role) {
       throw new ForbiddenError("Unauthorized");
     }
     const workspace = await prisma.workspace.findFirst({
