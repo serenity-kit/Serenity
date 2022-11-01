@@ -13,7 +13,6 @@ type ActiveSnapshotInfo = {
 
 export async function createSnapshot(
   snapshot: Snapshot,
-  keyDerivationTrace: KeyDerivationTrace,
   activeSnapshotInfo?: ActiveSnapshotInfo
 ) {
   return await prisma.$transaction(async (prisma) => {
@@ -75,7 +74,7 @@ export async function createSnapshot(
           connect: { id: snapshot.publicData.docId },
         },
         document: { connect: { id: snapshot.publicData.docId } },
-        keyDerivationTrace,
+        keyDerivationTrace: snapshot.keyDerivationTrace! as KeyDerivationTrace,
         clocks: {},
       },
     });

@@ -128,7 +128,7 @@ export default function Page({
     }
   };
 
-  const createAndSendSnapshot = async (key) => {
+  const createAndSendSnapshot = async (key, keyDervationTrace) => {
     const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
     const publicData = {
       snapshotId: uuidv4(),
@@ -148,6 +148,7 @@ export default function Page({
     websocketConnectionRef.current.send(
       JSON.stringify({
         ...snapshot,
+        keyDervationTrace,
         lastKnownSnapshotId: activeSnapshotIdRef.current,
         latestServerVersion: latestServerVersionRef.current,
       })
@@ -223,6 +224,12 @@ export default function Page({
         subkeyId: document.contentSubkeyId!,
       });
       const snapshotKey = sodium.from_base64(documentKey.key);
+      const snapshotKeyDerivationTrace = deriveFolderKey({
+        folderId: document.parentFolderId!,
+        workspaceKeyId,
+        workspaceId: document.workspaceId!,
+        activeDevice,
+      });
 
       const onWebsocketMessage = async (event) => {
         const data = JSON.parse(event.data);
@@ -243,7 +250,10 @@ export default function Page({
             // check for pending snapshots or pending updates and run them
             const pendingChanges = getPending(docId);
             if (pendingChanges.type === "snapshot") {
-              await createAndSendSnapshot(snapshotKey);
+              await createAndSendSnapshot(
+                snapshotKey,
+                snapshotKeyDerivationTrace
+              );
               removePending(docId);
             } else if (pendingChanges.type === "updates") {
               // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
@@ -279,7 +289,10 @@ export default function Page({
 
             const pending = getPending(data.docId);
             if (pending.type === "snapshot") {
-              await createAndSendSnapshot(snapshotKey);
+              await createAndSendSnapshot(
+                snapshotKey,
+                snapshotKeyDerivationTrace
+              );
               removePending(data.docId);
             } else if (pending.type === "updates") {
               // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
@@ -304,7 +317,10 @@ export default function Page({
             removeSnapshotInProgress(data.docId);
             // all pending can be removed since a new snapshot will include all local changes
             removePending(data.docId);
-            await createAndSendSnapshot(snapshotKey);
+            await createAndSendSnapshot(
+              snapshotKey,
+              snapshotKeyDerivationTrace
+            );
             break;
           case "update":
             const updateResult = await verifyAndDecryptUpdate(
@@ -451,7 +467,10 @@ export default function Page({
             ) {
               addPendingSnapshot(docId);
             } else {
-              await createAndSendSnapshot(snapshotKey);
+              await createAndSendSnapshot(
+                snapshotKey,
+                snapshotKeyDerivationTrace
+              );
             }
           } else {
             if (

@@ -94,7 +94,11 @@ export async function createInitialWorkspaceStructure({
     workspaceKeyId: workspaceKey?.id!,
     parentFolders: [],
   };
-  await createSnapshot(documentSnapshot, snapshotKeyDerivationTrace);
+  const fullDocumentSnapshot = {
+    ...documentSnapshot,
+    keyDerivationTrace: snapshotKeyDerivationTrace,
+  };
+  await createSnapshot(fullDocumentSnapshot);
   return {
     workspace,
     document: formatDocument(document),
