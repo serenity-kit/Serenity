@@ -35,11 +35,23 @@ export interface AwarenessUpdatePublicData {
   pubKey: string; // public signing key
 }
 
+export interface KeyDerivationTraceParentFolder {
+  folderId: string;
+  subkeyId: number;
+  parentFolderId?: string | undefined | null;
+}
+
+export interface KeyDerivationTrace {
+  workspaceKeyId: string;
+  parentFolders: KeyDerivationTraceParentFolder[];
+}
+
 export interface Snapshot {
   ciphertext: string;
   nonce: string;
   signature: string; // ciphertext + nonce + publicData
   publicData: SnapshotPublicData;
+  keyDerivationTrace?: KeyDerivationTrace | undefined;
 }
 
 export interface SnapshotWithServerData extends Snapshot {
