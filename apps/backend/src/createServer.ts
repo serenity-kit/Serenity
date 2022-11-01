@@ -27,6 +27,7 @@ import { getUpdatesForDocument } from "./database/getUpdatesForDocument";
 import { retryAsyncFunction } from "./retryAsyncFunction";
 import { schema } from "./schema";
 import { addConnection, addUpdate, removeConnection } from "./store";
+import { KeyDerivationTrace } from "./types/folder";
 import { ExpectedGraphqlError } from "./utils/expectedGraphqlError/expectedGraphqlError";
 
 export default async function createServer() {
@@ -147,7 +148,17 @@ export default async function createServer() {
                     snapshotId: data.lastKnownSnapshotId,
                   }
                 : undefined;
-            const snapshot = await createSnapshot(data, activeSnapshotInfo);
+            // NOTE: this is a bit of a hack.
+            // The server doesn't have access to the client's private data
+            // so it can't create a "real" key derivation trace.
+            // so instead we copy the parent folder's key derivation trace from the client
+            const snapshotKeyDerivationTrace = doc?.parentFolder
+              .keyDerivationTrace as KeyDerivationTrace;
+            const snapshot = await createSnapshot(
+              data,
+              snapshotKeyDerivationTrace,
+              activeSnapshotInfo
+            );
             console.log("addUpdate snapshot");
             connection.send(
               JSON.stringify({

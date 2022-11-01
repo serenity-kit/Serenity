@@ -6,24 +6,21 @@ export type Props = {
 };
 export const createWorkspaceInvitation = async ({ page }: Props) => {
   await page.locator("text=Settings").click();
-  delayForSeconds(2);
+  delayForSeconds(1);
   await page.locator("text=Members").click();
+  delayForSeconds(2);
   await page
     .locator('div[role="button"]:has-text("Create Invitation")')
     .click();
   await delayForSeconds(2);
-  const expectedNumInvitations = await page
-    .locator("//div[@id='workspaceInviteeList']/div/div")
-    .count();
   const linkInfoDiv = page
-    .locator("//input[@id='workspaceInvitationInstructionsInput']")
+    .locator("//div[@data-testid='workspaceInvitationInstructionsText']")
     .first();
-  const linkInfoText = await linkInfoDiv.inputValue();
-  const linkInfoWords = linkInfoText.split(" ");
+  const linkInfoText = await linkInfoDiv.textContent();
+  const linkInfoWords = linkInfoText?.replace(/\n/g, " ").split(" ") || "";
   const workspaceInvitationUrl = linkInfoWords[linkInfoWords.length - 1];
-  const numInvitations = await page
-    .locator("//div[@id='workspaceInviteeList']/div/div")
-    .count();
-  expect(numInvitations).toBe(expectedNumInvitations);
+  expect(workspaceInvitationUrl).toContain(
+    "http://localhost:3000/accept-workspace-invitation/"
+  );
   return { url: workspaceInvitationUrl };
 };

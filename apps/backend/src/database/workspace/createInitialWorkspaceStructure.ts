@@ -88,13 +88,13 @@ export async function createInitialWorkspaceStructure({
         workspaceKeyId: workspaceKey?.id!,
         parentFolders: [],
       },
-      contentKeyDerivationTrace: {
-        workspaceKeyId: workspaceKey?.id!,
-        parentFolders: [],
-      },
     },
   });
-  await createSnapshot(documentSnapshot);
+  const snapshotKeyDerivationTrace = {
+    workspaceKeyId: workspaceKey?.id!,
+    parentFolders: [],
+  };
+  await createSnapshot(documentSnapshot, snapshotKeyDerivationTrace);
   return {
     workspace,
     document: formatDocument(document),

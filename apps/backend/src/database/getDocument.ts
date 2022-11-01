@@ -1,5 +1,6 @@
-import { prisma } from "./prisma";
+import { Folder } from "../../prisma/generated/output";
 import { serializeSnapshot, serializeUpdates } from "../utils/serialize";
+import { prisma } from "./prisma";
 
 export async function getDocument(documentId: string) {
   const doc = await prisma.document.findUnique({
@@ -11,6 +12,12 @@ export async function getDocument(documentId: string) {
     },
   });
   if (!doc) return null;
+  let parentFolder: Folder | null = null;
+  if (doc.parentFolderId) {
+    parentFolder = await prisma.folder.findUnique({
+      where: { id: doc.parentFolderId },
+    });
+  }
 
   const snapshot = doc.activeSnapshot
     ? serializeSnapshot(doc.activeSnapshot)
@@ -21,7 +28,17 @@ export async function getDocument(documentId: string) {
     : [];
 
   return {
-    doc: { id: doc.id },
+    doc: {
+      id: doc.id,
+      parentFolderId: doc.parentFolderId,
+      workspaceKeyId: doc.workspaceKeyId,
+    },
+    parentFolder: {
+      id: parentFolder?.id,
+      parentFolderId: parentFolder?.parentFolderId,
+      subkeyId: parentFolder?.subkeyId,
+      keyDerivationTrace: parentFolder?.keyDerivationTrace,
+    },
     snapshot,
     updates,
   };

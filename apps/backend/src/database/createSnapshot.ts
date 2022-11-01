@@ -1,9 +1,10 @@
-import { prisma } from "./prisma";
 import {
-  Snapshot,
-  NaishoSnapshotMissesUpdatesError,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
+  NaishoSnapshotMissesUpdatesError,
+  Snapshot,
 } from "@naisho/core";
+import { KeyDerivationTrace } from "../types/folder";
+import { prisma } from "./prisma";
 
 type ActiveSnapshotInfo = {
   latestVersion: number;
@@ -12,6 +13,7 @@ type ActiveSnapshotInfo = {
 
 export async function createSnapshot(
   snapshot: Snapshot,
+  keyDerivationTrace: KeyDerivationTrace,
   activeSnapshotInfo?: ActiveSnapshotInfo
 ) {
   return await prisma.$transaction(async (prisma) => {
@@ -73,6 +75,7 @@ export async function createSnapshot(
           connect: { id: snapshot.publicData.docId },
         },
         document: { connect: { id: snapshot.publicData.docId } },
+        keyDerivationTrace,
         clocks: {},
       },
     });
