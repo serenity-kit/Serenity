@@ -1,4 +1,4 @@
-import { inputObjectType, list, nonNull, objectType } from "nexus";
+import { enumType, inputObjectType, list, nonNull, objectType } from "nexus";
 import { CreatorDevice, Device } from "./device";
 
 export const MemberIdWithDevice = objectType({
@@ -45,12 +45,22 @@ export const WorkspaceKey = objectType({
   },
 });
 
+const RoleEnum = enumType({
+  name: "Role",
+  members: {
+    ADMIN: "ADMIN",
+    EDITOR: "EDITOR",
+    COMMENTER: "COMMENTER",
+    VIEWER: "VIEWER",
+  },
+});
+
 export const WorkspaceMember = objectType({
   name: "WorkspaceMember",
   definition(t) {
     t.nonNull.string("userId");
     t.string("username");
-    t.nonNull.boolean("isAdmin");
+    t.nonNull.field("role", { type: RoleEnum });
   },
 });
 
@@ -79,7 +89,7 @@ export const WorkspaceMemberInput = inputObjectType({
   name: "WorkspaceMemberInput",
   definition(t) {
     t.nonNull.string("userId");
-    t.nonNull.boolean("isAdmin");
+    t.nonNull.string("role");
   },
 });
 

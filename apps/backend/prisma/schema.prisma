@@ -172,12 +172,19 @@ model Workspace {
   workspaceKeys     WorkspaceKey[]
 }
 
+enum Role {
+  ADMIN
+  EDITOR
+  COMMENTER
+  VIEWER
+}
+
 model UsersToWorkspaces {
   user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId             String
   workspace          Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId        String
-  isAdmin            Boolean
+  role               Role      @default(VIEWER)
   isAuthorizedMember Boolean   @default(false)
 
   @@id([userId, workspaceId])
