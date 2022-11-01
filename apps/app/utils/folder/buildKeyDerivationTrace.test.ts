@@ -10,12 +10,12 @@ import { getFolder } from "./getFolder";
 it("should return empty parentFolders", async () => {
   const result = await buildKeyDerivationTrace({
     folderId: null,
-    workspaceKeyId: "abc",
+    workspaceKeyId: "aaa",
   });
   expect(result).toMatchInlineSnapshot(`
     {
       "parentFolders": [],
-      "workspaceKeyId": "abc",
+      "workspaceKeyId": "aaa",
     }
   `);
 });
