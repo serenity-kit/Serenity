@@ -204,19 +204,6 @@ export default function Page({
       // the currently active document
       updateActiveDocumentInfoStore(document, activeDevice);
 
-      // const folder = await getFolder({ id: document.parentFolderId! });
-      // const folderKeyString = await getFolderKey({
-      //   folderId: folder.id!,
-      //   workspaceKeyId: document.workspaceKeyId!,
-      //   workspaceId: document.workspaceId!,
-      //   folderSubkeyId: folder.subkeyId,
-      //   activeDevice,
-      // });
-      // const documentKey = await recreateDocumentKey({
-      //   folderKey: folderKeyString,
-      //   subkeyId: document.contentSubkeyId!,
-      // });
-      // const key = sodium.from_base64(documentKey.key);
       const workspace = await getWorkspace({
         workspaceId: document.workspaceId!,
         deviceSigningPublicKey: activeDevice.signingPublicKey,
