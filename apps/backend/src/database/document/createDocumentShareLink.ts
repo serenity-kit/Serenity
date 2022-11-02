@@ -69,65 +69,67 @@ export const createDocumentShareLink = async ({
   if (!userToWorkspace) {
     throw new ForbiddenError("Unauthorized");
   }
-  // create the device
-  const creatorDevice = await prisma.creatorDevice.create({
-    data: {
-      signingPublicKey: deviceSigningPublicKey,
-      encryptionPublicKey: deviceEncryptionPublicKey,
-      encryptionPublicKeySignature: deviceEncryptionPublicKeySignature,
-      user: {
-        connect: {
-          id: sharerUserId,
+  return await prisma.$transaction(async (prisma) => {
+    // create the device
+    const creatorDevice = await prisma.creatorDevice.create({
+      data: {
+        signingPublicKey: deviceSigningPublicKey,
+        encryptionPublicKey: deviceEncryptionPublicKey,
+        encryptionPublicKeySignature: deviceEncryptionPublicKeySignature,
+        user: {
+          connect: {
+            id: sharerUserId,
+          },
         },
       },
-    },
-  });
+    });
 
-  const documentShareLink = await prisma.documentShareLink.create({
-    data: {
-      documentId,
-      role: sharingRole,
-      deviceSecretBoxCiphertext,
-      deviceSecretBoxNonce,
-      creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
-    },
-  });
-
-  // get the latest snapshot and set up the snapshot key boxes
-  const latestSnapshot = await prisma.snapshot.findFirst({
-    where: { documentId },
-    orderBy: { createdAt: "desc" },
-  });
-  if (!latestSnapshot) {
-    throw new Error("No snapshot found");
-  }
-  let latestSnapshotKey = await prisma.snapshotKey.findFirst({
-    where: { snapshotId: latestSnapshot?.id },
-    orderBy: { generation: "desc" },
-  });
-  let snapshotKeyId = "";
-  if (!latestSnapshotKey) {
-    latestSnapshotKey = await prisma.snapshotKey.create({
+    const documentShareLink = await prisma.documentShareLink.create({
       data: {
-        generation: 0,
-        snapshotId: latestSnapshot.id,
+        documentId,
+        role: sharingRole,
+        deviceSecretBoxCiphertext,
+        deviceSecretBoxNonce,
+        creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
       },
     });
-  }
-  snapshotKeyId = latestSnapshotKey.id;
 
-  const snapshotKeyBoxes: SnapshotKeyBoxCreateInput[] = [];
-  for (const snapshotKeyBox of snapshotDeviceKeyBoxes) {
-    snapshotKeyBoxes.push({
-      snapshotKeyId,
-      ciphertext: snapshotKeyBox.ciphertext,
-      nonce: snapshotKeyBox.nonce,
-      deviceSigningPublicKey: snapshotKeyBox.deviceSigningPublicKey,
-      creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
+    // get the latest snapshot and set up the snapshot key boxes
+    const latestSnapshot = await prisma.snapshot.findFirst({
+      where: { documentId },
+      orderBy: { createdAt: "desc" },
     });
-  }
-  await prisma.snapshotKeyBox.createMany({
-    data: snapshotKeyBoxes,
+    if (!latestSnapshot) {
+      throw new Error("No snapshot found");
+    }
+    let latestSnapshotKey = await prisma.snapshotKey.findFirst({
+      where: { snapshotId: latestSnapshot?.id },
+      orderBy: { generation: "desc" },
+    });
+    let snapshotKeyId = "";
+    if (!latestSnapshotKey) {
+      latestSnapshotKey = await prisma.snapshotKey.create({
+        data: {
+          generation: 0,
+          snapshotId: latestSnapshot.id,
+        },
+      });
+    }
+    snapshotKeyId = latestSnapshotKey.id;
+
+    const snapshotKeyBoxes: SnapshotKeyBoxCreateInput[] = [];
+    for (const snapshotKeyBox of snapshotDeviceKeyBoxes) {
+      snapshotKeyBoxes.push({
+        snapshotKeyId,
+        ciphertext: snapshotKeyBox.ciphertext,
+        nonce: snapshotKeyBox.nonce,
+        deviceSigningPublicKey: snapshotKeyBox.deviceSigningPublicKey,
+        creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
+      });
+    }
+    await prisma.snapshotKeyBox.createMany({
+      data: snapshotKeyBoxes,
+    });
+    return documentShareLink;
   });
-  return documentShareLink;
 };
