@@ -1,4 +1,4 @@
-import { objectType } from "nexus";
+import { inputObjectType, objectType } from "nexus";
 import { Session } from "./session";
 
 export const Device = objectType({
@@ -39,5 +39,14 @@ export const CreatorDevice = objectType({
     t.nonNull.string("encryptionPublicKey");
     t.nonNull.string("encryptionPublicKeySignature");
     t.field("createdAt", { type: "Date" });
+  },
+});
+
+export const CreatorDeviceInput = inputObjectType({
+  name: "CreatorDeviceInput",
+  definition(t) {
+    t.nonNull.string("signingPublicKey");
+    t.nonNull.string("encryptionPublicKey");
+    t.nonNull.string("encryptionPublicKeySignature");
   },
 });
