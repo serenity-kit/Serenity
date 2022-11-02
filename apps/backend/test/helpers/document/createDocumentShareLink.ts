@@ -5,30 +5,30 @@ import { SnapshotDeviceKeyBox } from "../../../src/database/document/createDocum
 import { Device } from "../../../src/types/device";
 
 type CreateSnapshotDeviceKeyBoxParams = {
-  receiverDeviceEncryptionPublicKeys: string[];
+  receiverDevices: Device[];
   creatorDeviceEncryptionPrivateKey: string;
   key: string;
 };
 const createSnapshotDeviceKeyBoxes = async ({
-  receiverDeviceEncryptionPublicKeys,
+  receiverDevices,
   creatorDeviceEncryptionPrivateKey,
   key,
 }: CreateSnapshotDeviceKeyBoxParams) => {
   const snapshotKeyBoxes: SnapshotDeviceKeyBox[] = [];
-  for (const receiverDeviceEncryptionPublicKey of receiverDeviceEncryptionPublicKeys) {
+  for (const receiverDevice of receiverDevices) {
     const nonce = await sodium.randombytes_buf(
       sodium.crypto_secretbox_NONCEBYTES
     );
     const ciphertext = await sodium.crypto_box_easy(
       key,
       nonce,
-      receiverDeviceEncryptionPublicKey,
+      receiverDevice.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey
     );
     snapshotKeyBoxes.push({
       ciphertext,
       nonce,
-      deviceSigningPublicKey: receiverDeviceEncryptionPublicKey,
+      deviceSigningPublicKey: receiverDevice.signingPublicKey,
     });
   }
   return snapshotKeyBoxes;
@@ -43,7 +43,7 @@ export type Params = {
   creatorDevice: Device;
   creatorDeviceEncryptionPrivateKey: string;
   snapshotKey: string;
-  receiverDeviceEncryptionPublicKeys: string[];
+  receiverDevices: Device[];
   authorizationHeader: string;
 };
 
@@ -56,7 +56,7 @@ export const createDocumentShareLink = async ({
   creatorDevice,
   creatorDeviceEncryptionPrivateKey,
   snapshotKey,
-  receiverDeviceEncryptionPublicKeys,
+  receiverDevices,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -64,7 +64,7 @@ export const createDocumentShareLink = async ({
   };
 
   const snapshotDeviceKeyBoxes = await createSnapshotDeviceKeyBoxes({
-    receiverDeviceEncryptionPublicKeys,
+    receiverDevices,
     creatorDeviceEncryptionPrivateKey,
     key: snapshotKey,
   });
