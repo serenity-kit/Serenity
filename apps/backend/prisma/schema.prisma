@@ -11,22 +11,23 @@ generator client {
 }
 
 model Document {
-  id                     String        @id
-  activeSnapshot         Snapshot?     @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
-  activeSnapshotId       String?       @unique
+  id                     String              @id
+  activeSnapshot         Snapshot?           @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
+  activeSnapshotId       String?             @unique
   snapshots              Snapshot[]
-  createdAt              DateTime      @default(now())
-  workspace              Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt              DateTime            @default(now())
+  workspace              Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceKeyId         String?
-  workspaceKey           WorkspaceKey? @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
+  workspaceKey           WorkspaceKey?       @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
   workspaceId            String
-  parentFolder           Folder?       @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
+  parentFolder           Folder?             @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
   parentFolderId         String?
   encryptedName          String?
   encryptedNameNonce     String?
   subkeyId               Int?
   contentSubkeyId        Int?
-  nameKeyDerivationTrace Json          @default("{}")
+  nameKeyDerivationTrace Json                @default("{}")
+  documentShareLinks     DocumentShareLink[]
 
   @@unique([subkeyId, workspaceId])
 }
@@ -152,13 +153,14 @@ model Device {
 }
 
 model CreatorDevice {
-  signingPublicKey             String            @id @unique
+  signingPublicKey             String              @id @unique
   encryptionPublicKey          String
   encryptionPublicKeySignature String
-  user                         User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user                         User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId                       String?
-  createdAt                    DateTime          @default(now())
+  createdAt                    DateTime            @default(now())
   workspaceKeyBoxes            WorkspaceKeyBox[]
+  documentShareLinks           DocumentShareLink[]
 }
 
 model Workspace {
@@ -232,4 +234,15 @@ model Folder {
   documents          Document[]
 
   @@unique([subkeyId, workspaceId])
+}
+
+model DocumentShareLink {
+  token                         String        @id @unique @default(uuid())
+  documentId                    String
+  document                      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  role                          Role          @default(VIEWER)
+  deviceSecretBoxCiphertext     String
+  deviceSecretBoxNonce          String
+  creatorDeviceSigningPublicKey String
+  creatorDevice                 CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
 }
