@@ -11,6 +11,15 @@ import { CreatorDeviceInput } from "../../types/device";
 import { SnapshotDeviceKeyBoxInput } from "../../types/document";
 import { MemberRoleEnum } from "../../types/workspace";
 
+export const SnapshotDeviceKeyBoxInput = inputObjectType({
+  name: "SnapshotDeviceKeyBoxInput",
+  definition(t) {
+    t.nonNull.string("ciphertext");
+    t.nonNull.string("nonce");
+    t.nonNull.string("deviceSigningPublicKey");
+  },
+});
+
 export const CreateDocumentShareLinkInput = inputObjectType({
   name: "CreateDocumentShareLinkInput",
   definition(t) {
