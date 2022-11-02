@@ -1,3 +1,4 @@
+import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
@@ -11,6 +12,7 @@ const password = "password";
 let userData1: any = null;
 
 const setup = async () => {
+  await sodium.ready;
   userData1 = await createUserWithWorkspace({
     id: uuidv4(),
     username: `${uuidv4()}@example.com`,
@@ -26,6 +28,7 @@ beforeAll(async () => {
 test("create share link", async () => {
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
+  const snapshotKey = await sodium.crypto_kdf_keygen();
   const documentShareLinkResponse = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
@@ -33,6 +36,9 @@ test("create share link", async () => {
     deviceSecretBoxCiphertext: "deviceSecretBoxCiphertext",
     deviceSecretBoxNonce: "deviceSecretBoxNonce",
     creatorDevice,
+    creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+    receiverDevices: [creatorDevice],
+    snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });
   const token = documentShareLinkResponse.createDocumentShareLink.token;
@@ -49,6 +55,7 @@ test("Invalid ownership", async () => {
     otherUser.webDevice;
   const documentId = userData1.document.id;
   const authorizationHeader = otherUser.sessionKey;
+  const snapshotKey = await sodium.crypto_kdf_keygen();
   await expect(
     (async () =>
       await createDocumentShareLink({
@@ -58,6 +65,9 @@ test("Invalid ownership", async () => {
         deviceSecretBoxCiphertext: "deviceSecretBoxCiphertext",
         deviceSecretBoxNonce: "deviceSecretBoxNonce",
         creatorDevice,
+        creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+        receiverDevices: [creatorDevice],
+        snapshotKey,
         authorizationHeader,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -66,6 +76,7 @@ test("Invalid ownership", async () => {
 test("Unauthenticated", async () => {
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
+  const snapshotKey = await sodium.crypto_kdf_keygen();
   await expect(
     (async () =>
       await createDocumentShareLink({
@@ -75,6 +86,9 @@ test("Unauthenticated", async () => {
         deviceSecretBoxCiphertext: "deviceSecretBoxCiphertext",
         deviceSecretBoxNonce: "deviceSecretBoxNonce",
         creatorDevice,
+        creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+        receiverDevices: [creatorDevice],
+        snapshotKey,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -96,6 +110,7 @@ describe("Input errors", () => {
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
       userData1.webDevice;
+    const snapshotKey = await sodium.crypto_kdf_keygen();
     await expect(
       (async () =>
         await graphql.client.request(
@@ -108,7 +123,9 @@ describe("Input errors", () => {
               deviceSecretBoxCiphertext: "deviceSecretBoxCiphertext",
               deviceSecretBoxNonce: "deviceSecretBoxNonce",
               creatorDevice,
-              authorizationHeader: userData1.sessionKey,
+              creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+              receiverDevices: [creatorDevice],
+              snapshotKey,
             },
           },
           { authorization: userData1.sessionKey }
@@ -123,6 +140,7 @@ describe("Input errors", () => {
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
       userData1.webDevice;
+    const snapshotKey = await sodium.crypto_kdf_keygen();
     await expect(
       (async () =>
         await graphql.client.request(
@@ -135,7 +153,9 @@ describe("Input errors", () => {
               deviceSecretBoxCiphertext: "deviceSecretBoxCiphertext",
               deviceSecretBoxNonce: "deviceSecretBoxNonce",
               creatorDevice,
-              authorizationHeader: userData1.sessionKey,
+              creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+              receiverDevices: [creatorDevice],
+              snapshotKey,
             },
           },
           { authorization: userData1.sessionKey }
@@ -155,6 +175,7 @@ describe("Input errors", () => {
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
       otherUser.webDevice;
+    const snapshotKey = await sodium.crypto_kdf_keygen();
     await expect(
       (async () =>
         await graphql.client.request(
@@ -167,7 +188,9 @@ describe("Input errors", () => {
               deviceSecretBoxCiphertext: "deviceSecretBoxCiphertext",
               deviceSecretBoxNonce: "deviceSecretBoxNonce",
               creatorDevice,
-              authorizationHeader: userData1.sessionKey,
+              creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+              receiverDevices: [creatorDevice],
+              snapshotKey,
             },
           },
           { authorization: userData1.sessionKey }
