@@ -21,11 +21,13 @@ import { AppContextProvider } from "./context/AppContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
 import { patchConsoleOutput } from "./utils/patchConsoleOutput/patchConsoleOutput";
+import { patchFileReader } from "./utils/patchFileReader/patchFileReader";
 import { patchGlobalStyles } from "./utils/patchGlobalStyles/patchGlobalStyles";
 import { source } from "./webviews/opaque/source";
 
 patchConsoleOutput();
 patchGlobalStyles();
+patchFileReader();
 
 // import { clearDeviceAndSessionStorage } from "./utils/authentication/clearDeviceAndSessionStorage";
 // clearDeviceAndSessionStorage();

@@ -1,0 +1,17 @@
+{
+  "name": "@serenity-tools/editor-image-extension",
+  "version": "0.0.1",
+  "main": "src/index",
+  "scripts": {
+    "ts:check": "yarn tsc --noEmit",
+    "test": "echo 'Nothing to test'",
+    "lint": "eslint --ext .tsx --ext .ts ./"
+  },
+  "devDependencies": {
+    "@babel/preset-flow": "^7.18.6",
+    "@types/base-64": "^1.0.0"
+  },
+  "dependencies": {
+    "base-64": "^1.0.0"
+  }
+}

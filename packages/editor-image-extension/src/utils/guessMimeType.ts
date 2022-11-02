@@ -1,7 +1,8 @@
-export type Props = {
+export type GuessMimeTypeParams = {
   base64FileData: string;
 };
-export const guessMimeType = ({ base64FileData }: Props) => {
+
+export const guessMimeType = ({ base64FileData }: GuessMimeTypeParams) => {
   const isPng = base64FileData.startsWith("iVBORw0KGgo");
   if (isPng) {
     return "image/png";

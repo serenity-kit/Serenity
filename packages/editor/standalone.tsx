@@ -1,3 +1,5 @@
+import "regenerator-runtime/runtime.js";
+
 import { NativeBaseProvider } from "native-base";
 import React from "react";
 import ReactDOM from "react-dom";
@@ -19,6 +21,14 @@ if (window.initialContent) {
   const update = new Uint8Array(window.initialContent);
   Y.applyUpdateV2(window.ydoc, update, "react-native-bridge");
 }
+
+const fileRequests: {
+  [fileId: string]: {
+    resolve: (value: string) => void;
+    reject: (reason?: string) => void;
+  };
+} = {};
+
 window.applyYjsUpdate = function (updateArray) {
   if (updateArray) {
     const update = new Uint8Array(updateArray);
@@ -73,6 +83,20 @@ window.blurEditor = () => {
   window.editor.commands.blur();
 };
 
+window.resolveImageRequest = (fileId, base64) => {
+  const fileRequest = fileRequests[fileId];
+  if (fileRequest) {
+    fileRequest.resolve(base64);
+  }
+};
+
+window.rejectImageRequest = (fileId, reason) => {
+  const fileRequest = fileRequests[fileId];
+  if (fileRequest) {
+    fileRequest.reject(reason);
+  }
+};
+
 const domContainer = document.querySelector("#editor");
 ReactDOM.render(
   <NativeBaseProvider>
@@ -85,6 +109,23 @@ ReactDOM.render(
       updateTitle={updateTitle}
       isNew={window.isNew}
       onCreate={(params) => (window.editor = params.editor)}
+      encryptAndUpload={async () => {
+        // TODO: implement
+        return Promise.resolve({
+          fileId: "dummyFileId",
+          nonce: "dummynonce",
+          key: "dummykey",
+        });
+      }}
+      downloadAndDecryptFile={(params) => {
+        const promise = new Promise<string>((resolve, reject) => {
+          fileRequests[params.fileId] = { resolve, reject };
+        });
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({ type: "requestImage", ...params })
+        );
+        return promise;
+      }}
       onTransaction={({ editor }) => {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({

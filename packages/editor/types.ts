@@ -1,3 +1,8 @@
+import {
+  InsertImageParams,
+  UpdateImageAttributesParams,
+} from "@serenity-tools/editor-image-extension";
+
 // needed to allow extending the global scope
 export {};
 
@@ -54,6 +59,14 @@ export type UpdateEditorParams =
     }
   | {
       variant: "toggle-task-list";
+    }
+  | {
+      variant: "insert-image";
+      params: InsertImageParams;
+    }
+  | {
+      variant: "update-image-attributes";
+      params: UpdateImageAttributesParams;
     };
 
 export type UpdateEditor = (params: UpdateEditorParams) => void;
@@ -73,5 +86,7 @@ declare global {
     applyYjsUpdate: (update: any) => void;
     applyYAwarenessUpdate: (update: any) => void;
     blurEditor: () => void;
+    resolveImageRequest: (fileId: string, base64: string) => void;
+    rejectImageRequest: (fileId: string, reason: string) => void;
   }
 }

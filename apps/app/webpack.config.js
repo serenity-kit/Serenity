@@ -15,6 +15,7 @@ module.exports = async function (env, argv) {
           // Ensure the shared packages are transpiled.
           resolveApp("../../packages/libsodium"),
           resolveApp("../../packages/editor"),
+          resolveApp("../../packages/editor-image-extension"),
           resolveApp("../../packages/ui"),
           resolveApp("../../packages/naisho-core"),
           resolveApp("../../packages/opaque"),
