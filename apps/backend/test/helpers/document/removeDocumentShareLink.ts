@@ -1,14 +1,10 @@
 import { gql } from "graphql-request";
-import { Role } from "../../../prisma/generated/output";
 import { Device } from "../../../src/types/device";
 import { createSnapshotDeviceKeyBoxes } from "./createSnapshotDeviceKeyBoxes";
 
 export type Params = {
   graphql: any;
-  documentId: string;
-  sharingRole: Role;
-  deviceSecretBoxCiphertext: string;
-  deviceSecretBoxNonce: string;
+  token: string;
   creatorDevice: Device;
   creatorDeviceEncryptionPrivateKey: string;
   snapshotKey: string;
@@ -16,12 +12,9 @@ export type Params = {
   authorizationHeader: string;
 };
 
-export const createDocumentShareLink = async ({
+export const removeDocumentShareLink = async ({
   graphql,
-  documentId,
-  sharingRole,
-  deviceSecretBoxCiphertext,
-  deviceSecretBoxNonce,
+  token,
   creatorDevice,
   creatorDeviceEncryptionPrivateKey,
   snapshotKey,
@@ -31,6 +24,7 @@ export const createDocumentShareLink = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
+
   const snapshotDeviceKeyBoxes = await createSnapshotDeviceKeyBoxes({
     receiverDevices,
     creatorDeviceEncryptionPrivateKey,
@@ -38,9 +32,9 @@ export const createDocumentShareLink = async ({
   });
 
   const query = gql`
-    mutation createDocumentShareLink($input: CreateDocumentShareLinkInput!) {
-      createDocumentShareLink(input: $input) {
-        token
+    mutation removeDocumentShareLink($input: RemoveDocumentShareLinkInput!) {
+      removeDocumentShareLink(input: $input) {
+        success
       }
     }
   `;
@@ -48,10 +42,7 @@ export const createDocumentShareLink = async ({
     query,
     {
       input: {
-        documentId,
-        sharingRole,
-        deviceSecretBoxCiphertext,
-        deviceSecretBoxNonce,
+        token,
         creatorDevice,
         snapshotDeviceKeyBoxes,
       },
