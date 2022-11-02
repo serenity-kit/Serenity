@@ -72,7 +72,7 @@ test("Invalid document ownership", async () => {
   ).rejects.toThrowError("Unauthorized");
 });
 
-test("remove share link", async () => {
+test.only("remove share link", async () => {
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
   const receiverDevices = [creatorDevice];

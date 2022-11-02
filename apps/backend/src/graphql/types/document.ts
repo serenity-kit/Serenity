@@ -1,4 +1,4 @@
-import { objectType } from "nexus";
+import { inputObjectType, objectType } from "nexus";
 import { KeyDerivationTrace } from "./folder";
 import { WorkspaceKey } from "./workspace";
 
@@ -17,5 +17,14 @@ export const Document = objectType({
     t.string("workspaceId");
     t.nonNull.field("nameKeyDerivationTrace", { type: KeyDerivationTrace });
     t.field("workspaceKey", { type: WorkspaceKey });
+  },
+});
+
+export const SnapshotDeviceKeyBoxInput = inputObjectType({
+  name: "SnapshotDeviceKeyBoxInput",
+  definition(t) {
+    t.nonNull.string("ciphertext");
+    t.nonNull.string("nonce");
+    t.nonNull.string("deviceSigningPublicKey");
   },
 });

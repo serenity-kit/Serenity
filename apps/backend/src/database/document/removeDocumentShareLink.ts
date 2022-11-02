@@ -1,17 +1,7 @@
-// create a device and that is encrypted with a secret bo
-
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
-
-// inputs are:
-// documentId: string
-// deviceSecretBoxCipherTex: string;
-// deviceSecretBoxNonce: string;
-// device: { signingPublicKey, encryptionPublicKey, encryptionPublickeySignature }
-
-// return device from database
 
 export type SnapshotKeyBoxCreateInput = {
   snapshotKeyId: string;
@@ -50,6 +40,7 @@ export const removeDocumentShareLink = async ({
     const document = await prisma.document.findFirst({
       where: { id: documentId },
     });
+    console.log({ document });
     if (!document) {
       throw new ForbiddenError("Unauthorized");
     }
@@ -105,7 +96,7 @@ export const removeDocumentShareLink = async ({
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
       });
     }
-    await prisma.snapshotKeyBox.createMany({
+    const numCreateMany = await prisma.snapshotKeyBox.createMany({
       data: snapshotKeyBoxes,
     });
   });

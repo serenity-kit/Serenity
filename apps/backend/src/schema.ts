@@ -7,6 +7,7 @@ import * as WorkspacesQueryTypes from "./graphql/queries/workspace/workspaces";
 import * as CreateDocumentMutationTypes from "./graphql/mutations/document/createDocument";
 import * as CreateDocumentShareLinkTypes from "./graphql/mutations/document/createDocumentShareLink";
 import * as DeleteDocumentsMutationTypes from "./graphql/mutations/document/deleteDocuments";
+import * as RemoveDocumentShareLinkTypes from "./graphql/mutations/document/removeDocumentShareLink";
 import * as UpdateDocumentNameMutationTypes from "./graphql/mutations/document/updateDocumentName";
 import * as DocumentQueryTypes from "./graphql/queries/document/document";
 import * as DocumentPathQueryTypes from "./graphql/queries/document/documentPath";
@@ -78,6 +79,7 @@ export const schema = makeSchema({
     FirstDocumentQueryTypes,
     DocumentQueryTypes,
     CreateDocumentShareLinkTypes,
+    RemoveDocumentShareLinkTypes,
 
     CreateFolderMutationTypes,
     UpdateFolderNameMutationTypes,

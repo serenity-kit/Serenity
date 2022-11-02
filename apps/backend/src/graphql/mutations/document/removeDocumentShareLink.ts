@@ -8,18 +8,10 @@ import {
 } from "nexus";
 import { removeDocumentShareLink } from "../../../database/document/removeDocumentShareLink";
 import { CreatorDeviceInput } from "../../types/device";
-
-export const SnapshotDeviceKeyBoxInput = inputObjectType({
-  name: "SnapshotDeviceKeyBoxInput",
-  definition(t) {
-    t.nonNull.string("ciphertext");
-    t.nonNull.string("nonce");
-    t.nonNull.string("deviceSigningPublicKey");
-  },
-});
+import { SnapshotDeviceKeyBoxInput } from "../../types/document";
 
 export const RemoveDocumentShareLinkInput = inputObjectType({
-  name: "CreateDocumentShareLinkInput",
+  name: "RemoveDocumentShareLinkInput",
   definition(t) {
     t.nonNull.string("token");
     t.nonNull.field("creatorDevice", { type: CreatorDeviceInput });
@@ -30,14 +22,14 @@ export const RemoveDocumentShareLinkInput = inputObjectType({
 });
 
 export const RemoveDocumentShareLinkResult = objectType({
-  name: "CreateDocumentShareLinkResult",
+  name: "RemoveDocumentShareLinkResult",
   definition(t) {
     t.nonNull.boolean("success");
   },
 });
 
-export const createDocumentLinkShareMutation = mutationField(
-  "createDocumentShareLink",
+export const removeDocumentLinkShareMutation = mutationField(
+  "removeDocumentShareLink",
   {
     type: RemoveDocumentShareLinkResult,
     args: {
@@ -48,6 +40,7 @@ export const createDocumentLinkShareMutation = mutationField(
       ),
     },
     async resolve(root, args, context) {
+      console.log({ input: args.input });
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
@@ -60,9 +53,8 @@ export const createDocumentLinkShareMutation = mutationField(
         deviceSigningPublicKey: args.input.creatorDevice.signingPublicKey,
         snapshotDeviceKeyBoxes: args.input.snapshotDeviceKeyBoxes,
       });
-      return {
-        succes: true,
-      };
+      console.log("removed");
+      return { succes: true };
     },
   }
 );

@@ -37,7 +37,7 @@ test("create share link", async () => {
     deviceSecretBoxNonce: "deviceSecretBoxNonce",
     creatorDevice,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-    receiverDeviceEncryptionPublicKeys: [creatorDevice.encryptionPublicKey],
+    receiverDevices: [creatorDevice],
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });
@@ -66,7 +66,7 @@ test("Invalid ownership", async () => {
         deviceSecretBoxNonce: "deviceSecretBoxNonce",
         creatorDevice,
         creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-        receiverDeviceEncryptionPublicKeys: [creatorDevice.encryptionPublicKey],
+        receiverDevices: [creatorDevice],
         snapshotKey,
         authorizationHeader,
       }))()
@@ -87,7 +87,7 @@ test("Unauthenticated", async () => {
         deviceSecretBoxNonce: "deviceSecretBoxNonce",
         creatorDevice,
         creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-        receiverDeviceEncryptionPublicKeys: [creatorDevice.encryptionPublicKey],
+        receiverDevices: [creatorDevice],
         snapshotKey,
         authorizationHeader: "badauthheader",
       }))()
@@ -124,9 +124,7 @@ describe("Input errors", () => {
               deviceSecretBoxNonce: "deviceSecretBoxNonce",
               creatorDevice,
               creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-              receiverDeviceEncryptionPublicKeys: [
-                creatorDevice.encryptionPublicKey,
-              ],
+              receiverDevices: [creatorDevice],
               snapshotKey,
             },
           },
@@ -156,9 +154,7 @@ describe("Input errors", () => {
               deviceSecretBoxNonce: "deviceSecretBoxNonce",
               creatorDevice,
               creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-              receiverDeviceEncryptionPublicKeys: [
-                creatorDevice.encryptionPublicKey,
-              ],
+              receiverDevices: [creatorDevice],
               snapshotKey,
             },
           },
@@ -193,9 +189,7 @@ describe("Input errors", () => {
               deviceSecretBoxNonce: "deviceSecretBoxNonce",
               creatorDevice,
               creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-              receiverDeviceEncryptionPublicKeys: [
-                creatorDevice.encryptionPublicKey,
-              ],
+              receiverDevices: [creatorDevice],
               snapshotKey,
             },
           },
