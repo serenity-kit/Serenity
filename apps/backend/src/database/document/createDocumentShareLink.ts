@@ -12,6 +12,20 @@ import { prisma } from "../prisma";
 
 // return device from database
 
+export type SnapshotKeyBoxCreateInput = {
+  snapshotKeyId: string;
+  deviceSigningPublicKey: string;
+  creatorDeviceSigningPublicKey: string;
+  nonce?: string;
+  ciphertext: string;
+};
+
+export type SnapshotDeviceKeyBox = {
+  ciphertext: string;
+  nonce: string;
+  deviceSigningPublicKey: string;
+};
+
 export type Props = {
   documentId: string;
   sharingRole: Role;
@@ -21,6 +35,7 @@ export type Props = {
   deviceSigningPublicKey: string;
   deviceEncryptionPublicKey: string;
   deviceEncryptionPublicKeySignature: string;
+  snapshotDeviceKeyBoxes: SnapshotDeviceKeyBox[];
 };
 export const createDocumentShareLink = async ({
   documentId,
@@ -31,6 +46,7 @@ export const createDocumentShareLink = async ({
   deviceSigningPublicKey,
   deviceEncryptionPublicKey,
   deviceEncryptionPublicKeySignature,
+  snapshotDeviceKeyBoxes,
 }: Props): Promise<DocumentShareLink> => {
   // get the document
   const document = await prisma.document.findFirst({
@@ -77,5 +93,41 @@ export const createDocumentShareLink = async ({
     },
   });
 
+  // get the latest snapshot and set up the snapshot key boxes
+  const latestSnapshot = await prisma.snapshot.findFirst({
+    where: { documentId },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!latestSnapshot) {
+    throw new Error("No snapshot found");
+  }
+  let latestSnapshotKey = await prisma.snapshotKey.findFirst({
+    where: { snapshotId: latestSnapshot?.id },
+    orderBy: { generation: "desc" },
+  });
+  let snapshotKeyId = "";
+  if (!latestSnapshotKey) {
+    latestSnapshotKey = await prisma.snapshotKey.create({
+      data: {
+        generation: 0,
+        snapshotId: latestSnapshot.id,
+      },
+    });
+  }
+  snapshotKeyId = latestSnapshotKey.id;
+
+  const snapshotKeyBoxes: SnapshotKeyBoxCreateInput[] = [];
+  for (const snapshotKeyBox of snapshotDeviceKeyBoxes) {
+    snapshotKeyBoxes.push({
+      snapshotKeyId,
+      ciphertext: snapshotKeyBox.ciphertext,
+      nonce: snapshotKeyBox.nonce,
+      deviceSigningPublicKey: snapshotKeyBox.deviceSigningPublicKey,
+      creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
+    });
+  }
+  await prisma.snapshotKeyBox.createMany({
+    data: snapshotKeyBoxes,
+  });
   return documentShareLink;
 };

@@ -10,6 +10,15 @@ import { createDocumentShareLink } from "../../../database/document/createDocume
 import { CreatorDeviceInput } from "../../types/device";
 import { MemberRoleEnum } from "../../types/workspace";
 
+export const SnapshotDeviceKeyBoxInput = inputObjectType({
+  name: "SnapshotDeviceKeyBoxInput",
+  definition(t) {
+    t.nonNull.string("ciphertext");
+    t.nonNull.string("nonce");
+    t.nonNull.string("deviceSigningPublicKey");
+  },
+});
+
 export const CreateDocumentShareLinkInput = inputObjectType({
   name: "CreateDocumentShareLinkInput",
   definition(t) {
@@ -18,6 +27,9 @@ export const CreateDocumentShareLinkInput = inputObjectType({
     t.nonNull.string("deviceSecretBoxCiphertext");
     t.nonNull.string("deviceSecretBoxNonce");
     t.nonNull.field("creatorDevice", { type: CreatorDeviceInput });
+    t.nonNull.list.nonNull.field("snapshotDeviceKeyBoxes", {
+      type: SnapshotDeviceKeyBoxInput,
+    });
   },
 });
 
@@ -56,6 +68,7 @@ export const createDocumentLinkShareMutation = mutationField(
         deviceEncryptionPublicKey: args.input.creatorDevice.encryptionPublicKey,
         deviceEncryptionPublicKeySignature:
           args.input.creatorDevice.encryptionPublicKeySignature,
+        snapshotDeviceKeyBoxes: args.input.snapshotDeviceKeyBoxes,
       });
       return {
         token: documentShareLink.token,
