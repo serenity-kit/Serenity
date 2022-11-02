@@ -15,7 +15,7 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "ts:check": "yarn workspaces run ts:check",
+    "ts:check": "yarn && yarn workspaces run ts:check",
     "test": "yarn workspaces run test",
     "lint": "yarn workspaces run lint",
     "prettier:write": "yarn prettier --write '**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css,html,graphql,gql}'",
