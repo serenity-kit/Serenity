@@ -8,7 +8,7 @@ mutation updateWorkspaceMembersRoles(
       members {
         userId
         username
-        isAdmin
+        role
       }
     }
   }

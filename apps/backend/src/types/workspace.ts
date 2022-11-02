@@ -1,3 +1,4 @@
+import { Role } from "../../prisma/generated/output";
 import { CreatorDevice, Device } from "./device";
 
 export type MemberIdWithDevice = {
@@ -31,7 +32,7 @@ export type WorkspaceKey = {
 export type WorkspaceMember = {
   userId: string;
   username: string | undefined | null;
-  isAdmin: boolean;
+  role: Role;
 };
 
 export type Workspace = {
@@ -55,11 +56,11 @@ export type WorkspaceInvitation = {
 export const formatWorkspace = (workspace: any): Workspace => {
   const members: WorkspaceMember[] = [];
   workspace.usersToWorkspaces.forEach(
-    (member: { userId: string; user: any; isAdmin: boolean }) => {
+    (member: { userId: string; user: any; role: Role }) => {
       const workspaceMember: WorkspaceMember = {
         userId: member.userId,
         username: member.user.username,
-        isAdmin: member.isAdmin,
+        role: member.role,
       };
       members.push(workspaceMember);
     }

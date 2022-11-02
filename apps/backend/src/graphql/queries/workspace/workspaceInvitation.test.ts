@@ -1,11 +1,12 @@
-import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
 import { workspaceInvitations } from "../../../../test/helpers/workspace/workspaceInvitations";
+import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
-import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
-import { prisma } from "../../../database/prisma";
-import { v4 as uuidv4 } from "uuid";
 
 const graphql = setupGraphql();
 const workspaceId = "workspace1";
@@ -55,7 +56,7 @@ test("should return a list of workspace invitations if they are admin", async ()
           id: workspaceId,
         },
       },
-      isAdmin: true,
+      role: Role.ADMIN,
     },
   });
   await createWorkspaceInvitation({
@@ -110,7 +111,7 @@ test("not admin should throw error", async () => {
           id: workspaceId,
         },
       },
-      isAdmin: false,
+      role: Role.EDITOR,
     },
   });
   await expect(
@@ -141,7 +142,7 @@ test("not logged in user should throw an authentication error", async () => {
           id: workspaceId,
         },
       },
-      isAdmin: false,
+      role: Role.EDITOR,
     },
   });
   await expect(

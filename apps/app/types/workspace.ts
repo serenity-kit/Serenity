@@ -14,10 +14,17 @@ export type WorkspaceKey = {
   workspaceKeyBox: WorkspaceKeyBox;
 };
 
+export enum Role {
+  ADMIN = "ADMIN",
+  EDITOR = "EDITOR",
+  COMMENTER = "COMMENTER",
+  VIEWER = "VIEWER",
+}
+
 export type WorkspaceMember = {
   userId: string;
   username: string | undefined | null;
-  isAdmin: boolean;
+  role: Role;
 };
 
 export type Workspace = {

@@ -1,4 +1,5 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
+import { Role } from "../../../prisma/generated/output";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
 import { prisma } from "../prisma";
 import { rotateWorkspaceKey } from "./rotateWorkspaceKey";
@@ -24,7 +25,12 @@ export const removeMembersAndRotateWorkspaceKey = async ({
       throw new UserInputError("Cannot remove yourself from a workspace");
     }
     const verifiedUserWorskpace = await prisma.usersToWorkspaces.findFirst({
-      where: { userId, workspaceId, isAdmin: true, isAuthorizedMember: true },
+      where: {
+        userId,
+        workspaceId,
+        role: Role.ADMIN,
+        isAuthorizedMember: true,
+      },
       select: { workspaceId: true },
     });
     if (!verifiedUserWorskpace) {

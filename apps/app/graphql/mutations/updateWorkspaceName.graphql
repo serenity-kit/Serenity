@@ -6,7 +6,7 @@ mutation updateWorkspaceName($input: UpdateWorkspaceNameInput!) {
       members {
         userId
         username
-        isAdmin
+        role
       }
     }
   }

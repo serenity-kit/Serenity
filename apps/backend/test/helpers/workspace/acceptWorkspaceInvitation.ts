@@ -27,7 +27,7 @@ export const acceptWorkspaceInvitation = async ({
           members {
             userId
             username
-            isAdmin
+            role
           }
         }
       }

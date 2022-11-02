@@ -1,6 +1,7 @@
-import { prisma } from "../prisma";
-import { WorkspaceInvitation } from "../../types/workspace";
 import { ForbiddenError } from "apollo-server-express";
+import { Role } from "../../../prisma/generated/output";
+import { WorkspaceInvitation } from "../../types/workspace";
+import { prisma } from "../prisma";
 
 // by default, invitation expires in 48 hours
 const INVITATION_EXPIRATION_TIME = 48 * 60 * 60 * 1000;
@@ -18,7 +19,7 @@ export async function createWorkspaceInvitation({
     where: {
       userId: inviterUserId,
       workspaceId,
-      isAdmin: true,
+      role: Role.ADMIN,
     },
     select: {
       userId: true,
@@ -35,10 +36,10 @@ export async function createWorkspaceInvitation({
           name: true,
         },
       },
-      isAdmin: true,
+      role: true,
     },
   });
-  if (!userToWorkspace || !userToWorkspace.isAdmin) {
+  if (!userToWorkspace || !userToWorkspace.role) {
     throw new ForbiddenError("Unauthorized");
   }
   const rawWorkspaceInvitation = await prisma.workspaceInvitations.create({

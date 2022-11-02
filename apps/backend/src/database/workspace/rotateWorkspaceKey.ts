@@ -1,6 +1,6 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { v4 as uuidv4 } from "uuid";
-import { Prisma } from "../../../prisma/generated/output";
+import { Prisma, Role } from "../../../prisma/generated/output";
 import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
@@ -29,7 +29,7 @@ export const rotateWorkspaceKey = async ({
   const verifedUserWorkspace = await prisma.usersToWorkspaces.findMany({
     where: {
       userId,
-      isAdmin: true,
+      role: Role.ADMIN,
       isAuthorizedMember: true,
       workspaceId,
     },
