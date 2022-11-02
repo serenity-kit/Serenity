@@ -21,7 +21,7 @@ export const getWorkspace = async ({
         name
         members {
           username
-          isAdmin
+          role
         }
         currentWorkspaceKey {
           id

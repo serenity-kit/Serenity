@@ -1,6 +1,7 @@
-import { prisma } from "../prisma";
-import { WorkspaceInvitation } from "../../types/workspace";
 import { ForbiddenError } from "apollo-server-express";
+import { Role } from "../../../prisma/generated/output";
+import { WorkspaceInvitation } from "../../types/workspace";
+import { prisma } from "../prisma";
 
 type Cursor = {
   id?: string;
@@ -24,7 +25,7 @@ export async function getWorkspaceInvitations({
     where: {
       userId,
       workspaceId,
-      isAdmin: true,
+      role: Role.ADMIN,
     },
   });
   if (!userToWorkspaces) {

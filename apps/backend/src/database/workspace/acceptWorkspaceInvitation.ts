@@ -1,4 +1,5 @@
 import { ForbiddenError } from "apollo-server-express";
+import { Role } from "../../../prisma/generated/output";
 import { formatWorkspace, Workspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 
@@ -41,7 +42,7 @@ export async function acceptWorkspaceInvitation({
             usersToWorkspaces: {
               select: {
                 userId: true,
-                isAdmin: true,
+                role: true,
                 user: {
                   select: {
                     username: true,
@@ -63,7 +64,7 @@ export async function acceptWorkspaceInvitation({
         data: {
           userId,
           workspaceId,
-          isAdmin: false,
+          role: Role.EDITOR,
           isAuthorizedMember: false,
         },
       });
@@ -79,7 +80,7 @@ export async function acceptWorkspaceInvitation({
           usersToWorkspaces: {
             select: {
               userId: true,
-              isAdmin: true,
+              role: true,
               user: {
                 select: {
                   username: true,

@@ -1,4 +1,5 @@
 import { gql } from "graphql-request";
+import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
@@ -69,7 +70,7 @@ test("user should be able to delete a workspace invitation they didn't create", 
           id: workspace1,
         },
       },
-      isAdmin: true,
+      role: Role.ADMIN,
     },
   });
   const workspaceInvitationResult = await createWorkspaceInvitation({
@@ -107,7 +108,7 @@ test("user should not be able to delete a workspace invitation if they aren't ad
           id: workspace2,
         },
       },
-      isAdmin: false,
+      role: Role.EDITOR,
     },
   });
   // user2 shares workspace

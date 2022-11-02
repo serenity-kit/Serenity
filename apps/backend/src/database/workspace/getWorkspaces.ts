@@ -43,7 +43,7 @@ export async function getWorkspaces({
         },
         select: {
           userId: true,
-          isAdmin: true,
+          role: true,
           user: {
             select: {
               username: true,

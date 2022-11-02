@@ -30,6 +30,7 @@ import {
   RemoveMembersAndRotateWorkspaceKeyDocument,
   RemoveMembersAndRotateWorkspaceKeyMutation,
   RemoveMembersAndRotateWorkspaceKeyMutationVariables,
+  Role,
   useUpdateWorkspaceMembersRolesMutation,
   Workspace,
   WorkspaceMember,
@@ -53,13 +54,13 @@ import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevice
 type Member = {
   userId: string;
   username: string;
-  isAdmin: boolean;
+  role: Role;
 };
 
 function WorkspaceMemberRow({
   userId,
   username,
-  isAdmin,
+  role,
   allowEditing,
   adminUserId,
   onAdminStatusChange,
@@ -80,7 +81,7 @@ function WorkspaceMemberRow({
       </Text>
       <View style={workspaceMemberStyles.checkboxContainer}>
         <Checkbox
-          defaultIsChecked={isAdmin}
+          defaultIsChecked={role === Role.Admin}
           isDisabled={!allowEditing}
           onChange={onAdminStatusChange}
           value={username}
@@ -178,7 +179,7 @@ export default function WorkspaceSettingsMembersScreen(
     members.forEach((member: WorkspaceMember, row: number) => {
       memberLookup[member.userId] = row;
       if (member.userId === me?.id) {
-        setIsAdmin(member.isAdmin);
+        setIsAdmin(member.role === Role.Admin);
       }
     });
     setMemberLookup(memberLookup);
@@ -190,7 +191,7 @@ export default function WorkspaceSettingsMembersScreen(
     members.forEach((member: Member) => {
       graphqlMembers.push({
         userId: member.userId,
-        isAdmin: member.isAdmin,
+        role: member.role,
       });
     });
     const updateWorkspaceResult = await updateWorkspaceMembersRolesMutation({
@@ -210,13 +211,10 @@ export default function WorkspaceSettingsMembersScreen(
     }
   };
 
-  const updateMember = async (
-    member: WorkspaceMember,
-    isMemberAdmin: boolean
-  ) => {
+  const updateMember = async (member: WorkspaceMember, role: Role) => {
     const existingMemberRow = memberLookup[member.userId];
     if (existingMemberRow >= 0) {
-      members[existingMemberRow].isAdmin = isMemberAdmin;
+      members[existingMemberRow].role = role;
       setMembers(members);
       await _updateWorkspaceMemberData(members);
     }
@@ -418,7 +416,7 @@ export default function WorkspaceSettingsMembersScreen(
                 key={member.userId}
                 userId={member.userId}
                 username={member.username}
-                isAdmin={member.isAdmin}
+                role={member.role}
                 adminUserId={
                   state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
                     ?.id
@@ -430,7 +428,11 @@ export default function WorkspaceSettingsMembersScreen(
                       ?.me?.id
                 }
                 onAdminStatusChange={(isMemberAdmin: boolean) => {
-                  updateMember(member, isMemberAdmin);
+                  let memberRole: Role = Role.Editor;
+                  if (isMemberAdmin) {
+                    memberRole = Role.Admin;
+                  }
+                  updateMember(member, memberRole);
                 }}
                 onDeletePress={() => {
                   removeMemberPreflight(member.userId);

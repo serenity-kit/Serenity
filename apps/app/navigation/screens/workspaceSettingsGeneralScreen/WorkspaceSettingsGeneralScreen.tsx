@@ -19,6 +19,7 @@ import { StyleSheet } from "react-native";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
   MeResult,
+  Role,
   useDeleteWorkspacesMutation,
   useUpdateWorkspaceNameMutation,
   Workspace,
@@ -87,7 +88,7 @@ export default function WorkspaceSettingsGeneralScreen(
     members.forEach((member: WorkspaceMember, row: number) => {
       memberLookup[member.userId] = row;
       if (member.userId === me?.id) {
-        setIsAdmin(member.isAdmin);
+        setIsAdmin(member.role === Role.Admin);
       }
     });
     setMemberLookup(memberLookup);

@@ -6,7 +6,7 @@ mutation acceptWorkspaceInvitation($input: AcceptWorkspaceInvitationInput!) {
       members {
         userId
         username
-        isAdmin
+        role
       }
     }
   }

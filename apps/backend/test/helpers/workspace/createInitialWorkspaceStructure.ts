@@ -65,7 +65,7 @@ export const createInitialWorkspaceStructure = async ({
           name
           members {
             userId
-            isAdmin
+            role
           }
           currentWorkspaceKey {
             id

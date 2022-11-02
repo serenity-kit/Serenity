@@ -1,3 +1,4 @@
+import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -29,7 +30,7 @@ export async function deleteWorkspaceInvitations({
       const userWorkspaces = await prisma.usersToWorkspaces.findMany({
         where: {
           userId: userId,
-          isAdmin: true,
+          role: Role.ADMIN,
           workspaceId: {
             in: requestedWorkspaceIds,
           },

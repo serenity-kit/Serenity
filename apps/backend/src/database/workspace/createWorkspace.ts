@@ -63,7 +63,7 @@ export async function createWorkspace({
         usersToWorkspaces: {
           create: {
             userId,
-            isAdmin: true,
+            role: "ADMIN",
             isAuthorizedMember: true,
           },
         },
@@ -118,7 +118,7 @@ export async function createWorkspace({
       },
       select: {
         userId: true,
-        isAdmin: true,
+        role: true,
         user: {
           select: {
             username: true,
@@ -135,7 +135,7 @@ export async function createWorkspace({
       members.push({
         userId: userToWorkspace.userId,
         username: userToWorkspace.user.username,
-        isAdmin: userToWorkspace.isAdmin,
+        role: userToWorkspace.role,
       });
     });
     const workspace: Workspace = {
