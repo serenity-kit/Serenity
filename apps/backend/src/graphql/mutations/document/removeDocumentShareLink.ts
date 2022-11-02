@@ -40,7 +40,6 @@ export const removeDocumentLinkShareMutation = mutationField(
       ),
     },
     async resolve(root, args, context) {
-      console.log({ input: args.input });
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
@@ -53,8 +52,9 @@ export const removeDocumentLinkShareMutation = mutationField(
         deviceSigningPublicKey: args.input.creatorDevice.signingPublicKey,
         snapshotDeviceKeyBoxes: args.input.snapshotDeviceKeyBoxes,
       });
-      console.log("removed");
-      return { succes: true };
+      return {
+        success: true,
+      };
     },
   }
 );

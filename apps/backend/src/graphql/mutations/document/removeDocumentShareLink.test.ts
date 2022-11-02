@@ -7,7 +7,6 @@ import { createDocumentShareLink } from "../../../../test/helpers/document/creat
 import { removeDocumentShareLink } from "../../../../test/helpers/document/removeDocumentShareLink";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { Device } from "../../../types/device";
 
 const graphql = setupGraphql();
 const password = "password";
@@ -53,11 +52,8 @@ test("Invalid document ownership", async () => {
     password,
   });
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-    userData1.webDevice;
-  const receiverDevices = [
-    creatorDevice as Device,
-    otherUser.webDevice as Device,
-  ];
+    otherUser.webDevice;
+  const receiverDevices = [creatorDevice, otherUser.webDevice];
   await expect(
     (async () =>
       await removeDocumentShareLink({
@@ -72,7 +68,7 @@ test("Invalid document ownership", async () => {
   ).rejects.toThrowError("Unauthorized");
 });
 
-test.only("remove share link", async () => {
+test("remove share link", async () => {
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
   const receiverDevices = [creatorDevice];
@@ -85,7 +81,13 @@ test.only("remove share link", async () => {
     receiverDevices,
     authorizationHeader: userData1.sessionKey,
   });
-  expect(response).toMatchInlineSnapshot();
+  expect(response).toMatchInlineSnapshot(`
+    {
+      "removeDocumentShareLink": {
+        "success": true,
+      },
+    }
+  `);
 });
 
 test("Unauthenticated", async () => {

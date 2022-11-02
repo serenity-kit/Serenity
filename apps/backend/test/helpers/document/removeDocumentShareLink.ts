@@ -49,6 +49,5 @@ export const removeDocumentShareLink = async ({
     },
     authorizationHeaders
   );
-  console.log({ result });
   return result;
 };

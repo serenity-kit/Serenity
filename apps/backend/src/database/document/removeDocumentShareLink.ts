@@ -40,7 +40,6 @@ export const removeDocumentShareLink = async ({
     const document = await prisma.document.findFirst({
       where: { id: documentId },
     });
-    console.log({ document });
     if (!document) {
       throw new ForbiddenError("Unauthorized");
     }
