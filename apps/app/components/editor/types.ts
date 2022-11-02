@@ -3,6 +3,7 @@ import * as Y from "yjs";
 
 export type EditorProps = {
   documentId: string;
+  workspaceId: string;
   yDocRef: React.MutableRefObject<Y.Doc>;
   yAwarenessRef: React.MutableRefObject<Awareness>;
   isNew: boolean;

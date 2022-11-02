@@ -3,7 +3,7 @@ import React, { useEffect, useReducer } from "react";
 
 type State =
   | {
-      step: "uploading" | "downloading";
+      step: "uploading" | "downloading" | "failedToDecrypt";
       contentAsBase64: null;
     }
   | {
@@ -11,15 +11,22 @@ type State =
       contentAsBase64: string;
     };
 
-type Action = {
-  type: "setContentAsBase64";
-  contentAsBase64: string;
-};
+type Action =
+  | {
+      type: "setContentAsBase64";
+      contentAsBase64: string;
+    }
+  | {
+      type: "failedToDecrypt";
+      contentAsBase64: null;
+    };
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "setContentAsBase64":
       return { contentAsBase64: action.contentAsBase64, step: "done" };
+    case "failedToDecrypt":
+      return { contentAsBase64: null, step: "failedToDecrypt" };
   }
 };
 
@@ -44,17 +51,22 @@ export const Image = (props: any) => {
   useEffect(() => {
     const retrieveContent = async () => {
       if (fileId && key && nonce) {
-        const decryptedImageData = await downloadAndDecryptFile({
-          fileId,
-          workspaceId: "invalid",
-          documentId: "invalid",
-          key,
-          publicNonce: nonce,
-        });
-        dispatch({
-          type: "setContentAsBase64",
-          contentAsBase64: decryptedImageData,
-        });
+        try {
+          const decryptedImageData = await downloadAndDecryptFile({
+            fileId,
+            key,
+            publicNonce: nonce,
+          });
+          dispatch({
+            type: "setContentAsBase64",
+            contentAsBase64: decryptedImageData,
+          });
+        } catch (err) {
+          dispatch({
+            type: "failedToDecrypt",
+            contentAsBase64: null,
+          });
+        }
       }
     };
 
@@ -75,9 +87,13 @@ export const Image = (props: any) => {
             alignItems: "center",
           }}
         >
-          {state.step === "downloading"
-            ? "Download in progress …"
-            : "Upload in progress …"}
+          {
+            {
+              downloading: "Download in progress …",
+              uploading: "Upload in progress …",
+              failedToDecrypt: "Failed to decrypt",
+            }[state.step]
+          }
         </div>
       ) : (
         <img src={state.contentAsBase64!} />

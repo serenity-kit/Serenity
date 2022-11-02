@@ -3,7 +3,7 @@ import { Button, Text, View } from "@serenity-tools/ui";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Image, useWindowDimensions } from "react-native";
-import { downloadFileBase64Bytes } from "../../../utils/file/downloadFileBase64Bytes";
+import { downloadFileBase64Bytes } from "../../../utils/file/createDownloadAndDecryptFileFunction";
 import { encryptAndUploadFile } from "../../../utils/file/encryptAndUploadFile";
 
 export default function FileUploadTestScreen() {
