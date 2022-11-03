@@ -14,10 +14,9 @@ export default function SidebarFolderMenu(props: Props) {
 
   return (
     <Menu
-      placement="bottom"
+      placement="bottom left"
       style={tw`w-60`}
-      offset={8}
-      crossOffset={80}
+      offset={2}
       isOpen={isOpenMenu}
       onChange={setIsOpenMenu}
       trigger={
