@@ -45,7 +45,7 @@ export const WorkspaceKey = objectType({
   },
 });
 
-const MemberRoleEnum = enumType({
+export const MemberRoleEnum = enumType({
   name: "Role",
   members: {
     ADMIN: "ADMIN",

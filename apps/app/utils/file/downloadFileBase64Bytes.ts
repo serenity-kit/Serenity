@@ -22,7 +22,7 @@ export const downloadFileBase64Bytes = async ({
   }
   const response = await fetch(result.data?.fileUrl.downloadUrl);
   const arrayBuffer = await response.arrayBuffer();
-  const encryptedFileBytes = new Uint8Array(Buffer.from(arrayBuffer));
+  const encryptedFileBytes = new Uint8Array(arrayBuffer);
   const serializedFileBytes = sodium.to_base64(encryptedFileBytes);
   const decryptedFileData = await decryptFile({
     encryptedBase64FileData: serializedFileBytes,

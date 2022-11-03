@@ -1,11 +1,8 @@
 import {
   Avatar,
-  Button,
   CenterContent,
-  Checkbox,
   Description,
   Heading,
-  IconButton,
   InfoMessage,
   List,
   ListHeader,
@@ -21,7 +18,7 @@ import {
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
-import { StyleSheet, useWindowDimensions } from "react-native";
+import { StyleSheet } from "react-native";
 import MemberMenu from "../../../components/memberMenu/MemberMenu";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";

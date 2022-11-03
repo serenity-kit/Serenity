@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Platform, Text as RNText } from "react-native";
+import { Platform, StyleSheet, Text as RNText } from "react-native";
 import { tw } from "../../tailwind";
 
 export type HeadingProps = RNText["props"] & {
