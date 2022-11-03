@@ -45,6 +45,7 @@ const reconnectTimeout = 2000;
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
   updateTitle: (title: string) => void;
   signatureKeyPair: KeyPair;
+  workspaceId: string;
 };
 
 export default function Page({
@@ -52,6 +53,7 @@ export default function Page({
   route,
   updateTitle,
   signatureKeyPair,
+  workspaceId,
 }: Props) {
   if (!route.params?.pageId) {
     // should never happen
@@ -505,6 +507,7 @@ export default function Page({
   return (
     <Editor
       documentId={docId}
+      workspaceId={workspaceId}
       yDocRef={yDocRef}
       yAwarenessRef={yAwarenessRef}
       openDrawer={navigation.openDrawer}

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import {
-  EncryptAndUploadFunction,
+  EncryptAndUploadFunctionFile,
   InsertImageParams,
   UpdateImageAttributesParams,
 } from "../types";
@@ -8,14 +8,14 @@ import { getWidthAndHeightFromFile } from "./getWidthAndHeightFromFile";
 
 type InsertImagesParams = {
   images: File[];
-  encryptAndUpload: EncryptAndUploadFunction;
+  encryptAndUploadFile: EncryptAndUploadFunctionFile;
   insertImage: (params: InsertImageParams) => void;
   updateImageAttributes: (params: UpdateImageAttributesParams) => void;
 };
 
 export const insertImages = ({
   images,
-  encryptAndUpload,
+  encryptAndUploadFile,
   insertImage,
   updateImageAttributes,
 }: InsertImagesParams) => {
@@ -27,7 +27,7 @@ export const insertImages = ({
       width: imageDimensions?.width || null,
       height: imageDimensions?.height || null,
     });
-    const result = await encryptAndUpload(file);
+    const result = await encryptAndUploadFile(file);
     updateImageAttributes({
       uploadId,
       fileInfo: result,

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Keyboard } from "react-native";
 import { WebView } from "react-native-webview";
 // import { Asset } from "expo-asset";
@@ -18,13 +18,13 @@ import {
 } from "y-protocols/awareness";
 import * as Y from "yjs";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
-import { downloadFileBase64Bytes } from "../../utils/file/downloadFileBase64Bytes";
+import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
+import { createEncryptAndUploadFileFunction } from "../../utils/file/createEncryptAndUploadFileFunction";
 import { source } from "../../webviews/editor/source";
 import {
   EditorBottombar,
   EditorBottombarProps,
 } from "../editorBottombar/EditorBottombar";
-import { encryptAndUpload } from "./encryptAndUpload";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -47,7 +47,7 @@ const BottombarWrapper = ({
   keyboardAnimationDuration,
   editorBottombarState,
   onUpdate,
-  encryptAndUpload,
+  encryptAndUploadFile,
 }: BottombarWrapperProps) => {
   const [bottom] = useState(new Animated.Value(0));
 
@@ -65,7 +65,7 @@ const BottombarWrapper = ({
       <EditorBottombar
         editorBottombarState={editorBottombarState}
         onUpdate={onUpdate}
-        encryptAndUpload={encryptAndUpload}
+        encryptAndUploadFile={encryptAndUploadFile}
       />
     </Animated.View>
   );
@@ -77,6 +77,8 @@ export default function Editor({
   openDrawer,
   updateTitle,
   isNew,
+  documentId,
+  workspaceId,
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
@@ -89,6 +91,20 @@ export default function Editor({
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [keyboardAnimationDuration, setKeyboardAnimationDuration] = useState(0);
   const store = useEditorStore();
+
+  const encryptAndUploadFile = useMemo(() => {
+    return createEncryptAndUploadFileFunction({
+      workspaceId,
+      documentId,
+    });
+  }, [workspaceId, documentId]);
+
+  const downloadAndDecryptFile = useMemo(() => {
+    return createDownloadAndDecryptFileFunction({
+      workspaceId,
+      documentId,
+    });
+  }, [workspaceId, documentId]);
 
   useEffect(() => {
     const showSubscription = Keyboard.addListener(
@@ -210,7 +226,7 @@ export default function Editor({
           }
           if (message.type === "requestImage") {
             try {
-              const result = await downloadFileBase64Bytes({ ...message });
+              const result = await downloadAndDecryptFile({ ...message });
               webViewRef.current?.injectJavaScript(`
                 window.resolveImageRequest("${message.fileId}", "${result}");
                 true;
@@ -263,7 +279,7 @@ export default function Editor({
           true;
         `);
           }}
-          encryptAndUpload={encryptAndUpload}
+          encryptAndUploadFile={encryptAndUploadFile}
         />
       ) : null}
     </>

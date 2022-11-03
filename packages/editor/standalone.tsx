@@ -109,7 +109,7 @@ ReactDOM.render(
       updateTitle={updateTitle}
       isNew={window.isNew}
       onCreate={(params) => (window.editor = params.editor)}
-      encryptAndUpload={async () => {
+      encryptAndUploadFile={async () => {
         // TODO: implement
         return Promise.resolve({
           fileId: "dummyFileId",

@@ -21,9 +21,6 @@ export default function DevDashboardScreen(props) {
       >
         Encrypt / Decrypt Image
       </SidebarLink>
-      <SidebarLink to={{ screen: "FileUploadTest" }} iconName="dashboard-line">
-        File Upload Test
-      </SidebarLink>
       <SidebarLink to={{ screen: "AccountSettings" }} iconName="dashboard-line">
         User settings
       </SidebarLink>

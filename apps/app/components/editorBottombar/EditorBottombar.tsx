@@ -1,6 +1,6 @@
 import { EditorBottombarState, UpdateEditor } from "@serenity-tools/editor";
 import {
-  EncryptAndUploadFunction,
+  EncryptAndUploadFunctionFile,
   initiateImagePicker,
   InsertImageParams,
   UpdateImageAttributesParams,
@@ -17,14 +17,18 @@ import { forwardRef } from "react";
 export type EditorBottombarProps = {
   onUpdate: UpdateEditor;
   editorBottombarState: EditorBottombarState;
-  encryptAndUpload: EncryptAndUploadFunction;
+  encryptAndUploadFile: EncryptAndUploadFunctionFile;
 };
 
 export const editorBottombarHeight = 48;
 
 export const EditorBottombar = forwardRef(
   (
-    { onUpdate, editorBottombarState, encryptAndUpload }: EditorBottombarProps,
+    {
+      onUpdate,
+      editorBottombarState,
+      encryptAndUploadFile,
+    }: EditorBottombarProps,
     ref
   ) => {
     return (
@@ -38,7 +42,7 @@ export const EditorBottombar = forwardRef(
           <EditorBottombarButton
             onPress={(event) => {
               initiateImagePicker({
-                encryptAndUpload,
+                encryptAndUploadFile,
                 insertImage: (params: InsertImageParams) => {
                   onUpdate({ variant: "insert-image", params });
                 },

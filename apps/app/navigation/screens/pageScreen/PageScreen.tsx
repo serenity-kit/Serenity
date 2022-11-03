@@ -180,6 +180,7 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
         key={pageId}
         updateTitle={updateTitle}
         signatureKeyPair={signatureKeyPair}
+        workspaceId={workspaceId}
       />
     );
   } else {

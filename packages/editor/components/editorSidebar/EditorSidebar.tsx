@@ -1,5 +1,5 @@
 import {
-  EncryptAndUploadFunction,
+  EncryptAndUploadFunctionFile,
   initiateImagePicker,
   InsertImageParams,
   updateImageAttributes,
@@ -21,13 +21,13 @@ import React from "react";
 type EditorSidebarProps = {
   editor: Editor | null;
   headingLevels: Level[];
-  encryptAndUpload: EncryptAndUploadFunction;
+  encryptAndUploadFile: EncryptAndUploadFunctionFile;
 };
 
 export default function EditorSidebar({
   editor,
   headingLevels,
-  encryptAndUpload,
+  encryptAndUploadFile,
 }: EditorSidebarProps) {
   return (
     <View
@@ -192,7 +192,7 @@ export default function EditorSidebar({
         <SidebarButton
           onPress={() => {
             initiateImagePicker({
-              encryptAndUpload,
+              encryptAndUploadFile,
               insertImage: ({ uploadId, width, height }: InsertImageParams) => {
                 if (!editor) {
                   return;
