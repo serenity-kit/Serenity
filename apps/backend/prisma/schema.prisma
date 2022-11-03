@@ -238,10 +238,13 @@ model Folder {
 }
 
 model DocumentShareLink {
-  token      String   @id @unique @default(uuid())
-  documentId String
-  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  role       Role     @default(VIEWER)
+  token                     String   @id @unique @default(uuid())
+  sharerUserId              String   @default("invalid")
+  documentId                String
+  document                  Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  role                      Role     @default(VIEWER)
+  deviceSecretBoxCiphertext String   @default("invalid")
+  deviceSecretBoxNonce      String   @default("invalid")
 }
 
 model SnapshotKeyBox {

@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
-import { createAndEncryptKeyForDevice } from "../../../../test/helpers/device/createAndEncryptKeyForDevice";
+import { createAndEncryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
@@ -27,7 +27,7 @@ test("attach the same device does nothing", async () => {
   const authorizationHeader = userAndDevice1.sessionKey;
   const deviceSigningPublicKey = userAndDevice1.device.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
-  const { nonce, ciphertext } = await createAndEncryptKeyForDevice({
+  const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
   });
@@ -79,7 +79,7 @@ test("attach a device to a workspace", async () => {
   const deviceSigningPublicKey = userAndDevice1.webDevice.signingPublicKey;
   const deviceEncryptionPublicKey =
     userAndDevice1.webDevice.encryptionPublicKey;
-  const { nonce, ciphertext } = await createAndEncryptKeyForDevice({
+  const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
   });
@@ -132,7 +132,7 @@ test("Unauthenticated", async () => {
   const workspaceId = userAndDevice1.workspace.id;
   const deviceSigningPublicKey = userAndDevice1.device.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
-  const { nonce, ciphertext } = await createAndEncryptKeyForDevice({
+  const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey:
       userAndDevice1.deviceEncryptionPrivateKey,
@@ -185,7 +185,7 @@ describe("Input errors", () => {
     }
   `;
   test("Invalid deviceWorkspaceKeyBox ciphertext", async () => {
-    const { nonce } = await createAndEncryptKeyForDevice({
+    const { nonce } = await createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -212,7 +212,7 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid deviceWorkspaceKeyBox nonce", async () => {
-    const { ciphertext } = await createAndEncryptKeyForDevice({
+    const { ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -239,7 +239,7 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid deviceWorkspaceKeyBox workspaceId", async () => {
-    const { ciphertext, nonce } = await createAndEncryptKeyForDevice({
+    const { ciphertext, nonce } = await createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -282,7 +282,7 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid deviceSigningPublicKey", async () => {
-    const { ciphertext, nonce } = await createAndEncryptKeyForDevice({
+    const { ciphertext, nonce } = await createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -310,7 +310,7 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("No creatorDeviceSigningPublicKey provided", async () => {
-    const { ciphertext, nonce } = await createAndEncryptKeyForDevice({
+    const { ciphertext, nonce } = await createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -343,7 +343,7 @@ describe("Input errors", () => {
     const deviceSigningPublicKey = userAndDevice1.webDevice.signingPublicKey;
     const deviceEncryptionPublicKey =
       userAndDevice1.webDevice.encryptionPublicKey;
-    const { nonce, ciphertext } = await createAndEncryptKeyForDevice({
+    const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });

@@ -23,8 +23,10 @@ export const CreateDocumentShareLinkInput = inputObjectType({
   definition(t) {
     t.nonNull.string("documentId");
     t.nonNull.field("sharingRole", { type: MemberRoleEnum });
+    t.nonNull.string("deviceSecretBoxCiphertext");
+    t.nonNull.string("deviceSecretBoxNonce");
     t.nonNull.string("creatorDeviceSigningPublicKey");
-    t.nonNull.list.nonNull.field("snapshotDeviceKeyBoxes", {
+    t.nonNull.field("snapshotDeviceKeyBox", {
       type: SnapshotDeviceKeyBoxInput,
     });
   },
@@ -59,8 +61,10 @@ export const createDocumentLinkShareMutation = mutationField(
         sharerUserId: context.user.id,
         documentId: args.input.documentId,
         sharingRole: args.input.sharingRole,
+        deviceSecretBoxCiphertext: args.input.deviceSecretBoxCiphertext,
+        deviceSecretBoxNonce: args.input.deviceSecretBoxNonce,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
-        snapshotDeviceKeyBoxes: args.input.snapshotDeviceKeyBoxes,
+        snapshotDeviceKeyBox: args.input.snapshotDeviceKeyBox,
       });
       return {
         token: documentShareLink.token,

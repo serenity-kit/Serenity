@@ -67,9 +67,11 @@ export type CreateDocumentResult = {
 
 export type CreateDocumentShareLinkInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
+  deviceSecretBoxCiphertext: Scalars['String'];
+  deviceSecretBoxNonce: Scalars['String'];
   documentId: Scalars['String'];
   sharingRole: Role;
-  snapshotDeviceKeyBoxes: Array<SnapshotDeviceKeyBoxInput>;
+  snapshotDeviceKeyBox: SnapshotDeviceKeyBoxInput;
 };
 
 export type CreateDocumentShareLinkResult = {

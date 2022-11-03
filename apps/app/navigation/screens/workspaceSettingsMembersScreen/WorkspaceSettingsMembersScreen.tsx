@@ -38,7 +38,7 @@ import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
-import { createAndEncryptKeyForDevice } from "../../../utils/device/createAndEncryptKeyForDevice";
+import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { getUrqlClient } from "../../../utils/urqlClient/urqlClient";
 import {
@@ -194,12 +194,13 @@ export default function WorkspaceSettingsMembersScreen(
           continue;
         }
         if (device.userId !== removingMember.userId) {
-          const { ciphertext, nonce } = await createAndEncryptKeyForDevice({
-            receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-            creatorDeviceEncryptionPrivateKey:
-              activeDevice.encryptionPrivateKey!,
-            workspaceKey: workspaceKey.workspaceKey,
-          });
+          const { ciphertext, nonce } =
+            await createAndEncryptWorkspaceKeyForDevice({
+              receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+              creatorDeviceEncryptionPrivateKey:
+                activeDevice.encryptionPrivateKey!,
+              workspaceKey: workspaceKey.workspaceKey,
+            });
           deviceWorkspaceKeyBoxes.push({
             ciphertext,
             nonce,

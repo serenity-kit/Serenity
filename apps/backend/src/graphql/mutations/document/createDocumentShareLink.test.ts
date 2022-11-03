@@ -28,14 +28,14 @@ beforeAll(async () => {
 test("create share link", async () => {
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
+  // TODO: derive snapshotkey from folder key derivation trace
   const snapshotKey = await sodium.crypto_kdf_keygen();
   const documentShareLinkResponse = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.EDITOR,
-    creatorDevice,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-    receiverDevices: [creatorDevice],
+    creatorDevice,
     snapshotKey,
     authorizationHeader: userData1.sessionKey,
   });
@@ -53,6 +53,7 @@ test("Invalid ownership", async () => {
     otherUser.webDevice;
   const documentId = userData1.document.id;
   const authorizationHeader = otherUser.sessionKey;
+  // TODO: derive snapshotkey from folder key derivation trace
   const snapshotKey = await sodium.crypto_kdf_keygen();
   await expect(
     (async () =>
@@ -60,9 +61,8 @@ test("Invalid ownership", async () => {
         graphql,
         documentId,
         sharingRole: Role.EDITOR,
-        creatorDevice,
         creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-        receiverDevices: [creatorDevice],
+        creatorDevice,
         snapshotKey,
         authorizationHeader,
       }))()
@@ -79,9 +79,8 @@ test("Unauthenticated", async () => {
         graphql,
         documentId: userData1.document.id,
         sharingRole: Role.EDITOR,
-        creatorDevice,
         creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-        receiverDevices: [creatorDevice],
+        creatorDevice,
         snapshotKey,
         authorizationHeader: "badauthheader",
       }))()
@@ -115,8 +114,8 @@ describe("Input errors", () => {
               documentId: null,
               sharingRole: Role.EDITOR,
               creatorDevice,
-              creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-              receiverDevices: [creatorDevice],
+              deviceSecretBoxCiphertext: "",
+              deviceSecretBoxNonce: "",
               snapshotKey,
             },
           },
@@ -143,8 +142,8 @@ describe("Input errors", () => {
               documentId: userData1.document.id,
               sharingRole: null,
               creatorDevice,
-              creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-              receiverDevices: [creatorDevice],
+              deviceSecretBoxCiphertext: "",
+              deviceSecretBoxNonce: "",
               snapshotKey,
             },
           },
@@ -176,8 +175,8 @@ describe("Input errors", () => {
               documentId: userData1.document.id,
               sharingRole: Role.VIEWER,
               creatorDevice,
-              creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-              receiverDevices: [creatorDevice],
+              deviceSecretBoxCiphertext: "",
+              deviceSecretBoxNonce: "",
               snapshotKey,
             },
           },

@@ -4,7 +4,7 @@ import {
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { MemberDevices } from "../../types/workspaceDevice";
-import { createAndEncryptKeyForDevice } from "../device/createAndEncryptKeyForDevice";
+import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
 import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
 import { getWorkspaces } from "../workspace/getWorkspaces";
 
@@ -73,13 +73,14 @@ export const createWorkspaceMemberDevices = async ({
           workspaceDevices: [],
         };
         for (let receiverDevice of unauthorizedMember.devices) {
-          const { nonce, ciphertext } = await createAndEncryptKeyForDevice({
-            receiverDeviceEncryptionPublicKey:
-              receiverDevice.encryptionPublicKey,
-            creatorDeviceEncryptionPrivateKey:
-              activeDevice.encryptionPrivateKey!,
-            workspaceKey: workspaceKeyString,
-          });
+          const { nonce, ciphertext } =
+            await createAndEncryptWorkspaceKeyForDevice({
+              receiverDeviceEncryptionPublicKey:
+                receiverDevice.encryptionPublicKey,
+              creatorDeviceEncryptionPrivateKey:
+                activeDevice.encryptionPrivateKey!,
+              workspaceKey: workspaceKeyString,
+            });
           member.workspaceDevices.push({
             receiverDeviceSigningPublicKey: receiverDevice.signingPublicKey,
             ciphertext,

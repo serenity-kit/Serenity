@@ -21,15 +21,19 @@ export type Props = {
   documentId: string;
   sharingRole: Role;
   sharerUserId: string;
+  deviceSecretBoxCiphertext: string;
+  deviceSecretBoxNonce: string;
   creatorDeviceSigningPublicKey: string;
-  snapshotDeviceKeyBoxes: SnapshotDeviceKeyBox[];
+  snapshotDeviceKeyBox: SnapshotDeviceKeyBox;
 };
 export const createDocumentShareLink = async ({
   documentId,
   sharingRole,
   sharerUserId,
+  deviceSecretBoxCiphertext,
+  deviceSecretBoxNonce,
   creatorDeviceSigningPublicKey,
-  snapshotDeviceKeyBoxes,
+  snapshotDeviceKeyBox,
 }: Props): Promise<DocumentShareLink> => {
   // get the document
   const document = await prisma.document.findFirst({
@@ -59,7 +63,10 @@ export const createDocumentShareLink = async ({
     const documentShareLink = await prisma.documentShareLink.create({
       data: {
         documentId,
+        sharerUserId,
         role: sharingRole,
+        deviceSecretBoxCiphertext,
+        deviceSecretBoxNonce,
       },
     });
     // get the latest snapshot and set up the snapshot key boxes
@@ -70,19 +77,12 @@ export const createDocumentShareLink = async ({
     if (!latestSnapshot) {
       throw new Error("No snapshot found");
     }
-
-    const snapshotKeyBoxes: SnapshotKeyBoxCreateInput[] = [];
-    for (const snapshotKeyBox of snapshotDeviceKeyBoxes) {
-      snapshotKeyBoxes.push({
+    await prisma.snapshotKeyBox.create({
+      data: {
         snapshotId: latestSnapshot.id,
-        ciphertext: snapshotKeyBox.ciphertext,
-        nonce: snapshotKeyBox.nonce,
-        deviceSigningPublicKey: snapshotKeyBox.deviceSigningPublicKey,
         creatorDeviceSigningPublicKey,
-      });
-    }
-    await prisma.snapshotKeyBox.createMany({
-      data: snapshotKeyBoxes,
+        ...snapshotDeviceKeyBox,
+      },
     });
     return documentShareLink;
   });
