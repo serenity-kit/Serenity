@@ -2,37 +2,29 @@ import { expect, Page } from "@playwright/test";
 import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../../../src/database/prisma";
 import { delayForSeconds } from "../delayForSeconds";
+import { openMemberSettingsMemberRoleMenu } from "./openMemberSettingsMemberRoleMenu";
 
 export type Props = {
   userId: string;
   workspaceId: string;
   page: Page;
 };
-export const toggleAdminForMember = async ({
+export const changeMemberRoleToEditor = async ({
   page,
   userId,
   workspaceId,
 }: Props) => {
-  const userWorkspaceBefore = await prisma.usersToWorkspaces.findFirst({
-    where: { userId, workspaceId },
-    select: { role: true },
-  });
-  if (!userWorkspaceBefore) {
-    throw new Error("Invalid userId or workspaceId");
-  }
-  const roleBefore = userWorkspaceBefore.role;
-  await page
-    .locator(`data-testid=workspace-member-row__${userId}--isAdmin`)
-    .click();
+  await openMemberSettingsMemberRoleMenu({ page, userId });
+  const X = page.locator(`data-testid=member-menu--${userId}__make-editor`);
+  const text = await X.textContent();
+  console.log({ text });
+  await page.locator(`data-testid=member-menu--${userId}__make-editor`).click();
   await delayForSeconds(2);
   const userWorkspaceAfter = await prisma.usersToWorkspaces.findFirst({
     where: { userId, workspaceId },
     select: { role: true },
   });
   const roleAfter = userWorkspaceAfter?.role;
-  expect(roleAfter).not.toBe(roleBefore);
-  if (roleBefore !== Role.ADMIN) {
-    expect(roleAfter).toBe(Role.ADMIN);
-  }
+  expect(roleAfter).toBe(Role.EDITOR);
   await delayForSeconds(1);
 };

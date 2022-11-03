@@ -12,10 +12,14 @@ export type MenuButtonProps = PressableProps & {
   iconName?: IconNames;
   danger?: boolean;
   shortcut?: React.ReactNode;
+  hideIcon?: boolean;
 };
 
 export const MenuButton = React.forwardRef(
-  ({ danger, iconName, shortcut, ...rest }: MenuButtonProps, ref: any) => {
+  (
+    { danger, iconName, shortcut, hideIcon = false, ...rest }: MenuButtonProps,
+    ref: any
+  ) => {
     const isDesktopDevice = useIsDesktopDevice();
     const iconColor = danger ? "error-500" : "gray-800";
     const textColor = isDesktopDevice ? "gray-800" : "gray-900";
@@ -25,6 +29,7 @@ export const MenuButton = React.forwardRef(
       hover: danger ? tw`bg-error-100` : tw`bg-gray-200`,
       disabled: tw`bg-transparent opacity-50`, // TODO opacity tbd
       pressable: tw`py-3 md:py-2 px-5 md:px-3`,
+      hidden: tw`opacity-0`,
     });
 
     return (
@@ -45,7 +50,11 @@ export const MenuButton = React.forwardRef(
         }}
       >
         <HStack space={isDesktopDevice ? 2 : 4} alignItems="center">
-          {iconName && <Icon name={iconName} color={iconColor} />}
+          {iconName && (
+            <View style={hideIcon && styles.hidden}>
+              <Icon name={iconName} color={iconColor} />
+            </View>
+          )}
           <Text variant={isDesktopDevice ? "xs" : "md"} style={styles.text}>
             {rest.children}
           </Text>

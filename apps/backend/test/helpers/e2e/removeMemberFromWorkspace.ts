@@ -1,5 +1,6 @@
 import { Page } from "@playwright/test";
 import { delayForSeconds } from "../delayForSeconds";
+import { openMemberSettingsMemberRoleMenu } from "./openMemberSettingsMemberRoleMenu";
 import { verifyPassword } from "./verifyPassword";
 
 export type Props = {
@@ -12,9 +13,8 @@ export const removeMemberFromWorkspace = async ({
   userId,
   password,
 }: Props) => {
-  await page
-    .locator(`data-testid=workspace-member-row__${userId}--remove`)
-    .click();
+  await openMemberSettingsMemberRoleMenu({ page, userId });
+  await page.locator(`data-testid=member-menu--${userId}__delete`).click();
   await verifyPassword({ page, password, throwIfNotOpen: false });
   await delayForSeconds(1);
 };

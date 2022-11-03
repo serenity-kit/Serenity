@@ -1,13 +1,14 @@
-import React from "react";
-import { View, ViewProps } from "../view/View";
-import { tw } from "../../tailwind";
-import { ScrollView } from "../scrollView/ScrollView";
 import { HStack, VStack } from "native-base";
-import { Heading } from "../heading/Heading";
+import React from "react";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
+import { tw } from "../../tailwind";
+import { Heading } from "../heading/Heading";
+import { ScrollView } from "../scrollView/ScrollView";
+import { View, ViewProps } from "../view/View";
 
 export type SettingsContentWrapperProps = ViewProps & {
   title?: string;
+  scrollViewTestID?: string;
 };
 
 export function SettingsContentWrapper(props: SettingsContentWrapperProps) {
@@ -25,7 +26,10 @@ export function SettingsContentWrapper(props: SettingsContentWrapperProps) {
           <Heading lvl={2}>{title}</Heading>
         </HStack>
       ) : null}
-      <ScrollView style={tw`py-8 px-6 md:px-10`}>
+      <ScrollView
+        style={tw`py-8 px-6 md:px-10`}
+        testID={props.scrollViewTestID}
+      >
         <VStack space={5}>{props.children}</VStack>
       </ScrollView>
     </View>

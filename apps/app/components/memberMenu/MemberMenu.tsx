@@ -1,64 +1,73 @@
-import { IconButton, Menu, MenuButton, Shortcut, tw } from "@serenity-tools/ui";
+import {
+  IconButton,
+  Menu,
+  MenuButton,
+  SidebarDivider,
+  tw,
+} from "@serenity-tools/ui";
 import { useState } from "react";
+import { Role } from "../../generated/graphql";
 
 type Props = {
-  folderId: string;
-  refetchFolders: () => void;
-  onUpdateNamePress: () => void;
+  memberId: string;
+  role: Role;
+  onUpdateRole: (role: Role) => void;
   onDeletePressed: () => void;
-  onCreateFolderPress: () => void;
 };
 
-export default function SidebarFolderMenu(props: Props) {
+export default function MemberMenu(props: Props) {
+  const { memberId, role, ...rest } = props;
   const [isOpenMenu, setIsOpenMenu] = useState(false);
 
   return (
     <Menu
+      {...rest}
       placement="bottom left"
       style={tw`w-60`}
-      offset={2}
+      offset={6}
       isOpen={isOpenMenu}
       onChange={setIsOpenMenu}
       trigger={
         <IconButton
+          testID={`member-menu--${memberId}__open`}
           accessibilityLabel="More options menu"
           name="more-line"
-          color="gray-600"
+          color="gray-700"
           style={tw`p-2 md:p-0`}
-          testID={`sidebar-folder-menu--${props.folderId}__open`}
         ></IconButton>
       }
     >
       <MenuButton
+        testID={`member-menu--${memberId}__make-editor`}
         onPress={() => {
           setIsOpenMenu(false);
-          props.onCreateFolderPress();
+          props.onUpdateRole(Role.Editor);
         }}
-        iconName="folder-line"
-        shortcut={<Shortcut letter="N" />}
-        testID={`sidebar-folder-menu--${props.folderId}__create-subfolder`}
+        iconName={"check-line"}
+        hideIcon={role !== Role.Editor}
       >
-        Create folder
+        Editor
       </MenuButton>
       <MenuButton
+        testID={`member-menu--${memberId}__make-admin`}
         onPress={() => {
           setIsOpenMenu(false);
-          props.onUpdateNamePress();
+          props.onUpdateRole(Role.Admin);
         }}
-        iconName="font-size-2"
-        shortcut={<Shortcut letter="R" />}
-        testID={`sidebar-folder-menu--${props.folderId}__rename`}
+        iconName={"check-line"}
+        hideIcon={role !== Role.Admin}
       >
-        Rename
+        Admin
       </MenuButton>
+      <SidebarDivider collapsed />
       <MenuButton
+        testID={`member-menu--${memberId}__delete`}
         onPress={() => {
           setIsOpenMenu(false);
           props.onDeletePressed();
         }}
         iconName="delete-bin-line"
         danger
-        testID={`sidebar-folder-menu--${props.folderId}__delete`}
       >
         Delete
       </MenuButton>

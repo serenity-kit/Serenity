@@ -1,18 +1,25 @@
 import {
-  Button,
+  Avatar,
   CenterContent,
-  Checkbox,
   Description,
   Heading,
   InfoMessage,
+  List,
+  ListHeader,
+  ListIconText,
+  ListItem,
+  ListText,
   SettingsContentWrapper,
   Spinner,
   Text,
+  tw,
+  useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
-import { StyleSheet, useWindowDimensions } from "react-native";
+import { StyleSheet } from "react-native";
+import MemberMenu from "../../../components/memberMenu/MemberMenu";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
@@ -48,67 +55,6 @@ type Member = {
   role: Role;
 };
 
-function WorkspaceMemberRow({
-  userId,
-  username,
-  role,
-  allowEditing,
-  adminUserId,
-  onAdminStatusChange,
-  onDeletePress,
-}) {
-  useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-
-  return (
-    <View
-      style={styles.memberListItem}
-      testID={`workspace-member-row__${adminUserId}`}
-    >
-      <Text style={styles.memberListItemLabel}>
-        {username}
-        {userId === adminUserId && (
-          <Text style={workspaceMemberStyles.adminLabel}>(You)</Text>
-        )}
-      </Text>
-      <View style={workspaceMemberStyles.checkboxContainer}>
-        <Checkbox
-          defaultIsChecked={role === Role.Admin}
-          isDisabled={!allowEditing}
-          onChange={onAdminStatusChange}
-          value={username}
-          testID={`workspace-member-row__${userId}--isAdmin`}
-        >
-          <Text>Admin</Text>
-        </Checkbox>
-        {allowEditing && (
-          <Button
-            onPress={onDeletePress}
-            testID={`workspace-member-row__${userId}--remove`}
-          >
-            Remove
-          </Button>
-        )}
-      </View>
-    </View>
-  );
-}
-
-const workspaceMemberStyles = StyleSheet.create({
-  memberListItem: {
-    flexGrow: 1,
-  },
-  memberListItemLabel: {
-    flexGrow: 1,
-  },
-  checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  adminLabel: {
-    fontStyle: "italic",
-  },
-});
-
 export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
@@ -139,6 +85,7 @@ export default function WorkspaceSettingsMembersScreen(
   );
   const [hasGraphqlError, setHasGraphqlError] = useState(false);
   const [graphqlError, setGraphqlError] = useState("");
+  const isDesktopDevice = useIsDesktopDevice();
 
   useInterval(() => {
     if (activeDevice) {
@@ -296,12 +243,15 @@ export default function WorkspaceSettingsMembersScreen(
 
   return (
     <>
-      {hasGraphqlError && (
-        <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>{graphqlError}</Text>
-        </View>
-      )}
-      <SettingsContentWrapper title="Members">
+      <SettingsContentWrapper
+        title="Members"
+        scrollViewTestID="member-settings--scroll-view"
+      >
+        {hasGraphqlError && (
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorText}>{graphqlError}</Text>
+          </View>
+        )}
         {state.value !== "loadWorkspaceSuccess" ? (
           <CenterContent>
             {state.value === "loadWorkspaceFailed" ? (
@@ -335,50 +285,74 @@ export default function WorkspaceSettingsMembersScreen(
                 />
               </>
             )}
-            <Heading lvl={3} padded>
+            <Heading lvl={3} style={tw`mt-3`}>
               Members
             </Heading>
-            {members.map((member: any) => (
-              <WorkspaceMemberRow
-                key={member.userId}
-                userId={member.userId}
-                username={member.username}
-                role={member.role}
-                adminUserId={
+
+            <List
+              data={members}
+              emptyString={"No members available"}
+              header={
+                <ListHeader data={["Name", "Email", "Role"]} mainIsIconText />
+              }
+            >
+              {members.map((member: any) => {
+                const adminUserId =
                   state.context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
-                    ?.id
-                }
-                allowEditing={
-                  isAdmin &&
-                  member.userId !==
-                    state.context.meWithWorkspaceLoadingInfoQueryResult?.data
-                      ?.me?.id
-                }
-                onAdminStatusChange={(isMemberAdmin: boolean) => {
-                  let memberRole: Role = Role.Editor;
-                  if (isMemberAdmin) {
-                    memberRole = Role.Admin;
-                  }
-                  updateMember(member, memberRole);
-                }}
-                onDeletePress={() => {
-                  removeMemberPreflight(member.userId);
-                }}
-              />
-            ))}
-            {isAdmin ? (
-              <>
-                <Text style={styles.memberListItemLabel}>
-                  You are an admin of this workspace
-                </Text>
-              </>
-            ) : (
-              <>
-                <Text style={styles.memberListItemLabel}>
-                  You are not an admin of this workspace
-                </Text>
-              </>
-            )}
+                    ?.id;
+                // TODO acutally use username when available
+                const username = member.username.slice(
+                  0,
+                  member.username.indexOf("@")
+                );
+                // TODO actually use initials when we have a username
+                const initials = username.substring(0, 2);
+                const email = member.username;
+
+                const allowEditing = isAdmin && member.userId !== adminUserId;
+
+                // capitalize by css doesn't work here as it will only affect the first letter
+                const roleName =
+                  member.role.charAt(0).toUpperCase() +
+                  member.role.slice(1).toLowerCase();
+
+                return (
+                  <ListItem
+                    testID={`workspace-member-row__${adminUserId}`}
+                    key={member.userId}
+                    mainItem={
+                      <ListIconText
+                        main={
+                          username +
+                          (member.userId === adminUserId ? " (you)" : "")
+                        }
+                        secondary={email}
+                        avatar={
+                          <Avatar size={isDesktopDevice ? "xs" : "sm"}>
+                            {initials}
+                          </Avatar>
+                        }
+                      />
+                    }
+                    secondaryItem={<ListText secondary>{roleName}</ListText>}
+                    actionItem={
+                      allowEditing ? (
+                        <MemberMenu
+                          memberId={member.userId}
+                          role={member.role}
+                          onUpdateRole={(role) => {
+                            updateMember(member, role);
+                          }}
+                          onDeletePressed={() => {
+                            removeMemberPreflight(member.userId);
+                          }}
+                        />
+                      ) : null
+                    }
+                  />
+                );
+              })}
+            </List>
           </>
         )}
       </SettingsContentWrapper>
@@ -402,17 +376,6 @@ export default function WorkspaceSettingsMembersScreen(
 }
 
 const styles = StyleSheet.create({
-  memberListItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  memberListItemLabel: {
-    flexGrow: 1,
-  },
-  addMemberContainer: {
-    flexDirection: "row",
-  },
   formError: {
     color: "red",
   },

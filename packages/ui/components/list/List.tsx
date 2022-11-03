@@ -7,7 +7,7 @@ import { Text } from "../text/Text";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
 
 export type ListProps = ViewProps & {
-  data: Array<string>;
+  data: Array<any>;
   emptyString: string;
   header?: React.ReactNode;
   mainWidth?: string;
