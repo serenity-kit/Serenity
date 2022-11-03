@@ -391,7 +391,7 @@ export default function WorkspaceSettingsMembersScreen(
                     }
                     secondaryItem={
                       <ListText secondary>
-                        {member.isAdmin ? "Admin" : "Editor"}
+                        {member.role === Role.Admin ? "Admin" : "Editor"}
                       </ListText>
                     }
                     actionItem={
