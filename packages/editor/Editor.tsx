@@ -13,7 +13,7 @@ import { Awareness } from "y-protocols/awareness";
 import * as Y from "yjs";
 import {
   DownloadAndDecryptFileFunction,
-  EncryptAndUploadFunction,
+  EncryptAndUploadFunctionFile,
   ImageNodeExtension,
 } from "../editor-image-extension/src";
 import "./awareness.css";
@@ -34,7 +34,7 @@ type EditorProps = {
   onFocus?: (params: EditorEvents["focus"]) => void;
   onBlur?: (params: EditorEvents["blur"]) => void;
   onCreate?: (params: EditorEvents["create"]) => void;
-  encryptAndUpload: EncryptAndUploadFunction;
+  encryptAndUploadFile: EncryptAndUploadFunctionFile;
   downloadAndDecryptFile: DownloadAndDecryptFileFunction;
 };
 
@@ -101,7 +101,7 @@ export const Editor = (props: EditorProps) => {
         }),
         SerenityScrollIntoViewOnEditModeExtension.configure({}),
         ImageNodeExtension.configure({
-          encryptAndUpload: props.encryptAndUpload,
+          encryptAndUploadFile: props.encryptAndUploadFile,
           downloadAndDecryptFile: props.downloadAndDecryptFile,
         }),
       ],
@@ -176,7 +176,7 @@ export const Editor = (props: EditorProps) => {
         <EditorSidebar
           editor={editor}
           headingLevels={headingLevels}
-          encryptAndUpload={props.encryptAndUpload}
+          encryptAndUploadFile={props.encryptAndUploadFile}
         />
       )}
     </div>

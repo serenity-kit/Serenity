@@ -9,11 +9,11 @@ import { Editor as TipTapEditor } from "@tiptap/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { View as RNView } from "react-native";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
+import { createEncryptAndUploadFileFunction } from "../../utils/file/createEncryptAndUploadFileFunction";
 import {
   EditorBottombar,
   editorBottombarHeight,
 } from "../editorBottombar/EditorBottombar";
-import { createEncryptAndUploadFunction } from "./createEncryptAndUploadFunction";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -71,8 +71,8 @@ export default function Editor({
     };
   }, []);
 
-  const encryptAndUpload = useMemo(() => {
-    return createEncryptAndUploadFunction({
+  const encryptAndUploadFile = useMemo(() => {
+    return createEncryptAndUploadFileFunction({
       workspaceId,
       documentId,
     });
@@ -124,7 +124,7 @@ export default function Editor({
               getEditorBottombarStateFromEditor(params.editor)
             );
           }}
-          encryptAndUpload={encryptAndUpload}
+          encryptAndUploadFile={encryptAndUploadFile}
         />
       </View>
       {!hasEditorSidebar && (
@@ -143,7 +143,7 @@ export default function Editor({
                 updateEditor(tipTapEditorRef.current, params);
               }
             }}
-            encryptAndUpload={encryptAndUpload}
+            encryptAndUploadFile={encryptAndUploadFile}
           />
         </View>
       )}

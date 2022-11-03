@@ -3,7 +3,7 @@ import { ReactNodeViewRenderer } from "@tiptap/react";
 import { Image } from "./Image";
 import {
   DownloadAndDecryptFileFunction,
-  EncryptAndUploadFunction,
+  EncryptAndUploadFunctionFile,
   FileInfo,
 } from "./types";
 import { uploadImageProsemirrorPlugin } from "./uploadImageProsemirrorPlugin";
@@ -11,7 +11,7 @@ import { uploadImageProsemirrorPlugin } from "./uploadImageProsemirrorPlugin";
 export interface ImageOptions {
   inline: boolean;
   HTMLAttributes: Record<string, any>;
-  encryptAndUpload: EncryptAndUploadFunction;
+  encryptAndUploadFile: EncryptAndUploadFunctionFile;
   downloadAndDecryptFile: DownloadAndDecryptFileFunction;
 }
 
@@ -45,7 +45,7 @@ export const ImageNodeExtension = Node.create<ImageOptions>({
       inline: false,
       allowBase64: false,
       HTMLAttributes: {},
-      encryptAndUpload: async () => {
+      encryptAndUploadFile: async () => {
         return { key: "", nonce: "", fileId: "" };
       },
       downloadAndDecryptFile: async () => "",
@@ -123,6 +123,6 @@ export const ImageNodeExtension = Node.create<ImageOptions>({
   },
 
   addProseMirrorPlugins() {
-    return [uploadImageProsemirrorPlugin(this.options.encryptAndUpload)];
+    return [uploadImageProsemirrorPlugin(this.options.encryptAndUploadFile)];
   },
 });

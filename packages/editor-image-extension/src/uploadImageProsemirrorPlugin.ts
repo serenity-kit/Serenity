@@ -1,10 +1,10 @@
 import { Plugin } from "prosemirror-state";
-import { EncryptAndUploadFunction } from "./types";
+import { EncryptAndUploadFunctionFile } from "./types";
 import { insertImages } from "./utils/insertImages";
 import { updateImageAttributes } from "./utils/updateImageAttributes";
 
 export const uploadImageProsemirrorPlugin = (
-  encryptAndUpload: EncryptAndUploadFunction
+  encryptAndUploadFile: EncryptAndUploadFunctionFile
 ) => {
   return new Plugin({
     props: {
@@ -36,7 +36,7 @@ export const uploadImageProsemirrorPlugin = (
 
           insertImages({
             images,
-            encryptAndUpload,
+            encryptAndUploadFile,
             insertImage: ({ uploadId, width, height }) => {
               const node = view.state.schema.nodes.image.create({
                 uploadId,

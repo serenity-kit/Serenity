@@ -19,12 +19,12 @@ import {
 import * as Y from "yjs";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
+import { createEncryptAndUploadFileFunction } from "../../utils/file/createEncryptAndUploadFileFunction";
 import { source } from "../../webviews/editor/source";
 import {
   EditorBottombar,
   EditorBottombarProps,
 } from "../editorBottombar/EditorBottombar";
-import { createEncryptAndUploadFunction } from "./createEncryptAndUploadFunction";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -47,7 +47,7 @@ const BottombarWrapper = ({
   keyboardAnimationDuration,
   editorBottombarState,
   onUpdate,
-  encryptAndUpload,
+  encryptAndUploadFile,
 }: BottombarWrapperProps) => {
   const [bottom] = useState(new Animated.Value(0));
 
@@ -65,7 +65,7 @@ const BottombarWrapper = ({
       <EditorBottombar
         editorBottombarState={editorBottombarState}
         onUpdate={onUpdate}
-        encryptAndUpload={encryptAndUpload}
+        encryptAndUploadFile={encryptAndUploadFile}
       />
     </Animated.View>
   );
@@ -92,8 +92,8 @@ export default function Editor({
   const [keyboardAnimationDuration, setKeyboardAnimationDuration] = useState(0);
   const store = useEditorStore();
 
-  const encryptAndUpload = useMemo(() => {
-    return createEncryptAndUploadFunction({
+  const encryptAndUploadFile = useMemo(() => {
+    return createEncryptAndUploadFileFunction({
       workspaceId,
       documentId,
     });
@@ -279,7 +279,7 @@ export default function Editor({
           true;
         `);
           }}
-          encryptAndUpload={encryptAndUpload}
+          encryptAndUploadFile={encryptAndUploadFile}
         />
       ) : null}
     </>

@@ -1,6 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import {
-  EncryptAndUploadFunction,
+  EncryptAndUploadFunctionFile,
   InsertImageParams,
   UpdateImageAttributesParams,
 } from "../types";
@@ -8,13 +8,13 @@ import { base64ToFile } from "./base64ToFile";
 import { insertImages } from "./insertImages";
 
 type Props = {
-  encryptAndUpload: EncryptAndUploadFunction;
+  encryptAndUploadFile: EncryptAndUploadFunctionFile;
   insertImage: ({ uploadId, width, height }: InsertImageParams) => void;
   updateImageAttributes: (params: UpdateImageAttributesParams) => void;
 };
 
 export const initiateImagePicker = async ({
-  encryptAndUpload,
+  encryptAndUploadFile,
   insertImage,
   updateImageAttributes,
 }: Props) => {
@@ -37,7 +37,7 @@ export const initiateImagePicker = async ({
   });
 
   insertImages({
-    encryptAndUpload,
+    encryptAndUploadFile,
     images: [image],
     insertImage,
     updateImageAttributes,
