@@ -133,6 +133,7 @@ export default function Editor({
           style={{
             position: "absolute",
             display: "none",
+            width: "100%",
           }}
         >
           <EditorBottombar
