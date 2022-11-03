@@ -7,7 +7,6 @@ import {
   View,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { VStack } from "native-base";
 import { useState } from "react";
 import { FlatList, useWindowDimensions } from "react-native";
 import DeviceListItem from "../../../components/deviceListItem/DeviceListItem";
@@ -22,7 +21,7 @@ import {
   WorkspaceDeviceParing,
   WorkspaceWithWorkspaceDevicesParing,
 } from "../../../types/workspaceDevice";
-import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
+import { createAndEncryptKeyForDevice } from "../../../utils/device/createAndEncryptKeyForDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { deriveCurrentWorkspaceKey } from "../../../utils/workspace/deriveCurrentWorkspaceKey";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
@@ -96,13 +95,11 @@ export default function DeviceManagerScreen(props) {
         if (device.signingPublicKey === deviceSigningPublicKey) {
           continue;
         }
-        const { ciphertext, nonce } =
-          await createAndEncryptWorkspaceKeyForDevice({
-            receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-            creatorDeviceEncryptionPrivateKey:
-              activeDevice.encryptionPrivateKey!,
-            workspaceKey: workspaceKey.workspaceKey,
-          });
+        const { ciphertext, nonce } = await createAndEncryptKeyForDevice({
+          receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+          creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+          workspaceKey: workspaceKey.workspaceKey,
+        });
         workspaceDevicePairing.push({
           ciphertext,
           nonce,

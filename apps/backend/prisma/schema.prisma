@@ -33,18 +33,18 @@ model Document {
 }
 
 model Snapshot {
-  id                     String        @id @default(uuid())
+  id                     String           @id @default(uuid())
   latestVersion          Int
   data                   String
   preview                String // title & icon
-  document               Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  document               Document         @relation(fields: [documentId], references: [id], onDelete: Cascade)
   documentId             String
   updates                Update[]
-  activeSnapshotDocument Document?     @relation("activeSnapshot")
-  createdAt              DateTime      @default(now())
-  keyDerivationTrace     Json          @default("{}")
+  activeSnapshotDocument Document?        @relation("activeSnapshot")
+  createdAt              DateTime         @default(now())
+  keyDerivationTrace     Json             @default("{}")
   clocks                 Json
-  snapshotKeys           SnapshotKey[]
+  snapshotKeyBoxes       SnapshotKeyBox[]
 }
 
 model Update {
@@ -154,14 +154,13 @@ model Device {
 }
 
 model CreatorDevice {
-  signingPublicKey             String              @id @unique
+  signingPublicKey             String            @id @unique
   encryptionPublicKey          String
   encryptionPublicKeySignature String
-  user                         User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user                         User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId                       String?
-  createdAt                    DateTime            @default(now())
+  createdAt                    DateTime          @default(now())
   workspaceKeyBoxes            WorkspaceKeyBox[]
-  documentShareLinks           DocumentShareLink[]
   snapshotKeyBoxes             SnapshotKeyBox[]
 }
 
@@ -239,28 +238,16 @@ model Folder {
 }
 
 model DocumentShareLink {
-  token                         String        @id @unique @default(uuid())
-  documentId                    String
-  document                      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  role                          Role          @default(VIEWER)
-  deviceSecretBoxCiphertext     String
-  deviceSecretBoxNonce          String
-  creatorDeviceSigningPublicKey String
-  creatorDevice                 CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
-}
-
-model SnapshotKey {
-  id               String           @id @unique @default(uuid())
-  snapshotKeyBoxes SnapshotKeyBox[]
-  snapshot         Snapshot         @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
-  snapshotId       String
-  generation       Int              @default(0)
+  token      String   @id @unique @default(uuid())
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  role       Role     @default(VIEWER)
 }
 
 model SnapshotKeyBox {
   id                            String        @id @unique @default(uuid())
-  snapshotKey                   SnapshotKey   @relation(fields: [snapshotKeyId], references: [id], onDelete: Cascade)
-  snapshotKeyId                 String
+  snapshot                      Snapshot      @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  snapshotId                    String
   deviceSigningPublicKey        String
   creatorDeviceSigningPublicKey String        @default("invalid")
   nonce                         String        @default("invalid")

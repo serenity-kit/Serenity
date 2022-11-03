@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
-import { createAndEncryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
+import { createAndEncryptKeyForDevice } from "../../../../test/helpers/device/createAndEncryptKeyForDevice";
 import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
 import { encryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/encryptWorkspaceKeyForDevice";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
@@ -67,7 +67,7 @@ test("add device", async () => {
     envelope: userData1.envelope,
   });
   user1Device2 = loginResult.webDevice;
-  const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
+  const { nonce, ciphertext } = await createAndEncryptKeyForDevice({
     receiverDeviceEncryptionPublicKey: user1Device2.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
   });

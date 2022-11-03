@@ -7,7 +7,6 @@ import {
   objectType,
 } from "nexus";
 import { createDocumentShareLink } from "../../../database/document/createDocumentShareLink";
-import { CreatorDeviceInput } from "../../types/device";
 import { MemberRoleEnum } from "../../types/workspace";
 
 export const SnapshotDeviceKeyBoxInput = inputObjectType({
@@ -24,9 +23,7 @@ export const CreateDocumentShareLinkInput = inputObjectType({
   definition(t) {
     t.nonNull.string("documentId");
     t.nonNull.field("sharingRole", { type: MemberRoleEnum });
-    t.nonNull.string("deviceSecretBoxCiphertext");
-    t.nonNull.string("deviceSecretBoxNonce");
-    t.nonNull.field("creatorDevice", { type: CreatorDeviceInput });
+    t.nonNull.string("creatorDeviceSigningPublicKey");
     t.nonNull.list.nonNull.field("snapshotDeviceKeyBoxes", {
       type: SnapshotDeviceKeyBoxInput,
     });
@@ -56,18 +53,13 @@ export const createDocumentLinkShareMutation = mutationField(
         throw new AuthenticationError("Not authenticated");
       }
       context.assertValidDeviceSigningPublicKeyForThisSession(
-        args.input.creatorDevice.signingPublicKey
+        args.input.creatorDeviceSigningPublicKey
       );
       const documentShareLink = await createDocumentShareLink({
         sharerUserId: context.user.id,
         documentId: args.input.documentId,
         sharingRole: args.input.sharingRole,
-        deviceSecretBoxCiphertext: args.input.deviceSecretBoxCiphertext,
-        deviceSecretBoxNonce: args.input.deviceSecretBoxNonce,
-        deviceSigningPublicKey: args.input.creatorDevice.signingPublicKey,
-        deviceEncryptionPublicKey: args.input.creatorDevice.encryptionPublicKey,
-        deviceEncryptionPublicKeySignature:
-          args.input.creatorDevice.encryptionPublicKeySignature,
+        creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
         snapshotDeviceKeyBoxes: args.input.snapshotDeviceKeyBoxes,
       });
       return {

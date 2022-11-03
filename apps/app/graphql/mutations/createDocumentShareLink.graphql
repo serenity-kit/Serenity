@@ -1,0 +1,5 @@
+mutation createDocumentShareLink($input: CreateDocumentShareLinkInput!) {
+  createDocumentShareLink(input: $input) {
+    token
+  }
+}

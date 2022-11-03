@@ -8,7 +8,7 @@ import {
 import * as sodium from "@serenity-tools/libsodium";
 import { Registration } from "@serenity-tools/opaque-server";
 import { v4 as uuidv4 } from "uuid";
-import { createAndEncryptWorkspaceKeyForDevice } from "../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
+import { createAndEncryptKeyForDevice } from "../../../test/helpers/device/createAndEncryptKeyForDevice";
 import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
 import { finishRegistration, startRegistration } from "../../utils/opaque";
 import { prisma } from "../prisma";
@@ -84,7 +84,7 @@ export default async function createUserWithWorkspace({
   const deviceEncryptionPublicKey = device.encryptionPublicKey;
   const deviceSigningPrivateKey = result.signingPrivateKey;
   const { nonce, ciphertext, workspaceKey } =
-    await createAndEncryptWorkspaceKeyForDevice({
+    await createAndEncryptKeyForDevice({
       receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
     });

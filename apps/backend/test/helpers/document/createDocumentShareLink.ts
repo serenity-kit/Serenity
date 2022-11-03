@@ -38,8 +38,6 @@ export type Params = {
   graphql: any;
   documentId: string;
   sharingRole: Role;
-  deviceSecretBoxCiphertext: string;
-  deviceSecretBoxNonce: string;
   creatorDevice: Device;
   creatorDeviceEncryptionPrivateKey: string;
   snapshotKey: string;
@@ -51,8 +49,6 @@ export const createDocumentShareLink = async ({
   graphql,
   documentId,
   sharingRole,
-  deviceSecretBoxCiphertext,
-  deviceSecretBoxNonce,
   creatorDevice,
   creatorDeviceEncryptionPrivateKey,
   snapshotKey,
@@ -82,9 +78,7 @@ export const createDocumentShareLink = async ({
       input: {
         documentId,
         sharingRole,
-        deviceSecretBoxCiphertext,
-        deviceSecretBoxNonce,
-        creatorDevice,
+        creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
         snapshotDeviceKeyBoxes,
       },
     },

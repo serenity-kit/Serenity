@@ -15,9 +15,6 @@ export const changeMemberRoleToEditor = async ({
   workspaceId,
 }: Props) => {
   await openMemberSettingsMemberRoleMenu({ page, userId });
-  const X = page.locator(`data-testid=member-menu--${userId}__make-editor`);
-  const text = await X.textContent();
-  console.log({ text });
   await page.locator(`data-testid=member-menu--${userId}__make-editor`).click();
   await delayForSeconds(2);
   const userWorkspaceAfter = await prisma.usersToWorkspaces.findFirst({

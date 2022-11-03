@@ -7,7 +7,7 @@ import {
 } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
-import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
+import { createAndEncryptKeyForDevice } from "../device/createAndEncryptKeyForDevice";
 
 type Params = {
   graphql: any;
@@ -46,11 +46,11 @@ export const createInitialWorkspaceStructure = async ({
     authorization: authorizationHeader,
   };
   const { nonce, ciphertext, workspaceKey } =
-    await createAndEncryptWorkspaceKeyForDevice({
+    await createAndEncryptKeyForDevice({
       receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
     });
-  const webDeviceWorkspaceKey = await createAndEncryptWorkspaceKeyForDevice({
+  const webDeviceWorkspaceKey = await createAndEncryptKeyForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
   });

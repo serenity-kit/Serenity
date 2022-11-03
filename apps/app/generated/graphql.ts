@@ -65,6 +65,18 @@ export type CreateDocumentResult = {
   id: Scalars['String'];
 };
 
+export type CreateDocumentShareLinkInput = {
+  creatorDeviceSigningPublicKey: Scalars['String'];
+  documentId: Scalars['String'];
+  sharingRole: Role;
+  snapshotDeviceKeyBoxes: Array<SnapshotDeviceKeyBoxInput>;
+};
+
+export type CreateDocumentShareLinkResult = {
+  __typename?: 'CreateDocumentShareLinkResult';
+  token: Scalars['String'];
+};
+
 export type CreateFolderInput = {
   encryptedName: Scalars['String'];
   encryptedNameNonce: Scalars['String'];
@@ -448,6 +460,7 @@ export type Mutation = {
   attachDeviceToWorkspaces?: Maybe<AttachDeviceToWorkspacesResult>;
   attachDevicesToWorkspaces?: Maybe<AttachDevicesToWorkspacesResult>;
   createDocument?: Maybe<CreateDocumentResult>;
+  createDocumentShareLink?: Maybe<CreateDocumentShareLinkResult>;
   createFolder?: Maybe<CreateFolderResult>;
   createInitialWorkspaceStructure?: Maybe<CreateInitialWorkspaceStructureResult>;
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
@@ -489,6 +502,11 @@ export type MutationAttachDevicesToWorkspacesArgs = {
 
 export type MutationCreateDocumentArgs = {
   input: CreateDocumentInput;
+};
+
+
+export type MutationCreateDocumentShareLinkArgs = {
+  input: CreateDocumentShareLinkInput;
 };
 
 
@@ -769,6 +787,12 @@ export type Session = {
   expiresAt: Scalars['Date'];
 };
 
+export type SnapshotDeviceKeyBoxInput = {
+  ciphertext: Scalars['String'];
+  deviceSigningPublicKey: Scalars['String'];
+  nonce: Scalars['String'];
+};
+
 export type StartLoginInput = {
   challenge: Scalars['String'];
   username: Scalars['String'];
@@ -1019,7 +1043,7 @@ export type WorkspaceMember = {
 };
 
 export type WorkspaceMemberInput = {
-  role: Scalars['String'];
+  role: Role;
   userId: Scalars['String'];
 };
 
@@ -1061,6 +1085,13 @@ export type CreateDocumentMutationVariables = Exact<{
 
 
 export type CreateDocumentMutation = { __typename?: 'Mutation', createDocument?: { __typename?: 'CreateDocumentResult', id: string } | null };
+
+export type CreateDocumentShareLinkMutationVariables = Exact<{
+  input: CreateDocumentShareLinkInput;
+}>;
+
+
+export type CreateDocumentShareLinkMutation = { __typename?: 'Mutation', createDocumentShareLink?: { __typename?: 'CreateDocumentShareLinkResult', token: string } | null };
 
 export type CreateFolderMutationVariables = Exact<{
   input: CreateFolderInput;
@@ -1450,6 +1481,17 @@ export const CreateDocumentDocument = gql`
 
 export function useCreateDocumentMutation() {
   return Urql.useMutation<CreateDocumentMutation, CreateDocumentMutationVariables>(CreateDocumentDocument);
+};
+export const CreateDocumentShareLinkDocument = gql`
+    mutation createDocumentShareLink($input: CreateDocumentShareLinkInput!) {
+  createDocumentShareLink(input: $input) {
+    token
+  }
+}
+    `;
+
+export function useCreateDocumentShareLinkMutation() {
+  return Urql.useMutation<CreateDocumentShareLinkMutation, CreateDocumentShareLinkMutationVariables>(CreateDocumentShareLinkDocument);
 };
 export const CreateFolderDocument = gql`
     mutation createFolder($input: CreateFolderInput!) {
@@ -2361,6 +2403,20 @@ export const runCreateDocumentMutation = async (variables: CreateDocumentMutatio
   return await getUrqlClient()
     .mutation<CreateDocumentMutation, CreateDocumentMutationVariables>(
       CreateDocumentDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runCreateDocumentShareLinkMutation = async (variables: CreateDocumentShareLinkMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<CreateDocumentShareLinkMutation, CreateDocumentShareLinkMutationVariables>(
+      CreateDocumentShareLinkDocument,
       variables,
       {
         // better to be safe here and always refetch
