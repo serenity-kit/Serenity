@@ -243,7 +243,10 @@ export default function WorkspaceSettingsMembersScreen(
 
   return (
     <>
-      <SettingsContentWrapper title="Members">
+      <SettingsContentWrapper
+        title="Members"
+        scrollViewTestID="member-settings--scroll-view"
+      >
         {hasGraphqlError && (
           <View style={styles.errorBanner}>
             <Text style={styles.errorText}>{graphqlError}</Text>

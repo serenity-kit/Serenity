@@ -29,7 +29,7 @@ export default function MemberMenu(props: Props) {
       onChange={setIsOpenMenu}
       trigger={
         <IconButton
-          testID={`members-menu--${memberId}__open`}
+          testID={`member-menu--${memberId}__open`}
           accessibilityLabel="More options menu"
           name="more-line"
           color="gray-700"
@@ -38,7 +38,7 @@ export default function MemberMenu(props: Props) {
       }
     >
       <MenuButton
-        testID={`members-menu--${memberId}__make-editor`}
+        testID={`member-menu--${memberId}__make-editor`}
         onPress={() => {
           setIsOpenMenu(false);
           props.onUpdateRole(Role.Editor);

@@ -4,10 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { acceptWorkspaceInvitation } from "../../helpers/e2e/acceptWorkspaceInvitation";
+import { changeMemberRoleToAdmin } from "../../helpers/e2e/changeMemberRoleToAdmin";
+import { changeMemberRoleToEditor } from "../../helpers/e2e/changeMemberRoleToEditor";
 import { createWorkspaceInvitation } from "../../helpers/e2e/createWorkspaceInvitation";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
-import { toggleAdminForMember } from "../../helpers/e2e/toggleAdminForMember";
 
 type UserData = {
   id: string;
@@ -72,13 +73,13 @@ test.describe("Workspace Sharing", () => {
     await reloadPage({ page });
 
     // make user2 an admin
-    await toggleAdminForMember({
+    await changeMemberRoleToAdmin({
       page,
       userId: user2.data.user.id,
       workspaceId: user1.data.workspace.id,
     });
     // make user2 a non-admin
-    await toggleAdminForMember({
+    await changeMemberRoleToEditor({
       page,
       userId: user2.data.user.id,
       workspaceId: user1.data.workspace.id,
