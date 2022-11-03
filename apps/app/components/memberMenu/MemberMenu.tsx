@@ -6,11 +6,12 @@ import {
   tw,
 } from "@serenity-tools/ui";
 import { useState } from "react";
-import { Role } from "../../types/workspace";
+import { Role } from "../../generated/graphql";
 
 type Props = {
   memberId: string;
   role: Role;
+  onUpdateRole: (role: Role) => void;
   onDeletePressed: () => void;
 };
 
@@ -40,10 +41,10 @@ export default function MemberMenu(props: Props) {
         testID={`members-menu--${memberId}__make-editor`}
         onPress={() => {
           setIsOpenMenu(false);
-          // TODO set Editor
+          props.onUpdateRole(Role.Editor);
         }}
         iconName={"check-line"}
-        hideIcon={role !== Role.EDITOR}
+        hideIcon={role !== Role.Editor}
       >
         Editor
       </MenuButton>
@@ -51,10 +52,10 @@ export default function MemberMenu(props: Props) {
         testID={`member-menu--${memberId}__make-admin`}
         onPress={() => {
           setIsOpenMenu(false);
-          // TODO set Admin
+          props.onUpdateRole(Role.Admin);
         }}
         iconName={"check-line"}
-        hideIcon={role !== Role.ADMIN}
+        hideIcon={role !== Role.Admin}
       >
         Admin
       </MenuButton>
