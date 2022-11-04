@@ -20,6 +20,7 @@ import * as Y from "yjs";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
 import { createEncryptAndUploadFileFunction } from "../../utils/file/createEncryptAndUploadFileFunction";
+import { showToast } from "../../utils/toast/showToast";
 import { source } from "../../webviews/editor/source";
 import {
   EditorBottombar,
@@ -78,6 +79,7 @@ export default function Editor({
   updateTitle,
   isNew,
   documentId,
+  documentLoaded,
   workspaceId,
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
@@ -153,10 +155,26 @@ export default function Editor({
       // the document with a lot of script tags
       // send to webview
 
-      webViewRef.current?.injectJavaScript(`
-        window.applyYjsUpdate(${JSON.stringify(Array.apply([], update))});
-        true;
-      `);
+      // make sure updates are applied to the editor even if the
+      // webview is not ready yet by applying them delayed
+      const applyUpdateToEditor = (update, count) => {
+        if (webViewRef.current) {
+          webViewRef.current?.injectJavaScript(`
+            window.applyYjsUpdate(${JSON.stringify(Array.apply([], update))});
+            true;
+          `);
+        } else if (count > 100) {
+          showToast(
+            "Failed to apply updates to editor. Please reload the app.",
+            "error"
+          );
+        } else {
+          setTimeout(() => {
+            applyUpdateToEditor(update, count + 1);
+          }, 200);
+        }
+      };
+      applyUpdateToEditor(update, 0);
     }
   });
 
@@ -177,6 +195,14 @@ export default function Editor({
       `);
     }
   );
+
+  if (!documentLoaded) {
+    return (
+      <CenterContent>
+        <Spinner fadeIn />
+      </CenterContent>
+    );
+  }
 
   return (
     <>

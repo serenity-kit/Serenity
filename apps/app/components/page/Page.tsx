@@ -22,7 +22,7 @@ import {
 } from "@naisho/core";
 import { recreateDocumentKey } from "@serenity-tools/common";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
   applyAwarenessUpdate,
@@ -69,7 +69,7 @@ export default function Page({
   const shouldReconnectWebsocketConnectionRef = useRef(true);
   const createSnapshotRef = useRef<boolean>(false); // only used for the UI
   const latestServerVersionRef = useRef<number | null>(null);
-  const editorInitializedRef = useRef<boolean>(false);
+  const [documentLoaded, setDocumentLoaded] = useState(false);
   const websocketState = useWebsocketState();
 
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
@@ -244,10 +244,7 @@ export default function Page({
               await applySnapshot(data.snapshot, snapshotKey);
             }
             await applyUpdates(data.updates, snapshotKey);
-            if (editorInitializedRef.current === false) {
-              // TODO initiate editor
-              editorInitializedRef.current = true;
-            }
+            setDocumentLoaded(true);
 
             // check for pending snapshots or pending updates and run them
             const pendingChanges = getPending(docId);
@@ -513,6 +510,7 @@ export default function Page({
       openDrawer={navigation.openDrawer}
       updateTitle={updateTitle}
       isNew={isNew}
+      documentLoaded={documentLoaded}
     />
   );
 }
