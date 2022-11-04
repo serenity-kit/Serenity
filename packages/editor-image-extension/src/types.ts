@@ -4,7 +4,9 @@ export type FileInfo = {
   fileId: string;
 };
 
-export type EncryptAndUploadFunctionFile = (file: File) => Promise<FileInfo>;
+export type EncryptAndUploadFunctionFile = (
+  fileAsBase64: string
+) => Promise<FileInfo>;
 
 type DownloadAndDecryptFileParams = {
   workspaceId: string;
