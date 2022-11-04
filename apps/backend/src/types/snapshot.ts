@@ -1,6 +1,9 @@
 import { Document } from "./document";
 import { KeyDerivationTrace } from "./folder";
 
+export type Clocks = {
+  [publicKey: string]: number;
+};
 export type Snapshot = {
   id: string;
   latestVersion: number;
@@ -11,8 +14,9 @@ export type Snapshot = {
   updates?: Update[];
   activeSnapshotDocument: Document;
   createdAt: Date;
+  subkeyId: number;
   keyDerivationTrace: KeyDerivationTrace;
-  clocks: number[];
+  clocks: Clocks;
 };
 
 export type Update = {
@@ -25,14 +29,9 @@ export type Update = {
   pubKey: string;
 };
 
-export const formatSnapshot = (snapshot: any): Document => {
-  let clocks = [];
-  if (snapshot.clocks) {
-    clocks = JSON.parse(snapshot.clocks);
-  }
+export const formatSnapshot = (snapshot: any): Snapshot => {
   return {
     ...snapshot,
     keyDerivationTrace: snapshot.keyDerivationTrace as KeyDerivationTrace,
-    clocks,
   };
 };

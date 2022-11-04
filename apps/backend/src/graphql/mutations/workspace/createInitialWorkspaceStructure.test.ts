@@ -1,5 +1,8 @@
 import { Snapshot } from "@naisho/core";
-import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
+import {
+  createIntroductionDocumentSnapshot,
+  createSnapshotKey,
+} from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
@@ -36,9 +39,14 @@ const setup = async () => {
   const documentEncryptionKey = sodium.from_base64(
     "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
   );
+  const folderKey = "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0";
+  const snapshotKeyData = await createSnapshotKey({
+    folderKey,
+  });
   documentSnapshot = await createIntroductionDocumentSnapshot({
     documentId,
     documentEncryptionKey,
+    subkeyId: snapshotKeyData.subkeyId,
   });
 };
 
@@ -49,30 +57,31 @@ beforeAll(async () => {
 
 test("user can create initial workspace structure", async () => {
   // generate a challenge code
-  const authorizationHeader = sessionKey1;
   const workspaceId = uuidv4();
   const workspaceName = "New Workspace";
-  const deviceSigningPublicKey = device.signingPublicKey;
   const folderId = uuidv4();
-  const folderIdSignature = `TODO+${folderId}`;
-  const folderName = "Getting started";
-  const documentId = uuidv4();
-  const documentName = "Introduction";
   const result = await createInitialWorkspaceStructure({
     graphql,
-    workspaceId,
-    workspaceName,
-    creatorDeviceSigningPublicKey: deviceSigningPublicKey,
-    deviceSigningPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: encryptionPrivateKey,
+    workspace: {
+      id: workspaceId,
+      name: workspaceName,
+    },
+    creatorDevice: {
+      encryptionPrivateKey,
+      signingPrivateKey,
+      ...device,
+    },
     webDevice,
-    folderId,
-    folderIdSignature,
-    folderName,
-    documentId,
-    documentName,
-    authorizationHeader,
+    folder: {
+      id: folderId,
+      idSignature: `TODO+${folderId}`,
+      name: "Getting started",
+    },
+    document: {
+      id: uuidv4(),
+      name: "Introduction",
+    },
+    authorizationHeader: sessionKey1,
   });
 
   const workspace = result.createInitialWorkspaceStructure.workspace;
@@ -91,30 +100,29 @@ test("user can create initial workspace structure", async () => {
 });
 
 test("Unauthenticated", async () => {
-  const workspaceId = uuidv4();
-  const workspaceName = "New Workspace";
-  const deviceSigningPublicKey = device.signingPublicKey;
-  const folderId = uuidv4();
-  const folderIdSignature = `TODO+${folderId}`;
-  const folderName = "Getting started";
-  const documentId = uuidv4();
-  const documentName = "Introduction";
   await expect(
     (async () =>
       await createInitialWorkspaceStructure({
         graphql,
-        workspaceId,
-        workspaceName,
-        creatorDeviceSigningPublicKey: deviceSigningPublicKey,
-        deviceSigningPublicKey,
-        deviceEncryptionPublicKey: device.encryptionPublicKey,
-        deviceEncryptionPrivateKey: encryptionPrivateKey,
+        workspace: {
+          id: uuidv4(),
+          name: "New Workspace",
+        },
+        creatorDevice: {
+          encryptionPrivateKey,
+          signingPrivateKey,
+          ...device,
+        },
         webDevice,
-        folderId,
-        folderIdSignature,
-        folderName,
-        documentId,
-        documentName,
+        folder: {
+          id: uuidv4(),
+          idSignature: `TODO+${uuidv4()}`,
+          name: "Getting started",
+        },
+        document: {
+          id: uuidv4(),
+          name: "Introduction",
+        },
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -162,14 +170,22 @@ describe("Test login", () => {
           query,
           {
             input: {
-              workspaceName: null,
-              workspaceId,
-              folderId,
-              folderIdSignature,
-              folderName,
-              documentId,
-              documentName,
-              documentSnapshot,
+              workspace: {
+                id: workspaceId,
+                name: null,
+              },
+              folder: {
+                id: folderId,
+                idSignature: folderIdSignature,
+                encryptedName: folderName,
+                encryptedNameNonce: "",
+              },
+              document: {
+                id: documentId,
+                encryptedName: documentName,
+                encryptedNameNonce: "",
+                snapshot: documentSnapshot,
+              },
             },
           },
           authorizationHeaders
@@ -183,14 +199,22 @@ describe("Test login", () => {
           query,
           {
             input: {
-              workspaceName,
-              workspaceId: null,
-              folderId,
-              folderIdSignature,
-              folderName,
-              documentId,
-              documentName,
-              documentSnapshot,
+              workspace: {
+                id: null,
+                name: workspaceName,
+              },
+              folder: {
+                id: folderId,
+                idSignature: folderIdSignature,
+                encryptedName: folderName,
+                encryptedNameNonce: "",
+              },
+              document: {
+                id: documentId,
+                encryptedName: documentName,
+                encryptedNameNonce: "",
+                snapshot: documentSnapshot,
+              },
             },
           },
           authorizationHeaders
@@ -205,14 +229,22 @@ describe("Test login", () => {
           query,
           {
             input: {
-              workspaceName,
-              workspaceId,
-              folderId: null,
-              folderIdSignature,
-              folderName,
-              documentId,
-              documentName,
-              documentSnapshot,
+              workspace: {
+                id: workspaceId,
+                name: workspaceName,
+              },
+              folder: {
+                id: null,
+                idSignature: folderIdSignature,
+                encryptedName: folderName,
+                encryptedNameNonce: "",
+              },
+              document: {
+                id: documentId,
+                encryptedName: documentName,
+                encryptedNameNonce: "",
+                snapshot: documentSnapshot,
+              },
             },
           },
           authorizationHeaders
@@ -227,14 +259,22 @@ describe("Test login", () => {
           query,
           {
             input: {
-              workspaceName,
-              workspaceId,
-              folderId,
-              folderIdSignature: null,
-              folderName,
-              documentId,
-              documentName,
-              documentSnapshot,
+              workspace: {
+                id: workspaceId,
+                name: workspaceName,
+              },
+              folder: {
+                id: folderId,
+                idSignature: null,
+                encryptedName: folderName,
+                encryptedNameNonce: "",
+              },
+              document: {
+                id: documentId,
+                encryptedName: documentName,
+                encryptedNameNonce: "",
+                snapshot: documentSnapshot,
+              },
             },
           },
           authorizationHeaders
@@ -249,14 +289,22 @@ describe("Test login", () => {
           query,
           {
             input: {
-              workspaceName,
-              workspaceId,
-              folderId,
-              folderIdSignature,
-              folderName: null,
-              documentId,
-              documentName,
-              documentSnapshot,
+              workspace: {
+                id: workspaceId,
+                name: workspaceName,
+              },
+              folder: {
+                id: folderId,
+                idSignature: folderIdSignature,
+                encryptedName: null,
+                encryptedNameNonce: "",
+              },
+              document: {
+                id: documentId,
+                encryptedName: documentName,
+                encryptedNameNonce: "",
+                snapshot: documentSnapshot,
+              },
             },
           },
           authorizationHeaders
@@ -271,14 +319,22 @@ describe("Test login", () => {
           query,
           {
             input: {
-              workspaceName,
-              workspaceId,
-              folderId,
-              folderIdSignature,
-              folderName,
-              documentId: null,
-              documentName,
-              documentSnapshot,
+              workspace: {
+                id: workspaceId,
+                name: workspaceName,
+              },
+              folder: {
+                id: folderId,
+                idSignature: folderIdSignature,
+                encryptedName: folderName,
+                encryptedNameNonce: "",
+              },
+              document: {
+                id: null,
+                encryptedName: documentName,
+                encryptedNameNonce: "",
+                snapshot: documentSnapshot,
+              },
             },
           },
           authorizationHeaders
@@ -292,14 +348,22 @@ describe("Test login", () => {
           query,
           {
             input: {
-              workspaceName,
-              workspaceId,
-              folderId,
-              folderIdSignature,
-              folderName,
-              documentId,
-              documentName: null,
-              documentSnapshot,
+              workspace: {
+                id: workspaceId,
+                name: workspaceName,
+              },
+              folder: {
+                id: folderId,
+                idSignature: folderIdSignature,
+                encryptedName: folderName,
+                encryptedNameNonce: "",
+              },
+              document: {
+                id: documentId,
+                encryptedName: null,
+                encryptedNameNonce: "",
+                snapshot: documentSnapshot,
+              },
             },
           },
           authorizationHeaders
@@ -314,14 +378,22 @@ describe("Test login", () => {
           query,
           {
             input: {
-              workspaceName,
-              workspaceId,
-              folderId,
-              folderIdSignature,
-              folderName,
-              documentId,
-              documentName,
-              documentSnapshot: null,
+              workspace: {
+                id: workspaceId,
+                name: workspaceName,
+              },
+              folder: {
+                id: folderId,
+                idSignature: folderIdSignature,
+                encryptedName: folderName,
+                encryptedNameNonce: "",
+              },
+              document: {
+                id: documentId,
+                encryptedName: documentName,
+                encryptedNameNonce: "",
+                snapshot: null,
+              },
             },
           },
           authorizationHeaders
@@ -351,63 +423,31 @@ describe("Test login", () => {
 
   test("deviceSigningPublicKey must belong to the user", async () => {
     // generate a challenge code
-    const authorizationHeader = sessionKey1;
-    const workspaceId = uuidv4();
-    const workspaceName = "New Workspace";
-    const folderId = uuidv4();
-    const folderIdSignature = `TODO+${folderId}`;
-    const folderName = "Getting started";
-    const documentId = uuidv4();
-    const documentName = "Introduction";
     await expect(
       (async () =>
         await createInitialWorkspaceStructure({
           graphql,
-          workspaceId,
-          workspaceName,
-          deviceSigningPublicKey: "abcd",
-          creatorDeviceSigningPublicKey: device.signingPublicKey,
-          deviceEncryptionPublicKey: device.encryptionPublicKey,
-          deviceEncryptionPrivateKey: encryptionPrivateKey,
+          workspace: {
+            id: uuidv4(),
+            name: "New Workspace",
+          },
+          creatorDevice: {
+            encryptionPrivateKey,
+            signingPrivateKey,
+            ...device,
+            signingPublicKey: "invalid",
+          },
           webDevice,
-          folderId,
-          folderIdSignature,
-          folderName,
-          documentId,
-          documentName,
-          authorizationHeader,
-        }))()
-    ).rejects.toThrowError(/Internal server error/);
-  });
-
-  test("creatorDeviceSigningPublicKey must belong to the user", async () => {
-    // generate a challenge code
-    const authorizationHeader = sessionKey1;
-    const workspaceId = uuidv4();
-    const workspaceName = "New Workspace";
-    const deviceSigningPublicKey = device.signingPublicKey;
-    const folderId = uuidv4();
-    const folderIdSignature = `TODO+${folderId}`;
-    const folderName = "Getting started";
-    const documentId = uuidv4();
-    const documentName = "Introduction";
-    await expect(
-      (async () =>
-        await createInitialWorkspaceStructure({
-          graphql,
-          workspaceId,
-          workspaceName,
-          deviceSigningPublicKey,
-          creatorDeviceSigningPublicKey: "abcd",
-          deviceEncryptionPublicKey: device.encryptionPublicKey,
-          deviceEncryptionPrivateKey: encryptionPrivateKey,
-          webDevice,
-          folderId,
-          folderIdSignature,
-          folderName,
-          documentId,
-          documentName,
-          authorizationHeader,
+          folder: {
+            id: uuidv4(),
+            idSignature: `TODO+${uuidv4()}`,
+            name: "Getting started",
+          },
+          document: {
+            id: uuidv4(),
+            name: "Introduction",
+          },
+          authorizationHeader: sessionKey1,
         }))()
     ).rejects.toThrowError(/Internal server error/);
   });

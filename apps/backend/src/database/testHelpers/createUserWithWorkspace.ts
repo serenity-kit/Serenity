@@ -2,6 +2,7 @@ import {
   createAndEncryptDevice,
   createDocumentKey,
   createIntroductionDocumentSnapshot,
+  createSnapshotKey,
   encryptDocumentTitle,
   encryptFolderName,
 } from "@serenity-tools/common";
@@ -105,38 +106,47 @@ export default async function createUserWithWorkspace({
   // const documentEncryptionKey = sodium.from_base64(
   //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
   // );
-  const docmenContentKeyResult = await createDocumentKey({
+  const docmentContentKeyResult = await createDocumentKey({
     folderKey,
   });
-  const documentEncryptionKey = sodium.from_base64(docmenContentKeyResult.key);
+  const snapshotKeyData = await createSnapshotKey({
+    folderKey,
+  });
+  const documentEncryptionKey = sodium.from_base64(docmentContentKeyResult.key);
   const documentSnapshot = await createIntroductionDocumentSnapshot({
     documentId,
     documentEncryptionKey,
+    subkeyId: snapshotKeyData.subkeyId,
   });
 
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
-    workspaceId: id,
-    workspaceName: "My Workspace",
-    folderId: uuidv4(),
-    folderIdSignature: uuidv4(),
-    encryptedFolderName: encryptedFolderResult.ciphertext,
-    encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
-    folderSubkeyId: encryptedFolderResult.folderSubkeyId,
-    documentId,
-    encryptedDocumentName: encryptedDocumentTitleResult.ciphertext,
-    encryptedDocumentNameNonce: encryptedDocumentTitleResult.publicNonce,
-    documentSubkeyId: docmentKeyResult.subkeyId,
-    documentContentSubkeyId: docmenContentKeyResult.subkeyId,
-    documentSnapshot,
-    creatorDeviceSigningPublicKey: device.signingPublicKey,
-    deviceWorkspaceKeyBoxes: [
-      {
-        deviceSigningPublicKey: device.signingPublicKey,
-        nonce,
-        ciphertext,
-      },
-    ],
+    workspace: {
+      id: id,
+      name: "My Workspace",
+      creatorDeviceSigningPublicKey: device.signingPublicKey,
+      deviceWorkspaceKeyBoxes: [
+        {
+          deviceSigningPublicKey: device.signingPublicKey,
+          nonce,
+          ciphertext,
+        },
+      ],
+    },
+    folder: {
+      id: uuidv4(),
+      idSignature: uuidv4(),
+      encryptedName: encryptedFolderResult.ciphertext,
+      encryptedNameNonce: encryptedFolderResult.publicNonce,
+      subkeyId: encryptedFolderResult.folderSubkeyId,
+    },
+    document: {
+      id: documentId,
+      encryptedName: encryptedDocumentTitleResult.ciphertext,
+      encryptedNameNonce: encryptedDocumentTitleResult.publicNonce,
+      subkeyId: docmentKeyResult.subkeyId,
+      snapshot: documentSnapshot,
+    },
   });
 
   const { session, sessionKey, webDevice } = await createDeviceAndLogin({

@@ -1,15 +1,19 @@
-import sodiumWrappers from "libsodium-wrappers";
+import { createSnapshotKey } from "@serenity-tools/common";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
+import sodiumWrappers from "libsodium-wrappers";
 import { v4 as uuidv4 } from "uuid";
-import { SnapshotPublicData } from "./types";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
+import { SnapshotPublicData } from "./types";
 
 test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
   await sodium.ready;
-
-  const key = sodiumWrappers.from_hex(
-    "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
+  const folderKey = sodium.to_base64(
+    sodiumWrappers.from_hex(
+      "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
+    )
   );
+  const snapshotKeyData = await createSnapshotKey({ folderKey });
+  const snapshotKey = sodium.from_base64(snapshotKeyData.key);
 
   const signatureKeyPair: KeyPair = {
     privateKey: sodiumWrappers.from_base64(
@@ -30,13 +34,14 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
   const snapshot = await createSnapshot(
     "Hello World",
     publicData,
-    key,
+    snapshotKey,
+    snapshotKeyData.subkeyId,
     signatureKeyPair
   );
 
   const result = await verifyAndDecryptSnapshot(
     snapshot,
-    key,
+    snapshotKey,
     signatureKeyPair.publicKey
   );
   if (result === null) {
@@ -48,9 +53,13 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
 test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", async () => {
   await sodium.ready;
 
-  const key = sodiumWrappers.from_hex(
-    "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
+  const folderKey = sodium.to_base64(
+    sodiumWrappers.from_hex(
+      "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
+    )
   );
+  const snapshotKeyData = await createSnapshotKey({ folderKey });
+  const snapshotKey = sodium.from_base64(snapshotKeyData.key);
 
   const signatureKeyPair: KeyPair = {
     privateKey: sodiumWrappers.from_base64(
@@ -71,7 +80,8 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
   const snapshot = await createSnapshot(
     "Hello World",
     publicData,
-    key,
+    snapshotKey,
+    snapshotKeyData.subkeyId,
     signatureKeyPair
   );
 
@@ -80,7 +90,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
       ...snapshot,
       signature: snapshot.signature.replace(/^./, "a"),
     },
-    key,
+    snapshotKey,
     signatureKeyPair.publicKey
   );
   expect(result).toBeNull();
@@ -89,9 +99,13 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
 test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", async () => {
   await sodium.ready;
 
-  const key = sodiumWrappers.from_hex(
-    "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
+  const folderKey = sodium.to_base64(
+    sodiumWrappers.from_hex(
+      "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
+    )
   );
+  const snapshotKeyData = await createSnapshotKey({ folderKey });
+  const snapshotKey = sodium.from_base64(snapshotKeyData.key);
 
   const signatureKeyPair: KeyPair = {
     privateKey: sodiumWrappers.from_base64(
@@ -112,7 +126,8 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
   const snapshot = await createSnapshot(
     "Hello World",
     publicData,
-    key,
+    snapshotKey,
+    snapshotKeyData.subkeyId,
     signatureKeyPair
   );
 
@@ -121,7 +136,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
       ...snapshot,
       ciphertext: snapshot.ciphertext.replace(/^./, "a"),
     },
-    key,
+    snapshotKey,
     signatureKeyPair.publicKey
   );
   expect(result).toBeNull();

@@ -1,0 +1,20 @@
+query latestSnapshot($documentId: ID!) {
+  latestSnapshot(documentId: $documentId) {
+    snapshot {
+      id
+      latestVersion
+      data
+      preview
+      documentId
+      subkeyId
+      keyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          parentFolderId
+          subkeyId
+        }
+      }
+    }
+  }
+}

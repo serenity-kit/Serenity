@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import {
   createDocumentKey,
   createIntroductionDocumentSnapshot,
+  createSnapshotKey,
   encryptDocumentTitle,
   encryptFolderName,
 } from "@serenity-tools/common";
@@ -19,7 +20,7 @@ import { TextInput } from "react-native";
 import { v4 as uuidv4 } from "uuid";
 import { useAppContext } from "../../context/AppContext";
 import {
-  useCreateInitialWorkspaceStructureMutation,
+  runCreateInitialWorkspaceStructureMutation,
   useDevicesQuery,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
@@ -40,8 +41,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
   const [hasCreateWorkspaceError, setHasCreateWorkspaceError] = useState(false);
   const { activeDevice } = useAppContext();
   const navigation = useNavigation();
-  const [, createInitialWorkspaceStructure] =
-    useCreateInitialWorkspaceStructureMutation();
 
   const [devicesResult] = useDevicesQuery({
     variables: {
@@ -97,39 +96,44 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         title: documentName,
         key: documentKeyData.key,
       });
-      const documentContentKeyData = await createDocumentKey({
+      const snapshotKeyData = await createSnapshotKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
-      const documentEncryptionKey = sodium.from_base64(
-        documentContentKeyData.key
-      );
+      const snapshotKey = sodium.from_base64(snapshotKeyData.key);
       const snapshot = await createIntroductionDocumentSnapshot({
         documentId,
-        documentEncryptionKey,
+        documentEncryptionKey: snapshotKey,
+        subkeyId: snapshotKeyData.subkeyId,
       });
 
-      // throw new Error("Debug error");
-
       const createInitialWorkspaceStructureResult =
-        await createInitialWorkspaceStructure({
-          input: {
-            workspaceName: name,
-            workspaceId,
-            folderId,
-            encryptedFolderName: encryptedFolderResult.ciphertext,
-            encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
-            folderSubkeyId: encryptedFolderResult.folderSubkeyId,
-            folderIdSignature: `TODO+${folderId}`,
-            encryptedDocumentName: encryptedDocumentTitle.ciphertext,
-            encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
-            documentSubkeyId: documentKeyData.subkeyId,
-            documentContentSubkeyId: documentContentKeyData.subkeyId,
-            documentId,
-            documentSnapshot: snapshot,
-            creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
-            deviceWorkspaceKeyBoxes,
+        await runCreateInitialWorkspaceStructureMutation(
+          {
+            input: {
+              workspace: {
+                id: workspaceId,
+                name,
+                creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
+                deviceWorkspaceKeyBoxes,
+              },
+              folder: {
+                id: folderId,
+                encryptedName: encryptedFolderResult.ciphertext,
+                encryptedNameNonce: encryptedFolderResult.publicNonce,
+                subkeyId: encryptedFolderResult.folderSubkeyId,
+                idSignature: `TODO+${folderId}`,
+              },
+              document: {
+                id: documentId,
+                encryptedName: encryptedDocumentTitle.ciphertext,
+                encryptedNameNonce: encryptedDocumentTitle.publicNonce,
+                subkeyId: documentKeyData.subkeyId,
+                snapshot,
+              },
+            },
           },
-        });
+          {}
+        );
       if (
         !createInitialWorkspaceStructureResult.data
           ?.createInitialWorkspaceStructure?.workspace ||

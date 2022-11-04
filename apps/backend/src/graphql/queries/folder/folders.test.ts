@@ -1,29 +1,23 @@
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
-import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
-const username2 = "68776484-0e46-4027-a6f4-8bdeef185b73@example.com";
 const password = "password";
-let workspaceKey = "";
-let workspaceKey2 = "";
+let user1Data: any = undefined;
+let user2Data: any = undefined;
+let user1WorkspaceKey = "";
+let user2WorkspaceKey = "";
 
-const workspaceId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
-const otherWorkspaceId = "929ca262-f144-40f7-8fe2-d3147f415f26";
 const parentFolderId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
 const folderId1 = "3530b9ed-11f3-44c7-9e16-7dba1e14815f";
 const folderId2 = "9e911f29-7a86-480b-89d7-5c647f21317f";
 const childFolderId = "98b3f4d9-141a-4e11-a0f5-7437a6d1eb4b";
 const otherFolderId = "c1c65251-7471-4893-a1b5-e3df937caf66";
-let sessionKey = "";
-let initialWorkspaceStructureResult: any = null;
-let workspace: any = null;
 
 type GetFoldersProps = {
   parentFolderId: string;
@@ -37,66 +31,59 @@ const getFolders = async ({
 }: GetFoldersProps) => {
   const authorizationHeaders = { authorization: authorizationHeader };
   const query = gql`
-  {
-      folders(parentFolderId: "${parentFolderId}", first: 50, usingOldKeys: ${usingOldKeys}) {
-          edges {
-              node {
-                  id
-                  parentFolderId
-                  rootFolderId
-                  workspaceId
-                  encryptedName
-                  encryptedNameNonce
-                  keyDerivationTrace {
-                    workspaceKeyId
-                    parentFolders {
-                      folderId
-                      subkeyId
-                      parentFolderId
-                    }
-                  }
+    query folders($parentFolderId: ID!, $first: Int!, $usingOldKeys: Boolean) {
+      folders(
+        parentFolderId: $parentFolderId
+        first: $first
+        usingOldKeys: $usingOldKeys
+      ) {
+        edges {
+          node {
+            id
+            parentFolderId
+            rootFolderId
+            workspaceId
+            encryptedName
+            encryptedNameNonce
+            keyDerivationTrace {
+              workspaceKeyId
+              parentFolders {
+                folderId
+                subkeyId
+                parentFolderId
               }
+            }
           }
-          pageInfo {
-              hasNextPage
-              endCursor
-          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
       }
-  }`;
+    }
+  `;
   const result = await graphql.client.request(
     query,
-    null,
+    {
+      parentFolderId,
+      first: 50,
+      usingOldKeys,
+    },
     authorizationHeaders
   );
   return result;
 };
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  sessionKey = registerUserResult.sessionKey;
-  const device = registerUserResult.mainDevice;
-  const webDevice = registerUserResult.webDevice;
-  initialWorkspaceStructureResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: workspaceId,
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice,
-    folderId: uuidv4(),
-    folderName: "Getting started",
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentId: uuidv4(),
-    documentName: "Introduction",
-    graphql,
-    authorizationHeader: sessionKey,
+  user1Data = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  workspace =
-    initialWorkspaceStructureResult.createInitialWorkspaceStructure.workspace;
-  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
-    device: registerUserResult.mainDevice,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    workspace,
+  user1WorkspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: user1Data.device,
+    deviceEncryptionPrivateKey: user1Data.encryptionPrivateKey,
+    workspace: user1Data.workspace,
   });
   const parentFolderName = "parent folder";
   const createParentFolderResult = await createFolder({
@@ -104,35 +91,20 @@ const setup = async () => {
     id: parentFolderId,
     name: parentFolderName,
     parentFolderId: null,
-    parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceId: workspaceId,
-    workspaceKeyId: workspace.currentWorkspaceKey.id,
+    parentKey: user1WorkspaceKey,
+    authorizationHeader: user1Data.sessionKey,
+    workspaceId: user1Data.workspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
   });
-  const registerUserResult2 = await registerUser(graphql, username2, password);
-  const device2 = registerUserResult2.mainDevice;
-  const initialWorkspaceStructureResult2 =
-    await createInitialWorkspaceStructure({
-      workspaceName: "other user workspace",
-      workspaceId: otherWorkspaceId,
-      deviceSigningPublicKey: device2.signingPublicKey,
-      deviceEncryptionPublicKey: device2.encryptionPublicKey,
-      deviceEncryptionPrivateKey: registerUserResult2.encryptionPrivateKey,
-      webDevice: registerUserResult2.webDevice,
-      folderId: uuidv4(),
-      folderName: "Getting started",
-      folderIdSignature: `TODO+${uuidv4()}`,
-      documentId: uuidv4(),
-      documentName: "Introduction",
-      graphql,
-      authorizationHeader: registerUserResult2.sessionKey,
-    });
-  const workspace2 =
-    initialWorkspaceStructureResult2.createInitialWorkspaceStructure.workspace;
-  workspaceKey2 = await getWorkspaceKeyForWorkspaceAndDevice({
-    device: registerUserResult2.mainDevice,
-    deviceEncryptionPrivateKey: registerUserResult2.encryptionPrivateKey,
-    workspace: workspace2,
+  user2Data = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
+  });
+  user2WorkspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: user2Data.device,
+    deviceEncryptionPrivateKey: user2Data.encryptionPrivateKey,
+    workspace: user2Data.workspace,
   });
   const otherFolderName = "other folder";
   const createOtherFolderResult = await createFolder({
@@ -140,10 +112,10 @@ const setup = async () => {
     id: otherFolderId,
     name: otherFolderName,
     parentFolderId: null,
-    parentKey: workspaceKey2,
-    authorizationHeader: registerUserResult2.sessionKey,
-    workspaceId: otherWorkspaceId,
-    workspaceKeyId: workspace2.currentWorkspaceKey.id,
+    parentKey: user2WorkspaceKey,
+    authorizationHeader: user2Data.sessionKey,
+    workspaceId: user2Data.workspace.id,
+    workspaceKeyId: user2Data.workspace.currentWorkspaceKey.id,
   });
 };
 
@@ -156,7 +128,7 @@ test("user should be able to list folders in a workspace when no subfoldes", asy
   const result = await getFolders({
     parentFolderId,
     usingOldKeys: false,
-    authorizationHeader: sessionKey,
+    authorizationHeader: user1Data.sessionKey,
   });
   expect(result.folders.edges.length).toBe(0);
 });
@@ -167,15 +139,15 @@ test("user should be able to list folders in a workspace with one item", async (
     id: folderId1,
     name: "parent folder",
     parentFolderId: parentFolderId,
-    parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceId: workspaceId,
-    workspaceKeyId: workspace.currentWorkspaceKey.id,
+    parentKey: user1WorkspaceKey,
+    authorizationHeader: user1Data.sessionKey,
+    workspaceId: user1Data.workspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
   });
   const result = await getFolders({
     parentFolderId,
     usingOldKeys: false,
-    authorizationHeader: sessionKey,
+    authorizationHeader: user1Data.sessionKey,
   });
   expect(result.folders.edges.length).toBe(1);
   result.folders.edges.forEach(
@@ -196,15 +168,15 @@ test("user should be able to list folders in a workspace with multiple items", a
     id: folderId2,
     name: "multiple folders",
     parentFolderId: parentFolderId,
-    parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceId: workspaceId,
-    workspaceKeyId: workspace.currentWorkspaceKey.id,
+    parentKey: user1WorkspaceKey,
+    authorizationHeader: user1Data.sessionKey,
+    workspaceId: user1Data.workspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
   });
   const result = await getFolders({
     parentFolderId,
     usingOldKeys: false,
-    authorizationHeader: sessionKey,
+    authorizationHeader: user1Data.sessionKey,
   });
   expect(result.folders.edges.length).toBe(2);
   result.folders.edges.forEach(
@@ -225,15 +197,15 @@ test("user should be able to list without showing subfolders", async () => {
     id: childFolderId,
     name: "folder",
     parentFolderId: folderId1,
-    parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceId: workspaceId,
-    workspaceKeyId: workspace.currentWorkspaceKey.id,
+    parentKey: user1WorkspaceKey,
+    authorizationHeader: user1Data.sessionKey,
+    workspaceId: user1Data.workspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
   });
   const result = await getFolders({
     parentFolderId,
     usingOldKeys: false,
-    authorizationHeader: sessionKey,
+    authorizationHeader: user1Data.sessionKey,
   });
   expect(result.folders.edges.length).toBe(2);
 });
@@ -242,7 +214,7 @@ test("old workpace keys", async () => {
   const result = await getFolders({
     parentFolderId,
     usingOldKeys: true,
-    authorizationHeader: sessionKey,
+    authorizationHeader: user1Data.sessionKey,
   });
   expect(result.folders.edges.length).toBe(0);
 });
@@ -254,7 +226,7 @@ test("retrieving a folder that doesn't exist throws an error", async () => {
       await getFolders({
         parentFolderId: fakeFolderId,
         usingOldKeys: false,
-        authorizationHeader: sessionKey,
+        authorizationHeader: user1Data.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
@@ -265,7 +237,7 @@ test("listing folders that the user doesn't own throws an error", async () => {
       await getFolders({
         parentFolderId: otherFolderId,
         usingOldKeys: false,
-        authorizationHeader: sessionKey,
+        authorizationHeader: user1Data.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
 });

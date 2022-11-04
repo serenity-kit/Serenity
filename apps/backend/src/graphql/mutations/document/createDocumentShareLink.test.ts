@@ -30,6 +30,18 @@ test("create share link", async () => {
     userData1.webDevice;
   // TODO: derive snapshotkey from folder key derivation trace
   const snapshotKey = await sodium.crypto_kdf_keygen();
+
+  // const snapshotKeyDerivationTrace = await deriveFolderKey({
+  //   folderId: document.parentFolderId!,
+  //   workspaceKeyId: snapshot.workspaceKeyId,
+  //   workspaceId: document.workspaceId!,
+  //   activeDevice: creatorDevice,
+  // });
+  // const snapshotKey = await recreateSnapshotKey({
+  //   folderKey: snapshotKeyDerivationTrace.folderKeyData.key,
+  //   subkeyId: snapshot.subkeyId,
+  // });
+
   const documentShareLinkResponse = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,

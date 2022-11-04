@@ -96,21 +96,9 @@ export type CreateFolderResult = {
 };
 
 export type CreateInitialWorkspaceStructureInput = {
-  creatorDeviceSigningPublicKey: Scalars['String'];
-  deviceWorkspaceKeyBoxes: Array<DeviceWorkspaceKeyBoxInput>;
-  documentContentSubkeyId: Scalars['Int'];
-  documentId: Scalars['String'];
-  documentSnapshot: DocumentSnapshotInput;
-  documentSubkeyId: Scalars['Int'];
-  encryptedDocumentName: Scalars['String'];
-  encryptedDocumentNameNonce: Scalars['String'];
-  encryptedFolderName: Scalars['String'];
-  encryptedFolderNameNonce: Scalars['String'];
-  folderId: Scalars['String'];
-  folderIdSignature: Scalars['String'];
-  folderSubkeyId: Scalars['Int'];
-  workspaceId: Scalars['String'];
-  workspaceName: Scalars['String'];
+  document: InitialWorkspaceDocumentInput;
+  folder: InitialWorkspaceFolderInput;
+  workspace: InitialWorkspaceWorkspaceInput;
 };
 
 export type CreateInitialWorkspaceStructureResult = {
@@ -379,6 +367,29 @@ export type GetWorkspaceDevicesResult = {
   devices: Array<Device>;
 };
 
+export type InitialWorkspaceDocumentInput = {
+  encryptedName: Scalars['String'];
+  encryptedNameNonce: Scalars['String'];
+  id: Scalars['String'];
+  snapshot: DocumentSnapshotInput;
+  subkeyId: Scalars['Int'];
+};
+
+export type InitialWorkspaceFolderInput = {
+  encryptedName: Scalars['String'];
+  encryptedNameNonce: Scalars['String'];
+  id: Scalars['String'];
+  idSignature: Scalars['String'];
+  subkeyId: Scalars['Int'];
+};
+
+export type InitialWorkspaceWorkspaceInput = {
+  creatorDeviceSigningPublicKey: Scalars['String'];
+  deviceWorkspaceKeyBoxes: Array<DeviceWorkspaceKeyBoxInput>;
+  id: Scalars['String'];
+  name: Scalars['String'];
+};
+
 export type InitiateFileUploadInput = {
   documentId: Scalars['String'];
   workspaceId: Scalars['String'];
@@ -641,6 +652,7 @@ export type Query = {
   firstDocument?: Maybe<Document>;
   folder?: Maybe<Folder>;
   folders?: Maybe<FolderConnection>;
+  latestSnapshot?: Maybe<SnapshotResult>;
   mainDevice?: Maybe<MainDeviceResult>;
   me?: Maybe<MeResult>;
   pendingWorkspaceInvitation?: Maybe<PendingWorkspaceInvitationResult>;
@@ -717,6 +729,11 @@ export type QueryFoldersArgs = {
 };
 
 
+export type QueryLatestSnapshotArgs = {
+  documentId: Scalars['ID'];
+};
+
+
 export type QueryRootFoldersArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
@@ -789,10 +806,30 @@ export type Session = {
   expiresAt: Scalars['Date'];
 };
 
+export type Snapshot = {
+  __typename?: 'Snapshot';
+  activeDocumentSnapshot?: Maybe<Document>;
+  data: Scalars['String'];
+  date: Scalars['Date'];
+  document?: Maybe<Document>;
+  documentId: Scalars['String'];
+  id: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTrace;
+  latestVersion: Scalars['Int'];
+  preview: Scalars['String'];
+  subkeyId: Scalars['Int'];
+  updates?: Maybe<Array<Update>>;
+};
+
 export type SnapshotDeviceKeyBoxInput = {
   ciphertext: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
   nonce: Scalars['String'];
+};
+
+export type SnapshotResult = {
+  __typename?: 'SnapshotResult';
+  snapshot?: Maybe<Snapshot>;
 };
 
 export type StartLoginInput = {
@@ -825,6 +862,17 @@ export type UnauthorizedDevicesForWorkspacesResult = {
 export type UnauthorizedMembersResult = {
   __typename?: 'UnauthorizedMembersResult';
   userIds: Array<Maybe<Scalars['String']>>;
+};
+
+export type Update = {
+  __typename?: 'Update';
+  data: Scalars['String'];
+  id: Scalars['String'];
+  pubKey: Scalars['String'];
+  snapshot?: Maybe<Snapshot>;
+  snapshotId: Scalars['String'];
+  snapshotVersion: Scalars['Int'];
+  version: Scalars['Int'];
 };
 
 export type UpdateDocumentNameInput = {
@@ -1310,6 +1358,13 @@ export type FoldersQueryVariables = Exact<{
 
 
 export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+
+export type LatestSnapshotQueryVariables = Exact<{
+  documentId: Scalars['ID'];
+}>;
+
+
+export type LatestSnapshotQuery = { __typename?: 'Query', latestSnapshot?: { __typename?: 'SnapshotResult', snapshot?: { __typename?: 'Snapshot', id: string, latestVersion: number, data: string, preview: string, documentId: string, subkeyId: number, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, parentFolderId?: string | null, subkeyId: number }> } } | null } | null };
 
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2059,6 +2114,32 @@ export const FoldersDocument = gql`
 
 export function useFoldersQuery(options: Omit<Urql.UseQueryArgs<FoldersQueryVariables>, 'query'>) {
   return Urql.useQuery<FoldersQuery, FoldersQueryVariables>({ query: FoldersDocument, ...options });
+};
+export const LatestSnapshotDocument = gql`
+    query latestSnapshot($documentId: ID!) {
+  latestSnapshot(documentId: $documentId) {
+    snapshot {
+      id
+      latestVersion
+      data
+      preview
+      documentId
+      subkeyId
+      keyDerivationTrace {
+        workspaceKeyId
+        parentFolders {
+          folderId
+          parentFolderId
+          subkeyId
+        }
+      }
+    }
+  }
+}
+    `;
+
+export function useLatestSnapshotQuery(options: Omit<Urql.UseQueryArgs<LatestSnapshotQueryVariables>, 'query'>) {
+  return Urql.useQuery<LatestSnapshotQuery, LatestSnapshotQueryVariables>({ query: LatestSnapshotDocument, ...options });
 };
 export const MainDeviceDocument = gql`
     query mainDevice {
@@ -2839,6 +2920,20 @@ export const runFoldersQuery = async (variables: FoldersQueryVariables, options?
   return await getUrqlClient()
     .query<FoldersQuery, FoldersQueryVariables>(
       FoldersDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runLatestSnapshotQuery = async (variables: LatestSnapshotQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<LatestSnapshotQuery, LatestSnapshotQueryVariables>(
+      LatestSnapshotDocument,
       variables,
       {
         // better to be safe here and always refetch

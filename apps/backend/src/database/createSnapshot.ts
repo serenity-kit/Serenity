@@ -74,6 +74,7 @@ export async function createSnapshot(
           connect: { id: snapshot.publicData.docId },
         },
         document: { connect: { id: snapshot.publicData.docId } },
+        subkeyId: snapshot.subkeyId,
         keyDerivationTrace: snapshot.keyDerivationTrace! as KeyDerivationTrace,
         clocks: {},
       },

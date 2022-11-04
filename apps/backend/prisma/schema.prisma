@@ -42,9 +42,12 @@ model Snapshot {
   updates                Update[]
   activeSnapshotDocument Document?        @relation("activeSnapshot")
   createdAt              DateTime         @default(now())
+  subkeyId               Int              @default(0)
   keyDerivationTrace     Json             @default("{}")
   clocks                 Json
   snapshotKeyBoxes       SnapshotKeyBox[]
+
+  @@unique([subkeyId, documentId])
 }
 
 model Update {

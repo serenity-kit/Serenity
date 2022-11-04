@@ -1,51 +1,37 @@
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
-import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { deleteDocuments } from "../../../../test/helpers/document/deleteDocuments";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const username = "user1";
 const password = "password";
-let addedWorkspace: any = null;
-let addedDocumentId: any = null;
-let sessionKey = "";
+let user1Data: any = undefined;
+let user1WorkspaceKey: any = undefined;
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  sessionKey = registerUserResult.sessionKey;
-  const device = registerUserResult.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey,
+  user1Data = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  user1WorkspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: user1Data.device,
+    deviceEncryptionPrivateKey: user1Data.encryptionPrivateKey,
+    workspace: user1Data.workspace,
+  });
   const createDocumentResult = await createDocument({
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     graphql,
-    authorizationHeader: sessionKey,
-    parentFolderId:
-      createWorkspaceResult.createInitialWorkspaceStructure.folder.id,
+    authorizationHeader: user1Data.sessionKey,
+    parentFolderId: user1Data.folder.id,
     contentSubkeyId: 1,
-    workspaceId: addedWorkspace.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    workspaceId: user1Data.workspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
   });
-  addedDocumentId = createDocumentResult.createDocument.id;
 };
 
 beforeAll(async () => {
@@ -54,9 +40,11 @@ beforeAll(async () => {
 });
 
 test("user should be able to delete a document", async () => {
-  const authorizationHeader = sessionKey;
-  const ids = [addedDocumentId];
-  const result = await deleteDocuments({ graphql, ids, authorizationHeader });
+  const result = await deleteDocuments({
+    graphql,
+    ids: [user1Data.document.id],
+    authorizationHeader: user1Data.sessionKey,
+  });
   expect(result.deleteDocuments).toMatchInlineSnapshot(`
     {
       "status": "success",
@@ -65,9 +53,11 @@ test("user should be able to delete a document", async () => {
 });
 
 test("Deleting nonexistent document does nothing", async () => {
-  const authorizationHeader = sessionKey;
-  const ids = ["badthing"];
-  const result = await deleteDocuments({ graphql, ids, authorizationHeader });
+  const result = await deleteDocuments({
+    graphql,
+    ids: ["bad-id"],
+    authorizationHeader: user1Data.sessionKey,
+  });
   expect(result.deleteDocuments).toMatchInlineSnapshot(`
     {
       "status": "success",
@@ -76,22 +66,17 @@ test("Deleting nonexistent document does nothing", async () => {
 });
 
 test("Unauthenticated", async () => {
-  const ids = [addedDocumentId];
   await expect(
     (async () =>
       await deleteDocuments({
         graphql,
-        ids,
+        ids: [user1Data.document.id],
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
 
 describe("Input errors", () => {
-  const authorizationHeaders = {
-    authorization: sessionKey,
-  };
-  const id = uuidv4();
   const query = gql`
     mutation deleteDocuments($input: DeleteDocumentsInput!) {
       deleteDocuments(input: $input) {
@@ -99,6 +84,7 @@ describe("Input errors", () => {
       }
     }
   `;
+  const id = uuidv4();
   test("Invalid ids", async () => {
     await expect(
       (async () =>
@@ -109,7 +95,7 @@ describe("Input errors", () => {
               ids: null,
             },
           },
-          authorizationHeaders
+          { authorizationHeaders: user1Data.sessionKey }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
@@ -121,14 +107,16 @@ describe("Input errors", () => {
           {
             input: null,
           },
-          authorizationHeaders
+          { authorizationHeaders: user1Data.sessionKey }
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("No input", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
+        await graphql.client.request(query, null, {
+          authorizationHeaders: user1Data.sessionKey,
+        }))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
 });

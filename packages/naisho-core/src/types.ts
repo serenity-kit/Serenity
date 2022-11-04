@@ -51,6 +51,7 @@ export interface Snapshot {
   nonce: string;
   signature: string; // ciphertext + nonce + publicData
   publicData: SnapshotPublicData;
+  subkeyId: number;
   keyDerivationTrace?: KeyDerivationTrace | undefined;
 }
 

@@ -56,6 +56,8 @@ import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
 import * as UnauthorizedDevicesForWorkspacesTypes from "./graphql/queries/device/unauthorizedDevicesForWorkspaces";
 import * as FileUrlQueryTypes from "./graphql/queries/file/fileUrl";
 
+import * as LatestSnapshotQueryTypes from "./graphql/queries/snapshot/latestSnapshot";
+
 import * as DocumentTypes from "./graphql/types/document";
 
 import * as DateTypes from "./graphql/types/date";
@@ -124,6 +126,8 @@ export const schema = makeSchema({
     AttachDeviceToWorkspacesMutationTypes,
     UnauthorizedDevicesForWorkspacesTypes,
     AttachDevicesToWorkspacesMutationTypes,
+
+    LatestSnapshotQueryTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),

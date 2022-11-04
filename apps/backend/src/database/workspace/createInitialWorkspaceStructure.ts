@@ -10,23 +10,34 @@ import {
   DeviceWorkspaceKeyBoxParams,
 } from "./createWorkspace";
 
-export type Params = {
-  userId: string;
-  workspaceId: string;
-  workspaceName: string;
-  folderId: string;
-  folderIdSignature: string;
-  encryptedFolderName: string;
-  encryptedFolderNameNonce: string;
-  folderSubkeyId: number;
-  documentId: string;
-  encryptedDocumentName: string;
-  encryptedDocumentNameNonce: string;
-  documentSubkeyId: number;
-  documentContentSubkeyId: number;
-  documentSnapshot: Snapshot;
+export type InitialWorkspaceParams = {
+  id: string;
+  name: string;
   creatorDeviceSigningPublicKey: string;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
+};
+
+export type InitialWorkspaceFolderParams = {
+  id: string;
+  idSignature: string;
+  encryptedName: string;
+  encryptedNameNonce: string;
+  subkeyId: number;
+};
+
+export type InitialWorkspaceDocumentParams = {
+  id: string;
+  encryptedName: string;
+  encryptedNameNonce: string;
+  subkeyId: number;
+  snapshot: Snapshot;
+};
+
+export type Params = {
+  userId: string;
+  workspace: InitialWorkspaceParams;
+  folder: InitialWorkspaceFolderParams;
+  document: InitialWorkspaceDocumentParams;
 };
 
 export type CreateWorkspaceResult = {
@@ -37,53 +48,41 @@ export type CreateWorkspaceResult = {
 
 export async function createInitialWorkspaceStructure({
   userId,
-  workspaceId,
-  workspaceName,
-  folderId,
-  encryptedFolderName,
-  encryptedFolderNameNonce,
-  folderSubkeyId,
-  documentId,
-  encryptedDocumentName,
-  encryptedDocumentNameNonce,
-  documentSubkeyId,
-  documentContentSubkeyId,
-  documentSnapshot,
-  creatorDeviceSigningPublicKey,
-  deviceWorkspaceKeyBoxes,
+  workspace,
+  folder,
+  document,
 }: Params): Promise<CreateWorkspaceResult> {
-  const workspace = await createWorkspace({
-    id: workspaceId,
-    name: workspaceName,
+  const createdWorkspace = await createWorkspace({
+    id: workspace.id,
+    name: workspace.name,
     userId,
-    creatorDeviceSigningPublicKey,
-    deviceWorkspaceKeyBoxes,
+    creatorDeviceSigningPublicKey: workspace.creatorDeviceSigningPublicKey,
+    deviceWorkspaceKeyBoxes: workspace.deviceWorkspaceKeyBoxes,
   });
-  const workspaceKey = workspace.currentWorkspaceKey;
-  const folder = await createFolder({
+  const workspaceKey = createdWorkspace.currentWorkspaceKey;
+  const createdFolder = await createFolder({
     userId,
-    id: folderId,
-    encryptedName: encryptedFolderName,
-    encryptedNameNonce: encryptedFolderNameNonce,
+    id: folder.id,
+    encryptedName: folder.encryptedName,
+    encryptedNameNonce: folder.encryptedNameNonce,
     workspaceKeyId: workspaceKey?.id!,
-    subkeyId: folderSubkeyId,
+    subkeyId: folder.subkeyId,
     parentFolderId: undefined,
-    workspaceId: workspace.id,
+    workspaceId: createdWorkspace.id,
     keyDerivationTrace: {
       workspaceKeyId: workspaceKey?.id!,
       parentFolders: [],
     },
   });
-  const document = await prisma.document.create({
+  const createdDocument = await prisma.document.create({
     data: {
-      id: documentId,
-      encryptedName: encryptedDocumentName,
-      encryptedNameNonce: encryptedDocumentNameNonce,
-      workspaceKeyId: workspace.currentWorkspaceKey?.id,
-      subkeyId: documentSubkeyId,
-      contentSubkeyId: documentContentSubkeyId,
+      id: document.id,
+      encryptedName: document.encryptedName,
+      encryptedNameNonce: document.encryptedNameNonce,
+      workspaceKeyId: createdWorkspace.currentWorkspaceKey?.id,
+      subkeyId: document.subkeyId,
       parentFolderId: folder.id,
-      workspaceId: workspaceId,
+      workspaceId: createdWorkspace.id,
       nameKeyDerivationTrace: {
         workspaceKeyId: workspaceKey?.id!,
         parentFolders: [],
@@ -95,13 +94,13 @@ export async function createInitialWorkspaceStructure({
     parentFolders: [],
   };
   const fullDocumentSnapshot = {
-    ...documentSnapshot,
+    ...document.snapshot,
     keyDerivationTrace: snapshotKeyDerivationTrace,
   };
   await createSnapshot(fullDocumentSnapshot);
   return {
-    workspace,
-    document: formatDocument(document),
-    folder: formatFolder(folder),
+    workspace: createdWorkspace,
+    document: formatDocument(createdDocument),
+    folder: formatFolder(createdFolder),
   };
 }

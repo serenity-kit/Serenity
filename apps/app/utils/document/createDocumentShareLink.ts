@@ -1,11 +1,14 @@
-import { createDevice } from "@serenity-tools/common";
+import { createDevice, recreateSnapshotKey } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { Platform } from "react-native";
 import {
   Role,
   runCreateDocumentShareLinkMutation,
+  runLatestSnapshotQuery,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
+import { deriveFolderKey } from "../folder/deriveFolderKeyData";
+import { getDocument } from "./getDocument";
 
 type SnapshotDeviceKeyBox = {
   ciphertext: string;
@@ -39,7 +42,42 @@ export const createDocumentShareLink = async ({
   creatorDeviceEncryptionPrivateKey,
 }: Props) => {
   // TODO: generate key from key derivation trace
-  const snapshotKey = await sodium.crypto_kdf_keygen();
+  const document = await getDocument({ documentId });
+  if (!document) {
+    // TODO: handle in UI
+    console.error("Document not found");
+    return;
+  }
+  const snapshotResult = await runLatestSnapshotQuery(
+    {
+      documentId,
+    },
+    { requestPolicy: "network-only" }
+  );
+  if (snapshotResult.error) {
+    // TODO: handle in UI
+    console.error(snapshotResult.error.message);
+    return;
+  }
+  const snapshot = snapshotResult.data?.latestSnapshot?.snapshot;
+  if (!snapshot) {
+    // TODO: What do we dot here?
+    console.error("No snapshot for this document yet");
+    return;
+  }
+  const snapshotKeyDerivationTrace = await deriveFolderKey({
+    folderId: document.parentFolderId!,
+    workspaceKeyId: snapshot.keyDerivationTrace.workspaceKeyId,
+    workspaceId: document.workspaceId!,
+    activeDevice: creatorDevice,
+  });
+  const snapshotKeyData = await recreateSnapshotKey({
+    folderKey: snapshotKeyDerivationTrace.folderKeyData.key,
+    subkeyId: snapshot.subkeyId,
+  });
+  const snapshotKey = snapshotKeyData.key;
+
+  // const snapshotKey = await sodium.crypto_kdf_keygen();
 
   const virtualDevice = await createDevice();
 

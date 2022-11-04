@@ -20,7 +20,7 @@ import {
   verifyAndDecryptSnapshot,
   verifyAndDecryptUpdate,
 } from "@naisho/core";
-import { recreateDocumentKey } from "@serenity-tools/common";
+import { createSnapshotKey, recreateDocumentKey } from "@serenity-tools/common";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -130,7 +130,7 @@ export default function Page({
     }
   };
 
-  const createAndSendSnapshot = async (key, keyDervationTrace) => {
+  const createAndSendSnapshot = async (key, subkeyId, keyDervationTrace) => {
     const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
     const publicData = {
       snapshotId: uuidv4(),
@@ -141,6 +141,7 @@ export default function Page({
       yDocState,
       publicData,
       key,
+      subkeyId,
       signatureKeyPair
     );
 
@@ -151,6 +152,7 @@ export default function Page({
       JSON.stringify({
         ...snapshot,
         keyDervationTrace,
+        subkeyId,
         lastKnownSnapshotId: activeSnapshotIdRef.current,
         latestServerVersion: latestServerVersionRef.current,
       })
@@ -225,13 +227,18 @@ export default function Page({
         folderKey: folderKeyString,
         subkeyId: document.contentSubkeyId!,
       });
-      const snapshotKey = sodium.from_base64(documentKey.key);
-      const snapshotKeyDerivationTrace = deriveFolderKey({
+      // const snapshotKey = sodium.from_base64(documentKey.key);
+      const snapshotKeyDerivationTrace = await deriveFolderKey({
         folderId: document.parentFolderId!,
         workspaceKeyId,
         workspaceId: document.workspaceId!,
         activeDevice,
       });
+      const snapshotKeyData = await createSnapshotKey({
+        folderKey: snapshotKeyDerivationTrace.folderKeyData.key,
+      });
+      const snapshotKey = sodium.from_base64(snapshotKeyData.key);
+      const snapshotSubkeyId = snapshotKeyData.subkeyId;
 
       const onWebsocketMessage = async (event) => {
         const data = JSON.parse(event.data);
@@ -254,6 +261,7 @@ export default function Page({
             if (pendingChanges.type === "snapshot") {
               await createAndSendSnapshot(
                 snapshotKey,
+                snapshotSubkeyId,
                 snapshotKeyDerivationTrace
               );
               removePending(docId);
@@ -293,6 +301,7 @@ export default function Page({
             if (pending.type === "snapshot") {
               await createAndSendSnapshot(
                 snapshotKey,
+                snapshotSubkeyId,
                 snapshotKeyDerivationTrace
               );
               removePending(data.docId);
@@ -321,6 +330,7 @@ export default function Page({
             removePending(data.docId);
             await createAndSendSnapshot(
               snapshotKey,
+              snapshotSubkeyId,
               snapshotKeyDerivationTrace
             );
             break;
@@ -471,6 +481,7 @@ export default function Page({
             } else {
               await createAndSendSnapshot(
                 snapshotKey,
+                snapshotSubkeyId,
                 snapshotKeyDerivationTrace
               );
             }

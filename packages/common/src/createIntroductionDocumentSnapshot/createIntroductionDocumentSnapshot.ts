@@ -10,9 +10,11 @@ const introductionDocument = `AlCOiJekCQAHAQRwYWdlAwdoZWFkaW5nKACOiJekCQAFbGV2ZW
 export const createIntroductionDocumentSnapshot = async ({
   documentId,
   documentEncryptionKey,
+  subkeyId,
 }: {
   documentId: string;
   documentEncryptionKey: Uint8Array;
+  subkeyId: number;
 }) => {
   // TODO in the future use the main device
   const signatureKeyPair = await createSignatureKeyPair();
@@ -27,6 +29,7 @@ export const createIntroductionDocumentSnapshot = async ({
     sodium.from_base64(introductionDocument),
     publicData,
     documentEncryptionKey,
+    subkeyId,
     signatureKeyPair
   );
 };

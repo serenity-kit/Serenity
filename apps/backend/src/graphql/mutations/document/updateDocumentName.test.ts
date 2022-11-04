@@ -7,74 +7,48 @@ import {
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
-import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { decryptWorkspaceKey } from "../../../../test/helpers/device/decryptWorkspaceKey";
+import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const username = "user1";
-const password = "password";
-let addedWorkspace: any = null;
-let addedFolder: any = null;
-let addedDocumentId = "";
-let sessionKey = "";
-let workspaceKey = "";
+let user1Data: any = null;
+let user1WorkspaceKey = "";
 let folderKey = "";
+const password = "password";
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  sessionKey = registerUserResult.sessionKey;
-  const device = registerUserResult.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey,
+  user1Data = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-
-  const workspaceKeyBox = addedWorkspace.currentWorkspaceKey.workspaceKeyBox;
-  workspaceKey = await decryptWorkspaceKey({
-    ciphertext: workspaceKeyBox.ciphertext,
-    nonce: workspaceKeyBox.nonce,
-    creatorDeviceEncryptionPublicKey:
-      registerUserResult.mainDevice.encryptionPublicKey,
-    receiverDeviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+  user1WorkspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: user1Data.device,
+    deviceEncryptionPrivateKey: user1Data.encryptionPrivateKey,
+    workspace: user1Data.workspace,
   });
-  addedFolder = createWorkspaceResult.createInitialWorkspaceStructure.folder;
   const folderKeyResult = await kdfDeriveFromKey({
-    key: workspaceKey,
+    key: user1WorkspaceKey,
     context: folderDerivedKeyContext,
-    subkeyId: addedFolder.subkeyId,
+    subkeyId: user1Data.folder.subkeyId,
   });
   folderKey = folderKeyResult.key;
   let documentContentKeyResult = await createDocumentKey({
     folderKey,
   });
-  const createDocumentResult = await createDocument({
-    id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
+  await createDocument({
+    id: uuidv4(),
     graphql,
-    authorizationHeader: sessionKey,
-    parentFolderId: addedFolder.parentFolderId,
+    parentFolderId: user1Data.folder.parentFolderId,
     contentSubkeyId: documentContentKeyResult.subkeyId,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: addedWorkspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    workspaceId: user1Data.workspace.id,
+    authorizationHeader: user1Data.sessionKey,
   });
-  addedDocumentId = createDocumentResult.createDocument.id;
 };
 
 beforeAll(async () => {
@@ -83,17 +57,15 @@ beforeAll(async () => {
 });
 
 test("user should be able to change a document name", async () => {
-  const authorizationHeader = sessionKey;
-  const id = addedDocumentId;
-  const name = "Updated Name";
+  const name = "Updated name";
   const result = await updateDocumentName({
     graphql,
-    id,
+    id: user1Data.document.id,
     name,
-    parentFolderId: addedFolder.parentFolderId,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    parentFolderId: user1Data.folder.parentFolderId,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
     folderKey,
-    authorizationHeader,
+    authorizationHeader: user1Data.sessionKey,
   });
   const updatedDocument = result.updateDocumentName.document;
   expect(typeof updatedDocument.encryptedName).toBe("string");
@@ -113,7 +85,6 @@ test("user should be able to change a document name", async () => {
 });
 
 test("Throw error when document doesn't exist", async () => {
-  const authorizationHeader = sessionKey;
   const id = "badthing";
   const name = "Doesn't Exist Name";
   await expect(
@@ -122,73 +93,53 @@ test("Throw error when document doesn't exist", async () => {
         graphql,
         id,
         name,
-        parentFolderId: addedFolder.parentFolderId,
-        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        parentFolderId: user1Data.folder.parentFolderId,
+        workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
         folderKey,
-        authorizationHeader,
+        authorizationHeader: user1Data.sessionKey,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
 });
 
 test("Throw error when user doesn't have access", async () => {
   // create a new user with access to different documents
-  const username2 = "user2";
-  const registerUserResult = await registerUser(graphql, username2, password);
-  const device = registerUserResult.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: registerUserResult.sessionKey,
+  const user2Data = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
   const otherUserDocumentResult = await createDocument({
-    id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
     graphql,
-    authorizationHeader: registerUserResult.sessionKey,
+    id: uuidv4(),
     parentFolderId: null,
     contentSubkeyId: 1,
-    workspaceId: addedWorkspace.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    workspaceId: user1Data.workspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    authorizationHeader: user2Data.sessionKey,
   });
-  const authorizationHeader = sessionKey;
-  const id = otherUserDocumentResult.createDocument.id;
-  const name = "Unauthorized Name";
   await expect(
     (async () =>
       await updateDocumentName({
         graphql,
-        id,
-        name,
-        parentFolderId: addedFolder.parentFolderId,
-        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        id: user1Data.document.id,
+        name: "Unauthorized Name",
+        parentFolderId: user1Data.folder.parentFolderId,
+        workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
         folderKey,
-        authorizationHeader,
+        authorizationHeader: user2Data.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
 
 test("Unauthenticated", async () => {
-  const id = addedDocumentId;
-  const name = "Updated Name";
   await expect(
     (async () =>
       await updateDocumentName({
         graphql,
-        id,
-        name,
-        parentFolderId: addedFolder.parentFolderId,
-        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        id: user1Data.document.id,
+        name: "Updated Name",
+        parentFolderId: user1Data.folder.parentFolderId,
+        workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader: "badauthheader",
       }))()
@@ -196,75 +147,71 @@ test("Unauthenticated", async () => {
 });
 
 describe("Input errors", () => {
-  const authorizationHeaders = {
-    authorization: sessionKey,
-  };
-  const id = uuidv4();
-  test("Invalid Id", async () => {
-    const query = gql`
-      mutation {
-        updateDocumentName(
-          input: {
-            id: 2
-            encryptedName: ""
-            encryptedNameNonce: ""
-            subkeyId: 1
-          }
-        ) {
-          document {
-            id
-          }
+  const query = gql`
+    mutation updateDocumentName($input: UpdateDocumentNameInput!) {
+      updateDocumentName(input: $input) {
+        document {
+          id
         }
       }
-    `;
+    }
+  `;
+  test("Invalid Id", async () => {
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
-    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              id: "badid",
+              encryptedName: "",
+              encryptedNameNonce: "",
+              subkeyId: 1,
+            },
+          },
+          {
+            authorizationHeaders: user1Data.sessionKey,
+          }
+        ))()
+    ).rejects.toThrowError();
   });
   test("Invalid name", async () => {
-    const query = gql`
-        mutation {
-            updateDocumentName(
-            input: {
-              id: "${id}"
-              encryptedName: null
-              encryptedNameNonce: null
-              subkeyId: 1
-            }
-          ) {
-            document {
-              id
-            }
-          }
-        }
-      `;
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
-    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              id: uuidv4(),
+              encryptedName: null,
+              encryptedNameNonce: "",
+              subkeyId: 1,
+            },
+          },
+          {
+            authorizationHeaders: user1Data.sessionKey,
+          }
+        ))()
+    ).rejects.toThrowError();
   });
   test("Invalid subkeyId", async () => {
-    const query = gql`
-      mutation {
-        updateDocumentName(
-          input: {
-            id: ""
-            encryptedName: "abc123"
-            encryptedNameNonce: "abc123"
-            subkeyId: "lala"
-          }
-        ) {
-          document {
-            id
-          }
-        }
-      }
-    `;
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
-    ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              id: uuidv4(),
+              encryptedName: "",
+              encryptedNameNonce: "",
+              subkeyId: "lala",
+            },
+          },
+          {
+            authorizationHeaders: user1Data.sessionKey,
+          }
+        ))()
+    ).rejects.toThrowError();
   });
   test("Invalid input", async () => {
     const query = gql`
@@ -278,7 +225,9 @@ describe("Input errors", () => {
     `;
     await expect(
       (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
+        await graphql.client.request(query, null, {
+          authorizationHeaders: user1Data.sessionKey,
+        }))()
     ).rejects.toThrowError(/GRAPHQL_VALIDATION_FAILED/);
   });
 });

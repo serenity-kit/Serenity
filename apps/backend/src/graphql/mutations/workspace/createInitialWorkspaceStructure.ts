@@ -29,12 +29,47 @@ export const DocumentSnapshotPublicDataInput = inputObjectType({
   },
 });
 
+export const InitialWorkspaceWorkspaceInput = inputObjectType({
+  name: "InitialWorkspaceWorkspaceInput",
+  definition(t) {
+    t.nonNull.string("id");
+    t.nonNull.string("name");
+    t.nonNull.string("creatorDeviceSigningPublicKey");
+    t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
+      type: DeviceWorkspaceKeyBoxInput,
+    });
+  },
+});
+
+export const InitialWorkspaceFolderInput = inputObjectType({
+  name: "InitialWorkspaceFolderInput",
+  definition(t) {
+    t.nonNull.string("id");
+    t.nonNull.string("idSignature");
+    t.nonNull.string("encryptedName");
+    t.nonNull.string("encryptedNameNonce");
+    t.nonNull.int("subkeyId");
+  },
+});
+
+export const InitialWorkspaceDocumentInput = inputObjectType({
+  name: "InitialWorkspaceDocumentInput",
+  definition(t) {
+    t.nonNull.string("id");
+    t.nonNull.string("encryptedName");
+    t.nonNull.string("encryptedNameNonce");
+    t.nonNull.int("subkeyId");
+    t.nonNull.field("snapshot", { type: DocumentSnapshotInput });
+  },
+});
+
 export const DocumentSnapshotInput = inputObjectType({
   name: "DocumentSnapshotInput",
   definition(t) {
     t.nonNull.string("ciphertext");
     t.nonNull.string("nonce");
     t.nonNull.string("signature");
+    t.nonNull.int("subkeyId");
     t.nonNull.field("publicData", { type: DocumentSnapshotPublicDataInput });
   },
 });
@@ -42,23 +77,9 @@ export const DocumentSnapshotInput = inputObjectType({
 export const CreateInitialWorkspaceStructureInput = inputObjectType({
   name: "CreateInitialWorkspaceStructureInput",
   definition(t) {
-    t.nonNull.string("workspaceId");
-    t.nonNull.string("workspaceName");
-    t.nonNull.string("folderId");
-    t.nonNull.string("folderIdSignature");
-    t.nonNull.string("encryptedFolderName");
-    t.nonNull.string("encryptedFolderNameNonce");
-    t.nonNull.int("folderSubkeyId");
-    t.nonNull.string("documentId");
-    t.nonNull.string("encryptedDocumentName");
-    t.nonNull.string("encryptedDocumentNameNonce");
-    t.nonNull.int("documentSubkeyId");
-    t.nonNull.int("documentContentSubkeyId");
-    t.nonNull.field("documentSnapshot", { type: DocumentSnapshotInput });
-    t.nonNull.string("creatorDeviceSigningPublicKey");
-    t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
-      type: DeviceWorkspaceKeyBoxInput,
-    });
+    t.nonNull.field("workspace", { type: InitialWorkspaceWorkspaceInput });
+    t.nonNull.field("folder", { type: InitialWorkspaceFolderInput });
+    t.nonNull.field("document", { type: InitialWorkspaceDocumentInput });
   },
 });
 
@@ -87,25 +108,13 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         throw new AuthenticationError("Not authenticated");
       }
       context.assertValidDeviceSigningPublicKeyForThisSession(
-        args.input.creatorDeviceSigningPublicKey
+        args.input.workspace.creatorDeviceSigningPublicKey
       );
       const workspaceStructure = await createInitialWorkspaceStructure({
         userId: context.user.id,
-        workspaceId: args.input.workspaceId,
-        workspaceName: args.input.workspaceName,
-        folderId: args.input.folderId,
-        folderIdSignature: args.input.folderIdSignature,
-        encryptedFolderName: args.input.encryptedFolderName,
-        encryptedFolderNameNonce: args.input.encryptedFolderNameNonce,
-        folderSubkeyId: args.input.folderSubkeyId,
-        documentId: args.input.documentId,
-        encryptedDocumentName: args.input.encryptedDocumentName,
-        encryptedDocumentNameNonce: args.input.encryptedDocumentNameNonce,
-        documentSubkeyId: args.input.documentSubkeyId,
-        documentContentSubkeyId: args.input.documentContentSubkeyId,
-        documentSnapshot: args.input.documentSnapshot,
-        creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
-        deviceWorkspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,
+        workspace: args.input.workspace,
+        folder: args.input.folder,
+        document: args.input.document,
       });
       return workspaceStructure;
     },

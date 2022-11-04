@@ -1,92 +1,51 @@
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
-import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { deleteFolders } from "../../../../test/helpers/folder/deleteFolder";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { prisma } from "../../../database/prisma";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-let userId = "";
-let sessionKey = "";
-let sessionKey2 = "";
-const username = "user1";
-const username2 = "user2";
+let user1Data: any = undefined;
+let user2Data: any = undefined;
 const password = "password";
-let addedWorkspace: any = null;
-let addedFolderId: any = null;
-let otherUserWorkspaceId: any = null;
-let workspaceKey = "";
-let workspaceKey2 = "";
+let user1WorkspaceKey = "";
+let user2WorkspaceKey = "";
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  sessionKey = registerUserResult.sessionKey;
-  userId = registerUserResult.userId;
-  const device = registerUserResult.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey,
+  user1Data = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
-    device: registerUserResult.mainDevice,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    workspace: addedWorkspace,
+  user2Data = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
+  });
+  user1WorkspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: user1Data.device,
+    deviceEncryptionPrivateKey: user1Data.encryptionPrivateKey,
+    workspace: user1Data.workspace,
   });
   const createFolderResult = await createFolder({
     graphql,
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     name: "Untitled",
-    parentKey: workspaceKey,
+    parentKey: user1WorkspaceKey,
     parentFolderId: null,
-    authorizationHeader: sessionKey,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: addedWorkspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    workspaceId: user1Data.workspace.id,
+    authorizationHeader: user1Data.sessionKey,
   });
-  addedFolderId = createFolderResult.createFolder.folder.id;
 
-  const registrationResponse = await registerUser(graphql, username2, password);
-  sessionKey2 = registrationResponse.sessionKey;
-  const device2 = registrationResponse.mainDevice;
-  const createWorkspaceResult2 = await createInitialWorkspaceStructure({
-    workspaceName: "other user workspace",
-    workspaceId: "e9f04512-8317-46e0-ae1b-64eddf70690d",
-    deviceSigningPublicKey: device2.signingPublicKey,
-    deviceEncryptionPublicKey: device2.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registrationResponse.encryptionPrivateKey,
-    webDevice: registrationResponse.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey2,
-  });
-  otherUserWorkspaceId =
-    createWorkspaceResult2.createInitialWorkspaceStructure.workspace.id;
-  const addedWorkspace2 =
-    createWorkspaceResult2.createInitialWorkspaceStructure.workspace;
-  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
-    device: registrationResponse.mainDevice,
-    deviceEncryptionPrivateKey: registrationResponse.encryptionPrivateKey,
-    workspace: addedWorkspace2,
+  user2WorkspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: user2Data.device,
+    deviceEncryptionPrivateKey: user2Data.encryptionPrivateKey,
+    workspace: user2Data.workspace,
   });
 };
 
@@ -103,18 +62,18 @@ test("user can delete a folder", async () => {
     graphql,
     id: folderId,
     name: "Untitled",
-    parentKey: workspaceKey,
+    parentKey: user1WorkspaceKey,
     parentFolderId: null,
-    authorizationHeader: sessionKey,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: addedWorkspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    workspaceId: user1Data.workspace.id,
+    authorizationHeader: user1Data.sessionKey,
   });
   expect(createFolderResult.createFolder.folder.id).toBe(folderId);
   const folderIds = [folderId];
   await deleteFolders({
     graphql,
     ids: folderIds,
-    authorizationHeader: sessionKey,
+    authorizationHeader: user1Data.sessionKey,
   });
   // try to retrieve the folder. It should come back as null
   const folder = await prisma.folder.findFirst({
@@ -133,20 +92,20 @@ test("deleting a parent folder will cascade to children", async () => {
     id: parentFolderId,
     name: "Parent folder",
     parentFolderId: null,
-    parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: addedWorkspace.id,
+    parentKey: user1WorkspaceKey,
+    authorizationHeader: user1Data.sessionKey,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    workspaceId: user1Data.workspace.id,
   });
   const createChildFolderResult = await createFolder({
     graphql,
     id: childFolderId,
     name: "Child folder",
     parentFolderId: parentFolderId,
-    parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: addedWorkspace.id,
+    parentKey: user1WorkspaceKey,
+    authorizationHeader: user1Data.sessionKey,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    workspaceId: user1Data.workspace.id,
   });
   expect(createParentFolderResult.createFolder.folder.id).toBe(parentFolderId);
   expect(createChildFolderResult.createFolder.folder.id).toBe(childFolderId);
@@ -157,7 +116,7 @@ test("deleting a parent folder will cascade to children", async () => {
   await deleteFolders({
     graphql,
     ids: folderIds,
-    authorizationHeader: sessionKey,
+    authorizationHeader: user1Data.sessionKey,
   });
   // try to retrieve the folder.  It should come back as null
   const folder = await prisma.folder.findFirst({
@@ -178,20 +137,20 @@ test("user can delete multiple folders", async () => {
     id: folderId1,
     name: "folder 1",
     parentFolderId: null,
-    parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: addedWorkspace.id,
+    parentKey: user1WorkspaceKey,
+    authorizationHeader: user1Data.sessionKey,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    workspaceId: user1Data.workspace.id,
   });
   const createFolderResult2 = await createFolder({
     graphql,
     id: folderId2,
     name: "folder 2",
     parentFolderId: null,
-    parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: addedWorkspace.id,
+    parentKey: user1WorkspaceKey,
+    authorizationHeader: user1Data.sessionKey,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    workspaceId: user1Data.workspace.id,
   });
   expect(createFolderResult1.createFolder.folder.id).toBe(folderId1);
   expect(createFolderResult2.createFolder.folder.id).toBe(folderId2);
@@ -199,7 +158,7 @@ test("user can delete multiple folders", async () => {
   await deleteFolders({
     graphql,
     ids: folderIds,
-    authorizationHeader: sessionKey,
+    authorizationHeader: user1Data.sessionKey,
   });
   // try to retrieve the folder.  It should come back as null
   const folders = await prisma.folder.findMany({
@@ -224,40 +183,40 @@ test("user can delete multiple folders", async () => {
     id: parentFolderId1,
     name: "parent folder",
     parentFolderId: null,
-    parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceId: addedWorkspace.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    parentKey: user1WorkspaceKey,
+    workspaceId: user1Data.workspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    authorizationHeader: user1Data.sessionKey,
   });
   const createParentFolderResult2 = await createFolder({
     graphql,
     id: parentFolderId2,
     name: "parent folder 2",
     parentFolderId: null,
-    parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: addedWorkspace.id,
+    parentKey: user1WorkspaceKey,
+    workspaceId: user1Data.workspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    authorizationHeader: user1Data.sessionKey,
   });
   const createChildFolderResult1 = await createFolder({
     graphql,
     id: childFolderId1,
     name: "child folder",
-    parentKey: workspaceKey,
     parentFolderId: parentFolderId1,
-    authorizationHeader: sessionKey,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: addedWorkspace.id,
+    parentKey: user1WorkspaceKey,
+    workspaceId: user1Data.workspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    authorizationHeader: user1Data.sessionKey,
   });
   const createChildFolderResult2 = await createFolder({
     graphql,
     id: childFolderId2,
     name: "child folder 2",
-    parentKey: workspaceKey,
     parentFolderId: parentFolderId2,
-    authorizationHeader: sessionKey,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: addedWorkspace.id,
+    parentKey: user1WorkspaceKey,
+    workspaceId: user1Data.workspace.id,
+    workspaceKeyId: user1Data.workspace.currentWorkspaceKey.id,
+    authorizationHeader: user1Data.sessionKey,
   });
   expect(createParentFolderResult1.createFolder.folder.id).toBe(
     parentFolderId1
@@ -271,7 +230,7 @@ test("user can delete multiple folders", async () => {
   await deleteFolders({
     graphql,
     ids: folderIds,
-    authorizationHeader: sessionKey,
+    authorizationHeader: user1Data.sessionKey,
   });
   // try to retrieve the folder.  It should come back as null
   const folders = await prisma.folder.findMany({
@@ -292,20 +251,20 @@ test("user can't delete folders they don't own", async () => {
     graphql,
     id: folderId,
     name: "folder name",
-    parentKey: workspaceKey,
     parentFolderId: null,
-    authorizationHeader: sessionKey2,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: otherUserWorkspaceId,
+    parentKey: user2WorkspaceKey,
+    workspaceId: user2Data.workspace.id,
+    workspaceKeyId: user2Data.workspace.currentWorkspaceKey.id,
+    authorizationHeader: user2Data.sessionKey,
   });
   expect(createFoldeResult.createFolder.folder.id).toBe(folderId);
   const folderIds = [folderId];
   await deleteFolders({
     graphql,
     ids: folderIds,
-    authorizationHeader: sessionKey,
+    authorizationHeader: user1Data.sessionKey,
   });
-  // try to retrieve the folder.  It should come back as null
+  // try to retrieve the folder.  It should not have been deleted
   const folder = await prisma.folder.findFirst({
     where: { id: folderId },
   });
@@ -321,7 +280,7 @@ test("user can't delete folders that don't exist", async () => {
   await deleteFolders({
     graphql,
     ids: folderIds,
-    authorizationHeader: sessionKey,
+    authorizationHeader: user1Data.sessionKey,
   });
   // try to retrieve the folder.  It should come back as null
   const folder = await prisma.folder.findFirst({
@@ -344,17 +303,20 @@ test("Unauthenticated", async () => {
 });
 
 describe("Input errors", () => {
-  const authorizationHeaders = {
-    authorization: sessionKey,
-  };
-  test("Invalid ids", async () => {
-    const query = gql`
-      mutation deleteFolders($input: DeleteFoldersInput!) {
-        deleteFolders(input: $input) {
-          status
-        }
+  const query = gql`
+    mutation deleteFolders($input: DeleteFoldersInput!) {
+      deleteFolders(input: $input) {
+        status
       }
-    `;
+    }
+  `;
+  test("Invalid ids", async () => {
+    const userData = await createUserWithWorkspace({
+      id: uuidv4(),
+      username: `${uuidv4()}@example.com`,
+      password,
+    });
+    const authorizationHeaders = { authorization: userData.sessionKey };
     await expect(
       (async () =>
         await graphql.client.request(
@@ -365,13 +327,12 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid input", async () => {
-    const query = gql`
-      mutation deleteFolders($input: DeleteFoldersInput!) {
-        deleteFolders(input: $input) {
-          status
-        }
-      }
-    `;
+    const userData = await createUserWithWorkspace({
+      id: uuidv4(),
+      username: `${uuidv4()}@example.com`,
+      password,
+    });
+    const authorizationHeaders = { authorization: userData.sessionKey };
     await expect(
       (async () =>
         await graphql.client.request(
@@ -382,13 +343,12 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("No input", async () => {
-    const query = gql`
-      mutation deleteFolders($input: DeleteFoldersInput!) {
-        deleteFolders(input: $input) {
-          status
-        }
-      }
-    `;
+    const userData = await createUserWithWorkspace({
+      id: uuidv4(),
+      username: `${uuidv4()}@example.com`,
+      password,
+    });
+    const authorizationHeaders = { authorization: userData.sessionKey };
     await expect(
       (async () =>
         await graphql.client.request(query, null, authorizationHeaders))()
