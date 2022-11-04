@@ -7,27 +7,27 @@ import {
 import { getWidthAndHeightFromFile } from "./getWidthAndHeightFromFile";
 
 type InsertImagesParams = {
-  images: File[];
+  filesAsBase64: string[];
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
   insertImage: (params: InsertImageParams) => void;
   updateImageAttributes: (params: UpdateImageAttributesParams) => void;
 };
 
 export const insertImages = ({
-  images,
+  filesAsBase64,
   encryptAndUploadFile,
   insertImage,
   updateImageAttributes,
 }: InsertImagesParams) => {
-  images.forEach(async (file) => {
+  filesAsBase64.forEach(async (fileAsBase64) => {
     const uploadId = uuidv4();
-    const imageDimensions = await getWidthAndHeightFromFile(file);
+    const imageDimensions = await getWidthAndHeightFromFile(fileAsBase64);
     insertImage({
       uploadId,
       width: imageDimensions?.width || null,
       height: imageDimensions?.height || null,
     });
-    const result = await encryptAndUploadFile(file);
+    const result = await encryptAndUploadFile(fileAsBase64);
     updateImageAttributes({
       uploadId,
       fileInfo: result,

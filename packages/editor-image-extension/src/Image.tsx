@@ -1,5 +1,6 @@
 import { NodeViewWrapper } from "@tiptap/react";
 import React, { useEffect, useReducer } from "react";
+import { guessMimeType } from "./utils/guessMimeType";
 
 type State =
   | {
@@ -57,9 +58,13 @@ export const Image = (props: any) => {
             key,
             publicNonce: nonce,
           });
+          const mimeType = guessMimeType({
+            base64FileData: decryptedImageData,
+          });
+          const dataUri = `data:${mimeType};base64,${decryptedImageData}`;
           dispatch({
             type: "setContentAsBase64",
-            contentAsBase64: decryptedImageData,
+            contentAsBase64: dataUri,
           });
         } catch (err) {
           dispatch({

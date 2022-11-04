@@ -4,7 +4,6 @@ import {
   InsertImageParams,
   UpdateImageAttributesParams,
 } from "../types";
-import { base64ToFile } from "./base64ToFile";
 import { insertImages } from "./insertImages";
 
 type Props = {
@@ -31,14 +30,9 @@ export const initiateImagePicker = async ({
     return;
   }
 
-  const image = base64ToFile({
-    base64: filePickerResult.base64,
-    fileName: filePickerResult.fileName || undefined,
-  });
-
   insertImages({
     encryptAndUploadFile,
-    images: [image],
+    filesAsBase64: [filePickerResult.base64],
     insertImage,
     updateImageAttributes,
   });

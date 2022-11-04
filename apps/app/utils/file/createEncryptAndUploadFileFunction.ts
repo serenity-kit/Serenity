@@ -7,25 +7,14 @@ type CreateEncryptAndUploadFileFunctionParams = {
   workspaceId: string;
 };
 
-const fileToBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    // TODO: handle errors
-    // @ts-expect-error - throw if not a string
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-
 export const createEncryptAndUploadFileFunction = ({
   documentId,
   workspaceId,
 }: CreateEncryptAndUploadFileFunctionParams) => {
-  return async (file: File) => {
-    const imageAsBase64 = await fileToBase64(file);
+  return async (fileAsBase64: string) => {
     const key = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
     const { encryptedBase64ImageData, publicNonce } = await encryptFile({
-      base64FileData: imageAsBase64,
+      base64FileData: fileAsBase64,
       key,
     });
     const binaryImageData = sodium.from_base64(encryptedBase64ImageData);
