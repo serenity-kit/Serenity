@@ -1,10 +1,9 @@
-import { HStack } from "native-base";
 import React from "react";
 import { StyleSheet } from "react-native";
-import { tw } from "../../tailwind";
-import { View, ViewProps } from "../view/View";
-import { Text } from "../text/Text";
 import { useIsDesktopDevice } from "../../hooks/useIsDesktopDevice/useIsDesktopDevice";
+import { tw } from "../../tailwind";
+import { Text } from "../text/Text";
+import { View, ViewProps } from "../view/View";
 
 export type ListProps = ViewProps & {
   data: Array<any>;

@@ -1,20 +1,16 @@
 import {
-  tw,
   Avatar,
   AvatarGroup,
   Button,
-  Icon,
-  useHasEditorSidebar,
   IconButton,
-  View,
-  Text,
+  Modal,
+  tw,
+  useHasEditorSidebar,
 } from "@serenity-tools/ui";
-import { Keyboard } from "react-native";
 import { HStack } from "native-base";
-import { Modal } from "@serenity-tools/ui";
-import React, { useState } from "react";
-import { PageShareModalContent } from "../pageShareModalContent/PageShareModalContent";
+import { useState } from "react";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
+import { PageShareModalContent } from "../pageShareModalContent/PageShareModalContent";
 
 export function PageHeaderRight() {
   const hasEditorSidebar = useHasEditorSidebar();
