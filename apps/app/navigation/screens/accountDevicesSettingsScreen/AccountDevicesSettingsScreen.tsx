@@ -7,7 +7,6 @@ import {
   View,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
-import { VStack } from "native-base";
 import { useState } from "react";
 import { FlatList, useWindowDimensions } from "react-native";
 import DeviceListItem from "../../../components/deviceListItem/DeviceListItem";

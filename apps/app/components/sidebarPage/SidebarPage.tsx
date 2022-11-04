@@ -21,6 +21,7 @@ import { Platform, StyleSheet } from "react-native";
 import { useUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
+import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { getFolder } from "../../utils/folder/getFolder";
@@ -153,6 +154,24 @@ export default function SidebarPage(props: Props) {
     setIsEditing(false);
   };
 
+  const createShareLink = async () => {
+    if (!activeDevice.encryptionPrivateKey) {
+      console.error("active device doesn't have encryptionPrivateKey");
+      return;
+    }
+    const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
+      activeDevice;
+    try {
+      const shareLinkData = await createDocumentShareLink({
+        documentId: props.documentId,
+        creatorDevice,
+        creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
   const styles = StyleSheet.create({
     page: tw``,
     hover: tw`bg-gray-200`,
@@ -237,6 +256,9 @@ export default function SidebarPage(props: Props) {
             refetchDocuments={props.onRefetchDocumentsPress}
             onUpdateNamePress={() => {
               setIsEditing(true);
+            }}
+            onCreateShareLinkPress={() => {
+              createShareLink();
             }}
           />
         </HStack>

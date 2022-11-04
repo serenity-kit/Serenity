@@ -208,6 +208,10 @@ export const crypto_kdf_derive_from_key = async (
   );
 };
 
+export const crypto_secretbox_keygen = async (): Promise<string> => {
+  return to_base64(sodium.crypto_secretbox_keygen());
+};
+
 const libsodiumExports = {
   ready,
   to_base64,
@@ -222,6 +226,7 @@ const libsodiumExports = {
   crypto_sign_detached,
   crypto_box_easy,
   crypto_box_open_easy,
+  crypto_secretbox_keygen,
   crypto_secretbox_easy,
   crypto_secretbox_open_easy,
   crypto_sign_verify_detached,

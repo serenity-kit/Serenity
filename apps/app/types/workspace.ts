@@ -1,3 +1,5 @@
+import { Role } from "../generated/graphql";
+
 export type WorkspaceKeyBox = {
   id: string;
   workspaceKeyId: string;
@@ -13,13 +15,6 @@ export type WorkspaceKey = {
   generation: number;
   workspaceKeyBox: WorkspaceKeyBox;
 };
-
-export enum Role {
-  ADMIN = "ADMIN",
-  EDITOR = "EDITOR",
-  COMMENTER = "COMMENTER",
-  VIEWER = "VIEWER",
-}
 
 export type WorkspaceMember = {
   userId: string;

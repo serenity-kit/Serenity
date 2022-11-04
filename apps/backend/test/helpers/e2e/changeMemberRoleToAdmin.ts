@@ -14,7 +14,6 @@ export const changeMemberRoleToAdmin = async ({
   userId,
   workspaceId,
 }: Props) => {
-  console.log(`$x(//div[@data-testid="member-menu--${userId}__make-admin"]')`);
   await openMemberSettingsMemberRoleMenu({ page, userId });
   await page
     .locator(`//div[@data-testid="member-menu--${userId}__make-admin"]`)

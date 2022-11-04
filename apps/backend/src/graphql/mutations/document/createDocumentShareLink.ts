@@ -7,7 +7,6 @@ import {
   objectType,
 } from "nexus";
 import { createDocumentShareLink } from "../../../database/document/createDocumentShareLink";
-import { CreatorDeviceInput } from "../../types/device";
 import { MemberRoleEnum } from "../../types/workspace";
 
 export const SnapshotDeviceKeyBoxInput = inputObjectType({
@@ -26,8 +25,8 @@ export const CreateDocumentShareLinkInput = inputObjectType({
     t.nonNull.field("sharingRole", { type: MemberRoleEnum });
     t.nonNull.string("deviceSecretBoxCiphertext");
     t.nonNull.string("deviceSecretBoxNonce");
-    t.nonNull.field("creatorDevice", { type: CreatorDeviceInput });
-    t.nonNull.list.nonNull.field("snapshotDeviceKeyBoxes", {
+    t.nonNull.string("creatorDeviceSigningPublicKey");
+    t.nonNull.field("snapshotDeviceKeyBox", {
       type: SnapshotDeviceKeyBoxInput,
     });
   },
@@ -56,7 +55,7 @@ export const createDocumentLinkShareMutation = mutationField(
         throw new AuthenticationError("Not authenticated");
       }
       context.assertValidDeviceSigningPublicKeyForThisSession(
-        args.input.creatorDevice.signingPublicKey
+        args.input.creatorDeviceSigningPublicKey
       );
       const documentShareLink = await createDocumentShareLink({
         sharerUserId: context.user.id,
@@ -64,11 +63,8 @@ export const createDocumentLinkShareMutation = mutationField(
         sharingRole: args.input.sharingRole,
         deviceSecretBoxCiphertext: args.input.deviceSecretBoxCiphertext,
         deviceSecretBoxNonce: args.input.deviceSecretBoxNonce,
-        deviceSigningPublicKey: args.input.creatorDevice.signingPublicKey,
-        deviceEncryptionPublicKey: args.input.creatorDevice.encryptionPublicKey,
-        deviceEncryptionPublicKeySignature:
-          args.input.creatorDevice.encryptionPublicKeySignature,
-        snapshotDeviceKeyBoxes: args.input.snapshotDeviceKeyBoxes,
+        creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
+        snapshotDeviceKeyBox: args.input.snapshotDeviceKeyBox,
       });
       return {
         token: documentShareLink.token,
