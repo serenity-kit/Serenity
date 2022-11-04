@@ -4,7 +4,13 @@ import {
   getEditorBottombarStateFromEditor,
   updateEditor,
 } from "@serenity-tools/editor";
-import { tw, useHasEditorSidebar, View } from "@serenity-tools/ui";
+import {
+  CenterContent,
+  Spinner,
+  tw,
+  useHasEditorSidebar,
+  View,
+} from "@serenity-tools/ui";
 import { Editor as TipTapEditor } from "@tiptap/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { View as RNView } from "react-native";
@@ -22,6 +28,7 @@ export default function Editor({
   yAwarenessRef,
   openDrawer,
   documentId,
+  documentLoaded,
   workspaceId,
   isNew,
   updateTitle,
@@ -84,6 +91,14 @@ export default function Editor({
       documentId,
     });
   }, [workspaceId, documentId]);
+
+  if (!documentLoaded) {
+    return (
+      <CenterContent>
+        <Spinner fadeIn />
+      </CenterContent>
+    );
+  }
 
   return (
     // overflow-hidden needed so hidden elements with borders don't trigger scrolling behaviour

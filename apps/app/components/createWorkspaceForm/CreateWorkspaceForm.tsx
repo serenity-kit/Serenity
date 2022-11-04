@@ -201,7 +201,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         onSuccess={() => {
           setIsPasswordModalVisible(false);
           setTimeout(() => {
-            console.log(inputRef.current);
             if (inputRef.current) {
               inputRef.current.focus();
             }
