@@ -23,14 +23,10 @@ import {
 } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
+import { notNull } from "../../../utils/notNull/notNull";
 import { deriveCurrentWorkspaceKey } from "../../../utils/workspace/deriveCurrentWorkspaceKey";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
-
-// inspired by https://stackoverflow.com/a/46700791
-function notNull<TypeValue>(value: TypeValue | null): value is TypeValue {
-  return value !== null;
-}
 
 export default function DeviceManagerScreen(props) {
   useMachine(loadMeAndVerifyMachine, {

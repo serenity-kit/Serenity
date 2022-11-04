@@ -1,0 +1,13 @@
+query documentShareLinks($documentId: ID!, $first: Int! = 50, $after: String) {
+  documentShareLinks(documentId: $documentId, first: $first, after: $after) {
+    nodes {
+      token
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}
