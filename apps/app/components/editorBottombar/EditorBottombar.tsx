@@ -41,26 +41,6 @@ export const EditorBottombar = forwardRef(
         <HStack space={2} alignItems="center">
           <EditorBottombarButton
             onPress={(event) => {
-              initiateImagePicker({
-                encryptAndUploadFile,
-                insertImage: (params: InsertImageParams) => {
-                  onUpdate({ variant: "insert-image", params });
-                },
-                updateImageAttributes: (
-                  params: UpdateImageAttributesParams
-                ) => {
-                  onUpdate({ variant: "update-image-attributes", params });
-                },
-              });
-            }}
-            name="image-line"
-            isActive={false}
-          />
-
-          <EditorBottombarDivider />
-
-          <EditorBottombarButton
-            onPress={(event) => {
               onUpdate({ variant: "toggle-bold" });
             }}
             name="bold"
@@ -148,6 +128,26 @@ export const EditorBottombar = forwardRef(
             }}
             name="list-check-2"
             isActive={editorBottombarState.isTaskList}
+          />
+
+          <EditorBottombarDivider />
+
+          <EditorBottombarButton
+            onPress={(event) => {
+              initiateImagePicker({
+                encryptAndUploadFile,
+                insertImage: (params: InsertImageParams) => {
+                  onUpdate({ variant: "insert-image", params });
+                },
+                updateImageAttributes: (
+                  params: UpdateImageAttributesParams
+                ) => {
+                  onUpdate({ variant: "update-image-attributes", params });
+                },
+              });
+            }}
+            name="image-line"
+            isActive={false}
           />
         </HStack>
       </ScrollView>
