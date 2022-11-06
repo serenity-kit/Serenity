@@ -22,7 +22,6 @@ type Props = {
   workspaceId: string;
   refetchDocuments: () => void;
   onUpdateNamePress: () => void;
-  onCreateShareLinkPress: () => void;
 };
 
 type Context = {
@@ -174,18 +173,6 @@ export default function SidebarPageMenu(props: Props) {
           testID={`sidebar-document-menu--${props.documentId}__rename`}
         >
           Rename
-        </MenuButton>
-        {/* FIXME: link sharing here until we find a better place */}
-        <MenuButton
-          onPress={() => {
-            send("createShareLink");
-            props.onCreateShareLinkPress();
-          }}
-          iconName="link"
-          shortcut={<Shortcut letter="S" />}
-          testID={`sidebar-document-menu--${props.documentId}__create-share-link`}
-        >
-          Share
         </MenuButton>
         <MenuButton
           onPress={() => {
