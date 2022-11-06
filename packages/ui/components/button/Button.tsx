@@ -94,6 +94,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
     variant = "primary",
     size = isEqualOrLargerThanXS ? "md" : "lg",
     isLoading = false,
+    style,
     ...rest
   } = props;
   const disabled = props.disabled || isLoading;
@@ -149,6 +150,7 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
       testID={props.testID}
       ref={ref}
       disabled={disabled}
+      style={style}
       {...rest}
       accessibilityRole={props.accessibilityRole ?? "button"}
       // @ts-expect-error - web only
@@ -158,11 +160,11 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
       // disable default outline styles
       _focusVisible={{
         // @ts-expect-error - web only
-        _web: { style: { outlineStyle: "none" } },
+        _web: { style: [style, { outlineStyle: "none" }] },
       }}
       _focus={{
         // @ts-expect-error - web only
-        _web: { style: { outlineStyle: "none" } },
+        _web: { style: [style, { outlineStyle: "none" }] },
       }}
     >
       {({ isPressed, isHovered, isFocused }) => {
