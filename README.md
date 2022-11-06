@@ -11,6 +11,12 @@ yarn
 cp apps/backend/.env.example apps/backend/.env
 ```
 
+In addition fill out the FILE_STORAGE related secrets in the .env file. In case it's a new bucket you also need to enable CORS by running.
+
+```sh
+yarn workspace backend r2:enable-cor
+```
+
 ## Development
 
 ### Backend
