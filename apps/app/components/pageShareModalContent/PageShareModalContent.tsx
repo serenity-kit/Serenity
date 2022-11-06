@@ -25,22 +25,25 @@ import { notNull } from "../../utils/notNull/notNull";
 
 const styles = StyleSheet.create({
   createShareLinkButton: tw`mb-8 self-start`,
+  shareLinkWrapperBase: tw`relative mb-2 py-4 px-5 border rounded`,
+  shareLinkWrapperActive: tw`bg-primary-100/40 border-primary-200`,
+  shareLinkWrapperInactive: tw`bg-gray-100 border-gray-200`,
+  shareLinkTextActive: tw`text-primary-900`,
+  shareLinkTextInactive: tw`text-gray-400`,
 });
 
-const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 2;
+const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 1;
 
 export function PageShareModalContent() {
   const route = useRoute<RouteProp<WorkspaceDrawerParamList, "Page">>();
-  const [documentShareLinksResult] = useDocumentShareLinksQuery({
-    variables: { documentId: route.params.pageId },
-  });
+  const [documentShareLinksResult, refetchDocumentShareLinks] =
+    useDocumentShareLinksQuery({
+      variables: { documentId: route.params.pageId },
+    });
   const isDesktopDevice = useIsDesktopDevice();
   const { activeDevice } = useWorkspaceContext();
 
   const [isClipboardNoticeActive, setIsClipboardNoticeActive] = useState(false);
-  const [selectedPageShareLinkToken, setSelectedPageShareLinkToken] = useState<
-    string | null
-  >(null);
   const [pageShareLink, setPageShareLink] = useState<string | null>(null);
 
   const documentShareLinks =
@@ -60,9 +63,8 @@ export function PageShareModalContent() {
         creatorDevice,
         creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
       });
-      console.log(shareLinkData);
-      setSelectedPageShareLinkToken(shareLinkData.token);
       setPageShareLink(shareLinkData.documentShareLink);
+      refetchDocumentShareLinks();
     } catch (error) {
       console.error(error.message);
     }
@@ -91,17 +93,29 @@ export function PageShareModalContent() {
             </InfoMessage>
           ) : (
             <>
-              <View>
+              <View
+                style={[
+                  styles.shareLinkWrapperBase,
+                  pageShareLink
+                    ? styles.shareLinkWrapperActive
+                    : styles.shareLinkWrapperInactive,
+                ]}
+              >
                 <Text
                   variant="xs"
                   testID="workspaceInvitationInstructionsText"
-                  selectable={selectedPageShareLinkToken !== null}
+                  selectable={pageShareLink !== null}
+                  style={[
+                    pageShareLink
+                      ? styles.shareLinkTextActive
+                      : styles.shareLinkTextInactive,
+                  ]}
                 >
-                  {selectedPageShareLinkToken !== null
+                  {pageShareLink !== null
                     ? pageShareLink
                     : 'The share link will be generated here\nClick on "Create page share link" to generate a new link'}
                 </Text>
-                {selectedPageShareLinkToken !== null ? (
+                {pageShareLink !== null ? (
                   <View style={tw`absolute right-3 top-3`}>
                     <Tooltip
                       label={
@@ -141,7 +155,7 @@ export function PageShareModalContent() {
                       mainItem={
                         <>
                           <ListText style={[tw`w-1/2 md:w-2/3`]}>
-                            https://serenity.re/accept-workspace-invitation
+                            https://serenity.re/page
                           </ListText>
                           <ListText>/</ListText>
                           <ListText style={[tw`w-1/2 md:w-1/4`]} bold>
