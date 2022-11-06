@@ -100,6 +100,7 @@ model User {
   sessions                                   Session[]
   pendingWorkspaceInvitationId               String?
   creatorDevices                             CreatorDevice[]
+  documentShareLinks                         DocumentShareLink[]
 }
 
 model Session {
@@ -208,8 +209,8 @@ model WorkspaceKeyBox {
   workspaceKey                  WorkspaceKey  @relation(fields: [workspaceKeyId], references: [id], onDelete: Cascade)
   workspaceKeyId                String
   deviceSigningPublicKey        String
-  creatorDeviceSigningPublicKey String        @default("invalid")
-  nonce                         String        @default("invalid")
+  creatorDeviceSigningPublicKey String
+  nonce                         String
   ciphertext                    String
   creatorDevice                 CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
 }
@@ -223,7 +224,7 @@ model Folder {
   workspace          Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId        String
   workspaceKey       WorkspaceKey? @relation(fields: [workspaceKeyId], references: [id], onDelete: SetDefault)
-  workspaceKeyId     String        @default("invalid")
+  workspaceKeyId     String
   parentFolder       Folder?       @relation(name: "parentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
   parentFolderId     String?
   keyDerivationTrace Json          @default("{}")
@@ -239,12 +240,13 @@ model Folder {
 
 model DocumentShareLink {
   token                     String   @id @unique @default(uuid())
-  sharerUserId              String   @default("invalid")
-  documentId                String
+  sharer                    User     @relation(fields: [sharerUserId], references: [id], onDelete: Cascade)
+  sharerUserId              String
   document                  Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId                String
   role                      Role     @default(VIEWER)
-  deviceSecretBoxCiphertext String   @default("invalid")
-  deviceSecretBoxNonce      String   @default("invalid")
+  deviceSecretBoxCiphertext String
+  deviceSecretBoxNonce      String
 }
 
 model SnapshotKeyBox {
@@ -252,8 +254,8 @@ model SnapshotKeyBox {
   snapshot                      Snapshot      @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
   snapshotId                    String
   deviceSigningPublicKey        String
-  creatorDeviceSigningPublicKey String        @default("invalid")
-  nonce                         String        @default("invalid")
+  creatorDeviceSigningPublicKey String
+  nonce                         String
   ciphertext                    String
   creatorDevice                 CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
 }
