@@ -257,9 +257,6 @@ export default function SidebarPage(props: Props) {
             onUpdateNamePress={() => {
               setIsEditing(true);
             }}
-            onCreateShareLinkPress={() => {
-              createShareLink();
-            }}
           />
         </HStack>
       </HStack>
