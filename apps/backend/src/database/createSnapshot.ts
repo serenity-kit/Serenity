@@ -63,6 +63,7 @@ export async function createSnapshot(
         "Snapshot does not include the latest changes."
       );
     }
+    console.log({ snapshot });
 
     return await prisma.snapshot.create({
       data: {
@@ -74,8 +75,9 @@ export async function createSnapshot(
           connect: { id: snapshot.publicData.docId },
         },
         document: { connect: { id: snapshot.publicData.docId } },
-        subkeyId: snapshot.subkeyId,
-        keyDerivationTrace: snapshot.keyDerivationTrace! as KeyDerivationTrace,
+        subkeyId: snapshot.publicData.subkeyId,
+        keyDerivationTrace: snapshot.publicData
+          .keyDerivationTrace! as KeyDerivationTrace,
         clocks: {},
       },
     });

@@ -139,6 +139,7 @@ export const createInitialWorkspaceStructure = async ({
     documentId: document.id,
     documentEncryptionKey,
     subkeyId: snapshotKeyData.subkeyId,
+    keyDerivationTrace: undefined,
   });
 
   const result = await graphql.client.request(

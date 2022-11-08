@@ -104,6 +104,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         documentId,
         documentEncryptionKey: snapshotKey,
         subkeyId: snapshotKeyData.subkeyId,
+        keyDerivationTrace: undefined,
       });
 
       const createInitialWorkspaceStructureResult =

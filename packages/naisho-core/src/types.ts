@@ -7,6 +7,8 @@ export interface SnapshotPublicData {
   docId: string;
   pubKey: string; // public signing key
   snapshotId: string;
+  subkeyId: number;
+  keyDerivationTrace?: KeyDerivationTrace | undefined;
 }
 
 export interface SnapshotServerData {
@@ -51,8 +53,6 @@ export interface Snapshot {
   nonce: string;
   signature: string; // ciphertext + nonce + publicData
   publicData: SnapshotPublicData;
-  subkeyId: number;
-  keyDerivationTrace?: KeyDerivationTrace | undefined;
 }
 
 export interface SnapshotWithServerData extends Snapshot {

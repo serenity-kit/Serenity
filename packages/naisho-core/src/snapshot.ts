@@ -56,7 +56,6 @@ export async function createSnapshot(
   content,
   publicData: SnapshotPublicData,
   key: Uint8Array,
-  subkeyId: number,
   signatureKeyPair: KeyPair
 ) {
   const publicDataAsBase64 = sodium.to_base64(
@@ -77,7 +76,6 @@ export async function createSnapshot(
     ciphertext,
     publicData,
     signature,
-    subkeyId,
   };
 
   return snapshot;

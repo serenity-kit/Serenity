@@ -117,6 +117,7 @@ export default async function createUserWithWorkspace({
     documentId,
     documentEncryptionKey,
     subkeyId: snapshotKeyData.subkeyId,
+    keyDerivationTrace: undefined,
   });
 
   const createWorkspaceResult = await createInitialWorkspaceStructure({

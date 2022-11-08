@@ -47,6 +47,7 @@ const setup = async () => {
     documentId,
     documentEncryptionKey,
     subkeyId: snapshotKeyData.subkeyId,
+    keyDerivationTrace: undefined,
   });
 };
 
