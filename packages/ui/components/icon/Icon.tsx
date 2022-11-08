@@ -108,6 +108,7 @@ import { Underline } from "./icons/Underline";
 import { UserLine } from "./icons/UserLine";
 import { UserSettingsLine } from "./icons/UserSettingsLine";
 import { WarningFill } from "./icons/WarningFill";
+import { WindowLine } from "./icons/WindowLine";
 
 import { View } from "react-native";
 import { useIsSmallerThanBreakpoint } from "../../hooks/useIsSmallerThanBreakpoint/useIsSmallerThanBreakpoint";
@@ -221,7 +222,8 @@ export type IconNames =
   | "underline"
   | "user-line"
   | "user-settings-line"
-  | "warning-fill";
+  | "warning-fill"
+  | "window-line";
 
 export type IconProps = {
   name: IconNames;
@@ -565,6 +567,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "warning-fill") {
     icon = <WarningFill color={color} size={iconSize} />;
+  }
+  if (name === "window-line") {
+    icon = <WindowLine color={color} size={iconSize} />;
   }
 
   if (!icon) return null;

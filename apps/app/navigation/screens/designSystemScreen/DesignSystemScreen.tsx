@@ -1136,6 +1136,7 @@ export default function DesignSystemScreen() {
             <IconTile name="group-line" />
             <IconTile name="computer-line" />
             <IconTile name="device-line" />
+            <IconTile name="window-line" />
             <IconTile name="download-line" />
             <IconTile name="printer-line" />
             <IconTile name="search-line" />
