@@ -97,7 +97,6 @@ export default function RegistrationVerificationScreen(
       // FIXME: allow non-extended login by storing into sessionStorage
       // for now this is a HACK to support devices and workspaceKeyBoxes
       const useExtendedLogin = true;
-
       const loginResult = await login({
         username,
         password,
@@ -110,7 +109,6 @@ export default function RegistrationVerificationScreen(
       await fetchMainDevice({
         exportKey: loginResult.result.exportKey,
       });
-
       if (Platform.OS === "web") {
         await removeWebDevice();
         await setWebDevice(unsafedDevice, useExtendedLogin);

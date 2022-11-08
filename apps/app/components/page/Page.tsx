@@ -20,7 +20,7 @@ import {
   verifyAndDecryptSnapshot,
   verifyAndDecryptUpdate,
 } from "@naisho/core";
-import { createSnapshotKey, recreateDocumentKey } from "@serenity-tools/common";
+import { recreateSnapshotKey } from "@serenity-tools/common";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -32,13 +32,16 @@ import {
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
-import { Document, runMeQuery } from "../../generated/graphql";
+import {
+  Document,
+  KeyDerivationTrace,
+  runMeQuery,
+} from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigation";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 const reconnectTimeout = 2000;
 
@@ -201,47 +204,36 @@ export default function Page({
         // TODO
         console.error(err);
       }
-      if (!document) {
-        console.error("Document not found");
-        return;
-      }
       // communicate to other components e.g. sidebar or topbar
       // the currently active document
       updateActiveDocumentInfoStore(document, activeDevice);
 
-      const workspace = await getWorkspace({
-        workspaceId: document.workspaceId!,
-        deviceSigningPublicKey: activeDevice.signingPublicKey,
-      });
-      // TODO: use the existing snapshot's key derivatio traced workspace key
-      // const workspaceKeyId = snapshot.keyDervationTrace.workspaceKeyId;
-      const workspaceKeyId = workspace?.currentWorkspaceKey?.id;
-      const folderKeyData = await deriveFolderKey({
-        folderId: document.parentFolderId!,
-        workspaceKeyId,
-        workspaceId: document.workspaceId!,
-        activeDevice,
-      });
-      const folderKeyString = folderKeyData.folderKeyData.key;
-      const documentKey = await recreateDocumentKey({
-        folderKey: folderKeyString,
-        subkeyId: document.contentSubkeyId!,
-      });
-      // const snapshotKey = sodium.from_base64(documentKey.key);
-      const snapshotKeyDerivationTrace = await deriveFolderKey({
-        folderId: document.parentFolderId!,
-        workspaceKeyId,
-        workspaceId: document.workspaceId!,
-        activeDevice,
-      });
-      const snapshotKeyData = await createSnapshotKey({
-        folderKey: snapshotKeyDerivationTrace.folderKeyData.key,
-      });
-      const snapshotKey = sodium.from_base64(snapshotKeyData.key);
-      const snapshotSubkeyId = snapshotKeyData.subkeyId;
+      let snapshotKeyDerivationTrace: KeyDerivationTrace | undefined;
+      let snapshotKey: Uint8Array | undefined = undefined;
+      let snapshotSubkeyId: number | undefined = undefined;
 
       const onWebsocketMessage = async (event) => {
         const data = JSON.parse(event.data);
+        if (!document) {
+          console.log("waiting for document");
+          return;
+        }
+        if (!snapshotKey) {
+          snapshotKeyDerivationTrace = data.snapshot.keyDervationTrace;
+          const workspaceKeyId = snapshotKeyDerivationTrace?.workspaceKeyId;
+          const folderKeyChainData = await deriveFolderKey({
+            folderId: document.parentFolderId!,
+            workspaceKeyId,
+            workspaceId: document.workspaceId!,
+            activeDevice,
+          });
+          const snapshotKeyData = await recreateSnapshotKey({
+            folderKey: folderKeyChainData.folderKeyData.key,
+            subkeyId: data.snapshot.subkeyId,
+          });
+          snapshotKey = sodium.from_base64(snapshotKeyData.key);
+          snapshotSubkeyId = snapshotKeyData.subkeyId;
+        }
         switch (data.type) {
           case "documentNotFound":
             // TODO stop reconnecting
@@ -442,6 +434,10 @@ export default function Page({
       yAwarenessRef.current.on(
         "update",
         async ({ added, updated, removed }) => {
+          if (!snapshotKey) {
+            console.log("snapshot key not yet available");
+            return;
+          }
           if (!getWebsocketState().connected) {
             return;
           }

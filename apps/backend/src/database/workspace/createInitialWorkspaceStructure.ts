@@ -1,6 +1,6 @@
 import { Snapshot } from "@naisho/core";
 import { Document, formatDocument } from "../../types/document";
-import { Folder, formatFolder } from "../../types/folder";
+import { Folder, formatFolder, KeyDerivationTrace } from "../../types/folder";
 import { Workspace } from "../../types/workspace";
 import { createSnapshot } from "../createSnapshot";
 import { createFolder } from "../folder/createFolder";
@@ -89,9 +89,15 @@ export async function createInitialWorkspaceStructure({
       },
     },
   });
-  const snapshotKeyDerivationTrace = {
+  const snapshotKeyDerivationTrace: KeyDerivationTrace = {
     workspaceKeyId: workspaceKey?.id!,
-    parentFolders: [],
+    parentFolders: [
+      {
+        folderId: folder.id,
+        parentFolderId: null,
+        subkeyId: folder.subkeyId,
+      },
+    ],
   };
   const fullDocumentSnapshot = {
     ...document.snapshot,
