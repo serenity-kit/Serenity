@@ -1,15 +1,21 @@
 import {
   Description,
   Heading,
+  IconButton,
   InfoMessage,
+  List,
+  ListHeader,
+  ListIconText,
+  ListItem,
+  ListText,
   SettingsContentWrapper,
-  Text,
+  useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
+import { format, formatDistance, parseJSON } from "date-fns";
 import { useState } from "react";
-import { FlatList, useWindowDimensions } from "react-native";
-import DeviceListItem from "../../../components/deviceListItem/DeviceListItem";
+import { useWindowDimensions } from "react-native";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import {
   useDeleteDevicesMutation,
@@ -39,6 +45,7 @@ export default function DeviceManagerScreen(props) {
     useState<string | undefined>(undefined);
   const { activeDevice } = useWorkspaceContext();
   useWindowDimensions();
+  const isDesktopDevice = useIsDesktopDevice();
 
   const [devicesResult, fetchDevices] = useDevicesQuery({
     variables: {
@@ -124,6 +131,19 @@ export default function DeviceManagerScreen(props) {
     setSigningPublicKeyToBeDeleted(undefined);
   };
 
+  const devices = devicesResult.data?.devices?.nodes?.filter(notNull) || [];
+
+  const getExpiredTextFromString = (date: string) => {
+    const prefix = !isDesktopDevice ? "Expires " : "";
+
+    return (
+      prefix +
+      formatDistance(parseJSON(date), new Date(), {
+        addSuffix: true,
+      })
+    );
+  };
+
   return (
     <>
       <SettingsContentWrapper title={"Devices"}>
@@ -136,29 +156,72 @@ export default function DeviceManagerScreen(props) {
             to your account.
           </Description>
         </View>
-        <FlatList
-          data={devicesResult.data?.devices?.nodes?.filter(notNull) || []}
-          keyExtractor={(item) => item.signingPublicKey}
-          renderItem={({ item }) => (
-            <DeviceListItem
-              isActiveDevice={
-                activeDevice.signingPublicKey === item.signingPublicKey
-              }
-              signingPublicKey={item.signingPublicKey}
-              encryptionPublicKey={item.encryptionPublicKey}
-              encryptionPublicKeySignature={item.encryptionPublicKeySignature}
-              createdAt={item.createdAt}
-              expiresAt={item.mostRecentSession?.expiresAt}
-              info={item.info}
-              onDeletePress={() => deleteDevicePreflight(item.signingPublicKey)}
+        <List
+          data={devices}
+          emptyString={"No devices found."}
+          header={
+            <ListHeader
+              data={["name", "created at", "expires"]}
+              mainIsIconText
             />
-          )}
-          ListEmptyComponent={() => (
-            <View>
-              <Text>No devices</Text>
-            </View>
-          )}
-        />
+          }
+        >
+          {devices.map((device) => {
+            const deviceInfoJson = JSON.parse(device.info!);
+
+            let deviceName = "";
+            switch (deviceInfoJson.type) {
+              case "web":
+                deviceName = deviceInfoJson.browser;
+                break;
+              case "main":
+                deviceName = "Main";
+                break;
+              default:
+                deviceName = deviceInfoJson.os;
+            }
+
+            const isMainDevice = deviceInfoJson.type === "main";
+            const isWebDevice = deviceInfoJson.type === "web";
+            const isActiveDevice =
+              activeDevice.signingPublicKey === device.signingPublicKey;
+
+            return (
+              <ListItem
+                key={device.signingPublicKey}
+                mainItem={
+                  <ListIconText
+                    iconName={isWebDevice ? "window-line" : "device-line"}
+                    main={deviceName + (isActiveDevice ? " (this device)" : "")}
+                    secondary={
+                      (!isDesktopDevice ? "Created at " : "") +
+                      format(parseJSON(device.createdAt), "yyyy-MM-dd")
+                    }
+                  ></ListIconText>
+                }
+                secondaryItem={
+                  <ListText secondary>
+                    {isWebDevice &&
+                      getExpiredTextFromString(
+                        device.mostRecentSession?.expiresAt
+                      )}
+                  </ListText>
+                }
+                actionItem={
+                  !isMainDevice && !isActiveDevice ? (
+                    <IconButton
+                      name={"delete-bin-line"}
+                      color={isDesktopDevice ? "gray-900" : "gray-700"}
+                      onPress={() =>
+                        deleteDevicePreflight(device.signingPublicKey)
+                      }
+                    />
+                  ) : null
+                }
+              ></ListItem>
+            );
+          })}
+        </List>
         <InfoMessage>
           Devices using the mobile application are always active, web devices on
           the other hand expire automatically after max 30 days after login,
