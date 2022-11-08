@@ -31,6 +31,7 @@ import { CloseCircleFill } from "./icons/CloseCircleFill";
 import { CodeSSlashLine } from "./icons/CodeSSlashLine";
 import { CodeView } from "./icons/CodeView";
 import { CommandLine } from "./icons/CommandLine";
+import { ComputerLine } from "./icons/ComputerLine";
 import { CupLine } from "./icons/CupLine";
 import { Cursor } from "./icons/Cursor";
 import { DashboardLine } from "./icons/DashboardLine";
@@ -144,6 +145,7 @@ export type IconNames =
   | "code-s-slash-line"
   | "code-view"
   | "command-line"
+  | "computer-line"
   | "cup-line"
   | "cursor"
   | "dashboard-line"
@@ -332,6 +334,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "command-line") {
     icon = <CommandLine color={color} size={iconSize} />;
+  }
+  if (name === "computer-line") {
+    icon = <ComputerLine color={color} size={iconSize} />;
   }
   if (name === "cup-line") {
     icon = <CupLine color={color} size={iconSize} />;
