@@ -1066,6 +1066,7 @@ export type WorkspaceLoadingInfo = {
   documentId?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   isAuthorized: Scalars['Boolean'];
+  role: Role;
 };
 
 export type WorkspaceMember = {
@@ -1369,7 +1370,7 @@ export type MeWithWorkspaceLoadingInfoQueryVariables = Exact<{
 }>;
 
 
-export type MeWithWorkspaceLoadingInfoQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null } | null } | null };
+export type MeWithWorkspaceLoadingInfoQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string, workspaceLoadingInfo?: { __typename?: 'WorkspaceLoadingInfo', id: string, isAuthorized: boolean, documentId?: string | null, role: Role } | null } | null };
 
 export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2161,6 +2162,7 @@ export const MeWithWorkspaceLoadingInfoDocument = gql`
       id
       isAuthorized
       documentId
+      role
     }
   }
 }
