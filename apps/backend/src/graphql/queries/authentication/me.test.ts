@@ -46,6 +46,7 @@ const meWithWorkspaceLoadingInfoQuery = gql`
         id
         isAuthorized
         documentId
+        role
       }
     }
   }
@@ -123,6 +124,7 @@ test("should be able to get the workspaceLoadingInfo with a defined workspaceId 
       "documentId": "3593ca39-3411-4d44-b803-8ee60edeeec2",
       "id": "97b2f730-c15e-471f-ab47-ef0576bb04c2",
       "isAuthorized": true,
+      "role": "ADMIN",
     }
   `);
 });
@@ -144,6 +146,7 @@ test("should get the fallback workspace if the workspaceId is not available and 
       "documentId": "3593ca39-3411-4d44-b803-8ee60edeeec2",
       "id": "97b2f730-c15e-471f-ab47-ef0576bb04c2",
       "isAuthorized": true,
+      "role": "ADMIN",
     }
   `);
 });
@@ -179,6 +182,7 @@ test("should be able to get the workspaceLoadingInfo, but another documentId if 
       "documentId": "3593ca39-3411-4d44-b803-8ee60edeeec2",
       "id": "97b2f730-c15e-471f-ab47-ef0576bb04c2",
       "isAuthorized": true,
+      "role": "ADMIN",
     }
   `);
 });
@@ -199,6 +203,7 @@ test("should get the workspaceLoadingInfo, but no documentId if the provided doc
       "documentId": null,
       "id": "97b2f730-c15e-471f-ab47-ef0576bb04c2",
       "isAuthorized": true,
+      "role": "ADMIN",
     }
   `);
 });

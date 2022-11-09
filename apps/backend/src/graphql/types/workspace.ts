@@ -81,6 +81,7 @@ export const WorkspaceLoadingInfo = objectType({
   definition(t) {
     t.nonNull.string("id");
     t.nonNull.boolean("isAuthorized");
+    t.nonNull.field("role", { type: MemberRoleEnum });
     t.string("documentId");
   },
 });
