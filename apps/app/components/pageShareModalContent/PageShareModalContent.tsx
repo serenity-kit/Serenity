@@ -1,6 +1,4 @@
-import { createSnapshot } from "@naisho/core";
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { createSnapshotKey } from "@serenity-tools/common";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import {
   Button,
@@ -20,7 +18,6 @@ import {
 import * as Clipboard from "expo-clipboard";
 import { useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
-import { v4 as uuidv4 } from "uuid";
 import {
   runRemoveDocumentShareLinkMutation,
   useDocumentShareLinksQuery,
@@ -28,11 +25,8 @@ import {
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerParamList } from "../../types/navigation";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
-import { buildSnapshotDeviceKeyBoxes } from "../../utils/document/buildSnapshotDeviceKeyBoxes";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
-import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { notNull } from "../../utils/notNull/notNull";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 const styles = StyleSheet.create({
   createShareLinkButton: tw`mb-8 self-start`,
@@ -89,62 +83,8 @@ export function PageShareModalContent() {
   };
 
   const removeShareLink = async (token: string) => {
-    if (!activeDocument) {
-      console.error("document not found");
-      return;
-    }
-    const workspace = await getWorkspace({
-      workspaceId: activeDocument.workspaceId!,
-      deviceSigningPublicKey: activeDevice.signingPublicKey,
-    });
-    if (!workspace) {
-      console.error("workspace not found");
-      return;
-    }
-    if (!workspace.currentWorkspaceKey) {
-      console.error("No workspace key found for this workspace");
-      return;
-    }
-    const keyTrace = await deriveFolderKey({
-      folderId: activeDocument?.parentFolderId!,
-      workspaceId: activeDocument?.workspaceId!,
-      workspaceKeyId: workspace.currentWorkspaceKey?.id,
-      activeDevice,
-    });
-    const snapshotKeyData = await createSnapshotKey({
-      folderKey: keyTrace.folderKeyData.key,
-    });
-    // FIXME: grab the latest content for the snapshot
-    const content = "";
-    const snapshot = await createSnapshot(
-      content,
-      {
-        docId: route.params.pageId,
-        pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-        snapshotId: uuidv4(),
-      },
-      sodium.from_base64(snapshotKeyData.key),
-      signatureKeyPair
-    );
-    const snapshotDeviceKeyBoxes = await buildSnapshotDeviceKeyBoxes({
-      snapshotKey: snapshotKeyData.key,
-      workspaceId: workspace.id,
-      creatorDevice: activeDevice,
-    });
     const removeDocumentShareLink = await runRemoveDocumentShareLinkMutation(
-      {
-        input: {
-          token,
-          creatorDevice: {
-            signingPublicKey: activeDevice.signingPublicKey,
-            encryptionPublicKey: activeDevice.encryptionPublicKey,
-            encryptionPublicKeySignature:
-              activeDevice.encryptionPublicKeySignature!,
-          },
-          snapshot,
-          snapshotDeviceKeyBoxes,
-        },
-      },
+      { input: { token } },
       {}
     );
     if (!removeDocumentShareLink.data?.removeDocumentShareLink?.success) {

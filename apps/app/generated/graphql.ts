@@ -137,12 +137,6 @@ export type CreatorDevice = {
   signingPublicKey: Scalars['String'];
 };
 
-export type CreatorDeviceInput = {
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
-  signingPublicKey: Scalars['String'];
-};
-
 export type DeleteDevicesInput = {
   creatorSigningPublicKey: Scalars['String'];
   deviceSigningPublicKeysToBeDeleted: Array<Scalars['String']>;
@@ -809,9 +803,6 @@ export type QueryWorkspacesArgs = {
 };
 
 export type RemoveDocumentShareLinkInput = {
-  creatorDevice: CreatorDeviceInput;
-  snapshot: DocumentSnapshotInput;
-  snapshotDeviceKeyBoxes: Array<SnapshotDeviceKeyBoxInput>;
   token: Scalars['String'];
 };
 
