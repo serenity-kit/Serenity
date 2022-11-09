@@ -1,4 +1,7 @@
+import { createSnapshot } from "@naisho/core";
 import { RouteProp, useRoute } from "@react-navigation/native";
+import { createSnapshotKey } from "@serenity-tools/common";
+import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import {
   Button,
   IconButton,
@@ -15,13 +18,21 @@ import {
   View,
 } from "@serenity-tools/ui";
 import * as Clipboard from "expo-clipboard";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
-import { useDocumentShareLinksQuery } from "../../generated/graphql";
+import { v4 as uuidv4 } from "uuid";
+import {
+  runRemoveDocumentShareLinkMutation,
+  useDocumentShareLinksQuery,
+} from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerParamList } from "../../types/navigation";
+import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
+import { buildSnapshotDeviceKeyBoxes } from "../../utils/document/buildSnapshotDeviceKeyBoxes";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
+import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { notNull } from "../../utils/notNull/notNull";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 const styles = StyleSheet.create({
   createShareLinkButton: tw`mb-8 self-start`,
@@ -42,10 +53,17 @@ export function PageShareModalContent() {
     });
   const isDesktopDevice = useIsDesktopDevice();
   const { activeDevice } = useWorkspaceContext();
+  const signatureKeyPair: KeyPair = useMemo(() => {
+    return {
+      publicKey: sodium.from_base64(activeDevice.signingPublicKey),
+      privateKey: sodium.from_base64(activeDevice.signingPrivateKey!),
+      keyType: "ed25519",
+    };
+  }, [activeDevice]);
 
   const [isClipboardNoticeActive, setIsClipboardNoticeActive] = useState(false);
   const [pageShareLink, setPageShareLink] = useState<string | null>(null);
-
+  const activeDocument = useActiveDocumentInfoStore((state) => state.document);
   const documentShareLinks =
     documentShareLinksResult.data?.documentShareLinks?.nodes?.filter(notNull) ||
     [];
@@ -70,11 +88,78 @@ export function PageShareModalContent() {
     }
   };
 
-  const copyInvitationText = () => {
+  const removeShareLink = async (token: string) => {
+    if (!activeDocument) {
+      console.error("document not found");
+      return;
+    }
+    const workspace = await getWorkspace({
+      workspaceId: activeDocument.workspaceId!,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
+    if (!workspace) {
+      console.error("workspace not found");
+      return;
+    }
+    if (!workspace.currentWorkspaceKey) {
+      console.error("No workspace key found for this workspace");
+      return;
+    }
+    const keyTrace = await deriveFolderKey({
+      folderId: activeDocument?.parentFolderId!,
+      workspaceId: activeDocument?.workspaceId!,
+      workspaceKeyId: workspace.currentWorkspaceKey?.id,
+      activeDevice,
+    });
+    const snapshotKeyData = await createSnapshotKey({
+      folderKey: keyTrace.folderKeyData.key,
+    });
+    // FIXME: grab the latest content for the snapshot
+    const content = "";
+    const snapshot = await createSnapshot(
+      content,
+      {
+        docId: route.params.pageId,
+        pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+        snapshotId: uuidv4(),
+      },
+      sodium.from_base64(snapshotKeyData.key),
+      signatureKeyPair
+    );
+    const snapshotDeviceKeyBoxes = await buildSnapshotDeviceKeyBoxes({
+      snapshotKey: snapshotKeyData.key,
+      workspaceId: workspace.id,
+      creatorDevice: activeDevice,
+    });
+    const removeDocumentShareLink = await runRemoveDocumentShareLinkMutation(
+      {
+        input: {
+          token,
+          creatorDevice: {
+            signingPublicKey: activeDevice.signingPublicKey,
+            encryptionPublicKey: activeDevice.encryptionPublicKey,
+            encryptionPublicKeySignature:
+              activeDevice.encryptionPublicKeySignature!,
+          },
+          snapshot,
+          snapshotDeviceKeyBoxes,
+        },
+      },
+      {}
+    );
+    if (!removeDocumentShareLink.data?.removeDocumentShareLink?.success) {
+      console.error(
+        removeDocumentShareLink.error?.message || "Could not remove share link"
+      );
+    }
+    refetchDocumentShareLinks();
+  };
+
+  const copyInvitationText = async () => {
     if (!pageShareLink) {
       return;
     }
-    Clipboard.setString(pageShareLink);
+    await Clipboard.setStringAsync(pageShareLink);
     setIsClipboardNoticeActive(true);
     setTimeout(() => {
       setIsClipboardNoticeActive(false);
@@ -169,6 +254,7 @@ export function PageShareModalContent() {
                           color={isDesktopDevice ? "gray-900" : "gray-700"}
                           onPress={() => {
                             // TODO delete documentShareLink
+                            removeShareLink(documentShareLink.token);
                           }}
                         />
                       }

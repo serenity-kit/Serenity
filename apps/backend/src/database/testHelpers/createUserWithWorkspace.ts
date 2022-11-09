@@ -158,5 +158,6 @@ export default async function createUserWithWorkspace({
     workspace: createWorkspaceResult.workspace,
     folder: createWorkspaceResult.folder,
     document: createWorkspaceResult.document,
+    snapshot: createWorkspaceResult.snapshot,
   };
 }
