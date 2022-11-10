@@ -1,4 +1,5 @@
 import { Snapshot } from "@naisho/core";
+import { Snapshot as SnapshotModel } from "../../../prisma/generated/output";
 import { Document, formatDocument } from "../../types/document";
 import { Folder, formatFolder } from "../../types/folder";
 import { Workspace } from "../../types/workspace";
@@ -33,6 +34,7 @@ export type CreateWorkspaceResult = {
   workspace: Workspace;
   document: Document;
   folder: Folder;
+  snapshot: SnapshotModel;
 };
 
 export async function createInitialWorkspaceStructure({
@@ -98,10 +100,11 @@ export async function createInitialWorkspaceStructure({
     ...documentSnapshot,
     keyDerivationTrace: snapshotKeyDerivationTrace,
   };
-  await createSnapshot(fullDocumentSnapshot);
+  const snapshot = await createSnapshot(fullDocumentSnapshot);
   return {
     workspace,
     document: formatDocument(document),
     folder: formatFolder(folder),
+    snapshot,
   };
 }

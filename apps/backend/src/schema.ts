@@ -13,6 +13,7 @@ import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDe
 import * as CreateDocumentMutationTypes from "./graphql/mutations/document/createDocument";
 import * as CreateDocumentShareLinkTypes from "./graphql/mutations/document/createDocumentShareLink";
 import * as DeleteDocumentsMutationTypes from "./graphql/mutations/document/deleteDocuments";
+import * as RemoveDocumentShareLinkTypes from "./graphql/mutations/document/removeDocumentShareLink";
 import * as UpdateDocumentNameMutationTypes from "./graphql/mutations/document/updateDocumentName";
 import * as InitiateFileUploadMutationTypes from "./graphql/mutations/file/initiateFileUpload";
 import * as CreateFolderMutationTypes from "./graphql/mutations/folder/createFolder";
@@ -72,6 +73,7 @@ export const schema = makeSchema({
     FirstDocumentQueryTypes,
     DocumentQueryTypes,
     CreateDocumentShareLinkTypes,
+    RemoveDocumentShareLinkTypes,
 
     DocumentShareLinkTypes,
     DocumentShareLinkQueryTypes,

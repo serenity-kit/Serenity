@@ -7,7 +7,7 @@ import {
   objectType,
 } from "nexus";
 import { createInitialWorkspaceStructure } from "../../../database/workspace/createInitialWorkspaceStructure";
-import { Document } from "../../types/document";
+import { Document, DocumentSnapshotInput } from "../../types/document";
 import { Folder } from "../../types/folder";
 import { Workspace } from "../../types/workspace";
 
@@ -17,25 +17,6 @@ export const DeviceWorkspaceKeyBoxInput = inputObjectType({
     t.nonNull.string("deviceSigningPublicKey");
     t.nonNull.string("nonce");
     t.nonNull.string("ciphertext");
-  },
-});
-
-export const DocumentSnapshotPublicDataInput = inputObjectType({
-  name: "DocumentSnapshotPublicDataInput",
-  definition(t) {
-    t.nonNull.string("docId");
-    t.nonNull.string("pubKey");
-    t.nonNull.string("snapshotId");
-  },
-});
-
-export const DocumentSnapshotInput = inputObjectType({
-  name: "DocumentSnapshotInput",
-  definition(t) {
-    t.nonNull.string("ciphertext");
-    t.nonNull.string("nonce");
-    t.nonNull.string("signature");
-    t.nonNull.field("publicData", { type: DocumentSnapshotPublicDataInput });
   },
 });
 

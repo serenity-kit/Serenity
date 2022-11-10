@@ -1,0 +1,5 @@
+mutation removeDocumentShareLink($input: RemoveDocumentShareLinkInput!) {
+  removeDocumentShareLink(input: $input) {
+    success
+  }
+}

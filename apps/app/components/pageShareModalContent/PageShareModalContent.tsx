@@ -1,4 +1,5 @@
 import { RouteProp, useRoute } from "@react-navigation/native";
+import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import {
   Button,
   IconButton,
@@ -15,11 +16,15 @@ import {
   View,
 } from "@serenity-tools/ui";
 import * as Clipboard from "expo-clipboard";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
-import { useDocumentShareLinksQuery } from "../../generated/graphql";
+import {
+  runRemoveDocumentShareLinkMutation,
+  useDocumentShareLinksQuery,
+} from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerParamList } from "../../types/navigation";
+import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { notNull } from "../../utils/notNull/notNull";
 
@@ -42,10 +47,17 @@ export function PageShareModalContent() {
     });
   const isDesktopDevice = useIsDesktopDevice();
   const { activeDevice } = useWorkspaceContext();
+  const signatureKeyPair: KeyPair = useMemo(() => {
+    return {
+      publicKey: sodium.from_base64(activeDevice.signingPublicKey),
+      privateKey: sodium.from_base64(activeDevice.signingPrivateKey!),
+      keyType: "ed25519",
+    };
+  }, [activeDevice]);
 
   const [isClipboardNoticeActive, setIsClipboardNoticeActive] = useState(false);
   const [pageShareLink, setPageShareLink] = useState<string | null>(null);
-
+  const activeDocument = useActiveDocumentInfoStore((state) => state.document);
   const documentShareLinks =
     documentShareLinksResult.data?.documentShareLinks?.nodes?.filter(notNull) ||
     [];
@@ -70,11 +82,24 @@ export function PageShareModalContent() {
     }
   };
 
-  const copyInvitationText = () => {
+  const removeShareLink = async (token: string) => {
+    const removeDocumentShareLink = await runRemoveDocumentShareLinkMutation(
+      { input: { token } },
+      {}
+    );
+    if (!removeDocumentShareLink.data?.removeDocumentShareLink?.success) {
+      console.error(
+        removeDocumentShareLink.error?.message || "Could not remove share link"
+      );
+    }
+    refetchDocumentShareLinks();
+  };
+
+  const copyInvitationText = async () => {
     if (!pageShareLink) {
       return;
     }
-    Clipboard.setString(pageShareLink);
+    await Clipboard.setStringAsync(pageShareLink);
     setIsClipboardNoticeActive(true);
     setTimeout(() => {
       setIsClipboardNoticeActive(false);
@@ -169,6 +194,7 @@ export function PageShareModalContent() {
                           color={isDesktopDevice ? "gray-900" : "gray-700"}
                           onPress={() => {
                             // TODO delete documentShareLink
+                            removeShareLink(documentShareLink.token);
                           }}
                         />
                       }

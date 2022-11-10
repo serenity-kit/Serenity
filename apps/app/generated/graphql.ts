@@ -498,6 +498,7 @@ export type Mutation = {
   finishRegistration?: Maybe<FinishRegistrationResult>;
   initiateFileUpload?: Maybe<InitiateFileUploadResult>;
   logout?: Maybe<LogoutResult>;
+  removeDocumentShareLink?: Maybe<RemoveDocumentShareLinkResult>;
   removeMembersAndRotateWorkspaceKey?: Maybe<RemoveMembersAndRotateWorkspaceKeyResult>;
   startLogin?: Maybe<StartLoginResult>;
   startRegistration?: Maybe<StartRegistrationResult>;
@@ -587,6 +588,11 @@ export type MutationFinishRegistrationArgs = {
 
 export type MutationInitiateFileUploadArgs = {
   input: InitiateFileUploadInput;
+};
+
+
+export type MutationRemoveDocumentShareLinkArgs = {
+  input: RemoveDocumentShareLinkInput;
 };
 
 
@@ -794,6 +800,15 @@ export type QueryWorkspacesArgs = {
   after?: InputMaybe<Scalars['String']>;
   deviceSigningPublicKey: Scalars['String'];
   first: Scalars['Int'];
+};
+
+export type RemoveDocumentShareLinkInput = {
+  token: Scalars['String'];
+};
+
+export type RemoveDocumentShareLinkResult = {
+  __typename?: 'RemoveDocumentShareLinkResult';
+  success: Scalars['Boolean'];
 };
 
 export type RemoveMembersAndRotateWorkspaceKeyInput = {
@@ -1208,6 +1223,13 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LogoutMutation = { __typename?: 'Mutation', logout?: { __typename?: 'LogoutResult', success: boolean } | null };
+
+export type RemoveDocumentShareLinkMutationVariables = Exact<{
+  input: RemoveDocumentShareLinkInput;
+}>;
+
+
+export type RemoveDocumentShareLinkMutation = { __typename?: 'Mutation', removeDocumentShareLink?: { __typename?: 'RemoveDocumentShareLinkResult', success: boolean } | null };
 
 export type RemoveMembersAndRotateWorkspaceKeyMutationVariables = Exact<{
   input: RemoveMembersAndRotateWorkspaceKeyInput;
@@ -1725,6 +1747,17 @@ export const LogoutDocument = gql`
 
 export function useLogoutMutation() {
   return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
+};
+export const RemoveDocumentShareLinkDocument = gql`
+    mutation removeDocumentShareLink($input: RemoveDocumentShareLinkInput!) {
+  removeDocumentShareLink(input: $input) {
+    success
+  }
+}
+    `;
+
+export function useRemoveDocumentShareLinkMutation() {
+  return Urql.useMutation<RemoveDocumentShareLinkMutation, RemoveDocumentShareLinkMutationVariables>(RemoveDocumentShareLinkDocument);
 };
 export const RemoveMembersAndRotateWorkspaceKeyDocument = gql`
     mutation removeMembersAndRotateWorkspaceKey($input: RemoveMembersAndRotateWorkspaceKeyInput!) {
@@ -2648,6 +2681,20 @@ export const runLogoutMutation = async (variables: LogoutMutationVariables, opti
   return await getUrqlClient()
     .mutation<LogoutMutation, LogoutMutationVariables>(
       LogoutDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runRemoveDocumentShareLinkMutation = async (variables: RemoveDocumentShareLinkMutationVariables, options: any) => {
+  return await getUrqlClient()
+    .mutation<RemoveDocumentShareLinkMutation, RemoveDocumentShareLinkMutationVariables>(
+      RemoveDocumentShareLinkDocument,
       variables,
       {
         // better to be safe here and always refetch
