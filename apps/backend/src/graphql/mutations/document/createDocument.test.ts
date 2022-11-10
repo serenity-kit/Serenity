@@ -5,6 +5,7 @@ import {
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
@@ -78,13 +79,44 @@ test("user should be able to create a document", async () => {
   expect(result.createDocument.id).toBe(id);
 });
 
-test("Invalid user role", async () => {
-  const otherUser = await registerUser(graphql, "user2", "password");
+test("commenter tries to create", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    "password"
+  );
   await prisma.usersToWorkspaces.create({
     data: {
       userId: otherUser.userId,
       workspaceId: addedWorkspace.id,
-      role: "VIEWER",
+      role: Role.COMMENTER,
+    },
+  });
+  await expect(
+    (async () =>
+      await createDocument({
+        id: uuidv4(),
+        graphql,
+        authorizationHeader: otherUser.sessionKey,
+        parentFolderId: addedFolder.parentFolderId,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        contentSubkeyId: 1,
+        workspaceId: addedWorkspace.id,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
+});
+
+test("viewer attempts to create", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    "password"
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.VIEWER,
     },
   });
   await expect(
