@@ -1134,7 +1134,9 @@ export default function DesignSystemScreen() {
             <IconTile name="user-line" />
             <IconTile name="user-settings-line" />
             <IconTile name="group-line" />
+            <IconTile name="computer-line" />
             <IconTile name="device-line" />
+            <IconTile name="window-line" />
             <IconTile name="download-line" />
             <IconTile name="printer-line" />
             <IconTile name="search-line" />
@@ -1281,6 +1283,30 @@ export default function DesignSystemScreen() {
             label={"Verification Key"}
             value="70909qer798q7987q"
             isDisabled
+          />
+        </DSExampleArea>
+        <Heading lvl={3}>Helper Text</Heading>
+        <Text variant="sm">
+          The <DSMono variant="property">helperText</DSMono> can be used to show
+          additional help when the user is focused on the input, which is
+          especially helpful for errors.
+        </Text>
+        <DSExampleArea vertical>
+          <Input
+            label={"Email"}
+            value="jane@example.com"
+            keyboardType="email-address"
+            placeholder="Enter your email …"
+            autoCapitalize="none"
+            helperText="helper Text"
+          />
+          <Input
+            label={"Password"}
+            secureTextEntry
+            value="foo"
+            placeholder="Enter your password …"
+            helperText="min 8 characters"
+            isInvalid
           />
         </DSExampleArea>
         <Heading lvl={3}>Hints</Heading>

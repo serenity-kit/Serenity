@@ -12,6 +12,7 @@ export * from "./encryptDocumentTitle/encryptDocumentTitle";
 export * from "./encryptExistingFolderName/encryptExistingFolderName";
 export * from "./encryptFolderName/encryptFolderName";
 export * from "./equalArrayContent/equalArrayContent";
+export * from "./getExpiredTextFromString/getExpiredTextFromString";
 export * from "./recreateDocumentKey/recreateDocumentKey";
 export * from "./recreateSnapshotKey/recreateSnapshotKey";
 export * from "./types";

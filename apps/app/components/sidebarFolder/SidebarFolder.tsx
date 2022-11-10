@@ -25,7 +25,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   runDeleteFoldersMutation,
   runUpdateFolderNameMutation,
-  useCreateDocumentMutation,
+  runCreateDocumentMutation,
   useCreateFolderMutation,
   useDocumentsQuery,
   useFoldersQuery,
@@ -71,7 +71,6 @@ export default function SidebarFolder(props: Props) {
   const [isDeleted, setIsDeleted] = useState(false);
   const isOpen = openFolderIds.includes(props.folderId);
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
-  const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
   const [foldersResult, refetchFolders] = useFoldersQuery({
     pause: !isOpen,
@@ -242,15 +241,18 @@ export default function SidebarFolder(props: Props) {
       folderId: props.folderId,
       workspaceKeyId: workspace.currentWorkspaceKey.id,
     });
-    const result = await createDocumentMutation({
-      input: {
-        id,
-        workspaceId: props.workspaceId,
-        parentFolderId: props.folderId,
-        contentSubkeyId: documentContentKeyResult.subkeyId,
-        nameKeyDerivationTrace,
+    const result = await runCreateDocumentMutation(
+      {
+        input: {
+          id,
+          workspaceId: props.workspaceId,
+          parentFolderId: props.folderId,
+          contentSubkeyId: documentContentKeyResult.subkeyId,
+          nameKeyDerivationTrace,
+        },
       },
-    });
+      {}
+    );
     if (result.data?.createDocument?.id) {
       navigation.navigate("Workspace", {
         workspaceId: route.params.workspaceId,
