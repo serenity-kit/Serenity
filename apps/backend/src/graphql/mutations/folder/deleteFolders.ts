@@ -14,6 +14,7 @@ export const DeleteFoldersInput = inputObjectType({
     t.nonNull.list.nonNull.field("ids", {
       type: "String",
     });
+    t.nonNull.string("workspaceId");
   },
 });
 
@@ -39,6 +40,7 @@ export const deleteFoldersMutation = mutationField("deleteFolders", {
     }
     await deleteFolders({
       folderIds: args.input.ids,
+      workspaceId: args.input.workspaceId,
       userId: context.user.id,
     });
     return { status: "success" };

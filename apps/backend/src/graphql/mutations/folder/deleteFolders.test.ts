@@ -1,5 +1,6 @@
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
@@ -114,6 +115,7 @@ test("user can delete a folder", async () => {
   await deleteFolders({
     graphql,
     ids: folderIds,
+    workspaceId: addedWorkspace.id,
     authorizationHeader: sessionKey,
   });
   // try to retrieve the folder. It should come back as null
@@ -157,6 +159,7 @@ test("deleting a parent folder will cascade to children", async () => {
   await deleteFolders({
     graphql,
     ids: folderIds,
+    workspaceId: addedWorkspace.id,
     authorizationHeader: sessionKey,
   });
   // try to retrieve the folder.  It should come back as null
@@ -199,6 +202,7 @@ test("user can delete multiple folders", async () => {
   await deleteFolders({
     graphql,
     ids: folderIds,
+    workspaceId: addedWorkspace.id,
     authorizationHeader: sessionKey,
   });
   // try to retrieve the folder.  It should come back as null
@@ -271,6 +275,7 @@ test("user can delete multiple folders", async () => {
   await deleteFolders({
     graphql,
     ids: folderIds,
+    workspaceId: addedWorkspace.id,
     authorizationHeader: sessionKey,
   });
   // try to retrieve the folder.  It should come back as null
@@ -303,6 +308,7 @@ test("user can't delete folders they don't own", async () => {
   await deleteFolders({
     graphql,
     ids: folderIds,
+    workspaceId: addedWorkspace.id,
     authorizationHeader: sessionKey,
   });
   // try to retrieve the folder.  It should come back as null
@@ -321,6 +327,7 @@ test("user can't delete folders that don't exist", async () => {
   await deleteFolders({
     graphql,
     ids: folderIds,
+    workspaceId: addedWorkspace.id,
     authorizationHeader: sessionKey,
   });
   // try to retrieve the folder.  It should come back as null
@@ -328,6 +335,58 @@ test("user can't delete folders that don't exist", async () => {
     where: { id: folderId },
   });
   expect(folder).toBe(null);
+});
+
+test("Commentor tries to delete", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.COMMENTER,
+    },
+  });
+  const folderId = "5b5d0365-5e68-499d-bf50-b20665c2cb5e";
+  const folderIds = [folderId];
+  await expect(
+    (async () =>
+      await deleteFolders({
+        graphql,
+        ids: folderIds,
+        workspaceId: addedWorkspace.id,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
+});
+
+test("Viewer tries to delete", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.VIEWER,
+    },
+  });
+  const folderId = "5b5d0365-5e68-499d-bf50-b20665c2cb5e";
+  const folderIds = [folderId];
+  await expect(
+    (async () =>
+      await deleteFolders({
+        graphql,
+        ids: folderIds,
+        workspaceId: addedWorkspace.id,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
 });
 
 test("Unauthenticated", async () => {
@@ -338,6 +397,7 @@ test("Unauthenticated", async () => {
       await deleteFolders({
         graphql,
         ids: folderIds,
+        workspaceId: addedWorkspace.id,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

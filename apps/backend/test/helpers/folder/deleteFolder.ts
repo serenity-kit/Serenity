@@ -3,12 +3,14 @@ import { gql } from "graphql-request";
 type Params = {
   graphql: any;
   ids: string[];
+  workspaceId: string;
   authorizationHeader: string;
 };
 
 export const deleteFolders = async ({
   graphql,
   ids,
+  workspaceId,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -23,7 +25,7 @@ export const deleteFolders = async ({
   `;
   const result = await graphql.client.request(
     query,
-    { input: { ids } },
+    { input: { ids, workspaceId } },
     authorizationHeaders
   );
   return result;
