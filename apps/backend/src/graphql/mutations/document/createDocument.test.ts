@@ -11,6 +11,7 @@ import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/d
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -75,6 +76,29 @@ test("user should be able to create a document", async () => {
     contentSubkeyId: documentContentKeyResult.subkeyId,
   });
   expect(result.createDocument.id).toBe(id);
+});
+
+test("Invalid user role", async () => {
+  const otherUser = await registerUser(graphql, "user2", "password");
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: "VIEWER",
+    },
+  });
+  await expect(
+    (async () =>
+      await createDocument({
+        id: uuidv4(),
+        graphql,
+        authorizationHeader: otherUser.sessionKey,
+        parentFolderId: addedFolder.parentFolderId,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        contentSubkeyId: 1,
+        workspaceId: addedWorkspace.id,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
 });
 
 test("Unauthenticated", async () => {
