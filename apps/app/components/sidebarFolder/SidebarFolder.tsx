@@ -23,12 +23,12 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, StyleSheet } from "react-native";
 import { v4 as uuidv4 } from "uuid";
 import {
+  runDeleteFoldersMutation,
+  runUpdateFolderNameMutation,
+  runCreateDocumentMutation,
   runCreateFolderMutation,
-  useCreateDocumentMutation,
-  useDeleteFoldersMutation,
   useDocumentsQuery,
   useFoldersQuery,
-  useUpdateFolderNameMutation,
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
@@ -71,9 +71,6 @@ export default function SidebarFolder(props: Props) {
   const [isDeleted, setIsDeleted] = useState(false);
   const isOpen = openFolderIds.includes(props.folderId);
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
-  const [, createDocumentMutation] = useCreateDocumentMutation();
-  const [, updateFolderNameMutation] = useUpdateFolderNameMutation();
-  const [, deleteFoldersMutation] = useDeleteFoldersMutation();
   const [foldersResult, refetchFolders] = useFoldersQuery({
     pause: !isOpen,
     variables: {
@@ -246,15 +243,18 @@ export default function SidebarFolder(props: Props) {
       folderId: props.folderId,
       workspaceKeyId: workspace.currentWorkspaceKey.id,
     });
-    const result = await createDocumentMutation({
-      input: {
-        id,
-        workspaceId: props.workspaceId,
-        parentFolderId: props.folderId,
-        contentSubkeyId: documentContentKeyResult.subkeyId,
-        nameKeyDerivationTrace,
+    const result = await runCreateDocumentMutation(
+      {
+        input: {
+          id,
+          workspaceId: props.workspaceId,
+          parentFolderId: props.folderId,
+          contentSubkeyId: documentContentKeyResult.subkeyId,
+          nameKeyDerivationTrace,
+        },
       },
-    });
+      {}
+    );
     if (result.data?.createDocument?.id) {
       navigation.navigate("Workspace", {
         workspaceId: route.params.workspaceId,
@@ -321,16 +321,19 @@ export default function SidebarFolder(props: Props) {
       folderId: sourceFolder.parentFolderId,
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
     });
-    const updateFolderNameResult = await updateFolderNameMutation({
-      input: {
-        id: props.folderId,
-        encryptedName: encryptedFolderResult.ciphertext,
-        encryptedNameNonce: encryptedFolderResult.publicNonce,
-        workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-        subkeyId: props.subkeyId!,
-        keyDerivationTrace,
+    const updateFolderNameResult = await runUpdateFolderNameMutation(
+      {
+        input: {
+          id: props.folderId,
+          encryptedName: encryptedFolderResult.ciphertext,
+          encryptedNameNonce: encryptedFolderResult.publicNonce,
+          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+          subkeyId: props.subkeyId!,
+          keyDerivationTrace,
+        },
       },
-    });
+      {}
+    );
     const folder = updateFolderNameResult.data?.updateFolderName?.folder;
     if (folder) {
       setFolderName(newFolderName);
@@ -347,11 +350,15 @@ export default function SidebarFolder(props: Props) {
   };
 
   const deleteFolder = async (folderId: string) => {
-    const deleteFoldersResult = await deleteFoldersMutation({
-      input: {
-        ids: [folderId],
+    const deleteFoldersResult = await runDeleteFoldersMutation(
+      {
+        input: {
+          ids: [folderId],
+          workspaceId: props.workspaceId,
+        },
       },
-    });
+      {}
+    );
     if (deleteFoldersResult.data && deleteFoldersResult.data.deleteFolders) {
       setIsDeleted(true);
       props.onStructureChange();

@@ -53,6 +53,32 @@ export const RawInput = forwardRef((props: RawInputProps, ref) => {
           },
         },
       }}
+      _invalid={{
+        _stack: {
+          style: [styles.wrapper, tw`bg-white border-error-500`],
+        },
+        _hover: {
+          _stack: {
+            style: [styles.wrapper, tw`bg-white border-error-500`],
+          },
+        },
+        _focus: {
+          _stack: {
+            style: [
+              styles.wrapper,
+              tw`bg-white border-error-500 se-outline-error`,
+            ],
+          },
+          _hover: {
+            _stack: {
+              style: [
+                styles.wrapper,
+                tw`bg-white border-error-500 se-outline-error`,
+              ],
+            },
+          },
+        },
+      }}
     />
   );
 });

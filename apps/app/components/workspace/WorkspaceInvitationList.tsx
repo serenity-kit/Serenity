@@ -8,8 +8,9 @@ import {
   useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
-import { formatDistance, parseJSON, isPast } from "date-fns";
+import { parseJSON, isPast } from "date-fns";
 import { StyleSheet } from "react-native";
+import { getExpiredTextFromString } from "@serenity-tools/common";
 
 type Props = {
   workspaceInvitations: any[];
@@ -20,26 +21,6 @@ type Props = {
 
 export function WorkspaceInvitationList(props: Props) {
   const isDesktopDevice = useIsDesktopDevice();
-
-  const isInvitationExpired = (date: string) => {
-    return isPast(parseJSON(date));
-  };
-
-  const getExpiredTextFromString = (date: string) => {
-    if (isInvitationExpired(date)) {
-      return "Expired";
-    }
-
-    const prefix = isDesktopDevice ? "Expires " : "";
-
-    return (
-      prefix +
-      formatDistance(parseJSON(date), new Date(), {
-        addSuffix: true,
-      })
-    );
-  };
-
   const styles = StyleSheet.create({});
 
   return (
@@ -50,7 +31,7 @@ export function WorkspaceInvitationList(props: Props) {
         header={<ListHeader data={["Active Links"]} />}
       >
         {props.workspaceInvitations.map((invitation) => {
-          const expired = isInvitationExpired(invitation.expiresAt);
+          const expired = isPast(parseJSON(invitation.expiresAt));
           return (
             <ListItem
               key={invitation.id}
@@ -68,7 +49,10 @@ export function WorkspaceInvitationList(props: Props) {
               }
               secondaryItem={
                 <ListText muted={expired} secondary>
-                  {getExpiredTextFromString(invitation.expiresAt)}
+                  {getExpiredTextFromString(
+                    invitation.expiresAt,
+                    isDesktopDevice
+                  )}
                 </ListText>
               }
               actionItem={

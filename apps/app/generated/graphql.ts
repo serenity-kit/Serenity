@@ -160,6 +160,7 @@ export type DeleteDocumentsResult = {
 
 export type DeleteFoldersInput = {
   ids: Array<Scalars['String']>;
+  workspaceId: Scalars['String'];
 };
 
 export type DeleteFoldersResult = {
