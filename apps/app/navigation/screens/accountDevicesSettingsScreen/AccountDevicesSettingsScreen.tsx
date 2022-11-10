@@ -12,8 +12,9 @@ import {
   useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
+import { getExpiredTextFromString } from "@serenity-tools/common";
 import { useMachine } from "@xstate/react";
-import { format, formatDistance, parseJSON } from "date-fns";
+import { format, parseJSON } from "date-fns";
 import { useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
@@ -133,17 +134,6 @@ export default function DeviceManagerScreen(props) {
 
   const devices = devicesResult.data?.devices?.nodes?.filter(notNull) || [];
 
-  const getExpiredTextFromString = (date: string) => {
-    const prefix = !isDesktopDevice ? "Expires " : "";
-
-    return (
-      prefix +
-      formatDistance(parseJSON(date), new Date(), {
-        addSuffix: true,
-      })
-    );
-  };
-
   return (
     <>
       <SettingsContentWrapper title={"Devices"}>
@@ -203,7 +193,8 @@ export default function DeviceManagerScreen(props) {
                   <ListText secondary>
                     {isWebDevice &&
                       getExpiredTextFromString(
-                        device.mostRecentSession?.expiresAt
+                        device.mostRecentSession?.expiresAt,
+                        isDesktopDevice
                       )}
                   </ListText>
                 }
