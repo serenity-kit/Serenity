@@ -1,5 +1,6 @@
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
@@ -7,6 +8,7 @@ import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { updateFolderName } from "../../../../test/helpers/folder/updateFolderName";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -159,6 +161,60 @@ test("throw error when user doesn't have access", async () => {
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
+});
+
+test("Commentor tries to update", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.COMMENTER,
+    },
+  });
+  await expect(
+    (async () =>
+      await updateFolderName({
+        graphql,
+        id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
+        name: "renamed",
+        workspaceKey,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        parentFolderId: null,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
+});
+
+test("Viewer tries to update", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.VIEWER,
+    },
+  });
+  await expect(
+    (async () =>
+      await updateFolderName({
+        graphql,
+        id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
+        name: "renamed",
+        workspaceKey,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        parentFolderId: null,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
 });
 
 test("Unauthenticated", async () => {

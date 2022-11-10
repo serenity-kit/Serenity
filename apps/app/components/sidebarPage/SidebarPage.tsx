@@ -18,7 +18,7 @@ import {
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
-import { useUpdateDocumentNameMutation } from "../../generated/graphql";
+import { runUpdateDocumentNameMutation } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
@@ -98,8 +98,6 @@ export default function SidebarPage(props: Props) {
       setDocumentTitle("decryption error");
     }
   };
-
-  const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const { depth = 0 } = props;
 
   const updateDocumentName = async (name: string) => {
@@ -132,16 +130,19 @@ export default function SidebarPage(props: Props) {
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
       folderId: document?.parentFolderId!,
     });
-    const updateDocumentNameResult = await updateDocumentNameMutation({
-      input: {
-        id: props.documentId,
-        encryptedName: encryptedDocumentTitle.ciphertext,
-        encryptedNameNonce: encryptedDocumentTitle.publicNonce,
-        workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-        subkeyId: documentKeyData.subkeyId,
-        nameKeyDerivationTrace,
+    const updateDocumentNameResult = await runUpdateDocumentNameMutation(
+      {
+        input: {
+          id: props.documentId,
+          encryptedName: encryptedDocumentTitle.ciphertext,
+          encryptedNameNonce: encryptedDocumentTitle.publicNonce,
+          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+          subkeyId: documentKeyData.subkeyId,
+          nameKeyDerivationTrace,
+        },
       },
-    });
+      {}
+    );
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {
       // TODO show notification
       const document =
