@@ -1283,6 +1283,30 @@ export default function DesignSystemScreen() {
             isDisabled
           />
         </DSExampleArea>
+        <Heading lvl={3}>Helper Text</Heading>
+        <Text variant="sm">
+          The <DSMono variant="property">helperText</DSMono> can be used to show
+          additional help when the user is focused on the input, which is
+          especially helpful for errors.
+        </Text>
+        <DSExampleArea vertical>
+          <Input
+            label={"Email"}
+            value="jane@example.com"
+            keyboardType="email-address"
+            placeholder="Enter your email …"
+            autoCapitalize="none"
+            helperText="helper Text"
+          />
+          <Input
+            label={"Password"}
+            secureTextEntry
+            value="foo"
+            placeholder="Enter your password …"
+            helperText="min 8 characters"
+            isInvalid
+          />
+        </DSExampleArea>
         <Heading lvl={3}>Hints</Heading>
         <Text variant="sm">
           You can use a <DSMono variant="property">hint</DSMono> to add
