@@ -31,6 +31,7 @@ import { CloseCircleFill } from "./icons/CloseCircleFill";
 import { CodeSSlashLine } from "./icons/CodeSSlashLine";
 import { CodeView } from "./icons/CodeView";
 import { CommandLine } from "./icons/CommandLine";
+import { ComputerLine } from "./icons/ComputerLine";
 import { CupLine } from "./icons/CupLine";
 import { Cursor } from "./icons/Cursor";
 import { DashboardLine } from "./icons/DashboardLine";
@@ -107,6 +108,7 @@ import { Underline } from "./icons/Underline";
 import { UserLine } from "./icons/UserLine";
 import { UserSettingsLine } from "./icons/UserSettingsLine";
 import { WarningFill } from "./icons/WarningFill";
+import { WindowLine } from "./icons/WindowLine";
 
 import { View } from "react-native";
 import { useIsSmallerThanBreakpoint } from "../../hooks/useIsSmallerThanBreakpoint/useIsSmallerThanBreakpoint";
@@ -144,6 +146,7 @@ export type IconNames =
   | "code-s-slash-line"
   | "code-view"
   | "command-line"
+  | "computer-line"
   | "cup-line"
   | "cursor"
   | "dashboard-line"
@@ -219,7 +222,8 @@ export type IconNames =
   | "underline"
   | "user-line"
   | "user-settings-line"
-  | "warning-fill";
+  | "warning-fill"
+  | "window-line";
 
 export type IconProps = {
   name: IconNames;
@@ -332,6 +336,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "command-line") {
     icon = <CommandLine color={color} size={iconSize} />;
+  }
+  if (name === "computer-line") {
+    icon = <ComputerLine color={color} size={iconSize} />;
   }
   if (name === "cup-line") {
     icon = <CupLine color={color} size={iconSize} />;
@@ -560,6 +567,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "warning-fill") {
     icon = <WarningFill color={color} size={iconSize} />;
+  }
+  if (name === "window-line") {
+    icon = <WindowLine color={color} size={iconSize} />;
   }
 
   if (!icon) return null;
