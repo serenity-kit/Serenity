@@ -36,7 +36,7 @@ const machine =
   /** @xstate-layout N4IgpgJg5mDOIC5SwJYTAIwIYCcAKWMAsmAHYCuAdOgDZgAuKpUAxBAPaliVMBu7Aa260GYAjESgADu1SNOkkAA9EANlUAOSgGYATAEZVAVn0B2AAxHT+3RoA0IAJ6J95gJyUALNbcbV280DTDVMAX1CHVHRsfEIwEgpqMDpGZhYwHBx2HEopGix6ADNsgFsklLE4xRk5FAUkZTVNHQNjM0trWwdnBH0rLyMjSzdPI21jI3CIkFJ2dHgGqMxccXiyKjQ6atkUeVJFFQQjDXNKc1MRv3NdXSNdbSNuxDvVSlMjN103TUH3t0npksYqsElQSuttrV6qBDn5PG91G5TOpgp8NPYnIhPOZtJRdKo3OZVO5xnpzPpwpE0MtYsR1uVREQ5lgaJDdnV9g1Dp5dE8ENokWd7iMvsjiTjKSAgSs4qCGakoGy9gdEA9cQTdKYbhrTFrPKo+fo+jpzDzVO9tJa-KpdJLpbS1okRPRIEqOSqEHCEQSxajbBiehp9JRfKbrBptOjUZ47dTgbKIQ0auzoY0EABaA2YjNGENufMFwv5i5TUJAA */
   createMachine(
     {
-      context: { navigation: null, documentId: "" } as Context,
+      context: { navigation: null, documentId: "", workspaceId: "" } as Context,
       tsTypes: {} as import("./SidebarPageMenu.typegen").Typegen0,
       predictableActionArguments: true,
       initial: "idle",
@@ -98,6 +98,7 @@ const machine =
             const result = await context.deleteDocumentsMutation({
               input: {
                 ids: [context.documentId],
+                workspaceId: context.workspaceId,
               },
             });
             // throw new Error("debugging the error flow");
@@ -134,6 +135,7 @@ export default function SidebarPageMenu(props: Props) {
     context: {
       navigation,
       documentId: props.documentId,
+      workspaceId: props.workspaceId,
       refetchDocuments: props.refetchDocuments,
       deleteDocumentsMutation: deleteDocumentsMutation,
     },
