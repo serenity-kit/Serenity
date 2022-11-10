@@ -23,12 +23,12 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, StyleSheet } from "react-native";
 import { v4 as uuidv4 } from "uuid";
 import {
+  runDeleteFoldersMutation,
+  runUpdateFolderNameMutation,
   useCreateDocumentMutation,
   useCreateFolderMutation,
-  useDeleteFoldersMutation,
   useDocumentsQuery,
   useFoldersQuery,
-  useUpdateFolderNameMutation,
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { RootStackScreenProps } from "../../types/navigation";
@@ -73,8 +73,6 @@ export default function SidebarFolder(props: Props) {
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
   const [, createDocumentMutation] = useCreateDocumentMutation();
   const [, createFolderMutation] = useCreateFolderMutation();
-  const [, updateFolderNameMutation] = useUpdateFolderNameMutation();
-  const [, deleteFoldersMutation] = useDeleteFoldersMutation();
   const [foldersResult, refetchFolders] = useFoldersQuery({
     pause: !isOpen,
     variables: {
@@ -319,16 +317,19 @@ export default function SidebarFolder(props: Props) {
       folderId: sourceFolder.parentFolderId,
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
     });
-    const updateFolderNameResult = await updateFolderNameMutation({
-      input: {
-        id: props.folderId,
-        encryptedName: encryptedFolderResult.ciphertext,
-        encryptedNameNonce: encryptedFolderResult.publicNonce,
-        workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-        subkeyId: props.subkeyId!,
-        keyDerivationTrace,
+    const updateFolderNameResult = await runUpdateFolderNameMutation(
+      {
+        input: {
+          id: props.folderId,
+          encryptedName: encryptedFolderResult.ciphertext,
+          encryptedNameNonce: encryptedFolderResult.publicNonce,
+          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+          subkeyId: props.subkeyId!,
+          keyDerivationTrace,
+        },
       },
-    });
+      {}
+    );
     const folder = updateFolderNameResult.data?.updateFolderName?.folder;
     if (folder) {
       setFolderName(newFolderName);
@@ -345,11 +346,15 @@ export default function SidebarFolder(props: Props) {
   };
 
   const deleteFolder = async (folderId: string) => {
-    const deleteFoldersResult = await deleteFoldersMutation({
-      input: {
-        ids: [folderId],
+    const deleteFoldersResult = await runDeleteFoldersMutation(
+      {
+        input: {
+          ids: [folderId],
+          workspaceId: props.workspaceId,
+        },
       },
-    });
+      {}
+    );
     if (deleteFoldersResult.data && deleteFoldersResult.data.deleteFolders) {
       setIsDeleted(true);
       props.onStructureChange();
