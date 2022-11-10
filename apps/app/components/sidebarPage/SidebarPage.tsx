@@ -18,10 +18,12 @@ import {
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
-import { runUpdateDocumentNameMutation } from "../../generated/graphql";
+import {
+  runUpdateDocumentNameMutation,
+  useDocumentQuery,
+} from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
-import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { getFolder } from "../../utils/folder/getFolder";
@@ -46,11 +48,12 @@ export default function SidebarPage(props: Props) {
   const [isHovered, setIsHovered] = useState(false);
   const [documentTitle, setDocumentTitle] = useState("decrypting…");
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
-  const document = useActiveDocumentInfoStore((state) => state.document);
+  const activeDocument = useActiveDocumentInfoStore((state) => state.document);
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
   const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
+  const [document] = useDocumentQuery({ variables: { id: props.documentId } });
 
   const linkProps = useLinkProps({
     to: {
@@ -66,11 +69,14 @@ export default function SidebarPage(props: Props) {
   });
 
   useEffect(() => {
-    decryptTitle();
-  }, [props.encryptedName, props.subkeyId]);
+    if (document.data?.document?.id) {
+      decryptTitle();
+    }
+  }, [props.encryptedName, props.subkeyId, document.data?.document?.id]);
 
   const decryptTitle = async () => {
     if (!props.subkeyId || !props.encryptedName || !props.encryptedNameNonce) {
+      // this case can happen when the document is created but the title is not yet set
       setDocumentTitle("Untitled");
       return;
     }
@@ -78,7 +84,8 @@ export default function SidebarPage(props: Props) {
       const folder = await getFolder({ id: props.parentFolderId });
       const folderKey = await getFolderKey({
         folderId: folder.id,
-        workspaceKeyId: undefined,
+        workspaceKeyId:
+          document.data?.document?.nameKeyDerivationTrace?.workspaceKeyId,
         workspaceId: props.workspaceId,
         folderSubkeyId: folder.subkeyId,
         activeDevice,
@@ -120,7 +127,7 @@ export default function SidebarPage(props: Props) {
     });
     const documentKeyData = await recreateDocumentKey({
       folderKey: folderKeyString,
-      subkeyId: document?.subkeyId!,
+      subkeyId: document.data?.document?.subkeyId!,
     });
     const encryptedDocumentTitle = await encryptDocumentTitle({
       title: name,
@@ -128,7 +135,7 @@ export default function SidebarPage(props: Props) {
     });
     const nameKeyDerivationTrace = await buildKeyDerivationTrace({
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-      folderId: document?.parentFolderId!,
+      folderId: document.data?.document?.parentFolderId!,
     });
     const updateDocumentNameResult = await runUpdateDocumentNameMutation(
       {
@@ -153,24 +160,6 @@ export default function SidebarPage(props: Props) {
       // refetch to revert back to actual name
     }
     setIsEditing(false);
-  };
-
-  const createShareLink = async () => {
-    if (!activeDevice.encryptionPrivateKey) {
-      console.error("active device doesn't have encryptionPrivateKey");
-      return;
-    }
-    const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
-      activeDevice;
-    try {
-      const shareLinkData = await createDocumentShareLink({
-        documentId: props.documentId,
-        creatorDevice,
-        creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-      });
-    } catch (error) {
-      console.error(error.message);
-    }
   };
 
   const styles = StyleSheet.create({
@@ -232,7 +221,7 @@ export default function SidebarPage(props: Props) {
                   style={[tw`pl-2 md:pl-1.5 max-w-${maxWidth}`]}
                   numberOfLines={1}
                   ellipsizeMode="tail"
-                  bold={document?.id === props.documentId}
+                  bold={activeDocument?.id === props.documentId}
                   testID={`sidebar-document--${props.documentId}`}
                 >
                   {documentTitle}

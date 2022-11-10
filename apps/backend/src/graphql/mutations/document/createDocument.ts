@@ -15,7 +15,6 @@ export const CreateDocumentInput = inputObjectType({
     t.nonNull.string("id");
     t.string("parentFolderId");
     t.nonNull.string("workspaceId");
-    t.nonNull.int("contentSubkeyId");
     t.nonNull.field("nameKeyDerivationTrace", {
       type: KeyDerivationTraceInput,
     });
@@ -50,7 +49,6 @@ export const createDocumentMutation = mutationField("createDocument", {
       encryptedNameNonce: null,
       workspaceKeyId: null,
       subkeyId: null,
-      contentSubkeyId: args.input.contentSubkeyId,
       parentFolderId,
       workspaceId: args.input.workspaceId,
       nameKeyDerivationTrace: args.input.nameKeyDerivationTrace,
