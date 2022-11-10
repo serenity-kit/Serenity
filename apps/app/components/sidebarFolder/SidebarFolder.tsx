@@ -23,8 +23,8 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, StyleSheet } from "react-native";
 import { v4 as uuidv4 } from "uuid";
 import {
+  runCreateFolderMutation,
   useCreateDocumentMutation,
-  useCreateFolderMutation,
   useDeleteFoldersMutation,
   useDocumentsQuery,
   useFoldersQuery,
@@ -72,7 +72,6 @@ export default function SidebarFolder(props: Props) {
   const isOpen = openFolderIds.includes(props.folderId);
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
   const [, createDocumentMutation] = useCreateDocumentMutation();
-  const [, createFolderMutation] = useCreateFolderMutation();
   const [, updateFolderNameMutation] = useUpdateFolderNameMutation();
   const [, deleteFoldersMutation] = useDeleteFoldersMutation();
   const [foldersResult, refetchFolders] = useFoldersQuery({
@@ -192,18 +191,21 @@ export default function SidebarFolder(props: Props) {
     });
     do {
       numCreateFolderAttempts += 1;
-      result = await createFolderMutation({
-        input: {
-          id,
-          workspaceId: route.params.workspaceId,
-          encryptedName: encryptedFolderResult.ciphertext,
-          encryptedNameNonce: encryptedFolderResult.publicNonce,
-          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-          subkeyId: encryptedFolderResult.folderSubkeyId,
-          parentFolderId: props.folderId,
-          keyDerivationTrace,
+      result = await runCreateFolderMutation(
+        {
+          input: {
+            id,
+            workspaceId: route.params.workspaceId,
+            encryptedName: encryptedFolderResult.ciphertext,
+            encryptedNameNonce: encryptedFolderResult.publicNonce,
+            workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+            subkeyId: encryptedFolderResult.folderSubkeyId,
+            parentFolderId: props.folderId,
+            keyDerivationTrace,
+          },
         },
-      });
+        {}
+      );
       if (result.data?.createFolder?.folder?.id) {
         didCreateFolderSucceed = true;
         folderId = result.data?.createFolder?.folder?.id;
