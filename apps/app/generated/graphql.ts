@@ -150,6 +150,7 @@ export type DeleteDevicesResult = {
 
 export type DeleteDocumentsInput = {
   ids: Array<Scalars['String']>;
+  workspaceId: Scalars['String'];
 };
 
 export type DeleteDocumentsResult = {

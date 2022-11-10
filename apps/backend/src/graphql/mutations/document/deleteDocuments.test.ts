@@ -1,11 +1,13 @@
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { deleteDocuments } from "../../../../test/helpers/document/deleteDocuments";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -56,7 +58,12 @@ beforeAll(async () => {
 test("user should be able to delete a document", async () => {
   const authorizationHeader = sessionKey;
   const ids = [addedDocumentId];
-  const result = await deleteDocuments({ graphql, ids, authorizationHeader });
+  const result = await deleteDocuments({
+    graphql,
+    ids,
+    workspaceId: addedWorkspace.id,
+    authorizationHeader,
+  });
   expect(result.deleteDocuments).toMatchInlineSnapshot(`
     {
       "status": "success",
@@ -67,12 +74,67 @@ test("user should be able to delete a document", async () => {
 test("Deleting nonexistent document does nothing", async () => {
   const authorizationHeader = sessionKey;
   const ids = ["badthing"];
-  const result = await deleteDocuments({ graphql, ids, authorizationHeader });
+  const result = await deleteDocuments({
+    graphql,
+    ids,
+    workspaceId: addedWorkspace.id,
+    authorizationHeader,
+  });
   expect(result.deleteDocuments).toMatchInlineSnapshot(`
     {
       "status": "success",
     }
   `);
+});
+
+test("commenter attempts to delete", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    "password"
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.COMMENTER,
+    },
+  });
+  const ids = [addedDocumentId];
+  await expect(
+    (async () =>
+      await deleteDocuments({
+        graphql,
+        ids,
+        workspaceId: addedWorkspace.id,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
+});
+
+test("viewer attempts to delete", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    "password"
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.VIEWER,
+    },
+  });
+  const ids = [addedDocumentId];
+  await expect(
+    (async () =>
+      await deleteDocuments({
+        graphql,
+        ids,
+        workspaceId: addedWorkspace.id,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
 });
 
 test("Unauthenticated", async () => {
@@ -82,6 +144,7 @@ test("Unauthenticated", async () => {
       await deleteDocuments({
         graphql,
         ids,
+        workspaceId: addedWorkspace.id,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -107,6 +170,7 @@ describe("Input errors", () => {
           {
             input: {
               ids: null,
+              workspaceId: addedWorkspace.id,
             },
           },
           authorizationHeaders

@@ -1,35 +1,31 @@
+import { ForbiddenError } from "apollo-server-express";
+import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 
 type Params = {
   documentIds: string[];
+  workspaceId: string;
   userId: string;
 };
 
-export async function deleteDocuments({ documentIds, userId }: Params) {
+export async function deleteDocuments({
+  documentIds,
+  workspaceId,
+  userId,
+}: Params) {
+  const allowedRoles = [Role.ADMIN, Role.EDITOR];
   try {
     await prisma.$transaction(async (prisma) => {
-      // get the workspace ids for the user
-      // find documents with the matching document ids and workspace ids
-      // delete these documents
-      const userToWorkspaces = await prisma.usersToWorkspaces.findMany({
-        where: {
-          userId,
-        },
+      const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+        where: { userId, workspaceId, role: { in: allowedRoles } },
       });
-      if (!userToWorkspaces || !userToWorkspaces.length) {
-        return null;
+      if (!userToWorkspace) {
+        throw new ForbiddenError("Unauthorized");
       }
-      const workspaceIds = userToWorkspaces.map(
-        (userToWorkspace) => userToWorkspace.workspaceId
-      );
       await prisma.document.deleteMany({
         where: {
-          id: {
-            in: documentIds,
-          },
-          workspaceId: {
-            in: workspaceIds,
-          },
+          id: { in: documentIds },
+          workspaceId,
         },
       });
     });

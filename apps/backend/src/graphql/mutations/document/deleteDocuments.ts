@@ -14,6 +14,7 @@ export const DeleteDocumentsInput = inputObjectType({
     t.nonNull.list.nonNull.field("ids", {
       type: "String",
     });
+    t.nonNull.string("workspaceId");
   },
 });
 
@@ -39,6 +40,7 @@ export const deleteDocumentsMutation = mutationField("deleteDocuments", {
     }
     await deleteDocuments({
       documentIds: args.input.ids,
+      workspaceId: args.input.workspaceId,
       userId: context.user.id,
     });
     return { status: "success" };
