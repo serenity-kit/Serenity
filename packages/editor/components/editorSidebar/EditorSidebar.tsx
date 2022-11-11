@@ -2,6 +2,7 @@ import {
   EncryptAndUploadFunctionFile,
   initiateImagePicker,
   InsertImageParams,
+  insertImages,
   updateImageAttributes,
   UpdateImageAttributesParams,
 } from "@serenity-tools/editor-image-extension";
@@ -16,7 +17,8 @@ import {
 } from "@serenity-tools/ui";
 import { Level } from "@tiptap/extension-heading";
 import { Editor } from "@tiptap/react";
-import React from "react";
+import React, { useRef } from "react";
+import { Platform } from "react-native";
 
 type EditorSidebarProps = {
   editor: Editor | null;
@@ -29,6 +31,53 @@ export default function EditorSidebar({
   headingLevels,
   encryptAndUploadFile,
 }: EditorSidebarProps) {
+  const fileInputRef = useRef<any>();
+  const insertImage = async ({
+    uploadId,
+    width,
+    height,
+  }: InsertImageParams) => {
+    if (!editor) {
+      return;
+    }
+    editor.commands.insertContent({
+      type: "image",
+      attrs: {
+        uploadId,
+        width,
+        height,
+      },
+    });
+  };
+
+  const testFileUpload = async (event: any) => {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const buf = e.target?.result as ArrayBuffer;
+      const data = Buffer.from(buf).toString("base64");
+      console.log(data);
+      insertImages({
+        encryptAndUploadFile,
+        filesAsBase64: [data],
+        insertImage,
+        updateImageAttributes: (params: UpdateImageAttributesParams) => {
+          if (!editor) {
+            return;
+          }
+          updateImageAttributes({ ...params, view: editor.view });
+        },
+      });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
   return (
     <View
       style={tw`w-sidebar h-full border-l border-gray-200 bg-gray-100 pt-4`}
@@ -186,19 +235,7 @@ export default function EditorSidebar({
         onPress={() => {
           initiateImagePicker({
             encryptAndUploadFile,
-            insertImage: ({ uploadId, width, height }: InsertImageParams) => {
-              if (!editor) {
-                return;
-              }
-              editor.commands.insertContent({
-                type: "image",
-                attrs: {
-                  uploadId,
-                  width,
-                  height,
-                },
-              });
-            },
+            insertImage,
             updateImageAttributes: (params: UpdateImageAttributesParams) => {
               if (!editor) {
                 return;
@@ -207,12 +244,21 @@ export default function EditorSidebar({
             },
           });
         }}
+        testID="editor-sidebar__add-image"
       >
         <EditorSidebarIcon isActive={false} name="image-line" />
         <Text variant="xs" bold={false}>
           Upload Image
         </Text>
       </SidebarButton>
+      {Platform.OS === "web" && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          onChange={testFileUpload}
+          data-testid="editor-sidebar__add-image--file-input"
+        />
+      )}
     </View>
   );
 }
