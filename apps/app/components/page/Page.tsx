@@ -21,7 +21,11 @@ import {
   verifyAndDecryptSnapshot,
   verifyAndDecryptUpdate,
 } from "@naisho/core";
-import { createSnapshotKey, recreateSnapshotKey } from "@serenity-tools/common";
+import {
+  createSnapshotKey,
+  recreateSnapshotKey,
+  sleep,
+} from "@serenity-tools/common";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -106,9 +110,6 @@ export default function Page({
   };
 
   const applySnapshot = async (snapshot, key) => {
-    console.log("apply snapshoy key", sodium.to_base64(key));
-    console.log("apply snapshoy", snapshot);
-    console.log("apply publicData", JSON.stringify(snapshot.publicData));
     try {
       activeSnapshotIdRef.current = snapshot.publicData.snapshotId;
       const initialResult = await verifyAndDecryptSnapshot(
@@ -367,6 +368,8 @@ export default function Page({
             removeSnapshotInProgress(data.docId);
             // all pending can be removed since a new snapshot will include all local changes
             removePending(data.docId);
+
+            await sleep(1000); // TODO add randomised backoff
             await createAndSendSnapshot();
             break;
           case "update":
