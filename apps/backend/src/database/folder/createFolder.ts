@@ -1,6 +1,7 @@
+import { KeyDerivationTrace } from "@naisho/core";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
-import { Folder, KeyDerivationTrace } from "../../types/folder";
+import { Folder } from "../../types/folder";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -89,8 +90,7 @@ export async function createFolder({
     });
     const folder: Folder = {
       ...rawFolder,
-      keyDerivationTrace:
-        (rawFolder.keyDerivationTrace as KeyDerivationTrace) || null,
+      keyDerivationTrace: rawFolder.keyDerivationTrace as KeyDerivationTrace,
       parentFolders: [],
     };
     return folder;

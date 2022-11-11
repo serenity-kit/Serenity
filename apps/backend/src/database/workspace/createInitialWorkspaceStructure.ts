@@ -60,6 +60,8 @@ export async function createInitialWorkspaceStructure({
     userId,
     creatorDeviceSigningPublicKey,
     deviceWorkspaceKeyBoxes,
+    workspaceKeyId:
+      documentSnapshot.publicData.keyDerivationTrace.workspaceKeyId,
   });
   const workspaceKey = workspace.currentWorkspaceKey;
   const folder = await createFolder({
@@ -76,6 +78,7 @@ export async function createInitialWorkspaceStructure({
       parentFolders: [],
     },
   });
+
   const document = await prisma.document.create({
     data: {
       id: documentId,
@@ -85,21 +88,11 @@ export async function createInitialWorkspaceStructure({
       subkeyId: documentSubkeyId,
       parentFolderId: folder.id,
       workspaceId: workspaceId,
-      nameKeyDerivationTrace: {
-        workspaceKeyId: workspaceKey?.id!,
-        parentFolders: [],
-      },
+      nameKeyDerivationTrace: documentSnapshot.publicData.keyDerivationTrace,
     },
   });
-  const snapshotKeyDerivationTrace = {
-    workspaceKeyId: workspaceKey?.id!,
-    parentFolders: [],
-  };
-  const fullDocumentSnapshot = {
-    ...documentSnapshot,
-    keyDerivationTrace: snapshotKeyDerivationTrace,
-  };
-  const snapshot = await createSnapshot(fullDocumentSnapshot);
+
+  const snapshot = await createSnapshot(documentSnapshot);
   return {
     workspace,
     document: formatDocument(document),

@@ -1,6 +1,6 @@
+import { KeyDerivationTrace } from "@naisho/core";
 import { ForbiddenError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
-import { KeyDerivationTrace } from "../../types/folder";
 import { prisma } from "../prisma";
 
 type Params = {

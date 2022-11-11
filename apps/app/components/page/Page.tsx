@@ -106,6 +106,9 @@ export default function Page({
   };
 
   const applySnapshot = async (snapshot, key) => {
+    console.log("apply snapshoy key", sodium.to_base64(key));
+    console.log("apply snapshoy", snapshot);
+    console.log("apply publicData", JSON.stringify(snapshot.publicData));
     try {
       activeSnapshotIdRef.current = snapshot.publicData.snapshotId;
       const initialResult = await verifyAndDecryptSnapshot(

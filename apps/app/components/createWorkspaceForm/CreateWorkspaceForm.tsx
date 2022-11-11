@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import {
   createDocumentKey,
   createIntroductionDocumentSnapshot,
+  createSnapshotKey,
   encryptDocumentTitle,
   encryptFolderName,
 } from "@serenity-tools/common";
@@ -72,6 +73,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         throw new Error("No active device available");
       }
       const workspaceId = uuidv4();
+      const workspaceKeyId = uuidv4();
       const folderId = uuidv4();
       const documentId = uuidv4();
       // grab all devices for this user
@@ -100,13 +102,28 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const documentContentKeyData = await createDocumentKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
-      const documentEncryptionKey = sodium.from_base64(
-        documentContentKeyData.key
-      );
+      const snapshotKey = await createSnapshotKey({
+        folderKey: encryptedFolderResult.folderSubkey,
+      });
       const snapshot = await createIntroductionDocumentSnapshot({
         documentId,
-        documentEncryptionKey,
+        snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
+        subkeyId: snapshotKey.subkeyId,
+        keyDerivationTrace: {
+          workspaceKeyId,
+          parentFolders: [
+            {
+              folderId,
+              subkeyId: encryptedFolderResult.folderSubkeyId,
+              parentFolderId: null,
+            },
+          ],
+        },
       });
+
+      console.log("snapshotKey", snapshotKey);
+      console.log("snapshot", snapshot);
+      console.log("snapshot publicData", JSON.stringify(snapshot.publicData));
 
       // throw new Error("Debug error");
 

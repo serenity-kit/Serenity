@@ -15,6 +15,7 @@ export const CreateDocumentInput = inputObjectType({
     t.nonNull.string("id");
     t.string("parentFolderId");
     t.nonNull.string("workspaceId");
+    t.nonNull.int("contentSubkeyId");
     t.nonNull.field("nameKeyDerivationTrace", {
       type: KeyDerivationTraceInput,
     });

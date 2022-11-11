@@ -1,8 +1,8 @@
-import sodiumWrappers from "libsodium-wrappers";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
+import sodiumWrappers from "libsodium-wrappers";
 import { v4 as uuidv4 } from "uuid";
-import { SnapshotPublicData } from "./types";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
+import { SnapshotPublicData } from "./types";
 
 test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
   await sodium.ready;
@@ -25,6 +25,11 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
     snapshotId: uuidv4(),
     docId: "6e46c006-5541-11ec-bf63-0242ac130002",
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+    subkeyId: 42,
+    keyDerivationTrace: {
+      workspaceKeyId: "abc",
+      parentFolders: [],
+    },
   };
 
   const snapshot = await createSnapshot(
@@ -66,6 +71,11 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
     snapshotId: uuidv4(),
     docId: "6e46c006-5541-11ec-bf63-0242ac130002",
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+    subkeyId: 42,
+    keyDerivationTrace: {
+      workspaceKeyId: "abc",
+      parentFolders: [],
+    },
   };
 
   const snapshot = await createSnapshot(
@@ -107,6 +117,11 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
     snapshotId: uuidv4(),
     docId: "6e46c006-5541-11ec-bf63-0242ac130002",
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+    subkeyId: 42,
+    keyDerivationTrace: {
+      workspaceKeyId: "abc",
+      parentFolders: [],
+    },
   };
 
   const snapshot = await createSnapshot(

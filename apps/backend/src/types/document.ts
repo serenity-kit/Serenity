@@ -1,4 +1,4 @@
-import { KeyDerivationTrace } from "./folder";
+import { KeyDerivationTrace } from "@naisho/core";
 import { WorkspaceKey } from "./workspace";
 
 export type Document = {

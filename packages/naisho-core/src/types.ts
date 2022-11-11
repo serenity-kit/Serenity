@@ -3,12 +3,23 @@ export type CiphertextContent = {
   content: string;
 };
 
+export type KeyDerivationTraceParentFolder = {
+  folderId: string;
+  subkeyId: number;
+  parentFolderId?: string | undefined | null;
+};
+
+export type KeyDerivationTrace = {
+  workspaceKeyId: string;
+  parentFolders: KeyDerivationTraceParentFolder[];
+};
+
 export interface SnapshotPublicData {
   docId: string;
   pubKey: string; // public signing key
   snapshotId: string;
   subkeyId: number;
-  keyDerivationTrace?: KeyDerivationTrace | undefined;
+  keyDerivationTrace: KeyDerivationTrace;
 }
 
 export interface SnapshotServerData {
@@ -35,17 +46,6 @@ export interface UpdateServerData {
 export interface AwarenessUpdatePublicData {
   docId: string;
   pubKey: string; // public signing key
-}
-
-export interface KeyDerivationTraceParentFolder {
-  folderId: string;
-  subkeyId: number;
-  parentFolderId?: string | undefined | null;
-}
-
-export interface KeyDerivationTrace {
-  workspaceKeyId: string;
-  parentFolders: KeyDerivationTraceParentFolder[];
 }
 
 export interface Snapshot {

@@ -21,6 +21,7 @@ type Params = {
   userId: string;
   creatorDeviceSigningPublicKey: string;
   deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
+  workspaceKeyId?: string | undefined;
 };
 
 export async function createWorkspace({
@@ -29,6 +30,7 @@ export async function createWorkspace({
   userId,
   creatorDeviceSigningPublicKey,
   deviceWorkspaceKeyBoxes,
+  workspaceKeyId,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
     const allDeviceSigningPublicKeys = deviceWorkspaceKeyBoxes.map(
@@ -69,7 +71,7 @@ export async function createWorkspace({
         },
         workspaceKeys: {
           create: {
-            id: uuidv4(),
+            id: workspaceKeyId || uuidv4(),
             generation: 0,
           },
         },
