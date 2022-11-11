@@ -138,7 +138,7 @@ export function PageShareModalContent() {
                 >
                   {pageShareLink !== null
                     ? pageShareLink
-                    : 'The share link will be generated here\nClick on "Create page share link" to generate a new link'}
+                    : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
                 </Text>
                 {pageShareLink !== null ? (
                   <View style={tw`absolute right-3 top-3`}>
@@ -165,7 +165,7 @@ export function PageShareModalContent() {
                 onPress={createShareLink}
                 style={styles.createShareLinkButton}
               >
-                Create Page Link
+                Create page link
               </Button>
               <List
                 data={documentShareLinks}
