@@ -1,6 +1,6 @@
+import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
-import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -53,6 +53,7 @@ export type AttachDevicesToWorkspacesResult = {
 };
 
 export type CreateDocumentInput = {
+  contentSubkeyId: Scalars['Int'];
   id: Scalars['String'];
   nameKeyDerivationTrace: KeyDerivationTraceInput;
   parentFolderId?: InputMaybe<Scalars['String']>;
@@ -318,8 +319,10 @@ export type DocumentSnapshotInput = {
 
 export type DocumentSnapshotPublicDataInput = {
   docId: Scalars['String'];
+  keyDerivationTrace?: InputMaybe<KeyDerivationTraceInput>;
   pubKey: Scalars['String'];
   snapshotId: Scalars['String'];
+  subkeyId?: InputMaybe<Scalars['Int']>;
 };
 
 export type File = {

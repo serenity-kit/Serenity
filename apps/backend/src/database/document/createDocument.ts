@@ -13,6 +13,7 @@ type Params = {
   parentFolderId?: string | null;
   workspaceId: string;
   nameKeyDerivationTrace: KeyDerivationTrace;
+  contentSubkeyId: number;
 };
 
 export async function createDocument({
@@ -25,6 +26,7 @@ export async function createDocument({
   parentFolderId,
   workspaceId,
   nameKeyDerivationTrace,
+  contentSubkeyId,
 }: Params) {
   const allowedRoles = [Role.ADMIN, Role.EDITOR];
   // verify that the user is an admin or editor of the workspace
@@ -44,6 +46,7 @@ export async function createDocument({
       parentFolderId,
       workspaceId,
       nameKeyDerivationTrace,
+      contentSubkeyId,
     },
   });
   return document;

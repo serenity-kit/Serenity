@@ -53,6 +53,7 @@ export const createDocumentMutation = mutationField("createDocument", {
       parentFolderId,
       workspaceId: args.input.workspaceId,
       nameKeyDerivationTrace: args.input.nameKeyDerivationTrace,
+      contentSubkeyId: args.input.contentSubkeyId,
     });
     return {
       id: document.id,

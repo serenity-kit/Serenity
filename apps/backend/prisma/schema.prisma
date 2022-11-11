@@ -28,6 +28,7 @@ model Document {
   nameKeyDerivationTrace Json                @default("{}")
   documentShareLinks     DocumentShareLink[]
   requiresSnapshot       Boolean             @default(false)
+  contentSubkeyId        Int?
 
   @@unique([subkeyId, workspaceId])
 }
