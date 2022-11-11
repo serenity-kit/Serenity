@@ -26,7 +26,7 @@ import {
   runDeleteFoldersMutation,
   runUpdateFolderNameMutation,
   runCreateDocumentMutation,
-  useCreateFolderMutation,
+  runCreateFolderMutation,
   useDocumentsQuery,
   useFoldersQuery,
 } from "../../generated/graphql";
@@ -71,7 +71,6 @@ export default function SidebarFolder(props: Props) {
   const [isDeleted, setIsDeleted] = useState(false);
   const isOpen = openFolderIds.includes(props.folderId);
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
-  const [, createFolderMutation] = useCreateFolderMutation();
   const [foldersResult, refetchFolders] = useFoldersQuery({
     pause: !isOpen,
     variables: {
@@ -189,18 +188,21 @@ export default function SidebarFolder(props: Props) {
     });
     do {
       numCreateFolderAttempts += 1;
-      result = await createFolderMutation({
-        input: {
-          id,
-          workspaceId: route.params.workspaceId,
-          encryptedName: encryptedFolderResult.ciphertext,
-          encryptedNameNonce: encryptedFolderResult.publicNonce,
-          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-          subkeyId: encryptedFolderResult.folderSubkeyId,
-          parentFolderId: props.folderId,
-          keyDerivationTrace,
+      result = await runCreateFolderMutation(
+        {
+          input: {
+            id,
+            workspaceId: route.params.workspaceId,
+            encryptedName: encryptedFolderResult.ciphertext,
+            encryptedNameNonce: encryptedFolderResult.publicNonce,
+            workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+            subkeyId: encryptedFolderResult.folderSubkeyId,
+            parentFolderId: props.folderId,
+            keyDerivationTrace,
+          },
         },
-      });
+        {}
+      );
       if (result.data?.createFolder?.folder?.id) {
         didCreateFolderSucceed = true;
         folderId = result.data?.createFolder?.folder?.id;

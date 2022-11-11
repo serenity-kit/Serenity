@@ -21,7 +21,7 @@ import { HStack } from "native-base";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
-  useCreateFolderMutation,
+  runCreateFolderMutation,
   useMeWithWorkspaceLoadingInfoQuery,
   useRootFoldersQuery,
 } from "../../generated/graphql";
@@ -55,7 +55,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       first: 20,
     },
   });
-  const [, createFolderMutation] = useCreateFolderMutation();
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
 
@@ -90,20 +89,23 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     let result: any = undefined;
     do {
       numCreateFolderAttempts += 1;
-      result = await createFolderMutation({
-        input: {
-          id,
-          workspaceId: route.params.workspaceId,
-          encryptedName: encryptedFolderResult.ciphertext,
-          encryptedNameNonce: encryptedFolderResult.publicNonce,
-          workspaceKeyId,
-          subkeyId: encryptedFolderResult.folderSubkeyId,
-          keyDerivationTrace: {
+      result = await runCreateFolderMutation(
+        {
+          input: {
+            id,
+            workspaceId: route.params.workspaceId,
+            encryptedName: encryptedFolderResult.ciphertext,
+            encryptedNameNonce: encryptedFolderResult.publicNonce,
             workspaceKeyId,
-            parentFolders: [],
+            subkeyId: encryptedFolderResult.folderSubkeyId,
+            keyDerivationTrace: {
+              workspaceKeyId,
+              parentFolders: [],
+            },
           },
         },
-      });
+        {}
+      );
       if (result.data?.createFolder?.folder?.id) {
         didCreateFolderSucceed = true;
         folderId = result.data?.createFolder?.folder?.id;

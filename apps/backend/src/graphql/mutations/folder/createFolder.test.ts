@@ -5,6 +5,7 @@ import {
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
@@ -270,6 +271,64 @@ test("Throw error when user doesn't have access", async () => {
         authorizationHeader: sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
+});
+
+test("Commentor tries to create", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.COMMENTER,
+    },
+  });
+  const id = uuidv4();
+  await expect(
+    (async () =>
+      await createFolder({
+        graphql,
+        id,
+        name: "test",
+        parentKey: workspaceKey,
+        parentFolderId: null,
+        workspaceId: addedWorkspace.id,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
+});
+
+test("Viewer tries to create", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.VIEWER,
+    },
+  });
+  const id = uuidv4();
+  await expect(
+    (async () =>
+      await createFolder({
+        graphql,
+        id,
+        name: "test",
+        parentKey: workspaceKey,
+        parentFolderId: null,
+        workspaceId: addedWorkspace.id,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
 });
 
 test("Unauthenticated", async () => {

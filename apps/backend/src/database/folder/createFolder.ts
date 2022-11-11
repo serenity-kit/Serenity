@@ -1,4 +1,5 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
+import { Role } from "../../../prisma/generated/output";
 import { Folder, KeyDerivationTrace } from "../../types/folder";
 import { prisma } from "../prisma";
 
@@ -25,6 +26,7 @@ export async function createFolder({
   workspaceId,
   keyDerivationTrace,
 }: Params) {
+  const allowedRoles = [Role.ADMIN, Role.EDITOR];
   return await prisma.$transaction(async (prisma) => {
     const folderforId = await prisma.folder.findFirst({
       where: { id },
@@ -47,6 +49,7 @@ export async function createFolder({
       where: {
         userId,
         workspaceId,
+        role: { in: allowedRoles },
       },
     });
     if (!userToWorkspace) {
