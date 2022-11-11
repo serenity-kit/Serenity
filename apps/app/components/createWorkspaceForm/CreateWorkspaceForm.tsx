@@ -121,10 +121,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         },
       });
 
-      console.log("snapshotKey", snapshotKey);
-      console.log("snapshot", snapshot);
-      console.log("snapshot publicData", JSON.stringify(snapshot.publicData));
-
       // throw new Error("Debug error");
 
       const createInitialWorkspaceStructureResult =

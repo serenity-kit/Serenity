@@ -77,7 +77,7 @@ export default function Page({
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
   const websocketConnectionRef = useRef<WebSocket>(null);
   const shouldReconnectWebsocketConnectionRef = useRef(true);
-  const createSnapshotRef = useRef<boolean>(false); // only used for the UI
+  const createSnapshotInProgressRef = useRef<boolean>(false); // only used for the UI
   const latestServerVersionRef = useRef<number | null>(null);
   const [documentLoaded, setDocumentLoaded] = useState(false);
   const websocketState = useWebsocketState();
@@ -512,8 +512,13 @@ export default function Page({
       // TODO switch to v2 updates
       yDocRef.current.on("update", async (update, origin) => {
         if (origin?.key === "y-sync$" || origin === "mobile-webview") {
-          if (!activeSnapshotIdRef.current || createSnapshotRef.current) {
-            createSnapshotRef.current = false;
+          if (
+            !activeSnapshotIdRef.current &&
+            !createSnapshotInProgressRef.current
+          ) {
+            // createAndSendSnapshot takes a while to set the snapshot in
+            // progress and therefore we need another mechanism
+            createSnapshotInProgressRef.current = true;
 
             if (
               getSnapshotInProgress(docId) ||
@@ -525,6 +530,7 @@ export default function Page({
             }
           } else {
             if (
+              !snapshotKeyRef.current ||
               getSnapshotInProgress(docId) ||
               !getWebsocketState().connected
             ) {
