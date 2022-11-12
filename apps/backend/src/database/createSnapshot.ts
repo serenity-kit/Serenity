@@ -3,7 +3,6 @@ import {
   NaishoSnapshotMissesUpdatesError,
   Snapshot,
 } from "@naisho/core";
-import { KeyDerivationTrace } from "../types/folder";
 import { prisma } from "./prisma";
 
 type ActiveSnapshotInfo = {
@@ -74,7 +73,8 @@ export async function createSnapshot(
           connect: { id: snapshot.publicData.docId },
         },
         document: { connect: { id: snapshot.publicData.docId } },
-        keyDerivationTrace: snapshot.keyDerivationTrace! as KeyDerivationTrace,
+        keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
+        subkeyId: snapshot.publicData.subkeyId,
         clocks: {},
       },
     });

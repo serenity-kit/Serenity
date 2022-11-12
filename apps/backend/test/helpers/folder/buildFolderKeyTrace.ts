@@ -1,8 +1,8 @@
-import { prisma } from "../../../src/database/prisma";
 import {
   KeyDerivationTrace,
   KeyDerivationTraceParentFolder,
-} from "../../../src/types/folder";
+} from "@naisho/core";
+import { prisma } from "../../../src/database/prisma";
 
 export type Params = {
   workspaceKeyId: string;

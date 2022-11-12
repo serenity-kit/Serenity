@@ -1,15 +1,5 @@
+import { KeyDerivationTrace } from "@naisho/core";
 import { WorkspaceKey } from "./workspace";
-
-export type KeyDerivationTraceParentFolder = {
-  folderId: string;
-  subkeyId: number;
-  parentFolderId?: string | undefined | null;
-};
-
-export type KeyDerivationTrace = {
-  workspaceKeyId: string;
-  parentFolders: KeyDerivationTraceParentFolder[];
-};
 
 export type Folder = {
   id: string;

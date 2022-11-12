@@ -24,11 +24,11 @@ model Document {
   parentFolderId         String?
   encryptedName          String?
   encryptedNameNonce     String?
-  subkeyId               Int?
-  contentSubkeyId        Int?
+  subkeyId               Int? // used for the name
   nameKeyDerivationTrace Json                @default("{}")
   documentShareLinks     DocumentShareLink[]
   requiresSnapshot       Boolean             @default(false)
+  contentSubkeyId        Int?
 
   @@unique([subkeyId, workspaceId])
 }
@@ -46,6 +46,7 @@ model Snapshot {
   keyDerivationTrace     Json             @default("{}")
   clocks                 Json
   snapshotKeyBoxes       SnapshotKeyBox[]
+  subkeyId               Int?
 }
 
 model Update {
