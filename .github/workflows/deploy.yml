@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - switch-to-fly
 
 jobs:
   deploy-staging:
