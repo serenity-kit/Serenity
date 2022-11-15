@@ -1,5 +1,6 @@
 import { KeyDerivationTrace } from "@naisho/core";
 import { ForbiddenError } from "apollo-server-express";
+import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 
 type Params = {
@@ -21,12 +22,9 @@ export async function updateDocumentName({
   userId,
   nameKeyDerivationTrace,
 }: Params) {
+  const allowedRoles = [Role.ADMIN, Role.EDITOR];
   try {
     return await prisma.$transaction(async (prisma) => {
-      // fetch the document
-      // check if the user has access to the document
-      // update the document
-      // probably this could be refactored into one query.
       const document = await prisma.document.findFirst({
         where: {
           id,
@@ -39,6 +37,7 @@ export async function updateDocumentName({
         where: {
           userId,
           workspaceId: document.workspaceId,
+          role: { in: allowedRoles },
         },
       });
       if (

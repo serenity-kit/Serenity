@@ -11,7 +11,7 @@ import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderR
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import {
   Document,
-  useUpdateDocumentNameMutation,
+  runUpdateDocumentNameMutation,
 } from "../../../generated/graphql";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
@@ -41,7 +41,6 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
-  const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
   const folderStore = useOpenFolderStore();
   const documentPathStore = useDocumentPathStore();
@@ -129,16 +128,19 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       folderId: document.parentFolderId!,
       workspaceKeyId: workspace.currentWorkspaceKey.id,
     });
-    const updateDocumentNameResult = await updateDocumentNameMutation({
-      input: {
-        id: pageId,
-        encryptedName: encryptedDocumentTitle.ciphertext,
-        encryptedNameNonce: encryptedDocumentTitle.publicNonce,
-        workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-        subkeyId: documentSubkeyId,
-        nameKeyDerivationTrace,
+    const updateDocumentNameResult = await runUpdateDocumentNameMutation(
+      {
+        input: {
+          id: pageId,
+          encryptedName: encryptedDocumentTitle.ciphertext,
+          encryptedNameNonce: encryptedDocumentTitle.publicNonce,
+          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+          subkeyId: documentSubkeyId,
+          nameKeyDerivationTrace,
+        },
       },
-    });
+      {}
+    );
     if (updateDocumentNameResult.data?.updateDocumentName?.document) {
       const updatedDocument =
         updateDocumentNameResult.data.updateDocumentName.document;
