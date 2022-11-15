@@ -1,3 +1,4 @@
+import sodium from "@serenity-tools/libsodium";
 import {
   Avatar,
   CenterContent,
@@ -19,6 +20,7 @@ import {
 import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
+import { v4 as uuidv4 } from "uuid";
 import MemberMenu from "../../../components/memberMenu/MemberMenu";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
@@ -45,7 +47,6 @@ import {
   addNewMembersIfNecessary,
   secondsBetweenNewMemberChecks,
 } from "../../../utils/workspace/addNewMembersIfNecessary";
-import { deriveCurrentWorkspaceKey } from "../../../utils/workspace/deriveCurrentWorkspaceKey";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 
@@ -176,10 +177,11 @@ export default function WorkspaceSettingsMembersScreen(
       setMembers(members);
       delete memberLookup[username];
       setMemberLookup(memberLookup);
-      const workspaceKey = await deriveCurrentWorkspaceKey({
-        workspaceId,
-        activeDevice,
-      });
+      const workspaceKeyString = await sodium.crypto_kdf_keygen();
+      const workspaceKey = {
+        id: uuidv4(),
+        workspaceKey: workspaceKeyString,
+      };
 
       const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
       // TODO: getWorkspaceDevices gets all devices attached to a workspace
