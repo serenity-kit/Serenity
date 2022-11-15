@@ -1,8 +1,3 @@
-/**
- * Learn more about using TypeScript with React Navigation:
- * https://reactnavigation.org/docs/typescript/
- */
-
 import { DrawerScreenProps } from "@react-navigation/drawer";
 import {
   CompositeScreenProps,
@@ -68,8 +63,13 @@ export type WorkspaceInvitationParams = {
   workspaceInvitationId: string;
 };
 
+export type WorkspaceStackNavigator = NavigatorScreenParams<{
+  WorkspaceSettingsMembers: undefined; // on phones
+}>;
+
 export type RootStackParamList = {
   Workspace: WorkspaceParams;
+  Workspace2: WorkspaceStackNavigator;
   WorkspaceSettings: WorkspaceSettingsParams;
   Onboarding: undefined;
   DesignSystem: undefined;
@@ -86,7 +86,6 @@ export type RootStackParamList = {
   AccountSettingsProfile: undefined; // on phones
   AccountSettingsDevices: undefined; // on phones
   WorkspaceSettingsGeneral: undefined; // on phones
-  WorkspaceSettingsMembers: undefined; // on phones
   SharePage: undefined;
   Root: undefined;
   NotFound: undefined;

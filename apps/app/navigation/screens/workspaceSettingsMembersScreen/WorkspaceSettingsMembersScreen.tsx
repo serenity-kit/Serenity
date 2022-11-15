@@ -59,11 +59,7 @@ type Member = {
 export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
 ) {
-  let workspaceId = useWorkspaceId();
-  if (workspaceId === "") {
-    const params = props.route.params! as { workspaceId: string };
-    workspaceId = params.workspaceId;
-  }
+  const workspaceId = useWorkspaceId();
   const { activeDevice } = useWorkspaceContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {

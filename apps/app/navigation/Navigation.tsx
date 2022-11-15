@@ -209,6 +209,32 @@ const WorkspaceSettingsMembersScreenWithLoginRedirect =
     WorkspaceSettingsMembersScreen
   );
 
+function WorkspaceStackNavigator(props) {
+  // const { width } = useWindowDimensions();
+  // const isPhone = isPhoneDimensions(width);
+
+  return (
+    <WorkspaceIdProvider value={props.route.params.workspaceId}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen
+          name="WorkspaceSettingsMembers"
+          component={WorkspaceSettingsMembersScreenWithLoginRedirect}
+          options={{
+            title: "Members",
+            headerLeft(props) {
+              return <HeaderLeft {...props} navigateTo="WorkspaceSettings" />;
+            },
+          }}
+        />
+      </Stack.Navigator>
+    </WorkspaceIdProvider>
+  );
+}
+
 function RootNavigator() {
   const dimensions = useWindowDimensions();
 
@@ -231,6 +257,11 @@ function RootNavigator() {
         <Stack.Screen
           name="Workspace"
           component={WorkspaceDrawerScreenWithLoginRedirect}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Workspace2"
+          component={WorkspaceStackNavigator}
           options={{ headerShown: false }}
         />
         <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
@@ -316,18 +347,6 @@ function RootNavigator() {
                 },
               }}
             />
-            <Stack.Screen
-              name="WorkspaceSettingsMembers"
-              component={WorkspaceSettingsMembersScreenWithLoginRedirect}
-              options={{
-                title: "Members",
-                headerLeft(props) {
-                  return (
-                    <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
-                  );
-                },
-              }}
-            />
           </>
         ) : null}
         <Stack.Screen
@@ -392,14 +411,13 @@ const getLinking = (
     ? {
         WorkspaceSettings: "/workspace/:workspaceId/settings",
         WorkspaceSettingsGeneral: "/workspace/:workspaceId/settings/general",
-        WorkspaceSettingsMembers: "/workspace/:workspaceId/settings/members",
       }
     : {
         WorkspaceSettings: {
           path: "/workspace/:workspaceId/settings",
           screens: {
             General: "general",
-            Members: "members",
+            // Members: "members",
           },
         },
       };
@@ -409,6 +427,12 @@ const getLinking = (
     config: {
       screens: {
         ...workspaceSettings,
+        Workspace2: {
+          path: "/workspace2/:workspaceId",
+          screens: {
+            WorkspaceSettingsMembers: "settings/members",
+          },
+        },
         Workspace: {
           path: "/workspace/:workspaceId",
           screens: {

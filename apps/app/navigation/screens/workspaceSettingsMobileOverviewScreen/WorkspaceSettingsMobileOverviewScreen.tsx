@@ -23,8 +23,11 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
       </SidebarLink>
       <SidebarLink
         to={{
-          screen: "WorkspaceSettingsMembers",
-          params: { workspaceId: props.route.params.workspaceId },
+          screen: "Workspace2",
+          params: {
+            workspaceId: props.route.params.workspaceId,
+            screen: "WorkspaceSettingsMembers",
+          },
         }}
         iconName={"group-line"}
       >
