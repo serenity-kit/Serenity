@@ -65,6 +65,7 @@ export type WorkspaceInvitationParams = {
 
 export type WorkspaceStackNavigator = NavigatorScreenParams<{
   WorkspaceSettingsMembers: undefined; // on phones
+  WorkspaceSettingsGeneral: undefined; // on phones
 }>;
 
 export type RootStackParamList = {
@@ -85,7 +86,6 @@ export type RootStackParamList = {
   AccountSettings: AccountSettingsParams | undefined;
   AccountSettingsProfile: undefined; // on phones
   AccountSettingsDevices: undefined; // on phones
-  WorkspaceSettingsGeneral: undefined; // on phones
   SharePage: undefined;
   Root: undefined;
   NotFound: undefined;

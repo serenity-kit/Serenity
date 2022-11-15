@@ -14,8 +14,11 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
     <View style={tw`py-5`}>
       <SidebarLink
         to={{
-          screen: "WorkspaceSettingsGeneral",
-          params: { workspaceId: props.route.params.workspaceId },
+          screen: "Workspace2",
+          params: {
+            workspaceId: props.route.params.workspaceId,
+            screen: "WorkspaceSettingsGeneral",
+          },
         }}
         iconName="settings-4-line"
       >

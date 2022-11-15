@@ -230,6 +230,16 @@ function WorkspaceStackNavigator(props) {
             },
           }}
         />
+        <Stack.Screen
+          name="WorkspaceSettingsGeneral"
+          component={WorkspaceSettingsGeneralScreenWithLoginRedirect}
+          options={{
+            title: "General",
+            headerLeft(props) {
+              return <HeaderLeft {...props} navigateTo="WorkspaceSettings" />;
+            },
+          }}
+        />
       </Stack.Navigator>
     </WorkspaceIdProvider>
   );
@@ -335,18 +345,6 @@ function RootNavigator() {
                 title: "Workspace settings",
               }}
             />
-            <Stack.Screen
-              name="WorkspaceSettingsGeneral"
-              component={WorkspaceSettingsGeneralScreenWithLoginRedirect}
-              options={{
-                title: "General",
-                headerLeft(props) {
-                  return (
-                    <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
-                  );
-                },
-              }}
-            />
           </>
         ) : null}
         <Stack.Screen
@@ -410,7 +408,6 @@ const getLinking = (
   const workspaceSettings = isPhoneDimensions
     ? {
         WorkspaceSettings: "/workspace/:workspaceId/settings",
-        WorkspaceSettingsGeneral: "/workspace/:workspaceId/settings/general",
       }
     : {
         WorkspaceSettings: {
@@ -430,6 +427,7 @@ const getLinking = (
         Workspace2: {
           path: "/workspace2/:workspaceId",
           screens: {
+            WorkspaceSettingsGeneral: "settings/general",
             WorkspaceSettingsMembers: "settings/members",
           },
         },

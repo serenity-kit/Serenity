@@ -206,7 +206,6 @@ export const rootScreenMachine =
           context.navigation.replace("Onboarding");
         },
         redirectToDocument: (context) => {
-          console.log("WEEEE redirectToDocument");
           if (
             context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
               ?.workspaceLoadingInfo
@@ -229,7 +228,6 @@ export const rootScreenMachine =
       },
       services: {
         getLastUsedWorkspaceAndDocumentId: async (context) => {
-          console.log("WEEEE getLastUsedWorkspaceAndDocumentId");
           const lastUsedWorkspaceId = await getLastUsedWorkspaceId();
           if (lastUsedWorkspaceId) {
             const lastUsedDocumentId = await getLastUsedDocumentId(
@@ -245,7 +243,6 @@ export const rootScreenMachine =
           };
         },
         fetchMeWithWorkspaceLoadingInfo: (context) => {
-          console.log("WEEEE fetchMeWithWorkspaceLoadingInfo");
           return runMeWithWorkspaceLoadingInfoQuery({
             workspaceId: context.workspaceId,
             documentId: context.documentId,
