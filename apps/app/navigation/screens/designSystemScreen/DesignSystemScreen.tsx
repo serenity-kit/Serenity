@@ -187,6 +187,32 @@ export default function DesignSystemScreen() {
             <Avatar customColor="sky">NG</Avatar>
           </AvatarGroup>
         </DSExampleArea>
+        <Heading lvl={3}>Status</Heading>
+        <Text variant="sm">
+          To indicate if an <DSMono variant="component">Avatar</DSMono> is
+          active or absent in the same context as the current user is, use the{" "}
+          <DSMono variant="property">status</DSMono> property, to make their
+          presence more visible.
+        </Text>
+        <DSExampleArea>
+          <AvatarGroup max={3} _avatar={{ size: "sm" }}>
+            <Avatar status="active" customColor="arctic">
+              SK
+            </Avatar>
+            <Avatar status="active" customColor="lavender">
+              NG
+            </Avatar>
+            <Avatar status="inactive" customColor="rose">
+              AN
+            </Avatar>
+            <Avatar status="inactive" customColor="honey">
+              NG
+            </Avatar>
+            <Avatar status="inactive" customColor="sky">
+              NG
+            </Avatar>
+          </AvatarGroup>
+        </DSExampleArea>
         <Heading lvl={4} style={h4Styles}>
           Related components
         </Heading>
