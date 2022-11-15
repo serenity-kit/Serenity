@@ -33,12 +33,15 @@ const setup = async () => {
   signingPrivateKey = registerUserResult1.signingPrivateKey;
 
   // hard-code the encryptionKey just so we have a document to run tests on
-  const documentEncryptionKey = sodium.from_base64(
+  const snapshotEncryptionKey = sodium.from_base64(
     "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
   );
+
   documentSnapshot = await createIntroductionDocumentSnapshot({
     documentId,
-    documentEncryptionKey,
+    snapshotEncryptionKey,
+    subkeyId: 42,
+    keyDerivationTrace: { workspaceKeyId: "abc", parentFolders: [] },
   });
 };
 

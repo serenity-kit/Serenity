@@ -1,12 +1,14 @@
 import {
   createDocumentKey,
   createIntroductionDocumentSnapshot,
+  createSnapshotKey,
   encryptDocumentTitle,
   encryptFolderName,
   LocalDevice,
 } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
+import { v4 as uuidv4 } from "uuid";
 import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
 
 type Params = {
@@ -42,6 +44,8 @@ export const createInitialWorkspaceStructure = async ({
   documentName,
   authorizationHeader,
 }: Params) => {
+  const workspaceKeyId = uuidv4();
+
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
@@ -127,13 +131,24 @@ export const createInitialWorkspaceStructure = async ({
     folderKey,
   });
   const documentContentSubkeyId = documentContentKeyResult.subkeyId;
-  const documentEncryptionKey = sodium.from_base64(
-    documentContentKeyResult.key
-  );
 
+  const snapshotKey = await createSnapshotKey({
+    folderKey: encryptedFolderResult.folderSubkey,
+  });
   const documentSnapshot = await createIntroductionDocumentSnapshot({
     documentId,
-    documentEncryptionKey,
+    snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
+    subkeyId: snapshotKey.subkeyId,
+    keyDerivationTrace: {
+      workspaceKeyId,
+      parentFolders: [
+        {
+          folderId,
+          subkeyId: encryptedFolderResult.folderSubkeyId,
+          parentFolderId: null,
+        },
+      ],
+    },
   });
 
   const result = await graphql.client.request(

@@ -10,6 +10,7 @@ query workspaces($deviceSigningPublicKey: String!) {
       currentWorkspaceKey {
         id
         workspaceId
+        generation
         workspaceKeyBox {
           id
           workspaceKeyId
@@ -25,6 +26,7 @@ query workspaces($deviceSigningPublicKey: String!) {
       workspaceKeys {
         id
         workspaceId
+        generation
         workspaceKeyBox {
           id
           workspaceKeyId

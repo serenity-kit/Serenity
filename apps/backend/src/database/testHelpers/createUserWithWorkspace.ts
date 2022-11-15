@@ -2,6 +2,7 @@ import {
   createAndEncryptDevice,
   createDocumentKey,
   createIntroductionDocumentSnapshot,
+  createSnapshotKey,
   encryptDocumentTitle,
   encryptFolderName,
 } from "@serenity-tools/common";
@@ -77,6 +78,8 @@ export default async function createUserWithWorkspace({
   });
 
   const documentId = uuidv4();
+  const folderId = uuidv4();
+  const workspaceKeyId = uuidv4();
   const documentName = "Introduction";
   const user = result.user;
   const device = result.device;
@@ -108,17 +111,30 @@ export default async function createUserWithWorkspace({
   const docmenContentKeyResult = await createDocumentKey({
     folderKey,
   });
-  const documentEncryptionKey = sodium.from_base64(docmenContentKeyResult.key);
+  const snapshotKey = await createSnapshotKey({
+    folderKey: encryptedFolderResult.folderSubkey,
+  });
   const documentSnapshot = await createIntroductionDocumentSnapshot({
     documentId,
-    documentEncryptionKey,
+    snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
+    subkeyId: snapshotKey.subkeyId,
+    keyDerivationTrace: {
+      workspaceKeyId,
+      parentFolders: [
+        {
+          folderId,
+          subkeyId: encryptedFolderResult.folderSubkeyId,
+          parentFolderId: null,
+        },
+      ],
+    },
   });
 
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
     workspaceId: id,
     workspaceName: "My Workspace",
-    folderId: uuidv4(),
+    folderId,
     folderIdSignature: uuidv4(),
     encryptedFolderName: encryptedFolderResult.ciphertext,
     encryptedFolderNameNonce: encryptedFolderResult.publicNonce,

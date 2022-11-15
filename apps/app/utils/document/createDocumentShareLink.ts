@@ -25,7 +25,7 @@ export const getDocumentShareLinkUrl = (
         : // on iOS window.location.host is not available
           `http://localhost:19006/`
       : "https://www.serenity.li";
-  return `${rootUrl}/share/${documentId}/${token}#key=${key}`;
+  return `${rootUrl}/page/${documentId}/${token}#key=${key}`;
 };
 
 export type Props = {

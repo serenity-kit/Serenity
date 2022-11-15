@@ -84,6 +84,7 @@ export const createInitialWorkspaceStructureMutation = mutationField(
         encryptedDocumentNameNonce: args.input.encryptedDocumentNameNonce,
         documentSubkeyId: args.input.documentSubkeyId,
         documentContentSubkeyId: args.input.documentContentSubkeyId,
+        // @ts-ignore TODO: fix createInitialWorkspaceStructure mutation
         documentSnapshot: args.input.documentSnapshot,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
         deviceWorkspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,

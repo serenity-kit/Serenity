@@ -1,5 +1,5 @@
+import { KeyDerivationTrace } from "@naisho/core";
 import { Document } from "./document";
-import { KeyDerivationTrace } from "./folder";
 
 export type Snapshot = {
   id: string;

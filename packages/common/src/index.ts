@@ -15,5 +15,6 @@ export * from "./equalArrayContent/equalArrayContent";
 export * from "./getExpiredTextFromString/getExpiredTextFromString";
 export * from "./recreateDocumentKey/recreateDocumentKey";
 export * from "./recreateSnapshotKey/recreateSnapshotKey";
+export * from "./sleep/sleep";
 export * from "./types";
 export * from "./verifyDevice/verifyDevice";

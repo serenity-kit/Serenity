@@ -1,5 +1,5 @@
+import { KeyDerivationTrace } from "@naisho/core";
 import { ForbiddenError } from "apollo-server-express";
-import { KeyDerivationTrace } from "../../types/folder";
 import { prisma } from "../prisma";
 
 type Params = {

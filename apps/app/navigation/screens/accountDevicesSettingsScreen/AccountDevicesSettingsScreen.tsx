@@ -1,3 +1,5 @@
+import { getExpiredTextFromString } from "@serenity-tools/common";
+import sodium from "@serenity-tools/libsodium";
 import {
   Description,
   Heading,
@@ -12,11 +14,11 @@ import {
   useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
-import { getExpiredTextFromString } from "@serenity-tools/common";
 import { useMachine } from "@xstate/react";
 import { format, parseJSON } from "date-fns";
 import { useState } from "react";
 import { useWindowDimensions } from "react-native";
+import { v4 as uuidv4 } from "uuid";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import {
   useDeleteDevicesMutation,
@@ -31,7 +33,6 @@ import {
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { notNull } from "../../../utils/notNull/notNull";
-import { deriveCurrentWorkspaceKey } from "../../../utils/workspace/deriveCurrentWorkspaceKey";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
 
@@ -88,10 +89,11 @@ export default function DeviceManagerScreen(props) {
         return;
       }
       const workspaceDevicePairing: WorkspaceDeviceParing[] = [];
-      const workspaceKey = await deriveCurrentWorkspaceKey({
-        workspaceId,
-        activeDevice,
-      });
+      const workspaceKeyString = await sodium.crypto_kdf_keygen();
+      const workspaceKey = {
+        id: uuidv4(),
+        workspaceKey: workspaceKeyString,
+      };
       for (let device of devices) {
         if (!device) {
           continue;

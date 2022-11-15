@@ -1140,6 +1140,8 @@ export default function DesignSystemScreen() {
             <IconTile name="download-line" />
             <IconTile name="printer-line" />
             <IconTile name="search-line" />
+            <IconTile name="share-line" />
+            <IconTile name="share-box-line" />
             <IconTile name="stars-s-fill" />
             <IconTile name="delete-bin-line" />
             <IconTile name="history-line" />

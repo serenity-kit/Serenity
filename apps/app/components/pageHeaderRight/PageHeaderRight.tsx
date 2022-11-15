@@ -61,11 +61,11 @@ export function PageHeaderRight() {
             ) : (
               <>
                 <IconButton
-                  name="more-2-fill"
+                  name="share-line"
                   size="lg"
                   color="gray-900"
                   onPress={() => {
-                    alert("TODO");
+                    setIsActiveShareModal(true);
                   }}
                 />
               </>

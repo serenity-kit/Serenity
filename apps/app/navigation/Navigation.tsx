@@ -47,6 +47,7 @@ import PageScreen from "./screens/pageScreen/PageScreen";
 import RegisterScreen from "./screens/registerScreen/RegisterScreen";
 import RegistrationVerificationScreen from "./screens/registrationVerificationScreen/RegistrationVerificationScreen";
 import RootScreen from "./screens/rootScreen/RootScreen";
+import SharePageScreen from "./screens/sharePageScreen/SharePageScreen";
 import WorkspaceNotDecryptedScreen from "./screens/workspaceNotDecryptedScreen/WorkspaceNotDecryptedScreen";
 import WorkspaceNotFoundScreen from "./screens/workspaceNotFoundScreen/WorkspaceNotFoundScreen";
 import WorkspaceRootScreen from "./screens/workspaceRootScreen/WorkspaceRootScreen";
@@ -254,6 +255,11 @@ function RootNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="SharePage"
+          component={SharePageScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="EncryptDecryptImageTest"
           component={EncryptDecryptImageTestScreen}
         />
@@ -422,6 +428,7 @@ const getLinking = (
         AcceptWorkspaceInvitation:
           "accept-workspace-invitation/:workspaceInvitationId",
         TestLibsodium: "test-libsodium",
+        SharePage: "page/:pageId/:token",
         WorkspaceNotFound: "workspace/:workspaceId/not-found",
         ...accountSettings,
         Root: "",

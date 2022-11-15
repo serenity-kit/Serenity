@@ -1,7 +1,6 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
-  createDocumentKey,
   decryptFolderName,
   encryptExistingFolderName,
   encryptFolderName,
@@ -23,10 +22,10 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, StyleSheet } from "react-native";
 import { v4 as uuidv4 } from "uuid";
 import {
+  runCreateDocumentMutation,
+  runCreateFolderMutation,
   runDeleteFoldersMutation,
   runUpdateFolderNameMutation,
-  runCreateDocumentMutation,
-  useCreateFolderMutation,
   useDocumentsQuery,
   useFoldersQuery,
 } from "../../generated/graphql";
@@ -71,7 +70,6 @@ export default function SidebarFolder(props: Props) {
   const [isDeleted, setIsDeleted] = useState(false);
   const isOpen = openFolderIds.includes(props.folderId);
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
-  const [, createFolderMutation] = useCreateFolderMutation();
   const [foldersResult, refetchFolders] = useFoldersQuery({
     pause: !isOpen,
     variables: {
@@ -117,7 +115,7 @@ export default function SidebarFolder(props: Props) {
       if (folder.parentFolderId) {
         parentKey = await getFolderKey({
           workspaceId: props.workspaceId,
-          workspaceKeyId: folder.workspaceKeyId,
+          workspaceKeyId: folder.keyDerivationTrace.workspaceKeyId,
           folderId: folder.parentFolderId,
           folderSubkeyId: props.subkeyId,
           activeDevice,
@@ -125,7 +123,7 @@ export default function SidebarFolder(props: Props) {
       } else {
         const workspaceKeyData = await deriveWorkspaceKey({
           workspaceId: props.workspaceId,
-          workspaceKeyId: folder.workspaceKeyId!,
+          workspaceKeyId: folder.keyDerivationTrace.workspaceKeyId,
           activeDevice,
         });
         parentKey = workspaceKeyData.workspaceKey;
@@ -189,18 +187,21 @@ export default function SidebarFolder(props: Props) {
     });
     do {
       numCreateFolderAttempts += 1;
-      result = await createFolderMutation({
-        input: {
-          id,
-          workspaceId: route.params.workspaceId,
-          encryptedName: encryptedFolderResult.ciphertext,
-          encryptedNameNonce: encryptedFolderResult.publicNonce,
-          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-          subkeyId: encryptedFolderResult.folderSubkeyId,
-          parentFolderId: props.folderId,
-          keyDerivationTrace,
+      result = await runCreateFolderMutation(
+        {
+          input: {
+            id,
+            workspaceId: route.params.workspaceId,
+            encryptedName: encryptedFolderResult.ciphertext,
+            encryptedNameNonce: encryptedFolderResult.publicNonce,
+            workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+            subkeyId: encryptedFolderResult.folderSubkeyId,
+            parentFolderId: props.folderId,
+            keyDerivationTrace,
+          },
         },
-      });
+        {}
+      );
       if (result.data?.createFolder?.folder?.id) {
         didCreateFolderSucceed = true;
         folderId = result.data?.createFolder?.folder?.id;
@@ -234,9 +235,6 @@ export default function SidebarFolder(props: Props) {
       folderSubkeyId: props.subkeyId,
       activeDevice,
     });
-    const documentContentKeyResult = await createDocumentKey({
-      folderKey: folderKeyString,
-    });
     const nameKeyDerivationTrace = await buildKeyDerivationTrace({
       folderId: props.folderId,
       workspaceKeyId: workspace.currentWorkspaceKey.id,
@@ -247,8 +245,8 @@ export default function SidebarFolder(props: Props) {
           id,
           workspaceId: props.workspaceId,
           parentFolderId: props.folderId,
-          contentSubkeyId: documentContentKeyResult.subkeyId,
           nameKeyDerivationTrace,
+          contentSubkeyId: 1234, // TODO remove
         },
       },
       {}
