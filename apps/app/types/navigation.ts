@@ -87,6 +87,7 @@ export type RootStackParamList = {
   AccountSettingsDevices: undefined; // on phones
   WorkspaceSettingsGeneral: undefined; // on phones
   WorkspaceSettingsMembers: undefined; // on phones
+  SharePage: undefined;
   Root: undefined;
   NotFound: undefined;
 };
