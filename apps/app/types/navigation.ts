@@ -71,13 +71,13 @@ export type WorkspaceStackNavigator = NavigatorScreenParams<{
 export type RootStackParamList = {
   Workspace: WorkspaceParams;
   Workspace2: WorkspaceStackNavigator;
-  WorkspaceSettings: WorkspaceSettingsParams;
   Onboarding: undefined;
   DesignSystem: undefined;
   DevDashboard: undefined;
   Register: undefined;
   RegistrationVerification: RegistrationVerificationParams;
   AcceptWorkspaceInvitation: WorkspaceInvitationParams;
+  WorkspaceSettings: WorkspaceSettingsParams; // TODO move
   WorkspaceNotFound: undefined;
   Login: LoginParams | undefined;
   LogoutInProgress: undefined;

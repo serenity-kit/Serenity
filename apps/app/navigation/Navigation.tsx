@@ -210,8 +210,7 @@ const WorkspaceSettingsMembersScreenWithLoginRedirect =
   );
 
 function WorkspaceStackNavigator(props) {
-  // const { width } = useWindowDimensions();
-  // const isPhone = isPhoneDimensions(width);
+  const dimensions = useWindowDimensions();
 
   return (
     <WorkspaceIdProvider value={props.route.params.workspaceId}>
@@ -220,26 +219,45 @@ function WorkspaceStackNavigator(props) {
           headerShown: false,
         }}
       >
-        <Stack.Screen
-          name="WorkspaceSettingsMembers"
-          component={WorkspaceSettingsMembersScreenWithLoginRedirect}
-          options={{
-            title: "Members",
-            headerLeft(props) {
-              return <HeaderLeft {...props} navigateTo="WorkspaceSettings" />;
-            },
-          }}
-        />
-        <Stack.Screen
-          name="WorkspaceSettingsGeneral"
-          component={WorkspaceSettingsGeneralScreenWithLoginRedirect}
-          options={{
-            title: "General",
-            headerLeft(props) {
-              return <HeaderLeft {...props} navigateTo="WorkspaceSettings" />;
-            },
-          }}
-        />
+        {isPhoneDimensions(dimensions.width) ||
+          // TODO remove true once workspaceDrawer iss moved in here
+          (true && (
+            <>
+              <Stack.Screen
+                name="WorkspaceSettings"
+                component={
+                  WorkspaceSettingsMobileOverviewScreenWithLoginRedirect
+                }
+                options={{
+                  title: "Workspace settings",
+                }}
+              />
+              <Stack.Screen
+                name="WorkspaceSettingsMembers"
+                component={WorkspaceSettingsMembersScreenWithLoginRedirect}
+                options={{
+                  title: "Members",
+                  headerLeft(props) {
+                    return (
+                      <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
+                    );
+                  },
+                }}
+              />
+              <Stack.Screen
+                name="WorkspaceSettingsGeneral"
+                component={WorkspaceSettingsGeneralScreenWithLoginRedirect}
+                options={{
+                  title: "General",
+                  headerLeft(props) {
+                    return (
+                      <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
+                    );
+                  },
+                }}
+              />
+            </>
+          ))}
       </Stack.Navigator>
     </WorkspaceIdProvider>
   );
@@ -338,13 +356,6 @@ function RootNavigator() {
                 },
               }}
             />
-            <Stack.Screen
-              name="WorkspaceSettings"
-              component={WorkspaceSettingsMobileOverviewScreenWithLoginRedirect}
-              options={{
-                title: "Workspace settings",
-              }}
-            />
           </>
         ) : null}
         <Stack.Screen
@@ -406,15 +417,13 @@ const getLinking = (
       };
 
   const workspaceSettings = isPhoneDimensions
-    ? {
-        WorkspaceSettings: "/workspace/:workspaceId/settings",
-      }
+    ? {}
     : {
         WorkspaceSettings: {
           path: "/workspace/:workspaceId/settings",
           screens: {
             General: "general",
-            // Members: "members",
+            Members: "members",
           },
         },
       };
@@ -429,6 +438,7 @@ const getLinking = (
           screens: {
             WorkspaceSettingsGeneral: "settings/general",
             WorkspaceSettingsMembers: "settings/members",
+            WorkspaceSettings: "settings",
           },
         },
         Workspace: {

@@ -148,8 +148,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <View style={!isPermanentLeftSidebar && tw`pt-5 pb-7`}>
         <SidebarLink
           to={{
-            screen: "WorkspaceSettings",
-            params: { workspaceId },
+            screen: "Workspace2",
+            params: { workspaceId, screen: "WorkspaceSettings" },
           }}
           iconName={"settings-4-line"}
           // @ts-expect-error needs fixing in the SidebarLink types
