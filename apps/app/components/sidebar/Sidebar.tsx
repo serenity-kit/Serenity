@@ -2,7 +2,6 @@ import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
 } from "@react-navigation/drawer";
-import { useRoute } from "@react-navigation/native";
 import { encryptFolderName } from "@serenity-tools/common";
 import {
   Heading,
@@ -27,14 +26,12 @@ import {
   useRootFoldersQuery,
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { RootStackScreenProps } from "../../types/navigation";
 import { deriveCurrentWorkspaceKey } from "../../utils/workspace/deriveCurrentWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
-  const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
   const { activeDevice } = useWorkspaceContext();
   const workspaceId = useWorkspaceId();
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
