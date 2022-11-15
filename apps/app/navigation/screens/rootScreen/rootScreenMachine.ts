@@ -199,7 +199,10 @@ export const rootScreenMachine =
             workspaceId:
               context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
                 ?.workspaceLoadingInfo?.id,
-            screen: "WorkspaceNotDecrypted",
+            screen: "WorkspaceDrawer",
+            params: {
+              screen: "WorkspaceNotDecrypted",
+            },
           });
         },
         redirectToNoWorkspaces: (context) => {
@@ -214,11 +217,14 @@ export const rootScreenMachine =
               workspaceId:
                 context.meWithWorkspaceLoadingInfoQueryResult?.data.me
                   .workspaceLoadingInfo.id,
-              screen: "Page",
+              screen: "WorkspaceDrawer",
               params: {
-                pageId:
-                  context.meWithWorkspaceLoadingInfoQueryResult?.data.me
-                    .workspaceLoadingInfo.documentId,
+                screen: "Page",
+                params: {
+                  pageId:
+                    context.meWithWorkspaceLoadingInfoQueryResult?.data.me
+                      .workspaceLoadingInfo.documentId,
+                },
               },
             });
           } else {

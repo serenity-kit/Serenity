@@ -25,7 +25,10 @@ import { useAppContext } from "../context/AppContext";
 import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
 import { useInterval } from "../hooks/useInterval";
-import { RootStackParamList } from "../types/navigation";
+import {
+  RootStackParamList,
+  WorkspaceStackParamList,
+} from "../types/navigation";
 import { setLastUsedWorkspaceId } from "../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import {
   addNewMembersIfNecessary,
@@ -60,6 +63,7 @@ import WorkspaceSettingsMobileOverviewScreen from "./screens/workspaceSettingsMo
  * https://reactnavigation.org/docs/modal
  */
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const WorkspaceStack = createNativeStackNavigator<WorkspaceStackParamList>();
 const Drawer = createDrawerNavigator();
 const AccountSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
 const WorkspaceSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
@@ -71,85 +75,59 @@ const styles = StyleSheet.create({
 
 const isPhoneDimensions = (width: number) => width < 768;
 
-function WorkspaceDrawerScreen(props) {
+function WorkspaceDrawerNavigator(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const { width } = useWindowDimensions();
-  const { activeDevice } = useAppContext();
-
-  useInterval(() => {
-    if (activeDevice) {
-      addNewMembersIfNecessary({ activeDevice });
-    }
-  }, secondsBetweenNewMemberChecks * 1000);
-
-  useEffect(() => {
-    if (props.route.params?.workspaceId) {
-      setLastUsedWorkspaceId(props.route.params.workspaceId);
-    }
-  }, [props.route.params?.workspaceId]);
-
-  if (!props.route.params) {
-    return null;
-  }
 
   return (
-    <WorkspaceIdProvider value={props.route.params.workspaceId}>
-      <Drawer.Navigator
-        drawerContent={(props) => <Sidebar {...props} />}
-        screenOptions={{
-          unmountOnBlur: true,
-          headerShown: true,
-          headerTitle: (props) => <Text>{props.children}</Text>,
-          headerStyle: [styles.header],
-          drawerType: isPermanentLeftSidebar ? "permanent" : "front",
-          drawerStyle: {
-            width: isPermanentLeftSidebar ? 240 : width,
-          },
-          headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
-          overlayColor: "transparent",
-        }}
-      >
-        <Drawer.Screen name="Page" component={PageScreen} />
-        <Drawer.Screen
-          name="WorkspaceNotDecrypted"
-          component={WorkspaceNotDecryptedScreen}
-          options={{ title: "" }}
-        />
-        <Drawer.Screen
-          name="WorkspaceRoot"
-          component={WorkspaceRootScreen}
-          options={{ headerShown: false }}
-        />
-      </Drawer.Navigator>
-    </WorkspaceIdProvider>
+    <Drawer.Navigator
+      drawerContent={(props) => <Sidebar {...props} />}
+      screenOptions={{
+        unmountOnBlur: true,
+        headerShown: true,
+        headerTitle: (props) => <Text>{props.children}</Text>,
+        headerStyle: [styles.header],
+        drawerType: isPermanentLeftSidebar ? "permanent" : "front",
+        drawerStyle: {
+          width: isPermanentLeftSidebar ? 240 : width,
+        },
+        headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
+        overlayColor: "transparent",
+      }}
+    >
+      <Drawer.Screen name="Page" component={PageScreen} />
+      <Drawer.Screen
+        name="WorkspaceNotDecrypted"
+        component={WorkspaceNotDecryptedScreen}
+        options={{ title: "" }}
+      />
+    </Drawer.Navigator>
   );
 }
 
-function WorkspaceSettingsDrawerScreen(props) {
+function WorkspaceSettingsDrawerNavigator(props) {
   return (
     <NavigationDrawerModal {...props}>
-      <WorkspaceIdProvider value={props.route.params.workspaceId}>
-        <WorkspaceSettingsDrawer.Navigator
-          drawerContent={(props) => <WorkspaceSettingsSidebar {...props} />}
-          screenOptions={{
-            unmountOnBlur: true,
-            headerShown: false,
-            drawerType: "permanent",
-            drawerStyle: {
-              width: 240,
-            },
-          }}
-        >
-          <WorkspaceSettingsDrawer.Screen
-            name="General"
-            component={WorkspaceSettingsGeneralScreen}
-          />
-          <WorkspaceSettingsDrawer.Screen
-            name="Members"
-            component={WorkspaceSettingsMembersScreen}
-          />
-        </WorkspaceSettingsDrawer.Navigator>
-      </WorkspaceIdProvider>
+      <WorkspaceSettingsDrawer.Navigator
+        drawerContent={(props) => <WorkspaceSettingsSidebar {...props} />}
+        screenOptions={{
+          unmountOnBlur: true,
+          headerShown: false,
+          drawerType: "permanent",
+          drawerStyle: {
+            width: 240,
+          },
+        }}
+      >
+        <WorkspaceSettingsDrawer.Screen
+          name="General"
+          component={WorkspaceSettingsGeneralScreen}
+        />
+        <WorkspaceSettingsDrawer.Screen
+          name="Members"
+          component={WorkspaceSettingsMembersScreen}
+        />
+      </WorkspaceSettingsDrawer.Navigator>
     </NavigationDrawerModal>
   );
 }
@@ -181,8 +159,8 @@ function AccountSettingsDrawerScreen(props) {
   );
 }
 
-const WorkspaceDrawerScreenWithLoginRedirect =
-  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(WorkspaceDrawerScreen);
+const WorkspaceDrawerNavigatorWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(WorkspaceDrawerNavigator);
 
 const AccountSettingsMobileOverviewScreenWithLoginRedirect =
   redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
@@ -211,54 +189,89 @@ const WorkspaceSettingsMembersScreenWithLoginRedirect =
 
 function WorkspaceStackNavigator(props) {
   const dimensions = useWindowDimensions();
+  const { activeDevice } = useAppContext();
+
+  useInterval(() => {
+    if (activeDevice) {
+      addNewMembersIfNecessary({ activeDevice });
+    }
+  }, secondsBetweenNewMemberChecks * 1000);
+
+  useEffect(() => {
+    if (props.route.params?.workspaceId) {
+      setLastUsedWorkspaceId(props.route.params.workspaceId);
+    }
+  }, [props.route.params?.workspaceId]);
+
+  if (!props.route.params) {
+    return null;
+  }
 
   return (
     <WorkspaceIdProvider value={props.route.params.workspaceId}>
-      <Stack.Navigator
+      <WorkspaceStack.Navigator
         screenOptions={{
           headerShown: false,
         }}
       >
-        {isPhoneDimensions(dimensions.width) ||
-          // TODO remove true once workspaceDrawer iss moved in here
-          (true && (
-            <>
-              <Stack.Screen
-                name="WorkspaceSettings"
-                component={
-                  WorkspaceSettingsMobileOverviewScreenWithLoginRedirect
-                }
-                options={{
-                  title: "Workspace settings",
-                }}
-              />
-              <Stack.Screen
-                name="WorkspaceSettingsMembers"
-                component={WorkspaceSettingsMembersScreenWithLoginRedirect}
-                options={{
-                  title: "Members",
-                  headerLeft(props) {
-                    return (
-                      <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
-                    );
-                  },
-                }}
-              />
-              <Stack.Screen
-                name="WorkspaceSettingsGeneral"
-                component={WorkspaceSettingsGeneralScreenWithLoginRedirect}
-                options={{
-                  title: "General",
-                  headerLeft(props) {
-                    return (
-                      <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
-                    );
-                  },
-                }}
-              />
-            </>
-          ))}
-      </Stack.Navigator>
+        <WorkspaceStack.Screen
+          name="WorkspaceDrawer"
+          component={WorkspaceDrawerNavigatorWithLoginRedirect}
+          options={{ headerShown: false }}
+        />
+        {isPhoneDimensions(dimensions.width) ? (
+          <>
+            <WorkspaceStack.Screen
+              name="WorkspaceSettings"
+              component={WorkspaceSettingsMobileOverviewScreenWithLoginRedirect}
+              options={{
+                title: "Workspace settings",
+              }}
+            />
+            <WorkspaceStack.Screen
+              name="WorkspaceSettingsMembers"
+              component={WorkspaceSettingsMembersScreenWithLoginRedirect}
+              options={{
+                title: "Members",
+                headerLeft(props) {
+                  return (
+                    <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
+                  );
+                },
+              }}
+            />
+            <WorkspaceStack.Screen
+              name="WorkspaceSettingsGeneral"
+              component={WorkspaceSettingsGeneralScreenWithLoginRedirect}
+              options={{
+                title: "General",
+                headerLeft(props) {
+                  return (
+                    <HeaderLeft {...props} navigateTo="WorkspaceSettings" />
+                  );
+                },
+              }}
+            />
+          </>
+        ) : (
+          <WorkspaceStack.Group
+            screenOptions={{
+              presentation: "modal",
+              headerShown: false,
+            }}
+          >
+            <WorkspaceStack.Screen
+              name="WorkspaceSettings"
+              component={WorkspaceSettingsDrawerNavigator}
+            />
+          </WorkspaceStack.Group>
+        )}
+        <WorkspaceStack.Screen
+          name="WorkspaceRoot"
+          component={WorkspaceRootScreen}
+          options={{ headerShown: false }}
+        />
+      </WorkspaceStack.Navigator>
     </WorkspaceIdProvider>
   );
 }
@@ -284,11 +297,6 @@ function RootNavigator() {
         />
         <Stack.Screen
           name="Workspace"
-          component={WorkspaceDrawerScreenWithLoginRedirect}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Workspace2"
           component={WorkspaceStackNavigator}
           options={{ headerShown: false }}
         />
@@ -381,16 +389,10 @@ function RootNavigator() {
         }}
       >
         {!isPhoneDimensions(dimensions.width) ? (
-          <>
-            <Stack.Screen
-              name="AccountSettings"
-              component={AccountSettingsDrawerScreen}
-            />
-            <Stack.Screen
-              name="WorkspaceSettings"
-              component={WorkspaceSettingsDrawerScreen}
-            />
-          </>
+          <Stack.Screen
+            name="AccountSettings"
+            component={AccountSettingsDrawerScreen}
+          />
         ) : null}
       </Stack.Group>
     </Stack.Navigator>
@@ -417,10 +419,14 @@ const getLinking = (
       };
 
   const workspaceSettings = isPhoneDimensions
-    ? {}
+    ? {
+        WorkspaceSettingsGeneral: "settings/general",
+        WorkspaceSettingsMembers: "settings/members",
+        WorkspaceSettings: "settings",
+      }
     : {
         WorkspaceSettings: {
-          path: "/workspace/:workspaceId/settings",
+          path: "settings",
           screens: {
             General: "general",
             Members: "members",
@@ -432,20 +438,17 @@ const getLinking = (
     prefixes: [Linking.createURL("/")],
     config: {
       screens: {
-        ...workspaceSettings,
-        Workspace2: {
-          path: "/workspace2/:workspaceId",
-          screens: {
-            WorkspaceSettingsGeneral: "settings/general",
-            WorkspaceSettingsMembers: "settings/members",
-            WorkspaceSettings: "settings",
-          },
-        },
         Workspace: {
           path: "/workspace/:workspaceId",
           screens: {
-            Page: "page/:pageId",
-            WorkspaceNotDecrypted: "lobby",
+            ...workspaceSettings,
+            WorkspaceDrawer: {
+              path: "/",
+              screens: {
+                Page: "page/:pageId",
+                WorkspaceNotDecrypted: "lobby",
+              },
+            },
             WorkspaceRoot: "",
           },
         },

@@ -33,7 +33,6 @@ export type WorkspaceDrawerParamList = {
   Page: PageParams;
   Settings: undefined;
   WorkspaceNotDecrypted: undefined;
-  WorkspaceRoot: undefined;
 };
 
 export type WorkspaceParams = NavigatorScreenParams<WorkspaceDrawerParamList> &
@@ -63,21 +62,25 @@ export type WorkspaceInvitationParams = {
   workspaceInvitationId: string;
 };
 
-export type WorkspaceStackNavigator = NavigatorScreenParams<{
+export type WorkspaceStackParamList = {
   WorkspaceSettingsMembers: undefined; // on phones
   WorkspaceSettingsGeneral: undefined; // on phones
-}>;
+  WorkspaceSettings: WorkspaceSettingsParams;
+  WorkspaceDrawer: WorkspaceParams;
+  WorkspaceRoot: undefined;
+};
+
+export type WorkspaceStackNavigatorScreenParamList =
+  NavigatorScreenParams<WorkspaceStackParamList>;
 
 export type RootStackParamList = {
-  Workspace: WorkspaceParams;
-  Workspace2: WorkspaceStackNavigator;
+  Workspace: WorkspaceStackNavigatorScreenParamList;
   Onboarding: undefined;
   DesignSystem: undefined;
   DevDashboard: undefined;
   Register: undefined;
   RegistrationVerification: RegistrationVerificationParams;
   AcceptWorkspaceInvitation: WorkspaceInvitationParams;
-  WorkspaceSettings: WorkspaceSettingsParams; // TODO move
   WorkspaceNotFound: undefined;
   Login: LoginParams | undefined;
   LogoutInProgress: undefined;
