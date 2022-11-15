@@ -14,7 +14,7 @@ import {
   runUpdateDocumentNameMutation,
 } from "../../../generated/graphql";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
-import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";

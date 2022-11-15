@@ -27,7 +27,7 @@ import {
 } from "../../../generated/graphql";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
-import { WorkspaceStackScreenProps } from "../../../types/navigation";
+import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,

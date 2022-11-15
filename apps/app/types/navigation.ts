@@ -1,9 +1,4 @@
-import { DrawerScreenProps } from "@react-navigation/drawer";
-import {
-  CompositeScreenProps,
-  NavigatorScreenParams,
-} from "@react-navigation/native";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { NavigatorScreenParams } from "@react-navigation/native";
 
 type PageParamList = {
   pageId: string;
@@ -41,12 +36,6 @@ export type WorkspaceSettingsDrawerParamList = {
   General: undefined;
   Members: undefined;
 };
-
-// export type WorkspaceSettingsParams =
-//   // tablet & desktop params
-//   | NavigatorScreenParams<WorkspaceSettingsDrawerParamList>
-//   // phone params
-//   | WorkspacePageParams;
 
 export type WorkspaceSettingsParams =
   // tablet & desktop params
@@ -97,33 +86,3 @@ export type RootStackParamList = {
   Root: undefined;
   NotFound: undefined;
 };
-
-/*
- * To be used in screens in the RootStack.
- * Screen Example: function LoginScreen(props: RootStackScreenProps<"Login">) {
- * Hook Example: const navigation = useNavigation<RootStackScreenProps<"Login">>();
- */
-export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
-  NativeStackScreenProps<RootStackParamList, Screen>;
-
-/*
- * To be used in screens in the WorkspaceStack.
- * Screen Example: function WorkspaceRootScreen(props: WorkspaceStackScreenProps<"WorkspaceRoot">) {
- * Hook Example: const navigation = useNavigation<WorkspaceStackScreenProps<"WorkspaceRoot">>();
- */
-export type WorkspaceStackScreenProps<
-  Screen extends keyof WorkspaceStackParamList
-> = CompositeScreenProps<
-  NativeStackScreenProps<WorkspaceStackParamList, Screen>,
-  NativeStackScreenProps<RootStackParamList>
->;
-
-export type WorkspaceDrawerScreenProps<
-  Screen extends keyof WorkspaceDrawerParamList
-> = DrawerScreenProps<WorkspaceDrawerParamList, Screen>;
-
-declare global {
-  namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
-  }
-}
