@@ -17,7 +17,7 @@ export type TextAreaProps = ViewProps & {
 export function TextArea(props: TextAreaProps) {
   const { variant = "xs", selectable, isClipboardNoticeActive } = props;
   const styles = StyleSheet.create({
-    wrapper: tw`relative mb-2 py-4 px-5 border rounded ${
+    wrapper: tw`flex-auto relative mb-2 py-4 px-5 border rounded ${
       selectable
         ? `pr-9 bg-primary-100/40 border-primary-200`
         : `bg-gray-100 border-gray-200`
