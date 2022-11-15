@@ -34,7 +34,7 @@ import {
 } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceSettingsGeneralScreen(
-  props: WorkspaceStackScreenProps<"WorkspaceSettings"> & {
+  props: WorkspaceStackScreenProps<"WorkspaceSettingsGeneral"> & {
     children?: React.ReactNode;
   }
 ) {

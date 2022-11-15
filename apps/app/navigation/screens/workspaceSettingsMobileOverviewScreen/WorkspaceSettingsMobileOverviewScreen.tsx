@@ -2,8 +2,11 @@ import { SidebarLink, tw, View } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import { workspaceSettingsAccessMachine } from "../../../machines/workspaceSettingsAccessMachine";
+import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 
-export default function WorkspaceSettingsMobileOverviewScreen(props) {
+export default function WorkspaceSettingsMobileOverviewScreen(
+  props: WorkspaceStackScreenProps<"WorkspaceSettings">
+) {
   const workspaceId = useWorkspaceId();
   useMachine(workspaceSettingsAccessMachine, {
     context: {

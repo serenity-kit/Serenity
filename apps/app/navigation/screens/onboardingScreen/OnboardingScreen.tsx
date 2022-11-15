@@ -3,8 +3,11 @@ import { KeyboardAvoidingView, useWindowDimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AccountMenu from "../../../components/accountMenu/AccountMenu";
 import { CreateWorkspaceForm } from "../../../components/createWorkspaceForm/CreateWorkspaceForm";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 
-export default function OnboardingScreen({ navigation }) {
+export default function OnboardingScreen({
+  navigation,
+}: RootStackScreenProps<"Onboarding">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
   return (
