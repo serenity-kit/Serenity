@@ -26,6 +26,7 @@ const exchanges = [
       PendingWorkspaceInvitationResult: () => null, // since it is just an id
       UnauthorizedDevicesForWorkspacesResult: () => null, // should not be normalised
       KeyDerivationTrace: () => null, // should not be normalised
+      KeyDerivationTraceParentFolder: () => null, // should not be normalised
       // @ts-expect-error the type seems to be wrong,
       MainDeviceResult: (mainDevice) => {
         return mainDevice.signingPublicKey;
