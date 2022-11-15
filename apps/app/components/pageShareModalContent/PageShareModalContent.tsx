@@ -2,15 +2,18 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import {
   Button,
+  Description,
+  FormWrapper,
+  Heading,
   IconButton,
   InfoMessage,
   List,
   ListHeader,
   ListItem,
   ListText,
+  ModalHeader,
   Spinner,
-  Text,
-  Tooltip,
+  TextArea,
   tw,
   useIsDesktopDevice,
   View,
@@ -29,7 +32,7 @@ import { createDocumentShareLink } from "../../utils/document/createDocumentShar
 import { notNull } from "../../utils/notNull/notNull";
 
 const styles = StyleSheet.create({
-  createShareLinkButton: tw`mb-8 self-start`,
+  createShareLinkButton: tw`mb-4 self-start`,
   shareLinkWrapperBase: tw`relative mb-2 py-4 px-5 border rounded`,
   shareLinkWrapperActive: tw`bg-primary-100/40 border-primary-200`,
   shareLinkWrapperInactive: tw`bg-gray-100 border-gray-200`,
@@ -95,7 +98,7 @@ export function PageShareModalContent() {
     refetchDocumentShareLinks();
   };
 
-  const copyInvitationText = async () => {
+  const copyLinkText = async () => {
     if (!pageShareLink) {
       return;
     }
@@ -117,56 +120,34 @@ export function PageShareModalContent() {
               Failed to fetch the page share links. Please try again later.
             </InfoMessage>
           ) : (
-            <>
-              <View
-                style={[
-                  styles.shareLinkWrapperBase,
-                  pageShareLink
-                    ? styles.shareLinkWrapperActive
-                    : styles.shareLinkWrapperInactive,
-                ]}
-              >
-                <Text
-                  variant="xs"
-                  testID="workspaceInvitationInstructionsText"
+            <FormWrapper>
+              <ModalHeader>Share a page</ModalHeader>
+              <View>
+                <TextArea
+                  testID="workspaceLinkText"
                   selectable={pageShareLink !== null}
-                  style={[
-                    pageShareLink
-                      ? styles.shareLinkTextActive
-                      : styles.shareLinkTextInactive,
-                  ]}
+                  onCopyPress={copyLinkText}
+                  isClipboardNoticeActive={isClipboardNoticeActive}
                 >
                   {pageShareLink !== null
                     ? pageShareLink
                     : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
-                </Text>
-                {pageShareLink !== null ? (
-                  <View style={tw`absolute right-3 top-3`}>
-                    <Tooltip
-                      label={
-                        isClipboardNoticeActive
-                          ? "Copying..."
-                          : "Copy to clipboard"
-                      }
-                      placement={"left"}
-                    >
-                      <IconButton
-                        name="file-copy-line"
-                        color={"primary-300"}
-                        transparent
-                        onPress={copyInvitationText}
-                        isLoading={isClipboardNoticeActive}
-                      />
-                    </Tooltip>
-                  </View>
-                ) : null}
+                </TextArea>
+                <Button
+                  onPress={createShareLink}
+                  style={styles.createShareLinkButton}
+                >
+                  Create page link
+                </Button>
               </View>
-              <Button
-                onPress={createShareLink}
-                style={styles.createShareLinkButton}
-              >
-                Create page link
-              </Button>
+              <View>
+                <Heading lvl={3} padded>
+                  Links
+                </Heading>
+                <Description variant="form">
+                  sorted by time of creation.
+                </Description>
+              </View>
               <List
                 data={documentShareLinks}
                 emptyString={"No active share links"}
@@ -202,7 +183,7 @@ export function PageShareModalContent() {
                   );
                 })}
               </List>
-            </>
+            </FormWrapper>
           )}
         </>
       )}
