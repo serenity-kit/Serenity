@@ -39,7 +39,8 @@ export default function Editor({
   const editorBottombarRef = useRef<null | HTMLElement>(null);
   const hasEditorSidebar = useHasEditorSidebar();
   const editorBottombarWrapperRef = useRef<RNView>(null);
-  const editorIsFocusedRef = useRef<boolean>(false);
+  const editorIsFocusedRef = useRef(false);
+  const wasNewOnFirstRender = useRef(isNew);
 
   const positionToolbar = () => {
     if (editorBottombarWrapperRef.current && editorIsFocusedRef.current) {
@@ -108,7 +109,7 @@ export default function Editor({
           documentId={documentId}
           yDocRef={yDocRef}
           yAwarenessRef={yAwarenessRef}
-          isNew={isNew}
+          isNew={wasNewOnFirstRender.current}
           openDrawer={openDrawer}
           updateTitle={updateTitle}
           downloadAndDecryptFile={downloadAndDecryptFile}
