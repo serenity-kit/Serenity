@@ -254,10 +254,13 @@ export default function SidebarFolder(props: Props) {
     if (result.data?.createDocument?.id) {
       navigation.navigate("Workspace", {
         workspaceId: route.params.workspaceId,
-        screen: "Page",
+        screen: "WorkspaceDrawer",
         params: {
-          pageId: result.data?.createDocument?.id,
-          isNew: true,
+          screen: "Page",
+          params: {
+            pageId: result.data?.createDocument?.id,
+            isNew: true,
+          },
         },
       });
     } else {
