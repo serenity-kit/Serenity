@@ -7,6 +7,7 @@ import {
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { decryptWorkspaceKey } from "../../../../test/helpers/device/decryptWorkspaceKey";
@@ -14,6 +15,7 @@ import { createDocument } from "../../../../test/helpers/document/createDocument
 import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 const username = "user1";
@@ -176,6 +178,64 @@ test("Throw error when user doesn't have access", async () => {
         authorizationHeader,
       }))()
   ).rejects.toThrow("Unauthorized");
+});
+
+test("Commenter tries to update", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.COMMENTER,
+    },
+  });
+  const id = addedDocumentId;
+  const name = "Updated Name";
+  await expect(
+    (async () =>
+      await updateDocumentName({
+        graphql,
+        id,
+        name,
+        parentFolderId: addedFolder.parentFolderId,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        folderKey,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
+});
+
+test("Viewer tries to update", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.VIEWER,
+    },
+  });
+  const id = addedDocumentId;
+  const name = "Updated Name";
+  await expect(
+    (async () =>
+      await updateDocumentName({
+        graphql,
+        id,
+        name,
+        parentFolderId: addedFolder.parentFolderId,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        folderKey,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
 });
 
 test("Unauthenticated", async () => {
