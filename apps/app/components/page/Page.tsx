@@ -88,7 +88,6 @@ export default function Page({
   );
 
   const deriveExistingSnapshotKey = async (snapshot: Snapshot) => {
-    console.log("deriveExistingSnapshotKey()");
     // derive existing key if snapshot exists
     const documentResult = await runDocumentQuery({ id: docId });
     const document = documentResult.data?.document;
@@ -168,7 +167,6 @@ export default function Page({
     document: Document,
     workspaceKeyId: string
   ) => {
-    console.log("createNewSnapshotKey()");
     const folderKeyChainData = await deriveFolderKey({
       folderId: document.parentFolderId!,
       workspaceKeyId,
