@@ -30,17 +30,18 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
       try {
         const folderKeyData = await deriveFolderKey({
           folderId: document?.parentFolderId!,
+          workspaceKeyId: document.nameKeyDerivationTrace?.workspaceKeyId,
           workspaceId: document?.workspaceId!,
           activeDevice,
         });
         const documentKeyData = await recreateDocumentKey({
           folderKey: folderKeyData.folderKeyData.key,
-          subkeyId: document?.subkeyId!,
+          subkeyId: document.subkeyId,
         });
-        documentName = await decryptDocumentTitle({
+        const documentName = await decryptDocumentTitle({
           key: documentKeyData.key,
-          ciphertext: document?.encryptedName,
-          publicNonce: document?.encryptedNameNonce,
+          ciphertext: document.encryptedName,
+          publicNonce: document.encryptedNameNonce,
         });
       } catch (error) {
         documentName = "Could not decrypt";

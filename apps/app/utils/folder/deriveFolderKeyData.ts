@@ -8,7 +8,7 @@ import { getFolder } from "./getFolder";
 export type GetParentFolderKeyProps = {
   folderId: string;
   workspaceId: string;
-  workspaceKeyId?: string;
+  workspaceKeyId?: string | undefined | null;
   activeDevice: Device;
 };
 export const deriveParentFolderKey = async ({
@@ -67,7 +67,7 @@ export const deriveParentFolderKey = async ({
 
 export type DeriveFolderKeyProps = {
   folderId: string;
-  workspaceKeyId?: string;
+  workspaceKeyId?: string | undefined | null;
   workspaceId: string;
   activeDevice: Device;
 };
@@ -77,20 +77,9 @@ export const deriveFolderKey = async ({
   workspaceKeyId,
   activeDevice,
 }: DeriveFolderKeyProps) => {
-  let usingWorkspaceKeyId = workspaceKeyId;
-  if (!usingWorkspaceKeyId) {
-    const workspace = await getWorkspace({
-      workspaceId,
-      deviceSigningPublicKey: activeDevice.signingPublicKey,
-    });
-    if (!workspace?.currentWorkspaceKey?.id) {
-      throw new Error("Workspace key not found");
-    }
-    usingWorkspaceKeyId = workspace.currentWorkspaceKey.id;
-  }
   let parentKeyData = await deriveParentFolderKey({
     folderId,
-    workspaceKeyId: usingWorkspaceKeyId,
+    workspaceKeyId,
     workspaceId,
     activeDevice,
   });
