@@ -49,6 +49,7 @@ export * from "./components/sidebarLink/SidebarLink";
 export * from "./components/sidebarText/SidebarText";
 export * from "./components/spinner/Spinner";
 export * from "./components/text/Text";
+export * from "./components/textArea/TextArea";
 export * from "./components/tooltip/Tooltip";
 export * from "./components/view/View";
 export * from "./components/workspaceAvatar/WorkspaceAvatar";

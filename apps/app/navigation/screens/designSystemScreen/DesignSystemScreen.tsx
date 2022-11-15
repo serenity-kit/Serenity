@@ -39,6 +39,7 @@ import {
   SidebarText,
   Spinner,
   Text,
+  TextArea,
   Tooltip,
   tw,
   View,
@@ -48,6 +49,7 @@ import { HStack, VStack } from "native-base";
 import { useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { showToast } from "../../../utils/toast/showToast";
+import * as Clipboard from "expo-clipboard";
 
 let counter = 0;
 
@@ -55,6 +57,8 @@ export default function DesignSystemScreen() {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [showModal, setShowModal] = useState(false);
   const [isOpenPopover, setIsOpenPopover] = useState(false);
+  const [isClipboardNoticeActive, setIsClipboardNoticeActive] = useState(false);
+  const [pageShareLink, setPageShareLink] = useState<string>("");
   const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
   const collaborationColors = Object.keys(colors.collaboration) as any;
 
@@ -67,6 +71,17 @@ export default function DesignSystemScreen() {
         </Text>
       </CenterContent>
     );
+  };
+
+  const copyTextAreaText = async () => {
+    if (!pageShareLink) {
+      return;
+    }
+    await Clipboard.setStringAsync(pageShareLink);
+    setIsClipboardNoticeActive(true);
+    setTimeout(() => {
+      setIsClipboardNoticeActive(false);
+    }, 1000);
   };
 
   // fakes filling elements into container to hinder the last wrapping children to grow and center themselves
@@ -1931,6 +1946,96 @@ export default function DesignSystemScreen() {
           </Text>
         </DSExampleArea>
 
+        <Heading lvl={1}>TextArea</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="md">
+            TextArea
+          </DSMono>{" "}
+          component is used for system generated text which the user might use
+          elsewhere.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="sm">
+          The basic{" "}
+          <DSMono variant="component" size="md">
+            TextArea
+          </DSMono>{" "}
+          is muted to show the user the Text inside is just an Info and not
+          something they can interact with.
+        </Text>
+        <DSExampleArea>
+          <TextArea>
+            {
+              'The share link will be generated here\nClick on "Create page link" to generate a new link'
+            }
+          </TextArea>
+        </DSExampleArea>
+        <Text variant="xxs" muted style={tw`mt-4`}>
+          Note: as there are currently troubles with react native that prevent
+          users to select text in the web version and even editing in Safari
+          (desktop & iOS), all Text on web will be selectable until this issue
+          is fixed
+        </Text>
+        <Heading lvl={3}>Select & Copy</Heading>
+        <Text variant="sm">
+          To allow the user to interact with the{" "}
+          <DSMono variant="component" size="md">
+            TextArea
+          </DSMono>{" "}
+          add the <DSMono variant="property">selectable</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <TextArea selectable style={tw`max-w-150`}>
+            {
+              "http://serenity.re/share/b80d1184-04f7-4965-a4e4/078967c0-c829-4870-b64c-#key=_gpZeFjmIHZzhmJwDp2chGYRiaKB0DdzTacl_uFV9ZU"
+            }
+          </TextArea>
+        </DSExampleArea>
+        <Text variant="sm" style={tw`mt-2.5`}>
+          To add even more functionality you can allow the user to copy the Text
+          to the clipboard, by adding{" "}
+          <DSMono variant="property">isClipboardNoticeActive</DSMono> and a{" "}
+          <DSMono variant="property">onCopyPress</DSMono> .
+        </Text>
+        <DSExampleArea
+          vertical
+          style={tw`mb-4 py-12 bg-gray-900/30 items-center`}
+          center
+        >
+          <Box style={tw`w-100`}>
+            <UIHeading lvl={3}>Share a page</UIHeading>
+            <TextArea
+              selectable={pageShareLink !== ""}
+              onCopyPress={copyTextAreaText}
+              isClipboardNoticeActive={isClipboardNoticeActive}
+            >
+              {pageShareLink !== ""
+                ? pageShareLink
+                : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
+            </TextArea>
+            <HStack space={4}>
+              <Button
+                onPress={() => {
+                  setPageShareLink(
+                    "http://serenity.re/share/b80d1184-04f7-4965-a4e4/078967c0-c829-4870-b64c-#key=_gpZeFjmIHZzhmJwDp2chGYRiaKB0DdzTacl_uFV9ZU"
+                  );
+                }}
+              >
+                Create page link
+              </Button>
+              <Button
+                onPress={() => {
+                  setPageShareLink("");
+                }}
+                variant={"secondary"}
+              >
+                Reset
+              </Button>
+            </HStack>
+          </Box>
+        </DSExampleArea>
+
         <Heading lvl={1}>Toast</Heading>
         <Text>
           The{" "}
@@ -1960,16 +2065,13 @@ export default function DesignSystemScreen() {
           >
             Copy
           </Button>
-        </DSExampleArea>
-
-        <DSExampleArea>
           <Button
             onPress={() => {
               showToast("Failed to delete the page.", "error");
             }}
             size={"md"}
           >
-            Error
+            This will fail
           </Button>
         </DSExampleArea>
 
