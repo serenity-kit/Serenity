@@ -211,7 +211,7 @@ function WorkspaceStackNavigator(props) {
     <WorkspaceIdProvider value={props.route.params.workspaceId}>
       <WorkspaceStack.Navigator
         screenOptions={{
-          headerShown: false,
+          headerShown: true,
         }}
       >
         <WorkspaceStack.Screen

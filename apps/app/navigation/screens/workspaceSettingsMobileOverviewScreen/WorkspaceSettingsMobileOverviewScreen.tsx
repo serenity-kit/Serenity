@@ -1,11 +1,13 @@
 import { SidebarLink, tw, View } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
+import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import { workspaceSettingsAccessMachine } from "../../../machines/workspaceSettingsAccessMachine";
 
 export default function WorkspaceSettingsMobileOverviewScreen(props) {
+  const workspaceId = useWorkspaceId();
   useMachine(workspaceSettingsAccessMachine, {
     context: {
-      workspaceId: props.route.params.workspaceId,
+      workspaceId,
       navigation: props.navigation,
     },
   });
@@ -14,9 +16,9 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
     <View style={tw`py-5`}>
       <SidebarLink
         to={{
-          screen: "Workspace2",
+          screen: "Workspace",
           params: {
-            workspaceId: props.route.params.workspaceId,
+            workspaceId,
             screen: "WorkspaceSettingsGeneral",
           },
         }}
@@ -26,9 +28,9 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
       </SidebarLink>
       <SidebarLink
         to={{
-          screen: "Workspace2",
+          screen: "Workspace",
           params: {
-            workspaceId: props.route.params.workspaceId,
+            workspaceId,
             screen: "WorkspaceSettingsMembers",
           },
         }}

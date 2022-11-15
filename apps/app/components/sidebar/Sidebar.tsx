@@ -151,8 +151,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             screen: "Workspace",
             params: {
               workspaceId,
-              screen: "WorkspaceDrawer",
-              params: { screen: "WorkspaceSettings" },
+              screen: "WorkspaceSettings",
             },
           }}
           iconName={"settings-4-line"}
