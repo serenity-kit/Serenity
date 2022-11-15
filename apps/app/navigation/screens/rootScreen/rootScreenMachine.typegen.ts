@@ -22,8 +22,8 @@ export interface Typegen0 {
       type: "error.platform.getLastUsedWorkspaceAndDocumentId";
       data: unknown;
     };
-    "xstate.after(2000)#rootScreen.failure": {
-      type: "xstate.after(2000)#rootScreen.failure";
+    "xstate.after(2000)#rootScreen.inProgress.failure": {
+      type: "xstate.after(2000)#rootScreen.inProgress.failure";
     };
     "xstate.init": { type: "xstate.init" };
   };
@@ -47,8 +47,8 @@ export interface Typegen0 {
     fetchMeWithWorkspaceLoadingInfo:
       | "done.invoke.getLastUsedWorkspaceAndDocumentId"
       | "error.platform.getLastUsedWorkspaceAndDocumentId"
-      | "xstate.after(2000)#rootScreen.failure";
-    getLastUsedWorkspaceAndDocumentId: "xstate.init";
+      | "xstate.after(2000)#rootScreen.inProgress.failure";
+    getLastUsedWorkspaceAndDocumentId: "start";
   };
   eventsCausingGuards: {
     hasAccessToWorkspace: "";
@@ -58,15 +58,30 @@ export interface Typegen0 {
   };
   eventsCausingDelays: {};
   matchesStates:
-    | "failure"
-    | "hasNoWorkspaces"
-    | "hasWorkspaceAccess"
-    | "invalidSession"
-    | "loaded"
-    | "loading"
-    | "loadingLastUsedWorkspaceAndDocumentId"
-    | "notAuthorized"
-    | "redirectToDocument"
-    | "validSession";
+    | "idle"
+    | "inProgress"
+    | "inProgress.failure"
+    | "inProgress.hasNoWorkspaces"
+    | "inProgress.hasWorkspaceAccess"
+    | "inProgress.invalidSession"
+    | "inProgress.loaded"
+    | "inProgress.loading"
+    | "inProgress.loadingLastUsedWorkspaceAndDocumentId"
+    | "inProgress.notAuthorized"
+    | "inProgress.redirectToDocument"
+    | "inProgress.validSession"
+    | {
+        inProgress?:
+          | "failure"
+          | "hasNoWorkspaces"
+          | "hasWorkspaceAccess"
+          | "invalidSession"
+          | "loaded"
+          | "loading"
+          | "loadingLastUsedWorkspaceAndDocumentId"
+          | "notAuthorized"
+          | "redirectToDocument"
+          | "validSession";
+      };
   tags: never;
 }
