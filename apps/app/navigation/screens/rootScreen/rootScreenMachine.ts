@@ -25,117 +25,143 @@ type Context = {
 };
 
 export const rootScreenMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QCcD2qAuBlAxssYAdgHQA2qAhhAJaFQAyFsGAqrJAOqrIDWsADhRxgAgoQgARVDgCuAWyIYAkhADEEVITDFaAN1Q9tMDI2ZtO3PoOFjJ0+YpWJQ-VLGoZqm5yAAeiAFoAJgAOAHZiAE4wgFYgyIAWWIBGSJCAZjCAGhAAT0RkjOIgsISANhCQmLKY5IAGcIBfRpy0TFx8IjJKGjpTVnYILl4BIVFxKVkFQmU1MGQ0ZGJ+UgoMADNuOWJjfvMhy1GbCftp2Z9Xd09vJD9A2OI4kLK6srCwiqC6hKCc-IR6nViOlImUavEykEYmlkulmq10Ng8AQSOQqLQoOpNNo9AZtOswBgcAALACyYA4HmJwysY3oPQxSkImwubg8XkIPn8CCC6WSjyhH15IR+tTKfwKkSBYO+VXi6QqVTC8JAbSRnVRDLoqnmi2Wqw2W2IBKJZIpVJpRzA9PRdCZLNul3ZN1A3JKQUeCWiNRCkV5dQaMQlCASP0eCoD5TqMVqYV5KrVHRR3SokFUrKuHK5iEqMWIdXSz1eLyCkLqkWDJUiUQVtRiRbSlQTiKTXXWFGopBk+FUvmYa20FHWGHmAAovgGAJSqRPItsdrv4DPOzm3bkx9LEEL1MoJAPVd51ZLBmLpIEgjcwsqF5LJZvtOckXQUUjUCBYODuTTpx1s66r10CniCJonSM8ymSUsqlSSswmrSJayCVIgniANSnvdVk2JJhLWsUQcGEWBYB-Fw-yzNcCjgiJKnSL4pV9Wj3lg+DEOQ1C6nQlVCFQCA4B8WcNRTXoGCYAYLBGPDbEmBwZicX9MxdO4EGCFD82SKjvhqQpYWDAIymrII93KUJwjg+o7xaVUW0fISMWXf9s2UlCPSPOD4iSEpA2DQsEmBDJQTCPkz1KGMMNbTVUwgezyMAhA4xCKIEjPX1IK9PdjzyRASk3BCXjCDJ0j3WiLIRB9BPbTtuzAaLFO5UpNxFBJ1MaoKSmDH5+XCcCvlCJI-TCmy9BfN8PyImKQCdByKIBeo82qGpImSGJXkM35MoQJ580KhVGzCI8YgSAbBOfV930-cbJvG7lb15fM3kM+r0mqbdvKhKIUJBZIkr9X1DssgTk24jARBkDBiW4agAC9IBqgClNSL1iFhcF5ShKoTwVLdd3iXkkjPJ6juTfAaHwHAMAAFVQaSzlhxzCjeR4YliBJluvA7snW28ymIa9r2eUMIMKTJCa6bDYAAOVQXCxngeSVzpr0IjBJrakiVmQXSE9Qi276y1Ccs4X+6zBLF6WbAIz9aempbFuKONohum8fm8p7iCa6IjylKFCwJo2ypRK3YoCPl+WiOJEhSNJMl0r7+RQj5Yg4t5Cn65pGiAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QCcD2qAuBlAxssYAdgHQCWEANmAMSwYCGyGA2gAwC6ioADqrKRlKpCXEAA9EAVgBMAGhABPRAA5pxAJzLlk1pOUB2Vst0A2AL5n5aTLnxEyhAApoo+WLGIVU9CKUJQAGXo6AFVYSAB1VGQAa1huehwwAEFCCAARVBwAVwBbIgwASQhqCGEwBwA3VBiKmAwg0PCIKNj4xJS0zJz8wiKINk4kEF5+QWFRCQQAFlUNZQBGdXV9AGZ9afWF5XklBBNpyWJlVdWTfQXpSR1V9XNLEGtsPAISP2dUVzgPLx8-QOCGDCkWicQSSVSGSyeQKxWoYGQaGQxG4FHoGAAZtFcsR6o0gc1WmCOpDujC+sVBqJRgIhCJhlNZmpNEsVutNhcdoopOpVsdJNMFtMNvp1AtWJsLFZ0M87G8nC43D9vL5-KVylUahUMWAMDgABYAWTAEQE+qJ7SSARV-0KhCxVOGNPG9NAU0uy2O52MrHUplYV12iBMJlYxBk6mmvoWJgM6mkUseMtsrwcHy+7k8NrVZUIFT81VqxB1eqNJrNFvBYGtf38dodCyGPD4tImDMQHvUXv0Pr9klDge5+yM4Z0ugW-eW51WiaeKfs70V3yztag8MR0RRaMx2OLuoNxtNGHNoMt1ezUHrqEdzbGdMmHeknuU3tYvv9g721xM4cMJl5KwLEK0j3NKNgvAuCqfEqK4QJA1A3iMLYug+CBLKsCzEDGWhPtMVwmJIFxBvsvLEBsrAHJswqnCcs7JhB8rpjBvxwSUzCNtSyH3u2aG8ph2GqJG+GEQsxGrKwmHTARuj9rMCy3GcdHgXKaZLpmGL0KQFDZPg1BiHQ6IVPQGIYAiAAU0hvqwACU1BzgxqnQcuGlaTpYCIc63Fuh2-4-icOhPhK0gYbcxE6NM4ZiqcJjrMF2wTkpsqpouTmZgW9AUOQWDfHSCEcJxd5tt5CCrE+Xbivosa3NINWxsRT7KMQUnSEBiyiiB1wzg89kqSlGYeJUGVZTlwh5U2SGFa64iIMFGHEMFRjGCyIbBWF0xdlcAp3GcAoUV1YFJZBTHLoNmUQNl7i5ex42eUV00ILNmELVovqLCtqzEYYYZRv2yhipZQqSIl86MWpHiEJgyTZMe0SkAAXvBHlcXdUylZ6FVVfGtVcns0ybBowogSYMZASs1zAw5fUwfgvj4DgGAACqoGSvQYGNBWtlNqNlVhrCVScWMgTjUgyBoCyVawZz-qcYoU71UH9cQ+rBAAcqglYdLA7NOsjXOIGj5V85jNVC8R-76E1AYXBJFHLKsQPdfR8vHZmyuwBrEI4Ek7ja7enOodIyh4fMLJRsseFhdcGiWQKQGrKoHpy8lCswW7HspF73wIRxOuTQHQfMn9ixh0JxF4z+6gBYc4tUX2FgPBDcHwMMPXJZQYAcyhPECmRgeV0+hGxrolXEQAtJG80hsKhzhz2eNJ0dYOwf8+LAi0p5VqS0Ks8UndefdBhm+L80tUKLLxoKCaO8pycu8qq57yjKg9sc2jGPbGELfoR8-vH7X6NIP8ckF6g1SvfVij89ZoVUBbW4MlQxvnFJIM2QdwznBAksUUAZJYgMcorFy2l8CQNQtsQBxA4HfiskgyOXZ+wyHjocFq9tcFU2XOlM6F1+B3VulA0+T0hSChkJIBh5x6obCaiGf8uhBQBmYdfQ6oDFanWGpdbhusA4xjDIYGMhw-znH0Mgoc-4nqlSuPJSQkZfosJTsuCGGAoYw2QPDSAxCeLiWkBFKSJgPG3GrjGD6Q5BRdkrtseOMgB7XGmNYu+xAaakDpozZm28CiuOKuJeSGgJQAPEsKCxYVA7RyYXjF8iw7jRKXm7NW6dm5+y7sVYSxBdDBTFJoSq3iAl7GnJbABYcPHUXUOUsBStgjp2SJndwqT7ogRHBROMBEzjiRMGtH8IpxSnH0AYjx+hBn9UmajdQxFthHGFIsIO5wAziwGfIkGezEDjzHqE+aW0DhaCFPFZQ9czBAA */
   createMachine(
     {
       context: { navigation: null } as Context,
       tsTypes: {} as import("./rootScreenMachine.typegen").Typegen0,
       predictableActionArguments: true,
-      initial: "loadingLastUsedWorkspaceAndDocumentId",
+      initial: "idle",
       states: {
-        loadingLastUsedWorkspaceAndDocumentId: {
-          invoke: {
-            src: "getLastUsedWorkspaceAndDocumentId",
-            id: "getLastUsedWorkspaceAndDocumentId",
-            onDone: [
-              {
-                actions: assign((_, event) => {
-                  return {
-                    lastUsedWorkspaceId: event.data.lastUsedWorkspaceId, // might be undefined
-                    lastUsedDocumentId: event.data.lastUsedDocumentId, // might be undefined
-                    returnOtherWorkspaceIfNotFound: true,
-                    returnOtherDocumentIfNotFound: true,
-                  };
-                }),
-                target: "loading",
-              },
-            ],
-            onError: [
-              {
-                target: "loading",
-              },
-            ],
-          },
-        },
-        loading: {
-          invoke: {
-            src: "fetchMeWithWorkspaceLoadingInfo",
-            id: "fetchMeWithWorkspaceLoadingInfo",
-            onDone: [
-              {
-                actions: assign({
-                  meWithWorkspaceLoadingInfoQueryResult: (_, event) =>
-                    event.data,
-                }),
-                cond: "hasNoNetworkError",
-                target: "loaded",
-              },
-              {
-                target: "failure",
-              },
-            ],
-            onError: [
-              {
-                target: "failure",
-              },
-            ],
-          },
-        },
-        loaded: {
-          always: [
-            {
-              cond: "isValidSession",
-              target: "validSession",
-            },
-            {
-              target: "invalidSession",
-            },
-          ],
-        },
-        failure: {
-          after: {
-            "2000": {
-              target: "loading",
+        idle: {
+          on: {
+            start: {
+              target: "inProgress",
             },
           },
         },
-        invalidSession: {
-          entry: "redirectToLogin",
-          type: "final",
-        },
-        validSession: {
-          always: [
-            {
-              cond: "hasAccessToWorkspace",
-              target: "hasWorkspaceAccess",
+        inProgress: {
+          initial: "loadingLastUsedWorkspaceAndDocumentId",
+          states: {
+            loadingLastUsedWorkspaceAndDocumentId: {
+              invoke: {
+                src: "getLastUsedWorkspaceAndDocumentId",
+                id: "getLastUsedWorkspaceAndDocumentId",
+                onDone: [
+                  {
+                    target: "loading",
+                    actions: assign((_, event) => {
+                      return {
+                        lastUsedWorkspaceId: event.data.lastUsedWorkspaceId, // might be undefined
+                        lastUsedDocumentId: event.data.lastUsedDocumentId, // might be undefined
+                        returnOtherWorkspaceIfNotFound: true,
+                        returnOtherDocumentIfNotFound: true,
+                      };
+                    }),
+                  },
+                ],
+                onError: [
+                  {
+                    target: "loading",
+                  },
+                ],
+              },
             },
-            {
-              target: "hasNoWorkspaces",
+            loading: {
+              invoke: {
+                src: "fetchMeWithWorkspaceLoadingInfo",
+                id: "fetchMeWithWorkspaceLoadingInfo",
+                onDone: [
+                  {
+                    target: "loaded",
+                    cond: "hasNoNetworkError",
+                    actions: assign({
+                      meWithWorkspaceLoadingInfoQueryResult: (_, event) =>
+                        event.data,
+                    }),
+                  },
+                  {
+                    target: "failure",
+                  },
+                ],
+                onError: [
+                  {
+                    target: "failure",
+                  },
+                ],
+              },
             },
-          ],
-        },
-        notAuthorized: {
-          entry: "redirectToLobby",
-          type: "final",
-        },
-        redirectToDocument: {
-          entry: "redirectToDocument",
-          type: "final",
-        },
-        hasNoWorkspaces: {
-          entry: "redirectToNoWorkspaces",
-          type: "final",
-        },
-        hasWorkspaceAccess: {
-          always: [
-            {
-              cond: "isAuthorized",
-              target: "redirectToDocument",
+            loaded: {
+              always: [
+                {
+                  target: "validSession",
+                  cond: "isValidSession",
+                },
+                {
+                  target: "invalidSession",
+                },
+              ],
             },
-            {
-              target: "notAuthorized",
+            failure: {
+              after: {
+                "2000": {
+                  target: "#rootScreen.inProgress.loading",
+                  actions: [],
+                  internal: false,
+                },
+              },
             },
-          ],
+            invalidSession: {
+              entry: "redirectToLogin",
+              type: "final",
+              always: {
+                target: "#rootScreen.idle",
+              },
+            },
+            validSession: {
+              always: [
+                {
+                  target: "hasWorkspaceAccess",
+                  cond: "hasAccessToWorkspace",
+                },
+                {
+                  target: "hasNoWorkspaces",
+                },
+              ],
+            },
+            notAuthorized: {
+              entry: "redirectToLobby",
+              type: "final",
+              always: {
+                target: "#rootScreen.idle",
+              },
+            },
+            redirectToDocument: {
+              entry: "redirectToDocument",
+              type: "final",
+              always: {
+                target: "#rootScreen.idle",
+              },
+            },
+            hasNoWorkspaces: {
+              entry: "redirectToNoWorkspaces",
+              type: "final",
+              always: {
+                target: "#rootScreen.idle",
+              },
+            },
+            hasWorkspaceAccess: {
+              always: [
+                {
+                  target: "redirectToDocument",
+                  cond: "isAuthorized",
+                },
+                {
+                  target: "notAuthorized",
+                },
+              ],
+            },
+          },
         },
       },
       id: "rootScreen",
@@ -180,6 +206,7 @@ export const rootScreenMachine =
           context.navigation.replace("Onboarding");
         },
         redirectToDocument: (context) => {
+          console.log("WEEEE redirectToDocument");
           if (
             context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
               ?.workspaceLoadingInfo
@@ -202,6 +229,7 @@ export const rootScreenMachine =
       },
       services: {
         getLastUsedWorkspaceAndDocumentId: async (context) => {
+          console.log("WEEEE getLastUsedWorkspaceAndDocumentId");
           const lastUsedWorkspaceId = await getLastUsedWorkspaceId();
           if (lastUsedWorkspaceId) {
             const lastUsedDocumentId = await getLastUsedDocumentId(
@@ -217,6 +245,7 @@ export const rootScreenMachine =
           };
         },
         fetchMeWithWorkspaceLoadingInfo: (context) => {
+          console.log("WEEEE fetchMeWithWorkspaceLoadingInfo");
           return runMeWithWorkspaceLoadingInfoQuery({
             workspaceId: context.workspaceId,
             documentId: context.documentId,
