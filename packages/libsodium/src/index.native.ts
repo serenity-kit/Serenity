@@ -214,6 +214,11 @@ export const crypto_kdf_derive_from_key = async (
   return base64ToUrlSafeBase64(kdfDeriveFromKey);
 };
 
+export const crypto_secretbox_keygen = async (): Promise<string> => {
+  const key = await sodium.crypto_secretbox_keygen();
+  return base64ToUrlSafeBase64(key);
+};
+
 export default {
   ready,
   to_base64,
@@ -228,6 +233,7 @@ export default {
   crypto_sign_keypair,
   crypto_sign_detached,
   crypto_sign_verify_detached,
+  crypto_secretbox_keygen,
   crypto_secretbox_easy,
   crypto_secretbox_open_easy,
   crypto_aead_xchacha20poly1305_ietf_keygen,
