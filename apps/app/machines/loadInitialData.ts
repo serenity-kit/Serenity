@@ -156,7 +156,10 @@ export const loadInitialDataMachine =
             workspaceId:
               context.meWithWorkspaceLoadingInfoQueryResult?.data?.me
                 ?.workspaceLoadingInfo?.id,
-            screen: "WorkspaceNotDecrypted",
+            screen: "WorkspaceDrawer",
+            params: {
+              screen: "WorkspaceNotDecrypted",
+            },
           });
         },
       },

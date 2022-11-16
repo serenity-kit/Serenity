@@ -26,6 +26,7 @@ import {
 } from "../../../generated/graphql";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { loadMeAndVerifyMachine } from "../../../machines/loadMeAndVerifyMachine";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 import {
   WorkspaceDeviceParing,
   WorkspaceWithWorkspaceDevicesParing,
@@ -36,7 +37,9 @@ import { notNull } from "../../../utils/notNull/notNull";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 import { getWorkspaces } from "../../../utils/workspace/getWorkspaces";
 
-export default function DeviceManagerScreen(props) {
+export default function AccountDevicesSettingsScreen(
+  props: RootStackScreenProps<"AccountSettingsDevices">
+) {
   useMachine(loadMeAndVerifyMachine, {
     context: {
       navigation: props.navigation,

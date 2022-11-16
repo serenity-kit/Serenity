@@ -10,7 +10,7 @@ import {
 } from "@serenity-tools/ui";
 import { LoginForm } from "../../../components/login/LoginForm";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
-import { RootStackScreenProps } from "../../../types/navigation";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 import { navigateToNextAuthenticatedPage } from "../../../utils/authentication/loginHelper";
 
 export default function LoginScreen(props: RootStackScreenProps<"Login">) {

@@ -2,7 +2,6 @@ import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
 } from "@react-navigation/drawer";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import { encryptFolderName } from "@serenity-tools/common";
 import {
   Heading,
@@ -20,23 +19,21 @@ import {
 import { HStack } from "native-base";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useWorkspaceId } from "../../context/WorkspaceIdContext";
 import {
   runCreateFolderMutation,
   useMeWithWorkspaceLoadingInfoQuery,
   useRootFoldersQuery,
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { RootStackScreenProps } from "../../types/navigation";
 import { deriveCurrentWorkspaceKey } from "../../utils/workspace/deriveCurrentWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
-  const route = useRoute<RootStackScreenProps<"Workspace">["route"]>();
-  const navigation = useNavigation();
   const { activeDevice } = useWorkspaceContext();
-  const workspaceId = route.params.workspaceId;
+  const workspaceId = useWorkspaceId();
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
 
@@ -93,7 +90,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         {
           input: {
             id,
-            workspaceId: route.params.workspaceId,
+            workspaceId,
             encryptedName: encryptedFolderResult.ciphertext,
             encryptedNameNonce: encryptedFolderResult.publicNonce,
             workspaceKeyId,
@@ -149,8 +146,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <View style={!isPermanentLeftSidebar && tw`pt-5 pb-7`}>
         <SidebarLink
           to={{
-            screen: "WorkspaceSettings",
-            params: { workspaceId },
+            screen: "Workspace",
+            params: {
+              workspaceId,
+              screen: "WorkspaceSettings",
+            },
           }}
           iconName={"settings-4-line"}
           // @ts-expect-error needs fixing in the SidebarLink types

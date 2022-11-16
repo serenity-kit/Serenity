@@ -17,7 +17,7 @@ import {
   useStartLoginMutation,
   useVerifyRegistrationMutation,
 } from "../../../generated/graphql";
-import { RootStackScreenProps } from "../../../types/navigation";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 import { createDeviceWithInfo } from "../../../utils/authentication/createDeviceWithInfo";
 import {
   fetchMainDevice,

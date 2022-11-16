@@ -1,8 +1,9 @@
-import { ScrollSafeAreaView, ScrollView, Text, View } from "@serenity-tools/ui";
-import { useEffect, useState } from "react";
-import sodium from "@serenity-tools/libsodium";
-import { useWindowDimensions } from "react-native";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
+import sodium from "@serenity-tools/libsodium";
+import { ScrollView, Text, View } from "@serenity-tools/ui";
+import { useEffect, useState } from "react";
+import { useWindowDimensions } from "react-native";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 
 const signingKeyPair = {
   keyType: "ed25519",
@@ -17,7 +18,9 @@ const nonce = "5GDx6cP2_uToVP-UKhddEmUelpyKTJLZ";
 
 const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
 
-export default function PageScreen() {
+export default function LibsodiumTestScreen(
+  props: RootStackScreenProps<"TestLibsodium">
+) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [data, setData] = useState({});
 

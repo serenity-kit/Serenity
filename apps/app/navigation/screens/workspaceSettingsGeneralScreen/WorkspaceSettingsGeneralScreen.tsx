@@ -27,14 +27,16 @@ import {
 } from "../../../generated/graphql";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
-import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
+import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceSettingsGeneralScreen(
-  props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
+  props: WorkspaceStackScreenProps<"WorkspaceSettingsGeneral"> & {
+    children?: React.ReactNode;
+  }
 ) {
   const workspaceId = useWorkspaceId();
   const { activeDevice } = useWorkspaceContext();

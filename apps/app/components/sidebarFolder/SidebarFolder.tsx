@@ -27,7 +27,7 @@ import {
   useFoldersQuery,
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { RootStackScreenProps } from "../../types/navigation";
+import { RootStackScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import {
   getDocumentPath,
@@ -190,7 +190,7 @@ export default function SidebarFolder(props: Props) {
         {
           input: {
             id,
-            workspaceId: route.params.workspaceId,
+            workspaceId: props.workspaceId,
             encryptedName: encryptedFolderResult.ciphertext,
             encryptedNameNonce: encryptedFolderResult.publicNonce,
             workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
@@ -247,11 +247,14 @@ export default function SidebarFolder(props: Props) {
     );
     if (result.data?.createDocument?.id) {
       navigation.navigate("Workspace", {
-        workspaceId: route.params.workspaceId,
-        screen: "Page",
+        workspaceId: props.workspaceId,
+        screen: "WorkspaceDrawer",
         params: {
-          pageId: result.data?.createDocument?.id,
-          isNew: true,
+          screen: "Page",
+          params: {
+            pageId: result.data?.createDocument?.id,
+            isNew: true,
+          },
         },
       });
     } else {

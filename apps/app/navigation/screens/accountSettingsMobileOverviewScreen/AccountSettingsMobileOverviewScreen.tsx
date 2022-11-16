@@ -2,8 +2,11 @@ import { SidebarLink, tw, View } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useWindowDimensions } from "react-native";
 import { loadMeAndVerifyMachine } from "../../../machines/loadMeAndVerifyMachine";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 
-export default function AccountSettingsMobileOverviewScreen(props) {
+export default function AccountSettingsMobileOverviewScreen(
+  props: RootStackScreenProps<"AccountSettings">
+) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   useMachine(loadMeAndVerifyMachine, {
     context: {
