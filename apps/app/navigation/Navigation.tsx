@@ -222,7 +222,7 @@ function WorkspaceStackNavigator(props) {
         <WorkspaceStack.Screen
           name="WorkspaceDrawer"
           component={WorkspaceDrawerNavigatorWithLoginRedirect}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, animation: "none" }}
         />
         {isPhoneDimensions(dimensions.width) ? (
           <>
@@ -293,7 +293,7 @@ function RootNavigator() {
         <Stack.Screen
           name="Root"
           component={RootScreen}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, animation: "none" }}
         />
         <Stack.Screen
           name="Workspace"
