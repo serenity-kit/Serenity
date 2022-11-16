@@ -179,21 +179,10 @@ export default function AccountMenu({
           initiateLogout();
           // making sure there are screens hanging around that would re-render
           // on logout and cause issues
-          navigation.navigate("LogoutInProgress");
-          // navigation.reset({
-          //   stale: false,
-          //   type: "stack",
-          //   key: "stack-logout",
-          //   index: 0,
-          //   routeNames: navigation.getState().routeNames,
-          //   routes: [
-          //     {
-          //       name: "LogoutInProgress",
-          //       path: "/logging-out",
-          //       key: "LogoutInProgress-logout",
-          //     },
-          //   ],
-          // });
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "LogoutInProgress" }],
+          });
         }}
         testID={`${testIdPrefix}account-menu--logout`}
       >

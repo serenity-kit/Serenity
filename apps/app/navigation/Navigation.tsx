@@ -231,6 +231,9 @@ function WorkspaceStackNavigator(props) {
               component={WorkspaceSettingsMobileOverviewScreenWithLoginRedirect}
               options={{
                 title: "Workspace settings",
+                headerLeft(props) {
+                  return <HeaderLeft {...props} />;
+                },
               }}
             />
             <WorkspaceStack.Screen
