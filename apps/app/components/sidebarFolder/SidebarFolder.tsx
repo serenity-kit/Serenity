@@ -191,7 +191,7 @@ export default function SidebarFolder(props: Props) {
         {
           input: {
             id,
-            workspaceId: route.params.workspaceId,
+            workspaceId: props.workspaceId,
             encryptedName: encryptedFolderResult.ciphertext,
             encryptedNameNonce: encryptedFolderResult.publicNonce,
             workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
@@ -253,7 +253,7 @@ export default function SidebarFolder(props: Props) {
     );
     if (result.data?.createDocument?.id) {
       navigation.navigate("Workspace", {
-        workspaceId: route.params.workspaceId,
+        workspaceId: props.workspaceId,
         screen: "WorkspaceDrawer",
         params: {
           screen: "Page",
