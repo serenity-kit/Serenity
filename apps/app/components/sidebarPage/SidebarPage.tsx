@@ -81,7 +81,7 @@ export default function SidebarPage(props: Props) {
     try {
       const document = documentResult.data?.document;
       if (!document) {
-        console.log("Unable to retrieve document!");
+        console.error("Unable to retrieve document!");
         return;
       }
       // TODO: optimize this by using the `getFolderKey()` function
