@@ -2,7 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { CenterContent, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useWindowDimensions } from "react-native";
-import { RootStackScreenProps } from "../../../types/navigation";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 import { rootScreenMachine } from "./rootScreenMachine";
 
 export default function RootScreen(props: RootStackScreenProps<"Root">) {

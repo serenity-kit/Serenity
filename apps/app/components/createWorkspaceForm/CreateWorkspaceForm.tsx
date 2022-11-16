@@ -165,9 +165,12 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
 
       navigation.navigate("Workspace", {
         workspaceId: workspace.id,
-        screen: "Page",
+        screen: "WorkspaceDrawer",
         params: {
-          pageId: document.id,
+          screen: "Page",
+          params: {
+            pageId: document.id,
+          },
         },
       });
       if (props.onWorkspaceStructureCreated) {

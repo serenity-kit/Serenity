@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, useWindowDimensions } from "react-native";
 import { CenterContent, Link, Text, tw, View } from "@serenity-tools/ui";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AccountMenu from "../../../components/accountMenu/AccountMenu";
-import { RootStackScreenProps } from "../../../types/navigation";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 
 export default function WorkspaceNotFoundScreen({
   navigation,

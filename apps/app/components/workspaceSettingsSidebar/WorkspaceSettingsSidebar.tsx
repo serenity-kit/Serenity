@@ -18,8 +18,14 @@ export default function WorkspaceSettingsSidebar(
       </Heading>
       <SidebarLink
         to={{
-          screen: "WorkspaceSettings",
-          params: { screen: "General", workspaceId },
+          screen: "Workspace",
+          params: {
+            workspaceId,
+            screen: "WorkspaceSettings",
+            params: {
+              screen: "General",
+            },
+          },
         }}
         iconName="settings-4-line"
         active={currentRouteName === "General"}
@@ -28,8 +34,14 @@ export default function WorkspaceSettingsSidebar(
       </SidebarLink>
       <SidebarLink
         to={{
-          screen: "WorkspaceSettings",
-          params: { screen: "Members", workspaceId },
+          screen: "Workspace",
+          params: {
+            workspaceId,
+            screen: "WorkspaceSettings",
+            params: {
+              screen: "Members",
+            },
+          },
         }}
         iconName="group-line"
         active={currentRouteName === "Members"}

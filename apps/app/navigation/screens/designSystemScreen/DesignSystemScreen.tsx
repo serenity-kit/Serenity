@@ -45,15 +45,18 @@ import {
   View,
   WorkspaceAvatar,
 } from "@serenity-tools/ui";
+import * as Clipboard from "expo-clipboard";
 import { HStack, VStack } from "native-base";
 import { useState } from "react";
 import { useWindowDimensions } from "react-native";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 import { showToast } from "../../../utils/toast/showToast";
-import * as Clipboard from "expo-clipboard";
 
 let counter = 0;
 
-export default function DesignSystemScreen() {
+export default function DesignSystemScreen(
+  props: RootStackScreenProps<"DesignSystem">
+) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [showModal, setShowModal] = useState(false);
   const [isOpenPopover, setIsOpenPopover] = useState(false);

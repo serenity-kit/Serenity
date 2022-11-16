@@ -5,7 +5,7 @@ import { PageHeader } from "../../../components/page/PageHeader";
 import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
-import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
