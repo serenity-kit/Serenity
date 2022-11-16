@@ -11,6 +11,7 @@ query rootFolders($workspaceId: ID!, $first: Int!, $after: String) {
       workspaceId
       keyDerivationTrace {
         workspaceKeyId
+        subkeyId
         parentFolders {
           folderId
           subkeyId

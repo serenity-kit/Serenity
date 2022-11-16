@@ -10,6 +10,7 @@ query document($id: ID!) {
     workspaceId
     nameKeyDerivationTrace {
       workspaceKeyId
+      subkeyId
       parentFolders {
         folderId
         subkeyId

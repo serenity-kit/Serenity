@@ -9,7 +9,7 @@ import {
 import { updateDocumentName } from "../../../database/document/updateDocumentName";
 import { formatDocument } from "../../../types/document";
 import { Document } from "../../types/document";
-import { KeyDerivationTraceInput } from "../folder/createFolder";
+import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const UpdateDocumentNameInput = inputObjectType({
   name: "UpdateDocumentNameInput",

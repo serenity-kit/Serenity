@@ -12,7 +12,7 @@ type Params = {
   subkeyId?: number | null;
   parentFolderId?: string | null;
   workspaceId: string;
-  nameKeyDerivationTrace: KeyDerivationTrace;
+  nameKeyDerivationTrace: KeyDerivationTrace | undefined | null;
   contentSubkeyId: number;
 };
 
@@ -45,7 +45,11 @@ export async function createDocument({
       subkeyId,
       parentFolderId,
       workspaceId,
-      nameKeyDerivationTrace,
+      nameKeyDerivationTrace: nameKeyDerivationTrace || {
+        workspaceKeyId: "",
+        subkeyId: -1,
+        parentFolders: [],
+      },
       contentSubkeyId,
     },
   });

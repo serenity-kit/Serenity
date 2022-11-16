@@ -100,6 +100,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             subkeyId: encryptedFolderResult.folderSubkeyId,
             keyDerivationTrace: {
               workspaceKeyId,
+              subkeyId: encryptedFolderResult.folderSubkeyId,
               parentFolders: [],
             },
           },
@@ -219,7 +220,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   folderId={folder.id}
                   encryptedName={folder.encryptedName}
                   encryptedNameNonce={folder.encryptedNameNonce}
-                  subkeyId={folder.subkeyId}
+                  subkeyId={folder.keyDerivationTrace.subkeyId}
+                  keyDerivationTrace={folder.keyDerivationTrace!}
                   workspaceId={workspaceId}
                   onStructureChange={refetchRootFolders}
                 />

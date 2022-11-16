@@ -100,7 +100,14 @@ export default async function createUserWithWorkspace({
   const docmentKeyResult = await createDocumentKey({
     folderKey,
   });
-  const documentKey = docmentKeyResult.key;
+  const snapshotKey = await createSnapshotKey({
+    folderKey: encryptedFolderResult.folderSubkey,
+  });
+  // FIXME: due to a hack, we are using the snapshotKey
+  // to encrypt the document title, instead of a document key
+  // const documentKey = docmentKeyResult.key;
+  const documentKey = snapshotKey.key;
+  const documentSubkeyId = snapshotKey.subkeyId;
   const encryptedDocumentTitleResult = await encryptDocumentTitle({
     title: documentName,
     key: documentKey,
@@ -108,18 +115,13 @@ export default async function createUserWithWorkspace({
   // const documentEncryptionKey = sodium.from_base64(
   //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
   // );
-  const docmenContentKeyResult = await createDocumentKey({
-    folderKey,
-  });
-  const snapshotKey = await createSnapshotKey({
-    folderKey: encryptedFolderResult.folderSubkey,
-  });
   const documentSnapshot = await createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
     subkeyId: snapshotKey.subkeyId,
     keyDerivationTrace: {
       workspaceKeyId,
+      subkeyId: snapshotKey.subkeyId,
       parentFolders: [
         {
           folderId,
@@ -142,8 +144,8 @@ export default async function createUserWithWorkspace({
     documentId,
     encryptedDocumentName: encryptedDocumentTitleResult.ciphertext,
     encryptedDocumentNameNonce: encryptedDocumentTitleResult.publicNonce,
-    documentSubkeyId: docmentKeyResult.subkeyId,
-    documentContentSubkeyId: docmenContentKeyResult.subkeyId,
+    documentSubkeyId,
+    documentContentSubkeyId: 123, // TODO: remove
     documentSnapshot,
     creatorDeviceSigningPublicKey: device.signingPublicKey,
     deviceWorkspaceKeyBoxes: [

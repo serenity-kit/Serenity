@@ -41,7 +41,11 @@ const setup = async () => {
     documentId,
     snapshotEncryptionKey,
     subkeyId: 42,
-    keyDerivationTrace: { workspaceKeyId: "abc", parentFolders: [] },
+    keyDerivationTrace: {
+      workspaceKeyId: "abc",
+      subkeyId: 42,
+      parentFolders: [],
+    },
   });
 };
 

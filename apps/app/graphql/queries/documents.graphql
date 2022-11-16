@@ -12,6 +12,7 @@ query documents($parentFolderId: ID!, $first: Int! = 100, $after: String) {
       workspaceId
       nameKeyDerivationTrace {
         workspaceKeyId
+        subkeyId
         parentFolders {
           folderId
           subkeyId

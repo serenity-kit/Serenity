@@ -27,6 +27,7 @@ export const getFolder = async ({
         workspaceKeyId
         keyDerivationTrace {
           workspaceKeyId
+          subkeyId
           parentFolders {
             folderId
             subkeyId

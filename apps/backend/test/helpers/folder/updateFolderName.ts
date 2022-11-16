@@ -31,6 +31,7 @@ export const updateFolderName = async ({
 
   const keyDerivationTrace = await buildFolderKeyTrace({
     workspaceKeyId,
+    subkeyId: encryptedFolderResult.folderSubkeyId,
     parentFolderId,
   });
   const query = gql`
@@ -47,6 +48,7 @@ export const updateFolderName = async ({
           workspaceId
           keyDerivationTrace {
             workspaceKeyId
+            subkeyId
             parentFolders {
               folderId
               subkeyId

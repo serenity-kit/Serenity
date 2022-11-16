@@ -7,7 +7,7 @@ import {
   objectType,
 } from "nexus";
 import { createDocument } from "../../../database/document/createDocument";
-import { KeyDerivationTraceInput } from "../folder/createFolder";
+import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const CreateDocumentInput = inputObjectType({
   name: "CreateDocumentInput",
@@ -16,7 +16,7 @@ export const CreateDocumentInput = inputObjectType({
     t.string("parentFolderId");
     t.nonNull.string("workspaceId");
     t.nonNull.int("contentSubkeyId");
-    t.nonNull.field("nameKeyDerivationTrace", {
+    t.field("nameKeyDerivationTrace", {
       type: KeyDerivationTraceInput,
     });
   },

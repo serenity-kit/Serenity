@@ -1,6 +1,6 @@
 import { objectType } from "nexus";
 import { Document } from "./document";
-import { KeyDerivationTrace } from "./folder";
+import { KeyDerivationTrace } from "./keyDerivation";
 
 export const Update = objectType({
   name: "Update",

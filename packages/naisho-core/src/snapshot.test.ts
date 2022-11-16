@@ -28,6 +28,7 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
     subkeyId: 42,
     keyDerivationTrace: {
       workspaceKeyId: "abc",
+      subkeyId: 42,
       parentFolders: [],
     },
   };
@@ -74,6 +75,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
     subkeyId: 42,
     keyDerivationTrace: {
       workspaceKeyId: "abc",
+      subkeyId: 42,
       parentFolders: [],
     },
   };
@@ -120,6 +122,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
     subkeyId: 42,
     keyDerivationTrace: {
       workspaceKeyId: "abc",
+      subkeyId: 42,
       parentFolders: [],
     },
   };

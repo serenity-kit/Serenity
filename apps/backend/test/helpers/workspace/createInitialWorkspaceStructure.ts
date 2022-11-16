@@ -1,5 +1,4 @@
 import {
-  createDocumentKey,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
   encryptDocumentTitle,
@@ -97,6 +96,15 @@ export const createInitialWorkspaceStructure = async ({
           parentFolderId
           rootFolderId
           workspaceId
+          keyDerivationTrace {
+            workspaceKeyId
+            subkeyId
+            parentFolders {
+              folderId
+              subkeyId
+              parentFolderId
+            }
+          }
         }
       }
     }
@@ -111,11 +119,20 @@ export const createInitialWorkspaceStructure = async ({
   const folderSubkeyId = encryptedFolderResult.folderSubkeyId;
   const folderKey = encryptedFolderResult.folderSubkey;
 
-  const documentKeyResult = await createDocumentKey({
-    folderKey,
+  const snapshotKey = await createSnapshotKey({
+    folderKey: encryptedFolderResult.folderSubkey,
   });
-  const documentKey = documentKeyResult.key;
-  const documentSubkeyId = documentKeyResult.subkeyId;
+
+  // FIXME: because of a hack to use the snapshot key to
+  // encrypt the document title, we need to use the snapshotkey here
+  // for now
+  // const documentKeyResult = await createDocumentKey({
+  //   folderKey,
+  // });
+  // const documentKey = documentKeyResult.key;
+  // const documentSubkeyId = documentKeyResult.subkeyId;
+  const documentKey = snapshotKey.key;
+  const documentSubkeyId = snapshotKey.subkeyId;
   const encryptedDocumentTitleResult = await encryptDocumentTitle({
     title: documentName,
     key: documentKey,
@@ -127,20 +144,18 @@ export const createInitialWorkspaceStructure = async ({
   // const documentEncryptionKey = sodium.from_base64(
   //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
   // );
-  const documentContentKeyResult = await createDocumentKey({
-    folderKey,
-  });
-  const documentContentSubkeyId = documentContentKeyResult.subkeyId;
+  // TODO: remove
+  // const documentContentKeyResult = await createDocumentKey({
+  //   folderKey,
+  // const documentContentSubkeyId = documentContentKeyResult.subkeyId;
 
-  const snapshotKey = await createSnapshotKey({
-    folderKey: encryptedFolderResult.folderSubkey,
-  });
   const documentSnapshot = await createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
     subkeyId: snapshotKey.subkeyId,
     keyDerivationTrace: {
       workspaceKeyId,
+      subkeyId: snapshotKey.subkeyId,
       parentFolders: [
         {
           folderId,
@@ -166,7 +181,7 @@ export const createInitialWorkspaceStructure = async ({
         encryptedDocumentName,
         encryptedDocumentNameNonce,
         documentSubkeyId,
-        documentContentSubkeyId,
+        documentContentSubkeyId: 123, // TODO: Remove
         documentSnapshot,
         creatorDeviceSigningPublicKey:
           creatorDeviceSigningPublicKey ?? deviceSigningPublicKey,

@@ -1,6 +1,6 @@
 import {
   decryptDocumentTitle,
-  recreateDocumentKey,
+  recreateSnapshotKey,
 } from "@serenity-tools/common";
 import create from "zustand";
 import { Document } from "../../generated/graphql";
@@ -25,20 +25,29 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
       document &&
       document.encryptedName &&
       document.encryptedNameNonce &&
-      document.subkeyId
+      document.nameKeyDerivationTrace.subkeyId >= 0
     ) {
       try {
-        const folderKeyData = await deriveFolderKey({
-          folderId: document?.parentFolderId!,
-          workspaceKeyId: document.nameKeyDerivationTrace?.workspaceKeyId,
-          workspaceId: document?.workspaceId!,
+        const folderKeyChainData = await deriveFolderKey({
+          folderId: document.parentFolderId!,
+          // workspaceKeyId,
+          // workspaceId: document.workspaceId!,
+          keyDerivationTrace: document.nameKeyDerivationTrace,
           activeDevice,
         });
-        const documentKeyData = await recreateDocumentKey({
-          folderKey: folderKeyData.folderKeyData.key,
-          subkeyId: document.subkeyId,
+        const lastChainItem = folderKeyChainData[folderKeyChainData.length - 1];
+        // FIXME: as a hack we are using the snapshotkey to
+        // create the document title, so we must use the snapshotkey
+        // also to decrypt it.
+        // const documentKeyData = await recreateDocumentKey({
+        //   folderKey: lastChainItem.key,
+        //   subkeyId: document.nameKeyDerivationTrace.subkeyId,
+        // });
+        const documentKeyData = await recreateSnapshotKey({
+          folderKey: lastChainItem.key,
+          subkeyId: document.nameKeyDerivationTrace.subkeyId,
         });
-        const documentName = await decryptDocumentTitle({
+        documentName = await decryptDocumentTitle({
           key: documentKeyData.key,
           ciphertext: document.encryptedName,
           publicNonce: document.encryptedNameNonce,

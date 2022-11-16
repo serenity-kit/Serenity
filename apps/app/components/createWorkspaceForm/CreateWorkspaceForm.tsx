@@ -1,6 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
 import {
-  createDocumentKey,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
   encryptDocumentTitle,
@@ -92,25 +91,31 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         parentKey: workspaceKey,
       });
       const documentName = "Introduction";
-      const documentKeyData = await createDocumentKey({
+      // FIXME: For now we will use the same key for
+      // document name and snapshot.
+      // Separate these keys when we restructure the
+      // createInitialWorkspaceStructure mutation
+      // const documentKeyData = await createDocumentKey({
+      //   folderKey: encryptedFolderResult.folderSubkey,
+      // });
+      const snapshotKey = await createSnapshotKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
       const encryptedDocumentTitle = await encryptDocumentTitle({
         title: documentName,
-        key: documentKeyData.key,
+        key: snapshotKey.key, // documentKeyData.key, // FIXME!
       });
-      const documentContentKeyData = await createDocumentKey({
-        folderKey: encryptedFolderResult.folderSubkey,
-      });
-      const snapshotKey = await createSnapshotKey({
-        folderKey: encryptedFolderResult.folderSubkey,
-      });
+      // TODO: remove
+      // const documentContentKeyData = await createDocumentKey({
+      //   folderKey: encryptedFolderResult.folderSubkey,
+      // });
       const snapshot = await createIntroductionDocumentSnapshot({
         documentId,
         snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
         subkeyId: snapshotKey.subkeyId,
         keyDerivationTrace: {
           workspaceKeyId,
+          subkeyId: snapshotKey.subkeyId,
           parentFolders: [
             {
               folderId,
@@ -120,8 +125,6 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
           ],
         },
       });
-
-      // throw new Error("Debug error");
 
       const createInitialWorkspaceStructureResult =
         await createInitialWorkspaceStructure({
@@ -135,8 +138,8 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
             folderIdSignature: `TODO+${folderId}`,
             encryptedDocumentName: encryptedDocumentTitle.ciphertext,
             encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
-            documentSubkeyId: documentKeyData.subkeyId,
-            documentContentSubkeyId: documentContentKeyData.subkeyId,
+            documentSubkeyId: snapshotKey.subkeyId, // FIXME: documentKeyData.subkeyId,
+            documentContentSubkeyId: 123, // TODO: remove
             documentId,
             documentSnapshot: snapshot,
             creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,

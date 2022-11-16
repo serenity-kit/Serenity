@@ -10,11 +10,13 @@ import { getFolder } from "./getFolder";
 it("should return empty parentFolders", async () => {
   const result = await buildKeyDerivationTrace({
     folderId: null,
+    subkeyId: 123,
     workspaceKeyId: "abc",
   });
   expect(result).toMatchInlineSnapshot(`
     {
       "parentFolders": [],
+      "subkeyId": 123,
       "workspaceKeyId": "abc",
     }
   `);
@@ -39,6 +41,7 @@ it("should return one parent folder", async () => {
 
   const result = await buildKeyDerivationTrace({
     folderId: "aaa",
+    subkeyId: 234,
     workspaceKeyId: "abc",
   });
   expect(result).toMatchInlineSnapshot(`
@@ -50,6 +53,7 @@ it("should return one parent folder", async () => {
           "subkeyId": 1,
         },
       ],
+      "subkeyId": 234,
       "workspaceKeyId": "abc",
     }
   `);
@@ -95,6 +99,7 @@ it("should return two parent folders", async () => {
 
   const result = await buildKeyDerivationTrace({
     folderId: "aaa",
+    subkeyId: 345,
     workspaceKeyId: "abc",
   });
   expect(result).toMatchInlineSnapshot(`
@@ -111,6 +116,7 @@ it("should return two parent folders", async () => {
           "subkeyId": 2,
         },
       ],
+      "subkeyId": 345,
       "workspaceKeyId": "abc",
     }
   `);

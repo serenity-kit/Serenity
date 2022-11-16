@@ -82,7 +82,7 @@ test("user should be able to change a folder name", async () => {
   expect(updatedFolder.id).toBe(addedFolderId);
   expect(typeof updatedFolder.encryptedName).toBe("string");
   expect(typeof updatedFolder.encryptedNameNonce).toBe("string");
-  expect(typeof updatedFolder.subkeyId).toBe("number");
+  expect(typeof updatedFolder.keyDerivationTrace.subkeyId).toBe("number");
   expect(updatedFolder.parentFolderId).toBe(null);
   expect(updatedFolder.rootFolderId).toBe(null);
   expect(updatedFolder.workspaceId).toBe(addedWorkspace.id);

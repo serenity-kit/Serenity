@@ -2,8 +2,7 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { useLinkProps } from "@react-navigation/native";
 import {
   decryptDocumentTitle,
-  encryptDocumentTitle,
-  recreateDocumentKey,
+  recreateSnapshotKey,
 } from "@serenity-tools/common";
 import {
   Icon,
@@ -18,16 +17,12 @@ import {
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
-import {
-  runUpdateDocumentNameMutation,
-  useDocumentQuery,
-} from "../../generated/graphql";
+import { KeyDerivationTrace, useDocumentQuery } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
-import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
+import { updateDocumentName } from "../../utils/document/updateDocumentName";
+import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
-import { getFolder } from "../../utils/folder/getFolder";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
 type Props = ViewProps & {
@@ -37,6 +32,7 @@ type Props = ViewProps & {
   encryptedName?: string | null;
   encryptedNameNonce?: string | null;
   subkeyId?: number | null;
+  nameKeyDerivationTrace: KeyDerivationTrace;
   depth?: number;
   onRefetchDocumentsPress: () => void;
 };
@@ -53,7 +49,9 @@ export default function SidebarPage(props: Props) {
     (state) => state.update
   );
   const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
-  const [document] = useDocumentQuery({ variables: { id: props.documentId } });
+  const [documentResult] = useDocumentQuery({
+    variables: { id: props.documentId },
+  });
 
   const linkProps = useLinkProps({
     to: {
@@ -69,30 +67,34 @@ export default function SidebarPage(props: Props) {
   });
 
   useEffect(() => {
-    if (document.data?.document?.id) {
+    if (documentResult.data?.document?.id) {
       decryptTitle();
     }
-  }, [props.encryptedName, props.subkeyId, document.data?.document?.id]);
+  }, [props.encryptedName, props.subkeyId, documentResult.data?.document?.id]);
 
   const decryptTitle = async () => {
-    if (!props.subkeyId || !props.encryptedName || !props.encryptedNameNonce) {
+    if (!props.encryptedName || !props.encryptedNameNonce) {
       // this case can happen when the document is created but the title is not yet set
       setDocumentTitle("Untitled");
       return;
     }
     try {
-      const folder = await getFolder({ id: props.parentFolderId });
-      const folderKey = await getFolderKey({
-        folderId: folder.id,
-        workspaceKeyId:
-          document.data?.document?.nameKeyDerivationTrace?.workspaceKeyId,
-        workspaceId: props.workspaceId,
-        folderSubkeyId: folder.subkeyId,
+      const document = documentResult.data?.document;
+      if (!document) {
+        console.log("Unable to retrieve document!");
+        return;
+      }
+      // TODO: optimize this by using the `getFolderKey()` function
+      // so that we don't need to load each folder multiple times
+      const folderKeyData = await deriveFolderKey({
+        folderId: props.parentFolderId,
         activeDevice,
+        keyDerivationTrace: props.nameKeyDerivationTrace,
       });
-      const documentKeyData = await recreateDocumentKey({
-        folderKey,
-        subkeyId: props.subkeyId,
+      const folderKey = folderKeyData[folderKeyData.length - 1].key;
+      const documentKeyData = await recreateSnapshotKey({
+        folderKey: folderKey,
+        subkeyId: props.nameKeyDerivationTrace.subkeyId,
       });
       const documentTitle = await decryptDocumentTitle({
         key: documentKeyData.key,
@@ -107,57 +109,22 @@ export default function SidebarPage(props: Props) {
   };
   const { depth = 0 } = props;
 
-  const updateDocumentName = async (name: string) => {
-    const workspace = await getWorkspace({
-      workspaceId: props.workspaceId,
-      deviceSigningPublicKey: activeDevice.signingPublicKey,
-    });
-    if (!workspace?.currentWorkspaceKey) {
-      // TODO: handle error in UI
-      console.error("Workspace or workspaceKeys not found");
+  const updateDocumentTitle = async (name: string) => {
+    const document = documentResult.data?.document;
+    if (!document) {
+      console.error("Document not loaded");
       return;
     }
-    const folder = await getFolder({ id: props.parentFolderId });
-    const folderKeyString = await getFolderKey({
-      folderId: folder.id,
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
-      workspaceId: props.workspaceId,
-      folderSubkeyId: folder.subkeyId,
-      activeDevice,
-    });
-    const documentKeyData = await recreateDocumentKey({
-      folderKey: folderKeyString,
-      subkeyId: document.data?.document?.subkeyId!,
-    });
-    const encryptedDocumentTitle = await encryptDocumentTitle({
-      title: name,
-      key: documentKeyData.key,
-    });
-    const nameKeyDerivationTrace = await buildKeyDerivationTrace({
-      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-      folderId: document.data?.document?.parentFolderId!,
-    });
-    const updateDocumentNameResult = await runUpdateDocumentNameMutation(
-      {
-        input: {
-          id: props.documentId,
-          encryptedName: encryptedDocumentTitle.ciphertext,
-          encryptedNameNonce: encryptedDocumentTitle.publicNonce,
-          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-          subkeyId: documentKeyData.subkeyId,
-          nameKeyDerivationTrace,
-        },
-      },
-      {}
-    );
-    if (updateDocumentNameResult.data?.updateDocumentName?.document) {
-      // TODO show notification
-      const document =
-        updateDocumentNameResult.data.updateDocumentName.document;
-      updateActiveDocumentInfoStore(document, activeDevice);
-    } else {
-      // TODO: show error: couldn't update folder name
-      // refetch to revert back to actual name
+    try {
+      const updatedDocument = await updateDocumentName({
+        document,
+        name,
+        activeDevice,
+      });
+      // FIXME: do we update this when it's not the active document?
+      updateActiveDocumentInfoStore(updatedDocument, activeDevice);
+    } catch (error) {
+      console.error(error);
     }
     setIsEditing(false);
   };
@@ -211,7 +178,7 @@ export default function SidebarPage(props: Props) {
                   onCancel={() => {
                     setIsEditing(false);
                   }}
-                  onSubmit={updateDocumentName}
+                  onSubmit={updateDocumentTitle}
                   value={documentTitle}
                   style={tw`ml-0.5 w-${maxWidth}`}
                   testID={`sidebar-document--${props.documentId}__edit-name`}

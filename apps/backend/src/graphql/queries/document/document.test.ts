@@ -90,14 +90,18 @@ test("user should be retrieve a document", async () => {
   expect(retrievedDocument.parentFolderId).toBe(null);
   expect(typeof retrievedDocument.encryptedName).toBe("string");
   expect(typeof retrievedDocument.encryptedNameNonce).toBe("string");
-  expect(typeof retrievedDocument.subkeyId).toBe("number");
+  expect(typeof retrievedDocument.nameKeyDerivationTrace.subkeyId).toBe(
+    "number"
+  );
 
   expect(typeof retrievedDocument.encryptedName).toBe("string");
   expect(typeof retrievedDocument.encryptedNameNonce).toBe("string");
-  expect(typeof retrievedDocument.subkeyId).toBe("number");
+  expect(typeof retrievedDocument.nameKeyDerivationTrace.subkeyId).toBe(
+    "number"
+  );
   const documentSubkey = await recreateDocumentKey({
     folderKey,
-    subkeyId: retrievedDocument.subkeyId,
+    subkeyId: retrievedDocument.nameKeyDerivationTrace.subkeyId,
   });
   const decryptedName = await decryptDocumentTitle({
     key: documentSubkey.key,

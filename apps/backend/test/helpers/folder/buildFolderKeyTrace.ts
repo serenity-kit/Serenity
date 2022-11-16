@@ -6,10 +6,12 @@ import { prisma } from "../../../src/database/prisma";
 
 export type Params = {
   workspaceKeyId: string;
+  subkeyId: number;
   parentFolderId: string | null | undefined;
 };
 export const buildFolderKeyTrace = async ({
   workspaceKeyId,
+  subkeyId,
   parentFolderId,
 }: Params): Promise<KeyDerivationTrace> => {
   const workspaceKey = await prisma.workspaceKey.findFirst({
@@ -46,6 +48,7 @@ export const buildFolderKeyTrace = async ({
   }
   const keyDerivationTrace: KeyDerivationTrace = {
     workspaceKeyId,
+    subkeyId,
     parentFolders: parentFolderKeyDerivationTrace,
   };
   return keyDerivationTrace;

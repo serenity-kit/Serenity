@@ -1,27 +1,18 @@
-import {
-  DocumentDocument,
-  DocumentQuery,
-  DocumentQueryVariables,
-} from "../../generated/graphql";
-import { getUrqlClient } from "../urqlClient/urqlClient";
+import { runDocumentQuery } from "../../generated/graphql";
 
 export type Props = {
   documentId: string;
 };
 export const getDocument = async ({ documentId }: Props) => {
-  const documentResult = await getUrqlClient()
-    .query<DocumentQuery, DocumentQueryVariables>(
-      DocumentDocument,
-      { id: documentId },
-      {
-        // better to be safe here and always refetch
-        requestPolicy: "network-only",
-      }
-    )
-    .toPromise();
-  if (documentResult.error) {
-    throw new Error(documentResult.error?.message);
-  } else {
-    return documentResult.data?.document;
+  const documentResult = await runDocumentQuery(
+    {
+      id: documentId,
+    },
+    { requestPolicy: "network-only" }
+  );
+  if (!documentResult.data?.document) {
+    throw new Error(documentResult.error?.message || "Document not found");
   }
+  const document = documentResult.data.document;
+  return document;
 };
