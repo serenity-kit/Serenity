@@ -11,7 +11,7 @@ import {
 } from "@serenity-tools/ui";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import RegisterForm from "../../../components/register/RegisterForm";
-import { RootStackScreenProps } from "../../../types/navigation";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 
 export default function RegisterScreen(
   props: RootStackScreenProps<"Register">

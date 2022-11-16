@@ -38,7 +38,7 @@ import {
 import { useInterval } from "../../../hooks/useInterval";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
-import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
+import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
@@ -57,13 +57,9 @@ type Member = {
 };
 
 export default function WorkspaceSettingsMembersScreen(
-  props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
+  props: WorkspaceStackScreenProps<"WorkspaceSettingsMembers">
 ) {
-  let workspaceId = useWorkspaceId();
-  if (workspaceId === "") {
-    const params = props.route.params! as { workspaceId: string };
-    workspaceId = params.workspaceId;
-  }
+  const workspaceId = useWorkspaceId();
   const { activeDevice } = useWorkspaceContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {

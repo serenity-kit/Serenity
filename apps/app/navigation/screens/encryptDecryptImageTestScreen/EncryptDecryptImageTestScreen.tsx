@@ -3,8 +3,11 @@ import { Button, Text, View } from "@serenity-tools/ui";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import { Image, useWindowDimensions } from "react-native";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 
-export default function EncryptDecryptImageTestScreen() {
+export default function EncryptDecryptImageTestScreen(
+  props: RootStackScreenProps<"EncryptDecryptImageTest">
+) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [base64ImageData, setBase64ImageData] = useState<string>("");
   const [chaChaNonce, setChaChaNonce] = useState<string>("");

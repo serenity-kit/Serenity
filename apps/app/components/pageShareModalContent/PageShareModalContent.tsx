@@ -1,4 +1,4 @@
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import {
   Button,
@@ -26,7 +26,7 @@ import {
   useDocumentShareLinksQuery,
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { WorkspaceDrawerParamList } from "../../types/navigation";
+import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { notNull } from "../../utils/notNull/notNull";
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
 const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 1;
 
 export function PageShareModalContent() {
-  const route = useRoute<RouteProp<WorkspaceDrawerParamList, "Page">>();
+  const route = useRoute<WorkspaceDrawerScreenProps<"Page">["route"]>();
   const [documentShareLinksResult, refetchDocumentShareLinks] =
     useDocumentShareLinksQuery({
       variables: { documentId: route.params.pageId },

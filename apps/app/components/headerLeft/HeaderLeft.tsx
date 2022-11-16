@@ -52,12 +52,18 @@ export function HeaderLeft({ canGoBack, navigateTo }: Props) {
             ) {
               navigation.navigate("Workspace", {
                 workspaceId,
-                screen: "WorkspaceRoot",
+                screen: "WorkspaceDrawer",
+                params: {
+                  screen: "WorkspaceRoot",
+                },
               });
             } else if (navigateTo === "AccountSettings") {
               navigation.navigate("AccountSettings");
             } else if (navigateTo === "WorkspaceSettings" && workspaceId) {
-              navigation.navigate("WorkspaceSettings", { workspaceId });
+              navigation.navigate("Workspace", {
+                workspaceId,
+                screen: "WorkspaceSettings",
+              });
             } else if (canGoBack) {
               navigation.goBack();
             } else {

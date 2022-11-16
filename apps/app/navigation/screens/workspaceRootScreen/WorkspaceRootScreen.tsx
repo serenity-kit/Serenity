@@ -2,7 +2,7 @@ import { CenterContent, Spinner, Text } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useWindowDimensions } from "react-native";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
-import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 import { workspaceRootScreenMachine } from "./workspaceRootScreenMachine";
 
 export default function WorkspaceRootScreen(

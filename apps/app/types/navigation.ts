@@ -1,32 +1,12 @@
-/**
- * Learn more about using TypeScript with React Navigation:
- * https://reactnavigation.org/docs/typescript/
- */
+import { NavigatorScreenParams } from "@react-navigation/native";
 
-import { DrawerScreenProps } from "@react-navigation/drawer";
-import {
-  CompositeScreenProps,
-  NavigatorScreenParams,
-} from "@react-navigation/native";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-
-declare global {
-  namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
-  }
-}
-
-type PageParams = {
+type PageParamList = {
   pageId: string;
   isNew?: boolean;
 };
 
-type WorkspacePageParams = {
+type WorkspacePageParamList = {
   workspaceId: string;
-};
-
-type LoginParams = {
-  next: string;
 };
 
 type RegistrationVerificationParams = {
@@ -35,14 +15,14 @@ type RegistrationVerificationParams = {
 };
 
 export type WorkspaceDrawerParamList = {
-  Page: PageParams;
-  Settings: undefined;
+  Page: PageParamList;
   WorkspaceNotDecrypted: undefined;
   WorkspaceRoot: undefined;
 };
 
-export type WorkspaceParams = NavigatorScreenParams<WorkspaceDrawerParamList> &
-  WorkspacePageParams;
+export type WorkspaceDrawerParams =
+  | NavigatorScreenParams<WorkspaceDrawerParamList>
+  | WorkspaceDrawerParamList;
 
 export type AccountSettingsDrawerParamList = {
   Profile: undefined;
@@ -59,18 +39,32 @@ export type WorkspaceSettingsDrawerParamList = {
 
 export type WorkspaceSettingsParams =
   // tablet & desktop params
-  | (NavigatorScreenParams<WorkspaceSettingsDrawerParamList> &
-      WorkspacePageParams)
+  | NavigatorScreenParams<WorkspaceSettingsDrawerParamList>
   // phone params
-  | WorkspacePageParams;
+  | WorkspacePageParamList;
 
 export type WorkspaceInvitationParams = {
   workspaceInvitationId: string;
 };
 
+export type WorkspaceStackParamList = {
+  WorkspaceSettingsMembers: undefined; // on phones
+  WorkspaceSettingsGeneral: undefined; // on phones
+  WorkspaceSettings:
+    | WorkspaceSettingsParams // on phones
+    | undefined; // on wide screens
+  WorkspaceDrawer: WorkspaceDrawerParams;
+};
+
+export type WorkspaceStackParams =
+  NavigatorScreenParams<WorkspaceStackParamList> & WorkspacePageParamList;
+
+type LoginParams = {
+  next: string;
+};
+
 export type RootStackParamList = {
-  Workspace: WorkspaceParams;
-  WorkspaceSettings: WorkspaceSettingsParams;
+  Workspace: WorkspaceStackParams;
   Onboarding: undefined;
   DesignSystem: undefined;
   DevDashboard: undefined;
@@ -78,31 +72,16 @@ export type RootStackParamList = {
   RegistrationVerification: RegistrationVerificationParams;
   AcceptWorkspaceInvitation: WorkspaceInvitationParams;
   WorkspaceNotFound: undefined;
-  Login: LoginParams | undefined;
+  Login: LoginParams | undefined; // the next inside LoginParams is optional
   LogoutInProgress: undefined;
   EncryptDecryptImageTest: undefined;
   TestLibsodium: undefined;
-  AccountSettings: AccountSettingsParams | undefined;
+  AccountSettings:
+    | AccountSettingsParams // on phones
+    | undefined; // on wide screens
   AccountSettingsProfile: undefined; // on phones
   AccountSettingsDevices: undefined; // on phones
-  WorkspaceSettingsGeneral: undefined; // on phones
-  WorkspaceSettingsMembers: undefined; // on phones
   SharePage: undefined;
   Root: undefined;
   NotFound: undefined;
-};
-
-export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
-  NativeStackScreenProps<RootStackParamList, Screen>;
-
-export type WorkspaceDrawerScreenProps<
-  Screen extends keyof WorkspaceDrawerParamList
-> = CompositeScreenProps<
-  DrawerScreenProps<WorkspaceDrawerParamList, Screen>,
-  NativeStackScreenProps<RootStackParamList>
->;
-
-export type RouteDescription = {
-  screen: keyof RootStackParamList;
-  params: LoginParams | WorkspaceParams | WorkspaceInvitationParams | undefined;
 };

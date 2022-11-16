@@ -164,11 +164,14 @@ export const workspaceNotDecryptedScreenMachine =
               workspaceId:
                 context.meWithWorkspaceLoadingInfoQueryResult.data.me
                   .workspaceLoadingInfo.id,
-              screen: "Page",
+              screen: "WorkspaceDrawer",
               params: {
-                pageId:
-                  context.meWithWorkspaceLoadingInfoQueryResult.data.me
-                    .workspaceLoadingInfo.documentId,
+                screen: "Page",
+                params: {
+                  pageId:
+                    context.meWithWorkspaceLoadingInfoQueryResult.data.me
+                      .workspaceLoadingInfo.documentId,
+                },
               },
             });
           } else {

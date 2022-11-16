@@ -44,7 +44,7 @@ import {
   runWorkspaceQuery,
 } from "../../generated/graphql";
 import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";

@@ -1,7 +1,10 @@
 import { ScrollSafeAreaView, SidebarLink, tw } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 
-export default function DevDashboardScreen(props) {
+export default function DevDashboardScreen(
+  props: RootStackScreenProps<"DevDashboard">
+) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
   return (

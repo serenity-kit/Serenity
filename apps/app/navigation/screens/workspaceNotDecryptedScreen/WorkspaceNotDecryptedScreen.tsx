@@ -9,7 +9,7 @@ import {
 import { useMachine } from "@xstate/react";
 import { useWindowDimensions } from "react-native";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
-import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 import { workspaceNotDecryptedScreenMachine } from "./workspaceNotDecryptedScreenMachine";
 
 export default function WorkspaceNotDecryptedScreen({
