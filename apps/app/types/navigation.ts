@@ -16,8 +16,8 @@ type RegistrationVerificationParams = {
 
 export type WorkspaceDrawerParamList = {
   Page: PageParamList;
-  Settings: undefined;
   WorkspaceNotDecrypted: undefined;
+  WorkspaceRoot: undefined;
 };
 
 export type WorkspaceDrawerParams =
@@ -54,7 +54,6 @@ export type WorkspaceStackParamList = {
     | WorkspaceSettingsParams // on phones
     | undefined; // on wide screens
   WorkspaceDrawer: WorkspaceDrawerParams;
-  WorkspaceRoot: undefined;
 };
 
 export type WorkspaceStackParams =

@@ -128,7 +128,10 @@ export default function AccountMenu({
                   screen: "Workspace",
                   params: {
                     workspaceId: workspace.id,
-                    screen: "WorkspaceRoot",
+                    screen: "WorkspaceDrawer",
+                    params: {
+                      screen: "WorkspaceRoot",
+                    },
                   },
                 }}
                 icon={
@@ -176,20 +179,21 @@ export default function AccountMenu({
           initiateLogout();
           // making sure there are screens hanging around that would re-render
           // on logout and cause issues
-          navigation.reset({
-            stale: false,
-            type: "stack",
-            key: "stack-logout",
-            index: 0,
-            routeNames: navigation.getState().routeNames,
-            routes: [
-              {
-                name: "LogoutInProgress",
-                path: "/logging-out",
-                key: "LogoutInProgress-logout",
-              },
-            ],
-          });
+          navigation.navigate("LogoutInProgress");
+          // navigation.reset({
+          //   stale: false,
+          //   type: "stack",
+          //   key: "stack-logout",
+          //   index: 0,
+          //   routeNames: navigation.getState().routeNames,
+          //   routes: [
+          //     {
+          //       name: "LogoutInProgress",
+          //       path: "/logging-out",
+          //       key: "LogoutInProgress-logout",
+          //     },
+          //   ],
+          // });
         }}
         testID={`${testIdPrefix}account-menu--logout`}
       >

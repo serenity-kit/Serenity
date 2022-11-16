@@ -52,7 +52,10 @@ export function HeaderLeft({ canGoBack, navigateTo }: Props) {
             ) {
               navigation.navigate("Workspace", {
                 workspaceId,
-                screen: "WorkspaceRoot",
+                screen: "WorkspaceDrawer",
+                params: {
+                  screen: "WorkspaceRoot",
+                },
               });
             } else if (navigateTo === "AccountSettings") {
               navigation.navigate("AccountSettings");

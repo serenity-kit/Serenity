@@ -101,6 +101,11 @@ function WorkspaceDrawerNavigator(props) {
         component={WorkspaceNotDecryptedScreen}
         options={{ title: "" }}
       />
+      <Drawer.Screen
+        name="WorkspaceRoot"
+        component={WorkspaceRootScreen}
+        options={{ headerShown: false }}
+      />
     </Drawer.Navigator>
   );
 }
@@ -266,11 +271,6 @@ function WorkspaceStackNavigator(props) {
             />
           </WorkspaceStack.Group>
         )}
-        <WorkspaceStack.Screen
-          name="WorkspaceRoot"
-          component={WorkspaceRootScreen}
-          options={{ headerShown: false }}
-        />
       </WorkspaceStack.Navigator>
     </WorkspaceIdProvider>
   );
@@ -447,9 +447,9 @@ const getLinking = (
               screens: {
                 Page: "page/:pageId",
                 WorkspaceNotDecrypted: "lobby",
+                WorkspaceRoot: "",
               },
             },
-            WorkspaceRoot: "",
           },
         },
         Onboarding: "onboarding",

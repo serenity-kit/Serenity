@@ -2,11 +2,11 @@ import { CenterContent, Spinner, Text } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useWindowDimensions } from "react-native";
 import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
-import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 import { workspaceRootScreenMachine } from "./workspaceRootScreenMachine";
 
 export default function WorkspaceRootScreen(
-  props: WorkspaceStackScreenProps<"WorkspaceRoot">
+  props: WorkspaceDrawerScreenProps<"WorkspaceRoot">
 ) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const workspaceId = useWorkspaceId();

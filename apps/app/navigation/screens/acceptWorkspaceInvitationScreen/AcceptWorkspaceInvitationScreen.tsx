@@ -60,7 +60,10 @@ export default function AcceptWorkspaceInvitationScreen(
       });
       props.navigation.navigate("Workspace", {
         workspaceId: workspace!.id,
-        screen: "WorkspaceRoot",
+        screen: "WorkspaceDrawer",
+        params: {
+          screen: "WorkspaceRoot",
+        },
       });
     } catch (error) {
       setHasGraphqlError(true);
