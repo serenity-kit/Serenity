@@ -1,25 +1,27 @@
+import { Avatar as NbAvatar, IAvatarProps } from "native-base";
 import React, { forwardRef } from "react";
 import { StyleSheet } from "react-native";
-import { Avatar as NbAvatar, IAvatarProps } from "native-base";
 import { tw } from "../../tailwind";
 import { CollaborationColor } from "../../types";
 import { View } from "../view/View";
 
-export type AvatarVariant = "2xl" | "xl" | "lg" | "md" | "sm" | "xs" | "xxs";
+export type AvatarSize = "2xl" | "xl" | "lg" | "md" | "sm" | "xs" | "xxs";
 export type AvatarStatus = "active" | "inactive" | "default";
 
-export type AvatarProps = IAvatarProps & {
-  customColor?: CollaborationColor;
-  variant?: AvatarVariant;
+type CustomAvatarProps = {
+  color?: CollaborationColor;
+  size?: AvatarSize;
   status?: AvatarStatus;
 };
 
+export type AvatarProps = IAvatarProps & CustomAvatarProps;
+
 export const Avatar = forwardRef((props: AvatarProps, ref) => {
   const {
-    variant = "sm",
-    customColor = "serenity",
+    size = "sm",
+    color = "serenity",
     status = "default",
-  } = props;
+  }: CustomAvatarProps = props;
   const styles = StyleSheet.create({
     avatar: tw``,
   });
@@ -43,19 +45,19 @@ export const Avatar = forwardRef((props: AvatarProps, ref) => {
   return (
     <NbAvatar
       {...props}
-      size={variant}
+      size={size}
       style={[styles.avatar, statusStyling[status], props.style]}
       _text={{
         fontFamily: "Inter_600SemiBold",
         style: tw`uppercase`,
       }}
-      bg={`collaboration.${customColor}`}
+      bg={`collaboration.${color}`}
     >
       {status === "active" ? (
         <View
           style={[
-            tw`absolute w-${activeIndicatorSize[variant]} h-${activeIndicatorSize[variant]} bg-transparent`,
-            tw`rounded-full border-2 border-collaboration-${customColor}`,
+            tw`absolute w-${activeIndicatorSize[size]} h-${activeIndicatorSize[size]} bg-transparent`,
+            tw`rounded-full border-2 border-collaboration-${color}`,
             { zIndex: -1 },
           ]}
         />

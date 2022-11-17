@@ -43,11 +43,11 @@ export function PageHeaderRight() {
               max={hasEditorSidebar ? 3 : 2}
               _avatar={{ size: "sm" }}
             >
-              <Avatar customColor="emerald">BE</Avatar>
-              <Avatar customColor="honey">NG</Avatar>
-              <Avatar customColor="orange">AB</Avatar>
-              <Avatar customColor="rose">SK</Avatar>
-              <Avatar customColor="serenity">AD</Avatar>
+              <Avatar color="emerald">BE</Avatar>
+              <Avatar color="honey">NG</Avatar>
+              <Avatar color="orange">AB</Avatar>
+              <Avatar color="rose">SK</Avatar>
+              <Avatar color="serenity">AD</Avatar>
             </AvatarGroup>
             {hasEditorSidebar ? (
               <Button
