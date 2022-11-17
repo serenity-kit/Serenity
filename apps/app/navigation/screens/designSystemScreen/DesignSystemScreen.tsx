@@ -166,14 +166,14 @@ export default function DesignSystemScreen(
         <Heading lvl={3}>Styling</Heading>
         <Text variant="sm">
           Set one of the many coloring options with the{" "}
-          <DSMono variant="property">customColor</DSMono> property.
+          <DSMono variant="property">color</DSMono> property.
         </Text>
         <DSExampleArea>
-          <Avatar customColor="arctic">BE</Avatar>
-          <Avatar customColor="lavender">NG</Avatar>
-          <Avatar customColor="rose">AB</Avatar>
-          <Avatar customColor="honey">SK</Avatar>
-          <Avatar customColor="emerald">AD</Avatar>
+          <Avatar color="arctic">BE</Avatar>
+          <Avatar color="lavender">NG</Avatar>
+          <Avatar color="rose">AB</Avatar>
+          <Avatar color="honey">SK</Avatar>
+          <Avatar color="emerald">AD</Avatar>
         </DSExampleArea>
         <Heading lvl={3}>Grouping</Heading>
         <Text variant="sm">
@@ -183,11 +183,37 @@ export default function DesignSystemScreen(
         </Text>
         <DSExampleArea>
           <AvatarGroup max={3} _avatar={{ size: "sm" }}>
-            <Avatar customColor="arctic">SK</Avatar>
-            <Avatar customColor="lavender">NG</Avatar>
-            <Avatar customColor="rose">AN</Avatar>
-            <Avatar customColor="honey">NG</Avatar>
-            <Avatar customColor="sky">NG</Avatar>
+            <Avatar color="arctic">SK</Avatar>
+            <Avatar color="lavender">NG</Avatar>
+            <Avatar color="rose">AN</Avatar>
+            <Avatar color="honey">NG</Avatar>
+            <Avatar color="sky">NG</Avatar>
+          </AvatarGroup>
+        </DSExampleArea>
+        <Heading lvl={3}>Status</Heading>
+        <Text variant="sm">
+          To indicate if an <DSMono variant="component">Avatar</DSMono> is
+          active or absent in the same context as the current user is, use the{" "}
+          <DSMono variant="property">status</DSMono> property, to make their
+          presence more visible.
+        </Text>
+        <DSExampleArea>
+          <AvatarGroup max={3} _avatar={{ size: "sm" }}>
+            <Avatar status="active" color="arctic">
+              SK
+            </Avatar>
+            <Avatar status="active" color="lavender">
+              NG
+            </Avatar>
+            <Avatar status="inactive" color="rose">
+              AN
+            </Avatar>
+            <Avatar status="inactive" color="honey">
+              NG
+            </Avatar>
+            <Avatar status="inactive" color="sky">
+              NG
+            </Avatar>
           </AvatarGroup>
         </DSExampleArea>
         <Heading lvl={4} style={h4Styles}>
@@ -215,11 +241,11 @@ export default function DesignSystemScreen(
         <Heading lvl={3}>Styling</Heading>
         <Text variant="sm">
           Set one of the many coloring options with the{" "}
-          <DSMono variant="property">customColor</DSMono> property.
+          <DSMono variant="property">color</DSMono> property.
         </Text>
         <DSExampleArea>
           {collaborationColors.map((color) => {
-            return <WorkspaceAvatar key={color} customColor={color} />;
+            return <WorkspaceAvatar key={color} color={color} />;
           })}
         </DSExampleArea>
 
@@ -1630,13 +1656,13 @@ export default function DesignSystemScreen(
 
               <MenuLink
                 to={{ screen: "EncryptDecryptImageTest" }}
-                icon={<WorkspaceAvatar customColor="emerald" size={"xxs"} />}
+                icon={<WorkspaceAvatar color="emerald" size={"xxs"} />}
               >
                 Notes
               </MenuLink>
               <MenuLink
                 to={{ screen: "Login" }}
-                icon={<WorkspaceAvatar customColor="honey" size={"xxs"} />}
+                icon={<WorkspaceAvatar color="honey" size={"xxs"} />}
               >
                 Project X
               </MenuLink>
