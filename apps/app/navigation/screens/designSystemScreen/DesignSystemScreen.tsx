@@ -460,7 +460,6 @@ export default function DesignSystemScreen(
                       name="arrow-right-filled"
                       color={"gray-600"}
                       mobileSize={5}
-                      blub={"collaboration-orange"}
                     />
                   </View>
                   <View style={tw`-ml-0.5`}>
@@ -1126,8 +1125,8 @@ export default function DesignSystemScreen(
             <IconTile name="page-separator" />
             <IconTile name="separator" />
             <IconTile name="calendar-check-fill" />
-            <IconTile name="image-2-line" />
             <IconTile name="image-line" />
+            <IconTile name="image-2-line" />
             <IconTile name="movie-line" />
             <IconTile name="folder-music-line" />
             <IconTile name="emotion-line" />
