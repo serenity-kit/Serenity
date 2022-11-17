@@ -232,9 +232,8 @@ export type IconNames =
 export type IconProps = {
   name: IconNames;
   color?: Color;
-  size?: number;
-  mobileSize?: number;
-  blub?: Color;
+  size?: number | "full";
+  mobileSize?: number | "full";
 };
 
 export const Icon = (props: IconProps) => {
