@@ -5,14 +5,21 @@ import { tw } from "../../tailwind";
 import { CollaborationColor } from "../../types";
 import { View } from "../view/View";
 
+export type AvatarVariant = "2xl" | "xl" | "lg" | "md" | "sm" | "xs" | "xxs";
+export type AvatarStatus = "active" | "inactive" | "default";
+
 export type AvatarProps = IAvatarProps & {
   customColor?: CollaborationColor;
-  size?: "2xl" | "xl" | "lg" | "md" | "sm" | "xs" | "xxs";
-  status?: "active" | "inactive" | "default";
+  variant?: AvatarVariant;
+  status?: AvatarStatus;
 };
 
 export const Avatar = forwardRef((props: AvatarProps, ref) => {
-  const { size = "sm", customColor = "serenity", status = "default" } = props;
+  const {
+    variant = "sm",
+    customColor = "serenity",
+    status = "default",
+  } = props;
   const styles = StyleSheet.create({
     avatar: tw``,
   });
@@ -36,7 +43,7 @@ export const Avatar = forwardRef((props: AvatarProps, ref) => {
   return (
     <NbAvatar
       {...props}
-      size={size}
+      size={variant}
       style={[styles.avatar, statusStyling[status], props.style]}
       _text={{
         fontFamily: "Inter_600SemiBold",
@@ -47,7 +54,7 @@ export const Avatar = forwardRef((props: AvatarProps, ref) => {
       {status === "active" ? (
         <View
           style={[
-            tw`absolute w-${activeIndicatorSize[size]} h-${activeIndicatorSize[size]} bg-transparent`,
+            tw`absolute w-${activeIndicatorSize[variant]} h-${activeIndicatorSize[variant]} bg-transparent`,
             tw`rounded-full border-2 border-collaboration-${customColor}`,
             { zIndex: -1 },
           ]}
