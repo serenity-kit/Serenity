@@ -50,7 +50,7 @@ it("should return one parent folder", async () => {
         {
           "folderId": "aaa",
           "parentFolderId": null,
-          "subkeyId": 1,
+          "subkeyId": undefined,
         },
       ],
       "subkeyId": 234,
@@ -108,12 +108,12 @@ it("should return two parent folders", async () => {
         {
           "folderId": "aaa",
           "parentFolderId": "bbb",
-          "subkeyId": 1,
+          "subkeyId": undefined,
         },
         {
           "folderId": "bbb",
           "parentFolderId": null,
-          "subkeyId": 2,
+          "subkeyId": undefined,
         },
       ],
       "subkeyId": 345,
