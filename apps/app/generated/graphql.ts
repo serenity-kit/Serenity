@@ -289,6 +289,8 @@ export type DocumentEdge = {
 
 export type DocumentShareLink = {
   __typename?: 'DocumentShareLink';
+  deviceSecretBoxCiphertext: Scalars['String'];
+  deviceSecretBoxNonce: Scalars['String'];
   token: Scalars['String'];
 };
 
@@ -671,6 +673,7 @@ export type Query = {
   devices?: Maybe<DeviceWithRecentSessionConnection>;
   document?: Maybe<Document>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
+  documentShareLink?: Maybe<DocumentShareLink>;
   documentShareLinks?: Maybe<DocumentShareLinkConnection>;
   documents?: Maybe<DocumentConnection>;
   fileUrl?: Maybe<File>;
@@ -717,6 +720,11 @@ export type QueryDocumentArgs = {
 
 export type QueryDocumentPathArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryDocumentShareLinkArgs = {
+  token: Scalars['ID'];
 };
 
 
@@ -1329,6 +1337,13 @@ export type DocumentPathQueryVariables = Exact<{
 
 
 export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, subkeyId: number, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null };
+
+export type DocumentShareLinkQueryVariables = Exact<{
+  token: Scalars['ID'];
+}>;
+
+
+export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLink', token: string, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string } | null };
 
 export type DocumentShareLinksQueryVariables = Exact<{
   documentId: Scalars['ID'];
@@ -2038,6 +2053,19 @@ export const DocumentPathDocument = gql`
 
 export function useDocumentPathQuery(options: Omit<Urql.UseQueryArgs<DocumentPathQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentPathQuery, DocumentPathQueryVariables>({ query: DocumentPathDocument, ...options });
+};
+export const DocumentShareLinkDocument = gql`
+    query documentShareLink($token: ID!) {
+  documentShareLink(token: $token) {
+    token
+    deviceSecretBoxCiphertext
+    deviceSecretBoxNonce
+  }
+}
+    `;
+
+export function useDocumentShareLinkQuery(options: Omit<Urql.UseQueryArgs<DocumentShareLinkQueryVariables>, 'query'>) {
+  return Urql.useQuery<DocumentShareLinkQuery, DocumentShareLinkQueryVariables>({ query: DocumentShareLinkDocument, ...options });
 };
 export const DocumentShareLinksDocument = gql`
     query documentShareLinks($documentId: ID!, $first: Int! = 50, $after: String) {
@@ -2903,6 +2931,20 @@ export const runDocumentPathQuery = async (variables: DocumentPathQueryVariables
   return await getUrqlClient()
     .query<DocumentPathQuery, DocumentPathQueryVariables>(
       DocumentPathDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDocumentShareLinkQuery = async (variables: DocumentShareLinkQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DocumentShareLinkQuery, DocumentShareLinkQueryVariables>(
+      DocumentShareLinkDocument,
       variables,
       {
         // better to be safe here and always refetch

@@ -63,6 +63,11 @@ type LoginParams = {
   next: string;
 };
 
+type SharePageParams = {
+  documentId: string;
+  token: string;
+};
+
 export type RootStackParamList = {
   Workspace: WorkspaceStackParams;
   Onboarding: undefined;
@@ -81,7 +86,7 @@ export type RootStackParamList = {
     | undefined; // on wide screens
   AccountSettingsProfile: undefined; // on phones
   AccountSettingsDevices: undefined; // on phones
-  SharePage: undefined;
+  SharePage: SharePageParams;
   Root: undefined;
   NotFound: undefined;
 };
