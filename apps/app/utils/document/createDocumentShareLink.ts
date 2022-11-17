@@ -96,10 +96,11 @@ export const createDocumentShareLink = async ({
   const documentShareLink = getDocumentShareLinkUrl(
     documentId,
     token,
-    snapshotKey
+    virtualDeviceKey
   );
   return {
     token,
+    virtualDeviceKey,
     snapshotKey,
     documentShareLink,
   };
