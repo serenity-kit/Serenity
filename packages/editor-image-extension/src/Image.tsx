@@ -1,6 +1,7 @@
 import { NodeViewWrapper } from "@tiptap/react";
 import React, { useEffect, useReducer } from "react";
 import { guessMimeType } from "./utils/guessMimeType";
+import { tw, View, Text, Icon, useIsDesktopDevice } from "@serenity-tools/ui";
 
 type State =
   | {
@@ -48,6 +49,7 @@ export const Image = (props: any) => {
     contentAsBase64: null,
   };
   const [state, dispatch] = useReducer(reducer, initialState);
+  const isDesktopDevice = useIsDesktopDevice();
 
   useEffect(() => {
     const retrieveContent = async () => {
@@ -78,28 +80,51 @@ export const Image = (props: any) => {
     retrieveContent();
   }, [fileId, key, nonce, downloadAndDecryptFile]);
 
+  const isPortrait = height > width;
+
   return (
     <NodeViewWrapper
-      style={{ outline: props.selected ? "2px solid blue" : "none" }}
+      style={{
+        outline: props.selected
+          ? `3px solid ${tw.color("primary-400")}`
+          : "none",
+      }}
     >
       {state.step !== "done" ? (
-        <div
-          style={{
-            backgroundColor: "#ddd", // TODO replace with proper theme color
-            aspectRatio: `1 / ${height / width}`,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          {
+        <View
+          style={[
+            tw`flex justify-center items-center bg-gray-200`,
             {
-              downloading: "Download in progress …",
-              uploading: "Upload in progress …",
-              failedToDecrypt: "Failed to decrypt",
-            }[state.step]
-          }
-        </div>
+              aspectRatio: `1 / ${height / width}`,
+            },
+          ]}
+        >
+          <View
+            style={tw`max-${isPortrait ? "w" : "h"}-30 ${
+              isPortrait ? "w-1/3" : "h-2/5"
+            }`}
+          >
+            <Icon
+              name="image-2-line"
+              color={"gray-300"}
+              size="full"
+              mobileSize={"full"}
+            />
+          </View>
+          <Text
+            variant={isDesktopDevice || isPortrait ? "xs" : "xxs"}
+            style={tw`text-gray-400`}
+            bold
+          >
+            {
+              {
+                downloading: "Downloading …",
+                uploading: "Uploading …",
+                failedToDecrypt: "Failed to decrypt",
+              }[state.step]
+            }
+          </Text>
+        </View>
       ) : (
         <img src={state.contentAsBase64!} />
       )}
