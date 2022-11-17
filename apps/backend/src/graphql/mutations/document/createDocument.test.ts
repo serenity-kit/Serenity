@@ -62,7 +62,7 @@ test("user should be able to create a document", async () => {
   const folderKeyResult = await kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
-    subkeyId: addedFolder.subkeyId,
+    subkeyId: addedFolder.keyDerivationTrace.subkeyId,
   });
   let documentContentKeyResult = await createDocumentKey({
     folderKey: folderKeyResult.key,

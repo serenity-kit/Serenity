@@ -11,6 +11,7 @@ export type KeyDerivationTraceParentFolder = {
 
 export type KeyDerivationTrace = {
   workspaceKeyId: string;
+  subkeyId: number;
   parentFolders: KeyDerivationTraceParentFolder[];
 };
 

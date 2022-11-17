@@ -86,6 +86,7 @@ export async function getFolder({ userId, id }: Params) {
       return folder;
     });
   } catch (error) {
+    console.log({ error });
     throw error;
   }
 }

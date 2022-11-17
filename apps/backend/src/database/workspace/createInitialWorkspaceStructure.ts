@@ -75,6 +75,7 @@ export async function createInitialWorkspaceStructure({
     workspaceId: workspace.id,
     keyDerivationTrace: {
       workspaceKeyId: workspaceKey?.id!,
+      subkeyId: folderSubkeyId,
       parentFolders: [],
     },
   });

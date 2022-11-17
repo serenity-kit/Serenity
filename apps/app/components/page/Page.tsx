@@ -49,6 +49,7 @@ import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentI
 import { getDocument } from "../../utils/document/getDocument";
 import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
 import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
+import { getFolder } from "../../utils/folder/getFolder";
 
 const reconnectTimeout = 2000;
 
@@ -89,22 +90,19 @@ export default function Page({
 
   const deriveExistingSnapshotKey = async (snapshot: Snapshot) => {
     // derive existing key if snapshot exists
-    const documentResult = await runDocumentQuery({ id: docId });
-    const document = documentResult.data?.document;
-    if (!document) {
-      throw new Error("Document not found");
-    }
+    const document = await getDocument({ documentId: docId });
     const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
-    const workspaceKeyId = snapshotKeyDerivationTrace?.workspaceKeyId;
     const folderKeyChainData = await deriveFolderKey({
       folderId: document.parentFolderId!,
-      workspaceKeyId,
-      workspaceId: document.workspaceId!,
+      // workspaceKeyId,
+      // workspaceId: document.workspaceId!,
+      keyDerivationTrace: snapshotKeyDerivationTrace,
       activeDevice,
     });
+    const lastChainItem = folderKeyChainData[folderKeyChainData.length - 1];
     const snapshotKeyData = await recreateSnapshotKey({
-      folderKey: folderKeyChainData.folderKeyData.key,
-      subkeyId: snapshot.publicData.subkeyId,
+      folderKey: lastChainItem.key,
+      subkeyId: snapshotKeyDerivationTrace.subkeyId,
     });
     return snapshotKeyData;
   };
@@ -167,14 +165,18 @@ export default function Page({
     document: Document,
     workspaceKeyId: string
   ) => {
+    const folder = await getFolder({ id: document.parentFolderId! });
     const folderKeyChainData = await deriveFolderKey({
       folderId: document.parentFolderId!,
-      workspaceKeyId,
-      workspaceId: document.workspaceId!,
+      // workspaceKeyId,
+      // workspaceId: document.workspaceId!,
+      overrideWithWorkspaceKeyId: workspaceKeyId,
+      keyDerivationTrace: folder.keyDerivationTrace,
       activeDevice,
     });
+    const lastChainItem = folderKeyChainData[folderKeyChainData.length - 1];
     const snapshotKeyData = await createSnapshotKey({
-      folderKey: folderKeyChainData.folderKeyData.key,
+      folderKey: lastChainItem.key,
     });
     return snapshotKeyData;
   };
@@ -201,6 +203,7 @@ export default function Page({
     const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
     const keyDerivationTrace = await buildKeyDerivationTrace({
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+      subkeyId: snapshotKey.subkeyId,
       folderId: document.parentFolderId!,
     });
     const publicData = {

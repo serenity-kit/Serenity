@@ -67,11 +67,11 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
           if (!workspaceKeys[folder.workspaceKeyId!]) {
             throw new Error("Workspace key not found");
           }
-          parentKey = workspaceKeys[folder.workspaceKeyId!];
+          parentKey = workspaceKeys[folder.keyDerivationTrace.workspaceKeyId!];
         }
         folderName = await decryptFolderName({
           parentKey: parentKey,
-          subkeyId: folder.subkeyId!,
+          subkeyId: folder.keyDerivationTrace.subkeyId!,
           ciphertext: folder.encryptedName,
           publicNonce: folder.encryptedNameNonce,
         });

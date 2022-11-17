@@ -100,10 +100,10 @@ test("user should be able to change a document name", async () => {
   const updatedDocument = result.updateDocumentName.document;
   expect(typeof updatedDocument.encryptedName).toBe("string");
   expect(typeof updatedDocument.encryptedNameNonce).toBe("string");
-  expect(typeof updatedDocument.subkeyId).toBe("number");
+  expect(typeof updatedDocument.nameKeyDerivationTrace.subkeyId).toBe("number");
   const documentSubkey = await recreateDocumentKey({
     folderKey,
-    subkeyId: updatedDocument.subkeyId,
+    subkeyId: updatedDocument.nameKeyDerivationTrace.subkeyId,
   });
   const decryptedName = await decryptDocumentTitle({
     key: documentSubkey.key,

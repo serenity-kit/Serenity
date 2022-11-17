@@ -101,22 +101,29 @@ export const useFolderKeyStore = create<FolderKeyState>((set, get) => ({
     if (folderKey) {
       return folderKey;
     }
+    const folder = await getFolder({ id: folderId });
     // TODO: optimize by creating a single graphql query to get all folders
     const derivedFolderKeyData = await deriveFolderKey({
-      workspaceId,
-      workspaceKeyId: usingWorkspaceKeyId,
+      // workspaceId,
+      // workspaceKeyId: usingWorkspaceKeyId,
       folderId,
+      keyDerivationTrace: folder.keyDerivationTrace,
       activeDevice,
     });
-    folderKey = derivedFolderKeyData.folderKeyData.key;
-    const folderKeyChain = derivedFolderKeyData.keyChain;
-    folderSubkeyKeyLookup[folderSubkeyId] = folderKey;
-    for (const folderKeyLink of folderKeyChain) {
-      if (!folderSubkeyKeyLookup[folderKeyLink.folderId]) {
-        folderSubkeyKeyLookup[folderKeyLink.folderId] = {};
+    folderKey = derivedFolderKeyData[derivedFolderKeyData.length - 1].key;
+    let remainingFolderKeyData = [...derivedFolderKeyData];
+    // the first key in the trace is the workspace key
+    while (remainingFolderKeyData.length > 1) {
+      const lastFolderKeyData =
+        remainingFolderKeyData[remainingFolderKeyData.length - 1];
+      const traceFolderId = lastFolderKeyData.folderId;
+      if (!folderWorkspaceKeyIdLookup[traceFolderId!]) {
+        folderWorkspaceKeyIdLookup[traceFolderId!] = {};
       }
-      folderSubkeyKeyLookup[folderKeyLink.folderId][folderKeyLink.subkeyId] =
-        folderKeyLink.key;
+      folderWorkspaceKeyIdLookup[traceFolderId!][lastFolderKeyData.subkeyId] =
+        lastFolderKeyData.key;
+      remainingFolderKeyData = [...derivedFolderKeyData];
+      remainingFolderKeyData.pop();
     }
     set({ folderKeyLookupForWorkspace });
     return folderKey;

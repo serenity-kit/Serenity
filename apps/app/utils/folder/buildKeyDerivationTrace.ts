@@ -6,10 +6,12 @@ import { getFolder } from "./getFolder";
 
 export type Props = {
   folderId: string | undefined | null;
+  subkeyId: number;
   workspaceKeyId: string;
 };
 export const buildKeyDerivationTrace = async ({
   folderId,
+  subkeyId,
   workspaceKeyId,
 }: Props) => {
   const folderKeyData: KeyDerivationTraceParentFolder[] = [];
@@ -20,7 +22,7 @@ export const buildKeyDerivationTrace = async ({
       folder = await getFolder({ id: folderIdToFetch });
       folderKeyData.push({
         folderId: folder.id,
-        subkeyId: folder.subkeyId,
+        subkeyId: folder.keyDerivationTrace.subkeyId,
         parentFolderId: folder.parentFolderId,
       });
       if (folder.parentFolderId) {
@@ -30,6 +32,7 @@ export const buildKeyDerivationTrace = async ({
   }
   return {
     workspaceKeyId,
+    subkeyId,
     parentFolders: folderKeyData,
   };
 };

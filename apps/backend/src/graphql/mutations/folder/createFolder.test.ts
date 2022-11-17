@@ -80,7 +80,7 @@ test("user should be able to create a root folder", async () => {
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
   expect(typeof folder.encryptedNameNonce).toBe("string");
-  expect(typeof folder.subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.subkeyId).toBe("number");
 });
 
 test("user should be able to create a root folder with a name", async () => {
@@ -104,7 +104,7 @@ test("user should be able to create a root folder with a name", async () => {
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
   expect(typeof folder.encryptedNameNonce).toBe("string");
-  expect(typeof folder.subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.subkeyId).toBe("number");
 });
 
 test("user should be able to create a child folder", async () => {
@@ -136,7 +136,7 @@ test("user should be able to create a child folder", async () => {
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
   expect(typeof folder.encryptedNameNonce).toBe("string");
-  expect(typeof folder.subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.subkeyId).toBe("number");
 });
 
 test("duplicate ID throws an error", async () => {

@@ -1,6 +1,5 @@
 import { inputObjectType, objectType } from "nexus";
-import { KeyDerivationTraceInput } from "../mutations/folder/createFolder";
-import { KeyDerivationTrace } from "./folder";
+import { KeyDerivationTrace, KeyDerivationTraceInput } from "./keyDerivation";
 import { WorkspaceKey } from "./workspace";
 
 export const Document = objectType({
@@ -10,7 +9,6 @@ export const Document = objectType({
     t.string("encryptedName");
     t.string("encryptedNameNonce");
     t.string("workspaceKeyId");
-    t.field("workspaceKey", { type: WorkspaceKey });
     t.int("subkeyId");
     t.int("contentSubkeyId");
     t.string("parentFolderId");
@@ -28,7 +26,7 @@ export const DocumentSnapshotPublicDataInput = inputObjectType({
     t.nonNull.string("pubKey");
     t.nonNull.string("snapshotId");
     // TODO make it nonNull
-    t.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
     t.int("subkeyId");
   },
 });

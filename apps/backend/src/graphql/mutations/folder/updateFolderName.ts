@@ -9,7 +9,7 @@ import {
 } from "nexus";
 import { updateFolderName } from "../../../database/folder/updateFolderName";
 import { Folder } from "../../types/folder";
-import { KeyDerivationTraceInput } from "./createFolder";
+import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const UpdateFolderNameInput = inputObjectType({
   name: "UpdateFolderNameInput",

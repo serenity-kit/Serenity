@@ -37,6 +37,7 @@ export const createFolder = async ({
 
   const keyDerivationTrace = await buildFolderKeyTrace({
     workspaceKeyId,
+    subkeyId,
     parentFolderId,
   });
 
@@ -54,6 +55,7 @@ export const createFolder = async ({
           workspaceKeyId
           keyDerivationTrace {
             workspaceKeyId
+            subkeyId
             parentFolders {
               folderId
               subkeyId

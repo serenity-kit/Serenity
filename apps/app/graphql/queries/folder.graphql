@@ -9,6 +9,7 @@ query folder($id: ID!) {
     workspaceId
     keyDerivationTrace {
       workspaceKeyId
+      subkeyId
       parentFolders {
         folderId
         subkeyId

@@ -11,6 +11,7 @@ mutation createFolder($input: CreateFolderInput!) {
       workspaceId
       keyDerivationTrace {
         workspaceKeyId
+        subkeyId
         parentFolders {
           folderId
           subkeyId

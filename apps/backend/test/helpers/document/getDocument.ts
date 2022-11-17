@@ -26,6 +26,7 @@ export const getDocument = async ({
         workspaceId
         nameKeyDerivationTrace {
           workspaceKeyId
+          subkeyId
           parentFolders {
             folderId
             subkeyId
