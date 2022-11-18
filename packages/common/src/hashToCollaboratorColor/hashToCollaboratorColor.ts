@@ -3,6 +3,8 @@ import { SLeaves } from "../types";
 
 export type CollaborationColor = SLeaves<typeof customColors.collaboration>;
 
+const collaboratorColorNames = Object.keys(customColors.collaboration);
+
 // this is a very simple and not secure hash function that takes a string and returns a collaboratorColor
 export const hashToCollaboratorColor = (value: string): CollaborationColor => {
   let hash = 0;
@@ -12,8 +14,7 @@ export const hashToCollaboratorColor = (value: string): CollaborationColor => {
     const characterNumber = value.charCodeAt(stringIndex);
     // cacluclate a new value and run modulo with the collaboratorColors length
     hash =
-      (hash + characterNumber * stringIndex) %
-      customColors.collaboration.length;
+      (hash + characterNumber * stringIndex) % collaboratorColorNames.length;
   }
-  return customColors.collaboration[hash];
+  return collaboratorColorNames[hash] as CollaborationColor;
 };
