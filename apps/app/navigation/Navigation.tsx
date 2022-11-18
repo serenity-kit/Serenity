@@ -21,9 +21,10 @@ import NavigationDrawerModal from "../components/navigationDrawerModal/Navigatio
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
-import { useAppContext } from "../context/AppContext";
-import { WorkspaceIdProvider } from "../context/WorkspaceIdContext";
+import { WorkspaceProvider } from "../context/WorkspaceContext";
+import { useWorkspaceQuery } from "../generated/graphql";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
+import { useAuthenticatedAppContext } from "../hooks/useAuthenticatedAppContext";
 import { useInterval } from "../hooks/useInterval";
 import {
   RootStackParamList,
@@ -58,10 +59,6 @@ import WorkspaceSettingsGeneralScreen from "./screens/workspaceSettingsGeneralSc
 import WorkspaceSettingsMembersScreen from "./screens/workspaceSettingsMembersScreen/WorkspaceSettingsMembersScreen";
 import WorkspaceSettingsMobileOverviewScreen from "./screens/workspaceSettingsMobileOverviewScreen/WorkspaceSettingsMobileOverviewScreen";
 
-/**
- * A root stack navigator is often used for displaying modals on top of all other content.
- * https://reactnavigation.org/docs/modal
- */
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const WorkspaceStack = createNativeStackNavigator<WorkspaceStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -166,7 +163,14 @@ function AccountSettingsDrawerScreen(props) {
 
 function WorkspaceStackNavigator(props) {
   const dimensions = useWindowDimensions();
-  const { activeDevice } = useAppContext();
+  const { activeDevice } = useAuthenticatedAppContext();
+  const [workspaceQueryResult] = useWorkspaceQuery({
+    variables: {
+      id: props.route.params.workspaceId,
+      // fine since the query would not fire if pause is active
+      deviceSigningPublicKey: activeDevice?.signingPublicKey!,
+    },
+  });
 
   useInterval(() => {
     if (activeDevice) {
@@ -175,17 +179,22 @@ function WorkspaceStackNavigator(props) {
   }, secondsBetweenNewMemberChecks * 1000);
 
   useEffect(() => {
-    if (props.route.params?.workspaceId) {
+    if (props.route.params.workspaceId) {
       setLastUsedWorkspaceId(props.route.params.workspaceId);
     }
-  }, [props.route.params?.workspaceId]);
+  }, [props.route.params.workspaceId]);
 
   if (!props.route.params) {
     return null;
   }
 
   return (
-    <WorkspaceIdProvider value={props.route.params.workspaceId}>
+    <WorkspaceProvider
+      value={{
+        workspaceId: props.route.params.workspaceId,
+        workspaceQueryResult,
+      }}
+    >
       <WorkspaceStack.Navigator
         screenOptions={{
           headerShown: true,
@@ -247,7 +256,7 @@ function WorkspaceStackNavigator(props) {
           </WorkspaceStack.Group>
         )}
       </WorkspaceStack.Navigator>
-    </WorkspaceIdProvider>
+    </WorkspaceProvider>
   );
 }
 

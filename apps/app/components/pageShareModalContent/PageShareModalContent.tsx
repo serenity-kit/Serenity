@@ -25,7 +25,7 @@ import {
   runRemoveDocumentShareLinkMutation,
   useDocumentShareLinksQuery,
 } from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
+import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
@@ -49,7 +49,7 @@ export function PageShareModalContent() {
       variables: { documentId: route.params.pageId },
     });
   const isDesktopDevice = useIsDesktopDevice();
-  const { activeDevice } = useWorkspaceContext();
+  const { activeDevice } = useAuthenticatedAppContext();
   const signatureKeyPair: KeyPair = useMemo(() => {
     return {
       publicKey: sodium.from_base64(activeDevice.signingPublicKey),

@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from "uuid";
 import MemberMenu from "../../../components/memberMenu/MemberMenu";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
-import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
+import { useWorkspace } from "../../../context/WorkspaceContext";
 import {
   MeResult,
   RemoveMembersAndRotateWorkspaceKeyDocument,
@@ -35,7 +35,7 @@ import {
   Workspace,
   WorkspaceMember,
 } from "../../../generated/graphql";
-import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
@@ -54,8 +54,8 @@ type Member = {
 export default function WorkspaceSettingsMembersScreen(
   props: WorkspaceStackScreenProps<"WorkspaceSettingsMembers">
 ) {
-  const workspaceId = useWorkspaceId();
-  const { activeDevice } = useWorkspaceContext();
+  const { workspaceId } = useWorkspace();
+  const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
       workspaceId,
