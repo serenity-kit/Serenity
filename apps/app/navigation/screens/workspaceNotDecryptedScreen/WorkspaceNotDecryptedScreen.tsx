@@ -8,7 +8,7 @@ import {
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useWindowDimensions } from "react-native";
-import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
+import { useWorkspace } from "../../../context/WorkspaceContext";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 import { workspaceNotDecryptedScreenMachine } from "./workspaceNotDecryptedScreenMachine";
 
@@ -17,7 +17,7 @@ export default function WorkspaceNotDecryptedScreen({
   route,
 }: WorkspaceDrawerScreenProps<"WorkspaceNotDecrypted">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const workspaceId = useWorkspaceId();
+  const { workspaceId } = useWorkspace();
 
   // TODO show error message in case there is network error
   // TODO communicate when the next check attempt is happening

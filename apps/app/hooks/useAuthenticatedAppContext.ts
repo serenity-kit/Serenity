@@ -1,6 +1,6 @@
 import { useAppContext } from "../context/AppContext";
 
-export const useWorkspaceContext = () => {
+export const useAuthenticatedAppContext = () => {
   const { activeDevice, sessionKey, updateActiveDevice, updateAuthentication } =
     useAppContext();
 

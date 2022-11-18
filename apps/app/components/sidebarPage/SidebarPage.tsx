@@ -18,7 +18,7 @@ import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import { KeyDerivationTrace, useDocumentQuery } from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
+import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
@@ -39,7 +39,7 @@ type Props = ViewProps & {
 
 export default function SidebarPage(props: Props) {
   const isDesktopDevice = useIsDesktopDevice();
-  const { activeDevice } = useWorkspaceContext();
+  const { activeDevice } = useAuthenticatedAppContext();
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [documentTitle, setDocumentTitle] = useState("decrypting…");

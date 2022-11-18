@@ -19,21 +19,21 @@ import {
 import { HStack } from "native-base";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useWorkspaceId } from "../../context/WorkspaceIdContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
 import {
   runCreateFolderMutation,
   useMeWithWorkspaceLoadingInfoQuery,
   useRootFoldersQuery,
 } from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
+import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { deriveCurrentWorkspaceKey } from "../../utils/workspace/deriveCurrentWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
-  const { activeDevice } = useWorkspaceContext();
-  const workspaceId = useWorkspaceId();
+  const { activeDevice } = useAuthenticatedAppContext();
+  const { workspaceId } = useWorkspace();
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
 

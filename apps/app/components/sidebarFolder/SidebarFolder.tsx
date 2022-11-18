@@ -26,7 +26,7 @@ import {
   useDocumentsQuery,
   useFoldersQuery,
 } from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
+import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { RootStackScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import {
@@ -83,7 +83,7 @@ export default function SidebarFolder(props: Props) {
     },
   });
   const { depth = 0 } = props;
-  const { activeDevice } = useWorkspaceContext();
+  const { activeDevice } = useAuthenticatedAppContext();
   const documentPathStore = useDocumentPathStore();
   const document = useActiveDocumentInfoStore((state) => state.document);
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
