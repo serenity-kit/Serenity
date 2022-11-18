@@ -35,7 +35,6 @@ import {
   Workspace,
   WorkspaceMember,
 } from "../../../generated/graphql";
-import { useInterval } from "../../../hooks/useInterval";
 import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
@@ -43,10 +42,6 @@ import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { getUrqlClient } from "../../../utils/urqlClient/urqlClient";
-import {
-  addNewMembersIfNecessary,
-  secondsBetweenNewMemberChecks,
-} from "../../../utils/workspace/addNewMembersIfNecessary";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 
@@ -83,12 +78,6 @@ export default function WorkspaceSettingsMembersScreen(
   const [hasGraphqlError, setHasGraphqlError] = useState(false);
   const [graphqlError, setGraphqlError] = useState("");
   const isDesktopDevice = useIsDesktopDevice();
-
-  useInterval(() => {
-    if (activeDevice) {
-      addNewMembersIfNecessary({ activeDevice });
-    }
-  }, secondsBetweenNewMemberChecks * 1000);
 
   useEffect(() => {
     if (
