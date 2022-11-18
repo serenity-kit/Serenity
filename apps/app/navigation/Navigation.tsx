@@ -164,34 +164,6 @@ function AccountSettingsDrawerScreen(props) {
   );
 }
 
-const WorkspaceDrawerNavigatorWithLoginRedirect =
-  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(WorkspaceDrawerNavigator);
-
-const AccountSettingsMobileOverviewScreenWithLoginRedirect =
-  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
-    AccountSettingsMobileOverviewScreen
-  );
-const AccountProfileSettingsScreenWithLoginRedirect =
-  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
-    AccountProfileSettingsScreen
-  );
-const AccountDevicesSettingsScreenWithLoginRedirect =
-  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
-    AccountDevicesSettingsScreen
-  );
-const WorkspaceSettingsMobileOverviewScreenWithLoginRedirect =
-  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
-    WorkspaceSettingsMobileOverviewScreen
-  );
-const WorkspaceSettingsGeneralScreenWithLoginRedirect =
-  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
-    WorkspaceSettingsGeneralScreen
-  );
-const WorkspaceSettingsMembersScreenWithLoginRedirect =
-  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
-    WorkspaceSettingsMembersScreen
-  );
-
 function WorkspaceStackNavigator(props) {
   const dimensions = useWindowDimensions();
   const { activeDevice } = useAppContext();
@@ -221,14 +193,14 @@ function WorkspaceStackNavigator(props) {
       >
         <WorkspaceStack.Screen
           name="WorkspaceDrawer"
-          component={WorkspaceDrawerNavigatorWithLoginRedirect}
+          component={WorkspaceDrawerNavigator}
           options={{ headerShown: false, animation: "none" }}
         />
         {isPhoneDimensions(dimensions.width) ? (
           <>
             <WorkspaceStack.Screen
               name="WorkspaceSettings"
-              component={WorkspaceSettingsMobileOverviewScreenWithLoginRedirect}
+              component={WorkspaceSettingsMobileOverviewScreen}
               options={{
                 title: "Workspace settings",
                 headerLeft(props) {
@@ -238,7 +210,7 @@ function WorkspaceStackNavigator(props) {
             />
             <WorkspaceStack.Screen
               name="WorkspaceSettingsMembers"
-              component={WorkspaceSettingsMembersScreenWithLoginRedirect}
+              component={WorkspaceSettingsMembersScreen}
               options={{
                 title: "Members",
                 headerLeft(props) {
@@ -250,7 +222,7 @@ function WorkspaceStackNavigator(props) {
             />
             <WorkspaceStack.Screen
               name="WorkspaceSettingsGeneral"
-              component={WorkspaceSettingsGeneralScreenWithLoginRedirect}
+              component={WorkspaceSettingsGeneralScreen}
               options={{
                 title: "General",
                 headerLeft(props) {
@@ -279,6 +251,22 @@ function WorkspaceStackNavigator(props) {
   );
 }
 
+const AccountSettingsMobileOverviewScreenWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
+    AccountSettingsMobileOverviewScreen
+  );
+const AccountProfileSettingsScreenWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
+    AccountProfileSettingsScreen
+  );
+const AccountDevicesSettingsScreenWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(
+    AccountDevicesSettingsScreen
+  );
+
+const WorkspaceStackNavigatorWithLoginRedirect =
+  redirectToLoginIfMissingTheActiveDeviceOrSessionKey(WorkspaceStackNavigator);
+
 function RootNavigator() {
   const dimensions = useWindowDimensions();
 
@@ -300,7 +288,7 @@ function RootNavigator() {
         />
         <Stack.Screen
           name="Workspace"
-          component={WorkspaceStackNavigator}
+          component={WorkspaceStackNavigatorWithLoginRedirect}
           options={{ headerShown: false }}
         />
         <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
