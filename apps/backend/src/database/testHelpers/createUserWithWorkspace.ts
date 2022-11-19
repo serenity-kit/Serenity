@@ -107,10 +107,7 @@ export default async function createUserWithWorkspace({
   const snapshotKey = await createSnapshotKey({
     folderKey,
   });
-  // FIXME: looks like a bug is being created here somehow
-  // which interferes with tests
   const documentKey = docmentKeyResult.key;
-  const documentSubkeyId = snapshotKey.subkeyId;
   const encryptedDocumentTitleResult = await encryptDocumentTitle({
     title: documentName,
     key: documentKey,
