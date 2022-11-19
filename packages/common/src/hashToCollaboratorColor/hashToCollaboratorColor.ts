@@ -16,5 +16,5 @@ export const hashToCollaboratorColor = (value: string): CollaborationColor => {
     hash =
       (hash + characterNumber * stringIndex) % collaboratorColorNames.length;
   }
-  return collaboratorColorNames[hash];
+  return collaboratorColorNames[hash] as CollaborationColor;
 };
