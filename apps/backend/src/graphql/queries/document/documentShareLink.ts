@@ -1,4 +1,3 @@
-import { AuthenticationError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getDocumentShareLink } from "../../../database/document/getDocumentShareLink";
 import { DocumentShareLink } from "../../types/documentShareLink";
@@ -10,14 +9,22 @@ export const documentShareLinkQuery = queryField((t) => {
       token: nonNull(idArg()),
     },
     async resolve(root, args, context) {
-      if (!context.user) {
-        throw new AuthenticationError("Not authenticated");
-      }
+      // documentShare links can be shared publicly and therefor
+      // authentication except for a known token can't be required
       const documentShareLink = await getDocumentShareLink({
-        userId: context.user.id,
         token: args.token,
       });
-      return documentShareLink;
+      return {
+        ...documentShareLink,
+        snapshotKeyBoxs: documentShareLink.snapshotKeyBoxes.map(
+          (snapshotKeyBox) => {
+            return {
+              ...snapshotKeyBox,
+              creatorDevice: snapshotKeyBox.creatorDevice,
+            };
+          }
+        ),
+      };
     },
   });
 });

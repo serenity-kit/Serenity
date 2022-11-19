@@ -34,24 +34,33 @@ export default function SharePageScreen(
     return null;
   }, [state.context.device]);
 
-  if (state.value !== "done" && state.value !== "decryptDeviceFail") {
+  if (
+    state.value !== "done" &&
+    state.value !== "decryptDeviceFail" &&
+    state.value !== "decryptSnapsotKeyFailed"
+  ) {
     return (
       <CenterContent>
         <Spinner fadeIn />
       </CenterContent>
     );
-  } else if (state.value === "decryptDeviceFail") {
+  } else if (
+    state.value === "decryptDeviceFail" ||
+    state.value === "decryptSnapsotKeyFailed"
+  ) {
     return (
       <CenterContent>
         <InfoMessage variant="error">
           Failed decrypting document access. Please ask for a new share link.
+          <br />
+          Reason: {state.value}.
         </InfoMessage>
       </CenterContent>
     );
   } else if (signatureKeyPair) {
     return (
       <CenterContent>
-        <InfoMessage>Show Page</InfoMessage>
+        <InfoMessage>Snapshot key: {state.context.snapshotKey}</InfoMessage>
       </CenterContent>
       // <Page
       //   navigation={props.navigation}
