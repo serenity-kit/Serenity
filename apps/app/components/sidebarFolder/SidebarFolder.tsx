@@ -39,7 +39,6 @@ import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { getFolder } from "../../utils/folder/getFolder";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
 import { deriveCurrentWorkspaceKey } from "../../utils/workspace/deriveCurrentWorkspaceKey";
-import { deriveWorkspaceKey } from "../../utils/workspace/deriveWorkspaceKey";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 import SidebarPage from "../sidebarPage/SidebarPage";
@@ -47,6 +46,7 @@ import SidebarPage from "../sidebarPage/SidebarPage";
 type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
+  parentFolderId?: string | null | undefined;
   folderName?: string;
   encryptedName: string;
   encryptedNameNonce?: string;
@@ -112,26 +112,14 @@ export default function SidebarFolder(props: Props) {
       return;
     }
     try {
-      const folder = await getFolder({ id: props.folderId });
-      let parentKey = "";
-      if (folder.parentFolderId) {
-        parentKey = await getFolderKey({
-          workspaceId: props.workspaceId,
-          workspaceKeyId: folder.keyDerivationTrace.workspaceKeyId,
-          folderId: folder.parentFolderId,
-          folderSubkeyId: props.keyDerivationTrace.subkeyId,
-          activeDevice,
-        });
-      } else {
-        const workspaceKeyData = await deriveWorkspaceKey({
-          workspaceId: props.workspaceId,
-          workspaceKeyId: folder.keyDerivationTrace.workspaceKeyId,
-          activeDevice,
-        });
-        parentKey = workspaceKeyData.workspaceKey;
-      }
+      const parentKeyChainData = await deriveFolderKey({
+        folderId: props.folderId,
+        keyDerivationTrace: props.keyDerivationTrace,
+        activeDevice,
+      });
+      const parentKeyData = parentKeyChainData[parentKeyChainData.length - 2];
       const folderName = await decryptFolderName({
-        parentKey: parentKey,
+        parentKey: parentKeyData.key,
         subkeyId: props.keyDerivationTrace.subkeyId!,
         ciphertext: props.encryptedName,
         publicNonce: props.encryptedNameNonce,
@@ -167,27 +155,39 @@ export default function SidebarFolder(props: Props) {
       console.error(error);
       return;
     }
-    const parentFolderKey = await getFolderKey({
+    const parentFolderKeyChainData = await deriveFolderKey({
       folderId: props.folderId,
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
-      workspaceId: props.workspaceId,
-      folderSubkeyId: props.keyDerivationTrace.subkeyId,
+      keyDerivationTrace: props.keyDerivationTrace,
       activeDevice,
+      overrideWithWorkspaceKeyId: workspace.currentWorkspaceKey?.id,
     });
-
+    const parentFolderKeyData =
+      parentFolderKeyChainData[parentFolderKeyChainData.length - 1];
     const encryptedFolderResult = await encryptFolderName({
       name,
-      parentKey: parentFolderKey,
+      parentKey: parentFolderKeyData.key,
     });
     let didCreateFolderSucceed = false;
     let numCreateFolderAttempts = 0;
     let folderId: string | undefined = undefined;
     let result: any = undefined;
-    const keyDerivationTrace = await buildKeyDerivationTrace({
+    const parentKyDerivationTrace = await buildKeyDerivationTrace({
       folderId: props.folderId,
       subkeyId: props.keyDerivationTrace.subkeyId,
       workspaceKeyId: workspace.currentWorkspaceKey.id,
     });
+    const keyDerivationTrace: KeyDerivationTrace = {
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
+      subkeyId: encryptedFolderResult.folderSubkeyId,
+      parentFolders: [
+        ...parentKyDerivationTrace.parentFolders,
+        {
+          folderId: props.folderId,
+          subkeyId: props.keyDerivationTrace.subkeyId,
+          parentFolderId: props.parentFolderId,
+        },
+      ],
+    };
     do {
       numCreateFolderAttempts += 1;
       result = await runCreateFolderMutation(
@@ -509,6 +509,7 @@ export default function SidebarFolder(props: Props) {
                   <SidebarFolder
                     key={folder.id}
                     folderId={folder.id}
+                    parentFolderId={folder.parentFolderId}
                     workspaceId={props.workspaceId}
                     subkeyId={folder.keyDerivationTrace.subkeyId}
                     encryptedName={folder.encryptedName}

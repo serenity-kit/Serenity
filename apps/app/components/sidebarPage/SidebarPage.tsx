@@ -22,7 +22,6 @@ import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppConte
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
-import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
 type Props = ViewProps & {
@@ -48,7 +47,6 @@ export default function SidebarPage(props: Props) {
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
-  const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
   const [documentResult] = useDocumentQuery({
     variables: { id: props.documentId },
   });
