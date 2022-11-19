@@ -104,8 +104,6 @@ export const useFolderKeyStore = create<FolderKeyState>((set, get) => ({
     const folder = await getFolder({ id: folderId });
     // TODO: optimize by creating a single graphql query to get all folders
     const derivedFolderKeyData = await deriveFolderKey({
-      // workspaceId,
-      // workspaceKeyId: usingWorkspaceKeyId,
       folderId,
       keyDerivationTrace: folder.keyDerivationTrace,
       activeDevice,

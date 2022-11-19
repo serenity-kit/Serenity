@@ -298,8 +298,6 @@ export default function SidebarFolder(props: Props) {
     const folder = await getFolder({ id: props.folderId });
     const folderKeyTrace = await deriveFolderKey({
       folderId: props.folderId,
-      // workspaceId: props.workspaceId,
-      // workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
       overrideWithWorkspaceKeyId: workspace?.currentWorkspaceKey?.id!,
       keyDerivationTrace: folder.keyDerivationTrace!,
       activeDevice,

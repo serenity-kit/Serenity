@@ -94,8 +94,6 @@ export default function Page({
     const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
     const folderKeyChainData = await deriveFolderKey({
       folderId: document.parentFolderId!,
-      // workspaceKeyId,
-      // workspaceId: document.workspaceId!,
       keyDerivationTrace: snapshotKeyDerivationTrace,
       activeDevice,
     });
@@ -168,8 +166,6 @@ export default function Page({
     const folder = await getFolder({ id: document.parentFolderId! });
     const folderKeyChainData = await deriveFolderKey({
       folderId: document.parentFolderId!,
-      // workspaceKeyId,
-      // workspaceId: document.workspaceId!,
       overrideWithWorkspaceKeyId: workspaceKeyId,
       keyDerivationTrace: folder.keyDerivationTrace,
       activeDevice,

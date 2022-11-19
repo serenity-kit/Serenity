@@ -30,8 +30,6 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
       try {
         const folderKeyChainData = await deriveFolderKey({
           folderId: document.parentFolderId!,
-          // workspaceKeyId,
-          // workspaceId: document.workspaceId!,
           keyDerivationTrace: document.nameKeyDerivationTrace,
           activeDevice,
         });

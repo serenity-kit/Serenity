@@ -105,7 +105,7 @@ export default async function createUserWithWorkspace({
     folderKey,
   });
   const snapshotKey = await createSnapshotKey({
-    folderKey: encryptedFolderResult.folderSubkey,
+    folderKey,
   });
   // FIXME: looks like a bug is being created here somehow
   // which interferes with tests
@@ -166,7 +166,7 @@ export default async function createUserWithWorkspace({
       encryptedNameNonce: encryptedDocumentTitleResult.publicNonce,
       nameKeyDerivationTrace: {
         workspaceKeyId,
-        subkeyId: documentSubkeyId,
+        subkeyId: docmentKeyResult.subkeyId,
         parentFolders: [
           {
             folderId,
