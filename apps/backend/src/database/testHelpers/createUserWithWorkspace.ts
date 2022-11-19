@@ -92,6 +92,10 @@ export default async function createUserWithWorkspace({
       creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
     });
   const folderName = "Getting Started";
+  const folderIdSignature = await sodium.crypto_sign_detached(
+    folderId,
+    deviceSigningPrivateKey
+  );
   const encryptedFolderResult = await encryptFolderName({
     name: folderName,
     parentKey: workspaceKey,
@@ -103,10 +107,9 @@ export default async function createUserWithWorkspace({
   const snapshotKey = await createSnapshotKey({
     folderKey: encryptedFolderResult.folderSubkey,
   });
-  // FIXME: due to a hack, we are using the snapshotKey
-  // to encrypt the document title, instead of a document key
-  // const documentKey = docmentKeyResult.key;
-  const documentKey = snapshotKey.key;
+  // FIXME: looks like a bug is being created here somehow
+  // which interferes with tests
+  const documentKey = docmentKeyResult.key;
   const documentSubkeyId = snapshotKey.subkeyId;
   const encryptedDocumentTitleResult = await encryptDocumentTitle({
     title: documentName,
@@ -115,7 +118,7 @@ export default async function createUserWithWorkspace({
   // const documentEncryptionKey = sodium.from_base64(
   //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
   // );
-  const documentSnapshot = await createIntroductionDocumentSnapshot({
+  const snapshot = await createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
     subkeyId: snapshotKey.subkeyId,
@@ -134,27 +137,47 @@ export default async function createUserWithWorkspace({
 
   const createWorkspaceResult = await createInitialWorkspaceStructure({
     userId: user.id,
-    workspaceId: id,
-    workspaceName: "My Workspace",
-    folderId,
-    folderIdSignature: uuidv4(),
-    encryptedFolderName: encryptedFolderResult.ciphertext,
-    encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
-    folderSubkeyId: encryptedFolderResult.folderSubkeyId,
-    documentId,
-    encryptedDocumentName: encryptedDocumentTitleResult.ciphertext,
-    encryptedDocumentNameNonce: encryptedDocumentTitleResult.publicNonce,
-    documentSubkeyId,
-    documentContentSubkeyId: 123, // TODO: remove
-    documentSnapshot,
-    creatorDeviceSigningPublicKey: device.signingPublicKey,
-    deviceWorkspaceKeyBoxes: [
-      {
-        deviceSigningPublicKey: device.signingPublicKey,
-        nonce,
-        ciphertext,
+    workspace: {
+      id,
+      name: "My Workspace",
+      workspaceKeyId,
+      deviceWorkspaceKeyBoxes: [
+        {
+          deviceSigningPublicKey: device.signingPublicKey,
+          nonce,
+          ciphertext,
+        },
+      ],
+    },
+    folder: {
+      id: folderId,
+      idSignature: folderIdSignature,
+      encryptedName: encryptedFolderResult.ciphertext,
+      encryptedNameNonce: encryptedFolderResult.publicNonce,
+      keyDerivationTrace: {
+        workspaceKeyId,
+        subkeyId: encryptedFolderResult.folderSubkeyId,
+        parentFolders: [],
       },
-    ],
+    },
+    document: {
+      id: documentId,
+      encryptedName: encryptedDocumentTitleResult.ciphertext,
+      encryptedNameNonce: encryptedDocumentTitleResult.publicNonce,
+      nameKeyDerivationTrace: {
+        workspaceKeyId,
+        subkeyId: documentSubkeyId,
+        parentFolders: [
+          {
+            folderId,
+            subkeyId: encryptedFolderResult.folderSubkeyId,
+            parentFolderId: null,
+          },
+        ],
+      },
+      snapshot,
+    },
+    creatorDeviceSigningPublicKey: device.signingPublicKey,
   });
 
   const { session, sessionKey, webDevice } = await createDeviceAndLogin({

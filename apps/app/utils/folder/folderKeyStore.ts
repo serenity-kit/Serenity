@@ -95,7 +95,7 @@ export const useFolderKeyStore = create<FolderKeyState>((set, get) => ({
     let usingFolderSubkeyId = folderSubkeyId;
     if (usingFolderSubkeyId === undefined) {
       const folder = await getFolder({ id: folderId });
-      usingFolderSubkeyId = folder.subkeyId;
+      usingFolderSubkeyId = folder.keyDerivationTrace.subkeyId;
     }
     let folderKey = folderSubkeyKeyLookup[folderSubkeyId];
     if (folderKey) {

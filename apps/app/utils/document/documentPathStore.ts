@@ -55,7 +55,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
         if (folder.parentFolderId) {
           parentKey = await getFolderKey({
             workspaceId: folder.workspaceId!,
-            workspaceKeyId: folder.workspaceKeyId,
+            workspaceKeyId: folder.keyDerivationTrace.workspaceKeyId,
             folderId: folder.parentFolderId,
             activeDevice,
           });
@@ -64,7 +64,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
             workspaceId: folder.workspaceId!,
             activeDevice,
           });
-          if (!workspaceKeys[folder.workspaceKeyId!]) {
+          if (!workspaceKeys[folder.keyDerivationTrace.workspaceKeyId!]) {
             throw new Error("Workspace key not found");
           }
           parentKey = workspaceKeys[folder.keyDerivationTrace.workspaceKeyId!];

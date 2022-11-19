@@ -20,8 +20,6 @@ export const getDocument = async ({
         id
         encryptedName
         encryptedNameNonce
-        workspaceKeyId
-        subkeyId
         parentFolderId
         workspaceId
         nameKeyDerivationTrace {

@@ -41,8 +41,6 @@ export const updateFolderName = async ({
           id
           encryptedName
           encryptedNameNonce
-          workspaceKeyId
-          subkeyId
           parentFolderId
           rootFolderId
           workspaceId

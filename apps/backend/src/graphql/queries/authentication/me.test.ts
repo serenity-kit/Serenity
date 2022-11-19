@@ -1,22 +1,17 @@
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
-import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-let userId = "";
-const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
-const username2 = "08844f05-ef88-4ac0-acf8-1e5163c2dcdb@example.com";
+let userData1: any = undefined;
+let otherWorkspace: any = undefined;
 const password = "password";
 let sessionKey = "";
 
-const workspace1Name = "workspace 1";
 const workspace2Name = "workspace 2";
-const workspace1Id = "97b2f730-c15e-471f-ab47-ef0576bb04c2";
-const workspace2Id = "a4cbd808-aa39-45d7-b359-37ae934ca5a4";
-const workspace1DocumentId = "3593ca39-3411-4d44-b803-8ee60edeeec2";
 
 const meQuery = gql`
   {
@@ -53,41 +48,21 @@ const meWithWorkspaceLoadingInfoQuery = gql`
 `;
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  userId = registerUserResult.userId;
-  sessionKey = registerUserResult.sessionKey;
-
-  await createInitialWorkspaceStructure({
-    workspaceName: workspace1Name,
-    workspaceId: workspace1Id,
-    deviceSigningPublicKey: registerUserResult.mainDevice.signingPublicKey,
-    deviceEncryptionPublicKey:
-      registerUserResult.mainDevice.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    folderName: "Getting started",
-    documentName: "Introduction",
-    documentId: workspace1DocumentId,
-    graphql,
-    authorizationHeader: sessionKey,
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  await createInitialWorkspaceStructure({
-    workspaceName: workspace2Name,
-    workspaceId: workspace2Id,
-    deviceSigningPublicKey: registerUserResult.mainDevice.signingPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    deviceEncryptionPublicKey:
-      registerUserResult.mainDevice.encryptionPublicKey,
-    webDevice: registerUserResult.webDevice,
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    folderName: "Getting started",
-    documentName: "Introduction",
-    documentId: uuidv4(),
+  otherWorkspace = await createInitialWorkspaceStructure({
     graphql,
-    authorizationHeader: sessionKey,
+    workspaceName: workspace2Name,
+    creatorDevice: {
+      ...userData1.device,
+      encryptionPrivateKey: userData1.encryptionPrivateKey,
+      signingPrivateKey: userData1.signingPrivateKey,
+    },
+    devices: [userData1.device, userData1.webDevice],
+    authorizationHeader: userData1.sessionKey,
   });
 };
 
@@ -97,32 +72,28 @@ beforeAll(async () => {
 });
 
 test("user should be able to get their username", async () => {
-  const authorizationHeader = { authorization: sessionKey };
-  const result = await graphql.client.request(
-    meQuery,
-    null,
-    authorizationHeader
-  );
-  expect(result.me.id).toEqual(userId);
-  expect(result.me.username).toEqual(username);
+  const result = await graphql.client.request(meQuery, null, {
+    authorization: userData1.sessionKey,
+  });
+  expect(result.me.id).toEqual(userData1.user.id);
+  expect(result.me.username).toEqual(userData1.user.username);
 });
 
 test("should be able to get the workspaceLoadingInfo with a defined workspaceId and documentId", async () => {
-  const authorizationHeader = { authorization: sessionKey };
   const result = await graphql.client.request(
     meWithWorkspaceLoadingInfoQuery,
     {
-      workspaceId: workspace1Id,
-      documentId: workspace1DocumentId,
+      workspaceId: userData1.workspace.id,
+      documentId: userData1.document.id,
       returnOtherWorkspaceIfNotFound: false,
       returnOtherDocumentIfNotFound: false,
     },
-    authorizationHeader
+    { authorization: userData1.sessionKey }
   );
   expect(result.me.workspaceLoadingInfo).toMatchInlineSnapshot(`
     {
-      "documentId": "3593ca39-3411-4d44-b803-8ee60edeeec2",
-      "id": "97b2f730-c15e-471f-ab47-ef0576bb04c2",
+      "documentId": "${userData1.document.id}",
+      "id": "${userData1.workspace.id}",
       "isAuthorized": true,
       "role": "ADMIN",
     }
@@ -130,7 +101,6 @@ test("should be able to get the workspaceLoadingInfo with a defined workspaceId 
 });
 
 test("should get the fallback workspace if the workspaceId is not available and return other is true", async () => {
-  const authorizationHeader = { authorization: sessionKey };
   const result = await graphql.client.request(
     meWithWorkspaceLoadingInfoQuery,
     {
@@ -139,12 +109,12 @@ test("should get the fallback workspace if the workspaceId is not available and 
       returnOtherWorkspaceIfNotFound: true,
       returnOtherDocumentIfNotFound: true,
     },
-    authorizationHeader
+    { authorization: userData1.sessionKey }
   );
   expect(result.me.workspaceLoadingInfo).toMatchInlineSnapshot(`
     {
-      "documentId": "3593ca39-3411-4d44-b803-8ee60edeeec2",
-      "id": "97b2f730-c15e-471f-ab47-ef0576bb04c2",
+      "documentId": "${userData1.document.id}",
+      "id": "${userData1.workspace.id}",
       "isAuthorized": true,
       "role": "ADMIN",
     }
@@ -152,7 +122,6 @@ test("should get the fallback workspace if the workspaceId is not available and 
 });
 
 test("should get no workspace if the workspaceId is not available and return other is false", async () => {
-  const authorizationHeader = { authorization: sessionKey };
   const result = await graphql.client.request(
     meWithWorkspaceLoadingInfoQuery,
     {
@@ -161,26 +130,25 @@ test("should get no workspace if the workspaceId is not available and return oth
       returnOtherWorkspaceIfNotFound: false,
       returnOtherDocumentIfNotFound: false,
     },
-    authorizationHeader
+    { authorization: userData1.sessionKey }
   );
   expect(result.me.workspaceLoadingInfo).toBe(null);
 });
 
 test("should be able to get the workspaceLoadingInfo, but another documentId if the provided documentId is not available and return other is true", async () => {
-  const authorizationHeader = { authorization: sessionKey };
   const result = await graphql.client.request(
     meWithWorkspaceLoadingInfoQuery,
     {
-      workspaceId: workspace1Id,
+      workspaceId: userData1.workspace.id,
       documentId: "abc",
       returnOtherDocumentIfNotFound: true,
     },
-    authorizationHeader
+    { authorization: userData1.sessionKey }
   );
   expect(result.me.workspaceLoadingInfo).toMatchInlineSnapshot(`
     {
-      "documentId": "3593ca39-3411-4d44-b803-8ee60edeeec2",
-      "id": "97b2f730-c15e-471f-ab47-ef0576bb04c2",
+      "documentId": "${userData1.document.id}",
+      "id": "${userData1.workspace.id}",
       "isAuthorized": true,
       "role": "ADMIN",
     }
@@ -188,20 +156,19 @@ test("should be able to get the workspaceLoadingInfo, but another documentId if 
 });
 
 test("should get the workspaceLoadingInfo, but no documentId if the provided documentId is not available and return other is false", async () => {
-  const authorizationHeader = { authorization: sessionKey };
   const result = await graphql.client.request(
     meWithWorkspaceLoadingInfoQuery,
     {
-      workspaceId: workspace1Id,
+      workspaceId: userData1.workspace.id,
       documentId: "abc",
       returnOtherDocumentIfNotFound: false,
     },
-    authorizationHeader
+    { authorization: userData1.sessionKey }
   );
   expect(result.me.workspaceLoadingInfo).toMatchInlineSnapshot(`
     {
       "documentId": null,
-      "id": "97b2f730-c15e-471f-ab47-ef0576bb04c2",
+      "id": "${userData1.workspace.id}",
       "isAuthorized": true,
       "role": "ADMIN",
     }
@@ -209,25 +176,21 @@ test("should get the workspaceLoadingInfo, but no documentId if the provided doc
 });
 
 test("documentId provided but not the workspaceId", async () => {
-  const authorizationHeader = { authorization: sessionKey };
   await expect(
     (async () =>
       await graphql.client.request(
         meWithWorkspaceLoadingInfoQuery,
         {
-          documentId: workspace1DocumentId,
+          documentId: userData1.document.id,
         },
-        authorizationHeader
+        { authorization: userData1.sessionKey }
       ))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("Unauthenticated", async () => {
-  const authorizationHeader = { authorization: "lala" };
-  const result = await graphql.client.request(
-    meQuery,
-    null,
-    authorizationHeader
-  );
+  const result = await graphql.client.request(meQuery, null, {
+    authorization: "bad-session-key",
+  });
   expect(result.me).toEqual(null);
 });

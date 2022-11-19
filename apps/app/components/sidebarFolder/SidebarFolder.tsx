@@ -100,10 +100,14 @@ export default function SidebarFolder(props: Props) {
 
   useEffect(() => {
     decryptName();
-  }, [props.encryptedName, props.subkeyId]);
+  }, [props.encryptedName, props.keyDerivationTrace.subkeyId]);
 
   const decryptName = async () => {
-    if (!props.subkeyId || !props.encryptedName || !props.encryptedNameNonce) {
+    if (
+      !props.keyDerivationTrace.subkeyId ||
+      !props.encryptedName ||
+      !props.encryptedNameNonce
+    ) {
       setFolderName("Untitled");
       return;
     }
@@ -115,7 +119,7 @@ export default function SidebarFolder(props: Props) {
           workspaceId: props.workspaceId,
           workspaceKeyId: folder.keyDerivationTrace.workspaceKeyId,
           folderId: folder.parentFolderId,
-          folderSubkeyId: props.subkeyId,
+          folderSubkeyId: props.keyDerivationTrace.subkeyId,
           activeDevice,
         });
       } else {
@@ -128,7 +132,7 @@ export default function SidebarFolder(props: Props) {
       }
       const folderName = await decryptFolderName({
         parentKey: parentKey,
-        subkeyId: props.subkeyId!,
+        subkeyId: props.keyDerivationTrace.subkeyId!,
         ciphertext: props.encryptedName,
         publicNonce: props.encryptedNameNonce,
       });
@@ -167,7 +171,7 @@ export default function SidebarFolder(props: Props) {
       folderId: props.folderId,
       workspaceKeyId: workspace.currentWorkspaceKey.id,
       workspaceId: props.workspaceId,
-      folderSubkeyId: props.subkeyId,
+      folderSubkeyId: props.keyDerivationTrace.subkeyId,
       activeDevice,
     });
 
@@ -181,7 +185,7 @@ export default function SidebarFolder(props: Props) {
     let result: any = undefined;
     const keyDerivationTrace = await buildKeyDerivationTrace({
       folderId: props.folderId,
-      subkeyId: props.subkeyId,
+      subkeyId: props.keyDerivationTrace.subkeyId,
       workspaceKeyId: workspace.currentWorkspaceKey.id,
     });
     do {
@@ -227,13 +231,6 @@ export default function SidebarFolder(props: Props) {
       console.error("Workspace or workspaceKeys not found");
       return;
     }
-    // FIXME: we should not have a nameDerivationTrace before
-    // having an encryptedName
-    // const nameKeyDerivationTrace = await buildKeyDerivationTrace({
-    //   folderId: props.folderId,
-    //   subkeyId: props.keyDerivationTrace.subkeyId,
-    //   workspaceKeyId: workspace.currentWorkspaceKey.id,
-    // });
     const result = await runCreateDocumentMutation(
       {
         input: {
@@ -513,7 +510,7 @@ export default function SidebarFolder(props: Props) {
                     key={folder.id}
                     folderId={folder.id}
                     workspaceId={props.workspaceId}
-                    subkeyId={folder.subkeyId}
+                    subkeyId={folder.keyDerivationTrace.subkeyId}
                     encryptedName={folder.encryptedName}
                     encryptedNameNonce={folder.encryptedNameNonce}
                     keyDerivationTrace={folder.keyDerivationTrace}

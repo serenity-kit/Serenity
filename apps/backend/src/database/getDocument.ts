@@ -36,7 +36,7 @@ export async function getDocument(documentId: string) {
     parentFolder: {
       id: parentFolder?.id,
       parentFolderId: parentFolder?.parentFolderId,
-      subkeyId: parentFolder?.subkeyId,
+      subkeyId: parentFolder?.subkeyId, // TODO: remove
       keyDerivationTrace: parentFolder?.keyDerivationTrace,
     },
     snapshot,

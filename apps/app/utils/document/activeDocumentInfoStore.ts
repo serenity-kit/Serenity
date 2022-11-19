@@ -1,6 +1,6 @@
 import {
   decryptDocumentTitle,
-  recreateSnapshotKey,
+  recreateDocumentKey,
 } from "@serenity-tools/common";
 import create from "zustand";
 import { Document } from "../../generated/graphql";
@@ -36,14 +36,7 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
           activeDevice,
         });
         const lastChainItem = folderKeyChainData[folderKeyChainData.length - 1];
-        // FIXME: as a hack we are using the snapshotkey to
-        // create the document title, so we must use the snapshotkey
-        // also to decrypt it.
-        // const documentKeyData = await recreateDocumentKey({
-        //   folderKey: lastChainItem.key,
-        //   subkeyId: document.nameKeyDerivationTrace.subkeyId,
-        // });
-        const documentKeyData = await recreateSnapshotKey({
+        const documentKeyData = await recreateDocumentKey({
           folderKey: lastChainItem.key,
           subkeyId: document.nameKeyDerivationTrace.subkeyId,
         });

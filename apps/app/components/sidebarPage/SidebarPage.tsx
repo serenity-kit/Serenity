@@ -2,7 +2,7 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { useLinkProps } from "@react-navigation/native";
 import {
   decryptDocumentTitle,
-  recreateSnapshotKey,
+  recreateDocumentKey,
 } from "@serenity-tools/common";
 import {
   Icon,
@@ -73,7 +73,11 @@ export default function SidebarPage(props: Props) {
     if (documentResult.data?.document?.id) {
       decryptTitle();
     }
-  }, [props.encryptedName, props.subkeyId, documentResult.data?.document?.id]);
+  }, [
+    props.encryptedName,
+    props.nameKeyDerivationTrace.subkeyId,
+    documentResult.data?.document?.id,
+  ]);
 
   const decryptTitle = async () => {
     if (!props.encryptedName || !props.encryptedNameNonce) {
@@ -95,7 +99,7 @@ export default function SidebarPage(props: Props) {
         keyDerivationTrace: props.nameKeyDerivationTrace,
       });
       const folderKey = folderKeyData[folderKeyData.length - 1].key;
-      const documentKeyData = await recreateSnapshotKey({
+      const documentKeyData = await recreateDocumentKey({
         folderKey: folderKey,
         subkeyId: props.nameKeyDerivationTrace.subkeyId,
       });

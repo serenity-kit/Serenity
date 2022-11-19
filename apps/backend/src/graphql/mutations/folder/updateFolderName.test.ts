@@ -7,10 +7,11 @@ import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/d
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { updateFolderName } from "../../../../test/helpers/folder/updateFolderName";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { prisma } from "../../../database/prisma";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
+let userData1: any = undefined;
 const username = "user1";
 const password = "password";
 let sessionKey = "";
@@ -20,31 +21,16 @@ let addedFolderId: any = null;
 let workspaceKey = "";
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  sessionKey = registerUserResult.sessionKey;
-  const device = registerUserResult.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey,
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  addedWorkspace = userData1.workspace;
   workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
-    device: registerUserResult.mainDevice,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    workspace: addedWorkspace,
+    device: userData1.device,
+    deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspace: userData1.workspace,
   });
   const createFolderResult = await createFolder({
     graphql,
@@ -52,9 +38,9 @@ const setup = async () => {
     name: "folder",
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceId: addedWorkspace.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    authorizationHeader: userData1.sessionKey,
   });
   addedFolder = createFolderResult.createFolder.folder;
   addedFolderId = createFolderResult.createFolder.folder.id;
@@ -66,7 +52,6 @@ beforeAll(async () => {
 });
 
 test("user should be able to change a folder name", async () => {
-  const authorizationHeader = sessionKey;
   const id = addedFolderId;
   const name = "Updated Name";
   const result = await updateFolderName({
@@ -74,9 +59,9 @@ test("user should be able to change a folder name", async () => {
     id,
     name,
     workspaceKey,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    parentFolderId: addedFolder.parentFolderId,
-    authorizationHeader,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    parentFolderId: userData1.folder.parentFolderId,
+    authorizationHeader: userData1.sessionKey,
   });
   const updatedFolder = result.updateFolderName.folder;
   expect(updatedFolder.id).toBe(addedFolderId);
@@ -89,8 +74,7 @@ test("user should be able to change a folder name", async () => {
 });
 
 test("throw error when folder doesn't exist", async () => {
-  const authorizationHeader = sessionKey;
-  const id = "badthing";
+  const id = "bad-id";
   const name = "Doesn't Exist Name";
   await expect(
     (async () =>
@@ -101,50 +85,28 @@ test("throw error when folder doesn't exist", async () => {
         workspaceKey,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         parentFolderId: null,
-        authorizationHeader,
+        authorizationHeader: userData1.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
 });
 
 test("throw error when user doesn't have access", async () => {
   // create a new user with access to different folders
-  const username2 = "user2";
-  const registerUserResult = await registerUser(graphql, username2, password);
-  const device = registerUserResult.mainDevice;
-  // sessionKey = registerUserResult.sessionKey;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: registerUserResult.sessionKey,
+  const userData2 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-  const newFolder =
-    createWorkspaceResult.createInitialWorkspaceStructure.folder;
-  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
-    device: registerUserResult.mainDevice,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    workspace: addedWorkspace,
-  });
+  const newFolder = userData2.folder;
   const otherUserFolderResult = await createFolder({
     graphql,
-    id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
-    name: "folder",
+    id: uuidv4(),
+    name: "unauthorized folder",
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: registerUserResult.sessionKey,
-    workspaceId: addedWorkspace.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey!.id,
+    authorizationHeader: userData1.sessionKey,
   });
   const authorizationHeader = sessionKey;
   const id = otherUserFolderResult.createFolder.folder.id;
@@ -156,9 +118,9 @@ test("throw error when user doesn't have access", async () => {
         id,
         name,
         workspaceKey,
-        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         parentFolderId: newFolder.parentFolderId,
-        authorizationHeader,
+        authorizationHeader: userData2.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
 });

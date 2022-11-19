@@ -3,9 +3,6 @@ query document($id: ID!) {
     id
     encryptedName
     encryptedNameNonce
-    workspaceKeyId
-    subkeyId
-    contentSubkeyId
     parentFolderId
     workspaceId
     nameKeyDerivationTrace {

@@ -7,10 +7,12 @@ import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/d
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { deleteFolders } from "../../../../test/helpers/folder/deleteFolder";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { prisma } from "../../../database/prisma";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
+let userData1: any = undefined;
+let userData2: any = undefined;
 let userId = "";
 let sessionKey = "";
 let sessionKey2 = "";
@@ -24,32 +26,20 @@ let workspaceKey = "";
 let workspaceKey2 = "";
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  sessionKey = registerUserResult.sessionKey;
-  userId = registerUserResult.userId;
-  const device = registerUserResult.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey,
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  sessionKey = userData1.sessionKey;
+  userId = userData1.user.id;
+  addedWorkspace = userData1.workspace;
   workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
-    device: registerUserResult.mainDevice,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    device: userData1.device,
+    deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspace: addedWorkspace,
   });
+
   const createFolderResult = await createFolder({
     graphql,
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
@@ -62,32 +52,17 @@ const setup = async () => {
   });
   addedFolderId = createFolderResult.createFolder.folder.id;
 
-  const registrationResponse = await registerUser(graphql, username2, password);
-  sessionKey2 = registrationResponse.sessionKey;
-  const device2 = registrationResponse.mainDevice;
-  const createWorkspaceResult2 = await createInitialWorkspaceStructure({
-    workspaceName: "other user workspace",
-    workspaceId: "e9f04512-8317-46e0-ae1b-64eddf70690d",
-    deviceSigningPublicKey: device2.signingPublicKey,
-    deviceEncryptionPublicKey: device2.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registrationResponse.encryptionPrivateKey,
-    webDevice: registrationResponse.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey2,
+  userData2 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  otherUserWorkspaceId =
-    createWorkspaceResult2.createInitialWorkspaceStructure.workspace.id;
-  const addedWorkspace2 =
-    createWorkspaceResult2.createInitialWorkspaceStructure.workspace;
+  sessionKey2 = userData2.sessionKey;
+  otherUserWorkspaceId = userData2.workspace.id;
   workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
-    device: registrationResponse.mainDevice,
-    deviceEncryptionPrivateKey: registrationResponse.encryptionPrivateKey,
-    workspace: addedWorkspace2,
+    device: userData2.device,
+    deviceEncryptionPrivateKey: userData2.encryptionPrivateKey,
+    workspace: userData2.workspace,
   });
 };
 

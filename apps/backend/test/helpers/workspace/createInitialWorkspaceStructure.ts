@@ -1,115 +1,137 @@
 import {
+  createDocumentKey,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
   encryptDocumentTitle,
   encryptFolderName,
-  LocalDevice,
 } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
-import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
+import { DeviceWorkspaceKeyBoxParams } from "../../../src/database/workspace/createWorkspace";
+import { Device } from "../../../src/types/device";
+import { encryptWorkspaceKeyForDevice } from "../device/encryptWorkspaceKeyForDevice";
+
+const query = gql`
+  mutation createInitialWorkspaceStructure(
+    $input: CreateInitialWorkspaceStructureInput!
+  ) {
+    createInitialWorkspaceStructure(input: $input) {
+      workspace {
+        id
+        name
+        members {
+          userId
+          role
+        }
+        currentWorkspaceKey {
+          id
+          workspaceId
+          generation
+          workspaceKeyBox {
+            id
+            workspaceKeyId
+            deviceSigningPublicKey
+            ciphertext
+            nonce
+            creatorDevice {
+              signingPublicKey
+              encryptionPublicKey
+            }
+          }
+        }
+      }
+      folder {
+        id
+        encryptedName
+        encryptedNameNonce
+        parentFolderId
+        rootFolderId
+        workspaceId
+        keyDerivationTrace {
+          workspaceKeyId
+          subkeyId
+          parentFolders {
+            folderId
+            subkeyId
+            parentFolderId
+          }
+        }
+      }
+      document {
+        id
+        encryptedName
+        encryptedNameNonce
+        parentFolderId
+        workspaceId
+        nameKeyDerivationTrace {
+          workspaceKeyId
+          subkeyId
+          parentFolders {
+            folderId
+            subkeyId
+            parentFolderId
+          }
+        }
+      }
+    }
+  }
+`;
+
+type CreatorDeviceParams = {
+  signingPublicKey: string;
+  signingPrivateKey: string;
+  encryptionPublicKey: string;
+  encryptionPrivateKey: string;
+};
 
 type Params = {
   graphql: any;
-  workspaceId: string;
   workspaceName: string;
-  creatorDeviceSigningPublicKey?: string;
-  deviceSigningPublicKey: string;
-  deviceEncryptionPublicKey: string;
-  deviceEncryptionPrivateKey: string;
-  webDevice: LocalDevice;
-  folderId: string;
-  folderIdSignature: string;
-  folderName: string;
-  documentId: string;
-  documentName: string;
+  creatorDevice: CreatorDeviceParams;
+  devices: Device[];
   authorizationHeader: string;
 };
 
 export const createInitialWorkspaceStructure = async ({
   graphql,
   workspaceName,
-  workspaceId,
-  creatorDeviceSigningPublicKey,
-  deviceSigningPublicKey,
-  deviceEncryptionPublicKey,
-  deviceEncryptionPrivateKey,
-  webDevice,
-  folderId,
-  folderIdSignature,
-  folderName,
-  documentId,
-  documentName,
+  creatorDevice,
+  devices,
   authorizationHeader,
 }: Params) => {
+  // create ids
+  const workspaceId = uuidv4();
   const workspaceKeyId = uuidv4();
+  const folderId = uuidv4();
+  const documentId = uuidv4();
 
-  const authorizationHeaders = {
-    authorization: authorizationHeader,
-  };
-  const { nonce, ciphertext, workspaceKey } =
-    await createAndEncryptWorkspaceKeyForDevice({
-      receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
-      creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
+  const folderName = "Getting Started";
+  const documentName = "Introduction";
+
+  // create workspace key boxes
+  const workspaceKey = await sodium.crypto_kdf_keygen();
+  const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[] = [];
+  for (const device of devices) {
+    const deviceWorkspaceKeyBox = await encryptWorkspaceKeyForDevice({
+      receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+      creatorDeviceEncryptionPrivateKey: creatorDevice.encryptionPrivateKey,
+      workspaceKey,
     });
-  const webDeviceWorkspaceKey = await createAndEncryptWorkspaceKeyForDevice({
-    receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
-    creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
-  });
+    deviceWorkspaceKeyBoxes.push({
+      deviceSigningPublicKey: device.signingPublicKey,
+      ciphertext: deviceWorkspaceKeyBox.ciphertext,
+      nonce: deviceWorkspaceKeyBox.nonce,
+    });
+  }
+  const readyWorkspace = {
+    id: workspaceId,
+    name: workspaceName,
+    workspaceKeyId,
+    deviceWorkspaceKeyBoxes,
+  };
 
-  const query = gql`
-    mutation createInitialWorkspaceStructure(
-      $input: CreateInitialWorkspaceStructureInput!
-    ) {
-      createInitialWorkspaceStructure(input: $input) {
-        workspace {
-          id
-          name
-          members {
-            userId
-            role
-          }
-          currentWorkspaceKey {
-            id
-            workspaceId
-            generation
-            workspaceKeyBox {
-              id
-              workspaceKeyId
-              deviceSigningPublicKey
-              ciphertext
-              nonce
-              creatorDevice {
-                signingPublicKey
-                encryptionPublicKey
-              }
-            }
-          }
-        }
-        folder {
-          id
-          encryptedName
-          encryptedNameNonce
-          subkeyId
-          workspaceKeyId
-          parentFolderId
-          rootFolderId
-          workspaceId
-          keyDerivationTrace {
-            workspaceKeyId
-            subkeyId
-            parentFolders {
-              folderId
-              subkeyId
-              parentFolderId
-            }
-          }
-        }
-      }
-    }
-  `;
-
+  // prepare the folder
   const encryptedFolderResult = await encryptFolderName({
     name: folderName,
     parentKey: workspaceKey,
@@ -118,21 +140,29 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedFolderNameNonce = encryptedFolderResult.publicNonce;
   const folderSubkeyId = encryptedFolderResult.folderSubkeyId;
   const folderKey = encryptedFolderResult.folderSubkey;
+  const folderIdSignature = await sodium.crypto_sign_detached(
+    folderId,
+    creatorDevice.signingPrivateKey
+  );
+  const readyFolder = {
+    id: folderId,
+    idSignature: folderIdSignature,
+    encryptedName: encryptedFolderName,
+    encryptedNameNonce: encryptedFolderNameNonce,
+    keyDerivationTrace: {
+      workspaceKeyId,
+      subkeyId: folderSubkeyId,
+      parentFolders: [],
+    },
+  };
 
-  const snapshotKey = await createSnapshotKey({
-    folderKey: encryptedFolderResult.folderSubkey,
+  // propare the document key
+  const documentKeyResult = await createDocumentKey({
+    folderKey,
   });
+  const documentKey = documentKeyResult.key;
+  const documentSubkeyId = documentKeyResult.subkeyId;
 
-  // FIXME: because of a hack to use the snapshot key to
-  // encrypt the document title, we need to use the snapshotkey here
-  // for now
-  // const documentKeyResult = await createDocumentKey({
-  //   folderKey,
-  // });
-  // const documentKey = documentKeyResult.key;
-  // const documentSubkeyId = documentKeyResult.subkeyId;
-  const documentKey = snapshotKey.key;
-  const documentSubkeyId = snapshotKey.subkeyId;
   const encryptedDocumentTitleResult = await encryptDocumentTitle({
     title: documentName,
     key: documentKey,
@@ -140,16 +170,11 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedDocumentName = encryptedDocumentTitleResult.ciphertext;
   const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;
 
-  // currently hard-coded until we enable e2e encryption per workspace
-  // const documentEncryptionKey = sodium.from_base64(
-  //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
-  // );
-  // TODO: remove
-  // const documentContentKeyResult = await createDocumentKey({
-  //   folderKey,
-  // const documentContentSubkeyId = documentContentKeyResult.subkeyId;
-
-  const documentSnapshot = await createIntroductionDocumentSnapshot({
+  // prepare the snapshot key
+  const snapshotKey = await createSnapshotKey({
+    folderKey,
+  });
+  const snapshot = await createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
     subkeyId: snapshotKey.subkeyId,
@@ -158,7 +183,7 @@ export const createInitialWorkspaceStructure = async ({
       subkeyId: snapshotKey.subkeyId,
       parentFolders: [
         {
-          folderId,
+          folderId: folderId,
           subkeyId: encryptedFolderResult.folderSubkeyId,
           parentFolderId: null,
         },
@@ -166,37 +191,37 @@ export const createInitialWorkspaceStructure = async ({
     },
   });
 
+  // prepare the document
+  const readyDocument = {
+    id: documentId,
+    encryptedName: encryptedDocumentName,
+    encryptedNameNonce: encryptedDocumentNameNonce,
+    nameKeyDerivationTrace: {
+      workspaceKeyId,
+      subkeyId: documentSubkeyId,
+      parentFolders: [
+        {
+          folderId: folderId,
+          subkeyId: folderSubkeyId,
+          parentFolderId: null,
+        },
+      ],
+    },
+    snapshot,
+  };
+
+  // create the initial workspace structure
+  const authorizationHeaders = {
+    authorization: authorizationHeader,
+  };
   const result = await graphql.client.request(
     query,
     {
       input: {
-        workspaceName,
-        workspaceId,
-        folderId,
-        folderIdSignature,
-        encryptedFolderName,
-        encryptedFolderNameNonce,
-        folderSubkeyId,
-        documentId,
-        encryptedDocumentName,
-        encryptedDocumentNameNonce,
-        documentSubkeyId,
-        documentContentSubkeyId: 123, // TODO: Remove
-        documentSnapshot,
-        creatorDeviceSigningPublicKey:
-          creatorDeviceSigningPublicKey ?? deviceSigningPublicKey,
-        deviceWorkspaceKeyBoxes: [
-          {
-            deviceSigningPublicKey,
-            nonce,
-            ciphertext,
-          },
-          {
-            deviceSigningPublicKey: webDevice.signingPublicKey,
-            nonce: webDeviceWorkspaceKey.nonce,
-            ciphertext: webDeviceWorkspaceKey.ciphertext,
-          },
-        ],
+        workspace: readyWorkspace,
+        folder: readyFolder,
+        document: readyDocument,
+        creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
       },
     },
     authorizationHeaders

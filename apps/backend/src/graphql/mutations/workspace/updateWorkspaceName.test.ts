@@ -1,47 +1,37 @@
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
-import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { updateWorkspaceName } from "../../../../test/helpers/workspace/updateWorkspaceName";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
+let userData1: any = undefined;
+let userData2: any = undefined;
 let userId1 = "";
 const username = "user";
 let userId2 = "";
 const username2 = "user1";
 const password = "password";
-let addedWorkspace: any = null;
 let sessionKey1 = "";
 let sessionKey2 = "";
 
 const setup = async () => {
-  const registerUserResult1 = await registerUser(graphql, username, password);
-  sessionKey1 = registerUserResult1.sessionKey;
-  userId1 = registerUserResult1.userId;
-  const device = registerUserResult1.mainDevice;
-  const registerUserResult2 = await registerUser(graphql, username2, password);
-  sessionKey2 = registerUserResult2.sessionKey;
-  userId2 = registerUserResult2.userId;
-
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "abc",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult1.encryptionPrivateKey,
-    webDevice: registerUserResult1.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey1,
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  sessionKey1 = userData1.sessionKey;
+  userId1 = userData1.user.id;
+
+  userData2 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
+  });
+  sessionKey2 = userData1.sessionKey;
+  userId2 = userData1.user.id;
 };
 
 beforeAll(async () => {
@@ -50,30 +40,24 @@ beforeAll(async () => {
 });
 
 test("user won't update the name when not set", async () => {
-  // generate a challenge code
-  const authorizationHeader = sessionKey1;
-  const id = "abc";
   const name = undefined;
   const result = await updateWorkspaceName({
     graphql,
-    id,
+    id: userData1.workspace.id,
     name,
-    authorizationHeader,
+    authorizationHeader: userData1.sessionKey,
   });
   const workspace = result.updateWorkspaceName.workspace;
-  expect(workspace.name).toBe(addedWorkspace.name);
+  expect(workspace.name).toBe(userData1.workspace.name);
 });
 
 test("user can change workspace name", async () => {
-  // generate a challenge code
-  const authorizationHeader = sessionKey1;
-  const id = "abc";
   const name = "workspace 2";
   const result = await updateWorkspaceName({
     graphql,
-    id,
+    id: userData1.workspace.id,
     name,
-    authorizationHeader,
+    authorizationHeader: userData1.sessionKey,
   });
   const workspace = result.updateWorkspaceName.workspace;
   expect(workspace.name).toBe(name);
@@ -112,7 +96,7 @@ test("user should not be able to update a workspace for a workspace that doesn't
 });
 
 test("Unauthenticated", async () => {
-  const id = addedWorkspace.id;
+  const id = userData1.workspace.id;
   const name = "unautharized workspace";
   await expect(
     (async () =>
@@ -141,7 +125,6 @@ describe("Input errors", () => {
     }
   `;
   test("Invalid id", async () => {
-    const id = addedWorkspace.id;
     const name = undefined;
     const authorizationHeaders = {
       authorization: sessionKey1,

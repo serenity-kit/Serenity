@@ -5,23 +5,17 @@ import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const username = "591e6e60-8a85-41fa-9ec8-33fdca675a2a@example.com";
+let userData1: any = undefined;
 const password = "password";
-let didRegisterUser = false;
 let sessionKey = "";
 let workspaceKey = "";
 
 const workspaceId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
 const parentFolderId = "4e9a4c29-2295-471c-84b5-5bf55169ff8c";
 const folderId = "3530b9ed-11f3-44c7-9e16-7dba1e14815f";
-const firstDocumentId = uuidv4();
-const otherFolderId = "c1c65251-7471-4893-a1b5-e3df937caf66";
-const documentId1 = "3530b9ed-11f3-44c7-9e16-7dba1e14815f";
-const documentId2 = "9e911f29-7a86-480b-89d7-5c647f21317f";
-const childDocumentId = "929ca262-f144-40f7-8fe2-d3147f415f26";
 
 const query = gql`
   query firstDocument($workspaceId: ID!) {
@@ -32,34 +26,17 @@ const query = gql`
 `;
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  sessionKey = registerUserResult.sessionKey;
-  const device = registerUserResult.mainDevice;
-  const webDevice = registerUserResult.webDevice;
-  const initialWorkspaceStructureResult = await createInitialWorkspaceStructure(
-    {
-      workspaceName: "workspace 1",
-      workspaceId,
-      deviceSigningPublicKey: device.signingPublicKey,
-      deviceEncryptionPublicKey: device.encryptionPublicKey,
-      deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-      webDevice,
-      folderName: "Getting started",
-      folderId: uuidv4(),
-      folderIdSignature: `TODO+${uuidv4()}`,
-      documentName: "Introduction",
-      documentId: firstDocumentId,
-      graphql,
-      authorizationHeader: sessionKey,
-    }
-  );
-  const workspace =
-    initialWorkspaceStructureResult.createInitialWorkspaceStructure.workspace;
-  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
-    device: registerUserResult.mainDevice,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    workspace,
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
+  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+    device: userData1.device,
+    deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspace: userData1.workspace,
+  });
+
   const parentFolderName = "parent folder";
   const folderName = "folder";
   const createParentFolderResult = await createFolder({
@@ -68,9 +45,9 @@ const setup = async () => {
     name: parentFolderName,
     parentFolderId: null,
     parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceId: workspaceId,
-    workspaceKeyId: workspace.currentWorkspaceKey.id,
+    authorizationHeader: userData1.sessionKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const createFolderResult = await createFolder({
     graphql,
@@ -78,11 +55,10 @@ const setup = async () => {
     name: folderName,
     parentFolderId: parentFolderId,
     parentKey: workspaceKey,
-    authorizationHeader: sessionKey,
-    workspaceId: workspaceId,
-    workspaceKeyId: workspace.currentWorkspaceKey.id,
+    authorizationHeader: userData1.sessionKey,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
-  didRegisterUser = true;
 };
 
 beforeAll(async () => {
@@ -91,14 +67,13 @@ beforeAll(async () => {
 });
 
 test("user should be able to retrieve the first document", async () => {
-  const authorizationHeader = { authorization: sessionKey };
   const result = await graphql.client.request(
     query,
-    { workspaceId },
-    authorizationHeader
+    { workspaceId: userData1.workspace.id },
+    { authorization: userData1.sessionKey }
   );
   const firstDocument = result.firstDocument;
-  expect(firstDocument.id).toBe(firstDocumentId);
+  expect(firstDocument.id).toBe(userData1.document.id);
 });
 
 test("user should not be able to retreive the first document from another workspace", async () => {
