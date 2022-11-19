@@ -1,47 +1,17 @@
-import {
-  StyleSheet,
-  TouchableOpacity,
-  useWindowDimensions,
-} from "react-native";
+import { useWindowDimensions } from "react-native";
 
-import { Text, View } from "@serenity-tools/ui";
+import { CenterContent, Heading, Link, tw } from "@serenity-tools/ui";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 
-export default function NotFoundScreen({
-  navigation,
-}: RootStackScreenProps<"NotFound">) {
+export default function NotFoundScreen({}: RootStackScreenProps<"NotFound">) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>This screen doesn't exist.</Text>
-      <TouchableOpacity
-        onPress={() => navigation.replace("DevDashboard")}
-        style={styles.link}
-      >
-        <Text style={styles.linkText}>Go to dashboard!</Text>
-      </TouchableOpacity>
-    </View>
+    <CenterContent>
+      <Heading lvl={1} style={tw`mb-4`}>
+        This screen doesn't exist :{"("}
+      </Heading>
+      <Link to={{ screen: "Root" }}>Go to home</Link>
+    </CenterContent>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
-  linkText: {
-    fontSize: 14,
-    color: "#2e78b7",
-  },
-});

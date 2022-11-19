@@ -158,10 +158,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         >
           Settings
         </SidebarLink>
-
-        <SidebarLink to={{ screen: "DevDashboard" }} iconName="dashboard-line">
-          Dev Dashboard
-        </SidebarLink>
       </View>
 
       {isPermanentLeftSidebar ? <SidebarDivider /> : null}
