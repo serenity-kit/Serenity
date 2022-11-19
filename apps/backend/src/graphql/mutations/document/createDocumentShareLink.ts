@@ -26,6 +26,9 @@ export const CreateDocumentShareLinkInput = inputObjectType({
     t.nonNull.string("deviceSecretBoxCiphertext");
     t.nonNull.string("deviceSecretBoxNonce");
     t.nonNull.string("creatorDeviceSigningPublicKey");
+    t.nonNull.string("deviceSigningPublicKey");
+    t.nonNull.string("deviceEncryptionPublicKey");
+    t.nonNull.string("deviceEncryptionPublicKeySignature");
     t.nonNull.field("snapshotDeviceKeyBox", {
       type: SnapshotDeviceKeyBoxInput,
     });
@@ -64,6 +67,10 @@ export const createDocumentLinkShareMutation = mutationField(
         deviceSecretBoxCiphertext: args.input.deviceSecretBoxCiphertext,
         deviceSecretBoxNonce: args.input.deviceSecretBoxNonce,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
+        deviceSigningPublicKey: args.input.deviceSigningPublicKey,
+        deviceEncryptionPublicKey: args.input.deviceEncryptionPublicKey,
+        deviceEncryptionPublicKeySignature:
+          args.input.deviceEncryptionPublicKeySignature,
         snapshotDeviceKeyBox: args.input.snapshotDeviceKeyBox,
       });
       return {

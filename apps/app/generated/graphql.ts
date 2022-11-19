@@ -67,8 +67,11 @@ export type CreateDocumentResult = {
 
 export type CreateDocumentShareLinkInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
+  deviceEncryptionPublicKey: Scalars['String'];
+  deviceEncryptionPublicKeySignature: Scalars['String'];
   deviceSecretBoxCiphertext: Scalars['String'];
   deviceSecretBoxNonce: Scalars['String'];
+  deviceSigningPublicKey: Scalars['String'];
   documentId: Scalars['String'];
   sharingRole: Role;
   snapshotDeviceKeyBox: SnapshotDeviceKeyBoxInput;
@@ -298,8 +301,12 @@ export type DocumentEdge = {
 
 export type DocumentShareLink = {
   __typename?: 'DocumentShareLink';
+  deviceEncryptionPublicKey: Scalars['String'];
+  deviceEncryptionPublicKeySignature: Scalars['String'];
   deviceSecretBoxCiphertext: Scalars['String'];
   deviceSecretBoxNonce: Scalars['String'];
+  deviceSigningPublicKey: Scalars['String'];
+  snapshotKeyBoxs?: Maybe<Array<SnapshotKeyBox>>;
   token: Scalars['String'];
 };
 
@@ -862,6 +869,16 @@ export type SnapshotDeviceKeyBoxInput = {
   nonce: Scalars['String'];
 };
 
+export type SnapshotKeyBox = {
+  __typename?: 'SnapshotKeyBox';
+  ciphertext: Scalars['String'];
+  creatorDevice: CreatorDevice;
+  creatorDeviceSigningPublicKey: Scalars['String'];
+  deviceSigningPublicKey: Scalars['String'];
+  id: Scalars['String'];
+  nonce: Scalars['String'];
+};
+
 export type StartLoginInput = {
   challenge: Scalars['String'];
   username: Scalars['String'];
@@ -1350,7 +1367,7 @@ export type DocumentShareLinkQueryVariables = Exact<{
 }>;
 
 
-export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLink', token: string, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string } | null };
+export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLink', token: string, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string, snapshotKeyBoxs?: Array<{ __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } }> | null } | null };
 
 export type DocumentShareLinksQueryVariables = Exact<{
   documentId: Scalars['ID'];
@@ -2053,6 +2070,15 @@ export const DocumentShareLinkDocument = gql`
     token
     deviceSecretBoxCiphertext
     deviceSecretBoxNonce
+    snapshotKeyBoxs {
+      id
+      ciphertext
+      nonce
+      creatorDevice {
+        signingPublicKey
+        encryptionPublicKey
+      }
+    }
   }
 }
     `;

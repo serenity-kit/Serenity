@@ -1,3 +1,4 @@
+import { LocalDevice } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { assign, createMachine } from "xstate";
 import {
@@ -17,12 +18,13 @@ type Context = {
   token: string;
   virtualDeviceKey?: string;
   navigation: any;
-  device?: any;
+  device?: LocalDevice;
+  snapshotKey?: string;
   documentShareLinkQueryResult?: DocumentShareLinkQueryResult;
 };
 
 export const sharePageScreenMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5SwBYEMBOYAKaYGUMBjLMAOwFk0iUBLMsAOgBsB7NCeqAYglYcb0AbqwDWTNhwAirIgFcAtuQAu+dFgAy9UQG0ADAF1EoAA6tYtZbX7GQAD0QA2AIyPGAZgCcjgCwAOPwBWQPc9PWcAdgAaEABPRGc-Rj1PCL9PSM8AJh9En0dHAF9CmNRMHDwwQhIwcioaegl2TjIePgFhMSbpWUUVNXKtMl1nIyQQMwsrG3GHBEC-PUY-CMCIx2DwiO8fGPiEZyy3TwCCzwWvVc9PYtL1CoJiUkpqOg6IZjBuWGVMZX0xqZzJZrGRbHMCh4fKEsnpHKdDkc9ogALSeRjODJw9wBQLZdw+LIRW4gMpYXCPGp1V6NFjNSDcAG2SYgmagObOMJJDZpeEuWE+QnIhBZLyMXKJRJ6LIBLJ4klkh5VJ61F4NASSCAMnSjZnA6Zg2aIPwExhpPR+AqOVaLCK7OKIUXoiV+TmyuXBHwK+4U5VUtVvJgAMzQtGY3DsPzQyiYaCDMYwAApYWEAJTfH2VarPeqBxghsNM8Ysg3gxA4pZpRZZQ689yBRzCuU+DwRIk43KOHKivze8q+7Oq3O0xVDUQyADuZE1DPaTE64kYWpIsRMygAarQMMo5GhmFIwEJaEQwEWgVNQWWDrl3IwckF0o4MjXrU3QsssudTqsuyF3H3ySzFVqXVJhR20Sdp3pCBuDADAMFYDBGBMZhoyDRCFCXMAVzXTdt13fdD2PU9DD1C82XsBIfDhZIMnOQIUjSQJImFQUkgiNJRS8IJ3A4wJihKEAyFYLV4HGRUB2AgNaU1LgyNZQ12WNCJxUSVI9GCJ88XcLJhRCZZvEWE4TT-bwAKVQcQLzWgPjAeTSyNBAUR0xhmMxDifAyAkX2FFFIkYTx8g2FJwj0dxHG88zJP9YcNWg+zL0czlCWWTzsmhZxqJrPxhUOY5Tj8ajqKCcIoqAmKaQEAtmASii5jbJJwpCQ4QhND0mxcO9AtWQJPIKIIikEiTypzSqwPuMdIJnCBasUyiDmlJZIjtG8QmtCJnGFdxTQYwkX3rQIazKylRtAxhhIAQSIE9YDE88FKvE10Q2TkOM8dw1MOLadr0PbXAOo6hszE6hzGpd+Ds4t9USpSDi7LIzSfdIiW0lJPD01xGF8ZwdJlBjPAtG4gf7EbQbO5cMFXZQDyPE8ADFQxqqHyLmjkvBbLttsOiIdIJ7w9M-cU9v8TS9A446-VOwNZqvFFFlc5x3LtLzCWcQJfM5Y4goKC0sk-GVnAEwogA */
+  /** @xstate-layout N4IgpgJg5mDOIC5SwBYEMBOYAKaYGUBjLMAOwFk1CUBLUsAOgBsB7NCOqAYghfoboA3FgGtGrdgBEWhAK4BbMgBd86LABk6IgNoAGALqJQABxawaSmnyMgAHogCcAZgBMDAOy6ALC5cBGADYADnd3BwC-ABoQAE9EPy8AjwCvdycAVi8vby8HB3SAXwLo1EwcPDAiEgoqWn4JDlJuXn4hUXE2CGk5RVIVNTBNUh0-QyQQU3NLa3H7BD8nXQZnF0WvRYWAp3cA6LiEZwZ0hz8XAPCHIK8glIcikoHcAmIwMkpqOkYaCCYwLlglJglHoxiYzBYrKQbHMFksVmsNk4tjs9vEHO4juldN53Okwn54fcQKUsE9Ki83rVPsxOpAuCCbJMITNQDDrl4GBk8e5ri53H5QkFUfMwstcXlzilzi5dAEiSTys9qu86h12HTtKNGeDplDZvF2Zz0tzefzBcKgukGLlgutEmcgoEXPLHhUqq8ah9+AAzNA0JhcWwAtBKRhob2hjAAChl2IAlP9XUqPSrqb7-QzxkzddD4otlq4EbpNttdrEDVa8bL0jcnEEgk5LnLisSk+TlVT+AqhiJpAB3UgNOktL6kYRiBgQMDEGLGJQANRoGCUsjQTEkYEENEIYEzYKmkNzCBlXj8nOyrlS-N0uKF5ZFZ+OflOiNW7nrLrKZPdlK9jG7Wj9oOtIQFwYAYBgLAYAwxhMCG3pQfIk7Thgs4LkuK5rhuW47nuEw6oe+rHt4Z5OBeLhXn4N41sKz4OAwEQCmRN4uPWXiFC2CrfhSnqqshOFgBuM5zn8I4CGO7TIcJKikGgxioCwSgANJgDEeHZoRrKIHyuQMP4OzpAEAR8roNy0eienpFRWRBLoxrnIZn6km6PGpvwU4CUJqEiWBEFQTBcFKAhGBIVO0n4LJ8koIpKlqQY2oHiydjabiSy5I6AQ8jKAreMKrFJD41wCqsN66HkHEtqQLBTvA4xcS5HZ-jS7CcAlzJ6lpCDpEiHi+Dpix1g4WS0T1TibLip4DRKTmKu2Kadl8PxgG1OZET45lBAwOTGQ2WzZKxM3cY1fFDhAK2acl8x1ks3LdWk6wnIktGeAwtlnMWmRjYEfiHQ181NemTDnUlczrfeCwYmkGSsfywQUTsv3Jr+fEAcMQGncDHWXYE7FGg2oR1maYP7AkbjoiECRXFk-irIjc3I9SVUAIKEDusC1fu7VHjjVoZPjaQU1lFpk2x4TBGx3hOHTP68dSHnboJKFoctWYESD2lkW4xmnNcSKsQ4Lh5d4enFkELgG8EoQRM6nFtjLbmMGF3lKNhCsAGJ+kDquJVjcwlRyY2hDsLjHJahvgwSDE3n4tkEjcp66FLttfn9DPuXwKuc6tnWLL41roulqXGoE5kYhRhm6GceR5M+7jS65C1Sc7EVybAMWqR7-qQJjR4mW4VyhGchObMKGROHpCQvtkZV4t19fHZ8PdEQAtGW+yr1t2LYqsDZm8+ZxFEUQA */
   createMachine(
     {
       context: { navigation: null } as Context,
@@ -82,7 +84,7 @@ export const sharePageScreenMachine =
             id: "decryptVirtualDevice",
             onDone: [
               {
-                target: "done",
+                target: "deviceDecrypte",
                 actions: assign({
                   device: (context, event) => {
                     return event.data;
@@ -98,10 +100,34 @@ export const sharePageScreenMachine =
           },
         },
         noAccess: {},
+        deviceDecrypte: {
+          invoke: {
+            src: "decryptSnapshotKey",
+            id: "decryptSnapshotKey",
+            onDone: [
+              {
+                target: "done",
+                actions: assign({
+                  snapshotKey: (context, event) => {
+                    return event.data;
+                  },
+                }),
+              },
+            ],
+            onError: [
+              {
+                target: "decryptSnapsotKeyFailed",
+              },
+            ],
+          },
+        },
+        decryptDeviceFail: {
+          type: "final",
+        },
         done: {
           type: "final",
         },
-        decryptDeviceFail: {
+        decryptSnapsotKeyFailed: {
           type: "final",
         },
       },
@@ -127,6 +153,28 @@ export const sharePageScreenMachine =
             sodium.from_base64_to_string(base64DeviceData)
           );
           return device;
+        },
+        decryptSnapshotKey: async (context, event) => {
+          if (
+            context.device &&
+            context.documentShareLinkQueryResult?.data?.documentShareLink
+              ?.snapshotKeyBoxs &&
+            context.documentShareLinkQueryResult.data.documentShareLink
+              .snapshotKeyBoxs.length > 0
+          ) {
+            const snapshotKeyBox =
+              context.documentShareLinkQueryResult.data.documentShareLink
+                .snapshotKeyBoxs[0];
+
+            const snapshotKey = await sodium.crypto_box_open_easy(
+              snapshotKeyBox.ciphertext,
+              snapshotKeyBox.nonce,
+              snapshotKeyBox.creatorDevice.encryptionPublicKey,
+              context.device?.encryptionPrivateKey
+            );
+            return snapshotKey;
+          }
+          throw new Error("Snapshot could not be decrypted");
         },
       },
       guards: {

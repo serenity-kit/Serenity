@@ -80,6 +80,10 @@ export const createDocumentShareLink = async ({
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey!,
         deviceSecretBoxCiphertext,
         deviceSecretBoxNonce,
+        deviceSigningPublicKey: virtualDevice.signingPublicKey,
+        deviceEncryptionPublicKey: virtualDevice.encryptionPublicKey,
+        deviceEncryptionPublicKeySignature:
+          virtualDevice.encryptionPublicKeySignature,
         documentId: documentId,
         sharingRole: Role.Viewer,
         snapshotDeviceKeyBox,
