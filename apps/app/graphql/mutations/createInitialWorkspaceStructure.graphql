@@ -29,8 +29,6 @@ mutation createInitialWorkspaceStructure(
       id
       encryptedName
       encryptedNameNonce
-      workspaceKeyId
-      subkeyId
       parentFolderId
       rootFolderId
       workspaceId

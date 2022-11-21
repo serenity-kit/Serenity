@@ -1,4 +1,4 @@
-import { Snapshot } from "@naisho/core";
+import { KeyDerivationTrace, Snapshot } from "@naisho/core";
 import { Snapshot as SnapshotModel } from "../../../prisma/generated/output";
 import { Document, formatDocument } from "../../types/document";
 import { Folder, formatFolder } from "../../types/folder";
@@ -11,25 +11,6 @@ import {
   DeviceWorkspaceKeyBoxParams,
 } from "./createWorkspace";
 
-export type Params = {
-  userId: string;
-  workspaceId: string;
-  workspaceName: string;
-  folderId: string;
-  folderIdSignature: string;
-  encryptedFolderName: string;
-  encryptedFolderNameNonce: string;
-  folderSubkeyId: number;
-  documentId: string;
-  encryptedDocumentName: string;
-  encryptedDocumentNameNonce: string;
-  documentSubkeyId: number;
-  documentContentSubkeyId: number;
-  documentSnapshot: Snapshot;
-  creatorDeviceSigningPublicKey: string;
-  deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
-};
-
 export type CreateWorkspaceResult = {
   workspace: Workspace;
   document: Document;
@@ -37,67 +18,83 @@ export type CreateWorkspaceResult = {
   snapshot: SnapshotModel;
 };
 
+export type WorkspaceParams = {
+  id: string;
+  name: string;
+  deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[];
+  workspaceKeyId: string;
+};
+
+export type FolderParams = {
+  id: string;
+  idSignature: string;
+  encryptedName: string;
+  encryptedNameNonce: string;
+  keyDerivationTrace: KeyDerivationTrace;
+};
+
+export type DocumentParams = {
+  id: string;
+  encryptedName: string;
+  encryptedNameNonce: string;
+  nameKeyDerivationTrace: KeyDerivationTrace;
+  snapshot: Snapshot;
+};
+
+export type Params = {
+  userId: string;
+  workspace: WorkspaceParams;
+  folder: FolderParams;
+  document: DocumentParams;
+  creatorDeviceSigningPublicKey: string;
+};
+
 export async function createInitialWorkspaceStructure({
   userId,
-  workspaceId,
-  workspaceName,
-  folderId,
-  encryptedFolderName,
-  encryptedFolderNameNonce,
-  folderSubkeyId,
-  documentId,
-  encryptedDocumentName,
-  encryptedDocumentNameNonce,
-  documentSubkeyId,
-  documentContentSubkeyId,
-  documentSnapshot,
+  workspace,
+  folder,
+  document,
   creatorDeviceSigningPublicKey,
-  deviceWorkspaceKeyBoxes,
 }: Params): Promise<CreateWorkspaceResult> {
-  const workspace = await createWorkspace({
-    id: workspaceId,
-    name: workspaceName,
+  const createdWorkspace = await createWorkspace({
+    id: workspace.id,
+    name: workspace.name,
     userId,
     creatorDeviceSigningPublicKey,
-    deviceWorkspaceKeyBoxes,
-    workspaceKeyId:
-      documentSnapshot.publicData.keyDerivationTrace.workspaceKeyId,
+    deviceWorkspaceKeyBoxes: workspace.deviceWorkspaceKeyBoxes,
+    workspaceKeyId: workspace.workspaceKeyId,
   });
-  const workspaceKey = workspace.currentWorkspaceKey;
-  const folder = await createFolder({
+  const workspaceKey = createdWorkspace.currentWorkspaceKey;
+  const createdFolder = await createFolder({
     userId,
-    id: folderId,
-    encryptedName: encryptedFolderName,
-    encryptedNameNonce: encryptedFolderNameNonce,
+    id: folder.id,
+    encryptedName: folder.encryptedName,
+    encryptedNameNonce: folder.encryptedNameNonce,
     workspaceKeyId: workspaceKey?.id!,
-    subkeyId: folderSubkeyId,
+    subkeyId: 123, // TODO: remove
     parentFolderId: undefined,
-    workspaceId: workspace.id,
-    keyDerivationTrace: {
-      workspaceKeyId: workspaceKey?.id!,
-      subkeyId: folderSubkeyId,
-      parentFolders: [],
-    },
+    workspaceId: createdWorkspace.id,
+    keyDerivationTrace: folder.keyDerivationTrace,
   });
 
-  const document = await prisma.document.create({
+  const createdDocument = await prisma.document.create({
     data: {
-      id: documentId,
-      encryptedName: encryptedDocumentName,
-      encryptedNameNonce: encryptedDocumentNameNonce,
-      workspaceKeyId: workspace.currentWorkspaceKey?.id,
-      subkeyId: documentSubkeyId,
+      id: document.id,
+      encryptedName: document.encryptedName,
+      encryptedNameNonce: document.encryptedNameNonce,
+      workspaceKeyId: createdWorkspace.currentWorkspaceKey?.id,
+      subkeyId: 123, // TODO: remove
       parentFolderId: folder.id,
-      workspaceId: workspaceId,
-      nameKeyDerivationTrace: documentSnapshot.publicData.keyDerivationTrace,
+      workspaceId: createdWorkspace.id,
+      nameKeyDerivationTrace: document.nameKeyDerivationTrace,
     },
   });
 
-  const snapshot = await createSnapshot(documentSnapshot);
+  const snapshot = await createSnapshot(document.snapshot);
   return {
-    workspace,
-    document: formatDocument(document),
-    folder: formatFolder(folder),
+    workspace: createdWorkspace,
+    document: formatDocument(createdDocument),
+    folder: formatFolder(createdFolder),
     snapshot,
   };
 }

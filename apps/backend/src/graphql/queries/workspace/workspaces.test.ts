@@ -1,15 +1,17 @@
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
-import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql, {
   TestContext,
 } from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 import { Workspace } from "../../../types/workspace";
 
 const graphql = setupGraphql();
+let userData1: any = undefined;
+let otherWorkspace: any = undefined;
 let userId = "";
 let sessionKey = "";
 const username = "user";
@@ -17,48 +19,35 @@ const password = "password";
 let device: any;
 let webDevice: any;
 
-const workspace1Id = uuidv4();
-const workspace2Id = uuidv4();
-const workspace1Name = "workspace 1";
+// const workspace1Id = uuidv4();
+// const workspace2Id = uuidv4();
+// const workspace1Name = "workspace 1";
 const workspace2Name = "workspace 2";
 let firstWorkspaceCursor = "";
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  webDevice = registerUserResult.webDevice;
-  userId = registerUserResult.userId;
-  sessionKey = registerUserResult.sessionKey;
-  device = registerUserResult.mainDevice;
-  await createInitialWorkspaceStructure({
-    workspaceName: workspace1Name,
-    workspaceId: workspace1Id,
-    deviceSigningPublicKey: registerUserResult.mainDevice.signingPublicKey,
-    deviceEncryptionPublicKey: registerUserResult.encryptionPrivateKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice,
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    folderName: "Getting started",
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey,
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username,
+    password,
   });
-  await createInitialWorkspaceStructure({
-    workspaceName: workspace2Name,
-    workspaceId: workspace2Id,
-    deviceSigningPublicKey: registerUserResult.mainDevice.signingPublicKey,
-    deviceEncryptionPublicKey: registerUserResult.encryptionPrivateKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice,
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    folderName: "Getting started",
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey,
-  });
+  sessionKey = userData1.sessionKey;
+  device = userData1.device;
+  webDevice = userData1.webDevice;
+  const createInitialWorkspaceStructureResult =
+    await createInitialWorkspaceStructure({
+      graphql,
+      workspaceName: workspace2Name,
+      creatorDevice: {
+        ...userData1.device,
+        encryptionPrivateKey: userData1.encryptionPrivateKey,
+        signingPrivateKey: userData1.signingPrivateKey,
+      },
+      devices: [userData1.device, userData1.webDevice],
+      authorizationHeader: sessionKey,
+    });
+  otherWorkspace =
+    createInitialWorkspaceStructureResult.createInitialWorkspaceStructure;
 };
 
 beforeAll(async () => {
@@ -139,7 +128,7 @@ test("user should be able to list workspaces", async () => {
     graphql,
     first: 50,
     deviceSigningPublicKey: device.signingPublicKey,
-    authorizationHeader: sessionKey,
+    authorizationHeader: userData1.sessionKey,
   });
   const workspaces = result.workspaces.nodes;
   expect(workspaces.length).toBe(2);
@@ -147,8 +136,8 @@ test("user should be able to list workspaces", async () => {
   workspaces.forEach((workspace: Workspace) => {
     expect(typeof workspace.id).toBe("string");
     expect(typeof workspace.name).toBe("string");
-    if (workspace.id === workspace1Id) {
-      expect(workspace.name).toBe(workspace1Name);
+    if (workspace.id === userData1.workspace.id) {
+      expect(workspace.name).toBe(userData1.workspace.name);
     } else {
       expect(workspace.name).toBe(workspace2Name);
     }
@@ -170,7 +159,7 @@ test("user should be able to list workspaces", async () => {
     );
     expect(workspace.members.length).toBe(1);
     const member = workspace.members[0];
-    expect(member.userId).toBe(userId);
+    expect(member.userId).toBe(userData1.user.id);
     expect(member.role).toBe(Role.ADMIN);
   });
 });
@@ -199,7 +188,7 @@ test("user can query by paginating cursor", async () => {
   const workspaces = result.workspaces.nodes;
   expect(workspaces.length).toBe(1);
   const workspace = workspaces[0];
-  expect(workspace.id).toBe(workspace2Id);
+  expect(workspace.id).toBe(otherWorkspace.workspace.id);
   expect(workspace.name).toBe(workspace2Name);
 });
 

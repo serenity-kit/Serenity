@@ -48,11 +48,9 @@ export const createFolder = async ({
           id
           encryptedName
           encryptedNameNonce
-          subkeyId
           parentFolderId
           rootFolderId
           workspaceId
-          workspaceKeyId
           keyDerivationTrace {
             workspaceKeyId
             subkeyId

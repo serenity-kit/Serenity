@@ -4,9 +4,6 @@ query documents($parentFolderId: ID!, $first: Int! = 100, $after: String) {
       id
       encryptedName
       encryptedNameNonce
-      workspaceKeyId
-      subkeyId
-      contentSubkeyId
       parentFolderId
       rootFolderId
       workspaceId

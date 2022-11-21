@@ -50,7 +50,7 @@ export const updateDocumentNameMutation = mutationField("updateDocumentName", {
       encryptedName: args.input.encryptedName,
       encryptedNameNonce: args.input.encryptedNameNonce,
       workspaceKeyId: args.input.workspaceKeyId,
-      subkeyId: args.input.subkeyId,
+      subkeyId: args.input.subkeyId, // TODO: remove
       userId: context.user.id,
       nameKeyDerivationTrace: args.input.nameKeyDerivationTrace,
     });

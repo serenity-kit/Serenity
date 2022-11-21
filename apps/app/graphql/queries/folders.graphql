@@ -4,8 +4,6 @@ query folders($parentFolderId: ID!, $first: Int!, $after: String) {
       id
       encryptedName
       encryptedNameNonce
-      workspaceKeyId
-      subkeyId
       parentFolderId
       rootFolderId
       workspaceId

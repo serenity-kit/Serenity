@@ -214,6 +214,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                 <Folder
                   key={folder.id}
                   folderId={folder.id}
+                  parentFolderId={folder.parentFolderId}
                   encryptedName={folder.encryptedName}
                   encryptedNameNonce={folder.encryptedNameNonce}
                   subkeyId={folder.keyDerivationTrace.subkeyId}

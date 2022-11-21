@@ -1,5 +1,5 @@
 import {
-  createSnapshotKey,
+  createDocumentKey,
   encryptDocumentTitle,
 } from "@serenity-tools/common";
 import {
@@ -37,12 +37,7 @@ export const updateDocumentName = async ({
     activeDevice,
   });
   const lastKeyTraceItem = folderKeyData[folderKeyData.length - 1];
-  // FIXME: since as a hack we are expecting to use the snapshotkey
-  // to derive the document title, we must use that here
-  // const documentKeyData = await createDocumentKey({
-  //   folderKey: lastKeyTraceItem.key,
-  // });
-  const documentKeyData = await createSnapshotKey({
+  const documentKeyData = await createDocumentKey({
     folderKey: lastKeyTraceItem.key,
   });
   const documentKey = documentKeyData.key;

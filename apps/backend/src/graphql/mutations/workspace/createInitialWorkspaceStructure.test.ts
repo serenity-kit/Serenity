@@ -1,52 +1,29 @@
-import { Snapshot } from "@naisho/core";
-import { createIntroductionDocumentSnapshot } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
+import {
+  createDevice,
+  decryptDocumentTitle,
+  decryptFolderName,
+  folderDerivedKeyContext,
+  recreateDocumentKey,
+} from "@serenity-tools/common";
+import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { decryptWorkspaceKey } from "../../../../test/helpers/device/decryptWorkspaceKey";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 
 const graphql = setupGraphql();
-let userId1 = "";
-const username = "user";
-const password = "password";
-let sessionKey1 = "";
-let device: any = null;
-let webDevice: any = null;
-let encryptionPrivateKey = "";
-let signingPrivateKey = "";
-let workspaceKey = "";
-const documentId = uuidv4();
-let documentSnapshot: Snapshot;
+let userData1: any = undefined;
 
 const setup = async () => {
-  const registerUserResult1 = await registerUser(graphql, username, password);
-  registerUserResult1.mainDeviceSigningPublicKey;
-  sessionKey1 = registerUserResult1.sessionKey;
-  userId1 = registerUserResult1.userId;
-  device = registerUserResult1.mainDevice;
-  webDevice = registerUserResult1.webDevice;
-  encryptionPrivateKey = registerUserResult1.encryptionPrivateKey;
-  signingPrivateKey = registerUserResult1.signingPrivateKey;
-
-  // hard-code the encryptionKey just so we have a document to run tests on
-  const snapshotEncryptionKey = sodium.from_base64(
-    "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
+  userData1 = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    "password"
   );
-
-  documentSnapshot = await createIntroductionDocumentSnapshot({
-    documentId,
-    snapshotEncryptionKey,
-    subkeyId: 42,
-    keyDerivationTrace: {
-      workspaceKeyId: "abc",
-      subkeyId: 42,
-      parentFolders: [],
-    },
-  });
 };
 
 beforeAll(async () => {
@@ -54,368 +31,637 @@ beforeAll(async () => {
   await setup();
 });
 
-test("user can create initial workspace structure", async () => {
-  // generate a challenge code
-  const authorizationHeader = sessionKey1;
-  const workspaceId = uuidv4();
-  const workspaceName = "New Workspace";
-  const deviceSigningPublicKey = device.signingPublicKey;
-  const folderId = uuidv4();
-  const folderIdSignature = `TODO+${folderId}`;
-  const folderName = "Getting started";
-  const documentId = uuidv4();
-  const documentName = "Introduction";
+test("create initial workspace structure", async () => {
+  const authorizationHeader = userData1.sessionKey;
+  const workspaceName = "My Worskpace";
   const result = await createInitialWorkspaceStructure({
     graphql,
-    workspaceId,
     workspaceName,
-    creatorDeviceSigningPublicKey: deviceSigningPublicKey,
-    deviceSigningPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: encryptionPrivateKey,
-    webDevice,
-    folderId,
-    folderIdSignature,
-    folderName,
-    documentId,
-    documentName,
+    creatorDevice: {
+      ...userData1.mainDevice,
+      encryptionPrivateKey: userData1.encryptionPrivateKey,
+      signingPrivateKey: userData1.signingPrivateKey,
+    },
+    devices: [userData1.mainDevice, userData1.webDevice],
     authorizationHeader,
   });
 
   const workspace = result.createInitialWorkspaceStructure.workspace;
-  // const document = result.createInitialWorkspaceStructure.document;
+  const document = result.createInitialWorkspaceStructure.document;
   const folder = result.createInitialWorkspaceStructure.folder;
+  expect(workspace.id).not.toBeNull();
+  expect(workspace.id).not.toBeUndefined();
   expect(workspace.name).toBe(workspaceName);
-  expect(workspace.id).toBe(workspaceId);
   expect(workspace.members.length).toBe(1);
-  // expect(document.workspaceId).toBe(workspaceId);
-  // expect(document.parentFolderId).toBe(folder.id);
-  expect(folder.workspaceId).toBe(workspaceId);
-  expect(folder.parentFolderId).toBe(null);
   workspace.members.forEach((member: { userId: string; role: Role }) => {
     expect(member.role).toBe(Role.ADMIN);
   });
+  expect(workspace.currentWorkspaceKey.id).not.toBeNull();
+  expect(folder.id).not.toBeNull();
+  expect(folder.id).not.toBeUndefined();
+  expect(folder.parentFolderId).toBe(null);
+  expect(folder.rootFolderId).toBe(null);
+  expect(typeof folder.encryptedName).toBe("string");
+  expect(typeof folder.encryptedNameNonce).toBe("string");
+  expect(typeof folder.keyDerivationTrace).toBe("object");
+  expect(typeof folder.keyDerivationTrace.workspaceKeyId).toBe("string");
+  expect(typeof folder.keyDerivationTrace.subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.parentFolders).toBe("object");
+  expect(document.id).not.toBeNull();
+  expect(document.id).not.toBeUndefined();
+  expect(typeof document.encryptedName).toBe("string");
+  expect(typeof document.encryptedNameNonce).toBe("string");
+  expect(typeof document.nameKeyDerivationTrace).toBe("object");
+  expect(typeof document.nameKeyDerivationTrace.workspaceKeyId).toBe("string");
+  expect(typeof document.nameKeyDerivationTrace.subkeyId).toBe("number");
+  expect(typeof document.nameKeyDerivationTrace.parentFolders).toBe("object");
+  // expect(typeof document.snapshot.keyDerivationTrace).toBe(KeyDerivationTrace);
+
+  // attempt to decrypt the folder and document names
+  const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBox;
+  const workspaceKey = await decryptWorkspaceKey({
+    ciphertext: workspaceKeyBox.ciphertext,
+    nonce: workspaceKeyBox.nonce,
+    creatorDeviceEncryptionPublicKey: userData1.mainDevice.encryptionPublicKey,
+    receiverDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+  });
+  expect(typeof workspaceKey).toBe("string");
+  // TODO: derive folder key from trace
+  const folderKey = await kdfDeriveFromKey({
+    key: workspaceKey,
+    context: folderDerivedKeyContext,
+    subkeyId: folder.keyDerivationTrace.subkeyId,
+  });
+  const decryptedFolderName = await decryptFolderName({
+    parentKey: workspaceKey,
+    subkeyId: folder.keyDerivationTrace.subkeyId,
+    ciphertext: folder.encryptedName,
+    publicNonce: folder.encryptedNameNonce,
+  });
+  // TODO: derive document key from trace
+  expect(decryptedFolderName).toBe("Getting Started");
+  const documentKey = await recreateDocumentKey({
+    folderKey: folderKey.key,
+    subkeyId: document.nameKeyDerivationTrace.subkeyId,
+  });
+  const decryptedDocumentName = await decryptDocumentTitle({
+    key: documentKey.key,
+    ciphertext: document.encryptedName,
+    publicNonce: document.encryptedNameNonce,
+  });
+  expect(decryptedDocumentName).toBe("Introduction");
 });
 
 test("Unauthenticated", async () => {
-  const workspaceId = uuidv4();
-  const workspaceName = "New Workspace";
-  const deviceSigningPublicKey = device.signingPublicKey;
-  const folderId = uuidv4();
-  const folderIdSignature = `TODO+${folderId}`;
-  const folderName = "Getting started";
-  const documentId = uuidv4();
-  const documentName = "Introduction";
   await expect(
     (async () =>
       await createInitialWorkspaceStructure({
         graphql,
-        workspaceId,
-        workspaceName,
-        creatorDeviceSigningPublicKey: deviceSigningPublicKey,
-        deviceSigningPublicKey,
-        deviceEncryptionPublicKey: device.encryptionPublicKey,
-        deviceEncryptionPrivateKey: encryptionPrivateKey,
-        webDevice,
-        folderId,
-        folderIdSignature,
-        folderName,
-        documentId,
-        documentName,
-        authorizationHeader: "badauthheader",
+        workspaceName: "Getting Started",
+        creatorDevice: {
+          ...userData1.mainDevice,
+          encryptionPrivateKey: userData1.encryptionPrivateKey,
+          signingPrivateKey: userData1.signingPrivateKey,
+        },
+        devices: [userData1.mainDevice, userData1.webDevice],
+        authorizationHeader: "invalid-session-key",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
 
-describe("Test login", () => {
-  const workspaceId = uuidv4();
-  const workspaceName = "New Workspace";
-  const folderId = uuidv4();
-  const folderIdSignature = `TODO+${folderId}`;
-  const folderName = "Getting started";
+test("creator device must belong to user", async () => {
+  const badDevice = await createDevice();
+  await expect(
+    (async () =>
+      await createInitialWorkspaceStructure({
+        graphql,
+        workspaceName: "Getting Started",
+        creatorDevice: {
+          ...userData1.mainDevice,
+          encryptionPrivateKey: badDevice.encryptionPrivateKey,
+          signingPrivateKey: badDevice.signingPrivateKey,
+        },
+        devices: [badDevice, userData1.webDevice],
+        authorizationHeader: "invalid-session-key",
+      }))()
+  ).rejects.toThrowError(/UNAUTHENTICATED/);
+});
 
-  const documentName = "Introduction";
-
-  const authorizationHeaders = {
-    authorization: sessionKey1,
-  };
-  const query = gql`
-    mutation createInitialWorkspaceStructure(
-      $input: CreateInitialWorkspaceStructureInput!
-    ) {
-      createInitialWorkspaceStructure(input: $input) {
-        workspace {
-          id
-          name
-          members {
-            userId
-            role
-          }
-        }
-        folder {
-          id
-          parentFolderId
-          rootFolderId
-          workspaceId
+const query = gql`
+  mutation createInitialWorkspaceStructure(
+    $input: CreateInitialWorkspaceStructureInput!
+  ) {
+    createInitialWorkspaceStructure(input: $input) {
+      workspace {
+        id
+        name
+        members {
+          userId
+          role
         }
       }
+      folder {
+        id
+        parentFolderId
+        rootFolderId
+        workspaceId
+      }
     }
-  `;
+  }
+`;
 
-  test("Invalid workspaceName", async () => {
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: {
-              workspaceName: null,
-              workspaceId,
-              folderId,
-              folderIdSignature,
-              folderName,
-              documentId,
-              documentName,
-              documentSnapshot,
+test("Invalid workspace name", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: uuidv4(),
+              name: null,
+              deviceWorkspaceKeyBoxes: [],
             },
-          },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-  test("Invalid workspaceId", async () => {
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: {
-              workspaceName,
-              workspaceId: null,
-              folderId,
-              folderIdSignature,
-              folderName,
-              documentId,
-              documentName,
-              documentSnapshot,
+            folder: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              keyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
             },
-          },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-
-  test("Invalid folderId", async () => {
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: {
-              workspaceName,
-              workspaceId,
-              folderId: null,
-              folderIdSignature,
-              folderName,
-              documentId,
-              documentName,
-              documentSnapshot,
+            document: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              nameKeyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
             },
+            creatorDeviceSigningPublicKey: "",
           },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
 
-  test("Invalid folderIdSignature", async () => {
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: {
-              workspaceName,
-              workspaceId,
-              folderId,
-              folderIdSignature: null,
-              folderName,
-              documentId,
-              documentName,
-              documentSnapshot,
+test("Invalid workspace id", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: null,
+              name: "Getting Started",
+              deviceWorkspaceKeyBoxes: [],
             },
-          },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-
-  test("Invalid folderName", async () => {
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: {
-              workspaceName,
-              workspaceId,
-              folderId,
-              folderIdSignature,
-              folderName: null,
-              documentId,
-              documentName,
-              documentSnapshot,
+            folder: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              keyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
             },
-          },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-
-  test("Invalid documentId", async () => {
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: {
-              workspaceName,
-              workspaceId,
-              folderId,
-              folderIdSignature,
-              folderName,
-              documentId: null,
-              documentName,
-              documentSnapshot,
+            document: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              nameKeyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
             },
+            creatorDeviceSigningPublicKey: "",
           },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-  test("Invalid documentName", async () => {
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: {
-              workspaceName,
-              workspaceId,
-              folderId,
-              folderIdSignature,
-              folderName,
-              documentId,
-              documentName: null,
-              documentSnapshot,
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
+
+test("Invalid folder id", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: uuidv4(),
+              name: "Getting Started",
+              deviceWorkspaceKeyBoxes: [],
             },
-          },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
-
-  test("Invalid documentSnapshot", async () => {
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: {
-              workspaceName,
-              workspaceId,
-              folderId,
-              folderIdSignature,
-              folderName,
-              documentId,
-              documentName,
-              documentSnapshot: null,
+            folder: {
+              id: null,
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              keyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
             },
+            document: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              nameKeyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            creatorDeviceSigningPublicKey: "",
           },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
 
-  test("Invalid input", async () => {
-    await expect(
-      (async () =>
-        await graphql.client.request(
-          query,
-          {
-            input: null,
+test("Invalid folder name", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: uuidv4(),
+              name: "Getting Started",
+              deviceWorkspaceKeyBoxes: [],
+            },
+            folder: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: null,
+              encryptedNameNonce: "",
+              keyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            document: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              nameKeyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            creatorDeviceSigningPublicKey: "",
           },
-          authorizationHeaders
-        ))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
 
-  test("No input", async () => {
-    await expect(
-      (async () =>
-        await graphql.client.request(query, null, authorizationHeaders))()
-    ).rejects.toThrowError(/BAD_USER_INPUT/);
-  });
+test("Invalid folder nonce", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: uuidv4(),
+              name: "Getting Started",
+              deviceWorkspaceKeyBoxes: [],
+            },
+            folder: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: null,
+              keyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            document: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              nameKeyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            creatorDeviceSigningPublicKey: "",
+          },
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
 
-  test("deviceSigningPublicKey must belong to the user", async () => {
-    // generate a challenge code
-    const authorizationHeader = sessionKey1;
-    const workspaceId = uuidv4();
-    const workspaceName = "New Workspace";
-    const folderId = uuidv4();
-    const folderIdSignature = `TODO+${folderId}`;
-    const folderName = "Getting started";
-    const documentId = uuidv4();
-    const documentName = "Introduction";
-    await expect(
-      (async () =>
-        await createInitialWorkspaceStructure({
-          graphql,
-          workspaceId,
-          workspaceName,
-          deviceSigningPublicKey: "abcd",
-          creatorDeviceSigningPublicKey: device.signingPublicKey,
-          deviceEncryptionPublicKey: device.encryptionPublicKey,
-          deviceEncryptionPrivateKey: encryptionPrivateKey,
-          webDevice,
-          folderId,
-          folderIdSignature,
-          folderName,
-          documentId,
-          documentName,
-          authorizationHeader,
-        }))()
-    ).rejects.toThrowError(/Internal server error/);
-  });
+test("Invalid folder trace", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: uuidv4(),
+              name: "Getting Started",
+              deviceWorkspaceKeyBoxes: [],
+            },
+            folder: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              keyDerivationTrace: null,
+            },
+            document: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              nameKeyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            creatorDeviceSigningPublicKey: "",
+          },
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
 
-  test("creatorDeviceSigningPublicKey must belong to the user", async () => {
-    // generate a challenge code
-    const authorizationHeader = sessionKey1;
-    const workspaceId = uuidv4();
-    const workspaceName = "New Workspace";
-    const deviceSigningPublicKey = device.signingPublicKey;
-    const folderId = uuidv4();
-    const folderIdSignature = `TODO+${folderId}`;
-    const folderName = "Getting started";
-    const documentId = uuidv4();
-    const documentName = "Introduction";
-    await expect(
-      (async () =>
-        await createInitialWorkspaceStructure({
-          graphql,
-          workspaceId,
-          workspaceName,
-          deviceSigningPublicKey,
-          creatorDeviceSigningPublicKey: "abcd",
-          deviceEncryptionPublicKey: device.encryptionPublicKey,
-          deviceEncryptionPrivateKey: encryptionPrivateKey,
-          webDevice,
-          folderId,
-          folderIdSignature,
-          folderName,
-          documentId,
-          documentName,
-          authorizationHeader,
-        }))()
-    ).rejects.toThrowError(/Internal server error/);
-  });
+test("Invalid document id", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: uuidv4(),
+              name: "Getting Started",
+              deviceWorkspaceKeyBoxes: [],
+            },
+            folder: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              keyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            document: {
+              id: null,
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              nameKeyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            creatorDeviceSigningPublicKey: "",
+          },
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
+
+test("Invalid document name", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: uuidv4(),
+              name: "Getting Started",
+              deviceWorkspaceKeyBoxes: [],
+            },
+            folder: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              keyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            document: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: null,
+              encryptedNameNonce: "",
+              nameKeyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            creatorDeviceSigningPublicKey: "",
+          },
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
+
+test("Invalid document nonce", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: uuidv4(),
+              name: "Getting Started",
+              deviceWorkspaceKeyBoxes: [],
+            },
+            folder: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              keyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            document: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: null,
+              nameKeyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            creatorDeviceSigningPublicKey: "",
+          },
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
+
+test("Invalid document trace", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: uuidv4(),
+              name: "Getting Started",
+              deviceWorkspaceKeyBoxes: [],
+            },
+            folder: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              keyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            document: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              nameKeyDerivationTrace: null,
+            },
+            creatorDeviceSigningPublicKey: "",
+          },
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
+
+test("Invalid creator device", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: uuidv4(),
+              name: "Getting Started",
+              deviceWorkspaceKeyBoxes: [],
+            },
+            folder: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              keyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            document: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              nameKeyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            creatorDeviceSigningPublicKey: null,
+          },
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
+});
+
+test("creator device must belong to user", async () => {
+  await expect(
+    (async () =>
+      await graphql.client.request(
+        query,
+        {
+          input: {
+            workspace: {
+              id: uuidv4(),
+              name: "Getting Started",
+              deviceWorkspaceKeyBoxes: [],
+            },
+            folder: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              keyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            document: {
+              id: uuidv4(),
+              idSignature: `TODO+${uuidv4()}`,
+              encryptedName: "",
+              encryptedNameNonce: "",
+              nameKeyDerivationTrace: {
+                workspaceKeyId: uuidv4(),
+                subkeyId: 0,
+                parentFolders: [],
+              },
+            },
+            creatorDeviceSigningPublicKey: "invalid-device-public-key",
+          },
+        },
+        { authorization: userData1.sessionKey }
+      ))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });

@@ -47,8 +47,6 @@ export const updateDocumentName = async ({
         document {
           encryptedName
           encryptedNameNonce
-          workspaceKeyId
-          subkeyId
           id
           parentFolderId
           workspaceId

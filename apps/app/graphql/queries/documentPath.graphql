@@ -3,11 +3,9 @@ query documentPath($id: ID!) {
     id
     encryptedName
     encryptedNameNonce
-    workspaceKeyId
     parentFolderId
     rootFolderId
     workspaceId
-    subkeyId
     keyDerivationTrace {
       workspaceKeyId
       subkeyId

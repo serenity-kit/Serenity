@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
 import {
+  createDocumentKey,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
   encryptDocumentTitle,
@@ -75,7 +76,10 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const workspaceKeyId = uuidv4();
       const folderId = uuidv4();
       const documentId = uuidv4();
-      // grab all devices for this user
+      const folderName = "Getting started";
+      const documentName = "Introduction";
+
+      // build workspace key boxes for workspace
       if (!devicesResult.data?.devices?.nodes) {
         throw new Error("No devices found!");
       }
@@ -85,30 +89,45 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       if (!workspaceKey) {
         throw new Error("Could not retrieve workspaceKey!");
       }
-      const folderName = "Getting started";
+
       const encryptedFolderResult = await encryptFolderName({
         name: folderName,
         parentKey: workspaceKey,
       });
-      const documentName = "Introduction";
-      // FIXME: For now we will use the same key for
-      // document name and snapshot.
-      // Separate these keys when we restructure the
-      // createInitialWorkspaceStructure mutation
-      // const documentKeyData = await createDocumentKey({
-      //   folderKey: encryptedFolderResult.folderSubkey,
-      // });
-      const snapshotKey = await createSnapshotKey({
+      const folderIdSignature = await sodium.crypto_sign_detached(
+        folderId,
+        activeDevice.signingPrivateKey!
+      );
+      const folderKeyDerivationTrace = {
+        workspaceKeyId,
+        subkeyId: encryptedFolderResult.folderSubkeyId,
+        parentFolders: [],
+      };
+
+      // prepare document
+      const documentKeyData = await createDocumentKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
       const encryptedDocumentTitle = await encryptDocumentTitle({
         title: documentName,
-        key: snapshotKey.key, // documentKeyData.key, // FIXME!
+        key: documentKeyData.key,
       });
-      // TODO: remove
-      // const documentContentKeyData = await createDocumentKey({
-      //   folderKey: encryptedFolderResult.folderSubkey,
-      // });
+      const documentKeyDerivationTrace = {
+        workspaceKeyId,
+        subkeyId: documentKeyData.subkeyId,
+        parentFolders: [
+          {
+            folderId,
+            subkeyId: encryptedFolderResult.folderSubkeyId,
+            parentFolderId: null,
+          },
+        ],
+      };
+
+      // prepare document snapshot
+      const snapshotKey = await createSnapshotKey({
+        folderKey: encryptedFolderResult.folderSubkey,
+      });
       const snapshot = await createIntroductionDocumentSnapshot({
         documentId,
         snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
@@ -129,21 +148,27 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const createInitialWorkspaceStructureResult =
         await createInitialWorkspaceStructure({
           input: {
-            workspaceName: name,
-            workspaceId,
-            folderId,
-            encryptedFolderName: encryptedFolderResult.ciphertext,
-            encryptedFolderNameNonce: encryptedFolderResult.publicNonce,
-            folderSubkeyId: encryptedFolderResult.folderSubkeyId,
-            folderIdSignature: `TODO+${folderId}`,
-            encryptedDocumentName: encryptedDocumentTitle.ciphertext,
-            encryptedDocumentNameNonce: encryptedDocumentTitle.publicNonce,
-            documentSubkeyId: snapshotKey.subkeyId, // FIXME: documentKeyData.subkeyId,
-            documentContentSubkeyId: 123, // TODO: remove
-            documentId,
-            documentSnapshot: snapshot,
+            workspace: {
+              id: workspaceId,
+              name,
+              workspaceKeyId,
+              deviceWorkspaceKeyBoxes,
+            },
+            folder: {
+              id: folderId,
+              idSignature: folderIdSignature,
+              encryptedName: encryptedFolderResult.ciphertext,
+              encryptedNameNonce: encryptedFolderResult.publicNonce,
+              keyDerivationTrace: folderKeyDerivationTrace,
+            },
+            document: {
+              id: documentId,
+              encryptedName: encryptedDocumentTitle.ciphertext,
+              encryptedNameNonce: encryptedDocumentTitle.publicNonce,
+              nameKeyDerivationTrace: documentKeyDerivationTrace,
+              snapshot,
+            },
             creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
-            deviceWorkspaceKeyBoxes,
           },
         });
       if (
