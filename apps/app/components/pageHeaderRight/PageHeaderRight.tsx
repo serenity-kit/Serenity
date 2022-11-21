@@ -1,3 +1,4 @@
+import { hashToCollaboratorColor } from "@serenity-tools/common";
 import {
   Avatar,
   AvatarGroup,
@@ -9,11 +10,13 @@ import {
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";
+import { useWorkspace } from "../../context/WorkspaceContext";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { PageShareModalContent } from "../pageShareModalContent/PageShareModalContent";
 
 export function PageHeaderRight() {
   const hasEditorSidebar = useHasEditorSidebar();
+  const { workspaceQueryResult } = useWorkspace();
   const [isActiveShareModal, setIsActiveShareModal] = useState(false);
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
   const triggerBlur = useEditorStore((state) => state.triggerBlur);
@@ -39,16 +42,24 @@ export function PageHeaderRight() {
           />
         ) : (
           <>
-            <AvatarGroup
-              max={hasEditorSidebar ? 3 : 2}
-              _avatar={{ size: "sm" }}
-            >
-              <Avatar color="emerald">BE</Avatar>
-              <Avatar color="honey">NG</Avatar>
-              <Avatar color="orange">AB</Avatar>
-              <Avatar color="rose">SK</Avatar>
-              <Avatar color="serenity">AD</Avatar>
-            </AvatarGroup>
+            {workspaceQueryResult.data?.workspace?.members?.length ? (
+              <AvatarGroup
+                max={hasEditorSidebar ? 3 : 2}
+                _avatar={{ size: "sm" }}
+              >
+                {workspaceQueryResult.data.workspace.members.map((member) => {
+                  return (
+                    <Avatar
+                      key={member.userId}
+                      color={hashToCollaboratorColor(member.userId)}
+                    >
+                      {member.username?.split("@")[0].substring(0, 2)}
+                    </Avatar>
+                  );
+                })}
+              </AvatarGroup>
+            ) : null}
+
             {hasEditorSidebar ? (
               <Button
                 size="sm"

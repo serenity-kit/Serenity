@@ -24,7 +24,7 @@ import {
   useDeleteDevicesMutation,
   useDevicesQuery,
 } from "../../../generated/graphql";
-import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { loadMeAndVerifyMachine } from "../../../machines/loadMeAndVerifyMachine";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import {
@@ -48,7 +48,7 @@ export default function AccountDevicesSettingsScreen(
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [signingPublicKeyToBeDeleted, setSigningPublicKeyToBeDeleted] =
     useState<string | undefined>(undefined);
-  const { activeDevice } = useWorkspaceContext();
+  const { activeDevice } = useAuthenticatedAppContext();
   useWindowDimensions();
   const isDesktopDevice = useIsDesktopDevice();
 

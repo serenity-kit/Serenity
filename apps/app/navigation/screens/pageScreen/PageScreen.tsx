@@ -3,8 +3,8 @@ import { useWindowDimensions } from "react-native";
 import Page from "../../../components/page/Page";
 import { PageHeader } from "../../../components/page/PageHeader";
 import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
-import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
-import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { useWorkspace } from "../../../context/WorkspaceContext";
+import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
@@ -25,8 +25,8 @@ import { loadPageMachine } from "./loadPageMachine";
 const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const pageId = props.route.params.pageId;
-  const { activeDevice } = useWorkspaceContext();
-  const workspaceId = useWorkspaceId();
+  const { activeDevice } = useAuthenticatedAppContext();
+  const { workspaceId } = useWorkspace();
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );

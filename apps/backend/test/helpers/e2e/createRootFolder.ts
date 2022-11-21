@@ -16,7 +16,7 @@ export const createRootFolder = async (
   await page.locator("data-testid=root-create-folder").click();
   await page.locator(`data-testid=sidebar-folder__edit-name`).fill(name);
   await page.locator(`data-testid=sidebar-folder__edit-name`).press("Enter");
-  await delayForSeconds(3);
+  await delayForSeconds(4);
   const numFoldersAfterAdd = await prisma.folder.count({
     where: { workspaceId },
   });
