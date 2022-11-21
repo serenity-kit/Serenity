@@ -72,5 +72,7 @@ export default function SharePageScreen(
       //   workspaceId={"TODO"}
       // />
     );
+  } else {
+    throw new Error("Invalid UI state");
   }
 }
