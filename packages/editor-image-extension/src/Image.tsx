@@ -113,7 +113,7 @@ export const Image = (props: any) => {
           </View>
           <Text
             variant={isDesktopDevice || isPortrait ? "xs" : "xxs"}
-            style={tw`text-gray-400`}
+            style={tw`text-gray-400 opacity-80`}
             bold
           >
             {
