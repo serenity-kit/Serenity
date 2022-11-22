@@ -86,7 +86,7 @@ export const Image = (props: any) => {
     <NodeViewWrapper
       style={{
         outline: props.selected
-          ? `3px solid ${tw.color("primary-400")}`
+          ? `2px solid ${tw.color("primary-400")}`
           : "none",
       }}
     >
