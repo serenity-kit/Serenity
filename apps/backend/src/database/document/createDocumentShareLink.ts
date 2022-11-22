@@ -7,8 +7,6 @@ export type SnapshotDeviceKeyBox = {
   ciphertext: string;
   nonce: string;
   deviceSigningPublicKey: string;
-  deviceEncryptionPublicKey: string;
-  deviceEncryptionPublicKeySignature: string;
 };
 
 export type Props = {
@@ -82,9 +80,9 @@ export const createDocumentShareLink = async ({
     }
     await prisma.snapshotKeyBox.create({
       data: {
+        ...snapshotDeviceKeyBox,
         snapshotId: latestSnapshot.id,
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
-        ...snapshotDeviceKeyBox,
         documentShareLinkToken: documentShareLink.token,
       },
     });

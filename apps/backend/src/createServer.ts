@@ -66,7 +66,7 @@ export default async function createServer() {
     },
     formatError: (err) => {
       // useful for debugging
-      console.error(err);
+      // console.error(err);
       if (
         err.originalError instanceof AuthenticationError ||
         err.originalError instanceof ForbiddenError ||
