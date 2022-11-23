@@ -3,70 +3,73 @@ import { folderDerivedKeyContext } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { Device } from "../../types/Device";
 import { deriveWorkspaceKey } from "../workspace/deriveWorkspaceKey";
-import { getFolder } from "./getFolder";
 
 export type FolderKeyDerivationChainItem = {
   folderId: string | undefined; // the folderId, undefined if workspaceKey
   key: string; // symmetric key
   subkeyId: number | undefined; // subkey used to derive this key, undefined if workspaceId
 };
-export type DeriveParentFolderKeyProps = {
+export type Props = {
+  workspaceId: string;
   folderId: string;
-  overrideWithWorkspaceKeyId?: string | null | undefined;
   keyDerivationTrace: KeyDerivationTrace;
+  overrideWithWorkspaceKeyId?: string | null | undefined;
   activeDevice: Device;
 };
 export const deriveFolderKey = async ({
+  workspaceId,
   folderId,
-  overrideWithWorkspaceKeyId,
   keyDerivationTrace,
+  overrideWithWorkspaceKeyId,
   activeDevice,
-}: DeriveParentFolderKeyProps): Promise<FolderKeyDerivationChainItem[]> => {
-  // get the folder
-  const folder = await getFolder({ id: folderId });
-  // check if we are using a specific workspace key id
+}: Props) => {
   const workspaceKeyId =
     overrideWithWorkspaceKeyId || keyDerivationTrace.workspaceKeyId;
-  // if there is no parentFolderId, we are at the root of the folder tree
-  // just derive the workpsace key as the parent key
-  let parentFolderKeyData: FolderKeyDerivationChainItem[] = [];
-  if (!folder.parentFolderId) {
-    const workspaceKey = await deriveWorkspaceKey({
-      workspaceId: folder.workspaceId!,
-      workspaceKeyId,
-      activeDevice,
-    });
-    parentFolderKeyData = [
-      {
-        key: workspaceKey.workspaceKey,
-        subkeyId: undefined,
-        folderId: workspaceKeyId, // TODO: remove this. it's not needed
-      },
-    ];
-  } else {
-    // if there is a parent folder, we must derive that first
-    // to get the parent key
-    parentFolderKeyData = await deriveFolderKey({
-      folderId: folder.parentFolderId!,
-      overrideWithWorkspaceKeyId: workspaceKeyId,
-      keyDerivationTrace: folder.keyDerivationTrace,
-      activeDevice,
-    });
-  }
-  // now we can derive the current folder key
-  const lastItem = parentFolderKeyData[parentFolderKeyData.length - 1];
-  const folderKeyData = await kdfDeriveFromKey({
-    key: lastItem.key,
-    context: folderDerivedKeyContext,
-    subkeyId: folder.keyDerivationTrace.subkeyId,
+  // using a KeyDerivationTrace object, loop through parent folders
+  // until empty, then return the workspace key from the workspaceKeyId.
+  // append each key derivation from the loop.
+  // then derive the folder key from the subeyId.
+  const workspaceKey = await deriveWorkspaceKey({
+    workspaceId,
+    workspaceKeyId,
+    activeDevice,
   });
-  const folderKeyChain: FolderKeyDerivationChainItem[] = [
-    ...parentFolderKeyData,
+  const folderKeyDerivationTrace: FolderKeyDerivationChainItem[] = [
     {
-      key: folderKeyData.key,
-      subkeyId: folder.keyDerivationTrace.subkeyId,
-      folderId: folder.id,
+      key: workspaceKey.workspaceKey,
+      subkeyId: undefined,
+      // TODO: remove the folderId here. I've only put it in
+      // to make sure we have the correct workspaceKeyId
+      folderId: `workspaceKeyId-${workspaceKeyId}`,
     },
   ];
-  return folderKeyChain;
+  // NOTE: assume for now that the parent folder key data are in reverse order
+  let parentKey = workspaceKey.workspaceKey;
+  for (let i = keyDerivationTrace.parentFolders.length - 1; i >= 0; i--) {
+    const ancestorKeySeedData = keyDerivationTrace.parentFolders[i];
+    const ancestorKeyData = await kdfDeriveFromKey({
+      key: parentKey,
+      context: folderDerivedKeyContext,
+      subkeyId: ancestorKeySeedData.subkeyId,
+    });
+    parentKey = ancestorKeyData.key;
+    folderKeyDerivationTrace.push({
+      key: ancestorKeyData.key,
+      subkeyId: ancestorKeySeedData.subkeyId,
+      folderId: ancestorKeySeedData.folderId,
+    });
+  }
+  // special case: append the current folder key
+  const folderKeyData = await kdfDeriveFromKey({
+    key: parentKey,
+    context: folderDerivedKeyContext,
+    subkeyId: keyDerivationTrace.subkeyId,
+  });
+  folderKeyDerivationTrace.push({
+    key: folderKeyData.key,
+    subkeyId: keyDerivationTrace.subkeyId,
+    // TODO: insert the current folderId
+    folderId,
+  });
+  return folderKeyDerivationTrace;
 };

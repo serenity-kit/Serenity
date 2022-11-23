@@ -30,15 +30,16 @@ export const updateDocumentName = async ({
     throw new Error("Workspace or workspaceKeys not found");
   }
   const folder = await getFolder({ id: document.parentFolderId! });
-  const folderKeyData = await deriveFolderKey({
+  const parentFolderKeyData = await deriveFolderKey({
     folderId: document.parentFolderId!,
+    workspaceId: document.workspaceId!,
     keyDerivationTrace: folder.keyDerivationTrace,
     overrideWithWorkspaceKeyId: workspace.currentWorkspaceKey.id,
     activeDevice,
   });
-  const lastKeyTraceItem = folderKeyData[folderKeyData.length - 1];
+  const folderKeyData = parentFolderKeyData[parentFolderKeyData.length - 1];
   const documentKeyData = await createDocumentKey({
-    folderKey: lastKeyTraceItem.key,
+    folderKey: folderKeyData.key,
   });
   const documentKey = documentKeyData.key;
   const encryptedDocumentTitle = await encryptDocumentTitle({

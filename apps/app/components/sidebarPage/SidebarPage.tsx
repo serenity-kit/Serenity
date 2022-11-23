@@ -93,10 +93,13 @@ export default function SidebarPage(props: Props) {
       // so that we don't need to load each folder multiple times
       const folderKeyData = await deriveFolderKey({
         folderId: props.parentFolderId,
+        workspaceId: props.workspaceId,
         activeDevice,
         keyDerivationTrace: props.nameKeyDerivationTrace,
       });
-      const folderKey = folderKeyData[folderKeyData.length - 1].key;
+      // the last subkey key is treated like a folder key, so we can toss it out
+      // we actually want to derive a document subkey
+      const folderKey = folderKeyData[folderKeyData.length - 2].key;
       const documentKeyData = await recreateDocumentKey({
         folderKey: folderKey,
         subkeyId: props.nameKeyDerivationTrace.subkeyId,

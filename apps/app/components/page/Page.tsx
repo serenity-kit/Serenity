@@ -94,10 +94,14 @@ export default function Page({
     const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
     const folderKeyChainData = await deriveFolderKey({
       folderId: document.parentFolderId!,
+      workspaceId: document.workspaceId!,
       keyDerivationTrace: snapshotKeyDerivationTrace,
       activeDevice,
     });
-    const lastChainItem = folderKeyChainData[folderKeyChainData.length - 1];
+    // the last subkey key here is treated like a folder key
+    // but since we want to derive a snapshot key, we can just toss
+    // the last one out and use the rest
+    const lastChainItem = folderKeyChainData[folderKeyChainData.length - 2];
     const snapshotKeyData = await recreateSnapshotKey({
       folderKey: lastChainItem.key,
       subkeyId: snapshotKeyDerivationTrace.subkeyId,
@@ -166,6 +170,7 @@ export default function Page({
     const folder = await getFolder({ id: document.parentFolderId! });
     const folderKeyChainData = await deriveFolderKey({
       folderId: document.parentFolderId!,
+      workspaceId: document.workspaceId!,
       overrideWithWorkspaceKeyId: workspaceKeyId,
       keyDerivationTrace: folder.keyDerivationTrace,
       activeDevice,

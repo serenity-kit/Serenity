@@ -45,7 +45,6 @@ export const createDocumentShareLink = async ({
 
   // create virtual device
   const virtualDeviceKey = await sodium.crypto_secretbox_keygen();
-  // const virtualDeviceKey = await sodium.crypto_kdf_keygen();
 
   // encrypt virtual device
   const serializedVirtualDevice = await sodium.to_base64(
