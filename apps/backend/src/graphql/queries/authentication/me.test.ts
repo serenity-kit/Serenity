@@ -53,7 +53,7 @@ const setup = async () => {
     username: `${uuidv4()}@example.com`,
     password,
   });
-  otherWorkspace = await createInitialWorkspaceStructure({
+  const otherWorkspaceResult = await createInitialWorkspaceStructure({
     graphql,
     workspaceName: workspace2Name,
     creatorDevice: {
@@ -64,6 +64,7 @@ const setup = async () => {
     devices: [userData1.device, userData1.webDevice],
     authorizationHeader: userData1.sessionKey,
   });
+  otherWorkspace = otherWorkspaceResult.createInitialWorkspaceStructure;
 };
 
 beforeAll(async () => {
@@ -113,8 +114,8 @@ test("should get the fallback workspace if the workspaceId is not available and 
   );
   expect(result.me.workspaceLoadingInfo).toMatchInlineSnapshot(`
     {
-      "documentId": "${userData1.document.id}",
-      "id": "${userData1.workspace.id}",
+      "documentId": "${otherWorkspace.document.id}",
+      "id": "${otherWorkspace.workspace.id}",
       "isAuthorized": true,
       "role": "ADMIN",
     }

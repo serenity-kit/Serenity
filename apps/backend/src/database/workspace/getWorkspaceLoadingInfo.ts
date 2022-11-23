@@ -10,19 +10,45 @@ type Params = {
 };
 
 const getFirstWorkspace = async ({ userId }: { userId: string }) => {
-  return await prisma.workspace.findFirst({
+  const usersToWorkspace = await prisma.usersToWorkspaces.findMany({
+    where: { userId },
     include: {
-      usersToWorkspaces: { where: { userId } },
-      documents: {
-        take: 1,
-        orderBy: { createdAt: "desc" },
-        select: { id: true },
-      },
-    },
-    where: {
-      usersToWorkspaces: { some: { userId } },
+      workspace: true,
     },
   });
+  if (!usersToWorkspace.length) {
+    // TODO: handle case where user has no workspaces
+    return null;
+  }
+  const workspaceIds: string[] = [];
+  const workspaceLookup: { [workspaceId: string]: UsersToWorkspaces } = {};
+  usersToWorkspace.forEach((usersToWorkspace) => {
+    workspaceIds.push(usersToWorkspace.workspaceId);
+    workspaceLookup[usersToWorkspace.workspaceId] = usersToWorkspace;
+  });
+  const userDocument = await prisma.document.findFirst({
+    where: { workspaceId: { in: workspaceIds } },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, workspaceId: true, workspace: true },
+  });
+  if (!userDocument) {
+    const workspace = usersToWorkspace[0].workspace;
+    return {
+      ...workspace,
+      usersToWorkspaces: [
+        {
+          ...usersToWorkspace[0],
+        },
+      ],
+      documents: [],
+    };
+  }
+  const workspaceMembership = workspaceLookup[userDocument.workspaceId];
+  return {
+    ...userDocument.workspace,
+    usersToWorkspaces: [workspaceMembership],
+    documents: [userDocument],
+  };
 };
 
 const getWorkspaceByWorkspaceId = async ({
