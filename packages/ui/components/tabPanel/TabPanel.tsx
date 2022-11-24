@@ -1,4 +1,5 @@
 import React from "react";
+import { tw } from "../../tailwind";
 import { View, ViewProps } from "../view/View";
 
 export type TabPanelProps = ViewProps & {
@@ -12,6 +13,7 @@ export function TabPanel(props: TabPanelProps) {
       accessibilityRole="tabpanel"
       accessibilityLabelledBy={`${props.tabId}-tab`}
       nativeID={`${props.tabId}-panel`}
+      style={tw`py-4`}
       {...props}
     />
   );

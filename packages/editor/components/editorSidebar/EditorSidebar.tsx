@@ -38,20 +38,14 @@ export default function EditorSidebar({
   >("editing");
 
   return (
-    <View
-      style={tw`w-sidebar h-full border-l border-gray-200 bg-gray-100 pt-4`}
-    >
-      <TabList
-        accessibilityLabel="Editor sidebar Tabs"
-        style={tw`flex-row px-4`}
-      >
+    <View style={tw`w-sidebar h-full border-l border-gray-200 bg-gray-100`}>
+      <TabList accessibilityLabel="Editor sidebar Tabs">
         <Tab
           tabId="editing"
           isActive={activeTab === "editing"}
           onPress={() => {
             setActiveTab("editing");
           }}
-          style={tw`mr-4`}
         >
           Edit
         </Tab>
@@ -65,8 +59,6 @@ export default function EditorSidebar({
           Table of Contents
         </Tab>
       </TabList>
-
-      <SidebarDivider />
 
       {activeTab === "tableOfContents" ? (
         <TabPanel tabId="tableOfContents">

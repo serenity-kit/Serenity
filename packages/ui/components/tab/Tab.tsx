@@ -1,6 +1,9 @@
 import React from "react";
+import { tw } from "../../tailwind";
 import { Pressable, PressableProps } from "../pressable/Pressable";
 import { Text } from "../text/Text";
+import { Platform } from "react-native";
+import { useFocusRing } from "@react-native-aria/focus";
 
 export type TabProps = PressableProps & { tabId: string; isActive: boolean };
 
@@ -10,13 +13,26 @@ export type TabProps = PressableProps & { tabId: string; isActive: boolean };
 // The current version seemed like an ok compromise for now.
 // Learn more https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles/tab_role
 export function Tab({ isActive, tabId, children, ...otherProps }: TabProps) {
+  const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
+
+  const pressableStyles = [
+    tw`py-1.5 px-2`,
+    isFocusVisible && (Platform.OS === "web" ? tw`se-inset-focus-mini` : tw``),
+  ];
+
   return (
     <Pressable
+      {...focusRingProps} // sets onFocus and onBlur
       accessibilityRole="tab"
-      // @ts-expect-error exists in the docs, but not in the types https://necolas.github.io/react-native-web/docs/accessibility/
+      // exists in the docs, but not in the types https://necolas.github.io/react-native-web/docs/accessibility/
       accessibilityControls={`${tabId}-panel`}
       accessibilitySelected={isActive}
       nativeID={`${tabId}-tab`}
+      style={pressableStyles}
+      _focusVisible={{
+        // @ts-expect-error - web only
+        _web: { style: [pressableStyles, { outlineStyle: "none" }] },
+      }}
       {...otherProps}
     >
       <Text variant="xs" bold={isActive}>
