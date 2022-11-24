@@ -18,6 +18,7 @@ import {
 import cors from "cors";
 import express from "express";
 import { createServer as httpCreateServer } from "http";
+import { URLSearchParams } from "url";
 import { WebSocketServer } from "ws";
 import { getSessionIncludingUser } from "./database/authentication/getSessionIncludingUser";
 import { createSnapshot } from "./database/createSnapshot";
@@ -118,7 +119,7 @@ export default async function createServer() {
   const webSocketServer = new WebSocketServer({ noServer: true });
   webSocketServer.on(
     "connection",
-    async function connection(connection, request) {
+    async function connection(connection, request, context) {
       // unique id for each client connection
 
       console.log("connected");
@@ -136,6 +137,7 @@ export default async function createServer() {
       connection.send(JSON.stringify({ type: "document", ...doc }));
 
       connection.on("message", async function message(messageContent) {
+        console.log(`context`, context);
         const data = JSON.parse(messageContent.toString());
 
         if (data?.publicData?.snapshotId) {
@@ -261,10 +263,42 @@ export default async function createServer() {
     }
   );
 
-  server.on("upgrade", (request, socket, head) => {
+  server.on("upgrade", async (request, socket, head) => {
+    let context = {};
+    const queryStartPos = (request.url || "").indexOf("?");
+    if (queryStartPos !== -1) {
+      const queryString = request.url?.slice(queryStartPos + 1);
+      const queryParameters = new URLSearchParams(queryString);
+      const sessionKey = queryParameters.get("sessionKey");
+      if (sessionKey) {
+        const session = await getSessionIncludingUser({
+          sessionKey,
+        });
+        if (session && session.user) {
+          context = {
+            session,
+            user: session.user,
+            assertValidDeviceSigningPublicKeyForThisSession: (
+              deviceSigningPublicKey: string
+            ) => {
+              if (
+                deviceSigningPublicKey !== session.deviceSigningPublicKey &&
+                deviceSigningPublicKey !==
+                  session.user.mainDeviceSigningPublicKey
+              ) {
+                throw new Error(
+                  "Invalid deviceSigningPublicKey for this session"
+                );
+              }
+            },
+          };
+        }
+      }
+    }
+
     // @ts-ignore
     webSocketServer.handleUpgrade(request, socket, head, (ws) => {
-      webSocketServer.emit("connection", ws, request);
+      webSocketServer.emit("connection", ws, request, context);
     });
   });
 
