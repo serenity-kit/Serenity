@@ -16,11 +16,13 @@ export const TableOfContentButton = React.forwardRef(
     const styles = StyleSheet.create({
       text: active ? tw`text-primary-500` : tw``,
       hover: active ? tw`bg-primary-100` : tw`bg-gray-200`,
+      active: tw`pr-3 border-r-3 border-primary-500/85`,
       focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : tw``,
     });
 
     const pressableStyles = [
       tw`py-1 px-4`,
+      active && styles.active,
       isHovered && styles.hover,
       isFocusVisible && styles.focusVisible,
     ];
