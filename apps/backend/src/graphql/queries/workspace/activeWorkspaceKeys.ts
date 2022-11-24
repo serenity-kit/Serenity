@@ -21,6 +21,9 @@ export const activeWorkspaceKeysQuery = queryField((t) => {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
+      context.assertValidDeviceSigningPublicKeyForThisSession(
+        args.deviceSigningPublicKey
+      );
       const activeWorkspaceKeys = await getActiveWorkspaceKeys({
         userId: context.user.id,
         workspaceId: args.workspaceId,

@@ -94,7 +94,7 @@ test("add device", async () => {
     graphql,
     workspaceId: userData1.workspace.id,
     deviceSigningPublicKey: user1Device2.signingPublicKey,
-    sessionKey: userData1.sessionKey,
+    sessionKey: loginResult.sessionKey,
   });
   const workspaceKeys = result.activeWorkspaceKeys.activeWorkspaceKeys;
   expect(workspaceKeys.length).toBe(1);
