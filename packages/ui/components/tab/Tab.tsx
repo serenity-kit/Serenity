@@ -1,4 +1,5 @@
 import React from "react";
+import { tw } from "../../tailwind";
 import { Pressable, PressableProps } from "../pressable/Pressable";
 import { Text } from "../text/Text";
 
@@ -17,6 +18,7 @@ export function Tab({ isActive, tabId, children, ...otherProps }: TabProps) {
       accessibilityControls={`${tabId}-panel`}
       accessibilitySelected={isActive}
       nativeID={`${tabId}-tab`}
+      style={[tw`mx-2`]}
       {...otherProps}
     >
       <Text variant="xs" bold={isActive}>
