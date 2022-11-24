@@ -1,5 +1,5 @@
 import { AuthenticationError } from "apollo-server-express";
-import { idArg, nonNull, queryField, objectType } from "nexus";
+import { idArg, nonNull, objectType, queryField } from "nexus";
 import { getDeviceBySigningPublicKey } from "../../../database/device/getDeviceBySigningPublicKey";
 import { Device } from "../../types/device";
 

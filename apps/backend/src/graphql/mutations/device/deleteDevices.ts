@@ -40,6 +40,9 @@ export const deleteDevicesMutation = mutationField("deleteDevices", {
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
     }
+    context.assertValidDeviceSigningPublicKeyForThisSession(
+      args.input.creatorSigningPublicKey
+    );
     await deleteDevices({
       userId: context.user.id,
       creatorDeviceSigningPublicKey: args.input.creatorSigningPublicKey,
