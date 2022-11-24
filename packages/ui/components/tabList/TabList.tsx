@@ -11,7 +11,10 @@ export function TabList(props: TabListProps) {
     <View
       {...props}
       accessibilityRole="tablist"
-      style={[tw`flex-row -mx-2 p-4 border-b border-gray-200`, props.style]}
+      style={[
+        tw`flex-row -mx-2 py-2.5 px-4 border-b border-gray-200`,
+        props.style,
+      ]}
     />
   );
 }
