@@ -1,11 +1,16 @@
 import { SidebarLink, tw, View } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
+import { useWorkspace } from "../../../context/WorkspaceContext";
 import { workspaceSettingsAccessMachine } from "../../../machines/workspaceSettingsAccessMachine";
+import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 
-export default function WorkspaceSettingsMobileOverviewScreen(props) {
+export default function WorkspaceSettingsMobileOverviewScreen(
+  props: WorkspaceStackScreenProps<"WorkspaceSettings">
+) {
+  const { workspaceId } = useWorkspace();
   useMachine(workspaceSettingsAccessMachine, {
     context: {
-      workspaceId: props.route.params.workspaceId,
+      workspaceId,
       navigation: props.navigation,
     },
   });
@@ -14,8 +19,11 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
     <View style={tw`py-5`}>
       <SidebarLink
         to={{
-          screen: "WorkspaceSettingsGeneral",
-          params: { workspaceId: props.route.params.workspaceId },
+          screen: "Workspace",
+          params: {
+            workspaceId,
+            screen: "WorkspaceSettingsGeneral",
+          },
         }}
         iconName="settings-4-line"
       >
@@ -23,8 +31,11 @@ export default function WorkspaceSettingsMobileOverviewScreen(props) {
       </SidebarLink>
       <SidebarLink
         to={{
-          screen: "WorkspaceSettingsMembers",
-          params: { workspaceId: props.route.params.workspaceId },
+          screen: "Workspace",
+          params: {
+            workspaceId,
+            screen: "WorkspaceSettingsMembers",
+          },
         }}
         iconName={"group-line"}
       >

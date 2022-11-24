@@ -9,7 +9,7 @@ import {
 import { updateDocumentName } from "../../../database/document/updateDocumentName";
 import { formatDocument } from "../../../types/document";
 import { Document } from "../../types/document";
-import { KeyDerivationTraceInput } from "../folder/createFolder";
+import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const UpdateDocumentNameInput = inputObjectType({
   name: "UpdateDocumentNameInput",
@@ -50,7 +50,7 @@ export const updateDocumentNameMutation = mutationField("updateDocumentName", {
       encryptedName: args.input.encryptedName,
       encryptedNameNonce: args.input.encryptedNameNonce,
       workspaceKeyId: args.input.workspaceKeyId,
-      subkeyId: args.input.subkeyId,
+      subkeyId: args.input.subkeyId, // TODO: remove
       userId: context.user.id,
       nameKeyDerivationTrace: args.input.nameKeyDerivationTrace,
     });

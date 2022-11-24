@@ -55,7 +55,7 @@ export type AttachDevicesToWorkspacesResult = {
 export type CreateDocumentInput = {
   contentSubkeyId: Scalars['Int'];
   id: Scalars['String'];
-  nameKeyDerivationTrace: KeyDerivationTraceInput;
+  nameKeyDerivationTrace?: InputMaybe<KeyDerivationTraceInput>;
   parentFolderId?: InputMaybe<Scalars['String']>;
   workspaceId: Scalars['String'];
 };
@@ -95,22 +95,34 @@ export type CreateFolderResult = {
   folder?: Maybe<Folder>;
 };
 
+export type CreateInitialDocumentInput = {
+  encryptedName: Scalars['String'];
+  encryptedNameNonce: Scalars['String'];
+  id: Scalars['String'];
+  nameKeyDerivationTrace: KeyDerivationTraceInput;
+  snapshot: DocumentSnapshotInput;
+};
+
+export type CreateInitialFolderInput = {
+  encryptedName: Scalars['String'];
+  encryptedNameNonce: Scalars['String'];
+  id: Scalars['String'];
+  idSignature: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTraceInput;
+};
+
+export type CreateInitialWorkspaceInput = {
+  deviceWorkspaceKeyBoxes: Array<DeviceWorkspaceKeyBoxInput>;
+  id: Scalars['String'];
+  name: Scalars['String'];
+  workspaceKeyId: Scalars['String'];
+};
+
 export type CreateInitialWorkspaceStructureInput = {
   creatorDeviceSigningPublicKey: Scalars['String'];
-  deviceWorkspaceKeyBoxes: Array<DeviceWorkspaceKeyBoxInput>;
-  documentContentSubkeyId: Scalars['Int'];
-  documentId: Scalars['String'];
-  documentSnapshot: DocumentSnapshotInput;
-  documentSubkeyId: Scalars['Int'];
-  encryptedDocumentName: Scalars['String'];
-  encryptedDocumentNameNonce: Scalars['String'];
-  encryptedFolderName: Scalars['String'];
-  encryptedFolderNameNonce: Scalars['String'];
-  folderId: Scalars['String'];
-  folderIdSignature: Scalars['String'];
-  folderSubkeyId: Scalars['Int'];
-  workspaceId: Scalars['String'];
-  workspaceName: Scalars['String'];
+  document: CreateInitialDocumentInput;
+  folder: CreateInitialFolderInput;
+  workspace: CreateInitialWorkspaceInput;
 };
 
 export type CreateInitialWorkspaceStructureResult = {
@@ -256,17 +268,14 @@ export type DeviceWorkspaceKeyBoxInput = {
 
 export type Document = {
   __typename?: 'Document';
-  contentSubkeyId?: Maybe<Scalars['Int']>;
   encryptedName?: Maybe<Scalars['String']>;
   encryptedNameNonce?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   nameKeyDerivationTrace: KeyDerivationTrace;
   parentFolderId?: Maybe<Scalars['String']>;
   rootFolderId?: Maybe<Scalars['String']>;
-  subkeyId?: Maybe<Scalars['Int']>;
   workspaceId?: Maybe<Scalars['String']>;
   workspaceKey?: Maybe<WorkspaceKey>;
-  workspaceKeyId?: Maybe<Scalars['String']>;
 };
 
 export type DocumentConnection = {
@@ -289,6 +298,8 @@ export type DocumentEdge = {
 
 export type DocumentShareLink = {
   __typename?: 'DocumentShareLink';
+  deviceSecretBoxCiphertext: Scalars['String'];
+  deviceSecretBoxNonce: Scalars['String'];
   token: Scalars['String'];
 };
 
@@ -319,8 +330,10 @@ export type DocumentSnapshotInput = {
 
 export type DocumentSnapshotPublicDataInput = {
   docId: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTraceInput;
   pubKey: Scalars['String'];
-  snapshotId: Scalars['String'];
+  snapshotId?: InputMaybe<Scalars['String']>;
+  subkeyId?: InputMaybe<Scalars['Int']>;
 };
 
 export type File = {
@@ -375,10 +388,8 @@ export type Folder = {
   keyDerivationTrace: KeyDerivationTrace;
   parentFolderId?: Maybe<Scalars['String']>;
   rootFolderId?: Maybe<Scalars['String']>;
-  subkeyId: Scalars['Int'];
   workspaceId?: Maybe<Scalars['String']>;
   workspaceKey?: Maybe<WorkspaceKey>;
-  workspaceKeyId?: Maybe<Scalars['String']>;
 };
 
 export type FolderConnection = {
@@ -418,11 +429,13 @@ export type InitiateFileUploadResult = {
 export type KeyDerivationTrace = {
   __typename?: 'KeyDerivationTrace';
   parentFolders: Array<KeyDerivationTraceParentFolder>;
+  subkeyId: Scalars['Int'];
   workspaceKeyId: Scalars['String'];
 };
 
 export type KeyDerivationTraceInput = {
   parentFolders: Array<KeyDerivationTraceParentFolderInput>;
+  subkeyId: Scalars['Int'];
   workspaceKeyId: Scalars['String'];
 };
 
@@ -667,6 +680,7 @@ export type Query = {
   devices?: Maybe<DeviceWithRecentSessionConnection>;
   document?: Maybe<Document>;
   documentPath?: Maybe<Array<Maybe<Folder>>>;
+  documentShareLink?: Maybe<DocumentShareLink>;
   documentShareLinks?: Maybe<DocumentShareLinkConnection>;
   documents?: Maybe<DocumentConnection>;
   fileUrl?: Maybe<File>;
@@ -713,6 +727,11 @@ export type QueryDocumentArgs = {
 
 export type QueryDocumentPathArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryDocumentShareLinkArgs = {
+  token: Scalars['ID'];
 };
 
 
@@ -1149,14 +1168,14 @@ export type CreateFolderMutationVariables = Exact<{
 }>;
 
 
-export type CreateFolderMutation = { __typename?: 'Mutation', createFolder?: { __typename?: 'CreateFolderResult', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null } | null };
+export type CreateFolderMutation = { __typename?: 'Mutation', createFolder?: { __typename?: 'CreateFolderResult', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null } | null };
 
 export type CreateInitialWorkspaceStructureMutationVariables = Exact<{
   input: CreateInitialWorkspaceStructureInput;
 }>;
 
 
-export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, role: Role }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null } | null, document?: { __typename?: 'Document', id: string } | null } | null };
+export type CreateInitialWorkspaceStructureMutation = { __typename?: 'Mutation', createInitialWorkspaceStructure?: { __typename?: 'CreateInitialWorkspaceStructureResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, role: Role }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null } | null, folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null, document?: { __typename?: 'Document', id: string } | null } | null };
 
 export type CreateWorkspaceInvitationMutationVariables = Exact<{
   input: CreateWorkspaceInvitationInput;
@@ -1259,14 +1278,14 @@ export type UpdateDocumentNameMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null } | null };
+export type UpdateDocumentNameMutation = { __typename?: 'Mutation', updateDocumentName?: { __typename?: 'UpdateDocumentNameResult', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, parentFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null } | null };
 
 export type UpdateFolderNameMutationVariables = Exact<{
   input: UpdateFolderNameInput;
 }>;
 
 
-export type UpdateFolderNameMutation = { __typename?: 'Mutation', updateFolderName?: { __typename?: 'UpdateFolderNameResult', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null } | null };
+export type UpdateFolderNameMutation = { __typename?: 'Mutation', updateFolderName?: { __typename?: 'UpdateFolderNameResult', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null } | null };
 
 export type UpdateWorkspaceMembersRolesMutationVariables = Exact<{
   input: UpdateWorkspaceMembersRolesInput;
@@ -1317,14 +1336,21 @@ export type DocumentQueryVariables = Exact<{
 }>;
 
 
-export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null };
+export type DocumentQuery = { __typename?: 'Query', document?: { __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, parentFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null };
 
 export type DocumentPathQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, subkeyId: number, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null };
+export type DocumentPathQuery = { __typename?: 'Query', documentPath?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null };
+
+export type DocumentShareLinkQueryVariables = Exact<{
+  token: Scalars['ID'];
+}>;
+
+
+export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLink', token: string, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string } | null };
 
 export type DocumentShareLinksQueryVariables = Exact<{
   documentId: Scalars['ID'];
@@ -1342,7 +1368,7 @@ export type DocumentsQueryVariables = Exact<{
 }>;
 
 
-export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, workspaceKeyId?: string | null, subkeyId?: number | null, contentSubkeyId?: number | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type DocumentsQuery = { __typename?: 'Query', documents?: { __typename?: 'DocumentConnection', nodes?: Array<{ __typename?: 'Document', id: string, encryptedName?: string | null, encryptedNameNonce?: string | null, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, nameKeyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type FileUrlQueryVariables = Exact<{
   fileId: Scalars['ID'];
@@ -1365,7 +1391,7 @@ export type FolderQueryVariables = Exact<{
 }>;
 
 
-export type FolderQuery = { __typename?: 'Query', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null };
+export type FolderQuery = { __typename?: 'Query', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, parentFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null };
 
 export type FoldersQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -1374,7 +1400,7 @@ export type FoldersQueryVariables = Exact<{
 }>;
 
 
-export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1408,7 +1434,7 @@ export type RootFoldersQueryVariables = Exact<{
 }>;
 
 
-export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, workspaceKeyId?: string | null, subkeyId: number, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type UnauthorizedDevicesForWorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1463,7 +1489,7 @@ export type WorkspacesQueryVariables = Exact<{
 }>;
 
 
-export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, role: Role }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null }> | null } | null> | null } | null };
+export type WorkspacesQuery = { __typename?: 'Query', workspaces?: { __typename?: 'WorkspaceConnection', nodes?: Array<{ __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, role: Role }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null }> | null } | null> | null } | null };
 
 
 export const AcceptWorkspaceInvitationDocument = gql`
@@ -1567,13 +1593,12 @@ export const CreateFolderDocument = gql`
       id
       encryptedName
       encryptedNameNonce
-      workspaceKeyId
-      subkeyId
       parentFolderId
       rootFolderId
       workspaceId
       keyDerivationTrace {
         workspaceKeyId
+        subkeyId
         parentFolders {
           folderId
           subkeyId
@@ -1618,11 +1643,18 @@ export const CreateInitialWorkspaceStructureDocument = gql`
       id
       encryptedName
       encryptedNameNonce
-      workspaceKeyId
-      subkeyId
       parentFolderId
       rootFolderId
       workspaceId
+      keyDerivationTrace {
+        workspaceKeyId
+        subkeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
     document {
       id
@@ -1814,13 +1846,11 @@ export const UpdateDocumentNameDocument = gql`
       id
       encryptedName
       encryptedNameNonce
-      workspaceKeyId
-      subkeyId
-      contentSubkeyId
       parentFolderId
       workspaceId
       nameKeyDerivationTrace {
         workspaceKeyId
+        subkeyId
         parentFolders {
           folderId
           subkeyId
@@ -1842,12 +1872,11 @@ export const UpdateFolderNameDocument = gql`
       id
       encryptedName
       encryptedNameNonce
-      workspaceKeyId
-      subkeyId
       parentFolderId
       rootFolderId
       keyDerivationTrace {
         workspaceKeyId
+        subkeyId
         parentFolders {
           folderId
           subkeyId
@@ -1975,13 +2004,11 @@ export const DocumentDocument = gql`
     id
     encryptedName
     encryptedNameNonce
-    workspaceKeyId
-    subkeyId
-    contentSubkeyId
     parentFolderId
     workspaceId
     nameKeyDerivationTrace {
       workspaceKeyId
+      subkeyId
       parentFolders {
         folderId
         subkeyId
@@ -2001,13 +2028,12 @@ export const DocumentPathDocument = gql`
     id
     encryptedName
     encryptedNameNonce
-    workspaceKeyId
     parentFolderId
     rootFolderId
     workspaceId
-    subkeyId
     keyDerivationTrace {
       workspaceKeyId
+      subkeyId
       parentFolders {
         folderId
         subkeyId
@@ -2020,6 +2046,19 @@ export const DocumentPathDocument = gql`
 
 export function useDocumentPathQuery(options: Omit<Urql.UseQueryArgs<DocumentPathQueryVariables>, 'query'>) {
   return Urql.useQuery<DocumentPathQuery, DocumentPathQueryVariables>({ query: DocumentPathDocument, ...options });
+};
+export const DocumentShareLinkDocument = gql`
+    query documentShareLink($token: ID!) {
+  documentShareLink(token: $token) {
+    token
+    deviceSecretBoxCiphertext
+    deviceSecretBoxNonce
+  }
+}
+    `;
+
+export function useDocumentShareLinkQuery(options: Omit<Urql.UseQueryArgs<DocumentShareLinkQueryVariables>, 'query'>) {
+  return Urql.useQuery<DocumentShareLinkQuery, DocumentShareLinkQueryVariables>({ query: DocumentShareLinkDocument, ...options });
 };
 export const DocumentShareLinksDocument = gql`
     query documentShareLinks($documentId: ID!, $first: Int! = 50, $after: String) {
@@ -2047,14 +2086,12 @@ export const DocumentsDocument = gql`
       id
       encryptedName
       encryptedNameNonce
-      workspaceKeyId
-      subkeyId
-      contentSubkeyId
       parentFolderId
       rootFolderId
       workspaceId
       nameKeyDerivationTrace {
         workspaceKeyId
+        subkeyId
         parentFolders {
           folderId
           subkeyId
@@ -2104,12 +2141,11 @@ export const FolderDocument = gql`
     id
     encryptedName
     encryptedNameNonce
-    workspaceKeyId
-    subkeyId
     parentFolderId
     workspaceId
     keyDerivationTrace {
       workspaceKeyId
+      subkeyId
       parentFolders {
         folderId
         subkeyId
@@ -2130,13 +2166,12 @@ export const FoldersDocument = gql`
       id
       encryptedName
       encryptedNameNonce
-      workspaceKeyId
-      subkeyId
       parentFolderId
       rootFolderId
       workspaceId
       keyDerivationTrace {
         workspaceKeyId
+        subkeyId
         parentFolders {
           folderId
           subkeyId
@@ -2224,13 +2259,12 @@ export const RootFoldersDocument = gql`
       id
       encryptedName
       encryptedNameNonce
-      workspaceKeyId
-      subkeyId
       parentFolderId
       rootFolderId
       workspaceId
       keyDerivationTrace {
         workspaceKeyId
+        subkeyId
         parentFolders {
           folderId
           subkeyId
@@ -2419,6 +2453,7 @@ export const WorkspacesDocument = gql`
       currentWorkspaceKey {
         id
         workspaceId
+        generation
         workspaceKeyBox {
           id
           workspaceKeyId
@@ -2434,6 +2469,7 @@ export const WorkspacesDocument = gql`
       workspaceKeys {
         id
         workspaceId
+        generation
         workspaceKeyBox {
           id
           workspaceKeyId
@@ -2879,6 +2915,20 @@ export const runDocumentPathQuery = async (variables: DocumentPathQueryVariables
   return await getUrqlClient()
     .query<DocumentPathQuery, DocumentPathQueryVariables>(
       DocumentPathDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDocumentShareLinkQuery = async (variables: DocumentShareLinkQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<DocumentShareLinkQuery, DocumentShareLinkQueryVariables>(
+      DocumentShareLinkDocument,
       variables,
       {
         // better to be safe here and always refetch

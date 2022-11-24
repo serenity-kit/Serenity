@@ -7,18 +7,18 @@ module.exports = async function (globalConfig, projectConfig) {
   const prismaBinary = "./node_modules/.bin/prisma";
   // Set the required environment variable to contain the connection string
   // to our database
-  process.env.POSTGRES_URL = connectionString;
-  global.process.env.POSTGRES_URL = connectionString;
+  process.env.DATABASE_URL = connectionString;
+  global.process.env.DATABASE_URL = connectionString;
 
   // seems to work better than DROP DATABSE
   await exec(
-    `POSTGRES_URL=${connectionString} ${prismaBinary} migrate reset -f`
+    `DATABASE_URL=${connectionString} ${prismaBinary} migrate reset -f`
   );
 
   // Run the migrations to ensure our schema has the required structure
-  await exec(`POSTGRES_URL=${connectionString} ${prismaBinary} migrate deploy`);
+  await exec(`DATABASE_URL=${connectionString} ${prismaBinary} migrate deploy`);
   // Regenerate client
-  await exec(`POSTGRES_URL=${connectionString} ${prismaBinary} generate`);
+  await exec(`DATABASE_URL=${connectionString} ${prismaBinary} generate`);
 };
 
 // afterAll(() => {

@@ -1,3 +1,4 @@
+import { KeyDerivationTrace } from "@naisho/core";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -7,9 +8,8 @@ import {
   objectType,
 } from "nexus";
 import { updateFolderName } from "../../../database/folder/updateFolderName";
-import { KeyDerivationTrace } from "../../../types/folder";
 import { Folder } from "../../types/folder";
-import { KeyDerivationTraceInput } from "./createFolder";
+import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const UpdateFolderNameInput = inputObjectType({
   name: "UpdateFolderNameInput",

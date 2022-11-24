@@ -16,7 +16,7 @@ import {
 import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
+import { useWorkspace } from "../../../context/WorkspaceContext";
 import {
   MeResult,
   Role,
@@ -25,19 +25,21 @@ import {
   Workspace,
   WorkspaceMember,
 } from "../../../generated/graphql";
-import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
-import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
+import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import {
   removeLastUsedDocumentId,
   removeLastUsedWorkspaceId,
 } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 
 export default function WorkspaceSettingsGeneralScreen(
-  props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
+  props: WorkspaceStackScreenProps<"WorkspaceSettingsGeneral"> & {
+    children?: React.ReactNode;
+  }
 ) {
-  const workspaceId = useWorkspaceId();
-  const { activeDevice } = useWorkspaceContext();
+  const { workspaceId } = useWorkspace();
+  const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
       workspaceId: workspaceId,

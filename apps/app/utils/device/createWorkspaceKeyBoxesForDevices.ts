@@ -1,7 +1,7 @@
 import * as sodium from "@serenity-tools/libsodium";
 import { DeviceWorkspaceKeyBoxInput } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { createAndEncryptWorkspaceKeyForDevice } from "./createAndEncryptWorkspaceKeyForDevice";
+import { encryptWorkspaceKeyForDevice } from "./encryptWorkspaceKeyForDevice";
 import { getMainDevice } from "./mainDeviceMemoryStore";
 
 export type DeviceWorkspaceKeyBoxParams = {
@@ -31,7 +31,7 @@ export const createWorkspaceKeyBoxesForDevices = async ({
 
   const workspaceKey = await sodium.crypto_kdf_keygen();
   for (const receiverDevice of allDevices) {
-    const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
+    const { nonce, ciphertext } = await encryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: receiverDevice.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
       workspaceKey,

@@ -2,9 +2,7 @@ import {
   Button,
   Description,
   Heading,
-  IconButton,
-  Text,
-  Tooltip,
+  TextArea,
   tw,
   View,
 } from "@serenity-tools/ui";
@@ -118,50 +116,21 @@ export function CreateWorkspaceInvitation(props: Props) {
   };
 
   const styles = StyleSheet.create({
-    invitationWrapper: tw`relative mb-2 py-4 px-5 border rounded ${
-      selectedWorkspaceInvitationId !== null
-        ? `bg-primary-100/40 border-primary-200`
-        : `bg-gray-100 border-gray-200`
-    }`,
-    invitationText:
-      selectedWorkspaceInvitationId !== null
-        ? tw`text-primary-900`
-        : tw`text-gray-400`,
     invitationButton: tw`mb-8 self-start`,
   });
 
   return (
     <>
-      <View style={styles.invitationWrapper}>
-        <Text
-          variant="xs"
-          style={styles.invitationText}
-          testID="workspaceInvitationInstructionsText"
-          selectable={selectedWorkspaceInvitationId !== null}
-        >
-          {selectedWorkspaceInvitationId !== null
-            ? getWorkspaceInvitationText()
-            : 'The invitation text and link will be generated here\nClick on "Create invitation" to generate a new invitation'}
-        </Text>
-        {selectedWorkspaceInvitationId !== null ? (
-          <View style={tw`absolute right-3 top-3`}>
-            <Tooltip
-              label={
-                isClipboardNoticeActive ? "Copying..." : "Copy to clipboard"
-              }
-              placement={"left"}
-            >
-              <IconButton
-                name="file-copy-line"
-                color={"primary-300"}
-                transparent
-                onPress={copyInvitationText}
-                isLoading={isClipboardNoticeActive}
-              />
-            </Tooltip>
-          </View>
-        ) : null}
-      </View>
+      <TextArea
+        testID="workspaceInvitationInstructionsText"
+        selectable={selectedWorkspaceInvitationId !== null}
+        onCopyPress={copyInvitationText}
+        isClipboardNoticeActive={isClipboardNoticeActive}
+      >
+        {selectedWorkspaceInvitationId !== null
+          ? getWorkspaceInvitationText()
+          : 'The invitation text and link will be generated here\nClick on "Create invitation" to generate a new invitation'}
+      </TextArea>
       <Button
         onPress={createWorkspaceInvitationPreflight}
         style={styles.invitationButton}
@@ -170,7 +139,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       </Button>
       <View style={tw`mb-5`}>
         <Heading lvl={3} padded>
-          Invite Links
+          Invite links
         </Heading>
         <Description variant="form">
           sorted by time until expiration.

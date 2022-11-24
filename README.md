@@ -123,7 +123,7 @@ To reset the test DB migrations run:
 
 ```sh
 cd apps/backend
-POSTGRES_URL=postgres://prisma:prisma@localhost:5432/serenity_test yarn prisma migrate reset
+DATABASE_URL=postgres://prisma:prisma@localhost:5432/serenity_test yarn prisma migrate reset
 ```
 
 For any package:
@@ -170,6 +170,19 @@ yarn workspace backend prisma:e2etest:studio
 
 Backend deployment icluding running migrations is done via Github Actions.
 Frontend deployment is setup in Netlify.
+
+### Setup fly.io deployment
+
+Update app name inside fly.toml
+
+```sh
+fly postgres create
+# store the connection string
+flyctl secrets set DATABASE_URL=<db_connection_url>/naisho
+# set all other secrets usually defined in the .env file
+```
+
+Update DATABASE_URL in Github secrets with <db_connection_url>/naisho
 
 ## Folder/File Naming Convention
 

@@ -1,20 +1,11 @@
-import {
-  createDocumentKey,
-  encryptDocumentTitle,
-  recreateDocumentKey,
-} from "@serenity-tools/common";
 import { useEffect, useLayoutEffect, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 import Page from "../../../components/page/Page";
 import { PageHeader } from "../../../components/page/PageHeader";
 import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
-import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
-import {
-  Document,
-  useUpdateDocumentNameMutation,
-} from "../../../generated/graphql";
-import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
-import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
+import { useWorkspace } from "../../../context/WorkspaceContext";
+import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
@@ -25,23 +16,20 @@ import {
   useDocumentPathStore,
 } from "../../../utils/document/documentPathStore";
 import { getDocument } from "../../../utils/document/getDocument";
-import { buildKeyDerivationTrace } from "../../../utils/folder/buildKeyDerivationTrace";
+import { updateDocumentName } from "../../../utils/document/updateDocumentName";
 import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
-import { getFolder } from "../../../utils/folder/getFolder";
 import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
-import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 import { loadPageMachine } from "./loadPageMachine";
 
 const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const pageId = props.route.params.pageId;
-  const { activeDevice } = useWorkspaceContext();
-  const workspaceId = useWorkspaceId();
+  const { activeDevice } = useAuthenticatedAppContext();
+  const { workspaceId } = useWorkspace();
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
-  const [, updateDocumentNameMutation] = useUpdateDocumentNameMutation();
   const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
   const folderStore = useOpenFolderStore();
   const documentPathStore = useDocumentPathStore();
@@ -78,17 +66,7 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
   };
 
   const updateTitle = async (title: string) => {
-    let document: Document | undefined | null = undefined;
-    const workspace = await getWorkspace({
-      workspaceId,
-      deviceSigningPublicKey: activeDevice.signingPublicKey,
-    });
-    if (!workspace?.currentWorkspaceKey) {
-      // TODO: handle error in UI
-      console.error("Workspace or workspaceKeys not found");
-      return;
-    }
-    document = await getDocument({
+    const document = await getDocument({
       documentId: pageId,
     });
     // this is necessary to propagate document name update to the sidebar and header
@@ -97,52 +75,15 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
       console.error("document ID doesn't match page ID");
       return;
     }
-    const folder = await getFolder({ id: document.parentFolderId! });
-    const folderKeyString = await getFolderKey({
-      folderId: folder.id!,
-      workspaceId: document.workspaceId!,
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
-      folderSubkeyId: folder.subkeyId,
-      activeDevice,
-    });
-    let documentSubkeyId = 0;
-    let documentKey = "";
-    if (document?.subkeyId) {
-      documentSubkeyId = document.subkeyId;
-      const documentKeyData = await recreateDocumentKey({
-        folderKey: folderKeyString,
-        subkeyId: document.subkeyId,
+    try {
+      const updatedDocument = await updateDocumentName({
+        document,
+        name: title,
+        activeDevice,
       });
-      documentKey = documentKeyData.key;
-    } else {
-      const documentKeyData = await createDocumentKey({
-        folderKey: folderKeyString,
-      });
-      documentSubkeyId = documentKeyData.subkeyId;
-      documentKey = documentKeyData.key;
-    }
-    const encryptedDocumentTitle = await encryptDocumentTitle({
-      title,
-      key: documentKey,
-    });
-    const nameKeyDerivationTrace = await buildKeyDerivationTrace({
-      folderId: document.parentFolderId!,
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
-    });
-    const updateDocumentNameResult = await updateDocumentNameMutation({
-      input: {
-        id: pageId,
-        encryptedName: encryptedDocumentTitle.ciphertext,
-        encryptedNameNonce: encryptedDocumentTitle.publicNonce,
-        workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-        subkeyId: documentSubkeyId,
-        nameKeyDerivationTrace,
-      },
-    });
-    if (updateDocumentNameResult.data?.updateDocumentName?.document) {
-      const updatedDocument =
-        updateDocumentNameResult.data.updateDocumentName.document;
       await updateActiveDocumentInfoStore(updatedDocument, activeDevice);
+    } catch (error) {
+      console.error(error);
     }
   };
 

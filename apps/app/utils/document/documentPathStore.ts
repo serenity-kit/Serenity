@@ -7,9 +7,9 @@ import {
   Folder,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
+import { deriveFolderKey } from "../folder/deriveFolderKeyData";
 import { GetFolderKeyProps } from "../folder/folderKeyStore";
 import { getUrqlClient } from "../urqlClient/urqlClient";
-import { getWorkspaceKeys } from "../workspace/getWorskpaceKeys";
 
 interface DocumentPathState {
   folders: Folder[];
@@ -51,27 +51,18 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
       try {
         // TODO: optimize key derivation to look up
         // parent keys and workspace keys more easily
-        let parentKey = "";
-        if (folder.parentFolderId) {
-          parentKey = await getFolderKey({
-            workspaceId: folder.workspaceId!,
-            workspaceKeyId: folder.workspaceKeyId,
-            folderId: folder.parentFolderId,
-            activeDevice,
-          });
-        } else {
-          const workspaceKeys = await getWorkspaceKeys({
-            workspaceId: folder.workspaceId!,
-            activeDevice,
-          });
-          if (!workspaceKeys[folder.workspaceKeyId!]) {
-            throw new Error("Workspace key not found");
-          }
-          parentKey = workspaceKeys[folder.workspaceKeyId!];
-        }
+        const parentKeyTrace = await deriveFolderKey({
+          workspaceId: folder.workspaceId!,
+          folderId: folder.id,
+          keyDerivationTrace: folder.keyDerivationTrace,
+          activeDevice,
+        });
+        // since decryptFolderName also derives the folder subkey,
+        // we can pass the parentKeyTrace's parent key to it
+        const parentKey = parentKeyTrace[parentKeyTrace.length - 2].key;
         folderName = await decryptFolderName({
           parentKey: parentKey,
-          subkeyId: folder.subkeyId!,
+          subkeyId: folder.keyDerivationTrace.subkeyId!,
           ciphertext: folder.encryptedName,
           publicNonce: folder.encryptedNameNonce,
         });

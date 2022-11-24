@@ -11,40 +11,26 @@ import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { prisma } from "../../../database/prisma";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const username = "user1";
+let userData1: any = undefined;
 const password = "password";
 let userData: any = null;
 let addedWorkspace: any = null;
-let addedDocumentId: any = null;
 let addedFolder: any = null;
 let sessionKey = "";
 
 const setup = async () => {
-  userData = await registerUser(graphql, username, password);
-  sessionKey = userData.sessionKey;
-  const device = userData.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: userData.encryptionPrivateKey,
-    webDevice: userData.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey,
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
-  addedFolder = createWorkspaceResult.createInitialWorkspaceStructure.folder;
+  sessionKey = userData1.sessionKey;
+  addedWorkspace = userData1.workspace;
+  addedFolder = userData1.folder;
 };
 
 beforeAll(async () => {
@@ -55,14 +41,14 @@ beforeAll(async () => {
 test("user should be able to create a document", async () => {
   const id = uuidv4();
   const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
-    device: userData.mainDevice,
-    deviceEncryptionPrivateKey: userData.encryptionPrivateKey,
-    workspace: addedWorkspace,
+    device: userData1.device,
+    deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspace: userData1.workspace,
   });
   const folderKeyResult = await kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
-    subkeyId: addedFolder.subkeyId,
+    subkeyId: userData1.folder.keyDerivationTrace.subkeyId,
   });
   let documentContentKeyResult = await createDocumentKey({
     folderKey: folderKeyResult.key,
@@ -70,10 +56,10 @@ test("user should be able to create a document", async () => {
   const result = await createDocument({
     id,
     graphql,
-    authorizationHeader: sessionKey,
-    parentFolderId: addedFolder.parentFolderId,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    workspaceId: addedWorkspace.id,
+    authorizationHeader: userData1.sessionKey,
+    parentFolderId: userData1.folder.parentFolderId,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceId: userData1.workspace.id,
     contentSubkeyId: documentContentKeyResult.subkeyId,
   });
   expect(result.createDocument.id).toBe(id);
@@ -88,7 +74,7 @@ test("commenter tries to create", async () => {
   await prisma.usersToWorkspaces.create({
     data: {
       userId: otherUser.userId,
-      workspaceId: addedWorkspace.id,
+      workspaceId: userData1.workspace.id,
       role: Role.COMMENTER,
     },
   });
@@ -98,10 +84,10 @@ test("commenter tries to create", async () => {
         id: uuidv4(),
         graphql,
         authorizationHeader: otherUser.sessionKey,
-        parentFolderId: addedFolder.parentFolderId,
-        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        parentFolderId: userData1.folder.parentFolderId,
+        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         contentSubkeyId: 1,
-        workspaceId: addedWorkspace.id,
+        workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -115,7 +101,7 @@ test("viewer attempts to create", async () => {
   await prisma.usersToWorkspaces.create({
     data: {
       userId: otherUser.userId,
-      workspaceId: addedWorkspace.id,
+      workspaceId: userData1.workspace.id,
       role: Role.VIEWER,
     },
   });
@@ -125,10 +111,10 @@ test("viewer attempts to create", async () => {
         id: uuidv4(),
         graphql,
         authorizationHeader: otherUser.sessionKey,
-        parentFolderId: addedFolder.parentFolderId,
-        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        parentFolderId: userData1.folder.parentFolderId,
+        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         contentSubkeyId: 1,
-        workspaceId: addedWorkspace.id,
+        workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
 });
@@ -140,10 +126,10 @@ test("Unauthenticated", async () => {
         id: uuidv4(),
         graphql,
         authorizationHeader: "badauthkey",
-        parentFolderId: addedFolder.parentFolderId,
-        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        parentFolderId: userData1.folder.parentFolderId,
+        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         contentSubkeyId: 1,
-        workspaceId: addedWorkspace.id,
+        workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });
@@ -169,7 +155,7 @@ describe("Input errors", () => {
             input: {
               id: null,
               parentFolderId: null,
-              workspaceId: addedWorkspace.id,
+              workspaceId: userData1.workspace.id,
             },
           },
           authorizationHeaders

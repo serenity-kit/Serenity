@@ -8,7 +8,7 @@ jest.mock("../workspace/getWorkspace", () => ({
   getWorkspace: jest.fn(),
 }));
 
-import { createDevice } from "@serenity-tools/common";
+import { createDevice, encryptFolderName } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
@@ -26,6 +26,10 @@ it("should return empty parentFolders", async () => {
   const workspaceKeyId = uuidv4();
   const folderId = uuidv4();
   const workspaceKeyString = await sodium.crypto_kdf_keygen();
+  const folderNameData = await encryptFolderName({
+    name: "folderName",
+    parentKey: workspaceKeyString,
+  });
   const workspaceKeyData = await createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
@@ -63,15 +67,15 @@ it("should return empty parentFolders", async () => {
     return {
       __typename: "Folder",
       id: folderId,
-      encryptedName: "aaa",
-      encryptedNameNonce: "aaa",
+      encryptedName: folderNameData.ciphertext,
+      encryptedNameNonce: folderNameData.publicNonce,
       workspaceKeyId,
-      subkeyId: 1,
+      subkeyId: folderNameData.folderSubkeyId,
       parentFolderId: null,
       workspaceId,
       keyDerivationTrace: {
         workspaceKeyId,
-        subkeyId: 1,
+        subkeyId: folderNameData.folderSubkeyId,
         parentFolders: [],
       },
     };
@@ -80,27 +84,176 @@ it("should return empty parentFolders", async () => {
   const derivedFolderKeyData = await deriveFolderKey({
     folderId,
     workspaceId,
-    workspaceKeyId,
     activeDevice,
+    keyDerivationTrace: {
+      workspaceKeyId,
+      subkeyId: folderNameData.folderSubkeyId,
+      parentFolders: [],
+    },
   });
   expect(derivedFolderKeyData).toMatchInlineSnapshot(`
-    {
-      "folderKeyData": {
-        "key": "6H8DHEVWRlmDnKBvBw5IhQF_Km69QOeKPMCjV2VWt0s",
-        "subkeyId": 1,
+    [
+      {
+        "folderId": "workspaceKeyId-${workspaceKeyId}",
+        "key": "${workspaceKeyString}",
+        "subkeyId": undefined,
       },
-      "keyChain": [],
-    }
+      {
+        "folderId": "${folderId}",
+        "key": "${folderNameData.folderSubkey}",
+        "subkeyId": ${folderNameData.folderSubkeyId},
+      },
+    ]
   `);
 });
 
-it.only("should return single parentFolders", async () => {
+it("should return single parentFolders", async () => {
   const activeDevice = await createDevice();
   const workspaceId = uuidv4();
   const workspaceKeyId = uuidv4();
   const folderId = uuidv4();
   const parentFolderId = uuidv4();
   const workspaceKeyString = await sodium.crypto_kdf_keygen();
+  const parentFolderNameData = await encryptFolderName({
+    name: "parentFolderName",
+    parentKey: workspaceKeyString,
+  });
+  const folderNameData = await encryptFolderName({
+    name: "folderName",
+    parentKey: parentFolderNameData.folderSubkey,
+  });
+  const workspaceKeyData = await createAndEncryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
+    workspaceKey: workspaceKeyString,
+  });
+  const workspaceKey = {
+    __typename: "WorkspaceKey",
+    id: workspaceKeyId,
+    workspaceKeyBox: {
+      __typename: "WorkspaceKeyBox",
+      id: uuidv4(),
+      ciphertext: workspaceKeyData.ciphertext,
+      nonce: workspaceKeyData.nonce,
+      deviceSigningPublicKey: "abc",
+      creatorDevice: {
+        __typename: "Device",
+        id: uuidv4(),
+        signingPublicKey: activeDevice.signingPublicKey,
+        encryptionPublicKey: activeDevice.encryptionPublicKey,
+      },
+    },
+  };
+  // @ts-ignore getWorkspace is mocked
+  getWorkspace.mockImplementation((props) => {
+    return {
+      __typename: "Workspace",
+      id: workspaceId,
+      currentWorkspaceKey: workspaceKey,
+      workspaceKeys: [workspaceKey],
+    };
+  });
+
+  // @ts-ignore getFolder is mocked
+  getFolder.mockImplementation((props) => {
+    if (props.folderId === folderId) {
+      return {
+        __typename: "Folder",
+        id: folderId,
+        encryptedName: folderNameData.ciphertext,
+        encryptedNameNonce: folderNameData.publicNonce,
+        workspaceKeyId,
+        subkeyId: folderNameData.folderSubkeyId,
+        parentFolderId: parentFolderId,
+        workspaceId,
+        keyDerivationTrace: {
+          workspaceKeyId,
+          subkeyId: folderNameData.folderSubkeyId,
+          parentFolders: [
+            {
+              folderId: parentFolderId,
+              subkeyId: parentFolderNameData.folderSubkeyId,
+              parentFolderId: null,
+            },
+          ],
+        },
+      };
+    } else {
+      return {
+        __typename: "Folder",
+        id: parentFolderId,
+        encryptedName: parentFolderNameData.ciphertext,
+        encryptedNameNonce: parentFolderNameData.publicNonce,
+        workspaceKeyId,
+        subkeyId: parentFolderNameData.folderSubkeyId,
+        parentFolderId: null,
+        workspaceId,
+        keyDerivationTrace: {
+          workspaceKeyId,
+          subkeyId: parentFolderNameData.folderSubkeyId,
+          parentFolders: [],
+        },
+      };
+    }
+  });
+
+  const derivedFolderKeyData = await deriveFolderKey({
+    folderId,
+    workspaceId,
+    activeDevice,
+    keyDerivationTrace: {
+      workspaceKeyId,
+      subkeyId: folderNameData.folderSubkeyId,
+      parentFolders: [
+        {
+          folderId: parentFolderId,
+          subkeyId: parentFolderNameData.folderSubkeyId,
+          parentFolderId: null,
+        },
+      ],
+    },
+  });
+  expect(derivedFolderKeyData).toMatchInlineSnapshot(`
+    [
+      {
+        "folderId": "workspaceKeyId-${workspaceKeyId}",
+        "key": "${workspaceKeyString}",
+        "subkeyId": undefined,
+      },
+      {
+        "folderId": "${parentFolderId}",
+        "key": "${parentFolderNameData.folderSubkey}",
+        "subkeyId": ${parentFolderNameData.folderSubkeyId},
+      },
+      {
+        "folderId": "${folderId}",
+        "key": "${folderNameData.folderSubkey}",
+        "subkeyId": ${folderNameData.folderSubkeyId},
+      },
+    ]
+  `);
+});
+
+it("should return deep parentFolders", async () => {
+  const activeDevice = await createDevice();
+  const workspaceId = uuidv4();
+  const workspaceKeyId = uuidv4();
+  const folderId = uuidv4();
+  const parentFolderId = uuidv4();
+  const childFolderId = uuidv4();
+  const workspaceKeyString = await sodium.crypto_kdf_keygen();
+  const parentFolderNameData = await encryptFolderName({
+    name: "parentFolderName",
+    parentKey: workspaceKeyString,
+  });
+  const folderNameData = await encryptFolderName({
+    name: "folderName",
+    parentKey: parentFolderNameData.folderSubkey,
+  });
+  const childFolderNameData = await encryptFolderName({
+    name: "childFolderName",
+    parentKey: folderNameData.folderSubkey,
+  });
   const workspaceKeyData = await createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
@@ -136,23 +289,50 @@ it.only("should return single parentFolders", async () => {
   // @ts-ignore getFolder is mocked
   getFolder.mockImplementation((props) => {
     console.log("props", props);
-    if (props.folderId === folderId) {
+    if (props.folderId === childFolderId) {
+      return {
+        __typename: "Folder",
+        id: childFolderId,
+        encryptedName: childFolderNameData.ciphertext,
+        encryptedNameNonce: childFolderNameData.publicNonce,
+        workspaceKeyId,
+        subkeyId: childFolderNameData.folderSubkeyId,
+        parentFolderId: folderId,
+        workspaceId,
+        keyDerivationTrace: {
+          workspaceKeyId,
+          subkeyId: childFolderNameData.folderSubkeyId,
+          parentFolders: [
+            {
+              folderId: folderId,
+              subkeyId: folderNameData.folderSubkeyId,
+              parentFolderId: parentFolderId,
+            },
+            {
+              folderId: parentFolderId,
+              subkeyId: parentFolderNameData.folderSubkeyId,
+              parentFolderId: null,
+            },
+          ],
+        },
+      };
+    } else if (props.folderId === folderId) {
       return {
         __typename: "Folder",
         id: folderId,
-        encryptedName: "aaa",
-        encryptedNameNonce: "aaa",
+        encryptedName: folderNameData.ciphertext,
+        encryptedNameNonce: folderNameData.publicNonce,
         workspaceKeyId,
-        subkeyId: 1,
+        subkeyId: folderNameData.folderSubkeyId,
         parentFolderId: parentFolderId,
         workspaceId,
         keyDerivationTrace: {
           workspaceKeyId,
-          subkeyId: 1,
+          subkeyId: folderNameData.folderSubkeyId,
           parentFolders: [
             {
               folderId: parentFolderId,
-              subkeyId: 2,
+              subkeyId: parentFolderNameData.folderSubkeyId,
               parentFolderId: null,
             },
           ],
@@ -162,15 +342,15 @@ it.only("should return single parentFolders", async () => {
       return {
         __typename: "Folder",
         id: parentFolderId,
-        encryptedName: "aaa",
-        encryptedNameNonce: "aaa",
+        encryptedName: parentFolderNameData.ciphertext,
+        encryptedNameNonce: parentFolderNameData.publicNonce,
         workspaceKeyId,
-        subkeyId: 1,
+        subkeyId: parentFolderNameData.folderSubkeyId,
         parentFolderId: null,
         workspaceId,
         keyDerivationTrace: {
           workspaceKeyId,
-          subkeyId: 2,
+          subkeyId: parentFolderNameData.folderSubkeyId,
           parentFolders: [],
         },
       };
@@ -178,18 +358,48 @@ it.only("should return single parentFolders", async () => {
   });
 
   const derivedFolderKeyData = await deriveFolderKey({
-    folderId,
+    folderId: childFolderId,
     workspaceId,
-    workspaceKeyId,
     activeDevice,
+    keyDerivationTrace: {
+      workspaceKeyId,
+      subkeyId: childFolderNameData.folderSubkeyId,
+      parentFolders: [
+        {
+          folderId: folderId,
+          subkeyId: folderNameData.folderSubkeyId,
+          parentFolderId: null,
+        },
+        {
+          folderId: parentFolderId,
+          subkeyId: parentFolderNameData.folderSubkeyId,
+          parentFolderId: null,
+        },
+      ],
+    },
   });
   expect(derivedFolderKeyData).toMatchInlineSnapshot(`
-    {
-      "folderKeyData": {
-        "key": "R7Wgk-GO5acyqQXgyLHIJiQsBCks6siJW31fyuQVQZo",
-        "subkeyId": 1,
+    [
+      {
+        "folderId": "workspaceKeyId-${workspaceKeyId}",
+        "key": "${workspaceKeyString}",
+        "subkeyId": undefined,
       },
-      "keyChain": [],
-    }
+      {
+        "folderId": "${parentFolderId}",
+        "key": "${parentFolderNameData.folderSubkey}",
+        "subkeyId": ${parentFolderNameData.folderSubkeyId},
+      },
+      {
+        "folderId": "${folderId}",
+        "key": "${folderNameData.folderSubkey}",
+        "subkeyId": ${folderNameData.folderSubkeyId},
+      },
+      {
+        "folderId": "${childFolderId}",
+        "key": "${childFolderNameData.folderSubkey}",
+        "subkeyId": ${childFolderNameData.folderSubkeyId},
+      },
+    ]
   `);
 });

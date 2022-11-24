@@ -100,6 +100,8 @@ import { SearchLine } from "./icons/SearchLine";
 import { Separator } from "./icons/Separator";
 import { SerenityFeather } from "./icons/SerenityFeather";
 import { Settings4Line } from "./icons/Settings4Line";
+import { ShareLine } from "./icons/ShareLine";
+import { ShareBoxLine } from "./icons/ShareBoxLine";
 import { StarSFill } from "./icons/StarSFill";
 import { Strikethrough } from "./icons/Strikethrough";
 import { Table2 } from "./icons/Table2";
@@ -215,6 +217,8 @@ export type IconNames =
   | "separator"
   | "serenity-feather"
   | "settings-4-line"
+  | "share-line"
+  | "share-box-line"
   | "stars-s-fill"
   | "strikethrough"
   | "table-2"
@@ -228,9 +232,8 @@ export type IconNames =
 export type IconProps = {
   name: IconNames;
   color?: Color;
-  size?: number;
-  mobileSize?: number;
-  blub?: Color;
+  size?: number | "full";
+  mobileSize?: number | "full";
 };
 
 export const Icon = (props: IconProps) => {
@@ -538,11 +541,17 @@ export const Icon = (props: IconProps) => {
   if (name === "separator") {
     icon = <Separator color={color} size={iconSize} />;
   }
+  if (name === "serenity-feather") {
+    icon = <SerenityFeather color={color} size={iconSize} />;
+  }
   if (name === "settings-4-line") {
     icon = <Settings4Line color={color} size={iconSize} />;
   }
-  if (name === "serenity-feather") {
-    icon = <SerenityFeather color={color} size={iconSize} />;
+  if (name === "share-line") {
+    icon = <ShareLine color={color} size={iconSize} />;
+  }
+  if (name === "share-box-line") {
+    icon = <ShareBoxLine color={color} size={iconSize} />;
   }
   if (name === "stars-s-fill") {
     icon = <StarSFill color={color} size={iconSize} />;

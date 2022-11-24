@@ -7,15 +7,18 @@ import {
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { decryptWorkspaceKey } from "../../../../test/helpers/device/decryptWorkspaceKey";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
+import { prisma } from "../../../database/prisma";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
+let userData1: any = undefined;
 const username = "user1";
 const password = "password";
 let addedWorkspace: any = null;
@@ -26,40 +29,26 @@ let workspaceKey = "";
 let folderKey = "";
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  sessionKey = registerUserResult.sessionKey;
-  const device = registerUserResult.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey,
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  addedWorkspace = userData1.workspace;
+  sessionKey = userData1.sessionKey;
+  addedFolder = userData1.folder;
 
   const workspaceKeyBox = addedWorkspace.currentWorkspaceKey.workspaceKeyBox;
   workspaceKey = await decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext,
     nonce: workspaceKeyBox.nonce,
-    creatorDeviceEncryptionPublicKey:
-      registerUserResult.mainDevice.encryptionPublicKey,
-    receiverDeviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
+    creatorDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
+    receiverDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
   });
-  addedFolder = createWorkspaceResult.createInitialWorkspaceStructure.folder;
   const folderKeyResult = await kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
-    subkeyId: addedFolder.subkeyId,
+    subkeyId: addedFolder.keyDerivationTrace.subkeyId,
   });
   folderKey = folderKeyResult.key;
   let documentContentKeyResult = await createDocumentKey({
@@ -98,10 +87,10 @@ test("user should be able to change a document name", async () => {
   const updatedDocument = result.updateDocumentName.document;
   expect(typeof updatedDocument.encryptedName).toBe("string");
   expect(typeof updatedDocument.encryptedNameNonce).toBe("string");
-  expect(typeof updatedDocument.subkeyId).toBe("number");
+  expect(typeof updatedDocument.nameKeyDerivationTrace.subkeyId).toBe("number");
   const documentSubkey = await recreateDocumentKey({
     folderKey,
-    subkeyId: updatedDocument.subkeyId,
+    subkeyId: updatedDocument.nameKeyDerivationTrace.subkeyId,
   });
   const decryptedName = await decryptDocumentTitle({
     key: documentSubkey.key,
@@ -131,35 +120,20 @@ test("Throw error when document doesn't exist", async () => {
 });
 
 test("Throw error when user doesn't have access", async () => {
-  // create a new user with access to different documents
-  const username2 = "user2";
-  const registerUserResult = await registerUser(graphql, username2, password);
-  const device = registerUserResult.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: registerUserResult.sessionKey,
+  const userData2 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+
   const otherUserDocumentResult = await createDocument({
-    id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
     graphql,
-    authorizationHeader: registerUserResult.sessionKey,
-    parentFolderId: null,
+    id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
+    parentFolderId: userData1.folder.parentFolderId,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    workspaceId: userData1.workspace.id,
     contentSubkeyId: 1,
-    workspaceId: addedWorkspace.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    authorizationHeader: userData1.sessionKey,
   });
   const authorizationHeader = sessionKey;
   const id = otherUserDocumentResult.createDocument.id;
@@ -173,9 +147,67 @@ test("Throw error when user doesn't have access", async () => {
         parentFolderId: addedFolder.parentFolderId,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
-        authorizationHeader,
+        authorizationHeader: userData2.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
+});
+
+test("Commenter tries to update", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.COMMENTER,
+    },
+  });
+  const id = addedDocumentId;
+  const name = "Updated Name";
+  await expect(
+    (async () =>
+      await updateDocumentName({
+        graphql,
+        id,
+        name,
+        parentFolderId: addedFolder.parentFolderId,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        folderKey,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
+});
+
+test("Viewer tries to update", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.VIEWER,
+    },
+  });
+  const id = addedDocumentId;
+  const name = "Updated Name";
+  await expect(
+    (async () =>
+      await updateDocumentName({
+        graphql,
+        id,
+        name,
+        parentFolderId: addedFolder.parentFolderId,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        folderKey,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
 });
 
 test("Unauthenticated", async () => {

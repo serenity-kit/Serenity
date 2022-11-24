@@ -1,4 +1,4 @@
-name: "Deploy API to Heroku"
+name: "Deploy API"
 
 on:
   push:
@@ -13,13 +13,7 @@ jobs:
       - name: Build
         working-directory: ./apps/backend
         run: yarn build
-      - name: Run Migrations
-        working-directory: ./apps/backend
-        run: POSTGRES_URL=${{secrets.POSTGRES_URL}} yarn prisma:prod:migrate
-      - uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
-          usedocker: true
-          appdir: "apps/backend"
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only ./apps/backend
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

@@ -5,15 +5,17 @@ import {
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { prisma } from "../../../database/prisma";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
+let userData1: any = undefined;
 const username = "user1";
 const password = "password";
 let userAndDevice: any = null;
@@ -23,32 +25,17 @@ let sessionKey = "";
 let addedWorkspaceStructure: any = null;
 
 const setup = async () => {
-  userAndDevice = await registerUser(graphql, username, password);
-  sessionKey = userAndDevice.sessionKey;
-  const device = userAndDevice.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: userAndDevice.encryptionPrivateKey,
-    webDevice: userAndDevice.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey,
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspaceStructure =
-    createWorkspaceResult.createInitialWorkspaceStructure;
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  sessionKey = userData1.sessionKey;
+  addedWorkspace = userData1.workspace;
   workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
-    device: userAndDevice.mainDevice,
-    deviceEncryptionPrivateKey: userAndDevice.encryptionPrivateKey,
-    workspace: addedWorkspace,
+    device: userData1.device,
+    deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+    workspace: userData1.workspace,
   });
 };
 
@@ -69,8 +56,8 @@ test("user should be able to create a root folder", async () => {
     name,
     parentFolderId,
     parentKey: workspaceKey,
-    workspaceId: addedWorkspace.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
   });
   const folder = result.createFolder.folder;
@@ -79,7 +66,7 @@ test("user should be able to create a root folder", async () => {
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
   expect(typeof folder.encryptedNameNonce).toBe("string");
-  expect(typeof folder.subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.subkeyId).toBe("number");
 });
 
 test("user should be able to create a root folder with a name", async () => {
@@ -93,8 +80,8 @@ test("user should be able to create a root folder with a name", async () => {
     name,
     parentFolderId,
     parentKey: workspaceKey,
-    workspaceId: addedWorkspace.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
   });
   const folder = result.createFolder.folder;
@@ -103,7 +90,7 @@ test("user should be able to create a root folder with a name", async () => {
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
   expect(typeof folder.encryptedNameNonce).toBe("string");
-  expect(typeof folder.subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.subkeyId).toBe("number");
 });
 
 test("user should be able to create a child folder", async () => {
@@ -125,8 +112,8 @@ test("user should be able to create a child folder", async () => {
     name,
     parentKey: parentFolderKey.key,
     parentFolderId,
-    workspaceId: addedWorkspace.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
   });
   const folder = result.createFolder.folder;
@@ -135,7 +122,7 @@ test("user should be able to create a child folder", async () => {
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
   expect(typeof folder.encryptedNameNonce).toBe("string");
-  expect(typeof folder.subkeyId).toBe("number");
+  expect(typeof folder.keyDerivationTrace.subkeyId).toBe("number");
 });
 
 test("duplicate ID throws an error", async () => {
@@ -149,8 +136,8 @@ test("duplicate ID throws an error", async () => {
     name,
     parentKey: workspaceKey,
     parentFolderId,
-    workspaceId: addedWorkspace.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    workspaceId: userData1.workspace.id,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     authorizationHeader,
   });
   await expect(
@@ -161,8 +148,8 @@ test("duplicate ID throws an error", async () => {
         name,
         parentKey: workspaceKey,
         parentFolderId,
-        workspaceId: addedWorkspace.id,
-        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        workspaceId: userData1.workspace.id,
+        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         authorizationHeader,
       }))()
   ).rejects.toThrow("Invalid input: duplicate id");
@@ -175,8 +162,8 @@ test("Throw error on duplicate subkeyId, workspaceId", async () => {
     name,
     parentKey: workspaceKey,
   });
-  const workspaceId = addedWorkspaceStructure.workspace.id;
-  const existingSubkeyId = addedWorkspaceStructure.folder.subkeyId;
+  const workspaceId = userData1.workspace.id;
+  const existingSubkeyId = userData1.folder.subkeyId;
   const encryptedName = encryptedFolderResult.ciphertext;
   const encryptedNameNonce = encryptedFolderResult.publicNonce;
   const query = gql`
@@ -186,7 +173,6 @@ test("Throw error on duplicate subkeyId, workspaceId", async () => {
           id
           encryptedName
           encryptedNameNonce
-          subkeyId
           parentFolderId
           rootFolderId
           workspaceId
@@ -235,27 +221,12 @@ test("Throw error when the parent folder doesn't exist", async () => {
 });
 
 test("Throw error when user doesn't have access", async () => {
-  // create a new user with access to different documents
-  const username2 = "user2";
-  const registerUserResult = await registerUser(graphql, username2, password);
-  const device = registerUserResult.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "95ad4e7a-f476-4bba-a650-8bb586d94ed3",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: userAndDevice.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: registerUserResult.sessionKey,
+  const userData2 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  const otherAddedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  const otherAddedWorkspace = userData2.workspace;
   const name = "Untitled";
   await expect(
     (async () =>
@@ -270,6 +241,64 @@ test("Throw error when user doesn't have access", async () => {
         authorizationHeader: sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
+});
+
+test("Commentor tries to create", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.COMMENTER,
+    },
+  });
+  const id = uuidv4();
+  await expect(
+    (async () =>
+      await createFolder({
+        graphql,
+        id,
+        name: "test",
+        parentKey: workspaceKey,
+        parentFolderId: null,
+        workspaceId: addedWorkspace.id,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
+});
+
+test("Viewer tries to create", async () => {
+  const otherUser = await registerUser(
+    graphql,
+    `${uuidv4()}@example.com`,
+    password
+  );
+  await prisma.usersToWorkspaces.create({
+    data: {
+      userId: otherUser.userId,
+      workspaceId: addedWorkspace.id,
+      role: Role.VIEWER,
+    },
+  });
+  const id = uuidv4();
+  await expect(
+    (async () =>
+      await createFolder({
+        graphql,
+        id,
+        name: "test",
+        parentKey: workspaceKey,
+        parentFolderId: null,
+        workspaceId: addedWorkspace.id,
+        workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+        authorizationHeader: otherUser.sessionKey,
+      }))()
+  ).rejects.toThrowError("Unauthorized");
 });
 
 test("Unauthenticated", async () => {
@@ -293,6 +322,20 @@ describe("Input errors", () => {
   const authorizationHeaders = {
     authorization: sessionKey,
   };
+  const query = gql`
+    mutation createFolder($input: CreateFolderInput!) {
+      createFolder(input: $input) {
+        folder {
+          id
+          encryptedName
+          encryptedNameNonce
+          parentFolderId
+          rootFolderId
+          workspaceId
+        }
+      }
+    }
+  `;
   test("Invalid id", async () => {
     const name = "test";
     const encryptedFolderResult = await encryptFolderName({
@@ -302,21 +345,6 @@ describe("Input errors", () => {
     const encryptedName = encryptedFolderResult.ciphertext;
     const encryptedNameNonce = encryptedFolderResult.publicNonce;
     const subkeyId = encryptedFolderResult.folderSubkeyId;
-    const query = gql`
-      mutation createFolder($input: CreateFolderInput!) {
-        createFolder(input: $input) {
-          folder {
-            id
-            encryptedName
-            encryptedNameNonce
-            subkeyId
-            parentFolderId
-            rootFolderId
-            workspaceId
-          }
-        }
-      }
-    `;
     await expect(
       (async () =>
         await graphql.client.request(
@@ -345,21 +373,6 @@ describe("Input errors", () => {
     const encryptedName = encryptedFolderResult.ciphertext;
     const encryptedNameNonce = encryptedFolderResult.publicNonce;
     const subkeyId = encryptedFolderResult.folderSubkeyId;
-    const query = gql`
-      mutation createFolder($input: CreateFolderInput!) {
-        createFolder(input: $input) {
-          folder {
-            id
-            encryptedName
-            encryptedNameNonce
-            subkeyId
-            parentFolderId
-            rootFolderId
-            workspaceId
-          }
-        }
-      }
-    `;
     await expect(
       (async () =>
         await graphql.client.request(
@@ -380,21 +393,6 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid input", async () => {
-    const query = gql`
-      mutation createFolder($input: CreateFolderInput!) {
-        createFolder(input: $input) {
-          folder {
-            id
-            encryptedName
-            encryptedNameNonce
-            subkeyId
-            parentFolderId
-            rootFolderId
-            workspaceId
-          }
-        }
-      }
-    `;
     await expect(
       (async () =>
         await graphql.client.request(
@@ -407,21 +405,6 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("No input", async () => {
-    const query = gql`
-      mutation createFolder($input: CreateFolderInput!) {
-        createFolder(input: $input) {
-          folder {
-            id
-            encryptedName
-            encryptedNameNonce
-            subkeyId
-            parentFolderId
-            rootFolderId
-            workspaceId
-          }
-        }
-      }
-    `;
     await expect(
       (async () =>
         await graphql.client.request(query, null, authorizationHeaders))()

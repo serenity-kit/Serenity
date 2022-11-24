@@ -6,10 +6,11 @@ import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { deleteDocuments } from "../../../../test/helpers/document/deleteDocuments";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
-import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 import { prisma } from "../../../database/prisma";
+import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
+let userData1: any = undefined;
 const username = "user1";
 const password = "password";
 let addedWorkspace: any = null;
@@ -17,32 +18,19 @@ let addedDocumentId: any = null;
 let sessionKey = "";
 
 const setup = async () => {
-  const registerUserResult = await registerUser(graphql, username, password);
-  sessionKey = registerUserResult.sessionKey;
-  const device = registerUserResult.mainDevice;
-  const createWorkspaceResult = await createInitialWorkspaceStructure({
-    workspaceName: "workspace 1",
-    workspaceId: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
-    deviceSigningPublicKey: device.signingPublicKey,
-    deviceEncryptionPublicKey: device.encryptionPublicKey,
-    deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-    webDevice: registerUserResult.webDevice,
-    folderName: "Getting started",
-    folderId: uuidv4(),
-    folderIdSignature: `TODO+${uuidv4()}`,
-    documentName: "Introduction",
-    documentId: uuidv4(),
-    graphql,
-    authorizationHeader: sessionKey,
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
   });
-  addedWorkspace =
-    createWorkspaceResult.createInitialWorkspaceStructure.workspace;
+  addedWorkspace = userData1.workspace;
+  sessionKey = userData1.sessionKey;
+  const folder = userData1.folder;
   const createDocumentResult = await createDocument({
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     graphql,
     authorizationHeader: sessionKey,
-    parentFolderId:
-      createWorkspaceResult.createInitialWorkspaceStructure.folder.id,
+    parentFolderId: folder.id,
     contentSubkeyId: 1,
     workspaceId: addedWorkspace.id,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,

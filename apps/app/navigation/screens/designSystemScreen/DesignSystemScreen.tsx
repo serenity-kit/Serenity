@@ -39,22 +39,29 @@ import {
   SidebarText,
   Spinner,
   Text,
+  TextArea,
   Tooltip,
   tw,
   View,
   WorkspaceAvatar,
 } from "@serenity-tools/ui";
+import * as Clipboard from "expo-clipboard";
 import { HStack, VStack } from "native-base";
 import { useState } from "react";
 import { useWindowDimensions } from "react-native";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 import { showToast } from "../../../utils/toast/showToast";
 
 let counter = 0;
 
-export default function DesignSystemScreen() {
+export default function DesignSystemScreen(
+  props: RootStackScreenProps<"DesignSystem">
+) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [showModal, setShowModal] = useState(false);
   const [isOpenPopover, setIsOpenPopover] = useState(false);
+  const [isClipboardNoticeActive, setIsClipboardNoticeActive] = useState(false);
+  const [pageShareLink, setPageShareLink] = useState<string>("");
   const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
   const collaborationColors = Object.keys(colors.collaboration) as any;
 
@@ -67,6 +74,17 @@ export default function DesignSystemScreen() {
         </Text>
       </CenterContent>
     );
+  };
+
+  const copyTextAreaText = async () => {
+    if (!pageShareLink) {
+      return;
+    }
+    await Clipboard.setStringAsync(pageShareLink);
+    setIsClipboardNoticeActive(true);
+    setTimeout(() => {
+      setIsClipboardNoticeActive(false);
+    }, 1000);
   };
 
   // fakes filling elements into container to hinder the last wrapping children to grow and center themselves
@@ -148,14 +166,14 @@ export default function DesignSystemScreen() {
         <Heading lvl={3}>Styling</Heading>
         <Text variant="sm">
           Set one of the many coloring options with the{" "}
-          <DSMono variant="property">customColor</DSMono> property.
+          <DSMono variant="property">color</DSMono> property.
         </Text>
         <DSExampleArea>
-          <Avatar customColor="arctic">BE</Avatar>
-          <Avatar customColor="lavender">NG</Avatar>
-          <Avatar customColor="rose">AB</Avatar>
-          <Avatar customColor="honey">SK</Avatar>
-          <Avatar customColor="emerald">AD</Avatar>
+          <Avatar color="arctic">BE</Avatar>
+          <Avatar color="lavender">NG</Avatar>
+          <Avatar color="rose">AB</Avatar>
+          <Avatar color="honey">SK</Avatar>
+          <Avatar color="emerald">AD</Avatar>
         </DSExampleArea>
         <Heading lvl={3}>Grouping</Heading>
         <Text variant="sm">
@@ -165,11 +183,37 @@ export default function DesignSystemScreen() {
         </Text>
         <DSExampleArea>
           <AvatarGroup max={3} _avatar={{ size: "sm" }}>
-            <Avatar customColor="arctic">SK</Avatar>
-            <Avatar customColor="lavender">NG</Avatar>
-            <Avatar customColor="rose">AN</Avatar>
-            <Avatar customColor="honey">NG</Avatar>
-            <Avatar customColor="sky">NG</Avatar>
+            <Avatar color="arctic">SK</Avatar>
+            <Avatar color="lavender">NG</Avatar>
+            <Avatar color="rose">AN</Avatar>
+            <Avatar color="honey">NG</Avatar>
+            <Avatar color="sky">NG</Avatar>
+          </AvatarGroup>
+        </DSExampleArea>
+        <Heading lvl={3}>Status</Heading>
+        <Text variant="sm">
+          To indicate if an <DSMono variant="component">Avatar</DSMono> is
+          active or absent in the same context as the current user is, use the{" "}
+          <DSMono variant="property">status</DSMono> property, to make their
+          presence more visible.
+        </Text>
+        <DSExampleArea>
+          <AvatarGroup max={3} _avatar={{ size: "sm" }}>
+            <Avatar status="active" color="arctic">
+              SK
+            </Avatar>
+            <Avatar status="active" color="lavender">
+              NG
+            </Avatar>
+            <Avatar status="inactive" color="rose">
+              AN
+            </Avatar>
+            <Avatar status="inactive" color="honey">
+              NG
+            </Avatar>
+            <Avatar status="inactive" color="sky">
+              NG
+            </Avatar>
           </AvatarGroup>
         </DSExampleArea>
         <Heading lvl={4} style={h4Styles}>
@@ -197,11 +241,11 @@ export default function DesignSystemScreen() {
         <Heading lvl={3}>Styling</Heading>
         <Text variant="sm">
           Set one of the many coloring options with the{" "}
-          <DSMono variant="property">customColor</DSMono> property.
+          <DSMono variant="property">color</DSMono> property.
         </Text>
         <DSExampleArea>
           {collaborationColors.map((color) => {
-            return <WorkspaceAvatar key={color} customColor={color} />;
+            return <WorkspaceAvatar key={color} color={color} />;
           })}
         </DSExampleArea>
 
@@ -442,7 +486,6 @@ export default function DesignSystemScreen() {
                       name="arrow-right-filled"
                       color={"gray-600"}
                       mobileSize={5}
-                      blub={"collaboration-orange"}
                     />
                   </View>
                   <View style={tw`-ml-0.5`}>
@@ -1020,6 +1063,27 @@ export default function DesignSystemScreen() {
           <Icon name="check-line" size={10} mobileSize={12} />
           <Icon name="check-line" size={12} mobileSize={14} />
         </DSExampleArea>
+        <Text variant="sm" style={tw`mt-4`}>
+          To make an Icon full-size, which means it will fill it's
+          parent-container, set the <DSMono variant="property">size</DSMono> to{" "}
+          <DSMono variant="type">full</DSMono> . Don't forget to then also set
+          the <DSMono variant="property">mobileSize</DSMono> property, if you
+          want the same behaviour on mobile.
+        </Text>
+        <DSExampleArea>
+          <View style={tw`w-5 h-5 border border-dashed border-gray-300`}>
+            <Icon name="check-line" size={"full"} mobileSize={"full"} />
+          </View>
+          <View style={tw`w-15 h-15 border border-dashed border-gray-300`}>
+            <Icon name="check-line" size={"full"} mobileSize={"full"} />
+          </View>
+          <View style={tw`w-40 h-25 border border-dashed border-gray-300`}>
+            <Icon name="check-line" size={"full"} mobileSize={"full"} />
+          </View>
+          <View style={tw`w-25 h-40 border border-dashed border-gray-300`}>
+            <Icon name="check-line" size={"full"} mobileSize={"full"} />
+          </View>
+        </DSExampleArea>
         <Heading lvl={3}>Styling</Heading>
         <Text variant="sm">
           Icons don't have a style property, but you can still dye them with the{" "}
@@ -1028,7 +1092,7 @@ export default function DesignSystemScreen() {
         <Text variant="sm" style={tw`mt-4`}>
           You can use all of our custom colors defined for the application by
           typing the name and if necessary the hue value:{" "}
-          <DSMono variant="type">collaboration-honey</DSMono>,
+          <DSMono variant="type">collaboration-honey</DSMono>,{" "}
           <DSMono variant="type">white</DSMono> , or{" "}
           <DSMono variant="type">gray-500</DSMono> for example.
         </Text>
@@ -1108,8 +1172,8 @@ export default function DesignSystemScreen() {
             <IconTile name="page-separator" />
             <IconTile name="separator" />
             <IconTile name="calendar-check-fill" />
-            <IconTile name="image-2-line" />
             <IconTile name="image-line" />
+            <IconTile name="image-2-line" />
             <IconTile name="movie-line" />
             <IconTile name="folder-music-line" />
             <IconTile name="emotion-line" />
@@ -1140,6 +1204,8 @@ export default function DesignSystemScreen() {
             <IconTile name="download-line" />
             <IconTile name="printer-line" />
             <IconTile name="search-line" />
+            <IconTile name="share-line" />
+            <IconTile name="share-box-line" />
             <IconTile name="stars-s-fill" />
             <IconTile name="delete-bin-line" />
             <IconTile name="history-line" />
@@ -1610,13 +1676,13 @@ export default function DesignSystemScreen() {
 
               <MenuLink
                 to={{ screen: "EncryptDecryptImageTest" }}
-                icon={<WorkspaceAvatar customColor="emerald" size={"xxs"} />}
+                icon={<WorkspaceAvatar color="emerald" size={"xxs"} />}
               >
                 Notes
               </MenuLink>
               <MenuLink
                 to={{ screen: "Login" }}
-                icon={<WorkspaceAvatar customColor="honey" size={"xxs"} />}
+                icon={<WorkspaceAvatar color="honey" size={"xxs"} />}
               >
                 Project X
               </MenuLink>
@@ -1929,6 +1995,96 @@ export default function DesignSystemScreen() {
           </Text>
         </DSExampleArea>
 
+        <Heading lvl={1}>TextArea</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="md">
+            TextArea
+          </DSMono>{" "}
+          component is used for system generated text which the user might use
+          elsewhere.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="sm">
+          The basic{" "}
+          <DSMono variant="component" size="md">
+            TextArea
+          </DSMono>{" "}
+          is muted to show the user the Text inside is just an Info and not
+          something they can interact with.
+        </Text>
+        <DSExampleArea>
+          <TextArea>
+            {
+              'The share link will be generated here\nClick on "Create page link" to generate a new link'
+            }
+          </TextArea>
+        </DSExampleArea>
+        <Text variant="xxs" muted style={tw`mt-4`}>
+          Note: as there are currently troubles with react native that prevent
+          users to select text in the web version and even editing in Safari
+          (desktop & iOS), all Text on web will be selectable until this issue
+          is fixed
+        </Text>
+        <Heading lvl={3}>Select & Copy</Heading>
+        <Text variant="sm">
+          To allow the user to interact with the{" "}
+          <DSMono variant="component" size="md">
+            TextArea
+          </DSMono>{" "}
+          add the <DSMono variant="property">selectable</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <TextArea selectable style={tw`max-w-150`}>
+            {
+              "http://serenity.re/share/b80d1184-04f7-4965-a4e4/078967c0-c829-4870-b64c-#key=_gpZeFjmIHZzhmJwDp2chGYRiaKB0DdzTacl_uFV9ZU"
+            }
+          </TextArea>
+        </DSExampleArea>
+        <Text variant="sm" style={tw`mt-2.5`}>
+          To add even more functionality you can allow the user to copy the Text
+          to the clipboard, by adding{" "}
+          <DSMono variant="property">isClipboardNoticeActive</DSMono> and a{" "}
+          <DSMono variant="property">onCopyPress</DSMono> .
+        </Text>
+        <DSExampleArea
+          vertical
+          style={tw`mb-4 py-12 bg-gray-900/30 items-center`}
+          center
+        >
+          <Box style={tw`w-100`}>
+            <UIHeading lvl={3}>Share a page</UIHeading>
+            <TextArea
+              selectable={pageShareLink !== ""}
+              onCopyPress={copyTextAreaText}
+              isClipboardNoticeActive={isClipboardNoticeActive}
+            >
+              {pageShareLink !== ""
+                ? pageShareLink
+                : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
+            </TextArea>
+            <HStack space={4}>
+              <Button
+                onPress={() => {
+                  setPageShareLink(
+                    "http://serenity.re/share/b80d1184-04f7-4965-a4e4/078967c0-c829-4870-b64c-#key=_gpZeFjmIHZzhmJwDp2chGYRiaKB0DdzTacl_uFV9ZU"
+                  );
+                }}
+              >
+                Create page link
+              </Button>
+              <Button
+                onPress={() => {
+                  setPageShareLink("");
+                }}
+                variant={"secondary"}
+              >
+                Reset
+              </Button>
+            </HStack>
+          </Box>
+        </DSExampleArea>
+
         <Heading lvl={1}>Toast</Heading>
         <Text>
           The{" "}
@@ -1958,16 +2114,13 @@ export default function DesignSystemScreen() {
           >
             Copy
           </Button>
-        </DSExampleArea>
-
-        <DSExampleArea>
           <Button
             onPress={() => {
               showToast("Failed to delete the page.", "error");
             }}
             size={"md"}
           >
-            Error
+            This will fail
           </Button>
         </DSExampleArea>
 

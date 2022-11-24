@@ -27,16 +27,17 @@ export const updateDocumentName = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const documentSubkey = await createDocumentKey({
+  const documentKeyData = await createDocumentKey({
     folderKey,
   });
   const encryptedDocumentResult = await encryptDocumentTitle({
     title: name,
-    key: documentSubkey.key,
+    key: documentKeyData.key,
   });
 
   const nameKeyDerivationTrace = await buildFolderKeyTrace({
     workspaceKeyId,
+    subkeyId: documentKeyData.subkeyId,
     parentFolderId,
   });
 
@@ -46,13 +47,12 @@ export const updateDocumentName = async ({
         document {
           encryptedName
           encryptedNameNonce
-          workspaceKeyId
-          subkeyId
           id
           parentFolderId
           workspaceId
           nameKeyDerivationTrace {
             workspaceKeyId
+            subkeyId
             parentFolders {
               folderId
               subkeyId
@@ -71,7 +71,7 @@ export const updateDocumentName = async ({
         encryptedName: encryptedDocumentResult.ciphertext,
         encryptedNameNonce: encryptedDocumentResult.publicNonce,
         workspaceKeyId,
-        subkeyId: documentSubkey.subkeyId,
+        subkeyId: documentKeyData.subkeyId,
         nameKeyDerivationTrace,
       },
     },

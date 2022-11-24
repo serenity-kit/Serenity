@@ -35,7 +35,8 @@ import * as UnauthorizedDevicesForWorkspacesTypes from "./graphql/queries/device
 import * as DocumentQueryTypes from "./graphql/queries/document/document";
 import * as DocumentPathQueryTypes from "./graphql/queries/document/documentPath";
 import * as DocumentsQueryTypes from "./graphql/queries/document/documents";
-import * as DocumentShareLinkQueryTypes from "./graphql/queries/document/documentShareLinks";
+import * as DocumentShareLinkQueryTypes from "./graphql/queries/document/documentShareLink";
+import * as DocumentShareLinksQueryTypes from "./graphql/queries/document/documentShareLinks";
 import * as FirstDocumentQueryTypes from "./graphql/queries/document/firstDocument";
 import * as FileUrlQueryTypes from "./graphql/queries/file/fileUrl";
 import * as FolderQueryTypes from "./graphql/queries/folder/folder";
@@ -76,6 +77,7 @@ export const schema = makeSchema({
     RemoveDocumentShareLinkTypes,
 
     DocumentShareLinkTypes,
+    DocumentShareLinksQueryTypes,
     DocumentShareLinkQueryTypes,
 
     CreateFolderMutationTypes,

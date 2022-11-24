@@ -4,13 +4,13 @@ import {
 } from "@react-navigation/drawer";
 
 import { Heading, SidebarLink, tw } from "@serenity-tools/ui";
-import { useWorkspaceId } from "../../context/WorkspaceIdContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
 
 export default function WorkspaceSettingsSidebar(
   props: DrawerContentComponentProps
 ) {
   const currentRouteName = props.state.routeNames[props.state.index];
-  const workspaceId = useWorkspaceId();
+  const { workspaceId } = useWorkspace();
   return (
     <DrawerContentScrollView {...props} style={tw`bg-gray-100 py-4`}>
       <Heading lvl={4} style={tw`px-4 pb-4`}>
@@ -18,8 +18,14 @@ export default function WorkspaceSettingsSidebar(
       </Heading>
       <SidebarLink
         to={{
-          screen: "WorkspaceSettings",
-          params: { screen: "General", workspaceId },
+          screen: "Workspace",
+          params: {
+            workspaceId,
+            screen: "WorkspaceSettings",
+            params: {
+              screen: "General",
+            },
+          },
         }}
         iconName="settings-4-line"
         active={currentRouteName === "General"}
@@ -28,8 +34,14 @@ export default function WorkspaceSettingsSidebar(
       </SidebarLink>
       <SidebarLink
         to={{
-          screen: "WorkspaceSettings",
-          params: { screen: "Members", workspaceId },
+          screen: "Workspace",
+          params: {
+            workspaceId,
+            screen: "WorkspaceSettings",
+            params: {
+              screen: "Members",
+            },
+          },
         }}
         iconName="group-line"
         active={currentRouteName === "Members"}

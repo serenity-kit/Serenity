@@ -25,22 +25,27 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
       document &&
       document.encryptedName &&
       document.encryptedNameNonce &&
-      document.subkeyId
+      document.nameKeyDerivationTrace.subkeyId >= 0
     ) {
       try {
-        const folderKeyData = await deriveFolderKey({
-          folderId: document?.parentFolderId!,
-          workspaceId: document?.workspaceId!,
+        const folderKeyChainData = await deriveFolderKey({
+          folderId: document.parentFolderId!,
+          workspaceId: document.workspaceId!,
+          keyDerivationTrace: document.nameKeyDerivationTrace,
           activeDevice,
         });
+        // the last subkey key is treated like a folder key,
+        // but actually we want to create a document subkey, so we can
+        // use all subkeys up to the last one
+        const lastChainItem = folderKeyChainData[folderKeyChainData.length - 2];
         const documentKeyData = await recreateDocumentKey({
-          folderKey: folderKeyData.folderKeyData.key,
-          subkeyId: document?.subkeyId!,
+          folderKey: lastChainItem.key,
+          subkeyId: document.nameKeyDerivationTrace.subkeyId,
         });
         documentName = await decryptDocumentTitle({
           key: documentKeyData.key,
-          ciphertext: document?.encryptedName,
-          publicNonce: document?.encryptedNameNonce,
+          ciphertext: document.encryptedName,
+          publicNonce: document.encryptedNameNonce,
         });
       } catch (error) {
         documentName = "Could not decrypt";

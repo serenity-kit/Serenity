@@ -1,4 +1,9 @@
-import { createSignatureKeyPair, createSnapshot } from "@naisho/core";
+import {
+  createSignatureKeyPair,
+  createSnapshot,
+  KeyDerivationTrace,
+  SnapshotPublicData,
+} from "@naisho/core";
 import sodium from "@serenity-tools/libsodium";
 import { v4 as uuidv4 } from "uuid";
 
@@ -9,24 +14,30 @@ const introductionDocument = `AlCOiJekCQAHAQRwYWdlAwdoZWFkaW5nKACOiJekCQAFbGV2ZW
 
 export const createIntroductionDocumentSnapshot = async ({
   documentId,
-  documentEncryptionKey,
+  snapshotEncryptionKey,
+  subkeyId,
+  keyDerivationTrace,
 }: {
   documentId: string;
-  documentEncryptionKey: Uint8Array;
+  snapshotEncryptionKey: Uint8Array;
+  subkeyId: number;
+  keyDerivationTrace: KeyDerivationTrace;
 }) => {
   // TODO in the future use the main device
   const signatureKeyPair = await createSignatureKeyPair();
 
-  const publicData = {
+  const publicData: SnapshotPublicData = {
     snapshotId: uuidv4(),
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+    subkeyId,
+    keyDerivationTrace,
   };
 
   return await createSnapshot(
     sodium.from_base64(introductionDocument),
     publicData,
-    documentEncryptionKey,
+    snapshotEncryptionKey,
     signatureKeyPair
   );
 };

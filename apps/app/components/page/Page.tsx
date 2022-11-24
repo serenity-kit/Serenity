@@ -15,12 +15,17 @@ import {
   removePending,
   removeSnapshotInProgress,
   removeUpdateFromInProgressQueue,
+  Snapshot,
   useWebsocketState,
   verifyAndDecryptAwarenessUpdate,
   verifyAndDecryptSnapshot,
   verifyAndDecryptUpdate,
 } from "@naisho/core";
-import { recreateDocumentKey } from "@serenity-tools/common";
+import {
+  createSnapshotKey,
+  recreateSnapshotKey,
+  sleep,
+} from "@serenity-tools/common";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -32,13 +37,19 @@ import {
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
-import { Document, runMeQuery } from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { WorkspaceDrawerScreenProps } from "../../types/navigation";
+import {
+  Document,
+  runDocumentQuery,
+  runMeQuery,
+  runWorkspaceQuery,
+} from "../../generated/graphql";
+import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../utils/document/getDocument";
+import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
 import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { getFolder } from "../../utils/folder/getFolder";
 
 const reconnectTimeout = 2000;
 
@@ -61,20 +72,42 @@ export default function Page({
   }
   const docId = route.params.pageId;
   const isNew = route.params.isNew ?? false;
-  const { activeDevice } = useWorkspaceContext();
+  const { activeDevice } = useAuthenticatedAppContext();
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
   const websocketConnectionRef = useRef<WebSocket>(null);
   const shouldReconnectWebsocketConnectionRef = useRef(true);
-  const createSnapshotRef = useRef<boolean>(false); // only used for the UI
+  const createSnapshotInProgressRef = useRef<boolean>(false); // only used for the UI
   const latestServerVersionRef = useRef<number | null>(null);
   const [documentLoaded, setDocumentLoaded] = useState(false);
   const websocketState = useWebsocketState();
+  const snapshotKeyRef = useRef<Uint8Array | null>(null);
 
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
+
+  const deriveExistingSnapshotKey = async (snapshot: Snapshot) => {
+    // derive existing key if snapshot exists
+    const document = await getDocument({ documentId: docId });
+    const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
+    const folderKeyChainData = await deriveFolderKey({
+      folderId: document.parentFolderId!,
+      workspaceId: document.workspaceId!,
+      keyDerivationTrace: snapshotKeyDerivationTrace,
+      activeDevice,
+    });
+    // the last subkey key here is treated like a folder key
+    // but since we want to derive a snapshot key, we can just toss
+    // the last one out and use the rest
+    const lastChainItem = folderKeyChainData[folderKeyChainData.length - 2];
+    const snapshotKeyData = await recreateSnapshotKey({
+      folderKey: lastChainItem.key,
+      subkeyId: snapshotKeyDerivationTrace.subkeyId,
+    });
+    return snapshotKeyData;
+  };
 
   const applySnapshot = async (snapshot, key) => {
     try {
@@ -93,7 +126,7 @@ export default function Page({
       }
     } catch (err) {
       // TODO
-      console.log("Apply updates failed. TODO handle error");
+      console.log("Apply snapshot failed. TODO handle error");
       console.error(err);
     }
   };
@@ -130,17 +163,61 @@ export default function Page({
     }
   };
 
-  const createAndSendSnapshot = async (key, keyDervationTrace) => {
+  const createNewSnapshotKey = async (
+    document: Document,
+    workspaceKeyId: string
+  ) => {
+    const folder = await getFolder({ id: document.parentFolderId! });
+    const folderKeyChainData = await deriveFolderKey({
+      folderId: document.parentFolderId!,
+      workspaceId: document.workspaceId!,
+      overrideWithWorkspaceKeyId: workspaceKeyId,
+      keyDerivationTrace: folder.keyDerivationTrace,
+      activeDevice,
+    });
+    const lastChainItem = folderKeyChainData[folderKeyChainData.length - 1];
+    const snapshotKeyData = await createSnapshotKey({
+      folderKey: lastChainItem.key,
+    });
+    return snapshotKeyData;
+  };
+
+  const createAndSendSnapshot = async () => {
+    const workspaceResult = await runWorkspaceQuery({
+      id: workspaceId,
+      deviceSigningPublicKey: activeDevice?.signingPublicKey,
+    });
+    const workspace = workspaceResult?.data?.workspace;
+    if (!workspace) {
+      throw new Error("Workspace not found");
+    }
+    const documentResult = await runDocumentQuery({ id: docId });
+    const document = documentResult.data?.document;
+    if (!document) {
+      throw new Error("Document not found");
+    }
+    const snapshotKey = await createNewSnapshotKey(
+      document,
+      workspace.currentWorkspaceKey?.id!
+    );
+    snapshotKeyRef.current = sodium.from_base64(snapshotKey.key);
     const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
+    const keyDerivationTrace = await buildKeyDerivationTrace({
+      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+      subkeyId: snapshotKey.subkeyId,
+      folderId: document.parentFolderId!,
+    });
     const publicData = {
       snapshotId: uuidv4(),
       docId,
       pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+      keyDerivationTrace,
+      subkeyId: snapshotKey.subkeyId,
     };
     const snapshot = await createSnapshot(
       yDocState,
       publicData,
-      key,
+      sodium.from_base64(snapshotKey.key),
       signatureKeyPair
     );
 
@@ -150,7 +227,6 @@ export default function Page({
     websocketConnectionRef.current.send(
       JSON.stringify({
         ...snapshot,
-        keyDervationTrace,
         lastKnownSnapshotId: activeSnapshotIdRef.current,
         latestServerVersion: latestServerVersionRef.current,
       })
@@ -207,32 +283,6 @@ export default function Page({
       // the currently active document
       updateActiveDocumentInfoStore(document, activeDevice);
 
-      const workspace = await getWorkspace({
-        workspaceId: document.workspaceId!,
-        deviceSigningPublicKey: activeDevice.signingPublicKey,
-      });
-      // TODO: use the existing snapshot's key derivatio traced workspace key
-      // const workspaceKeyId = snapshot.keyDervationTrace.workspaceKeyId;
-      const workspaceKeyId = workspace?.currentWorkspaceKey?.id;
-      const folderKeyData = await deriveFolderKey({
-        folderId: document.parentFolderId!,
-        workspaceKeyId,
-        workspaceId: document.workspaceId!,
-        activeDevice,
-      });
-      const folderKeyString = folderKeyData.folderKeyData.key;
-      const documentKey = await recreateDocumentKey({
-        folderKey: folderKeyString,
-        subkeyId: document.contentSubkeyId!,
-      });
-      const snapshotKey = sodium.from_base64(documentKey.key);
-      const snapshotKeyDerivationTrace = deriveFolderKey({
-        folderId: document.parentFolderId!,
-        workspaceKeyId,
-        workspaceId: document.workspaceId!,
-        activeDevice,
-      });
-
       const onWebsocketMessage = async (event) => {
         const data = JSON.parse(event.data);
         switch (data.type) {
@@ -241,32 +291,37 @@ export default function Page({
             break;
           case "document":
             if (data.snapshot) {
-              await applySnapshot(data.snapshot, snapshotKey);
+              const snapshotKeyData1 = await deriveExistingSnapshotKey(
+                data.snapshot
+              );
+              snapshotKeyRef.current = sodium.from_base64(snapshotKeyData1.key);
+              await applySnapshot(data.snapshot, snapshotKeyRef.current);
             }
-            await applyUpdates(data.updates, snapshotKey);
+            await applyUpdates(data.updates, snapshotKeyRef.current);
             setDocumentLoaded(true);
 
             // check for pending snapshots or pending updates and run them
             const pendingChanges = getPending(docId);
             if (pendingChanges.type === "snapshot") {
-              await createAndSendSnapshot(
-                snapshotKey,
-                snapshotKeyDerivationTrace
-              );
+              await createAndSendSnapshot();
               removePending(docId);
             } else if (pendingChanges.type === "updates") {
               // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
               removePending(docId);
               pendingChanges.rawUpdates.forEach(async (rawUpdate) => {
-                await createAndSendUpdate(rawUpdate, snapshotKey);
+                await createAndSendUpdate(rawUpdate, snapshotKeyRef.current);
               });
             }
             break;
           case "snapshot":
             console.log("apply snapshot");
+            const snapshotKeyData2 = await deriveExistingSnapshotKey(
+              data.snapshot
+            );
+            snapshotKeyRef.current = sodium.from_base64(snapshotKeyData2.key);
             const snapshotResult = await verifyAndDecryptSnapshot(
               data,
-              snapshotKey,
+              snapshotKeyRef.current,
               sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
             );
             activeSnapshotIdRef.current = data.publicData.snapshotId;
@@ -288,26 +343,27 @@ export default function Page({
 
             const pending = getPending(data.docId);
             if (pending.type === "snapshot") {
-              await createAndSendSnapshot(
-                snapshotKey,
-                snapshotKeyDerivationTrace
-              );
+              await createAndSendSnapshot();
               removePending(data.docId);
             } else if (pending.type === "updates") {
               // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
               removePending(data.docId);
               pending.rawUpdates.forEach(async (rawUpdate) => {
-                await createAndSendUpdate(rawUpdate, snapshotKey);
+                await createAndSendUpdate(rawUpdate, snapshotKeyRef.current);
               });
             }
             break;
           case "snapshotFailed":
             console.log("snapshot saving failed", data);
             if (data.snapshot) {
-              await applySnapshot(data.snapshot, snapshotKey);
+              const snapshotKeyData3 = await deriveExistingSnapshotKey(
+                data.snapshot
+              );
+              snapshotKeyRef.current = sodium.from_base64(snapshotKeyData3.key);
+              await applySnapshot(data.snapshot, snapshotKeyRef.current);
             }
             if (data.updates) {
-              await applyUpdates(data.updates, snapshotKey);
+              await applyUpdates(data.updates, snapshotKeyRef.current);
             }
 
             // TODO add a backoff after multiple failed tries
@@ -316,15 +372,14 @@ export default function Page({
             removeSnapshotInProgress(data.docId);
             // all pending can be removed since a new snapshot will include all local changes
             removePending(data.docId);
-            await createAndSendSnapshot(
-              snapshotKey,
-              snapshotKeyDerivationTrace
-            );
+
+            await sleep(1000); // TODO add randomised backoff
+            await createAndSendSnapshot();
             break;
           case "update":
             const updateResult = await verifyAndDecryptUpdate(
               data,
-              snapshotKey,
+              snapshotKeyRef.current,
               sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
             );
             Yjs.applyUpdate(
@@ -353,12 +408,16 @@ export default function Page({
               data.snapshotId,
               data.clock
             );
-            await createAndSendUpdate(rawUpdate, snapshotKey, data.clock);
+            await createAndSendUpdate(
+              rawUpdate,
+              snapshotKeyRef.current,
+              data.clock
+            );
             break;
           case "awarenessUpdate":
             const awarenessUpdateResult = await verifyAndDecryptAwarenessUpdate(
               data,
-              snapshotKey,
+              snapshotKeyRef.current,
               sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
             );
             console.log("awarenessUpdate");
@@ -373,7 +432,7 @@ export default function Page({
       };
 
       const setupWebsocket = () => {
-        let host = "wss://serenity-staging-api.herokuapp.com";
+        let host = "wss://serenity-dev.fly.dev";
         if (process.env.NODE_ENV === "development") {
           host = "ws://localhost:4000";
         }
@@ -429,7 +488,7 @@ export default function Page({
       yAwarenessRef.current.on(
         "update",
         async ({ added, updated, removed }) => {
-          if (!getWebsocketState().connected) {
+          if (!getWebsocketState().connected || !snapshotKeyRef.current) {
             return;
           }
 
@@ -445,7 +504,7 @@ export default function Page({
           const awarenessUpdate = await createAwarenessUpdate(
             yAwarenessUpdate,
             publicData,
-            snapshotKey,
+            snapshotKeyRef.current,
             signatureKeyPair
           );
           console.log("send awarenessUpdate");
@@ -457,8 +516,13 @@ export default function Page({
       // TODO switch to v2 updates
       yDocRef.current.on("update", async (update, origin) => {
         if (origin?.key === "y-sync$" || origin === "mobile-webview") {
-          if (!activeSnapshotIdRef.current || createSnapshotRef.current) {
-            createSnapshotRef.current = false;
+          if (
+            !activeSnapshotIdRef.current &&
+            !createSnapshotInProgressRef.current
+          ) {
+            // createAndSendSnapshot takes a while to set the snapshot in
+            // progress and therefore we need another mechanism
+            createSnapshotInProgressRef.current = true;
 
             if (
               getSnapshotInProgress(docId) ||
@@ -466,13 +530,11 @@ export default function Page({
             ) {
               addPendingSnapshot(docId);
             } else {
-              await createAndSendSnapshot(
-                snapshotKey,
-                snapshotKeyDerivationTrace
-              );
+              await createAndSendSnapshot();
             }
           } else {
             if (
+              !snapshotKeyRef.current ||
               getSnapshotInProgress(docId) ||
               !getWebsocketState().connected
             ) {
@@ -480,7 +542,7 @@ export default function Page({
               // must be based on the new snapshot
               addPendingUpdate(docId, update);
             } else {
-              await createAndSendUpdate(update, snapshotKey);
+              await createAndSendUpdate(update, snapshotKeyRef.current);
             }
           }
         }

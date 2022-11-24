@@ -25,7 +25,7 @@ export const getDocumentShareLinkUrl = (
         : // on iOS window.location.host is not available
           `http://localhost:19006/`
       : "https://www.serenity.li";
-  return `${rootUrl}/share/${documentId}/${token}#key=${key}`;
+  return `${rootUrl}/page/${documentId}/${token}#key=${key}`;
 };
 
 export type Props = {
@@ -45,7 +45,6 @@ export const createDocumentShareLink = async ({
 
   // create virtual device
   const virtualDeviceKey = await sodium.crypto_secretbox_keygen();
-  // const virtualDeviceKey = await sodium.crypto_kdf_keygen();
 
   // encrypt virtual device
   const serializedVirtualDevice = await sodium.to_base64(
@@ -96,10 +95,11 @@ export const createDocumentShareLink = async ({
   const documentShareLink = getDocumentShareLinkUrl(
     documentId,
     token,
-    snapshotKey
+    virtualDeviceKey
   );
   return {
     token,
+    virtualDeviceKey,
     snapshotKey,
     documentShareLink,
   };

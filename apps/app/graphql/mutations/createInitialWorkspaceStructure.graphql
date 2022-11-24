@@ -29,11 +29,18 @@ mutation createInitialWorkspaceStructure(
       id
       encryptedName
       encryptedNameNonce
-      workspaceKeyId
-      subkeyId
       parentFolderId
       rootFolderId
       workspaceId
+      keyDerivationTrace {
+        workspaceKeyId
+        subkeyId
+        parentFolders {
+          folderId
+          subkeyId
+          parentFolderId
+        }
+      }
     }
     document {
       id

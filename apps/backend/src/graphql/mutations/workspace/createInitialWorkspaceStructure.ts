@@ -9,6 +9,7 @@ import {
 import { createInitialWorkspaceStructure } from "../../../database/workspace/createInitialWorkspaceStructure";
 import { Document, DocumentSnapshotInput } from "../../types/document";
 import { Folder } from "../../types/folder";
+import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 import { Workspace } from "../../types/workspace";
 
 export const DeviceWorkspaceKeyBoxInput = inputObjectType({
@@ -20,26 +21,51 @@ export const DeviceWorkspaceKeyBoxInput = inputObjectType({
   },
 });
 
-export const CreateInitialWorkspaceStructureInput = inputObjectType({
-  name: "CreateInitialWorkspaceStructureInput",
+export const CreateInitialWorkspaceInput = inputObjectType({
+  name: "CreateInitialWorkspaceInput",
   definition(t) {
-    t.nonNull.string("workspaceId");
-    t.nonNull.string("workspaceName");
-    t.nonNull.string("folderId");
-    t.nonNull.string("folderIdSignature");
-    t.nonNull.string("encryptedFolderName");
-    t.nonNull.string("encryptedFolderNameNonce");
-    t.nonNull.int("folderSubkeyId");
-    t.nonNull.string("documentId");
-    t.nonNull.string("encryptedDocumentName");
-    t.nonNull.string("encryptedDocumentNameNonce");
-    t.nonNull.int("documentSubkeyId");
-    t.nonNull.int("documentContentSubkeyId");
-    t.nonNull.field("documentSnapshot", { type: DocumentSnapshotInput });
-    t.nonNull.string("creatorDeviceSigningPublicKey");
+    t.nonNull.string("id");
+    t.nonNull.string("name");
+    t.nonNull.string("workspaceKeyId");
     t.nonNull.list.nonNull.field("deviceWorkspaceKeyBoxes", {
       type: DeviceWorkspaceKeyBoxInput,
     });
+  },
+});
+
+export const CreateInitialFolderInput = inputObjectType({
+  name: "CreateInitialFolderInput",
+  definition(t) {
+    t.nonNull.string("id");
+    t.nonNull.string("idSignature");
+    t.nonNull.string("encryptedName");
+    t.nonNull.string("encryptedNameNonce");
+    t.nonNull.field("keyDerivationTrace", {
+      type: KeyDerivationTraceInput,
+    });
+  },
+});
+
+export const CreateInitialDocumentInput = inputObjectType({
+  name: "CreateInitialDocumentInput",
+  definition(t) {
+    t.nonNull.string("id");
+    t.nonNull.string("encryptedName");
+    t.nonNull.string("encryptedNameNonce");
+    t.nonNull.field("nameKeyDerivationTrace", {
+      type: KeyDerivationTraceInput,
+    });
+    t.nonNull.field("snapshot", { type: DocumentSnapshotInput });
+  },
+});
+
+export const CreateInitialWorkspaceStructureInput = inputObjectType({
+  name: "CreateInitialWorkspaceStructureInput",
+  definition(t) {
+    t.nonNull.field("workspace", { type: CreateInitialWorkspaceInput });
+    t.nonNull.field("folder", { type: CreateInitialFolderInput });
+    t.nonNull.field("document", { type: CreateInitialDocumentInput });
+    t.nonNull.string("creatorDeviceSigningPublicKey");
   },
 });
 
@@ -72,21 +98,11 @@ export const createInitialWorkspaceStructureMutation = mutationField(
       );
       const workspaceStructure = await createInitialWorkspaceStructure({
         userId: context.user.id,
-        workspaceId: args.input.workspaceId,
-        workspaceName: args.input.workspaceName,
-        folderId: args.input.folderId,
-        folderIdSignature: args.input.folderIdSignature,
-        encryptedFolderName: args.input.encryptedFolderName,
-        encryptedFolderNameNonce: args.input.encryptedFolderNameNonce,
-        folderSubkeyId: args.input.folderSubkeyId,
-        documentId: args.input.documentId,
-        encryptedDocumentName: args.input.encryptedDocumentName,
-        encryptedDocumentNameNonce: args.input.encryptedDocumentNameNonce,
-        documentSubkeyId: args.input.documentSubkeyId,
-        documentContentSubkeyId: args.input.documentContentSubkeyId,
-        documentSnapshot: args.input.documentSnapshot,
+        workspace: args.input.workspace,
+        folder: args.input.folder,
+        // @ts-ignore we need to force the snapshot.publicData to have a snapshot Id
+        document: args.input.document,
         creatorDeviceSigningPublicKey: args.input.creatorDeviceSigningPublicKey,
-        deviceWorkspaceKeyBoxes: args.input.deviceWorkspaceKeyBoxes,
       });
       return workspaceStructure;
     },

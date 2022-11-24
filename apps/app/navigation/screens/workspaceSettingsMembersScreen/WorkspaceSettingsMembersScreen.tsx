@@ -1,3 +1,4 @@
+import sodium from "@serenity-tools/libsodium";
 import {
   Avatar,
   CenterContent,
@@ -19,35 +20,27 @@ import {
 import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
+import { v4 as uuidv4 } from "uuid";
 import MemberMenu from "../../../components/memberMenu/MemberMenu";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
-import { useWorkspaceId } from "../../../context/WorkspaceIdContext";
+import { useWorkspace } from "../../../context/WorkspaceContext";
 import {
   MeResult,
-  RemoveMembersAndRotateWorkspaceKeyDocument,
-  RemoveMembersAndRotateWorkspaceKeyMutation,
-  RemoveMembersAndRotateWorkspaceKeyMutationVariables,
   Role,
+  runRemoveMembersAndRotateWorkspaceKeyMutation,
+  runWorkspaceDevicesQuery,
   useUpdateWorkspaceMembersRolesMutation,
   Workspace,
   WorkspaceMember,
 } from "../../../generated/graphql";
-import { useInterval } from "../../../hooks/useInterval";
-import { useWorkspaceContext } from "../../../hooks/useWorkspaceContext";
+import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
-import { WorkspaceDrawerScreenProps } from "../../../types/navigation";
+import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
-import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
+import { encryptWorkspaceKeyForDevice } from "../../../utils/device/encryptWorkspaceKeyForDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
-import { getUrqlClient } from "../../../utils/urqlClient/urqlClient";
-import {
-  addNewMembersIfNecessary,
-  secondsBetweenNewMemberChecks,
-} from "../../../utils/workspace/addNewMembersIfNecessary";
-import { deriveCurrentWorkspaceKey } from "../../../utils/workspace/deriveCurrentWorkspaceKey";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
-import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
 
 type Member = {
   userId: string;
@@ -56,14 +49,10 @@ type Member = {
 };
 
 export default function WorkspaceSettingsMembersScreen(
-  props: WorkspaceDrawerScreenProps<"Settings"> & { children?: React.ReactNode }
+  props: WorkspaceStackScreenProps<"WorkspaceSettingsMembers">
 ) {
-  let workspaceId = useWorkspaceId();
-  if (workspaceId === "") {
-    const params = props.route.params! as { workspaceId: string };
-    workspaceId = params.workspaceId;
-  }
-  const { activeDevice } = useWorkspaceContext();
+  const { workspaceId } = useWorkspace();
+  const { activeDevice } = useAuthenticatedAppContext();
   const [state] = useMachine(workspaceSettingsLoadWorkspaceMachine, {
     context: {
       workspaceId,
@@ -86,12 +75,6 @@ export default function WorkspaceSettingsMembersScreen(
   const [hasGraphqlError, setHasGraphqlError] = useState(false);
   const [graphqlError, setGraphqlError] = useState("");
   const isDesktopDevice = useIsDesktopDevice();
-
-  useInterval(() => {
-    if (activeDevice) {
-      addNewMembersIfNecessary({ activeDevice });
-    }
-  }, secondsBetweenNewMemberChecks * 1000);
 
   useEffect(() => {
     if (
@@ -176,31 +159,38 @@ export default function WorkspaceSettingsMembersScreen(
       setMembers(members);
       delete memberLookup[username];
       setMemberLookup(memberLookup);
-      const workspaceKey = await deriveCurrentWorkspaceKey({
-        workspaceId,
-        activeDevice,
-      });
+      const workspaceKeyString = await sodium.crypto_kdf_keygen();
+      const workspaceKey = {
+        id: uuidv4(),
+        workspaceKey: workspaceKeyString,
+      };
 
       const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [];
-      // TODO: getWorkspaceDevices gets all devices attached to a workspace
-      let workspaceDevices = await getWorkspaceDevices({
-        workspaceId,
-      });
-      if (!workspaceDevices || workspaceDevices.length === 0) {
+      let workspaceDeviceResult = await runWorkspaceDevicesQuery(
+        {
+          workspaceId,
+        },
+        { requestPolicy: "network-only" }
+      );
+      if (
+        !workspaceDeviceResult.data?.workspaceDevices?.nodes ||
+        workspaceDeviceResult.data?.workspaceDevices?.nodes.length === 0
+      ) {
         throw new Error("No devices found for workspace");
       }
+      let workspaceDevices =
+        workspaceDeviceResult.data?.workspaceDevices?.nodes;
       for (let device of workspaceDevices) {
         if (!device) {
           continue;
         }
         if (device.userId !== removingMember.userId) {
-          const { ciphertext, nonce } =
-            await createAndEncryptWorkspaceKeyForDevice({
-              receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-              creatorDeviceEncryptionPrivateKey:
-                activeDevice.encryptionPrivateKey!,
-              workspaceKey: workspaceKey.workspaceKey,
-            });
+          const { ciphertext, nonce } = await encryptWorkspaceKeyForDevice({
+            receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+            creatorDeviceEncryptionPrivateKey:
+              activeDevice.encryptionPrivateKey!,
+            workspaceKey: workspaceKey.workspaceKey,
+          });
           deviceWorkspaceKeyBoxes.push({
             ciphertext,
             nonce,
@@ -209,23 +199,17 @@ export default function WorkspaceSettingsMembersScreen(
         }
       }
 
-      await getUrqlClient()
-        .mutation<
-          RemoveMembersAndRotateWorkspaceKeyMutation,
-          RemoveMembersAndRotateWorkspaceKeyMutationVariables
-        >(
-          RemoveMembersAndRotateWorkspaceKeyDocument,
-          {
-            input: {
-              revokedUserIds: [removingMember.userId],
-              workspaceId,
-              creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
-              deviceWorkspaceKeyBoxes,
-            },
+      await runRemoveMembersAndRotateWorkspaceKeyMutation(
+        {
+          input: {
+            creatorDeviceSigningPublicKey: activeDevice.signingPublicKey,
+            deviceWorkspaceKeyBoxes,
+            revokedUserIds: [removingMember.userId],
+            workspaceId,
           },
-          { requestPolicy: "network-only" }
-        )
-        .toPromise();
+        },
+        { requestPolicy: "network-only" }
+      );
     }
     const workspace = await getWorkspace({
       deviceSigningPublicKey: activeDevice.signingPublicKey,

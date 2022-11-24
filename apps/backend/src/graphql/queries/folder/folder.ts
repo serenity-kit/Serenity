@@ -22,7 +22,8 @@ export const folderQuery = queryField((t) => {
         userId,
         id: args.id,
       });
-      return formatFolder(folder);
+      const formattedFolder = formatFolder(folder);
+      return formattedFolder;
     },
   });
 });

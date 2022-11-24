@@ -20,7 +20,7 @@ import {
   useStartLoginMutation,
   useVerifyPasswordMutation,
 } from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
+import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
 
@@ -35,7 +35,7 @@ export function VerifyPasswordModal(props: Props) {
   const [password, setPassword] = useState("");
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
   const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
-  const { activeDevice, sessionKey } = useWorkspaceContext();
+  const { activeDevice, sessionKey } = useAuthenticatedAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, verifyPasswordMutation] = useVerifyPasswordMutation();
 

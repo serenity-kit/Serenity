@@ -3,7 +3,7 @@ import { CenterContent, Text } from "@serenity-tools/ui";
 import { useWindowDimensions } from "react-native";
 import { useAppContext } from "../../../context/AppContext";
 import { runLogoutMutation } from "../../../generated/graphql";
-import { RootStackScreenProps } from "../../../types/navigation";
+import { RootStackScreenProps } from "../../../types/navigationProps";
 import { clearDeviceAndSessionStorage } from "../../../utils/authentication/clearDeviceAndSessionStorage";
 import { userWorkspaceKeyStore } from "../../../utils/workspace/workspaceKeyStore";
 

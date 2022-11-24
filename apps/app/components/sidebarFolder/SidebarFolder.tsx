@@ -1,11 +1,6 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import {
-  createDocumentKey,
-  decryptFolderName,
-  encryptExistingFolderName,
-  encryptFolderName,
-} from "@serenity-tools/common";
+import { decryptFolderName, encryptFolderName } from "@serenity-tools/common";
 import {
   Icon,
   IconButton,
@@ -23,27 +18,26 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, StyleSheet } from "react-native";
 import { v4 as uuidv4 } from "uuid";
 import {
+  KeyDerivationTrace,
+  runCreateDocumentMutation,
+  runCreateFolderMutation,
   runDeleteFoldersMutation,
   runUpdateFolderNameMutation,
-  runCreateDocumentMutation,
-  useCreateFolderMutation,
   useDocumentsQuery,
   useFoldersQuery,
 } from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { RootStackScreenProps } from "../../types/navigation";
+import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { RootStackScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
 import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
-import { deriveParentFolderKey } from "../../utils/folder/deriveFolderKeyData";
+import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { getFolder } from "../../utils/folder/getFolder";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
-import { deriveCurrentWorkspaceKey } from "../../utils/workspace/deriveCurrentWorkspaceKey";
-import { deriveWorkspaceKey } from "../../utils/workspace/deriveWorkspaceKey";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 import SidebarPage from "../sidebarPage/SidebarPage";
@@ -51,10 +45,12 @@ import SidebarPage from "../sidebarPage/SidebarPage";
 type Props = ViewProps & {
   workspaceId: string;
   folderId: string;
+  parentFolderId?: string | null | undefined;
   folderName?: string;
   encryptedName: string;
   encryptedNameNonce?: string;
   subkeyId: number;
+  keyDerivationTrace: KeyDerivationTrace;
   depth?: number;
   onStructureChange: () => void;
 };
@@ -71,7 +67,6 @@ export default function SidebarFolder(props: Props) {
   const [isDeleted, setIsDeleted] = useState(false);
   const isOpen = openFolderIds.includes(props.folderId);
   const [isEditing, setIsEditing] = useState<"none" | "name" | "new">("none");
-  const [, createFolderMutation] = useCreateFolderMutation();
   const [foldersResult, refetchFolders] = useFoldersQuery({
     pause: !isOpen,
     variables: {
@@ -87,7 +82,7 @@ export default function SidebarFolder(props: Props) {
     },
   });
   const { depth = 0 } = props;
-  const { activeDevice } = useWorkspaceContext();
+  const { activeDevice } = useAuthenticatedAppContext();
   const documentPathStore = useDocumentPathStore();
   const document = useActiveDocumentInfoStore((state) => state.document);
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
@@ -104,35 +99,31 @@ export default function SidebarFolder(props: Props) {
 
   useEffect(() => {
     decryptName();
-  }, [props.encryptedName, props.subkeyId]);
+  }, [props.encryptedName, props.keyDerivationTrace.subkeyId]);
 
   const decryptName = async () => {
-    if (!props.subkeyId || !props.encryptedName || !props.encryptedNameNonce) {
+    if (
+      !props.keyDerivationTrace.subkeyId ||
+      !props.encryptedName ||
+      !props.encryptedNameNonce
+    ) {
       setFolderName("Untitled");
       return;
     }
     try {
-      const folder = await getFolder({ id: props.folderId });
-      let parentKey = "";
-      if (folder.parentFolderId) {
-        parentKey = await getFolderKey({
-          workspaceId: props.workspaceId,
-          workspaceKeyId: folder.workspaceKeyId,
-          folderId: folder.parentFolderId,
-          folderSubkeyId: props.subkeyId,
-          activeDevice,
-        });
-      } else {
-        const workspaceKeyData = await deriveWorkspaceKey({
-          workspaceId: props.workspaceId,
-          workspaceKeyId: folder.workspaceKeyId!,
-          activeDevice,
-        });
-        parentKey = workspaceKeyData.workspaceKey;
-      }
+      const parentKeyChainData = await deriveFolderKey({
+        folderId: props.folderId,
+        workspaceId: props.workspaceId,
+        keyDerivationTrace: props.keyDerivationTrace,
+        activeDevice,
+      });
+      // since the decryptFolderName method takes a parent key
+      // and the last item of the key chain is the current folder key,
+      // we have to send in the parent key to the decryptFolderName method
+      const parentKeyData = parentKeyChainData[parentKeyChainData.length - 2];
       const folderName = await decryptFolderName({
-        parentKey: parentKey,
-        subkeyId: props.subkeyId!,
+        parentKey: parentKeyData.key,
+        subkeyId: props.keyDerivationTrace.subkeyId!,
         ciphertext: props.encryptedName,
         publicNonce: props.encryptedNameNonce,
       });
@@ -146,7 +137,7 @@ export default function SidebarFolder(props: Props) {
   const createFolder = async (name: string) => {
     openFolder();
     const id = uuidv4();
-    let workspaceKey = "";
+    // let workspaceKey = "";
     const workspace = await getWorkspace({
       deviceSigningPublicKey: activeDevice.signingPublicKey,
       workspaceId: props.workspaceId,
@@ -156,51 +147,51 @@ export default function SidebarFolder(props: Props) {
       console.error("Workspace or workspaceKeys not found");
       return;
     }
-    try {
-      const result = await deriveCurrentWorkspaceKey({
-        workspaceId: props.workspaceId,
-        activeDevice,
-      });
-      workspaceKey = result.workspaceKey;
-    } catch (error: any) {
-      // TODO: handle device not registered error
-      console.error(error);
-      return;
-    }
-    const parentFolderKey = await getFolderKey({
+    // derive this (the new folder's parent) folder key trace:
+    const parentFolderKeyChainData = await deriveFolderKey({
       folderId: props.folderId,
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
       workspaceId: props.workspaceId,
-      folderSubkeyId: props.subkeyId,
+      keyDerivationTrace: props.keyDerivationTrace,
       activeDevice,
+      overrideWithWorkspaceKeyId: workspace.currentWorkspaceKey?.id,
     });
-
+    const parentChainItem =
+      parentFolderKeyChainData[parentFolderKeyChainData.length - 1];
     const encryptedFolderResult = await encryptFolderName({
       name,
-      parentKey: parentFolderKey,
+      parentKey: parentChainItem.key,
     });
+    const parentKeyDerivationTrace = await buildKeyDerivationTrace({
+      folderId: props.folderId,
+      subkeyId: encryptedFolderResult.folderSubkeyId,
+      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+    });
+    const keyDerivationTrace = {
+      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+      subkeyId: encryptedFolderResult.folderSubkeyId,
+      parentFolders: parentKeyDerivationTrace.parentFolders,
+    };
     let didCreateFolderSucceed = false;
     let numCreateFolderAttempts = 0;
     let folderId: string | undefined = undefined;
     let result: any = undefined;
-    const keyDerivationTrace = await buildKeyDerivationTrace({
-      folderId: props.folderId,
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
-    });
     do {
       numCreateFolderAttempts += 1;
-      result = await createFolderMutation({
-        input: {
-          id,
-          workspaceId: route.params.workspaceId,
-          encryptedName: encryptedFolderResult.ciphertext,
-          encryptedNameNonce: encryptedFolderResult.publicNonce,
-          workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-          subkeyId: encryptedFolderResult.folderSubkeyId,
-          parentFolderId: props.folderId,
-          keyDerivationTrace,
+      result = await runCreateFolderMutation(
+        {
+          input: {
+            id,
+            workspaceId: props.workspaceId,
+            encryptedName: encryptedFolderResult.ciphertext,
+            encryptedNameNonce: encryptedFolderResult.publicNonce,
+            workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+            subkeyId: encryptedFolderResult.folderSubkeyId,
+            parentFolderId: props.folderId,
+            keyDerivationTrace,
+          },
         },
-      });
+        {}
+      );
       if (result.data?.createFolder?.folder?.id) {
         didCreateFolderSucceed = true;
         folderId = result.data?.createFolder?.folder?.id;
@@ -208,7 +199,6 @@ export default function SidebarFolder(props: Props) {
       }
     } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
     if (folderId) {
-      setIsEditing("none");
     } else {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
@@ -227,39 +217,27 @@ export default function SidebarFolder(props: Props) {
       console.error("Workspace or workspaceKeys not found");
       return;
     }
-    const folderKeyString = await getFolderKey({
-      folderId: props.folderId,
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
-      workspaceId: props.workspaceId,
-      folderSubkeyId: props.subkeyId,
-      activeDevice,
-    });
-    const documentContentKeyResult = await createDocumentKey({
-      folderKey: folderKeyString,
-    });
-    const nameKeyDerivationTrace = await buildKeyDerivationTrace({
-      folderId: props.folderId,
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
-    });
     const result = await runCreateDocumentMutation(
       {
         input: {
           id,
           workspaceId: props.workspaceId,
           parentFolderId: props.folderId,
-          contentSubkeyId: documentContentKeyResult.subkeyId,
-          nameKeyDerivationTrace,
+          contentSubkeyId: 1234, // TODO remove
         },
       },
       {}
     );
     if (result.data?.createDocument?.id) {
       navigation.navigate("Workspace", {
-        workspaceId: route.params.workspaceId,
-        screen: "Page",
+        workspaceId: props.workspaceId,
+        screen: "WorkspaceDrawer",
         params: {
-          pageId: result.data?.createDocument?.id,
-          isNew: true,
+          screen: "Page",
+          params: {
+            pageId: result.data?.createDocument?.id,
+            isNew: true,
+          },
         },
       });
     } else {
@@ -303,21 +281,32 @@ export default function SidebarFolder(props: Props) {
       workspaceId: props.workspaceId,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
-    const parentKey = await deriveParentFolderKey({
+    const folder = await getFolder({ id: props.folderId });
+    const folderKeyTrace = await deriveFolderKey({
       folderId: props.folderId,
       workspaceId: props.workspaceId,
-      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+      overrideWithWorkspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+      keyDerivationTrace: folder.keyDerivationTrace!,
       activeDevice,
     });
-    const encryptedFolderResult = await encryptExistingFolderName({
+    // ignore the last chain item as it's the key for the old folder name
+    const parentChainItem = folderKeyTrace[folderKeyTrace.length - 2];
+    const encryptedFolderResult = await encryptFolderName({
       name: newFolderName,
-      parentKey: parentKey.keyData.key,
-      subkeyId: props.subkeyId!,
+      parentKey: parentChainItem.key,
     });
-    const sourceFolder = await getFolder({ id: props.folderId });
     const keyDerivationTrace = await buildKeyDerivationTrace({
-      folderId: sourceFolder.parentFolderId,
+      folderId: props.parentFolderId,
+      subkeyId: encryptedFolderResult.folderSubkeyId,
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+    });
+
+    const reDerivedKeyTrace = await deriveFolderKey({
+      folderId: props.folderId,
+      workspaceId: props.workspaceId,
+      overrideWithWorkspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+      keyDerivationTrace,
+      activeDevice,
     });
     const updateFolderNameResult = await runUpdateFolderNameMutation(
       {
@@ -326,14 +315,14 @@ export default function SidebarFolder(props: Props) {
           encryptedName: encryptedFolderResult.ciphertext,
           encryptedNameNonce: encryptedFolderResult.publicNonce,
           workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-          subkeyId: props.subkeyId!,
+          subkeyId: encryptedFolderResult.folderSubkeyId!,
           keyDerivationTrace,
         },
       },
       {}
     );
-    const folder = updateFolderNameResult.data?.updateFolderName?.folder;
-    if (folder) {
+    const updatedFolder = updateFolderNameResult.data?.updateFolderName?.folder;
+    if (updatedFolder) {
       setFolderName(newFolderName);
       // refetch the document path
       // TODO: Optimize by checking if the current folder is in the document path
@@ -513,10 +502,12 @@ export default function SidebarFolder(props: Props) {
                   <SidebarFolder
                     key={folder.id}
                     folderId={folder.id}
+                    parentFolderId={folder.parentFolderId}
                     workspaceId={props.workspaceId}
-                    subkeyId={folder.subkeyId}
+                    subkeyId={folder.keyDerivationTrace.subkeyId}
                     encryptedName={folder.encryptedName}
                     encryptedNameNonce={folder.encryptedNameNonce}
+                    keyDerivationTrace={folder.keyDerivationTrace}
                     onStructureChange={props.onStructureChange}
                     depth={depth + 1}
                   />
@@ -535,7 +526,8 @@ export default function SidebarFolder(props: Props) {
                     documentId={document.id}
                     encryptedName={document.encryptedName}
                     encryptedNameNonce={document.encryptedNameNonce}
-                    subkeyId={document.subkeyId}
+                    subkeyId={document.nameKeyDerivationTrace.subkeyId}
+                    nameKeyDerivationTrace={document.nameKeyDerivationTrace}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}
                     depth={depth}

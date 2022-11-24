@@ -1,16 +1,19 @@
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import {
   Button,
+  Description,
+  FormWrapper,
+  Heading,
   IconButton,
   InfoMessage,
   List,
   ListHeader,
   ListItem,
   ListText,
+  ModalHeader,
   Spinner,
-  Text,
-  Tooltip,
+  TextArea,
   tw,
   useIsDesktopDevice,
   View,
@@ -22,14 +25,14 @@ import {
   runRemoveDocumentShareLinkMutation,
   useDocumentShareLinksQuery,
 } from "../../generated/graphql";
-import { useWorkspaceContext } from "../../hooks/useWorkspaceContext";
-import { WorkspaceDrawerParamList } from "../../types/navigation";
+import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { notNull } from "../../utils/notNull/notNull";
 
 const styles = StyleSheet.create({
-  createShareLinkButton: tw`mb-8 self-start`,
+  createShareLinkButton: tw`mb-4 self-start`,
   shareLinkWrapperBase: tw`relative mb-2 py-4 px-5 border rounded`,
   shareLinkWrapperActive: tw`bg-primary-100/40 border-primary-200`,
   shareLinkWrapperInactive: tw`bg-gray-100 border-gray-200`,
@@ -40,13 +43,13 @@ const styles = StyleSheet.create({
 const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 1;
 
 export function PageShareModalContent() {
-  const route = useRoute<RouteProp<WorkspaceDrawerParamList, "Page">>();
+  const route = useRoute<WorkspaceDrawerScreenProps<"Page">["route"]>();
   const [documentShareLinksResult, refetchDocumentShareLinks] =
     useDocumentShareLinksQuery({
       variables: { documentId: route.params.pageId },
     });
   const isDesktopDevice = useIsDesktopDevice();
-  const { activeDevice } = useWorkspaceContext();
+  const { activeDevice } = useAuthenticatedAppContext();
   const signatureKeyPair: KeyPair = useMemo(() => {
     return {
       publicKey: sodium.from_base64(activeDevice.signingPublicKey),
@@ -95,7 +98,7 @@ export function PageShareModalContent() {
     refetchDocumentShareLinks();
   };
 
-  const copyInvitationText = async () => {
+  const copyLinkText = async () => {
     if (!pageShareLink) {
       return;
     }
@@ -117,56 +120,34 @@ export function PageShareModalContent() {
               Failed to fetch the page share links. Please try again later.
             </InfoMessage>
           ) : (
-            <>
-              <View
-                style={[
-                  styles.shareLinkWrapperBase,
-                  pageShareLink
-                    ? styles.shareLinkWrapperActive
-                    : styles.shareLinkWrapperInactive,
-                ]}
-              >
-                <Text
-                  variant="xs"
-                  testID="workspaceInvitationInstructionsText"
+            <FormWrapper>
+              <ModalHeader>Share a page</ModalHeader>
+              <View>
+                <TextArea
+                  testID="workspaceLinkText"
                   selectable={pageShareLink !== null}
-                  style={[
-                    pageShareLink
-                      ? styles.shareLinkTextActive
-                      : styles.shareLinkTextInactive,
-                  ]}
+                  onCopyPress={copyLinkText}
+                  isClipboardNoticeActive={isClipboardNoticeActive}
                 >
                   {pageShareLink !== null
                     ? pageShareLink
-                    : 'The share link will be generated here\nClick on "Create page share link" to generate a new link'}
-                </Text>
-                {pageShareLink !== null ? (
-                  <View style={tw`absolute right-3 top-3`}>
-                    <Tooltip
-                      label={
-                        isClipboardNoticeActive
-                          ? "Copying..."
-                          : "Copy to clipboard"
-                      }
-                      placement={"left"}
-                    >
-                      <IconButton
-                        name="file-copy-line"
-                        color={"primary-300"}
-                        transparent
-                        onPress={copyInvitationText}
-                        isLoading={isClipboardNoticeActive}
-                      />
-                    </Tooltip>
-                  </View>
-                ) : null}
+                    : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
+                </TextArea>
+                <Button
+                  onPress={createShareLink}
+                  style={styles.createShareLinkButton}
+                >
+                  Create page link
+                </Button>
               </View>
-              <Button
-                onPress={createShareLink}
-                style={styles.createShareLinkButton}
-              >
-                Create Page Link
-              </Button>
+              <View>
+                <Heading lvl={3} padded>
+                  Links
+                </Heading>
+                <Description variant="form">
+                  sorted by time of creation.
+                </Description>
+              </View>
               <List
                 data={documentShareLinks}
                 emptyString={"No active share links"}
@@ -202,7 +183,7 @@ export function PageShareModalContent() {
                   );
                 })}
               </List>
-            </>
+            </FormWrapper>
           )}
         </>
       )}
