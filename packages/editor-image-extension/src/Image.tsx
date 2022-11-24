@@ -86,7 +86,9 @@ export const Image = (props: any) => {
     <NodeViewWrapper
       style={{
         outline: props.selected
-          ? `2px solid ${tw.color("primary-400")}`
+          ? `2px solid ${tw.color(
+              state.step === "failedToDecrypt" ? "error-200" : "primary-400"
+            )}`
           : "none",
       }}
     >
@@ -106,7 +108,11 @@ export const Image = (props: any) => {
               }`}
             >
               <Icon
-                name="image-2-line"
+                name={
+                  state.step === "failedToDecrypt"
+                    ? "lock-unlock-line-close"
+                    : "image-2-line"
+                }
                 color={"gray-300"}
                 size="full"
                 mobileSize={"full"}

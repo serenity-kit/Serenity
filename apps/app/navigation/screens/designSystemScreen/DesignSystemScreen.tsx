@@ -1236,6 +1236,7 @@ export default function DesignSystemScreen(
           <DSTiles>
             <IconTile name="plus" />
             <IconTile name="more" />
+            <IconTile name="lock-unlock-line-close" />
             <IconTile name="cursor" />
             <IconTile name="arrow-right-filled" />
             <IconTile name="arrow-down-filled" />
