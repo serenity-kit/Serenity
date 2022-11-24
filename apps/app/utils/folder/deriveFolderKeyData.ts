@@ -38,8 +38,6 @@ export const deriveFolderKey = async ({
     {
       key: workspaceKey.workspaceKey,
       subkeyId: undefined,
-      // TODO: remove the folderId here. I've only put it in
-      // to make sure we have the correct workspaceKeyId
       folderId: `workspaceKeyId-${workspaceKeyId}`,
     },
   ];
@@ -68,7 +66,6 @@ export const deriveFolderKey = async ({
   folderKeyDerivationTrace.push({
     key: folderKeyData.key,
     subkeyId: keyDerivationTrace.subkeyId,
-    // TODO: insert the current folderId
     folderId,
   });
   return folderKeyDerivationTrace;
