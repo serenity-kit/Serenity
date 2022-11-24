@@ -21,7 +21,7 @@ export const TableOfContentButton = React.forwardRef(
     });
 
     const pressableStyles = [
-      tw`py-1 px-4`,
+      tw`py-1.5 px-4`,
       active && styles.active,
       isHovered && styles.hover,
       isFocusVisible && styles.focusVisible,
@@ -41,7 +41,7 @@ export const TableOfContentButton = React.forwardRef(
       >
         <Text
           variant="xs"
-          style={[tw`pl-${(lvl - 1) * 3 || 0}`, styles.text]}
+          style={[tw`pl-${(lvl - 1) * 4 || 0}`, styles.text]}
           bold={lvl === 1}
         >
           {rest.children}
