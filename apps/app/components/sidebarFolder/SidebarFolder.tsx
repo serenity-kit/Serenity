@@ -38,7 +38,6 @@ import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { getFolder } from "../../utils/folder/getFolder";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
-import { deriveCurrentWorkspaceKey } from "../../utils/workspace/deriveCurrentWorkspaceKey";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 import SidebarPage from "../sidebarPage/SidebarPage";
@@ -114,9 +113,13 @@ export default function SidebarFolder(props: Props) {
     try {
       const parentKeyChainData = await deriveFolderKey({
         folderId: props.folderId,
+        workspaceId: props.workspaceId,
         keyDerivationTrace: props.keyDerivationTrace,
         activeDevice,
       });
+      // since the decryptFolderName method takes a parent key
+      // and the last item of the key chain is the current folder key,
+      // we have to send in the parent key to the decryptFolderName method
       const parentKeyData = parentKeyChainData[parentKeyChainData.length - 2];
       const folderName = await decryptFolderName({
         parentKey: parentKeyData.key,
@@ -134,7 +137,7 @@ export default function SidebarFolder(props: Props) {
   const createFolder = async (name: string) => {
     openFolder();
     const id = uuidv4();
-    let workspaceKey = "";
+    // let workspaceKey = "";
     const workspace = await getWorkspace({
       deviceSigningPublicKey: activeDevice.signingPublicKey,
       workspaceId: props.workspaceId,
@@ -144,50 +147,34 @@ export default function SidebarFolder(props: Props) {
       console.error("Workspace or workspaceKeys not found");
       return;
     }
-    try {
-      const result = await deriveCurrentWorkspaceKey({
-        workspaceId: props.workspaceId,
-        activeDevice,
-      });
-      workspaceKey = result.workspaceKey;
-    } catch (error: any) {
-      // TODO: handle device not registered error
-      console.error(error);
-      return;
-    }
+    // derive this (the new folder's parent) folder key trace:
     const parentFolderKeyChainData = await deriveFolderKey({
       folderId: props.folderId,
+      workspaceId: props.workspaceId,
       keyDerivationTrace: props.keyDerivationTrace,
       activeDevice,
       overrideWithWorkspaceKeyId: workspace.currentWorkspaceKey?.id,
     });
-    const parentFolderKeyData =
+    const parentChainItem =
       parentFolderKeyChainData[parentFolderKeyChainData.length - 1];
     const encryptedFolderResult = await encryptFolderName({
       name,
-      parentKey: parentFolderKeyData.key,
+      parentKey: parentChainItem.key,
     });
+    const parentKeyDerivationTrace = await buildKeyDerivationTrace({
+      folderId: props.folderId,
+      subkeyId: encryptedFolderResult.folderSubkeyId,
+      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+    });
+    const keyDerivationTrace = {
+      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+      subkeyId: encryptedFolderResult.folderSubkeyId,
+      parentFolders: parentKeyDerivationTrace.parentFolders,
+    };
     let didCreateFolderSucceed = false;
     let numCreateFolderAttempts = 0;
     let folderId: string | undefined = undefined;
     let result: any = undefined;
-    const parentKyDerivationTrace = await buildKeyDerivationTrace({
-      folderId: props.folderId,
-      subkeyId: props.keyDerivationTrace.subkeyId,
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
-    });
-    const keyDerivationTrace: KeyDerivationTrace = {
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
-      subkeyId: encryptedFolderResult.folderSubkeyId,
-      parentFolders: [
-        ...parentKyDerivationTrace.parentFolders,
-        {
-          folderId: props.folderId,
-          subkeyId: props.keyDerivationTrace.subkeyId,
-          parentFolderId: props.parentFolderId,
-        },
-      ],
-    };
     do {
       numCreateFolderAttempts += 1;
       result = await runCreateFolderMutation(
@@ -212,7 +199,6 @@ export default function SidebarFolder(props: Props) {
       }
     } while (!didCreateFolderSucceed && numCreateFolderAttempts < 5);
     if (folderId) {
-      setIsEditing("none");
     } else {
       console.error(result.error);
       alert("Failed to create a folder. Please try again.");
@@ -298,20 +284,29 @@ export default function SidebarFolder(props: Props) {
     const folder = await getFolder({ id: props.folderId });
     const folderKeyTrace = await deriveFolderKey({
       folderId: props.folderId,
+      workspaceId: props.workspaceId,
       overrideWithWorkspaceKeyId: workspace?.currentWorkspaceKey?.id!,
       keyDerivationTrace: folder.keyDerivationTrace!,
       activeDevice,
     });
+    // ignore the last chain item as it's the key for the old folder name
     const parentChainItem = folderKeyTrace[folderKeyTrace.length - 2];
     const encryptedFolderResult = await encryptFolderName({
       name: newFolderName,
       parentKey: parentChainItem.key,
     });
-    // const sourceFolder = await getFolder({ id: props.folderId });
     const keyDerivationTrace = await buildKeyDerivationTrace({
-      folderId: folder.parentFolderId,
+      folderId: props.parentFolderId,
       subkeyId: encryptedFolderResult.folderSubkeyId,
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+    });
+
+    const reDerivedKeyTrace = await deriveFolderKey({
+      folderId: props.folderId,
+      workspaceId: props.workspaceId,
+      overrideWithWorkspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+      keyDerivationTrace,
+      activeDevice,
     });
     const updateFolderNameResult = await runUpdateFolderNameMutation(
       {

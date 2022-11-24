@@ -30,10 +30,14 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
       try {
         const folderKeyChainData = await deriveFolderKey({
           folderId: document.parentFolderId!,
+          workspaceId: document.workspaceId!,
           keyDerivationTrace: document.nameKeyDerivationTrace,
           activeDevice,
         });
-        const lastChainItem = folderKeyChainData[folderKeyChainData.length - 1];
+        // the last subkey key is treated like a folder key,
+        // but actually we want to create a document subkey, so we can
+        // use all subkeys up to the last one
+        const lastChainItem = folderKeyChainData[folderKeyChainData.length - 2];
         const documentKeyData = await recreateDocumentKey({
           folderKey: lastChainItem.key,
           subkeyId: document.nameKeyDerivationTrace.subkeyId,
