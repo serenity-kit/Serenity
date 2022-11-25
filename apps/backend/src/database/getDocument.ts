@@ -32,6 +32,7 @@ export async function getDocument(documentId: string) {
       id: doc.id,
       parentFolderId: doc.parentFolderId,
       workspaceKeyId: doc.workspaceKeyId,
+      workspaceId: doc.workspaceId,
     },
     parentFolder: {
       id: parentFolder?.id,
