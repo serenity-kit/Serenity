@@ -20,7 +20,7 @@ const config: PlaywrightTestConfig = {
     //   use: { ...devices["Desktop Firefox"] },
     // },
   ],
-  testMatch: /.*\.e2e\.ts/,
+  testMatch: /.*\.e2e\.run\.ts/,
   timeout: 1200000,
 };
 export default config;

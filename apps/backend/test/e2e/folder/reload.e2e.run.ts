@@ -16,7 +16,7 @@ test.beforeAll(async () => {
 });
 
 test.describe("After reload", () => {
-  test("Create, rename, delete root folder", async ({ page }) => {
+  test.only("Create, rename, delete root folder", async ({ page }) => {
     const { user, workspace } = await createUserWithWorkspace({
       id: uuidv4(),
       username: `${uuidv4()}@example.com`,
