@@ -45,6 +45,7 @@ import {
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
+import { getSessionKey } from "../../utils/authentication/sessionKeyStore";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
@@ -431,15 +432,19 @@ export default function Page({
         }
       };
 
+      const sessionKey = await getSessionKey();
+
       const setupWebsocket = () => {
-        let host = "wss://serenity-dev.fly.dev";
+        let host = `wss://serenity-dev.fly.dev`;
         if (process.env.NODE_ENV === "development") {
-          host = "ws://localhost:4000";
+          host = `ws://localhost:4000`;
         }
         if (process.env.IS_E2E_TEST === "true") {
-          host = "ws://localhost:4001";
+          host = `ws://localhost:4001`;
         }
-        const connection = new WebSocket(`${host}/${docId}`);
+        const connection = new WebSocket(
+          `${host}/${docId}?sessionKey=${sessionKey}`
+        );
         // @ts-expect-error TODO handle later
         websocketConnectionRef.current = connection;
 
