@@ -11,14 +11,14 @@ export const createRootFolder = async (
   workspaceId: string
 ) => {
   const numFoldersBeforeAdd = await prisma.folder.count({
-    where: { workspaceId },
+    where: { workspaceId, parentFolderId: null },
   });
   await page.locator("data-testid=root-create-folder").click();
   await page.locator(`data-testid=sidebar-folder__edit-name`).fill(name);
   await page.locator(`data-testid=sidebar-folder__edit-name`).press("Enter");
-  await delayForSeconds(4);
+  await delayForSeconds(2);
   const numFoldersAfterAdd = await prisma.folder.count({
-    where: { workspaceId },
+    where: { workspaceId, parentFolderId: null },
   });
   expect(numFoldersAfterAdd).toEqual(numFoldersBeforeAdd + 1);
   const folder = await prisma.folder.findFirst({
