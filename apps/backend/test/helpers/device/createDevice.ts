@@ -1,5 +1,6 @@
 import { createDevice as createdDeviceHelper } from "@serenity-tools/common";
-import { gql } from "graphql-request";
+import { createDevice as saveDevice } from "../../../src/database/device/createDevice";
+import { prisma } from "../../../src/database/prisma";
 
 type Params = {
   graphql: any;
@@ -10,23 +11,13 @@ export const createDevice = async ({
   graphql,
   authorizationHeader,
 }: Params) => {
-  const authorizationHeaders = {
-    authorization: authorizationHeader,
-  };
-  const query = gql`
-    mutation createDevice($input: CreateDeviceInput!) {
-      createDevice(input: $input) {
-        device {
-          userId
-          signingPublicKey
-          encryptionPublicKey
-          encryptionPublicKeySignature
-          info
-        }
-      }
-    }
-  `;
-
+  const session = await prisma.session.findFirst({
+    where: { sessionKey: authorizationHeader },
+    select: { userId: true },
+  });
+  if (!session) {
+    throw new Error("Session not found");
+  }
   const device = await createdDeviceHelper();
 
   const deviceInfoJson = {
@@ -38,18 +29,12 @@ export const createDevice = async ({
   };
   const deviceInfo = JSON.stringify(deviceInfoJson);
 
-  const result = await graphql.client.request(
-    query,
-    {
-      input: {
-        encryptionPublicKeySignature: device.encryptionPublicKeySignature,
-        encryptionPublicKey: device.encryptionPublicKey,
-        signingPublicKey: device.signingPublicKey,
-        info: deviceInfo,
-      },
-    },
-    authorizationHeaders
-  );
-  result.localDevice = device;
-  return result;
+  await saveDevice({
+    userId: session.userId,
+    signingPublicKey: device.signingPublicKey,
+    encryptionPublicKey: device.encryptionPublicKey,
+    encryptionPublicKeySignature: device.encryptionPublicKeySignature,
+    info: deviceInfo,
+  });
+  return { localDevice: device };
 };
