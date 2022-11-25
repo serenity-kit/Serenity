@@ -1,3 +1,4 @@
+import { createSnapshotKey } from "@serenity-tools/common";
 import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
@@ -5,6 +6,7 @@ import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocumentShareLink } from "../../../../test/helpers/document/createDocumentShareLink";
 import { getDocumentShareLinks } from "../../../../test/helpers/document/getDocumentShareLinks";
+import { deriveFolderKey } from "../../../../test/helpers/folder/deriveFolderKey";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
@@ -29,15 +31,22 @@ beforeAll(async () => {
 test("list share link", async () => {
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
-  // TODO: derive snapshotkey from folder key derivation trace
-  const snapshotKey = await sodium.crypto_kdf_keygen();
+  const folderKeyTrace = await deriveFolderKey({
+    workspaceId: userData1.workspace.id,
+    folderId: userData1.folder.id,
+    keyDerivationTrace: userData1.folder.keyDerivationTrace,
+    activeDevice: userData1.webDevice,
+  });
+  const snapshotKeyData = await createSnapshotKey({
+    folderKey: folderKeyTrace[folderKeyTrace.length - 1].key,
+  });
   const documentShareLinkResponse = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
     sharingRole: Role.EDITOR,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
     creatorDevice,
-    snapshotKey,
+    snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData1.sessionKey,
   });
   const token = documentShareLinkResponse.createDocumentShareLink.token;

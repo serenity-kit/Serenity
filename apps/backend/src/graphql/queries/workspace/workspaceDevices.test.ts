@@ -12,6 +12,7 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 const graphql = setupGraphql();
 let userData1: any = null;
 let userData2: any = null;
+let numStartingDevices = 2;
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
@@ -36,9 +37,22 @@ test("One key on first run", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const devices = workspaceDevicesResult.workspaceDevices.nodes;
-  expect(devices.length).toBe(1);
-  const device = devices[0];
-  expect(device.signingPublicKey).toBe(userData1.device.signingPublicKey);
+  expect(devices.length).toBe(numStartingDevices);
+  let foundUser1Device = false;
+  let foundUser1Device2 = false;
+  for (let device of devices) {
+    if (device.signingPublicKey === userData1.device.signingPublicKey) {
+      foundUser1Device = true;
+    } else if (
+      device.signingPublicKey === userData1.webDevice.signingPublicKey
+    ) {
+      foundUser1Device2 = true;
+    } else {
+      throw new Error("Unexpected device found");
+    }
+  }
+  expect(foundUser1Device).toBe(true);
+  expect(foundUser1Device2).toBe(true);
 });
 
 // TODO: test after user joins workspace, and their device is added to the devices list
@@ -101,12 +115,17 @@ test("new user results in added device", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const devices = workspaceDevicesResult.workspaceDevices.nodes;
-  expect(devices.length).toBe(2);
+  expect(devices.length).toBe(numStartingDevices + 1);
   let foundUser1Device = false;
+  let foundUser1Device2 = false;
   let foundUser2Device = false;
   for (let device of devices) {
     if (device.signingPublicKey === userData1.device.signingPublicKey) {
       foundUser1Device = true;
+    } else if (
+      device.signingPublicKey === userData1.webDevice.signingPublicKey
+    ) {
+      foundUser1Device2 = true;
     } else if (device.signingPublicKey === userData2.device.signingPublicKey) {
       foundUser2Device = true;
     } else {
@@ -114,6 +133,7 @@ test("new user results in added device", async () => {
     }
   }
   expect(foundUser1Device).toBe(true);
+  expect(foundUser1Device2).toBe(true);
   expect(foundUser2Device).toBe(true);
 });
 
