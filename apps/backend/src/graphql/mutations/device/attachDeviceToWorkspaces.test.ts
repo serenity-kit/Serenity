@@ -2,6 +2,7 @@ import { gql } from "graphql-request";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
+import { createDevice } from "../../../../test/helpers/device/createDevice";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
@@ -22,10 +23,13 @@ beforeAll(async () => {
 test("attach the same device does nothing", async () => {
   const workspaceId = userAndDevice1.workspace.id;
   const existingWorkspaceKeyBox = await prisma.workspaceKeyBox.findFirst({
-    where: { workspaceKey: { workspaceId } },
+    where: {
+      workspaceKey: { workspaceId },
+      deviceSigningPublicKey: userAndDevice1.webDevice.signingPublicKey,
+    },
   });
   const authorizationHeader = userAndDevice1.sessionKey;
-  const deviceSigningPublicKey = userAndDevice1.device.signingPublicKey;
+  const deviceSigningPublicKey = userAndDevice1.webDevice.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
   const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
@@ -61,9 +65,11 @@ test("attach the same device does nothing", async () => {
   const workspaceKeyBox = workspaceKey.workspaceKeyBox;
   expect(workspaceKeyBox?.ciphertext).toBe(existingWorkspaceKeyBox?.ciphertext);
   expect(workspaceKeyBox?.nonce).toBe(existingWorkspaceKeyBox?.nonce);
-  expect(workspaceKeyBox?.deviceSigningPublicKey).toBe(deviceSigningPublicKey);
+  expect(workspaceKeyBox?.deviceSigningPublicKey).toBe(
+    userAndDevice1.webDevice.signingPublicKey
+  );
   expect(workspaceKeyBox?.creatorDeviceSigningPublicKey).toBe(
-    deviceSigningPublicKey
+    userAndDevice1.device.signingPublicKey
   );
   // there should now be two workspacKeyBoxes
   const workspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
@@ -71,24 +77,28 @@ test("attach the same device does nothing", async () => {
       workspaceKeyId: workspaceKey.id,
     },
   });
-  expect(workspaceKeyBoxes?.length).toBe(1);
+  // 2 because we create a mainDevice and loginDevice in createUserWithWorkspace helper
+  expect(workspaceKeyBoxes?.length).toBe(2);
 });
 
 test("attach a device to a workspace", async () => {
+  const createDeviceResult = await createDevice({
+    graphql,
+    authorizationHeader: userAndDevice1.sessionKey,
+  });
+  const newDevice = createDeviceResult.localDevice;
   const authorizationHeader = userAndDevice1.sessionKey;
-  const deviceSigningPublicKey = userAndDevice1.webDevice.signingPublicKey;
-  const deviceEncryptionPublicKey =
-    userAndDevice1.webDevice.encryptionPublicKey;
   const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
-    receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
-    creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
+    receiverDeviceEncryptionPublicKey: newDevice.encryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey:
+      userAndDevice1.webDevice.encryptionPrivateKey,
   });
   const workspaceId = userAndDevice1.workspace.id;
   const workspaceKeyId = userAndDevice1.workspace.currentWorkspaceKey.id;
   const result = await attachDeviceToWorkspaces({
     graphql,
-    deviceSigningPublicKey,
-    creatorDeviceSigningPublicKey: userAndDevice1.device.signingPublicKey, // main device
+    deviceSigningPublicKey: newDevice.signingPublicKey,
+    creatorDeviceSigningPublicKey: userAndDevice1.webDevice.signingPublicKey,
     deviceWorkspaceKeyBoxes: [
       {
         workspaceId,
@@ -114,9 +124,11 @@ test("attach a device to a workspace", async () => {
   const workspaceKeyBox = workspaceKey.workspaceKeyBox;
   expect(workspaceKeyBox?.ciphertext).toBe(ciphertext);
   expect(workspaceKeyBox?.nonce).toBe(nonce);
-  expect(workspaceKeyBox?.deviceSigningPublicKey).toBe(deviceSigningPublicKey);
+  expect(workspaceKeyBox?.deviceSigningPublicKey).toBe(
+    newDevice.signingPublicKey
+  );
   expect(workspaceKeyBox?.creatorDeviceSigningPublicKey).toBe(
-    userAndDevice1.device.signingPublicKey
+    userAndDevice1.webDevice.signingPublicKey
   );
   // there should now be two workspacKeyBoxes
   const workspaceKeyBoxes = await prisma.workspaceKeyBox.findMany({
@@ -124,7 +136,8 @@ test("attach a device to a workspace", async () => {
       workspaceKeyId: workspaceKey.id,
     },
   });
-  expect(workspaceKeyBoxes?.length).toBe(2);
+  // 3 because we start with 2 when we create the user and workspace
+  expect(workspaceKeyBoxes?.length).toBe(3);
 });
 
 test("Unauthenticated", async () => {

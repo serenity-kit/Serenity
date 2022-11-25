@@ -10,8 +10,10 @@ import * as sodium from "@serenity-tools/libsodium";
 import { Registration } from "@serenity-tools/opaque-server";
 import { v4 as uuidv4 } from "uuid";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
+import { encryptWorkspaceKeyForDevice } from "../../../test/helpers/device/encryptWorkspaceKeyForDevice";
 import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
 import { finishRegistration, startRegistration } from "../../utils/opaque";
+import { attachDeviceToWorkspaces } from "../device/attachDeviceToWorkspaces";
 import { prisma } from "../prisma";
 import { createDeviceAndLogin } from "./createDeviceAndLogin";
 
@@ -83,18 +85,15 @@ export default async function createUserWithWorkspace({
   const documentName = "Introduction";
   const user = result.user;
   const device = result.device;
-  const deviceEncryptionPrivateKey = result.encryptionPrivateKey;
-  const deviceEncryptionPublicKey = device.encryptionPublicKey;
-  const deviceSigningPrivateKey = result.signingPrivateKey;
   const { nonce, ciphertext, workspaceKey } =
     await createAndEncryptWorkspaceKeyForDevice({
-      receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
-      creatorDeviceEncryptionPrivateKey: deviceEncryptionPrivateKey,
+      receiverDeviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
+      creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
     });
   const folderName = "Getting Started";
   const folderIdSignature = await sodium.crypto_sign_detached(
     folderId,
-    deviceSigningPrivateKey
+    mainDevice.signingPrivateKey
   );
   const encryptedFolderResult = await encryptFolderName({
     name: folderName,
@@ -183,13 +182,38 @@ export default async function createUserWithWorkspace({
     envelope,
   });
 
+  const webDeviceWorkspaceKeyBox = await encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: webDevice.encryptionPublicKey,
+    creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
+    workspaceKey,
+  });
+
+  await attachDeviceToWorkspaces({
+    userId: user.id,
+    receiverDeviceSigningPublicKey: webDevice.signingPublicKey,
+    creatorDeviceSigningPublicKey: mainDevice.signingPublicKey,
+    workspaceKeyBoxes: [
+      {
+        workspaceId: createWorkspaceResult.workspace.id,
+        workspaceKeyDevicePairs: [
+          {
+            workspaceKeyId:
+              createWorkspaceResult.workspace.currentWorkspaceKey?.id!,
+            nonce: webDeviceWorkspaceKeyBox.nonce,
+            ciphertext: webDeviceWorkspaceKeyBox.ciphertext,
+          },
+        ],
+      },
+    ],
+  });
+
   return {
     ...result,
     session,
     sessionKey,
     device,
-    deviceEncryptionPrivateKey,
-    deviceSigningPrivateKey,
+    deviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
+    deviceSigningPrivateKey: mainDevice.signingPrivateKey,
     webDevice,
     user,
     envelope,

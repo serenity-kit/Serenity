@@ -288,7 +288,6 @@ it("should return deep parentFolders", async () => {
 
   // @ts-ignore getFolder is mocked
   getFolder.mockImplementation((props) => {
-    console.log("props", props);
     if (props.folderId === childFolderId) {
       return {
         __typename: "Folder",
