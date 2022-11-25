@@ -51,6 +51,7 @@ export * from "./components/spinner/Spinner";
 export * from "./components/tab/Tab";
 export * from "./components/tabList/TabList";
 export * from "./components/tabPanel/TabPanel";
+export * from "./components/tableOfContentButton/TableOfContentButton";
 export * from "./components/text/Text";
 export * from "./components/textArea/TextArea";
 export * from "./components/tooltip/Tooltip";

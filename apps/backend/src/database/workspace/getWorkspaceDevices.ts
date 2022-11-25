@@ -36,6 +36,9 @@ export async function getWorkspaceDevices({
   );
   const devices = await prisma.device.findMany({
     where: { signingPublicKey: { in: deviceSigningPublicKeys } },
+    cursor,
+    skip,
+    take,
   });
   return devices;
 }

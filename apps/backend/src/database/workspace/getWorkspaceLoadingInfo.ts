@@ -22,6 +22,7 @@ const getFirstWorkspace = async ({ userId }: { userId: string }) => {
     where: {
       usersToWorkspaces: { some: { userId } },
     },
+    orderBy: { createdAt: "desc" },
   });
 };
 

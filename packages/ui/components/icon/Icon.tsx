@@ -82,6 +82,7 @@ import { ListCheck } from "./icons/ListCheck";
 import { ListCheck2 } from "./icons/ListCheck2";
 import { ListOrdered } from "./icons/ListOrdered";
 import { ListUnordered } from "./icons/ListUnordered";
+import { LockUnlockLineClose } from "./icons/LockUnlockLineClose";
 import { Menu } from "./icons/Menu";
 import { MicroscopeLine } from "./icons/MicroscopeLine";
 import { More } from "./icons/More";
@@ -199,6 +200,7 @@ export type IconNames =
   | "list-check-2"
   | "list-unordered"
   | "list-ordered"
+  | "lock-unlock-line-close"
   | "menu"
   | "microscope-line"
   | "more"
@@ -232,9 +234,8 @@ export type IconNames =
 export type IconProps = {
   name: IconNames;
   color?: Color;
-  size?: number;
-  mobileSize?: number;
-  blub?: Color;
+  size?: number | "full";
+  mobileSize?: number | "full";
 };
 
 export const Icon = (props: IconProps) => {
@@ -493,6 +494,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "list-unordered") {
     icon = <ListUnordered color={color} size={iconSize} />;
+  }
+  if (name === "lock-unlock-line-close") {
+    icon = <LockUnlockLineClose color={color} size={iconSize} />;
   }
   if (name === "menu") {
     icon = <Menu color={color} size={iconSize} />;

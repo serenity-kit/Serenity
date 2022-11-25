@@ -1,6 +1,6 @@
 import { expect, Page, test } from "@playwright/test";
 import { v4 as uuidv4 } from "uuid";
-import { User, Workspace } from "../../../prisma/generated/output";
+import { User } from "../../../prisma/generated/output";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { Document } from "../../../src/types/document";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
@@ -10,7 +10,7 @@ import { register } from "../../helpers/e2e/register";
 type ExpectResultsProps = {
   page: Page;
   user: User;
-  workspace: Workspace;
+  workspace: any; // GraphQL result type - not the prisma type
   document: Document;
 };
 const expectResults = async ({
@@ -20,7 +20,6 @@ const expectResults = async ({
   document,
 }: ExpectResultsProps) => {
   expect(user).not.toBeUndefined();
-  expect(workspace).not.toBeUndefined();
   expect(workspace).not.toBeUndefined();
   await delayForSeconds(3);
   // TODO: get the workspace id and expect URL to match

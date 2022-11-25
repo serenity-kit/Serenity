@@ -8,29 +8,26 @@ import { deleteFolder } from "../../helpers/e2e/deleteFolder";
 import { login } from "../../helpers/e2e/login";
 import { renameFolder } from "../../helpers/e2e/renameFolder";
 
-const userId = uuidv4();
-const username = `${uuidv4()}@example.com`;
 const password = "pass";
-const workspaceName = "a workspace";
-let createdWorkspace: any = null;
-let workspaceId = "";
-let firstFolder: any = null;
 
 test.beforeAll(async () => {
   await sodium.ready;
-  const { workspace, folder } = await createUserWithWorkspace({
-    id: userId,
-    username,
-    password,
-  });
-  createdWorkspace = workspace;
-  firstFolder = folder;
-  workspaceId = workspace.id;
 });
 
 test.describe("After login", () => {
   test("Create, rename, delete root folder", async ({ page }) => {
-    await login({ page, username, password, stayLoggedIn: true });
+    const { user, workspace } = await createUserWithWorkspace({
+      id: uuidv4(),
+      username: `${uuidv4()}@example.com`,
+      password,
+    });
+    const createdWorkspace = workspace;
+    await login({
+      page,
+      username: user.username,
+      password,
+      stayLoggedIn: true,
+    });
     const addedFolder = await createRootFolder(
       page,
       "Test folder",
@@ -41,7 +38,19 @@ test.describe("After login", () => {
   });
 
   test("Create, rename, delete a subfolder", async ({ page }) => {
-    await login({ page, username, password, stayLoggedIn: true });
+    const { user, workspace, folder } = await createUserWithWorkspace({
+      id: uuidv4(),
+      username: `${uuidv4()}@example.com`,
+      password,
+    });
+    const createdWorkspace = workspace;
+    const firstFolder = folder;
+    await login({
+      page,
+      username: user.username,
+      password,
+      stayLoggedIn: true,
+    });
     const addedSubfolder = await createSubFolder(
       page,
       firstFolder.id,

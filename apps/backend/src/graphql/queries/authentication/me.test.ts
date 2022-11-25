@@ -7,7 +7,7 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 
 const graphql = setupGraphql();
 let userData1: any = undefined;
-let otherWorkspace: any = undefined;
+let otherWorkspaceStructure: any = undefined;
 const password = "password";
 let sessionKey = "";
 
@@ -53,7 +53,7 @@ const setup = async () => {
     username: `${uuidv4()}@example.com`,
     password,
   });
-  otherWorkspace = await createInitialWorkspaceStructure({
+  const createWorkspaceResult = await createInitialWorkspaceStructure({
     graphql,
     workspaceName: workspace2Name,
     creatorDevice: {
@@ -64,6 +64,8 @@ const setup = async () => {
     devices: [userData1.device, userData1.webDevice],
     authorizationHeader: userData1.sessionKey,
   });
+  otherWorkspaceStructure =
+    createWorkspaceResult.createInitialWorkspaceStructure;
 };
 
 beforeAll(async () => {
@@ -113,8 +115,8 @@ test("should get the fallback workspace if the workspaceId is not available and 
   );
   expect(result.me.workspaceLoadingInfo).toMatchInlineSnapshot(`
     {
-      "documentId": "${userData1.document.id}",
-      "id": "${userData1.workspace.id}",
+      "documentId": "${otherWorkspaceStructure.document.id}",
+      "id": "${otherWorkspaceStructure.workspace.id}",
       "isAuthorized": true,
       "role": "ADMIN",
     }

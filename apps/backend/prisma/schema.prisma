@@ -176,6 +176,9 @@ model Workspace {
   usersToWorkspaces UsersToWorkspaces[]
   invitations       WorkspaceInvitations[]
   workspaceKeys     WorkspaceKey[]
+  createdAt         DateTime               @default(now())
+
+  @@index([createdAt(sort: Desc)])
 }
 
 enum Role {

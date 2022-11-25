@@ -486,7 +486,6 @@ export default function DesignSystemScreen(
                       name="arrow-right-filled"
                       color={"gray-600"}
                       mobileSize={5}
-                      blub={"collaboration-orange"}
                     />
                   </View>
                   <View style={tw`-ml-0.5`}>
@@ -1064,6 +1063,27 @@ export default function DesignSystemScreen(
           <Icon name="check-line" size={10} mobileSize={12} />
           <Icon name="check-line" size={12} mobileSize={14} />
         </DSExampleArea>
+        <Text variant="sm" style={tw`mt-4`}>
+          To make an Icon full-size, which means it will fill it's
+          parent-container, set the <DSMono variant="property">size</DSMono> to{" "}
+          <DSMono variant="type">full</DSMono> . Don't forget to then also set
+          the <DSMono variant="property">mobileSize</DSMono> property, if you
+          want the same behaviour on mobile.
+        </Text>
+        <DSExampleArea>
+          <View style={tw`w-5 h-5 border border-dashed border-gray-300`}>
+            <Icon name="check-line" size={"full"} mobileSize={"full"} />
+          </View>
+          <View style={tw`w-15 h-15 border border-dashed border-gray-300`}>
+            <Icon name="check-line" size={"full"} mobileSize={"full"} />
+          </View>
+          <View style={tw`w-40 h-25 border border-dashed border-gray-300`}>
+            <Icon name="check-line" size={"full"} mobileSize={"full"} />
+          </View>
+          <View style={tw`w-25 h-40 border border-dashed border-gray-300`}>
+            <Icon name="check-line" size={"full"} mobileSize={"full"} />
+          </View>
+        </DSExampleArea>
         <Heading lvl={3}>Styling</Heading>
         <Text variant="sm">
           Icons don't have a style property, but you can still dye them with the{" "}
@@ -1072,7 +1092,7 @@ export default function DesignSystemScreen(
         <Text variant="sm" style={tw`mt-4`}>
           You can use all of our custom colors defined for the application by
           typing the name and if necessary the hue value:{" "}
-          <DSMono variant="type">collaboration-honey</DSMono>,
+          <DSMono variant="type">collaboration-honey</DSMono>,{" "}
           <DSMono variant="type">white</DSMono> , or{" "}
           <DSMono variant="type">gray-500</DSMono> for example.
         </Text>
@@ -1152,8 +1172,8 @@ export default function DesignSystemScreen(
             <IconTile name="page-separator" />
             <IconTile name="separator" />
             <IconTile name="calendar-check-fill" />
-            <IconTile name="image-2-line" />
             <IconTile name="image-line" />
+            <IconTile name="image-2-line" />
             <IconTile name="movie-line" />
             <IconTile name="folder-music-line" />
             <IconTile name="emotion-line" />
@@ -1216,6 +1236,7 @@ export default function DesignSystemScreen(
           <DSTiles>
             <IconTile name="plus" />
             <IconTile name="more" />
+            <IconTile name="lock-unlock-line-close" />
             <IconTile name="cursor" />
             <IconTile name="arrow-right-filled" />
             <IconTile name="arrow-down-filled" />

@@ -45,6 +45,7 @@ import {
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
+import { getSessionKey } from "../../utils/authentication/sessionKeyStore";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
@@ -94,10 +95,14 @@ export default function Page({
     const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
     const folderKeyChainData = await deriveFolderKey({
       folderId: document.parentFolderId!,
+      workspaceId: document.workspaceId!,
       keyDerivationTrace: snapshotKeyDerivationTrace,
       activeDevice,
     });
-    const lastChainItem = folderKeyChainData[folderKeyChainData.length - 1];
+    // the last subkey key here is treated like a folder key
+    // but since we want to derive a snapshot key, we can just toss
+    // the last one out and use the rest
+    const lastChainItem = folderKeyChainData[folderKeyChainData.length - 2];
     const snapshotKeyData = await recreateSnapshotKey({
       folderKey: lastChainItem.key,
       subkeyId: snapshotKeyDerivationTrace.subkeyId,
@@ -166,6 +171,7 @@ export default function Page({
     const folder = await getFolder({ id: document.parentFolderId! });
     const folderKeyChainData = await deriveFolderKey({
       folderId: document.parentFolderId!,
+      workspaceId: document.workspaceId!,
       overrideWithWorkspaceKeyId: workspaceKeyId,
       keyDerivationTrace: folder.keyDerivationTrace,
       activeDevice,
@@ -426,15 +432,19 @@ export default function Page({
         }
       };
 
+      const sessionKey = await getSessionKey();
+
       const setupWebsocket = () => {
-        let host = "wss://serenity-dev.fly.dev";
+        let host = `wss://serenity-dev.fly.dev`;
         if (process.env.NODE_ENV === "development") {
-          host = "ws://localhost:4000";
+          host = `ws://localhost:4000`;
         }
         if (process.env.IS_E2E_TEST === "true") {
-          host = "ws://localhost:4001";
+          host = `ws://localhost:4001`;
         }
-        const connection = new WebSocket(`${host}/${docId}`);
+        const connection = new WebSocket(
+          `${host}/${docId}?sessionKey=${sessionKey}`
+        );
         // @ts-expect-error TODO handle later
         websocketConnectionRef.current = connection;
 
