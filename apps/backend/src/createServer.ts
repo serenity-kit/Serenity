@@ -1,4 +1,5 @@
 import {
+  NaishoNewSnapshotWithKeyRotationRequired,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
   UpdateWithServerData,
@@ -247,7 +248,10 @@ export default async function createServer() {
             // }
 
             // TODO add a smart queue to create an offset based on the version?
-            savedUpdate = await retryAsyncFunction(() => createUpdate(data));
+            savedUpdate = await retryAsyncFunction(
+              () => createUpdate(data),
+              [NaishoNewSnapshotWithKeyRotationRequired]
+            );
             if (savedUpdate === undefined) {
               throw new Error("Update could not be saved.");
             }
@@ -259,7 +263,7 @@ export default async function createServer() {
                 snapshotId: data.publicData.refSnapshotId,
                 clock: data.publicData.clock,
                 // @ts-expect-error not sure why savedUpdate is "never"
-                serverVersion: savedUpdate.version,
+                serverVersion: savedUpdate.serverData.version,
               })
             );
             console.log("addUpdate update");
@@ -277,6 +281,8 @@ export default async function createServer() {
                   docId: data.publicData.docId,
                   snapshotId: data.publicData.refSnapshotId,
                   clock: data.publicData.clock,
+                  requiresNewSnapshotWithKeyRotation:
+                    err instanceof NaishoNewSnapshotWithKeyRotationRequired,
                 })
               );
             }
