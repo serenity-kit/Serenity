@@ -65,7 +65,6 @@ test("user should be retrieve a document", async () => {
     workspaceId,
     contentSubkeyId: 1,
     authorizationHeader,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
   });
   await updateDocumentName({
     graphql,

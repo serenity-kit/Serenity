@@ -33,7 +33,6 @@ const setup = async () => {
     parentFolderId: folder.id,
     contentSubkeyId: 1,
     workspaceId: addedWorkspace.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
   });
   addedDocumentId = createDocumentResult.createDocument.id;
 };

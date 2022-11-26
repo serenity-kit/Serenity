@@ -58,7 +58,6 @@ test("user should be able to create a document", async () => {
     graphql,
     authorizationHeader: userData1.sessionKey,
     parentFolderId: userData1.folder.parentFolderId,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     workspaceId: userData1.workspace.id,
     contentSubkeyId: documentContentKeyResult.subkeyId,
   });
@@ -85,7 +84,6 @@ test("commenter tries to create", async () => {
         graphql,
         authorizationHeader: otherUser.sessionKey,
         parentFolderId: userData1.folder.parentFolderId,
-        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         contentSubkeyId: 1,
         workspaceId: userData1.workspace.id,
       }))()
@@ -112,7 +110,6 @@ test("viewer attempts to create", async () => {
         graphql,
         authorizationHeader: otherUser.sessionKey,
         parentFolderId: userData1.folder.parentFolderId,
-        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         contentSubkeyId: 1,
         workspaceId: userData1.workspace.id,
       }))()
@@ -127,7 +124,6 @@ test("Unauthenticated", async () => {
         graphql,
         authorizationHeader: "badauthkey",
         parentFolderId: userData1.folder.parentFolderId,
-        workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
         contentSubkeyId: 1,
         workspaceId: userData1.workspace.id,
       }))()

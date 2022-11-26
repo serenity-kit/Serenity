@@ -60,7 +60,6 @@ const setup = async () => {
     authorizationHeader: sessionKey,
     parentFolderId: addedFolder.parentFolderId,
     contentSubkeyId: documentContentKeyResult.subkeyId,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     workspaceId: addedWorkspace.id,
   });
   addedDocumentId = createDocumentResult.createDocument.id;
@@ -130,7 +129,6 @@ test("Throw error when user doesn't have access", async () => {
     graphql,
     id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
     parentFolderId: userData1.folder.parentFolderId,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
     workspaceId: userData1.workspace.id,
     contentSubkeyId: 1,
     authorizationHeader: userData1.sessionKey,

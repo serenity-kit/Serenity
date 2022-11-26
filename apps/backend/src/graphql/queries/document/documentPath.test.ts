@@ -105,7 +105,6 @@ const setup = async () => {
     workspaceId: userData1.workspace.id,
     contentSubkeyId: 1,
     authorizationHeader: userData1.sessionKey,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   await createDocument({
     graphql,
@@ -114,7 +113,6 @@ const setup = async () => {
     workspaceId: userData1.workspace.id,
     contentSubkeyId: 2,
     authorizationHeader: userData1.sessionKey,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
 
   userData2 = await createUserWithWorkspace({
@@ -167,7 +165,6 @@ const setup = async () => {
     workspaceId: userData2.workspace.id,
     contentSubkeyId: 3,
     authorizationHeader: userData2.sessionKey,
-    workspaceKeyId: userData2.workspace.currentWorkspaceKey.id,
   });
 };
 
