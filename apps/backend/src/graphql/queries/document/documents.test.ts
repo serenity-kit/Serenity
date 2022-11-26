@@ -184,7 +184,6 @@ test("user should be able to list documents in a folder with one item", async ()
     workspaceId: userData1.workspace.id,
     contentSubkeyId: 1,
     authorizationHeader: userData1.sessionKey,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const result = await getDocuments({
     graphql,
@@ -220,7 +219,6 @@ test("user should be able to list documents in a folder with multiple items", as
     workspaceId: userData1.workspace.id,
     contentSubkeyId: 1,
     authorizationHeader: userData1.sessionKey,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const result = await getDocuments({
     graphql,
@@ -264,7 +262,6 @@ test("user should be able to list without showing subfolder documents", async ()
     workspaceId: userData1.workspace.id,
     contentSubkeyId: 3,
     authorizationHeader: userData1.sessionKey,
-    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
   });
   const result = await getDocuments({
     graphql,
