@@ -135,41 +135,46 @@ export default async function createServer() {
         connection.close();
         return;
       }
+
+      if (!context.user) {
+        // TODO close connection properly
+        connection.send(JSON.stringify({ type: "unauthorized" }));
+        connection.close();
+        return;
+      }
+
+      // if the user doesn't have access to the workspace,
+      // throw an error
+      const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+        where: {
+          userId: context.user.id,
+          workspaceId: doc.doc.workspaceId,
+          isAuthorizedMember: true,
+        },
+      });
+      if (!userToWorkspace) {
+        // TODO close connection properly
+        connection.send(JSON.stringify({ type: "unauthorized" }));
+        connection.close();
+        return;
+      }
+
       addConnection(documentId, connection);
       connection.send(JSON.stringify({ type: "document", ...doc }));
 
       connection.on("message", async function message(messageContent) {
+        // messages from non-authorized users (viewer & commenters) are ignored
+        if (
+          userToWorkspace.role !== Role.ADMIN &&
+          userToWorkspace.role !== Role.EDITOR
+        ) {
+          return;
+        }
+
         const data = JSON.parse(messageContent.toString());
 
+        // new snapshot
         if (data?.publicData?.snapshotId) {
-          // if the user doesn't have access to the workspace,
-          // throw an error
-          let doc = await getDocument(documentId);
-          if (!doc) {
-            connection.send(
-              JSON.stringify({
-                type: "snapshotFailed",
-                docId: data.publicData.docId,
-              })
-            );
-            return;
-          }
-          const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
-            where: {
-              userId: context.user.id,
-              workspaceId: doc.doc.workspaceId,
-              role: { in: [Role.ADMIN, Role.EDITOR] },
-            },
-          });
-          if (!userToWorkspace) {
-            connection.send(
-              JSON.stringify({
-                type: "snapshotFailed",
-                docId: data.publicData.docId,
-              })
-            );
-            return;
-          }
           try {
             const activeSnapshotInfo =
               data.lastKnownSnapshotId && data.latestServerVersion
@@ -232,6 +237,7 @@ export default async function createServer() {
               );
             }
           }
+          // new update
         } else if (data?.publicData?.refSnapshotId) {
           let savedUpdate: undefined | UpdateWithServerData = undefined;
           try {
@@ -239,38 +245,7 @@ export default async function createServer() {
             // if (random < 8) {
             //   throw new Error("CUSTOM ERROR");
             // }
-            // if the user doesn't have access to the workspace,
-            // throw an error
-            let doc = await getDocument(documentId);
-            if (!doc) {
-              connection.send(
-                JSON.stringify({
-                  type: "updateFailed",
-                  docId: data.publicData.docId,
-                  snapshotId: data.publicData.refSnapshotId,
-                  clock: data.publicData.clock,
-                })
-              );
-              return;
-            }
-            const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
-              where: {
-                userId: context.user.id,
-                workspaceId: doc.doc.workspaceId,
-                role: { in: [Role.ADMIN, Role.EDITOR] },
-              },
-            });
-            if (!userToWorkspace) {
-              connection.send(
-                JSON.stringify({
-                  type: "updateFailed",
-                  docId: data.publicData.docId,
-                  snapshotId: data.publicData.refSnapshotId,
-                  clock: data.publicData.clock,
-                })
-              );
-              return;
-            }
+
             // TODO add a smart queue to create an offset based on the version?
             savedUpdate = await retryAsyncFunction(() => createUpdate(data));
             if (savedUpdate === undefined) {
@@ -306,6 +281,7 @@ export default async function createServer() {
               );
             }
           }
+          // new awareness update
         } else {
           console.log("addUpdate awarenessUpdate");
           addUpdate(
@@ -356,7 +332,6 @@ export default async function createServer() {
       }
     }
 
-    // @ts-ignore
     webSocketServer.handleUpgrade(request, socket, head, (ws) => {
       webSocketServer.emit("connection", ws, request, context);
     });
