@@ -14,6 +14,7 @@ import {
   createSocketClient,
   waitForClientState,
 } from "../test/helpers/websocket";
+import { prisma } from "./database/prisma";
 import createUserWithWorkspace from "./database/testHelpers/createUserWithWorkspace";
 import { Device } from "./types/device";
 
@@ -32,6 +33,7 @@ let addedFolder: any = null;
 let folderKey = "";
 let addedWorkspace: any = null;
 let snapshotId: string = "";
+let latestServerVersion = null;
 
 const setup = async () => {
   const result = await createUserWithWorkspace({
@@ -189,7 +191,7 @@ test("successfully creates a snapshot", async () => {
     JSON.stringify({
       ...snapshot,
       lastKnownSnapshotId: null,
-      latestServerVersion: null,
+      latestServerVersion,
     })
   );
 
@@ -234,4 +236,125 @@ test("successfully creates an update", async () => {
   expect(messages[1].clock).toEqual(0);
   expect(messages[1].docId).toEqual(documentId);
   expect(messages[1].snapshotId).toEqual(snapshotId);
+  expect(messages[1].serverVersion).toEqual(1);
+  latestServerVersion = messages[1].serverVersion;
+});
+
+test("if document is set to requiresSnapshot updates will fail", async () => {
+  await prisma.document.update({
+    where: { id: documentId },
+    data: { requiresSnapshot: true },
+  });
+
+  const { client, messages } = await createSocketClient(
+    graphql.port,
+    `/${documentId}?sessionKey=${sessionKey}`,
+    2
+  );
+
+  await waitForClientState(client, client.OPEN);
+
+  const snapshotKey = await createSnapshotKey({ folderKey });
+  const signatureKeyPair: KeyPair = {
+    publicKey: sodium.from_base64(webDevice!.signingPublicKey),
+    privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
+    keyType: "ed25519",
+  };
+
+  const publicData = {
+    refSnapshotId: snapshotId,
+    docId: documentId,
+    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+  };
+  const updateToSend = await createUpdate(
+    "UPDATE CONTENT DUMMY",
+    publicData,
+    sodium.from_base64(snapshotKey.key),
+    signatureKeyPair
+  );
+
+  client.send(JSON.stringify(updateToSend));
+
+  await waitForClientState(client, client.CLOSED);
+  expect(messages[1].type).toEqual("updateFailed");
+  expect(messages[1].clock).toEqual(1);
+  expect(messages[1].requiresNewSnapshotWithKeyRotation).toBe(true);
+  expect(messages[1].docId).toEqual(documentId);
+  expect(messages[1].snapshotId).toEqual(snapshotId);
+});
+
+test("successfully creates a snapshot and update", async () => {
+  const { client, messages } = await createSocketClient(
+    graphql.port,
+    `/${documentId}?sessionKey=${sessionKey}`,
+    3
+  );
+
+  await waitForClientState(client, client.OPEN);
+
+  const snapshotKey = await createSnapshotKey({ folderKey });
+  const keyDerivationTrace = {
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    subkeyId: snapshotKey.subkeyId,
+    parentFolders: [
+      {
+        folderId: addedFolder.id,
+        subkeyId: addedFolder.subkeyId,
+        parentFolderId: null,
+      },
+    ],
+  };
+  const signatureKeyPair: KeyPair = {
+    publicKey: sodium.from_base64(webDevice!.signingPublicKey),
+    privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
+    keyType: "ed25519",
+  };
+  const publicData = {
+    snapshotId: "9674b24a-bb14-4f7e-bc81-dd49906a28fd",
+    docId: documentId,
+    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+    keyDerivationTrace,
+    subkeyId: snapshotKey.subkeyId,
+  };
+  const snapshot = await createSnapshot(
+    "CONTENT DUMMY",
+    publicData,
+    sodium.from_base64(snapshotKey.key),
+    signatureKeyPair
+  );
+  client.send(
+    JSON.stringify({
+      ...snapshot,
+      lastKnownSnapshotId: snapshotId,
+      latestServerVersion,
+    })
+  );
+  snapshotId = snapshot.publicData.snapshotId;
+
+  const updatePublicData = {
+    refSnapshotId: snapshotId,
+    docId: documentId,
+    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+  };
+  const updateToSend = await createUpdate(
+    "UPDATE CONTENT DUMMY",
+    updatePublicData,
+    sodium.from_base64(snapshotKey.key),
+    signatureKeyPair
+  );
+
+  client.send(JSON.stringify(updateToSend));
+
+  await waitForClientState(client, client.CLOSED);
+
+  expect(messages[1].type).toEqual("snapshotSaved");
+  expect(messages[1].docId).toEqual(documentId);
+  expect(messages[1].snapshotId).toEqual(snapshotId);
+
+  expect(messages[2].type).toEqual("updateSaved");
+  expect(messages[2].clock).toEqual(0);
+  expect(messages[2].docId).toEqual(documentId);
+  expect(messages[2].snapshotId).toEqual(snapshotId);
+  expect(messages[2].serverVersion).toEqual(1);
+  latestServerVersion = messages[1].serverVersion;
 });

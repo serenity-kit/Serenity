@@ -19,6 +19,7 @@ export async function createSnapshot(
       where: { id: snapshot.publicData.docId },
       select: {
         activeSnapshot: true,
+        requiresSnapshot: true,
       },
     });
     if (!document) {
@@ -61,6 +62,14 @@ export async function createSnapshot(
       throw new NaishoSnapshotMissesUpdatesError(
         "Snapshot does not include the latest changes."
       );
+    }
+
+    // only update when necessary
+    if (document.requiresSnapshot) {
+      await prisma.document.update({
+        where: { id: snapshot.publicData.docId },
+        data: { requiresSnapshot: false },
+      });
     }
 
     return await prisma.snapshot.create({

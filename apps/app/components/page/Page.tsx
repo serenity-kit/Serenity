@@ -405,18 +405,29 @@ export default function Page({
 
             break;
           case "updateFailed":
-            console.log("update saving failed", data.snapshotId, data.clock);
-            // TODO retry with an increasing offset instead of just trying again
-            const rawUpdate = getUpdateInProgress(
-              data.docId,
+            console.log(
+              "update saving failed",
               data.snapshotId,
-              data.clock
+              data.clock,
+              data.requiresNewSnapshotWithKeyRotation
             );
-            await createAndSendUpdate(
-              rawUpdate,
-              snapshotKeyRef.current,
-              data.clock
-            );
+
+            if (data.requiresNewSnapshotWithKeyRotation) {
+              await createAndSendSnapshot();
+            } else {
+              // TODO retry with an increasing offset instead of just trying again
+              const rawUpdate = getUpdateInProgress(
+                data.docId,
+                data.snapshotId,
+                data.clock
+              );
+              await createAndSendUpdate(
+                rawUpdate,
+                snapshotKeyRef.current,
+                data.clock
+              );
+            }
+
             break;
           case "awarenessUpdate":
             const awarenessUpdateResult = await verifyAndDecryptAwarenessUpdate(

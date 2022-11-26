@@ -1,4 +1,4 @@
-import { Update } from "@naisho/core";
+import { NaishoNewSnapshotWithKeyRotationRequired, Update } from "@naisho/core";
 import { Prisma } from "../../prisma/generated/output";
 import { serializeUpdate } from "../utils/serialize";
 import { prisma } from "./prisma";
@@ -10,7 +10,9 @@ export async function createUpdate(update: Update) {
       select: {
         latestVersion: true,
         clocks: true,
-        document: { select: { activeSnapshotId: true } },
+        document: {
+          select: { activeSnapshotId: true, requiresSnapshot: true },
+        },
       },
     });
     if (snapshot === null) {
@@ -20,6 +22,12 @@ export async function createUpdate(update: Update) {
       snapshot.document.activeSnapshotId !== update.publicData.refSnapshotId
     ) {
       throw new Error("Update referencing an out of date snapshot.");
+    }
+
+    if (snapshot.document.requiresSnapshot) {
+      throw new NaishoNewSnapshotWithKeyRotationRequired(
+        "Key roration is required"
+      );
     }
 
     if (
@@ -54,7 +62,6 @@ export async function createUpdate(update: Update) {
       },
     });
 
-    console.log(snapshot.latestVersion + 1);
     return serializeUpdate(
       await prisma.update.create({
         data: {
