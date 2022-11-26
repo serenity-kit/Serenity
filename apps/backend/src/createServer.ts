@@ -20,11 +20,13 @@ import express from "express";
 import { createServer as httpCreateServer } from "http";
 import { URLSearchParams } from "url";
 import { WebSocketServer } from "ws";
+import { Role } from "../prisma/generated/output";
 import { getSessionIncludingUser } from "./database/authentication/getSessionIncludingUser";
 import { createSnapshot } from "./database/createSnapshot";
 import { createUpdate } from "./database/createUpdate";
 import { getDocument } from "./database/getDocument";
 import { getUpdatesForDocument } from "./database/getUpdatesForDocument";
+import { prisma } from "./database/prisma";
 import { retryAsyncFunction } from "./retryAsyncFunction";
 import { schema } from "./schema";
 import { addConnection, addUpdate, removeConnection } from "./store";
@@ -137,10 +139,37 @@ export default async function createServer() {
       connection.send(JSON.stringify({ type: "document", ...doc }));
 
       connection.on("message", async function message(messageContent) {
-        console.log(`context`, context);
         const data = JSON.parse(messageContent.toString());
 
         if (data?.publicData?.snapshotId) {
+          // if the user doesn't have access to the workspace,
+          // throw an error
+          let doc = await getDocument(documentId);
+          if (!doc) {
+            connection.send(
+              JSON.stringify({
+                type: "snapshotFailed",
+                docId: data.publicData.docId,
+              })
+            );
+            return;
+          }
+          const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+            where: {
+              userId: context.user.id,
+              workspaceId: doc.doc.workspaceId,
+              role: { in: [Role.ADMIN, Role.EDITOR] },
+            },
+          });
+          if (!userToWorkspace) {
+            connection.send(
+              JSON.stringify({
+                type: "snapshotFailed",
+                docId: data.publicData.docId,
+              })
+            );
+            return;
+          }
           try {
             const activeSnapshotInfo =
               data.lastKnownSnapshotId && data.latestServerVersion
@@ -210,7 +239,38 @@ export default async function createServer() {
             // if (random < 8) {
             //   throw new Error("CUSTOM ERROR");
             // }
-
+            // if the user doesn't have access to the workspace,
+            // throw an error
+            let doc = await getDocument(documentId);
+            if (!doc) {
+              connection.send(
+                JSON.stringify({
+                  type: "updateFailed",
+                  docId: data.publicData.docId,
+                  snapshotId: data.publicData.refSnapshotId,
+                  clock: data.publicData.clock,
+                })
+              );
+              return;
+            }
+            const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
+              where: {
+                userId: context.user.id,
+                workspaceId: doc.doc.workspaceId,
+                role: { in: [Role.ADMIN, Role.EDITOR] },
+              },
+            });
+            if (!userToWorkspace) {
+              connection.send(
+                JSON.stringify({
+                  type: "updateFailed",
+                  docId: data.publicData.docId,
+                  snapshotId: data.publicData.refSnapshotId,
+                  clock: data.publicData.clock,
+                })
+              );
+              return;
+            }
             // TODO add a smart queue to create an offset based on the version?
             savedUpdate = await retryAsyncFunction(() => createUpdate(data));
             if (savedUpdate === undefined) {
