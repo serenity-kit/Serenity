@@ -136,6 +136,13 @@ export default async function createServer() {
         return;
       }
 
+      if (!context.user) {
+        // TODO close connection properly
+        connection.send(JSON.stringify({ type: "unauthorized" }));
+        connection.close();
+        return;
+      }
+
       // if the user doesn't have access to the workspace,
       // throw an error
       const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
