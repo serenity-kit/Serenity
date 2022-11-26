@@ -77,6 +77,10 @@ export const createDocumentShareLink = async ({
         deviceSecretBoxNonce,
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
         snapshotDeviceKeyBox,
+        deviceSigningPublicKey: virtualDevice.signingPublicKey,
+        deviceEncryptionPublicKey: virtualDevice.encryptionPublicKey,
+        deviceEncryptionPublicKeySignature:
+          virtualDevice.encryptionPublicKeySignature,
       },
     },
     authorizationHeaders

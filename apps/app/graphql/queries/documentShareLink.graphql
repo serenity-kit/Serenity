@@ -3,5 +3,14 @@ query documentShareLink($token: ID!) {
     token
     deviceSecretBoxCiphertext
     deviceSecretBoxNonce
+    snapshotKeyBoxs {
+      id
+      ciphertext
+      nonce
+      creatorDevice {
+        signingPublicKey
+        encryptionPublicKey
+      }
+    }
   }
 }

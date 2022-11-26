@@ -3,14 +3,6 @@ import { DocumentShareLink, Role } from "../../../prisma/generated/output";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
 
-export type SnapshotKeyBoxCreateInput = {
-  snapshotId: string;
-  deviceSigningPublicKey: string;
-  creatorDeviceSigningPublicKey: string;
-  nonce?: string;
-  ciphertext: string;
-};
-
 export type SnapshotDeviceKeyBox = {
   ciphertext: string;
   nonce: string;
@@ -24,6 +16,9 @@ export type Props = {
   deviceSecretBoxCiphertext: string;
   deviceSecretBoxNonce: string;
   creatorDeviceSigningPublicKey: string;
+  deviceSigningPublicKey: string;
+  deviceEncryptionPublicKey: string;
+  deviceEncryptionPublicKeySignature: string;
   snapshotDeviceKeyBox: SnapshotDeviceKeyBox;
 };
 export const createDocumentShareLink = async ({
@@ -33,6 +28,9 @@ export const createDocumentShareLink = async ({
   deviceSecretBoxCiphertext,
   deviceSecretBoxNonce,
   creatorDeviceSigningPublicKey,
+  deviceSigningPublicKey,
+  deviceEncryptionPublicKey,
+  deviceEncryptionPublicKeySignature,
   snapshotDeviceKeyBox,
 }: Props): Promise<DocumentShareLink> => {
   // get the document
@@ -67,6 +65,9 @@ export const createDocumentShareLink = async ({
         role: sharingRole,
         deviceSecretBoxCiphertext,
         deviceSecretBoxNonce,
+        deviceSigningPublicKey,
+        deviceEncryptionPublicKey,
+        deviceEncryptionPublicKeySignature,
       },
     });
     // get the latest snapshot and set up the snapshot key boxes
@@ -79,9 +80,10 @@ export const createDocumentShareLink = async ({
     }
     await prisma.snapshotKeyBox.create({
       data: {
-        snapshotId: latestSnapshot.id,
-        creatorDeviceSigningPublicKey,
         ...snapshotDeviceKeyBox,
+        snapshotId: latestSnapshot.id,
+        creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
+        documentShareLinkToken: documentShareLink.token,
       },
     });
     return documentShareLink;

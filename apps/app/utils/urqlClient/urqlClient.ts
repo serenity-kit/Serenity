@@ -40,6 +40,10 @@ const exchanges = [
         return device.signingPublicKey;
       },
       Session: () => null,
+      // @ts-expect-error the type seems to be wrong
+      DocumentShareLink: (documentShareLink) => {
+        return documentShareLink.token;
+      },
     },
   }),
   authExchange<AuthState>({
