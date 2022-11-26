@@ -290,6 +290,9 @@ export default function Page({
           case "documentNotFound":
             // TODO stop reconnecting
             break;
+          case "unauthorized":
+            // TODO stop reconnecting
+            break;
           case "document":
             if (data.snapshot) {
               const snapshotKeyData1 = await deriveExistingSnapshotKey(
