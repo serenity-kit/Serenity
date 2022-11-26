@@ -46,7 +46,6 @@ test("get a documentShareLink", async () => {
   const documentShareLinkResult = await getDocumentShareLink({
     graphql,
     token,
-    authorizationHeader: userData.sessionKey,
   });
   const documentShareLink = documentShareLinkResult.documentShareLink;
   expect(documentShareLink.token).toBe(token);
@@ -60,33 +59,6 @@ test("invalid token", async () => {
       await getDocumentShareLink({
         graphql,
         token: "invalid",
-        authorizationHeader: userData.sessionKey,
       }))()
-  ).rejects.toThrowError(/BAD_USER_INPUT/);
-});
-
-test("Unauthorized", async () => {
-  const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
-  });
-  await expect(
-    (async () =>
-      await getDocumentShareLink({
-        graphql,
-        token,
-        authorizationHeader: userData2.sessionKey,
-      }))()
-  ).rejects.toThrowError("Unauthorized");
-});
-
-test("Unauthenticated", async () => {
-  await expect(
-    (async () =>
-      await getDocumentShareLink({
-        graphql,
-        token: "abc123",
-        authorizationHeader: "bad-session-key",
-      }))()
-  ).rejects.toThrowError(/UNAUTHENTICATED/);
+  ).rejects.toThrowError(/FORBIDDEN/);
 });

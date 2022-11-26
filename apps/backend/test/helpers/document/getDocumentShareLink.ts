@@ -4,12 +4,10 @@ import { TestContext } from "../setupGraphql";
 export type GetDocumentShareLinkParams = {
   graphql: TestContext;
   token: string;
-  authorizationHeader: string;
 };
 export const getDocumentShareLink = async ({
   graphql,
   token,
-  authorizationHeader,
 }: GetDocumentShareLinkParams) => {
   const query = gql`
     query documentShareLink($token: ID!) {
@@ -20,9 +18,5 @@ export const getDocumentShareLink = async ({
       }
     }
   `;
-  return await graphql.client.request(
-    query,
-    { token },
-    { authorization: authorizationHeader }
-  );
+  return await graphql.client.request(query, { token });
 };
