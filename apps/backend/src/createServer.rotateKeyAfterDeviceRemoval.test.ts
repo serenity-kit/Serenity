@@ -40,6 +40,7 @@ let addedWorkspace: any = null;
 let snapshotId: string = "";
 let latestServerVersion = null;
 let encryptionPrivateKey = "";
+let lastSnapshotKey = "";
 
 const setup = async () => {
   const userAndWorkspaceData = await createUserWithWorkspace({
@@ -101,6 +102,7 @@ test("successfully creates a snapshot", async () => {
   await waitForClientState(client, client.OPEN);
 
   const snapshotKey = await createSnapshotKey({ folderKey });
+  lastSnapshotKey = snapshotKey.key;
   const keyDerivationTrace = {
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     subkeyId: snapshotKey.subkeyId,
@@ -154,7 +156,6 @@ test("successfully creates an update", async () => {
 
   await waitForClientState(client, client.OPEN);
 
-  const snapshotKey = await createSnapshotKey({ folderKey });
   const signatureKeyPair: KeyPair = {
     publicKey: sodium.from_base64(webDevice!.signingPublicKey),
     privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
@@ -169,7 +170,7 @@ test("successfully creates an update", async () => {
   const updateToSend = await createUpdate(
     "UPDATE CONTENT DUMMY",
     publicData,
-    sodium.from_base64(snapshotKey.key),
+    sodium.from_base64(lastSnapshotKey),
     signatureKeyPair
   );
 
@@ -234,7 +235,6 @@ test("document update will fail", async () => {
 
   await waitForClientState(client, client.OPEN);
 
-  const snapshotKey = await createSnapshotKey({ folderKey });
   const signatureKeyPair: KeyPair = {
     publicKey: sodium.from_base64(webDevice!.signingPublicKey),
     privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
@@ -249,7 +249,7 @@ test("document update will fail", async () => {
   const updateToSend = await createUpdate(
     "UPDATE CONTENT DUMMY",
     publicData,
-    sodium.from_base64(snapshotKey.key),
+    sodium.from_base64(lastSnapshotKey),
     signatureKeyPair
   );
 
@@ -315,11 +315,11 @@ test("snapshot based on old workspace key fails", async () => {
   expect(messages[1].type).toEqual("snapshotFailed");
 });
 
-test("successfully creates a snapshot and update", async () => {
+test("successfully creates a snapshot", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
     `/${documentId}?sessionKey=${sessionKey}`,
-    3
+    2
   );
 
   await waitForClientState(client, client.OPEN);
@@ -349,6 +349,7 @@ test("successfully creates a snapshot and update", async () => {
   folderKey = folderKeyResult.key;
 
   const snapshotKey = await createSnapshotKey({ folderKey });
+  lastSnapshotKey = snapshotKey.key;
   const keyDerivationTrace = {
     workspaceKeyId: workspaceResult.workspace.currentWorkspaceKey.id,
     subkeyId: snapshotKey.subkeyId,
@@ -387,6 +388,28 @@ test("successfully creates a snapshot and update", async () => {
   );
   snapshotId = snapshot.publicData.snapshotId;
 
+  await waitForClientState(client, client.CLOSED);
+
+  expect(messages[1].type).toEqual("snapshotSaved");
+  expect(messages[1].docId).toEqual(documentId);
+  expect(messages[1].snapshotId).toEqual(snapshotId);
+});
+
+test("successfully creates an update", async () => {
+  const { client, messages } = await createSocketClient(
+    graphql.port,
+    `/${documentId}?sessionKey=${sessionKey}`,
+    2
+  );
+
+  await waitForClientState(client, client.OPEN);
+
+  const signatureKeyPair: KeyPair = {
+    publicKey: sodium.from_base64(webDevice!.signingPublicKey),
+    privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
+    keyType: "ed25519",
+  };
+
   const updatePublicData = {
     refSnapshotId: snapshotId,
     docId: documentId,
@@ -395,7 +418,7 @@ test("successfully creates a snapshot and update", async () => {
   const updateToSend = await createUpdate(
     "UPDATE CONTENT DUMMY",
     updatePublicData,
-    sodium.from_base64(snapshotKey.key),
+    sodium.from_base64(lastSnapshotKey),
     signatureKeyPair
   );
 
@@ -403,14 +426,10 @@ test("successfully creates a snapshot and update", async () => {
 
   await waitForClientState(client, client.CLOSED);
 
-  expect(messages[1].type).toEqual("snapshotSaved");
+  expect(messages[1].type).toEqual("updateSaved");
+  expect(messages[1].clock).toEqual(0);
   expect(messages[1].docId).toEqual(documentId);
   expect(messages[1].snapshotId).toEqual(snapshotId);
-
-  expect(messages[2].type).toEqual("updateSaved");
-  expect(messages[2].clock).toEqual(0);
-  expect(messages[2].docId).toEqual(documentId);
-  expect(messages[2].snapshotId).toEqual(snapshotId);
-  expect(messages[2].serverVersion).toEqual(1);
+  expect(messages[1].serverVersion).toEqual(1);
   latestServerVersion = messages[1].serverVersion;
 });

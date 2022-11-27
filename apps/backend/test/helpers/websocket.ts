@@ -23,7 +23,7 @@ export async function waitForInitialConnection(
 export async function waitForClientState(
   client: WebSocket,
   expectedState: WebSocket["readyState"],
-  timeoutInMilliseconds = 500
+  timeoutInMilliseconds = 1000
 ) {
   if (timeoutInMilliseconds < 0) {
     throw new Error("waitForClientState Timeout");

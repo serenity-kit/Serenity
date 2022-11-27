@@ -33,6 +33,7 @@ let folderKey = "";
 let addedWorkspace: any = null;
 let snapshotId: string = "";
 let latestServerVersion = null;
+let lastSnapshotKey = "";
 
 const setup = async () => {
   const result = await createUserWithWorkspace({
