@@ -10,10 +10,15 @@ type ActiveSnapshotInfo = {
   snapshotId: string;
 };
 
-export async function createSnapshot(
-  snapshot: Snapshot,
-  activeSnapshotInfo?: ActiveSnapshotInfo
-) {
+type CreateSnapshotParams = {
+  snapshot: Snapshot;
+  activeSnapshotInfo?: ActiveSnapshotInfo;
+};
+
+export async function createSnapshot({
+  snapshot,
+  activeSnapshotInfo,
+}: CreateSnapshotParams) {
   return await prisma.$transaction(async (prisma) => {
     const document = await prisma.document.findUnique({
       where: { id: snapshot.publicData.docId },

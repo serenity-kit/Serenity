@@ -1,11 +1,23 @@
-import { NaishoNewSnapshotWithKeyRotationRequired, Update } from "@naisho/core";
+import {
+  KeyDerivationTrace,
+  NaishoNewSnapshotWithKeyRotationRequired,
+  Update,
+} from "@naisho/core";
 import { Prisma } from "../../prisma/generated/output";
 import { serializeUpdate } from "../utils/serialize";
 import { prisma } from "./prisma";
 
-export async function createUpdate(update: Update) {
+type CreateUpdateParams = {
+  update: Update;
+  workspaceId: string;
+};
+
+export async function createUpdate({
+  update,
+  workspaceId,
+}: CreateUpdateParams) {
   return await prisma.$transaction(async (prisma) => {
-    const snapshot = await prisma.snapshot.findUnique({
+    const snapshotPromise = prisma.snapshot.findUniqueOrThrow({
       where: { id: update.publicData.refSnapshotId },
       select: {
         latestVersion: true,
@@ -13,18 +25,33 @@ export async function createUpdate(update: Update) {
         document: {
           select: { activeSnapshotId: true, requiresSnapshot: true },
         },
+        keyDerivationTrace: true,
       },
     });
-    if (snapshot === null) {
-      throw new Error("Snapshot does not exist.");
-    }
+    const currentWorkspaceKeyPromise = prisma.workspaceKey.findFirstOrThrow({
+      where: { workspaceId },
+      select: { id: true },
+      orderBy: { generation: "desc" },
+    });
+    const [snapshot, currentWorkspaceKey] = await Promise.all([
+      snapshotPromise,
+      currentWorkspaceKeyPromise,
+    ]);
+
     if (
       snapshot.document.activeSnapshotId !== update.publicData.refSnapshotId
     ) {
       throw new Error("Update referencing an out of date snapshot.");
     }
 
-    if (snapshot.document.requiresSnapshot) {
+    const snapshotKeyDerivationTrace =
+      snapshot.keyDerivationTrace as KeyDerivationTrace;
+    if (
+      // page share link has been removed
+      snapshot.document.requiresSnapshot ||
+      // workspaceKey has been rotated
+      snapshotKeyDerivationTrace.workspaceKeyId !== currentWorkspaceKey.id
+    ) {
       throw new NaishoNewSnapshotWithKeyRotationRequired(
         "Key roration is required"
       );

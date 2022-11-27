@@ -184,7 +184,10 @@ export default async function createServer() {
                     snapshotId: data.lastKnownSnapshotId,
                   }
                 : undefined;
-            const snapshot = await createSnapshot(data, activeSnapshotInfo);
+            const snapshot = await createSnapshot({
+              snapshot: data,
+              activeSnapshotInfo,
+            });
             console.log("addUpdate snapshot");
             connection.send(
               JSON.stringify({
@@ -249,7 +252,11 @@ export default async function createServer() {
 
             // TODO add a smart queue to create an offset based on the version?
             savedUpdate = await retryAsyncFunction(
-              () => createUpdate(data),
+              () =>
+                createUpdate({
+                  update: data,
+                  workspaceId: userToWorkspace.workspaceId,
+                }),
               [NaishoNewSnapshotWithKeyRotationRequired]
             );
             if (savedUpdate === undefined) {
@@ -290,6 +297,7 @@ export default async function createServer() {
           // new awareness update
         } else {
           console.log("addUpdate awarenessUpdate");
+          // TODO check if user still has access to the document
           addUpdate(
             documentId,
             { ...data, type: "awarenessUpdate" },
