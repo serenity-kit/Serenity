@@ -14,15 +14,16 @@ import {
   createSocketClient,
   waitForClientState,
 } from "../test/helpers/websocket";
+import { prisma } from "./database/prisma";
 import createUserWithWorkspace from "./database/testHelpers/createUserWithWorkspace";
 import { Device } from "./types/device";
 
 let server;
 
 const graphql = setupGraphql();
-const username = "74176fce-8391-4f12-bbd5-d30a91e9ee7f@example.com";
-const workspaceId = "5237c256-e078-4aa5-a7b1-8e6559698769";
-const documentId = "10f99b10-62a3-427f-9928-c1e0b32648e2";
+const username = "59f80f08-c065-4acc-a542-2725fb2dff6c@example.com";
+const workspaceId = "2d008bf8-87c4-4439-9b4b-9a0ec3919479";
+const documentId = "72fbd941-42b7-4263-89fe-65bf43f455a7";
 let userId: string | null = null;
 let device: Device | null = null;
 let webDevice: LocalDevice | null = null;
@@ -74,78 +75,6 @@ beforeAll(async () => {
   await setup();
 });
 
-test("document not found if no id is provided", async () => {
-  const { client, messages } = await createSocketClient(graphql.port, "", 1);
-  await waitForClientState(client, client.CLOSED);
-  expect(messages).toMatchInlineSnapshot(`
-    [
-      {
-        "type": "documentNotFound",
-      },
-    ]
-  `);
-  expect(client.readyState).toEqual(client.CLOSED);
-});
-
-test("document not found if the document does not exist", async () => {
-  const { client, messages } = await createSocketClient(
-    graphql.port,
-    `/id-that-does-not-exist`,
-    1
-  );
-  await waitForClientState(client, client.CLOSED);
-  expect(messages).toMatchInlineSnapshot(`
-    [
-      {
-        "type": "documentNotFound",
-      },
-    ]
-  `);
-  expect(client.readyState).toEqual(client.CLOSED);
-});
-
-test("unauthorized if no valid session key is provided", async () => {
-  const { client, messages } = await createSocketClient(
-    graphql.port,
-    `/${documentId}`,
-    1
-  );
-  await waitForClientState(client, client.CLOSED);
-  expect(messages).toMatchInlineSnapshot(`
-    [
-      {
-        "type": "unauthorized",
-      },
-    ]
-  `);
-  expect(client.readyState).toEqual(client.CLOSED);
-});
-
-test("successfully retrieves a document", async () => {
-  const { client, messages } = await createSocketClient(
-    graphql.port,
-    `/${documentId}?sessionKey=${sessionKey}`,
-    1
-  );
-  await waitForClientState(client, client.CLOSED);
-  expect(messages).toMatchInlineSnapshot(`
-    [
-      {
-        "doc": {
-          "id": "10f99b10-62a3-427f-9928-c1e0b32648e2",
-          "parentFolderId": null,
-          "workspaceId": "5237c256-e078-4aa5-a7b1-8e6559698769",
-          "workspaceKeyId": null,
-        },
-        "parentFolder": {},
-        "snapshot": null,
-        "type": "document",
-        "updates": [],
-      },
-    ]
-  `);
-});
-
 test("successfully creates a snapshot", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
@@ -173,7 +102,7 @@ test("successfully creates a snapshot", async () => {
     keyType: "ed25519",
   };
   const publicData = {
-    snapshotId: "5ef62cbf-3c0e-4cf7-bf6e-f4d578f4855b",
+    snapshotId: "be0fa80f-4c6b-47f9-b2d4-ac1cc9f3e31b",
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
@@ -236,5 +165,124 @@ test("successfully creates an update", async () => {
   expect(messages[1].docId).toEqual(documentId);
   expect(messages[1].snapshotId).toEqual(snapshotId);
   expect(messages[1].serverVersion).toEqual(1);
+  latestServerVersion = messages[1].serverVersion;
+});
+
+test("if document is set to requiresSnapshot updates will fail", async () => {
+  await prisma.document.update({
+    where: { id: documentId },
+    data: { requiresSnapshot: true },
+  });
+
+  const { client, messages } = await createSocketClient(
+    graphql.port,
+    `/${documentId}?sessionKey=${sessionKey}`,
+    2
+  );
+
+  await waitForClientState(client, client.OPEN);
+
+  const snapshotKey = await createSnapshotKey({ folderKey });
+  const signatureKeyPair: KeyPair = {
+    publicKey: sodium.from_base64(webDevice!.signingPublicKey),
+    privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
+    keyType: "ed25519",
+  };
+
+  const publicData = {
+    refSnapshotId: snapshotId,
+    docId: documentId,
+    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+  };
+  const updateToSend = await createUpdate(
+    "UPDATE CONTENT DUMMY",
+    publicData,
+    sodium.from_base64(snapshotKey.key),
+    signatureKeyPair
+  );
+
+  client.send(JSON.stringify(updateToSend));
+
+  await waitForClientState(client, client.CLOSED);
+  expect(messages[1].type).toEqual("updateFailed");
+  expect(messages[1].clock).toEqual(1);
+  expect(messages[1].requiresNewSnapshotWithKeyRotation).toBe(true);
+  expect(messages[1].docId).toEqual(documentId);
+  expect(messages[1].snapshotId).toEqual(snapshotId);
+});
+
+test("successfully creates a snapshot and update", async () => {
+  const { client, messages } = await createSocketClient(
+    graphql.port,
+    `/${documentId}?sessionKey=${sessionKey}`,
+    3
+  );
+
+  await waitForClientState(client, client.OPEN);
+
+  const snapshotKey = await createSnapshotKey({ folderKey });
+  const keyDerivationTrace = {
+    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
+    subkeyId: snapshotKey.subkeyId,
+    parentFolders: [
+      {
+        folderId: addedFolder.id,
+        subkeyId: addedFolder.subkeyId,
+        parentFolderId: null,
+      },
+    ],
+  };
+  const signatureKeyPair: KeyPair = {
+    publicKey: sodium.from_base64(webDevice!.signingPublicKey),
+    privateKey: sodium.from_base64(webDevice!.signingPrivateKey),
+    keyType: "ed25519",
+  };
+  const publicData = {
+    snapshotId: "9674b24a-bb14-4f7e-bc81-dd49906a28fd",
+    docId: documentId,
+    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+    keyDerivationTrace,
+    subkeyId: snapshotKey.subkeyId,
+  };
+  const snapshot = await createSnapshot(
+    "CONTENT DUMMY",
+    publicData,
+    sodium.from_base64(snapshotKey.key),
+    signatureKeyPair
+  );
+  client.send(
+    JSON.stringify({
+      ...snapshot,
+      lastKnownSnapshotId: snapshotId,
+      latestServerVersion,
+    })
+  );
+  snapshotId = snapshot.publicData.snapshotId;
+
+  const updatePublicData = {
+    refSnapshotId: snapshotId,
+    docId: documentId,
+    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+  };
+  const updateToSend = await createUpdate(
+    "UPDATE CONTENT DUMMY",
+    updatePublicData,
+    sodium.from_base64(snapshotKey.key),
+    signatureKeyPair
+  );
+
+  client.send(JSON.stringify(updateToSend));
+
+  await waitForClientState(client, client.CLOSED);
+
+  expect(messages[1].type).toEqual("snapshotSaved");
+  expect(messages[1].docId).toEqual(documentId);
+  expect(messages[1].snapshotId).toEqual(snapshotId);
+
+  expect(messages[2].type).toEqual("updateSaved");
+  expect(messages[2].clock).toEqual(0);
+  expect(messages[2].docId).toEqual(documentId);
+  expect(messages[2].snapshotId).toEqual(snapshotId);
+  expect(messages[2].serverVersion).toEqual(1);
   latestServerVersion = messages[1].serverVersion;
 });
