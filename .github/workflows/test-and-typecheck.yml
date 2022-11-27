@@ -29,6 +29,8 @@ jobs:
         run: docker-compose up -d
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+      - name: NODE log
+        run: node -v
       - name: Test
         run: yarn test
   prettier:
