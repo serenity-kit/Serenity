@@ -2,11 +2,9 @@
 
 ## Setup
 
-Recommended node version: 16
+Recommended node version: 18
 
 ```sh
-yarn global add expo-cli
-yarn global add eas-cli
 yarn
 cp apps/backend/.env.example apps/backend/.env
 ```
