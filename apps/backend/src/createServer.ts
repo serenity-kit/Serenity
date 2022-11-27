@@ -187,6 +187,7 @@ export default async function createServer() {
             const snapshot = await createSnapshot({
               snapshot: data,
               activeSnapshotInfo,
+              workspaceId: userToWorkspace.workspaceId,
             });
             console.log("addUpdate snapshot");
             connection.send(
@@ -233,7 +234,12 @@ export default async function createServer() {
                 })
               );
             } else {
-              console.error(error);
+              // log in case it's an unexpected error
+              if (
+                !(error instanceof NaishoNewSnapshotWithKeyRotationRequired)
+              ) {
+                console.error(error);
+              }
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",

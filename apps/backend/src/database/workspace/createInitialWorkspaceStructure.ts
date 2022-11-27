@@ -90,7 +90,10 @@ export async function createInitialWorkspaceStructure({
     },
   });
 
-  const snapshot = await createSnapshot({ snapshot: document.snapshot });
+  const snapshot = await createSnapshot({
+    snapshot: document.snapshot,
+    workspaceId: createdWorkspace.id,
+  });
   return {
     workspace: createdWorkspace,
     document: formatDocument(createdDocument),

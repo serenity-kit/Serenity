@@ -212,6 +212,7 @@ export default async function createUserWithWorkspace({
     session,
     sessionKey,
     device,
+    mainDevice,
     deviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
     deviceSigningPrivateKey: mainDevice.signingPrivateKey,
     webDevice,
