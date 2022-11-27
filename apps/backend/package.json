@@ -20,7 +20,7 @@
     "ts:check": "yarn tsc --noEmit",
     "test:e2e": "DATABASE_URL=postgres://prisma:prisma@localhost:5432/serenity_e2e_tests npx playwright test",
     "test:e2e:headed": "DATABASE_URL=postgres://prisma:prisma@localhost:5432/serenity_e2e_tests npx playwright test --headed",
-    "test": "jest --runInBand --logHeapUsage",
+    "test": "node --max-old-space-size=8192 ./node_modules/.bin/jest --runInBand --logHeapUsage",
     "lint": "eslint --ext .tsx --ext .ts ./",
     "r2:enable-cors": "ts-node ./scripts/enableCorsForR2Bucket.ts"
   },

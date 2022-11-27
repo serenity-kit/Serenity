@@ -232,6 +232,7 @@ test("successfully creates an update", async () => {
   client.send(JSON.stringify(updateToSend));
 
   await waitForClientState(client, client.CLOSED);
+
   expect(messages[1].type).toEqual("updateSaved");
   expect(messages[1].clock).toEqual(0);
   expect(messages[1].docId).toEqual(documentId);

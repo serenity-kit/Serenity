@@ -5,7 +5,7 @@ export async function waitForInitialConnection(
   timeoutInMilliseconds = 500
 ) {
   if (timeoutInMilliseconds < 0) {
-    throw new Error("waitForClientState Timeout");
+    throw new Error("waitForInitialConnection Timeout");
   }
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -20,24 +20,35 @@ export async function waitForInitialConnection(
   });
 }
 
+const timeoutCheckInterval = 25;
+
 export async function waitForClientState(
   client: WebSocket,
   expectedState: WebSocket["readyState"],
-  timeoutInMilliseconds = 1000
+  timeoutInMilliseconds = 3000
 ) {
   if (timeoutInMilliseconds < 0) {
-    throw new Error("waitForClientState Timeout");
+    throw new Error(
+      `waitForClientState Timeout ${JSON.stringify({
+        actual: client.readyState,
+        expected: expectedState,
+      })}`
+    );
   }
   return new Promise(function (resolve, reject) {
     setTimeout(function () {
       if (client.readyState === expectedState) {
         resolve(undefined);
       } else {
-        waitForClientState(client, expectedState, timeoutInMilliseconds - 10)
+        waitForClientState(
+          client,
+          expectedState,
+          timeoutInMilliseconds - timeoutCheckInterval
+        )
           .then(resolve)
           .catch(reject);
       }
-    }, 10);
+    }, timeoutCheckInterval);
   });
 }
 
