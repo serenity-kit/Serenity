@@ -39,6 +39,7 @@ declare module "@tiptap/core" {
 
 export const ImageNodeExtension = Node.create<ImageOptions>({
   name: "image",
+  draggable: true,
 
   addOptions() {
     return {
@@ -65,8 +66,6 @@ export const ImageNodeExtension = Node.create<ImageOptions>({
       downloadAndDecryptFile: this.options.downloadAndDecryptFile,
     };
   },
-
-  draggable: true,
 
   addAttributes() {
     return {

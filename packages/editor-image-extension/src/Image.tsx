@@ -91,6 +91,9 @@ export const Image = (props: any) => {
             )}`
           : "none",
       }}
+      // needs to be here otherwise image won't be draggable
+      // read https://github.com/ueberdosis/tiptap/issues/2597 for more detailed info
+      data-drag-handle=""
     >
       {state.step !== "done" ? (
         <View
