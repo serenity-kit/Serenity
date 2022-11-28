@@ -7,6 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3 # needed until 18 becomes the default
+        with:
+          node-version: 18
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Typecheck
@@ -15,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3 # needed until 18 becomes the default
+        with:
+          node-version: 18
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Typecheck
@@ -23,18 +29,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3 # needed until 18 becomes the default
+        with:
+          node-version: 18
       - name: Setup .env
         run: cp apps/backend/.env.example apps/backend/.env
       - name: Run Database
         run: docker-compose up -d
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+      - name: NODE log
+        run: node -v
       - name: Test
         run: yarn test
   prettier:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3 # needed until 18 becomes the default
+        with:
+          node-version: 18
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Test
@@ -49,6 +63,9 @@ jobs:
       FILE_STORAGE_BUCKET: ${{ secrets.FILE_STORAGE_BUCKET }}
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3 # needed until 18 becomes the default
+        with:
+          node-version: 18
       - name: Setup .env
         run: cp apps/backend/.env.example apps/backend/.env
       - name: Run Database

@@ -1,4 +1,6 @@
 import {
+  KeyDerivationTrace,
+  NaishoNewSnapshotWithKeyRotationRequired,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
   Snapshot,
@@ -10,20 +12,45 @@ type ActiveSnapshotInfo = {
   snapshotId: string;
 };
 
-export async function createSnapshot(
-  snapshot: Snapshot,
-  activeSnapshotInfo?: ActiveSnapshotInfo
-) {
+type CreateSnapshotParams = {
+  snapshot: Snapshot;
+  workspaceId: string;
+  activeSnapshotInfo?: ActiveSnapshotInfo;
+};
+
+export async function createSnapshot({
+  snapshot,
+  activeSnapshotInfo,
+  workspaceId,
+}: CreateSnapshotParams) {
   return await prisma.$transaction(async (prisma) => {
-    const document = await prisma.document.findUnique({
+    const documentPromise = prisma.document.findUniqueOrThrow({
       where: { id: snapshot.publicData.docId },
       select: {
         activeSnapshot: true,
         requiresSnapshot: true,
       },
     });
-    if (!document) {
-      throw new Error("Document doesn't exist.");
+    const currentWorkspaceKeyPromise = prisma.workspaceKey.findFirstOrThrow({
+      where: { workspaceId },
+      select: { id: true },
+      orderBy: { generation: "desc" },
+    });
+    const [document, currentWorkspaceKey] = await Promise.all([
+      documentPromise,
+      currentWorkspaceKeyPromise,
+    ]);
+
+    const snapshotKeyDerivationTrace = snapshot.publicData
+      .keyDerivationTrace as KeyDerivationTrace;
+
+    if (
+      // workspaceKey has been rotated
+      snapshotKeyDerivationTrace.workspaceKeyId !== currentWorkspaceKey.id
+    ) {
+      throw new NaishoNewSnapshotWithKeyRotationRequired(
+        "Key roration is required"
+      );
     }
 
     // function sleep(ms) {
@@ -54,6 +81,7 @@ export async function createSnapshot(
         "Snapshot is out of date."
       );
     }
+
     if (
       document.activeSnapshot &&
       activeSnapshotInfo !== undefined &&

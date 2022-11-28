@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3 # needed until 18 becomes the default
+        with:
+          node-version: 18
       - name: Build
         working-directory: ./apps/backend
         run: yarn build
