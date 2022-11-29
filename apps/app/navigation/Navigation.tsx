@@ -10,6 +10,7 @@ import {
   Heading,
   Text,
   tw,
+  useIsDesktopDevice,
   useIsPermanentLeftSidebar,
 } from "@serenity-tools/ui";
 import * as Linking from "expo-linking";
@@ -74,6 +75,8 @@ const isPhoneDimensions = (width: number) => width < 768;
 
 function WorkspaceDrawerNavigator(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+  const isDesktopDevice = useIsDesktopDevice();
+
   const { width } = useWindowDimensions();
 
   return (
@@ -86,10 +89,13 @@ function WorkspaceDrawerNavigator(props) {
         headerStyle: [styles.header],
         drawerType: isPermanentLeftSidebar ? "permanent" : "front",
         drawerStyle: {
-          width: isPermanentLeftSidebar ? 240 : width,
+          width: isDesktopDevice ? 240 : width,
         },
         headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
-        overlayColor: "transparent",
+        overlayColor:
+          !isPermanentLeftSidebar && isDesktopDevice
+            ? tw.color("backdrop")
+            : "transparent",
       }}
     >
       <Drawer.Screen name="Page" component={PageScreen} />

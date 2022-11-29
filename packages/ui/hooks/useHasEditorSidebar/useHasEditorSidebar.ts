@@ -1,6 +1,6 @@
 import { useWindowDimensions } from "react-native";
 
-export const editorSidebarBreakPoint = 600;
+export const editorSidebarBreakPoint = 768; // md
 
 export function useHasEditorSidebar() {
   const { width } = useWindowDimensions();

@@ -41,7 +41,6 @@ export default function AccountMenu({
   const [isOpenAccountMenu, setIsOpenAccountMenu] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const isDesktopDevice = useIsDesktopDevice();
-  const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const navigation = useNavigation();
   const { activeDevice } = useAppContext();
   const [meResult] = useMeQuery();
@@ -80,16 +79,16 @@ export default function AccountMenu({
           testID={`${testIdPrefix}account-menu--trigger`}
         >
           <HStack
-            space={isPermanentLeftSidebar ? 2 : 3}
+            space={isDesktopDevice ? 2 : 3}
             alignItems="center"
             style={[
               tw`py-0.5 md:py-1.5 pr-2`,
               isFocusVisible && tw`se-inset-focus-mini`,
             ]}
           >
-            <WorkspaceAvatar size={isPermanentLeftSidebar ? "xs" : "sm"} />
+            <WorkspaceAvatar size={isDesktopDevice ? "xs" : "sm"} />
             <Text
-              variant={isPermanentLeftSidebar ? "xs" : "md"}
+              variant={isDesktopDevice ? "xs" : "md"}
               bold
               style={tw`-mr-1 max-w-30 text-gray-900`} // -mr needed for icon spacing, max-w needed for ellipsis
               numberOfLines={1}
