@@ -1,15 +1,24 @@
-import { ForbiddenError } from "apollo-server-express";
+import { Device } from "@serenity-tools/common";
+import sodium from "@serenity-tools/libsodium";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
+import canonicalize from "canonicalize";
 import { Role } from "../../../prisma/generated/output";
 import { formatWorkspace, Workspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 
 type Params = {
   workspaceInvitationId: string;
+  inviteeUsername: string;
+  inviteeMainDevice: Device;
+  inviteeUsernameAndDeviceSignature: string;
   userId: string;
 };
 
 export async function acceptWorkspaceInvitation({
   workspaceInvitationId,
+  inviteeUsername,
+  inviteeMainDevice,
+  inviteeUsernameAndDeviceSignature,
   userId,
 }: Params): Promise<Workspace> {
   return await prisma.$transaction(async (prisma) => {
@@ -25,6 +34,19 @@ export async function acceptWorkspaceInvitation({
     });
     if (!workspaceInvitation) {
       throw new ForbiddenError("Unauthorized");
+    }
+    // verify the signature
+    const inviteeInfo = canonicalize({
+      username: inviteeUsername,
+      mainDevice: inviteeMainDevice,
+    });
+    const doesSignatureVerify = await sodium.crypto_sign_verify_detached(
+      inviteeUsernameAndDeviceSignature,
+      inviteeInfo!,
+      workspaceInvitation.invitationSigningPublicKey
+    );
+    if (!doesSignatureVerify) {
+      throw new UserInputError("invalid inviteeUsernameAndDeviceSignature");
     }
     const workspaceId = workspaceInvitation.workspaceId;
     // check if this user already has access to this workspace

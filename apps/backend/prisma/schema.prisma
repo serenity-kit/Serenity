@@ -116,13 +116,15 @@ model Session {
 }
 
 model WorkspaceInvitations {
-  id            String    @id @default(uuid())
-  inviterUser   User      @relation(fields: [inviterUserId], references: [id], onDelete: Cascade)
-  inviterUserId String
-  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId   String
-  createdAt     DateTime  @default(now())
-  expiresAt     DateTime
+  id                         String    @id @default(uuid())
+  inviterUser                User      @relation(fields: [inviterUserId], references: [id], onDelete: Cascade)
+  inviterUserId              String
+  workspace                  Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId                String
+  invitationSigningPublicKey String
+  invitationDataSignature    String
+  createdAt                  DateTime  @default(now())
+  expiresAt                  DateTime
 }
 
 model RecoveryDevice {

@@ -42,6 +42,18 @@ export const CreatorDevice = objectType({
   },
 });
 
+export const DeviceInput = inputObjectType({
+  name: "DeviceInput",
+  definition(t) {
+    t.nonNull.string("userId");
+    t.nonNull.string("signingPublicKey");
+    t.nonNull.string("encryptionPublicKey");
+    t.nonNull.string("encryptionPublicKeySignature");
+    t.nonNull.field("createdAt", { type: "Date" });
+    t.string("info");
+  },
+});
+
 export const CreatorDeviceInput = inputObjectType({
   name: "CreatorDeviceInput",
   definition(t) {

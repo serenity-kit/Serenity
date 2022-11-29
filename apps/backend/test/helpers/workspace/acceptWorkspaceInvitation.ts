@@ -1,26 +1,33 @@
+import sodium from "@serenity-tools/libsodium";
+import canonicalize from "canonicalize";
 import { gql } from "graphql-request";
+import { Device } from "../../../src/types/device";
 
 type Params = {
   graphql: any;
   workspaceInvitationId: string;
+  inviteeUsername: string;
+  inviteeMainDevice: Device;
+  invitationSigningPrivateKey: string;
   authorizationHeader: string;
 };
 
 export const acceptWorkspaceInvitation = async ({
   graphql,
   workspaceInvitationId,
+  inviteeUsername,
+  inviteeMainDevice,
+  invitationSigningPrivateKey,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
   const query = gql`
-    mutation {
-      acceptWorkspaceInvitation(
-        input: {
-          workspaceInvitationId: "${workspaceInvitationId}"
-        }
-      ) {
+    mutation acceptWorkspaceInvitation(
+      $input: AcceptWorkspaceInvitationInput!
+    ) {
+      acceptWorkspaceInvitation(input: $input) {
         workspace {
           id
           name
@@ -33,9 +40,32 @@ export const acceptWorkspaceInvitation = async ({
       }
     }
   `;
+  const safeMainDevice = {
+    signingPublicKey: inviteeMainDevice.signingPublicKey,
+    encryptionPublicKey: inviteeMainDevice.encryptionPublicKey,
+    encryptionPublicKeySignature:
+      inviteeMainDevice.encryptionPublicKeySignature,
+    userId: inviteeMainDevice.userId,
+    createdAt: inviteeMainDevice.createdAt,
+  };
+  const inviteeUsernameAndDevice = canonicalize({
+    username: inviteeUsername,
+    mainDevice: safeMainDevice,
+  });
+  const inviteeUsernameAndDeviceSignature = await sodium.crypto_sign_detached(
+    inviteeUsernameAndDevice!,
+    invitationSigningPrivateKey
+  );
   const result = await graphql.client.request(
     query,
-    null,
+    {
+      input: {
+        workspaceInvitationId,
+        inviteeUsername,
+        inviteeMainDevice: safeMainDevice,
+        inviteeUsernameAndDeviceSignature,
+      },
+    },
     authorizationHeaders
   );
   return result;

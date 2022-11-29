@@ -7,12 +7,16 @@ import {
   objectType,
 } from "nexus";
 import { acceptWorkspaceInvitation } from "../../../database/workspace/acceptWorkspaceInvitation";
+import { DeviceInput } from "../../types/device";
 import { Workspace } from "../../types/workspace";
 
 export const AcceptWorkspaceInvitationInput = inputObjectType({
   name: "AcceptWorkspaceInvitationInput",
   definition(t) {
     t.nonNull.string("workspaceInvitationId");
+    t.nonNull.string("inviteeUsername");
+    t.nonNull.field("inviteeMainDevice", { type: DeviceInput });
+    t.nonNull.string("inviteeUsernameAndDeviceSignature");
   },
 });
 
@@ -40,6 +44,10 @@ export const createWorkspaceInvitationMutation = mutationField(
       }
       const workspace = await acceptWorkspaceInvitation({
         workspaceInvitationId: args.input.workspaceInvitationId,
+        inviteeUsername: args.input.inviteeUsername,
+        inviteeMainDevice: args.input.inviteeMainDevice,
+        inviteeUsernameAndDeviceSignature:
+          args.input.inviteeUsernameAndDeviceSignature,
         userId: context.user.id,
       });
       return { workspace };

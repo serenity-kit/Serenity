@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
 import { getUnauthorizedMembers } from "../../../../test/helpers/workspace/getUnauthorizedMembers";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { acceptWorkspaceInvitation } from "../../../database/workspace/acceptWorkspaceInvitation";
 
 const graphql = setupGraphql();
 const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
@@ -54,8 +54,13 @@ test("unauthorized members when workspace added", async () => {
   const workspaceInvitationId =
     workspaceInvitationResult.createWorkspaceInvitation.workspaceInvitation.id;
   await acceptWorkspaceInvitation({
+    graphql,
     workspaceInvitationId,
-    userId: otherUserId,
+    inviteeUsername: otherUserAndDevice.user.username,
+    inviteeMainDevice: otherUserAndDevice.mainDevice,
+    invitationSigningPrivateKey:
+      workspaceInvitationResult.invitationSigningPrivateKey,
+    authorizationHeader: otherUserAndDevice.sessionKey,
   });
   const result = await getUnauthorizedMembers({
     graphql,

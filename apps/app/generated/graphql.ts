@@ -18,6 +18,9 @@ export type Scalars = {
 };
 
 export type AcceptWorkspaceInvitationInput = {
+  inviteeMainDevice: DeviceInput;
+  inviteeUsername: Scalars['String'];
+  inviteeUsernameAndDeviceSignature: Scalars['String'];
   workspaceInvitationId: Scalars['String'];
 };
 
@@ -136,6 +139,10 @@ export type CreateInitialWorkspaceStructureResult = {
 };
 
 export type CreateWorkspaceInvitationInput = {
+  expiresAt: Scalars['Date'];
+  invitationDataSignature: Scalars['String'];
+  invitationId: Scalars['String'];
+  invitationSigningPublicKey: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
@@ -227,6 +234,15 @@ export type DeviceEdge = {
   cursor: Scalars['String'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Device>;
+};
+
+export type DeviceInput = {
+  createdAt: Scalars['Date'];
+  encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
+  info?: InputMaybe<Scalars['String']>;
+  signingPublicKey: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 export type DeviceResult = {
@@ -470,6 +486,7 @@ export type MainDeviceResult = {
   createdAt: Scalars['Date'];
   encryptionKeySalt: Scalars['String'];
   encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
   info?: Maybe<Scalars['String']>;
   nonce: Scalars['String'];
   signingPublicKey: Scalars['String'];
@@ -1422,7 +1439,7 @@ export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'Fol
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string, createdAt: any } | null };
+export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt: any } | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2224,6 +2241,7 @@ export const MainDeviceDocument = gql`
     ciphertext
     encryptionKeySalt
     encryptionPublicKey
+    encryptionPublicKeySignature
     createdAt
   }
 }

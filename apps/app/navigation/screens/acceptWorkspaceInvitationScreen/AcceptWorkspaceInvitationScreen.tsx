@@ -17,8 +17,10 @@ import { useWindowDimensions } from "react-native";
 import { LoginForm } from "../../../components/login/LoginForm";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import RegisterForm from "../../../components/register/RegisterForm";
+import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { useWorkspaceInvitationQuery } from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigationProps";
+import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
 
 const Wrapper = ({ children }) => (
@@ -41,6 +43,8 @@ const ErrorWrapper = ({ children }) => (
 export default function AcceptWorkspaceInvitationScreen(
   props: RootStackScreenProps<"AcceptWorkspaceInvitation">
 ) {
+  const [signingPrivateKey] = useState(window.location.hash.split("=")[1]);
+
   const workspaceInvitationId = props.route.params?.workspaceInvitationId;
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const [workspaceInvitationQueryResult] = useWorkspaceInvitationQuery({
@@ -51,12 +55,20 @@ export default function AcceptWorkspaceInvitationScreen(
   const [hasGraphqlError, setHasGraphqlError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authForm, setAuthForm] = useState<"login" | "register">("login");
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
 
   const acceptAndGoToWorkspace = async () => {
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      setIsPasswordModalVisible(true);
+      return;
+    }
     try {
       setIsSubmitting(true);
       const workspace = await acceptWorkspaceInvitation({
         workspaceInvitationId,
+        mainDevice,
+        signingPrivateKey,
       });
       props.navigation.navigate("Workspace", {
         workspaceId: workspace!.id,
@@ -74,6 +86,7 @@ export default function AcceptWorkspaceInvitationScreen(
   };
 
   const switchToRegisterForm = () => {
+    // FIXME: pass signing private key to register verification screen
     setAuthForm("register");
   };
 
@@ -182,6 +195,17 @@ export default function AcceptWorkspaceInvitationScreen(
           <View style={tw`mt-2 text-center`}>
             <Link to={{ screen: "Root" }}>Ignore invitation</Link>
           </View>
+          <VerifyPasswordModal
+            isVisible={isPasswordModalVisible}
+            description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"
+            onSuccess={() => {
+              setIsPasswordModalVisible(false);
+              acceptAndGoToWorkspace();
+            }}
+            onCancel={() => {
+              setIsPasswordModalVisible(false);
+            }}
+          />
         </>
       ) : (
         <>

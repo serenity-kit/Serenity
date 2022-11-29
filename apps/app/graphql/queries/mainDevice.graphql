@@ -5,6 +5,7 @@ query mainDevice {
     ciphertext
     encryptionKeySalt
     encryptionPublicKey
+    encryptionPublicKeySignature
     createdAt
   }
 }

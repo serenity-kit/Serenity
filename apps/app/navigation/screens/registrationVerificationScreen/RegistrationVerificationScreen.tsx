@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { Platform } from "react-native";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
+import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { useAppContext } from "../../../context/AppContext";
 import {
   useFinishLoginMutation,
@@ -31,6 +32,7 @@ import {
   isUsernamePasswordStored,
 } from "../../../utils/authentication/registrationMemoryStore";
 import { setDevice } from "../../../utils/device/deviceStore";
+import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import {
   removeWebDevice,
   setWebDevice,
@@ -45,6 +47,8 @@ type VerificationError = "none" | "invalidCode" | "maxRetries" | "invalidUser";
 export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
 ) {
+  const [signingPrivateKey] = useState(window.location.hash.split("=")[1]);
+
   const [, verifyRegistrationMutation] = useVerifyRegistrationMutation();
   const [verificationCode, setVerificationCode] = useState(
     props.route.params.verification || ""
@@ -60,6 +64,7 @@ export default function RegistrationVerificationScreen(
   const { updateAuthentication, updateActiveDevice } = useAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
   const [, finishLoginMutation] = useFinishLoginMutation();
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
 
   const navigateToLoginScreen = async () => {
     await removeLastUsedWorkspaceId();
@@ -67,6 +72,11 @@ export default function RegistrationVerificationScreen(
   };
 
   const acceptPendingWorkspaceInvitation = async () => {
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      setIsPasswordModalVisible(true);
+      return;
+    }
     const pendingWorkspaceInvitationId = await getPendingWorkspaceInvitationId(
       {}
     );
@@ -74,6 +84,8 @@ export default function RegistrationVerificationScreen(
       try {
         await acceptWorkspaceInvitation({
           workspaceInvitationId: pendingWorkspaceInvitationId,
+          mainDevice,
+          signingPrivateKey,
         });
       } catch (error) {
         setGraphqlError(error.message);
@@ -258,6 +270,17 @@ export default function RegistrationVerificationScreen(
           Register
         </Button>
       </Box>
+      <VerifyPasswordModal
+        isVisible={isPasswordModalVisible}
+        description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"
+        onSuccess={() => {
+          setIsPasswordModalVisible(false);
+          acceptPendingWorkspaceInvitation();
+        }}
+        onCancel={() => {
+          setIsPasswordModalVisible(false);
+        }}
+      />
     </OnboardingScreenWrapper>
   );
 }

@@ -38,22 +38,9 @@ export async function getWorkspaceInvitations({
         gt: new Date(),
       },
     },
-    select: {
-      id: true,
-      expiresAt: true,
-      createdAt: true,
-      workspaceId: true,
-      inviterUserId: true,
-      inviterUser: {
-        select: {
-          username: true,
-        },
-      },
-      workspace: {
-        select: {
-          name: true,
-        },
-      },
+    include: {
+      inviterUser: { select: { username: true } },
+      workspace: { select: { name: true } },
     },
     orderBy: {
       createdAt: "desc",
@@ -62,12 +49,9 @@ export async function getWorkspaceInvitations({
   const workspaceInvitations: WorkspaceInvitation[] = [];
   rawWorkspaceInvitations.forEach((rawWorkspaceInvitation) => {
     const workspaceInvitation: WorkspaceInvitation = {
-      id: rawWorkspaceInvitation.id,
-      workspaceId: rawWorkspaceInvitation.workspaceId,
-      workspaceName: rawWorkspaceInvitation.workspace.name,
-      expiresAt: rawWorkspaceInvitation.expiresAt,
-      inviterUserId: rawWorkspaceInvitation.inviterUserId,
+      ...rawWorkspaceInvitation,
       inviterUsername: rawWorkspaceInvitation.inviterUser.username,
+      workspaceName: rawWorkspaceInvitation.workspace.name,
     };
     workspaceInvitations.push(workspaceInvitation);
   });
