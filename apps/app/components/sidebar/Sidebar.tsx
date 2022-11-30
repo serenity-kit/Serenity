@@ -13,6 +13,7 @@ import {
   Text,
   Tooltip,
   tw,
+  useIsDesktopDevice,
   useIsPermanentLeftSidebar,
   View,
 } from "@serenity-tools/ui";
@@ -36,6 +37,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   const { workspaceId } = useWorkspace();
   const [isCreatingNewFolder, setIsCreatingNewFolder] = useState(false);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+  const isDesktopDevice = useIsDesktopDevice();
 
   const [meWithWorkspaceLoadingInfo] = useMeWithWorkspaceLoadingInfoQuery({
     variables: {
@@ -119,11 +121,19 @@ export default function Sidebar(props: DrawerContentComponentProps) {
 
   return (
     // TODO override for now until we find out where the pt-1 comes from
-    <DrawerContentScrollView {...props} style={tw`bg-gray-100 -mt-1 pb-4`}>
+    <DrawerContentScrollView
+      {...props}
+      style={[
+        tw`bg-gray-100 -mt-1 pb-4`,
+        isDesktopDevice &&
+          !isPermanentLeftSidebar &&
+          tw`border-r border-gray-200`,
+      ]}
+    >
       <HStack
         alignItems="center"
         justifyContent="space-between"
-        style={tw`py-1.5 px-5 md:px-4`}
+        style={[tw`py-1.5 px-5 md:px-4`]}
       >
         <AccountMenu
           workspaceId={workspaceId}
@@ -136,14 +146,14 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               props.navigation.closeDrawer();
             }}
             name="double-arrow-left"
-            size={"lg"}
+            size={isDesktopDevice ? "md" : "lg"}
           ></IconButton>
         )}
       </HStack>
 
-      {!isPermanentLeftSidebar ? <SidebarDivider collapsed /> : null}
+      {!isDesktopDevice ? <SidebarDivider collapsed /> : null}
 
-      <View style={!isPermanentLeftSidebar && tw`pt-5 pb-7`}>
+      <View style={isDesktopDevice ? tw`pt-4` : tw`pt-5 pb-7`}>
         <SidebarLink
           to={{
             screen: "Workspace",
@@ -160,7 +170,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         </SidebarLink>
       </View>
 
-      {isPermanentLeftSidebar ? <SidebarDivider /> : null}
+      {isDesktopDevice ? <SidebarDivider /> : null}
 
       {isAuthorizedForThisWorkspace ? (
         <>
@@ -177,9 +187,9 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   setIsCreatingNewFolder(true);
                 }}
                 name="plus"
-                size={isPermanentLeftSidebar ? "md" : "lg"}
+                size={isDesktopDevice ? "md" : "lg"}
                 testID="root-create-folder"
-                color={isPermanentLeftSidebar ? "gray-400" : "gray-600"}
+                color={isDesktopDevice ? "gray-400" : "gray-600"}
               ></IconButton>
             </Tooltip>
           </HStack>
