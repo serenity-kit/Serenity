@@ -1,6 +1,10 @@
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
-import { createAndEncryptDevice } from "@serenity-tools/common";
+import seleniumSodium from "@serenity-tools/libsodium";
+import {
+  createAndEncryptDevice,
+  encryptWorkspaceInvitationPrivateKey,
+} from "@serenity-tools/common";
 import { TestContext } from "../setupGraphql";
 import { requestRegistrationChallengeResponse } from "./requestRegistrationChallengeResponse";
 
@@ -32,9 +36,29 @@ export const registerUnverifiedUser = async ({
       }
     }
   `;
-  const exportKey = result.registration.getExportKey();
+  const exportKey = sodium.to_base64(result.registration.getExportKey());
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    await createAndEncryptDevice(sodium.to_base64(exportKey));
+    await createAndEncryptDevice(exportKey);
+
+  let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
+  let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;
+  let pendingWorkspaceInvitationKeySubkeyId: number | null = null;
+  let pendingWorkspaceInvitationKeyEncryptionSalt: string | null = null;
+  if (pendingWorkspaceInvitationId) {
+    const signingKeyPair = await seleniumSodium.crypto_sign_keypair();
+    const workspaceInvitationKeyData =
+      await encryptWorkspaceInvitationPrivateKey({
+        exportKey,
+        workspaceInvitationSigningPrivateKey: signingKeyPair.privateKey,
+      });
+    pendingWorkspaceInvitationKeyCiphertext =
+      workspaceInvitationKeyData.ciphertext;
+    pendingWorkspaceInvitationKeyPublicNonce =
+      workspaceInvitationKeyData.publicNonce;
+    pendingWorkspaceInvitationKeySubkeyId = workspaceInvitationKeyData.subkeyId;
+    pendingWorkspaceInvitationKeyEncryptionSalt =
+      workspaceInvitationKeyData.encryptionKeySalt;
+  }
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
@@ -42,6 +66,10 @@ export const registerUnverifiedUser = async ({
       message: sodium.to_base64(message),
       mainDevice,
       pendingWorkspaceInvitationId,
+      pendingWorkspaceInvitationKeyCiphertext,
+      pendingWorkspaceInvitationKeyPublicNonce,
+      pendingWorkspaceInvitationKeySubkeyId,
+      pendingWorkspaceInvitationKeyEncryptionSalt,
     },
   });
   return registrationResponse;
