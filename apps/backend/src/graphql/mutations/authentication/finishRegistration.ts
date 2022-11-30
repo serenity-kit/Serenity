@@ -30,6 +30,7 @@ export const FinishRegistrationInput = inputObjectType({
     t.int("pendingWorkspaceInvitationKeySubkeyId");
     t.string("pendingWorkspaceInvitationKeyCiphertext");
     t.string("pendingWorkspaceInvitationKeyPublicNonce");
+    t.string("pendingWorkspaceInvitationKeyEncryptionSalt");
   },
 });
 
@@ -67,6 +68,8 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
         args.input.pendingWorkspaceInvitationKeyCiphertext,
       pendingWorkspaceInvitationKeyPublicNonce:
         args.input.pendingWorkspaceInvitationKeyPublicNonce,
+      pendingWorkspaceInvitationKeyEncryptionSalt:
+        args.input.pendingWorkspaceInvitationKeyEncryptionSalt,
     });
     return {
       id: unverifiedUser.id,

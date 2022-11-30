@@ -2,7 +2,8 @@ import sodium from "@serenity-tools/libsodium";
 import { encryptWorkspaceInvitationPrivateKey } from "../encryptWorkspaceInvitationKey/encryptWorkspaceInvitationKey";
 import { decryptWorkspaceInvitationKey } from "./decryptWorkspaceInvitationKey";
 
-const exportKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+const exportKey =
+  "FlPV3HRQoQArQWpyIUXNGBn2ZTyM4l72oRz91JU04V3DAft2CzHli0aCrGExXFYr4elAB3aeROxY9bVLx8ac4w";
 
 beforeAll(async () => {
   await sodium.ready;
@@ -19,6 +20,7 @@ test("decryptWorkspaceInvitationId", async () => {
     ciphertext: encryptedData.ciphertext,
     publicNonce: encryptedData.publicNonce,
     subkeyId: encryptedData.subkeyId,
+    encryptionKeySalt: encryptedData.encryptionKeySalt,
   });
   expect(decryptFolderResult).toBe(keyPair.privateKey);
 });
@@ -36,6 +38,7 @@ test("decryptFolderName with publicData fails for wrong key", async () => {
         ciphertext: encryptedData.ciphertext,
         publicNonce: encryptedData.publicNonce,
         subkeyId: encryptedData.subkeyId,
+        encryptionKeySalt: encryptedData.encryptionKeySalt,
       }))()
   ).rejects.toThrowError(/ciphertext cannot be decrypted using that key/);
 });

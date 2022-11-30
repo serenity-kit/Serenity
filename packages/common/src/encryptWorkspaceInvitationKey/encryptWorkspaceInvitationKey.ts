@@ -1,4 +1,5 @@
 import { encryptAead } from "@naisho/core";
+import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 export type Params = {
@@ -15,8 +16,11 @@ export const encryptWorkspaceInvitationPrivateKey = async ({
   workspaceInvitationSigningPrivateKey,
 }: Params) => {
   const publicData = "";
+  const { encryptionKey, encryptionKeySalt } =
+    await createEncryptionKeyFromOpaqueExportKey(exportKey);
+
   const derivedEncryptionKey = await kdfDeriveFromKey({
-    key: exportKey,
+    key: encryptionKey,
     context: workspaceInvitationDerivedKeyContext,
   });
   const result = await encryptAead(
@@ -30,5 +34,6 @@ export const encryptWorkspaceInvitationPrivateKey = async ({
     ciphertext: result.ciphertext,
     publicNonce: result.publicNonce,
     publicData,
+    encryptionKeySalt,
   };
 };

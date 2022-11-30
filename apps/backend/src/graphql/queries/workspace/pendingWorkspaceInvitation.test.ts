@@ -47,13 +47,21 @@ test("user should be be able to get their pending workspace invitation", async (
     {
       pendingWorkspaceInvitation {
         id
+        ciphertext
+        publicNonce
+        subkeyId
+        encryptionKeySalt
       }
     }
   `;
   const result = await graphql.client.request(query, null, authorizationHeader);
   expect(result.pendingWorkspaceInvitation).toMatchInlineSnapshot(`
       {
+        "ciphertext": "${registerUser1Result.pendingWorkspaceInvitationKeyCiphertext}",
+        "encryptionKeySalt": "${registerUser1Result.pendingWorkspaceInvitationKeyEncryptionSalt}",
         "id": "${pendingWorkspaceInvitation2}",
+        "publicNonce": "${registerUser1Result.pendingWorkspaceInvitationKeyPublicNonce}",
+        "subkeyId": ${registerUser1Result.pendingWorkspaceInvitationKeySubkeyId},
       }
     `);
 });

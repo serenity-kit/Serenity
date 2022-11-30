@@ -395,6 +395,7 @@ export type FinishRegistrationInput = {
   message: Scalars['String'];
   pendingWorkspaceInvitationId?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeyCiphertext?: InputMaybe<Scalars['String']>;
+  pendingWorkspaceInvitationKeyEncryptionSalt?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeyPublicNonce?: InputMaybe<Scalars['String']>;
   pendingWorkspaceInvitationKeySubkeyId?: InputMaybe<Scalars['Int']>;
   registrationId: Scalars['String'];
@@ -698,6 +699,7 @@ export type PageInfo = {
 export type PendingWorkspaceInvitationResult = {
   __typename?: 'PendingWorkspaceInvitationResult';
   ciphertext?: Maybe<Scalars['String']>;
+  encryptionKeySalt?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
   publicNonce?: Maybe<Scalars['String']>;
   subkeyId?: Maybe<Scalars['Int']>;
@@ -1465,7 +1467,7 @@ export type MeWithWorkspaceLoadingInfoQuery = { __typename?: 'Query', me?: { __t
 export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PendingWorkspaceInvitationQuery = { __typename?: 'Query', pendingWorkspaceInvitation?: { __typename?: 'PendingWorkspaceInvitationResult', id?: string | null, ciphertext?: string | null, publicNonce?: string | null, subkeyId?: number | null } | null };
+export type PendingWorkspaceInvitationQuery = { __typename?: 'Query', pendingWorkspaceInvitation?: { __typename?: 'PendingWorkspaceInvitationResult', id?: string | null, ciphertext?: string | null, publicNonce?: string | null, subkeyId?: number | null, encryptionKeySalt?: string | null } | null };
 
 export type RootFoldersQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -2298,6 +2300,7 @@ export const PendingWorkspaceInvitationDocument = gql`
     ciphertext
     publicNonce
     subkeyId
+    encryptionKeySalt
   }
 }
     `;

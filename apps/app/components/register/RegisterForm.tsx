@@ -89,6 +89,7 @@ export default function RegisterForm(props: Props) {
         let pendingWorkspaceInvitationKeySubkeyId: number | null = null;
         let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
         let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;
+        let pendingWorkspaceInvitationKeyEncryptionSalt: string | null = null;
         if (props.workspaceInvitationKey) {
           const encryptedWorkspaceKeyData =
             await encryptWorkspaceInvitationPrivateKey({
@@ -101,6 +102,8 @@ export default function RegisterForm(props: Props) {
             encryptedWorkspaceKeyData.ciphertext;
           pendingWorkspaceInvitationKeyPublicNonce =
             encryptedWorkspaceKeyData.publicNonce;
+          pendingWorkspaceInvitationKeyEncryptionSalt =
+            encryptedWorkspaceKeyData.encryptionKeySalt;
         }
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
@@ -112,6 +115,7 @@ export default function RegisterForm(props: Props) {
             pendingWorkspaceInvitationKeySubkeyId,
             pendingWorkspaceInvitationKeyCiphertext,
             pendingWorkspaceInvitationKeyPublicNonce,
+            pendingWorkspaceInvitationKeyEncryptionSalt,
           },
         });
         // check for an error

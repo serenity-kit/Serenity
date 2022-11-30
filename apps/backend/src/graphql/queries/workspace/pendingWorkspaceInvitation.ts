@@ -8,6 +8,7 @@ export const PendingWorkspaceInvitationResult = objectType({
     t.string("ciphertext");
     t.string("publicNonce");
     t.int("subkeyId");
+    t.string("encryptionKeySalt");
   },
 });
 
@@ -23,6 +24,8 @@ export const pendingWorkspaceInvitationQuery = queryField((t) => {
         ciphertext: context.user.pendingWorkspaceInvitationKeyCiphertext,
         publicNonce: context.user.pendingWorkspaceInvitationKeyPublicNonce,
         subkeyId: context.user.pendingWorkspaceInvitationKeySubkeyId,
+        encryptionKeySalt:
+          context.user.pendingWorkspaceInvitationKeyEncryptionSalt,
       };
     },
   });

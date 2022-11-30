@@ -1,7 +1,8 @@
 import sodium from "@serenity-tools/libsodium";
 import { encryptWorkspaceInvitationPrivateKey } from "./encryptWorkspaceInvitationKey";
 
-const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+const exportKey =
+  "FlPV3HRQoQArQWpyIUXNGBn2ZTyM4l72oRz91JU04V3DAft2CzHli0aCrGExXFYr4elAB3aeROxY9bVLx8ac4w";
 
 beforeAll(async () => {
   await sodium.ready;
@@ -10,7 +11,7 @@ beforeAll(async () => {
 test("encryptFolderName", async () => {
   const keyPair = await sodium.crypto_sign_keypair();
   const result = await encryptWorkspaceInvitationPrivateKey({
-    exportKey: kdfKey,
+    exportKey,
     workspaceInvitationSigningPrivateKey: keyPair.privateKey,
   });
   expect(typeof result.key).toBe("string");

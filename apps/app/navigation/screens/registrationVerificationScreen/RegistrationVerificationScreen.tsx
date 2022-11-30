@@ -94,6 +94,7 @@ export default function RegistrationVerificationScreen(
         subkeyId: pendingWorkspaceInvitation.subkeyId!,
         ciphertext: pendingWorkspaceInvitation.ciphertext!,
         publicNonce: pendingWorkspaceInvitation.publicNonce!,
+        encryptionKeySalt: pendingWorkspaceInvitation.encryptionKeySalt!,
       });
       try {
         await acceptWorkspaceInvitation({

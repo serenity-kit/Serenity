@@ -19,6 +19,7 @@ type Props = {
   pendingWorkspaceInvitationKeySubkeyId: number | null | undefined;
   pendingWorkspaceInvitationKeyCiphertext: string | null | undefined;
   pendingWorkspaceInvitationKeyPublicNonce: string | null | undefined;
+  pendingWorkspaceInvitationKeyEncryptionSalt: string | null | undefined;
 };
 
 const verifyDevice = async (device: DeviceInput) => {
@@ -37,6 +38,7 @@ export async function finalizeRegistration({
   pendingWorkspaceInvitationKeySubkeyId,
   pendingWorkspaceInvitationKeyCiphertext,
   pendingWorkspaceInvitationKeyPublicNonce,
+  pendingWorkspaceInvitationKeyEncryptionSalt,
 }: Props) {
   if (!verifyDevice(mainDevice)) {
     throw new Error("Failed to verify main device.");
@@ -60,6 +62,14 @@ export async function finalizeRegistration({
   ) {
     throw new UserInputError(
       "pendingWorkspaceInvitationId without workspaceInvitationKeyPublicNonce"
+    );
+  }
+  if (
+    pendingWorkspaceInvitationId &&
+    !pendingWorkspaceInvitationKeyEncryptionSalt
+  ) {
+    throw new UserInputError(
+      "pendingWorkspaceInvitationId without pendingWorkspaceInvitationKeyEncryptionSalt"
     );
   }
   try {
@@ -92,6 +102,7 @@ export async function finalizeRegistration({
           pendingWorkspaceInvitationKeySubkeyId,
           pendingWorkspaceInvitationKeyCiphertext,
           pendingWorkspaceInvitationKeyPublicNonce,
+          pendingWorkspaceInvitationKeyEncryptionSalt,
         },
       });
       // TODO: send an email to the user's email address

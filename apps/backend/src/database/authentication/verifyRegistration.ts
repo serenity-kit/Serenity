@@ -70,6 +70,8 @@ const createDevicesAndUser = async (
         unverifiedUser.pendingWorkspaceInvitationKeyCiphertext,
       pendingWorkspaceInvitationKeyPublicNonce:
         unverifiedUser.pendingWorkspaceInvitationKeyPublicNonce,
+      pendingWorkspaceInvitationKeyEncryptionSalt:
+        unverifiedUser.pendingWorkspaceInvitationKeyEncryptionSalt,
     },
   });
   await prisma.unverifiedUser.delete({

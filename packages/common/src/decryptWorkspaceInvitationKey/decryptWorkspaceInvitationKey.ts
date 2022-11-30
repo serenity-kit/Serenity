@@ -1,5 +1,6 @@
 import { decryptAead } from "@naisho/core";
 import sodium from "@serenity-tools/libsodium";
+import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 import { workspaceInvitationDerivedKeyContext } from "../encryptWorkspaceInvitationKey/encryptWorkspaceInvitationKey";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
@@ -8,6 +9,7 @@ type Params = {
   subkeyId: number;
   ciphertext: string;
   publicNonce: string;
+  encryptionKeySalt: string;
 };
 
 export const decryptWorkspaceInvitationKey = async ({
@@ -15,10 +17,15 @@ export const decryptWorkspaceInvitationKey = async ({
   subkeyId,
   ciphertext,
   publicNonce,
+  encryptionKeySalt,
 }: Params) => {
   const publicData = "";
+  const { encryptionKey } = await createEncryptionKeyFromOpaqueExportKey(
+    exportKey,
+    encryptionKeySalt
+  );
   const derivedEncryptionKey = await kdfDeriveFromKey({
-    key: exportKey,
+    key: encryptionKey,
     context: workspaceInvitationDerivedKeyContext,
     subkeyId,
   });
