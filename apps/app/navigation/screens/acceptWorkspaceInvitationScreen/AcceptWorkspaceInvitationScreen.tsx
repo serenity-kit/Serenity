@@ -20,6 +20,7 @@ import RegisterForm from "../../../components/register/RegisterForm";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { useWorkspaceInvitationQuery } from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigationProps";
+import { getExportKey } from "../../../utils/authentication/exportKeyStore";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
 
@@ -43,6 +44,7 @@ const ErrorWrapper = ({ children }) => (
 export default function AcceptWorkspaceInvitationScreen(
   props: RootStackScreenProps<"AcceptWorkspaceInvitation">
 ) {
+  // TODO: display error if there is no key
   const [signingPrivateKey] = useState(window.location.hash.split("=")[1]);
 
   const workspaceInvitationId = props.route.params?.workspaceInvitationId;
@@ -84,9 +86,7 @@ export default function AcceptWorkspaceInvitationScreen(
       setIsSubmitting(false);
     }
   };
-
   const switchToRegisterForm = () => {
-    // FIXME: pass signing private key to register verification screen
     setAuthForm("register");
   };
 
@@ -94,7 +94,10 @@ export default function AcceptWorkspaceInvitationScreen(
     setAuthForm("login");
   };
 
-  const onRegisterSuccess = (username: string, verificationCode: string) => {
+  const onRegisterSuccess = async (
+    username: string,
+    verificationCode: string
+  ) => {
     props.navigation.navigate("RegistrationVerification", {
       username,
       verification: verificationCode,
@@ -108,6 +111,17 @@ export default function AcceptWorkspaceInvitationScreen(
           <Spinner fadeIn style={tw`mt-4`} />
         </VStack>
       </Wrapper>
+    );
+  }
+
+  if (!signingPrivateKey) {
+    return (
+      <ErrorWrapper>
+        <InfoMessage variant="error" icon>
+          You have not provided a "#key=" parameter in the URL Without the
+          proper key, you cannot join this workspace.
+        </InfoMessage>
+      </ErrorWrapper>
     );
   }
 
@@ -230,6 +244,7 @@ export default function AcceptWorkspaceInvitationScreen(
                 pendingWorkspaceInvitationId={
                   props.route.params.workspaceInvitationId
                 }
+                workspaceInvitationKey={signingPrivateKey}
                 onRegisterSuccess={onRegisterSuccess}
                 isFocused={true}
               />

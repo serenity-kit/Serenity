@@ -55,6 +55,7 @@ test("server should register a user", async () => {
 });
 
 test("server should register a user with a pending workspace id", async () => {
+  const sigingKeyPair = await sodium.crypto_sign_keypair();
   const result = await requestRegistrationChallengeResponse(
     graphql,
     username,

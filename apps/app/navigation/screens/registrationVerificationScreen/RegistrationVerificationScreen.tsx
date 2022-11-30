@@ -1,3 +1,4 @@
+import { decryptWorkspaceInvitationKey } from "@serenity-tools/common";
 import {
   Box,
   Button,
@@ -20,6 +21,7 @@ import {
 } from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { createDeviceWithInfo } from "../../../utils/authentication/createDeviceWithInfo";
+import { getExportKey } from "../../../utils/authentication/exportKeyStore";
 import {
   fetchMainDevice,
   login,
@@ -40,7 +42,7 @@ import {
 import { removeLastUsedWorkspaceId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
 import { attachDeviceToWorkspaces } from "../../../utils/workspace/attachDeviceToWorkspaces";
-import { getPendingWorkspaceInvitationId } from "../../../utils/workspace/getPendingWorkspaceInvitationId";
+import { getPendingWorkspaceInvitation } from "../../../utils/workspace/getPendingWorkspaceInvitation";
 
 type VerificationError = "none" | "invalidCode" | "maxRetries" | "invalidUser";
 
@@ -77,13 +79,25 @@ export default function RegistrationVerificationScreen(
       setIsPasswordModalVisible(true);
       return;
     }
-    const pendingWorkspaceInvitationId = await getPendingWorkspaceInvitationId(
-      {}
-    );
-    if (pendingWorkspaceInvitationId) {
+    const pendingWorkspaceInvitation = await getPendingWorkspaceInvitation({});
+    if (pendingWorkspaceInvitation) {
+      const exportKey = await getExportKey();
+      if (!exportKey) {
+        // TODO: display error in UI
+        console.error(
+          "Unable to retrieve export key necessary for decrypting workspace invitation"
+        );
+        return;
+      }
+      const signingPrivateKey = await decryptWorkspaceInvitationKey({
+        exportKey,
+        subkeyId: pendingWorkspaceInvitation.subkeyId!,
+        ciphertext: pendingWorkspaceInvitation.ciphertext!,
+        publicNonce: pendingWorkspaceInvitation.publicNonce!,
+      });
       try {
         await acceptWorkspaceInvitation({
-          workspaceInvitationId: pendingWorkspaceInvitationId,
+          workspaceInvitationId: pendingWorkspaceInvitation.id!,
           mainDevice,
           signingPrivateKey,
         });

@@ -1,4 +1,7 @@
-import { createAndEncryptDevice } from "@serenity-tools/common";
+import {
+  createAndEncryptDevice,
+  encryptWorkspaceInvitationPrivateKey,
+} from "@serenity-tools/common";
 import { finishRegistration, registerInitialize } from "@serenity-tools/opaque";
 import {
   Button,
@@ -21,6 +24,7 @@ import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 
 type Props = {
   pendingWorkspaceInvitationId?: string;
+  workspaceInvitationKey?: string;
   onRegisterSuccess?: (username: string, verificationCode: string) => void;
   isFocused: boolean;
 };
@@ -81,6 +85,23 @@ export default function RegisterForm(props: Props) {
           encryptionPublicKey: mainDevice.encryptionPublicKey,
           info: JSON.stringify({ type: "main" }),
         });
+
+        let pendingWorkspaceInvitationKeySubkeyId: number | null = null;
+        let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
+        let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;
+        if (props.workspaceInvitationKey) {
+          const encryptedWorkspaceKeyData =
+            await encryptWorkspaceInvitationPrivateKey({
+              exportKey,
+              workspaceInvitationSigningPrivateKey: signingPrivateKey,
+            });
+          pendingWorkspaceInvitationKeySubkeyId =
+            encryptedWorkspaceKeyData.subkeyId;
+          pendingWorkspaceInvitationKeyCiphertext =
+            encryptedWorkspaceKeyData.ciphertext;
+          pendingWorkspaceInvitationKeyPublicNonce =
+            encryptedWorkspaceKeyData.publicNonce;
+        }
         const finishRegistrationResult = await finishRegistrationMutation({
           input: {
             message: response,
@@ -88,6 +109,9 @@ export default function RegisterForm(props: Props) {
               startRegistrationResult.data.startRegistration.registrationId,
             mainDevice,
             pendingWorkspaceInvitationId: props.pendingWorkspaceInvitationId,
+            pendingWorkspaceInvitationKeySubkeyId,
+            pendingWorkspaceInvitationKeyCiphertext,
+            pendingWorkspaceInvitationKeyPublicNonce,
           },
         });
         // check for an error

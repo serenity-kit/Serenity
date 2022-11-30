@@ -79,6 +79,9 @@ model UnverifiedUser {
   mainDeviceEncryptionPublicKey              String    @unique
   mainDeviceEncryptionPublicKeySignature     String    @unique
   pendingWorkspaceInvitationId               String?
+  pendingWorkspaceInvitationKeySubkeyId      Int?
+  pendingWorkspaceInvitationKeyCiphertext    String?
+  pendingWorkspaceInvitationKeyPublicNonce   String?
 }
 
 model User {
@@ -101,6 +104,9 @@ model User {
   workspaceInvitations                       WorkspaceInvitations[]
   sessions                                   Session[]
   pendingWorkspaceInvitationId               String?
+  pendingWorkspaceInvitationKeySubkeyId      Int?
+  pendingWorkspaceInvitationKeyCiphertext    String?
+  pendingWorkspaceInvitationKeyPublicNonce   String?
   creatorDevices                             CreatorDevice[]
   documentShareLinks                         DocumentShareLink[]
 }
