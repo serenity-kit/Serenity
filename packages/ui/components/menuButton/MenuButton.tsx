@@ -9,6 +9,7 @@ import { Text } from "../text/Text";
 import { View } from "../view/View";
 
 export type MenuButtonProps = PressableProps & {
+  children: React.ReactNode;
   iconName?: IconNames;
   danger?: boolean;
   shortcut?: React.ReactNode;

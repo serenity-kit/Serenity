@@ -1,10 +1,11 @@
-import * as React from "react";
 import { useFocusRing } from "@react-native-aria/focus";
+import * as React from "react";
+import { createLinkStyles } from "../link/Link";
 import { Pressable, PressableProps } from "../pressable/Pressable";
 import { Text, TextVariants } from "../text/Text";
-import { createLinkStyles } from "../link/Link";
 
 export type LinkButtonProps = PressableProps & {
+  children: React.ReactNode;
   variant?: TextVariants;
 };
 
