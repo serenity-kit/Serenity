@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "native-base": "^3.4.23",
-    "react-native-svg": "12.3.0"
+    "react-native-svg": "13.4.0"
   }
 }
