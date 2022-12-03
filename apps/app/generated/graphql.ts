@@ -18,7 +18,7 @@ export type Scalars = {
 };
 
 export type AcceptWorkspaceInvitationInput = {
-  inviteeMainDevice: DeviceInput;
+  inviteeMainDevice: ReducedDeviceInput;
   inviteeUsername: Scalars['String'];
   inviteeUsernameAndDeviceSignature: Scalars['String'];
   workspaceInvitationId: Scalars['String'];
@@ -234,15 +234,6 @@ export type DeviceEdge = {
   cursor: Scalars['String'];
   /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
   node?: Maybe<Device>;
-};
-
-export type DeviceInput = {
-  createdAt: Scalars['Date'];
-  encryptionPublicKey: Scalars['String'];
-  encryptionPublicKeySignature: Scalars['String'];
-  info?: InputMaybe<Scalars['String']>;
-  signingPublicKey: Scalars['String'];
-  userId: Scalars['String'];
 };
 
 export type DeviceResult = {
@@ -853,6 +844,13 @@ export type QueryWorkspacesArgs = {
   after?: InputMaybe<Scalars['String']>;
   deviceSigningPublicKey: Scalars['String'];
   first: Scalars['Int'];
+};
+
+export type ReducedDeviceInput = {
+  encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
+  signingPublicKey: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 export type RemoveDocumentShareLinkInput = {

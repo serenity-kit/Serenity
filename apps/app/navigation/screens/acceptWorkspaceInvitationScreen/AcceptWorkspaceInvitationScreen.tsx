@@ -23,6 +23,7 @@ import { RootStackScreenProps } from "../../../types/navigationProps";
 import { getExportKey } from "../../../utils/authentication/exportKeyStore";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
+import { useAppContext } from "../../../context/AppContext";
 
 const Wrapper = ({ children }) => (
   <OnboardingScreenWrapper>
@@ -58,6 +59,8 @@ export default function AcceptWorkspaceInvitationScreen(
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authForm, setAuthForm] = useState<"login" | "register">("login");
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+
+  const { activeDevice } = useAppContext();
 
   const acceptAndGoToWorkspace = async () => {
     const mainDevice = getMainDevice();
@@ -209,17 +212,19 @@ export default function AcceptWorkspaceInvitationScreen(
           <View style={tw`mt-2 text-center`}>
             <Link to={{ screen: "Root" }}>Ignore invitation</Link>
           </View>
-          <VerifyPasswordModal
-            isVisible={isPasswordModalVisible}
-            description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"
-            onSuccess={() => {
-              setIsPasswordModalVisible(false);
-              acceptAndGoToWorkspace();
-            }}
-            onCancel={() => {
-              setIsPasswordModalVisible(false);
-            }}
-          />
+          {activeDevice && (
+            <VerifyPasswordModal
+              isVisible={isPasswordModalVisible}
+              description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"
+              onSuccess={() => {
+                setIsPasswordModalVisible(false);
+                acceptAndGoToWorkspace();
+              }}
+              onCancel={() => {
+                setIsPasswordModalVisible(false);
+              }}
+            />
+          )}
         </>
       ) : (
         <>

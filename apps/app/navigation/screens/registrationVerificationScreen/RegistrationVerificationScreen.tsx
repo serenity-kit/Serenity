@@ -69,7 +69,7 @@ export default function RegistrationVerificationScreen(
     props.navigation.push("Login");
   };
 
-  const acceptPendingWorkspaceInvitation = async () => {
+  const acceptPendingWorkspaceInvitation = async (exportKey: string) => {
     const mainDevice = getMainDevice();
     if (!mainDevice) {
       console.error("No main device found!");
@@ -77,7 +77,6 @@ export default function RegistrationVerificationScreen(
     }
     const pendingWorkspaceInvitation = await getPendingWorkspaceInvitation({});
     if (pendingWorkspaceInvitation) {
-      const exportKey = await getExportKey();
       if (!exportKey) {
         // TODO: display error in UI
         console.error(
@@ -130,8 +129,9 @@ export default function RegistrationVerificationScreen(
         device: unsafedDevice,
         useExtendedLogin,
       });
+      const exportKey = loginResult.result.exportKey;
       await fetchMainDevice({
-        exportKey: loginResult.result.exportKey,
+        exportKey,
       });
 
       if (Platform.OS === "web") {
@@ -153,7 +153,7 @@ export default function RegistrationVerificationScreen(
         console.error(error);
         return;
       }
-      await acceptPendingWorkspaceInvitation();
+      await acceptPendingWorkspaceInvitation(exportKey);
       navigateToNextAuthenticatedPage({
         navigation: props.navigation,
         pendingWorkspaceInvitationId: null,

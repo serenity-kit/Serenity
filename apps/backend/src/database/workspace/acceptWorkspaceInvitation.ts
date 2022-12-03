@@ -38,7 +38,12 @@ export async function acceptWorkspaceInvitation({
     // verify the signature
     const inviteeInfo = canonicalize({
       username: inviteeUsername,
-      mainDevice: inviteeMainDevice,
+      mainDevice: {
+        signingPublicKey: inviteeMainDevice.signingPublicKey,
+        encryptionPublicKey: inviteeMainDevice.encryptionPublicKey,
+        encryptionPublicKeySignature:
+          inviteeMainDevice.encryptionPublicKeySignature,
+      },
     });
     const doesSignatureVerify = await sodium.crypto_sign_verify_detached(
       inviteeUsernameAndDeviceSignature,

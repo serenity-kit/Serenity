@@ -94,7 +94,8 @@ export default function RegisterForm(props: Props) {
           const encryptedWorkspaceKeyData =
             await encryptWorkspaceInvitationPrivateKey({
               exportKey,
-              workspaceInvitationSigningPrivateKey: signingPrivateKey,
+              workspaceInvitationSigningPrivateKey:
+                props.workspaceInvitationKey,
             });
           pendingWorkspaceInvitationKeySubkeyId =
             encryptedWorkspaceKeyData.subkeyId;

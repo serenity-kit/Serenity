@@ -7,7 +7,7 @@ import {
   objectType,
 } from "nexus";
 import { acceptWorkspaceInvitation } from "../../../database/workspace/acceptWorkspaceInvitation";
-import { DeviceInput } from "../../types/device";
+import { ReducedDeviceInput } from "../../types/device";
 import { Workspace } from "../../types/workspace";
 
 export const AcceptWorkspaceInvitationInput = inputObjectType({
@@ -15,7 +15,7 @@ export const AcceptWorkspaceInvitationInput = inputObjectType({
   definition(t) {
     t.nonNull.string("workspaceInvitationId");
     t.nonNull.string("inviteeUsername");
-    t.nonNull.field("inviteeMainDevice", { type: DeviceInput });
+    t.nonNull.field("inviteeMainDevice", { type: ReducedDeviceInput });
     t.nonNull.string("inviteeUsernameAndDeviceSignature");
   },
 });

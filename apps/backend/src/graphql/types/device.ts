@@ -62,3 +62,13 @@ export const CreatorDeviceInput = inputObjectType({
     t.nonNull.string("encryptionPublicKeySignature");
   },
 });
+
+export const ReducedDeviceInput = inputObjectType({
+  name: "ReducedDeviceInput",
+  definition(t) {
+    t.nonNull.string("userId");
+    t.nonNull.string("signingPublicKey");
+    t.nonNull.string("encryptionPublicKey");
+    t.nonNull.string("encryptionPublicKeySignature");
+  },
+});
