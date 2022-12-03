@@ -1,5 +1,5 @@
-import { Pressable as NativeBasePressable, IPressableProps } from "native-base";
+import { IPressableProps, Pressable as NativeBasePressable } from "native-base";
 
-export type PressableProps = IPressableProps & {};
+export type PressableProps = IPressableProps & { children?: React.ReactNode };
 
 export const Pressable = NativeBasePressable;

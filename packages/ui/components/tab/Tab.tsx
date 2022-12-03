@@ -1,9 +1,9 @@
+import { useFocusRing } from "@react-native-aria/focus";
 import React from "react";
+import { Platform } from "react-native";
 import { tw } from "../../tailwind";
 import { Pressable, PressableProps } from "../pressable/Pressable";
 import { Text } from "../text/Text";
-import { Platform } from "react-native";
-import { useFocusRing } from "@react-native-aria/focus";
 
 export type TabProps = PressableProps & { tabId: string; isActive: boolean };
 

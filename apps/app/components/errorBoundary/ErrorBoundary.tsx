@@ -1,7 +1,9 @@
 import React from "react";
 import { Text } from "react-native";
 
-export class ErrorBoundary extends React.Component {
+export class ErrorBoundary extends React.Component<{
+  children: React.ReactNode;
+}> {
   state = {
     hasError: false,
   };

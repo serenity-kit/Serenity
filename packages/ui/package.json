@@ -8,6 +8,7 @@
     "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "dependencies": {
-    "react-native-svg": "12.3.0"
+    "native-base": "^3.4.23",
+    "react-native-svg": "13.4.0"
   }
 }
