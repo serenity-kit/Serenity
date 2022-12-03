@@ -49,11 +49,20 @@ test("user should be able to accept an invitation", async () => {
     createWorkspaceResult.createWorkspaceInvitation.workspaceInvitation.id;
   invitationSigningPrivateKey =
     createWorkspaceResult.invitationSigningPrivateKey;
+  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+    inviteeUserAndDevice.signingPrivateKey
+  );
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId,
     inviteeUsername: inviteeUserAndDevice.user.username,
-    inviteeMainDevice: inviteeUserAndDevice.mainDevice,
+    inviteeMainDevice: {
+      userId: inviteeUserAndDevice.user.id,
+      signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
+      encryptionPublicKey: inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      encryptionPublicKeySignature: encryptionPublicKeySignature,
+    },
     invitationSigningPrivateKey,
     authorizationHeader: inviteeUserAndDevice.sessionKey,
   });
@@ -74,11 +83,20 @@ test("user should be able to accept an invitation", async () => {
 });
 
 test("double-accepting invitation does nothing", async () => {
+  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+    inviteeUserAndDevice.signingPrivateKey
+  );
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId,
     inviteeUsername: inviteeUserAndDevice.user.username,
-    inviteeMainDevice: inviteeUserAndDevice.mainDevice,
+    inviteeMainDevice: {
+      userId: inviteeUserAndDevice.user.id,
+      signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
+      encryptionPublicKey: inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      encryptionPublicKeySignature: encryptionPublicKeySignature,
+    },
     invitationSigningPrivateKey,
     authorizationHeader: inviteeUserAndDevice.sessionKey,
   });
@@ -95,13 +113,23 @@ test("double-accepting invitation does nothing", async () => {
 });
 
 test("invalid invitation id should throw error", async () => {
+  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+    inviteeUserAndDevice.signingPrivateKey
+  );
   await expect(
     (async () =>
       await acceptWorkspaceInvitation({
         graphql,
         workspaceInvitationId: "invalid",
         inviteeUsername: inviteeUserAndDevice.user.username,
-        inviteeMainDevice: inviteeUserAndDevice.mainDevice,
+        inviteeMainDevice: {
+          userId: inviteeUserAndDevice.user.id,
+          signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
+          encryptionPublicKey:
+            inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+          encryptionPublicKeySignature: encryptionPublicKeySignature,
+        },
         invitationSigningPrivateKey,
         authorizationHeader: inviteeUserAndDevice.sessionKey,
       }))()
@@ -117,13 +145,23 @@ test("expired invitation id should throw error", async () => {
       expiresAt: new Date(Date.now() - 1000),
     },
   });
+  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+    inviteeUserAndDevice.signingPrivateKey
+  );
   await expect(
     (async () =>
       await acceptWorkspaceInvitation({
         graphql,
         workspaceInvitationId: "invalid",
         inviteeUsername: inviteeUserAndDevice.user.username,
-        inviteeMainDevice: inviteeUserAndDevice.mainDevice,
+        inviteeMainDevice: {
+          userId: inviteeUserAndDevice.user.id,
+          signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
+          encryptionPublicKey:
+            inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+          encryptionPublicKeySignature: encryptionPublicKeySignature,
+        },
         invitationSigningPrivateKey,
         authorizationHeader: inviteeUserAndDevice.sessionKey,
       }))()
@@ -139,6 +177,10 @@ test("invalid signature should throw error", async () => {
       expiresAt: new Date(Date.now() - 1000),
     },
   });
+  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+    inviteeUserAndDevice.signingPrivateKey
+  );
   const badSigningKeys = await sodium.crypto_sign_keypair();
   await expect(
     (async () =>
@@ -146,7 +188,13 @@ test("invalid signature should throw error", async () => {
         graphql,
         workspaceInvitationId: workspaceInvitationId,
         inviteeUsername: inviteeUserAndDevice.user.username,
-        inviteeMainDevice: inviteeUserAndDevice.mainDevice,
+        inviteeMainDevice: {
+          userId: inviteeUserAndDevice.user.id,
+          signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
+          encryptionPublicKey:
+            inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+          encryptionPublicKeySignature: encryptionPublicKeySignature,
+        },
         invitationSigningPrivateKey: badSigningKeys.privateKey,
         authorizationHeader: inviteeUserAndDevice.sessionKey,
       }))()
@@ -154,13 +202,23 @@ test("invalid signature should throw error", async () => {
 });
 
 test("Unauthenticated", async () => {
+  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+    inviteeUserAndDevice.signingPrivateKey
+  );
   await expect(
     (async () =>
       await acceptWorkspaceInvitation({
         graphql,
         workspaceInvitationId,
         inviteeUsername: inviteeUserAndDevice.user.username,
-        inviteeMainDevice: inviteeUserAndDevice.mainDevice,
+        inviteeMainDevice: {
+          userId: inviteeUserAndDevice.user.id,
+          signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
+          encryptionPublicKey:
+            inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+          encryptionPublicKeySignature: encryptionPublicKeySignature,
+        },
         invitationSigningPrivateKey,
         authorizationHeader: "badauthheader",
       }))()
