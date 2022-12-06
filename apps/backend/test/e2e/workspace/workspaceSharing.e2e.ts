@@ -5,6 +5,7 @@ import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { createWorkspaceInvitation } from "../../helpers/e2e/createWorkspaceInvitation";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { registerOnPage } from "../../helpers/e2e/registerOnPage";
+import { verifyPassword } from "../../helpers/e2e/verifyPassword";
 
 test.describe("Workspace Sharing", () => {
   let workspaceInvitationUrl = "";
@@ -52,9 +53,15 @@ test.describe("Workspace Sharing", () => {
     );
     await page.goto(workspaceInvitationUrl);
     await delayForSeconds(2);
+
     // click "accept"
     await page.locator('div[role="button"]:has-text("Accept")').click();
-    await delayForSeconds(5);
+    await verifyPassword({
+      page,
+      password,
+      throwIfNotOpen: true,
+    });
+    await delayForSeconds(2);
     // expect the new url to include the new workspace ID
     const pageUrl = page.url();
     expect(pageUrl).toBe(
