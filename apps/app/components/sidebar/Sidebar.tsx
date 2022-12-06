@@ -163,7 +163,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             },
           }}
           iconName={"settings-4-line"}
-          // @ts-expect-error needs fixing in the SidebarLink types
           disabled={!isAuthorizedForThisWorkspace}
         >
           Settings

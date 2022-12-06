@@ -1,5 +1,5 @@
 import React from "react";
-import Svg, { Path, Line, Defs, Stop, LinearGradient } from "react-native-svg";
+import Svg, { Defs, Line, LinearGradient, Path, Stop } from "react-native-svg";
 
 export type Props = { size: string };
 

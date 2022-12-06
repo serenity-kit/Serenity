@@ -14,6 +14,7 @@ export type ButtonVariants = "primary" | "secondary" | "danger";
 export type ButtonSizes = "sm" | "md" | "lg";
 
 export type ButtonProps = PressableProps & {
+  children: React.ReactNode;
   size?: ButtonSizes;
   variant?: ButtonVariants;
   isLoading?: boolean;
