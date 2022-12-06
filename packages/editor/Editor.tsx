@@ -1,4 +1,10 @@
-import { tw, useHasEditorSidebar, View } from "@serenity-tools/ui";
+import {
+  BoxShadow,
+  EditorBottombarButton,
+  tw,
+  useHasEditorSidebar,
+  View,
+} from "@serenity-tools/ui";
 import { EditorEvents } from "@tiptap/core";
 import Collaboration from "@tiptap/extension-collaboration";
 import { Level } from "@tiptap/extension-heading";
@@ -6,8 +12,9 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
-import { EditorContent, useEditor } from "@tiptap/react";
+import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { HStack } from "native-base";
 import React, { useRef, useState } from "react";
 import { Awareness } from "y-protocols/awareness";
 import * as Y from "yjs";
@@ -178,6 +185,42 @@ export const Editor = (props: EditorProps) => {
           headingLevels={headingLevels}
           encryptAndUploadFile={props.encryptAndUploadFile}
         />
+      )}
+      {hasEditorSidebar && editor && (
+        <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
+          <BoxShadow elevation={3} rounded>
+            <HStack
+              space={1}
+              style={tw`border border-gray-200 bg-white rounded p-0.5`}
+            >
+              <EditorBottombarButton
+                onPress={() => editor.chain().focus().toggleBold().run()}
+                name="bold"
+                isActive={editor.isActive("bold")}
+              />
+
+              <EditorBottombarButton
+                onPress={() => editor.chain().focus().toggleItalic().run()}
+                name="italic"
+                isActive={editor.isActive("italic")}
+              />
+
+              <EditorBottombarButton
+                onPress={() => editor.chain().focus().toggleCode().run()}
+                name="code-view"
+                isActive={editor.isActive("code")}
+              />
+
+              <EditorBottombarButton
+                onPress={() =>
+                  editor.chain().focus().toggleLink({ href: "#" }).run()
+                }
+                name="link"
+                isActive={editor.isActive("link")}
+              />
+            </HStack>
+          </BoxShadow>
+        </BubbleMenu>
       )}
     </div>
   );
