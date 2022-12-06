@@ -88,7 +88,7 @@ test.describe("Edit document", () => {
     await page.goBack();
     const user2Context = await browser.newContext();
     const user2Page = await user2Context.newPage();
-    await user2Page.goto("http://localhost:3000/login");
+    await user2Page.goto("http://localhost:19006/login");
     await e2eLoginUser({
       page: user2Page,
       username: user2.username,
@@ -99,6 +99,7 @@ test.describe("Edit document", () => {
       page: user2Page,
       workspaceInvitationUrl,
       sharedWorkspaceId: user1.data.workspace.id,
+      password: user2.password,
     });
     await delayForSeconds(5);
     const user1Url = page.url();
@@ -223,7 +224,7 @@ test.describe("Edit document in subfolder", () => {
     await page.goBack();
     const user2Context = await browser.newContext();
     const user2Page = await user2Context.newPage();
-    await user2Page.goto("http://localhost:3000/login");
+    await user2Page.goto("http://localhost:19006/login");
     await e2eLoginUser({
       page: user2Page,
       username: user2.username,
@@ -234,6 +235,7 @@ test.describe("Edit document in subfolder", () => {
       page: user2Page,
       workspaceInvitationUrl,
       sharedWorkspaceId: user1.data.workspace.id,
+      password: user2.password,
     });
     await delayForSeconds(5);
     const user1Url = page.url();

@@ -151,7 +151,7 @@ yarn workspace serenity dev:e2e
 yarn workspace backend test:e2e
 ```
 
-The tests will use a separate database for the tests and a separate expo webpack server on http://localhost:3000/
+The tests will use a separate database for the tests and a separate expo webpack server on http://localhost:19006/
 
 The tests on the CI run with production build. The commands are available in the Github Actions file.
 

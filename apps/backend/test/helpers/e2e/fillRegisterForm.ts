@@ -22,7 +22,7 @@ export const fillRegisterForm = async ({ page, username, password }: Props) => {
   });
   expect(unverifiedUser).not.toBe(null);
   const confirmationCode = unverifiedUser?.confirmationCode || "";
-  const confirmRegistrationUrl = `http://localhost:3000/registration-verification?username=${encodeURIComponent(
+  const confirmRegistrationUrl = `http://localhost:19006/registration-verification?username=${encodeURIComponent(
     username
   )}&verification=${encodeURIComponent(confirmationCode)}`;
 

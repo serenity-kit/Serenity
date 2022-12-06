@@ -100,8 +100,7 @@ export default async function createServer() {
   // Note: on staging we also want the dev setup to be able to connect
   const allowedList = [
     "https://www.serenity.li", // production web app
-    "http://localhost:19006", // development web app
-    "http://localhost:3000", // e2e web app
+    "http://localhost:19006", // development & e2e web app
     "http://localhost:4000", // needed for GraphiQL in development
     "http://localhost:4001", // needed for GraphiQL in e2e
   ];

@@ -8,7 +8,7 @@ export const createFirstWorkspace = async ({
   page,
   workspaceName,
 }: CreateFirstWorkspaceProps) => {
-  await expect(page).toHaveURL("http://localhost:3000/onboarding");
+  await expect(page).toHaveURL("http://localhost:19006/onboarding");
   // Fill in the new workspace name
   await page
     .locator(

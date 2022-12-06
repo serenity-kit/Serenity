@@ -24,7 +24,7 @@ const expectResults = async ({
   await delayForSeconds(3);
   // TODO: get the workspace id and expect URL to match
   await expect(page).toHaveURL(
-    `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
+    `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
   );
 };
 

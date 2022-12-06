@@ -29,7 +29,7 @@ const expectResults = async ({
   await delayForSeconds(3);
   // TODO: get the workspace id and expect URL to match
   await expect(page).toHaveURL(
-    `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
+    `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
   );
 };
 
@@ -37,7 +37,7 @@ test("Register and reload before onboarding", async ({ page }) => {
   const username = `${uuidv4()}@example.com`;
   const password = "password";
   const workspaceName = "my workspace";
-  await page.goto("http://localhost:3000/register");
+  await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
   const registrationResult = await registerWithoutOnboarding({
     page,
@@ -47,9 +47,9 @@ test("Register and reload before onboarding", async ({ page }) => {
   expect(registrationResult).not.toBeUndefined();
   expect(registrationResult.user).not.toBe(null);
   expect(registrationResult.mainDevice).not.toBe(null);
-  await expect(page).toHaveURL("http://localhost:3000/onboarding");
+  await expect(page).toHaveURL("http://localhost:19006/onboarding");
   await reloadPage({ page });
-  await expect(page).toHaveURL("http://localhost:3000/onboarding");
+  await expect(page).toHaveURL("http://localhost:19006/onboarding");
   const createWorkspaceResult = await createWorkspaceOnOnboarding({
     page,
     username,
@@ -70,7 +70,7 @@ test("Register and re-login before onboarding", async ({ page }) => {
   const username = `${uuidv4()}@example.com`;
   const password = "password";
   const workspaceName = "my workspace";
-  await page.goto("http://localhost:3000/register");
+  await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
   const registrationResult = await registerWithoutOnboarding({
     page,
@@ -80,10 +80,10 @@ test("Register and re-login before onboarding", async ({ page }) => {
   expect(registrationResult).not.toBeUndefined();
   expect(registrationResult.user).not.toBe(null);
   expect(registrationResult.mainDevice).not.toBe(null);
-  await expect(page).toHaveURL("http://localhost:3000/onboarding");
-  await page.goto("http://localhost:3000/register");
+  await expect(page).toHaveURL("http://localhost:19006/onboarding");
+  await page.goto("http://localhost:19006/register");
   await login({ page, username, password, stayLoggedIn: true });
-  await expect(page).toHaveURL("http://localhost:3000/onboarding");
+  await expect(page).toHaveURL("http://localhost:19006/onboarding");
   const createWorkspaceResult = await createWorkspaceOnOnboarding({
     page,
     username,

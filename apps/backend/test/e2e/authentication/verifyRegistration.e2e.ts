@@ -11,7 +11,7 @@ test("Register Properly", async ({ page }) => {
   const username = `${uuidv4()}@example.com`;
   const password = "password";
   // Go to registration url
-  await page.goto("http://localhost:3000/register");
+  await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
   const { confirmationCode } = await fillRegisterForm({
     page,
@@ -19,13 +19,13 @@ test("Register Properly", async ({ page }) => {
     password,
   });
   await verifyRegistration({ page, confirmationCode });
-  await expect(page).toHaveURL("http://localhost:3000/onboarding");
+  await expect(page).toHaveURL("http://localhost:19006/onboarding");
 });
 
 test("One wrong code", async ({ page }) => {
   const username = `${uuidv4()}@example.com`;
   const password = "password";
-  await page.goto("http://localhost:3000/register");
+  await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
   const { confirmationCode } = await fillRegisterForm({
     page,
@@ -40,13 +40,13 @@ test("One wrong code", async ({ page }) => {
 
   await verifyRegistration({ page, confirmationCode });
   // TODO: get the workspace id and expect URL to match
-  await expect(page).toHaveURL("http://localhost:3000/onboarding");
+  await expect(page).toHaveURL("http://localhost:19006/onboarding");
 });
 
 test("max wrong codes", async ({ page }) => {
   const username = `${uuidv4()}@example.com`;
   const password = "password";
-  await page.goto("http://localhost:3000/register");
+  await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
 
   const { confirmationCode } = await fillRegisterForm({
@@ -85,5 +85,5 @@ test("max wrong codes", async ({ page }) => {
 
   await verifyRegistration({ page, confirmationCode: newConfirmationCode });
   // TODO: get the workspace id and expect URL to match
-  await expect(page).toHaveURL("http://localhost:3000/onboarding");
+  await expect(page).toHaveURL("http://localhost:19006/onboarding");
 });

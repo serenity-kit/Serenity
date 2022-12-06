@@ -9,7 +9,7 @@ export type Props = {
   workspaceName: string;
 };
 export const register = async ({ page, username, password, workspaceName }) => {
-  await page.goto("http://localhost:3000/register");
+  await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
   const result = await e2eRegisterUser({
     page,

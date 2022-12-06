@@ -19,7 +19,7 @@ export const registerWithoutOnboarding = async ({
     password,
   });
   await verifyRegistration({ page, confirmationCode });
-  await expect(page).toHaveURL("http://localhost:3000/onboarding");
+  await expect(page).toHaveURL("http://localhost:19006/onboarding");
   const user = await prisma.user.findFirst({
     where: { username },
   });
