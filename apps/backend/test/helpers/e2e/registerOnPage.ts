@@ -29,7 +29,7 @@ export const registerOnPage = async ({
   // Click "register button"
   await page.locator('div[role="button"]:has-text("Register")').click();
 
-  await delayForSeconds(1);
+  await delayForSeconds(2);
   // unverified user should have been created
   const unverifiedUser = await prisma.unverifiedUser.findFirst({
     where: { username },
