@@ -5,6 +5,7 @@ import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { createWorkspaceInvitation } from "../../helpers/e2e/createWorkspaceInvitation";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { registerOnPage } from "../../helpers/e2e/registerOnPage";
+import { verifyPassword } from "../../helpers/e2e/verifyPassword";
 
 test.describe("Workspace Sharing", () => {
   let workspaceInvitationUrl = "";
@@ -22,13 +23,13 @@ test.describe("Workspace Sharing", () => {
     sharedWorkspaceId = workspace.id;
     await delayForSeconds(2);
     // const workspaceName = "sharable";
-    // await page.goto("http://localhost:3000/register");
+    // await page.goto("http://localhost:19006/register");
     // await registerOnPage({ page, username, password, workspaceName });
-    await page.goto("http://localhost:3000/login");
+    await page.goto("http://localhost:19006/login");
     await e2eLoginUser({ page, username, password });
     await delayForSeconds(2);
     await expect(page).toHaveURL(
-      `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
+      `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
     );
     const { url } = await createWorkspaceInvitation({ page });
     workspaceInvitationUrl = url;
@@ -44,21 +45,27 @@ test.describe("Workspace Sharing", () => {
       password,
     });
     await delayForSeconds(2);
-    await page.goto("http://localhost:3000/login");
+    await page.goto("http://localhost:19006/login");
     await e2eLoginUser({ page, username, password });
     await delayForSeconds(2);
     await expect(page).toHaveURL(
-      `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
+      `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
     );
     await page.goto(workspaceInvitationUrl);
     await delayForSeconds(2);
+
     // click "accept"
     await page.locator('div[role="button"]:has-text("Accept")').click();
-    await delayForSeconds(5);
+    await verifyPassword({
+      page,
+      password,
+      throwIfNotOpen: true,
+    });
+    await delayForSeconds(2);
     // expect the new url to include the new workspace ID
     const pageUrl = page.url();
     expect(pageUrl).toBe(
-      `http://localhost:3000/workspace/${sharedWorkspaceId}/lobby`
+      `http://localhost:19006/workspace/${sharedWorkspaceId}/lobby`
     );
   });
 
@@ -80,7 +87,7 @@ test.describe("Workspace Sharing", () => {
     const pageUrl = page.url();
     const lastIndexOfSlash = pageUrl.lastIndexOf("/");
     expect(pageUrl).toBe(
-      `http://localhost:3000/workspace/${sharedWorkspaceId}/lobby`
+      `http://localhost:19006/workspace/${sharedWorkspaceId}/lobby`
     );
   });
 
@@ -99,7 +106,7 @@ test.describe("Workspace Sharing", () => {
     const pageUrl = page.url();
     const lastIndexOfSlash = pageUrl.lastIndexOf("/");
     expect(pageUrl).toBe(
-      `http://localhost:3000/workspace/${sharedWorkspaceId}/lobby`
+      `http://localhost:19006/workspace/${sharedWorkspaceId}/lobby`
     );
   });
 });

@@ -127,6 +127,10 @@ test("user can remove another user", async () => {
   await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId: workspaceInvitationId,
+    inviteeUsername: userData2.user.username,
+    inviteeMainDevice: userData2.mainDevice,
+    invitationSigningPrivateKey:
+      workspaceInvitationResult.invitationSigningPrivateKey,
     authorizationHeader: userData2.sessionKey,
   });
   const user2DeviceKeyBox = await encryptWorkspaceKeyForDevice({
@@ -254,6 +258,10 @@ test("user can rotate key for multiple devices", async () => {
   await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId: workspaceInvitationId,
+    inviteeUsername: userData2.user.username,
+    inviteeMainDevice: userData2.mainDevice,
+    invitationSigningPrivateKey:
+      workspaceInvitationResult.invitationSigningPrivateKey,
     authorizationHeader: userData2.sessionKey,
   });
   const user2DeviceKeyBox = await encryptWorkspaceKeyForDevice({

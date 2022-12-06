@@ -12,6 +12,7 @@ export default function RootScreen(props: RootStackScreenProps<"Root">) {
       navigation: props.navigation,
     },
   });
+  console.log("ROOT");
 
   // react-navigation in certain situations does not unmount screens and therefor we need to trigger
   // a fresh start of the machine when the screen is focused again

@@ -1,5 +1,9 @@
 query pendingWorkspaceInvitation {
   pendingWorkspaceInvitation {
     id
+    ciphertext
+    publicNonce
+    subkeyId
+    encryptionKeySalt
   }
 }

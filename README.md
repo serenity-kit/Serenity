@@ -151,7 +151,7 @@ yarn workspace serenity dev:e2e
 yarn workspace backend test:e2e
 ```
 
-The tests will use a separate database for the tests and a separate expo webpack server on http://localhost:3000/
+The tests will use a separate database for the tests and a separate expo webpack server on http://localhost:19006/
 
 The tests on the CI run with production build. The commands are available in the Github Actions file.
 
@@ -181,6 +181,18 @@ flyctl secrets set DATABASE_URL=<db_connection_url>/naisho
 ```
 
 Update DATABASE_URL in Github secrets with <db_connection_url>/naisho
+
+### Wipe the Staging DB @ fly.io
+
+```sh
+flyctl postgres connect --app serenity-dev-db
+# in the psql console run
+SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+WHERE pg_stat_activity.datname = 'serenity';
+
+drop database serenity;
+```
 
 ## Folder/File Naming Convention
 

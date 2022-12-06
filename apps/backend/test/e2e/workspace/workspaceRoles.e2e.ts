@@ -44,7 +44,7 @@ test.describe("Workspace Sharing", () => {
   let workspaceInvitationUrl = "";
 
   test("Change member role", async ({ browser, page }) => {
-    await page.goto("http://localhost:3000/login");
+    await page.goto("http://localhost:19006/login");
     await e2eLoginUser({
       page,
       username: user1.username,
@@ -57,7 +57,7 @@ test.describe("Workspace Sharing", () => {
     // now accept for both users
     const user2Context = await browser.newContext();
     const user2Page = await user2Context.newPage();
-    await user2Page.goto("http://localhost:3000/login");
+    await user2Page.goto("http://localhost:19006/login");
     await e2eLoginUser({
       page: user2Page,
       username: user2.username,
@@ -68,6 +68,7 @@ test.describe("Workspace Sharing", () => {
       page: user2Page,
       workspaceInvitationUrl,
       sharedWorkspaceId: user1.data.workspace.id,
+      password: user2.password,
     });
     await delayForSeconds(5);
     await reloadPage({ page });

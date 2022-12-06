@@ -1,33 +1,64 @@
+import sodium from "@serenity-tools/libsodium";
+import canonicalize from "canonicalize";
 import {
-  AcceptWorkspaceInvitationDocument,
-  AcceptWorkspaceInvitationMutation,
-  AcceptWorkspaceInvitationMutationVariables,
+  runAcceptWorkspaceInvitationMutation,
+  runMeQuery,
   Workspace,
 } from "../../generated/graphql";
-import { getUrqlClient } from "../urqlClient/urqlClient";
+import { Device } from "../../types/Device";
 
 export type Props = {
   workspaceInvitationId: string;
+  mainDevice: Device;
+  signingPrivateKey: string;
 };
 
 export const acceptWorkspaceInvitation = async ({
   workspaceInvitationId,
+  mainDevice,
+  signingPrivateKey,
 }: Props): Promise<Workspace | undefined> => {
-  const result = await getUrqlClient()
-    .mutation<
-      AcceptWorkspaceInvitationMutation,
-      AcceptWorkspaceInvitationMutationVariables
-    >(
-      AcceptWorkspaceInvitationDocument,
-      {
-        input: { workspaceInvitationId },
+  const meResult = await runMeQuery({});
+  if (!meResult.data?.me) {
+    throw new Error(meResult.error?.message || "Could not fetch me");
+  }
+  const me = meResult.data.me;
+  const safeMainDevice = {
+    userId: me.id,
+    signingPublicKey: mainDevice.signingPublicKey,
+    encryptionPublicKey: mainDevice.encryptionPublicKey,
+    encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature!,
+  };
+  if (!safeMainDevice.encryptionPublicKeySignature) {
+    safeMainDevice.encryptionPublicKeySignature =
+      await sodium.crypto_sign_detached(
+        safeMainDevice.encryptionPublicKey,
+        mainDevice.signingPrivateKey!
+      );
+  }
+  const inviteeInfo = canonicalize({
+    username: me.username,
+    mainDevice: {
+      signingPublicKey: safeMainDevice.signingPublicKey,
+      encryptionPublicKey: safeMainDevice.encryptionPublicKey,
+      encryptionPublicKeySignature: safeMainDevice.encryptionPublicKeySignature,
+    },
+  });
+  const inviteeUsernameAndDeviceSignature = await sodium.crypto_sign_detached(
+    inviteeInfo!,
+    signingPrivateKey
+  );
+  const result = await runAcceptWorkspaceInvitationMutation(
+    {
+      input: {
+        workspaceInvitationId,
+        inviteeUsername: me.username,
+        inviteeMainDevice: safeMainDevice,
+        inviteeUsernameAndDeviceSignature,
       },
-      {
-        // better to be safe here and always refetch
-        requestPolicy: "network-only",
-      }
-    )
-    .toPromise();
+    },
+    { requestPolicy: "network-only" }
+  );
   if (result.error) {
     throw new Error(result.error.message);
   }

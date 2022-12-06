@@ -1,3 +1,4 @@
+import sodium from "@serenity-tools/libsodium";
 import {
   Button,
   Description,
@@ -6,6 +7,7 @@ import {
   tw,
   View,
 } from "@serenity-tools/ui";
+import canonicalize from "canonicalize";
 import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
 import { Platform, StyleSheet } from "react-native";
@@ -44,6 +46,10 @@ export function CreateWorkspaceInvitation(props: Props) {
     useDeleteWorkspaceInvitationsMutation();
   const [selectedWorkspaceInvitationId, setSelectedWorkspaceInvitationId] =
     useState<string | null>(null);
+  const [
+    selectedWorkspaceInvitationSigningPrivateKey,
+    setSelectedWorkspaceInvitationSigningPrivateKey,
+  ] = useState<string | null>(null);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [isClipboardNoticeActive, setIsClipboardNoticeActive] =
     useState<boolean>(false);
@@ -51,6 +57,9 @@ export function CreateWorkspaceInvitation(props: Props) {
 
   const getWorkspaceInvitationText = () => {
     if (!selectedWorkspaceInvitationId) {
+      return;
+    }
+    if (!selectedWorkspaceInvitationSigningPrivateKey) {
       return;
     }
     const rootUrl =
@@ -62,7 +71,7 @@ export function CreateWorkspaceInvitation(props: Props) {
             `http://localhost:19006/`
         : "https://www.serenity.li";
 
-    return `You are invited to a Serenity Workspace. To join, use this link to accept the invitation:\n${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}`;
+    return `You are invited to a Serenity Workspace. To join, use this link to accept the invitation:\n${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}#key=${selectedWorkspaceInvitationSigningPrivateKey}`;
   };
 
   const createWorkspaceInvitationPreflight = async () => {
@@ -75,10 +84,30 @@ export function CreateWorkspaceInvitation(props: Props) {
   };
 
   const createWorkspaceInvitation = async () => {
+    const invitationSigningKeys = await sodium.crypto_sign_keypair();
+    const invitationIdLengthBytes = 24;
+    const invitationId = await sodium.randombytes_buf(invitationIdLengthBytes);
+    const currentTime = new Date();
+    const twoDaysMillis = 2 * 24 * 60 * 60 * 1000;
+    const expiresAt = new Date(currentTime.getTime() + twoDaysMillis);
+    const invitationData = canonicalize({
+      workspaceId,
+      invitationId,
+      invitationPublicSigningKey: invitationSigningKeys.publicKey,
+      expiresAtMillis: expiresAt.getTime(),
+    });
+    const invitationDataSignature = await sodium.crypto_sign_detached(
+      invitationData!,
+      invitationSigningKeys.privateKey
+    );
     const createWorkspaceInvitationResult =
       await createWorkspaceInvitationMutation({
         input: {
           workspaceId,
+          invitationId,
+          invitationSigningPublicKey: invitationSigningKeys.publicKey,
+          expiresAt,
+          invitationDataSignature,
         },
       });
     refetchWorkspaceInvitationsResult();
@@ -90,6 +119,9 @@ export function CreateWorkspaceInvitation(props: Props) {
         .createWorkspaceInvitation.workspaceInvitation as WorkspaceInvitation;
       props.onWorkspaceInvitationCreated({ workspaceInvitation });
       setSelectedWorkspaceInvitationId(workspaceInvitation.id);
+      setSelectedWorkspaceInvitationSigningPrivateKey(
+        invitationSigningKeys.privateKey
+      );
     }
   };
 

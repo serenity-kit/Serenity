@@ -1,3 +1,4 @@
+import { decryptWorkspaceInvitationKey } from "@serenity-tools/common";
 import {
   Box,
   Button,
@@ -19,6 +20,7 @@ import {
 } from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { createDeviceWithInfo } from "../../../utils/authentication/createDeviceWithInfo";
+import { getExportKey } from "../../../utils/authentication/exportKeyStore";
 import {
   fetchMainDevice,
   login,
@@ -31,6 +33,7 @@ import {
   isUsernamePasswordStored,
 } from "../../../utils/authentication/registrationMemoryStore";
 import { setDevice } from "../../../utils/device/deviceStore";
+import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import {
   removeWebDevice,
   setWebDevice,
@@ -38,7 +41,7 @@ import {
 import { removeLastUsedWorkspaceId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
 import { attachDeviceToWorkspaces } from "../../../utils/workspace/attachDeviceToWorkspaces";
-import { getPendingWorkspaceInvitationId } from "../../../utils/workspace/getPendingWorkspaceInvitationId";
+import { getPendingWorkspaceInvitation } from "../../../utils/workspace/getPendingWorkspaceInvitation";
 
 type VerificationError = "none" | "invalidCode" | "maxRetries" | "invalidUser";
 
@@ -66,14 +69,33 @@ export default function RegistrationVerificationScreen(
     props.navigation.push("Login");
   };
 
-  const acceptPendingWorkspaceInvitation = async () => {
-    const pendingWorkspaceInvitationId = await getPendingWorkspaceInvitationId(
-      {}
-    );
-    if (pendingWorkspaceInvitationId) {
+  const acceptPendingWorkspaceInvitation = async (exportKey: string) => {
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      console.error("No main device found!");
+      return;
+    }
+    const pendingWorkspaceInvitation = await getPendingWorkspaceInvitation({});
+    if (pendingWorkspaceInvitation) {
+      if (!exportKey) {
+        // TODO: display error in UI
+        console.error(
+          "Unable to retrieve export key necessary for decrypting workspace invitation"
+        );
+        return;
+      }
+      const signingPrivateKey = await decryptWorkspaceInvitationKey({
+        exportKey,
+        subkeyId: pendingWorkspaceInvitation.subkeyId!,
+        ciphertext: pendingWorkspaceInvitation.ciphertext!,
+        publicNonce: pendingWorkspaceInvitation.publicNonce!,
+        encryptionKeySalt: pendingWorkspaceInvitation.encryptionKeySalt!,
+      });
       try {
         await acceptWorkspaceInvitation({
-          workspaceInvitationId: pendingWorkspaceInvitationId,
+          workspaceInvitationId: pendingWorkspaceInvitation.id!,
+          mainDevice,
+          signingPrivateKey,
         });
       } catch (error) {
         setGraphqlError(error.message);
@@ -107,8 +129,9 @@ export default function RegistrationVerificationScreen(
         device: unsafedDevice,
         useExtendedLogin,
       });
+      const exportKey = loginResult.result.exportKey;
       await fetchMainDevice({
-        exportKey: loginResult.result.exportKey,
+        exportKey,
       });
 
       if (Platform.OS === "web") {
@@ -130,8 +153,7 @@ export default function RegistrationVerificationScreen(
         console.error(error);
         return;
       }
-
-      await acceptPendingWorkspaceInvitation();
+      await acceptPendingWorkspaceInvitation(exportKey);
       navigateToNextAuthenticatedPage({
         navigation: props.navigation,
         pendingWorkspaceInvitationId: null,

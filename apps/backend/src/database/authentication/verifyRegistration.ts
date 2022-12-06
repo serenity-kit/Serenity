@@ -64,6 +64,14 @@ const createDevicesAndUser = async (
         },
       },
       pendingWorkspaceInvitationId: unverifiedUser.pendingWorkspaceInvitationId,
+      pendingWorkspaceInvitationKeySubkeyId:
+        unverifiedUser.pendingWorkspaceInvitationKeySubkeyId,
+      pendingWorkspaceInvitationKeyCiphertext:
+        unverifiedUser.pendingWorkspaceInvitationKeyCiphertext,
+      pendingWorkspaceInvitationKeyPublicNonce:
+        unverifiedUser.pendingWorkspaceInvitationKeyPublicNonce,
+      pendingWorkspaceInvitationKeyEncryptionSalt:
+        unverifiedUser.pendingWorkspaceInvitationKeyEncryptionSalt,
     },
   });
   await prisma.unverifiedUser.delete({

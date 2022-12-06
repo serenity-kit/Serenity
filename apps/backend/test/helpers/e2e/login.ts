@@ -9,7 +9,7 @@ export type Prop = {
   stayLoggedIn?: boolean;
 };
 export const login = async ({ page, username, password, stayLoggedIn }) => {
-  await page.goto("http://localhost:3000/login");
+  await page.goto("http://localhost:19006/login");
   await delayForSeconds(2);
   return e2eLoginUser({ page, username, password, stayLoggedIn });
 };

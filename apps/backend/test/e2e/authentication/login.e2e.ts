@@ -14,11 +14,11 @@ test("Login without remembering web keys", async ({ page }) => {
     password,
   });
 
-  await page.goto("http://localhost:3000/login");
+  await page.goto("http://localhost:19006/login");
   await e2eLoginUser({ page, username, password, stayLoggedIn: false });
   delayForSeconds(3);
   await expect(page).toHaveURL(
-    `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
+    `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
   );
 });
 
@@ -31,29 +31,29 @@ test("Login and remember web keys", async ({ page }) => {
     password,
   });
 
-  await page.goto("http://localhost:3000/login");
+  await page.goto("http://localhost:19006/login");
   await e2eLoginUser({ page, username, password, stayLoggedIn: true });
   delayForSeconds(3);
   await expect(page).toHaveURL(
-    `http://localhost:3000/workspace/${workspace.id}/page/${document.id}`
+    `http://localhost:19006/workspace/${workspace.id}/page/${document.id}`
   );
 });
 
 test("Register then Login", async ({ page }) => {
   const username = `${uuidv4()}@example.com`;
   const password = "pass";
-  await page.goto("http://localhost:3000/register");
+  await page.goto("http://localhost:19006/register");
   const { workspace, document } = await e2eRegisterUser({
     page,
     username,
     password,
     workspaceName: uuidv4(),
   });
-  await page.goto("http://localhost:3000/login");
+  await page.goto("http://localhost:19006/login");
   delayForSeconds(3);
   await e2eLoginUser({ page, username, password, stayLoggedIn: true });
   delayForSeconds(3);
   await expect(page).toHaveURL(
-    `http://localhost:3000/workspace/${workspace?.id}/page/${document?.id}`
+    `http://localhost:19006/workspace/${workspace?.id}/page/${document?.id}`
   );
 });

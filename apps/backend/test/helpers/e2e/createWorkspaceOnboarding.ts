@@ -68,7 +68,7 @@ export const createWorkspaceOnOnboarding = async ({
   expect(document).not.toBe(null);
   const documentId = document?.id;
   await expect(page).toHaveURL(
-    `http://localhost:3000/workspace/${workspaceId}/page/${documentId}`
+    `http://localhost:19006/workspace/${workspaceId}/page/${documentId}`
   );
   const folder = await prisma.folder.findFirst({
     where: { workspaceId },
@@ -80,7 +80,7 @@ export const createWorkspaceOnOnboarding = async ({
     },
   });
   await expect(page).toHaveURL(
-    `http://localhost:3000/workspace/${workspaceId}/page/${documentId}`
+    `http://localhost:19006/workspace/${workspaceId}/page/${documentId}`
   );
   const formattedFolder = formatFolder(folder);
   const formattedDocument = formatDocument(document);

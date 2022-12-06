@@ -27,6 +27,10 @@ export const FinishRegistrationInput = inputObjectType({
     t.nonNull.string("registrationId");
     t.nonNull.field("mainDevice", { type: FinishRegistrationDeviceInput });
     t.string("pendingWorkspaceInvitationId");
+    t.int("pendingWorkspaceInvitationKeySubkeyId");
+    t.string("pendingWorkspaceInvitationKeyCiphertext");
+    t.string("pendingWorkspaceInvitationKeyPublicNonce");
+    t.string("pendingWorkspaceInvitationKeyEncryptionSalt");
   },
 });
 
@@ -58,6 +62,14 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
       opaqueEnvelope: envelope,
       mainDevice: args.input.mainDevice,
       pendingWorkspaceInvitationId: args.input.pendingWorkspaceInvitationId,
+      pendingWorkspaceInvitationKeySubkeyId:
+        args.input.pendingWorkspaceInvitationKeySubkeyId,
+      pendingWorkspaceInvitationKeyCiphertext:
+        args.input.pendingWorkspaceInvitationKeyCiphertext,
+      pendingWorkspaceInvitationKeyPublicNonce:
+        args.input.pendingWorkspaceInvitationKeyPublicNonce,
+      pendingWorkspaceInvitationKeyEncryptionSalt:
+        args.input.pendingWorkspaceInvitationKeyEncryptionSalt,
     });
     return {
       id: unverifiedUser.id,

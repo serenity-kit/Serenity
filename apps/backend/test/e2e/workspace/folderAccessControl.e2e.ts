@@ -67,10 +67,10 @@ test.describe("Workspace Sharing", () => {
 
   test("User 1 can create a sharing link", async ({ browser, page }) => {
     // const workspaceName = "sharable";
-    // await page.goto("http://localhost:3000/register");
+    // await page.goto("http://localhost:19006/register");
     // await registerOnPage({ page, username, password, workspaceName });
 
-    await page.goto("http://localhost:3000/login");
+    await page.goto("http://localhost:19006/login");
     await e2eLoginUser({
       page,
       username: user1.username,
@@ -86,7 +86,7 @@ test.describe("Workspace Sharing", () => {
     // now accept for both users
     const user2Context = await browser.newContext();
     const user2Page = await user2Context.newPage();
-    await user2Page.goto("http://localhost:3000/login");
+    await user2Page.goto("http://localhost:19006/login");
     await e2eLoginUser({
       page: user2Page,
       username: user2.username,
@@ -97,6 +97,7 @@ test.describe("Workspace Sharing", () => {
       page: user2Page,
       workspaceInvitationUrl,
       sharedWorkspaceId: user1.data.workspace.id,
+      password: user2.password,
     });
     await delayForSeconds(5);
     // await renameFolder(user2Page, user1.data.folder.id, "user2 renamed");
@@ -104,7 +105,7 @@ test.describe("Workspace Sharing", () => {
     // can this user read the folders?
     const user3Context = await browser.newContext();
     const user3Page = await user3Context.newPage();
-    await user3Page.goto("http://localhost:3000/login");
+    await user3Page.goto("http://localhost:19006/login");
     await e2eLoginUser({
       page: user3Page,
       username: user3.username,
@@ -115,6 +116,7 @@ test.describe("Workspace Sharing", () => {
       page: user3Page,
       workspaceInvitationUrl,
       sharedWorkspaceId: user1.data.workspace.id,
+      password: user3.password,
     });
     await delayForSeconds(5);
     // await renameFolder(user3Page, user1.data.folder.id, "user3 renamed");
@@ -132,7 +134,7 @@ test.describe("Workspace Sharing", () => {
     await reloadPage({ page: user3Page });
     await delayForSeconds(4);
     const user3Url = user3Page.url();
-    const expectedUser3Url = `http://localhost:3000/workspace/${user1.data.workspace.id}/not-found`;
+    const expectedUser3Url = `http://localhost:19006/workspace/${user1.data.workspace.id}/not-found`;
     const invalidAccessMessage = user3Page.locator(
       "data-testid=no-access-to-workspace-error"
     );
@@ -148,6 +150,7 @@ test.describe("Workspace Sharing", () => {
       page: user3Page,
       workspaceInvitationUrl,
       sharedWorkspaceId: user1.data.workspace.id,
+      password: user3.password,
     });
     await delayForSeconds(2);
     await renameFolder(user3Page, user1.data.folder.id, "user3 re-added");

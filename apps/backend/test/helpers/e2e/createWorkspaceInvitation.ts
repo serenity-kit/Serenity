@@ -23,7 +23,7 @@ export const createWorkspaceInvitation = async ({ page }: Props) => {
   const linkInfoWords = linkInfoText?.replace(/\n/g, " ").split(" ") || "";
   const workspaceInvitationUrl = linkInfoWords[linkInfoWords.length - 1];
   expect(workspaceInvitationUrl).toContain(
-    "http://localhost:3000/accept-workspace-invitation/"
+    "http://localhost:19006/accept-workspace-invitation/"
   );
   return { url: workspaceInvitationUrl };
 };

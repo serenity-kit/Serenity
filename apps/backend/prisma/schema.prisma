@@ -63,46 +63,54 @@ model Update {
 }
 
 model UnverifiedUser {
-  id                                         String    @id @default(uuid())
-  username                                   String
-  opaqueEnvelope                             String
+  id                                          String    @id @default(uuid())
+  username                                    String
+  opaqueEnvelope                              String
   // contains the device signingPrivateKey and encryptionPrivateKey
   // can be decrypted using the key storred in the OPAQUE envelope
-  passwordResetOneTimePassword               String?
-  passwordResetOneTimePasswordExpireDateTime DateTime?
-  confirmationCode                           String    @default(uuid())
-  confirmationTryCounter                     Int       @default(0)
-  mainDeviceNonce                            String    @unique
-  mainDeviceCiphertext                       String
-  mainDeviceEncryptionKeySalt                String
-  mainDeviceSigningPublicKey                 String    @unique
-  mainDeviceEncryptionPublicKey              String    @unique
-  mainDeviceEncryptionPublicKeySignature     String    @unique
-  pendingWorkspaceInvitationId               String?
+  passwordResetOneTimePassword                String?
+  passwordResetOneTimePasswordExpireDateTime  DateTime?
+  confirmationCode                            String    @default(uuid())
+  confirmationTryCounter                      Int       @default(0)
+  mainDeviceNonce                             String    @unique
+  mainDeviceCiphertext                        String
+  mainDeviceEncryptionKeySalt                 String
+  mainDeviceSigningPublicKey                  String    @unique
+  mainDeviceEncryptionPublicKey               String    @unique
+  mainDeviceEncryptionPublicKeySignature      String    @unique
+  pendingWorkspaceInvitationId                String?
+  pendingWorkspaceInvitationKeySubkeyId       Int?
+  pendingWorkspaceInvitationKeyCiphertext     String?
+  pendingWorkspaceInvitationKeyPublicNonce    String?
+  pendingWorkspaceInvitationKeyEncryptionSalt String?
 }
 
 model User {
-  id                                         String                 @id @default(uuid())
-  username                                   String                 @unique
-  opaqueEnvelope                             String
+  id                                          String                 @id @default(uuid())
+  username                                    String                 @unique
+  opaqueEnvelope                              String
   // contains the device signingPrivateKey and encryptionPrivateKey
   // can be decrypted using the key storred in the OPAQUE envelope
-  mainDeviceCiphertext                       String
+  mainDeviceCiphertext                        String
   // nonce to decrypt the mainDeviceCiphertext
-  mainDeviceNonce                            String                 @unique
-  mainDeviceEncryptionKeySalt                String
-  mainDevice                                 Device                 @relation(name: "mainDevice", fields: [mainDeviceSigningPublicKey], references: [signingPublicKey])
-  mainDeviceSigningPublicKey                 String                 @unique
-  devices                                    Device[]
-  recoveryDevice                             RecoveryDevice?
-  passwordResetOneTimePassword               String?
-  passwordResetOneTimePasswordExpireDateTime DateTime?
-  usersToWorkspaces                          UsersToWorkspaces[]
-  workspaceInvitations                       WorkspaceInvitations[]
-  sessions                                   Session[]
-  pendingWorkspaceInvitationId               String?
-  creatorDevices                             CreatorDevice[]
-  documentShareLinks                         DocumentShareLink[]
+  mainDeviceNonce                             String                 @unique
+  mainDeviceEncryptionKeySalt                 String
+  mainDevice                                  Device                 @relation(name: "mainDevice", fields: [mainDeviceSigningPublicKey], references: [signingPublicKey])
+  mainDeviceSigningPublicKey                  String                 @unique
+  devices                                     Device[]
+  recoveryDevice                              RecoveryDevice?
+  passwordResetOneTimePassword                String?
+  passwordResetOneTimePasswordExpireDateTime  DateTime?
+  usersToWorkspaces                           UsersToWorkspaces[]
+  workspaceInvitations                        WorkspaceInvitations[]
+  sessions                                    Session[]
+  pendingWorkspaceInvitationId                String?
+  pendingWorkspaceInvitationKeySubkeyId       Int?
+  pendingWorkspaceInvitationKeyCiphertext     String?
+  pendingWorkspaceInvitationKeyPublicNonce    String?
+  pendingWorkspaceInvitationKeyEncryptionSalt String?
+  creatorDevices                              CreatorDevice[]
+  documentShareLinks                          DocumentShareLink[]
 }
 
 model Session {
@@ -116,13 +124,15 @@ model Session {
 }
 
 model WorkspaceInvitations {
-  id            String    @id @default(uuid())
-  inviterUser   User      @relation(fields: [inviterUserId], references: [id], onDelete: Cascade)
-  inviterUserId String
-  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId   String
-  createdAt     DateTime  @default(now())
-  expiresAt     DateTime
+  id                         String    @id @default(uuid())
+  inviterUser                User      @relation(fields: [inviterUserId], references: [id], onDelete: Cascade)
+  inviterUserId              String
+  workspace                  Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId                String
+  invitationSigningPublicKey String
+  invitationDataSignature    String
+  createdAt                  DateTime  @default(now())
+  expiresAt                  DateTime
 }
 
 model RecoveryDevice {

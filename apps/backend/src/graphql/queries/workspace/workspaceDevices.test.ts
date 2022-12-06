@@ -68,6 +68,9 @@ test("new user results in added device", async () => {
   await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId,
+    inviteeUsername: userData2.user.username,
+    inviteeMainDevice: userData2.mainDevice,
+    invitationSigningPrivateKey: invitationResult.invitationSigningPrivateKey,
     authorizationHeader: userData2.sessionKey,
   });
   const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({

@@ -49,6 +49,8 @@ export type WorkspaceInvitation = {
   workspaceId: string;
   inviterUserId: string;
   inviterUsername: string;
+  invitationSigningPublicKey: string;
+  invitationDataSignature: string;
   workspaceName: string | undefined;
   expiresAt: Date;
 };

@@ -1,4 +1,5 @@
 import * as sodium from "@serenity-tools/libsodium";
+import { UserInputError } from "apollo-server-express";
 import { Device } from "../../types/device";
 import { createConfirmationCode } from "../../utils/confirmationCode";
 import { ExpectedGraphqlError } from "../../utils/expectedGraphqlError/expectedGraphqlError";
@@ -15,6 +16,10 @@ type Props = {
   opaqueEnvelope: string;
   mainDevice: DeviceInput;
   pendingWorkspaceInvitationId: string | null | undefined;
+  pendingWorkspaceInvitationKeySubkeyId: number | null | undefined;
+  pendingWorkspaceInvitationKeyCiphertext: string | null | undefined;
+  pendingWorkspaceInvitationKeyPublicNonce: string | null | undefined;
+  pendingWorkspaceInvitationKeyEncryptionSalt: string | null | undefined;
 };
 
 const verifyDevice = async (device: DeviceInput) => {
@@ -30,9 +35,42 @@ export async function finalizeRegistration({
   opaqueEnvelope,
   mainDevice,
   pendingWorkspaceInvitationId,
+  pendingWorkspaceInvitationKeySubkeyId,
+  pendingWorkspaceInvitationKeyCiphertext,
+  pendingWorkspaceInvitationKeyPublicNonce,
+  pendingWorkspaceInvitationKeyEncryptionSalt,
 }: Props) {
   if (!verifyDevice(mainDevice)) {
     throw new Error("Failed to verify main device.");
+  }
+  if (pendingWorkspaceInvitationId && !pendingWorkspaceInvitationKeySubkeyId) {
+    throw new UserInputError(
+      "pendingWorkspaceInvitationId without workspaceInvitationKeySubkeyId"
+    );
+  }
+  if (
+    pendingWorkspaceInvitationId &&
+    !pendingWorkspaceInvitationKeyCiphertext
+  ) {
+    throw new UserInputError(
+      "pendingWorkspaceInvitationId without workspaceInvitationKeyCiphertext"
+    );
+  }
+  if (
+    pendingWorkspaceInvitationId &&
+    !pendingWorkspaceInvitationKeyPublicNonce
+  ) {
+    throw new UserInputError(
+      "pendingWorkspaceInvitationId without workspaceInvitationKeyPublicNonce"
+    );
+  }
+  if (
+    pendingWorkspaceInvitationId &&
+    !pendingWorkspaceInvitationKeyEncryptionSalt
+  ) {
+    throw new UserInputError(
+      "pendingWorkspaceInvitationId without pendingWorkspaceInvitationKeyEncryptionSalt"
+    );
   }
   try {
     return await prisma.$transaction(async (prisma) => {
@@ -61,6 +99,10 @@ export async function finalizeRegistration({
           mainDeviceEncryptionPublicKeySignature:
             mainDevice.encryptionPublicKeySignature,
           pendingWorkspaceInvitationId,
+          pendingWorkspaceInvitationKeySubkeyId,
+          pendingWorkspaceInvitationKeyCiphertext,
+          pendingWorkspaceInvitationKeyPublicNonce,
+          pendingWorkspaceInvitationKeyEncryptionSalt,
         },
       });
       // TODO: send an email to the user's email address

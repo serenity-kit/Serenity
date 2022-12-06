@@ -1,6 +1,11 @@
-import { createAndEncryptDevice } from "@serenity-tools/common";
+import {
+  createAndEncryptDevice,
+  createEncryptionKeyFromOpaqueExportKey,
+  encryptWorkspaceInvitationPrivateKey,
+} from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
+import serenitySodium from "@serenity-tools/libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { requestRegistrationChallengeResponse } from "../../../../test/helpers/authentication/requestRegistrationChallengeResponse";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -55,6 +60,7 @@ test("server should register a user", async () => {
 });
 
 test("server should register a user with a pending workspace id", async () => {
+  const sigingKeyPair = await serenitySodium.crypto_sign_keypair();
   const result = await requestRegistrationChallengeResponse(
     graphql,
     username,
@@ -73,9 +79,15 @@ test("server should register a user with a pending workspace id", async () => {
     }
   `;
 
-  const exportKey = result.registration.getExportKey();
+  const exportKey = sodium.to_base64(result.registration.getExportKey());
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    await createAndEncryptDevice(sodium.to_base64(exportKey));
+    await createAndEncryptDevice(exportKey);
+  const workspaceInvitationKeyData = await encryptWorkspaceInvitationPrivateKey(
+    {
+      exportKey,
+      workspaceInvitationSigningPrivateKey: sigingKeyPair.privateKey,
+    }
+  );
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
@@ -83,6 +95,14 @@ test("server should register a user with a pending workspace id", async () => {
       message: sodium.to_base64(message),
       mainDevice,
       pendingWorkspaceInvitationId,
+      pendingWorkspaceInvitationKeyCiphertext:
+        workspaceInvitationKeyData.ciphertext,
+      pendingWorkspaceInvitationKeyPublicNonce:
+        workspaceInvitationKeyData.publicNonce,
+      pendingWorkspaceInvitationKeySubkeyId:
+        workspaceInvitationKeyData.subkeyId,
+      pendingWorkspaceInvitationKeyEncryptionSalt:
+        workspaceInvitationKeyData.encryptionKeySalt,
     },
   });
   expect(typeof registrationResponse.finishRegistration.id).toBe("string");
@@ -130,6 +150,35 @@ describe("Input errors", () => {
           },
         }))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("pendingWorkspaceInvitationId without other data", async () => {
+    const result = await requestRegistrationChallengeResponse(
+      graphql,
+      username,
+      password
+    );
+    const pendingWorkspaceInvitationId = uuidv4();
+    const message = result.registration.finish(
+      sodium.from_base64(result.data.challengeResponse)
+    );
+    const exportKey = result.registration.getExportKey();
+    const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
+      await createAndEncryptDevice(sodium.to_base64(exportKey));
+    await expect(
+      (async () =>
+        await graphql.client.request(query, {
+          input: {
+            registrationId: uuidv4(),
+            message: sodium.to_base64(message),
+            mainDevice,
+            pendingWorkspaceInvitationId,
+            pendingWorkspaceInvitationKeyCiphertext: null,
+            pendingWorkspaceInvitationKeyPublicNonce: null,
+            pendingWorkspaceInvitationKeySubkeyId: null,
+            pendingWorkspaceInvitationKeyEncryptionSalt: null,
+          },
+        }))()
+    ).rejects.toThrowError();
   });
   test("Invalid message", async () => {
     const result = await requestRegistrationChallengeResponse(

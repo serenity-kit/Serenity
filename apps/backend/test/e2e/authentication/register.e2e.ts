@@ -10,7 +10,7 @@ test("Register", async ({ page }) => {
   const workspaceName = "my workspace";
 
   // Go to registration url
-  await page.goto("http://localhost:3000/register");
+  await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
 
   const registrationResult = await e2eRegisterUser({
@@ -50,6 +50,6 @@ test("Register", async ({ page }) => {
   const documentId = document?.id;
   // TODO: get the workspace id and expect URL to match
   await expect(page).toHaveURL(
-    `http://localhost:3000/workspace/${workspaceId}/page/${documentId}`
+    `http://localhost:19006/workspace/${workspaceId}/page/${documentId}`
   );
 });

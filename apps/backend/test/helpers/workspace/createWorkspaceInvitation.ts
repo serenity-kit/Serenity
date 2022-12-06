@@ -1,3 +1,5 @@
+import sodium from "@serenity-tools/libsodium";
+import canonicalize from "canonicalize";
 import { gql } from "graphql-request";
 
 type Params = {
@@ -15,12 +17,10 @@ export const createWorkspaceInvitation = async ({
     authorization: authorizationHeader,
   };
   const query = gql`
-    mutation {
-      createWorkspaceInvitation(
-        input: {
-          workspaceId: "${workspaceId}"
-        }
-      ) {
+    mutation createWorkspaceInvitation(
+      $input: CreateWorkspaceInvitationInput!
+    ) {
+      createWorkspaceInvitation(input: $input) {
         workspaceInvitation {
           id
           workspaceId
@@ -30,10 +30,39 @@ export const createWorkspaceInvitation = async ({
       }
     }
   `;
+
+  // expires 48 hours in the future
+  const invitationId = await sodium.randombytes_buf(24);
+  const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
+
+  const signingKeys = await sodium.crypto_sign_keypair();
+
+  const invitationData = canonicalize({
+    workspaceId,
+    invitationId,
+    invitationSigningPublicKey: signingKeys.publicKey,
+    expiresAt,
+  });
+  const invitationDataSignature = await sodium.crypto_sign_detached(
+    invitationData!,
+    signingKeys.privateKey
+  );
+
   const result = await graphql.client.request(
     query,
-    null,
+    {
+      input: {
+        workspaceId,
+        invitationId,
+        invitationSigningPublicKey: signingKeys.publicKey,
+        expiresAt,
+        invitationDataSignature,
+      },
+    },
     authorizationHeaders
   );
-  return result;
+  return {
+    ...result,
+    invitationSigningPrivateKey: signingKeys.privateKey,
+  };
 };

@@ -19,3 +19,5 @@ export * from "./recreateSnapshotKey/recreateSnapshotKey";
 export * from "./sleep/sleep";
 export * from "./types";
 export * from "./verifyDevice/verifyDevice";
+export * from "./encryptWorkspaceInvitationKey/encryptWorkspaceInvitationKey";
+export * from "./decryptWorkspaceInvitationKey/decryptWorkspaceInvitationKey";

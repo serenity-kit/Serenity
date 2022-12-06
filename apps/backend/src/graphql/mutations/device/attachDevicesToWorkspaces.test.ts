@@ -39,6 +39,10 @@ test("Existing workspace does nothing", async () => {
   await acceptWorkspaceInvitation({
     graphql,
     workspaceInvitationId,
+    inviteeUsername: userAndDevice2.user.username,
+    inviteeMainDevice: userAndDevice2.mainDevice,
+    invitationSigningPrivateKey:
+      workspaceInvitationResult.invitationSigningPrivateKey,
     authorizationHeader: userAndDevice2.sessionKey,
   });
   // now we create workspacekeyboxes for the new user.

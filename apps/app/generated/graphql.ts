@@ -18,6 +18,9 @@ export type Scalars = {
 };
 
 export type AcceptWorkspaceInvitationInput = {
+  inviteeMainDevice: ReducedDeviceInput;
+  inviteeUsername: Scalars['String'];
+  inviteeUsernameAndDeviceSignature: Scalars['String'];
   workspaceInvitationId: Scalars['String'];
 };
 
@@ -136,6 +139,10 @@ export type CreateInitialWorkspaceStructureResult = {
 };
 
 export type CreateWorkspaceInvitationInput = {
+  expiresAt: Scalars['Date'];
+  invitationDataSignature: Scalars['String'];
+  invitationId: Scalars['String'];
+  invitationSigningPublicKey: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
@@ -378,6 +385,10 @@ export type FinishRegistrationInput = {
   mainDevice: FinishRegistrationDeviceInput;
   message: Scalars['String'];
   pendingWorkspaceInvitationId?: InputMaybe<Scalars['String']>;
+  pendingWorkspaceInvitationKeyCiphertext?: InputMaybe<Scalars['String']>;
+  pendingWorkspaceInvitationKeyEncryptionSalt?: InputMaybe<Scalars['String']>;
+  pendingWorkspaceInvitationKeyPublicNonce?: InputMaybe<Scalars['String']>;
+  pendingWorkspaceInvitationKeySubkeyId?: InputMaybe<Scalars['Int']>;
   registrationId: Scalars['String'];
 };
 
@@ -470,6 +481,7 @@ export type MainDeviceResult = {
   createdAt: Scalars['Date'];
   encryptionKeySalt: Scalars['String'];
   encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
   info?: Maybe<Scalars['String']>;
   nonce: Scalars['String'];
   signingPublicKey: Scalars['String'];
@@ -677,7 +689,11 @@ export type PageInfo = {
 
 export type PendingWorkspaceInvitationResult = {
   __typename?: 'PendingWorkspaceInvitationResult';
+  ciphertext?: Maybe<Scalars['String']>;
+  encryptionKeySalt?: Maybe<Scalars['String']>;
   id?: Maybe<Scalars['String']>;
+  publicNonce?: Maybe<Scalars['String']>;
+  subkeyId?: Maybe<Scalars['Int']>;
 };
 
 export type Query = {
@@ -828,6 +844,13 @@ export type QueryWorkspacesArgs = {
   after?: InputMaybe<Scalars['String']>;
   deviceSigningPublicKey: Scalars['String'];
   first: Scalars['Int'];
+};
+
+export type ReducedDeviceInput = {
+  encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
+  signingPublicKey: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 export type RemoveDocumentShareLinkInput = {
@@ -1422,7 +1445,7 @@ export type FoldersQuery = { __typename?: 'Query', folders?: { __typename?: 'Fol
 export type MainDeviceQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string, createdAt: any } | null };
+export type MainDeviceQuery = { __typename?: 'Query', mainDevice?: { __typename?: 'MainDeviceResult', signingPublicKey: string, nonce: string, ciphertext: string, encryptionKeySalt: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt: any } | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1442,7 +1465,7 @@ export type MeWithWorkspaceLoadingInfoQuery = { __typename?: 'Query', me?: { __t
 export type PendingWorkspaceInvitationQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PendingWorkspaceInvitationQuery = { __typename?: 'Query', pendingWorkspaceInvitation?: { __typename?: 'PendingWorkspaceInvitationResult', id?: string | null } | null };
+export type PendingWorkspaceInvitationQuery = { __typename?: 'Query', pendingWorkspaceInvitation?: { __typename?: 'PendingWorkspaceInvitationResult', id?: string | null, ciphertext?: string | null, publicNonce?: string | null, subkeyId?: number | null, encryptionKeySalt?: string | null } | null };
 
 export type RootFoldersQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -2224,6 +2247,7 @@ export const MainDeviceDocument = gql`
     ciphertext
     encryptionKeySalt
     encryptionPublicKey
+    encryptionPublicKeySignature
     createdAt
   }
 }
@@ -2271,6 +2295,10 @@ export const PendingWorkspaceInvitationDocument = gql`
     query pendingWorkspaceInvitation {
   pendingWorkspaceInvitation {
     id
+    ciphertext
+    publicNonce
+    subkeyId
+    encryptionKeySalt
   }
 }
     `;

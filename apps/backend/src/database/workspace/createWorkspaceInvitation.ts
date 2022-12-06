@@ -1,4 +1,6 @@
-import { ForbiddenError } from "apollo-server-express";
+import sodium from "@serenity-tools/libsodium";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
+import canonicalize from "canonicalize";
 import { Role } from "../../../prisma/generated/output";
 import { WorkspaceInvitation } from "../../types/workspace";
 import { prisma } from "../prisma";
@@ -8,13 +10,43 @@ const INVITATION_EXPIRATION_TIME = 48 * 60 * 60 * 1000;
 
 type Params = {
   workspaceId: string;
+  invitationId: string;
+  invitationSigningPublicKey: string;
+  expiresAt: Date;
+  invitationDataSignature: string;
   inviterUserId: string;
 };
 
 export async function createWorkspaceInvitation({
   workspaceId,
+  invitationId,
+  invitationSigningPublicKey,
+  invitationDataSignature,
+  expiresAt,
   inviterUserId,
 }: Params) {
+  const expiresAtErrorMarginMillis = 1000 * 60 * 60 * 2; // 2 hours
+  const maxExpirationTime = new Date(Date.now() + expiresAtErrorMarginMillis);
+  if (maxExpirationTime > expiresAt) {
+    throw new UserInputError(
+      "The invitation expiration time is too far in the future"
+    );
+  }
+  const expiresAtMillis = expiresAt.getTime();
+  const expectedSigningData = canonicalize({
+    workspaceId,
+    invitationId,
+    invitationSigningPublicKey,
+    expiresAtMillis,
+  });
+  const doesSignatureVerify = sodium.crypto_sign_verify_detached(
+    invitationDataSignature,
+    expectedSigningData!,
+    invitationSigningPublicKey
+  );
+  if (!doesSignatureVerify) {
+    throw new UserInputError("invalid invitationDataSignature");
+  }
   const userToWorkspace = await prisma.usersToWorkspaces.findFirst({
     where: {
       userId: inviterUserId,
@@ -44,16 +76,16 @@ export async function createWorkspaceInvitation({
   }
   const rawWorkspaceInvitation = await prisma.workspaceInvitations.create({
     data: {
+      id: invitationId,
       workspaceId,
       inviterUserId,
+      invitationSigningPublicKey,
+      invitationDataSignature,
       expiresAt: new Date(Date.now() + INVITATION_EXPIRATION_TIME),
     },
   });
   const workspaceInvitation: WorkspaceInvitation = {
-    id: rawWorkspaceInvitation.id,
-    workspaceId: rawWorkspaceInvitation.workspaceId,
-    inviterUserId: rawWorkspaceInvitation.inviterUserId,
-    expiresAt: rawWorkspaceInvitation.expiresAt,
+    ...rawWorkspaceInvitation,
     inviterUsername: userToWorkspace.user.username,
     workspaceName: userToWorkspace.workspace.name,
   };
