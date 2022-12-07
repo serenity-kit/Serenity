@@ -1,6 +1,7 @@
 import {
   BoxShadow,
   EditorBottombarButton,
+  EditorBottombarDivider,
   tw,
   useHasEditorSidebar,
   View,
@@ -191,7 +192,8 @@ export const Editor = (props: EditorProps) => {
           <BoxShadow elevation={3} rounded>
             <HStack
               space={1}
-              style={tw`border border-gray-200 bg-white rounded p-0.5`}
+              style={tw`p-1 bg-white border border-gray-200 rounded`}
+              alignItems="center"
             >
               <EditorBottombarButton
                 onPress={() => editor.chain().focus().toggleBold().run()}
@@ -210,6 +212,9 @@ export const Editor = (props: EditorProps) => {
                 name="code-view"
                 isActive={editor.isActive("code")}
               />
+
+              {/* for some reason tailwind md:h-6 doesn't work on the Divider yet */}
+              <EditorBottombarDivider style={tw`h-6`} />
 
               <EditorBottombarButton
                 onPress={() =>
