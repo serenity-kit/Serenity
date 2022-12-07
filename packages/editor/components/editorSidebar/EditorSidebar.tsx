@@ -67,63 +67,6 @@ export default function EditorSidebar({
       ) : (
         <TabPanel tabId="editing">
           <Heading lvl={4} style={tw`ml-4`} padded>
-            Formats
-          </Heading>
-
-          <SidebarButton
-            onPress={() => editor?.chain().focus().toggleBold().run()}
-          >
-            <EditorSidebarIcon
-              isActive={editor?.isActive("bold") || false}
-              name="bold"
-            />
-            <Text variant="xs" bold={editor?.isActive("bold") || false}>
-              Bold
-            </Text>
-          </SidebarButton>
-
-          <SidebarButton
-            onPress={() => editor?.chain().focus().toggleItalic().run()}
-          >
-            <EditorSidebarIcon
-              isActive={editor?.isActive("italic") || false}
-              name="italic"
-            />
-            <Text variant="xs" bold={editor?.isActive("italic") || false}>
-              Italic
-            </Text>
-          </SidebarButton>
-
-          <SidebarButton
-            onPress={() => editor?.chain().focus().toggleCode().run()}
-          >
-            <EditorSidebarIcon
-              isActive={editor?.isActive("code") || false}
-              name="code-view"
-            />
-            <Text variant="xs" bold={editor?.isActive("code") || false}>
-              Code
-            </Text>
-          </SidebarButton>
-
-          {/* styling dummy */}
-          <SidebarButton
-            onPress={() =>
-              editor?.chain().focus().toggleLink({ href: "#" }).run()
-            }
-          >
-            <EditorSidebarIcon
-              isActive={editor?.isActive("link") || false}
-              name="link"
-            />
-            <Text variant="xs" bold={editor?.isActive("link") || false}>
-              Link
-            </Text>
-          </SidebarButton>
-
-          <SidebarDivider />
-
-          <Heading lvl={4} style={tw`ml-4`} padded>
             Blocks
           </Heading>
 
@@ -258,6 +201,63 @@ export default function EditorSidebar({
             <EditorSidebarIcon isActive={false} name="image-line" />
             <Text variant="xs" bold={false}>
               Upload Image
+            </Text>
+          </SidebarButton>
+
+          <SidebarDivider />
+
+          <Heading lvl={4} style={tw`ml-4`} padded>
+            Formats
+          </Heading>
+
+          <SidebarButton
+            onPress={() => editor?.chain().focus().toggleBold().run()}
+          >
+            <EditorSidebarIcon
+              isActive={editor?.isActive("bold") || false}
+              name="bold"
+            />
+            <Text variant="xs" bold={editor?.isActive("bold") || false}>
+              Bold
+            </Text>
+          </SidebarButton>
+
+          <SidebarButton
+            onPress={() => editor?.chain().focus().toggleItalic().run()}
+          >
+            <EditorSidebarIcon
+              isActive={editor?.isActive("italic") || false}
+              name="italic"
+            />
+            <Text variant="xs" bold={editor?.isActive("italic") || false}>
+              Italic
+            </Text>
+          </SidebarButton>
+
+          <SidebarButton
+            onPress={() => editor?.chain().focus().toggleCode().run()}
+          >
+            <EditorSidebarIcon
+              isActive={editor?.isActive("code") || false}
+              name="code-view"
+            />
+            <Text variant="xs" bold={editor?.isActive("code") || false}>
+              Code
+            </Text>
+          </SidebarButton>
+
+          {/* styling dummy */}
+          <SidebarButton
+            onPress={() =>
+              editor?.chain().focus().toggleLink({ href: "#" }).run()
+            }
+          >
+            <EditorSidebarIcon
+              isActive={editor?.isActive("link") || false}
+              name="link"
+            />
+            <Text variant="xs" bold={editor?.isActive("link") || false}>
+              Link
             </Text>
           </SidebarButton>
         </TabPanel>

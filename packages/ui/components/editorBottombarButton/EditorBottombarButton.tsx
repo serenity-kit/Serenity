@@ -18,7 +18,7 @@ export const EditorBottombarButton = forwardRef(
 
     const styles = StyleSheet.create({
       pressable: tw``,
-      hstack: tw`h-7 w-8.5 items-center justify-center bg-transparent rounded`,
+      hstack: tw`h-7 w-8.5 md:h-6 md:w-6 items-center justify-center bg-transparent rounded`,
       active: tw`bg-primary-100`,
       hover: isActive ? tw`bg-primary-200` : tw`bg-gray-200`,
       pressed: tw`bg-primary-200`,
