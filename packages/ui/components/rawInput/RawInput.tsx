@@ -41,14 +41,14 @@ export const RawInput = forwardRef((props: RawInputProps, ref) => {
         _stack: {
           style: [
             styles.wrapper,
-            tw`bg-white border-primary-500 se-outline-focus`,
+            tw`bg-white border-primary-400 se-outline-focus-input`,
           ],
         },
         _hover: {
           _stack: {
             style: [
               styles.wrapper,
-              tw`bg-white border-primary-500 se-outline-focus`,
+              tw`bg-white border-primary-400 se-outline-focus-input`,
             ],
           },
         },
@@ -66,14 +66,14 @@ export const RawInput = forwardRef((props: RawInputProps, ref) => {
           _stack: {
             style: [
               styles.wrapper,
-              tw`bg-white border-error-500 se-outline-error`,
+              tw`bg-white border-error-500 se-outline-error-input`,
             ],
           },
           _hover: {
             _stack: {
               style: [
                 styles.wrapper,
-                tw`bg-white border-error-500 se-outline-error`,
+                tw`bg-white border-error-500 se-outline-error-input`,
               ],
             },
           },

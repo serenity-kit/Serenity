@@ -146,6 +146,9 @@ module.exports = {
     plugin((params) => {
       params.addUtilities({
         // Important: do not use prefixes here like md: -> they crash the build
+        "se-outline-focus-input": {
+          boxShadow: `0px 0px 0px 0.25rem ${customTheme.colors.primary["100"]}`,
+        },
         "se-outline-focus": {
           boxShadow: `0px 0px 0px 0.25rem ${customTheme.colors.primary["200"]}`, // web-only
         },
@@ -157,6 +160,9 @@ module.exports = {
         },
         "se-inset-focus-mini": {
           boxShadow: `inset 0px 0px 0px 0.125rem ${customTheme.colors.primary["200"]}`, // web-only
+        },
+        "se-outline-error-input": {
+          boxShadow: `0px 0px 0px 0.25rem ${customTheme.colors.error["100"]}`,
         },
         "se-outline-error": {
           boxShadow: `0px 0px 0px 0.25rem ${customTheme.colors.error["200"]}`, // web-only
