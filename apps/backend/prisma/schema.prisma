@@ -5,7 +5,7 @@ datasource db {
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = []
+  previewFeatures = ["interactiveTransactions"]
   binaryTargets   = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
   output          = "./generated/output"
 }
