@@ -1,14 +1,24 @@
 import { IInputProps, Input as NbInput } from "native-base";
 import React, { forwardRef } from "react";
 import { StyleSheet } from "react-native";
+import { useIsEqualOrLargerThanBreakpoint } from "../../hooks/useIsEqualOrLargerThanBreakpoint/useIsEqualOrLargerThanBreakpoint";
 import { tw } from "../../tailwind";
 
-export type RawInputProps = IInputProps & {};
+export type RawInputSize = "md" | "lg";
+
+export type RawInputProps = IInputProps & {
+  size?: RawInputSize;
+};
 
 export const RawInput = forwardRef((props: RawInputProps, ref) => {
+  const isEqualOrLargerThanXS = useIsEqualOrLargerThanBreakpoint("xs");
+  const { size = isEqualOrLargerThanXS ? "md" : "lg" } = props;
+
   const styles = StyleSheet.create({
-    wrapper: tw`h-form-element rounded`,
-    input: tw`px-4 flex justify-center text-input font-input text-gray-900 `,
+    wrapper: tw`rounded ${size == "md" ? "h-10" : "h-form-element"}`,
+    input: tw`px-4 flex justify-center font-input text-gray-900 ${
+      size == "md" ? "text-xs" : "text-input"
+    }`,
   });
 
   return (
@@ -41,14 +51,14 @@ export const RawInput = forwardRef((props: RawInputProps, ref) => {
         _stack: {
           style: [
             styles.wrapper,
-            tw`bg-white border-primary-500 se-outline-focus`,
+            tw`bg-white border-primary-400 se-outline-focus-input`,
           ],
         },
         _hover: {
           _stack: {
             style: [
               styles.wrapper,
-              tw`bg-white border-primary-500 se-outline-focus`,
+              tw`bg-white border-primary-400 se-outline-focus-input`,
             ],
           },
         },
@@ -66,14 +76,14 @@ export const RawInput = forwardRef((props: RawInputProps, ref) => {
           _stack: {
             style: [
               styles.wrapper,
-              tw`bg-white border-error-500 se-outline-error`,
+              tw`bg-white border-error-500 se-outline-error-input`,
             ],
           },
           _hover: {
             _stack: {
               style: [
                 styles.wrapper,
-                tw`bg-white border-error-500 se-outline-error`,
+                tw`bg-white border-error-500 se-outline-error-input`,
               ],
             },
           },
