@@ -206,5 +206,3 @@ drop database serenity;
 Copyright 2022–2022 Naisho GmbH
 
 Licensed under the AGPLv3: https://opensource.org/licenses/agpl-3.0
-
-The package `react-native-sodium-expo-plugin` is licensed under the ISC license.
