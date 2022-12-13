@@ -184,8 +184,6 @@ export const crypto_kdf_derive_from_key = async (
   context: string,
   key: string
 ): Promise<string> => {
-  console.log("crypto_kdf_CONTEXTBYTES", sodium.crypto_kdf_CONTEXTBYTES);
-
   if ([...context].length !== sodium.crypto_kdf_CONTEXTBYTES) {
     throw new Error("crypto_kdf_derive_from_key context must be 8 bytes");
   }

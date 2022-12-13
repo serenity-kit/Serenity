@@ -184,8 +184,7 @@ export const crypto_kdf_derive_from_key = async (
   context: string,
   key: string
 ): Promise<string> => {
-  // replace 8 with crypto_kdf_CONTEXTBYTES once https://github.com/SerenityNotes/react-native-libsodium/issues/4 is fixed
-  if ([...context].length !== 8) {
+  if ([...context].length !== sodium.crypto_kdf_CONTEXTBYTES) {
     throw new Error("crypto_kdf_derive_from_key context must be 8 bytes");
   }
   return to_base64(
