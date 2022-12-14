@@ -90,17 +90,6 @@ export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
   return to_base64(result);
 };
 
-export const crypto_generichash = async (
-  hash_length: number,
-  b64_password: string
-): Promise<string> => {
-  const result = sodium.crypto_generichash(
-    hash_length,
-    from_base64(b64_password)
-  );
-  return to_base64(result);
-};
-
 export const crypto_pwhash = async (
   keyLength: number,
   password: string,
@@ -220,7 +209,6 @@ const libsodiumExports = {
   randombytes_buf,
   randombytes_uniform,
   crypto_pwhash,
-  crypto_generichash,
   crypto_box_keypair,
   crypto_sign_keypair,
   crypto_sign_detached,
@@ -240,7 +228,6 @@ const libsodiumExports = {
 };
 
 type Libsodium = typeof libsodiumExports & {
-  crypto_generichash_BYTES: number;
   crypto_secretbox_NONCEBYTES: number;
   crypto_pwhash_SALTBYTES: number;
   crypto_pwhash_OPSLIMIT_INTERACTIVE: number;
@@ -255,9 +242,7 @@ type Libsodium = typeof libsodiumExports & {
 
 const handler = {
   get(_target: Libsodium, prop: keyof Libsodium): any {
-    if (prop === "crypto_generichash_BYTES") {
-      return sodium.crypto_generichash_BYTES;
-    } else if (prop === "crypto_secretbox_NONCEBYTES") {
+    if (prop === "crypto_secretbox_NONCEBYTES") {
       return sodium.crypto_secretbox_NONCEBYTES;
     } else if (prop === "crypto_pwhash_SALTBYTES") {
       return sodium.crypto_pwhash_SALTBYTES;
