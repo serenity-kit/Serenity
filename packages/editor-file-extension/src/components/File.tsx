@@ -2,6 +2,7 @@ import { Icon, Spinner, Text, tw } from "@serenity-tools/ui";
 import { NodeViewWrapper } from "@tiptap/react";
 import { HStack } from "native-base";
 import React, { useEffect, useReducer } from "react";
+import { formatBytes } from "../utils/formatBytes";
 import { guessMimeType } from "../utils/guessMimeType";
 import { Image } from "./Image";
 import { State } from "./types";
@@ -117,7 +118,7 @@ export const File = (props: any) => {
           </Text>
           {/* padding to adjust centered look */}
           <Text variant="xs" muted style={tw`pt-0.5`}>
-            {fileSize}
+            {formatBytes(fileSize)}
           </Text>
           <HStack alignItems={"center"}>
             {isLoading ? (
