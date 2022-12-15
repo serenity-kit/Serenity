@@ -4,6 +4,12 @@ export type FileInfo = {
   fileId: string;
 };
 
+export type FileWithBase64Content = {
+  content: string;
+  name: string;
+  size: number;
+};
+
 export type EncryptAndUploadFunctionFile = (
   fileAsBase64: string
 ) => Promise<FileInfo>;

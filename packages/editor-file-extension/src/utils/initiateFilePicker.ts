@@ -32,7 +32,13 @@ export const initiateFilePicker = async ({
 
   insertFiles({
     encryptAndUploadFile,
-    filesAsBase64: [filePickerResult.assets[0].uri],
+    filesWithBase64Content: [
+      {
+        content: filePickerResult.assets[0].uri,
+        name: "Franz.txt",
+        size: 1234,
+      },
+    ],
     insertFile,
     updateFileAttributes,
   });

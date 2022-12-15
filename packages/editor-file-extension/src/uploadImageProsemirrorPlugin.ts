@@ -43,7 +43,6 @@ export const uploadImageProsemirrorPlugin = (
 
             const filesAsBase64 = await Promise.all(
               files.map(async (file) => {
-                console.log("file", file);
                 const fileAsBase64 = await fileToBase64(file.file);
                 return {
                   detectedType: file.type,
@@ -80,7 +79,13 @@ export const uploadImageProsemirrorPlugin = (
                 });
               } else {
                 insertFiles({
-                  filesAsBase64: [fileAsBase64.fileAsBase64],
+                  filesWithBase64Content: [
+                    {
+                      content: fileAsBase64.fileAsBase64,
+                      name: fileAsBase64.fileName,
+                      size: fileAsBase64.fileSize,
+                    },
+                  ],
                   encryptAndUploadFile,
                   insertFile: ({ uploadId, fileName, fileSize }) => {
                     const node = view.state.schema.nodes.file.create({

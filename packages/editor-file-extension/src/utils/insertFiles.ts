@@ -1,31 +1,32 @@
 import { v4 as uuidv4 } from "uuid";
 import {
   EncryptAndUploadFunctionFile,
+  FileWithBase64Content,
   InsertFileParams,
   UpdateFileAttributesParams,
 } from "../types";
 
 type InsertFilesParams = {
-  filesAsBase64: string[];
+  filesWithBase64Content: FileWithBase64Content[];
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
   insertFile: (params: InsertFileParams) => void;
   updateFileAttributes: (params: UpdateFileAttributesParams) => void;
 };
 
 export const insertFiles = ({
-  filesAsBase64,
+  filesWithBase64Content,
   encryptAndUploadFile,
   insertFile,
   updateFileAttributes,
 }: InsertFilesParams) => {
-  filesAsBase64.forEach(async (fileAsBase64) => {
+  filesWithBase64Content.forEach(async (fileWithBase64Content) => {
     const uploadId = uuidv4();
     insertFile({
-      fileName: "janedoe.txt",
-      fileSize: 2000,
+      fileName: fileWithBase64Content.name,
+      fileSize: fileWithBase64Content.size,
       uploadId,
     });
-    const result = await encryptAndUploadFile(fileAsBase64);
+    const result = await encryptAndUploadFile(fileWithBase64Content.content);
     updateFileAttributes({
       uploadId,
       fileInfo: result,
