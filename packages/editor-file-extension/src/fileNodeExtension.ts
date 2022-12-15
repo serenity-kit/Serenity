@@ -84,6 +84,9 @@ export const FileNodeExtension = Node.create<ImageOptions>({
       uploadId: {
         default: null,
       },
+      mimeType: {
+        default: null,
+      },
     };
   },
 

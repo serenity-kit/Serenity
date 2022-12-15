@@ -244,6 +244,7 @@ export default function EditorSidebar({
                         fileAsBase64,
                         fileName: file.file.name,
                         fileSize: file.file.size,
+                        fileType: file.file.type,
                       };
                     })
                   );
@@ -264,6 +265,7 @@ export default function EditorSidebar({
                                   height,
                                 },
                                 uploadId,
+                                mimeType: fileAsBase64.fileType,
                               },
                             },
                             { updateSelection: false }
@@ -297,6 +299,7 @@ export default function EditorSidebar({
                                   fileSize,
                                 },
                                 uploadId,
+                                mimeType: fileAsBase64.fileType,
                               },
                             },
                             { updateSelection: false }

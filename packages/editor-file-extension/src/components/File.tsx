@@ -1,9 +1,8 @@
-import { Icon, Spinner, Text, tw } from "@serenity-tools/ui";
+import { Icon, IconButton, Spinner, Text, tw } from "@serenity-tools/ui";
 import { NodeViewWrapper } from "@tiptap/react";
 import { HStack } from "native-base";
 import React, { useEffect, useReducer } from "react";
 import { formatBytes } from "../utils/formatBytes";
-import { guessMimeType } from "../utils/guessMimeType";
 import { Image } from "./Image";
 import { State } from "./types";
 
@@ -26,6 +25,16 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
+function download(fileName: string, contentAsBase64: string) {
+  const element = document.createElement("a");
+  element.setAttribute("href", contentAsBase64);
+  element.setAttribute("download", fileName);
+  element.style.display = "none";
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
+
 export const File = (props: any) => {
   // Update Attributes example:
   //   props.updateAttributes({
@@ -44,6 +53,8 @@ export const File = (props: any) => {
   };
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  console.log("contentAsBase64", state.contentAsBase64, props.node.attrs);
+
   useEffect(() => {
     const retrieveContent = async () => {
       if (fileId && key && nonce) {
@@ -53,10 +64,7 @@ export const File = (props: any) => {
             key,
             publicNonce: nonce,
           });
-          const mimeType = guessMimeType({
-            base64FileData: decryptedImageData,
-          });
-          const dataUri = `data:${mimeType};base64,${decryptedImageData}`;
+          const dataUri = `data:${props.node.attrs.mimeType};base64,${decryptedImageData}`;
           dispatch({
             type: "setContentAsBase64",
             contentAsBase64: dataUri,
@@ -150,6 +158,18 @@ export const File = (props: any) => {
                 }[state.step]
               }
             </Text>
+            <IconButton
+              name="download-line"
+              onPress={() => {
+                if (state.contentAsBase64) {
+                  download(
+                    fileName,
+                    state.contentAsBase64,
+                    props.node.attrs.mimeType
+                  );
+                }
+              }}
+            />
           </HStack>
         </HStack>
       </div>

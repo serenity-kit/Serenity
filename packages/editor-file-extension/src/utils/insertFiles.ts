@@ -24,6 +24,7 @@ export const insertFiles = ({
     insertFile({
       fileName: fileWithBase64Content.name,
       fileSize: fileWithBase64Content.size,
+      mimeType: fileWithBase64Content.mimeType,
       uploadId,
     });
     const result = await encryptAndUploadFile(fileWithBase64Content.content);

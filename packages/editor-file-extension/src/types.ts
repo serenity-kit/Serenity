@@ -8,6 +8,7 @@ export type FileWithBase64Content = {
   content: string;
   name: string;
   size: number;
+  mimeType: string;
 };
 
 export type EncryptAndUploadFunctionFile = (
@@ -30,12 +31,14 @@ export type InsertImageParams = {
   width: number | null;
   height: number | null;
   uploadId: string;
+  mimeType: string;
 };
 
 export type InsertFileParams = {
   fileName: string;
   fileSize: number;
   uploadId: string;
+  mimeType: string;
 };
 
 export type UpdateFileAttributesParams = {

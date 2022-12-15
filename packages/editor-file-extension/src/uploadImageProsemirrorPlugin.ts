@@ -49,6 +49,7 @@ export const uploadImageProsemirrorPlugin = (
                   fileAsBase64,
                   fileName: file.file.name,
                   fileSize: file.file.size,
+                  mimeType: file.file.type,
                 };
               })
             );
@@ -84,16 +85,18 @@ export const uploadImageProsemirrorPlugin = (
                       content: fileAsBase64.fileAsBase64,
                       name: fileAsBase64.fileName,
                       size: fileAsBase64.fileSize,
+                      mimeType: fileAsBase64.mimeType,
                     },
                   ],
                   encryptAndUploadFile,
-                  insertFile: ({ uploadId, fileName, fileSize }) => {
+                  insertFile: ({ uploadId, fileName, fileSize, mimeType }) => {
                     const node = view.state.schema.nodes.file.create({
                       subtype: "file",
                       uploadId,
                       subtypeAttributes: {
                         fileName,
                         fileSize,
+                        mimeType,
                       },
                     });
                     const transaction = view.state.tr.insert(
