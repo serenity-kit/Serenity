@@ -1,7 +1,7 @@
 import {
   InsertImageParams,
-  UpdateImageAttributesParams,
-} from "@serenity-tools/editor-image-extension";
+  UpdateFileAttributesParams,
+} from "../editor-file-extension/src";
 
 // needed to allow extending the global scope
 export {};
@@ -66,7 +66,7 @@ export type UpdateEditorParams =
     }
   | {
       variant: "update-image-attributes";
-      params: UpdateImageAttributesParams;
+      params: UpdateFileAttributesParams;
     };
 
 export type UpdateEditor = (params: UpdateEditorParams) => void;

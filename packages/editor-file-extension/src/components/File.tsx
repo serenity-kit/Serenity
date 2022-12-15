@@ -1,17 +1,10 @@
+import { Icon, Spinner, Text, tw } from "@serenity-tools/ui";
 import { NodeViewWrapper } from "@tiptap/react";
+import { HStack } from "native-base";
 import React, { useEffect, useReducer } from "react";
-import { guessMimeType } from "./utils/guessMimeType";
-import { tw, View, Text, Icon, useIsDesktopDevice } from "@serenity-tools/ui";
-
-type State =
-  | {
-      step: "uploading" | "downloading" | "failedToDecrypt";
-      contentAsBase64: null;
-    }
-  | {
-      step: "done";
-      contentAsBase64: string;
-    };
+import { guessMimeType } from "../utils/guessMimeType";
+import { Image } from "./Image";
+import { State } from "./types";
 
 type Action =
   | {
@@ -32,24 +25,23 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-export const Image = (props: any) => {
+export const File = (props: any) => {
   // Update Attributes example:
   //   props.updateAttributes({
   //     something: props.node.attrs.something + 2,
   //   });
 
-  const { fileInfo, width, height } = props.node.attrs;
+  const { fileInfo } = props.node.attrs;
   const { fileId, key, nonce } = fileInfo
     ? fileInfo
     : { fileId: null, key: null, nonce: null };
 
-  const { downloadAndDecryptFile } = props.editor.storage.image;
+  const { downloadAndDecryptFile } = props.editor.storage.file;
   const initialState: State = {
     step: fileId ? "downloading" : "uploading",
     contentAsBase64: null,
   };
   const [state, dispatch] = useReducer(reducer, initialState);
-  const isDesktopDevice = useIsDesktopDevice();
 
   useEffect(() => {
     const retrieveContent = async () => {
@@ -80,48 +72,74 @@ export const Image = (props: any) => {
     retrieveContent();
   }, [fileId, key, nonce, downloadAndDecryptFile]);
 
-  const isPortrait = height > width;
+  if (props.node.attrs.subtype === "image") {
+    return (
+      <Image
+        selected={props.selected}
+        state={state}
+        subtypeAttributes={props.node.attrs.subtypeAttributes}
+      />
+    );
+  }
+
+  const { fileSize, fileName } = props.node.attrs.subtypeAttributes;
+  const isLoading = state.step === "uploading" || state.step === "downloading";
+  const hasFailedToDecrypt = state.step === "failedToDecrypt";
+  const isDone = state.step === "done";
 
   return (
     <NodeViewWrapper
       style={{
         outline: props.selected
           ? `2px solid ${tw.color(
-              state.step === "failedToDecrypt" ? "error-200" : "primary-400"
+              hasFailedToDecrypt ? "error-200" : "primary-400"
             )}`
           : "none",
       }}
     >
-      {state.step !== "done" ? (
-        <View
-          style={[
-            tw``,
-            {
-              aspectRatio: `1 / ${height / width}`,
-            },
-          ]}
-        >
-          <div className="shimmerBG flex h-full w-full flex-col items-center justify-center">
-            <View
-              style={tw`max-${isPortrait ? "w" : "h"}-30 ${
-                isPortrait ? "w-1/3" : "h-2/5"
-              }`}
-            >
-              <Icon
-                name={
-                  state.step === "failedToDecrypt"
-                    ? "lock-unlock-line-close"
-                    : "image-2-line"
-                }
-                color={"gray-300"}
-                size="full"
-                mobileSize={"full"}
+      <div className={"w-full rounded" + (isLoading && " shimmerBG")}>
+        <HStack space={2} alignItems={"center"} style={tw`p-1.5`}>
+          <Icon
+            name={
+              hasFailedToDecrypt
+                ? "lock-unlock-line-close"
+                : "file-transfer-line"
+            }
+            size={5}
+            color={isDone ? "gray-900" : "gray-600"}
+          />
+          <Text
+            variant="md"
+            muted={!isDone}
+            style={hasFailedToDecrypt && tw`line-through`}
+          >
+            {fileName}
+          </Text>
+          {/* padding to adjust centered look */}
+          <Text variant="xs" muted style={tw`pt-0.5`}>
+            {fileSize}
+          </Text>
+          <HStack alignItems={"center"}>
+            {isLoading ? (
+              <Spinner
+                color={tw.color("gray-500")}
+                style={[
+                  tw`ml-5 mr-1`,
+                  {
+                    transform: [
+                      {
+                        scale: 0.8,
+                      },
+                    ],
+                  },
+                ]}
               />
-            </View>
+            ) : null}
+            {/* padding to adjust centered look */}
             <Text
-              variant={isDesktopDevice || isPortrait ? "xs" : "xxs"}
-              style={tw`text-gray-400 opacity-80`}
-              bold
+              variant="xs"
+              muted
+              style={[tw`pt-0.5`, hasFailedToDecrypt && tw`ml-5`]}
             >
               {
                 {
@@ -131,11 +149,9 @@ export const Image = (props: any) => {
                 }[state.step]
               }
             </Text>
-          </div>
-        </View>
-      ) : (
-        <img src={state.contentAsBase64!} />
-      )}
+          </HStack>
+        </HStack>
+      </div>
     </NodeViewWrapper>
   );
 };

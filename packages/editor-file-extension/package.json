@@ -1,5 +1,5 @@
 {
-  "name": "@serenity-tools/editor-image-extension",
+  "name": "@serenity-tools/editor-file-extension",
   "version": "0.0.1",
   "main": "src/index",
   "scripts": {

@@ -21,12 +21,18 @@ export type DownloadAndDecryptFileFunction = (
 ) => Promise<string>;
 
 export type InsertImageParams = {
-  uploadId: string;
   width: number | null;
   height: number | null;
+  uploadId: string;
 };
 
-export type UpdateImageAttributesParams = {
+export type InsertFileParams = {
+  fileName: string;
+  fileSize: number;
+  uploadId: string;
+};
+
+export type UpdateFileAttributesParams = {
   uploadId: string;
   fileInfo: FileInfo;
 };

@@ -36,7 +36,7 @@
     "@react-navigation/native-stack": "^6.9.0",
     "@serenity-tools/common": "*",
     "@serenity-tools/editor": "*",
-    "@serenity-tools/editor-image-extension": "*",
+    "@serenity-tools/editor-file-extension": "*",
     "@serenity-tools/libsodium": "*",
     "@serenity-tools/opaque": "*",
     "@serenity-tools/ui": "*",

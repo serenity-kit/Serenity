@@ -1,11 +1,4 @@
 import {
-  EncryptAndUploadFunctionFile,
-  initiateImagePicker,
-  InsertImageParams,
-  updateImageAttributes,
-  UpdateImageAttributesParams,
-} from "@serenity-tools/editor-image-extension";
-import {
   EditorSidebarIcon,
   Heading,
   SidebarButton,
@@ -20,6 +13,15 @@ import {
 import { Level } from "@tiptap/extension-heading";
 import { Editor } from "@tiptap/react";
 import React from "react";
+import {
+  EncryptAndUploadFunctionFile,
+  initiateFilePicker,
+  initiateImagePicker,
+  InsertFileParams,
+  InsertImageParams,
+  updateFileAttributes,
+  UpdateFileAttributesParams,
+} from "../../../editor-file-extension/src";
 import TableOfContents from "../tableOfContents/TableOfContents";
 
 type EditorSidebarProps = {
@@ -179,21 +181,22 @@ export default function EditorSidebar({
                     return;
                   }
                   editor.commands.insertContent({
-                    type: "image",
+                    type: "file",
                     attrs: {
+                      subtype: "image",
+                      subtypeAttributes: {
+                        width,
+                        height,
+                      },
                       uploadId,
-                      width,
-                      height,
                     },
                   });
                 },
-                updateImageAttributes: (
-                  params: UpdateImageAttributesParams
-                ) => {
+                updateFileAttributes: (params: UpdateFileAttributesParams) => {
                   if (!editor) {
                     return;
                   }
-                  updateImageAttributes({ ...params, view: editor.view });
+                  updateFileAttributes({ ...params, view: editor.view });
                 },
               });
             }}
@@ -201,6 +204,45 @@ export default function EditorSidebar({
             <EditorSidebarIcon isActive={false} name="image-line" />
             <Text variant="xs" bold={false}>
               Upload Image
+            </Text>
+          </SidebarButton>
+
+          <SidebarButton
+            onPress={() => {
+              initiateFilePicker({
+                encryptAndUploadFile,
+                insertFile: ({
+                  uploadId,
+                  fileName,
+                  fileSize,
+                }: InsertFileParams) => {
+                  if (!editor) {
+                    return;
+                  }
+                  editor.commands.insertContent({
+                    type: "file",
+                    attrs: {
+                      subtype: "file",
+                      subtypeAttributes: {
+                        fileName,
+                        fileSize,
+                      },
+                      uploadId,
+                    },
+                  });
+                },
+                updateFileAttributes: (params: UpdateFileAttributesParams) => {
+                  if (!editor) {
+                    return;
+                  }
+                  updateFileAttributes({ ...params, view: editor.view });
+                },
+              });
+            }}
+          >
+            <EditorSidebarIcon isActive={false} name="image-line" />
+            <Text variant="xs" bold={false}>
+              Upload File
             </Text>
           </SidebarButton>
 
