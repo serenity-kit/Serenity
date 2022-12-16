@@ -100,6 +100,9 @@ export const File = (props: any) => {
             )}`
           : "none",
       }}
+      // needs to be here otherwise image won't be draggable
+      // read https://github.com/ueberdosis/tiptap/issues/2597 for more detailed info
+      data-drag-handle=""
     >
       <div className={"w-full rounded" + (isLoading && " shimmerBG")}>
         <HStack space={2} alignItems={"center"} style={tw`p-1.5`}>
