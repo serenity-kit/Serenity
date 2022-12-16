@@ -4,6 +4,7 @@ import { File } from "./components/File";
 import {
   DownloadAndDecryptFileFunction,
   EncryptAndUploadFunctionFile,
+  FileInfo,
   FileNodeAttributes,
 } from "./types";
 import { uploadFileProsemirrorPlugin } from "./uploadFileProsemirrorPlugin";
@@ -14,6 +15,13 @@ export interface ImageOptions {
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
   downloadAndDecryptFile: DownloadAndDecryptFileFunction;
 }
+
+const keyStore: { [fileId: string]: string } = {};
+
+const fileInfoWithoutKey = (fileInfo: FileInfo) => {
+  const { key, ...rest } = fileInfo;
+  return rest;
+};
 
 // we can add markdown support later
 // export const inputRegex = /(?:^|\s)(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
@@ -80,7 +88,10 @@ export const FileNodeExtension = Node.create<ImageOptions>({
           const width = parseInt(node.getAttribute("width")!, 10);
           const height = parseInt(node.getAttribute("height")!, 10);
           const mimeType = node.getAttribute("data-mime-type")!;
-          const rawFileInfo = node.getAttribute("data-file-info");
+          const fileInfo = JSON.parse(
+            node.getAttribute("data-file-info") || "{}"
+          );
+          const key = keyStore[fileInfo.fileId];
 
           const attrs: FileNodeAttributes = {
             subtype: "image",
@@ -90,7 +101,7 @@ export const FileNodeExtension = Node.create<ImageOptions>({
             },
             uploadId: node.getAttribute("data-upload-id"),
             mimeType,
-            fileInfo: JSON.parse(rawFileInfo || "{}"),
+            fileInfo: { ...fileInfo, key },
           };
           return attrs;
         },
@@ -102,7 +113,10 @@ export const FileNodeExtension = Node.create<ImageOptions>({
           const fileName = node.getAttribute("data-file-name")!;
           const fileSize = node.getAttribute("data-file-size")!;
           const mimeType = node.getAttribute("data-mime-type")!;
-          const rawFileInfo = node.getAttribute("data-file-info");
+          const fileInfo = JSON.parse(
+            node.getAttribute("data-file-info") || "{}"
+          );
+          const key = keyStore[fileInfo.fileId];
 
           const attrs: FileNodeAttributes = {
             subtype: "file",
@@ -112,7 +126,7 @@ export const FileNodeExtension = Node.create<ImageOptions>({
             },
             uploadId: node.getAttribute("data-upload-id"),
             mimeType,
-            fileInfo: JSON.parse(rawFileInfo || "{}"),
+            fileInfo: { ...fileInfo, key },
           };
           return attrs;
         },
@@ -121,11 +135,16 @@ export const FileNodeExtension = Node.create<ImageOptions>({
   },
 
   renderHTML({ HTMLAttributes, node }) {
+    // update keyStore in case the user wants to paste the content into the same editor
+    keyStore[node.attrs.fileInfo.fileId] = node.attrs.fileInfo.key;
+
     if (node.attrs.subtype === "image") {
       return [
         "img",
         mergeAttributes(this.options.HTMLAttributes, {
-          ["data-file-info"]: JSON.stringify(HTMLAttributes.fileInfo),
+          ["data-file-info"]: JSON.stringify(
+            fileInfoWithoutKey(HTMLAttributes.fileInfo)
+          ),
           ["data-upload-id"]: HTMLAttributes.attrsuploadId,
           width: HTMLAttributes.subtypeAttributes.width,
           height: HTMLAttributes.subtypeAttributes.width,
@@ -138,7 +157,9 @@ export const FileNodeExtension = Node.create<ImageOptions>({
       "div",
       mergeAttributes(this.options.HTMLAttributes, {
         ["data-type"]: "file",
-        ["data-file-info"]: JSON.stringify(HTMLAttributes.fileInfo),
+        ["data-file-info"]: JSON.stringify(
+          fileInfoWithoutKey(HTMLAttributes.fileInfo)
+        ),
         ["data-upload-id"]: HTMLAttributes.attrsuploadId,
         ["data-file-name"]: HTMLAttributes.subtypeAttributes.fileName,
         ["data-file-size"]: HTMLAttributes.subtypeAttributes.fileSize,
