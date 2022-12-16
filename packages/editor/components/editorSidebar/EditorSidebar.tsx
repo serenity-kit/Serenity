@@ -16,6 +16,7 @@ import React from "react";
 import { Platform } from "react-native";
 import {
   EncryptAndUploadFunctionFile,
+  FileNodeAttributes,
   initiateImagePicker,
   insertFiles,
   InsertImageParams,
@@ -178,21 +179,24 @@ export default function EditorSidebar({
                   uploadId,
                   width,
                   height,
+                  mimeType,
                 }: InsertImageParams) => {
                   if (!editor) {
                     return;
                   }
-                  editor.commands.insertContent({
-                    type: "file",
-                    attrs: {
-                      subtype: "image",
-                      subtypeAttributes: {
-                        width,
-                        height,
-                      },
-                      uploadId,
+                  const attrs: FileNodeAttributes = {
+                    subtype: "image",
+                    subtypeAttributes: {
+                      width,
+                      height,
                     },
-                  });
+                    mimeType,
+                    uploadId,
+                  };
+                  editor.commands.insertContent(
+                    { type: "file", attrs },
+                    { updateSelection: false }
+                  );
                 },
                 updateFileAttributes: (params: UpdateFileAttributesParams) => {
                   if (!editor) {
@@ -260,19 +264,17 @@ export default function EditorSidebar({
                         ],
                         encryptAndUploadFile,
                         insertImage: ({ uploadId, width, height }) => {
-                          editor.commands.insertContent(
-                            {
-                              type: "file",
-                              attrs: {
-                                subtype: "image",
-                                subtypeAttributes: {
-                                  width,
-                                  height,
-                                },
-                                uploadId,
-                                mimeType: fileAsBase64.fileType,
-                              },
+                          const attrs: FileNodeAttributes = {
+                            subtype: "image",
+                            subtypeAttributes: {
+                              width,
+                              height,
                             },
+                            uploadId,
+                            mimeType: fileAsBase64.fileType,
+                          };
+                          editor.commands.insertContent(
+                            { type: "file", attrs },
                             { updateSelection: false }
                           );
                         },
@@ -295,19 +297,17 @@ export default function EditorSidebar({
                         ],
                         encryptAndUploadFile,
                         insertFile: ({ uploadId, fileName, fileSize }) => {
-                          editor.commands.insertContent(
-                            {
-                              type: "file",
-                              attrs: {
-                                subtype: "file",
-                                subtypeAttributes: {
-                                  fileName,
-                                  fileSize,
-                                },
-                                uploadId,
-                                mimeType: fileAsBase64.fileType,
-                              },
+                          const attrs: FileNodeAttributes = {
+                            subtype: "file",
+                            subtypeAttributes: {
+                              fileName,
+                              fileSize,
                             },
+                            uploadId,
+                            mimeType: fileAsBase64.fileType,
+                          };
+                          editor.commands.insertContent(
+                            { type: "file", attrs },
                             { updateSelection: false }
                           );
                         },

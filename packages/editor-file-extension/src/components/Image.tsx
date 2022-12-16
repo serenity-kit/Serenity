@@ -1,14 +1,14 @@
 import { Icon, Text, tw, useIsDesktopDevice, View } from "@serenity-tools/ui";
 import { NodeViewWrapper } from "@tiptap/react";
 import React from "react";
-import { State } from "./types";
+import { FileState } from "../types";
 
 type Props = {
   subtypeAttributes: {
     width: number;
     height: number;
   };
-  state: State;
+  state: FileState;
   selected: boolean;
 };
 
@@ -70,7 +70,7 @@ export const Image: React.FC<Props> = (props) => {
           </div>
         </View>
       ) : (
-        <img src={state.contentAsBase64!} />
+        <img src={state.contentAsBase64} />
       )}
     </NodeViewWrapper>
   );

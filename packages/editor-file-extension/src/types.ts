@@ -4,6 +4,38 @@ export type FileInfo = {
   fileId: string;
 };
 
+export type FileState =
+  | {
+      step: "uploading" | "downloading" | "failedToDecrypt";
+      contentAsBase64: null;
+    }
+  | {
+      step: "done";
+      contentAsBase64: string;
+    };
+
+export type FileNodeAttributes =
+  | {
+      subtype: "file";
+      subtypeAttributes: {
+        fileName: string;
+        fileSize: number;
+      };
+      fileInfo?: FileInfo;
+      uploadId?: string | null;
+      mimeType: string;
+    }
+  | {
+      subtype: "image";
+      subtypeAttributes: {
+        width: number | null;
+        height: number | null;
+      };
+      fileInfo?: FileInfo;
+      uploadId?: string | null;
+      mimeType: string;
+    };
+
 export type FileWithBase64Content = {
   content: string;
   name: string;
