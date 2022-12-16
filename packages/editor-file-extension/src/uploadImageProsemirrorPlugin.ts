@@ -57,7 +57,12 @@ export const uploadImageProsemirrorPlugin = (
             filesAsBase64.forEach((fileAsBase64) => {
               if (fileAsBase64.detectedType === "image") {
                 insertImages({
-                  filesAsBase64: [fileAsBase64.fileAsBase64],
+                  filesWithBase64Content: [
+                    {
+                      content: fileAsBase64.fileAsBase64,
+                      mimeType: fileAsBase64.mimeType,
+                    },
+                  ],
                   encryptAndUploadFile,
                   insertImage: ({ uploadId, width, height }) => {
                     const node = view.state.schema.nodes.file.create({

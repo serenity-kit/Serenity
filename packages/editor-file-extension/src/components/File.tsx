@@ -153,6 +153,7 @@ export const File = (props: any) => {
                   downloading: "Downloading …",
                   uploading: "Uploading …",
                   failedToDecrypt: "Failed to decrypt",
+                  done: "",
                 }[state.step]
               }
             </Text>

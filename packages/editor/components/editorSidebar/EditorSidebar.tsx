@@ -252,7 +252,12 @@ export default function EditorSidebar({
                   filesAsBase64.forEach((fileAsBase64) => {
                     if (fileAsBase64.detectedType === "image") {
                       insertImages({
-                        filesAsBase64: [fileAsBase64.fileAsBase64],
+                        filesWithBase64Content: [
+                          {
+                            content: fileAsBase64.fileAsBase64,
+                            mimeType: fileAsBase64.fileType,
+                          },
+                        ],
                         encryptAndUploadFile,
                         insertImage: ({ uploadId, width, height }) => {
                           editor.commands.insertContent(
@@ -285,6 +290,7 @@ export default function EditorSidebar({
                             content: fileAsBase64.fileAsBase64,
                             name: fileAsBase64.fileName,
                             size: fileAsBase64.fileSize,
+                            mimeType: fileAsBase64.fileType,
                           },
                         ],
                         encryptAndUploadFile,
