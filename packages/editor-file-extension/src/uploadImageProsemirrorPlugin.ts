@@ -1,5 +1,5 @@
 import { Plugin } from "prosemirror-state";
-import { EncryptAndUploadFunctionFile } from "./types";
+import { EncryptAndUploadFunctionFile, FileNodeAttributes } from "./types";
 import { fileToBase64 } from "./utils/fileToBase64";
 import { insertFiles } from "./utils/insertFiles";
 import { insertImages } from "./utils/insertImages";
@@ -65,7 +65,7 @@ export const uploadImageProsemirrorPlugin = (
                   ],
                   encryptAndUploadFile,
                   insertImage: ({ uploadId, width, height, mimeType }) => {
-                    const node = view.state.schema.nodes.file.create({
+                    const attrs: FileNodeAttributes = {
                       subtype: "image",
                       uploadId,
                       subtypeAttributes: {
@@ -73,7 +73,8 @@ export const uploadImageProsemirrorPlugin = (
                         height,
                       },
                       mimeType,
-                    });
+                    };
+                    const node = view.state.schema.nodes.file.create(attrs);
                     const transaction = view.state.tr.insert(
                       coordinates.pos,
                       node
@@ -96,7 +97,7 @@ export const uploadImageProsemirrorPlugin = (
                   ],
                   encryptAndUploadFile,
                   insertFile: ({ uploadId, fileName, fileSize, mimeType }) => {
-                    const node = view.state.schema.nodes.file.create({
+                    const attrs: FileNodeAttributes = {
                       subtype: "file",
                       uploadId,
                       subtypeAttributes: {
@@ -104,7 +105,8 @@ export const uploadImageProsemirrorPlugin = (
                         fileSize,
                       },
                       mimeType,
-                    });
+                    };
+                    const node = view.state.schema.nodes.file.create(attrs);
                     const transaction = view.state.tr.insert(
                       coordinates.pos,
                       node

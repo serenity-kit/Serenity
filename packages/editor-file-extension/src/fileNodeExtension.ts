@@ -4,6 +4,7 @@ import { File } from "./components/File";
 import {
   DownloadAndDecryptFileFunction,
   EncryptAndUploadFunctionFile,
+  FileNodeAttributes,
 } from "./types";
 import { uploadImageProsemirrorPlugin } from "./uploadImageProsemirrorPlugin";
 
@@ -75,32 +76,44 @@ export const FileNodeExtension = Node.create<ImageOptions>({
     return [
       {
         tag: "img",
-        getAttrs(node: HTMLElement) {
-          const attrs = {
+        getAttrs(node) {
+          if (typeof node === "string") return {};
+          const width = parseInt(node.getAttribute("width")!, 10);
+          const height = parseInt(node.getAttribute("height")!, 10);
+          const mimeType = node.getAttribute("data-mime-type")!;
+          const rawFileInfo = node.getAttribute("data-file-info");
+
+          const attrs: FileNodeAttributes = {
             subtype: "image",
             subtypeAttributes: {
-              width: node.getAttribute("width"),
-              height: node.getAttribute("height"),
+              width,
+              height,
             },
             uploadId: node.getAttribute("data-upload-id"),
-            mimeType: node.getAttribute("data-mime-type"),
-            fileInfo: JSON.parse(node.getAttribute("data-file-info") || "{}"),
+            mimeType,
+            fileInfo: JSON.parse(rawFileInfo || "{}"),
           };
           return attrs;
         },
       },
       {
         tag: "div[data-type=file]",
-        getAttrs(node: HTMLElement) {
-          const attrs = {
+        getAttrs(node) {
+          if (typeof node === "string") return {};
+          const fileName = node.getAttribute("data-file-name")!;
+          const fileSize = node.getAttribute("data-file-size")!;
+          const mimeType = node.getAttribute("data-mime-type")!;
+          const rawFileInfo = node.getAttribute("data-file-info");
+
+          const attrs: FileNodeAttributes = {
             subtype: "file",
             subtypeAttributes: {
-              fileName: node.getAttribute("data-file-name"),
-              fileSize: node.getAttribute("data-file-size"),
+              fileName,
+              fileSize: parseInt(fileSize, 10),
             },
             uploadId: node.getAttribute("data-upload-id"),
-            mimeType: node.getAttribute("data-mime-type"),
-            fileInfo: JSON.parse(node.getAttribute("data-file-info") || "{}"),
+            mimeType,
+            fileInfo: JSON.parse(rawFileInfo || "{}"),
           };
           return attrs;
         },
