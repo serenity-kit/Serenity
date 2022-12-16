@@ -14,25 +14,6 @@ export interface ImageOptions {
   downloadAndDecryptFile: DownloadAndDecryptFileFunction;
 }
 
-// declare module "@tiptap/core" {
-//   interface Commands<ReturnType> {
-//     image: {
-//       /**
-//        * Add an image
-//        */
-//       setImage: (options: {
-//         src: string;
-//         alt?: string;
-//         title?: string;
-//         width?: number;
-//         height?: number;
-//         fileInfo?: FileInfo;
-//         uploadId?: string;
-//       }) => ReturnType;
-//     };
-//   }
-// }
-
 // we can add markdown support later
 // export const inputRegex = /(?:^|\s)(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
 
@@ -75,7 +56,8 @@ export const FileNodeExtension = Node.create<ImageOptions>({
         default: "file",
       },
       subtypeAttributes: {
-        // { src: null, alt: null, title: null, width: null, height: null }
+        // image: { src: null, alt: null, title: null, width: null, height: null }
+        // file:  { fileName: null, fileSize: null }
         default: {},
       },
       fileInfo: {
@@ -90,34 +72,70 @@ export const FileNodeExtension = Node.create<ImageOptions>({
     };
   },
 
-  // parseHTML() {
-  //   return [{ tag: "img[src]" }];
-  // },
-
-  renderHTML({ HTMLAttributes }) {
-    // TODO render based on subtype
-    // return [
-    //   "img",
-    //   mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-    // ];
+  parseHTML() {
     return [
-      "div",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      {
+        tag: "img",
+        getAttrs(node: HTMLElement) {
+          const attrs = {
+            subtype: "image",
+            subtypeAttributes: {
+              width: node.getAttribute("width"),
+              height: node.getAttribute("height"),
+            },
+            uploadId: node.getAttribute("data-upload-id"),
+            mimeType: node.getAttribute("data-mime-type"),
+            fileInfo: JSON.parse(node.getAttribute("data-file-info") || "{}"),
+          };
+          return attrs;
+        },
+      },
+      {
+        tag: "div[data-type=file]",
+        getAttrs(node: HTMLElement) {
+          const attrs = {
+            subtype: "file",
+            subtypeAttributes: {
+              fileName: node.getAttribute("data-file-name"),
+              fileSize: node.getAttribute("data-file-size"),
+            },
+            uploadId: node.getAttribute("data-upload-id"),
+            mimeType: node.getAttribute("data-mime-type"),
+            fileInfo: JSON.parse(node.getAttribute("data-file-info") || "{}"),
+          };
+          return attrs;
+        },
+      },
     ];
   },
 
-  // addCommands() {
-  //   return {
-  //     setImage:
-  //       (options) =>
-  //       ({ commands }) => {
-  //         return commands.insertContent({
-  //           type: this.name,
-  //           attrs: options,
-  //         });
-  //       },
-  //   };
-  // },
+  renderHTML({ HTMLAttributes, node }) {
+    if (node.attrs.subtype === "image") {
+      console.log("renderHTML", node.attrs);
+      return [
+        "img",
+        mergeAttributes(this.options.HTMLAttributes, {
+          ["data-file-info"]: JSON.stringify(HTMLAttributes.fileInfo),
+          ["data-upload-id"]: HTMLAttributes.attrsuploadId,
+          width: HTMLAttributes.subtypeAttributes.width,
+          height: HTMLAttributes.subtypeAttributes.width,
+          ["data-mime-type"]: HTMLAttributes.mimeType, // TODO mime-type is missing
+          // TODO add src!
+        }),
+      ];
+    }
+    return [
+      "div",
+      mergeAttributes(this.options.HTMLAttributes, {
+        ["data-type"]: "file",
+        ["data-file-info"]: JSON.stringify(HTMLAttributes.fileInfo),
+        ["data-upload-id"]: HTMLAttributes.attrsuploadId,
+        ["data-file-name"]: HTMLAttributes.subtypeAttributes.fileName,
+        ["data-file-size"]: HTMLAttributes.subtypeAttributes.fileSize,
+        ["data-mime-type"]: HTMLAttributes.mimeType,
+      }),
+    ];
+  },
 
   addNodeView() {
     return ReactNodeViewRenderer(File);
