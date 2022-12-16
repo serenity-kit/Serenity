@@ -5,7 +5,7 @@ import { insertFiles } from "./utils/insertFiles";
 import { insertImages } from "./utils/insertImages";
 import { updateFileAttributes } from "./utils/updateFileAttributes";
 
-export const uploadImageProsemirrorPlugin = (
+export const uploadFileProsemirrorPlugin = (
   encryptAndUploadFile: EncryptAndUploadFunctionFile
 ) => {
   return new Plugin({

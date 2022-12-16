@@ -6,7 +6,7 @@ import {
   EncryptAndUploadFunctionFile,
   FileNodeAttributes,
 } from "./types";
-import { uploadImageProsemirrorPlugin } from "./uploadImageProsemirrorPlugin";
+import { uploadFileProsemirrorPlugin } from "./uploadFileProsemirrorPlugin";
 
 export interface ImageOptions {
   inline: boolean;
@@ -20,6 +20,7 @@ export interface ImageOptions {
 
 export const FileNodeExtension = Node.create<ImageOptions>({
   name: "file",
+  draggable: true,
 
   addOptions() {
     return {
@@ -47,8 +48,6 @@ export const FileNodeExtension = Node.create<ImageOptions>({
       downloadAndDecryptFile: this.options.downloadAndDecryptFile,
     };
   },
-
-  draggable: true,
 
   addAttributes() {
     return {
@@ -153,6 +152,6 @@ export const FileNodeExtension = Node.create<ImageOptions>({
   },
 
   addProseMirrorPlugins() {
-    return [uploadImageProsemirrorPlugin(this.options.encryptAndUploadFile)];
+    return [uploadFileProsemirrorPlugin(this.options.encryptAndUploadFile)];
   },
 });
