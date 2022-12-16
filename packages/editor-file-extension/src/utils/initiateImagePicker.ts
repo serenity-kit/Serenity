@@ -1,4 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
+import mime from "mime";
+import { Platform } from "react-native";
 import {
   EncryptAndUploadFunctionFile,
   InsertImageParams,
@@ -43,7 +45,13 @@ export const initiateImagePicker = async ({
     filesWithBase64Content: [
       {
         content: filePickerResult.assets[0].base64!,
-        mimeType: extractMimeType(filePickerResult.assets[0].uri),
+        // on web we get a base64 uri string, but no file name
+        // on iOs we get a file name, but no base64 uri string
+        mimeType:
+          Platform.OS === "web"
+            ? extractMimeType(filePickerResult.assets[0].uri)
+            : // @ts-ignore - this is a bug in the types
+              mime.getType(filePickerResult.assets[0].fileName || ""),
       },
     ],
     insertImage,
