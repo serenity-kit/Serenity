@@ -6,7 +6,7 @@ import {
   useHasEditorSidebar,
   View,
 } from "@serenity-tools/ui";
-import { EditorEvents } from "@tiptap/core";
+import { EditorEvents, isTextSelection } from "@tiptap/core";
 import Collaboration from "@tiptap/extension-collaboration";
 import { Level } from "@tiptap/extension-heading";
 import Link from "@tiptap/extension-link";
@@ -56,6 +56,7 @@ export const Editor = (props: EditorProps) => {
   const shouldCommitNewTitleRef = useRef(isNew);
   const scrollIntoViewOnEditModeDelay =
     props.scrollIntoViewOnEditModeDelay ?? 150; // 150ms works well on iOS Safari
+  const bubbleMenuRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor(
     {
@@ -191,11 +192,44 @@ export const Editor = (props: EditorProps) => {
         <BubbleMenu
           editor={editor}
           tippyOptions={{ duration: 100 }}
-          shouldShow={(params) => {
-            return !params.editor.isActive("file");
+          // modified default from https://github.com/ueberdosis/tiptap/blob/main/packages/extension-bubble-menu/src/bubble-menu-plugin.ts#L47-L79
+          shouldShow={({ state, from, to, view, editor }) => {
+            const { doc, selection } = state;
+            const { empty } = selection;
+
+            // Sometime check for `empty` is not enough.
+            // Doubleclick an empty paragraph returns a node size of 2.
+            // So we check also for an empty text size.
+            const isEmptyTextBlock =
+              !doc.textBetween(from, to).length &&
+              isTextSelection(state.selection);
+
+            // When clicking on a element inside the bubble menu the editor "blur" event
+            // is called and the bubble menu item is focussed. In this case we should
+            // consider the menu as part of the editor and keep showing the menu
+            let isChildOfMenu = false;
+            if (bubbleMenuRef.current) {
+              isChildOfMenu = bubbleMenuRef.current.contains(
+                document.activeElement
+              );
+            }
+
+            const hasEditorFocus = view.hasFocus() || isChildOfMenu;
+
+            if (
+              !hasEditorFocus ||
+              empty ||
+              isEmptyTextBlock ||
+              !editor.isEditable ||
+              editor.isActive("file")
+            ) {
+              return false;
+            }
+
+            return true;
           }}
         >
-          <BoxShadow elevation={3} rounded>
+          <BoxShadow elevation={3} rounded ref={bubbleMenuRef}>
             <HStack
               space={1}
               style={tw`p-1 bg-white border border-gray-200 rounded`}
