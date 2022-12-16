@@ -4,6 +4,18 @@ export type FileInfo = {
   fileId: string;
 };
 
+export type FileWithBase64Content = {
+  content: string;
+  name: string;
+  size: number;
+  mimeType: string;
+};
+
+export type ImageWithBase64Content = {
+  content: string;
+  mimeType: string;
+};
+
 export type EncryptAndUploadFunctionFile = (
   fileAsBase64: string
 ) => Promise<FileInfo>;
@@ -21,12 +33,20 @@ export type DownloadAndDecryptFileFunction = (
 ) => Promise<string>;
 
 export type InsertImageParams = {
-  uploadId: string;
   width: number | null;
   height: number | null;
+  uploadId: string;
+  mimeType: string;
 };
 
-export type UpdateImageAttributesParams = {
+export type InsertFileParams = {
+  fileName: string;
+  fileSize: number;
+  uploadId: string;
+  mimeType: string;
+};
+
+export type UpdateFileAttributesParams = {
   uploadId: string;
   fileInfo: FileInfo;
 };

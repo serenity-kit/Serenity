@@ -1,10 +1,13 @@
 import { Image as ImageNative, Platform } from "react-native";
-import { guessMimeType } from "./guessMimeType";
 
-export const getWidthAndHeightFromFile = (fileAsBase64: string) => {
+type Params = {
+  fileAsBase64: string;
+  mimeType: string;
+};
+
+export const getImageDimensions = ({ fileAsBase64, mimeType }: Params) => {
   return new Promise<{ width: number; height: number } | null>(
     (resolve, reject) => {
-      const mimeType = guessMimeType({ base64FileData: fileAsBase64 });
       const dataUri = `data:${mimeType};base64,${fileAsBase64}`;
       if (Platform.OS === "web") {
         const image = new Image();

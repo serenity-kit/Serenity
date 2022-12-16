@@ -22,8 +22,8 @@ import * as Y from "yjs";
 import {
   DownloadAndDecryptFileFunction,
   EncryptAndUploadFunctionFile,
-  ImageNodeExtension,
-} from "../editor-image-extension/src";
+  FileNodeExtension,
+} from "../editor-file-extension/src";
 import "./awareness.css";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
@@ -108,7 +108,7 @@ export const Editor = (props: EditorProps) => {
           awareness: props.yAwarenessRef.current,
         }),
         SerenityScrollIntoViewOnEditModeExtension.configure({}),
-        ImageNodeExtension.configure({
+        FileNodeExtension.configure({
           encryptAndUploadFile: props.encryptAndUploadFile,
           downloadAndDecryptFile: props.downloadAndDecryptFile,
         }),

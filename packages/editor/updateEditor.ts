@@ -1,5 +1,5 @@
-import { updateImageAttributes } from "@serenity-tools/editor-image-extension";
 import { Editor } from "@tiptap/core";
+import { updateFileAttributes } from "../editor-file-extension/src";
 import { UpdateEditorParams } from "./types";
 
 export const updateEditor = (editor: Editor, params: UpdateEditorParams) => {
@@ -34,6 +34,6 @@ export const updateEditor = (editor: Editor, params: UpdateEditorParams) => {
       attrs: params.params,
     });
   } else if (params.variant === "update-image-attributes") {
-    updateImageAttributes({ ...params.params, view: editor.view });
+    updateFileAttributes({ ...params.params, view: editor.view });
   }
 };

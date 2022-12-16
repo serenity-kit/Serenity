@@ -1,11 +1,4 @@
 import {
-  EncryptAndUploadFunctionFile,
-  initiateImagePicker,
-  InsertImageParams,
-  updateImageAttributes,
-  UpdateImageAttributesParams,
-} from "@serenity-tools/editor-image-extension";
-import {
   EditorSidebarIcon,
   Heading,
   SidebarButton,
@@ -20,6 +13,17 @@ import {
 import { Level } from "@tiptap/extension-heading";
 import { Editor } from "@tiptap/react";
 import React from "react";
+import { Platform } from "react-native";
+import {
+  EncryptAndUploadFunctionFile,
+  initiateImagePicker,
+  insertFiles,
+  InsertImageParams,
+  insertImages,
+  updateFileAttributes,
+  UpdateFileAttributesParams,
+} from "../../../editor-file-extension/src";
+import { fileToBase64 } from "../../../editor-file-extension/src/utils/fileToBase64";
 import TableOfContents from "../tableOfContents/TableOfContents";
 
 type EditorSidebarProps = {
@@ -179,21 +183,22 @@ export default function EditorSidebar({
                     return;
                   }
                   editor.commands.insertContent({
-                    type: "image",
+                    type: "file",
                     attrs: {
+                      subtype: "image",
+                      subtypeAttributes: {
+                        width,
+                        height,
+                      },
                       uploadId,
-                      width,
-                      height,
                     },
                   });
                 },
-                updateImageAttributes: (
-                  params: UpdateImageAttributesParams
-                ) => {
+                updateFileAttributes: (params: UpdateFileAttributesParams) => {
                   if (!editor) {
                     return;
                   }
-                  updateImageAttributes({ ...params, view: editor.view });
+                  updateFileAttributes({ ...params, view: editor.view });
                 },
               });
             }}
@@ -203,6 +208,128 @@ export default function EditorSidebar({
               Upload Image
             </Text>
           </SidebarButton>
+
+          {Platform.OS === "web" ? (
+            <SidebarButton
+              onPress={() => {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.multiple = true;
+                input.onchange = async (event) => {
+                  if (!editor) {
+                    return;
+                  }
+                  const target = event.target as HTMLInputElement;
+                  if (!target.files) {
+                    return;
+                  }
+
+                  const files = Array.from(target.files).map((file) => {
+                    return {
+                      type: /image/i.test(file.type) ? "image" : "file",
+                      file,
+                    };
+                  });
+                  if (files.length === 0) {
+                    return false;
+                  }
+
+                  event.preventDefault();
+
+                  const filesAsBase64 = await Promise.all(
+                    files.map(async (file) => {
+                      const fileAsBase64 = await fileToBase64(file.file);
+                      return {
+                        detectedType: file.type,
+                        fileAsBase64,
+                        fileName: file.file.name,
+                        fileSize: file.file.size,
+                        fileType: file.file.type,
+                      };
+                    })
+                  );
+
+                  filesAsBase64.forEach((fileAsBase64) => {
+                    if (fileAsBase64.detectedType === "image") {
+                      insertImages({
+                        filesWithBase64Content: [
+                          {
+                            content: fileAsBase64.fileAsBase64,
+                            mimeType: fileAsBase64.fileType,
+                          },
+                        ],
+                        encryptAndUploadFile,
+                        insertImage: ({ uploadId, width, height }) => {
+                          editor.commands.insertContent(
+                            {
+                              type: "file",
+                              attrs: {
+                                subtype: "image",
+                                subtypeAttributes: {
+                                  width,
+                                  height,
+                                },
+                                uploadId,
+                                mimeType: fileAsBase64.fileType,
+                              },
+                            },
+                            { updateSelection: false }
+                          );
+                        },
+                        updateFileAttributes: (params) => {
+                          updateFileAttributes({
+                            ...params,
+                            view: editor.view,
+                          });
+                        },
+                      });
+                    } else {
+                      insertFiles({
+                        filesWithBase64Content: [
+                          {
+                            content: fileAsBase64.fileAsBase64,
+                            name: fileAsBase64.fileName,
+                            size: fileAsBase64.fileSize,
+                            mimeType: fileAsBase64.fileType,
+                          },
+                        ],
+                        encryptAndUploadFile,
+                        insertFile: ({ uploadId, fileName, fileSize }) => {
+                          editor.commands.insertContent(
+                            {
+                              type: "file",
+                              attrs: {
+                                subtype: "file",
+                                subtypeAttributes: {
+                                  fileName,
+                                  fileSize,
+                                },
+                                uploadId,
+                                mimeType: fileAsBase64.fileType,
+                              },
+                            },
+                            { updateSelection: false }
+                          );
+                        },
+                        updateFileAttributes: (params) => {
+                          updateFileAttributes({
+                            ...params,
+                            view: editor.view,
+                          });
+                        },
+                      });
+                    }
+                  });
+                };
+                input.click();
+              }}
+            >
+              <EditorSidebarIcon isActive={false} name="image-line" />
+              <Text variant="xs" bold={false}>
+                Upload File
+              </Text>
+            </SidebarButton>
+          ) : null}
 
           <SidebarDivider />
 

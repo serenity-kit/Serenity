@@ -17,6 +17,6 @@
   },
   "include": [
     "./", // <-- change this to where your source files are
-    "../editor-image-extension/src/utils/initiateImagePicker.ts"
+    "../editor-file-extension/src/utils/initiateImagePicker.ts"
   ]
 }

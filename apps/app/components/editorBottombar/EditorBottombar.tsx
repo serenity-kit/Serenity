@@ -3,8 +3,8 @@ import {
   EncryptAndUploadFunctionFile,
   initiateImagePicker,
   InsertImageParams,
-  UpdateImageAttributesParams,
-} from "@serenity-tools/editor-image-extension";
+  UpdateFileAttributesParams,
+} from "@serenity-tools/editor-file-extension";
 import {
   EditorBottombarButton,
   EditorBottombarDivider,
@@ -139,9 +139,7 @@ export const EditorBottombar = forwardRef(
                 insertImage: (params: InsertImageParams) => {
                   onUpdate({ variant: "insert-image", params });
                 },
-                updateImageAttributes: (
-                  params: UpdateImageAttributesParams
-                ) => {
+                updateFileAttributes: (params: UpdateFileAttributesParams) => {
                   onUpdate({ variant: "update-image-attributes", params });
                 },
               });

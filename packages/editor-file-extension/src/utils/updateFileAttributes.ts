@@ -1,11 +1,11 @@
 import { Node } from "prosemirror-model";
 import { EditorView } from "prosemirror-view";
-import { UpdateImageAttributesParams } from "../types";
+import { UpdateFileAttributesParams } from "../types";
 
-const getImagePositionByUploadId = (uploadId: string, view: EditorView) => {
+const getFilePositionByUploadId = (uploadId: string, view: EditorView) => {
   const positions: Array<{ node: Node; pos: number }> = [];
   view.state.doc.descendants((node, pos) => {
-    if (node.type.name === "image" && node.attrs.uploadId === uploadId) {
+    if (node.type.name === "file" && node.attrs.uploadId === uploadId) {
       positions.push({ node, pos });
     }
   });
@@ -17,17 +17,17 @@ const getImagePositionByUploadId = (uploadId: string, view: EditorView) => {
   return positions[0];
 };
 
-export const updateImageAttributes = ({
+export const updateFileAttributes = ({
   uploadId,
   fileInfo,
   view,
-}: UpdateImageAttributesParams & { view: EditorView }) => {
-  const imagePosition = getImagePositionByUploadId(uploadId, view);
-  if (!imagePosition) {
+}: UpdateFileAttributesParams & { view: EditorView }) => {
+  const filePosition = getFilePositionByUploadId(uploadId, view);
+  if (!filePosition) {
     return; // was already remove
   }
   const fileInfoTransaction = view.state.tr.setNodeAttribute(
-    imagePosition.pos,
+    filePosition.pos,
     "fileInfo",
     fileInfo
   );
