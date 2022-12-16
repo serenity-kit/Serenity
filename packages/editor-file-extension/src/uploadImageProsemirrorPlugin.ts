@@ -64,7 +64,7 @@ export const uploadImageProsemirrorPlugin = (
                     },
                   ],
                   encryptAndUploadFile,
-                  insertImage: ({ uploadId, width, height }) => {
+                  insertImage: ({ uploadId, width, height, mimeType }) => {
                     const node = view.state.schema.nodes.file.create({
                       subtype: "image",
                       uploadId,
@@ -72,6 +72,7 @@ export const uploadImageProsemirrorPlugin = (
                         width,
                         height,
                       },
+                      mimeType,
                     });
                     const transaction = view.state.tr.insert(
                       coordinates.pos,
