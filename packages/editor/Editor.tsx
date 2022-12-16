@@ -188,7 +188,13 @@ export const Editor = (props: EditorProps) => {
         />
       )}
       {hasEditorSidebar && editor && (
-        <BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
+        <BubbleMenu
+          editor={editor}
+          tippyOptions={{ duration: 100 }}
+          shouldShow={(params) => {
+            return !params.editor.isActive("file");
+          }}
+        >
           <BoxShadow elevation={3} rounded>
             <HStack
               space={1}
