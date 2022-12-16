@@ -12,27 +12,40 @@ type Props = {
   updateFileAttributes: (params: UpdateFileAttributesParams) => void;
 };
 
+const extractMimeType = (uri: string) => {
+  const splitUri = uri.split(";");
+  return splitUri[0].replace("data:", "");
+};
+
 export const initiateImagePicker = async ({
   encryptAndUploadFile,
   insertImage,
   updateFileAttributes,
 }: Props) => {
   const filePickerResult = await ImagePicker.launchImageLibraryAsync({
-    // mediaTypes: ImagePicker.MediaTypeOptions.All,
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
     allowsMultipleSelection: false, // later we can allow multiple selection
     allowsEditing: false,
     quality: 1,
     base64: true,
   });
-  if (filePickerResult.cancelled || !filePickerResult.base64) {
+  if (
+    filePickerResult.canceled ||
+    !filePickerResult.assets ||
+    !filePickerResult.assets[0]
+  ) {
     console.error("Failed to select an image");
     return;
   }
 
   insertImages({
     encryptAndUploadFile,
-    filesAsBase64: [filePickerResult.base64],
+    filesWithBase64Content: [
+      {
+        content: filePickerResult.assets[0].base64!,
+        mimeType: extractMimeType(filePickerResult.assets[0].uri),
+      },
+    ],
     insertImage,
     updateFileAttributes,
   });

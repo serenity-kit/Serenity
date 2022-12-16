@@ -1,33 +1,38 @@
 import { v4 as uuidv4 } from "uuid";
 import {
   EncryptAndUploadFunctionFile,
+  ImageWithBase64Content,
   InsertImageParams,
   UpdateFileAttributesParams,
 } from "../types";
-import { getWidthAndHeightFromFile } from "./getWidthAndHeightFromFile";
+import { getImageDimensions } from "./getImageDimensions";
 
 type InsertImagesParams = {
-  filesAsBase64: string[];
+  filesWithBase64Content: ImageWithBase64Content[];
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
   insertImage: (params: InsertImageParams) => void;
   updateFileAttributes: (params: UpdateFileAttributesParams) => void;
 };
 
 export const insertImages = ({
-  filesAsBase64,
+  filesWithBase64Content,
   encryptAndUploadFile,
   insertImage,
   updateFileAttributes,
 }: InsertImagesParams) => {
-  filesAsBase64.forEach(async (fileAsBase64) => {
+  filesWithBase64Content.forEach(async (fileWithBase64Content) => {
     const uploadId = uuidv4();
-    const imageDimensions = await getWidthAndHeightFromFile(fileAsBase64);
+    const imageDimensions = await getImageDimensions({
+      fileAsBase64: fileWithBase64Content.content,
+      mimeType: fileWithBase64Content.mimeType,
+    });
     insertImage({
+      mimeType: fileWithBase64Content.mimeType,
       width: imageDimensions?.width || null,
       height: imageDimensions?.height || null,
       uploadId,
     });
-    const result = await encryptAndUploadFile(fileAsBase64);
+    const result = await encryptAndUploadFile(fileWithBase64Content.content);
     updateFileAttributes({
       uploadId,
       fileInfo: result,

@@ -41,7 +41,7 @@ export const File = (props: any) => {
   //     something: props.node.attrs.something + 2,
   //   });
 
-  const { fileInfo } = props.node.attrs;
+  const { fileInfo, mimeType } = props.node.attrs;
   const { fileId, key, nonce } = fileInfo
     ? fileInfo
     : { fileId: null, key: null, nonce: null };
@@ -53,8 +53,6 @@ export const File = (props: any) => {
   };
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  console.log("contentAsBase64", state.contentAsBase64, props.node.attrs);
-
   useEffect(() => {
     const retrieveContent = async () => {
       if (fileId && key && nonce) {
@@ -64,7 +62,7 @@ export const File = (props: any) => {
             key,
             publicNonce: nonce,
           });
-          const dataUri = `data:${props.node.attrs.mimeType};base64,${decryptedImageData}`;
+          const dataUri = `data:${mimeType};base64,${decryptedImageData}`;
           dispatch({
             type: "setContentAsBase64",
             contentAsBase64: dataUri,
@@ -79,7 +77,7 @@ export const File = (props: any) => {
     };
 
     retrieveContent();
-  }, [fileId, key, nonce, downloadAndDecryptFile]);
+  }, [fileId, key, nonce, downloadAndDecryptFile, mimeType]);
 
   if (props.node.attrs.subtype === "image") {
     return (
@@ -162,11 +160,7 @@ export const File = (props: any) => {
               name="download-line"
               onPress={() => {
                 if (state.contentAsBase64) {
-                  download(
-                    fileName,
-                    state.contentAsBase64,
-                    props.node.attrs.mimeType
-                  );
+                  download(fileName, state.contentAsBase64);
                 }
               }}
             />
