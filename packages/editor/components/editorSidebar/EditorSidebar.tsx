@@ -178,6 +178,7 @@ export default function EditorSidebar({
                   uploadId,
                   width,
                   height,
+                  mimeType,
                 }: InsertImageParams) => {
                   if (!editor) {
                     return;
@@ -190,6 +191,7 @@ export default function EditorSidebar({
                         width,
                         height,
                       },
+                      mimeType,
                       uploadId,
                     },
                   });

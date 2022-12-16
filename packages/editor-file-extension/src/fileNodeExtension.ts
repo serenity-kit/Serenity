@@ -23,7 +23,6 @@ export const FileNodeExtension = Node.create<ImageOptions>({
   addOptions() {
     return {
       inline: false,
-      allowBase64: false,
       HTMLAttributes: {},
       encryptAndUploadFile: async () => {
         return { key: "", nonce: "", fileId: "" };
@@ -111,7 +110,6 @@ export const FileNodeExtension = Node.create<ImageOptions>({
 
   renderHTML({ HTMLAttributes, node }) {
     if (node.attrs.subtype === "image") {
-      console.log("renderHTML", node.attrs);
       return [
         "img",
         mergeAttributes(this.options.HTMLAttributes, {
@@ -119,8 +117,8 @@ export const FileNodeExtension = Node.create<ImageOptions>({
           ["data-upload-id"]: HTMLAttributes.attrsuploadId,
           width: HTMLAttributes.subtypeAttributes.width,
           height: HTMLAttributes.subtypeAttributes.width,
-          ["data-mime-type"]: HTMLAttributes.mimeType, // TODO mime-type is missing
-          // TODO add src!
+          ["data-mime-type"]: HTMLAttributes.mimeType,
+          // TODO add src as base64!
         }),
       ];
     }

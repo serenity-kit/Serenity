@@ -1,29 +1,11 @@
 import { Icon, IconButton, Spinner, Text, tw } from "@serenity-tools/ui";
 import { NodeViewWrapper } from "@tiptap/react";
 import { HStack } from "native-base";
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect } from "react";
+import { useFileStatesStore } from "../stores/fileStatesStore";
+import { FileInfo, FileState } from "../types";
 import { formatBytes } from "../utils/formatBytes";
 import { Image } from "./Image";
-import { State } from "./types";
-
-type Action =
-  | {
-      type: "setContentAsBase64";
-      contentAsBase64: string;
-    }
-  | {
-      type: "failedToDecrypt";
-      contentAsBase64: null;
-    };
-
-const reducer = (state: State, action: Action): State => {
-  switch (action.type) {
-    case "setContentAsBase64":
-      return { contentAsBase64: action.contentAsBase64, step: "done" };
-    case "failedToDecrypt":
-      return { contentAsBase64: null, step: "failedToDecrypt" };
-  }
-};
 
 function download(fileName: string, contentAsBase64: string) {
   const element = document.createElement("a");
@@ -36,26 +18,33 @@ function download(fileName: string, contentAsBase64: string) {
 }
 
 export const File = (props: any) => {
-  // Update Attributes example:
-  //   props.updateAttributes({
-  //     something: props.node.attrs.something + 2,
-  //   });
+  const {
+    fileInfo,
+    mimeType,
+  }: { fileInfo: FileInfo; mimeType: string; state: FileState } =
+    props.node.attrs;
 
-  const { fileInfo, mimeType } = props.node.attrs;
   const { fileId, key, nonce } = fileInfo
     ? fileInfo
     : { fileId: null, key: null, nonce: null };
 
   const { downloadAndDecryptFile } = props.editor.storage.file;
-  const initialState: State = {
-    step: fileId ? "downloading" : "uploading",
-    contentAsBase64: null,
-  };
-  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const fileStates = useFileStatesStore((state) => state.fileStates);
+  const state: FileState = (fileId && fileStates[fileId]) ||
+    (fileId && {
+      step: "downloading",
+      contentAsBase64: null,
+    }) || {
+      step: "uploading",
+      contentAsBase64: null,
+    };
+
+  const updateFileState = useFileStatesStore((state) => state.updateFileState);
 
   useEffect(() => {
     const retrieveContent = async () => {
-      if (fileId && key && nonce) {
+      if (fileId && key && nonce && state.step === "downloading") {
         try {
           const decryptedImageData = await downloadAndDecryptFile({
             fileId,
@@ -63,13 +52,13 @@ export const File = (props: any) => {
             publicNonce: nonce,
           });
           const dataUri = `data:${mimeType};base64,${decryptedImageData}`;
-          dispatch({
-            type: "setContentAsBase64",
+          updateFileState(fileId, {
+            step: "done",
             contentAsBase64: dataUri,
           });
         } catch (err) {
-          dispatch({
-            type: "failedToDecrypt",
+          updateFileState(fileId, {
+            step: "failedToDecrypt",
             contentAsBase64: null,
           });
         }
@@ -77,7 +66,15 @@ export const File = (props: any) => {
     };
 
     retrieveContent();
-  }, [fileId, key, nonce, downloadAndDecryptFile, mimeType]);
+  }, [
+    fileId,
+    key,
+    nonce,
+    downloadAndDecryptFile,
+    mimeType,
+    updateFileState,
+    state.step,
+  ]);
 
   if (props.node.attrs.subtype === "image") {
     return (

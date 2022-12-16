@@ -102,8 +102,8 @@ export const uploadImageProsemirrorPlugin = (
                       subtypeAttributes: {
                         fileName,
                         fileSize,
-                        mimeType,
                       },
+                      mimeType,
                     });
                     const transaction = view.state.tr.insert(
                       coordinates.pos,
