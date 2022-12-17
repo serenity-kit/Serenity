@@ -13,4 +13,6 @@ export const initialEditorBottombarState: EditorBottombarState = {
   isBulletList: false,
   isOrderedList: false,
   isTaskList: false,
+  canUndo: false,
+  canRedo: false,
 };

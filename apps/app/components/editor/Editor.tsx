@@ -17,6 +17,7 @@ import {
   encodeAwarenessUpdate,
 } from "y-protocols/awareness";
 import * as Y from "yjs";
+import { editorToolbarService } from "../../machines/editorToolbarMachine";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
 import { createEncryptAndUploadFileFunction } from "../../utils/file/createEncryptAndUploadFileFunction";
@@ -131,6 +132,21 @@ export default function Editor({
         window.blurEditor();
         true;
       `);
+    });
+
+    editorToolbarService.onEvent((args) => {
+      let params: UpdateEditorParams | null = null;
+      if (args.type === "UNDO") {
+        params = { variant: "undo" };
+      } else if (args.type === "REDO") {
+        params = { variant: "redo" };
+      }
+      if (params) {
+        webViewRef.current?.injectJavaScript(`
+          window.updateEditor(\`${JSON.stringify(params)}\`);
+          true;
+        `);
+      }
     });
 
     return () => {
@@ -252,6 +268,9 @@ export default function Editor({
           }
           if (message.type === "update-editor-toolbar-state") {
             setEditorBottombarState(message.content);
+            editorToolbarService.send("updateToolbarState", {
+              toolbarState: message.content,
+            });
           }
           if (message.type === "requestImage") {
             try {

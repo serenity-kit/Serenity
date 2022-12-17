@@ -17,5 +17,7 @@ export const getEditorBottombarStateFromEditor = (
     isBulletList: editor.isActive("bulletList"),
     isOrderedList: editor.isActive("orderedList"),
     isTaskList: editor.isActive("taskList"),
+    canUndo: editor.can().undo(),
+    canRedo: editor.can().redo(),
   };
 };
