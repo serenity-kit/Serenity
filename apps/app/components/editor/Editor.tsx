@@ -17,6 +17,7 @@ import {
   encodeAwarenessUpdate,
 } from "y-protocols/awareness";
 import * as Y from "yjs";
+import { editorToolbarService } from "../../machines/editorToolbarMachine";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
 import { createEncryptAndUploadFileFunction } from "../../utils/file/createEncryptAndUploadFileFunction";
@@ -93,6 +94,9 @@ export default function Editor({
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [keyboardAnimationDuration, setKeyboardAnimationDuration] = useState(0);
   const store = useEditorStore();
+  const setIsInEditingMode = useEditorStore(
+    (state) => state.setIsInEditingMode
+  );
 
   const encryptAndUploadFile = useMemo(() => {
     return createEncryptAndUploadFileFunction({
@@ -115,12 +119,12 @@ export default function Editor({
         setKeyboardAnimationDuration(event.duration);
         setKeyboardHeight(event.endCoordinates.height);
         setIsEditorBottombarVisible(true);
-        store.setIsInEditingMode(true);
+        setIsInEditingMode(true);
       }
     );
     const hideSubscription = Keyboard.addListener("keyboardWillHide", () => {
       setIsEditorBottombarVisible(false);
-      store.setIsInEditingMode(false);
+      setIsInEditingMode(false);
     });
 
     store.subscribeToBlurTrigger(() => {
@@ -130,10 +134,28 @@ export default function Editor({
       `);
     });
 
+    const onEventListener = (args) => {
+      let params: UpdateEditorParams | null = null;
+      if (args.type === "UNDO") {
+        params = { variant: "undo" };
+      } else if (args.type === "REDO") {
+        params = { variant: "redo" };
+      }
+      if (params) {
+        webViewRef.current?.injectJavaScript(`
+          window.updateEditor(\`${JSON.stringify(params)}\`);
+          true;
+        `);
+      }
+    };
+
+    editorToolbarService.onEvent(onEventListener);
+
     return () => {
       showSubscription.remove();
       hideSubscription.remove();
       store.removeAllSubscribers();
+      editorToolbarService.off(onEventListener);
     };
   }, []);
 
@@ -249,6 +271,9 @@ export default function Editor({
           }
           if (message.type === "update-editor-toolbar-state") {
             setEditorBottombarState(message.content);
+            editorToolbarService.send("updateToolbarState", {
+              toolbarState: message.content,
+            });
           }
           if (message.type === "requestImage") {
             try {

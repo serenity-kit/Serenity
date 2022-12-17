@@ -3,6 +3,7 @@ import {
   EditorBottombarState,
   getEditorBottombarStateFromEditor,
   updateEditor,
+  UpdateEditorParams,
 } from "@serenity-tools/editor";
 import {
   CenterContent,
@@ -14,6 +15,8 @@ import {
 import { Editor as TipTapEditor } from "@tiptap/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { View as RNView } from "react-native";
+import { editorToolbarService } from "../../machines/editorToolbarMachine";
+import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
 import { createEncryptAndUploadFileFunction } from "../../utils/file/createEncryptAndUploadFileFunction";
 import {
@@ -41,6 +44,9 @@ export default function Editor({
   const editorBottombarWrapperRef = useRef<RNView>(null);
   const editorIsFocusedRef = useRef(false);
   const wasNewOnFirstRender = useRef(isNew);
+  const setIsInEditingMode = useEditorStore(
+    (state) => state.setIsInEditingMode
+  );
 
   const positionToolbar = () => {
     if (editorBottombarWrapperRef.current && editorIsFocusedRef.current) {
@@ -69,6 +75,20 @@ export default function Editor({
     window.visualViewport.addEventListener("resize", showAndPositionToolbar);
     window.addEventListener("scroll", positionToolbar);
 
+    const onEventListener = (args) => {
+      let params: UpdateEditorParams | null = null;
+      if (args.type === "UNDO") {
+        params = { variant: "undo" };
+      } else if (args.type === "REDO") {
+        params = { variant: "redo" };
+      }
+      if (params && tipTapEditorRef.current) {
+        updateEditor(tipTapEditorRef.current, params);
+      }
+    };
+
+    editorToolbarService.onEvent(onEventListener);
+
     return () => {
       // @ts-expect-error - works in web only
       window.visualViewport.removeEventListener(
@@ -76,6 +96,7 @@ export default function Editor({
         showAndPositionToolbar
       );
       window.removeEventListener("scroll", positionToolbar);
+      editorToolbarService.off(onEventListener);
     };
   }, []);
 
@@ -116,13 +137,20 @@ export default function Editor({
           onFocus={() => {
             editorIsFocusedRef.current = true;
             showAndPositionToolbar();
+            setIsInEditingMode(true);
           }}
           onBlur={(params) => {
             if (
               !(
                 params.event.relatedTarget &&
                 "nodeType" in params.event.relatedTarget &&
-                editorBottombarRef.current?.contains(params.event.relatedTarget)
+                // check if click was not inside the editor bottom bar
+                (editorBottombarRef.current?.contains(
+                  params.event.relatedTarget
+                ) ||
+                  // check if click was not inside editor buttons e.g. undo/redo
+                  // @ts-expect-error
+                  params.event.relatedTarget.dataset.editorButton === "true")
               )
             ) {
               editorIsFocusedRef.current = false;
@@ -130,15 +158,18 @@ export default function Editor({
                 // @ts-expect-error - it's a div
                 editorBottombarWrapperRef.current.style.display = "none";
               }
+              setIsInEditingMode(false);
             }
           }}
           onCreate={(params) => {
             tipTapEditorRef.current = params.editor;
           }}
           onTransaction={(params) => {
-            setEditorBottombarState(
-              getEditorBottombarStateFromEditor(params.editor)
+            const toolbarState = getEditorBottombarStateFromEditor(
+              params.editor
             );
+            setEditorBottombarState(toolbarState);
+            editorToolbarService.send("updateToolbarState", { toolbarState });
           }}
           encryptAndUploadFile={encryptAndUploadFile}
         />

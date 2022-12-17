@@ -21,6 +21,9 @@ export type EditorBottombarState = {
   isBulletList: boolean;
   isOrderedList: boolean;
   isTaskList: boolean;
+
+  canUndo: boolean;
+  canRedo: boolean;
 };
 
 export type UpdateEditorParams =
@@ -67,6 +70,12 @@ export type UpdateEditorParams =
   | {
       variant: "update-image-attributes";
       params: UpdateFileAttributesParams;
+    }
+  | {
+      variant: "undo";
+    }
+  | {
+      variant: "redo";
     };
 
 export type UpdateEditor = (params: UpdateEditorParams) => void;

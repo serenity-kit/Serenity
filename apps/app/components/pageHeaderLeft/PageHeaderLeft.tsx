@@ -9,11 +9,16 @@ import {
   useIsPermanentLeftSidebar,
   View,
 } from "@serenity-tools/ui";
+import { useSelector } from "@xstate/react";
 import { HStack } from "native-base";
 import { useWindowDimensions } from "react-native";
+import { editorToolbarService } from "../../machines/editorToolbarMachine";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { useDocumentPathStore } from "../../utils/document/documentPathStore";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
+
+const selectCanUndo = (state) => state.context.toolbarState.canUndo;
+const selectCanRedo = (state) => state.context.toolbarState.canRedo;
 
 export function PageHeaderLeft(props: any) {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -27,8 +32,8 @@ export function PageHeaderLeft(props: any) {
   const isDesktopDevice = useIsDesktopDevice();
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
 
-  // TODO disable IconButton depending on if going back/forward is possible
-  const actionIsNotPossible = true;
+  const canUndo = useSelector(editorToolbarService, selectCanUndo);
+  const canRedo = useSelector(editorToolbarService, selectCanRedo);
 
   return (
     <HStack alignItems={"center"}>
@@ -40,13 +45,23 @@ export function PageHeaderLeft(props: any) {
                 size={"lg"}
                 name="arrow-go-back-line"
                 color={"gray-900"}
+                disabled={!canUndo}
+                onPress={() => {
+                  editorToolbarService.send("UNDO");
+                }}
+                // @ts-expect-error
+                dataSet={{ editorButton: "true" }}
               ></IconButton>
               <IconButton
                 size={"lg"}
                 name="arrow-go-forward-line"
                 color={"gray-900"}
-                // TODO
-                disabled={actionIsNotPossible}
+                disabled={!canRedo}
+                onPress={() => {
+                  editorToolbarService.send("REDO");
+                }}
+                // @ts-expect-error
+                dataSet={{ editorButton: "true" }}
               ></IconButton>
             </HStack>
           ) : (
@@ -62,7 +77,7 @@ export function PageHeaderLeft(props: any) {
           )}
         </View>
       ) : null}
-      {!isInEditingMode ? (
+      {!isInEditingMode || isDesktopDevice ? (
         <HStack
           space={0.5}
           alignItems="center"
