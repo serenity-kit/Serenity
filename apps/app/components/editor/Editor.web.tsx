@@ -14,6 +14,7 @@ import {
 import { Editor as TipTapEditor } from "@tiptap/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { View as RNView } from "react-native";
+import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
 import { createEncryptAndUploadFileFunction } from "../../utils/file/createEncryptAndUploadFileFunction";
 import {
@@ -41,6 +42,9 @@ export default function Editor({
   const editorBottombarWrapperRef = useRef<RNView>(null);
   const editorIsFocusedRef = useRef(false);
   const wasNewOnFirstRender = useRef(isNew);
+  const setIsInEditingMode = useEditorStore(
+    (state) => state.setIsInEditingMode
+  );
 
   const positionToolbar = () => {
     if (editorBottombarWrapperRef.current && editorIsFocusedRef.current) {
@@ -116,8 +120,10 @@ export default function Editor({
           onFocus={() => {
             editorIsFocusedRef.current = true;
             showAndPositionToolbar();
+            setIsInEditingMode(true);
           }}
           onBlur={(params) => {
+            // check if click was not inside the editor bottom bar
             if (
               !(
                 params.event.relatedTarget &&
@@ -130,6 +136,7 @@ export default function Editor({
                 // @ts-expect-error - it's a div
                 editorBottombarWrapperRef.current.style.display = "none";
               }
+              setIsInEditingMode(false);
             }
           }}
           onCreate={(params) => {

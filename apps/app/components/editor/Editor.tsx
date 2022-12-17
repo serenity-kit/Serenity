@@ -93,6 +93,9 @@ export default function Editor({
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [keyboardAnimationDuration, setKeyboardAnimationDuration] = useState(0);
   const store = useEditorStore();
+  const setIsInEditingMode = useEditorStore(
+    (state) => state.setIsInEditingMode
+  );
 
   const encryptAndUploadFile = useMemo(() => {
     return createEncryptAndUploadFileFunction({
@@ -115,12 +118,12 @@ export default function Editor({
         setKeyboardAnimationDuration(event.duration);
         setKeyboardHeight(event.endCoordinates.height);
         setIsEditorBottombarVisible(true);
-        store.setIsInEditingMode(true);
+        setIsInEditingMode(true);
       }
     );
     const hideSubscription = Keyboard.addListener("keyboardWillHide", () => {
       setIsEditorBottombarVisible(false);
-      store.setIsInEditingMode(false);
+      setIsInEditingMode(false);
     });
 
     store.subscribeToBlurTrigger(() => {
