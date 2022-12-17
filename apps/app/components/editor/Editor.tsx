@@ -134,7 +134,7 @@ export default function Editor({
       `);
     });
 
-    editorToolbarService.onEvent((args) => {
+    const onEventListener = (args) => {
       let params: UpdateEditorParams | null = null;
       if (args.type === "UNDO") {
         params = { variant: "undo" };
@@ -147,12 +147,15 @@ export default function Editor({
           true;
         `);
       }
-    });
+    };
+
+    editorToolbarService.onEvent(onEventListener);
 
     return () => {
       showSubscription.remove();
       hideSubscription.remove();
       store.removeAllSubscribers();
+      editorToolbarService.off(onEventListener);
     };
   }, []);
 

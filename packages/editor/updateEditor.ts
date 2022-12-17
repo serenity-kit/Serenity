@@ -36,8 +36,8 @@ export const updateEditor = (editor: Editor, params: UpdateEditorParams) => {
   } else if (params.variant === "update-image-attributes") {
     updateFileAttributes({ ...params.params, view: editor.view });
   } else if (params.variant === "undo") {
-    editor.commands.undo();
+    editor.chain().undo().focus().run();
   } else if (params.variant === "redo") {
-    editor.commands.redo();
+    editor.chain().redo().focus().run();
   }
 };

@@ -49,6 +49,8 @@ export function PageHeaderLeft(props: any) {
                 onPress={() => {
                   editorToolbarService.send("UNDO");
                 }}
+                // @ts-expect-error
+                dataSet={{ editorButton: "true" }}
               ></IconButton>
               <IconButton
                 size={"lg"}
@@ -58,6 +60,8 @@ export function PageHeaderLeft(props: any) {
                 onPress={() => {
                   editorToolbarService.send("REDO");
                 }}
+                // @ts-expect-error
+                dataSet={{ editorButton: "true" }}
               ></IconButton>
             </HStack>
           ) : (
@@ -73,7 +77,7 @@ export function PageHeaderLeft(props: any) {
           )}
         </View>
       ) : null}
-      {!isInEditingMode ? (
+      {!isInEditingMode || isDesktopDevice ? (
         <HStack
           space={0.5}
           alignItems="center"
