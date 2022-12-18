@@ -64,6 +64,16 @@ export type DownloadAndDecryptFileFunction = (
   params: DownloadAndDecryptFileParams
 ) => Promise<string>;
 
+type ShareOrDownloadFileParams = {
+  contentAsBase64: string;
+  mimeType: string;
+  fileName: string;
+};
+
+export type ShareOrDownloadFileFunction = (
+  params: ShareOrDownloadFileParams
+) => void;
+
 export type InsertImageParams = {
   width: number | null;
   height: number | null;

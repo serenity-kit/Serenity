@@ -172,6 +172,20 @@ export default function Editor({
             editorToolbarService.send("updateToolbarState", { toolbarState });
           }}
           encryptAndUploadFile={encryptAndUploadFile}
+          shareOrDownloadFile={({
+            mimeType,
+            contentAsBase64,
+            fileName: shareFileName,
+          }) => {
+            const dataUri = `data:${mimeType};base64,${contentAsBase64}`;
+            const element = document.createElement("a");
+            element.setAttribute("href", dataUri);
+            element.setAttribute("download", shareFileName);
+            element.style.display = "none";
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+          }}
         />
       </View>
       {!hasEditorSidebar && (

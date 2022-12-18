@@ -6,6 +6,7 @@ import {
   EncryptAndUploadFunctionFile,
   FileInfo,
   FileNodeAttributes,
+  ShareOrDownloadFileFunction,
 } from "./types";
 import { uploadFileProsemirrorPlugin } from "./uploadFileProsemirrorPlugin";
 
@@ -14,6 +15,7 @@ export interface ImageOptions {
   HTMLAttributes: Record<string, any>;
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
   downloadAndDecryptFile: DownloadAndDecryptFileFunction;
+  shareOrDownloadFile: ShareOrDownloadFileFunction;
 }
 
 const keyStore: { [fileId: string]: string } = {};
@@ -38,6 +40,7 @@ export const FileNodeExtension = Node.create<ImageOptions>({
         return { key: "", nonce: "", fileId: "" };
       },
       downloadAndDecryptFile: async () => "",
+      shareOrDownloadFile: async () => undefined,
     };
   },
 
@@ -54,6 +57,7 @@ export const FileNodeExtension = Node.create<ImageOptions>({
   addStorage() {
     return {
       downloadAndDecryptFile: this.options.downloadAndDecryptFile,
+      shareOrDownloadFile: this.options.shareOrDownloadFile,
     };
   },
 

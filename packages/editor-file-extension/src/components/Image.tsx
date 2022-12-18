@@ -10,13 +10,15 @@ type Props = {
   };
   state: FileState;
   selected: boolean;
+  mimeType: string;
 };
 
 export const Image: React.FC<Props> = (props) => {
-  const { subtypeAttributes, state } = props;
+  const { subtypeAttributes, state, mimeType } = props;
   const { width, height } = subtypeAttributes;
   const isDesktopDevice = useIsDesktopDevice();
   const isPortrait = height > width;
+  const dataUri = `data:${mimeType};base64,${state.contentAsBase64}`;
 
   return (
     <NodeViewWrapper
@@ -73,7 +75,7 @@ export const Image: React.FC<Props> = (props) => {
           </div>
         </View>
       ) : (
-        <img src={state.contentAsBase64} />
+        <img src={dataUri} />
       )}
     </NodeViewWrapper>
   );

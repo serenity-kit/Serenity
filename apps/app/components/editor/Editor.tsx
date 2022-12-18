@@ -21,6 +21,7 @@ import { editorToolbarService } from "../../machines/editorToolbarMachine";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
 import { createEncryptAndUploadFileFunction } from "../../utils/file/createEncryptAndUploadFileFunction";
+import { shareFile } from "../../utils/shareFile/shareFile";
 import { showToast } from "../../utils/toast/showToast";
 import { source } from "../../webviews/editor/source";
 import {
@@ -289,6 +290,10 @@ export default function Editor({
                 true;
               `);
             }
+          }
+          if (message.type === "downloadFile") {
+            const { contentAsBase64, fileName, mimeType } = message.content;
+            shareFile({ contentAsBase64, mimeType, fileName });
           }
         }}
         // Needed for .focus() to work

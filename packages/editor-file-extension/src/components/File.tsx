@@ -7,16 +7,6 @@ import { FileInfo, FileState } from "../types";
 import { formatBytes } from "../utils/formatBytes";
 import { Image } from "./Image";
 
-function download(fileName: string, contentAsBase64: string) {
-  const element = document.createElement("a");
-  element.setAttribute("href", contentAsBase64);
-  element.setAttribute("download", fileName);
-  element.style.display = "none";
-  document.body.appendChild(element);
-  element.click();
-  document.body.removeChild(element);
-}
-
 export const File = (props: any) => {
   const {
     fileInfo,
@@ -28,7 +18,8 @@ export const File = (props: any) => {
     ? fileInfo
     : { fileId: null, key: null, nonce: null };
 
-  const { downloadAndDecryptFile } = props.editor.storage.file;
+  const { downloadAndDecryptFile, shareOrDownloadFile } =
+    props.editor.storage.file;
 
   const fileStates = useFileStatesStore((state) => state.fileStates);
   const state: FileState = (fileId && fileStates[fileId]) ||
@@ -51,10 +42,9 @@ export const File = (props: any) => {
             key,
             publicNonce: nonce,
           });
-          const dataUri = `data:${mimeType};base64,${decryptedImageData}`;
           updateFileState(fileId, {
             step: "done",
-            contentAsBase64: dataUri,
+            contentAsBase64: decryptedImageData,
           });
         } catch (err) {
           updateFileState(fileId, {
@@ -82,6 +72,7 @@ export const File = (props: any) => {
         selected={props.selected}
         state={state}
         subtypeAttributes={props.node.attrs.subtypeAttributes}
+        mimeType={mimeType}
       />
     );
   }
@@ -161,9 +152,14 @@ export const File = (props: any) => {
               name="download-line"
               onPress={() => {
                 if (state.contentAsBase64) {
-                  download(fileName, state.contentAsBase64);
+                  shareOrDownloadFile({
+                    contentAsBase64: state.contentAsBase64,
+                    fileName,
+                    mimeType,
+                  });
                 }
               }}
+              disabled={!state.contentAsBase64}
             />
           </HStack>
         </HStack>
