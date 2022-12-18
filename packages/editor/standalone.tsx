@@ -134,6 +134,18 @@ ReactDOM.render(
           })
         );
       }}
+      shareOrDownloadFile={({ contentAsBase64, mimeType, fileName }) => {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: "downloadFile",
+            content: {
+              contentAsBase64: contentAsBase64,
+              mimeType,
+              fileName,
+            },
+          })
+        );
+      }}
     />
   </NativeBaseProvider>,
   domContainer
