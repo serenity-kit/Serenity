@@ -18,8 +18,7 @@ export const File = (props: any) => {
     ? fileInfo
     : { fileId: null, key: null, nonce: null };
 
-  const { downloadAndDecryptFile, shareOrDownloadFile } =
-    props.editor.storage.file;
+  const { downloadAndDecryptFile, shareOrSaveFile } = props.editor.storage.file;
 
   const fileStates = useFileStatesStore((state) => state.fileStates);
   const state: FileState = (fileId && fileStates[fileId]) ||
@@ -152,7 +151,7 @@ export const File = (props: any) => {
               name="download-line"
               onPress={() => {
                 if (state.contentAsBase64) {
-                  shareOrDownloadFile({
+                  shareOrSaveFile({
                     contentAsBase64: state.contentAsBase64,
                     fileName,
                     mimeType,

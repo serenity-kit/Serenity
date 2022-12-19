@@ -23,7 +23,7 @@ import {
   DownloadAndDecryptFileFunction,
   EncryptAndUploadFunctionFile,
   FileNodeExtension,
-  ShareOrDownloadFileFunction,
+  ShareOrSaveFileFunction,
 } from "../editor-file-extension/src";
 import "./awareness.css";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
@@ -45,7 +45,7 @@ type EditorProps = {
   onCreate?: (params: EditorEvents["create"]) => void;
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
   downloadAndDecryptFile: DownloadAndDecryptFileFunction;
-  shareOrDownloadFile: ShareOrDownloadFileFunction;
+  shareOrSaveFile: ShareOrSaveFileFunction;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -114,7 +114,7 @@ export const Editor = (props: EditorProps) => {
         FileNodeExtension.configure({
           encryptAndUploadFile: props.encryptAndUploadFile,
           downloadAndDecryptFile: props.downloadAndDecryptFile,
-          shareOrDownloadFile: props.shareOrDownloadFile,
+          shareOrSaveFile: props.shareOrSaveFile,
         }),
       ],
       onCreate: (params) => {
