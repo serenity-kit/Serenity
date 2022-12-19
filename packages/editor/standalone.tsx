@@ -134,7 +134,7 @@ ReactDOM.render(
           })
         );
       }}
-      shareOrDownloadFile={({ contentAsBase64, mimeType, fileName }) => {
+      shareOrSaveFile={({ contentAsBase64, mimeType, fileName }) => {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
             type: "downloadFile",

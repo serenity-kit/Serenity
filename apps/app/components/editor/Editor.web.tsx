@@ -172,7 +172,7 @@ export default function Editor({
             editorToolbarService.send("updateToolbarState", { toolbarState });
           }}
           encryptAndUploadFile={encryptAndUploadFile}
-          shareOrDownloadFile={({
+          shareOrSaveFile={({
             mimeType,
             contentAsBase64,
             fileName: shareFileName,
