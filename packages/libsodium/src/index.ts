@@ -1,11 +1,21 @@
-import sodium, { StringKeyPair } from "libsodium-wrappers";
+import sodium, {
+  from_base64,
+  StringKeyPair,
+  to_base64,
+} from "libsodium-wrappers";
 import {
   base64ToUrlSafeBase64,
   urlSafeBase64ToBase64,
 } from "./base64Conversion";
-import { from_base64, from_base64_to_string, to_base64 } from "./base64wasm";
-export type { KeyPair, KeyType, StringKeyPair } from "libsodium-wrappers";
-export { from_base64, from_base64_to_string, to_base64 } from "./base64wasm";
+import { from_base64_to_string } from "./base64wasm";
+export {
+  from_base64,
+  KeyPair,
+  KeyType,
+  StringKeyPair,
+  to_base64,
+} from "libsodium-wrappers";
+export { from_base64_to_string } from "./base64wasm";
 export const ready = sodium.ready;
 
 export const randombytes_buf = async (length: number): Promise<string> => {

@@ -1,11 +1,21 @@
-import sodium, { StringKeyPair } from "react-native-libsodium";
+import sodium, {
+  from_base64,
+  StringKeyPair,
+  to_base64,
+} from "react-native-libsodium";
 import {
   base64ToUrlSafeBase64,
   urlSafeBase64ToBase64,
 } from "./base64Conversion";
-import { from_base64, from_base64_to_string, to_base64 } from "./base64native";
-export type { KeyPair, KeyType, StringKeyPair } from "react-native-libsodium";
-export { from_base64, from_base64_to_string, to_base64 } from "./base64native";
+import { from_base64_to_string } from "./base64native";
+export {
+  from_base64,
+  KeyPair,
+  KeyType,
+  StringKeyPair,
+  to_base64,
+} from "react-native-libsodium";
+export { from_base64_to_string } from "./base64native";
 export const ready = sodium.ready;
 
 export const randombytes_buf = async (length: number): Promise<string> => {
