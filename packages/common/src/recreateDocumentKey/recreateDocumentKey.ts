@@ -6,10 +6,10 @@ type Params = {
   subkeyId: number;
 };
 
-export const recreateDocumentKey = async (params: Params) => {
+export const recreateDocumentKey = (params: Params) => {
   // TODO On the client and on the backend we should check no
   // subkeyId per folderKey is a duplicate.
-  return await kdfDeriveFromKey({
+  return kdfDeriveFromKey({
     key: params.folderKey,
     context: documentDerivedKeyContext,
     subkeyId: params.subkeyId,

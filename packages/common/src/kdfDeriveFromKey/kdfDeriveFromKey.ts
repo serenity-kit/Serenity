@@ -1,4 +1,10 @@
-import sodium from "@serenity-tools/libsodium";
+import {
+  crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
+  crypto_kdf_derive_from_key,
+  from_base64,
+  randombytes_uniform,
+  to_base64,
+} from "react-native-libsodium";
 
 type Params = {
   key: string;
@@ -11,17 +17,16 @@ type Params = {
 // While 2 ** 32 - 1 should be a valid uint32_t it failed
 const upperBound = 2 ** 31 - 1;
 
-export const kdfDeriveFromKey = async (params: Params) => {
-  const subkeyId =
-    params.subkeyId || (await sodium.randombytes_uniform(upperBound));
-  const derivedKey = await sodium.crypto_kdf_derive_from_key(
-    sodium.crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
+export const kdfDeriveFromKey = (params: Params) => {
+  const subkeyId = params.subkeyId || randombytes_uniform(upperBound);
+  const derivedKey = crypto_kdf_derive_from_key(
+    crypto_aead_xchacha20poly1305_ietf_KEYBYTES,
     subkeyId,
     params.context,
-    params.key
+    from_base64(params.key)
   );
   return {
     subkeyId,
-    key: derivedKey,
+    key: to_base64(derivedKey),
   };
 };

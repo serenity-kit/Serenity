@@ -87,7 +87,7 @@ test("create initial workspace structure", async () => {
   });
   expect(typeof workspaceKey).toBe("string");
   // TODO: derive folder key from trace
-  const folderKey = await kdfDeriveFromKey({
+  const folderKey = kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
     subkeyId: folder.keyDerivationTrace.subkeyId,
@@ -100,7 +100,7 @@ test("create initial workspace structure", async () => {
   });
   // TODO: derive document key from trace
   expect(decryptedFolderName).toBe("Getting Started");
-  const documentKey = await recreateDocumentKey({
+  const documentKey = recreateDocumentKey({
     folderKey: folderKey.key,
     subkeyId: document.nameKeyDerivationTrace.subkeyId,
   });

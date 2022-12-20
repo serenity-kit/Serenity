@@ -45,12 +45,12 @@ test("user should be able to create a document", async () => {
     deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspace: userData1.workspace,
   });
-  const folderKeyResult = await kdfDeriveFromKey({
+  const folderKeyResult = kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
     subkeyId: userData1.folder.keyDerivationTrace.subkeyId,
   });
-  let documentContentKeyResult = await createDocumentKey({
+  let documentContentKeyResult = createDocumentKey({
     folderKey: folderKeyResult.key,
   });
   const result = await createDocument({

@@ -5,18 +5,18 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("create new subkey", async () => {
+test("create new subkey", () => {
   const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const result = await kdfDeriveFromKey({ key: kdfKey, context: "serenity" });
+  const result = kdfDeriveFromKey({ key: kdfKey, context: "serenity" });
   const { subkeyId, key } = result;
   expect(typeof subkeyId).toBe("number");
   expect(typeof key).toBe("string");
   expect(key.length).toBe(43);
 });
 
-test("reconstruct subkey based on the existing subkeyId", async () => {
+test("reconstruct subkey based on the existing subkeyId", () => {
   const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const result = await kdfDeriveFromKey({
+  const result = kdfDeriveFromKey({
     key: kdfKey,
     context: "serenity",
     subkeyId: 5200022,

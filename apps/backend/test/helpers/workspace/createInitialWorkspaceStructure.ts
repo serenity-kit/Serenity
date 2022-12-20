@@ -157,7 +157,7 @@ export const createInitialWorkspaceStructure = async ({
   };
 
   // propare the document key
-  const documentKeyResult = await createDocumentKey({
+  const documentKeyResult = createDocumentKey({
     folderKey,
   });
   const documentKey = documentKeyResult.key;
@@ -171,7 +171,7 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;
 
   // prepare the snapshot key
-  const snapshotKey = await createSnapshotKey({
+  const snapshotKey = createSnapshotKey({
     folderKey,
   });
   const snapshot = await createIntroductionDocumentSnapshot({

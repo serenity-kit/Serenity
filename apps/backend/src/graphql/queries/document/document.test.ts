@@ -42,7 +42,7 @@ const setup = async () => {
     receiverDeviceEncryptionPrivateKey: result.encryptionPrivateKey,
   });
   addedFolder = result.folder;
-  const folderKeyResult = await kdfDeriveFromKey({
+  const folderKeyResult = kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
     subkeyId: addedFolder.subkeyId,
@@ -98,7 +98,7 @@ test("user should be retrieve a document", async () => {
   expect(typeof retrievedDocument.nameKeyDerivationTrace.subkeyId).toBe(
     "number"
   );
-  const documentSubkey = await recreateDocumentKey({
+  const documentSubkey = recreateDocumentKey({
     folderKey,
     subkeyId: retrievedDocument.nameKeyDerivationTrace.subkeyId,
   });

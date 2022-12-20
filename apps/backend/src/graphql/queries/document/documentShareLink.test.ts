@@ -23,7 +23,7 @@ const setup = async () => {
     keyDerivationTrace: userData.folder.keyDerivationTrace,
     activeDevice: userData.webDevice,
   });
-  const snapshotKeyData = await createSnapshotKey({
+  const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace[folderKeyTrace.length - 1].key,
   });
   const createDocumentShareLinkResponse = await createDocumentShareLink({

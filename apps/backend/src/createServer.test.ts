@@ -53,7 +53,7 @@ const setup = async () => {
     receiverDeviceEncryptionPrivateKey: result.encryptionPrivateKey,
   });
   addedFolder = result.folder;
-  const folderKeyResult = await kdfDeriveFromKey({
+  const folderKeyResult = kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
     subkeyId: addedFolder.subkeyId,
@@ -156,7 +156,7 @@ test("successfully creates a snapshot", async () => {
 
   await waitForClientState(client, client.OPEN);
 
-  const snapshotKey = await createSnapshotKey({ folderKey });
+  const snapshotKey = createSnapshotKey({ folderKey });
   const keyDerivationTrace = {
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     subkeyId: snapshotKey.subkeyId,
@@ -210,7 +210,7 @@ test("successfully creates an update", async () => {
 
   await waitForClientState(client, client.OPEN);
 
-  const snapshotKey = await createSnapshotKey({ folderKey });
+  const snapshotKey = createSnapshotKey({ folderKey });
   const signatureKeyPair: KeyPair = {
     publicKey: sodium.from_base64(webDevice!.signingPublicKey),
     privateKey: sodium.from_base64(webDevice!.signingPrivateKey),

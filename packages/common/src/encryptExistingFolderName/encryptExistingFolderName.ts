@@ -17,7 +17,7 @@ export const encryptExistingFolderName = async (params: Params) => {
   if (!canonicalizedPublicData) {
     throw new Error("Invalid public data for encrypting the name.");
   }
-  const folderKey = await kdfDeriveFromKey({
+  const folderKey = kdfDeriveFromKey({
     key: params.parentKey,
     context: folderDerivedKeyContext,
     subkeyId: params.subkeyId,

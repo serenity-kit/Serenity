@@ -105,7 +105,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       };
 
       // prepare document
-      const documentKeyData = await createDocumentKey({
+      const documentKeyData = createDocumentKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
       const encryptedDocumentTitle = await encryptDocumentTitle({
@@ -125,7 +125,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       };
 
       // prepare document snapshot
-      const snapshotKey = await createSnapshotKey({
+      const snapshotKey = createSnapshotKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
       const snapshot = await createIntroductionDocumentSnapshot({

@@ -27,7 +27,7 @@ export const updateDocumentName = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const documentKeyData = await createDocumentKey({
+  const documentKeyData = createDocumentKey({
     folderKey,
   });
   const encryptedDocumentResult = await encryptDocumentTitle({

@@ -63,7 +63,7 @@ const setup = async () => {
       userAndWorkspaceData.encryptionPrivateKey,
   });
   addedFolder = userAndWorkspaceData.folder;
-  const folderKeyResult = await kdfDeriveFromKey({
+  const folderKeyResult = kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
     subkeyId: addedFolder.subkeyId,
@@ -101,7 +101,7 @@ test("successfully creates a snapshot", async () => {
 
   await waitForClientState(client, client.OPEN);
 
-  const snapshotKey = await createSnapshotKey({ folderKey });
+  const snapshotKey = createSnapshotKey({ folderKey });
   lastSnapshotKey = snapshotKey.key;
   const keyDerivationTrace = {
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
@@ -272,7 +272,7 @@ test("snapshot based on old workspace key fails", async () => {
 
   await waitForClientState(client, client.OPEN);
 
-  const snapshotKey = await createSnapshotKey({ folderKey });
+  const snapshotKey = createSnapshotKey({ folderKey });
   const keyDerivationTrace = {
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     subkeyId: snapshotKey.subkeyId,
@@ -341,14 +341,14 @@ test("successfully creates a snapshot", async () => {
       workspaceKeyBox.creatorDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: encryptionPrivateKey,
   });
-  const folderKeyResult = await kdfDeriveFromKey({
+  const folderKeyResult = kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
     subkeyId: addedFolder.subkeyId,
   });
   folderKey = folderKeyResult.key;
 
-  const snapshotKey = await createSnapshotKey({ folderKey });
+  const snapshotKey = createSnapshotKey({ folderKey });
   lastSnapshotKey = snapshotKey.key;
   const keyDerivationTrace = {
     workspaceKeyId: workspaceResult.workspace.currentWorkspaceKey.id,
