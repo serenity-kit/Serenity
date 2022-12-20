@@ -13,11 +13,10 @@ export const createEncryptAndUploadFileFunction = ({
 }: CreateEncryptAndUploadFileFunctionParams) => {
   return async (fileAsBase64: string) => {
     const key = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
-    const { encryptedBase64ImageData, publicNonce } = await encryptFile({
+    const { fileCiphertext, publicNonce } = encryptFile({
       base64FileData: fileAsBase64,
       key,
     });
-    const binaryImageData = sodium.from_base64(encryptedBase64ImageData);
     const result = await runInitiateFileUploadMutation(
       {
         initiateFileUpload: {
@@ -34,7 +33,7 @@ export const createEncryptAndUploadFileFunction = ({
     }
     const response = await fetch(uploadUrl, {
       method: "PUT",
-      body: binaryImageData,
+      body: fileCiphertext,
     });
     if (!response || response.status !== 200) {
       throw new Error("Failed to upload the file");
