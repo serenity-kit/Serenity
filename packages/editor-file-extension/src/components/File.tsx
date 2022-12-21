@@ -95,7 +95,7 @@ export const File = (props: any) => {
       data-drag-handle=""
     >
       <div className={"w-full rounded" + (isLoading && " shimmerBG")}>
-        <HStack space={2} alignItems={"center"} style={tw`p-1.5`}>
+        <HStack space={2} alignItems={"center"} style={tw`mt-2 p-1.5`}>
           <Icon
             name={
               hasFailedToDecrypt
