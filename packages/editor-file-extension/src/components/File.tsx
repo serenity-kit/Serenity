@@ -90,8 +90,8 @@ export const File = (props: any) => {
             )}`
           : "none",
         // using these to align Icon with text without cramping the focus-outline to the content
-        marginRight: -6,
-        marginLeft: -6,
+        marginRight: -8,
+        marginLeft: -8,
       }}
       // needs to be here otherwise image won't be draggable
       // read https://github.com/ueberdosis/tiptap/issues/2597 for more detailed info
