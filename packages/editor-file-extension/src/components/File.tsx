@@ -106,7 +106,7 @@ export const File = (props: any) => {
                 : "file-transfer-line"
             }
             size={5}
-            color={isDone ? "gray-900" : "gray-600"}
+            color={isDone ? "primary-400" : "gray-600"}
           />
           <Text
             variant="md"
