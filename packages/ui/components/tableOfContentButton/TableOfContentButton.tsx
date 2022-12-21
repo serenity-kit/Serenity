@@ -1,7 +1,9 @@
-import React, { useState } from "react";
-import { StyleSheet, Platform } from "react-native";
 import { useFocusRing } from "@react-native-aria/focus";
-import { Pressable, PressableProps, tw, Text } from "@serenity-tools/ui";
+import React, { useState } from "react";
+import { Platform, StyleSheet } from "react-native";
+import { tw } from "../../tailwind";
+import { Pressable, PressableProps } from "../pressable/Pressable";
+import { Text } from "../text/Text";
 
 export type TableOfContentButtonProps = PressableProps & {
   active?: boolean;
