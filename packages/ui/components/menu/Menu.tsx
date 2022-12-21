@@ -1,4 +1,8 @@
-import { BottomSheetModal, BottomSheetModalProps } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetModal,
+  BottomSheetModalProps,
+  BottomSheetBackdrop,
+} from "@gorhom/bottom-sheet";
 import React, { useCallback, useLayoutEffect, useRef } from "react";
 import { StyleSheet, TouchableWithoutFeedback, View } from "react-native";
 import { Popover } from "react-native-popper";
@@ -83,6 +87,19 @@ export const Menu = ({
     },
   });
 
+  // see https://github.com/gorhom/react-native-bottom-sheet/issues/585 for more details
+  const renderBackdrop = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.25}
+        {...props}
+      />
+    ),
+    []
+  );
+
   return (
     <>
       {triggerElem}
@@ -92,6 +109,7 @@ export const Menu = ({
         index={0}
         onChange={handleSheetChanges}
         style={tw`shadow-black shadow-opacity-5 shadow-radius-2 shadow-offset-0/0`}
+        backdropComponent={renderBackdrop}
       >
         {children}
       </BottomSheetModal>
