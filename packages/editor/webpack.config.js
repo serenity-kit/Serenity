@@ -59,6 +59,14 @@ module.exports = {
           loader: "babel-loader",
         },
       },
+      // react-native-reanimated includes raw JSX and therefor needs to be compiled
+      {
+        test: /\.(js|jsx|ts|tsx)$/,
+        include: /node_modules\/react-native-reanimated/,
+        use: {
+          loader: "babel-loader",
+        },
+      },
       {
         test: /\.css$/i,
         use: [MiniCssExtractPlugin.loader, "css-loader"],

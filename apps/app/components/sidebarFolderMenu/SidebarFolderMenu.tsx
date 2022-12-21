@@ -14,9 +14,14 @@ export default function SidebarFolderMenu(props: Props) {
 
   return (
     <Menu
-      placement="bottom left"
-      style={tw`w-60`}
-      offset={2}
+      bottomSheetModalProps={{
+        snapPoints: [200],
+      }}
+      popoverProps={{
+        placement: "bottom left",
+        offset: 2,
+        style: tw`w-60`,
+      }}
       isOpen={isOpenMenu}
       onChange={setIsOpenMenu}
       trigger={

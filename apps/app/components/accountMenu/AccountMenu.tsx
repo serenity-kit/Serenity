@@ -11,7 +11,6 @@ import {
   Text,
   tw,
   useIsDesktopDevice,
-  useIsPermanentLeftSidebar,
   View,
   WorkspaceAvatar,
 } from "@serenity-tools/ui";
@@ -60,13 +59,21 @@ export default function AccountMenu({
 
   return (
     <Menu
-      placement="bottom left"
-      // we could solve this via additional margin but that's kinda hacky and messes with the BoxShadow component
-      // style={tw`ml-4`}
-      offset={2}
-      // can never be more than half the trigger width !! should be something like 16+24+8+labellength*12-24
-      // or we only use the icon as the trigger (worsens ux)
-      crossOffset={120}
+      bottomSheetModalProps={{
+        snapPoints: [
+          // 50 is the height of a single workspace item
+          180 + (workspacesResult.data?.workspaces?.nodes?.length || 0) * 50,
+        ],
+      }}
+      popoverProps={{
+        placement: "bottom left",
+        // we could solve this via additional margin but that's kinda hacky and messes with the BoxShadow component
+        // style={tw`ml-4`}
+        offset: 2,
+        // can never be more than half the trigger width !! should be something like 16+24+8+labellength*12-24
+        // or we only use the icon as the trigger (worsens ux)
+        crossOffset: 120,
+      }}
       isOpen={isOpenAccountMenu}
       onChange={setIsOpenAccountMenu}
       trigger={

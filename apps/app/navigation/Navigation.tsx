@@ -1,3 +1,4 @@
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import {
   DarkTheme,
@@ -500,7 +501,10 @@ export default function Navigation({
       linking={getLinking(isPhoneDimensions(dimensions.width))}
       theme={colorScheme === "dark" ? DarkTheme : LightTheme}
     >
-      <RootNavigator />
+      {/* needs to be inside the navigation container for navigate to work inside bottom sheet modals */}
+      <BottomSheetModalProvider>
+        <RootNavigator />
+      </BottomSheetModalProvider>
     </NavigationContainer>
   );
 }
