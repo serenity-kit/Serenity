@@ -109,6 +109,8 @@ export const File = (props: any) => {
             variant="md"
             muted={!isDone}
             style={hasFailedToDecrypt && tw`line-through`}
+            numberOfLines={1}
+            ellipsizeMode="middle"
           >
             {fileName}
           </Text>
