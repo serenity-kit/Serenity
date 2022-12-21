@@ -1,4 +1,4 @@
-const sizes = [" bytes", "kb", "mb", "gb", "tb"];
+const sizes = ["bytes", "kb", "mb", "gb", "tb"];
 const decimals = 1;
 const base = 1024;
 
