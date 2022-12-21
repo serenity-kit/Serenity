@@ -89,13 +89,16 @@ export const File = (props: any) => {
               hasFailedToDecrypt ? "error-200" : "primary-400"
             )}`
           : "none",
+        // using these to align Icon with text without cramping the focus-outline to the content
+        marginRight: -8,
+        marginLeft: -8,
       }}
       // needs to be here otherwise image won't be draggable
       // read https://github.com/ueberdosis/tiptap/issues/2597 for more detailed info
       data-drag-handle=""
     >
       <div className={"w-full rounded" + (isLoading && " shimmerBG")}>
-        <HStack space={2} alignItems={"center"} style={tw`p-1.5`}>
+        <HStack space={2} alignItems={"center"} style={tw`mt-2 p-1.5`}>
           <Icon
             name={
               hasFailedToDecrypt
@@ -103,12 +106,14 @@ export const File = (props: any) => {
                 : "file-transfer-line"
             }
             size={5}
-            color={isDone ? "gray-900" : "gray-600"}
+            color={isDone ? "primary-400" : "gray-600"}
           />
           <Text
             variant="md"
             muted={!isDone}
             style={hasFailedToDecrypt && tw`line-through`}
+            numberOfLines={1}
+            ellipsizeMode="middle"
           >
             {fileName}
           </Text>

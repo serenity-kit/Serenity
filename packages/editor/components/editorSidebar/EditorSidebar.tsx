@@ -168,7 +168,7 @@ export default function EditorSidebar({
           <SidebarDivider />
 
           <Heading lvl={4} style={tw`ml-4`} padded>
-            Images
+            Media
           </Heading>
 
           <SidebarButton
@@ -209,7 +209,7 @@ export default function EditorSidebar({
           >
             <EditorSidebarIcon isActive={false} name="image-line" />
             <Text variant="xs" bold={false}>
-              Upload Image
+              Image
             </Text>
           </SidebarButton>
 
@@ -324,9 +324,9 @@ export default function EditorSidebar({
                 input.click();
               }}
             >
-              <EditorSidebarIcon isActive={false} name="image-line" />
+              <EditorSidebarIcon isActive={false} name="attachment-2" />
               <Text variant="xs" bold={false}>
-                Upload File
+                File
               </Text>
             </SidebarButton>
           ) : null}

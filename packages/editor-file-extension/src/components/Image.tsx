@@ -28,6 +28,7 @@ export const Image: React.FC<Props> = (props) => {
               state.step === "failedToDecrypt" ? "error-200" : "primary-400"
             )}`
           : "none",
+        marginTop: 8,
       }}
       // needs to be here otherwise image won't be draggable
       // read https://github.com/ueberdosis/tiptap/issues/2597 for more detailed info
