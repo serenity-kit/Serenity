@@ -22,9 +22,14 @@ export default function MemberMenu(props: Props) {
   return (
     <Menu
       {...rest}
-      placement="bottom left"
-      style={tw`w-60`}
-      offset={6}
+      bottomSheetModalProps={{
+        snapPoints: [180],
+      }}
+      popoverProps={{
+        placement: "bottom left",
+        offset: 6,
+        style: tw`w-60`,
+      }}
       isOpen={isOpenMenu}
       onChange={setIsOpenMenu}
       trigger={

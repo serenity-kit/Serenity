@@ -1579,9 +1579,14 @@ export default function DesignSystemScreen(
         </Text>
         <DSExampleArea>
           <Menu
-            placement="bottom left"
-            style={tw`w-60`}
-            offset={8}
+            bottomSheetModalProps={{
+              snapPoints: [140],
+            }}
+            popoverProps={{
+              placement: "bottom left",
+              offset: 8,
+              style: tw`w-60`,
+            }}
             isOpen={isOpenPopover}
             onChange={setIsOpenPopover}
             trigger={

@@ -144,10 +144,15 @@ export default function SidebarPageMenu(props: Props) {
   return (
     <>
       <Menu
-        placement="bottom left"
-        style={tw`w-60`}
-        offset={2}
         isOpen={state.value !== "idle"}
+        bottomSheetModalProps={{
+          snapPoints: [140],
+        }}
+        popoverProps={{
+          placement: "bottom left",
+          offset: 2,
+          style: tw`w-60`,
+        }}
         onChange={(isOpen) => {
           if (!isOpen) {
             send("closeMenu");
@@ -187,6 +192,7 @@ export default function SidebarPageMenu(props: Props) {
           Delete
         </MenuButton>
       </Menu>
+
       <Modal
         isVisible={state.value === "deleteModal" || state.value === "deleting"}
         onBackdropPress={() => {
