@@ -1,7 +1,7 @@
 import {
+  BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetModalProps,
-  BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
 import React, { useCallback, useLayoutEffect, useRef } from "react";
 import { StyleSheet, TouchableWithoutFeedback, View } from "react-native";
@@ -55,6 +55,19 @@ export const Menu = ({
     }
   }, [isOpen]);
 
+  // see https://github.com/gorhom/react-native-bottom-sheet/issues/585 for more details
+  const renderBackdrop = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.25}
+        {...props}
+      />
+    ),
+    []
+  );
+
   if (isDesktopDevice) {
     return (
       <Popover
@@ -86,19 +99,6 @@ export const Menu = ({
       onChange(!isOpen);
     },
   });
-
-  // see https://github.com/gorhom/react-native-bottom-sheet/issues/585 for more details
-  const renderBackdrop = useCallback(
-    (props) => (
-      <BottomSheetBackdrop
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.25}
-        {...props}
-      />
-    ),
-    []
-  );
 
   return (
     <>
