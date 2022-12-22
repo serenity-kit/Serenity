@@ -149,7 +149,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               props.navigation.closeDrawer();
             }}
             name="double-arrow-left"
-            size={isDesktopDevice ? "md" : "lg"}
+            size={isDesktopDevice ? "md" : "xl"}
           ></IconButton>
         )}
       </HStack>

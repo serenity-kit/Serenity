@@ -34,7 +34,7 @@ export function PageHeaderRight() {
         {isInEditingMode && !hasEditorSidebar ? (
           <IconButton
             name="check-line"
-            size="lg"
+            size="xl"
             color="primary-500"
             onPress={() => {
               triggerBlur();
@@ -74,7 +74,7 @@ export function PageHeaderRight() {
               <>
                 <IconButton
                   name="share-line"
-                  size="lg"
+                  size="xl"
                   color="gray-900"
                   onPress={() => {
                     setIsActiveShareModal(true);
