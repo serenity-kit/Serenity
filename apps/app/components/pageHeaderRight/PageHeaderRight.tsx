@@ -39,7 +39,7 @@ export function PageHeaderRight() {
             onPress={() => {
               triggerBlur();
             }}
-            // TODO transparent
+            transparent
           />
         ) : (
           <>
