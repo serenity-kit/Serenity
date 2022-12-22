@@ -1,6 +1,6 @@
 import { Editor } from "@tiptap/core";
 import { updateFileAttributes } from "../editor-file-extension/src";
-import { UpdateEditorParams } from "./types";
+import { FileNodeAttributes, UpdateEditorParams } from "./types";
 
 export const updateEditor = (editor: Editor, params: UpdateEditorParams) => {
   if (params.variant === "toggle-bold") {
@@ -29,10 +29,20 @@ export const updateEditor = (editor: Editor, params: UpdateEditorParams) => {
   } else if (params.variant === "toggle-task-list") {
     editor.chain().focus().toggleTaskList().run();
   } else if (params.variant === "insert-image") {
-    editor.commands.insertContent({
-      type: "image",
-      attrs: params.params,
-    });
+    const { width, height, mimeType, uploadId } = params.params;
+    const attrs: FileNodeAttributes = {
+      subtype: "image",
+      subtypeAttributes: {
+        width,
+        height,
+      },
+      mimeType,
+      uploadId,
+    };
+    editor.commands.insertContent(
+      { type: "file", attrs },
+      { updateSelection: false }
+    );
   } else if (params.variant === "update-image-attributes") {
     updateFileAttributes({ ...params.params, view: editor.view });
   } else if (params.variant === "undo") {
