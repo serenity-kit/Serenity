@@ -68,7 +68,8 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
       // disable default outline styles
       // @ts-expect-error - web only
       _focusVisible={{ _web: { style: { outlineStyle: "none" } } }}
-      style={(styles.pressable, props.style)}
+      // @ts-expect-error - native base style mismatch
+      style={[styles.pressable, rest.style]}
     >
       {({ isPressed, isHovered, isFocused }) => {
         return (
