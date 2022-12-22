@@ -1,5 +1,6 @@
 import {
   BottomSheetBackdrop,
+  BottomSheetBackdropProps,
   BottomSheetModal,
   BottomSheetModalProps,
 } from "@gorhom/bottom-sheet";
@@ -57,7 +58,7 @@ export const Menu = ({
 
   // see https://github.com/gorhom/react-native-bottom-sheet/issues/585 for more details
   const renderBackdrop = useCallback(
-    (props) => (
+    (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop
         disappearsOnIndex={-1}
         appearsOnIndex={0}
