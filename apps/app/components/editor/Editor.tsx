@@ -83,6 +83,7 @@ export default function Editor({
   documentId,
   documentLoaded,
   workspaceId,
+  username,
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
@@ -303,6 +304,7 @@ export default function Editor({
           window.initialContent = ${JSON.stringify(
             Array.apply([], Y.encodeStateAsUpdateV2(yDocRef.current))
           )};
+          window.username = "${username}";
           true; // this is required, or you'll sometimes get silent failures
         `}
         onLoad={() => {

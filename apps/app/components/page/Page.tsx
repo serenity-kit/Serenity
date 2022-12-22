@@ -81,7 +81,10 @@ export default function Page({
   const shouldReconnectWebsocketConnectionRef = useRef(true);
   const createSnapshotInProgressRef = useRef<boolean>(false); // only used for the UI
   const latestServerVersionRef = useRef<number | null>(null);
-  const [documentLoaded, setDocumentLoaded] = useState(false);
+  const [documentLoadedInfo, setDocumentLoadedInfo] = useState({
+    loaded: false,
+    username: "Unknown user",
+  });
   const websocketState = useWebsocketState();
   const snapshotKeyRef = useRef<Uint8Array | null>(null);
 
@@ -263,9 +266,6 @@ export default function Page({
 
       const me = await runMeQuery({});
 
-      yAwarenessRef.current.setLocalStateField("user", {
-        name: me.data?.me?.username ?? "Unknown user",
-      });
       let document: Document | undefined = undefined;
       try {
         const fetchedDocument = await getDocument({
@@ -302,7 +302,10 @@ export default function Page({
               await applySnapshot(data.snapshot, snapshotKeyRef.current);
             }
             await applyUpdates(data.updates, snapshotKeyRef.current);
-            setDocumentLoaded(true);
+            setDocumentLoadedInfo({
+              loaded: true,
+              username: me.data?.me?.username ?? "Unknown user",
+            });
 
             // check for pending snapshots or pending updates and run them
             const pendingChanges = getPending(docId);
@@ -591,7 +594,8 @@ export default function Page({
       openDrawer={navigation.openDrawer}
       updateTitle={updateTitle}
       isNew={isNew}
-      documentLoaded={documentLoaded}
+      documentLoaded={documentLoadedInfo.loaded}
+      username={documentLoadedInfo.username}
     />
   );
 }

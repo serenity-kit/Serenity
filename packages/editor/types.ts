@@ -91,11 +91,13 @@ declare global {
     editor: any;
     isNew: boolean;
     initialContent: any;
+    username: string;
     updateEditor: (paramsString: string) => void;
     applyYjsUpdate: (update: any) => void;
     applyYAwarenessUpdate: (update: any) => void;
     blurEditor: () => void;
     resolveImageRequest: (fileId: string, base64: string) => void;
     rejectImageRequest: (fileId: string, reason: string) => void;
+    updateUsername: (username: string) => void;
   }
 }
