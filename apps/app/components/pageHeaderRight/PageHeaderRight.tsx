@@ -29,6 +29,7 @@ export function PageHeaderRight() {
         } px-3 border-b border-gray-200`}
         justifyContent="space-between"
         alignItems="center"
+        space={hasEditorSidebar ? 0 : 4}
       >
         {isInEditingMode && !hasEditorSidebar ? (
           <IconButton
