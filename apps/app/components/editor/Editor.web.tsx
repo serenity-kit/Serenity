@@ -35,6 +35,7 @@ export default function Editor({
   workspaceId,
   isNew,
   updateTitle,
+  username,
 }: EditorProps) {
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
@@ -99,6 +100,10 @@ export default function Editor({
       editorToolbarService.off(onEventListener);
     };
   }, []);
+
+  useEffect(() => {
+    yAwarenessRef.current.setLocalStateField("user", { name: username });
+  }, [username]);
 
   const encryptAndUploadFile = useMemo(() => {
     return createEncryptAndUploadFileFunction({
