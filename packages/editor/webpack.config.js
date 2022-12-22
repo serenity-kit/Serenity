@@ -89,6 +89,8 @@ module.exports = {
     new webpack.DefinePlugin({
       // needed since react-native uses it internally
       __DEV__: JSON.stringify(false),
+      process: { env: {} }, // needed for react-native-reanimated
     }),
+    new webpack.EnvironmentPlugin({ JEST_WORKER_ID: null }), // needed for react-native-reanimated
   ],
 };
