@@ -1,6 +1,9 @@
+import {
+  FileNodeAttributes,
+  updateFileAttributes,
+} from "@serenity-tools/editor-file-extension";
 import { Editor } from "@tiptap/core";
-import { updateFileAttributes } from "../editor-file-extension/src";
-import { FileNodeAttributes, UpdateEditorParams } from "./types";
+import { UpdateEditorParams } from "./types";
 
 export const updateEditor = (editor: Editor, params: UpdateEditorParams) => {
   if (params.variant === "toggle-bold") {

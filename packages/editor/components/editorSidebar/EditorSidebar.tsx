@@ -1,4 +1,15 @@
 import {
+  EncryptAndUploadFunctionFile,
+  FileNodeAttributes,
+  fileToBase64,
+  initiateImagePicker,
+  insertFiles,
+  InsertImageParams,
+  insertImages,
+  updateFileAttributes,
+  UpdateFileAttributesParams,
+} from "@serenity-tools/editor-file-extension";
+import {
   EditorSidebarIcon,
   Heading,
   SidebarButton,
@@ -14,17 +25,6 @@ import { Level } from "@tiptap/extension-heading";
 import { Editor } from "@tiptap/react";
 import React from "react";
 import { Platform } from "react-native";
-import {
-  EncryptAndUploadFunctionFile,
-  FileNodeAttributes,
-  initiateImagePicker,
-  insertFiles,
-  InsertImageParams,
-  insertImages,
-  updateFileAttributes,
-  UpdateFileAttributesParams,
-} from "../../../editor-file-extension/src";
-import { fileToBase64 } from "../../../editor-file-extension/src/utils/fileToBase64";
 import TableOfContents from "../tableOfContents/TableOfContents";
 
 type EditorSidebarProps = {
