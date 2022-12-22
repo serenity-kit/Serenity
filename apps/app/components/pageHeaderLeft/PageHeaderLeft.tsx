@@ -42,7 +42,7 @@ export function PageHeaderLeft(props: any) {
           {isInEditingMode ? (
             <HStack>
               <IconButton
-                size={"lg"}
+                size={"xl"}
                 name="arrow-go-back-line"
                 color={"gray-900"}
                 disabled={!canUndo}
@@ -53,7 +53,7 @@ export function PageHeaderLeft(props: any) {
                 dataSet={{ editorButton: "true" }}
               ></IconButton>
               <IconButton
-                size={"lg"}
+                size={"xl"}
                 name="arrow-go-forward-line"
                 color={"gray-900"}
                 disabled={!canRedo}
@@ -71,7 +71,7 @@ export function PageHeaderLeft(props: any) {
               }}
               name="arrow-left-line"
               color={"gray-900"}
-              size={isDesktopDevice ? "md" : "lg"}
+              size={isDesktopDevice ? "md" : "xl"}
               style={isDesktopDevice ? tw`` : tw`-mr-3`}
             />
           )}

@@ -133,7 +133,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       <HStack
         alignItems="center"
         justifyContent="space-between"
-        style={[tw`py-1.5 px-5 md:px-4`]}
+        style={[
+          tw`h-12 pr-2.5 pl-5 md:px-4`,
+          !isDesktopDevice && tw`border-b border-gray-200`,
+        ]}
       >
         <AccountMenu
           workspaceId={workspaceId}
@@ -146,12 +149,10 @@ export default function Sidebar(props: DrawerContentComponentProps) {
               props.navigation.closeDrawer();
             }}
             name="double-arrow-left"
-            size={isDesktopDevice ? "md" : "lg"}
+            size={isDesktopDevice ? "md" : "xl"}
           ></IconButton>
         )}
       </HStack>
-
-      {!isDesktopDevice ? <SidebarDivider collapsed /> : null}
 
       <View style={isDesktopDevice ? tw`pt-4` : tw`pt-5 pb-7`}>
         <SidebarLink

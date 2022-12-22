@@ -114,7 +114,10 @@ export default function DesignSystemScreen(
     return (
       <View
         {...props}
-        style={tw`-my-1.5 -mx-2 py-1.5 px-2 border border-dashed border-gray-200`}
+        style={[
+          tw`border border-dashed border-gray-200`,
+          props.padded && tw`-my-1.5 -mx-2 py-1.5 px-2`,
+        ]}
       >
         {props.children}
       </View>
@@ -406,15 +409,32 @@ export default function DesignSystemScreen(
           which for now only affects the clickable/hovered area.
         </Text>
         <Text variant="sm">
-          The default is regular, to make it a bit bigger use the{" "}
+          The default is medium, to make it a bit bigger use the{" "}
           <DSMono variant="property">lg</DSMono> property.
+        </Text>
+        <Text variant="sm" style={tw`mt-4`}>
+          For special cases such as the navigation-bar, which one should be able
+          to use with one hand, we use the{" "}
+          <DSMono variant="property">xl</DSMono> version for mobile to increase
+          clickability.
         </Text>
         <DSExampleArea>
           <IconButton name="double-arrow-left" color="gray-800" />
           <IconButton name="double-arrow-right" color="gray-800" />
           <IconButton name="double-arrow-left" color="gray-800" size="lg" />
           <IconButton name="double-arrow-right" color="gray-800" size="lg" />
+          <DSMarker>
+            <IconButton name="double-arrow-left" color="gray-800" size="xl" />
+          </DSMarker>
+          <DSMarker>
+            <IconButton name="double-arrow-right" color="gray-800" size="xl" />
+          </DSMarker>
         </DSExampleArea>
+        <Text style={tw`mt-4`} variant="xxs" muted>
+          Note that the xl-version has the same hover-area as the large one, as
+          it might be visible when the user clicks it, but the clickable area is
+          larger &#40;indicated by the dashed line&#41;.
+        </Text>
         <Heading lvl={3}>Styling</Heading>
         <Text variant="sm">
           As with <DSMono variant="component">Icons</DSMono> you can use the{" "}
@@ -669,7 +689,7 @@ export default function DesignSystemScreen(
               <UIHeading lvl={1} padded center>
                 Create your Account
               </UIHeading>
-              <DSMarker>
+              <DSMarker padded>
                 <Description variant={"login"}>
                   Type in your email and choose a password.
                   {"\n"}
@@ -722,7 +742,7 @@ export default function DesignSystemScreen(
         >
           <Box>
             <ModalHeader>Delete workspace ?</ModalHeader>
-            <DSMarker>
+            <DSMarker padded>
               <Description variant="modal">
                 Are you sure you want to delete the workspace “Paula's
                 Workspace” with all its pages and folders? You can't undo this
@@ -779,7 +799,7 @@ export default function DesignSystemScreen(
                     <UIHeading lvl={3} padded>
                       Manage Devices
                     </UIHeading>
-                    <DSMarker>
+                    <DSMarker padded>
                       <Description variant={"form"}>
                         The following list shows all the devices which are
                         currently linked to your account.

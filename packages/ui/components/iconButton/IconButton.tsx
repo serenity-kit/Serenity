@@ -13,7 +13,7 @@ export type IconButtonProps = PressableProps & {
   name: IconNames;
   color?: Color;
   label?: string;
-  size?: "md" | "lg";
+  size?: "md" | "lg" | "xl";
   transparent?: boolean;
   isLoading?: boolean;
 };
@@ -30,7 +30,15 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
     ...rest
   } = props;
 
-  let dimensions = size === "lg" ? "w-8 h-8" : "w-5 h-5";
+  // the pressable style sizing defines the clickable area
+  const pressableSize = {
+    md: "h-5 w-5",
+    lg: "h-8 w-8",
+    xl: "h-12 w-12",
+  };
+
+  // the dimensions of the button define the visible area when clicked or hovered
+  let dimensions = size === "md" ? "w-5 h-5" : "w-8 h-8";
   let iconColor = color ?? "gray-400";
 
   if (label) {
@@ -42,9 +50,17 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
     iconColor = "gray-500";
   }
 
+  // --- dev only
+  // const showClickableArea = false;
+
   const styles = StyleSheet.create({
-    pressable: tw.style(dimensions), // defines clickable area
-    view: tw.style(
+    pressable: tw.style(
+      label
+        ? dimensions
+        : tw`flex justify-center items-center ${pressableSize[size]}`
+      // showClickableArea && tw`bg-collaboration-honey/40`
+    ),
+    stack: tw.style(
       `${dimensions} flex ${
         !label ? "justify-center" : ""
       } items-center bg-transparent rounded-md ${
@@ -68,13 +84,14 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
       // disable default outline styles
       // @ts-expect-error - web only
       _focusVisible={{ _web: { style: { outlineStyle: "none" } } }}
-      style={(styles.pressable, props.style)}
+      // @ts-expect-error - native base style mismatch
+      style={[styles.pressable, rest.style]}
     >
       {({ isPressed, isHovered, isFocused }) => {
         return (
           <HStack
             style={[
-              styles.view,
+              styles.stack,
               isHovered && !isLoading && styles.hover,
               isPressed && !isLoading && styles.pressed,
               isFocusVisible && styles.focusVisible,

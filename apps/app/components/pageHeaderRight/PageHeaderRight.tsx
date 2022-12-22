@@ -29,16 +29,17 @@ export function PageHeaderRight() {
         } px-3 border-b border-gray-200`}
         justifyContent="space-between"
         alignItems="center"
+        space={hasEditorSidebar ? 0 : 4}
       >
         {isInEditingMode && !hasEditorSidebar ? (
           <IconButton
             name="check-line"
-            size="lg"
+            size="xl"
             color="primary-500"
             onPress={() => {
               triggerBlur();
             }}
-            // TODO transparent
+            transparent
           />
         ) : (
           <>
@@ -73,7 +74,7 @@ export function PageHeaderRight() {
               <>
                 <IconButton
                   name="share-line"
-                  size="lg"
+                  size="xl"
                   color="gray-900"
                   onPress={() => {
                     setIsActiveShareModal(true);
