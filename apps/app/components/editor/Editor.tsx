@@ -333,9 +333,9 @@ export default function Editor({
           editorBottombarState={editorBottombarState}
           onUpdate={(params: UpdateEditorParams) => {
             webViewRef.current?.injectJavaScript(`
-          window.updateEditor(\`${JSON.stringify(params)}\`);
-          true;
-        `);
+              window.updateEditor(\`${JSON.stringify(params)}\`);
+              true;
+            `);
           }}
           encryptAndUploadFile={encryptAndUploadFile}
         />
