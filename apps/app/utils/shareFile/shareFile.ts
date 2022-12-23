@@ -19,5 +19,6 @@ export const shareFile = async ({
   await FileSystem.writeAsStringAsync(uri, contentAsBase64, {
     encoding: FileSystem.EncodingType.Base64,
   });
-  Sharing.shareAsync(uri);
+  await Sharing.shareAsync(uri);
+  await FileSystem.deleteAsync(uri, { idempotent: true });
 };
