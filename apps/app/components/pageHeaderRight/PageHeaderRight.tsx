@@ -39,7 +39,7 @@ export function PageHeaderRight() {
             onPress={() => {
               triggerBlur();
             }}
-            transparent
+            // the prop `transparent` this causes a bug that hides the editor once you focus on the editor in safari (no sure why
           />
         ) : (
           <>
