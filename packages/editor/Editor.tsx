@@ -29,7 +29,7 @@ import "./awareness.css";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
 import { AwarnessExtension } from "./naisho-awareness-extension";
-import { SerenityScrollIntoViewOnEditModeExtension } from "./scroll-into-view-on-edit-mode-extensions";
+import { SerenityScrollIntoViewForEditModeExtension } from "./scroll-into-view-for-edit-mode-extensions";
 
 type EditorProps = {
   documentId: string;
@@ -110,7 +110,7 @@ export const Editor = (props: EditorProps) => {
         AwarnessExtension.configure({
           awareness: props.yAwarenessRef.current,
         }),
-        SerenityScrollIntoViewOnEditModeExtension.configure({}),
+        SerenityScrollIntoViewForEditModeExtension.configure({}),
         FileNodeExtension.configure({
           encryptAndUploadFile: props.encryptAndUploadFile,
           downloadAndDecryptFile: props.downloadAndDecryptFile,
@@ -141,6 +141,12 @@ export const Editor = (props: EditorProps) => {
             props.updateTitle(newTitleRef.current);
           }
         }
+        // makes sure the editor is scrolled up when the user jumps to
+        // the next line (return or long line) while editing
+        // unfortionatly only works when triggered with a timeout of 0 or more
+        setTimeout(() => {
+          params.editor.chain().scrollIntoViewWhileEditMode().run();
+        }, 0);
       },
       onTransaction: (transactionParams) => {
         if (props.onTransaction) {
