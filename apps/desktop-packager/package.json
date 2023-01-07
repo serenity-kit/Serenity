@@ -1,0 +1,23 @@
+{
+  "name": "serenity-desktop-packager",
+  "productName": "Serenity",
+  "version": "0.0.1",
+  "main": "src/index.js",
+  "scripts": {
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish"
+  },
+  "dependencies": {
+    "electron": "^22.0.0",
+    "electron-squirrel-startup": "^1.0.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.4",
+    "@electron-forge/maker-deb": "^6.0.4",
+    "@electron-forge/maker-rpm": "^6.0.4",
+    "@electron-forge/maker-squirrel": "^6.0.4",
+    "@electron-forge/maker-zip": "^6.0.4",
+    "electron": "22.0.0"
+  }
+}

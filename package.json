@@ -2,10 +2,20 @@
   "private": true,
   "name": "serenity-monorepo",
   "version": "1.0.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/electron",
+      "**/electron/**",
+      "**/electron-squirrel-startup",
+      "**/electron-squirrel-startup/**",
+      "**/@electron-forge",
+      "**/@electron-forge/**"
+    ]
+  },
   "devDependencies": {
     "eslint": "^8.23.0",
     "husky": "^8.0.1",
