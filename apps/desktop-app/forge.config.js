@@ -1,7 +1,9 @@
-const fs = require("fs");
+const path = require("path");
 
 module.exports = {
-  packagerConfig: {},
+  packagerConfig: {
+    icon: path.resolve(__dirname, "icons", "icon"),
+  },
   rebuildConfig: {},
   makers: [
     {
@@ -21,9 +23,4 @@ module.exports = {
       config: {},
     },
   ],
-  hooks: {
-    generateAssets: async (forgeConfig, platform, arch) => {
-      console.log("We should generate some assets here");
-    },
-  },
 };

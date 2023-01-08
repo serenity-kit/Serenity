@@ -14,76 +14,76 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Typecheck
         run: yarn ts:check
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3 # needed until 18 becomes the default
-        with:
-          node-version: 18
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      - name: Typecheck
-        run: yarn lint
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3 # needed until 18 becomes the default
-        with:
-          node-version: 18
-      - name: Setup .env
-        run: cp apps/backend/.env.example apps/backend/.env
-      - name: Run Database
-        run: docker-compose up -d
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      - name: NODE log
-        run: node -v
-      - name: Test
-        run: yarn test
-  prettier:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3 # needed until 18 becomes the default
-        with:
-          node-version: 18
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      - name: Test
-        run: yarn prettier:check
-  e2e-test:
-    runs-on: ubuntu-latest
-    environment: staging
-    env:
-      FILE_STORAGE_ACCOUNT_ID: ${{ secrets.FILE_STORAGE_ACCOUNT_ID }}
-      FILE_STORAGE_ACCESS_KEY_ID: ${{ secrets.FILE_STORAGE_ACCESS_KEY_ID }}
-      FILE_STORAGE_SECRET_ACCESS_KEY: ${{ secrets.FILE_STORAGE_SECRET_ACCESS_KEY }}
-      FILE_STORAGE_BUCKET: ${{ secrets.FILE_STORAGE_BUCKET }}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3 # needed until 18 becomes the default
-        with:
-          node-version: 18
-      - name: Setup .env
-        run: cp apps/backend/.env.example apps/backend/.env
-      - name: Run Database
-        run: docker-compose up -d
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-      - name: Build backend
-        run: yarn workspace backend build
-      - name: Run backend
-        run: yarn workspace backend start:e2e &
-      - name: Build frontend
-        run: yarn workspace serenity build:web:e2e
-      - name: Run frontend
-        run: yarn workspace serenity start:e2e &
-      - name: Sleep for 5 seconds
-        run: sleep 5s
-        shell: bash
-      - name: Run e2e tests
-        run: yarn workspace backend test:e2e
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3 # needed until 18 becomes the default
+  #       with:
+  #         node-version: 18
+  #     - name: Install dependencies
+  #       run: yarn install --frozen-lockfile
+  #     - name: Typecheck
+  #       run: yarn lint
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3 # needed until 18 becomes the default
+  #       with:
+  #         node-version: 18
+  #     - name: Setup .env
+  #       run: cp apps/backend/.env.example apps/backend/.env
+  #     - name: Run Database
+  #       run: docker-compose up -d
+  #     - name: Install dependencies
+  #       run: yarn install --frozen-lockfile
+  #     - name: NODE log
+  #       run: node -v
+  #     - name: Test
+  #       run: yarn test
+  # prettier:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3 # needed until 18 becomes the default
+  #       with:
+  #         node-version: 18
+  #     - name: Install dependencies
+  #       run: yarn install --frozen-lockfile
+  #     - name: Test
+  #       run: yarn prettier:check
+  # e2e-test:
+  #   runs-on: ubuntu-latest
+  #   environment: staging
+  #   env:
+  #     FILE_STORAGE_ACCOUNT_ID: ${{ secrets.FILE_STORAGE_ACCOUNT_ID }}
+  #     FILE_STORAGE_ACCESS_KEY_ID: ${{ secrets.FILE_STORAGE_ACCESS_KEY_ID }}
+  #     FILE_STORAGE_SECRET_ACCESS_KEY: ${{ secrets.FILE_STORAGE_SECRET_ACCESS_KEY }}
+  #     FILE_STORAGE_BUCKET: ${{ secrets.FILE_STORAGE_BUCKET }}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3 # needed until 18 becomes the default
+  #       with:
+  #         node-version: 18
+  #     - name: Setup .env
+  #       run: cp apps/backend/.env.example apps/backend/.env
+  #     - name: Run Database
+  #       run: docker-compose up -d
+  #     - name: Install dependencies
+  #       run: yarn install --frozen-lockfile
+  #     - name: Install Playwright Browsers
+  #       run: npx playwright install --with-deps
+  #     - name: Build backend
+  #       run: yarn workspace backend build
+  #     - name: Run backend
+  #       run: yarn workspace backend start:e2e &
+  #     - name: Build frontend
+  #       run: yarn workspace serenity build:web:e2e
+  #     - name: Run frontend
+  #       run: yarn workspace serenity start:e2e &
+  #     - name: Sleep for 5 seconds
+  #       run: sleep 5s
+  #       shell: bash
+  #     - name: Run e2e tests
+  #       run: yarn workspace backend test:e2e

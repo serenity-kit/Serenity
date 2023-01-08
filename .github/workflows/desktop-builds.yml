@@ -1,0 +1,40 @@
+name: Desktop Builds
+
+on: [push]
+
+jobs:
+  build:
+    # runs-on: ubuntu-latest
+    name: Build (${{ matrix.os }} - ${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # build for supported platforms
+        # https://github.com/electron/electron-packager/blob/ebcbd439ff3e0f6f92fa880ff28a8670a9bcf2ab/src/targets.js#L9
+        # os: [macOS-latest, ubuntu-latest, windows-latest]
+        os: [macOS-latest, ubuntu-latest]
+        arch: [x64, arm64]
+        # include:
+        #   - os: ubuntu-latest
+        #     arch: armv7l
+        # # publishing artifacts for multiple Windows architectures has
+        # # a bug which can cause the wrong architecture to be downloaded
+        # # for an update, so until that is fixed, only build Windows x64
+        # exclude:
+        #   - os: windows-latest
+        #     arch: arm64
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3 # needed until 18 becomes the default
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build, package & make
+        working-directory: apps/desktop-app
+        run: yarn package --arch=${{ matrix.arch }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.os }}
+          path: out/**/*
