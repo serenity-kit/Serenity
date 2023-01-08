@@ -92,9 +92,10 @@ yarn build:graphql-types
 
 ```sh
 cd apps/app
-yarn dev:electron-web
+yarn dev:electron-web # runs the web app in electron mode
 # in another tab run
-yarn dev:electron-main
+cd apps/desktop-app
+yarn dev # runs the electron app
 ```
 
 ### Editor (standalone)

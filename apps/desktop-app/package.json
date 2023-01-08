@@ -1,10 +1,11 @@
 {
-  "name": "serenity-desktop-packager",
+  "name": "serenity-desktop-app",
   "productName": "Serenity",
   "version": "0.0.1",
   "main": "src/index.js",
   "scripts": {
-    "package": "electron-forge package",
+    "dev": "yarn && electron-forge start",
+    "package": "cd ../app && yarn build:electron-web && cd - && electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish"
   },
