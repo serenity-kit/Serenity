@@ -1,14 +1,75 @@
-const { app, BrowserWindow } = require("electron");
+const electron = require("electron");
 const path = require("path");
+const fs = require("fs");
+const { promisify } = require("util");
 
-const isDevelopment = process.env.NODE_ENV !== "production";
+// see https://cs.chromium.org/chromium/src/net/base/net_error_list.h
+const FILE_NOT_FOUND = -6;
+const { app, BrowserWindow } = electron;
+const fsStat = promisify(fs.stat);
+const scheme = "serenity-desktop";
+const root = "app";
+
+const serve = (rootDirectoryPath) => {
+  electron.protocol.registerSchemesAsPrivileged([
+    {
+      scheme,
+      privileges: {
+        standard: true,
+        secure: true,
+        allowServiceWorkers: true,
+        supportFetchAPI: true,
+        corsEnabled: true,
+      },
+    },
+  ]);
+
+  const absoluteDirectoryPath = path.resolve(
+    electron.app.getAppPath(),
+    rootDirectoryPath
+  );
+
+  electron.app.on("ready", () => {
+    electron.session.defaultSession.protocol.registerFileProtocol(
+      scheme,
+      async (request, callback) => {
+        const indexPath = path.join(absoluteDirectoryPath, "index.html");
+        const filePath = path.join(
+          absoluteDirectoryPath,
+          decodeURIComponent(new URL(request.url).pathname)
+        );
+        const fileStat = await fsStat(filePath);
+
+        const fileExtension = path.extname(filePath);
+
+        if (fileStat.isFile()) {
+          callback({
+            path: filePath,
+          });
+        } else if (!fileExtension) {
+          callback({
+            path: indexPath,
+          });
+        } else {
+          callback({ error: FILE_NOT_FOUND });
+        }
+      }
+    );
+  });
+};
+
+const isDevelopment = process.env.NODE_ENV === "development";
+
+if (!isDevelopment) {
+  serve(path.join("src", "web-build"));
+}
 
 // handle creating/removing shortcuts on Windows when installing/uninstalling
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
 
-const createWindow = () => {
+const createWindow = async () => {
   // create the browser window
   const mainWindow = new BrowserWindow({
     webPreferences: {},
@@ -21,7 +82,8 @@ const createWindow = () => {
     mainWindow.loadURL(`http://localhost:19006`);
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(__dirname, "web-build", "index.html"));
+    mainWindow.loadURL(`${scheme}://${root}`);
+    // mainWindow.webContents.openDevTools();
   }
 };
 

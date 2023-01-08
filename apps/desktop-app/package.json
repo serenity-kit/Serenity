@@ -7,13 +7,14 @@
   "main": "src/index.ts",
   "scripts": {
     "build-electron-web": "cd ../app && yarn build:electron-web && cd -",
-    "dev": "yarn && electron-forge start",
+    "dev": "yarn && NODE_ENV=\"development\" electron-forge start",
     "package": "yarn build-electron-web && electron-forge package",
+    "package:only": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .tsx --ext .ts ./",
     "test": "echo 'Nothing to test'",
-    "ts:check": "node ../../add-ts-no-check.js && yarn tsc --noEmit"
+    "ts:check": "yarn tsc --noEmit"
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0"
