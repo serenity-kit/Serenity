@@ -35,8 +35,5 @@ module.exports = async function (env, argv) {
 
   config.plugins.push(new webpack.EnvironmentPlugin({ IS_E2E_TEST: false }));
 
-  // a ./ prefix is required to make it work with Electron where the scripts are served locally
-  config.output.publicPath = "./";
-
   return config;
 };
