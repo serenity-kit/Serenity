@@ -1,6 +1,7 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
 const { getDefaultConfig } = require("expo/metro-config");
 const path = require("path");
+const exclusionList = require("metro-config/src/defaults/exclusionList");
 
 // Find the workspace root, this can be replaced with `find-yarn-workspace-root`
 const workspaceRoot = path.resolve(__dirname, "../..");
@@ -18,6 +19,10 @@ config.resolver.nodeModulesPaths = [
 
 // needed for yjs and lib0 since they use .cjs and .mjs files
 config.resolver.sourceExts.push("cjs", "mjs");
+
+// exclude the electron app since the electron app package.json is generated in the out folder
+// and in addition we should never import the electron code in app anyway
+config.resolver.blockList = exclusionList([new RegExp(`../desktop-app/.*`)]);
 
 // config.resolver.assetExts.push("wasm");
 

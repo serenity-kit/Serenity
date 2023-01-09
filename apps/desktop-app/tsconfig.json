@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "jsx": "preserve",
+    "lib": ["dom", "esnext"],
+    "moduleResolution": "node",
+    // Don't emit; allow Babel to transform files.
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "target": "esnext",
+    "esModuleInterop": true,
+    "module": "esnext",
+    // "isolatedModules": true, // disabled because of native-base issues
+    "allowJs": true // Seems to be needed for index.js
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "src/web-build/**/*", "out/**/*"]
+}

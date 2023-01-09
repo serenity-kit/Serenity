@@ -103,6 +103,7 @@ export default async function createServer() {
     "http://localhost:19006", // development & e2e web app
     "http://localhost:4000", // needed for GraphiQL in development
     "http://localhost:4001", // needed for GraphiQL in e2e
+    "serenity-desktop://app", // desktop app
   ];
   const allowedOrigin = (origin, callback) => {
     if (allowedList.indexOf(origin) !== -1 || !origin) {

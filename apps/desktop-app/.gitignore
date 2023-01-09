@@ -1,0 +1,5 @@
+# Electron-Forge
+out/
+
+# Generated build
+src/web-build

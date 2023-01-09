@@ -1,0 +1,30 @@
+{
+  "name": "serenity-desktop-app",
+  "productName": "Serenity",
+  "executableName": "serenity",
+  "version": "0.0.1",
+  "description": "End-to-end encrypted workspaces for teams",
+  "main": "src/index.ts",
+  "scripts": {
+    "build-electron-web": "cd ../app && yarn build:electron-web && cd -",
+    "dev": "yarn && NODE_ENV=\"development\" electron-forge start",
+    "package": "yarn build-electron-web && electron-forge package",
+    "package:only": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": "eslint --ext .tsx --ext .ts ./",
+    "test": "echo 'Nothing to test'",
+    "ts:check": "yarn tsc --noEmit"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.4",
+    "@electron-forge/maker-deb": "^6.0.4",
+    "@electron-forge/maker-rpm": "^6.0.4",
+    "@electron-forge/maker-squirrel": "^6.0.4",
+    "@electron-forge/maker-zip": "^6.0.4",
+    "electron": "^22.0.0"
+  }
+}
