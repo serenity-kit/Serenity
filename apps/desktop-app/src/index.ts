@@ -2,10 +2,29 @@ const electron = require("electron");
 const path = require("path");
 const fs = require("fs");
 const { promisify } = require("util");
+const sqlite3Import = require("sqlite3");
+
+const sqliteDbPath = path.join(electron.app.getPath("userData"), "serenity.db");
+console.log("Serenity sqlite DbPath:", sqliteDbPath);
+const isDevelopment = process.env.NODE_ENV === "development";
+
+const sqlite3 = isDevelopment ? sqlite3Import.verbose() : sqlite3Import;
+const db = new sqlite3.Database(sqliteDbPath);
+
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS "Document" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "content" BLOB
+  );`);
+});
+
+const asyncDb = {
+  get: promisify(db.get.bind(db)),
+};
 
 // see https://cs.chromium.org/chromium/src/net/base/net_error_list.h
 const FILE_NOT_FOUND = -6;
-const { app, BrowserWindow } = electron;
+const { app, BrowserWindow, ipcMain } = electron;
 const fsStat = promisify(fs.stat);
 const scheme = "serenity-desktop";
 const root = "app";
@@ -58,8 +77,6 @@ const serve = (rootDirectoryPath) => {
   });
 };
 
-const isDevelopment = process.env.NODE_ENV === "development";
-
 if (!isDevelopment) {
   serve(path.join("src", "web-build"));
 }
@@ -72,7 +89,9 @@ if (require("electron-squirrel-startup")) {
 const createWindow = async () => {
   // create the browser window
   const mainWindow = new BrowserWindow({
-    webPreferences: {},
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+    },
   });
   // take up the full screen
   mainWindow.maximize();
@@ -90,7 +109,21 @@ const createWindow = async () => {
 // this method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs
-app.on("ready", createWindow);
+app.on("ready", () => {
+  ipcMain.handle("sqlite:setDocument", (event, document) => {
+    db.run(`REPLACE INTO "Document" VALUES (?, ?)`, [
+      document.id,
+      document.content,
+    ]);
+    return true;
+  });
+
+  ipcMain.handle("sqlite:getDocument", (event, documentId) => {
+    return asyncDb.get(`SELECT * FROM "Document" WHERE id = ?`, documentId);
+  });
+
+  createWindow();
+});
 
 // wuit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
