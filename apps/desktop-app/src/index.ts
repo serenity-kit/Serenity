@@ -14,7 +14,7 @@ const db = new sqlite3.Database(sqliteDbPath);
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS "Document" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "content" TEXT
+    "content" BLOB
   );`);
 });
 
@@ -111,7 +111,8 @@ const createWindow = async () => {
 // Some APIs can only be used after this event occurs
 app.on("ready", () => {
   ipcMain.handle("sqlite:setDocument", (event, document) => {
-    db.run(`INSERT INTO "Document" VALUES (?, ?)`, [
+    console.log("sqlite:setDocument", document);
+    db.run(`REPLACE INTO "Document" VALUES (?, ?)`, [
       document.id,
       document.content,
     ]);

@@ -1,7 +1,4 @@
-type Document = {
-  id: string;
-  content: string;
-};
+import type { Document } from "./types";
 
 export interface SerenityElectron {
   setDocument: (document: Document) => Promise<boolean>;
@@ -14,16 +11,12 @@ declare global {
   }
 }
 
-const invoke = async () => {
-  // const id = Date.now().toString();
-  const id = "test-id";
-  // const insertResult = await window.serenityElectron.setDocument({
-  //   id,
-  //   content: "test-content",
-  // });
-  // console.log("insertResult", insertResult);
-  const selectResult = await window.serenityElectron.getDocument(id);
-  console.log("selectResult", selectResult);
+export const setLocalDocument = async (document: Document) => {
+  return await window.serenityElectron.setDocument(document);
 };
 
-invoke();
+export const getLocalDocument = async (
+  documentId: string
+): Promise<Document | undefined> => {
+  return await window.serenityElectron.getDocument(documentId);
+};

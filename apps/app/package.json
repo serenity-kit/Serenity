@@ -11,7 +11,7 @@
     "dev:speed": "NODE_OPTIONS=--openssl-legacy-provider API_URL=http://localhost:4000/graphql npx expo start --dev-client",
     "dev:staging": "yarn setup && NODE_OPTIONS=--openssl-legacy-provider npx expo start --dev-client",
     "dev:e2e": "yarn setup && NODE_OPTIONS=--openssl-legacy-provider IS_E2E_TEST=true API_URL=http://localhost:4001/graphql npx expo start --web",
-    "dev:electron-web": "yarn setup && NODE_OPTIONS=--openssl-legacy-provider EXPO_ELECTRON_MODE=true npx expo start --web --dev-client",
+    "dev:electron-web": "yarn setup && NODE_OPTIONS=--openssl-legacy-provider API_URL=http://localhost:4000/graphql EXPO_ELECTRON_MODE=true npx expo start --web --dev-client",
     "build:xstate-types": " xstate typegen \"./**/*.ts?(x)\"",
     "build:graphql-types": "graphql-codegen --config codegen.yml",
     "build:web": "yarn setup && NODE_OPTIONS=--openssl-legacy-provider npx expo export:web && cp _redirects ./web-build/_redirects",

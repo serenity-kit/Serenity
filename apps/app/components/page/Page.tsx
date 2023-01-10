@@ -51,6 +51,10 @@ import { getDocument } from "../../utils/document/getDocument";
 import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
 import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { getFolder } from "../../utils/folder/getFolder";
+import {
+  getLocalDocument,
+  setLocalDocument,
+} from "../../utils/localSqliteApi/localSqliteApi";
 
 const reconnectTimeout = 2000;
 
@@ -263,6 +267,19 @@ export default function Page({
   useEffect(() => {
     async function initDocument() {
       await sodium.ready;
+
+      const localDocument = await getLocalDocument(docId);
+      if (localDocument) {
+        Yjs.applyUpdate(
+          yDocRef.current,
+          localDocument.content,
+          "serenity-local-sqlite"
+        );
+        setDocumentLoadedInfo({
+          loaded: true,
+          username: "Unknown user",
+        });
+      }
 
       const me = await runMeQuery({});
 
@@ -537,6 +554,13 @@ export default function Page({
 
       // TODO switch to v2 updates
       yDocRef.current.on("update", async (update, origin) => {
+        // TODO pending updates should be stored in the local db if possible (not possible on web)
+        // TODO pending updates should be sent when the websocket connection is re-established
+        setLocalDocument({
+          id: docId,
+          content: Yjs.encodeStateAsUpdate(yDocRef.current),
+        });
+
         if (origin?.key === "y-sync$" || origin === "mobile-webview") {
           if (
             !activeSnapshotIdRef.current &&
