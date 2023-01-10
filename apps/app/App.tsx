@@ -20,6 +20,7 @@ import { ErrorBoundary } from "./components/errorBoundary/ErrorBoundary";
 import { AppContextProvider } from "./context/AppContext";
 import useCachedResources from "./hooks/useCachedResources";
 import Navigation from "./navigation/Navigation";
+import "./utils/localSqliteApi/localSqliteApi";
 import { patchConsoleOutput } from "./utils/patchConsoleOutput/patchConsoleOutput";
 import { patchFileReader } from "./utils/patchFileReader/patchFileReader";
 import { patchGlobalStyles } from "./utils/patchGlobalStyles/patchGlobalStyles";
