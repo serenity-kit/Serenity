@@ -111,7 +111,6 @@ const createWindow = async () => {
 // Some APIs can only be used after this event occurs
 app.on("ready", () => {
   ipcMain.handle("sqlite:setDocument", (event, document) => {
-    console.log("sqlite:setDocument", document);
     db.run(`REPLACE INTO "Document" VALUES (?, ?)`, [
       document.id,
       document.content,
