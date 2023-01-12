@@ -8,8 +8,8 @@
   "scripts": {
     "build-electron-web": "cd ../app && yarn build:electron-web && cd -",
     "dev": "yarn && NODE_ENV=\"development\" electron-forge start",
-    "package": "yarn build-electron-web && electron-forge package",
-    "package:only": "electron-forge package",
+    "package": "yarn build-electron-web && DEBUG=electron-osx-sign* electron-forge package",
+    "package:only": "DEBUG=electron-osx-sign* electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .tsx --ext .ts ./",
@@ -17,8 +17,7 @@
     "ts:check": "yarn tsc --noEmit"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.0",
-    "sqlite3": "^5.1.4"
+    "electron-squirrel-startup": "^1.0.0"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.4",
