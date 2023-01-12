@@ -11,18 +11,18 @@ jobs:
       matrix:
         # build for supported platforms
         # https://github.com/electron/electron-packager/blob/ebcbd439ff3e0f6f92fa880ff28a8670a9bcf2ab/src/targets.js#L9
-        # os: [macOS-latest, ubuntu-latest, windows-latest]
-        os: [macOS-latest, ubuntu-latest]
+        os: [macOS-latest, ubuntu-latest, windows-latest]
+        # os: [macOS-latest, ubuntu-latest]
         arch: [x64, arm64]
         # include:
         #   - os: ubuntu-latest
         #     arch: armv7l
-        # # publishing artifacts for multiple Windows architectures has
-        # # a bug which can cause the wrong architecture to be downloaded
-        # # for an update, so until that is fixed, only build Windows x64
-        # exclude:
-        #   - os: windows-latest
-        #     arch: arm64
+        # publishing artifacts for multiple Windows architectures has
+        # a bug which can cause the wrong architecture to be downloaded
+        # for an update, so until that is fixed, only build Windows x64
+        exclude:
+          - os: windows-latest
+            arch: arm64
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
