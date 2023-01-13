@@ -110,7 +110,7 @@ yarn dev
 
 ## Tests
 
-For backend:
+For backend
 
 ```sh
 docker-compose up # to start the postgres instance
@@ -118,14 +118,14 @@ docker-compose up # to start the postgres instance
 yarn workspace backend test
 ```
 
-To reset the test DB migrations run:
+To reset the test DB migrations run
 
 ```sh
 cd apps/backend
 DATABASE_URL=postgres://prisma:prisma@localhost:5432/serenity_test yarn prisma migrate reset
 ```
 
-For any package:
+For any package
 
 ```sh
 cd packages/libsodium
