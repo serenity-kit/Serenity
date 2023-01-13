@@ -3,7 +3,7 @@ const path = require("path");
 module.exports = {
   packagerConfig: {
     icon: path.resolve(__dirname, "icons", "icon"),
-    // osxSign: {},
+    osxSign: {},
     // osxNotarize: {
     //   tool: "notarytool",
     //   appleId: process.env.APPLE_ID,

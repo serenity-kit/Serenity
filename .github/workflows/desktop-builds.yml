@@ -46,6 +46,7 @@ jobs:
           security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple: -s -k $MACOS_KEYCHAIN_PASSWORD build.keychain
           rm -fr *.p12
+          security find-identity -v -p codesigning
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Build, package & make
@@ -54,6 +55,7 @@ jobs:
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         working-directory: apps/desktop-app
+        timeout-minutes: 12
         run: yarn package --arch=${{ matrix.arch }}
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
