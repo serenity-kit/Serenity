@@ -6,12 +6,11 @@
   "description": "End-to-end encrypted workspaces for teams",
   "main": "src/index.ts",
   "scripts": {
-    "build-electron-web": "cd ../app && yarn build:electron-web && cd -",
+    "build": "cd ../app && yarn build:electron-web && cd -",
     "dev": "yarn && NODE_ENV=\"development\" electron-forge start",
-    "package": "yarn build-electron-web && DEBUG=electron-osx-sign* electron-forge package",
-    "package:only": "DEBUG=electron-osx-sign* electron-forge package",
+    "package": "DEBUG=electron-osx-sign* electron-forge package",
     "make": "electron-forge make",
-    "publish": "electron-forge publish",
+    "publish-app": "electron-forge publish",
     "lint": "eslint --ext .tsx --ext .ts ./",
     "test": "echo 'Nothing to test'",
     "ts:check": "yarn tsc --noEmit"

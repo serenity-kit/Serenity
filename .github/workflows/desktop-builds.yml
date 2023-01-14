@@ -32,6 +32,11 @@ jobs:
           node-version: 18
           cache: yarn
           architecture: ${{ matrix.architecture }}
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build Electron Web bundle
+        working-directory: apps/desktop-app
+        run: yarn build
       - name: Set MacOS signing certs
         if: matrix.os == 'macOS-latest'
         env:
@@ -48,15 +53,13 @@ jobs:
           rm -fr *.p12
           security find-identity -v -p codesigning
           security set-keychain-settings -lut 1200
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
       - name: Build, package & make
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         working-directory: apps/desktop-app
-        timeout-minutes: 12
+        timeout-minutes: 10
         run: yarn make --arch=${{ matrix.arch }}
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
