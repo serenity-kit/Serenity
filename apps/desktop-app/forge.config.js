@@ -1,6 +1,9 @@
 const path = require("path");
 
 module.exports = {
+  name: "Serenity",
+  executableName: "serenity",
+  appBundleId: "re.serenity.desktop-app",
   packagerConfig: {
     icon: path.resolve(__dirname, "icons", "icon"),
     osxSign: {},
