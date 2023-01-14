@@ -3,10 +3,11 @@ const fs = require("fs");
 
 module.exports = {
   name: "Serenity",
-  executableName: "serenity",
+  executableName: "serenity-desktop-app",
   appBundleId: "re.serenity.desktop-app",
   // asar: true,
   packagerConfig: {
+    executableName: "serenity-desktop-app",
     icon: path.resolve(__dirname, "icons", "icon"),
     osxSign: {
       // "hardened-runtime": true,

@@ -1,5 +1,6 @@
 {
   "name": "serenity-desktop-app",
+  "license": "AGPL-3.0-only",
   "productName": "Serenity",
   "executableName": "serenity",
   "version": "0.0.1",
