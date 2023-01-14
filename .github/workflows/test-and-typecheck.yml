@@ -10,6 +10,7 @@ jobs:
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
         with:
           node-version: 18
+          cache: yarn
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Typecheck
@@ -21,6 +22,7 @@ jobs:
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
         with:
           node-version: 18
+          cache: yarn
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Typecheck
@@ -32,6 +34,7 @@ jobs:
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
         with:
           node-version: 18
+          cache: yarn
       - name: Setup .env
         run: cp apps/backend/.env.example apps/backend/.env
       - name: Run Database
@@ -49,6 +52,7 @@ jobs:
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
         with:
           node-version: 18
+          cache: yarn
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Test
@@ -66,6 +70,7 @@ jobs:
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
         with:
           node-version: 18
+          cache: yarn
       - name: Setup .env
         run: cp apps/backend/.env.example apps/backend/.env
       - name: Run Database

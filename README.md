@@ -61,21 +61,21 @@ yarn dev
 # in the console press `i` for iOS or `a` for Android or use the Expo Web-interface
 ```
 
-Creating a dev build for iOS Simulator.
+Creating a dev build for iOS Simulator
 
 ```sh
 cd apps/app
 yarn eas build --profile development-simulator --platform ios
 ```
 
-Creating a dev build for iOS.
+Creating a dev build for iOS
 
 ```sh
 cd apps/app
 yarn eas build --profile development --platform ios
 ```
 
-Creating a preview build for internal distribution.
+Creating a preview build for internal distribution
 
 ```sh
 cd apps/app
@@ -110,7 +110,7 @@ yarn dev
 
 ## Tests
 
-For backend:
+For backend
 
 ```sh
 docker-compose up # to start the postgres instance
@@ -118,14 +118,14 @@ docker-compose up # to start the postgres instance
 yarn workspace backend test
 ```
 
-To reset the test DB migrations run:
+To reset the test DB migrations run
 
 ```sh
 cd apps/backend
 DATABASE_URL=postgres://prisma:prisma@localhost:5432/serenity_test yarn prisma migrate reset
 ```
 
-For any package:
+For any package
 
 ```sh
 cd packages/libsodium
