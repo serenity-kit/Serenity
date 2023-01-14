@@ -70,11 +70,7 @@ jobs:
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
         with:
           node-version: 18
-<<<<<<< HEAD
           cache: yarn
-=======
-          # cache: yarn
->>>>>>> 099d9066 (setup macos signing certs)
       - name: Setup .env
         run: cp apps/backend/.env.example apps/backend/.env
       - name: Run Database
