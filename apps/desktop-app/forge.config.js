@@ -3,7 +3,6 @@ const fs = require("fs");
 
 module.exports = {
   name: "Serenity",
-  executableName: "serenity-desktop-app",
   appBundleId: "re.serenity.desktop-app",
   // asar: true,
   packagerConfig: {
