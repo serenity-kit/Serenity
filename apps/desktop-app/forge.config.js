@@ -4,9 +4,13 @@ module.exports = {
   name: "Serenity",
   executableName: "serenity",
   appBundleId: "re.serenity.desktop-app",
+  // asar: true,
   packagerConfig: {
     icon: path.resolve(__dirname, "icons", "icon"),
-    osxSign: {},
+    osxSign: {
+      // "hardened-runtime": true,
+      // "gatekeeper-assess": false,
+    },
     // osxNotarize: {
     //   tool: "notarytool",
     //   appleId: process.env.APPLE_ID,
