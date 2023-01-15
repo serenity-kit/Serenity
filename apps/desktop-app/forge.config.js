@@ -54,4 +54,12 @@ module.exports = {
       config: {},
     },
   ],
+  plugins: [
+    {
+      name: "@electron-forge/plugin-electronegativity",
+      config: {
+        isSarif: true,
+      },
+    },
+  ],
 };
