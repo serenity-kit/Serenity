@@ -29,13 +29,39 @@ jobs:
         with:
           node-version: 18
           cache: yarn
+          architecture: ${{ matrix.architecture }}
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-      - name: Build, package & make
+      - name: Build Electron Web bundle
         working-directory: apps/desktop-app
-        run: yarn package --arch=${{ matrix.arch }}
+        run: yarn build
+      - name: Set MacOS signing certs
+        if: matrix.os == 'macOS-latest'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_KEYCHAIN_PASSWORD: ${{ secrets.MACOS_KEYCHAIN_PASSWORD }}
+        run: |
+          echo $MACOS_CERTIFICATE | base64 --decode > certificate.p12
+          security create-keychain -p $MACOS_KEYCHAIN_PASSWORD build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p $MACOS_KEYCHAIN_PASSWORD build.keychain
+          security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PASSWORD -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k $MACOS_KEYCHAIN_PASSWORD build.keychain
+          rm -fr *.p12
+          security set-keychain-settings -lut 1200 # prevent the keychain to get locked before codesign is done
+      - name: Build, package & make
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        working-directory: apps/desktop-app
+        timeout-minutes: 10
+        run: yarn make --arch=${{ matrix.arch }}
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}
-          path: apps/desktop-app/out/**/*
+          # apps/desktop-app/out/ contains also the packaged app in case you need to debug it before make
+          # By default we only upload the bundled one to reduce the upload time
+          path: apps/desktop-app/out/make/**/*
