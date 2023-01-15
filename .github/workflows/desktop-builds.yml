@@ -62,4 +62,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}
-          path: apps/desktop-app/out/**/*
+          # apps/desktop-app/out/ contains also the packaged app in case you need to debug it before make
+          # By default we only upload the bundled one to reduce the upload time
+          path: apps/desktop-app/out/make/**/*

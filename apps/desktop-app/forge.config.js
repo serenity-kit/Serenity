@@ -28,7 +28,7 @@ module.exports = {
         "sqlite3",
         "build"
       );
-      console.log("Sqlite BuildPath: ", sqliteBuildPath);
+      // console.log("Sqlite BuildPath: ", sqliteBuildPath);
       // needs to be deleted otherwise macos codesign will fail
       fs.rmSync(sqliteBuildPath, {
         recursive: true,
