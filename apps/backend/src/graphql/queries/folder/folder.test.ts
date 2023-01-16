@@ -38,7 +38,7 @@ beforeAll(async () => {
     receiverDeviceEncryptionPrivateKey: result.encryptionPrivateKey,
   });
   addedFolder = result.folder;
-  const folderKeyResult = await kdfDeriveFromKey({
+  const folderKeyResult = kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
     subkeyId: addedFolder.keyDerivationTrace.subkeyId,

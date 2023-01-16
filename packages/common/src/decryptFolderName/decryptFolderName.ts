@@ -19,7 +19,7 @@ export const decryptFolderName = async (params: Params) => {
   if (!canonicalizedPublicData) {
     throw new Error("Invalid public data for decrypting the folder.");
   }
-  const folderKey = await kdfDeriveFromKey({
+  const folderKey = kdfDeriveFromKey({
     key: params.parentKey,
     context: folderDerivedKeyContext,
     subkeyId: params.subkeyId,

@@ -36,7 +36,7 @@ test("create share link", async () => {
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
   });
-  const snapshotKeyData = await createSnapshotKey({
+  const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace[folderKeyTrace.length - 1].key,
   });
   const documentShareLinkResponse = await createDocumentShareLink({
@@ -68,7 +68,7 @@ test("Invalid ownership", async () => {
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
   });
-  const snapshotKeyData = await createSnapshotKey({
+  const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace[folderKeyTrace.length - 1].key,
   });
   await expect(

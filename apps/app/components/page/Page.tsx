@@ -110,7 +110,7 @@ export default function Page({
     // but since we want to derive a snapshot key, we can just toss
     // the last one out and use the rest
     const lastChainItem = folderKeyChainData[folderKeyChainData.length - 2];
-    const snapshotKeyData = await recreateSnapshotKey({
+    const snapshotKeyData = recreateSnapshotKey({
       folderKey: lastChainItem.key,
       subkeyId: snapshotKeyDerivationTrace.subkeyId,
     });
@@ -184,7 +184,7 @@ export default function Page({
       activeDevice,
     });
     const lastChainItem = folderKeyChainData[folderKeyChainData.length - 1];
-    const snapshotKeyData = await createSnapshotKey({
+    const snapshotKeyData = createSnapshotKey({
       folderKey: lastChainItem.key,
     });
     return snapshotKeyData;

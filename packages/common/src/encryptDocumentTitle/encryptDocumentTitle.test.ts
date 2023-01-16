@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 test("encryptDocumentTitle", async () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const documentKey = await createDocumentKey({ folderKey });
+  const documentKey = createDocumentKey({ folderKey });
   const result = await encryptDocumentTitle({
     key: documentKey.key,
     title: "Todos",
@@ -19,7 +19,7 @@ test("encryptDocumentTitle", async () => {
 
 test("encryptDocumentTitle with publicData", async () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const documentKey = await createDocumentKey({ folderKey });
+  const documentKey = createDocumentKey({ folderKey });
   const result = await encryptDocumentTitle({
     key: documentKey.key,
     title: "Todos",
@@ -31,7 +31,7 @@ test("encryptDocumentTitle with publicData", async () => {
 
 test("encryptDocumentTitle with publicData fails for invalid data", async () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const documentKey = await createDocumentKey({ folderKey });
+  const documentKey = createDocumentKey({ folderKey });
   await expect(
     (async () =>
       await encryptDocumentTitle({

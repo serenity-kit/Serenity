@@ -1,10 +1,10 @@
-import * as sodium from "@serenity-tools/libsodium";
+import { randombytes_uniform } from "react-native-libsodium";
 
-export const createConfirmationCode = async (): Promise<string> => {
+export const createConfirmationCode = (): string => {
   const length = 8;
   const confirmationCode: number[] = new Array(length);
   for (let i = 0; i < length; i++) {
-    confirmationCode[i] = await sodium.randombytes_uniform(10);
+    confirmationCode[i] = randombytes_uniform(10);
   }
   return confirmationCode.join("");
 };

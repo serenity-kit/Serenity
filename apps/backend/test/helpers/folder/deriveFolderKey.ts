@@ -60,7 +60,7 @@ export const deriveFolderKey = async ({
   let parentKey = workspaceKeyString;
   for (let i = keyDerivationTrace.parentFolders.length - 1; i >= 0; i--) {
     const ancestorKeySeedData = keyDerivationTrace.parentFolders[i];
-    const ancestorKeyData = await kdfDeriveFromKey({
+    const ancestorKeyData = kdfDeriveFromKey({
       key: parentKey,
       context: folderDerivedKeyContext,
       subkeyId: ancestorKeySeedData.subkeyId,
@@ -73,7 +73,7 @@ export const deriveFolderKey = async ({
     });
   }
   // special case: append the current folder key
-  const folderKeyData = await kdfDeriveFromKey({
+  const folderKeyData = kdfDeriveFromKey({
     key: parentKey,
     context: folderDerivedKeyContext,
     subkeyId: keyDerivationTrace.subkeyId,

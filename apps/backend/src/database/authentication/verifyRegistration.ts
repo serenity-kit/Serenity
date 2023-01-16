@@ -10,7 +10,7 @@ const resetConfirmationCode = async (
   prisma: PrismaClient,
   username: string
 ) => {
-  const confirmationCode = await createConfirmationCode();
+  const confirmationCode = createConfirmationCode();
   await prisma.unverifiedUser.updateMany({
     where: {
       username,

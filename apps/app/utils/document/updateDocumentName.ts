@@ -38,7 +38,7 @@ export const updateDocumentName = async ({
     activeDevice,
   });
   const folderKeyData = parentFolderKeyData[parentFolderKeyData.length - 1];
-  const documentKeyData = await createDocumentKey({
+  const documentKeyData = createDocumentKey({
     folderKey: folderKeyData.key,
   });
   const documentKey = documentKeyData.key;

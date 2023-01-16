@@ -23,13 +23,6 @@ export const randombytes_buf = async (length: number): Promise<string> => {
   return to_base64(result);
 };
 
-export const randombytes_uniform = async (
-  upperBound: number
-): Promise<number> => {
-  const result = await sodium.randombytes_uniform(upperBound);
-  return result;
-};
-
 export const crypto_sign_keypair = async (): Promise<StringKeyPair> => {
   const result = await sodium.crypto_sign_keypair();
   return {
@@ -188,25 +181,6 @@ export const crypto_kdf_keygen = async (): Promise<string> => {
   return to_base64(sodium.crypto_kdf_keygen());
 };
 
-export const crypto_kdf_derive_from_key = async (
-  subkey_len: number,
-  subkey_id: number,
-  context: string,
-  key: string
-): Promise<string> => {
-  if ([...context].length !== sodium.crypto_kdf_CONTEXTBYTES) {
-    throw new Error("crypto_kdf_derive_from_key context must be 8 bytes");
-  }
-  return to_base64(
-    sodium.crypto_kdf_derive_from_key(
-      subkey_len,
-      subkey_id,
-      context,
-      from_base64(key)
-    )
-  );
-};
-
 export const crypto_secretbox_keygen = async (): Promise<string> => {
   return to_base64(sodium.crypto_secretbox_keygen());
 };
@@ -217,7 +191,6 @@ const libsodiumExports = {
   from_base64,
   from_base64_to_string,
   randombytes_buf,
-  randombytes_uniform,
   crypto_pwhash,
   crypto_box_keypair,
   crypto_sign_keypair,
@@ -232,7 +205,6 @@ const libsodiumExports = {
   crypto_aead_xchacha20poly1305_ietf_encrypt,
   crypto_aead_xchacha20poly1305_ietf_decrypt,
   crypto_kdf_keygen,
-  crypto_kdf_derive_from_key,
   base64_to_url_safe_base64: base64ToUrlSafeBase64,
   url_safe_base64_to_base64: urlSafeBase64ToBase64,
 };

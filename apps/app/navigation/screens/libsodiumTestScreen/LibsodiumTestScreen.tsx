@@ -103,7 +103,7 @@ export default function LibsodiumTestScreen(
         sodium.from_base64_to_string(decryptedSecretBox)
       );
 
-      const kdfDerivedKey = await kdfDeriveFromKey({
+      const kdfDerivedKey = kdfDeriveFromKey({
         key: kdfKey,
         context: "serenity",
         subkeyId: 5200022,

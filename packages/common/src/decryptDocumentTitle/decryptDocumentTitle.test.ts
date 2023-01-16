@@ -10,13 +10,13 @@ beforeAll(async () => {
 
 test("decryptDocumentTitle", async () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialDocumentKey = await createDocumentKey({ folderKey });
+  const initialDocumentKey = createDocumentKey({ folderKey });
   const result = await encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
 
-  const documentKey = await recreateDocumentKey({
+  const documentKey = recreateDocumentKey({
     folderKey,
     subkeyId: initialDocumentKey.subkeyId,
   });
@@ -32,13 +32,13 @@ test("decryptDocumentTitle", async () => {
 
 test("decryptDocumentTitle fails for wrong key", async () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialDocumentKey = await createDocumentKey({ folderKey });
+  const initialDocumentKey = createDocumentKey({ folderKey });
   const result = await encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
 
-  const documentKey = await recreateDocumentKey({
+  const documentKey = recreateDocumentKey({
     folderKey,
     subkeyId: initialDocumentKey.subkeyId,
   });
@@ -56,13 +56,13 @@ test("decryptDocumentTitle fails for wrong key", async () => {
 
 test("decryptDocumentTitle fails for wrong publicData", async () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialDocumentKey = await createDocumentKey({ folderKey });
+  const initialDocumentKey = createDocumentKey({ folderKey });
   const result = await encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
 
-  const documentKey = await recreateDocumentKey({
+  const documentKey = recreateDocumentKey({
     folderKey,
     subkeyId: initialDocumentKey.subkeyId,
   });
@@ -80,13 +80,13 @@ test("decryptDocumentTitle fails for wrong publicData", async () => {
 
 test("decryptDocumentTitle fails for invalid publicData", async () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialDocumentKey = await createDocumentKey({ folderKey });
+  const initialDocumentKey = createDocumentKey({ folderKey });
   const result = await encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
 
-  const documentKey = await recreateDocumentKey({
+  const documentKey = recreateDocumentKey({
     folderKey,
     subkeyId: initialDocumentKey.subkeyId,
   });

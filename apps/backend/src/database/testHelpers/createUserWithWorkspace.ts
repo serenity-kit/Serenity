@@ -100,10 +100,10 @@ export default async function createUserWithWorkspace({
     parentKey: workspaceKey,
   });
   const folderKey = encryptedFolderResult.folderSubkey;
-  const docmentKeyResult = await createDocumentKey({
+  const docmentKeyResult = createDocumentKey({
     folderKey,
   });
-  const snapshotKey = await createSnapshotKey({
+  const snapshotKey = createSnapshotKey({
     folderKey,
   });
   const documentKey = docmentKeyResult.key;

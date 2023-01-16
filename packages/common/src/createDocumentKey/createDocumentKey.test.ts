@@ -5,9 +5,9 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("create new documentKey", async () => {
+test("create new documentKey", () => {
   const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const result = await createDocumentKey({
+  const result = createDocumentKey({
     folderKey: kdfKey,
   });
   const { subkeyId, key } = result;

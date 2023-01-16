@@ -85,7 +85,7 @@ export async function finalizeRegistration({
           "This email has already been registered."
         );
       }
-      const confirmationCode = await createConfirmationCode();
+      const confirmationCode = createConfirmationCode();
       const unverifiedUser = await prisma.unverifiedUser.create({
         data: {
           username,

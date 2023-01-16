@@ -101,7 +101,7 @@ test("user should be able to create a child folder", async () => {
   const parentFolder = await prisma.folder.findFirst({
     where: { id: parentFolderId },
   });
-  const parentFolderKey = await kdfDeriveFromKey({
+  const parentFolderKey = kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
     subkeyId: parentFolder?.subkeyId,

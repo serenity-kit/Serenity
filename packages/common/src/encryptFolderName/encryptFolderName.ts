@@ -21,7 +21,7 @@ export const encryptFolderName = async (params: Params) => {
   }
   // TODO On the frontend and on the backend we should check no
   // subkeyId per parentKey is a duplicate.
-  const folderKey = await kdfDeriveFromKey({
+  const folderKey = kdfDeriveFromKey({
     key: params.parentKey,
     context: folderDerivedKeyContext,
   });

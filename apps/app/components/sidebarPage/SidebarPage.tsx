@@ -100,7 +100,7 @@ export default function SidebarPage(props: Props) {
       // the last subkey key is treated like a folder key, so we can toss it out
       // we actually want to derive a document subkey
       const folderKey = folderKeyData[folderKeyData.length - 2].key;
-      const documentKeyData = await recreateDocumentKey({
+      const documentKeyData = recreateDocumentKey({
         folderKey: folderKey,
         subkeyId: props.nameKeyDerivationTrace.subkeyId,
       });

@@ -45,13 +45,13 @@ const setup = async () => {
     creatorDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
   });
-  const folderKeyResult = await kdfDeriveFromKey({
+  const folderKeyResult = kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
     subkeyId: addedFolder.keyDerivationTrace.subkeyId,
   });
   folderKey = folderKeyResult.key;
-  let documentContentKeyResult = await createDocumentKey({
+  let documentContentKeyResult = createDocumentKey({
     folderKey,
   });
   const createDocumentResult = await createDocument({
@@ -87,7 +87,7 @@ test("user should be able to change a document name", async () => {
   expect(typeof updatedDocument.encryptedName).toBe("string");
   expect(typeof updatedDocument.encryptedNameNonce).toBe("string");
   expect(typeof updatedDocument.nameKeyDerivationTrace.subkeyId).toBe("number");
-  const documentSubkey = await recreateDocumentKey({
+  const documentSubkey = recreateDocumentKey({
     folderKey,
     subkeyId: updatedDocument.nameKeyDerivationTrace.subkeyId,
   });

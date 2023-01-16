@@ -5,9 +5,9 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("create new snapshotKey", async () => {
+test("create new snapshotKey", () => {
   const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const result = await createSnapshotKey({
+  const result = createSnapshotKey({
     folderKey: kdfKey,
   });
   const { subkeyId, key } = result;
