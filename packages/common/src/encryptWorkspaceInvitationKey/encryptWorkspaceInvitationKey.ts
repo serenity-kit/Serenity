@@ -17,7 +17,7 @@ export const encryptWorkspaceInvitationPrivateKey = async ({
 }: Params) => {
   const publicData = "";
   const { encryptionKey, encryptionKeySalt } =
-    await createEncryptionKeyFromOpaqueExportKey(exportKey);
+    createEncryptionKeyFromOpaqueExportKey(exportKey);
 
   const derivedEncryptionKey = kdfDeriveFromKey({
     key: encryptionKey,

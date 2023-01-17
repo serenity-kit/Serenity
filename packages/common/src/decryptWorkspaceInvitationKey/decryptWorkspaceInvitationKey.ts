@@ -20,7 +20,7 @@ export const decryptWorkspaceInvitationKey = async ({
   encryptionKeySalt,
 }: Params) => {
   const publicData = "";
-  const { encryptionKey } = await createEncryptionKeyFromOpaqueExportKey(
+  const { encryptionKey } = createEncryptionKeyFromOpaqueExportKey(
     exportKey,
     encryptionKeySalt
   );
