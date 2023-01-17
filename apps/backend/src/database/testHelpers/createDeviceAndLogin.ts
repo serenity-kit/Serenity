@@ -23,7 +23,10 @@ export const createDeviceAndLogin = async ({
     username,
     challenge: sodium.to_base64(loginChallenge),
   });
-  const loginStartResponse = login.finish(sodium.from_base64(loginMessage));
+  const loginStartResponse = login.finish(
+    password,
+    sodium.from_base64(loginMessage)
+  );
 
   const { sessionKey } = finishLogin({
     loginId,

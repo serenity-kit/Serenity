@@ -1,6 +1,6 @@
+import { Registration } from "@serenity-tools/opaque-server";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
-import { Registration } from "@serenity-tools/opaque-server";
 
 export type RegistrationChallengeReponseType = {
   data: any;

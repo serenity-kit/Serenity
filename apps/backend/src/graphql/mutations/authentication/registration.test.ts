@@ -33,6 +33,7 @@ test("server should create a registration challenge response", async () => {
 
 test("server should register a user", async () => {
   const message = result.registration.finish(
+    password,
     sodium.from_base64(result.data.challengeResponse)
   );
   const query = gql`
@@ -67,6 +68,7 @@ test("server should register a user with a pending workspace id", async () => {
 
   const pendingWorkspaceInvitationId = uuidv4();
   const message = result.registration.finish(
+    password,
     sodium.from_base64(result.data.challengeResponse)
   );
   const query = gql`
@@ -132,6 +134,7 @@ describe("Input errors", () => {
     );
     const pendingWorkspaceInvitationId = uuidv4();
     const message = result.registration.finish(
+      password,
       sodium.from_base64(result.data.challengeResponse)
     );
     const exportKey = result.registration.getExportKey();
@@ -157,6 +160,7 @@ describe("Input errors", () => {
     );
     const pendingWorkspaceInvitationId = uuidv4();
     const message = result.registration.finish(
+      password,
       sodium.from_base64(result.data.challengeResponse)
     );
     const exportKey = result.registration.getExportKey();
@@ -186,6 +190,7 @@ describe("Input errors", () => {
     );
     const pendingWorkspaceInvitationId = uuidv4();
     const message = result.registration.finish(
+      password,
       sodium.from_base64(result.data.challengeResponse)
     );
     const exportKey = result.registration.getExportKey();
@@ -211,6 +216,7 @@ describe("Input errors", () => {
     );
     const pendingWorkspaceInvitationId = uuidv4();
     const message = result.registration.finish(
+      password,
       sodium.from_base64(result.data.challengeResponse)
     );
     const exportKey = result.registration.getExportKey();
@@ -236,6 +242,7 @@ describe("Input errors", () => {
     );
     const pendingWorkspaceInvitationId = uuidv4();
     const message = result.registration.finish(
+      password,
       sodium.from_base64(result.data.challengeResponse)
     );
     const exportKey = result.registration.getExportKey();
@@ -265,6 +272,7 @@ describe("Input errors", () => {
     );
     const pendingWorkspaceInvitationId = uuidv4();
     const message = result.registration.finish(
+      password,
       sodium.from_base64(result.data.challengeResponse)
     );
     const exportKey = result.registration.getExportKey();
@@ -290,6 +298,7 @@ describe("Input errors", () => {
     );
     const pendingWorkspaceInvitationId = uuidv4();
     const message = result.registration.finish(
+      password,
       sodium.from_base64(result.data.challengeResponse)
     );
     const exportKey = result.registration.getExportKey();
@@ -319,6 +328,7 @@ describe("Input errors", () => {
     );
     const pendingWorkspaceInvitationId = uuidv4();
     const message = result.registration.finish(
+      password,
       sodium.from_base64(result.data.challengeResponse)
     );
     const exportKey = result.registration.getExportKey();
@@ -348,6 +358,7 @@ describe("Input errors", () => {
     );
     const pendingWorkspaceInvitationId = uuidv4();
     const message = result.registration.finish(
+      password,
       sodium.from_base64(result.data.challengeResponse)
     );
     const exportKey = result.registration.getExportKey();
@@ -377,6 +388,7 @@ describe("Input errors", () => {
     );
     const pendingWorkspaceInvitationId = uuidv4();
     const message = result.registration.finish(
+      password,
       sodium.from_base64(result.data.challengeResponse)
     );
     const exportKey = result.registration.getExportKey();

@@ -25,6 +25,7 @@ export const registerUnverifiedUser = async ({
     password
   );
   const message = result.registration.finish(
+    password,
     sodium.from_base64(result.data.challengeResponse)
   );
   const query = gql`

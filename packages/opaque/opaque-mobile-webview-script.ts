@@ -1,7 +1,7 @@
 import "regenerator-runtime/runtime.js";
-import { wasmBase64String } from "./src/opaque-wasm-base64";
 import { base64ToArrayBuffer } from "./src/base64ToArrayBuffer";
-import init, { Registration, Login } from "./vendor/opaque-wasm-web-build";
+import { wasmBase64String } from "./src/opaque-wasm-base64";
+import init, { Login, Registration } from "./vendor/opaque-wasm-web-build";
 
 init(base64ToArrayBuffer(wasmBase64String));
 
@@ -27,11 +27,15 @@ window.registerInitialize = function (id: string, password: string) {
   );
 };
 
-window.finishRegistration = function (id: string, challengeResponse: string) {
+window.finishRegistration = function (
+  id: string,
+  password: string,
+  challengeResponse: string
+) {
   if (registration === null) {
     throw new Error("Failed to initialize WebView Registration");
   }
-  const message = registration.finish(fromBase64(challengeResponse));
+  const message = registration.finish(password, fromBase64(challengeResponse));
   window.ReactNativeWebView.postMessage(
     JSON.stringify({
       id,
@@ -54,11 +58,11 @@ window.startLogin = function (id: string, password: string) {
   );
 };
 
-window.finishLogin = function (id: string, response: string) {
+window.finishLogin = function (id: string, password: string, response: string) {
   if (login === null) {
     throw new Error("Failed to initialize WebView Login");
   }
-  const message = login.finish(fromBase64(response));
+  const message = login.finish(password, fromBase64(response));
   window.ReactNativeWebView.postMessage(
     JSON.stringify({
       id,

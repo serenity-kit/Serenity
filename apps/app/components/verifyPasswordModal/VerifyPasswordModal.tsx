@@ -90,6 +90,7 @@ export function VerifyPasswordModal(props: Props) {
       let finishLoginResponse: any = undefined;
       try {
         finishLoginResponse = await finishLogin(
+          password,
           startLoginResult.data.startLogin.challengeResponse
         );
       } catch (error) {

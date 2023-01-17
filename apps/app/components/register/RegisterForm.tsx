@@ -73,6 +73,7 @@ export default function RegisterForm(props: Props) {
       });
       if (startRegistrationResult.data?.startRegistration) {
         const { response, exportKey } = await finishRegistration(
+          password,
           startRegistrationResult.data.startRegistration.challengeResponse
         );
         const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =

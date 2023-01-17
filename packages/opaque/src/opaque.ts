@@ -5,8 +5,12 @@ export const registerInitialize = async (password: string) => {
   return sodium.base64_to_url_safe_base64(message);
 };
 
-export const finishRegistration = async (challengeResponse: string) => {
+export const finishRegistration = async (
+  password: string,
+  challengeResponse: string
+) => {
   const result = await global._opaque.finishRegistration(
+    password,
     sodium.url_safe_base64_to_base64(challengeResponse)
   );
   return {
@@ -20,8 +24,9 @@ export const startLogin = async (password: string) => {
   return sodium.base64_to_url_safe_base64(message);
 };
 
-export const finishLogin = async (response: string) => {
+export const finishLogin = async (password: string, response: string) => {
   const result = await global._opaque.finishLogin(
+    password,
     sodium.url_safe_base64_to_base64(response)
   );
   return {

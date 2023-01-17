@@ -38,7 +38,10 @@ test("server should login a user", async () => {
   });
 
   const finishMessage = sodium.to_base64(
-    result.login.finish(sodium.from_base64(result.data.challengeResponse))
+    result.login.finish(
+      password,
+      sodium.from_base64(result.data.challengeResponse)
+    )
   );
 
   const sessionKey = sodium.to_base64(result.login.getSessionKey());
@@ -99,7 +102,10 @@ describe("Input errors", () => {
     });
 
     const finishMessage = sodium.to_base64(
-      result.login.finish(sodium.from_base64(result.data.challengeResponse))
+      result.login.finish(
+        password,
+        sodium.from_base64(result.data.challengeResponse)
+      )
     );
     await expect(
       (async () =>

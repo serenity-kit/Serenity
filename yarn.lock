@@ -17929,11 +17929,6 @@ onetime@^6.0.0:
   dependencies:
     mimic-fn "^4.0.0"
 
-opaque-wasm@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/opaque-wasm/-/opaque-wasm-1.1.0.tgz#d18c4795ce8f62b53947e0985a6be6201d96a0b3"
-  integrity sha512-dzglFVmylpT/lninkF4QJ8N4/HzvEdErk9zWZh4QTFfZDdG1hgbENP2yF4BRoFkZ4sihwA0Hw5b753yU5zu8rg==
-
 open@^6.2.0:
   version "6.4.0"
   resolved "https://registry.yarnpkg.com/open/-/open-6.4.0.tgz#5c13e96d0dc894686164f18965ecfe889ecfc8a9"

@@ -17,6 +17,7 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
   });
   const finishMessage = sodium.to_base64(
     startLoginResult.login.finish(
+      password,
       sodium.from_base64(startLoginResult.data.challengeResponse)
     )
   );
