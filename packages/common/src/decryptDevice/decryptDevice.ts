@@ -12,7 +12,7 @@ export const decryptDevice = async ({
   exportKey,
   encryptionKeySalt,
 }): Promise<PrivateKeys> => {
-  const { encryptionKey } = await createEncryptionKeyFromOpaqueExportKey(
+  const { encryptionKey } = createEncryptionKeyFromOpaqueExportKey(
     exportKey,
     encryptionKeySalt
   );

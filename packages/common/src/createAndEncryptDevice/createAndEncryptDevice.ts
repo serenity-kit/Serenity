@@ -4,7 +4,7 @@ import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFr
 
 export const createAndEncryptDevice = async (exportKey: string) => {
   const { encryptionKey, encryptionKeySalt } =
-    await createEncryptionKeyFromOpaqueExportKey(exportKey);
+    createEncryptionKeyFromOpaqueExportKey(exportKey);
   const {
     signingPublicKey,
     signingPrivateKey,
