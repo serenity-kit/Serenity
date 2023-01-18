@@ -7,13 +7,13 @@ export type Props = {
   deviceEncryptionPrivateKey: string;
   workspace: Workspace;
 };
-export const getWorkspaceKeyForWorkspaceAndDevice = async ({
+export const getWorkspaceKeyForWorkspaceAndDevice = ({
   device,
   deviceEncryptionPrivateKey,
   workspace,
-}: Props): Promise<string> => {
+}: Props): string => {
   const workspaceKeyData = workspace.currentWorkspaceKey?.workspaceKeyBox;
-  const workspaceKey = await decryptWorkspaceKey({
+  const workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyData?.ciphertext!,
     nonce: workspaceKeyData?.nonce!,
     creatorDeviceEncryptionPublicKey: device.encryptionPublicKey,

@@ -32,7 +32,7 @@ export const getWorkspaceKeys = async ({
         `A creator device couldn't be retrieved for workspace ${workspaceId}!`
       );
     }
-    const workspaceKeyString = await decryptWorkspaceKey({
+    const workspaceKeyString = decryptWorkspaceKey({
       ciphertext: workspaceKeyBox.ciphertext,
       nonce: workspaceKeyBox.nonce,
       creatorDeviceEncryptionPublicKey: creatorDevice.encryptionPublicKey,

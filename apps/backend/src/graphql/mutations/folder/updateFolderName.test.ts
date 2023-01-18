@@ -27,7 +27,7 @@ const setup = async () => {
     password,
   });
   addedWorkspace = userData1.workspace;
-  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspace: userData1.workspace,

@@ -79,7 +79,7 @@ test("create initial workspace structure", async () => {
 
   // attempt to decrypt the folder and document names
   const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBox;
-  const workspaceKey = await decryptWorkspaceKey({
+  const workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext,
     nonce: workspaceKeyBox.nonce,
     creatorDeviceEncryptionPublicKey: userData1.mainDevice.encryptionPublicKey,

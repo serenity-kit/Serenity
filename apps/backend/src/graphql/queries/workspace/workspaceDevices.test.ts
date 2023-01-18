@@ -73,7 +73,7 @@ test("new user results in added device", async () => {
     invitationSigningPrivateKey: invitationResult.invitationSigningPrivateKey,
     authorizationHeader: userData2.sessionKey,
   });
-  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  const workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspace: userData1.workspace,

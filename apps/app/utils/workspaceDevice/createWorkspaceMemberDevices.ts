@@ -42,7 +42,7 @@ export const createWorkspaceMemberDevices = async ({
         // This device isn't registered for this workspace
         continue;
       }
-      const workspaceKeyString = await decryptWorkspaceKey({
+      const workspaceKeyString = decryptWorkspaceKey({
         ciphertext: workspaceKeyBox.ciphertext,
         nonce: workspaceKeyBox.nonce,
         creatorDeviceEncryptionPublicKey:

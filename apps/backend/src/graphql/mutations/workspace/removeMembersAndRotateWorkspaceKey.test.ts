@@ -35,7 +35,7 @@ beforeAll(async () => {
 });
 
 test("user cannot remove self", async () => {
-  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  const workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspace: userData1.workspace,
@@ -73,7 +73,7 @@ test("user cannot remove self", async () => {
 });
 
 test("user cannot revoke own main device", async () => {
-  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  const workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspace: userData1.workspace,
@@ -111,7 +111,7 @@ test("user cannot revoke own main device", async () => {
 });
 
 test("user can remove another user", async () => {
-  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  const workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspace: userData1.workspace,
@@ -243,7 +243,7 @@ test("user can remove another user", async () => {
 });
 
 test("user can rotate key for multiple devices", async () => {
-  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  const workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspace: userData1.workspace,

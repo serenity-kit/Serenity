@@ -39,7 +39,7 @@ const setup = async () => {
   addedFolder = userData1.folder;
 
   const workspaceKeyBox = addedWorkspace.currentWorkspaceKey.workspaceKeyBox;
-  workspaceKey = await decryptWorkspaceKey({
+  workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext,
     nonce: workspaceKeyBox.nonce,
     creatorDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
