@@ -32,12 +32,11 @@ export async function createWorkspaceInvitation({
       "The invitation expiration time is too far in the future"
     );
   }
-  const expiresAtMillis = expiresAt.getTime();
   const expectedSigningData = canonicalize({
     workspaceId,
     invitationId,
     invitationSigningPublicKey,
-    expiresAtMillis,
+    expiresAt: expiresAt.toISOString(),
   });
   const doesSignatureVerify = sodium.crypto_sign_verify_detached(
     invitationDataSignature,
