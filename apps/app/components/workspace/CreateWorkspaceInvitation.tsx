@@ -94,7 +94,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       workspaceId,
       invitationId,
       invitationPublicSigningKey: invitationSigningKeys.publicKey,
-      expiresAtMillis: expiresAt.getTime(),
+      expiresAt: expiresAt.toISOString(),
     });
     const invitationDataSignature = await sodium.crypto_sign_detached(
       invitationData!,
