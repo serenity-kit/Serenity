@@ -41,6 +41,7 @@ export default async function createServer() {
         ? ApolloServerPluginLandingPageDisabled()
         : ApolloServerPluginLandingPageGraphQLPlayground(),
     ],
+    persistedQueries: false, // to prevent denial of service attacks via memory exhaustion
     context: async (request) => {
       if (request.req.headers.authorization) {
         const session = await getSessionIncludingUser({
