@@ -20,7 +20,7 @@ export const createAeadKeyAndCipherTextForDevice = async ({
   if (!theNonce) {
     theNonce = await sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
   }
-  const ciphertext = await sodium.crypto_box_easy(
+  const ciphertext = sodium.crypto_box_easy(
     key,
     theNonce,
     receiverDeviceEncryptionPublicKey,

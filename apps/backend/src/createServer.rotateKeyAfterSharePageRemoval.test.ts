@@ -50,7 +50,7 @@ const setup = async () => {
   addedWorkspace = result.workspace;
   encryptionPrivateKey = result.encryptionPrivateKey;
   const workspaceKeyBox = addedWorkspace.currentWorkspaceKey?.workspaceKeyBox;
-  workspaceKey = await decryptWorkspaceKey({
+  workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox?.ciphertext!,
     nonce: workspaceKeyBox?.nonce!,
     creatorDeviceEncryptionPublicKey: result.device.encryptionPublicKey,
@@ -233,7 +233,7 @@ test("successfully creates a snapshot", async () => {
   const workspaceKeyBox =
     workspaceResult.workspace.currentWorkspaceKey.workspaceKeyBox;
 
-  workspaceKey = await decryptWorkspaceKey({
+  workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext,
     nonce: workspaceKeyBox.nonce,
     creatorDeviceEncryptionPublicKey:

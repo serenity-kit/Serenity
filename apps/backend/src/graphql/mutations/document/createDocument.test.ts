@@ -40,7 +40,7 @@ beforeAll(async () => {
 
 test("user should be able to create a document", async () => {
   const id = uuidv4();
-  const workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  const workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspace: userData1.workspace,

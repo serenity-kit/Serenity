@@ -61,7 +61,7 @@ test("Existing workspace does nothing", async () => {
   if (!workspaceKeyBox) {
     throw new Error("No workspaceKeyBox for workspace!");
   }
-  const decryptedWorkspaceKey = await decryptWorkspaceKey({
+  const decryptedWorkspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext,
     nonce: workspaceKeyBox.nonce,
     creatorDeviceEncryptionPublicKey: userAndDevice1.device.encryptionPublicKey,

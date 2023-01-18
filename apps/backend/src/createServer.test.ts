@@ -46,7 +46,7 @@ const setup = async () => {
   sessionKey = result.sessionKey;
   addedWorkspace = result.workspace;
   const workspaceKeyBox = addedWorkspace.currentWorkspaceKey?.workspaceKeyBox;
-  workspaceKey = await decryptWorkspaceKey({
+  workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox?.ciphertext!,
     nonce: workspaceKeyBox?.nonce!,
     creatorDeviceEncryptionPublicKey: result.device.encryptionPublicKey,

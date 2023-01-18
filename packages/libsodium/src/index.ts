@@ -147,12 +147,12 @@ export const crypto_box_keypair = (): StringKeyPair => {
   };
 };
 
-export const crypto_box_easy = async (
+export const crypto_box_easy = (
   message: string,
   nonce: string,
   recipientPublicKey: string,
   creatorPrivateKey: string
-): Promise<string> => {
+): string => {
   const cipherText = sodium.crypto_box_easy(
     from_base64(message),
     from_base64(nonce),
@@ -162,12 +162,12 @@ export const crypto_box_easy = async (
   return to_base64(cipherText);
 };
 
-export const crypto_box_open_easy = async (
+export const crypto_box_open_easy = (
   ciphertext: string,
   nonce: string,
   creatorPublicKey: string,
   recipientPrivateKey: string
-): Promise<string> => {
+): string => {
   const message = sodium.crypto_box_open_easy(
     from_base64(ciphertext),
     from_base64(nonce),

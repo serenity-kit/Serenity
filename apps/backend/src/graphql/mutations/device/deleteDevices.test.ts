@@ -35,7 +35,7 @@ const setup = async () => {
     envelope: userData1.envelope,
   });
   user1Device2 = loginResult.webDevice;
-  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspace: userData1.workspace,

@@ -34,7 +34,7 @@ const setup = async () => {
   sessionKey = userData1.sessionKey;
   userId = userData1.user.id;
   addedWorkspace = userData1.workspace;
-  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspace: addedWorkspace,
@@ -59,7 +59,7 @@ const setup = async () => {
   });
   sessionKey2 = userData2.sessionKey;
   otherUserWorkspaceId = userData2.workspace.id;
-  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData2.device,
     deviceEncryptionPrivateKey: userData2.encryptionPrivateKey,
     workspace: userData2.workspace,

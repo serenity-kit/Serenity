@@ -166,7 +166,7 @@ export const sharePageScreenMachine =
               context.documentShareLinkQueryResult.data.documentShareLink
                 .snapshotKeyBoxs[0];
 
-            const snapshotKey = await sodium.crypto_box_open_easy(
+            const snapshotKey = sodium.crypto_box_open_easy(
               snapshotKeyBox.ciphertext,
               snapshotKeyBox.nonce,
               snapshotKeyBox.creatorDevice.encryptionPublicKey,

@@ -42,7 +42,7 @@ export const deriveFolderKey = async ({
   if (!workspaceKeyBox) {
     throw new Error("Workspace key not found");
   }
-  const workspaceKeyString = await decryptWorkspaceKey({
+  const workspaceKeyString = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext,
     nonce: workspaceKeyBox.nonce,
     creatorDeviceEncryptionPublicKey:

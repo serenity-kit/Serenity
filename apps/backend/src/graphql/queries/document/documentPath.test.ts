@@ -60,7 +60,7 @@ const setup = async () => {
   // );
   // const workspace =
   //   initialWorkspaceStructureResult.createInitialWorkspaceStructure.workspace;
-  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspace: userData1.workspace,
@@ -142,7 +142,7 @@ const setup = async () => {
   //   });
 
   const workspace2 = userData2.workspace;
-  workspaceKey2 = await getWorkspaceKeyForWorkspaceAndDevice({
+  workspaceKey2 = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData2.device,
     deviceEncryptionPrivateKey: userData2.encryptionPrivateKey,
     workspace: userData2.workspace,

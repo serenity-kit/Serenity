@@ -69,7 +69,7 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
         throw new Error("Could not find workspaceKeyBox for main device!");
       }
       const creatorDevice = workspaceKeyBox.creatorDevice;
-      const workspaceKeyString = await decryptWorkspaceKey({
+      const workspaceKeyString = decryptWorkspaceKey({
         ciphertext: workspaceKeyBox.ciphertext,
         nonce: workspaceKeyBox.nonce,
         receiverDeviceEncryptionPrivateKey: mainDevice?.encryptionPrivateKey!,

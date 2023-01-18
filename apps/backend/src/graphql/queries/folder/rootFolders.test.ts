@@ -33,7 +33,7 @@ const setup = async () => {
     password,
   });
   workspace = userData1.workspace;
-  workspaceKey = await getWorkspaceKeyForWorkspaceAndDevice({
+  workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspace: userData1.workspace,
@@ -44,7 +44,7 @@ const setup = async () => {
     username: `${uuidv4()}@example.com`,
     password,
   });
-  workspaceKey2 = await getWorkspaceKeyForWorkspaceAndDevice({
+  workspaceKey2 = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData2.device,
     deviceEncryptionPrivateKey: userData2.encryptionPrivateKey,
     workspace: userData2.workspace,
