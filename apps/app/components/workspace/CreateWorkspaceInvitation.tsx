@@ -84,9 +84,9 @@ export function CreateWorkspaceInvitation(props: Props) {
   };
 
   const createWorkspaceInvitation = async () => {
-    const invitationSigningKeys = await sodium.crypto_sign_keypair();
+    const invitationSigningKeys = sodium.crypto_sign_keypair();
     const invitationIdLengthBytes = 24;
-    const invitationId = await sodium.randombytes_buf(invitationIdLengthBytes);
+    const invitationId = sodium.randombytes_buf(invitationIdLengthBytes);
     const currentTime = new Date();
     const twoDaysMillis = 2 * 24 * 60 * 60 * 1000;
     const expiresAt = new Date(currentTime.getTime() + twoDaysMillis);
@@ -96,7 +96,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       invitationPublicSigningKey: invitationSigningKeys.publicKey,
       expiresAt: expiresAt.toISOString(),
     });
-    const invitationDataSignature = await sodium.crypto_sign_detached(
+    const invitationDataSignature = sodium.crypto_sign_detached(
       invitationData!,
       invitationSigningKeys.privateKey
     );

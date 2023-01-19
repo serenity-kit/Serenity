@@ -30,7 +30,7 @@ export function getUpdateInProgress(
   return updatesInProgress[documentId][`${snapshotId}-${clock}`];
 }
 
-export async function createUpdate(
+export function createUpdate(
   content,
   publicData: UpdatePublicData,
   key: Uint8Array,
@@ -65,12 +65,12 @@ export async function createUpdate(
   const publicDataAsBase64 = sodium.to_base64(
     JSON.stringify(publicDataWithClock)
   );
-  const { ciphertext, publicNonce } = await encryptAead(
+  const { ciphertext, publicNonce } = encryptAead(
     content,
     publicDataAsBase64,
     sodium.to_base64(key)
   );
-  const signature = await sign(
+  const signature = sign(
     `${publicNonce}${ciphertext}${publicDataAsBase64}`,
     sodium.to_base64(signatureKeyPair.privateKey)
   );
@@ -85,12 +85,12 @@ export async function createUpdate(
   return update;
 }
 
-export async function verifyAndDecryptUpdate(update: Update, key, publicKey) {
+export function verifyAndDecryptUpdate(update: Update, key, publicKey) {
   const publicDataAsBase64 = sodium.to_base64(
     JSON.stringify(update.publicData)
   );
 
-  const isValid = await verifySignature(
+  const isValid = verifySignature(
     `${update.nonce}${update.ciphertext}${publicDataAsBase64}`,
     update.signature,
     sodium.to_base64(publicKey)

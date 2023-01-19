@@ -7,17 +7,13 @@ type Params = {
   publicData?: any;
 };
 
-export const encryptDocumentTitle = async (params: Params) => {
+export const encryptDocumentTitle = (params: Params) => {
   const publicData = params.publicData || {};
   const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {
     throw new Error("Invalid public data for encrypting the title.");
   }
-  const result = await encryptAead(
-    params.title,
-    canonicalizedPublicData,
-    params.key
-  );
+  const result = encryptAead(params.title, canonicalizedPublicData, params.key);
   return {
     ciphertext: result.ciphertext,
     publicNonce: result.publicNonce,

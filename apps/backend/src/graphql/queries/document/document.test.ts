@@ -102,7 +102,7 @@ test("user should be retrieve a document", async () => {
     folderKey,
     subkeyId: retrievedDocument.nameKeyDerivationTrace.subkeyId,
   });
-  const decryptedName = await decryptDocumentTitle({
+  const decryptedName = decryptDocumentTitle({
     key: documentSubkey.key,
     ciphertext: retrievedDocument.encryptedName,
     publicNonce: retrievedDocument.encryptedNameNonce,

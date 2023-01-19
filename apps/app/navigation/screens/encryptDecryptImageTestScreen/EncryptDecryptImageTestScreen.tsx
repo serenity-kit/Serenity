@@ -38,17 +38,17 @@ export default function EncryptDecryptImageTestScreen(
     return `data:image/jpeg;base64,${base64ImageData}`;
   };
 
-  const createChaChaKeys = async () => {
-    const key = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
+  const createChaChaKeys = () => {
+    const key = sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
     console.log(key);
     setChaChaKey(key);
   };
 
-  const chaChaEncryptBase64ImageData = async () => {
-    const nonce = await sodium.randombytes_buf(24);
+  const chaChaEncryptBase64ImageData = () => {
+    const nonce = sodium.randombytes_buf(24);
     const additionalData = "";
     const encryptedImageData =
-      await sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+      sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
         base64ImageData,
         additionalData,
         null,
@@ -59,10 +59,10 @@ export default function EncryptDecryptImageTestScreen(
     setChaChaEncryptedImageData(encryptedImageData);
   };
 
-  const chaChaDecryptBase64ImageData = async () => {
+  const chaChaDecryptBase64ImageData = () => {
     const additionalData = "";
     const decryptedImageData =
-      await sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
+      sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
         null,
         chaChaEncryptedImageData,
         additionalData,

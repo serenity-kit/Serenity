@@ -73,14 +73,13 @@ export const createWorkspaceMemberDevices = async ({
           workspaceDevices: [],
         };
         for (let receiverDevice of unauthorizedMember.devices) {
-          const { nonce, ciphertext } =
-            await createAndEncryptWorkspaceKeyForDevice({
-              receiverDeviceEncryptionPublicKey:
-                receiverDevice.encryptionPublicKey,
-              creatorDeviceEncryptionPrivateKey:
-                activeDevice.encryptionPrivateKey!,
-              workspaceKey: workspaceKeyString,
-            });
+          const { nonce, ciphertext } = createAndEncryptWorkspaceKeyForDevice({
+            receiverDeviceEncryptionPublicKey:
+              receiverDevice.encryptionPublicKey,
+            creatorDeviceEncryptionPrivateKey:
+              activeDevice.encryptionPrivateKey!,
+            workspaceKey: workspaceKeyString,
+          });
           member.workspaceDevices.push({
             receiverDeviceSigningPublicKey: receiverDevice.signingPublicKey,
             ciphertext,

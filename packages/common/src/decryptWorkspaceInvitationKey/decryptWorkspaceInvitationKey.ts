@@ -12,7 +12,7 @@ type Params = {
   encryptionKeySalt: string;
 };
 
-export const decryptWorkspaceInvitationKey = async ({
+export const decryptWorkspaceInvitationKey = ({
   exportKey,
   subkeyId,
   ciphertext,
@@ -29,7 +29,7 @@ export const decryptWorkspaceInvitationKey = async ({
     context: workspaceInvitationDerivedKeyContext,
     subkeyId,
   });
-  const result = await decryptAead(
+  const result = decryptAead(
     sodium.from_base64(ciphertext),
     publicData,
     derivedEncryptionKey.key,

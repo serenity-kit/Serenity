@@ -30,11 +30,10 @@ export const acceptWorkspaceInvitation = async ({
     encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature!,
   };
   if (!safeMainDevice.encryptionPublicKeySignature) {
-    safeMainDevice.encryptionPublicKeySignature =
-      await sodium.crypto_sign_detached(
-        safeMainDevice.encryptionPublicKey,
-        mainDevice.signingPrivateKey!
-      );
+    safeMainDevice.encryptionPublicKeySignature = sodium.crypto_sign_detached(
+      safeMainDevice.encryptionPublicKey,
+      mainDevice.signingPrivateKey!
+    );
   }
   const inviteeInfo = canonicalize({
     username: me.username,
@@ -44,7 +43,7 @@ export const acceptWorkspaceInvitation = async ({
       encryptionPublicKeySignature: safeMainDevice.encryptionPublicKeySignature,
     },
   });
-  const inviteeUsernameAndDeviceSignature = await sodium.crypto_sign_detached(
+  const inviteeUsernameAndDeviceSignature = sodium.crypto_sign_detached(
     inviteeInfo!,
     signingPrivateKey
   );

@@ -47,7 +47,7 @@ test("server should register a user", async () => {
 
   const exportKey = result.registration.getExportKey();
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    await createAndEncryptDevice(sodium.to_base64(exportKey));
+    createAndEncryptDevice(sodium.to_base64(exportKey));
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
@@ -81,13 +81,11 @@ test("server should register a user with a pending workspace id", async () => {
 
   const exportKey = sodium.to_base64(result.registration.getExportKey());
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    await createAndEncryptDevice(exportKey);
-  const workspaceInvitationKeyData = await encryptWorkspaceInvitationPrivateKey(
-    {
-      exportKey,
-      workspaceInvitationSigningPrivateKey: sigingKeyPair.privateKey,
-    }
-  );
+    createAndEncryptDevice(exportKey);
+  const workspaceInvitationKeyData = encryptWorkspaceInvitationPrivateKey({
+    exportKey,
+    workspaceInvitationSigningPrivateKey: sigingKeyPair.privateKey,
+  });
 
   const registrationResponse = await graphql.client.request(query, {
     input: {
@@ -138,7 +136,7 @@ describe("Input errors", () => {
     );
     const exportKey = result.registration.getExportKey();
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-      await createAndEncryptDevice(sodium.to_base64(exportKey));
+      createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
@@ -163,7 +161,7 @@ describe("Input errors", () => {
     );
     const exportKey = result.registration.getExportKey();
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-      await createAndEncryptDevice(sodium.to_base64(exportKey));
+      createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
@@ -192,7 +190,7 @@ describe("Input errors", () => {
     );
     const exportKey = result.registration.getExportKey();
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-      await createAndEncryptDevice(sodium.to_base64(exportKey));
+      createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
@@ -217,7 +215,7 @@ describe("Input errors", () => {
     );
     const exportKey = result.registration.getExportKey();
     const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-      await createAndEncryptDevice(sodium.to_base64(exportKey));
+      createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
@@ -246,7 +244,7 @@ describe("Input errors", () => {
       encryptionPrivateKey,
       ciphertext,
       ...mainDevice
-    } = await createAndEncryptDevice(sodium.to_base64(exportKey));
+    } = createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
@@ -271,7 +269,7 @@ describe("Input errors", () => {
     );
     const exportKey = result.registration.getExportKey();
     const { signingPrivateKey, encryptionPrivateKey, nonce, ...mainDevice } =
-      await createAndEncryptDevice(sodium.to_base64(exportKey));
+      createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
@@ -300,7 +298,7 @@ describe("Input errors", () => {
       encryptionPrivateKey,
       encryptionKeySalt,
       ...mainDevice
-    } = await createAndEncryptDevice(sodium.to_base64(exportKey));
+    } = createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
@@ -329,7 +327,7 @@ describe("Input errors", () => {
       encryptionPrivateKey,
       signingPublicKey,
       ...mainDevice
-    } = await createAndEncryptDevice(sodium.to_base64(exportKey));
+    } = createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
@@ -358,7 +356,7 @@ describe("Input errors", () => {
       encryptionPrivateKey,
       encryptionPublicKey,
       ...mainDevice
-    } = await createAndEncryptDevice(sodium.to_base64(exportKey));
+    } = createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {
@@ -387,7 +385,7 @@ describe("Input errors", () => {
       encryptionPrivateKey,
       encryptionPublicKeySignature,
       ...mainDevice
-    } = await createAndEncryptDevice(sodium.to_base64(exportKey));
+    } = createAndEncryptDevice(sodium.to_base64(exportKey));
     await expect(
       (async () =>
         await graphql.client.request(query, {

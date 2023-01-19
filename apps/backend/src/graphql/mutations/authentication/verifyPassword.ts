@@ -34,19 +34,18 @@ export const verifyLoginMutation = mutationField("verifyPassword", {
       })
     ),
   },
-  async resolve(_root, args, context) {
+  resolve(_root, args, context) {
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
     }
     context.assertValidDeviceSigningPublicKeyForThisSession(
       args.input.deviceSigningPublicKey
     );
-    const isValidSessionTokenSignature =
-      await sodium.crypto_sign_verify_detached(
-        args.input.sessionTokenSignature,
-        context.session.sessionKey,
-        args.input.deviceSigningPublicKey
-      );
+    const isValidSessionTokenSignature = sodium.crypto_sign_verify_detached(
+      args.input.sessionTokenSignature,
+      context.session.sessionKey,
+      args.input.deviceSigningPublicKey
+    );
     return {
       isValid: isValidSessionTokenSignature,
     };

@@ -37,19 +37,18 @@ export const registerUser = async (
 
   const exportKey = result.registration.getExportKey();
   const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
-    await createAndEncryptDevice(sodium.to_base64(exportKey));
+    createAndEncryptDevice(sodium.to_base64(exportKey));
 
   let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
   let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;
   let pendingWorkspaceInvitationKeySubkeyId: number | null = null;
   let pendingWorkspaceInvitationKeyEncryptionSalt: string | null = null;
   if (pendingWorkspaceInvitationId) {
-    const signingKeyPair = await seleniumSodium.crypto_sign_keypair();
-    const workspaceInvitationKeyData =
-      await encryptWorkspaceInvitationPrivateKey({
-        exportKey,
-        workspaceInvitationSigningPrivateKey: signingKeyPair.privateKey,
-      });
+    const signingKeyPair = seleniumSodium.crypto_sign_keypair();
+    const workspaceInvitationKeyData = encryptWorkspaceInvitationPrivateKey({
+      exportKey,
+      workspaceInvitationSigningPrivateKey: signingKeyPair.privateKey,
+    });
     pendingWorkspaceInvitationKeyCiphertext =
       workspaceInvitationKeyData.ciphertext;
     pendingWorkspaceInvitationKeyPublicNonce =

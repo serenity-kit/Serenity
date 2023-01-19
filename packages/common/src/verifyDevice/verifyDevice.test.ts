@@ -7,31 +7,27 @@ beforeAll(async () => {
 });
 
 test("verify device", async () => {
-  const device = await createDevice();
-  await expect(
-    (async () => await verifyDevice(device))()
-  ).resolves.toBeUndefined();
+  const device = createDevice();
+  expect(verifyDevice(device)).toBeUndefined();
 });
 
 test("verify device throws an error with invalid signature", async () => {
-  const device = await createDevice();
+  const device = createDevice();
   await expect(
-    (async () =>
-      await verifyDevice({
-        ...device,
-        encryptionPublicKeySignature: "invalid",
-      }))()
+    verifyDevice({
+      ...device,
+      encryptionPublicKeySignature: "invalid",
+    })
   ).rejects.toThrowError();
 });
 
 test("verify device throws an error with ommited signature", async () => {
-  const device = await createDevice();
+  const device = createDevice();
   await expect(
-    (async () =>
-      await verifyDevice({
-        ...device,
-        // @ts-expect-error desired for the test
-        encryptionPublicKeySignature: undefined,
-      }))()
+    verifyDevice({
+      ...device,
+      // @ts-expect-error desired for the test
+      encryptionPublicKeySignature: undefined,
+    })
   ).rejects.toThrowError();
 });

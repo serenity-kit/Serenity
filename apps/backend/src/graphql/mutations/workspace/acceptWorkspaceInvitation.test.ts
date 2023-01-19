@@ -49,7 +49,7 @@ test("user should be able to accept an invitation", async () => {
     createWorkspaceResult.createWorkspaceInvitation.workspaceInvitation.id;
   invitationSigningPrivateKey =
     createWorkspaceResult.invitationSigningPrivateKey;
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+  const encryptionPublicKeySignature = sodium.crypto_sign_detached(
     inviteeUserAndDevice.mainDevice.encryptionPublicKey,
     inviteeUserAndDevice.signingPrivateKey
   );
@@ -83,7 +83,7 @@ test("user should be able to accept an invitation", async () => {
 });
 
 test("double-accepting invitation does nothing", async () => {
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+  const encryptionPublicKeySignature = sodium.crypto_sign_detached(
     inviteeUserAndDevice.mainDevice.encryptionPublicKey,
     inviteeUserAndDevice.signingPrivateKey
   );
@@ -113,7 +113,7 @@ test("double-accepting invitation does nothing", async () => {
 });
 
 test("invalid invitation id should throw error", async () => {
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+  const encryptionPublicKeySignature = sodium.crypto_sign_detached(
     inviteeUserAndDevice.mainDevice.encryptionPublicKey,
     inviteeUserAndDevice.signingPrivateKey
   );
@@ -145,7 +145,7 @@ test("expired invitation id should throw error", async () => {
       expiresAt: new Date(Date.now() - 1000),
     },
   });
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+  const encryptionPublicKeySignature = sodium.crypto_sign_detached(
     inviteeUserAndDevice.mainDevice.encryptionPublicKey,
     inviteeUserAndDevice.signingPrivateKey
   );
@@ -177,11 +177,11 @@ test("invalid signature should throw error", async () => {
       expiresAt: new Date(Date.now() - 1000),
     },
   });
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+  const encryptionPublicKeySignature = sodium.crypto_sign_detached(
     inviteeUserAndDevice.mainDevice.encryptionPublicKey,
     inviteeUserAndDevice.signingPrivateKey
   );
-  const badSigningKeys = await sodium.crypto_sign_keypair();
+  const badSigningKeys = sodium.crypto_sign_keypair();
   await expect(
     (async () =>
       await acceptWorkspaceInvitation({
@@ -202,7 +202,7 @@ test("invalid signature should throw error", async () => {
 });
 
 test("Unauthenticated", async () => {
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+  const encryptionPublicKeySignature = sodium.crypto_sign_detached(
     inviteeUserAndDevice.mainDevice.encryptionPublicKey,
     inviteeUserAndDevice.signingPrivateKey
   );

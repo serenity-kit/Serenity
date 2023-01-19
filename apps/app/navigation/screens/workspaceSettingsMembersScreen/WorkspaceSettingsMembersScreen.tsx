@@ -159,7 +159,7 @@ export default function WorkspaceSettingsMembersScreen(
       setMembers(members);
       delete memberLookup[username];
       setMemberLookup(memberLookup);
-      const workspaceKeyString = await sodium.crypto_kdf_keygen();
+      const workspaceKeyString = sodium.crypto_kdf_keygen();
       const workspaceKey = {
         id: uuidv4(),
         workspaceKey: workspaceKeyString,
@@ -185,7 +185,7 @@ export default function WorkspaceSettingsMembersScreen(
           continue;
         }
         if (device.userId !== removingMember.userId) {
-          const { ciphertext, nonce } = await encryptWorkspaceKeyForDevice({
+          const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
             receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
             creatorDeviceEncryptionPrivateKey:
               activeDevice.encryptionPrivateKey!,

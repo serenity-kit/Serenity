@@ -140,11 +140,11 @@ export const sharePageScreenMachine =
           });
           return documentShareLinkResult;
         },
-        decryptVirtualDevice: async (context, event) => {
+        decryptVirtualDevice: (context, event) => {
           const virtualDeviceKey = context.virtualDeviceKey;
           const documentShareLink =
             context.documentShareLinkQueryResult?.data?.documentShareLink;
-          const base64DeviceData = await sodium.crypto_secretbox_open_easy(
+          const base64DeviceData = sodium.crypto_secretbox_open_easy(
             documentShareLink?.deviceSecretBoxCiphertext!,
             documentShareLink?.deviceSecretBoxNonce!,
             virtualDeviceKey!

@@ -52,7 +52,7 @@ export function getPending(documentId): PendingResult {
   return { type: "none" };
 }
 
-export async function createSnapshot(
+export function createSnapshot(
   content,
   publicData: SnapshotPublicData,
   key: Uint8Array,
@@ -62,12 +62,12 @@ export async function createSnapshot(
     canonicalize(publicData) as string
   );
 
-  const { ciphertext, publicNonce } = await encryptAead(
+  const { ciphertext, publicNonce } = encryptAead(
     content,
     publicDataAsBase64,
     sodium.to_base64(key)
   );
-  const signature = await sign(
+  const signature = sign(
     `${publicNonce}${ciphertext}${publicDataAsBase64}`,
     sodium.to_base64(signatureKeyPair.privateKey)
   );
@@ -81,7 +81,7 @@ export async function createSnapshot(
   return snapshot;
 }
 
-export async function verifyAndDecryptSnapshot(
+export function verifyAndDecryptSnapshot(
   snapshot: Snapshot,
   key: Uint8Array,
   publicKey: Uint8Array
@@ -90,7 +90,7 @@ export async function verifyAndDecryptSnapshot(
     canonicalize(snapshot.publicData) as string
   );
 
-  const isValid = await verifySignature(
+  const isValid = verifySignature(
     `${snapshot.nonce}${snapshot.ciphertext}${publicDataAsBase64}`,
     snapshot.signature,
     sodium.to_base64(publicKey)
@@ -98,7 +98,7 @@ export async function verifyAndDecryptSnapshot(
   if (!isValid) {
     return null;
   }
-  return await decryptAead(
+  return decryptAead(
     sodium.from_base64(snapshot.ciphertext),
     publicDataAsBase64,
     sodium.to_base64(key),

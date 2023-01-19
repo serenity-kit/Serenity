@@ -7,8 +7,8 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("encryptFolderName", async () => {
-  const result = await encryptFolderName({
+test("encryptFolderName", () => {
+  const result = encryptFolderName({
     parentKey: kdfKey,
     name: "Getting started",
   });
@@ -19,8 +19,8 @@ test("encryptFolderName", async () => {
   expect(typeof result.publicNonce).toBe("string");
 });
 
-test("encryptFolderName with publicData", async () => {
-  const result = await encryptFolderName({
+test("encryptFolderName with publicData", () => {
+  const result = encryptFolderName({
     parentKey: kdfKey,
     name: "Getting started",
     publicData: { something: 4 },
@@ -29,13 +29,12 @@ test("encryptFolderName with publicData", async () => {
   expect(typeof result.publicNonce).toBe("string");
 });
 
-test("encryptFolderName with publicData fails for invalid publicData", async () => {
-  await expect(
-    (async () =>
-      await encryptFolderName({
-        parentKey: kdfKey,
-        name: "Getting started",
-        publicData: function foo() {},
-      }))()
+test("encryptFolderName with publicData fails for invalid publicData", () => {
+  expect(
+    encryptFolderName({
+      parentKey: kdfKey,
+      name: "Getting started",
+      publicData: function foo() {},
+    })
   ).rejects.toThrowError(/Invalid public data for encrypting the name\./);
 });

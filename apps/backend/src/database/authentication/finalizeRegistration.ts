@@ -22,8 +22,8 @@ type Props = {
   pendingWorkspaceInvitationKeyEncryptionSalt: string | null | undefined;
 };
 
-const verifyDevice = async (device: DeviceInput) => {
-  return await sodium.crypto_sign_verify_detached(
+const verifyDevice = (device: DeviceInput) => {
+  return sodium.crypto_sign_verify_detached(
     device.encryptionPublicKeySignature,
     device.encryptionPublicKey,
     device.signingPublicKey

@@ -6,17 +6,17 @@ type PrivateKeys = {
   signingPrivateKey: string;
 };
 
-export const decryptDevice = async ({
+export const decryptDevice = ({
   ciphertext,
   nonce,
   exportKey,
   encryptionKeySalt,
-}): Promise<PrivateKeys> => {
+}): PrivateKeys => {
   const { encryptionKey } = createEncryptionKeyFromOpaqueExportKey(
     exportKey,
     encryptionKeySalt
   );
-  const decryptedCiphertextBase64 = await sodium.crypto_secretbox_open_easy(
+  const decryptedCiphertextBase64 = sodium.crypto_secretbox_open_easy(
     ciphertext,
     nonce,
     encryptionKey

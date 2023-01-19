@@ -57,7 +57,7 @@ test("delete and keep devices mismatch", async () => {
   const expectedNumDevices =
     numDevicesBeforeDeleteResponse.devices.edges.length;
 
-  const workspaceKeyBox1 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
@@ -104,12 +104,12 @@ test("delete a device", async () => {
   //   },
   // });
   // expect(session).not.toBeNull();
-  const workspaceKeyBox1 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
   });
-  const workspaceKeyBox2 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
@@ -178,17 +178,17 @@ test("won't delete a device they don't own", async () => {
   const expectedNumDevices =
     numDevicesBeforeDeleteResponse.devices.edges.length;
 
-  const workspaceKeyBox1 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
   });
-  const workspaceKeyBox2 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
   });
-  const workspaceKeyBox3 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox3 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData2.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
@@ -250,7 +250,7 @@ test("delete login device clears session", async () => {
     },
   });
   expect(session).not.toBeNull();
-  const workspaceKeyBox1 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,

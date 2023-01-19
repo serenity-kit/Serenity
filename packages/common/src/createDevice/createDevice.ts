@@ -1,10 +1,10 @@
 import sodium from "@serenity-tools/libsodium";
 import { LocalDevice } from "../types";
 
-export const createDevice = async () => {
-  const signingKeyPair = await sodium.crypto_sign_keypair();
-  const encryptionKeyPair = await sodium.crypto_box_keypair();
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
+export const createDevice = () => {
+  const signingKeyPair = sodium.crypto_sign_keypair();
+  const encryptionKeyPair = sodium.crypto_box_keypair();
+  const encryptionPublicKeySignature = sodium.crypto_sign_detached(
     encryptionKeyPair.publicKey,
     signingKeyPair.privateKey
   );

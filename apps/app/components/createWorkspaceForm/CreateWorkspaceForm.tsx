@@ -85,16 +85,16 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       }
       const devices = devicesResult.data?.devices?.nodes as Device[];
       const { deviceWorkspaceKeyBoxes, workspaceKey } =
-        await createWorkspaceKeyBoxesForDevices({ devices, activeDevice });
+        createWorkspaceKeyBoxesForDevices({ devices, activeDevice });
       if (!workspaceKey) {
         throw new Error("Could not retrieve workspaceKey!");
       }
 
-      const encryptedFolderResult = await encryptFolderName({
+      const encryptedFolderResult = encryptFolderName({
         name: folderName,
         parentKey: workspaceKey,
       });
-      const folderIdSignature = await sodium.crypto_sign_detached(
+      const folderIdSignature = sodium.crypto_sign_detached(
         folderId,
         activeDevice.signingPrivateKey!
       );
@@ -108,7 +108,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const documentKeyData = createDocumentKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
-      const encryptedDocumentTitle = await encryptDocumentTitle({
+      const encryptedDocumentTitle = encryptDocumentTitle({
         title: documentName,
         key: documentKeyData.key,
       });
@@ -128,7 +128,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const snapshotKey = createSnapshotKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
-      const snapshot = await createIntroductionDocumentSnapshot({
+      const snapshot = createIntroductionDocumentSnapshot({
         documentId,
         snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
         subkeyId: snapshotKey.subkeyId,

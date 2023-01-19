@@ -45,7 +45,7 @@ export async function acceptWorkspaceInvitation({
           inviteeMainDevice.encryptionPublicKeySignature,
       },
     });
-    const doesSignatureVerify = await sodium.crypto_sign_verify_detached(
+    const doesSignatureVerify = sodium.crypto_sign_verify_detached(
       inviteeUsernameAndDeviceSignature,
       inviteeInfo!,
       workspaceInvitation.invitationSigningPublicKey

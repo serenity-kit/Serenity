@@ -84,7 +84,7 @@ export default function RegistrationVerificationScreen(
         );
         return;
       }
-      const signingPrivateKey = await decryptWorkspaceInvitationKey({
+      const signingPrivateKey = decryptWorkspaceInvitationKey({
         exportKey,
         subkeyId: pendingWorkspaceInvitation.subkeyId!,
         ciphertext: pendingWorkspaceInvitation.ciphertext!,
@@ -114,7 +114,7 @@ export default function RegistrationVerificationScreen(
     try {
       setErrorMessage("");
 
-      const unsafedDevice = await createDeviceWithInfo();
+      const unsafedDevice = createDeviceWithInfo();
 
       // FIXME: allow non-extended login by storing into sessionStorage
       // for now this is a HACK to support devices and workspaceKeyBoxes

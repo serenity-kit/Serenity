@@ -30,7 +30,7 @@ export const updateDocumentName = async ({
   const documentKeyData = createDocumentKey({
     folderKey,
   });
-  const encryptedDocumentResult = await encryptDocumentTitle({
+  const encryptedDocumentResult = encryptDocumentTitle({
     title: name,
     key: documentKeyData.key,
   });

@@ -14,7 +14,7 @@ export type Props = {
   devices: Device[];
   activeDevice: Device;
 };
-export const createWorkspaceKeyBoxesForDevices = async ({
+export const createWorkspaceKeyBoxesForDevices = ({
   devices,
   activeDevice,
 }: Props) => {
@@ -29,9 +29,9 @@ export const createWorkspaceKeyBoxesForDevices = async ({
     throw new Error("Active device doesn't have an encryptionPrivateKey!");
   }
 
-  const workspaceKey = await sodium.crypto_kdf_keygen();
+  const workspaceKey = sodium.crypto_kdf_keygen();
   for (const receiverDevice of allDevices) {
-    const { nonce, ciphertext } = await encryptWorkspaceKeyForDevice({
+    const { nonce, ciphertext } = encryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: receiverDevice.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
       workspaceKey,

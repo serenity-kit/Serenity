@@ -12,7 +12,7 @@ export const createEncryptAndUploadFileFunction = ({
   workspaceId,
 }: CreateEncryptAndUploadFileFunctionParams) => {
   return async (fileAsBase64: string) => {
-    const key = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
+    const key = sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
     const { fileCiphertext, publicNonce } = encryptFile({
       base64FileData: fileAsBase64,
       key,

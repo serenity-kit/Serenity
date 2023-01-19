@@ -70,7 +70,7 @@ test("verify user", async () => {
   const finishMessage = sodium.to_base64(
     result.login.finish(sodium.from_base64(result.data.challengeResponse))
   );
-  const sessionTokenSignature = await sodium.crypto_sign_detached(
+  const sessionTokenSignature = sodium.crypto_sign_detached(
     userData.sessionKey,
     userData.webDevice.signingPrivateKey
   );
@@ -118,7 +118,7 @@ test("bad login", async () => {
   const finishMessage = sodium.to_base64(
     result.login.finish(sodium.from_base64(result.data.challengeResponse))
   );
-  const sessionTokenSignature = await sodium.crypto_sign_detached(
+  const sessionTokenSignature = sodium.crypto_sign_detached(
     userData.sessionKey,
     userData.webDevice.signingPrivateKey
   );
@@ -151,7 +151,7 @@ describe("Input errors", () => {
     const finishMessage = sodium.to_base64(
       result.login.finish(sodium.from_base64(result.data.challengeResponse))
     );
-    const sessionTokenSignature = await sodium.crypto_sign_detached(
+    const sessionTokenSignature = sodium.crypto_sign_detached(
       userData.sessionKey,
       userData.webDevice.signingPrivateKey
     );
@@ -175,7 +175,7 @@ describe("Input errors", () => {
       username,
       password,
     });
-    const sessionTokenSignature = await sodium.crypto_sign_detached(
+    const sessionTokenSignature = sodium.crypto_sign_detached(
       userData.sessionKey,
       userData.webDevice.signingPrivateKey
     );
@@ -202,7 +202,7 @@ describe("Input errors", () => {
     const finishMessage = sodium.to_base64(
       result.login.finish(sodium.from_base64(result.data.challengeResponse))
     );
-    const sessionTokenSignature = await sodium.crypto_sign_detached(
+    const sessionTokenSignature = sodium.crypto_sign_detached(
       userData.sessionKey,
       userData.webDevice.signingPrivateKey
     );

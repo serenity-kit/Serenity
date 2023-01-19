@@ -9,13 +9,13 @@ type Params = {
   publicData?: any;
 };
 
-export const decryptDocumentTitle = async (params: Params) => {
+export const decryptDocumentTitle = (params: Params) => {
   const publicData = params.publicData || {};
   const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {
     throw new Error("Invalid public data for decrypting the document.");
   }
-  const result = await decryptAead(
+  const result = decryptAead(
     sodium.from_base64(params.ciphertext),
     canonicalizedPublicData,
     params.key,

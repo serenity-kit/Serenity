@@ -6,7 +6,7 @@ export type Props = {
   workspaceKey: string;
   nonce?: string;
 };
-export const encryptWorkspaceKeyForDevice = async ({
+export const encryptWorkspaceKeyForDevice = ({
   receiverDeviceEncryptionPublicKey,
   creatorDeviceEncryptionPrivateKey,
   workspaceKey,
@@ -16,7 +16,7 @@ export const encryptWorkspaceKeyForDevice = async ({
   if (nonce) {
     theNonce = nonce;
   } else {
-    theNonce = await sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+    theNonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
   }
   const ciphertext = sodium.crypto_box_easy(
     workspaceKey,

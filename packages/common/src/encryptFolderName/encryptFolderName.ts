@@ -13,7 +13,7 @@ type Params = {
 // for one parentKey and checking only the uniquness for this type.
 export const folderDerivedKeyContext = "folder__";
 
-export const encryptFolderName = async (params: Params) => {
+export const encryptFolderName = (params: Params) => {
   const publicData = params.publicData || {};
   const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {
@@ -25,7 +25,7 @@ export const encryptFolderName = async (params: Params) => {
     key: params.parentKey,
     context: folderDerivedKeyContext,
   });
-  const result = await encryptAead(
+  const result = encryptAead(
     params.name,
     canonicalizedPublicData,
     folderKey.key

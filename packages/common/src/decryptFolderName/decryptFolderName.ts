@@ -13,7 +13,7 @@ type Params = {
   publicData?: any;
 };
 
-export const decryptFolderName = async (params: Params) => {
+export const decryptFolderName = (params: Params) => {
   const publicData = params.publicData || {};
   const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {
@@ -24,7 +24,7 @@ export const decryptFolderName = async (params: Params) => {
     context: folderDerivedKeyContext,
     subkeyId: params.subkeyId,
   });
-  const result = await decryptAead(
+  const result = decryptAead(
     sodium.from_base64(params.ciphertext),
     canonicalizedPublicData,
     folderKey.key,

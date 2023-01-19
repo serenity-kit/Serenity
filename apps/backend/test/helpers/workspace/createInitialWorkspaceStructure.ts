@@ -110,10 +110,10 @@ export const createInitialWorkspaceStructure = async ({
   const documentName = "Introduction";
 
   // create workspace key boxes
-  const workspaceKey = await sodium.crypto_kdf_keygen();
+  const workspaceKey = sodium.crypto_kdf_keygen();
   const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[] = [];
   for (const device of devices) {
-    const deviceWorkspaceKeyBox = await encryptWorkspaceKeyForDevice({
+    const deviceWorkspaceKeyBox = encryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: creatorDevice.encryptionPrivateKey,
       workspaceKey,
@@ -132,7 +132,7 @@ export const createInitialWorkspaceStructure = async ({
   };
 
   // prepare the folder
-  const encryptedFolderResult = await encryptFolderName({
+  const encryptedFolderResult = encryptFolderName({
     name: folderName,
     parentKey: workspaceKey,
   });
@@ -140,7 +140,7 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedFolderNameNonce = encryptedFolderResult.publicNonce;
   const folderSubkeyId = encryptedFolderResult.folderSubkeyId;
   const folderKey = encryptedFolderResult.folderSubkey;
-  const folderIdSignature = await sodium.crypto_sign_detached(
+  const folderIdSignature = sodium.crypto_sign_detached(
     folderId,
     creatorDevice.signingPrivateKey
   );
@@ -163,7 +163,7 @@ export const createInitialWorkspaceStructure = async ({
   const documentKey = documentKeyResult.key;
   const documentSubkeyId = documentKeyResult.subkeyId;
 
-  const encryptedDocumentTitleResult = await encryptDocumentTitle({
+  const encryptedDocumentTitleResult = encryptDocumentTitle({
     title: documentName,
     key: documentKey,
   });
@@ -174,7 +174,7 @@ export const createInitialWorkspaceStructure = async ({
   const snapshotKey = createSnapshotKey({
     folderKey,
   });
-  const snapshot = await createIntroductionDocumentSnapshot({
+  const snapshot = createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
     subkeyId: snapshotKey.subkeyId,

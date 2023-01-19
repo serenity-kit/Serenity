@@ -88,7 +88,7 @@ test("Invalid ownership", async () => {
 test("Unauthenticated", async () => {
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
-  const snapshotKey = await sodium.crypto_kdf_keygen();
+  const snapshotKey = sodium.crypto_kdf_keygen();
   await expect(
     (async () =>
       await createDocumentShareLink({
@@ -119,7 +119,7 @@ describe("Input errors", () => {
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
       userData1.webDevice;
-    const snapshotKey = await sodium.crypto_kdf_keygen();
+    const snapshotKey = sodium.crypto_kdf_keygen();
     await expect(
       (async () =>
         await graphql.client.request(
@@ -147,7 +147,7 @@ describe("Input errors", () => {
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
       userData1.webDevice;
-    const snapshotKey = await sodium.crypto_kdf_keygen();
+    const snapshotKey = sodium.crypto_kdf_keygen();
     await expect(
       (async () =>
         await graphql.client.request(
@@ -180,7 +180,7 @@ describe("Input errors", () => {
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
       otherUser.webDevice;
-    const snapshotKey = await sodium.crypto_kdf_keygen();
+    const snapshotKey = sodium.crypto_kdf_keygen();
     await expect(
       (async () =>
         await graphql.client.request(

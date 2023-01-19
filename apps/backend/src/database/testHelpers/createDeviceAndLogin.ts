@@ -30,7 +30,7 @@ export const createDeviceAndLogin = async ({
     message: sodium.to_base64(loginStartResponse),
   });
 
-  const webDevice = await createDevice();
+  const webDevice = createDevice();
 
   const session = await createSession({
     username,

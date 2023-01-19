@@ -156,7 +156,7 @@ test("successfully creates a snapshot", async () => {
 
   await waitForClientState(client, client.OPEN);
 
-  const snapshotKey = createSnapshotKey({ folderKey });
+  const snapshotKey = await createSnapshotKey({ folderKey });
   const keyDerivationTrace = {
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     subkeyId: snapshotKey.subkeyId,
@@ -180,7 +180,7 @@ test("successfully creates a snapshot", async () => {
     keyDerivationTrace,
     subkeyId: snapshotKey.subkeyId,
   };
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
@@ -222,7 +222,7 @@ test("successfully creates an update", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
-  const updateToSend = await createUpdate(
+  const updateToSend = createUpdate(
     "UPDATE CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),

@@ -83,7 +83,7 @@ export const login = async ({
     startLoginResult.data.startLogin.challengeResponse
   );
 
-  const sessionTokenSignature = await sodium.crypto_sign_detached(
+  const sessionTokenSignature = sodium.crypto_sign_detached(
     result.sessionKey,
     device.signingPrivateKey
   );
@@ -139,7 +139,7 @@ export const fetchMainDevice = async ({ exportKey }: FetchMainDeviceParams) => {
     throw new Error("Failed to fetch main device.");
   }
   const mainDevice = mainDeviceResult.data.mainDevice;
-  const privateKeys = await decryptDevice({
+  const privateKeys = decryptDevice({
     ciphertext: mainDevice.ciphertext,
     encryptionKeySalt: mainDevice.encryptionKeySalt,
     nonce: mainDevice.nonce,

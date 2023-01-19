@@ -23,7 +23,7 @@ const setup = async () => {
   });
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
-  snapshotKey = await sodium.crypto_kdf_keygen();
+  snapshotKey = sodium.crypto_kdf_keygen();
   const documentShareLinkResponse = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,

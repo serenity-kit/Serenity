@@ -67,7 +67,7 @@ test("Existing workspace does nothing", async () => {
     creatorDeviceEncryptionPublicKey: userAndDevice1.device.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
   });
-  const { nonce, ciphertext } = await encryptWorkspaceKeyForDevice({
+  const { nonce, ciphertext } = encryptWorkspaceKeyForDevice({
     workspaceKey: decryptedWorkspaceKey,
     receiverDeviceEncryptionPublicKey:
       userAndDevice2.device.encryptionPublicKey,

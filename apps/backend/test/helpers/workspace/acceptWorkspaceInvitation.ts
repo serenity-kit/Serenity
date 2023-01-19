@@ -55,7 +55,7 @@ export const acceptWorkspaceInvitation = async ({
       encryptionPublicKeySignature: safeMainDevice.encryptionPublicKeySignature,
     },
   });
-  const inviteeUsernameAndDeviceSignature = await sodium.crypto_sign_detached(
+  const inviteeUsernameAndDeviceSignature = sodium.crypto_sign_detached(
     inviteeUsernameAndDevice!,
     invitationSigningPrivateKey
   );

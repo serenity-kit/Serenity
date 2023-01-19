@@ -5,7 +5,7 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("crypto_kdf_keygen should create kdf key", async () => {
-  const result = await sodium.crypto_kdf_keygen();
+test("crypto_kdf_keygen should create kdf key", () => {
+  const result = sodium.crypto_kdf_keygen();
   expect([...result].length).toEqual(43);
 });

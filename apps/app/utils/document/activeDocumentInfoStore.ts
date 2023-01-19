@@ -42,7 +42,7 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
           folderKey: lastChainItem.key,
           subkeyId: document.nameKeyDerivationTrace.subkeyId,
         });
-        documentName = await decryptDocumentTitle({
+        documentName = decryptDocumentTitle({
           key: documentKeyData.key,
           ciphertext: document.encryptedName,
           publicNonce: document.encryptedNameNonce,

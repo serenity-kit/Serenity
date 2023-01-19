@@ -39,27 +39,27 @@ export const createDocumentShareLink = async ({
   creatorDeviceEncryptionPrivateKey,
 }: Props) => {
   // TODO: generate key from key derivation trace
-  const snapshotKey = await sodium.crypto_kdf_keygen();
+  const snapshotKey = sodium.crypto_kdf_keygen();
 
-  const virtualDevice = await createDevice();
+  const virtualDevice = createDevice();
 
   // create virtual device
-  const virtualDeviceKey = await sodium.crypto_secretbox_keygen();
+  const virtualDeviceKey = sodium.crypto_secretbox_keygen();
 
   // encrypt virtual device
-  const serializedVirtualDevice = await sodium.to_base64(
+  const serializedVirtualDevice = sodium.to_base64(
     JSON.stringify(virtualDevice)
   );
-  const deviceSecretBoxNonce = await sodium.randombytes_buf(
+  const deviceSecretBoxNonce = sodium.randombytes_buf(
     sodium.crypto_secretbox_NONCEBYTES
   );
-  const deviceSecretBoxCiphertext = await sodium.crypto_secretbox_easy(
+  const deviceSecretBoxCiphertext = sodium.crypto_secretbox_easy(
     serializedVirtualDevice,
     deviceSecretBoxNonce,
     virtualDeviceKey
   );
 
-  const snapshotDeviceNonce = await sodium.randombytes_buf(
+  const snapshotDeviceNonce = sodium.randombytes_buf(
     sodium.crypto_secretbox_NONCEBYTES
   );
   const snapshotDeviceCiphertext = sodium.crypto_box_easy(

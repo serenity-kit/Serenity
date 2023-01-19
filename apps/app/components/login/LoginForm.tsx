@@ -58,7 +58,7 @@ export function LoginForm(props: Props) {
       setGqlErrorMessage("");
       setIsLoggingIn(true);
       await clearDeviceAndSessionStorage(clearWorkspaceKeyStore);
-      const unsavedDevice = await createDeviceWithInfo();
+      const unsavedDevice = createDeviceWithInfo();
       const loginResult = await login({
         username,
         password,

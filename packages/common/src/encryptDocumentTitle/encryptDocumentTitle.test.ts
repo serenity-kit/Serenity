@@ -6,10 +6,10 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("encryptDocumentTitle", async () => {
+test("encryptDocumentTitle", () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const documentKey = createDocumentKey({ folderKey });
-  const result = await encryptDocumentTitle({
+  const result = encryptDocumentTitle({
     key: documentKey.key,
     title: "Todos",
   });
@@ -17,10 +17,10 @@ test("encryptDocumentTitle", async () => {
   expect(typeof result.publicNonce).toBe("string");
 });
 
-test("encryptDocumentTitle with publicData", async () => {
+test("encryptDocumentTitle with publicData", () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const documentKey = createDocumentKey({ folderKey });
-  const result = await encryptDocumentTitle({
+  const result = encryptDocumentTitle({
     key: documentKey.key,
     title: "Todos",
     publicData: { something: 2 },
@@ -29,15 +29,14 @@ test("encryptDocumentTitle with publicData", async () => {
   expect(typeof result.publicNonce).toBe("string");
 });
 
-test("encryptDocumentTitle with publicData fails for invalid data", async () => {
+test("encryptDocumentTitle with publicData fails for invalid data", () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const documentKey = createDocumentKey({ folderKey });
-  await expect(
-    (async () =>
-      await encryptDocumentTitle({
-        key: documentKey.key,
-        title: "Todos",
-        publicData: function foo() {},
-      }))()
+  expect(
+    encryptDocumentTitle({
+      key: documentKey.key,
+      title: "Todos",
+      publicData: function foo() {},
+    })
   ).rejects.toThrowError(/Invalid public data for encrypting the title\./);
 });

@@ -76,12 +76,11 @@ export const finishLoginMutation = mutationField("finishLogin", {
       message: args.input.message,
     });
 
-    const isValidSessionTokenSignature =
-      await sodium.crypto_sign_verify_detached(
-        args.input.sessionTokenSignature,
-        finishLoginResult.sessionKey,
-        args.input.deviceSigningPublicKey
-      );
+    const isValidSessionTokenSignature = sodium.crypto_sign_verify_detached(
+      args.input.sessionTokenSignature,
+      finishLoginResult.sessionKey,
+      args.input.deviceSigningPublicKey
+    );
     if (!isValidSessionTokenSignature) {
       throw new Error("Invalid sessionTokenSignature");
     }

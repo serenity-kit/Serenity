@@ -53,7 +53,7 @@ test("server should login a user", async () => {
   };
   const deviceInfo = JSON.stringify(deviceInfoJson);
 
-  const sessionTokenSignature = await sodium.crypto_sign_detached(
+  const sessionTokenSignature = sodium.crypto_sign_detached(
     sessionKey,
     device.signingPrivateKey
   );

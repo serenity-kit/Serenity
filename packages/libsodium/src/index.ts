@@ -18,13 +18,13 @@ export {
 export { from_base64_to_string } from "./base64wasm";
 export const ready = sodium.ready;
 
-export const randombytes_buf = async (length: number): Promise<string> => {
-  const result = await sodium.randombytes_buf(length);
+export const randombytes_buf = (length: number): string => {
+  const result = sodium.randombytes_buf(length);
   return to_base64(result);
 };
 
-export const crypto_sign_keypair = async (): Promise<StringKeyPair> => {
-  const result = await sodium.crypto_sign_keypair();
+export const crypto_sign_keypair = (): StringKeyPair => {
+  const result = sodium.crypto_sign_keypair();
   return {
     keyType: "ed25519",
     privateKey: to_base64(result.privateKey),
@@ -32,40 +32,36 @@ export const crypto_sign_keypair = async (): Promise<StringKeyPair> => {
   };
 };
 
-export const crypto_sign_detached = async (
+export const crypto_sign_detached = (
   message: string,
   privateKey: string
-): Promise<string> => {
-  const result = await sodium.crypto_sign_detached(
-    message,
-    from_base64(privateKey)
-  );
+): string => {
+  const result = sodium.crypto_sign_detached(message, from_base64(privateKey));
   return to_base64(result);
 };
 
-export const crypto_sign_verify_detached = async (
+export const crypto_sign_verify_detached = (
   signature: string,
   message: string,
   publicKey: string
-): Promise<boolean> => {
-  return await sodium.crypto_sign_verify_detached(
+): boolean => {
+  return sodium.crypto_sign_verify_detached(
     from_base64(signature),
     message,
     from_base64(publicKey)
   );
 };
 
-export const crypto_aead_xchacha20poly1305_ietf_keygen =
-  async (): Promise<string> =>
-    to_base64(sodium.crypto_aead_xchacha20poly1305_ietf_keygen());
+export const crypto_aead_xchacha20poly1305_ietf_keygen = (): string =>
+  to_base64(sodium.crypto_aead_xchacha20poly1305_ietf_keygen());
 
-export const crypto_aead_xchacha20poly1305_ietf_encrypt = async (
+export const crypto_aead_xchacha20poly1305_ietf_encrypt = (
   message: string,
   additional_data: string,
   secret_nonce: null,
   public_nonce: string,
   key: string
-): Promise<string> => {
+): string => {
   const result = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
     message,
     additional_data,
@@ -76,13 +72,13 @@ export const crypto_aead_xchacha20poly1305_ietf_encrypt = async (
   return to_base64(result);
 };
 
-export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
+export const crypto_aead_xchacha20poly1305_ietf_decrypt = (
   secret_nonce: null,
   ciphertext: string,
   additional_data: string,
   public_nonce: string,
   key: string
-): Promise<string> => {
+): string => {
   const result = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
     secret_nonce,
     from_base64(ciphertext),
@@ -93,14 +89,14 @@ export const crypto_aead_xchacha20poly1305_ietf_decrypt = async (
   return to_base64(result);
 };
 
-export const crypto_pwhash = async (
+export const crypto_pwhash = (
   keyLength: number,
   password: string,
   salt: string,
   opsLimit: number,
   memLimit: number,
   algorithm: number
-): Promise<string> => {
+): string => {
   const result = sodium.crypto_pwhash(
     keyLength,
     password,
@@ -112,11 +108,11 @@ export const crypto_pwhash = async (
   return to_base64(result);
 };
 
-export const crypto_secretbox_easy = async (
+export const crypto_secretbox_easy = (
   message: string,
   nonce: string,
   key: string
-): Promise<string> => {
+): string => {
   const cipherText = sodium.crypto_secretbox_easy(
     from_base64(message),
     from_base64(nonce),
@@ -125,11 +121,11 @@ export const crypto_secretbox_easy = async (
   return to_base64(cipherText);
 };
 
-export const crypto_secretbox_open_easy = async (
+export const crypto_secretbox_open_easy = (
   ciphertext: string,
   nonce: string,
   key: string
-): Promise<string> => {
+): string => {
   const message = sodium.crypto_secretbox_open_easy(
     from_base64(ciphertext),
     from_base64(nonce),
@@ -177,11 +173,11 @@ export const crypto_box_open_easy = (
   return to_base64(message);
 };
 
-export const crypto_kdf_keygen = async (): Promise<string> => {
+export const crypto_kdf_keygen = (): string => {
   return to_base64(sodium.crypto_kdf_keygen());
 };
 
-export const crypto_secretbox_keygen = async (): Promise<string> => {
+export const crypto_secretbox_keygen = (): string => {
   return to_base64(sodium.crypto_secretbox_keygen());
 };
 

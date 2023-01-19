@@ -27,14 +27,9 @@ test.skip("createUpdate & verifyAndDecryptUpdate successfully", async () => {
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
 
-  const update = await createUpdate(
-    "Hello World",
-    publicData,
-    key,
-    signatureKeyPair
-  );
+  const update = createUpdate("Hello World", publicData, key, signatureKeyPair);
 
-  const result = await verifyAndDecryptUpdate(
+  const result = verifyAndDecryptUpdate(
     update,
     key,
     signatureKeyPair.publicKey
@@ -68,14 +63,9 @@ test("createUpdate & verifyAndDecryptUpdate break due changed signature", async 
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
 
-  const update = await createUpdate(
-    "Hello World",
-    publicData,
-    key,
-    signatureKeyPair
-  );
+  const update = createUpdate("Hello World", publicData, key, signatureKeyPair);
 
-  const result = await verifyAndDecryptUpdate(
+  const result = verifyAndDecryptUpdate(
     {
       ...update,
       signature: update.signature.replace(/^./, "a"),
@@ -109,14 +99,9 @@ test("createUpdate & verifyAndDecryptUpdate break due changed ciphertext", async
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
 
-  const update = await createUpdate(
-    "Hello World",
-    publicData,
-    key,
-    signatureKeyPair
-  );
+  const update = createUpdate("Hello World", publicData, key, signatureKeyPair);
 
-  const result = await verifyAndDecryptUpdate(
+  const result = verifyAndDecryptUpdate(
     {
       ...update,
       ciphertext: update.ciphertext.replace(/^./, "a"),

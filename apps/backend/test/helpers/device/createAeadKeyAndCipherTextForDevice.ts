@@ -4,14 +4,12 @@ export type Props = {
   receiverDeviceEncryptionPublicKey: string;
   creatorDeviceEncryptionPrivateKey: string;
 };
-export const createAeadKeyAndCipherTextForDevice = async ({
+export const createAeadKeyAndCipherTextForDevice = ({
   receiverDeviceEncryptionPublicKey,
   creatorDeviceEncryptionPrivateKey,
 }: Props) => {
-  const aeadKey = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
-  const nonce = await sodium.randombytes_buf(
-    sodium.crypto_secretbox_NONCEBYTES
-  );
+  const aeadKey = sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
+  const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
   const ciphertext = sodium.crypto_box_easy(
     aeadKey,
     nonce,

@@ -95,7 +95,7 @@ export function VerifyPasswordModal(props: Props) {
       } catch (error) {
         throw error;
       }
-      const sessionTokenSignature = await sodium.crypto_sign_detached(
+      const sessionTokenSignature = sodium.crypto_sign_detached(
         sessionKey,
         activeDevice.signingPrivateKey!
       );

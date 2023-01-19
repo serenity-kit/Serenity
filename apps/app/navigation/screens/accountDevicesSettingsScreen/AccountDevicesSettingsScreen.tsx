@@ -92,7 +92,7 @@ export default function AccountDevicesSettingsScreen(
         return;
       }
       const workspaceDevicePairing: WorkspaceDeviceParing[] = [];
-      const workspaceKeyString = await sodium.crypto_kdf_keygen();
+      const workspaceKeyString = sodium.crypto_kdf_keygen();
       const workspaceKey = {
         id: uuidv4(),
         workspaceKey: workspaceKeyString,
@@ -104,13 +104,11 @@ export default function AccountDevicesSettingsScreen(
         if (device.signingPublicKey === deviceSigningPublicKey) {
           continue;
         }
-        const { ciphertext, nonce } =
-          await createAndEncryptWorkspaceKeyForDevice({
-            receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-            creatorDeviceEncryptionPrivateKey:
-              activeDevice.encryptionPrivateKey!,
-            workspaceKey: workspaceKey.workspaceKey,
-          });
+        const { ciphertext, nonce } = createAndEncryptWorkspaceKeyForDevice({
+          receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+          creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+          workspaceKey: workspaceKey.workspaceKey,
+        });
         workspaceDevicePairing.push({
           ciphertext,
           nonce,
