@@ -1,10 +1,10 @@
-import { gql } from "graphql-request";
-import sodium from "libsodium-wrappers";
-import seleniumSodium from "@serenity-tools/libsodium";
 import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
 } from "@serenity-tools/common";
+import seleniumSodium from "@serenity-tools/libsodium";
+import { gql } from "graphql-request";
+import sodium from "libsodium-wrappers";
 import { TestContext } from "../setupGraphql";
 import { requestRegistrationChallengeResponse } from "./requestRegistrationChallengeResponse";
 
@@ -38,7 +38,7 @@ export const registerUnverifiedUser = async ({
   `;
   const exportKey = sodium.to_base64(result.registration.getExportKey());
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    await createAndEncryptDevice(exportKey);
+    createAndEncryptDevice(exportKey);
 
   let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
   let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;

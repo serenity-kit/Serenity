@@ -42,7 +42,7 @@ export const createDocumentShareLink = async ({
   // TODO: generate key from key derivation trace
   const snapshotKey = await sodiumOld.crypto_kdf_keygen();
 
-  const virtualDevice = await createDevice();
+  const virtualDevice = createDevice();
 
   // create virtual device
   const virtualDeviceKey = sodium.crypto_secretbox_keygen();

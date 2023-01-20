@@ -76,7 +76,7 @@ export default function RegisterForm(props: Props) {
           startRegistrationResult.data.startRegistration.challengeResponse
         );
         const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
-          await createAndEncryptDevice(exportKey);
+          createAndEncryptDevice(exportKey);
 
         setMainDevice({
           encryptionPrivateKey: encryptionPrivateKey,

@@ -18,7 +18,7 @@ export const createDevice = async ({
   if (!session) {
     throw new Error("Session not found");
   }
-  const device = await createdDeviceHelper();
+  const device = createdDeviceHelper();
 
   const deviceInfoJson = {
     type: "web",

@@ -31,7 +31,7 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
 
   const sessionKey = sodium.to_base64(startLoginResult.login.getSessionKey());
 
-  const device = await createDevice();
+  const device = createDevice();
   const deviceInfoJson = {
     type: "web",
     OS: "MacOS",

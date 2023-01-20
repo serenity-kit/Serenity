@@ -2,9 +2,9 @@ import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
 } from "@serenity-tools/common";
+import seleniumSodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
 import sodium from "libsodium-wrappers";
-import seleniumSodium from "@serenity-tools/libsodium";
 import { loginUser } from "./loginUser";
 import { requestRegistrationChallengeResponse } from "./requestRegistrationChallengeResponse";
 import { verifyUser } from "./verifyUser";
@@ -37,7 +37,7 @@ export const registerUser = async (
 
   const exportKey = result.registration.getExportKey();
   const { encryptionPrivateKey, signingPrivateKey, ...mainDevice } =
-    await createAndEncryptDevice(sodium.to_base64(exportKey));
+    createAndEncryptDevice(sodium.to_base64(exportKey));
 
   let pendingWorkspaceInvitationKeyCiphertext: string | null = null;
   let pendingWorkspaceInvitationKeyPublicNonce: string | null = null;

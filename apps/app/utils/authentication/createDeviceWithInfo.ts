@@ -4,8 +4,8 @@ import { Platform } from "react-native";
 
 export type LocalDeviceInclInfo = LocalDevice & { info?: string };
 
-export const createDeviceWithInfo = async () => {
-  let device: LocalDeviceInclInfo = await createDevice();
+export const createDeviceWithInfo = () => {
+  let device: LocalDeviceInclInfo = createDevice();
   const browser = detect();
   if (Platform.OS === "web") {
     const deviceInfoJson = {

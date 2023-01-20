@@ -45,7 +45,7 @@ export default async function createUserWithWorkspace({
     registrationId,
     message: sodium.to_base64(message),
   });
-  const mainDevice = await createAndEncryptDevice(exportKey);
+  const mainDevice = createAndEncryptDevice(exportKey);
 
   const result = await prisma.$transaction(async (prisma) => {
     const device = await prisma.device.create({

@@ -21,7 +21,7 @@ beforeAll(async () => {
 });
 
 it("should return empty parentFolders", async () => {
-  const activeDevice = await createDevice();
+  const activeDevice = createDevice();
   const workspaceId = uuidv4();
   const workspaceKeyId = uuidv4();
   const folderId = uuidv4();
@@ -108,7 +108,7 @@ it("should return empty parentFolders", async () => {
 });
 
 it("should return single parentFolders", async () => {
-  const activeDevice = await createDevice();
+  const activeDevice = createDevice();
   const workspaceId = uuidv4();
   const workspaceKeyId = uuidv4();
   const folderId = uuidv4();
@@ -235,7 +235,7 @@ it("should return single parentFolders", async () => {
 });
 
 it("should return deep parentFolders", async () => {
-  const activeDevice = await createDevice();
+  const activeDevice = createDevice();
   const workspaceId = uuidv4();
   const workspaceKeyId = uuidv4();
   const folderId = uuidv4();

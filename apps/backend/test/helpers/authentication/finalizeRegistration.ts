@@ -26,7 +26,7 @@ export const finalizeRegistration = async ({
 
   const exportKey = registration.getExportKey();
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
-    await createAndEncryptDevice(sodium.to_base64(exportKey));
+    createAndEncryptDevice(sodium.to_base64(exportKey));
 
   const registrationResponse = await graphql.client.request(query, {
     input: {

@@ -6,14 +6,14 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("verify device", async () => {
-  const device = await createDevice();
-  await expect(verifyDevice(device)).resolves.toBeUndefined();
+test("verify device", () => {
+  const device = createDevice();
+  expect(verifyDevice(device)).resolves.toBeUndefined();
 });
 
-test("verify device throws an error with invalid signature", async () => {
-  const device = await createDevice();
-  await expect(
+test("verify device throws an error with invalid signature", () => {
+  const device = createDevice();
+  expect(
     verifyDevice({
       ...device,
       encryptionPublicKeySignature: "invalid",
@@ -21,8 +21,8 @@ test("verify device throws an error with invalid signature", async () => {
   ).rejects.toThrowError();
 });
 
-test("verify device throws an error with ommited signature", async () => {
-  const device = await createDevice();
+test("verify device throws an error with ommited signature", () => {
+  const device = createDevice();
   expect(
     verifyDevice({
       ...device,

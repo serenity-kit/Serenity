@@ -28,7 +28,7 @@ export const createDocumentShareLink = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const virtualDevice = await createDevice();
+  const virtualDevice = createDevice();
 
   // create virtual device
   const virtualDeviceKey = sodium.crypto_secretbox_keygen();
