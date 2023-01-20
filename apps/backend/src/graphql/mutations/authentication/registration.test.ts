@@ -2,9 +2,8 @@ import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
 } from "@serenity-tools/common";
-import serenitySodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
-import sodium from "libsodium-wrappers";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { requestRegistrationChallengeResponse } from "../../../../test/helpers/authentication/requestRegistrationChallengeResponse";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -59,7 +58,7 @@ test("server should register a user", async () => {
 });
 
 test("server should register a user with a pending workspace id", async () => {
-  const sigingKeyPair = await serenitySodium.crypto_sign_keypair();
+  const sigingKeyPair = sodium.crypto_sign_keypair();
   const result = await requestRegistrationChallengeResponse(
     graphql,
     username,
@@ -83,7 +82,9 @@ test("server should register a user with a pending workspace id", async () => {
     createAndEncryptDevice(exportKey);
   const workspaceInvitationKeyData = encryptWorkspaceInvitationPrivateKey({
     exportKey,
-    workspaceInvitationSigningPrivateKey: sigingKeyPair.privateKey,
+    workspaceInvitationSigningPrivateKey: sodium.to_base64(
+      sigingKeyPair.privateKey
+    ),
   });
 
   const registrationResponse = await graphql.client.request(query, {
