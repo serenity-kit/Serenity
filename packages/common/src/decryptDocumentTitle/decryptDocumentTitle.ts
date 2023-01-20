@@ -1,6 +1,6 @@
 import { decryptAead } from "@naisho/core";
-import sodium from "@serenity-tools/libsodium";
 import canonicalize from "canonicalize";
+import sodium from "react-native-libsodium";
 
 type Params = {
   key: string;
@@ -18,8 +18,8 @@ export const decryptDocumentTitle = async (params: Params) => {
   const result = await decryptAead(
     sodium.from_base64(params.ciphertext),
     canonicalizedPublicData,
-    params.key,
+    sodium.from_base64(params.key),
     params.publicNonce
   );
-  return sodium.from_base64_to_string(result);
+  return sodium.to_string(result);
 };

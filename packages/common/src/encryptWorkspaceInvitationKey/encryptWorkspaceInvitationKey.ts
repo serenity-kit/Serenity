@@ -1,4 +1,5 @@
 import { encryptAead } from "@naisho/core";
+import sodium from "react-native-libsodium";
 import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
@@ -23,10 +24,10 @@ export const encryptWorkspaceInvitationPrivateKey = async ({
     key: encryptionKey,
     context: workspaceInvitationDerivedKeyContext,
   });
-  const result = await encryptAead(
+  const result = encryptAead(
     workspaceInvitationSigningPrivateKey,
     publicData,
-    derivedEncryptionKey.key
+    sodium.from_base64(derivedEncryptionKey.key)
   );
   return {
     key: derivedEncryptionKey.key,

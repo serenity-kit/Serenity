@@ -1,5 +1,5 @@
 import sodiumWrappers from "libsodium-wrappers";
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { UpdatePublicData } from "./types";
 import { createUpdate, verifyAndDecryptUpdate } from "./update";
@@ -42,7 +42,7 @@ test.skip("createUpdate & verifyAndDecryptUpdate successfully", async () => {
   if (result === null) {
     throw new Error("Update could not be verified.");
   }
-  expect(sodium.from_base64_to_string(result)).toBe("Hello World");
+  expect(sodium.to_string(result)).toBe("Hello World");
 });
 
 test("createUpdate & verifyAndDecryptUpdate break due changed signature", async () => {

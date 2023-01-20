@@ -126,11 +126,7 @@ export default function Page({
         sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
       );
       if (initialResult) {
-        Yjs.applyUpdate(
-          yDocRef.current,
-          sodium.from_base64(initialResult),
-          "naisho-remote"
-        );
+        Yjs.applyUpdate(yDocRef.current, initialResult, "naisho-remote");
       }
     } catch (err) {
       // TODO
@@ -155,11 +151,7 @@ export default function Page({
           );
           // when reconnecting the server might send already processed data updates. these then are ignored
           if (updateResult) {
-            Yjs.applyUpdate(
-              yDocRef.current,
-              sodium.from_base64(updateResult),
-              "naisho-remote"
-            );
+            Yjs.applyUpdate(yDocRef.current, updateResult, "naisho-remote");
             latestServerVersionRef.current = update.serverData.version;
           }
         })

@@ -1,6 +1,6 @@
 import { decryptAead } from "@naisho/core";
-import sodium from "@serenity-tools/libsodium";
 import canonicalize from "canonicalize";
+import sodium from "react-native-libsodium";
 import { folderDerivedKeyContext } from "../encryptFolderName/encryptFolderName";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
@@ -27,8 +27,8 @@ export const decryptFolderName = async (params: Params) => {
   const result = await decryptAead(
     sodium.from_base64(params.ciphertext),
     canonicalizedPublicData,
-    folderKey.key,
+    sodium.from_base64(folderKey.key),
     params.publicNonce
   );
-  return sodium.from_base64_to_string(result);
+  return sodium.to_string(result);
 };

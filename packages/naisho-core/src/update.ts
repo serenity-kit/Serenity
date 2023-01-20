@@ -1,4 +1,4 @@
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
 import { Update, UpdatePublicData } from "./types";
 
@@ -68,11 +68,11 @@ export async function createUpdate(
   const { ciphertext, publicNonce } = await encryptAead(
     content,
     publicDataAsBase64,
-    sodium.to_base64(key)
+    key
   );
   const signature = await sign(
     `${publicNonce}${ciphertext}${publicDataAsBase64}`,
-    sodium.to_base64(signatureKeyPair.privateKey)
+    signatureKeyPair.privateKey
   );
 
   const update: Update = {
@@ -93,7 +93,7 @@ export async function verifyAndDecryptUpdate(update: Update, key, publicKey) {
   const isValid = await verifySignature(
     `${update.nonce}${update.ciphertext}${publicDataAsBase64}`,
     update.signature,
-    sodium.to_base64(publicKey)
+    publicKey
   );
   if (!isValid) {
     return null;
@@ -126,7 +126,7 @@ export async function verifyAndDecryptUpdate(update: Update, key, publicKey) {
   const result = decryptAead(
     sodium.from_base64(update.ciphertext),
     sodium.to_base64(JSON.stringify(update.publicData)),
-    sodium.to_base64(key),
+    key,
     update.nonce
   );
 

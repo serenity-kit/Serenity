@@ -12,10 +12,6 @@ const signingKeyPair = {
   publicKey: "wbsF-N6QWE5LLx31gst9y1zpHrMtTfTfbkOaCgSV590",
 };
 
-const exitingCiphertext = "v8ZC5Pn1rRSNSe8nMmOQaohC5WgR";
-const key = "PD67EhgYgH0nx3je2QHutsJjuN9EXDFBiMfG5p3pwsU";
-const nonce = "UNq7ErCr-h4SL9mJW3NukN0_qaruE3qx";
-
 const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
 
 export default function LibsodiumTestScreen(

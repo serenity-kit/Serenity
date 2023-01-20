@@ -10,7 +10,6 @@
     "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "dependencies": {
-    "@serenity-tools/libsodium": "*",
     "canonicalize": "^1.0.8",
     "libsodium-wrappers": "^0.7.10",
     "uuid": "^9.0.0"

@@ -1,5 +1,6 @@
 import { encryptAead } from "@naisho/core";
 import canonicalize from "canonicalize";
+import sodium from "react-native-libsodium";
 import { folderDerivedKeyContext } from "../encryptFolderName/encryptFolderName";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
@@ -25,7 +26,7 @@ export const encryptExistingFolderName = async (params: Params) => {
   const result = await encryptAead(
     params.name,
     canonicalizedPublicData,
-    folderKey.key
+    sodium.from_base64(folderKey.key)
   );
   return {
     folderSubkey: folderKey.key,
