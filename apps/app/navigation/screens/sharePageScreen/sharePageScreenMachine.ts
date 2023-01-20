@@ -1,5 +1,6 @@
 import { LocalDevice } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
+import sodiumOld from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { assign, createMachine } from "xstate";
 import {
   DocumentShareLinkQuery,
@@ -145,13 +146,11 @@ export const sharePageScreenMachine =
           const documentShareLink =
             context.documentShareLinkQueryResult?.data?.documentShareLink;
           const base64DeviceData = await sodium.crypto_secretbox_open_easy(
-            documentShareLink?.deviceSecretBoxCiphertext!,
-            documentShareLink?.deviceSecretBoxNonce!,
-            virtualDeviceKey!
+            sodium.from_base64(documentShareLink?.deviceSecretBoxCiphertext!),
+            sodium.from_base64(documentShareLink?.deviceSecretBoxNonce!),
+            sodium.from_base64(virtualDeviceKey!)
           );
-          const device = JSON.parse(
-            sodium.from_base64_to_string(base64DeviceData)
-          );
+          const device = JSON.parse(sodium.to_string(base64DeviceData));
           return device;
         },
         decryptSnapshotKey: async (context, event) => {
@@ -166,7 +165,7 @@ export const sharePageScreenMachine =
               context.documentShareLinkQueryResult.data.documentShareLink
                 .snapshotKeyBoxs[0];
 
-            const snapshotKey = sodium.crypto_box_open_easy(
+            const snapshotKey = sodiumOld.crypto_box_open_easy(
               snapshotKeyBox.ciphertext,
               snapshotKeyBox.nonce,
               snapshotKeyBox.creatorDevice.encryptionPublicKey,
