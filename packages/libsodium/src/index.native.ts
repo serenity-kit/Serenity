@@ -112,32 +112,6 @@ export const crypto_pwhash = async (
   return to_base64(result);
 };
 
-export const crypto_secretbox_easy = async (
-  message: string,
-  nonce: string,
-  key: string
-): Promise<string> => {
-  const cipherText = sodium.crypto_secretbox_easy(
-    from_base64(message),
-    from_base64(nonce),
-    from_base64(key)
-  );
-  return to_base64(cipherText);
-};
-
-export const crypto_secretbox_open_easy = async (
-  ciphertext: string,
-  nonce: string,
-  key: string
-): Promise<string> => {
-  const message = sodium.crypto_secretbox_open_easy(
-    from_base64(ciphertext),
-    from_base64(nonce),
-    from_base64(key)
-  );
-  return to_base64(message);
-};
-
 export const crypto_box_keypair = (): StringKeyPair => {
   const result = sodium.crypto_box_keypair();
   return {
@@ -198,8 +172,6 @@ const libsodiumExports = {
   crypto_box_easy,
   crypto_box_open_easy,
   crypto_secretbox_keygen,
-  crypto_secretbox_easy,
-  crypto_secretbox_open_easy,
   crypto_sign_verify_detached,
   crypto_aead_xchacha20poly1305_ietf_keygen,
   crypto_aead_xchacha20poly1305_ietf_encrypt,

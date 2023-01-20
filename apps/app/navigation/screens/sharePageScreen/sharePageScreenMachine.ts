@@ -145,7 +145,7 @@ export const sharePageScreenMachine =
           const virtualDeviceKey = context.virtualDeviceKey;
           const documentShareLink =
             context.documentShareLinkQueryResult?.data?.documentShareLink;
-          const base64DeviceData = await sodium.crypto_secretbox_open_easy(
+          const base64DeviceData = sodium.crypto_secretbox_open_easy(
             sodium.from_base64(documentShareLink?.deviceSecretBoxCiphertext!),
             sodium.from_base64(documentShareLink?.deviceSecretBoxNonce!),
             sodium.from_base64(virtualDeviceKey!)
