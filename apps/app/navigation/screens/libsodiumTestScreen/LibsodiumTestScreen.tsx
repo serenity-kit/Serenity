@@ -1,5 +1,4 @@
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
-import sodiumOld from "@serenity-tools/libsodium";
 import { ScrollView, Text, View } from "@serenity-tools/ui";
 import { useEffect, useState } from "react";
 import { useWindowDimensions } from "react-native";
@@ -13,9 +12,9 @@ const signingKeyPair = {
   publicKey: "wbsF-N6QWE5LLx31gst9y1zpHrMtTfTfbkOaCgSV590",
 };
 
-const exitingCiphertext = "DtMWG6Jx9wAmLXh64enOwd6E7cFX";
-const key = "eL4FdkhTmU2F56ySJKKH-2ZVrzdsIIbbmvyz_N3Swb0";
-const nonce = "5GDx6cP2_uToVP-UKhddEmUelpyKTJLZ";
+const exitingCiphertext = "v8ZC5Pn1rRSNSe8nMmOQaohC5WgR";
+const key = "PD67EhgYgH0nx3je2QHutsJjuN9EXDFBiMfG5p3pwsU";
+const nonce = "UNq7ErCr-h4SL9mJW3NukN0_qaruE3qx";
 
 const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
 
@@ -27,63 +26,53 @@ export default function LibsodiumTestScreen(
 
   useEffect(() => {
     async function run() {
-      const randombytes_buf = await sodiumOld.randombytes_buf(24);
-      const crypto_sign_detached = await sodiumOld.crypto_sign_detached(
+      const randombytes_buf = sodium.randombytes_buf(24);
+      const crypto_sign_detached = sodium.crypto_sign_detached(
         "Hello",
-        signingKeyPair.privateKey
+        sodium.from_base64(signingKeyPair.privateKey)
       );
-      const crypto_sign_verify_detached =
-        await sodiumOld.crypto_sign_verify_detached(
-          crypto_sign_detached,
-          "Hello",
-          signingKeyPair.publicKey
-        );
+      const crypto_sign_verify_detached = sodium.crypto_sign_verify_detached(
+        crypto_sign_detached,
+        "Hello",
+        sodium.from_base64(signingKeyPair.publicKey)
+      );
 
-      const crypto_sign_keypair = await sodiumOld.crypto_sign_keypair();
-      const crypto_sign_detached2 = await sodiumOld.crypto_sign_detached(
+      const crypto_sign_keypair = sodium.crypto_sign_keypair();
+      const crypto_sign_detached2 = sodium.crypto_sign_detached(
         "Hello",
         crypto_sign_keypair.privateKey
       );
-      const crypto_sign_verify_detached2 =
-        await sodiumOld.crypto_sign_verify_detached(
-          crypto_sign_detached2,
-          "Hello",
-          crypto_sign_keypair.publicKey
-        );
+      const crypto_sign_verify_detached2 = sodium.crypto_sign_verify_detached(
+        crypto_sign_detached2,
+        "Hello",
+        crypto_sign_keypair.publicKey
+      );
 
-      const tmpKey =
-        await sodiumOld.crypto_aead_xchacha20poly1305_ietf_keygen();
-      const ciphertext =
-        await sodiumOld.crypto_aead_xchacha20poly1305_ietf_encrypt(
-          "Hello",
-          "test",
-          null,
-          randombytes_buf,
-          tmpKey
-        );
+      const tmpKey = sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
+      const ciphertext = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+        "Hello",
+        "test",
+        null,
+        randombytes_buf,
+        tmpKey
+      );
 
-      const message =
-        await sodiumOld.crypto_aead_xchacha20poly1305_ietf_decrypt(
-          null,
-          ciphertext,
-          "test",
-          randombytes_buf,
-          tmpKey
-        );
-      const messageFromExistingCiphertext =
-        await sodiumOld.crypto_aead_xchacha20poly1305_ietf_decrypt(
-          null,
-          exitingCiphertext,
-          "test",
-          nonce,
-          key
-        );
+      console.log("tmpKey:", sodium.to_base64(tmpKey));
+      console.log("nonce:", sodium.to_base64(randombytes_buf));
+
+      const message = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
+        null,
+        ciphertext,
+        "test",
+        randombytes_buf,
+        tmpKey
+      );
 
       const secretBoxNonce = sodium.randombytes_buf(
-        sodiumOld.crypto_secretbox_NONCEBYTES
+        sodium.crypto_secretbox_NONCEBYTES
       );
       const secretBoxKey = sodium.randombytes_buf(
-        sodiumOld.crypto_secretbox_KEYBYTES
+        sodium.crypto_secretbox_KEYBYTES
       );
       console.log(secretBoxNonce);
       console.log(secretBoxKey);
@@ -109,24 +98,23 @@ export default function LibsodiumTestScreen(
         subkeyId: 5200022,
       });
 
-      const generatedKdfKey = await sodiumOld.crypto_kdf_keygen();
+      const generatedKdfKey = sodium.crypto_kdf_keygen();
 
       setData({
-        randombytes_buf,
-        crypto_sign_keypair,
-        crypto_sign_detached,
-        crypto_sign_verify_detached,
-        crypto_sign_detached2,
-        crypto_sign_verify_detached2,
-        ciphertext,
-        message: sodiumOld.from_base64_to_string(message),
-        messageFromExistingCiphertext: sodiumOld.from_base64_to_string(
-          messageFromExistingCiphertext
+        randombytes_buf: sodium.to_base64(randombytes_buf),
+        crypto_sign_keypair_public_key: sodium.to_base64(
+          crypto_sign_keypair.publicKey
         ),
-        kdfDerivedKey,
+        crypto_sign_detached: sodium.to_base64(crypto_sign_detached),
+        crypto_sign_verify_detached,
+        crypto_sign_detached2: sodium.to_base64(crypto_sign_detached2),
+        crypto_sign_verify_detached2,
+        ciphertext: sodium.to_base64(ciphertext),
+        message: sodium.to_string(message),
+        kdfDerivedKey: sodium.to_base64(kdfDerivedKey.key),
         kdfDerivedKeyIsCorrect:
           kdfDerivedKey.key === "R2ycEA9jEapG3MEAM3VEgYsKgiwkMm_JuwqbtfE13F4",
-        generatedKdfKey,
+        generatedKdfKey: sodium.to_base64(generatedKdfKey),
       });
     }
 
