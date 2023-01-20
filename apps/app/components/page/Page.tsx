@@ -120,7 +120,7 @@ export default function Page({
   const applySnapshot = async (snapshot, key) => {
     try {
       activeSnapshotIdRef.current = snapshot.publicData.snapshotId;
-      const initialResult = await verifyAndDecryptSnapshot(
+      const initialResult = verifyAndDecryptSnapshot(
         snapshot,
         key,
         sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
@@ -335,7 +335,7 @@ export default function Page({
               data.snapshot
             );
             snapshotKeyRef.current = sodium.from_base64(snapshotKeyData2.key);
-            const snapshotResult = await verifyAndDecryptSnapshot(
+            const snapshotResult = verifyAndDecryptSnapshot(
               data,
               snapshotKeyRef.current,
               sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
@@ -343,12 +343,7 @@ export default function Page({
             activeSnapshotIdRef.current = data.publicData.snapshotId;
             // @ts-expect-error TODO handle later
             latestServerVersionRef.current = undefined;
-            Yjs.applyUpdate(
-              yDocRef.current,
-              // @ts-expect-error TODO handle later
-              sodium.from_base64(snapshotResult),
-              "naisho-remote"
-            );
+            Yjs.applyUpdate(yDocRef.current, snapshotResult, "naisho-remote");
             break;
           case "snapshotSaved":
             console.log("snapshot saving confirmed");
@@ -393,17 +388,12 @@ export default function Page({
             await createAndSendSnapshot();
             break;
           case "update":
-            const updateResult = await verifyAndDecryptUpdate(
+            const updateResult = verifyAndDecryptUpdate(
               data,
               snapshotKeyRef.current,
               sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
             );
-            Yjs.applyUpdate(
-              yDocRef.current,
-              // @ts-expect-error TODO handle later
-              sodium.from_base64(updateResult),
-              "naisho-remote"
-            );
+            Yjs.applyUpdate(yDocRef.current, updateResult, "naisho-remote");
             latestServerVersionRef.current = data.serverData.version;
             break;
           case "updateSaved":
@@ -442,7 +432,7 @@ export default function Page({
 
             break;
           case "awarenessUpdate":
-            const awarenessUpdateResult = await verifyAndDecryptAwarenessUpdate(
+            const awarenessUpdateResult = verifyAndDecryptAwarenessUpdate(
               data,
               snapshotKeyRef.current,
               sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
@@ -450,8 +440,7 @@ export default function Page({
             console.log("awarenessUpdate");
             applyAwarenessUpdate(
               yAwarenessRef.current,
-              // @ts-expect-error TODO handle later
-              sodium.from_base64(awarenessUpdateResult),
+              awarenessUpdateResult,
               null
             );
             break;
@@ -516,33 +505,30 @@ export default function Page({
       // );
       // });
 
-      yAwarenessRef.current.on(
-        "update",
-        async ({ added, updated, removed }) => {
-          if (!getWebsocketState().connected || !snapshotKeyRef.current) {
-            return;
-          }
-
-          const changedClients = added.concat(updated).concat(removed);
-          const yAwarenessUpdate = encodeAwarenessUpdate(
-            yAwarenessRef.current,
-            changedClients
-          );
-          const publicData = {
-            docId,
-            pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-          };
-          const awarenessUpdate = await createAwarenessUpdate(
-            yAwarenessUpdate,
-            publicData,
-            snapshotKeyRef.current,
-            signatureKeyPair
-          );
-          console.log("send awarenessUpdate");
-          // @ts-expect-error TODO handle later
-          websocketConnectionRef.current.send(JSON.stringify(awarenessUpdate));
+      yAwarenessRef.current.on("update", ({ added, updated, removed }) => {
+        if (!getWebsocketState().connected || !snapshotKeyRef.current) {
+          return;
         }
-      );
+
+        const changedClients = added.concat(updated).concat(removed);
+        const yAwarenessUpdate = encodeAwarenessUpdate(
+          yAwarenessRef.current,
+          changedClients
+        );
+        const publicData = {
+          docId,
+          pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+        };
+        const awarenessUpdate = createAwarenessUpdate(
+          yAwarenessUpdate,
+          publicData,
+          snapshotKeyRef.current,
+          signatureKeyPair
+        );
+        console.log("send awarenessUpdate");
+        // @ts-expect-error TODO handle later
+        websocketConnectionRef.current.send(JSON.stringify(awarenessUpdate));
+      });
 
       // TODO switch to v2 updates
       yDocRef.current.on("update", async (update, origin) => {

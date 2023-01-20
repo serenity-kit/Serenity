@@ -81,7 +81,7 @@ export async function createSnapshot(
   return snapshot;
 }
 
-export async function verifyAndDecryptSnapshot(
+export function verifyAndDecryptSnapshot(
   snapshot: Snapshot,
   key: Uint8Array,
   publicKey: Uint8Array
@@ -90,15 +90,15 @@ export async function verifyAndDecryptSnapshot(
     canonicalize(snapshot.publicData) as string
   );
 
-  const isValid = await verifySignature(
+  const isValid = verifySignature(
     `${snapshot.nonce}${snapshot.ciphertext}${publicDataAsBase64}`,
     snapshot.signature,
     publicKey
   );
   if (!isValid) {
-    return null;
+    throw new Error("Invalid snapshot");
   }
-  return await decryptAead(
+  return decryptAead(
     sodium.from_base64(snapshot.ciphertext),
     publicDataAsBase64,
     key,

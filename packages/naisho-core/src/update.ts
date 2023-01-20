@@ -85,18 +85,18 @@ export async function createUpdate(
   return update;
 }
 
-export async function verifyAndDecryptUpdate(update: Update, key, publicKey) {
+export function verifyAndDecryptUpdate(update: Update, key, publicKey) {
   const publicDataAsBase64 = sodium.to_base64(
     JSON.stringify(update.publicData)
   );
 
-  const isValid = await verifySignature(
+  const isValid = verifySignature(
     `${update.nonce}${update.ciphertext}${publicDataAsBase64}`,
     update.signature,
     publicKey
   );
   if (!isValid) {
-    return null;
+    throw new Error("Invalid signature for update");
   }
 
   // verify the updates per public key start with 0 and come in ordered
@@ -115,11 +115,11 @@ export async function verifyAndDecryptUpdate(update: Update, key, publicKey) {
         1 !==
       update.publicData.clock
     ) {
-      return null;
+      throw new Error("Invalid update");
     }
   } else {
     if (update.publicData.clock !== 0) {
-      return null;
+      throw new Error("Invalid update");
     }
   }
 

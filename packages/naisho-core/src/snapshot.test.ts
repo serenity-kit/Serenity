@@ -40,7 +40,7 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
     signatureKeyPair
   );
 
-  const result = await verifyAndDecryptSnapshot(
+  const result = verifyAndDecryptSnapshot(
     snapshot,
     key,
     signatureKeyPair.publicKey
@@ -87,7 +87,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
     signatureKeyPair
   );
 
-  const result = await verifyAndDecryptSnapshot(
+  const result = verifyAndDecryptSnapshot(
     {
       ...snapshot,
       signature: snapshot.signature.replace(/^./, "a"),
@@ -134,7 +134,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
     signatureKeyPair
   );
 
-  const result = await verifyAndDecryptSnapshot(
+  const result = verifyAndDecryptSnapshot(
     {
       ...snapshot,
       ciphertext: snapshot.ciphertext.replace(/^./, "a"),
