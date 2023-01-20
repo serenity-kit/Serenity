@@ -81,12 +81,10 @@ test("server should register a user with a pending workspace id", async () => {
   const exportKey = sodium.to_base64(result.registration.getExportKey());
   const { signingPrivateKey, encryptionPrivateKey, ...mainDevice } =
     createAndEncryptDevice(exportKey);
-  const workspaceInvitationKeyData = await encryptWorkspaceInvitationPrivateKey(
-    {
-      exportKey,
-      workspaceInvitationSigningPrivateKey: sigingKeyPair.privateKey,
-    }
-  );
+  const workspaceInvitationKeyData = encryptWorkspaceInvitationPrivateKey({
+    exportKey,
+    workspaceInvitationSigningPrivateKey: sigingKeyPair.privateKey,
+  });
 
   const registrationResponse = await graphql.client.request(query, {
     input: {

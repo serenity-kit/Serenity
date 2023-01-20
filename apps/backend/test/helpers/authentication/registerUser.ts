@@ -45,11 +45,10 @@ export const registerUser = async (
   let pendingWorkspaceInvitationKeyEncryptionSalt: string | null = null;
   if (pendingWorkspaceInvitationId) {
     const signingKeyPair = await seleniumSodium.crypto_sign_keypair();
-    const workspaceInvitationKeyData =
-      await encryptWorkspaceInvitationPrivateKey({
-        exportKey,
-        workspaceInvitationSigningPrivateKey: signingKeyPair.privateKey,
-      });
+    const workspaceInvitationKeyData = encryptWorkspaceInvitationPrivateKey({
+      exportKey,
+      workspaceInvitationSigningPrivateKey: signingKeyPair.privateKey,
+    });
     pendingWorkspaceInvitationKeyCiphertext =
       workspaceInvitationKeyData.ciphertext;
     pendingWorkspaceInvitationKeyPublicNonce =

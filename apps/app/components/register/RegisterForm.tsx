@@ -92,7 +92,7 @@ export default function RegisterForm(props: Props) {
         let pendingWorkspaceInvitationKeyEncryptionSalt: string | null = null;
         if (props.workspaceInvitationKey) {
           const encryptedWorkspaceKeyData =
-            await encryptWorkspaceInvitationPrivateKey({
+            encryptWorkspaceInvitationPrivateKey({
               exportKey,
               workspaceInvitationSigningPrivateKey:
                 props.workspaceInvitationKey,

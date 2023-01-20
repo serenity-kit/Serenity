@@ -12,7 +12,7 @@ export type Params = {
 // for one parentKey and checking only the uniquness for this type.
 export const workspaceInvitationDerivedKeyContext = "wsinvite";
 
-export const encryptWorkspaceInvitationPrivateKey = async ({
+export const encryptWorkspaceInvitationPrivateKey = ({
   exportKey,
   workspaceInvitationSigningPrivateKey,
 }: Params) => {

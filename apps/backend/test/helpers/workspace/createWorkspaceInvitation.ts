@@ -1,6 +1,6 @@
-import sodium from "@serenity-tools/libsodium";
 import canonicalize from "canonicalize";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 
 type Params = {
   graphql: any;
@@ -32,18 +32,18 @@ export const createWorkspaceInvitation = async ({
   `;
 
   // expires 48 hours in the future
-  const invitationId = await sodium.randombytes_buf(24);
+  const invitationId = sodium.to_base64(sodium.randombytes_buf(24));
   const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
 
-  const signingKeys = await sodium.crypto_sign_keypair();
+  const signingKeys = sodium.crypto_sign_keypair();
 
   const invitationData = canonicalize({
     workspaceId,
     invitationId,
-    invitationSigningPublicKey: signingKeys.publicKey,
+    invitationSigningPublicKey: sodium.to_base64(signingKeys.publicKey),
     expiresAt,
   });
-  const invitationDataSignature = await sodium.crypto_sign_detached(
+  const invitationDataSignature = sodium.crypto_sign_detached(
     invitationData!,
     signingKeys.privateKey
   );
@@ -54,7 +54,7 @@ export const createWorkspaceInvitation = async ({
       input: {
         workspaceId,
         invitationId,
-        invitationSigningPublicKey: signingKeys.publicKey,
+        invitationSigningPublicKey: sodium.to_base64(signingKeys.publicKey),
         expiresAt,
         invitationDataSignature,
       },
@@ -63,6 +63,6 @@ export const createWorkspaceInvitation = async ({
   );
   return {
     ...result,
-    invitationSigningPrivateKey: signingKeys.privateKey,
+    invitationSigningPrivateKey: sodium.to_base64(signingKeys.privateKey),
   };
 };
