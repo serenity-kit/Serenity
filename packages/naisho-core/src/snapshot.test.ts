@@ -87,15 +87,16 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
     signatureKeyPair
   );
 
-  const result = verifyAndDecryptSnapshot(
-    {
-      ...snapshot,
-      signature: snapshot.signature.replace(/^./, "a"),
-    },
-    key,
-    signatureKeyPair.publicKey
-  );
-  expect(result).toBeNull();
+  expect(() =>
+    verifyAndDecryptSnapshot(
+      {
+        ...snapshot,
+        signature: snapshot.signature.replace(/^./, "a"),
+      },
+      key,
+      signatureKeyPair.publicKey
+    )
+  ).toThrowError();
 });
 
 test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", async () => {
@@ -134,13 +135,14 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
     signatureKeyPair
   );
 
-  const result = verifyAndDecryptSnapshot(
-    {
-      ...snapshot,
-      ciphertext: snapshot.ciphertext.replace(/^./, "a"),
-    },
-    key,
-    signatureKeyPair.publicKey
-  );
-  expect(result).toBeNull();
+  expect(() =>
+    verifyAndDecryptSnapshot(
+      {
+        ...snapshot,
+        ciphertext: snapshot.ciphertext.replace(/^./, "a"),
+      },
+      key,
+      signatureKeyPair.publicKey
+    )
+  ).toThrowError();
 });

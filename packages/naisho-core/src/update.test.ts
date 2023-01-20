@@ -65,15 +65,16 @@ test("createUpdate & verifyAndDecryptUpdate break due changed signature", async 
 
   const update = createUpdate("Hello World", publicData, key, signatureKeyPair);
 
-  const result = verifyAndDecryptUpdate(
-    {
-      ...update,
-      signature: update.signature.replace(/^./, "a"),
-    },
-    key,
-    signatureKeyPair.publicKey
-  );
-  expect(result).toBeNull();
+  expect(() =>
+    verifyAndDecryptUpdate(
+      {
+        ...update,
+        signature: update.signature.replace(/^./, "a"),
+      },
+      key,
+      signatureKeyPair.publicKey
+    )
+  ).toThrowError();
 });
 
 test("createUpdate & verifyAndDecryptUpdate break due changed ciphertext", async () => {
@@ -101,13 +102,14 @@ test("createUpdate & verifyAndDecryptUpdate break due changed ciphertext", async
 
   const update = createUpdate("Hello World", publicData, key, signatureKeyPair);
 
-  const result = verifyAndDecryptUpdate(
-    {
-      ...update,
-      ciphertext: update.ciphertext.replace(/^./, "a"),
-    },
-    key,
-    signatureKeyPair.publicKey
-  );
-  expect(result).toBeNull();
+  expect(() =>
+    verifyAndDecryptUpdate(
+      {
+        ...update,
+        ciphertext: update.ciphertext.replace(/^./, "a"),
+      },
+      key,
+      signatureKeyPair.publicKey
+    )
+  ).toThrowError();
 });
