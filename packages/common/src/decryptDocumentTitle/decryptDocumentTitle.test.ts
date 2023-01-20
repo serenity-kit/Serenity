@@ -1,4 +1,4 @@
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { createDocumentKey } from "../createDocumentKey/createDocumentKey";
 import { encryptDocumentTitle } from "../encryptDocumentTitle/encryptDocumentTitle";
 import { recreateDocumentKey } from "../recreateDocumentKey/recreateDocumentKey";

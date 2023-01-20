@@ -33,7 +33,7 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
     },
   };
 
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "Hello World",
     publicData,
     key,
@@ -80,7 +80,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
     },
   };
 
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "Hello World",
     publicData,
     key,
@@ -127,7 +127,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
     },
   };
 
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "Hello World",
     publicData,
     key,

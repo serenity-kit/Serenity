@@ -214,7 +214,7 @@ export default function Page({
       keyDerivationTrace,
       subkeyId: snapshotKey.subkeyId,
     };
-    const snapshot = await createSnapshot(
+    const snapshot = createSnapshot(
       yDocState,
       publicData,
       sodium.from_base64(snapshotKey.key),

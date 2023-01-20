@@ -1,4 +1,4 @@
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { encryptFolderName } from "./encryptFolderName";
 
 const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";

@@ -1,4 +1,4 @@
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { kdfDeriveFromKey } from "./kdfDeriveFromKey";
 
 beforeAll(async () => {

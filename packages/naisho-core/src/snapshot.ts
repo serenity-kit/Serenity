@@ -52,7 +52,7 @@ export function getPending(documentId): PendingResult {
   return { type: "none" };
 }
 
-export async function createSnapshot(
+export function createSnapshot(
   content,
   publicData: SnapshotPublicData,
   key: Uint8Array,
@@ -62,12 +62,12 @@ export async function createSnapshot(
     canonicalize(publicData) as string
   );
 
-  const { ciphertext, publicNonce } = await encryptAead(
+  const { ciphertext, publicNonce } = encryptAead(
     content,
     publicDataAsBase64,
     key
   );
-  const signature = await sign(
+  const signature = sign(
     `${publicNonce}${ciphertext}${publicDataAsBase64}`,
     signatureKeyPair.privateKey
   );

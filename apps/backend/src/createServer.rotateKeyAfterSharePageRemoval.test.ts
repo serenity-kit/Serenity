@@ -113,7 +113,7 @@ test("successfully creates a snapshot", async () => {
     keyDerivationTrace,
     subkeyId: snapshotKey.subkeyId,
   };
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
@@ -272,7 +272,7 @@ test("successfully creates a snapshot", async () => {
     keyDerivationTrace,
     subkeyId: snapshotKey.subkeyId,
   };
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
