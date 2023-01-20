@@ -26,8 +26,8 @@ import {
   recreateSnapshotKey,
   sleep,
 } from "@serenity-tools/common";
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { useEffect, useRef, useState } from "react";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import {
   applyAwarenessUpdate,
