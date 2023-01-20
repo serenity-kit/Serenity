@@ -1,5 +1,5 @@
 import { test } from "@playwright/test";
-import * as sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { createRootFolder } from "../../helpers/e2e/createRootFolder";
 import { createSubFolder } from "../../helpers/e2e/createSubFolder";
