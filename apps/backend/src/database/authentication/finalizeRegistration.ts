@@ -1,4 +1,3 @@
-import { verifyDevice } from "@serenity-tools/common";
 import { UserInputError } from "apollo-server-express";
 import { Device } from "../../types/device";
 import { createConfirmationCode } from "../../utils/confirmationCode";
@@ -32,12 +31,6 @@ export async function finalizeRegistration({
   pendingWorkspaceInvitationKeyPublicNonce,
   pendingWorkspaceInvitationKeyEncryptionSalt,
 }: Props) {
-  try {
-    verifyDevice(mainDevice);
-  } catch (error) {
-    throw new UserInputError("Failed to verify the main device.");
-  }
-
   if (pendingWorkspaceInvitationId && !pendingWorkspaceInvitationKeySubkeyId) {
     throw new UserInputError(
       "pendingWorkspaceInvitationId without workspaceInvitationKeySubkeyId"
