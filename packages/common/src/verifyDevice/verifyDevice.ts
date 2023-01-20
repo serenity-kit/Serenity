@@ -1,11 +1,11 @@
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { Device } from "../types";
 
-export const verifyDevice = async (device: Device) => {
-  const valid = await sodium.crypto_sign_verify_detached(
-    device.encryptionPublicKeySignature,
-    device.encryptionPublicKey,
-    device.signingPublicKey
+export const verifyDevice = (device: Device) => {
+  const valid = sodium.crypto_sign_verify_detached(
+    sodium.from_base64(device.encryptionPublicKeySignature),
+    sodium.from_base64(device.encryptionPublicKey),
+    sodium.from_base64(device.signingPublicKey)
   );
   if (!valid) {
     throw new Error("Invalid device encryptionPublicKey signature");

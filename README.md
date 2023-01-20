@@ -128,14 +128,14 @@ DATABASE_URL=postgres://prisma:prisma@localhost:5432/serenity_test yarn prisma m
 For any package
 
 ```sh
-cd packages/libsodium
+cd packages/common
 yarn test
 ```
 
 or
 
 ```sh
-yarn workspace @serenity-tools/libsodium test
+yarn workspace @serenity-tools/common test
 ```
 
 ## End-to-end tests
