@@ -222,7 +222,7 @@ test("successfully creates an update", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
-  const updateToSend = await createUpdate(
+  const updateToSend = createUpdate(
     "UPDATE CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),

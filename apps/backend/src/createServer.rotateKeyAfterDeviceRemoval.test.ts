@@ -167,7 +167,7 @@ test("successfully creates an update", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
-  const updateToSend = await createUpdate(
+  const updateToSend = createUpdate(
     "UPDATE CONTENT DUMMY",
     publicData,
     sodium.from_base64(lastSnapshotKey),
@@ -246,7 +246,7 @@ test("document update will fail", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
-  const updateToSend = await createUpdate(
+  const updateToSend = createUpdate(
     "UPDATE CONTENT DUMMY",
     publicData,
     sodium.from_base64(lastSnapshotKey),
@@ -415,7 +415,7 @@ test("successfully creates an update", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
-  const updateToSend = await createUpdate(
+  const updateToSend = createUpdate(
     "UPDATE CONTENT DUMMY",
     updatePublicData,
     sodium.from_base64(lastSnapshotKey),

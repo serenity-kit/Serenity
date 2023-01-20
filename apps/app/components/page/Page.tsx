@@ -117,7 +117,7 @@ export default function Page({
     return snapshotKeyData;
   };
 
-  const applySnapshot = async (snapshot, key) => {
+  const applySnapshot = (snapshot, key) => {
     try {
       activeSnapshotIdRef.current = snapshot.publicData.snapshotId;
       const initialResult = verifyAndDecryptSnapshot(
@@ -135,27 +135,25 @@ export default function Page({
     }
   };
 
-  const applyUpdates = async (updates, key) => {
+  const applyUpdates = (updates, key) => {
     try {
-      await Promise.all(
-        updates.map(async (update) => {
-          console.log(
-            update.serverData.version,
-            update.publicData.pubKey,
-            update.publicData.clock
-          );
-          const updateResult = await verifyAndDecryptUpdate(
-            update,
-            key,
-            sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-          );
-          // when reconnecting the server might send already processed data updates. these then are ignored
-          if (updateResult) {
-            Yjs.applyUpdate(yDocRef.current, updateResult, "naisho-remote");
-            latestServerVersionRef.current = update.serverData.version;
-          }
-        })
-      );
+      updates.map((update) => {
+        console.log(
+          update.serverData.version,
+          update.publicData.pubKey,
+          update.publicData.clock
+        );
+        const updateResult = verifyAndDecryptUpdate(
+          update,
+          key,
+          sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+        );
+        // when reconnecting the server might send already processed data updates. these then are ignored
+        if (updateResult) {
+          Yjs.applyUpdate(yDocRef.current, updateResult, "naisho-remote");
+          latestServerVersionRef.current = update.serverData.version;
+        }
+      });
     } catch (err) {
       // TODO
       console.log("Apply updates failed. TODO handle error");
@@ -233,14 +231,14 @@ export default function Page({
     );
   };
 
-  const createAndSendUpdate = async (update, key, clockOverwrite?: number) => {
+  const createAndSendUpdate = (update, key, clockOverwrite?: number) => {
     console.log("createAndSendUpdate");
     const publicData = {
       refSnapshotId: activeSnapshotIdRef.current,
       docId,
       pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     };
-    const updateToSend = await createUpdate(
+    const updateToSend = createUpdate(
       update,
       // @ts-expect-error TODO handle later
       publicData,
@@ -308,9 +306,9 @@ export default function Page({
                 data.snapshot
               );
               snapshotKeyRef.current = sodium.from_base64(snapshotKeyData1.key);
-              await applySnapshot(data.snapshot, snapshotKeyRef.current);
+              applySnapshot(data.snapshot, snapshotKeyRef.current);
             }
-            await applyUpdates(data.updates, snapshotKeyRef.current);
+            applyUpdates(data.updates, snapshotKeyRef.current);
             setDocumentLoadedInfo({
               loaded: true,
               username: me.data?.me?.username ?? "Unknown user",
@@ -324,8 +322,8 @@ export default function Page({
             } else if (pendingChanges.type === "updates") {
               // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
               removePending(docId);
-              pendingChanges.rawUpdates.forEach(async (rawUpdate) => {
-                await createAndSendUpdate(rawUpdate, snapshotKeyRef.current);
+              pendingChanges.rawUpdates.forEach((rawUpdate) => {
+                createAndSendUpdate(rawUpdate, snapshotKeyRef.current);
               });
             }
             break;
@@ -359,8 +357,8 @@ export default function Page({
             } else if (pending.type === "updates") {
               // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
               removePending(data.docId);
-              pending.rawUpdates.forEach(async (rawUpdate) => {
-                await createAndSendUpdate(rawUpdate, snapshotKeyRef.current);
+              pending.rawUpdates.forEach((rawUpdate) => {
+                createAndSendUpdate(rawUpdate, snapshotKeyRef.current);
               });
             }
             break;
@@ -371,10 +369,10 @@ export default function Page({
                 data.snapshot
               );
               snapshotKeyRef.current = sodium.from_base64(snapshotKeyData3.key);
-              await applySnapshot(data.snapshot, snapshotKeyRef.current);
+              applySnapshot(data.snapshot, snapshotKeyRef.current);
             }
             if (data.updates) {
-              await applyUpdates(data.updates, snapshotKeyRef.current);
+              applyUpdates(data.updates, snapshotKeyRef.current);
             }
 
             // TODO add a backoff after multiple failed tries
@@ -423,7 +421,7 @@ export default function Page({
                 data.snapshotId,
                 data.clock
               );
-              await createAndSendUpdate(
+              createAndSendUpdate(
                 rawUpdate,
                 snapshotKeyRef.current,
                 data.clock
@@ -566,7 +564,7 @@ export default function Page({
               // must be based on the new snapshot
               addPendingUpdate(docId, update);
             } else {
-              await createAndSendUpdate(update, snapshotKeyRef.current);
+              createAndSendUpdate(update, snapshotKeyRef.current);
             }
           }
         }
