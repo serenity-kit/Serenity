@@ -1,5 +1,5 @@
-import sodium from "@serenity-tools/libsodium";
 import canonicalize from "canonicalize";
+import sodium from "react-native-libsodium";
 import {
   runAcceptWorkspaceInvitationMutation,
   runMeQuery,
@@ -30,11 +30,12 @@ export const acceptWorkspaceInvitation = async ({
     encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature!,
   };
   if (!safeMainDevice.encryptionPublicKeySignature) {
-    safeMainDevice.encryptionPublicKeySignature =
-      await sodium.crypto_sign_detached(
+    safeMainDevice.encryptionPublicKeySignature = sodium.to_base64(
+      sodium.crypto_sign_detached(
         safeMainDevice.encryptionPublicKey,
-        mainDevice.signingPrivateKey!
-      );
+        sodium.from_base64(mainDevice.signingPrivateKey!)
+      )
+    );
   }
   const inviteeInfo = canonicalize({
     username: me.username,
@@ -44,9 +45,9 @@ export const acceptWorkspaceInvitation = async ({
       encryptionPublicKeySignature: safeMainDevice.encryptionPublicKeySignature,
     },
   });
-  const inviteeUsernameAndDeviceSignature = await sodium.crypto_sign_detached(
+  const inviteeUsernameAndDeviceSignature = sodium.crypto_sign_detached(
     inviteeInfo!,
-    signingPrivateKey
+    sodium.from_base64(signingPrivateKey)
   );
   const result = await runAcceptWorkspaceInvitationMutation(
     {
@@ -54,7 +55,9 @@ export const acceptWorkspaceInvitation = async ({
         workspaceInvitationId,
         inviteeUsername: me.username,
         inviteeMainDevice: safeMainDevice,
-        inviteeUsernameAndDeviceSignature,
+        inviteeUsernameAndDeviceSignature: sodium.to_base64(
+          inviteeUsernameAndDeviceSignature
+        ),
       },
     },
     { requestPolicy: "network-only" }

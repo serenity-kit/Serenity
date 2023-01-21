@@ -1,6 +1,6 @@
 import { createDevice } from "@serenity-tools/common";
-import * as sodium from "@serenity-tools/libsodium";
 import { Login } from "@serenity-tools/opaque-server";
+import sodium from "react-native-libsodium";
 import { addDays } from "../../utils/addDays/addDays";
 import { finishLogin, startLogin } from "../../utils/opaque";
 import { createSession } from "../authentication/createSession";
