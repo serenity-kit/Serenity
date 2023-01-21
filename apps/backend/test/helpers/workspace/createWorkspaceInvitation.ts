@@ -56,7 +56,7 @@ export const createWorkspaceInvitation = async ({
         invitationId,
         invitationSigningPublicKey: sodium.to_base64(signingKeys.publicKey),
         expiresAt,
-        invitationDataSignature,
+        invitationDataSignature: sodium.to_base64(invitationDataSignature),
       },
     },
     authorizationHeaders
