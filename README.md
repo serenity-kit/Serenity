@@ -195,7 +195,19 @@ WHERE pg_stat_activity.datname = 'serenity';
 drop database serenity;
 ```
 
-## Folder/File Naming Convention
+## Conventions
+
+### Keys should als be encrypted as Uint8Array
+
+Example:
+
+```ts
+sodium.crypto_box_easy(workspaceKey, nonce, publicKey, privateKey);
+```
+
+In the case above the workspaceKey must be a `Uint8Array`.
+
+### Folder/File Naming Convention
 
 - Folder and file names use camelCase.
 - Folders start with a lower case character.
