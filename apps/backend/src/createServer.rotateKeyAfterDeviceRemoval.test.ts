@@ -315,7 +315,7 @@ test("snapshot based on old workspace key fails", async () => {
   expect(messages[1].type).toEqual("snapshotFailed");
 });
 
-test("successfully creates a snapshot", async () => {
+test("successfully creates a snapshot again", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
     `/${documentId}?sessionKey=${sessionKey}`,
@@ -333,7 +333,6 @@ test("successfully creates a snapshot", async () => {
 
   const workspaceKeyBox =
     workspaceResult.workspace.currentWorkspaceKey.workspaceKeyBox;
-
   workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext,
     nonce: workspaceKeyBox.nonce,
@@ -347,7 +346,6 @@ test("successfully creates a snapshot", async () => {
     subkeyId: addedFolder.subkeyId,
   });
   folderKey = folderKeyResult.key;
-
   const snapshotKey = createSnapshotKey({ folderKey });
   lastSnapshotKey = snapshotKey.key;
   const keyDerivationTrace = {
@@ -395,7 +393,7 @@ test("successfully creates a snapshot", async () => {
   expect(messages[1].snapshotId).toEqual(snapshotId);
 });
 
-test("successfully creates an update", async () => {
+test("successfully creates an update again", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
     `/${documentId}?sessionKey=${sessionKey}`,
