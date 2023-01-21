@@ -6,8 +6,8 @@ import {
   encryptDocumentTitle,
   encryptFolderName,
 } from "@serenity-tools/common";
-import * as sodium from "@serenity-tools/libsodium";
 import { Registration } from "@serenity-tools/opaque-server";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { createAndEncryptWorkspaceKeyForDevice } from "../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
 import { encryptWorkspaceKeyForDevice } from "../../../test/helpers/device/encryptWorkspaceKeyForDevice";
@@ -86,14 +86,16 @@ export default async function createUserWithWorkspace({
   const user = result.user;
   const device = result.device;
   const { nonce, ciphertext, workspaceKey } =
-    await createAndEncryptWorkspaceKeyForDevice({
+    createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: mainDevice.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
     });
   const folderName = "Getting Started";
-  const folderIdSignature = await sodium.crypto_sign_detached(
-    folderId,
-    mainDevice.signingPrivateKey
+  const folderIdSignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      folderId,
+      sodium.from_base64(mainDevice.signingPrivateKey)
+    )
   );
   const encryptedFolderResult = encryptFolderName({
     name: folderName,
@@ -182,7 +184,7 @@ export default async function createUserWithWorkspace({
     envelope,
   });
 
-  const webDeviceWorkspaceKeyBox = await encryptWorkspaceKeyForDevice({
+  const webDeviceWorkspaceKeyBox = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: webDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
     workspaceKey,

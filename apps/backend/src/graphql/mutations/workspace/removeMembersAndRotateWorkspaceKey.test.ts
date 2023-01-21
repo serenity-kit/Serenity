@@ -46,7 +46,7 @@ test("user cannot remove self", async () => {
     password: password1,
   });
   const newDevice = loginResult.webDevice;
-  const { ciphertext, nonce } = await encryptWorkspaceKeyForDevice({
+  const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: newDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
@@ -84,7 +84,7 @@ test("user cannot revoke own main device", async () => {
     password: password1,
   });
   const newDevice = loginResult.webDevice;
-  const { ciphertext, nonce } = await encryptWorkspaceKeyForDevice({
+  const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: newDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
@@ -133,7 +133,7 @@ test("user can remove another user", async () => {
       workspaceInvitationResult.invitationSigningPrivateKey,
     authorizationHeader: userData2.sessionKey,
   });
-  const user2DeviceKeyBox = await encryptWorkspaceKeyForDevice({
+  const user2DeviceKeyBox = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
@@ -157,7 +157,7 @@ test("user can remove another user", async () => {
     authorizationHeader: userData1.sessionKey,
     deviceWorkspaceKeyBoxes: user2DeviceKeyBoxes,
   });
-  const { ciphertext, nonce } = await encryptWorkspaceKeyForDevice({
+  const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
@@ -264,7 +264,7 @@ test("user can rotate key for multiple devices", async () => {
       workspaceInvitationResult.invitationSigningPrivateKey,
     authorizationHeader: userData2.sessionKey,
   });
-  const user2DeviceKeyBox = await encryptWorkspaceKeyForDevice({
+  const user2DeviceKeyBox = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
@@ -301,12 +301,12 @@ test("user can rotate key for multiple devices", async () => {
   expect(
     workspaceUserIdsBefore.indexOf(userData2.user.id)
   ).toBeGreaterThanOrEqual(0);
-  const keyData1 = await encryptWorkspaceKeyForDevice({
+  const keyData1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
   });
-  const keyData2 = await encryptWorkspaceKeyForDevice({
+  const keyData2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,
@@ -317,7 +317,7 @@ test("user can rotate key for multiple devices", async () => {
     password: password1,
   });
   const newDevice = loginResult.webDevice;
-  const keyData3 = await encryptWorkspaceKeyForDevice({
+  const keyData3 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: newDevice.signingPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspaceKey,

@@ -188,12 +188,12 @@ test("successfully creates an update", async () => {
 test("delete a device", async () => {
   const authorizationHeader = sessionKey;
 
-  const workspaceKeyBox1 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: device!.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
     workspaceKey,
   });
-  const workspaceKeyBox2 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: webDevice!.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
     workspaceKey,

@@ -30,7 +30,7 @@ it("should return empty parentFolders", async () => {
     name: "folderName",
     parentKey: workspaceKeyString,
   });
-  const workspaceKeyData = await createAndEncryptWorkspaceKeyForDevice({
+  const workspaceKeyData = createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
     workspaceKey: workspaceKeyString,
@@ -122,7 +122,7 @@ it("should return single parentFolders", async () => {
     name: "folderName",
     parentKey: parentFolderNameData.folderSubkey,
   });
-  const workspaceKeyData = await createAndEncryptWorkspaceKeyForDevice({
+  const workspaceKeyData = createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
     workspaceKey: workspaceKeyString,
@@ -254,7 +254,7 @@ it("should return deep parentFolders", async () => {
     name: "childFolderName",
     parentKey: folderNameData.folderSubkey,
   });
-  const workspaceKeyData = await createAndEncryptWorkspaceKeyForDevice({
+  const workspaceKeyData = createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
     workspaceKey: workspaceKeyString,

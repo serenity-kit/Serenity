@@ -85,7 +85,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       }
       const devices = devicesResult.data?.devices?.nodes as Device[];
       const { deviceWorkspaceKeyBoxes, workspaceKey } =
-        await createWorkspaceKeyBoxesForDevices({ devices, activeDevice });
+        createWorkspaceKeyBoxesForDevices({ devices, activeDevice });
       if (!workspaceKey) {
         throw new Error("Could not retrieve workspaceKey!");
       }

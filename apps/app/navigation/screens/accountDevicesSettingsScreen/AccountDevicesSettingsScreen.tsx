@@ -104,13 +104,11 @@ export default function AccountDevicesSettingsScreen(
         if (device.signingPublicKey === deviceSigningPublicKey) {
           continue;
         }
-        const { ciphertext, nonce } =
-          await createAndEncryptWorkspaceKeyForDevice({
-            receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-            creatorDeviceEncryptionPrivateKey:
-              activeDevice.encryptionPrivateKey!,
-            workspaceKey: workspaceKey.workspaceKey,
-          });
+        const { ciphertext, nonce } = createAndEncryptWorkspaceKeyForDevice({
+          receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+          creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+          workspaceKey: workspaceKey.workspaceKey,
+        });
         workspaceDevicePairing.push({
           ciphertext,
           nonce,

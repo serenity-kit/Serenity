@@ -31,7 +31,7 @@ test("attach the same device does nothing", async () => {
   const authorizationHeader = userAndDevice1.sessionKey;
   const deviceSigningPublicKey = userAndDevice1.webDevice.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
-  const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
+  const { nonce, ciphertext } = createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
   });
@@ -88,7 +88,7 @@ test("attach a device to a workspace", async () => {
   });
   const newDevice = createDeviceResult.localDevice;
   const authorizationHeader = userAndDevice1.sessionKey;
-  const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
+  const { nonce, ciphertext } = createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: newDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey:
       userAndDevice1.webDevice.encryptionPrivateKey,
@@ -145,7 +145,7 @@ test("Unauthenticated", async () => {
   const workspaceId = userAndDevice1.workspace.id;
   const deviceSigningPublicKey = userAndDevice1.device.signingPublicKey;
   const deviceEncryptionPublicKey = userAndDevice1.device.encryptionPublicKey;
-  const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
+  const { nonce, ciphertext } = createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
     creatorDeviceEncryptionPrivateKey:
       userAndDevice1.deviceEncryptionPrivateKey,
@@ -198,7 +198,7 @@ describe("Input errors", () => {
     }
   `;
   test("Invalid deviceWorkspaceKeyBox ciphertext", async () => {
-    const { nonce } = await createAndEncryptWorkspaceKeyForDevice({
+    const { nonce } = createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -225,7 +225,7 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid deviceWorkspaceKeyBox nonce", async () => {
-    const { ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
+    const { ciphertext } = createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -252,7 +252,7 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid deviceWorkspaceKeyBox workspaceId", async () => {
-    const { ciphertext, nonce } = await createAndEncryptWorkspaceKeyForDevice({
+    const { ciphertext, nonce } = createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -295,7 +295,7 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("Invalid deviceSigningPublicKey", async () => {
-    const { ciphertext, nonce } = await createAndEncryptWorkspaceKeyForDevice({
+    const { ciphertext, nonce } = createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -323,7 +323,7 @@ describe("Input errors", () => {
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
   test("No creatorDeviceSigningPublicKey provided", async () => {
-    const { ciphertext, nonce } = await createAndEncryptWorkspaceKeyForDevice({
+    const { ciphertext, nonce } = createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: userAndDevice1.device.signingPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
@@ -356,7 +356,7 @@ describe("Input errors", () => {
     const deviceSigningPublicKey = userAndDevice1.webDevice.signingPublicKey;
     const deviceEncryptionPublicKey =
       userAndDevice1.webDevice.encryptionPublicKey;
-    const { nonce, ciphertext } = await createAndEncryptWorkspaceKeyForDevice({
+    const { nonce, ciphertext } = createAndEncryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: deviceEncryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: userAndDevice1.encryptionPrivateKey,
     });
