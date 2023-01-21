@@ -8,13 +8,13 @@ type Params = {
   publicData?: any;
 };
 
-export const encryptDocumentTitle = async (params: Params) => {
+export const encryptDocumentTitle = (params: Params) => {
   const publicData = params.publicData || {};
   const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {
     throw new Error("Invalid public data for encrypting the title.");
   }
-  const result = await encryptAead(
+  const result = encryptAead(
     params.title,
     canonicalizedPublicData,
     sodium.from_base64(params.key)

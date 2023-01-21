@@ -104,7 +104,7 @@ export default function SidebarPage(props: Props) {
         folderKey: folderKey,
         subkeyId: props.nameKeyDerivationTrace.subkeyId,
       });
-      const documentTitle = await decryptDocumentTitle({
+      const documentTitle = decryptDocumentTitle({
         key: documentKeyData.key,
         ciphertext: props.encryptedName,
         publicNonce: props.encryptedNameNonce,

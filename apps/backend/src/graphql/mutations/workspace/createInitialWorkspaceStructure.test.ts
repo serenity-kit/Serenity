@@ -104,7 +104,7 @@ test("create initial workspace structure", async () => {
     folderKey: folderKey.key,
     subkeyId: document.nameKeyDerivationTrace.subkeyId,
   });
-  const decryptedDocumentName = await decryptDocumentTitle({
+  const decryptedDocumentName = decryptDocumentTitle({
     key: documentKey.key,
     ciphertext: document.encryptedName,
     publicNonce: document.encryptedNameNonce,

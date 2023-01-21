@@ -158,7 +158,7 @@ test("duplicate ID throws an error", async () => {
 test("Throw error on duplicate subkeyId, workspaceId", async () => {
   const authorizationHeaders = { authorization: sessionKey };
   const name = "subkey test";
-  const encryptedFolderResult = await encryptFolderName({
+  const encryptedFolderResult = encryptFolderName({
     name,
     parentKey: workspaceKey,
   });
@@ -338,7 +338,7 @@ describe("Input errors", () => {
   `;
   test("Invalid id", async () => {
     const name = "test";
-    const encryptedFolderResult = await encryptFolderName({
+    const encryptedFolderResult = encryptFolderName({
       name,
       parentKey: workspaceKey,
     });
@@ -366,7 +366,7 @@ describe("Input errors", () => {
   });
   test("Invalid workspaceId", async () => {
     const name = "test";
-    const encryptedFolderResult = await encryptFolderName({
+    const encryptedFolderResult = encryptFolderName({
       name,
       parentKey: workspaceKey,
     });

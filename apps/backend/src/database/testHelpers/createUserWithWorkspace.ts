@@ -95,7 +95,7 @@ export default async function createUserWithWorkspace({
     folderId,
     mainDevice.signingPrivateKey
   );
-  const encryptedFolderResult = await encryptFolderName({
+  const encryptedFolderResult = encryptFolderName({
     name: folderName,
     parentKey: workspaceKey,
   });
@@ -107,7 +107,7 @@ export default async function createUserWithWorkspace({
     folderKey,
   });
   const documentKey = docmentKeyResult.key;
-  const encryptedDocumentTitleResult = await encryptDocumentTitle({
+  const encryptedDocumentTitleResult = encryptDocumentTitle({
     title: documentName,
     key: documentKey,
   });

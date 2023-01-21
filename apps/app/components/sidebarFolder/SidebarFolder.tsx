@@ -157,7 +157,7 @@ export default function SidebarFolder(props: Props) {
     });
     const parentChainItem =
       parentFolderKeyChainData[parentFolderKeyChainData.length - 1];
-    const encryptedFolderResult = await encryptFolderName({
+    const encryptedFolderResult = encryptFolderName({
       name,
       parentKey: parentChainItem.key,
     });
@@ -291,7 +291,7 @@ export default function SidebarFolder(props: Props) {
     });
     // ignore the last chain item as it's the key for the old folder name
     const parentChainItem = folderKeyTrace[folderKeyTrace.length - 2];
-    const encryptedFolderResult = await encryptFolderName({
+    const encryptedFolderResult = encryptFolderName({
       name: newFolderName,
       parentKey: parentChainItem.key,
     });

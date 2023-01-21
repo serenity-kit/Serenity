@@ -9,7 +9,7 @@ beforeAll(async () => {
 });
 
 test("decryptFolderName", async () => {
-  const result = await encryptFolderName({
+  const result = encryptFolderName({
     parentKey: kdfKey,
     name: "Getting started",
   });
@@ -24,7 +24,7 @@ test("decryptFolderName", async () => {
 });
 
 test("decryptFolderName with publicData fails for wrong key", async () => {
-  const result = await encryptFolderName({
+  const result = encryptFolderName({
     parentKey: kdfKey,
     name: "Getting started",
   });
@@ -41,7 +41,7 @@ test("decryptFolderName with publicData fails for wrong key", async () => {
 });
 
 test("decryptFolderName with publicData fails for wrong public data", async () => {
-  const result = await encryptFolderName({
+  const result = encryptFolderName({
     parentKey: kdfKey,
     name: "Getting started",
   });
@@ -58,7 +58,7 @@ test("decryptFolderName with publicData fails for wrong public data", async () =
 });
 
 test("decryptFolderName with publicData fails for invalid publicData", async () => {
-  const result = await encryptFolderName({
+  const result = encryptFolderName({
     parentKey: kdfKey,
     name: "Getting started",
   });
