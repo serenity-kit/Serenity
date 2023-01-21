@@ -1,7 +1,7 @@
 import { Device } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import canonicalize from "canonicalize";
+import sodium from "react-native-libsodium";
 import { Role } from "../../../prisma/generated/output";
 import { formatWorkspace, Workspace } from "../../types/workspace";
 import { prisma } from "../prisma";
@@ -45,10 +45,10 @@ export async function acceptWorkspaceInvitation({
           inviteeMainDevice.encryptionPublicKeySignature,
       },
     });
-    const doesSignatureVerify = await sodium.crypto_sign_verify_detached(
-      inviteeUsernameAndDeviceSignature,
+    const doesSignatureVerify = sodium.crypto_sign_verify_detached(
+      sodium.from_base64(inviteeUsernameAndDeviceSignature),
       inviteeInfo!,
-      workspaceInvitation.invitationSigningPublicKey
+      sodium.from_base64(workspaceInvitation.invitationSigningPublicKey)
     );
     if (!doesSignatureVerify) {
       throw new UserInputError("invalid inviteeUsernameAndDeviceSignature");
