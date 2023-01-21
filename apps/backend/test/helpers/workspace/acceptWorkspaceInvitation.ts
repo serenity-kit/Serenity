@@ -66,7 +66,9 @@ export const acceptWorkspaceInvitation = async ({
         workspaceInvitationId,
         inviteeUsername,
         inviteeMainDevice: safeMainDevice,
-        inviteeUsernameAndDeviceSignature,
+        inviteeUsernameAndDeviceSignature: sodium.to_base64(
+          inviteeUsernameAndDeviceSignature
+        ),
       },
     },
     authorizationHeaders

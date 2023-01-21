@@ -6,7 +6,6 @@ import {
   encryptDocumentTitle,
   encryptFolderName,
 } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
 import {
   Button,
   FormWrapper,
@@ -17,6 +16,7 @@ import {
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import { TextInput } from "react-native";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { useAppContext } from "../../context/AppContext";
 import {
@@ -94,9 +94,9 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         name: folderName,
         parentKey: workspaceKey,
       });
-      const folderIdSignature = await sodium.crypto_sign_detached(
+      const folderIdSignature = sodium.crypto_sign_detached(
         folderId,
-        activeDevice.signingPrivateKey!
+        sodium.from_base64(activeDevice.signingPrivateKey!)
       );
       const folderKeyDerivationTrace = {
         workspaceKeyId,
@@ -156,7 +156,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
             },
             folder: {
               id: folderId,
-              idSignature: folderIdSignature,
+              idSignature: sodium.to_base64(folderIdSignature),
               encryptedName: encryptedFolderResult.ciphertext,
               encryptedNameNonce: encryptedFolderResult.publicNonce,
               keyDerivationTrace: folderKeyDerivationTrace,

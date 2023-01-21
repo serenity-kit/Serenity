@@ -1,7 +1,7 @@
-import sodium from "@serenity-tools/libsodium";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useState } from "react";
+import sodium from "react-native-libsodium";
 import { Client } from "urql";
 import { Device } from "../types/Device";
 import * as SessionKeyStore from "../utils/authentication/sessionKeyStore";

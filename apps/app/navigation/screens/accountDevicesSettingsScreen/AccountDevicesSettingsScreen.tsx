@@ -1,5 +1,4 @@
 import { getExpiredTextFromString } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
 import {
   Description,
   Heading,
@@ -18,6 +17,7 @@ import { useMachine } from "@xstate/react";
 import { format, parseJSON } from "date-fns";
 import { useState } from "react";
 import { useWindowDimensions } from "react-native";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import {
@@ -92,7 +92,7 @@ export default function AccountDevicesSettingsScreen(
         return;
       }
       const workspaceDevicePairing: WorkspaceDeviceParing[] = [];
-      const workspaceKeyString = await sodium.crypto_kdf_keygen();
+      const workspaceKeyString = sodium.to_base64(sodium.crypto_kdf_keygen());
       const workspaceKey = {
         id: uuidv4(),
         workspaceKey: workspaceKeyString,

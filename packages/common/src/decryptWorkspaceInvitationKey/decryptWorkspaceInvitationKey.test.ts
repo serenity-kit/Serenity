@@ -22,7 +22,7 @@ test("decryptWorkspaceInvitationId", async () => {
     subkeyId: encryptedData.subkeyId,
     encryptionKeySalt: encryptedData.encryptionKeySalt,
   });
-  expect(decryptFolderResult).toBe(keyPair.privateKey);
+  expect(decryptFolderResult).toBe(sodium.to_base64(keyPair.privateKey));
 });
 
 test("decryptFolderName with publicData fails for wrong key", async () => {
