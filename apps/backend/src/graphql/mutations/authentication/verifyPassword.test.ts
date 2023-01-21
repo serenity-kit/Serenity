@@ -1,5 +1,5 @@
-import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { requestLoginChallengeResponse } from "../../../../test/helpers/authentication/requestLoginChallengeResponse";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -70,9 +70,11 @@ test("verify user", async () => {
   const finishMessage = sodium.to_base64(
     result.login.finish(sodium.from_base64(result.data.challengeResponse))
   );
-  const sessionTokenSignature = await sodium.crypto_sign_detached(
-    userData.sessionKey,
-    userData.webDevice.signingPrivateKey
+  const sessionTokenSignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      userData.sessionKey,
+      sodium.from_base64(userData.webDevice.signingPrivateKey)
+    )
   );
   const verifyPasswordResponse = await verifyPassword({
     loginId: result.data.loginId,
@@ -118,9 +120,11 @@ test("bad login", async () => {
   const finishMessage = sodium.to_base64(
     result.login.finish(sodium.from_base64(result.data.challengeResponse))
   );
-  const sessionTokenSignature = await sodium.crypto_sign_detached(
-    userData.sessionKey,
-    userData.webDevice.signingPrivateKey
+  const sessionTokenSignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      userData.sessionKey,
+      sodium.from_base64(userData.webDevice.signingPrivateKey)
+    )
   );
   await expect(
     (async () =>
@@ -151,9 +155,11 @@ describe("Input errors", () => {
     const finishMessage = sodium.to_base64(
       result.login.finish(sodium.from_base64(result.data.challengeResponse))
     );
-    const sessionTokenSignature = await sodium.crypto_sign_detached(
-      userData.sessionKey,
-      userData.webDevice.signingPrivateKey
+    const sessionTokenSignature = sodium.to_base64(
+      sodium.crypto_sign_detached(
+        userData.sessionKey,
+        sodium.from_base64(userData.webDevice.signingPrivateKey)
+      )
     );
     await expect(
       (async () =>
@@ -175,9 +181,11 @@ describe("Input errors", () => {
       username,
       password,
     });
-    const sessionTokenSignature = await sodium.crypto_sign_detached(
-      userData.sessionKey,
-      userData.webDevice.signingPrivateKey
+    const sessionTokenSignature = sodium.to_base64(
+      sodium.crypto_sign_detached(
+        userData.sessionKey,
+        sodium.from_base64(userData.webDevice.signingPrivateKey)
+      )
     );
     await expect(
       (async () =>
@@ -202,9 +210,11 @@ describe("Input errors", () => {
     const finishMessage = sodium.to_base64(
       result.login.finish(sodium.from_base64(result.data.challengeResponse))
     );
-    const sessionTokenSignature = await sodium.crypto_sign_detached(
-      userData.sessionKey,
-      userData.webDevice.signingPrivateKey
+    const sessionTokenSignature = sodium.to_base64(
+      sodium.crypto_sign_detached(
+        userData.sessionKey,
+        sodium.from_base64(userData.webDevice.signingPrivateKey)
+      )
     );
     await expect(
       (async () =>

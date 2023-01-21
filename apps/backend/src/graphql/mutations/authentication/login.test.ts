@@ -1,6 +1,6 @@
 import { createDevice as createdDeviceHelper } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { requestLoginChallengeResponse } from "../../../../test/helpers/authentication/requestLoginChallengeResponse";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -53,9 +53,11 @@ test("server should login a user", async () => {
   };
   const deviceInfo = JSON.stringify(deviceInfoJson);
 
-  const sessionTokenSignature = await sodium.crypto_sign_detached(
-    sessionKey,
-    device.signingPrivateKey
+  const sessionTokenSignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      sessionKey,
+      sodium.from_base64(device.signingPrivateKey)
+    )
   );
 
   const query = gql`
