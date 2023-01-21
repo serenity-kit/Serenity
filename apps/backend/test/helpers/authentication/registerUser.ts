@@ -2,9 +2,8 @@ import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
 } from "@serenity-tools/common";
-import seleniumSodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
-import sodium from "libsodium-wrappers";
+import sodium from "react-native-libsodium";
 import { loginUser } from "./loginUser";
 import { requestRegistrationChallengeResponse } from "./requestRegistrationChallengeResponse";
 import { verifyUser } from "./verifyUser";
@@ -44,10 +43,12 @@ export const registerUser = async (
   let pendingWorkspaceInvitationKeySubkeyId: number | null = null;
   let pendingWorkspaceInvitationKeyEncryptionSalt: string | null = null;
   if (pendingWorkspaceInvitationId) {
-    const signingKeyPair = await seleniumSodium.crypto_sign_keypair();
+    const signingKeyPair = sodium.crypto_sign_keypair();
     const workspaceInvitationKeyData = encryptWorkspaceInvitationPrivateKey({
       exportKey,
-      workspaceInvitationSigningPrivateKey: signingKeyPair.privateKey,
+      workspaceInvitationSigningPrivateKey: sodium.to_base64(
+        signingKeyPair.privateKey
+      ),
     });
     pendingWorkspaceInvitationKeyCiphertext =
       workspaceInvitationKeyData.ciphertext;

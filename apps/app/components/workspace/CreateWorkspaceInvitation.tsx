@@ -1,4 +1,3 @@
-import sodium from "@serenity-tools/libsodium";
 import {
   Button,
   Description,
@@ -11,6 +10,7 @@ import canonicalize from "canonicalize";
 import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
 import { Platform, StyleSheet } from "react-native";
+import sodium from "react-native-libsodium";
 import {
   useCreateWorkspaceInvitationMutation,
   useDeleteWorkspaceInvitationsMutation,
@@ -84,9 +84,11 @@ export function CreateWorkspaceInvitation(props: Props) {
   };
 
   const createWorkspaceInvitation = async () => {
-    const invitationSigningKeys = await sodium.crypto_sign_keypair();
+    const invitationSigningKeys = sodium.crypto_sign_keypair();
     const invitationIdLengthBytes = 24;
-    const invitationId = await sodium.randombytes_buf(invitationIdLengthBytes);
+    const invitationId = sodium.to_base64(
+      sodium.randombytes_buf(invitationIdLengthBytes)
+    );
     const currentTime = new Date();
     const twoDaysMillis = 2 * 24 * 60 * 60 * 1000;
     const expiresAt = new Date(currentTime.getTime() + twoDaysMillis);
@@ -96,7 +98,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       invitationPublicSigningKey: invitationSigningKeys.publicKey,
       expiresAt: expiresAt.toISOString(),
     });
-    const invitationDataSignature = await sodium.crypto_sign_detached(
+    const invitationDataSignature = sodium.crypto_sign_detached(
       invitationData!,
       invitationSigningKeys.privateKey
     );
@@ -105,9 +107,11 @@ export function CreateWorkspaceInvitation(props: Props) {
         input: {
           workspaceId,
           invitationId,
-          invitationSigningPublicKey: invitationSigningKeys.publicKey,
+          invitationSigningPublicKey: sodium.to_base64(
+            invitationSigningKeys.publicKey
+          ),
           expiresAt,
-          invitationDataSignature,
+          invitationDataSignature: sodium.to_base64(invitationDataSignature),
         },
       });
     refetchWorkspaceInvitationsResult();
@@ -120,7 +124,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       props.onWorkspaceInvitationCreated({ workspaceInvitation });
       setSelectedWorkspaceInvitationId(workspaceInvitation.id);
       setSelectedWorkspaceInvitationSigningPrivateKey(
-        invitationSigningKeys.privateKey
+        sodium.to_base64(invitationSigningKeys.privateKey)
       );
     }
   };

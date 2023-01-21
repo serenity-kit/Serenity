@@ -1,4 +1,3 @@
-import sodium from "@serenity-tools/libsodium";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -7,6 +6,7 @@ import {
   nonNull,
   objectType,
 } from "nexus";
+import sodium from "react-native-libsodium";
 
 export const VerifyPasswordInput = inputObjectType({
   name: "VerifyPasswordInput",
@@ -41,12 +41,11 @@ export const verifyLoginMutation = mutationField("verifyPassword", {
     context.assertValidDeviceSigningPublicKeyForThisSession(
       args.input.deviceSigningPublicKey
     );
-    const isValidSessionTokenSignature =
-      await sodium.crypto_sign_verify_detached(
-        args.input.sessionTokenSignature,
-        context.session.sessionKey,
-        args.input.deviceSigningPublicKey
-      );
+    const isValidSessionTokenSignature = sodium.crypto_sign_verify_detached(
+      sodium.from_base64(args.input.sessionTokenSignature),
+      context.session.sessionKey,
+      sodium.from_base64(args.input.deviceSigningPublicKey)
+    );
     return {
       isValid: isValidSessionTokenSignature,
     };

@@ -1,6 +1,6 @@
 import { createDevice } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { requestLoginChallengeResponse } from "./requestLoginChallengeResponse";
 
 type Params = {
@@ -31,7 +31,7 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
 
   const sessionKey = sodium.to_base64(startLoginResult.login.getSessionKey());
 
-  const device = await createDevice();
+  const device = createDevice();
   const deviceInfoJson = {
     type: "web",
     OS: "MacOS",
@@ -41,9 +41,9 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
   };
   const deviceInfo = JSON.stringify(deviceInfoJson);
 
-  const sessionTokenSignature = await sodium.crypto_sign_detached(
+  const sessionTokenSignature = sodium.crypto_sign_detached(
     sessionKey,
-    device.signingPrivateKey
+    sodium.from_base64(device.signingPrivateKey)
   );
 
   await graphql.client.request(finishLoginQuery, {
@@ -54,7 +54,7 @@ export const loginUser = async ({ graphql, username, password }: Params) => {
       deviceEncryptionPublicKey: device.encryptionPublicKey,
       deviceEncryptionPublicKeySignature: device.encryptionPublicKeySignature,
       deviceInfo: deviceInfo,
-      sessionTokenSignature,
+      sessionTokenSignature: sodium.to_base64(sessionTokenSignature),
       deviceType: "web",
     },
   });

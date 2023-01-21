@@ -1,5 +1,4 @@
 import { LocalDevice } from "@serenity-tools/common";
-import sodiumOld from "@serenity-tools/libsodium";
 import sodium from "react-native-libsodium";
 import { assign, createMachine } from "xstate";
 import {
@@ -165,13 +164,15 @@ export const sharePageScreenMachine =
               context.documentShareLinkQueryResult.data.documentShareLink
                 .snapshotKeyBoxs[0];
 
-            const snapshotKey = sodiumOld.crypto_box_open_easy(
-              snapshotKeyBox.ciphertext,
-              snapshotKeyBox.nonce,
-              snapshotKeyBox.creatorDevice.encryptionPublicKey,
-              context.device?.encryptionPrivateKey
+            const snapshotKey = sodium.crypto_box_open_easy(
+              sodium.from_base64(snapshotKeyBox.ciphertext),
+              sodium.from_base64(snapshotKeyBox.nonce),
+              sodium.from_base64(
+                snapshotKeyBox.creatorDevice.encryptionPublicKey
+              ),
+              sodium.from_base64(context.device?.encryptionPrivateKey)
             );
-            return snapshotKey;
+            return sodium.to_base64(snapshotKey);
           }
           throw new Error("Snapshot could not be decrypted");
         },
