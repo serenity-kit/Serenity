@@ -66,14 +66,13 @@ test("decryptDocumentTitle fails for wrong publicData", () => {
     subkeyId: initialDocumentKey.subkeyId,
   });
 
-  expect(
-    () =>
-      await decryptDocumentTitle({
-        key: documentKey.key,
-        ciphertext: result.ciphertext,
-        publicNonce: result.publicNonce,
-        publicData: { something: 4 },
-      })
+  expect(() =>
+    decryptDocumentTitle({
+      key: documentKey.key,
+      ciphertext: result.ciphertext,
+      publicNonce: result.publicNonce,
+      publicData: { something: 4 },
+    })
   ).toThrowError(/ciphertext cannot be decrypted using that key/);
 });
 

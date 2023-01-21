@@ -60,7 +60,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
         // since decryptFolderName also derives the folder subkey,
         // we can pass the parentKeyTrace's parent key to it
         const parentKey = parentKeyTrace[parentKeyTrace.length - 2].key;
-        folderName = await decryptFolderName({
+        folderName = decryptFolderName({
           parentKey: parentKey,
           subkeyId: folder.keyDerivationTrace.subkeyId!,
           ciphertext: folder.encryptedName,

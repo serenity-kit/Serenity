@@ -83,7 +83,7 @@ export default function RegistrationVerificationScreen(
         );
         return;
       }
-      const signingPrivateKey = await decryptWorkspaceInvitationKey({
+      const signingPrivateKey = decryptWorkspaceInvitationKey({
         exportKey,
         subkeyId: pendingWorkspaceInvitation.subkeyId!,
         ciphertext: pendingWorkspaceInvitation.ciphertext!,

@@ -92,7 +92,7 @@ test("create initial workspace structure", async () => {
     context: folderDerivedKeyContext,
     subkeyId: folder.keyDerivationTrace.subkeyId,
   });
-  const decryptedFolderName = await decryptFolderName({
+  const decryptedFolderName = decryptFolderName({
     parentKey: workspaceKey,
     subkeyId: folder.keyDerivationTrace.subkeyId,
     ciphertext: folder.encryptedName,

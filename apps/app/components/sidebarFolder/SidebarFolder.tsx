@@ -121,7 +121,7 @@ export default function SidebarFolder(props: Props) {
       // and the last item of the key chain is the current folder key,
       // we have to send in the parent key to the decryptFolderName method
       const parentKeyData = parentKeyChainData[parentKeyChainData.length - 2];
-      const folderName = await decryptFolderName({
+      const folderName = decryptFolderName({
         parentKey: parentKeyData.key,
         subkeyId: props.keyDerivationTrace.subkeyId!,
         ciphertext: props.encryptedName,
