@@ -185,7 +185,7 @@ export default function WorkspaceSettingsMembersScreen(
           continue;
         }
         if (device.userId !== removingMember.userId) {
-          const { ciphertext, nonce } = await encryptWorkspaceKeyForDevice({
+          const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
             receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
             creatorDeviceEncryptionPrivateKey:
               activeDevice.encryptionPrivateKey!,

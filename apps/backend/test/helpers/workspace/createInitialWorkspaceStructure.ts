@@ -113,7 +113,7 @@ export const createInitialWorkspaceStructure = async ({
   const workspaceKey = sodium.to_base64(sodium.crypto_kdf_keygen());
   const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[] = [];
   for (const device of devices) {
-    const deviceWorkspaceKeyBox = await encryptWorkspaceKeyForDevice({
+    const deviceWorkspaceKeyBox = encryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: creatorDevice.encryptionPrivateKey,
       workspaceKey,

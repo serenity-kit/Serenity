@@ -182,7 +182,7 @@ export default async function createUserWithWorkspace({
     envelope,
   });
 
-  const webDeviceWorkspaceKeyBox = await encryptWorkspaceKeyForDevice({
+  const webDeviceWorkspaceKeyBox = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: webDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey,
     workspaceKey,

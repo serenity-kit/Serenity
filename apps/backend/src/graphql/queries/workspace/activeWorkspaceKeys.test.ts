@@ -131,17 +131,17 @@ test("delete device", async () => {
   });
 
   const user1Device3 = loginResult.webDevice;
-  const workspaceKeyBox1 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
   });
-  const workspaceKeyBox2 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData1.webDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,
   });
-  const workspaceKeyBox3 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox3 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: user1Device2.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,

@@ -1,5 +1,4 @@
 import { createDevice } from "@serenity-tools/common";
-import sodiumOld, { to_base64 } from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../prisma/generated/output";
@@ -36,7 +35,7 @@ export const createDocumentShareLink = async ({
   // encrypt virtual device
   const serializedVirtualDevice = JSON.stringify(virtualDevice);
   const deviceSecretBoxNonce = sodium.randombytes_buf(
-    sodiumOld.crypto_secretbox_NONCEBYTES
+    sodium.crypto_secretbox_NONCEBYTES
   );
   const deviceSecretBoxCiphertext = sodium.crypto_secretbox_easy(
     serializedVirtualDevice,
@@ -44,18 +43,18 @@ export const createDocumentShareLink = async ({
     virtualDeviceKey
   );
 
-  const snapshotDeviceNonce = await sodiumOld.randombytes_buf(
-    sodiumOld.crypto_secretbox_NONCEBYTES
+  const snapshotDeviceNonce = sodium.randombytes_buf(
+    sodium.crypto_secretbox_NONCEBYTES
   );
-  const snapshotDeviceCiphertext = sodiumOld.crypto_box_easy(
+  const snapshotDeviceCiphertext = sodium.crypto_box_easy(
     snapshotKey,
     snapshotDeviceNonce,
-    virtualDevice.encryptionPublicKey,
-    creatorDeviceEncryptionPrivateKey
+    sodium.from_base64(virtualDevice.encryptionPublicKey),
+    sodium.from_base64(creatorDeviceEncryptionPrivateKey)
   );
   const snapshotDeviceKeyBox: SnapshotDeviceKeyBox = {
-    ciphertext: snapshotDeviceCiphertext,
-    nonce: snapshotDeviceNonce,
+    ciphertext: sodium.to_base64(snapshotDeviceCiphertext),
+    nonce: sodium.to_base64(snapshotDeviceNonce),
     deviceSigningPublicKey: virtualDevice.signingPublicKey,
   };
 
@@ -72,8 +71,8 @@ export const createDocumentShareLink = async ({
       input: {
         documentId,
         sharingRole,
-        deviceSecretBoxCiphertext: to_base64(deviceSecretBoxCiphertext),
-        deviceSecretBoxNonce: to_base64(deviceSecretBoxNonce),
+        deviceSecretBoxCiphertext: sodium.to_base64(deviceSecretBoxCiphertext),
+        deviceSecretBoxNonce: sodium.to_base64(deviceSecretBoxNonce),
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
         snapshotDeviceKeyBox,
         deviceSigningPublicKey: virtualDevice.signingPublicKey,

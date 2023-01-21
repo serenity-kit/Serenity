@@ -31,7 +31,7 @@ export const createWorkspaceKeyBoxesForDevices = async ({
 
   const workspaceKey = await sodium.crypto_kdf_keygen();
   for (const receiverDevice of allDevices) {
-    const { nonce, ciphertext } = await encryptWorkspaceKeyForDevice({
+    const { nonce, ciphertext } = encryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: receiverDevice.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
       workspaceKey,

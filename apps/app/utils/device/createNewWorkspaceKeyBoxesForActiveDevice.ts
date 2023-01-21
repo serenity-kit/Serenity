@@ -75,7 +75,7 @@ export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
         receiverDeviceEncryptionPrivateKey: mainDevice?.encryptionPrivateKey!,
         creatorDeviceEncryptionPublicKey: creatorDevice?.encryptionPublicKey!,
       });
-      const { nonce, ciphertext } = await encryptWorkspaceKeyForDevice({
+      const { nonce, ciphertext } = encryptWorkspaceKeyForDevice({
         workspaceKey: workspaceKeyString,
         receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
         creatorDeviceEncryptionPrivateKey: mainDevice.encryptionPrivateKey!,
