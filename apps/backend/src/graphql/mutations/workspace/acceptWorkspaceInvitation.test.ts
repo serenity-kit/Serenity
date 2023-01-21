@@ -1,5 +1,5 @@
-import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -49,9 +49,11 @@ test("user should be able to accept an invitation", async () => {
     createWorkspaceResult.createWorkspaceInvitation.workspaceInvitation.id;
   invitationSigningPrivateKey =
     createWorkspaceResult.invitationSigningPrivateKey;
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
-    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-    inviteeUserAndDevice.signingPrivateKey
+  const encryptionPublicKeySignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      inviteeUserAndDevice.signingPrivateKey
+    )
   );
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
@@ -83,9 +85,11 @@ test("user should be able to accept an invitation", async () => {
 });
 
 test("double-accepting invitation does nothing", async () => {
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
-    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-    inviteeUserAndDevice.signingPrivateKey
+  const encryptionPublicKeySignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      inviteeUserAndDevice.signingPrivateKey
+    )
   );
   const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
     graphql,
@@ -113,9 +117,11 @@ test("double-accepting invitation does nothing", async () => {
 });
 
 test("invalid invitation id should throw error", async () => {
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
-    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-    inviteeUserAndDevice.signingPrivateKey
+  const encryptionPublicKeySignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      inviteeUserAndDevice.signingPrivateKey
+    )
   );
   await expect(
     (async () =>
@@ -145,9 +151,11 @@ test("expired invitation id should throw error", async () => {
       expiresAt: new Date(Date.now() - 1000),
     },
   });
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
-    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-    inviteeUserAndDevice.signingPrivateKey
+  const encryptionPublicKeySignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      inviteeUserAndDevice.signingPrivateKey
+    )
   );
   await expect(
     (async () =>
@@ -177,11 +185,13 @@ test("invalid signature should throw error", async () => {
       expiresAt: new Date(Date.now() - 1000),
     },
   });
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
-    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-    inviteeUserAndDevice.signingPrivateKey
+  const encryptionPublicKeySignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      inviteeUserAndDevice.signingPrivateKey
+    )
   );
-  const badSigningKeys = await sodium.crypto_sign_keypair();
+  const badSigningKeys = sodium.crypto_sign_keypair();
   await expect(
     (async () =>
       await acceptWorkspaceInvitation({
@@ -195,16 +205,20 @@ test("invalid signature should throw error", async () => {
             inviteeUserAndDevice.mainDevice.encryptionPublicKey,
           encryptionPublicKeySignature: encryptionPublicKeySignature,
         },
-        invitationSigningPrivateKey: badSigningKeys.privateKey,
+        invitationSigningPrivateKey: sodium.to_base64(
+          badSigningKeys.privateKey
+        ),
         authorizationHeader: inviteeUserAndDevice.sessionKey,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
 });
 
 test("Unauthenticated", async () => {
-  const encryptionPublicKeySignature = await sodium.crypto_sign_detached(
-    inviteeUserAndDevice.mainDevice.encryptionPublicKey,
-    inviteeUserAndDevice.signingPrivateKey
+  const encryptionPublicKeySignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      inviteeUserAndDevice.signingPrivateKey
+    )
   );
   await expect(
     (async () =>

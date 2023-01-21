@@ -1,6 +1,6 @@
 import { createSnapshotKey } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -88,7 +88,7 @@ test("Invalid ownership", async () => {
 test("Unauthenticated", async () => {
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
-  const snapshotKey = await sodium.crypto_kdf_keygen();
+  const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
   await expect(
     (async () =>
       await createDocumentShareLink({
@@ -119,7 +119,7 @@ describe("Input errors", () => {
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
       userData1.webDevice;
-    const snapshotKey = await sodium.crypto_kdf_keygen();
+    const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
     await expect(
       (async () =>
         await graphql.client.request(
@@ -147,7 +147,7 @@ describe("Input errors", () => {
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
       userData1.webDevice;
-    const snapshotKey = await sodium.crypto_kdf_keygen();
+    const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
     await expect(
       (async () =>
         await graphql.client.request(
@@ -180,7 +180,7 @@ describe("Input errors", () => {
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
       otherUser.webDevice;
-    const snapshotKey = await sodium.crypto_kdf_keygen();
+    const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
     await expect(
       (async () =>
         await graphql.client.request(
