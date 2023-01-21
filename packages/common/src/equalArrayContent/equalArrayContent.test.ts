@@ -1,6 +1,6 @@
 import { equalArrayContent } from "./equalArrayContent";
 
-test("encryptFolderName", async () => {
+test("equalArrayContent", async () => {
   expect(equalArrayContent(["a", "b", "c"], ["a", "b", "c"])).toBe(true);
   expect(equalArrayContent(["a", "b", "c"], ["a", "b"])).toBe(false);
   expect(equalArrayContent(["a", "b"], ["a", "b", "c"])).toBe(false);

@@ -78,7 +78,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       console.error("Could not get workspace key!");
       return;
     }
-    const encryptedFolderResult = await encryptFolderName({
+    const encryptedFolderResult = encryptFolderName({
       name,
       parentKey: workspaceKey,
     });

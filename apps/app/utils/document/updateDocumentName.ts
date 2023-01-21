@@ -42,7 +42,7 @@ export const updateDocumentName = async ({
     folderKey: folderKeyData.key,
   });
   const documentKey = documentKeyData.key;
-  const encryptedDocumentTitle = await encryptDocumentTitle({
+  const encryptedDocumentTitle = encryptDocumentTitle({
     title: name,
     key: documentKey,
   });

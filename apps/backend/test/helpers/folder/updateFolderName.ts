@@ -24,7 +24,7 @@ export const updateFolderName = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const encryptedFolderResult = await encryptFolderName({
+  const encryptedFolderResult = encryptFolderName({
     name,
     parentKey: workspaceKey,
   });

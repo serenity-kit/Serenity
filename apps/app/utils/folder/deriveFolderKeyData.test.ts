@@ -26,7 +26,7 @@ it("should return empty parentFolders", async () => {
   const workspaceKeyId = uuidv4();
   const folderId = uuidv4();
   const workspaceKeyString = await sodium.crypto_kdf_keygen();
-  const folderNameData = await encryptFolderName({
+  const folderNameData = encryptFolderName({
     name: "folderName",
     parentKey: workspaceKeyString,
   });
@@ -114,11 +114,11 @@ it("should return single parentFolders", async () => {
   const folderId = uuidv4();
   const parentFolderId = uuidv4();
   const workspaceKeyString = await sodium.crypto_kdf_keygen();
-  const parentFolderNameData = await encryptFolderName({
+  const parentFolderNameData = encryptFolderName({
     name: "parentFolderName",
     parentKey: workspaceKeyString,
   });
-  const folderNameData = await encryptFolderName({
+  const folderNameData = encryptFolderName({
     name: "folderName",
     parentKey: parentFolderNameData.folderSubkey,
   });
@@ -242,15 +242,15 @@ it("should return deep parentFolders", async () => {
   const parentFolderId = uuidv4();
   const childFolderId = uuidv4();
   const workspaceKeyString = await sodium.crypto_kdf_keygen();
-  const parentFolderNameData = await encryptFolderName({
+  const parentFolderNameData = encryptFolderName({
     name: "parentFolderName",
     parentKey: workspaceKeyString,
   });
-  const folderNameData = await encryptFolderName({
+  const folderNameData = encryptFolderName({
     name: "folderName",
     parentKey: parentFolderNameData.folderSubkey,
   });
-  const childFolderNameData = await encryptFolderName({
+  const childFolderNameData = encryptFolderName({
     name: "childFolderName",
     parentKey: folderNameData.folderSubkey,
   });

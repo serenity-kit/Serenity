@@ -11,7 +11,7 @@ beforeAll(async () => {
 test("decryptDocumentTitle", async () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const initialDocumentKey = createDocumentKey({ folderKey });
-  const result = await encryptDocumentTitle({
+  const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
@@ -33,7 +33,7 @@ test("decryptDocumentTitle", async () => {
 test("decryptDocumentTitle fails for wrong key", async () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const initialDocumentKey = createDocumentKey({ folderKey });
-  const result = await encryptDocumentTitle({
+  const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
@@ -57,7 +57,7 @@ test("decryptDocumentTitle fails for wrong key", async () => {
 test("decryptDocumentTitle fails for wrong publicData", async () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const initialDocumentKey = createDocumentKey({ folderKey });
-  const result = await encryptDocumentTitle({
+  const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
@@ -81,7 +81,7 @@ test("decryptDocumentTitle fails for wrong publicData", async () => {
 test("decryptDocumentTitle fails for invalid publicData", async () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const initialDocumentKey = createDocumentKey({ folderKey });
-  const result = await encryptDocumentTitle({
+  const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });

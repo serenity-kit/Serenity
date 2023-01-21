@@ -5,8 +5,8 @@ import {
   encryptDocumentTitle,
   encryptFolderName,
 } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { DeviceWorkspaceKeyBoxParams } from "../../../src/database/workspace/createWorkspace";
 import { Device } from "../../../src/types/device";
@@ -110,7 +110,7 @@ export const createInitialWorkspaceStructure = async ({
   const documentName = "Introduction";
 
   // create workspace key boxes
-  const workspaceKey = await sodium.crypto_kdf_keygen();
+  const workspaceKey = sodium.to_base64(sodium.crypto_kdf_keygen());
   const deviceWorkspaceKeyBoxes: DeviceWorkspaceKeyBoxParams[] = [];
   for (const device of devices) {
     const deviceWorkspaceKeyBox = await encryptWorkspaceKeyForDevice({
@@ -132,7 +132,7 @@ export const createInitialWorkspaceStructure = async ({
   };
 
   // prepare the folder
-  const encryptedFolderResult = await encryptFolderName({
+  const encryptedFolderResult = encryptFolderName({
     name: folderName,
     parentKey: workspaceKey,
   });
@@ -140,9 +140,11 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedFolderNameNonce = encryptedFolderResult.publicNonce;
   const folderSubkeyId = encryptedFolderResult.folderSubkeyId;
   const folderKey = encryptedFolderResult.folderSubkey;
-  const folderIdSignature = await sodium.crypto_sign_detached(
-    folderId,
-    creatorDevice.signingPrivateKey
+  const folderIdSignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      folderId,
+      sodium.from_base64(creatorDevice.signingPrivateKey)
+    )
   );
   const readyFolder = {
     id: folderId,
@@ -163,7 +165,7 @@ export const createInitialWorkspaceStructure = async ({
   const documentKey = documentKeyResult.key;
   const documentSubkeyId = documentKeyResult.subkeyId;
 
-  const encryptedDocumentTitleResult = await encryptDocumentTitle({
+  const encryptedDocumentTitleResult = encryptDocumentTitle({
     title: documentName,
     key: documentKey,
   });

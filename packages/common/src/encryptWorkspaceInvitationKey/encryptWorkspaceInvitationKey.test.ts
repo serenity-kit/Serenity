@@ -8,7 +8,7 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("encryptFolderName", async () => {
+test("encryptWorkspaceInvitationPrivateKey", async () => {
   const keyPair = sodium.crypto_sign_keypair();
   const result = encryptWorkspaceInvitationPrivateKey({
     exportKey,

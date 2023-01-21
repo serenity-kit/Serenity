@@ -90,7 +90,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         throw new Error("Could not retrieve workspaceKey!");
       }
 
-      const encryptedFolderResult = await encryptFolderName({
+      const encryptedFolderResult = encryptFolderName({
         name: folderName,
         parentKey: workspaceKey,
       });
@@ -108,7 +108,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const documentKeyData = createDocumentKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
-      const encryptedDocumentTitle = await encryptDocumentTitle({
+      const encryptedDocumentTitle = encryptDocumentTitle({
         title: documentName,
         key: documentKeyData.key,
       });
