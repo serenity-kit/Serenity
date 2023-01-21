@@ -1,4 +1,3 @@
-import sodium from "@serenity-tools/libsodium";
 import {
   Avatar,
   CenterContent,
@@ -20,6 +19,7 @@ import {
 import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import MemberMenu from "../../../components/memberMenu/MemberMenu";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
@@ -159,7 +159,7 @@ export default function WorkspaceSettingsMembersScreen(
       setMembers(members);
       delete memberLookup[username];
       setMemberLookup(memberLookup);
-      const workspaceKeyString = await sodium.crypto_kdf_keygen();
+      const workspaceKeyString = sodium.to_base64(sodium.crypto_kdf_keygen());
       const workspaceKey = {
         id: uuidv4(),
         workspaceKey: workspaceKeyString,

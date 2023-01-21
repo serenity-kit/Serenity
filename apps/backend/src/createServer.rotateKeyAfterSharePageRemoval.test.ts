@@ -5,7 +5,7 @@ import {
   LocalDevice,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
 import deleteAllRecords from "../test/helpers/deleteAllRecords";
 import { decryptWorkspaceKey } from "../test/helpers/device/decryptWorkspaceKey";
 import { createDocument } from "../test/helpers/document/createDocument";

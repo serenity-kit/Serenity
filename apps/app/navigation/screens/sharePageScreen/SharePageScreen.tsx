@@ -1,8 +1,8 @@
 import { useFocusEffect } from "@react-navigation/native";
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { useMemo, useState } from "react";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { sharePageScreenMachine } from "./sharePageScreenMachine";
 

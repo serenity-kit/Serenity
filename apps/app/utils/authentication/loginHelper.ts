@@ -1,7 +1,7 @@
 import { decryptDevice } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
 import { finishLogin, startLogin } from "@serenity-tools/opaque";
 import { Platform } from "react-native";
+import sodium from "react-native-libsodium";
 import { UpdateAuthenticationFunction } from "../../context/AppContext";
 import {
   MainDeviceDocument,
@@ -83,9 +83,11 @@ export const login = async ({
     startLoginResult.data.startLogin.challengeResponse
   );
 
-  const sessionTokenSignature = await sodium.crypto_sign_detached(
-    result.sessionKey,
-    device.signingPrivateKey
+  const sessionTokenSignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      result.sessionKey,
+      sodium.from_base64(device.signingPrivateKey)
+    )
   );
 
   const finishLoginResult = await finishLoginMutation({
