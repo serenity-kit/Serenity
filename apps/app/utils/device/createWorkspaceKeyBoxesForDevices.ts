@@ -1,4 +1,4 @@
-import * as sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { DeviceWorkspaceKeyBoxInput } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { encryptWorkspaceKeyForDevice } from "./encryptWorkspaceKeyForDevice";
@@ -14,7 +14,7 @@ export type Props = {
   devices: Device[];
   activeDevice: Device;
 };
-export const createWorkspaceKeyBoxesForDevices = async ({
+export const createWorkspaceKeyBoxesForDevices = ({
   devices,
   activeDevice,
 }: Props) => {
@@ -29,12 +29,12 @@ export const createWorkspaceKeyBoxesForDevices = async ({
     throw new Error("Active device doesn't have an encryptionPrivateKey!");
   }
 
-  const workspaceKey = await sodium.crypto_kdf_keygen();
+  const workspaceKey = sodium.crypto_kdf_keygen();
   for (const receiverDevice of allDevices) {
-    const { nonce, ciphertext } = await encryptWorkspaceKeyForDevice({
+    const { nonce, ciphertext } = encryptWorkspaceKeyForDevice({
       receiverDeviceEncryptionPublicKey: receiverDevice.encryptionPublicKey,
       creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
-      workspaceKey,
+      workspaceKey: sodium.to_base64(workspaceKey),
     });
     deviceWorkspaceKeyBoxes.push({
       ciphertext,
@@ -44,6 +44,6 @@ export const createWorkspaceKeyBoxesForDevices = async ({
   }
   return {
     deviceWorkspaceKeyBoxes,
-    workspaceKey: workspaceKey,
+    workspaceKey: sodium.to_base64(workspaceKey),
   };
 };

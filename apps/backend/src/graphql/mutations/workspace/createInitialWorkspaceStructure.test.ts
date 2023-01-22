@@ -92,7 +92,7 @@ test("create initial workspace structure", async () => {
     context: folderDerivedKeyContext,
     subkeyId: folder.keyDerivationTrace.subkeyId,
   });
-  const decryptedFolderName = await decryptFolderName({
+  const decryptedFolderName = decryptFolderName({
     parentKey: workspaceKey,
     subkeyId: folder.keyDerivationTrace.subkeyId,
     ciphertext: folder.encryptedName,
@@ -104,7 +104,7 @@ test("create initial workspace structure", async () => {
     folderKey: folderKey.key,
     subkeyId: document.nameKeyDerivationTrace.subkeyId,
   });
-  const decryptedDocumentName = await decryptDocumentTitle({
+  const decryptedDocumentName = decryptDocumentTitle({
     key: documentKey.key,
     ciphertext: document.encryptedName,
     publicNonce: document.encryptedNameNonce,
@@ -130,7 +130,7 @@ test("Unauthenticated", async () => {
 });
 
 test("creator device must belong to user", async () => {
-  const badDevice = await createDevice();
+  const badDevice = createDevice();
   await expect(
     (async () =>
       await createInitialWorkspaceStructure({

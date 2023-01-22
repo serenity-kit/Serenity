@@ -1,26 +1,24 @@
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 
 export type Props = {
   receiverDeviceEncryptionPublicKey: string;
   creatorDeviceEncryptionPrivateKey: string;
 };
-export const createAndEncryptWorkspaceKeyForDevice = async ({
+export const createAndEncryptWorkspaceKeyForDevice = ({
   receiverDeviceEncryptionPublicKey,
   creatorDeviceEncryptionPrivateKey,
 }: Props) => {
-  const workspaceKey = await sodium.crypto_kdf_keygen();
-  const nonce = await sodium.randombytes_buf(
-    sodium.crypto_secretbox_NONCEBYTES
-  );
+  const workspaceKey = sodium.crypto_kdf_keygen();
+  const nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
   const ciphertext = sodium.crypto_box_easy(
     workspaceKey,
     nonce,
-    receiverDeviceEncryptionPublicKey,
-    creatorDeviceEncryptionPrivateKey
+    sodium.from_base64(receiverDeviceEncryptionPublicKey),
+    sodium.from_base64(creatorDeviceEncryptionPrivateKey)
   );
   return {
-    workspaceKey,
-    nonce,
-    ciphertext,
+    workspaceKey: sodium.to_base64(workspaceKey),
+    nonce: sodium.to_base64(nonce),
+    ciphertext: sodium.to_base64(ciphertext),
   };
 };

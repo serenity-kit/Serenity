@@ -91,7 +91,7 @@ test("user should be able to change a document name", async () => {
     folderKey,
     subkeyId: updatedDocument.nameKeyDerivationTrace.subkeyId,
   });
-  const decryptedName = await decryptDocumentTitle({
+  const decryptedName = decryptDocumentTitle({
     key: documentSubkey.key,
     ciphertext: updatedDocument.encryptedName,
     publicNonce: updatedDocument.encryptedNameNonce,

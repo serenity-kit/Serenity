@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import * as sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";

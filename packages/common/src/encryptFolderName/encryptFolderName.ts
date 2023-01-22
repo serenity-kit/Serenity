@@ -1,5 +1,6 @@
 import { encryptAead } from "@naisho/core";
 import canonicalize from "canonicalize";
+import sodium from "react-native-libsodium";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {
@@ -13,7 +14,7 @@ type Params = {
 // for one parentKey and checking only the uniquness for this type.
 export const folderDerivedKeyContext = "folder__";
 
-export const encryptFolderName = async (params: Params) => {
+export const encryptFolderName = (params: Params) => {
   const publicData = params.publicData || {};
   const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {
@@ -25,10 +26,10 @@ export const encryptFolderName = async (params: Params) => {
     key: params.parentKey,
     context: folderDerivedKeyContext,
   });
-  const result = await encryptAead(
+  const result = encryptAead(
     params.name,
     canonicalizedPublicData,
-    folderKey.key
+    sodium.from_base64(folderKey.key)
   );
   return {
     folderSubkey: folderKey.key,

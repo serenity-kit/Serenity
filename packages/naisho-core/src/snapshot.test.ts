@@ -1,5 +1,5 @@
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import sodiumWrappers from "libsodium-wrappers";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
 import { SnapshotPublicData } from "./types";
@@ -33,14 +33,14 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
     },
   };
 
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "Hello World",
     publicData,
     key,
     signatureKeyPair
   );
 
-  const result = await verifyAndDecryptSnapshot(
+  const result = verifyAndDecryptSnapshot(
     snapshot,
     key,
     signatureKeyPair.publicKey
@@ -48,7 +48,7 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
   if (result === null) {
     throw new Error("Snapshot could not be verified.");
   }
-  expect(sodium.from_base64_to_string(result)).toBe("Hello World");
+  expect(sodium.to_string(result)).toBe("Hello World");
 });
 
 test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", async () => {
@@ -80,22 +80,23 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
     },
   };
 
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "Hello World",
     publicData,
     key,
     signatureKeyPair
   );
 
-  const result = await verifyAndDecryptSnapshot(
-    {
-      ...snapshot,
-      signature: snapshot.signature.replace(/^./, "a"),
-    },
-    key,
-    signatureKeyPair.publicKey
-  );
-  expect(result).toBeNull();
+  expect(() =>
+    verifyAndDecryptSnapshot(
+      {
+        ...snapshot,
+        signature: snapshot.signature.replace(/^./, "a"),
+      },
+      key,
+      signatureKeyPair.publicKey
+    )
+  ).toThrowError();
 });
 
 test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", async () => {
@@ -127,20 +128,21 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
     },
   };
 
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "Hello World",
     publicData,
     key,
     signatureKeyPair
   );
 
-  const result = await verifyAndDecryptSnapshot(
-    {
-      ...snapshot,
-      ciphertext: snapshot.ciphertext.replace(/^./, "a"),
-    },
-    key,
-    signatureKeyPair.publicKey
-  );
-  expect(result).toBeNull();
+  expect(() =>
+    verifyAndDecryptSnapshot(
+      {
+        ...snapshot,
+        ciphertext: snapshot.ciphertext.replace(/^./, "a"),
+      },
+      key,
+      signatureKeyPair.publicKey
+    )
+  ).toThrowError();
 });

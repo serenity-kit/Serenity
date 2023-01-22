@@ -1,6 +1,6 @@
 import { createSnapshotKey } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";

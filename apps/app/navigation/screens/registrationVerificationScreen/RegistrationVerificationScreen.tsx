@@ -20,7 +20,6 @@ import {
 } from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { createDeviceWithInfo } from "../../../utils/authentication/createDeviceWithInfo";
-import { getExportKey } from "../../../utils/authentication/exportKeyStore";
 import {
   fetchMainDevice,
   login,
@@ -84,7 +83,7 @@ export default function RegistrationVerificationScreen(
         );
         return;
       }
-      const signingPrivateKey = await decryptWorkspaceInvitationKey({
+      const signingPrivateKey = decryptWorkspaceInvitationKey({
         exportKey,
         subkeyId: pendingWorkspaceInvitation.subkeyId!,
         ciphertext: pendingWorkspaceInvitation.ciphertext!,
@@ -114,7 +113,7 @@ export default function RegistrationVerificationScreen(
     try {
       setErrorMessage("");
 
-      const unsafedDevice = await createDeviceWithInfo();
+      const unsafedDevice = createDeviceWithInfo();
 
       // FIXME: allow non-extended login by storing into sessionStorage
       // for now this is a HACK to support devices and workspaceKeyBoxes

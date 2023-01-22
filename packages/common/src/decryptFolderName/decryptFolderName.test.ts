@@ -1,4 +1,4 @@
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { encryptFolderName } from "../encryptFolderName/encryptFolderName";
 import { decryptFolderName } from "./decryptFolderName";
 
@@ -8,12 +8,12 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("decryptFolderName", async () => {
-  const result = await encryptFolderName({
+test("decryptFolderName", () => {
+  const result = encryptFolderName({
     parentKey: kdfKey,
     name: "Getting started",
   });
-  const decryptFolderResult = await decryptFolderName({
+  const decryptFolderResult = decryptFolderName({
     parentKey: kdfKey,
     ciphertext: result.ciphertext,
     publicNonce: result.publicNonce,
@@ -23,53 +23,50 @@ test("decryptFolderName", async () => {
   expect(decryptFolderResult).toBe("Getting started");
 });
 
-test("decryptFolderName with publicData fails for wrong key", async () => {
-  const result = await encryptFolderName({
+test("decryptFolderName with publicData fails for wrong key", () => {
+  const result = encryptFolderName({
     parentKey: kdfKey,
     name: "Getting started",
   });
-  await expect(
-    (async () =>
-      await decryptFolderName({
-        parentKey: "4NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto",
-        ciphertext: result.ciphertext,
-        publicNonce: result.publicNonce,
-        subkeyId: result.folderSubkeyId,
-        publicData: result.publicData,
-      }))()
-  ).rejects.toThrowError(/ciphertext cannot be decrypted using that key/);
+  expect(() =>
+    decryptFolderName({
+      parentKey: "4NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto",
+      ciphertext: result.ciphertext,
+      publicNonce: result.publicNonce,
+      subkeyId: result.folderSubkeyId,
+      publicData: result.publicData,
+    })
+  ).toThrowError(/ciphertext cannot be decrypted using that key/);
 });
 
-test("decryptFolderName with publicData fails for wrong public data", async () => {
-  const result = await encryptFolderName({
+test("decryptFolderName with publicData fails for wrong public data", () => {
+  const result = encryptFolderName({
     parentKey: kdfKey,
     name: "Getting started",
   });
-  await expect(
-    (async () =>
-      await decryptFolderName({
-        parentKey: kdfKey,
-        ciphertext: result.ciphertext,
-        publicNonce: result.publicNonce,
-        subkeyId: result.folderSubkeyId,
-        publicData: { something: 4 },
-      }))()
-  ).rejects.toThrowError(/ciphertext cannot be decrypted using that key/);
+  expect(() =>
+    decryptFolderName({
+      parentKey: kdfKey,
+      ciphertext: result.ciphertext,
+      publicNonce: result.publicNonce,
+      subkeyId: result.folderSubkeyId,
+      publicData: { something: 4 },
+    })
+  ).toThrowError(/ciphertext cannot be decrypted using that key/);
 });
 
-test("decryptFolderName with publicData fails for invalid publicData", async () => {
-  const result = await encryptFolderName({
+test("decryptFolderName with publicData fails for invalid publicData", () => {
+  const result = encryptFolderName({
     parentKey: kdfKey,
     name: "Getting started",
   });
-  await expect(
-    (async () =>
-      await decryptFolderName({
-        parentKey: kdfKey,
-        ciphertext: result.ciphertext,
-        publicNonce: result.publicNonce,
-        subkeyId: result.folderSubkeyId,
-        publicData: function foo() {},
-      }))()
-  ).rejects.toThrowError(/Invalid public data for decrypting the folder\./);
+  expect(() =>
+    decryptFolderName({
+      parentKey: kdfKey,
+      ciphertext: result.ciphertext,
+      publicNonce: result.publicNonce,
+      subkeyId: result.folderSubkeyId,
+      publicData: function foo() {},
+    })
+  ).toThrowError(/Invalid public data for decrypting the folder\./);
 });

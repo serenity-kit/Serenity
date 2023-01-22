@@ -1,5 +1,4 @@
 import { useRoute } from "@react-navigation/native";
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import {
   Button,
   Description,
@@ -21,6 +20,7 @@ import {
 import * as Clipboard from "expo-clipboard";
 import { useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
+import sodium, { KeyPair } from "react-native-libsodium";
 import {
   runRemoveDocumentShareLinkMutation,
   useDocumentShareLinksQuery,

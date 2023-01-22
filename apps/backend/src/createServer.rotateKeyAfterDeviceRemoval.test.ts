@@ -5,7 +5,7 @@ import {
   LocalDevice,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
 import deleteAllRecords from "../test/helpers/deleteAllRecords";
 import { decryptWorkspaceKey } from "../test/helpers/device/decryptWorkspaceKey";
 import { deleteDevices } from "../test/helpers/device/deleteDevices";
@@ -126,7 +126,7 @@ test("successfully creates a snapshot", async () => {
     keyDerivationTrace,
     subkeyId: snapshotKey.subkeyId,
   };
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
@@ -167,7 +167,7 @@ test("successfully creates an update", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
-  const updateToSend = await createUpdate(
+  const updateToSend = createUpdate(
     "UPDATE CONTENT DUMMY",
     publicData,
     sodium.from_base64(lastSnapshotKey),
@@ -188,12 +188,12 @@ test("successfully creates an update", async () => {
 test("delete a device", async () => {
   const authorizationHeader = sessionKey;
 
-  const workspaceKeyBox1 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox1 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: device!.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
     workspaceKey,
   });
-  const workspaceKeyBox2 = await encryptWorkspaceKeyForDevice({
+  const workspaceKeyBox2 = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: webDevice!.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
     workspaceKey,
@@ -246,7 +246,7 @@ test("document update will fail", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
-  const updateToSend = await createUpdate(
+  const updateToSend = createUpdate(
     "UPDATE CONTENT DUMMY",
     publicData,
     sodium.from_base64(lastSnapshotKey),
@@ -296,7 +296,7 @@ test("snapshot based on old workspace key fails", async () => {
     keyDerivationTrace,
     subkeyId: snapshotKey.subkeyId,
   };
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
@@ -373,7 +373,7 @@ test("successfully creates a snapshot", async () => {
     keyDerivationTrace,
     subkeyId: snapshotKey.subkeyId,
   };
-  const snapshot = await createSnapshot(
+  const snapshot = createSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
@@ -415,7 +415,7 @@ test("successfully creates an update", async () => {
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
-  const updateToSend = await createUpdate(
+  const updateToSend = createUpdate(
     "UPDATE CONTENT DUMMY",
     updatePublicData,
     sodium.from_base64(lastSnapshotKey),

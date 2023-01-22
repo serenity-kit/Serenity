@@ -1,5 +1,5 @@
 import { LocalDevice } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { assign, createMachine } from "xstate";
 import {
   DocumentShareLinkQuery,
@@ -144,14 +144,12 @@ export const sharePageScreenMachine =
           const virtualDeviceKey = context.virtualDeviceKey;
           const documentShareLink =
             context.documentShareLinkQueryResult?.data?.documentShareLink;
-          const base64DeviceData = await sodium.crypto_secretbox_open_easy(
-            documentShareLink?.deviceSecretBoxCiphertext!,
-            documentShareLink?.deviceSecretBoxNonce!,
-            virtualDeviceKey!
+          const base64DeviceData = sodium.crypto_secretbox_open_easy(
+            sodium.from_base64(documentShareLink?.deviceSecretBoxCiphertext!),
+            sodium.from_base64(documentShareLink?.deviceSecretBoxNonce!),
+            sodium.from_base64(virtualDeviceKey!)
           );
-          const device = JSON.parse(
-            sodium.from_base64_to_string(base64DeviceData)
-          );
+          const device = JSON.parse(sodium.to_string(base64DeviceData));
           return device;
         },
         decryptSnapshotKey: async (context, event) => {
@@ -167,12 +165,14 @@ export const sharePageScreenMachine =
                 .snapshotKeyBoxs[0];
 
             const snapshotKey = sodium.crypto_box_open_easy(
-              snapshotKeyBox.ciphertext,
-              snapshotKeyBox.nonce,
-              snapshotKeyBox.creatorDevice.encryptionPublicKey,
-              context.device?.encryptionPrivateKey
+              sodium.from_base64(snapshotKeyBox.ciphertext),
+              sodium.from_base64(snapshotKeyBox.nonce),
+              sodium.from_base64(
+                snapshotKeyBox.creatorDevice.encryptionPublicKey
+              ),
+              sodium.from_base64(context.device?.encryptionPrivateKey)
             );
-            return snapshotKey;
+            return sodium.to_base64(snapshotKey);
           }
           throw new Error("Snapshot could not be decrypted");
         },

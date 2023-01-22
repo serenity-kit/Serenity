@@ -128,14 +128,14 @@ DATABASE_URL=postgres://prisma:prisma@localhost:5432/serenity_test yarn prisma m
 For any package
 
 ```sh
-cd packages/libsodium
+cd packages/common
 yarn test
 ```
 
 or
 
 ```sh
-yarn workspace @serenity-tools/libsodium test
+yarn workspace @serenity-tools/common test
 ```
 
 ## End-to-end tests
@@ -195,7 +195,19 @@ WHERE pg_stat_activity.datname = 'serenity';
 drop database serenity;
 ```
 
-## Folder/File Naming Convention
+## Conventions
+
+### Keys should als be encrypted as Uint8Array
+
+Example:
+
+```ts
+sodium.crypto_box_easy(workspaceKey, nonce, publicKey, privateKey);
+```
+
+In the case above the workspaceKey must be a `Uint8Array`.
+
+### Folder/File Naming Convention
 
 - Folder and file names use camelCase.
 - Folders start with a lower case character.

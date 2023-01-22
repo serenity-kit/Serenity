@@ -78,7 +78,7 @@ test("new user results in added device", async () => {
     deviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
     workspace: userData1.workspace,
   });
-  const { ciphertext, nonce } = await encryptWorkspaceKeyForDevice({
+  const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: userData2.device.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
     workspaceKey,

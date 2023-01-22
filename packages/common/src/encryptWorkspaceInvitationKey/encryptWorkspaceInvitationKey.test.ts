@@ -1,4 +1,4 @@
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { encryptWorkspaceInvitationPrivateKey } from "./encryptWorkspaceInvitationKey";
 
 const exportKey =
@@ -9,10 +9,10 @@ beforeAll(async () => {
 });
 
 test("encryptFolderName", async () => {
-  const keyPair = await sodium.crypto_sign_keypair();
-  const result = await encryptWorkspaceInvitationPrivateKey({
+  const keyPair = sodium.crypto_sign_keypair();
+  const result = encryptWorkspaceInvitationPrivateKey({
     exportKey,
-    workspaceInvitationSigningPrivateKey: keyPair.privateKey,
+    workspaceInvitationSigningPrivateKey: sodium.to_base64(keyPair.privateKey),
   });
   expect(typeof result.key).toBe("string");
   expect(result.key.length).toBe(43);

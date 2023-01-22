@@ -1,4 +1,4 @@
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 
 export type Props = {
   ciphertext: string;
@@ -13,10 +13,10 @@ export const decryptWorkspaceKey = ({
   receiverDeviceEncryptionPrivateKey,
 }: Props) => {
   const workspaceKey = sodium.crypto_box_open_easy(
-    ciphertext,
-    nonce,
-    creatorDeviceEncryptionPublicKey,
-    receiverDeviceEncryptionPrivateKey
+    sodium.from_base64(ciphertext),
+    sodium.from_base64(nonce),
+    sodium.from_base64(creatorDeviceEncryptionPublicKey),
+    sodium.from_base64(receiverDeviceEncryptionPrivateKey)
   );
-  return workspaceKey;
+  return sodium.to_base64(workspaceKey);
 };

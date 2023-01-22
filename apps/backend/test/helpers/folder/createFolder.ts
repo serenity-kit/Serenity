@@ -27,7 +27,7 @@ export const createFolder = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const encryptedFolderResult = await encryptFolderName({
+  const encryptedFolderResult = encryptFolderName({
     name,
     parentKey,
   });

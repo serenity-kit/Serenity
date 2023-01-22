@@ -1,5 +1,5 @@
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import canonicalize from "canonicalize";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
 import { Snapshot, SnapshotPublicData } from "./types";
 
@@ -52,7 +52,7 @@ export function getPending(documentId): PendingResult {
   return { type: "none" };
 }
 
-export async function createSnapshot(
+export function createSnapshot(
   content,
   publicData: SnapshotPublicData,
   key: Uint8Array,
@@ -62,14 +62,14 @@ export async function createSnapshot(
     canonicalize(publicData) as string
   );
 
-  const { ciphertext, publicNonce } = await encryptAead(
+  const { ciphertext, publicNonce } = encryptAead(
     content,
     publicDataAsBase64,
-    sodium.to_base64(key)
+    key
   );
-  const signature = await sign(
+  const signature = sign(
     `${publicNonce}${ciphertext}${publicDataAsBase64}`,
-    sodium.to_base64(signatureKeyPair.privateKey)
+    signatureKeyPair.privateKey
   );
   const snapshot: Snapshot = {
     nonce: publicNonce,
@@ -81,7 +81,7 @@ export async function createSnapshot(
   return snapshot;
 }
 
-export async function verifyAndDecryptSnapshot(
+export function verifyAndDecryptSnapshot(
   snapshot: Snapshot,
   key: Uint8Array,
   publicKey: Uint8Array
@@ -90,18 +90,18 @@ export async function verifyAndDecryptSnapshot(
     canonicalize(snapshot.publicData) as string
   );
 
-  const isValid = await verifySignature(
+  const isValid = verifySignature(
     `${snapshot.nonce}${snapshot.ciphertext}${publicDataAsBase64}`,
     snapshot.signature,
-    sodium.to_base64(publicKey)
+    publicKey
   );
   if (!isValid) {
-    return null;
+    throw new Error("Invalid snapshot");
   }
-  return await decryptAead(
+  return decryptAead(
     sodium.from_base64(snapshot.ciphertext),
     publicDataAsBase64,
-    sodium.to_base64(key),
+    key,
     snapshot.nonce
   );
 }

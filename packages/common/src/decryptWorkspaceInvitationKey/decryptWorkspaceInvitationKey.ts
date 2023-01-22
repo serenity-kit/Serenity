@@ -1,5 +1,5 @@
 import { decryptAead } from "@naisho/core";
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { createEncryptionKeyFromOpaqueExportKey } from "../createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";
 import { workspaceInvitationDerivedKeyContext } from "../encryptWorkspaceInvitationKey/encryptWorkspaceInvitationKey";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
@@ -12,7 +12,7 @@ type Params = {
   encryptionKeySalt: string;
 };
 
-export const decryptWorkspaceInvitationKey = async ({
+export const decryptWorkspaceInvitationKey = ({
   exportKey,
   subkeyId,
   ciphertext,
@@ -29,11 +29,11 @@ export const decryptWorkspaceInvitationKey = async ({
     context: workspaceInvitationDerivedKeyContext,
     subkeyId,
   });
-  const result = await decryptAead(
+  const result = decryptAead(
     sodium.from_base64(ciphertext),
     publicData,
-    derivedEncryptionKey.key,
+    sodium.from_base64(derivedEncryptionKey.key),
     publicNonce
   );
-  return sodium.from_base64_to_string(result);
+  return sodium.to_string(result);
 };

@@ -1,59 +1,56 @@
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 
-export async function encryptAead(
-  message,
-  additionalData: string,
-  key: string
-) {
+export function encryptAead(message, additionalData: string, key: Uint8Array) {
   // TODO
-  // const publicNonce = await sodium.randombytes_buf(
+  // const publicNonce = sodium.randombytes_buf(
   //   sodiumWrappers.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
   // );
-  const publicNonce = await sodium.randombytes_buf(24);
+  const publicNonce = sodium.randombytes_buf(24);
   const result = {
-    publicNonce,
-    ciphertext: await sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-      message,
-      additionalData,
-      null,
-      publicNonce,
-      key
+    publicNonce: sodium.to_base64(publicNonce),
+    ciphertext: sodium.to_base64(
+      sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+        message,
+        additionalData,
+        null,
+        publicNonce,
+        key
+      )
     ),
   };
   return result;
 }
 
-export async function decryptAead(
+export function decryptAead(
   ciphertext: Uint8Array,
   additionalData: string,
-  key: string,
+  key: Uint8Array,
   publicNonce: string
 ) {
   return sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
     null,
-    sodium.to_base64(ciphertext),
+    ciphertext,
     additionalData,
-    publicNonce,
+    sodium.from_base64(publicNonce),
     key
   );
 }
 
-export async function createSignatureKeyPair() {
-  const keypair = await sodium.crypto_sign_keypair();
-  return {
-    publicKey: sodium.from_base64(keypair.publicKey),
-    privateKey: sodium.from_base64(keypair.privateKey),
-    keyType: keypair.keyType,
-  };
+export function createSignatureKeyPair() {
+  return sodium.crypto_sign_keypair();
 }
 
-export async function sign(message, privateKey) {
-  return await sodium.crypto_sign_detached(message, privateKey);
+export function sign(message, privateKey: Uint8Array) {
+  return sodium.to_base64(sodium.crypto_sign_detached(message, privateKey));
 }
 
-export async function verifySignature(message, signature, publicKey) {
-  return await sodium.crypto_sign_verify_detached(
-    signature,
+export function verifySignature(
+  message,
+  signature: string,
+  publicKey: Uint8Array
+) {
+  return sodium.crypto_sign_verify_detached(
+    sodium.from_base64(signature),
     message,
     publicKey
   );

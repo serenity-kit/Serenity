@@ -7,9 +7,9 @@ import { useWorkspace } from "../../../context/WorkspaceContext";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
 import {
   getDocumentPath,

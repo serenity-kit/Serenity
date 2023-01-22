@@ -1,5 +1,4 @@
 import { verifyDevice } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
 import { UserInputError } from "apollo-server-express";
 import {
   arg,
@@ -8,6 +7,7 @@ import {
   nonNull,
   objectType,
 } from "nexus";
+import sodium from "react-native-libsodium";
 import { createSession } from "../../../database/authentication/createSession";
 import { addDays } from "../../../utils/addDays/addDays";
 import { addYears } from "../../../utils/addYears/addYears";
@@ -76,12 +76,11 @@ export const finishLoginMutation = mutationField("finishLogin", {
       message: args.input.message,
     });
 
-    const isValidSessionTokenSignature =
-      await sodium.crypto_sign_verify_detached(
-        args.input.sessionTokenSignature,
-        finishLoginResult.sessionKey,
-        args.input.deviceSigningPublicKey
-      );
+    const isValidSessionTokenSignature = sodium.crypto_sign_verify_detached(
+      sodium.from_base64(args.input.sessionTokenSignature),
+      finishLoginResult.sessionKey,
+      sodium.from_base64(args.input.deviceSigningPublicKey)
+    );
     if (!isValidSessionTokenSignature) {
       throw new Error("Invalid sessionTokenSignature");
     }

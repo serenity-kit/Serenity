@@ -1,8 +1,8 @@
-import sodium from "@serenity-tools/libsodium";
 import { Button, Text, View } from "@serenity-tools/ui";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import { Image, useWindowDimensions } from "react-native";
+import sodium from "react-native-libsodium";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 
 export default function EncryptDecryptImageTestScreen(
@@ -39,40 +39,40 @@ export default function EncryptDecryptImageTestScreen(
   };
 
   const createChaChaKeys = async () => {
-    const key = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
+    const key = sodium.to_base64(
+      sodium.crypto_aead_xchacha20poly1305_ietf_keygen()
+    );
     console.log(key);
     setChaChaKey(key);
   };
 
   const chaChaEncryptBase64ImageData = async () => {
-    const nonce = await sodium.randombytes_buf(24);
+    const nonce = sodium.to_base64(sodium.randombytes_buf(24));
     const additionalData = "";
     const encryptedImageData =
-      await sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
+      sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
         base64ImageData,
         additionalData,
         null,
-        nonce,
-        chaChaKey
+        sodium.from_base64(nonce),
+        sodium.from_base64(chaChaKey)
       );
     setChaChaNonce(nonce);
-    setChaChaEncryptedImageData(encryptedImageData);
+    setChaChaEncryptedImageData(sodium.to_base64(encryptedImageData));
   };
 
   const chaChaDecryptBase64ImageData = async () => {
     const additionalData = "";
     const decryptedImageData =
-      await sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
+      sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
         null,
-        chaChaEncryptedImageData,
+        sodium.from_base64(chaChaEncryptedImageData),
         additionalData,
-        chaChaNonce,
-        chaChaKey
+        sodium.from_base64(chaChaNonce),
+        sodium.from_base64(chaChaKey)
       );
-    console.log(sodium.from_base64_to_string(decryptedImageData));
-    setChaChaDecryptedImageData(
-      sodium.from_base64_to_string(decryptedImageData)
-    );
+    console.log(sodium.to_string(decryptedImageData));
+    setChaChaDecryptedImageData(sodium.to_string(decryptedImageData));
   };
 
   return (

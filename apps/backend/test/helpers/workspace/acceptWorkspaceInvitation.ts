@@ -1,6 +1,6 @@
-import sodium from "@serenity-tools/libsodium";
 import canonicalize from "canonicalize";
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { Device } from "../../../src/types/device";
 
 type Params = {
@@ -55,9 +55,9 @@ export const acceptWorkspaceInvitation = async ({
       encryptionPublicKeySignature: safeMainDevice.encryptionPublicKeySignature,
     },
   });
-  const inviteeUsernameAndDeviceSignature = await sodium.crypto_sign_detached(
+  const inviteeUsernameAndDeviceSignature = sodium.crypto_sign_detached(
     inviteeUsernameAndDevice!,
-    invitationSigningPrivateKey
+    sodium.from_base64(invitationSigningPrivateKey)
   );
   const result = await graphql.client.request(
     query,
@@ -66,7 +66,9 @@ export const acceptWorkspaceInvitation = async ({
         workspaceInvitationId,
         inviteeUsername,
         inviteeMainDevice: safeMainDevice,
-        inviteeUsernameAndDeviceSignature,
+        inviteeUsernameAndDeviceSignature: sodium.to_base64(
+          inviteeUsernameAndDeviceSignature
+        ),
       },
     },
     authorizationHeaders

@@ -1,4 +1,4 @@
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { createDocumentKey } from "../createDocumentKey/createDocumentKey";
 import { encryptDocumentTitle } from "../encryptDocumentTitle/encryptDocumentTitle";
 import { recreateDocumentKey } from "../recreateDocumentKey/recreateDocumentKey";
@@ -8,10 +8,10 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("decryptDocumentTitle", async () => {
+test("decryptDocumentTitle", () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const initialDocumentKey = createDocumentKey({ folderKey });
-  const result = await encryptDocumentTitle({
+  const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
@@ -20,7 +20,7 @@ test("decryptDocumentTitle", async () => {
     folderKey,
     subkeyId: initialDocumentKey.subkeyId,
   });
-  const documentTitle = await decryptDocumentTitle({
+  const documentTitle = decryptDocumentTitle({
     key: documentKey.key,
     ciphertext: result.ciphertext,
     publicNonce: result.publicNonce,
@@ -30,10 +30,10 @@ test("decryptDocumentTitle", async () => {
   expect(documentTitle).toBe("Todos");
 });
 
-test("decryptDocumentTitle fails for wrong key", async () => {
+test("decryptDocumentTitle fails for wrong key", () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const initialDocumentKey = createDocumentKey({ folderKey });
-  const result = await encryptDocumentTitle({
+  const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
@@ -43,21 +43,20 @@ test("decryptDocumentTitle fails for wrong key", async () => {
     subkeyId: initialDocumentKey.subkeyId,
   });
 
-  await expect(
-    (async () =>
-      await decryptDocumentTitle({
-        key: "0000" + documentKey.key.substring(4),
-        ciphertext: result.ciphertext,
-        publicNonce: result.publicNonce,
-        publicData: result.publicData,
-      }))()
-  ).rejects.toThrowError(/ciphertext cannot be decrypted using that key/);
+  expect(() =>
+    decryptDocumentTitle({
+      key: "0000" + documentKey.key.substring(4),
+      ciphertext: result.ciphertext,
+      publicNonce: result.publicNonce,
+      publicData: result.publicData,
+    })
+  ).toThrowError(/ciphertext cannot be decrypted using that key/);
 });
 
-test("decryptDocumentTitle fails for wrong publicData", async () => {
+test("decryptDocumentTitle fails for wrong publicData", () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const initialDocumentKey = createDocumentKey({ folderKey });
-  const result = await encryptDocumentTitle({
+  const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
@@ -67,21 +66,20 @@ test("decryptDocumentTitle fails for wrong publicData", async () => {
     subkeyId: initialDocumentKey.subkeyId,
   });
 
-  await expect(
-    (async () =>
-      await decryptDocumentTitle({
-        key: documentKey.key,
-        ciphertext: result.ciphertext,
-        publicNonce: result.publicNonce,
-        publicData: { something: 4 },
-      }))()
-  ).rejects.toThrowError(/ciphertext cannot be decrypted using that key/);
+  expect(() =>
+    decryptDocumentTitle({
+      key: documentKey.key,
+      ciphertext: result.ciphertext,
+      publicNonce: result.publicNonce,
+      publicData: { something: 4 },
+    })
+  ).toThrowError(/ciphertext cannot be decrypted using that key/);
 });
 
-test("decryptDocumentTitle fails for invalid publicData", async () => {
+test("decryptDocumentTitle fails for invalid publicData", () => {
   const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const initialDocumentKey = createDocumentKey({ folderKey });
-  const result = await encryptDocumentTitle({
+  const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
@@ -91,13 +89,12 @@ test("decryptDocumentTitle fails for invalid publicData", async () => {
     subkeyId: initialDocumentKey.subkeyId,
   });
 
-  await expect(
-    (async () =>
-      await decryptDocumentTitle({
-        key: documentKey.key,
-        ciphertext: result.ciphertext,
-        publicNonce: result.publicNonce,
-        publicData: function foo() {},
-      }))()
-  ).rejects.toThrowError(/Invalid public data for decrypting the document\./);
+  expect(() =>
+    decryptDocumentTitle({
+      key: documentKey.key,
+      ciphertext: result.ciphertext,
+      publicNonce: result.publicNonce,
+      publicData: function foo() {},
+    })
+  ).toThrowError(/Invalid public data for decrypting the document\./);
 });

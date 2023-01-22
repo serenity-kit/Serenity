@@ -1,22 +1,22 @@
-import sodium, { KeyPair } from "@serenity-tools/libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
 import { AwarenessUpdate, AwarenessUpdatePublicData } from "./types";
 
-export async function createAwarenessUpdate(
+export function createAwarenessUpdate(
   content,
   publicData: AwarenessUpdatePublicData,
   key: Uint8Array,
   signatureKeyPair: KeyPair
 ) {
   const publicDataAsBase64 = sodium.to_base64(JSON.stringify(publicData));
-  const { ciphertext, publicNonce } = await encryptAead(
+  const { ciphertext, publicNonce } = encryptAead(
     content,
     publicDataAsBase64,
-    sodium.to_base64(key)
+    key
   );
-  const signature = await sign(
+  const signature = sign(
     `${publicNonce}${ciphertext}${publicDataAsBase64}`,
-    sodium.to_base64(signatureKeyPair.privateKey)
+    signatureKeyPair.privateKey
   );
   const awarenessUpdate: AwarenessUpdate = {
     nonce: publicNonce,
@@ -28,7 +28,7 @@ export async function createAwarenessUpdate(
   return awarenessUpdate;
 }
 
-export async function verifyAndDecryptAwarenessUpdate(
+export function verifyAndDecryptAwarenessUpdate(
   update: AwarenessUpdate,
   key,
   publicKey: Uint8Array
@@ -37,18 +37,18 @@ export async function verifyAndDecryptAwarenessUpdate(
     JSON.stringify(update.publicData)
   );
 
-  const isValid = await verifySignature(
+  const isValid = verifySignature(
     `${update.nonce}${update.ciphertext}${publicDataAsBase64}`,
     update.signature,
-    sodium.to_base64(publicKey)
+    publicKey
   );
   if (!isValid) {
-    return null;
+    throw new Error("Invalid awareness update");
   }
-  return await decryptAead(
+  return decryptAead(
     sodium.from_base64(update.ciphertext),
     sodium.to_base64(JSON.stringify(update.publicData)),
-    sodium.to_base64(key),
+    key,
     update.nonce
   );
 }

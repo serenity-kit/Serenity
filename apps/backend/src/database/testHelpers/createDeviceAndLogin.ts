@@ -1,6 +1,6 @@
 import { createDevice } from "@serenity-tools/common";
-import * as sodium from "@serenity-tools/libsodium";
 import { Login } from "@serenity-tools/opaque-server";
+import sodium from "react-native-libsodium";
 import { addDays } from "../../utils/addDays/addDays";
 import { finishLogin, startLogin } from "../../utils/opaque";
 import { createSession } from "../authentication/createSession";
@@ -30,7 +30,7 @@ export const createDeviceAndLogin = async ({
     message: sodium.to_base64(loginStartResponse),
   });
 
-  const webDevice = await createDevice();
+  const webDevice = createDevice();
 
   const session = await createSession({
     username,

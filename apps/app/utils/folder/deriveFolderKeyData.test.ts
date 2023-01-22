@@ -9,7 +9,7 @@ jest.mock("../workspace/getWorkspace", () => ({
 }));
 
 import { createDevice, encryptFolderName } from "@serenity-tools/common";
-import sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
 import { getWorkspace } from "../workspace/getWorkspace";
@@ -21,16 +21,16 @@ beforeAll(async () => {
 });
 
 it("should return empty parentFolders", async () => {
-  const activeDevice = await createDevice();
+  const activeDevice = createDevice();
   const workspaceId = uuidv4();
   const workspaceKeyId = uuidv4();
   const folderId = uuidv4();
-  const workspaceKeyString = await sodium.crypto_kdf_keygen();
-  const folderNameData = await encryptFolderName({
+  const workspaceKeyString = sodium.to_base64(sodium.crypto_kdf_keygen());
+  const folderNameData = encryptFolderName({
     name: "folderName",
     parentKey: workspaceKeyString,
   });
-  const workspaceKeyData = await createAndEncryptWorkspaceKeyForDevice({
+  const workspaceKeyData = createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
     workspaceKey: workspaceKeyString,
@@ -108,21 +108,21 @@ it("should return empty parentFolders", async () => {
 });
 
 it("should return single parentFolders", async () => {
-  const activeDevice = await createDevice();
+  const activeDevice = createDevice();
   const workspaceId = uuidv4();
   const workspaceKeyId = uuidv4();
   const folderId = uuidv4();
   const parentFolderId = uuidv4();
-  const workspaceKeyString = await sodium.crypto_kdf_keygen();
-  const parentFolderNameData = await encryptFolderName({
+  const workspaceKeyString = sodium.to_base64(sodium.crypto_kdf_keygen());
+  const parentFolderNameData = encryptFolderName({
     name: "parentFolderName",
     parentKey: workspaceKeyString,
   });
-  const folderNameData = await encryptFolderName({
+  const folderNameData = encryptFolderName({
     name: "folderName",
     parentKey: parentFolderNameData.folderSubkey,
   });
-  const workspaceKeyData = await createAndEncryptWorkspaceKeyForDevice({
+  const workspaceKeyData = createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
     workspaceKey: workspaceKeyString,
@@ -235,26 +235,26 @@ it("should return single parentFolders", async () => {
 });
 
 it("should return deep parentFolders", async () => {
-  const activeDevice = await createDevice();
+  const activeDevice = createDevice();
   const workspaceId = uuidv4();
   const workspaceKeyId = uuidv4();
   const folderId = uuidv4();
   const parentFolderId = uuidv4();
   const childFolderId = uuidv4();
-  const workspaceKeyString = await sodium.crypto_kdf_keygen();
-  const parentFolderNameData = await encryptFolderName({
+  const workspaceKeyString = sodium.to_base64(sodium.crypto_kdf_keygen());
+  const parentFolderNameData = encryptFolderName({
     name: "parentFolderName",
     parentKey: workspaceKeyString,
   });
-  const folderNameData = await encryptFolderName({
+  const folderNameData = encryptFolderName({
     name: "folderName",
     parentKey: parentFolderNameData.folderSubkey,
   });
-  const childFolderNameData = await encryptFolderName({
+  const childFolderNameData = encryptFolderName({
     name: "childFolderName",
     parentKey: folderNameData.folderSubkey,
   });
-  const workspaceKeyData = await createAndEncryptWorkspaceKeyForDevice({
+  const workspaceKeyData = createAndEncryptWorkspaceKeyForDevice({
     receiverDeviceEncryptionPublicKey: activeDevice.encryptionPublicKey,
     creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey,
     workspaceKey: workspaceKeyString,

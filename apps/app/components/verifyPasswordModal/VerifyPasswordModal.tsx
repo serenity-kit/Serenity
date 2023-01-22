@@ -1,4 +1,3 @@
-import sodium from "@serenity-tools/libsodium";
 import { finishLogin, startLogin } from "@serenity-tools/opaque";
 import {
   Button,
@@ -13,6 +12,7 @@ import {
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import { TextInput } from "react-native";
+import sodium from "react-native-libsodium";
 import {
   MainDeviceDocument,
   MainDeviceQuery,
@@ -95,16 +95,16 @@ export function VerifyPasswordModal(props: Props) {
       } catch (error) {
         throw error;
       }
-      const sessionTokenSignature = await sodium.crypto_sign_detached(
+      const sessionTokenSignature = sodium.crypto_sign_detached(
         sessionKey,
-        activeDevice.signingPrivateKey!
+        sodium.from_base64(activeDevice.signingPrivateKey!)
       );
       const verifyPasswordResponse = await verifyPasswordMutation({
         input: {
           loginId: startLoginResult.data.startLogin.loginId,
           message: finishLoginResponse.response,
           deviceSigningPublicKey: activeDevice.signingPublicKey,
-          sessionTokenSignature,
+          sessionTokenSignature: sodium.to_base64(sessionTokenSignature),
         },
       });
       if (verifyPasswordResponse.error) {

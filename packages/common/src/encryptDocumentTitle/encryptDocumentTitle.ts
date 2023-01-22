@@ -1,5 +1,6 @@
 import { encryptAead } from "@naisho/core";
 import canonicalize from "canonicalize";
+import sodium from "react-native-libsodium";
 
 type Params = {
   title: string;
@@ -7,16 +8,16 @@ type Params = {
   publicData?: any;
 };
 
-export const encryptDocumentTitle = async (params: Params) => {
+export const encryptDocumentTitle = (params: Params) => {
   const publicData = params.publicData || {};
   const canonicalizedPublicData = canonicalize(publicData);
   if (!canonicalizedPublicData) {
     throw new Error("Invalid public data for encrypting the title.");
   }
-  const result = await encryptAead(
+  const result = encryptAead(
     params.title,
     canonicalizedPublicData,
-    params.key
+    sodium.from_base64(params.key)
   );
   return {
     ciphertext: result.ciphertext,

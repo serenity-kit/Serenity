@@ -1,4 +1,3 @@
-import * as sodium from "@serenity-tools/libsodium";
 import { UserInputError } from "apollo-server-express";
 import { Device } from "../../types/device";
 import { createConfirmationCode } from "../../utils/confirmationCode";
@@ -22,14 +21,6 @@ type Props = {
   pendingWorkspaceInvitationKeyEncryptionSalt: string | null | undefined;
 };
 
-const verifyDevice = async (device: DeviceInput) => {
-  return await sodium.crypto_sign_verify_detached(
-    device.encryptionPublicKeySignature,
-    device.encryptionPublicKey,
-    device.signingPublicKey
-  );
-};
-
 export async function finalizeRegistration({
   username,
   opaqueEnvelope,
@@ -40,9 +31,6 @@ export async function finalizeRegistration({
   pendingWorkspaceInvitationKeyPublicNonce,
   pendingWorkspaceInvitationKeyEncryptionSalt,
 }: Props) {
-  if (!verifyDevice(mainDevice)) {
-    throw new Error("Failed to verify main device.");
-  }
   if (pendingWorkspaceInvitationId && !pendingWorkspaceInvitationKeySubkeyId) {
     throw new UserInputError(
       "pendingWorkspaceInvitationId without workspaceInvitationKeySubkeyId"

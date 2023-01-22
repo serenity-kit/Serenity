@@ -1,4 +1,4 @@
-import * as sodium from "@serenity-tools/libsodium";
+import sodium from "react-native-libsodium";
 import { runInitiateFileUploadMutation } from "../../generated/graphql";
 import { encryptFile } from "./encryptFile";
 
@@ -12,7 +12,9 @@ export const createEncryptAndUploadFileFunction = ({
   workspaceId,
 }: CreateEncryptAndUploadFileFunctionParams) => {
   return async (fileAsBase64: string) => {
-    const key = await sodium.crypto_aead_xchacha20poly1305_ietf_keygen();
+    const key = sodium.to_base64(
+      sodium.crypto_aead_xchacha20poly1305_ietf_keygen()
+    );
     const { fileCiphertext, publicNonce } = encryptFile({
       base64FileData: fileAsBase64,
       key,
