@@ -56,10 +56,9 @@ export type AttachDevicesToWorkspacesResult = {
 };
 
 export type CreateDocumentInput = {
-  contentSubkeyId: Scalars['Int'];
   id: Scalars['String'];
   nameKeyDerivationTrace?: InputMaybe<KeyDerivationTraceInput>;
-  parentFolderId?: InputMaybe<Scalars['String']>;
+  parentFolderId: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 

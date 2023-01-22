@@ -6,7 +6,6 @@ export type Document = {
   encryptedName?: string | null;
   encryptedNameNonce?: string | null;
   workspaceKey?: WorkspaceKey | null;
-  contentSubkeyId?: number | null;
   parentFolderId: string | null;
   workspaceId: string;
   createdAt?: Date;

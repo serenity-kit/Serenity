@@ -21,7 +21,6 @@ export const Snapshot = objectType({
     t.nonNull.string("id");
     t.nonNull.int("latestVersion");
     t.nonNull.string("data");
-    t.nonNull.string("preview");
     t.field("document", { type: Document });
     t.nonNull.string("documentId");
     t.list.nonNull.field("updates", { type: Update });

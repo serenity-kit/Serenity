@@ -73,9 +73,8 @@ const setup = async () => {
   const createDocumentResponse = await createDocument({
     graphql,
     id: documentId,
-    parentFolderId: addedFolder.parentFolderId,
+    parentFolderId: addedFolder.id,
     workspaceId,
-    contentSubkeyId: 42,
     authorizationHeader: sessionKey,
   });
 

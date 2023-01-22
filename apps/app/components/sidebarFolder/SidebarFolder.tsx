@@ -223,7 +223,6 @@ export default function SidebarFolder(props: Props) {
           id,
           workspaceId: props.workspaceId,
           parentFolderId: props.folderId,
-          contentSubkeyId: 1234, // TODO remove
         },
       },
       {}

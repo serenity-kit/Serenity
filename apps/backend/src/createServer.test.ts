@@ -63,9 +63,8 @@ const setup = async () => {
   const createDocumentResponse = await createDocument({
     graphql,
     id: documentId,
-    parentFolderId: addedFolder.parentFolderId,
+    parentFolderId: addedFolder.id,
     workspaceId,
-    contentSubkeyId: 42,
     authorizationHeader: sessionKey,
   });
 };
@@ -129,22 +128,11 @@ test("successfully retrieves a document", async () => {
     1
   );
   await waitForClientState(client, client.CLOSED);
-  expect(messages).toMatchInlineSnapshot(`
-    [
-      {
-        "doc": {
-          "id": "10f99b10-62a3-427f-9928-c1e0b32648e2",
-          "parentFolderId": null,
-          "workspaceId": "5237c256-e078-4aa5-a7b1-8e6559698769",
-          "workspaceKeyId": null,
-        },
-        "parentFolder": {},
-        "snapshot": null,
-        "type": "document",
-        "updates": [],
-      },
-    ]
-  `);
+  expect(messages[0].doc.id).toEqual(documentId);
+  expect(messages[0].doc.parentFolderId).toEqual(addedFolder.id);
+  expect(messages[0].doc.workspaceId).toEqual(workspaceId);
+  expect(messages[0].snapshot).toBeNull();
+  expect(messages[0].type).toEqual("document");
 });
 
 test("successfully creates a snapshot", async () => {

@@ -1,14 +1,8 @@
-import {
-  createDocumentKey,
-  folderDerivedKeyContext,
-} from "@serenity-tools/common";
-import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
@@ -40,26 +34,18 @@ beforeAll(async () => {
 
 test("user should be able to create a document", async () => {
   const id = uuidv4();
-  const workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
-    device: userData1.device,
-    deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
-    workspace: userData1.workspace,
-  });
-  const folderKeyResult = kdfDeriveFromKey({
-    key: workspaceKey,
-    context: folderDerivedKeyContext,
-    subkeyId: userData1.folder.keyDerivationTrace.subkeyId,
-  });
-  let documentContentKeyResult = createDocumentKey({
-    folderKey: folderKeyResult.key,
-  });
+  // can be removed in case we don't need the workpaceKeyId
+  // const workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
+  //   device: userData1.device,
+  //   deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
+  //   workspace: userData1.workspace,
+  // });
   const result = await createDocument({
     id,
     graphql,
     authorizationHeader: userData1.sessionKey,
-    parentFolderId: userData1.folder.parentFolderId,
+    parentFolderId: userData1.folder.id,
     workspaceId: userData1.workspace.id,
-    contentSubkeyId: documentContentKeyResult.subkeyId,
   });
   expect(result.createDocument.id).toBe(id);
 });
@@ -83,8 +69,7 @@ test("commenter tries to create", async () => {
         id: uuidv4(),
         graphql,
         authorizationHeader: otherUser.sessionKey,
-        parentFolderId: userData1.folder.parentFolderId,
-        contentSubkeyId: 1,
+        parentFolderId: userData1.folder.id,
         workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -109,8 +94,7 @@ test("viewer attempts to create", async () => {
         id: uuidv4(),
         graphql,
         authorizationHeader: otherUser.sessionKey,
-        parentFolderId: userData1.folder.parentFolderId,
-        contentSubkeyId: 1,
+        parentFolderId: userData1.folder.id,
         workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -123,8 +107,7 @@ test("Unauthenticated", async () => {
         id: uuidv4(),
         graphql,
         authorizationHeader: "badauthkey",
-        parentFolderId: userData1.folder.parentFolderId,
-        contentSubkeyId: 1,
+        parentFolderId: userData1.folder.id,
         workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -150,7 +133,7 @@ describe("Input errors", () => {
           {
             input: {
               id: null,
-              parentFolderId: null,
+              parentFolderId: userData1.folder.parentFolderId,
               workspaceId: userData1.workspace.id,
             },
           },
@@ -166,7 +149,7 @@ describe("Input errors", () => {
           {
             input: {
               id: uuidv4,
-              parentFolderId: null,
+              parentFolderId: userData1.folder.parentFolderId,
               workspaceId: null,
             },
           },
