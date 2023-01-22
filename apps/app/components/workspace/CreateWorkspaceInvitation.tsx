@@ -95,13 +95,16 @@ export function CreateWorkspaceInvitation(props: Props) {
     const invitationData = canonicalize({
       workspaceId,
       invitationId,
-      invitationPublicSigningKey: invitationSigningKeys.publicKey,
+      invitationSigningPublicKey: sodium.to_base64(
+        invitationSigningKeys.publicKey
+      ),
       expiresAt: expiresAt.toISOString(),
     });
     const invitationDataSignature = sodium.crypto_sign_detached(
       invitationData!,
       invitationSigningKeys.privateKey
     );
+
     const createWorkspaceInvitationResult =
       await createWorkspaceInvitationMutation({
         input: {
