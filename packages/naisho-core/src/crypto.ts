@@ -40,7 +40,7 @@ export function createSignatureKeyPair() {
   return sodium.crypto_sign_keypair();
 }
 
-export function sign(message, privateKey: Uint8Array) {
+export function sign(message: string, privateKey: Uint8Array) {
   return sodium.to_base64(sodium.crypto_sign_detached(message, privateKey));
 }
 
