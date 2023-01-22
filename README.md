@@ -197,7 +197,9 @@ drop database serenity;
 
 ## Conventions
 
-### Keys should als be encrypted as Uint8Array
+### Cryptography
+
+#### Keys should be encrypted as Uint8Array
 
 Example:
 
@@ -206,6 +208,10 @@ sodium.crypto_box_easy(workspaceKey, nonce, publicKey, privateKey);
 ```
 
 In the case above the workspaceKey must be a `Uint8Array`.
+
+#### Signatures should always be encrypted as strings
+
+The reason here is that signatures often include other data as well end it's easier to stay consistent and always use strings.
 
 ### Folder/File Naming Convention
 

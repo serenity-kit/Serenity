@@ -5,7 +5,7 @@ export const createDevice = () => {
   const signingKeyPair = sodium.crypto_sign_keypair();
   const encryptionKeyPair = sodium.crypto_box_keypair();
   const encryptionPublicKeySignature = sodium.crypto_sign_detached(
-    encryptionKeyPair.publicKey,
+    sodium.to_base64(encryptionKeyPair.publicKey),
     signingKeyPair.privateKey
   );
   const device: LocalDevice = {
