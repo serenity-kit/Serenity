@@ -13,9 +13,8 @@ export const CreateDocumentInput = inputObjectType({
   name: "CreateDocumentInput",
   definition(t) {
     t.nonNull.string("id");
-    t.string("parentFolderId");
+    t.nonNull.string("parentFolderId");
     t.nonNull.string("workspaceId");
-    t.nonNull.int("contentSubkeyId");
     t.field("nameKeyDerivationTrace", {
       type: KeyDerivationTraceInput,
     });
@@ -42,18 +41,16 @@ export const createDocumentMutation = mutationField("createDocument", {
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
     }
-    const parentFolderId = args.input.parentFolderId || null;
     const document = await createDocument({
       userId: context.user.id,
       id: args.input.id,
       encryptedName: null,
       encryptedNameNonce: null,
       workspaceKeyId: null,
-      subkeyId: null,
-      parentFolderId,
+      subkeyId: null, // name subkey id
+      parentFolderId: args.input.parentFolderId,
       workspaceId: args.input.workspaceId,
       nameKeyDerivationTrace: args.input.nameKeyDerivationTrace,
-      contentSubkeyId: args.input.contentSubkeyId,
     });
     return {
       id: document.id,

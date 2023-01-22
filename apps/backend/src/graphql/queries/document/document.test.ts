@@ -61,16 +61,15 @@ test("user should be retrieve a document", async () => {
   const createDocumentResponse = await createDocument({
     graphql,
     id: documentId,
-    parentFolderId: addedFolder.parentFolderId,
+    parentFolderId: addedFolder.id,
     workspaceId,
-    contentSubkeyId: 1,
     authorizationHeader,
   });
   await updateDocumentName({
     graphql,
     id: documentId,
     name: documentName,
-    parentFolderId: addedFolder.parentFolderId,
+    parentFolderId: addedFolder.id,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     folderKey,
     authorizationHeader,
@@ -86,7 +85,7 @@ test("user should be retrieve a document", async () => {
   const retrievedDocument = result.document;
   expect(retrievedDocument.id).toBe(documentId);
   expect(retrievedDocument.workspaceId).toBe(workspaceId);
-  expect(retrievedDocument.parentFolderId).toBe(null);
+  expect(retrievedDocument.parentFolderId).toBe(addedFolder.id);
   expect(typeof retrievedDocument.encryptedName).toBe("string");
   expect(typeof retrievedDocument.encryptedNameNonce).toBe("string");
   expect(typeof retrievedDocument.nameKeyDerivationTrace.subkeyId).toBe(

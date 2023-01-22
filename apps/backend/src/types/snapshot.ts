@@ -5,7 +5,6 @@ export type Snapshot = {
   id: string;
   latestVersion: number;
   data: string;
-  preview: string;
   document?: Document | null | undefined;
   documentId: string;
   updates?: Update[];

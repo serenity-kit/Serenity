@@ -1,5 +1,4 @@
 import {
-  createDocumentKey,
   decryptDocumentTitle,
   folderDerivedKeyContext,
   recreateDocumentKey,
@@ -51,15 +50,11 @@ const setup = async () => {
     subkeyId: addedFolder.keyDerivationTrace.subkeyId,
   });
   folderKey = folderKeyResult.key;
-  let documentContentKeyResult = createDocumentKey({
-    folderKey,
-  });
   const createDocumentResult = await createDocument({
     id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     graphql,
     authorizationHeader: sessionKey,
-    parentFolderId: addedFolder.parentFolderId,
-    contentSubkeyId: documentContentKeyResult.subkeyId,
+    parentFolderId: addedFolder.id,
     workspaceId: addedWorkspace.id,
   });
   addedDocumentId = createDocumentResult.createDocument.id;
@@ -78,7 +73,7 @@ test("user should be able to change a document name", async () => {
     graphql,
     id,
     name,
-    parentFolderId: addedFolder.parentFolderId,
+    parentFolderId: addedFolder.id,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
     folderKey,
     authorizationHeader,
@@ -110,7 +105,7 @@ test("Throw error when document doesn't exist", async () => {
         graphql,
         id,
         name,
-        parentFolderId: addedFolder.parentFolderId,
+        parentFolderId: addedFolder.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader,
@@ -128,9 +123,8 @@ test("Throw error when user doesn't have access", async () => {
   const otherUserDocumentResult = await createDocument({
     graphql,
     id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
-    parentFolderId: userData1.folder.parentFolderId,
+    parentFolderId: userData1.folder.id,
     workspaceId: userData1.workspace.id,
-    contentSubkeyId: 1,
     authorizationHeader: userData1.sessionKey,
   });
   const authorizationHeader = sessionKey;
@@ -142,7 +136,7 @@ test("Throw error when user doesn't have access", async () => {
         graphql,
         id,
         name,
-        parentFolderId: addedFolder.parentFolderId,
+        parentFolderId: addedFolder.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader: userData2.sessionKey,
@@ -171,7 +165,7 @@ test("Commenter tries to update", async () => {
         graphql,
         id,
         name,
-        parentFolderId: addedFolder.parentFolderId,
+        parentFolderId: addedFolder.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader: otherUser.sessionKey,
@@ -200,7 +194,7 @@ test("Viewer tries to update", async () => {
         graphql,
         id,
         name,
-        parentFolderId: addedFolder.parentFolderId,
+        parentFolderId: addedFolder.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader: otherUser.sessionKey,
@@ -217,7 +211,7 @@ test("Unauthenticated", async () => {
         graphql,
         id,
         name,
-        parentFolderId: addedFolder.parentFolderId,
+        parentFolderId: addedFolder.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
         folderKey,
         authorizationHeader: "badauthheader",

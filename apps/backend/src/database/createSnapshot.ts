@@ -104,7 +104,6 @@ export async function createSnapshot({
       data: {
         id: snapshot.publicData.snapshotId,
         latestVersion: 0,
-        preview: "",
         data: JSON.stringify(snapshot),
         activeSnapshotDocument: {
           connect: { id: snapshot.publicData.docId },

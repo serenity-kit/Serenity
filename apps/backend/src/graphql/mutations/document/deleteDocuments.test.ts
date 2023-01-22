@@ -31,7 +31,6 @@ const setup = async () => {
     graphql,
     authorizationHeader: sessionKey,
     parentFolderId: folder.id,
-    contentSubkeyId: 1,
     workspaceId: addedWorkspace.id,
   });
   addedDocumentId = createDocumentResult.createDocument.id;
