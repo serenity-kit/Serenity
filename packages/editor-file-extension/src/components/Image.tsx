@@ -37,7 +37,7 @@ export const Image: React.FC<Props> = (props) => {
       {state.step !== "done" ? (
         <View
           style={[
-            tw``,
+            tw`w-[${width}px] max-w-full`,
             {
               aspectRatio: `1 / ${height / width}`,
             },
