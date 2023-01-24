@@ -108,8 +108,8 @@
   }
 
   /* --- lists --- */
-  ol,
-  ul {
+  .ProseMirror > ol,
+  .ProseMirror > ul {
     @apply my-4;
   }
   ol,
@@ -130,6 +130,78 @@
   }
   ul:not(.task-list-extension) {
     @apply list-disc;
+  }
+
+  li ol,
+  li ul {
+    @apply mt-2;
+  }
+
+  ol ol,
+  ol ul:not(.task-list-extension),
+  ul:not(.task-list-extension) ol,
+  ul:not(.task-list-extension) ul:not(.task-list-extension) {
+    border-left: 1px solid rgb(227, 227, 227);
+  }
+
+  ol ol,
+  ol ul:not(.task-list-extension) {
+    padding-left: 2.4rem;
+  }
+
+  ul:not(.task-list-extension) ol,
+  ul:not(.task-list-extension) ul:not(.task-list-extension) {
+    padding-left: 2rem;
+  }
+
+  /* needs to be as specific as the margins override each other otherwise */
+  ul:not(.task-list-extension) > li > ol,
+  ul:not(.task-list-extension) > li > ul:not(.task-list-extension) {
+    /* safari -1.05rem */
+    margin-left: -0.85rem;
+  }
+
+  /* needs to be as specific as the margins override each other otherwise */
+  ol > li > ol,
+  ol > li > ul:not(.task-list-extension) {
+    /* safari -1.3rem */
+    margin-left: -1rem;
+  }
+
+  ol li::marker,
+  ul:not(.task-list-extension) li::marker {
+    color: rgb(121, 121, 121);
+  }
+
+  /* to avoid lines that end in nothing */
+  li:last-child > ol,
+  li:last-child > ul:not(.task-list-extension) {
+    border-left-color: transparent;
+  }
+
+  /* Safari only override as list elements, especially ol, are aligned differently */
+  @media not all and (min-resolution: 0.001dpcm) {
+    @supports (-webkit-appearance: none) and (stroke-color: transparent) {
+      ol ol,
+      ol ul:not(.task-list-extension) {
+        padding-left: 2.8rem;
+      }
+
+      ul:not(.task-list-extension) ol,
+      ul:not(.task-list-extension) ul:not(.task-list-extension) {
+        padding-left: 2.6rem;
+      }
+
+      ol > li > ol,
+      ol > li > ul:not(.task-list-extension) {
+        margin-left: -1.3rem;
+      }
+
+      ul:not(.task-list-extension) > li > ol,
+      ul:not(.task-list-extension) > li > ul:not(.task-list-extension) {
+        margin-left: -1.05rem;
+      }
+    }
   }
 
   /* --- taskList --- */
