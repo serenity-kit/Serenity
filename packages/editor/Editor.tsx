@@ -173,7 +173,7 @@ export const Editor = (props: EditorProps) => {
   );
 
   return (
-    <div className="flex flex-auto flex-row">
+    <div className="flex h-full flex-auto flex-row">
       <View style={tw`flex-auto text-gray-900 dark:text-white`}>
         <div className="flex-auto overflow-y-auto overflow-x-hidden">
           <EditorContent
