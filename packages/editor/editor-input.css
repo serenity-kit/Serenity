@@ -157,14 +157,12 @@
   /* needs to be as specific as the margins override each other otherwise */
   ul:not(.task-list-extension) > li > ol,
   ul:not(.task-list-extension) > li > ul:not(.task-list-extension) {
-    /* safari -1.05rem */
     margin-left: -0.85rem;
   }
 
   /* needs to be as specific as the margins override each other otherwise */
   ol > li > ol,
   ol > li > ul:not(.task-list-extension) {
-    /* safari -1.3rem */
     margin-left: -1rem;
   }
 
@@ -182,6 +180,14 @@
   /* Safari only override as list elements, especially ol, are aligned differently */
   @media not all and (min-resolution: 0.001dpcm) {
     @supports (-webkit-appearance: none) and (stroke-color: transparent) {
+      .ProseMirror > ol {
+        margin-left: 0.35rem;
+      }
+
+      .ProseMirror > ul:not(.task-list-extension) {
+        margin-left: 0.2rem;
+      }
+
       ol ol,
       ol ul:not(.task-list-extension) {
         padding-left: 2.8rem;
@@ -189,17 +195,17 @@
 
       ul:not(.task-list-extension) ol,
       ul:not(.task-list-extension) ul:not(.task-list-extension) {
-        padding-left: 2.6rem;
+        padding-left: 2.8rem;
       }
 
       ol > li > ol,
       ol > li > ul:not(.task-list-extension) {
-        margin-left: -1.3rem;
+        margin-left: -1.35rem;
       }
 
       ul:not(.task-list-extension) > li > ol,
       ul:not(.task-list-extension) > li > ul:not(.task-list-extension) {
-        margin-left: -1.05rem;
+        margin-left: -1.25rem;
       }
     }
   }
