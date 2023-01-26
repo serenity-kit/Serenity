@@ -129,70 +129,66 @@ export default function Editor({
 
   return (
     // overflow-hidden needed so hidden elements with borders don't trigger scrolling behaviour
-    <View style={tw`overflow-hidden`}>
-      <View>
-        <SerenityEditor
-          documentId={documentId}
-          yDocRef={yDocRef}
-          yAwarenessRef={yAwarenessRef}
-          isNew={wasNewOnFirstRender.current}
-          openDrawer={openDrawer}
-          updateTitle={updateTitle}
-          downloadAndDecryptFile={downloadAndDecryptFile}
-          onFocus={() => {
-            editorIsFocusedRef.current = true;
-            showAndPositionToolbar();
-            setIsInEditingMode(true);
-          }}
-          onBlur={(params) => {
-            if (
-              !(
-                params.event.relatedTarget &&
-                "nodeType" in params.event.relatedTarget &&
-                // check if click was not inside the editor bottom bar
-                (editorBottombarRef.current?.contains(
-                  params.event.relatedTarget
-                ) ||
-                  // check if click was not inside editor buttons e.g. undo/redo
-                  // @ts-expect-error
-                  params.event.relatedTarget.dataset.editorButton === "true")
-              )
-            ) {
-              editorIsFocusedRef.current = false;
-              if (editorBottombarWrapperRef.current) {
-                // @ts-expect-error - it's a div
-                editorBottombarWrapperRef.current.style.display = "none";
-              }
-              setIsInEditingMode(false);
+    <View style={tw`h-full overflow-hidden`}>
+      <SerenityEditor
+        documentId={documentId}
+        yDocRef={yDocRef}
+        yAwarenessRef={yAwarenessRef}
+        isNew={wasNewOnFirstRender.current}
+        openDrawer={openDrawer}
+        updateTitle={updateTitle}
+        downloadAndDecryptFile={downloadAndDecryptFile}
+        onFocus={() => {
+          editorIsFocusedRef.current = true;
+          showAndPositionToolbar();
+          setIsInEditingMode(true);
+        }}
+        onBlur={(params) => {
+          if (
+            !(
+              params.event.relatedTarget &&
+              "nodeType" in params.event.relatedTarget &&
+              // check if click was not inside the editor bottom bar
+              (editorBottombarRef.current?.contains(
+                params.event.relatedTarget
+              ) ||
+                // check if click was not inside editor buttons e.g. undo/redo
+                // @ts-expect-error
+                params.event.relatedTarget.dataset.editorButton === "true")
+            )
+          ) {
+            editorIsFocusedRef.current = false;
+            if (editorBottombarWrapperRef.current) {
+              // @ts-expect-error - it's a div
+              editorBottombarWrapperRef.current.style.display = "none";
             }
-          }}
-          onCreate={(params) => {
-            tipTapEditorRef.current = params.editor;
-          }}
-          onTransaction={(params) => {
-            const toolbarState = getEditorBottombarStateFromEditor(
-              params.editor
-            );
-            setEditorBottombarState(toolbarState);
-            editorToolbarService.send("updateToolbarState", { toolbarState });
-          }}
-          encryptAndUploadFile={encryptAndUploadFile}
-          shareOrSaveFile={({
-            mimeType,
-            contentAsBase64,
-            fileName: shareFileName,
-          }) => {
-            const dataUri = `data:${mimeType};base64,${contentAsBase64}`;
-            const element = document.createElement("a");
-            element.setAttribute("href", dataUri);
-            element.setAttribute("download", shareFileName);
-            element.style.display = "none";
-            document.body.appendChild(element);
-            element.click();
-            document.body.removeChild(element);
-          }}
-        />
-      </View>
+            setIsInEditingMode(false);
+          }
+        }}
+        onCreate={(params) => {
+          tipTapEditorRef.current = params.editor;
+        }}
+        onTransaction={(params) => {
+          const toolbarState = getEditorBottombarStateFromEditor(params.editor);
+          setEditorBottombarState(toolbarState);
+          editorToolbarService.send("updateToolbarState", { toolbarState });
+        }}
+        encryptAndUploadFile={encryptAndUploadFile}
+        shareOrSaveFile={({
+          mimeType,
+          contentAsBase64,
+          fileName: shareFileName,
+        }) => {
+          const dataUri = `data:${mimeType};base64,${contentAsBase64}`;
+          const element = document.createElement("a");
+          element.setAttribute("href", dataUri);
+          element.setAttribute("download", shareFileName);
+          element.style.display = "none";
+          document.body.appendChild(element);
+          element.click();
+          document.body.removeChild(element);
+        }}
+      />
       {!hasEditorSidebar && (
         <View
           ref={editorBottombarWrapperRef}

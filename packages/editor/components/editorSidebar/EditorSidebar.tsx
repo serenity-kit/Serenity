@@ -12,6 +12,7 @@ import {
 import {
   EditorSidebarIcon,
   Heading,
+  ScrollView,
   SidebarButton,
   SidebarDivider,
   Tab,
@@ -43,7 +44,10 @@ export default function EditorSidebar({
   >("editing");
 
   return (
-    <View style={tw`w-sidebar h-full border-l border-gray-200 bg-gray-100`}>
+    // grow-0 overrides default of ScrollView to keep the assigned width
+    <ScrollView
+      style={tw`w-sidebar grow-0 border-l border-gray-200 bg-gray-100`}
+    >
       <TabList accessibilityLabel="Editor sidebar Tabs">
         <Tab
           tabId="editing"
@@ -332,63 +336,8 @@ export default function EditorSidebar({
           ) : null}
 
           <SidebarDivider />
-
-          <Heading lvl={4} style={tw`ml-4`} padded>
-            Formats
-          </Heading>
-
-          <SidebarButton
-            onPress={() => editor?.chain().focus().toggleBold().run()}
-          >
-            <EditorSidebarIcon
-              isActive={editor?.isActive("bold") || false}
-              name="bold"
-            />
-            <Text variant="xs" bold={editor?.isActive("bold") || false}>
-              Bold
-            </Text>
-          </SidebarButton>
-
-          <SidebarButton
-            onPress={() => editor?.chain().focus().toggleItalic().run()}
-          >
-            <EditorSidebarIcon
-              isActive={editor?.isActive("italic") || false}
-              name="italic"
-            />
-            <Text variant="xs" bold={editor?.isActive("italic") || false}>
-              Italic
-            </Text>
-          </SidebarButton>
-
-          <SidebarButton
-            onPress={() => editor?.chain().focus().toggleCode().run()}
-          >
-            <EditorSidebarIcon
-              isActive={editor?.isActive("code") || false}
-              name="code-view"
-            />
-            <Text variant="xs" bold={editor?.isActive("code") || false}>
-              Code
-            </Text>
-          </SidebarButton>
-
-          {/* styling dummy */}
-          <SidebarButton
-            onPress={() =>
-              editor?.chain().focus().toggleLink({ href: "#" }).run()
-            }
-          >
-            <EditorSidebarIcon
-              isActive={editor?.isActive("link") || false}
-              name="link"
-            />
-            <Text variant="xs" bold={editor?.isActive("link") || false}>
-              Link
-            </Text>
-          </SidebarButton>
         </TabPanel>
       )}
-    </View>
+    </ScrollView>
   );
 }
