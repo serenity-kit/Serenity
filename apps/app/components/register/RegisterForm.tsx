@@ -191,6 +191,8 @@ export default function RegisterForm(props: Props) {
           <LinkExternal
             variant="xs"
             href="https://www.serenity.re/en/notes/terms-of-service"
+            quiet
+            muted
           >
             terms of services
           </LinkExternal>{" "}
@@ -198,6 +200,8 @@ export default function RegisterForm(props: Props) {
           <LinkExternal
             variant="xs"
             href="https://www.serenity.re/en/notes/privacy-policy"
+            quiet
+            muted
           >
             privacy policy
           </LinkExternal>

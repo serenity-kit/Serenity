@@ -21,15 +21,17 @@ declare type Props<ParamList extends ReactNavigation.RootParamList> = {
   ) => void;
 } & (TextProps & {
   children: React.ReactNode;
+  quiet?: boolean;
 });
 
 export const createLinkStyles = () => {
   return StyleSheet.create({
     // reset outline for web focusVisible
     default: tw.style(
-      `text-primary-500 underline`,
+      `underline`,
       Platform.OS === "web" && { outlineStyle: "none" }
     ),
+    primary: tw`text-primary-500`,
     focusVisible:
       Platform.OS === "web" ? tw`se-outline-focus-mini rounded` : {},
   });
@@ -47,6 +49,7 @@ export function Link<ParamList extends ReactNavigation.RootParamList>(
       {...focusRingProps} // sets onFocus and onBlur
       style={[
         styles.default,
+        !props.quiet && styles.primary,
         isFocusVisible && styles.focusVisible,
         props.style,
       ]}

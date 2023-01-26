@@ -7,10 +7,11 @@ import { Text, TextVariants } from "../text/Text";
 export type LinkButtonProps = PressableProps & {
   children: React.ReactNode;
   variant?: TextVariants;
+  quiet?: boolean;
 };
 
 export function LinkButton(props: LinkButtonProps) {
-  const { variant = "xs" } = props;
+  const { variant = "xs", quiet } = props;
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const styles = createLinkStyles();
 
@@ -20,7 +21,10 @@ export function LinkButton(props: LinkButtonProps) {
       {...focusRingProps} // sets onFocus and onBlur
       style={(isFocusVisible && styles.focusVisible, props.style)}
     >
-      <Text variant={variant} style={styles.default}>
+      <Text
+        variant={variant}
+        style={[styles.default, !quiet && styles.primary]}
+      >
         {props.children}
       </Text>
     </Pressable>

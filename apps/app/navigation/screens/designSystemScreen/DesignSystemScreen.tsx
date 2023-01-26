@@ -651,7 +651,7 @@ export default function DesignSystemScreen(
           >
             <Text variant="sm">
               I accept our{" "}
-              <Link to={{ screen: "EncryptDecryptImageTest" }}>
+              <Link to={{ screen: "EncryptDecryptImageTest" }} quiet>
                 Encrypt / Decrypt Image
               </Link>{" "}
               test
@@ -717,6 +717,8 @@ export default function DesignSystemScreen(
                 <LinkExternal
                   variant="xs"
                   href="https://www.serenity.re/en/notes/terms-of-service"
+                  quiet
+                  muted
                 >
                   terms of services
                 </LinkExternal>{" "}
@@ -724,6 +726,8 @@ export default function DesignSystemScreen(
                 <LinkExternal
                   variant="xs"
                   href="https://www.serenity.re/en/notes/privacy-policy"
+                  quiet
+                  muted
                 >
                   privacy policy
                 </LinkExternal>
@@ -1434,7 +1438,7 @@ export default function DesignSystemScreen(
           parent is set to <DSMono variant="property">bold</DSMono>.
         </Text>
         <Text variant="sm" style={tw`mt-2`}>
-          Notice though the color stays the same no matter if the parent{" "}
+          Be aware that the color stays the same no matter if the parent{" "}
           <DSMono variant="component">Text</DSMono> is set to be{" "}
           <DSMono variant="property">muted</DSMono> or the color is changed, to
           ensure a consistent and distinguishable look &amp; feel of all{" "}
@@ -1458,6 +1462,43 @@ export default function DesignSystemScreen(
             <Link to={{ screen: "EncryptDecryptImageTest" }}>
               Encrypt / Decrypt Image
             </Link>
+          </Text>
+        </DSExampleArea>
+        <Heading lvl={3}>Quiet</Heading>
+        <Text variant="sm">
+          If you want to add a <DSMono variant="component">Link</DSMono> but
+          need to match the text-colors to make it less pronounced, add the
+          <DSMono variant="property">quiet</DSMono> property to avoid the
+          primary-color override.
+        </Text>
+        <Text variant="sm" style={tw`mt-2`}>
+          Notice though you will need to set both the{" "}
+          <DSMono variant="property">variant</DSMono> and if need be the{" "}
+          <DSMono variant="property">muted</DSMono> properties to match the{" "}
+          <DSMono variant="component">Text</DSMono> surrounding the{" "}
+          <DSMono variant="component">Link</DSMono> .
+        </Text>
+        <DSExampleArea vertical>
+          <Text variant="xs" muted>
+            Yes, I do agree to Serenity's{" "}
+            <LinkExternal
+              variant="xs"
+              href="https://www.serenity.re/en/notes/terms-of-service"
+              quiet
+              muted
+            >
+              terms of services
+            </LinkExternal>{" "}
+            and{" "}
+            <LinkExternal
+              variant="xs"
+              href="https://www.serenity.re/en/notes/privacy-policy"
+              quiet
+              muted
+            >
+              privacy policy
+            </LinkExternal>
+            .
           </Text>
         </DSExampleArea>
         <Heading lvl={4} style={h4Styles}>

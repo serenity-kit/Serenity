@@ -13,10 +13,11 @@ export type LinkExternalProps = TextProps & {
   children: React.ReactNode;
   href: string;
   icon?: boolean;
+  quiet?: boolean;
 };
 
 export function LinkExternal(props: LinkExternalProps) {
-  const { variant = "md", icon } = props;
+  const { variant = "md", icon, quiet } = props;
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const styles = createLinkStyles();
 
@@ -50,6 +51,7 @@ export function LinkExternal(props: LinkExternalProps) {
         variant={variant}
         style={[
           styles.default,
+          !quiet && styles.primary,
           isFocusVisible && styles.focusVisible,
           props.style,
         ]}
@@ -60,7 +62,7 @@ export function LinkExternal(props: LinkExternalProps) {
         <View style={tw`pl-0.5`}>
           <Icon
             name="external-link-line"
-            color={"primary-500"}
+            color={quiet ? "gray-700" : "primary-500"}
             size={iconSizes[variant]}
             mobileSize={iconSizes[variant]}
           />
