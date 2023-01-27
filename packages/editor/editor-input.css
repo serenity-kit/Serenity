@@ -251,6 +251,10 @@
     border-radius: 0.125rem;
   }
 
+  /* - css checkbox : hover - */
+  .task-item-extension label > span:hover {
+    cursor: pointer;
+  }
   /* - css checkbox : checked - */
   .task-item-extension input:checked + span:before {
     border-color: theme("colors.primary.400");
