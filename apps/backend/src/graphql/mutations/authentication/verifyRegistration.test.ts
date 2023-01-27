@@ -29,6 +29,7 @@ const setup = async () => {
     challengeResponse,
     registrationId,
     registration,
+    password,
   });
   unverifiedUser = await prisma.unverifiedUser.findFirst({
     where: {

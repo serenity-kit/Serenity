@@ -68,7 +68,10 @@ test("verify user", async () => {
     password,
   });
   const finishMessage = sodium.to_base64(
-    result.login.finish(sodium.from_base64(result.data.challengeResponse))
+    result.login.finish(
+      password,
+      sodium.from_base64(result.data.challengeResponse)
+    )
   );
   const sessionTokenSignature = sodium.to_base64(
     sodium.crypto_sign_detached(
@@ -95,7 +98,10 @@ test("bad password", async () => {
   });
   expect(() => {
     sodium.to_base64(
-      result.login.finish(sodium.from_base64(result.data.challengeResponse))
+      result.login.finish(
+        password,
+        sodium.from_base64(result.data.challengeResponse)
+      )
     );
   }).toThrow();
 });
@@ -118,7 +124,10 @@ test("bad login", async () => {
     password,
   });
   const finishMessage = sodium.to_base64(
-    result.login.finish(sodium.from_base64(result.data.challengeResponse))
+    result.login.finish(
+      password,
+      sodium.from_base64(result.data.challengeResponse)
+    )
   );
   const sessionTokenSignature = sodium.to_base64(
     sodium.crypto_sign_detached(
@@ -153,7 +162,10 @@ describe("Input errors", () => {
       password,
     });
     const finishMessage = sodium.to_base64(
-      result.login.finish(sodium.from_base64(result.data.challengeResponse))
+      result.login.finish(
+        password,
+        sodium.from_base64(result.data.challengeResponse)
+      )
     );
     const sessionTokenSignature = sodium.to_base64(
       sodium.crypto_sign_detached(
@@ -208,7 +220,10 @@ describe("Input errors", () => {
       password,
     });
     const finishMessage = sodium.to_base64(
-      result.login.finish(sodium.from_base64(result.data.challengeResponse))
+      result.login.finish(
+        password,
+        sodium.from_base64(result.data.challengeResponse)
+      )
     );
     const sessionTokenSignature = sodium.to_base64(
       sodium.crypto_sign_detached(
@@ -237,7 +252,10 @@ describe("Input errors", () => {
       password,
     });
     const finishMessage = sodium.to_base64(
-      result.login.finish(sodium.from_base64(result.data.challengeResponse))
+      result.login.finish(
+        password,
+        sodium.from_base64(result.data.challengeResponse)
+      )
     );
     await expect(
       (async () =>

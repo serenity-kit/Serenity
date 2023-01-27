@@ -12,7 +12,7 @@
     "lint": "eslint --ext .tsx --ext .ts ./"
   },
   "dependencies": {
-    "opaque-wasm": "^1.1.0",
+    "@serenity-tools/opaque-bundler": "*",
     "regenerator-runtime": "^0.13.9",
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0"

@@ -1,4 +1,4 @@
-import { Login, Registration } from "opaque-wasm";
+import { Login, Registration } from "@serenity-tools/opaque-bundler";
 
 const toBase64 = (data: Uint8Array) => {
   return btoa(String.fromCharCode.apply(null, [...data]));
@@ -19,8 +19,11 @@ window._opaque.registerInitialize = function (password: string) {
   return toBase64(message);
 };
 
-window._opaque.finishRegistration = function (challengeResponse: string) {
-  const message = registration.finish(fromBase64(challengeResponse));
+window._opaque.finishRegistration = function (
+  password: string,
+  challengeResponse: string
+) {
+  const message = registration.finish(password, fromBase64(challengeResponse));
   return {
     exportKey: toBase64(registration.getExportKey()),
     response: toBase64(message),
@@ -33,8 +36,8 @@ window._opaque.startLogin = function (password: string) {
   return toBase64(message);
 };
 
-window._opaque.finishLogin = function (response: string) {
-  const message = login.finish(fromBase64(response));
+window._opaque.finishLogin = function (password: string, response: string) {
+  const message = login.finish(password, fromBase64(response));
   return {
     sessionKey: toBase64(login.getSessionKey()),
     exportKey: toBase64(login.getExportKey()),

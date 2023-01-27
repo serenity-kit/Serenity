@@ -21,10 +21,11 @@ export const registerUser = async (
     username,
     password
   );
-
   const message = result.registration.finish(
+    password,
     sodium.from_base64(result.data.challengeResponse)
   );
+
   const query = gql`
     mutation finishRegistration($input: FinishRegistrationInput!) {
       finishRegistration(input: $input) {

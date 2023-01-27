@@ -8,14 +8,19 @@ export type Props = {
   challengeResponse: string;
   registrationId: string;
   registration: Registration;
+  password: string;
 };
 export const finalizeRegistration = async ({
   graphql,
   challengeResponse,
   registrationId,
   registration,
+  password,
 }: Props) => {
-  const message = registration.finish(sodium.from_base64(challengeResponse));
+  const message = registration.finish(
+    password,
+    sodium.from_base64(challengeResponse)
+  );
   const query = gql`
     mutation finishRegistration($input: FinishRegistrationInput!) {
       finishRegistration(input: $input) {

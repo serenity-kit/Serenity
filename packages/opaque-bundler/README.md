@@ -1,7 +1,7 @@
 This vendored package has been compiled using
 
 ```sh
-wasm-pack build --target nodejs
+wasm-pack build
 ```
 
 from https://github.com/marucjmar/opaque-wasm/ with the commit bc6d35caf9c53cf8ab80319801e8acf8fb009700

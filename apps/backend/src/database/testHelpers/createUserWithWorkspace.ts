@@ -39,7 +39,10 @@ export default async function createUserWithWorkspace({
     username,
     challenge: sodium.to_base64(challenge),
   });
-  const message = registration.finish(sodium.from_base64(response));
+  const message = registration.finish(
+    thePassword,
+    sodium.from_base64(response)
+  );
   const exportKey = sodium.to_base64(registration.getExportKey());
   const { envelope } = finishRegistration({
     registrationId,

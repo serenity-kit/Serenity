@@ -80,6 +80,7 @@ export const login = async ({
     throw new Error("Failed to start login");
   }
   const result = await finishLogin(
+    password,
     startLoginResult.data.startLogin.challengeResponse
   );
 

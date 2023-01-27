@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { View } from "react-native";
 import { WebView } from "react-native-webview";
 import { WebViewSource } from "react-native-webview/lib/WebViewTypes";
@@ -33,13 +33,16 @@ export default function OpaqueBridge({ source }: { source: WebViewSource }) {
       return promise;
     };
 
-    global._opaque.finishRegistration = (challengeResponse: string) => {
+    global._opaque.finishRegistration = (
+      password: string,
+      challengeResponse: string
+    ) => {
       counter++;
       const promise = new Promise((resolve, reject) => {
         promisesStorage[counter.toString()] = { resolve, reject };
       });
       webViewRef.current?.injectJavaScript(`
-        window.finishRegistration("${counter}", "${challengeResponse}");
+        window.finishRegistration("${counter}", "${password}", "${challengeResponse}");
         true;
       `);
       return promise;
@@ -57,13 +60,13 @@ export default function OpaqueBridge({ source }: { source: WebViewSource }) {
       return promise;
     };
 
-    global._opaque.finishLogin = (response: string) => {
+    global._opaque.finishLogin = (password: string, response: string) => {
       counter++;
       const promise = new Promise((resolve, reject) => {
         promisesStorage[counter.toString()] = { resolve, reject };
       });
       webViewRef.current?.injectJavaScript(`
-        window.finishLogin("${counter}", "${response}");
+        window.finishLogin("${counter}", "${password}", "${response}");
         true;
       `);
       return promise;
