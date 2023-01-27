@@ -247,8 +247,23 @@
     width: 1rem;
     height: 1rem;
     /* as browsers interpret 1.5px - 1.9px mostly the same this is the best scalable option */
-    border: 0.1rem solid theme("colors.gray.800");
+    border: 0.1rem solid theme("colors.gray.600");
     border-radius: 0.125rem;
+  }
+
+  /* - css checkbox : hover - */
+  .task-item-extension label > span:hover {
+    cursor: pointer;
+  }
+
+  .task-item-extension label > span:hover:after {
+    top: 0.2rem;
+    left: 0.125rem;
+    width: 0.75rem;
+    height: 0.375rem;
+    border-left: 0.125rem solid theme("colors.gray.400");
+    border-bottom: 0.125rem solid theme("colors.gray.400");
+    transform: rotate(-45deg);
   }
 
   /* - css checkbox : checked - */
