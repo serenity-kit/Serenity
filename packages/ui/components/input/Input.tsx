@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
-import { RawInput, RawInputProps, RawInputSize } from "../rawInput/RawInput";
+import { RawInput, RawInputProps } from "../rawInput/RawInput";
 import { Text } from "../text/Text";
 import { View } from "../view/View";
 import { HStack } from "native-base";
@@ -10,7 +10,6 @@ export type InputProps = RawInputProps & {
   label: string;
   hint?: string;
   helperText?: string;
-  size?: RawInputSize;
 };
 
 export const Input = React.forwardRef(({ ...props }: InputProps, ref: any) => {
@@ -60,7 +59,6 @@ export const Input = React.forwardRef(({ ...props }: InputProps, ref: any) => {
         onBlur={() => {
           setIsFocused(false);
         }}
-        size={props.size}
       />
       {props.hint && (
         <Text variant="xxs" bold muted style={styles.hint}>

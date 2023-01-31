@@ -6,18 +6,14 @@ import { tw } from "../../tailwind";
 
 export type RawInputProps = IInputProps & {};
 
-// as we need custom fontSize and lineHeight settings for centering Text on iOS we need to set it here via tw
-export const createInputStyles = () => {
-  const isEqualOrLargerThanXS = useIsEqualOrLargerThanBreakpoint("xs");
-  return StyleSheet.create({
-    input: tw`${isEqualOrLargerThanXS ? "text-xs" : "text-input"}`,
-  });
-};
-
 export const RawInput = forwardRef((props: RawInputProps, ref) => {
+  const isEqualOrLargerThanXS = useIsEqualOrLargerThanBreakpoint("xs");
+
   // only the necessary styles are defined here, the basic Input stylings are in App.tsx to override the
   // native-base stylings as the Input is also used internally in their Select component
-  const styles = createInputStyles();
+  const styles = StyleSheet.create({
+    input: tw`${isEqualOrLargerThanXS ? "text-xs" : "text-input"}`,
+  });
 
   return (
     <NbInput

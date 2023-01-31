@@ -1,10 +1,10 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 import { Select as NbSelect, ISelectProps } from "native-base";
 import { Icon } from "../icon/Icon";
 import { tw } from "../../tailwind";
 import { useIsEqualOrLargerThanBreakpoint } from "../../hooks/useIsEqualOrLargerThanBreakpoint/useIsEqualOrLargerThanBreakpoint";
 import { View } from "../view/View";
-import { createInputStyles } from "../rawInput/RawInput";
 
 export type SelectProps = ISelectProps & {};
 
@@ -26,7 +26,9 @@ export const Select = React.forwardRef((props: SelectProps, ref) => {
 
   // only the necessary styles are defined here, the basic Input stylings are in App.tsx to override the
   // native-base stylings as the Input is also used internally in the Select component
-  const styles = createInputStyles();
+  const styles = StyleSheet.create({
+    input: tw`${isEqualOrLargerThanXS ? "text-xs" : "text-input"}`,
+  });
 
   return (
     <NbSelect
