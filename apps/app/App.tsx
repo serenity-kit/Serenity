@@ -6,7 +6,11 @@ import {
   useFonts,
 } from "@expo-google-fonts/inter"; // Inter options can be found here https://github.com/expo/google-fonts/tree/master/font-packages/inter
 import { OpaqueBridge } from "@serenity-tools/opaque";
-import { tw, useIsDesktopDevice } from "@serenity-tools/ui";
+import {
+  tw,
+  useIsDesktopDevice,
+  useIsEqualOrLargerThanBreakpoint,
+} from "@serenity-tools/ui";
 import "expo-dev-client";
 import { StatusBar } from "expo-status-bar";
 import { extendTheme, NativeBaseProvider } from "native-base";
@@ -42,6 +46,7 @@ export default function App() {
     urqlClient,
   } = useCachedResources();
   const isDesktopDevice = useIsDesktopDevice();
+  const isEqualOrLargerThanXS = useIsEqualOrLargerThanBreakpoint("xs");
 
   const [isFontLoadingComplete] = useFonts({
     Inter_400Regular,
@@ -75,13 +80,42 @@ export default function App() {
           },
         },
       },
-      // this override is used only for the nb-internal useage of an Input inside their Select component
-      // this styling has no effect on our derived Input component
+      // these Input settings are extracted from their component as native-base also uses it
+      // internally for their Select component (which we also use), so all shared stylings
+      // - for Input and Input within the Select component - need to be defined here
       Input: {
         baseStyle: {
+          padding: 4,
+          display: "flex",
+          justifyContent: "center",
+          color: tw.color("gray-900"),
+          fontFamily: "Inter_400Regular",
+          _disabled: {
+            opacity: 0.5,
+            color: tw.color("gray-600"),
+            _stack: {
+              backgroundColor: tw.color("gray-100"),
+            },
+          },
+          _stack: {
+            height: isEqualOrLargerThanXS ? 10 : 12,
+            backgroundColor: "white",
+            style: [tw`border-gray-400`],
+          },
+          _hover: {
+            _stack: {
+              style: [tw`border-gray-600`],
+            },
+            _disabled: {
+              _stack: {
+                style: [tw`border-gray-400`],
+              },
+            },
+          },
           _focus: {
             _stack: {
-              style: [tw`border-primary-400 se-outline-focus-input`],
+              // background needs to be set here (nb-override)
+              style: [tw`bg-white border-primary-400 se-outline-focus-input`],
             },
             _hover: {
               _stack: {
@@ -89,9 +123,24 @@ export default function App() {
               },
             },
           },
-          _hover: {
+          _invalid: {
             _stack: {
-              style: [tw`border-gray-600`],
+              style: [tw`border-error-500`],
+            },
+            _hover: {
+              _stack: {
+                style: [tw`border-error-500`],
+              },
+            },
+            _focus: {
+              _stack: {
+                style: [tw`border-error-500 se-outline-error-input`],
+              },
+              _hover: {
+                _stack: {
+                  style: [tw`border-error-500 se-outline-error-input`],
+                },
+              },
             },
           },
         },

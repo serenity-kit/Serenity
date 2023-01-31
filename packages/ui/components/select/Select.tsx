@@ -1,15 +1,12 @@
 import React from "react";
-import { StyleSheet } from "react-native";
 import { Select as NbSelect, ISelectProps } from "native-base";
 import { Icon } from "../icon/Icon";
 import { tw } from "../../tailwind";
 import { useIsEqualOrLargerThanBreakpoint } from "../../hooks/useIsEqualOrLargerThanBreakpoint/useIsEqualOrLargerThanBreakpoint";
-import { RawInputSize } from "../rawInput/RawInput";
 import { View } from "../view/View";
+import { createInputStyles } from "../rawInput/RawInput";
 
-export type SelectProps = ISelectProps & {
-  size?: RawInputSize;
-};
+export type SelectProps = ISelectProps & {};
 
 /* 
 depending on which property is passed different elements will be adressed
@@ -25,15 +22,11 @@ findings so far
 
 export const Select = React.forwardRef((props: SelectProps, ref) => {
   const isEqualOrLargerThanXS = useIsEqualOrLargerThanBreakpoint("xs");
-  const {
-    dropdownIcon,
-    size = isEqualOrLargerThanXS ? "md" : "lg",
-    ...rest
-  } = props;
+  const { dropdownIcon, ...rest } = props;
 
-  const styles = StyleSheet.create({
-    input: tw`py-3 px-4 font-input ${size == "md" ? "text-xs" : "text-input"}`,
-  });
+  // only the necessary styles are defined here, the basic Input stylings are in App.tsx to override the
+  // native-base stylings as the Input is also used internally in the Select component
+  const styles = createInputStyles();
 
   return (
     <NbSelect
@@ -50,10 +43,10 @@ export const Select = React.forwardRef((props: SelectProps, ref) => {
           />
         </View>
       }
-      style={styles.input}
+      style={[styles.input, props.style]}
       borderColor={tw.color("gray-400")}
       // height needs to be defined here as when added via style some weird space is added
-      height={size === "md" ? 10 : 12}
+      height={isEqualOrLargerThanXS ? 10 : 12}
       backgroundColor={tw.color("white")}
       _actionSheetContent={{
         style: tw`bg-white`,
