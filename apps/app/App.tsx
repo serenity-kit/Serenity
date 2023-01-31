@@ -75,6 +75,27 @@ export default function App() {
           },
         },
       },
+      // this override is used only for the nb-internal useage of an Input inside their Select component
+      // this styling has no effect on our derived Input component
+      Input: {
+        baseStyle: {
+          _focus: {
+            _stack: {
+              style: [tw`border-primary-400 se-outline-focus-input`],
+            },
+            _hover: {
+              _stack: {
+                style: [tw`border-primary-400 se-outline-focus-input`],
+              },
+            },
+          },
+          _hover: {
+            _stack: {
+              style: [tw`border-gray-600`],
+            },
+          },
+        },
+      },
     },
   });
 
