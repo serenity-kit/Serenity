@@ -334,8 +334,6 @@ export default function EditorSidebar({
               </Text>
             </SidebarButton>
           ) : null}
-
-          <SidebarDivider />
         </TabPanel>
       )}
     </ScrollView>
