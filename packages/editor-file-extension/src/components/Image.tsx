@@ -1,7 +1,8 @@
 import { Icon, Text, tw, useIsDesktopDevice, View } from "@serenity-tools/ui";
 import { NodeViewWrapper } from "@tiptap/react";
-import React from "react";
+import React, { useState } from "react";
 import { FileState } from "../types";
+import { StyleSheet } from "react-native";
 
 type Props = {
   subtypeAttributes: {
@@ -15,6 +16,7 @@ type Props = {
 
 export const Image: React.FC<Props> = (props) => {
   const { subtypeAttributes, state, mimeType } = props;
+  const [isHovered, setIsHovered] = useState(false);
   const { width, height } = subtypeAttributes;
   const isDesktopDevice = useIsDesktopDevice();
   const isPortrait = height > width;
@@ -29,20 +31,25 @@ export const Image: React.FC<Props> = (props) => {
             )}`
           : "none",
         marginTop: 8,
+        cursor: "pointer",
+        backgroundColor: isHovered ? tw.color("primary-100") : "transparent",
       }}
       // needs to be here otherwise image won't be draggable
       // read https://github.com/ueberdosis/tiptap/issues/2597 for more detailed info
       data-drag-handle=""
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {state.step !== "done" ? (
-        <View
-          style={[
-            tw`w-[${width}px] max-w-full`,
-            {
-              aspectRatio: `1 / ${height / width}`,
-            },
-          ]}
-        >
+      <View
+        style={[
+          tw`w-[${width}px] max-w-full`,
+          {
+            aspectRatio: `1 / ${height / width}`,
+          },
+          isHovered && tw`opacity-80`,
+        ]}
+      >
+        {state.step !== "done" ? (
           <div className="shimmerBG flex h-full w-full flex-col items-center justify-center">
             <View
               style={tw`max-${isPortrait ? "w" : "h"}-30 ${
@@ -74,10 +81,10 @@ export const Image: React.FC<Props> = (props) => {
               }
             </Text>
           </div>
-        </View>
-      ) : (
-        <img src={dataUri} />
-      )}
+        ) : (
+          <img src={dataUri} />
+        )}
+      </View>
     </NodeViewWrapper>
   );
 };
