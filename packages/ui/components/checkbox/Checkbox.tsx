@@ -20,6 +20,9 @@ export const Checkbox = React.forwardRef(
         style={[styles.default, rest.style]}
         borderWidth={1}
         borderRadius={2}
+        _stack={{
+          alignItems: "flex-start",
+        }}
         _icon={{
           color: "white",
         }}
