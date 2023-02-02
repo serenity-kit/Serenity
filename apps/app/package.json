@@ -73,7 +73,7 @@
     "react-native": "0.70.5",
     "react-native-gesture-handler": "~2.8.0",
     "react-native-get-random-values": "~1.8.0",
-    "react-native-libsodium": "^0.5.6",
+    "react-native-libsodium": "^0.5.7",
     "react-native-modal": "^13.0.1",
     "react-native-popper": "^0.3.2",
     "react-native-reanimated": "~2.12.0",
