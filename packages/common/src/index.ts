@@ -1,4 +1,5 @@
 export * from "./createAndEncryptDevice/createAndEncryptDevice";
+export * from "./createAndEncryptWorkspaceKeyForDevice/createAndEncryptWorkspaceKeyForDevice";
 export * from "./createDevice/createDevice";
 export * from "./createDocumentKey/createDocumentKey";
 export * from "./createEncryptionKeyFromOpaqueExportKey/createEncryptionKeyFromOpaqueExportKey";

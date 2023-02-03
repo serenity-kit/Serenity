@@ -1,4 +1,7 @@
-import { getExpiredTextFromString } from "@serenity-tools/common";
+import {
+  createAndEncryptWorkspaceKeyForDevice,
+  getExpiredTextFromString,
+} from "@serenity-tools/common";
 import {
   Description,
   Heading,
@@ -18,7 +21,6 @@ import { format, parseJSON } from "date-fns";
 import { useState } from "react";
 import { useWindowDimensions } from "react-native";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import {
   useDeleteDevicesMutation,
@@ -31,7 +33,6 @@ import {
   WorkspaceDeviceParing,
   WorkspaceWithWorkspaceDevicesParing,
 } from "../../../types/workspaceDevice";
-import { createAndEncryptWorkspaceKeyForDevice } from "../../../utils/device/createAndEncryptWorkspaceKeyForDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { notNull } from "../../../utils/notNull/notNull";
 import { getWorkspaceDevices } from "../../../utils/workspace/getWorkspaceDevices";
@@ -93,10 +94,6 @@ export default function AccountDevicesSettingsScreen(
       }
       const workspaceDevicePairing: WorkspaceDeviceParing[] = [];
       const workspaceKeyString = sodium.to_base64(sodium.crypto_kdf_keygen());
-      const workspaceKey = {
-        id: uuidv4(),
-        workspaceKey: workspaceKeyString,
-      };
       for (let device of devices) {
         if (!device) {
           continue;
@@ -104,11 +101,12 @@ export default function AccountDevicesSettingsScreen(
         if (device.signingPublicKey === deviceSigningPublicKey) {
           continue;
         }
-        const { ciphertext, nonce } = createAndEncryptWorkspaceKeyForDevice({
-          receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
-          creatorDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
-          workspaceKey: workspaceKey.workspaceKey,
-        });
+        const { workspaceKey, ciphertext, nonce } =
+          createAndEncryptWorkspaceKeyForDevice({
+            receiverDeviceEncryptionPublicKey: device.encryptionPublicKey,
+            creatorDeviceEncryptionPrivateKey:
+              activeDevice.encryptionPrivateKey!,
+          });
         workspaceDevicePairing.push({
           ciphertext,
           nonce,
