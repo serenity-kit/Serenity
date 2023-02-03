@@ -1,5 +1,5 @@
-import { decryptWorkspaceKey } from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
+import { decryptWorkspaceKey } from "./decryptWorkspaceKey";
 
 beforeAll(async () => {
   await sodium.ready;
