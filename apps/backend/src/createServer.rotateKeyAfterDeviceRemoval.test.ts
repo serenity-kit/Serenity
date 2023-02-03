@@ -1,6 +1,7 @@
 import { createSnapshot, createUpdate } from "@naisho/core";
 import {
   createSnapshotKey,
+  encryptWorkspaceKeyForDevice,
   folderDerivedKeyContext,
   LocalDevice,
 } from "@serenity-tools/common";
@@ -9,7 +10,6 @@ import sodium, { KeyPair } from "react-native-libsodium";
 import deleteAllRecords from "../test/helpers/deleteAllRecords";
 import { decryptWorkspaceKey } from "../test/helpers/device/decryptWorkspaceKey";
 import { deleteDevices } from "../test/helpers/device/deleteDevices";
-import { encryptWorkspaceKeyForDevice } from "../test/helpers/device/encryptWorkspaceKeyForDevice";
 import { createDocument } from "../test/helpers/document/createDocument";
 import setupGraphql from "../test/helpers/setupGraphql";
 import {
