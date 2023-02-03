@@ -1,9 +1,11 @@
+import { decryptWorkspaceKey } from "@serenity-tools/common";
 import {
   WorkspaceDevicePairingInput,
   WorkspaceKeyDeviceInput,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { MemberDevices } from "../../types/workspaceDevice";
+import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
 import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
 import { encryptWorkspaceKeyForDevice } from "../device/encryptWorkspaceKeyForDevice";
 import { getWorkspaces } from "../workspace/getWorkspaces";

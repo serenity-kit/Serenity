@@ -1,5 +1,5 @@
+import { decryptWorkspaceKey } from "@serenity-tools/common";
 import { Device } from "../../types/Device";
-import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
 import { getWorkspace } from "./getWorkspace";
 
 export type Props = {

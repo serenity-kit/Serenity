@@ -10,6 +10,7 @@ export * from "./decryptDevice/decryptDevice";
 export * from "./decryptDocumentTitle/decryptDocumentTitle";
 export * from "./decryptFolderName/decryptFolderName";
 export * from "./decryptWorkspaceInvitationKey/decryptWorkspaceInvitationKey";
+export * from "./decryptWorkspaceKey/decryptWorkspaceKey";
 export * from "./encryptDocumentTitle/encryptDocumentTitle";
 export * from "./encryptFolderName/encryptFolderName";
 export * from "./encryptWorkspaceInvitationKey/encryptWorkspaceInvitationKey";

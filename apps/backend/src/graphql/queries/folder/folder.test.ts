@@ -1,8 +1,10 @@
-import { folderDerivedKeyContext } from "@serenity-tools/common";
+import {
+  decryptWorkspaceKey,
+  folderDerivedKeyContext,
+} from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { decryptWorkspaceKey } from "../../../../test/helpers/device/decryptWorkspaceKey";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { getFolder } from "../../../../test/helpers/folder/getFolder";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
