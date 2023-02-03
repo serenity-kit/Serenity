@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Avatar,
   AvatarGroup,
@@ -31,6 +32,8 @@ import {
   Mono,
   RawInput,
   ScrollSafeAreaView,
+  Select,
+  SelectItem,
   Shortcut,
   SidebarButton,
   SidebarDivider,
@@ -42,6 +45,7 @@ import {
   TextArea,
   Tooltip,
   tw,
+  useIsDesktopDevice,
   View,
   WorkspaceAvatar,
 } from "@serenity-tools/ui";
@@ -64,6 +68,7 @@ export default function DesignSystemScreen(
   const [pageShareLink, setPageShareLink] = useState<string>("");
   const elevationLevels: BoxShadowLevels[] = [0, 1, 2, 3];
   const collaborationColors = Object.keys(colors.collaboration) as any;
+  const isDesktopDevice = useIsDesktopDevice();
 
   const IconTile = (props) => {
     return (
@@ -126,6 +131,9 @@ export default function DesignSystemScreen(
 
   // DesignSystemScreen specific
   const h4Styles = tw`mt-8 -mb-4`;
+
+  // for Select
+  const [userRole, setUserRole] = React.useState("");
 
   return (
     <ScrollSafeAreaView>
@@ -1862,6 +1870,40 @@ export default function DesignSystemScreen(
               confirm={<Button variant="primary">Create workspace</Button>}
             />
           </Modal>
+        </DSExampleArea>
+
+        <Heading lvl={1}>Select</Heading>
+        <Text>
+          A{" "}
+          <DSMono variant="component" size="md">
+            Select
+          </DSMono>{" "}
+          is a component that allows users pick a value from predefined options.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="sm">
+          The <DSMono variant="component">Select</DSMono> is a simple component
+          without any custom properties, to keep the UI as clean as possible.
+        </Text>
+        <DSExampleArea vertical={!isDesktopDevice}>
+          <Select
+            selectedValue={userRole}
+            placeholder="Choose role"
+            onValueChange={(itemValue) => setUserRole(itemValue)}
+            width={isDesktopDevice ? "auto" : "100%"}
+          >
+            <SelectItem label="Reader" value="reader" />
+            <SelectItem label="Commentator" value="commentator" />
+            <SelectItem label="Editor" value="editor" />
+          </Select>
+          <Button
+            onPress={() => {
+              showToast(`Link for new ${userRole} created`);
+            }}
+            disabled={userRole === ""}
+          >
+            Create page link
+          </Button>
         </DSExampleArea>
 
         <Heading lvl={1}>Sidebar</Heading>

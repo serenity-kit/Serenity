@@ -39,6 +39,8 @@ export * from "./components/rawInput/RawInput";
 export * from "./components/safeAreaBottomSpacer/SafeAreaBottomSpacer";
 export * from "./components/scrollSafeAreaView/ScrollSafeAreaView";
 export * from "./components/scrollView/ScrollView";
+export * from "./components/select/Select";
+export * from "./components/selectItem/SelectItem";
 export * from "./components/settingsContentWrapper/SettingsContentWrapper";
 export * from "./components/shortcut/Shortcut";
 export * from "./components/sidebarButton/SidebarButton";
