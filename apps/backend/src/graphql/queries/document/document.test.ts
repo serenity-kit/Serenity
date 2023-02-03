@@ -1,12 +1,12 @@
 import {
   decryptDocumentTitle,
+  decryptWorkspaceKey,
   folderDerivedKeyContext,
   recreateDocumentKey,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { decryptWorkspaceKey } from "../../../../test/helpers/device/decryptWorkspaceKey";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { getDocument } from "../../../../test/helpers/document/getDocument";
 import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";

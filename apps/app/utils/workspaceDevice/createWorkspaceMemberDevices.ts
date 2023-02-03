@@ -1,3 +1,4 @@
+import { decryptWorkspaceKey } from "@serenity-tools/common";
 import {
   WorkspaceDevicePairingInput,
   WorkspaceKeyDeviceInput,
@@ -5,7 +6,6 @@ import {
 import { Device } from "../../types/Device";
 import { MemberDevices } from "../../types/workspaceDevice";
 import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
-import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
 import { getWorkspaces } from "../workspace/getWorkspaces";
 
 export type Props = {
