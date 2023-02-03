@@ -4,8 +4,8 @@ import {
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { MemberDevices } from "../../types/workspaceDevice";
-import { createAndEncryptWorkspaceKeyForDevice } from "../device/createAndEncryptWorkspaceKeyForDevice";
 import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
+import { encryptWorkspaceKeyForDevice } from "../device/encryptWorkspaceKeyForDevice";
 import { getWorkspaces } from "../workspace/getWorkspaces";
 
 export type Props = {
@@ -73,7 +73,7 @@ export const createWorkspaceMemberDevices = async ({
           workspaceDevices: [],
         };
         for (let receiverDevice of unauthorizedMember.devices) {
-          const { nonce, ciphertext } = createAndEncryptWorkspaceKeyForDevice({
+          const { nonce, ciphertext } = encryptWorkspaceKeyForDevice({
             receiverDeviceEncryptionPublicKey:
               receiverDevice.encryptionPublicKey,
             creatorDeviceEncryptionPrivateKey:

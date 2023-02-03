@@ -1,7 +1,7 @@
+import { createAndEncryptWorkspaceKeyForDevice } from "@serenity-tools/common";
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
-import { createAndEncryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
 import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
 import { encryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/encryptWorkspaceKeyForDevice";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
