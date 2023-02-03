@@ -1,3 +1,4 @@
+import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
 import {
   Avatar,
   CenterContent,
@@ -38,7 +39,6 @@ import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppCo
 import { workspaceSettingsLoadWorkspaceMachine } from "../../../machines/workspaceSettingsLoadWorkspaceMachine";
 import { WorkspaceStackScreenProps } from "../../../types/navigationProps";
 import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
-import { encryptWorkspaceKeyForDevice } from "../../../utils/device/encryptWorkspaceKeyForDevice";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { getWorkspace } from "../../../utils/workspace/getWorkspace";
 
