@@ -4,13 +4,13 @@ import {
   createSnapshotKey,
   encryptDocumentTitle,
   encryptFolderName,
+  encryptWorkspaceKeyForDevice,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { DeviceWorkspaceKeyBoxParams } from "../../../src/database/workspace/createWorkspace";
 import { Device } from "../../../src/types/device";
-import { encryptWorkspaceKeyForDevice } from "../device/encryptWorkspaceKeyForDevice";
 
 const query = gql`
   mutation createInitialWorkspaceStructure(

@@ -1,6 +1,6 @@
 import sodium from "react-native-libsodium";
 
-export type Props = {
+type Props = {
   ciphertext: string;
   nonce: string;
   creatorDeviceEncryptionPublicKey: string;

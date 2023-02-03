@@ -14,6 +14,7 @@ export * from "./decryptWorkspaceKey/decryptWorkspaceKey";
 export * from "./encryptDocumentTitle/encryptDocumentTitle";
 export * from "./encryptFolderName/encryptFolderName";
 export * from "./encryptWorkspaceInvitationKey/encryptWorkspaceInvitationKey";
+export * from "./encryptWorkspaceKeyForDevice/encryptWorkspaceKeyForDevice";
 export * from "./equalArrayContent/equalArrayContent";
 export * from "./getExpiredTextFromString/getExpiredTextFromString";
 export * from "./hashToCollaboratorColor/hashToCollaboratorColor";

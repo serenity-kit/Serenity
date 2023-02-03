@@ -5,7 +5,7 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("encrypt workspace key for device", () => {
+test("decrypt workspace key", () => {
   const nonce = "tWowcePQUts7U35mCW7TUvR-8p_9KQMA";
   const ciphertext =
     "59Ua5K1dkXqOGZVpmlR1sYW6hUW5ZtWfCFANglSmF1hURfnTxOi1MlVXAWuDAmTM";

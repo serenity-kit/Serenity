@@ -1,7 +1,7 @@
+import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDevicesToWorkspaces } from "../../../../test/helpers/device/attachDevicesToWorkspaces";
-import { encryptWorkspaceKeyForDevice } from "../../../../test/helpers/device/encryptWorkspaceKeyForDevice";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
