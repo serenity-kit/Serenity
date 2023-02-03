@@ -2,6 +2,7 @@ import {
   createDevice,
   decryptDocumentTitle,
   decryptFolderName,
+  decryptWorkspaceKey,
   folderDerivedKeyContext,
   recreateDocumentKey,
 } from "@serenity-tools/common";
@@ -11,7 +12,6 @@ import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
-import { decryptWorkspaceKey } from "../../../../test/helpers/device/decryptWorkspaceKey";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
 

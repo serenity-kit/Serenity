@@ -1,4 +1,7 @@
-import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
+import {
+  decryptWorkspaceKey,
+  encryptWorkspaceKeyForDevice,
+} from "@serenity-tools/common";
 import {
   WorkspaceKeyBox,
   WorkspaceKeyBoxData,
@@ -7,7 +10,6 @@ import {
 import { Device } from "../../types/Device";
 import { getWorkspace } from "../workspace/getWorkspace";
 import { getWorkspaces } from "../workspace/getWorkspaces";
-import { decryptWorkspaceKey } from "./decryptWorkspaceKey";
 import { getDevices } from "./getDevices";
 import { getMainDevice } from "./mainDeviceMemoryStore";
 

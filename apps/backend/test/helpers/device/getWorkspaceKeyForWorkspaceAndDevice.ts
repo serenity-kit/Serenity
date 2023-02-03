@@ -1,6 +1,6 @@
+import { decryptWorkspaceKey } from "@serenity-tools/common";
 import { Device } from "../../../prisma/generated/output";
 import { Workspace } from "../../../src/types/workspace";
-import { decryptWorkspaceKey } from "./decryptWorkspaceKey";
 
 export type Props = {
   device: Device | { encryptionPublicKey: string };

@@ -1,8 +1,11 @@
 import { KeyDerivationTrace } from "@naisho/core";
-import { folderDerivedKeyContext, LocalDevice } from "@serenity-tools/common";
+import {
+  decryptWorkspaceKey,
+  folderDerivedKeyContext,
+  LocalDevice,
+} from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { prisma } from "../../../src/database/prisma";
-import { decryptWorkspaceKey } from "../device/decryptWorkspaceKey";
 
 export type FolderKeyDerivationChainItem = {
   folderId: string | undefined; // the folderId, undefined if workspaceKey

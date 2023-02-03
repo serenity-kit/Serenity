@@ -1,5 +1,6 @@
 import {
   createAndEncryptDevice,
+  createAndEncryptWorkspaceKeyForDevice,
   createDocumentKey,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
@@ -10,7 +11,6 @@ import {
 import { Registration } from "@serenity-tools/opaque-server";
 import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
-import { createAndEncryptWorkspaceKeyForDevice } from "../../../test/helpers/device/createAndEncryptWorkspaceKeyForDevice";
 import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
 import { finishRegistration, startRegistration } from "../../utils/opaque";
 import { attachDeviceToWorkspaces } from "../device/attachDeviceToWorkspaces";
