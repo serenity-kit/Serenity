@@ -41,7 +41,7 @@
     "@serenity-tools/libsodium": "*",
     "@serenity-tools/opaque": "*",
     "@serenity-tools/ui": "*",
-    "@tiptap/extension-placeholder": "^2.0.0-beta.209",
+    "@tiptap/extension-placeholder": "^2.0.0-beta.217",
     "@types/node-emoji": "^1.8.1",
     "@urql/devtools": "^2.0.3",
     "@urql/exchange-auth": "^1.0.0",
