@@ -1,7 +1,9 @@
-import { ClientSideBaseVisitor } from "@graphql-codegen/visitor-plugin-common";
-import { pascalCase } from "change-case-all";
+const {
+  ClientSideBaseVisitor,
+} = require("@graphql-codegen/visitor-plugin-common");
+const { pascalCase } = require("change-case-all");
 
-export class CustomUrqlVisitor extends ClientSideBaseVisitor {
+class CustomUrqlVisitor extends ClientSideBaseVisitor {
   buildPromise = (
     node,
     operationType,
@@ -96,3 +98,7 @@ export const run${operationName} = async (variables: ${operationVariablesTypes},
     return [additional].filter((a) => a).join("\n");
   }
 }
+
+module.exports = {
+  CustomUrqlVisitor,
+};

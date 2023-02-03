@@ -1,6 +1,6 @@
-import { concatAST, Kind } from "graphql";
-import { oldVisit } from "@graphql-codegen/plugin-helpers";
-import { CustomUrqlVisitor } from "./CustomUrqlVisitor";
+const { concatAST, Kind } = require("graphql");
+const { oldVisit } = require("@graphql-codegen/plugin-helpers");
+const { CustomUrqlVisitor } = require("./CustomUrqlVisitor");
 
 // import { pipe, subscribe } from "wonka";
 // useEffect(() => {
