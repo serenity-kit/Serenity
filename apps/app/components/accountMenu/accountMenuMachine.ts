@@ -4,10 +4,10 @@ import {
   meQueryService,
   MeQueryServiceEvent,
   MeQueryUpdateResultEvent,
-} from "./meQueryService";
+} from "../../generated/graphql";
 
 type Context = {
-  result?: MeQueryResult;
+  meQueryResult?: MeQueryResult;
   meQueryActor: any;
 };
 
@@ -26,10 +26,11 @@ export const accountMenuMachine =
         idle: {
           entry: ["spawnMeQueryService"],
           on: {
-            UPDATE_RESULT: {
+            "MeQuery.UPDATE_RESULT": {
               actions: [
                 assign({
-                  result: (_, event: MeQueryUpdateResultEvent) => event.result,
+                  meQueryResult: (_, event: MeQueryUpdateResultEvent) =>
+                    event.result,
                 }),
               ],
             },
@@ -42,7 +43,7 @@ export const accountMenuMachine =
       actions: {
         spawnMeQueryService: assign({
           meQueryActor: () => {
-            return spawn(meQueryService());
+            return spawn(meQueryService({}));
           },
         }),
       },
