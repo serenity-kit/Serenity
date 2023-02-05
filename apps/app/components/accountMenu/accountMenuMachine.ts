@@ -3,6 +3,7 @@ import {
   MeQueryResult,
   meQueryService,
   MeQueryServiceEvent,
+  MeQueryUpdateResultEvent,
 } from "./meQueryService";
 
 type Context = {
@@ -28,13 +29,7 @@ export const accountMenuMachine =
             UPDATE_RESULT: {
               actions: [
                 assign({
-                  result: (
-                    _,
-                    event: Extract<
-                      MeQueryServiceEvent,
-                      { type: "UPDATE_RESULT" }
-                    >
-                  ) => event.result,
+                  result: (_, event: MeQueryUpdateResultEvent) => event.result,
                 }),
               ],
             },

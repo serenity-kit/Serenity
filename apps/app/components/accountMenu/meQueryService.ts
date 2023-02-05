@@ -14,15 +14,17 @@ import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
  */
 export type MeQueryResult = OperationResult<MeQuery, MeQueryVariables>;
 
-export type MeQueryServiceEvent =
-  | {
-      type: "UPDATE_RESULT";
-      result: MeQueryResult;
-    }
-  | {
-      type: "ERROR";
-      result: MeQueryResult;
-    };
+export type MeQueryUpdateResultEvent = {
+  type: "UPDATE_RESULT";
+  result: MeQueryResult;
+};
+
+export type MeQueryErrorEvent = {
+  type: "ERROR";
+  result: MeQueryResult;
+};
+
+export type MeQueryServiceEvent = MeQueryUpdateResultEvent | MeQueryErrorEvent;
 
 type MeQueryServiceSubscribersEntry = {
   variables: MeQueryVariables;
@@ -41,19 +43,14 @@ const meQuery = (variablesString: string, variables: MeQueryVariables) => {
     .query<MeQuery, MeQueryVariables>(MeDocument, variables)
     .toPromise()
     .then((result) => {
-      if (result.error) {
-        meQueryServiceSubscribers[variablesString].callbacks.forEach(
-          (callback) => {
-            callback({ type: "ERROR", result: result });
-          }
-        );
-      } else {
-        meQueryServiceSubscribers[variablesString].callbacks.forEach(
-          (callback) => {
-            callback({ type: "UPDATE_RESULT", result });
-          }
-        );
-      }
+      meQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "ERROR" : "UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
     });
 };
 
