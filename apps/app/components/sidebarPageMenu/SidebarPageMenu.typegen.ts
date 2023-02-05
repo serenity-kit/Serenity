@@ -19,18 +19,18 @@ export interface Typegen0 {
   };
   missingImplementations: {
     actions: never;
-    delays: never;
-    guards: never;
     services: never;
+    guards: never;
+    delays: never;
   };
   eventsCausingActions: {
     navigateToWorkspaceRoot: "done.invoke.deletePage";
   };
-  eventsCausingDelays: {};
-  eventsCausingGuards: {};
   eventsCausingServices: {
     deletePage: "confirmDelete";
   };
+  eventsCausingGuards: {};
+  eventsCausingDelays: {};
   matchesStates: "deleteModal" | "deleted" | "deleting" | "idle" | "menu";
   tags: never;
 }

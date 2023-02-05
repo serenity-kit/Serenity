@@ -14,6 +14,7 @@ import {
   View,
   WorkspaceAvatar,
 } from "@serenity-tools/ui";
+import { useMachine } from "@xstate/react";
 import { HStack } from "native-base";
 import { useState } from "react";
 import { Platform } from "react-native";
@@ -24,6 +25,7 @@ import {
   useWorkspacesQuery,
 } from "../../generated/graphql";
 import { initiateLogout } from "../../navigation/screens/logoutInProgressScreen/LogoutInProgressScreen";
+import { accountMenuMachine } from "./accountMenuMachine";
 
 type Props = {
   workspaceId?: string;
@@ -56,6 +58,9 @@ export default function AccountMenu({
     variables: { deviceSigningPublicKey: activeDevice?.signingPublicKey! },
     pause: !activeDevice,
   });
+
+  const [state, send] = useMachine(accountMenuMachine);
+  console.log(state);
 
   return (
     <Menu
