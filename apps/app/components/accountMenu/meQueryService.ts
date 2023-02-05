@@ -10,10 +10,8 @@ import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
  * and send the result to the machine.
  * It will share the same interval for all machines.
  * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
  */
-
-// TODO cache per variable combination
-
 export type MeQueryResult = OperationResult<MeQuery, MeQueryVariables>;
 
 export type MeQueryServiceEvent =
@@ -46,7 +44,7 @@ const meQuery = (variablesString: string, variables: MeQueryVariables) => {
       if (result.error) {
         meQueryServiceSubscribers[variablesString].callbacks.forEach(
           (callback) => {
-            callback({ type: "ERROR", result });
+            callback({ type: "ERROR", result: result });
           }
         );
       } else {
