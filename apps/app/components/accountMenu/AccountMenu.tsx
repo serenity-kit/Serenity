@@ -19,11 +19,7 @@ import { HStack } from "native-base";
 import { useState } from "react";
 import { Platform } from "react-native";
 import { useAppContext } from "../../context/AppContext";
-import {
-  useMeQuery,
-  useWorkspaceQuery,
-  useWorkspacesQuery,
-} from "../../generated/graphql";
+import { useWorkspaceQuery, useWorkspacesQuery } from "../../generated/graphql";
 import { initiateLogout } from "../../navigation/screens/logoutInProgressScreen/LogoutInProgressScreen";
 import { accountMenuMachine } from "./accountMenuMachine";
 
@@ -44,7 +40,6 @@ export default function AccountMenu({
   const isDesktopDevice = useIsDesktopDevice();
   const navigation = useNavigation();
   const { activeDevice } = useAppContext();
-  const [meResult] = useMeQuery();
   const [workspaceResult] = useWorkspaceQuery({
     variables: {
       id: workspaceId,
@@ -59,8 +54,7 @@ export default function AccountMenu({
     pause: !activeDevice,
   });
 
-  const [state, send] = useMachine(accountMenuMachine);
-  console.log(state);
+  const [state] = useMachine(accountMenuMachine);
 
   return (
     <Menu
@@ -126,7 +120,7 @@ export default function AccountMenu({
         }}
         icon={<Icon name={"user-settings-line"} color="gray-600" />}
       >
-        {meResult?.data?.me?.username}
+        {state.context.meQueryResult?.data?.me?.username}
       </MenuLink>
 
       {workspacesResult?.data?.workspaces?.nodes &&
