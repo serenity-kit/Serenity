@@ -20,7 +20,7 @@ type Params = {
   activeDevice: Device | null;
 };
 
-type Context = {
+interface Context {
   params: Params;
   meQueryResult?: MeQueryResult;
   meQueryActor?: any;
@@ -28,7 +28,7 @@ type Context = {
   workspacesQueryActor?: any;
   workspaceQueryResult?: WorkspaceQueryResult;
   workspaceQueryActor?: any;
-};
+}
 
 export const accountMenuMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QEMDGqD2BXAdgFwFkwcsC0ALASxzADpKIAbMAYgGUAVAQQCUOBtAAwBdRKAAOGWJTyUMOMSAAeiALQAWAOy0AzAE4dARnUAOdYZODDOkwDYArABoQAT0QWdtTbfMmTmzQsAJh8AX1DnNExcQmJSCmo6BmYWAFUABQARLg4AUQB9Hly2VIAZARFFSWlZeUUVBHUg5zcEE0NaU3tbTXt2w29ek3CIkBwMCDhFKOx8IhIyVCoaKqkZOQUkZTU9e10DYzMLKxtNFrU9vSu9P3smoPV7A3DI9FnYhYSaeiYwVZqNvVEPZPLYrN0gk5XIggpoTLQDLZDHpDPY+iYdJo9CNQkA */
@@ -88,31 +88,28 @@ export const accountMenuMachine =
     },
     {
       actions: {
-        spawnActors: assign({
-          meQueryActor: () => {
-            return spawn(meQueryService({}));
-          },
-          workspacesQueryActor: (context) => {
-            return context.params.activeDevice
+        spawnActors: assign((context) => {
+          return {
+            meQueryActor: spawn(meQueryService({})),
+            workspacesQueryActor: context.params.activeDevice
               ? spawn(
                   workspacesQueryService({
                     deviceSigningPublicKey:
                       context.params.activeDevice.signingPublicKey,
                   })
                 )
-              : null;
-          },
-          workspaceQueryActor: (context) => {
-            return context.params.activeDevice && context.params.workspaceId
-              ? spawn(
-                  workspaceQueryService({
-                    id: context.params.workspaceId,
-                    deviceSigningPublicKey:
-                      context.params.activeDevice.signingPublicKey,
-                  })
-                )
-              : null;
-          },
+              : null,
+            workspaceQueryActor:
+              context.params.activeDevice && context.params.workspaceId
+                ? spawn(
+                    workspaceQueryService({
+                      id: context.params.workspaceId,
+                      deviceSigningPublicKey:
+                        context.params.activeDevice.signingPublicKey,
+                    })
+                  )
+                : null,
+          };
         }),
       },
     }
