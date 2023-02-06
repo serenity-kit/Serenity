@@ -14,6 +14,7 @@ import {
   WorkspacesQueryUpdateResultEvent,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
+import { showToast } from "../../utils/toast/showToast";
 
 type Params = {
   workspaceId?: string;
@@ -61,6 +62,9 @@ export const accountMenuMachine =
                 }),
               ],
             },
+            "MeQuery.ERROR": {
+              actions: ["showErrorToast"],
+            },
             "WorkspacesQuery.UPDATE_RESULT": {
               actions: [
                 assign({
@@ -70,6 +74,9 @@ export const accountMenuMachine =
                   ) => event.result,
                 }),
               ],
+            },
+            "WorkspacesQuery.ERROR": {
+              actions: ["showErrorToast"],
             },
             "WorkspaceQuery.UPDATE_RESULT": {
               actions: [
@@ -81,6 +88,9 @@ export const accountMenuMachine =
                 }),
               ],
             },
+            "WorkspaceQuery.ERROR": {
+              actions: ["showErrorToast"],
+            },
           },
         },
       },
@@ -88,6 +98,9 @@ export const accountMenuMachine =
     },
     {
       actions: {
+        showErrorToast: () => {
+          showToast("Failed to load account menu data.", "error");
+        },
         spawnActors: assign((context) => {
           return {
             meQueryActor: spawn(meQueryService({})),

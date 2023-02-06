@@ -8,16 +8,20 @@ export interface Typegen0 {
   invokeSrcNameMap: {};
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: never;
   };
   eventsCausingActions: {
+    showErrorToast:
+      | "MeQuery.ERROR"
+      | "WorkspaceQuery.ERROR"
+      | "WorkspacesQuery.ERROR";
     spawnActors: "xstate.init";
   };
-  eventsCausingServices: {};
-  eventsCausingGuards: {};
   eventsCausingDelays: {};
+  eventsCausingGuards: {};
+  eventsCausingServices: {};
   matchesStates: "idle";
   tags: never;
 }
