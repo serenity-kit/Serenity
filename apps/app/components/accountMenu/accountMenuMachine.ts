@@ -4,11 +4,30 @@ import {
   meQueryService,
   MeQueryServiceEvent,
   MeQueryUpdateResultEvent,
+  WorkspaceQueryResult,
+  workspaceQueryService,
+  WorkspaceQueryServiceEvent,
+  WorkspaceQueryUpdateResultEvent,
+  WorkspacesQueryResult,
+  workspacesQueryService,
+  WorkspacesQueryServiceEvent,
+  WorkspacesQueryUpdateResultEvent,
 } from "../../generated/graphql";
+import { Device } from "../../types/Device";
+
+type Params = {
+  workspaceId?: string;
+  activeDevice: Device | null;
+};
 
 type Context = {
+  params: Params;
   meQueryResult?: MeQueryResult;
-  meQueryActor: any;
+  meQueryActor?: any;
+  workspacesQueryResult?: WorkspacesQueryResult;
+  workspacesQueryActor?: any;
+  workspaceQueryResult?: WorkspaceQueryResult;
+  workspaceQueryActor?: any;
 };
 
 export const accountMenuMachine =
@@ -16,21 +35,49 @@ export const accountMenuMachine =
   createMachine(
     {
       schema: {
-        events: {} as MeQueryServiceEvent,
+        events: {} as
+          | MeQueryServiceEvent
+          | WorkspacesQueryServiceEvent
+          | WorkspaceQueryServiceEvent,
         context: {} as Context,
       },
       tsTypes: {} as import("./accountMenuMachine.typegen").Typegen0,
       predictableActionArguments: true,
+      context: {
+        params: {
+          activeDevice: null,
+        },
+      },
       initial: "idle",
       states: {
         idle: {
-          entry: ["spawnMeQueryService"],
+          entry: ["spawnActors"],
           on: {
             "MeQuery.UPDATE_RESULT": {
               actions: [
                 assign({
                   meQueryResult: (_, event: MeQueryUpdateResultEvent) =>
                     event.result,
+                }),
+              ],
+            },
+            "WorkspacesQuery.UPDATE_RESULT": {
+              actions: [
+                assign({
+                  workspacesQueryResult: (
+                    _,
+                    event: WorkspacesQueryUpdateResultEvent
+                  ) => event.result,
+                }),
+              ],
+            },
+            "WorkspaceQuery.UPDATE_RESULT": {
+              actions: [
+                assign({
+                  workspaceQueryResult: (
+                    _,
+                    event: WorkspaceQueryUpdateResultEvent
+                  ) => event.result,
                 }),
               ],
             },
@@ -41,9 +88,30 @@ export const accountMenuMachine =
     },
     {
       actions: {
-        spawnMeQueryService: assign({
+        spawnActors: assign({
           meQueryActor: () => {
             return spawn(meQueryService({}));
+          },
+          workspacesQueryActor: (context) => {
+            return context.params.activeDevice
+              ? spawn(
+                  workspacesQueryService({
+                    deviceSigningPublicKey:
+                      context.params.activeDevice.signingPublicKey,
+                  })
+                )
+              : null;
+          },
+          workspaceQueryActor: (context) => {
+            return context.params.activeDevice && context.params.workspaceId
+              ? spawn(
+                  workspaceQueryService({
+                    id: context.params.workspaceId,
+                    deviceSigningPublicKey:
+                      context.params.activeDevice.signingPublicKey,
+                  })
+                )
+              : null;
           },
         }),
       },

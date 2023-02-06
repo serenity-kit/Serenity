@@ -19,7 +19,6 @@ import { HStack } from "native-base";
 import { useState } from "react";
 import { Platform } from "react-native";
 import { useAppContext } from "../../context/AppContext";
-import { useWorkspaceQuery, useWorkspacesQuery } from "../../generated/graphql";
 import { initiateLogout } from "../../navigation/screens/logoutInProgressScreen/LogoutInProgressScreen";
 import { accountMenuMachine } from "./accountMenuMachine";
 
@@ -40,28 +39,20 @@ export default function AccountMenu({
   const isDesktopDevice = useIsDesktopDevice();
   const navigation = useNavigation();
   const { activeDevice } = useAppContext();
-  const [workspaceResult] = useWorkspaceQuery({
-    variables: {
-      id: workspaceId,
-      // fine since the query would not fire if pause is active
-      deviceSigningPublicKey: activeDevice?.signingPublicKey!,
+  const [state] = useMachine(accountMenuMachine, {
+    context: {
+      params: { workspaceId, activeDevice },
     },
-    pause: !workspaceId || !activeDevice,
   });
-  const [workspacesResult] = useWorkspacesQuery({
-    // fine since the query would not fire if pause is active
-    variables: { deviceSigningPublicKey: activeDevice?.signingPublicKey! },
-    pause: !activeDevice,
-  });
-
-  const [state] = useMachine(accountMenuMachine);
+  const workspacesQueryResult = state.context.workspacesQueryResult;
 
   return (
     <Menu
       bottomSheetModalProps={{
         snapPoints: [
           // 50 is the height of a single workspace item
-          180 + (workspacesResult.data?.workspaces?.nodes?.length || 0) * 50,
+          180 +
+            (workspacesQueryResult?.data?.workspaces?.nodes?.length || 0) * 50,
         ],
       }}
       popoverProps={{
@@ -101,7 +92,8 @@ export default function AccountMenu({
               ellipsizeMode="tail"
             >
               {workspaceId
-                ? workspaceResult.data?.workspace?.name || " "
+                ? state.context.workspaceQueryResult?.data?.workspace?.name ||
+                  " "
                 : "No workspace"}
             </Text>
             <Icon name="arrow-up-down-s-line" color={"gray-400"} />
@@ -123,9 +115,9 @@ export default function AccountMenu({
         {state.context.meQueryResult?.data?.me?.username}
       </MenuLink>
 
-      {workspacesResult?.data?.workspaces?.nodes &&
-      workspacesResult.data.workspaces.nodes.length >= 1
-        ? workspacesResult.data.workspaces.nodes.map((workspace) =>
+      {workspacesQueryResult?.data?.workspaces?.nodes &&
+      workspacesQueryResult.data.workspaces.nodes.length >= 1
+        ? workspacesQueryResult.data.workspaces.nodes.map((workspace) =>
             workspace === null || workspace === undefined ? null : (
               <MenuLink
                 key={workspace.id}
