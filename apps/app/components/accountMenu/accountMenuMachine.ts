@@ -102,11 +102,11 @@ export const accountMenuMachine =
       },
       states: {
         open: {
-          entry: ["stopActors", "spawnActors"],
+          entry: ["stopActors", "spawnActors"], // respawn to trigger a request
           on: { CLOSE: "closed" },
         },
         closed: {
-          entry: ["stopActors", "spawnActors"],
+          entry: ["stopActors", "spawnActors"], // respawn to trigger a request
           on: { OPEN: "open" },
         },
       },
