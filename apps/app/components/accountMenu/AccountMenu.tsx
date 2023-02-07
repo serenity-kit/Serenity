@@ -16,7 +16,6 @@ import {
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { HStack } from "native-base";
-import { useState } from "react";
 import { Platform } from "react-native";
 import { useAppContext } from "../../context/AppContext";
 import { initiateLogout } from "../../navigation/screens/logoutInProgressScreen/LogoutInProgressScreen";
@@ -34,12 +33,11 @@ export default function AccountMenu({
   testID,
 }: Props) {
   const testIdPrefix = testID ? `${testID}__` : "";
-  const [isOpenAccountMenu, setIsOpenAccountMenu] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const isDesktopDevice = useIsDesktopDevice();
   const navigation = useNavigation();
   const { activeDevice } = useAppContext();
-  const [state] = useMachine(accountMenuMachine, {
+  const [state, send] = useMachine(accountMenuMachine, {
     context: {
       params: { workspaceId, activeDevice },
     },
@@ -64,8 +62,8 @@ export default function AccountMenu({
         // or we only use the icon as the trigger (worsens ux)
         crossOffset: 120,
       }}
-      isOpen={isOpenAccountMenu}
-      onChange={setIsOpenAccountMenu}
+      isOpen={state.matches("open")}
+      onChange={(isOpen) => send(isOpen ? "OPEN" : "CLOSE")}
       trigger={
         <Pressable
           accessibilityLabel="More options menu"
@@ -104,7 +102,7 @@ export default function AccountMenu({
       <MenuLink
         to={{ screen: "AccountSettings" }}
         onPress={(event) => {
-          setIsOpenAccountMenu(false);
+          send("CLOSE");
           if (Platform.OS === "ios") {
             event.preventDefault();
             navigation.navigate("AccountSettings");
@@ -149,7 +147,7 @@ export default function AccountMenu({
         <View style={tw`pl-1.5 pr-3 py-1.5`}>
           <IconButton
             onPress={() => {
-              setIsOpenAccountMenu(false);
+              send("CLOSE");
               openCreateWorkspace();
             }}
             name="plus"
@@ -160,7 +158,7 @@ export default function AccountMenu({
       ) : (
         <MenuButton
           onPress={() => {
-            setIsOpenAccountMenu(false);
+            send("CLOSE");
             openCreateWorkspace();
           }}
           iconName="plus"
@@ -172,7 +170,7 @@ export default function AccountMenu({
       <SidebarDivider collapsed />
       <MenuButton
         onPress={() => {
-          setIsOpenAccountMenu(false);
+          send("CLOSE");
           initiateLogout();
           // making sure there are screens hanging around that would re-render
           // on logout and cause issues

@@ -3,6 +3,7 @@
 export interface Typegen0 {
   "@@xstate/typegen": true;
   internalEvents: {
+    "": { type: "" };
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {};
@@ -17,11 +18,13 @@ export interface Typegen0 {
       | "MeQuery.ERROR"
       | "WorkspaceQuery.ERROR"
       | "WorkspacesQuery.ERROR";
-    spawnActors: "xstate.init";
+    spawnMeAndWorkspaceActors: "xstate.init";
+    spawnWorkspacesActor: "OPEN";
+    stopWorkspacesActor: "" | "CLOSE";
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {};
   eventsCausingServices: {};
-  matchesStates: "idle";
+  matchesStates: "closed" | "idle" | "open";
   tags: never;
 }
