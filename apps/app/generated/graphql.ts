@@ -1,4 +1,5 @@
 import { getUrqlClient } from '../utils/urqlClient/urqlClient';
+import canonicalize from 'canonicalize';
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
 export type Maybe<T> = T | null;
@@ -2936,6 +2937,95 @@ export const runDeviceBySigningPublicKeyQuery = async (variables: DeviceBySignin
     .toPromise();
 };
 
+export type DeviceBySigningPublicKeyQueryResult = Urql.OperationResult<DeviceBySigningPublicKeyQuery, DeviceBySigningPublicKeyQueryVariables>;
+
+export type DeviceBySigningPublicKeyQueryUpdateResultEvent = {
+  type: "DeviceBySigningPublicKeyQuery.UPDATE_RESULT";
+  result: DeviceBySigningPublicKeyQueryResult;
+};
+
+export type DeviceBySigningPublicKeyQueryErrorEvent = {
+  type: "DeviceBySigningPublicKeyQuery.ERROR";
+  result: DeviceBySigningPublicKeyQueryResult;
+};
+
+export type DeviceBySigningPublicKeyQueryServiceEvent = DeviceBySigningPublicKeyQueryUpdateResultEvent | DeviceBySigningPublicKeyQueryErrorEvent;
+
+type DeviceBySigningPublicKeyQueryServiceSubscribersEntry = {
+  variables: DeviceBySigningPublicKeyQueryVariables;
+  callbacks: ((event: DeviceBySigningPublicKeyQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type DeviceBySigningPublicKeyQueryServiceSubscribers = {
+  [variables: string]: DeviceBySigningPublicKeyQueryServiceSubscribersEntry;
+};
+
+const deviceBySigningPublicKeyQueryServiceSubscribers: DeviceBySigningPublicKeyQueryServiceSubscribers = {};
+
+const triggerDeviceBySigningPublicKeyQuery = (variablesString: string, variables: DeviceBySigningPublicKeyQueryVariables) => {
+  getUrqlClient()
+    .query<DeviceBySigningPublicKeyQuery, DeviceBySigningPublicKeyQueryVariables>(DeviceBySigningPublicKeyDocument, variables)
+    .toPromise()
+    .then((result) => {
+      deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "DeviceBySigningPublicKeyQuery.ERROR" : "DeviceBySigningPublicKeyQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const deviceBySigningPublicKeyQueryService =
+  (variables: DeviceBySigningPublicKeyQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (deviceBySigningPublicKeyQueryServiceSubscribers[variablesString]) {
+      deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      deviceBySigningPublicKeyQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerDeviceBySigningPublicKeyQuery(variablesString, variables);
+    if (!deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].intervalId) {
+      deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerDeviceBySigningPublicKeyQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runDevicesQuery = async (variables: DevicesQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<DevicesQuery, DevicesQueryVariables>(
@@ -2949,6 +3039,95 @@ export const runDevicesQuery = async (variables: DevicesQueryVariables, options?
     )
     .toPromise();
 };
+
+export type DevicesQueryResult = Urql.OperationResult<DevicesQuery, DevicesQueryVariables>;
+
+export type DevicesQueryUpdateResultEvent = {
+  type: "DevicesQuery.UPDATE_RESULT";
+  result: DevicesQueryResult;
+};
+
+export type DevicesQueryErrorEvent = {
+  type: "DevicesQuery.ERROR";
+  result: DevicesQueryResult;
+};
+
+export type DevicesQueryServiceEvent = DevicesQueryUpdateResultEvent | DevicesQueryErrorEvent;
+
+type DevicesQueryServiceSubscribersEntry = {
+  variables: DevicesQueryVariables;
+  callbacks: ((event: DevicesQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type DevicesQueryServiceSubscribers = {
+  [variables: string]: DevicesQueryServiceSubscribersEntry;
+};
+
+const devicesQueryServiceSubscribers: DevicesQueryServiceSubscribers = {};
+
+const triggerDevicesQuery = (variablesString: string, variables: DevicesQueryVariables) => {
+  getUrqlClient()
+    .query<DevicesQuery, DevicesQueryVariables>(DevicesDocument, variables)
+    .toPromise()
+    .then((result) => {
+      devicesQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "DevicesQuery.ERROR" : "DevicesQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const devicesQueryService =
+  (variables: DevicesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (devicesQueryServiceSubscribers[variablesString]) {
+      devicesQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      devicesQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerDevicesQuery(variablesString, variables);
+    if (!devicesQueryServiceSubscribers[variablesString].intervalId) {
+      devicesQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerDevicesQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = devicesQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        devicesQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        devicesQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runDocumentQuery = async (variables: DocumentQueryVariables, options?: any) => {
   return await getUrqlClient()
@@ -2964,6 +3143,95 @@ export const runDocumentQuery = async (variables: DocumentQueryVariables, option
     .toPromise();
 };
 
+export type DocumentQueryResult = Urql.OperationResult<DocumentQuery, DocumentQueryVariables>;
+
+export type DocumentQueryUpdateResultEvent = {
+  type: "DocumentQuery.UPDATE_RESULT";
+  result: DocumentQueryResult;
+};
+
+export type DocumentQueryErrorEvent = {
+  type: "DocumentQuery.ERROR";
+  result: DocumentQueryResult;
+};
+
+export type DocumentQueryServiceEvent = DocumentQueryUpdateResultEvent | DocumentQueryErrorEvent;
+
+type DocumentQueryServiceSubscribersEntry = {
+  variables: DocumentQueryVariables;
+  callbacks: ((event: DocumentQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type DocumentQueryServiceSubscribers = {
+  [variables: string]: DocumentQueryServiceSubscribersEntry;
+};
+
+const documentQueryServiceSubscribers: DocumentQueryServiceSubscribers = {};
+
+const triggerDocumentQuery = (variablesString: string, variables: DocumentQueryVariables) => {
+  getUrqlClient()
+    .query<DocumentQuery, DocumentQueryVariables>(DocumentDocument, variables)
+    .toPromise()
+    .then((result) => {
+      documentQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "DocumentQuery.ERROR" : "DocumentQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const documentQueryService =
+  (variables: DocumentQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (documentQueryServiceSubscribers[variablesString]) {
+      documentQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      documentQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerDocumentQuery(variablesString, variables);
+    if (!documentQueryServiceSubscribers[variablesString].intervalId) {
+      documentQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerDocumentQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = documentQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        documentQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        documentQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runDocumentPathQuery = async (variables: DocumentPathQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<DocumentPathQuery, DocumentPathQueryVariables>(
@@ -2977,6 +3245,95 @@ export const runDocumentPathQuery = async (variables: DocumentPathQueryVariables
     )
     .toPromise();
 };
+
+export type DocumentPathQueryResult = Urql.OperationResult<DocumentPathQuery, DocumentPathQueryVariables>;
+
+export type DocumentPathQueryUpdateResultEvent = {
+  type: "DocumentPathQuery.UPDATE_RESULT";
+  result: DocumentPathQueryResult;
+};
+
+export type DocumentPathQueryErrorEvent = {
+  type: "DocumentPathQuery.ERROR";
+  result: DocumentPathQueryResult;
+};
+
+export type DocumentPathQueryServiceEvent = DocumentPathQueryUpdateResultEvent | DocumentPathQueryErrorEvent;
+
+type DocumentPathQueryServiceSubscribersEntry = {
+  variables: DocumentPathQueryVariables;
+  callbacks: ((event: DocumentPathQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type DocumentPathQueryServiceSubscribers = {
+  [variables: string]: DocumentPathQueryServiceSubscribersEntry;
+};
+
+const documentPathQueryServiceSubscribers: DocumentPathQueryServiceSubscribers = {};
+
+const triggerDocumentPathQuery = (variablesString: string, variables: DocumentPathQueryVariables) => {
+  getUrqlClient()
+    .query<DocumentPathQuery, DocumentPathQueryVariables>(DocumentPathDocument, variables)
+    .toPromise()
+    .then((result) => {
+      documentPathQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "DocumentPathQuery.ERROR" : "DocumentPathQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const documentPathQueryService =
+  (variables: DocumentPathQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (documentPathQueryServiceSubscribers[variablesString]) {
+      documentPathQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      documentPathQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerDocumentPathQuery(variablesString, variables);
+    if (!documentPathQueryServiceSubscribers[variablesString].intervalId) {
+      documentPathQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerDocumentPathQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = documentPathQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        documentPathQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        documentPathQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runDocumentShareLinkQuery = async (variables: DocumentShareLinkQueryVariables, options?: any) => {
   return await getUrqlClient()
@@ -2992,6 +3349,95 @@ export const runDocumentShareLinkQuery = async (variables: DocumentShareLinkQuer
     .toPromise();
 };
 
+export type DocumentShareLinkQueryResult = Urql.OperationResult<DocumentShareLinkQuery, DocumentShareLinkQueryVariables>;
+
+export type DocumentShareLinkQueryUpdateResultEvent = {
+  type: "DocumentShareLinkQuery.UPDATE_RESULT";
+  result: DocumentShareLinkQueryResult;
+};
+
+export type DocumentShareLinkQueryErrorEvent = {
+  type: "DocumentShareLinkQuery.ERROR";
+  result: DocumentShareLinkQueryResult;
+};
+
+export type DocumentShareLinkQueryServiceEvent = DocumentShareLinkQueryUpdateResultEvent | DocumentShareLinkQueryErrorEvent;
+
+type DocumentShareLinkQueryServiceSubscribersEntry = {
+  variables: DocumentShareLinkQueryVariables;
+  callbacks: ((event: DocumentShareLinkQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type DocumentShareLinkQueryServiceSubscribers = {
+  [variables: string]: DocumentShareLinkQueryServiceSubscribersEntry;
+};
+
+const documentShareLinkQueryServiceSubscribers: DocumentShareLinkQueryServiceSubscribers = {};
+
+const triggerDocumentShareLinkQuery = (variablesString: string, variables: DocumentShareLinkQueryVariables) => {
+  getUrqlClient()
+    .query<DocumentShareLinkQuery, DocumentShareLinkQueryVariables>(DocumentShareLinkDocument, variables)
+    .toPromise()
+    .then((result) => {
+      documentShareLinkQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "DocumentShareLinkQuery.ERROR" : "DocumentShareLinkQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const documentShareLinkQueryService =
+  (variables: DocumentShareLinkQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (documentShareLinkQueryServiceSubscribers[variablesString]) {
+      documentShareLinkQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      documentShareLinkQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerDocumentShareLinkQuery(variablesString, variables);
+    if (!documentShareLinkQueryServiceSubscribers[variablesString].intervalId) {
+      documentShareLinkQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerDocumentShareLinkQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = documentShareLinkQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        documentShareLinkQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        documentShareLinkQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runDocumentShareLinksQuery = async (variables: DocumentShareLinksQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<DocumentShareLinksQuery, DocumentShareLinksQueryVariables>(
@@ -3005,6 +3451,95 @@ export const runDocumentShareLinksQuery = async (variables: DocumentShareLinksQu
     )
     .toPromise();
 };
+
+export type DocumentShareLinksQueryResult = Urql.OperationResult<DocumentShareLinksQuery, DocumentShareLinksQueryVariables>;
+
+export type DocumentShareLinksQueryUpdateResultEvent = {
+  type: "DocumentShareLinksQuery.UPDATE_RESULT";
+  result: DocumentShareLinksQueryResult;
+};
+
+export type DocumentShareLinksQueryErrorEvent = {
+  type: "DocumentShareLinksQuery.ERROR";
+  result: DocumentShareLinksQueryResult;
+};
+
+export type DocumentShareLinksQueryServiceEvent = DocumentShareLinksQueryUpdateResultEvent | DocumentShareLinksQueryErrorEvent;
+
+type DocumentShareLinksQueryServiceSubscribersEntry = {
+  variables: DocumentShareLinksQueryVariables;
+  callbacks: ((event: DocumentShareLinksQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type DocumentShareLinksQueryServiceSubscribers = {
+  [variables: string]: DocumentShareLinksQueryServiceSubscribersEntry;
+};
+
+const documentShareLinksQueryServiceSubscribers: DocumentShareLinksQueryServiceSubscribers = {};
+
+const triggerDocumentShareLinksQuery = (variablesString: string, variables: DocumentShareLinksQueryVariables) => {
+  getUrqlClient()
+    .query<DocumentShareLinksQuery, DocumentShareLinksQueryVariables>(DocumentShareLinksDocument, variables)
+    .toPromise()
+    .then((result) => {
+      documentShareLinksQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "DocumentShareLinksQuery.ERROR" : "DocumentShareLinksQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const documentShareLinksQueryService =
+  (variables: DocumentShareLinksQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (documentShareLinksQueryServiceSubscribers[variablesString]) {
+      documentShareLinksQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      documentShareLinksQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerDocumentShareLinksQuery(variablesString, variables);
+    if (!documentShareLinksQueryServiceSubscribers[variablesString].intervalId) {
+      documentShareLinksQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerDocumentShareLinksQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = documentShareLinksQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        documentShareLinksQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        documentShareLinksQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runDocumentsQuery = async (variables: DocumentsQueryVariables, options?: any) => {
   return await getUrqlClient()
@@ -3020,6 +3555,95 @@ export const runDocumentsQuery = async (variables: DocumentsQueryVariables, opti
     .toPromise();
 };
 
+export type DocumentsQueryResult = Urql.OperationResult<DocumentsQuery, DocumentsQueryVariables>;
+
+export type DocumentsQueryUpdateResultEvent = {
+  type: "DocumentsQuery.UPDATE_RESULT";
+  result: DocumentsQueryResult;
+};
+
+export type DocumentsQueryErrorEvent = {
+  type: "DocumentsQuery.ERROR";
+  result: DocumentsQueryResult;
+};
+
+export type DocumentsQueryServiceEvent = DocumentsQueryUpdateResultEvent | DocumentsQueryErrorEvent;
+
+type DocumentsQueryServiceSubscribersEntry = {
+  variables: DocumentsQueryVariables;
+  callbacks: ((event: DocumentsQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type DocumentsQueryServiceSubscribers = {
+  [variables: string]: DocumentsQueryServiceSubscribersEntry;
+};
+
+const documentsQueryServiceSubscribers: DocumentsQueryServiceSubscribers = {};
+
+const triggerDocumentsQuery = (variablesString: string, variables: DocumentsQueryVariables) => {
+  getUrqlClient()
+    .query<DocumentsQuery, DocumentsQueryVariables>(DocumentsDocument, variables)
+    .toPromise()
+    .then((result) => {
+      documentsQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "DocumentsQuery.ERROR" : "DocumentsQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const documentsQueryService =
+  (variables: DocumentsQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (documentsQueryServiceSubscribers[variablesString]) {
+      documentsQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      documentsQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerDocumentsQuery(variablesString, variables);
+    if (!documentsQueryServiceSubscribers[variablesString].intervalId) {
+      documentsQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerDocumentsQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = documentsQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        documentsQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        documentsQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runFileUrlQuery = async (variables: FileUrlQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<FileUrlQuery, FileUrlQueryVariables>(
@@ -3033,6 +3657,95 @@ export const runFileUrlQuery = async (variables: FileUrlQueryVariables, options?
     )
     .toPromise();
 };
+
+export type FileUrlQueryResult = Urql.OperationResult<FileUrlQuery, FileUrlQueryVariables>;
+
+export type FileUrlQueryUpdateResultEvent = {
+  type: "FileUrlQuery.UPDATE_RESULT";
+  result: FileUrlQueryResult;
+};
+
+export type FileUrlQueryErrorEvent = {
+  type: "FileUrlQuery.ERROR";
+  result: FileUrlQueryResult;
+};
+
+export type FileUrlQueryServiceEvent = FileUrlQueryUpdateResultEvent | FileUrlQueryErrorEvent;
+
+type FileUrlQueryServiceSubscribersEntry = {
+  variables: FileUrlQueryVariables;
+  callbacks: ((event: FileUrlQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type FileUrlQueryServiceSubscribers = {
+  [variables: string]: FileUrlQueryServiceSubscribersEntry;
+};
+
+const fileUrlQueryServiceSubscribers: FileUrlQueryServiceSubscribers = {};
+
+const triggerFileUrlQuery = (variablesString: string, variables: FileUrlQueryVariables) => {
+  getUrqlClient()
+    .query<FileUrlQuery, FileUrlQueryVariables>(FileUrlDocument, variables)
+    .toPromise()
+    .then((result) => {
+      fileUrlQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "FileUrlQuery.ERROR" : "FileUrlQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const fileUrlQueryService =
+  (variables: FileUrlQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (fileUrlQueryServiceSubscribers[variablesString]) {
+      fileUrlQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      fileUrlQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerFileUrlQuery(variablesString, variables);
+    if (!fileUrlQueryServiceSubscribers[variablesString].intervalId) {
+      fileUrlQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerFileUrlQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = fileUrlQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        fileUrlQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        fileUrlQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runFirstDocumentQuery = async (variables: FirstDocumentQueryVariables, options?: any) => {
   return await getUrqlClient()
@@ -3048,6 +3761,95 @@ export const runFirstDocumentQuery = async (variables: FirstDocumentQueryVariabl
     .toPromise();
 };
 
+export type FirstDocumentQueryResult = Urql.OperationResult<FirstDocumentQuery, FirstDocumentQueryVariables>;
+
+export type FirstDocumentQueryUpdateResultEvent = {
+  type: "FirstDocumentQuery.UPDATE_RESULT";
+  result: FirstDocumentQueryResult;
+};
+
+export type FirstDocumentQueryErrorEvent = {
+  type: "FirstDocumentQuery.ERROR";
+  result: FirstDocumentQueryResult;
+};
+
+export type FirstDocumentQueryServiceEvent = FirstDocumentQueryUpdateResultEvent | FirstDocumentQueryErrorEvent;
+
+type FirstDocumentQueryServiceSubscribersEntry = {
+  variables: FirstDocumentQueryVariables;
+  callbacks: ((event: FirstDocumentQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type FirstDocumentQueryServiceSubscribers = {
+  [variables: string]: FirstDocumentQueryServiceSubscribersEntry;
+};
+
+const firstDocumentQueryServiceSubscribers: FirstDocumentQueryServiceSubscribers = {};
+
+const triggerFirstDocumentQuery = (variablesString: string, variables: FirstDocumentQueryVariables) => {
+  getUrqlClient()
+    .query<FirstDocumentQuery, FirstDocumentQueryVariables>(FirstDocumentDocument, variables)
+    .toPromise()
+    .then((result) => {
+      firstDocumentQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "FirstDocumentQuery.ERROR" : "FirstDocumentQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const firstDocumentQueryService =
+  (variables: FirstDocumentQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (firstDocumentQueryServiceSubscribers[variablesString]) {
+      firstDocumentQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      firstDocumentQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerFirstDocumentQuery(variablesString, variables);
+    if (!firstDocumentQueryServiceSubscribers[variablesString].intervalId) {
+      firstDocumentQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerFirstDocumentQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = firstDocumentQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        firstDocumentQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        firstDocumentQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runFolderQuery = async (variables: FolderQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<FolderQuery, FolderQueryVariables>(
@@ -3061,6 +3863,95 @@ export const runFolderQuery = async (variables: FolderQueryVariables, options?: 
     )
     .toPromise();
 };
+
+export type FolderQueryResult = Urql.OperationResult<FolderQuery, FolderQueryVariables>;
+
+export type FolderQueryUpdateResultEvent = {
+  type: "FolderQuery.UPDATE_RESULT";
+  result: FolderQueryResult;
+};
+
+export type FolderQueryErrorEvent = {
+  type: "FolderQuery.ERROR";
+  result: FolderQueryResult;
+};
+
+export type FolderQueryServiceEvent = FolderQueryUpdateResultEvent | FolderQueryErrorEvent;
+
+type FolderQueryServiceSubscribersEntry = {
+  variables: FolderQueryVariables;
+  callbacks: ((event: FolderQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type FolderQueryServiceSubscribers = {
+  [variables: string]: FolderQueryServiceSubscribersEntry;
+};
+
+const folderQueryServiceSubscribers: FolderQueryServiceSubscribers = {};
+
+const triggerFolderQuery = (variablesString: string, variables: FolderQueryVariables) => {
+  getUrqlClient()
+    .query<FolderQuery, FolderQueryVariables>(FolderDocument, variables)
+    .toPromise()
+    .then((result) => {
+      folderQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "FolderQuery.ERROR" : "FolderQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const folderQueryService =
+  (variables: FolderQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (folderQueryServiceSubscribers[variablesString]) {
+      folderQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      folderQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerFolderQuery(variablesString, variables);
+    if (!folderQueryServiceSubscribers[variablesString].intervalId) {
+      folderQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerFolderQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = folderQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        folderQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        folderQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runFoldersQuery = async (variables: FoldersQueryVariables, options?: any) => {
   return await getUrqlClient()
@@ -3076,6 +3967,95 @@ export const runFoldersQuery = async (variables: FoldersQueryVariables, options?
     .toPromise();
 };
 
+export type FoldersQueryResult = Urql.OperationResult<FoldersQuery, FoldersQueryVariables>;
+
+export type FoldersQueryUpdateResultEvent = {
+  type: "FoldersQuery.UPDATE_RESULT";
+  result: FoldersQueryResult;
+};
+
+export type FoldersQueryErrorEvent = {
+  type: "FoldersQuery.ERROR";
+  result: FoldersQueryResult;
+};
+
+export type FoldersQueryServiceEvent = FoldersQueryUpdateResultEvent | FoldersQueryErrorEvent;
+
+type FoldersQueryServiceSubscribersEntry = {
+  variables: FoldersQueryVariables;
+  callbacks: ((event: FoldersQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type FoldersQueryServiceSubscribers = {
+  [variables: string]: FoldersQueryServiceSubscribersEntry;
+};
+
+const foldersQueryServiceSubscribers: FoldersQueryServiceSubscribers = {};
+
+const triggerFoldersQuery = (variablesString: string, variables: FoldersQueryVariables) => {
+  getUrqlClient()
+    .query<FoldersQuery, FoldersQueryVariables>(FoldersDocument, variables)
+    .toPromise()
+    .then((result) => {
+      foldersQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "FoldersQuery.ERROR" : "FoldersQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const foldersQueryService =
+  (variables: FoldersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (foldersQueryServiceSubscribers[variablesString]) {
+      foldersQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      foldersQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerFoldersQuery(variablesString, variables);
+    if (!foldersQueryServiceSubscribers[variablesString].intervalId) {
+      foldersQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerFoldersQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = foldersQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        foldersQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        foldersQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runMainDeviceQuery = async (variables: MainDeviceQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<MainDeviceQuery, MainDeviceQueryVariables>(
@@ -3089,6 +4069,95 @@ export const runMainDeviceQuery = async (variables: MainDeviceQueryVariables, op
     )
     .toPromise();
 };
+
+export type MainDeviceQueryResult = Urql.OperationResult<MainDeviceQuery, MainDeviceQueryVariables>;
+
+export type MainDeviceQueryUpdateResultEvent = {
+  type: "MainDeviceQuery.UPDATE_RESULT";
+  result: MainDeviceQueryResult;
+};
+
+export type MainDeviceQueryErrorEvent = {
+  type: "MainDeviceQuery.ERROR";
+  result: MainDeviceQueryResult;
+};
+
+export type MainDeviceQueryServiceEvent = MainDeviceQueryUpdateResultEvent | MainDeviceQueryErrorEvent;
+
+type MainDeviceQueryServiceSubscribersEntry = {
+  variables: MainDeviceQueryVariables;
+  callbacks: ((event: MainDeviceQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type MainDeviceQueryServiceSubscribers = {
+  [variables: string]: MainDeviceQueryServiceSubscribersEntry;
+};
+
+const mainDeviceQueryServiceSubscribers: MainDeviceQueryServiceSubscribers = {};
+
+const triggerMainDeviceQuery = (variablesString: string, variables: MainDeviceQueryVariables) => {
+  getUrqlClient()
+    .query<MainDeviceQuery, MainDeviceQueryVariables>(MainDeviceDocument, variables)
+    .toPromise()
+    .then((result) => {
+      mainDeviceQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "MainDeviceQuery.ERROR" : "MainDeviceQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const mainDeviceQueryService =
+  (variables: MainDeviceQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (mainDeviceQueryServiceSubscribers[variablesString]) {
+      mainDeviceQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      mainDeviceQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerMainDeviceQuery(variablesString, variables);
+    if (!mainDeviceQueryServiceSubscribers[variablesString].intervalId) {
+      mainDeviceQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerMainDeviceQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = mainDeviceQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        mainDeviceQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        mainDeviceQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runMeQuery = async (variables: MeQueryVariables, options?: any) => {
   return await getUrqlClient()
@@ -3104,6 +4173,95 @@ export const runMeQuery = async (variables: MeQueryVariables, options?: any) => 
     .toPromise();
 };
 
+export type MeQueryResult = Urql.OperationResult<MeQuery, MeQueryVariables>;
+
+export type MeQueryUpdateResultEvent = {
+  type: "MeQuery.UPDATE_RESULT";
+  result: MeQueryResult;
+};
+
+export type MeQueryErrorEvent = {
+  type: "MeQuery.ERROR";
+  result: MeQueryResult;
+};
+
+export type MeQueryServiceEvent = MeQueryUpdateResultEvent | MeQueryErrorEvent;
+
+type MeQueryServiceSubscribersEntry = {
+  variables: MeQueryVariables;
+  callbacks: ((event: MeQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type MeQueryServiceSubscribers = {
+  [variables: string]: MeQueryServiceSubscribersEntry;
+};
+
+const meQueryServiceSubscribers: MeQueryServiceSubscribers = {};
+
+const triggerMeQuery = (variablesString: string, variables: MeQueryVariables) => {
+  getUrqlClient()
+    .query<MeQuery, MeQueryVariables>(MeDocument, variables)
+    .toPromise()
+    .then((result) => {
+      meQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "MeQuery.ERROR" : "MeQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const meQueryService =
+  (variables: MeQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (meQueryServiceSubscribers[variablesString]) {
+      meQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      meQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerMeQuery(variablesString, variables);
+    if (!meQueryServiceSubscribers[variablesString].intervalId) {
+      meQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerMeQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = meQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        meQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        meQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runMeWithWorkspaceLoadingInfoQuery = async (variables: MeWithWorkspaceLoadingInfoQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<MeWithWorkspaceLoadingInfoQuery, MeWithWorkspaceLoadingInfoQueryVariables>(
@@ -3117,6 +4275,95 @@ export const runMeWithWorkspaceLoadingInfoQuery = async (variables: MeWithWorksp
     )
     .toPromise();
 };
+
+export type MeWithWorkspaceLoadingInfoQueryResult = Urql.OperationResult<MeWithWorkspaceLoadingInfoQuery, MeWithWorkspaceLoadingInfoQueryVariables>;
+
+export type MeWithWorkspaceLoadingInfoQueryUpdateResultEvent = {
+  type: "MeWithWorkspaceLoadingInfoQuery.UPDATE_RESULT";
+  result: MeWithWorkspaceLoadingInfoQueryResult;
+};
+
+export type MeWithWorkspaceLoadingInfoQueryErrorEvent = {
+  type: "MeWithWorkspaceLoadingInfoQuery.ERROR";
+  result: MeWithWorkspaceLoadingInfoQueryResult;
+};
+
+export type MeWithWorkspaceLoadingInfoQueryServiceEvent = MeWithWorkspaceLoadingInfoQueryUpdateResultEvent | MeWithWorkspaceLoadingInfoQueryErrorEvent;
+
+type MeWithWorkspaceLoadingInfoQueryServiceSubscribersEntry = {
+  variables: MeWithWorkspaceLoadingInfoQueryVariables;
+  callbacks: ((event: MeWithWorkspaceLoadingInfoQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type MeWithWorkspaceLoadingInfoQueryServiceSubscribers = {
+  [variables: string]: MeWithWorkspaceLoadingInfoQueryServiceSubscribersEntry;
+};
+
+const meWithWorkspaceLoadingInfoQueryServiceSubscribers: MeWithWorkspaceLoadingInfoQueryServiceSubscribers = {};
+
+const triggerMeWithWorkspaceLoadingInfoQuery = (variablesString: string, variables: MeWithWorkspaceLoadingInfoQueryVariables) => {
+  getUrqlClient()
+    .query<MeWithWorkspaceLoadingInfoQuery, MeWithWorkspaceLoadingInfoQueryVariables>(MeWithWorkspaceLoadingInfoDocument, variables)
+    .toPromise()
+    .then((result) => {
+      meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "MeWithWorkspaceLoadingInfoQuery.ERROR" : "MeWithWorkspaceLoadingInfoQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const meWithWorkspaceLoadingInfoQueryService =
+  (variables: MeWithWorkspaceLoadingInfoQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString]) {
+      meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerMeWithWorkspaceLoadingInfoQuery(variablesString, variables);
+    if (!meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].intervalId) {
+      meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerMeWithWorkspaceLoadingInfoQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runPendingWorkspaceInvitationQuery = async (variables: PendingWorkspaceInvitationQueryVariables, options?: any) => {
   return await getUrqlClient()
@@ -3132,6 +4379,95 @@ export const runPendingWorkspaceInvitationQuery = async (variables: PendingWorks
     .toPromise();
 };
 
+export type PendingWorkspaceInvitationQueryResult = Urql.OperationResult<PendingWorkspaceInvitationQuery, PendingWorkspaceInvitationQueryVariables>;
+
+export type PendingWorkspaceInvitationQueryUpdateResultEvent = {
+  type: "PendingWorkspaceInvitationQuery.UPDATE_RESULT";
+  result: PendingWorkspaceInvitationQueryResult;
+};
+
+export type PendingWorkspaceInvitationQueryErrorEvent = {
+  type: "PendingWorkspaceInvitationQuery.ERROR";
+  result: PendingWorkspaceInvitationQueryResult;
+};
+
+export type PendingWorkspaceInvitationQueryServiceEvent = PendingWorkspaceInvitationQueryUpdateResultEvent | PendingWorkspaceInvitationQueryErrorEvent;
+
+type PendingWorkspaceInvitationQueryServiceSubscribersEntry = {
+  variables: PendingWorkspaceInvitationQueryVariables;
+  callbacks: ((event: PendingWorkspaceInvitationQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type PendingWorkspaceInvitationQueryServiceSubscribers = {
+  [variables: string]: PendingWorkspaceInvitationQueryServiceSubscribersEntry;
+};
+
+const pendingWorkspaceInvitationQueryServiceSubscribers: PendingWorkspaceInvitationQueryServiceSubscribers = {};
+
+const triggerPendingWorkspaceInvitationQuery = (variablesString: string, variables: PendingWorkspaceInvitationQueryVariables) => {
+  getUrqlClient()
+    .query<PendingWorkspaceInvitationQuery, PendingWorkspaceInvitationQueryVariables>(PendingWorkspaceInvitationDocument, variables)
+    .toPromise()
+    .then((result) => {
+      pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "PendingWorkspaceInvitationQuery.ERROR" : "PendingWorkspaceInvitationQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const pendingWorkspaceInvitationQueryService =
+  (variables: PendingWorkspaceInvitationQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (pendingWorkspaceInvitationQueryServiceSubscribers[variablesString]) {
+      pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      pendingWorkspaceInvitationQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerPendingWorkspaceInvitationQuery(variablesString, variables);
+    if (!pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].intervalId) {
+      pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerPendingWorkspaceInvitationQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runRootFoldersQuery = async (variables: RootFoldersQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<RootFoldersQuery, RootFoldersQueryVariables>(
@@ -3145,6 +4481,95 @@ export const runRootFoldersQuery = async (variables: RootFoldersQueryVariables, 
     )
     .toPromise();
 };
+
+export type RootFoldersQueryResult = Urql.OperationResult<RootFoldersQuery, RootFoldersQueryVariables>;
+
+export type RootFoldersQueryUpdateResultEvent = {
+  type: "RootFoldersQuery.UPDATE_RESULT";
+  result: RootFoldersQueryResult;
+};
+
+export type RootFoldersQueryErrorEvent = {
+  type: "RootFoldersQuery.ERROR";
+  result: RootFoldersQueryResult;
+};
+
+export type RootFoldersQueryServiceEvent = RootFoldersQueryUpdateResultEvent | RootFoldersQueryErrorEvent;
+
+type RootFoldersQueryServiceSubscribersEntry = {
+  variables: RootFoldersQueryVariables;
+  callbacks: ((event: RootFoldersQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type RootFoldersQueryServiceSubscribers = {
+  [variables: string]: RootFoldersQueryServiceSubscribersEntry;
+};
+
+const rootFoldersQueryServiceSubscribers: RootFoldersQueryServiceSubscribers = {};
+
+const triggerRootFoldersQuery = (variablesString: string, variables: RootFoldersQueryVariables) => {
+  getUrqlClient()
+    .query<RootFoldersQuery, RootFoldersQueryVariables>(RootFoldersDocument, variables)
+    .toPromise()
+    .then((result) => {
+      rootFoldersQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "RootFoldersQuery.ERROR" : "RootFoldersQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const rootFoldersQueryService =
+  (variables: RootFoldersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (rootFoldersQueryServiceSubscribers[variablesString]) {
+      rootFoldersQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      rootFoldersQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerRootFoldersQuery(variablesString, variables);
+    if (!rootFoldersQueryServiceSubscribers[variablesString].intervalId) {
+      rootFoldersQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerRootFoldersQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = rootFoldersQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        rootFoldersQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        rootFoldersQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runUnauthorizedDevicesForWorkspacesQuery = async (variables: UnauthorizedDevicesForWorkspacesQueryVariables, options?: any) => {
   return await getUrqlClient()
@@ -3160,6 +4585,95 @@ export const runUnauthorizedDevicesForWorkspacesQuery = async (variables: Unauth
     .toPromise();
 };
 
+export type UnauthorizedDevicesForWorkspacesQueryResult = Urql.OperationResult<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>;
+
+export type UnauthorizedDevicesForWorkspacesQueryUpdateResultEvent = {
+  type: "UnauthorizedDevicesForWorkspacesQuery.UPDATE_RESULT";
+  result: UnauthorizedDevicesForWorkspacesQueryResult;
+};
+
+export type UnauthorizedDevicesForWorkspacesQueryErrorEvent = {
+  type: "UnauthorizedDevicesForWorkspacesQuery.ERROR";
+  result: UnauthorizedDevicesForWorkspacesQueryResult;
+};
+
+export type UnauthorizedDevicesForWorkspacesQueryServiceEvent = UnauthorizedDevicesForWorkspacesQueryUpdateResultEvent | UnauthorizedDevicesForWorkspacesQueryErrorEvent;
+
+type UnauthorizedDevicesForWorkspacesQueryServiceSubscribersEntry = {
+  variables: UnauthorizedDevicesForWorkspacesQueryVariables;
+  callbacks: ((event: UnauthorizedDevicesForWorkspacesQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type UnauthorizedDevicesForWorkspacesQueryServiceSubscribers = {
+  [variables: string]: UnauthorizedDevicesForWorkspacesQueryServiceSubscribersEntry;
+};
+
+const unauthorizedDevicesForWorkspacesQueryServiceSubscribers: UnauthorizedDevicesForWorkspacesQueryServiceSubscribers = {};
+
+const triggerUnauthorizedDevicesForWorkspacesQuery = (variablesString: string, variables: UnauthorizedDevicesForWorkspacesQueryVariables) => {
+  getUrqlClient()
+    .query<UnauthorizedDevicesForWorkspacesQuery, UnauthorizedDevicesForWorkspacesQueryVariables>(UnauthorizedDevicesForWorkspacesDocument, variables)
+    .toPromise()
+    .then((result) => {
+      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "UnauthorizedDevicesForWorkspacesQuery.ERROR" : "UnauthorizedDevicesForWorkspacesQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const unauthorizedDevicesForWorkspacesQueryService =
+  (variables: UnauthorizedDevicesForWorkspacesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString]) {
+      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerUnauthorizedDevicesForWorkspacesQuery(variablesString, variables);
+    if (!unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId) {
+      unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerUnauthorizedDevicesForWorkspacesQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runUnauthorizedMembersQuery = async (variables: UnauthorizedMembersQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>(
@@ -3173,6 +4687,95 @@ export const runUnauthorizedMembersQuery = async (variables: UnauthorizedMembers
     )
     .toPromise();
 };
+
+export type UnauthorizedMembersQueryResult = Urql.OperationResult<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>;
+
+export type UnauthorizedMembersQueryUpdateResultEvent = {
+  type: "UnauthorizedMembersQuery.UPDATE_RESULT";
+  result: UnauthorizedMembersQueryResult;
+};
+
+export type UnauthorizedMembersQueryErrorEvent = {
+  type: "UnauthorizedMembersQuery.ERROR";
+  result: UnauthorizedMembersQueryResult;
+};
+
+export type UnauthorizedMembersQueryServiceEvent = UnauthorizedMembersQueryUpdateResultEvent | UnauthorizedMembersQueryErrorEvent;
+
+type UnauthorizedMembersQueryServiceSubscribersEntry = {
+  variables: UnauthorizedMembersQueryVariables;
+  callbacks: ((event: UnauthorizedMembersQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type UnauthorizedMembersQueryServiceSubscribers = {
+  [variables: string]: UnauthorizedMembersQueryServiceSubscribersEntry;
+};
+
+const unauthorizedMembersQueryServiceSubscribers: UnauthorizedMembersQueryServiceSubscribers = {};
+
+const triggerUnauthorizedMembersQuery = (variablesString: string, variables: UnauthorizedMembersQueryVariables) => {
+  getUrqlClient()
+    .query<UnauthorizedMembersQuery, UnauthorizedMembersQueryVariables>(UnauthorizedMembersDocument, variables)
+    .toPromise()
+    .then((result) => {
+      unauthorizedMembersQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "UnauthorizedMembersQuery.ERROR" : "UnauthorizedMembersQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const unauthorizedMembersQueryService =
+  (variables: UnauthorizedMembersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (unauthorizedMembersQueryServiceSubscribers[variablesString]) {
+      unauthorizedMembersQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      unauthorizedMembersQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerUnauthorizedMembersQuery(variablesString, variables);
+    if (!unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId) {
+      unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerUnauthorizedMembersQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        unauthorizedMembersQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        unauthorizedMembersQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runUserIdFromUsernameQuery = async (variables: UserIdFromUsernameQueryVariables, options?: any) => {
   return await getUrqlClient()
@@ -3188,6 +4791,95 @@ export const runUserIdFromUsernameQuery = async (variables: UserIdFromUsernameQu
     .toPromise();
 };
 
+export type UserIdFromUsernameQueryResult = Urql.OperationResult<UserIdFromUsernameQuery, UserIdFromUsernameQueryVariables>;
+
+export type UserIdFromUsernameQueryUpdateResultEvent = {
+  type: "UserIdFromUsernameQuery.UPDATE_RESULT";
+  result: UserIdFromUsernameQueryResult;
+};
+
+export type UserIdFromUsernameQueryErrorEvent = {
+  type: "UserIdFromUsernameQuery.ERROR";
+  result: UserIdFromUsernameQueryResult;
+};
+
+export type UserIdFromUsernameQueryServiceEvent = UserIdFromUsernameQueryUpdateResultEvent | UserIdFromUsernameQueryErrorEvent;
+
+type UserIdFromUsernameQueryServiceSubscribersEntry = {
+  variables: UserIdFromUsernameQueryVariables;
+  callbacks: ((event: UserIdFromUsernameQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type UserIdFromUsernameQueryServiceSubscribers = {
+  [variables: string]: UserIdFromUsernameQueryServiceSubscribersEntry;
+};
+
+const userIdFromUsernameQueryServiceSubscribers: UserIdFromUsernameQueryServiceSubscribers = {};
+
+const triggerUserIdFromUsernameQuery = (variablesString: string, variables: UserIdFromUsernameQueryVariables) => {
+  getUrqlClient()
+    .query<UserIdFromUsernameQuery, UserIdFromUsernameQueryVariables>(UserIdFromUsernameDocument, variables)
+    .toPromise()
+    .then((result) => {
+      userIdFromUsernameQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "UserIdFromUsernameQuery.ERROR" : "UserIdFromUsernameQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const userIdFromUsernameQueryService =
+  (variables: UserIdFromUsernameQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (userIdFromUsernameQueryServiceSubscribers[variablesString]) {
+      userIdFromUsernameQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      userIdFromUsernameQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerUserIdFromUsernameQuery(variablesString, variables);
+    if (!userIdFromUsernameQueryServiceSubscribers[variablesString].intervalId) {
+      userIdFromUsernameQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerUserIdFromUsernameQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = userIdFromUsernameQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        userIdFromUsernameQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        userIdFromUsernameQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runWorkspaceQuery = async (variables: WorkspaceQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<WorkspaceQuery, WorkspaceQueryVariables>(
@@ -3201,6 +4893,95 @@ export const runWorkspaceQuery = async (variables: WorkspaceQueryVariables, opti
     )
     .toPromise();
 };
+
+export type WorkspaceQueryResult = Urql.OperationResult<WorkspaceQuery, WorkspaceQueryVariables>;
+
+export type WorkspaceQueryUpdateResultEvent = {
+  type: "WorkspaceQuery.UPDATE_RESULT";
+  result: WorkspaceQueryResult;
+};
+
+export type WorkspaceQueryErrorEvent = {
+  type: "WorkspaceQuery.ERROR";
+  result: WorkspaceQueryResult;
+};
+
+export type WorkspaceQueryServiceEvent = WorkspaceQueryUpdateResultEvent | WorkspaceQueryErrorEvent;
+
+type WorkspaceQueryServiceSubscribersEntry = {
+  variables: WorkspaceQueryVariables;
+  callbacks: ((event: WorkspaceQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspaceQueryServiceSubscribers = {
+  [variables: string]: WorkspaceQueryServiceSubscribersEntry;
+};
+
+const workspaceQueryServiceSubscribers: WorkspaceQueryServiceSubscribers = {};
+
+const triggerWorkspaceQuery = (variablesString: string, variables: WorkspaceQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspaceQuery, WorkspaceQueryVariables>(WorkspaceDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspaceQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspaceQuery.ERROR" : "WorkspaceQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspaceQueryService =
+  (variables: WorkspaceQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspaceQueryServiceSubscribers[variablesString]) {
+      workspaceQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspaceQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspaceQuery(variablesString, variables);
+    if (!workspaceQueryServiceSubscribers[variablesString].intervalId) {
+      workspaceQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspaceQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspaceQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspaceQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspaceQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runWorkspaceDevicesQuery = async (variables: WorkspaceDevicesQueryVariables, options?: any) => {
   return await getUrqlClient()
@@ -3216,6 +4997,95 @@ export const runWorkspaceDevicesQuery = async (variables: WorkspaceDevicesQueryV
     .toPromise();
 };
 
+export type WorkspaceDevicesQueryResult = Urql.OperationResult<WorkspaceDevicesQuery, WorkspaceDevicesQueryVariables>;
+
+export type WorkspaceDevicesQueryUpdateResultEvent = {
+  type: "WorkspaceDevicesQuery.UPDATE_RESULT";
+  result: WorkspaceDevicesQueryResult;
+};
+
+export type WorkspaceDevicesQueryErrorEvent = {
+  type: "WorkspaceDevicesQuery.ERROR";
+  result: WorkspaceDevicesQueryResult;
+};
+
+export type WorkspaceDevicesQueryServiceEvent = WorkspaceDevicesQueryUpdateResultEvent | WorkspaceDevicesQueryErrorEvent;
+
+type WorkspaceDevicesQueryServiceSubscribersEntry = {
+  variables: WorkspaceDevicesQueryVariables;
+  callbacks: ((event: WorkspaceDevicesQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspaceDevicesQueryServiceSubscribers = {
+  [variables: string]: WorkspaceDevicesQueryServiceSubscribersEntry;
+};
+
+const workspaceDevicesQueryServiceSubscribers: WorkspaceDevicesQueryServiceSubscribers = {};
+
+const triggerWorkspaceDevicesQuery = (variablesString: string, variables: WorkspaceDevicesQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspaceDevicesQuery, WorkspaceDevicesQueryVariables>(WorkspaceDevicesDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspaceDevicesQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspaceDevicesQuery.ERROR" : "WorkspaceDevicesQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspaceDevicesQueryService =
+  (variables: WorkspaceDevicesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspaceDevicesQueryServiceSubscribers[variablesString]) {
+      workspaceDevicesQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspaceDevicesQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspaceDevicesQuery(variablesString, variables);
+    if (!workspaceDevicesQueryServiceSubscribers[variablesString].intervalId) {
+      workspaceDevicesQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspaceDevicesQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspaceDevicesQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspaceDevicesQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspaceDevicesQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runWorkspaceInvitationQuery = async (variables: WorkspaceInvitationQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<WorkspaceInvitationQuery, WorkspaceInvitationQueryVariables>(
@@ -3229,6 +5099,95 @@ export const runWorkspaceInvitationQuery = async (variables: WorkspaceInvitation
     )
     .toPromise();
 };
+
+export type WorkspaceInvitationQueryResult = Urql.OperationResult<WorkspaceInvitationQuery, WorkspaceInvitationQueryVariables>;
+
+export type WorkspaceInvitationQueryUpdateResultEvent = {
+  type: "WorkspaceInvitationQuery.UPDATE_RESULT";
+  result: WorkspaceInvitationQueryResult;
+};
+
+export type WorkspaceInvitationQueryErrorEvent = {
+  type: "WorkspaceInvitationQuery.ERROR";
+  result: WorkspaceInvitationQueryResult;
+};
+
+export type WorkspaceInvitationQueryServiceEvent = WorkspaceInvitationQueryUpdateResultEvent | WorkspaceInvitationQueryErrorEvent;
+
+type WorkspaceInvitationQueryServiceSubscribersEntry = {
+  variables: WorkspaceInvitationQueryVariables;
+  callbacks: ((event: WorkspaceInvitationQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspaceInvitationQueryServiceSubscribers = {
+  [variables: string]: WorkspaceInvitationQueryServiceSubscribersEntry;
+};
+
+const workspaceInvitationQueryServiceSubscribers: WorkspaceInvitationQueryServiceSubscribers = {};
+
+const triggerWorkspaceInvitationQuery = (variablesString: string, variables: WorkspaceInvitationQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspaceInvitationQuery, WorkspaceInvitationQueryVariables>(WorkspaceInvitationDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspaceInvitationQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspaceInvitationQuery.ERROR" : "WorkspaceInvitationQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspaceInvitationQueryService =
+  (variables: WorkspaceInvitationQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspaceInvitationQueryServiceSubscribers[variablesString]) {
+      workspaceInvitationQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspaceInvitationQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspaceInvitationQuery(variablesString, variables);
+    if (!workspaceInvitationQueryServiceSubscribers[variablesString].intervalId) {
+      workspaceInvitationQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspaceInvitationQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspaceInvitationQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspaceInvitationQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspaceInvitationQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runWorkspaceInvitationsQuery = async (variables: WorkspaceInvitationsQueryVariables, options?: any) => {
   return await getUrqlClient()
@@ -3244,6 +5203,95 @@ export const runWorkspaceInvitationsQuery = async (variables: WorkspaceInvitatio
     .toPromise();
 };
 
+export type WorkspaceInvitationsQueryResult = Urql.OperationResult<WorkspaceInvitationsQuery, WorkspaceInvitationsQueryVariables>;
+
+export type WorkspaceInvitationsQueryUpdateResultEvent = {
+  type: "WorkspaceInvitationsQuery.UPDATE_RESULT";
+  result: WorkspaceInvitationsQueryResult;
+};
+
+export type WorkspaceInvitationsQueryErrorEvent = {
+  type: "WorkspaceInvitationsQuery.ERROR";
+  result: WorkspaceInvitationsQueryResult;
+};
+
+export type WorkspaceInvitationsQueryServiceEvent = WorkspaceInvitationsQueryUpdateResultEvent | WorkspaceInvitationsQueryErrorEvent;
+
+type WorkspaceInvitationsQueryServiceSubscribersEntry = {
+  variables: WorkspaceInvitationsQueryVariables;
+  callbacks: ((event: WorkspaceInvitationsQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspaceInvitationsQueryServiceSubscribers = {
+  [variables: string]: WorkspaceInvitationsQueryServiceSubscribersEntry;
+};
+
+const workspaceInvitationsQueryServiceSubscribers: WorkspaceInvitationsQueryServiceSubscribers = {};
+
+const triggerWorkspaceInvitationsQuery = (variablesString: string, variables: WorkspaceInvitationsQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspaceInvitationsQuery, WorkspaceInvitationsQueryVariables>(WorkspaceInvitationsDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspaceInvitationsQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspaceInvitationsQuery.ERROR" : "WorkspaceInvitationsQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspaceInvitationsQueryService =
+  (variables: WorkspaceInvitationsQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspaceInvitationsQueryServiceSubscribers[variablesString]) {
+      workspaceInvitationsQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspaceInvitationsQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspaceInvitationsQuery(variablesString, variables);
+    if (!workspaceInvitationsQueryServiceSubscribers[variablesString].intervalId) {
+      workspaceInvitationsQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspaceInvitationsQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspaceInvitationsQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspaceInvitationsQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspaceInvitationsQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
 export const runWorkspacesQuery = async (variables: WorkspacesQueryVariables, options?: any) => {
   return await getUrqlClient()
     .query<WorkspacesQuery, WorkspacesQueryVariables>(
@@ -3257,3 +5305,91 @@ export const runWorkspacesQuery = async (variables: WorkspacesQueryVariables, op
     )
     .toPromise();
 };
+
+export type WorkspacesQueryResult = Urql.OperationResult<WorkspacesQuery, WorkspacesQueryVariables>;
+
+export type WorkspacesQueryUpdateResultEvent = {
+  type: "WorkspacesQuery.UPDATE_RESULT";
+  result: WorkspacesQueryResult;
+};
+
+export type WorkspacesQueryErrorEvent = {
+  type: "WorkspacesQuery.ERROR";
+  result: WorkspacesQueryResult;
+};
+
+export type WorkspacesQueryServiceEvent = WorkspacesQueryUpdateResultEvent | WorkspacesQueryErrorEvent;
+
+type WorkspacesQueryServiceSubscribersEntry = {
+  variables: WorkspacesQueryVariables;
+  callbacks: ((event: WorkspacesQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type WorkspacesQueryServiceSubscribers = {
+  [variables: string]: WorkspacesQueryServiceSubscribersEntry;
+};
+
+const workspacesQueryServiceSubscribers: WorkspacesQueryServiceSubscribers = {};
+
+const triggerWorkspacesQuery = (variablesString: string, variables: WorkspacesQueryVariables) => {
+  getUrqlClient()
+    .query<WorkspacesQuery, WorkspacesQueryVariables>(WorkspacesDocument, variables)
+    .toPromise()
+    .then((result) => {
+      workspacesQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "WorkspacesQuery.ERROR" : "WorkspacesQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const workspacesQueryService =
+  (variables: WorkspacesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (workspacesQueryServiceSubscribers[variablesString]) {
+      workspacesQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      workspacesQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerWorkspacesQuery(variablesString, variables);
+    if (!workspacesQueryServiceSubscribers[variablesString].intervalId) {
+      workspacesQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerWorkspacesQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = workspacesQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        workspacesQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        workspacesQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+

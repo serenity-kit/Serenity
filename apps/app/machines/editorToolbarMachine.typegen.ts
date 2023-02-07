@@ -8,14 +8,14 @@ export interface Typegen0 {
   invokeSrcNameMap: {};
   missingImplementations: {
     actions: never;
-    delays: never;
-    guards: never;
     services: never;
+    guards: never;
+    delays: never;
   };
   eventsCausingActions: {};
-  eventsCausingDelays: {};
-  eventsCausingGuards: {};
   eventsCausingServices: {};
+  eventsCausingGuards: {};
+  eventsCausingDelays: {};
   matchesStates: "idle";
   tags: never;
 }

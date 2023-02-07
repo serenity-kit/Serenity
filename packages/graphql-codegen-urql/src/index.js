@@ -2,18 +2,6 @@ const { concatAST, Kind } = require("graphql");
 const { oldVisit } = require("@graphql-codegen/plugin-helpers");
 const { CustomUrqlVisitor } = require("./CustomUrqlVisitor");
 
-// import { pipe, subscribe } from "wonka";
-// useEffect(() => {
-//   // https://github.com/FormidableLabs/urql/blob/d45789f5b71c674eb4c4dc76c42f2142427ce408/docs/api/core.md#clientquery
-//   pipe(
-//     client.query(MeDocument, {}),
-//     subscribe((result) => {
-//       console.log(result); // OperationResult
-//     })
-//   );
-// }, []);
-//
-
 module.exports = {
   plugin(schema, documents, config, info) {
     const allAst = concatAST(documents.map((v) => v.document));
@@ -35,6 +23,7 @@ module.exports = {
     return {
       prepend: [
         "import { getUrqlClient } from '../utils/urqlClient/urqlClient';",
+        "import canonicalize from 'canonicalize';",
       ],
       content: [
         ...visitorResult.definitions.filter(

@@ -8,22 +8,19 @@ import {
   MenuLink,
   Pressable,
   SidebarDivider,
+  Spinner,
   Text,
   tw,
   useIsDesktopDevice,
   View,
   WorkspaceAvatar,
 } from "@serenity-tools/ui";
+import { useMachine } from "@xstate/react";
 import { HStack } from "native-base";
-import { useState } from "react";
 import { Platform } from "react-native";
 import { useAppContext } from "../../context/AppContext";
-import {
-  useMeQuery,
-  useWorkspaceQuery,
-  useWorkspacesQuery,
-} from "../../generated/graphql";
 import { initiateLogout } from "../../navigation/screens/logoutInProgressScreen/LogoutInProgressScreen";
+import { accountMenuMachine } from "./accountMenuMachine";
 
 type Props = {
   workspaceId?: string;
@@ -37,32 +34,24 @@ export default function AccountMenu({
   testID,
 }: Props) {
   const testIdPrefix = testID ? `${testID}__` : "";
-  const [isOpenAccountMenu, setIsOpenAccountMenu] = useState(false);
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const isDesktopDevice = useIsDesktopDevice();
   const navigation = useNavigation();
   const { activeDevice } = useAppContext();
-  const [meResult] = useMeQuery();
-  const [workspaceResult] = useWorkspaceQuery({
-    variables: {
-      id: workspaceId,
-      // fine since the query would not fire if pause is active
-      deviceSigningPublicKey: activeDevice?.signingPublicKey!,
+  const [state, send] = useMachine(accountMenuMachine, {
+    context: {
+      params: { workspaceId, activeDevice },
     },
-    pause: !workspaceId || !activeDevice,
   });
-  const [workspacesResult] = useWorkspacesQuery({
-    // fine since the query would not fire if pause is active
-    variables: { deviceSigningPublicKey: activeDevice?.signingPublicKey! },
-    pause: !activeDevice,
-  });
+  const workspacesQueryResult = state.context.workspacesQueryResult;
 
   return (
     <Menu
       bottomSheetModalProps={{
         snapPoints: [
           // 50 is the height of a single workspace item
-          180 + (workspacesResult.data?.workspaces?.nodes?.length || 0) * 50,
+          180 +
+            (workspacesQueryResult?.data?.workspaces?.nodes?.length || 1) * 50,
         ],
       }}
       popoverProps={{
@@ -74,8 +63,8 @@ export default function AccountMenu({
         // or we only use the icon as the trigger (worsens ux)
         crossOffset: 120,
       }}
-      isOpen={isOpenAccountMenu}
-      onChange={setIsOpenAccountMenu}
+      isOpen={state.matches("open")}
+      onChange={(isOpen) => send(isOpen ? "OPEN" : "CLOSE")}
       trigger={
         <Pressable
           accessibilityLabel="More options menu"
@@ -102,7 +91,8 @@ export default function AccountMenu({
               ellipsizeMode="tail"
             >
               {workspaceId
-                ? workspaceResult.data?.workspace?.name || " "
+                ? state.context.workspaceQueryResult?.data?.workspace?.name ||
+                  " "
                 : "No workspace"}
             </Text>
             <Icon name="arrow-up-down-s-line" color={"gray-400"} />
@@ -113,7 +103,7 @@ export default function AccountMenu({
       <MenuLink
         to={{ screen: "AccountSettings" }}
         onPress={(event) => {
-          setIsOpenAccountMenu(false);
+          send("CLOSE");
           if (Platform.OS === "ios") {
             event.preventDefault();
             navigation.navigate("AccountSettings");
@@ -121,44 +111,51 @@ export default function AccountMenu({
         }}
         icon={<Icon name={"user-settings-line"} color="gray-600" />}
       >
-        {meResult?.data?.me?.username}
+        {state.context.meQueryResult?.data?.me?.username}
       </MenuLink>
 
-      {workspacesResult?.data?.workspaces?.nodes &&
-      workspacesResult.data.workspaces.nodes.length >= 1
-        ? workspacesResult.data.workspaces.nodes.map((workspace) =>
-            workspace === null || workspace === undefined ? null : (
-              <MenuLink
-                key={workspace.id}
-                to={{
-                  screen: "Workspace",
+      {workspacesQueryResult?.data?.workspaces?.nodes &&
+      workspacesQueryResult.data.workspaces.nodes.length >= 1 ? (
+        workspacesQueryResult.data.workspaces.nodes.map((workspace) =>
+          workspace === null || workspace === undefined ? null : (
+            <MenuLink
+              key={workspace.id}
+              to={{
+                screen: "Workspace",
+                params: {
+                  workspaceId: workspace.id,
+                  screen: "WorkspaceDrawer",
                   params: {
-                    workspaceId: workspace.id,
-                    screen: "WorkspaceDrawer",
-                    params: {
-                      screen: "WorkspaceRoot",
-                    },
+                    screen: "WorkspaceRoot",
                   },
-                }}
-                icon={
-                  <WorkspaceAvatar
-                    customColor={"honey"}
-                    key={`avatar_${workspace.id}`}
-                    size="xxs"
-                  />
-                }
-              >
-                {workspace.name}
-              </MenuLink>
-            )
+                },
+              }}
+              icon={
+                <WorkspaceAvatar
+                  customColor={"honey"}
+                  key={`avatar_${workspace.id}`}
+                  size="xxs"
+                />
+              }
+            >
+              {workspace.name}
+            </MenuLink>
           )
-        : null}
+        )
+      ) : (
+        <View style={tw`pl-5 py-3.5`}>
+          <Spinner
+            style={tw`items-start`}
+            size={isDesktopDevice ? "sm" : "lg"}
+          />
+        </View>
+      )}
 
       {isDesktopDevice ? (
         <View style={tw`pl-1.5 pr-3 py-1.5`}>
           <IconButton
             onPress={() => {
-              setIsOpenAccountMenu(false);
+              send("CLOSE");
               openCreateWorkspace();
             }}
             name="plus"
@@ -169,7 +166,7 @@ export default function AccountMenu({
       ) : (
         <MenuButton
           onPress={() => {
-            setIsOpenAccountMenu(false);
+            send("CLOSE");
             openCreateWorkspace();
           }}
           iconName="plus"
@@ -181,7 +178,7 @@ export default function AccountMenu({
       <SidebarDivider collapsed />
       <MenuButton
         onPress={() => {
-          setIsOpenAccountMenu(false);
+          send("CLOSE");
           initiateLogout();
           // making sure there are screens hanging around that would re-render
           // on logout and cause issues
