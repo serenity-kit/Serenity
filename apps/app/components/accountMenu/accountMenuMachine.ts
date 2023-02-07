@@ -58,7 +58,7 @@ export const accountMenuMachine =
         workspaceQueryError: false,
         workspacesQueryError: false,
       },
-      initial: "idle",
+      initial: "closed",
       on: {
         "MeQuery.UPDATE_RESULT": {
           actions: [
@@ -101,16 +101,12 @@ export const accountMenuMachine =
         },
       },
       states: {
-        idle: {
-          entry: ["spawnMeAndWorkspaceActors"],
-          always: "closed",
-        },
         open: {
-          entry: ["spawnWorkspacesActor"],
+          entry: ["stopActors", "spawnActors"],
           on: { CLOSE: "closed" },
         },
         closed: {
-          entry: ["stopWorkspacesActor"],
+          entry: ["stopActors", "spawnActors"],
           on: { OPEN: "open" },
         },
       },
@@ -128,34 +124,42 @@ export const accountMenuMachine =
             showToast("Failed to load account menu data.", "error");
           }
         },
-        spawnMeAndWorkspaceActors: assign((context) => {
+        spawnActors: assign((context) => {
           return {
-            meQueryActor: spawn(meQueryService({})),
+            meQueryActor: spawn(meQueryService({}, 120000)), // poll only every 2 minutes
             workspaceQueryActor:
               context.params.activeDevice && context.params.workspaceId
                 ? spawn(
-                    workspaceQueryService({
-                      id: context.params.workspaceId,
-                      deviceSigningPublicKey:
-                        context.params.activeDevice.signingPublicKey,
-                    })
+                    workspaceQueryService(
+                      {
+                        id: context.params.workspaceId,
+                        deviceSigningPublicKey:
+                          context.params.activeDevice.signingPublicKey,
+                      },
+                      120000 // poll only every 2 minutes
+                    )
                   )
                 : undefined,
-          };
-        }),
-        spawnWorkspacesActor: assign((context) => {
-          return {
             workspacesQueryActor: context.params.activeDevice
               ? spawn(
-                  workspacesQueryService({
-                    deviceSigningPublicKey:
-                      context.params.activeDevice.signingPublicKey,
-                  })
+                  workspacesQueryService(
+                    {
+                      deviceSigningPublicKey:
+                        context.params.activeDevice.signingPublicKey,
+                    },
+                    120000 // poll only every 2 minutes
+                  )
                 )
               : undefined,
           };
         }),
-        stopWorkspacesActor: (context) => {
+        stopActors: (context) => {
+          if (context.meQueryActor?.stop) {
+            context.meQueryActor.stop();
+          }
+          if (context.workspaceQueryActor?.stop) {
+            context.workspaceQueryActor.stop();
+          }
           if (context.workspacesQueryActor?.stop) {
             context.workspacesQueryActor.stop();
           }

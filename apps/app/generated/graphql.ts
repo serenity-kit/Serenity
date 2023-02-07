@@ -2979,8 +2979,17 @@ const triggerDeviceBySigningPublicKeyQuery = (variablesString: string, variables
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const deviceBySigningPublicKeyQueryService =
-  (variables: DeviceBySigningPublicKeyQueryVariables) => (callback, onReceive) => {
+  (variables: DeviceBySigningPublicKeyQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (deviceBySigningPublicKeyQueryServiceSubscribers[variablesString]) {
       deviceBySigningPublicKeyQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -2998,7 +3007,7 @@ export const deviceBySigningPublicKeyQueryService =
         () => {
           triggerDeviceBySigningPublicKeyQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -3073,8 +3082,17 @@ const triggerDevicesQuery = (variablesString: string, variables: DevicesQueryVar
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const devicesQueryService =
-  (variables: DevicesQueryVariables) => (callback, onReceive) => {
+  (variables: DevicesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (devicesQueryServiceSubscribers[variablesString]) {
       devicesQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -3092,7 +3110,7 @@ export const devicesQueryService =
         () => {
           triggerDevicesQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -3167,8 +3185,17 @@ const triggerDocumentQuery = (variablesString: string, variables: DocumentQueryV
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const documentQueryService =
-  (variables: DocumentQueryVariables) => (callback, onReceive) => {
+  (variables: DocumentQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (documentQueryServiceSubscribers[variablesString]) {
       documentQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -3186,7 +3213,7 @@ export const documentQueryService =
         () => {
           triggerDocumentQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -3261,8 +3288,17 @@ const triggerDocumentPathQuery = (variablesString: string, variables: DocumentPa
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const documentPathQueryService =
-  (variables: DocumentPathQueryVariables) => (callback, onReceive) => {
+  (variables: DocumentPathQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (documentPathQueryServiceSubscribers[variablesString]) {
       documentPathQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -3280,7 +3316,7 @@ export const documentPathQueryService =
         () => {
           triggerDocumentPathQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -3355,8 +3391,17 @@ const triggerDocumentShareLinkQuery = (variablesString: string, variables: Docum
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const documentShareLinkQueryService =
-  (variables: DocumentShareLinkQueryVariables) => (callback, onReceive) => {
+  (variables: DocumentShareLinkQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (documentShareLinkQueryServiceSubscribers[variablesString]) {
       documentShareLinkQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -3374,7 +3419,7 @@ export const documentShareLinkQueryService =
         () => {
           triggerDocumentShareLinkQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -3449,8 +3494,17 @@ const triggerDocumentShareLinksQuery = (variablesString: string, variables: Docu
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const documentShareLinksQueryService =
-  (variables: DocumentShareLinksQueryVariables) => (callback, onReceive) => {
+  (variables: DocumentShareLinksQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (documentShareLinksQueryServiceSubscribers[variablesString]) {
       documentShareLinksQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -3468,7 +3522,7 @@ export const documentShareLinksQueryService =
         () => {
           triggerDocumentShareLinksQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -3543,8 +3597,17 @@ const triggerDocumentsQuery = (variablesString: string, variables: DocumentsQuer
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const documentsQueryService =
-  (variables: DocumentsQueryVariables) => (callback, onReceive) => {
+  (variables: DocumentsQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (documentsQueryServiceSubscribers[variablesString]) {
       documentsQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -3562,7 +3625,7 @@ export const documentsQueryService =
         () => {
           triggerDocumentsQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -3637,8 +3700,17 @@ const triggerFileUrlQuery = (variablesString: string, variables: FileUrlQueryVar
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const fileUrlQueryService =
-  (variables: FileUrlQueryVariables) => (callback, onReceive) => {
+  (variables: FileUrlQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (fileUrlQueryServiceSubscribers[variablesString]) {
       fileUrlQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -3656,7 +3728,7 @@ export const fileUrlQueryService =
         () => {
           triggerFileUrlQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -3731,8 +3803,17 @@ const triggerFirstDocumentQuery = (variablesString: string, variables: FirstDocu
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const firstDocumentQueryService =
-  (variables: FirstDocumentQueryVariables) => (callback, onReceive) => {
+  (variables: FirstDocumentQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (firstDocumentQueryServiceSubscribers[variablesString]) {
       firstDocumentQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -3750,7 +3831,7 @@ export const firstDocumentQueryService =
         () => {
           triggerFirstDocumentQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -3825,8 +3906,17 @@ const triggerFolderQuery = (variablesString: string, variables: FolderQueryVaria
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const folderQueryService =
-  (variables: FolderQueryVariables) => (callback, onReceive) => {
+  (variables: FolderQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (folderQueryServiceSubscribers[variablesString]) {
       folderQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -3844,7 +3934,7 @@ export const folderQueryService =
         () => {
           triggerFolderQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -3919,8 +4009,17 @@ const triggerFoldersQuery = (variablesString: string, variables: FoldersQueryVar
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const foldersQueryService =
-  (variables: FoldersQueryVariables) => (callback, onReceive) => {
+  (variables: FoldersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (foldersQueryServiceSubscribers[variablesString]) {
       foldersQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -3938,7 +4037,7 @@ export const foldersQueryService =
         () => {
           triggerFoldersQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -4013,8 +4112,17 @@ const triggerMainDeviceQuery = (variablesString: string, variables: MainDeviceQu
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const mainDeviceQueryService =
-  (variables: MainDeviceQueryVariables) => (callback, onReceive) => {
+  (variables: MainDeviceQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (mainDeviceQueryServiceSubscribers[variablesString]) {
       mainDeviceQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -4032,7 +4140,7 @@ export const mainDeviceQueryService =
         () => {
           triggerMainDeviceQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -4107,8 +4215,17 @@ const triggerMeQuery = (variablesString: string, variables: MeQueryVariables) =>
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const meQueryService =
-  (variables: MeQueryVariables) => (callback, onReceive) => {
+  (variables: MeQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (meQueryServiceSubscribers[variablesString]) {
       meQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -4126,7 +4243,7 @@ export const meQueryService =
         () => {
           triggerMeQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -4201,8 +4318,17 @@ const triggerMeWithWorkspaceLoadingInfoQuery = (variablesString: string, variabl
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const meWithWorkspaceLoadingInfoQueryService =
-  (variables: MeWithWorkspaceLoadingInfoQueryVariables) => (callback, onReceive) => {
+  (variables: MeWithWorkspaceLoadingInfoQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString]) {
       meWithWorkspaceLoadingInfoQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -4220,7 +4346,7 @@ export const meWithWorkspaceLoadingInfoQueryService =
         () => {
           triggerMeWithWorkspaceLoadingInfoQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -4295,8 +4421,17 @@ const triggerPendingWorkspaceInvitationQuery = (variablesString: string, variabl
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const pendingWorkspaceInvitationQueryService =
-  (variables: PendingWorkspaceInvitationQueryVariables) => (callback, onReceive) => {
+  (variables: PendingWorkspaceInvitationQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (pendingWorkspaceInvitationQueryServiceSubscribers[variablesString]) {
       pendingWorkspaceInvitationQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -4314,7 +4449,7 @@ export const pendingWorkspaceInvitationQueryService =
         () => {
           triggerPendingWorkspaceInvitationQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -4389,8 +4524,17 @@ const triggerRootFoldersQuery = (variablesString: string, variables: RootFolders
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const rootFoldersQueryService =
-  (variables: RootFoldersQueryVariables) => (callback, onReceive) => {
+  (variables: RootFoldersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (rootFoldersQueryServiceSubscribers[variablesString]) {
       rootFoldersQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -4408,7 +4552,7 @@ export const rootFoldersQueryService =
         () => {
           triggerRootFoldersQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -4483,8 +4627,17 @@ const triggerUnauthorizedDevicesForWorkspacesQuery = (variablesString: string, v
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const unauthorizedDevicesForWorkspacesQueryService =
-  (variables: UnauthorizedDevicesForWorkspacesQueryVariables) => (callback, onReceive) => {
+  (variables: UnauthorizedDevicesForWorkspacesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString]) {
       unauthorizedDevicesForWorkspacesQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -4502,7 +4655,7 @@ export const unauthorizedDevicesForWorkspacesQueryService =
         () => {
           triggerUnauthorizedDevicesForWorkspacesQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -4577,8 +4730,17 @@ const triggerUnauthorizedMembersQuery = (variablesString: string, variables: Una
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const unauthorizedMembersQueryService =
-  (variables: UnauthorizedMembersQueryVariables) => (callback, onReceive) => {
+  (variables: UnauthorizedMembersQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (unauthorizedMembersQueryServiceSubscribers[variablesString]) {
       unauthorizedMembersQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -4596,7 +4758,7 @@ export const unauthorizedMembersQueryService =
         () => {
           triggerUnauthorizedMembersQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -4671,8 +4833,17 @@ const triggerUserIdFromUsernameQuery = (variablesString: string, variables: User
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const userIdFromUsernameQueryService =
-  (variables: UserIdFromUsernameQueryVariables) => (callback, onReceive) => {
+  (variables: UserIdFromUsernameQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (userIdFromUsernameQueryServiceSubscribers[variablesString]) {
       userIdFromUsernameQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -4690,7 +4861,7 @@ export const userIdFromUsernameQueryService =
         () => {
           triggerUserIdFromUsernameQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -4765,8 +4936,17 @@ const triggerWorkspaceQuery = (variablesString: string, variables: WorkspaceQuer
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const workspaceQueryService =
-  (variables: WorkspaceQueryVariables) => (callback, onReceive) => {
+  (variables: WorkspaceQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (workspaceQueryServiceSubscribers[variablesString]) {
       workspaceQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -4784,7 +4964,7 @@ export const workspaceQueryService =
         () => {
           triggerWorkspaceQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -4859,8 +5039,17 @@ const triggerWorkspaceDevicesQuery = (variablesString: string, variables: Worksp
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const workspaceDevicesQueryService =
-  (variables: WorkspaceDevicesQueryVariables) => (callback, onReceive) => {
+  (variables: WorkspaceDevicesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (workspaceDevicesQueryServiceSubscribers[variablesString]) {
       workspaceDevicesQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -4878,7 +5067,7 @@ export const workspaceDevicesQueryService =
         () => {
           triggerWorkspaceDevicesQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -4953,8 +5142,17 @@ const triggerWorkspaceInvitationQuery = (variablesString: string, variables: Wor
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const workspaceInvitationQueryService =
-  (variables: WorkspaceInvitationQueryVariables) => (callback, onReceive) => {
+  (variables: WorkspaceInvitationQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (workspaceInvitationQueryServiceSubscribers[variablesString]) {
       workspaceInvitationQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -4972,7 +5170,7 @@ export const workspaceInvitationQueryService =
         () => {
           triggerWorkspaceInvitationQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -5047,8 +5245,17 @@ const triggerWorkspaceInvitationsQuery = (variablesString: string, variables: Wo
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const workspaceInvitationsQueryService =
-  (variables: WorkspaceInvitationsQueryVariables) => (callback, onReceive) => {
+  (variables: WorkspaceInvitationsQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (workspaceInvitationsQueryServiceSubscribers[variablesString]) {
       workspaceInvitationsQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -5066,7 +5273,7 @@ export const workspaceInvitationsQueryService =
         () => {
           triggerWorkspaceInvitationsQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
@@ -5141,8 +5348,17 @@ const triggerWorkspacesQuery = (variablesString: string, variables: WorkspacesQu
     });
 };
 
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
 export const workspacesQueryService =
-  (variables: WorkspacesQueryVariables) => (callback, onReceive) => {
+  (variables: WorkspacesQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
     const variablesString = canonicalize(variables) as string;
     if (workspacesQueryServiceSubscribers[variablesString]) {
       workspacesQueryServiceSubscribers[variablesString].callbacks.push(callback);
@@ -5160,7 +5376,7 @@ export const workspacesQueryService =
         () => {
           triggerWorkspacesQuery(variablesString, variables);
         },
-        4000
+        intervalInMs || 4000
       );
     }
 
