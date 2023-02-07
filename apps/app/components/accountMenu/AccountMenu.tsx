@@ -8,6 +8,7 @@ import {
   MenuLink,
   Pressable,
   SidebarDivider,
+  Spinner,
   Text,
   tw,
   useIsDesktopDevice,
@@ -50,7 +51,7 @@ export default function AccountMenu({
         snapPoints: [
           // 50 is the height of a single workspace item
           180 +
-            (workspacesQueryResult?.data?.workspaces?.nodes?.length || 0) * 50,
+            (workspacesQueryResult?.data?.workspaces?.nodes?.length || 1) * 50,
         ],
       }}
       popoverProps={{
@@ -114,34 +115,41 @@ export default function AccountMenu({
       </MenuLink>
 
       {workspacesQueryResult?.data?.workspaces?.nodes &&
-      workspacesQueryResult.data.workspaces.nodes.length >= 1
-        ? workspacesQueryResult.data.workspaces.nodes.map((workspace) =>
-            workspace === null || workspace === undefined ? null : (
-              <MenuLink
-                key={workspace.id}
-                to={{
-                  screen: "Workspace",
+      workspacesQueryResult.data.workspaces.nodes.length >= 1 ? (
+        workspacesQueryResult.data.workspaces.nodes.map((workspace) =>
+          workspace === null || workspace === undefined ? null : (
+            <MenuLink
+              key={workspace.id}
+              to={{
+                screen: "Workspace",
+                params: {
+                  workspaceId: workspace.id,
+                  screen: "WorkspaceDrawer",
                   params: {
-                    workspaceId: workspace.id,
-                    screen: "WorkspaceDrawer",
-                    params: {
-                      screen: "WorkspaceRoot",
-                    },
+                    screen: "WorkspaceRoot",
                   },
-                }}
-                icon={
-                  <WorkspaceAvatar
-                    customColor={"honey"}
-                    key={`avatar_${workspace.id}`}
-                    size="xxs"
-                  />
-                }
-              >
-                {workspace.name}
-              </MenuLink>
-            )
+                },
+              }}
+              icon={
+                <WorkspaceAvatar
+                  customColor={"honey"}
+                  key={`avatar_${workspace.id}`}
+                  size="xxs"
+                />
+              }
+            >
+              {workspace.name}
+            </MenuLink>
           )
-        : null}
+        )
+      ) : (
+        <View style={tw`pl-5 py-3.5`}>
+          <Spinner
+            style={tw`items-start`}
+            size={isDesktopDevice ? "sm" : "lg"}
+          />
+        </View>
+      )}
 
       {isDesktopDevice ? (
         <View style={tw`pl-1.5 pr-3 py-1.5`}>
