@@ -29,6 +29,7 @@ model Document {
   nameKeyDerivationTrace Json                @default("{}")
   documentShareLinks     DocumentShareLink[]
   requiresSnapshot       Boolean             @default(false)
+  comments               Comment[]
 
   @@unique([subkeyId, workspaceId])
 }
@@ -170,6 +171,7 @@ model CreatorDevice {
   createdAt                    DateTime          @default(now())
   workspaceKeyBoxes            WorkspaceKeyBox[]
   snapshotKeyBoxes             SnapshotKeyBox[]
+  Comment                      Comment[]
 }
 
 model Workspace {
@@ -276,4 +278,16 @@ model SnapshotKeyBox {
   documentShareLink             DocumentShareLink @relation(fields: [documentShareLinkToken], references: [token], onDelete: Cascade)
   documentShareLinkToken        String
   creatorDevice                 CreatorDevice     @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
+}
+
+model Comment {
+  id                            String        @id @unique @default(uuid())
+  document                      Document      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId                    String
+  createdAt                     DateTime      @default(now())
+  encryptedContent              String
+  encryptedContentNonce         String
+  contentKeyDerivationTrace     Json          @default("{}")
+  creatorDevice                 CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
+  creatorDeviceSigningPublicKey String
 }

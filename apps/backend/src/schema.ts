@@ -7,6 +7,7 @@ import * as StartLoginTypes from "./graphql/mutations/authentication/startLogin"
 import * as StartRegistrationTypes from "./graphql/mutations/authentication/startRegistration";
 import * as VerifyPasswordTypes from "./graphql/mutations/authentication/verifyPassword";
 import * as VerifyRegistrationTypes from "./graphql/mutations/authentication/verifyRegistration";
+import * as CreateCommentMutationTypes from "./graphql/mutations/comment/createComment";
 import * as AttachDevicesToWorkspacesMutationTypes from "./graphql/mutations/device/attachDevicesToWorkspaces";
 import * as AttachDeviceToWorkspacesMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspaces";
 import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
@@ -125,6 +126,8 @@ export const schema = makeSchema({
     AttachDeviceToWorkspacesMutationTypes,
     UnauthorizedDevicesForWorkspacesTypes,
     AttachDevicesToWorkspacesMutationTypes,
+
+    CreateCommentMutationTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),
