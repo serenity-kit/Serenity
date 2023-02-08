@@ -89,6 +89,15 @@ export const createComment = async ({
     mutation createComment($input: CreateCommentInput!) {
       createComment(input: $input) {
         id
+        documentId
+        encryptedContent
+        encryptedContentNonce
+        creatorDevice {
+          signingPublicKey
+          encryptionPublicKey
+          encryptionPublicKeySignature
+          createdAt
+        }
       }
     }
   `;

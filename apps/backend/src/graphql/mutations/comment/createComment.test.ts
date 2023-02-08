@@ -9,12 +9,9 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 
 const graphql = setupGraphql();
 let userData1: any = undefined;
-let documentId1;
-const password = "password";
-let userData: any = null;
-let addedWorkspace: any = null;
-let addedFolder: any = null;
 let sessionKey = "";
+let documentId1 = "";
+const password = "password";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
@@ -22,10 +19,8 @@ const setup = async () => {
     username: `${uuidv4()}@example.com`,
     password,
   });
-  sessionKey = userData1.sessionKey;
-  addedWorkspace = userData1.workspace;
-  addedFolder = userData1.folder;
   documentId1 = userData1.document.id;
+  sessionKey = userData1.sessionKey;
 };
 
 beforeAll(async () => {
@@ -38,13 +33,22 @@ test("owner comments", async () => {
     graphql,
     documentId: documentId1,
     comment: "nice job",
-    creatorDevice: userData1.device,
-    creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
-    creatorDeviceSigningPrivateKey: userData1.deviceSigningPrivateKey,
+    creatorDevice: userData1.webDevice,
+    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
   const comment = createCommentResult.createComment;
   expect(typeof comment.id).toBe("string");
+  expect(comment.documentId).toBe(documentId1);
+  expect(typeof comment.encryptedContent).toBe("string");
+  expect(typeof comment.encryptedContentNonce).toBe("string");
+  expect(comment.creatorDevice.signingPublicKey).toBe(
+    userData1.webDevice.signingPublicKey
+  );
+  expect(comment.creatorDevice.encryptionPublicKey).toBe(
+    userData1.webDevice.encryptionPublicKey
+  );
 });
 
 test("admin comments", async () => {
@@ -61,13 +65,22 @@ test("admin comments", async () => {
     graphql,
     documentId: documentId1,
     comment: "nice job",
-    creatorDevice: userData1.device,
-    creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
-    creatorDeviceSigningPrivateKey: userData1.deviceSigningPrivateKey,
+    creatorDevice: userData1.webDevice,
+    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
   const comment = createCommentResult.createComment;
   expect(typeof comment.id).toBe("string");
+  expect(comment.documentId).toBe(documentId1);
+  expect(typeof comment.encryptedContent).toBe("string");
+  expect(typeof comment.encryptedContentNonce).toBe("string");
+  expect(comment.creatorDevice.signingPublicKey).toBe(
+    userData1.webDevice.signingPublicKey
+  );
+  expect(comment.creatorDevice.encryptionPublicKey).toBe(
+    userData1.webDevice.encryptionPublicKey
+  );
 });
 
 test("editor comments", async () => {
@@ -84,13 +97,22 @@ test("editor comments", async () => {
     graphql,
     documentId: documentId1,
     comment: "nice job",
-    creatorDevice: userData1.device,
-    creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
-    creatorDeviceSigningPrivateKey: userData1.deviceSigningPrivateKey,
+    creatorDevice: userData1.webDevice,
+    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
   const comment = createCommentResult.createComment;
   expect(typeof comment.id).toBe("string");
+  expect(comment.documentId).toBe(documentId1);
+  expect(typeof comment.encryptedContent).toBe("string");
+  expect(typeof comment.encryptedContentNonce).toBe("string");
+  expect(comment.creatorDevice.signingPublicKey).toBe(
+    userData1.webDevice.signingPublicKey
+  );
+  expect(comment.creatorDevice.encryptionPublicKey).toBe(
+    userData1.webDevice.encryptionPublicKey
+  );
 });
 
 test("commenter comment", async () => {
@@ -107,13 +129,22 @@ test("commenter comment", async () => {
     graphql,
     documentId: documentId1,
     comment: "nice job",
-    creatorDevice: userData1.device,
-    creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
-    creatorDeviceSigningPrivateKey: userData1.deviceSigningPrivateKey,
+    creatorDevice: userData1.webDevice,
+    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
   const comment = createCommentResult.createComment;
   expect(typeof comment.id).toBe("string");
+  expect(comment.documentId).toBe(documentId1);
+  expect(typeof comment.encryptedContent).toBe("string");
+  expect(typeof comment.encryptedContentNonce).toBe("string");
+  expect(comment.creatorDevice.signingPublicKey).toBe(
+    userData1.webDevice.signingPublicKey
+  );
+  expect(comment.creatorDevice.encryptionPublicKey).toBe(
+    userData1.webDevice.encryptionPublicKey
+  );
 });
 
 test("viewer tries to comment", async () => {
@@ -132,9 +163,10 @@ test("viewer tries to comment", async () => {
         graphql,
         documentId: documentId1,
         comment: "nice job",
-        creatorDevice: userData1.device,
-        creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
-        creatorDeviceSigningPrivateKey: userData1.deviceSigningPrivateKey,
+        creatorDevice: userData1.webDevice,
+        creatorDeviceEncryptionPrivateKey:
+          userData1.webDevice.encryptionPrivateKey,
+        creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
         authorizationHeader: userData1.sessionKey,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -168,9 +200,10 @@ test("invalid document", async () => {
         graphql,
         documentId: badDocumentId,
         comment: "nice job",
-        creatorDevice: userData1.device,
-        creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
-        creatorDeviceSigningPrivateKey: userData1.deviceSigningPrivateKey,
+        creatorDevice: userData1.webDevice,
+        creatorDeviceEncryptionPrivateKey:
+          userData1.webDevice.encryptionPrivateKey,
+        creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
         authorizationHeader: userData1.sessionKey,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -183,9 +216,10 @@ test("Unauthenticated", async () => {
         graphql,
         documentId: documentId1,
         comment: "nice job",
-        creatorDevice: userData1.device,
-        creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
-        creatorDeviceSigningPrivateKey: userData1.deviceSigningPrivateKey,
+        creatorDevice: userData1.webDevice,
+        creatorDeviceEncryptionPrivateKey:
+          userData1.webDevice.encryptionPrivateKey,
+        creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
         authorizationHeader: "badauthkey",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -200,6 +234,15 @@ describe("Input errors", () => {
     mutation createComment($input: CreateCommentInput!) {
       createComment(input: $input) {
         id
+        documentId
+        encryptedContent
+        encryptedContentNonce
+        creatorDevice {
+          signingPublicKey
+          encryptionPublicKey
+          encryptionPublicKeySignature
+          createdAt
+        }
       }
     }
   `;

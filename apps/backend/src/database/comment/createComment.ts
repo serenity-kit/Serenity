@@ -63,7 +63,10 @@ export async function createComment({
         },
       },
     });
-    return comment;
+    return {
+      ...comment,
+      creatorDevice,
+    };
   } catch (e) {
     console.log(e);
     throw e;

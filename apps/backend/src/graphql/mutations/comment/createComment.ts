@@ -7,6 +7,7 @@ import {
   objectType,
 } from "nexus";
 import { createComment } from "../../../database/comment/createComment";
+import { CreatorDevice } from "../../types/device";
 import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const CreateCommentInput = inputObjectType({
@@ -25,6 +26,10 @@ export const CreateCommentResult = objectType({
   name: "CreateCommentResult",
   definition(t) {
     t.nonNull.string("id");
+    t.nonNull.string("documentId");
+    t.nonNull.string("encryptedContent");
+    t.nonNull.string("encryptedContentNonce");
+    t.nonNull.field("creatorDevice", { type: CreatorDevice });
   },
 });
 
@@ -49,8 +54,6 @@ export const createCommentMutation = mutationField("createComment", {
       encryptedContentNonce: args.input.encryptedContentNonce,
       contentKeyDerivationTrace: args.input.contentKeyDerivationTrace,
     });
-    return {
-      id: comment.id,
-    };
+    return comment;
   },
 });
