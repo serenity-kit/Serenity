@@ -1,11 +1,9 @@
-import { useEffect, useLayoutEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 import Page from "../../../components/page/Page";
-import { PageHeader } from "../../../components/page/PageHeader";
-import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
 import { useWorkspace } from "../../../context/WorkspaceContext";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
-import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
+import { PageCommentsDrawerScreenProps } from "../../../types/navigationProps";
 
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
@@ -22,7 +20,7 @@ import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { loadPageMachine } from "./loadPageMachine";
 
-const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
+const PageRemountWrapper = (props: PageCommentsDrawerScreenProps<"Page">) => {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const pageId = props.route.params.pageId;
   const { activeDevice } = useAuthenticatedAppContext();
@@ -42,13 +40,13 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     },
   });
 
-  useLayoutEffect(() => {
-    props.navigation.setOptions({
-      headerRight: PageHeaderRight,
-      headerTitle: PageHeader,
-      headerTitleAlign: "center",
-    });
-  }, []);
+  // useLayoutEffect(() => {
+  //   props.navigation.setOptions({
+  //     headerRight: PageHeaderRight,
+  //     headerTitle: PageHeader,
+  //     headerTitleAlign: "center",
+  //   });
+  // }, []);
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPath = await getDocumentPath(docId);
@@ -136,7 +134,9 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
 // By remounting the component we make sure that a fresh state machine gets started.
 // As an alternative we could also have an action that resets the state machine,
 // but with all the side-effects remounting seemed to be the stabler choice for now.
-export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
+export default function PageScreen(
+  props: PageCommentsDrawerScreenProps<"Page">
+) {
   const pageId = props.route.params.pageId;
   return <PageRemountWrapper key={pageId} {...props} />;
 }

@@ -44,7 +44,7 @@ import {
   runWorkspaceQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
-import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
+import { PageCommentsDrawerScreenProps } from "../../types/navigationProps";
 import { getSessionKey } from "../../utils/authentication/sessionKeyStore";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../utils/document/getDocument";
@@ -58,7 +58,7 @@ import {
 
 const reconnectTimeout = 2000;
 
-type Props = WorkspaceDrawerScreenProps<"Page"> & {
+type Props = PageCommentsDrawerScreenProps<"Page"> & {
   updateTitle: (title: string) => void;
   signatureKeyPair: KeyPair;
   workspaceId: string;

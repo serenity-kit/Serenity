@@ -26,7 +26,7 @@ import {
   useDocumentShareLinksQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
-import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
+import { PageCommentsDrawerScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { notNull } from "../../utils/notNull/notNull";
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
 const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 1;
 
 export function PageShareModalContent() {
-  const route = useRoute<WorkspaceDrawerScreenProps<"Page">["route"]>();
+  const route = useRoute<PageCommentsDrawerScreenProps<"Page">["route"]>();
   const [documentShareLinksResult, refetchDocumentShareLinks] =
     useDocumentShareLinksQuery({
       variables: { documentId: route.params.pageId },

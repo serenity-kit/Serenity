@@ -14,8 +14,16 @@ type RegistrationVerificationParams = {
   verification?: string;
 };
 
-export type WorkspaceDrawerParamList = {
+export type PageCommentsDrawerParamList = {
   Page: PageParamList;
+};
+
+export type PageCommentsDrawerParams =
+  | NavigatorScreenParams<PageCommentsDrawerParamList>
+  | PageCommentsDrawerParamList;
+
+export type WorkspaceDrawerParamList = {
+  PageCommentsDrawer: PageCommentsDrawerParams;
   WorkspaceNotDecrypted: undefined;
   WorkspaceRoot: undefined;
 };

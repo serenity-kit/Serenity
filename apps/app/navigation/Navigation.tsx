@@ -9,7 +9,6 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   Heading,
-  Text,
   tw,
   useIsDesktopDevice,
   useIsPermanentLeftSidebar,
@@ -18,9 +17,12 @@ import * as Linking from "expo-linking";
 import { useEffect } from "react";
 import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
+import CommentsSidebar from "../components/commentsSidebar/CommentsSidebar";
 import { HeaderLeft } from "../components/headerLeft/HeaderLeft";
 import NavigationDrawerModal from "../components/navigationDrawerModal/NavigationDrawerModal";
+import { PageHeader } from "../components/page/PageHeader";
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
+import { PageHeaderRight } from "../components/pageHeaderRight/PageHeaderRight";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
 import { WorkspaceProvider } from "../context/WorkspaceContext";
@@ -66,6 +68,7 @@ const WorkspaceStack = createNativeStackNavigator<WorkspaceStackParamList>();
 const Drawer = createDrawerNavigator();
 const AccountSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
 const WorkspaceSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
+const PageCommentsDrawer = createDrawerNavigator(); // for desktop and tablet
 
 const styles = StyleSheet.create({
   // web prefix needed as this otherwise messes with the height-calculation for mobile
@@ -74,10 +77,37 @@ const styles = StyleSheet.create({
 
 const isPhoneDimensions = (width: number) => width < 768;
 
+const PageCommentsDrawerNavigator: React.FC<{ navigation: any }> = (props) => {
+  return (
+    <PageCommentsDrawer.Navigator
+      id="PageCommentsDrawer"
+      drawerContent={(props) => <CommentsSidebar {...props} />}
+      screenOptions={{
+        headerStyle: [styles.header],
+        headerLeft: (headerProps) => (
+          <PageHeaderLeft {...headerProps} navigation={props.navigation} />
+        ),
+        headerRight: () => <PageHeaderRight />,
+        headerTitle: () => <PageHeader />,
+        headerTitleAlign: "center",
+        drawerType: "front", // TODO should be front
+        unmountOnBlur: true,
+        drawerPosition: "left",
+        drawerStyle: {
+          width: 240,
+          // right: 0,
+        },
+        overlayColor: "transparent",
+      }}
+    >
+      <PageCommentsDrawer.Screen name="Page" component={PageScreen} />
+    </PageCommentsDrawer.Navigator>
+  );
+};
+
 function WorkspaceDrawerNavigator(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const isDesktopDevice = useIsDesktopDevice();
-
   const { width } = useWindowDimensions();
 
   return (
@@ -85,21 +115,21 @@ function WorkspaceDrawerNavigator(props) {
       drawerContent={(props) => <Sidebar {...props} />}
       screenOptions={{
         unmountOnBlur: true,
-        headerShown: true,
-        headerTitle: (props) => <Text>{props.children}</Text>,
-        headerStyle: [styles.header],
+        headerShown: false,
         drawerType: isPermanentLeftSidebar ? "permanent" : "front",
         drawerStyle: {
           width: isDesktopDevice ? 240 : width,
         },
-        headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
         overlayColor:
           !isPermanentLeftSidebar && isDesktopDevice
             ? tw.color("backdrop")
             : "transparent",
       }}
     >
-      <Drawer.Screen name="Page" component={PageScreen} />
+      <Drawer.Screen
+        name="PageCommentsDrawer"
+        component={PageCommentsDrawerNavigator}
+      />
       <Drawer.Screen
         name="WorkspaceNotDecrypted"
         component={WorkspaceNotDecryptedScreen}
@@ -452,7 +482,12 @@ const getLinking = (
             WorkspaceDrawer: {
               path: "/",
               screens: {
-                Page: "page/:pageId",
+                PageCommentsDrawer: {
+                  path: "page",
+                  screens: {
+                    Page: ":pageId",
+                  },
+                },
                 WorkspaceNotDecrypted: "lobby",
                 WorkspaceRoot: "",
               },
