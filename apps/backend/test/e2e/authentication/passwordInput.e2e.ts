@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
-import { openMemberSettingsMemberRoleMenu } from "../../helpers/e2e/openMemberSettingsMemberRoleMenu";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
 
 test("Bad login then good login", async ({ page }) => {
@@ -23,20 +22,30 @@ test("Bad login then good login", async ({ page }) => {
   );
   await reloadPage({ page });
   await delayForSeconds(3);
-  await openMemberSettingsMemberRoleMenu({ page, userId: user.id });
-  await page.locator(`[data-testid=account-menu--create-workspace]`).click();
+  await page.locator(`[data-testid=general__account-menu--trigger]`).click();
   await delayForSeconds(1);
+  await page
+    .locator(`[data-testid=general__account-menu--create-workspace]`)
+    .click();
+  await delayForSeconds(1);
+  const passwordModal = page.locator(`[data-testid=verify-password-modal]`);
   const passwordInput = page.locator(
     `[data-testid=verify-password-modal__password-input]`
   );
-  const verifyButton = await page.locator(
+  const verifyButton = page.locator(
     `[data-testid=verify-password-modal__submit-button]`
   );
+  // enter wrong password. Modal should stay open
   await passwordInput.type("badpass");
   await verifyButton.click();
   await delayForSeconds(2);
-  expect(passwordInput).toBeVisible();
+  const isModalVisible1 = await passwordModal.isVisible();
+  expect(isModalVisible1).toBe(true);
+  // enter correct password. Modal should close
+  await passwordInput.selectText();
   await passwordInput.type("pass");
   await verifyButton.click();
-  expect(passwordInput).not.toBeVisible();
+  await delayForSeconds(1);
+  const isModalVisible2 = await passwordModal.isVisible();
+  expect(isModalVisible2).toBe(false);
 });
