@@ -2,6 +2,7 @@ import { DrawerScreenProps } from "@react-navigation/drawer";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import {
+  PageCommentsDrawerParamList,
   RootStackParamList,
   WorkspaceDrawerParamList,
   WorkspaceStackParamList,
@@ -30,6 +31,10 @@ export type WorkspaceStackScreenProps<
 export type WorkspaceDrawerScreenProps<
   Screen extends keyof WorkspaceDrawerParamList
 > = DrawerScreenProps<WorkspaceDrawerParamList, Screen>;
+
+export type PageCommentsDrawerScreenProps<
+  Screen extends keyof PageCommentsDrawerParamList
+> = DrawerScreenProps<PageCommentsDrawerParamList, Screen>;
 
 declare global {
   namespace ReactNavigation {

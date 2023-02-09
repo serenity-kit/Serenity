@@ -1,7 +1,12 @@
-import { NavigatorScreenParams } from "@react-navigation/native";
+import { NavigatorScreenParams, ParamListBase } from "@react-navigation/native";
+
+// see https://github.com/react-navigation/react-navigation/issues/6931#issuecomment-958749155
+interface ISubNavigator<T extends ParamListBase, K extends keyof T> {
+  screen: K;
+  params?: T[K];
+}
 
 type PageParamList = {
-  pageId: string;
   isNew?: boolean;
 };
 
@@ -9,20 +14,26 @@ type WorkspacePageParamList = {
   workspaceId: string;
 };
 
-type RegistrationVerificationParams = {
+type RegistrationVerificationParamsList = {
   username?: string;
   verification?: string;
 };
 
-export type WorkspaceDrawerParamList = {
+export type PageCommentsDrawerParamList = {
   Page: PageParamList;
+};
+
+export type WorkspaceDrawerParamList = {
+  PageCommentsDrawer: ISubNavigator<
+    PageCommentsDrawerParamList,
+    keyof PageCommentsDrawerParamList
+  > & { pageId: string };
   WorkspaceNotDecrypted: undefined;
   WorkspaceRoot: undefined;
 };
 
 export type WorkspaceDrawerParams =
-  | NavigatorScreenParams<WorkspaceDrawerParamList>
-  | WorkspaceDrawerParamList;
+  NavigatorScreenParams<WorkspaceDrawerParamList>;
 
 export type AccountSettingsDrawerParamList = {
   Profile: undefined;
@@ -77,7 +88,7 @@ export type RootStackParamList = {
   DesignSystem: undefined;
   DevDashboard: undefined;
   Register: undefined;
-  RegistrationVerification: RegistrationVerificationParams;
+  RegistrationVerification: RegistrationVerificationParamsList;
   AcceptWorkspaceInvitation: WorkspaceInvitationParams;
   WorkspaceNotFound: undefined;
   Login: LoginParams | undefined; // the next inside LoginParams is optional

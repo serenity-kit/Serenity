@@ -12,7 +12,7 @@ export const devices = queryField((t) => {
       documentId: nonNull(idArg()),
     },
     async nodes(root, args, context) {
-      if (args.first > 50) {
+      if (args.first && args.first > 50) {
         throw new UserInputError(
           "Requested too many devices. First value exceeds 50."
         );

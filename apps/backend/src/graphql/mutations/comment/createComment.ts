@@ -16,7 +16,7 @@ export const CreateCommentInput = inputObjectType({
     t.nonNull.string("documentId");
     t.nonNull.string("encryptedContent");
     t.nonNull.string("encryptedContentNonce");
-    t.field("contentKeyDerivationTrace", {
+    t.nonNull.field("contentKeyDerivationTrace", {
       type: KeyDerivationTraceInput,
     });
   },

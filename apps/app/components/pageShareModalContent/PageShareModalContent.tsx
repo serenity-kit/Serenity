@@ -1,4 +1,3 @@
-import { useRoute } from "@react-navigation/native";
 import {
   Button,
   Description,
@@ -21,12 +20,12 @@ import * as Clipboard from "expo-clipboard";
 import { useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import sodium, { KeyPair } from "react-native-libsodium";
+import { usePage } from "../../context/PageContext";
 import {
   runRemoveDocumentShareLinkMutation,
   useDocumentShareLinksQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
-import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { notNull } from "../../utils/notNull/notNull";
@@ -43,10 +42,10 @@ const styles = StyleSheet.create({
 const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 1;
 
 export function PageShareModalContent() {
-  const route = useRoute<WorkspaceDrawerScreenProps<"Page">["route"]>();
+  const { pageId } = usePage();
   const [documentShareLinksResult, refetchDocumentShareLinks] =
     useDocumentShareLinksQuery({
-      variables: { documentId: route.params.pageId },
+      variables: { documentId: pageId },
     });
   const isDesktopDevice = useIsDesktopDevice();
   const { activeDevice } = useAuthenticatedAppContext();
@@ -74,7 +73,7 @@ export function PageShareModalContent() {
       activeDevice;
     try {
       const shareLinkData = await createDocumentShareLink({
-        documentId: route.params.pageId,
+        documentId: pageId,
         creatorDevice,
         creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
       });
