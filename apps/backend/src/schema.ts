@@ -8,8 +8,9 @@ import * as StartRegistrationTypes from "./graphql/mutations/authentication/star
 import * as VerifyPasswordTypes from "./graphql/mutations/authentication/verifyPassword";
 import * as VerifyRegistrationTypes from "./graphql/mutations/authentication/verifyRegistration";
 import * as CreateCommentMutationTypes from "./graphql/mutations/comment/createComment";
-import * as CreateCommentReplyMutationTypes from "./graphql/mutations/commentReply/createCommentReply";
 import * as DeleteCommentsMutationTypes from "./graphql/mutations/comment/deleteComments";
+import * as CreateCommentReplyMutationTypes from "./graphql/mutations/commentReply/createCommentReply";
+import * as DeleteCommentRepliessMutationTypes from "./graphql/mutations/commentReply/deleteCommentReplies";
 import * as AttachDevicesToWorkspacesMutationTypes from "./graphql/mutations/device/attachDevicesToWorkspaces";
 import * as AttachDeviceToWorkspacesMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspaces";
 import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
@@ -135,6 +136,7 @@ export const schema = makeSchema({
     CommentsByDocumentIdQueryTypes,
 
     CreateCommentReplyMutationTypes,
+    DeleteCommentRepliessMutationTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),
