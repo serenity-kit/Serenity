@@ -56,6 +56,45 @@ export type AttachDevicesToWorkspacesResult = {
   workspaces: Array<WorkspaceWithWorkspaceKeys>;
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  creatorDevice: CreatorDevice;
+  documentId: Scalars['String'];
+  encryptedContent: Scalars['String'];
+  encryptedContentNonce: Scalars['String'];
+  id: Scalars['String'];
+};
+
+export type CommentConnection = {
+  __typename?: 'CommentConnection';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Edge-Types */
+  edges?: Maybe<Array<Maybe<CommentEdge>>>;
+  /** Flattened list of Comment type */
+  nodes?: Maybe<Array<Maybe<Comment>>>;
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-undefined.PageInfo */
+  pageInfo: PageInfo;
+};
+
+export type CommentEdge = {
+  __typename?: 'CommentEdge';
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Cursor */
+  cursor: Scalars['String'];
+  /** https://facebook.github.io/relay/graphql/connections.htm#sec-Node */
+  node?: Maybe<Comment>;
+};
+
+export type CreateCommentInput = {
+  contentKeyDerivationTrace?: InputMaybe<KeyDerivationTraceInput>;
+  documentId: Scalars['String'];
+  encryptedContent: Scalars['String'];
+  encryptedContentNonce: Scalars['String'];
+};
+
+export type CreateCommentResult = {
+  __typename?: 'CreateCommentResult';
+  comment?: Maybe<Comment>;
+};
+
 export type CreateDocumentInput = {
   id: Scalars['String'];
   nameKeyDerivationTrace?: InputMaybe<KeyDerivationTraceInput>;
@@ -518,6 +557,7 @@ export type Mutation = {
   acceptWorkspaceInvitation?: Maybe<AcceptWorkspaceInvitationResult>;
   attachDeviceToWorkspaces?: Maybe<AttachDeviceToWorkspacesResult>;
   attachDevicesToWorkspaces?: Maybe<AttachDevicesToWorkspacesResult>;
+  createComment?: Maybe<CreateCommentResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createDocumentShareLink?: Maybe<CreateDocumentShareLinkResult>;
   createFolder?: Maybe<CreateFolderResult>;
@@ -557,6 +597,11 @@ export type MutationAttachDeviceToWorkspacesArgs = {
 
 export type MutationAttachDevicesToWorkspacesArgs = {
   input: AttachDevicesToWorkspacesInput;
+};
+
+
+export type MutationCreateCommentArgs = {
+  input: CreateCommentInput;
 };
 
 
@@ -699,6 +744,7 @@ export type PendingWorkspaceInvitationResult = {
 export type Query = {
   __typename?: 'Query';
   activeWorkspaceKeys?: Maybe<ActiveWorkspaceKeysResult>;
+  commentsByDocumentId?: Maybe<CommentConnection>;
   deviceBySigningPublicKey?: Maybe<DeviceResult>;
   devices?: Maybe<DeviceWithRecentSessionConnection>;
   document?: Maybe<Document>;
@@ -728,6 +774,15 @@ export type Query = {
 export type QueryActiveWorkspaceKeysArgs = {
   deviceSigningPublicKey: Scalars['String'];
   workspaceId: Scalars['ID'];
+};
+
+
+export type QueryCommentsByDocumentIdArgs = {
+  after?: InputMaybe<Scalars['String']>;
+  before?: InputMaybe<Scalars['String']>;
+  documentId: Scalars['ID'];
+  first?: InputMaybe<Scalars['Int']>;
+  last?: InputMaybe<Scalars['Int']>;
 };
 
 
@@ -1189,6 +1244,13 @@ export type AttachDevicesToWorkspacesMutationVariables = Exact<{
 
 export type AttachDevicesToWorkspacesMutation = { __typename?: 'Mutation', attachDevicesToWorkspaces?: { __typename?: 'AttachDevicesToWorkspacesResult', workspaces: Array<{ __typename?: 'WorkspaceWithWorkspaceKeys', id: string, workspaceKeys: Array<{ __typename?: 'WorkspaceKeyWithMembers', id: string, generation: number, members: Array<{ __typename?: 'MemberWithWorkspaceKeyBoxes', id: string, workspaceKeyBoxes: Array<{ __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, ciphertext: string, nonce: string }> }> }> }> } | null };
 
+export type CreateCommentMutationVariables = Exact<{
+  input: CreateCommentInput;
+}>;
+
+
+export type CreateCommentMutation = { __typename?: 'Mutation', createComment?: { __typename?: 'CreateCommentResult', comment?: { __typename?: 'Comment', id: string, documentId: string, encryptedContent: string, encryptedContentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } } | null } | null };
+
 export type CreateDocumentMutationVariables = Exact<{
   input: CreateDocumentInput;
 }>;
@@ -1354,6 +1416,15 @@ export type VerifyRegistrationMutationVariables = Exact<{
 
 
 export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegistration?: { __typename?: 'VerifyRegistrationResult', id: string } | null };
+
+export type CommentsByDocumentIdQueryVariables = Exact<{
+  documentId: Scalars['ID'];
+  first?: InputMaybe<Scalars['Int']>;
+  after?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, encryptedContent: string, encryptedContentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DeviceBySigningPublicKeyQueryVariables = Exact<{
   signingPublicKey: Scalars['ID'];
@@ -1603,6 +1674,28 @@ export const AttachDevicesToWorkspacesDocument = gql`
 
 export function useAttachDevicesToWorkspacesMutation() {
   return Urql.useMutation<AttachDevicesToWorkspacesMutation, AttachDevicesToWorkspacesMutationVariables>(AttachDevicesToWorkspacesDocument);
+};
+export const CreateCommentDocument = gql`
+    mutation createComment($input: CreateCommentInput!) {
+  createComment(input: $input) {
+    comment {
+      id
+      documentId
+      encryptedContent
+      encryptedContentNonce
+      creatorDevice {
+        signingPublicKey
+        encryptionPublicKey
+        encryptionPublicKeySignature
+        createdAt
+      }
+    }
+  }
+}
+    `;
+
+export function useCreateCommentMutation() {
+  return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
 };
 export const CreateDocumentDocument = gql`
     mutation createDocument($input: CreateDocumentInput!) {
@@ -1990,6 +2083,34 @@ export const VerifyRegistrationDocument = gql`
 
 export function useVerifyRegistrationMutation() {
   return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
+};
+export const CommentsByDocumentIdDocument = gql`
+    query commentsByDocumentId($documentId: ID!, $first: Int = 50, $after: String) {
+  commentsByDocumentId(documentId: $documentId, first: $first, after: $after) {
+    nodes {
+      id
+      documentId
+      encryptedContent
+      encryptedContentNonce
+      creatorDevice {
+        signingPublicKey
+        encryptionPublicKey
+        encryptionPublicKeySignature
+        createdAt
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+  }
+}
+    `;
+
+export function useCommentsByDocumentIdQuery(options: Omit<Urql.UseQueryArgs<CommentsByDocumentIdQueryVariables>, 'query'>) {
+  return Urql.useQuery<CommentsByDocumentIdQuery, CommentsByDocumentIdQueryVariables>({ query: CommentsByDocumentIdDocument, ...options });
 };
 export const DeviceBySigningPublicKeyDocument = gql`
     query deviceBySigningPublicKey($signingPublicKey: ID!) {
@@ -2545,7 +2666,7 @@ export function useWorkspacesQuery(options: Omit<Urql.UseQueryArgs<WorkspacesQue
   return Urql.useQuery<WorkspacesQuery, WorkspacesQueryVariables>({ query: WorkspacesDocument, ...options });
 };
 
-export const runAcceptWorkspaceInvitationMutation = async (variables: AcceptWorkspaceInvitationMutationVariables, options: any) => {
+export const runAcceptWorkspaceInvitationMutation = async (variables: AcceptWorkspaceInvitationMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<AcceptWorkspaceInvitationMutation, AcceptWorkspaceInvitationMutationVariables>(
       AcceptWorkspaceInvitationDocument,
@@ -2559,7 +2680,7 @@ export const runAcceptWorkspaceInvitationMutation = async (variables: AcceptWork
     .toPromise();
 };
 
-export const runAttachDeviceToWorkspacesMutation = async (variables: AttachDeviceToWorkspacesMutationVariables, options: any) => {
+export const runAttachDeviceToWorkspacesMutation = async (variables: AttachDeviceToWorkspacesMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<AttachDeviceToWorkspacesMutation, AttachDeviceToWorkspacesMutationVariables>(
       AttachDeviceToWorkspacesDocument,
@@ -2573,7 +2694,7 @@ export const runAttachDeviceToWorkspacesMutation = async (variables: AttachDevic
     .toPromise();
 };
 
-export const runAttachDevicesToWorkspacesMutation = async (variables: AttachDevicesToWorkspacesMutationVariables, options: any) => {
+export const runAttachDevicesToWorkspacesMutation = async (variables: AttachDevicesToWorkspacesMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<AttachDevicesToWorkspacesMutation, AttachDevicesToWorkspacesMutationVariables>(
       AttachDevicesToWorkspacesDocument,
@@ -2587,7 +2708,21 @@ export const runAttachDevicesToWorkspacesMutation = async (variables: AttachDevi
     .toPromise();
 };
 
-export const runCreateDocumentMutation = async (variables: CreateDocumentMutationVariables, options: any) => {
+export const runCreateCommentMutation = async (variables: CreateCommentMutationVariables, options?: any) => {
+  return await getUrqlClient()
+    .mutation<CreateCommentMutation, CreateCommentMutationVariables>(
+      CreateCommentDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runCreateDocumentMutation = async (variables: CreateDocumentMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<CreateDocumentMutation, CreateDocumentMutationVariables>(
       CreateDocumentDocument,
@@ -2601,7 +2736,7 @@ export const runCreateDocumentMutation = async (variables: CreateDocumentMutatio
     .toPromise();
 };
 
-export const runCreateDocumentShareLinkMutation = async (variables: CreateDocumentShareLinkMutationVariables, options: any) => {
+export const runCreateDocumentShareLinkMutation = async (variables: CreateDocumentShareLinkMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<CreateDocumentShareLinkMutation, CreateDocumentShareLinkMutationVariables>(
       CreateDocumentShareLinkDocument,
@@ -2615,7 +2750,7 @@ export const runCreateDocumentShareLinkMutation = async (variables: CreateDocume
     .toPromise();
 };
 
-export const runCreateFolderMutation = async (variables: CreateFolderMutationVariables, options: any) => {
+export const runCreateFolderMutation = async (variables: CreateFolderMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<CreateFolderMutation, CreateFolderMutationVariables>(
       CreateFolderDocument,
@@ -2629,7 +2764,7 @@ export const runCreateFolderMutation = async (variables: CreateFolderMutationVar
     .toPromise();
 };
 
-export const runCreateInitialWorkspaceStructureMutation = async (variables: CreateInitialWorkspaceStructureMutationVariables, options: any) => {
+export const runCreateInitialWorkspaceStructureMutation = async (variables: CreateInitialWorkspaceStructureMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<CreateInitialWorkspaceStructureMutation, CreateInitialWorkspaceStructureMutationVariables>(
       CreateInitialWorkspaceStructureDocument,
@@ -2643,7 +2778,7 @@ export const runCreateInitialWorkspaceStructureMutation = async (variables: Crea
     .toPromise();
 };
 
-export const runCreateWorkspaceInvitationMutation = async (variables: CreateWorkspaceInvitationMutationVariables, options: any) => {
+export const runCreateWorkspaceInvitationMutation = async (variables: CreateWorkspaceInvitationMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(
       CreateWorkspaceInvitationDocument,
@@ -2657,7 +2792,7 @@ export const runCreateWorkspaceInvitationMutation = async (variables: CreateWork
     .toPromise();
 };
 
-export const runDeleteDevicesMutation = async (variables: DeleteDevicesMutationVariables, options: any) => {
+export const runDeleteDevicesMutation = async (variables: DeleteDevicesMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<DeleteDevicesMutation, DeleteDevicesMutationVariables>(
       DeleteDevicesDocument,
@@ -2671,7 +2806,7 @@ export const runDeleteDevicesMutation = async (variables: DeleteDevicesMutationV
     .toPromise();
 };
 
-export const runDeleteDocumentsMutation = async (variables: DeleteDocumentsMutationVariables, options: any) => {
+export const runDeleteDocumentsMutation = async (variables: DeleteDocumentsMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<DeleteDocumentsMutation, DeleteDocumentsMutationVariables>(
       DeleteDocumentsDocument,
@@ -2685,7 +2820,7 @@ export const runDeleteDocumentsMutation = async (variables: DeleteDocumentsMutat
     .toPromise();
 };
 
-export const runDeleteFoldersMutation = async (variables: DeleteFoldersMutationVariables, options: any) => {
+export const runDeleteFoldersMutation = async (variables: DeleteFoldersMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<DeleteFoldersMutation, DeleteFoldersMutationVariables>(
       DeleteFoldersDocument,
@@ -2699,7 +2834,7 @@ export const runDeleteFoldersMutation = async (variables: DeleteFoldersMutationV
     .toPromise();
 };
 
-export const runDeleteWorkspaceInvitationsMutation = async (variables: DeleteWorkspaceInvitationsMutationVariables, options: any) => {
+export const runDeleteWorkspaceInvitationsMutation = async (variables: DeleteWorkspaceInvitationsMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<DeleteWorkspaceInvitationsMutation, DeleteWorkspaceInvitationsMutationVariables>(
       DeleteWorkspaceInvitationsDocument,
@@ -2713,7 +2848,7 @@ export const runDeleteWorkspaceInvitationsMutation = async (variables: DeleteWor
     .toPromise();
 };
 
-export const runDeleteWorkspacesMutation = async (variables: DeleteWorkspacesMutationVariables, options: any) => {
+export const runDeleteWorkspacesMutation = async (variables: DeleteWorkspacesMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<DeleteWorkspacesMutation, DeleteWorkspacesMutationVariables>(
       DeleteWorkspacesDocument,
@@ -2727,7 +2862,7 @@ export const runDeleteWorkspacesMutation = async (variables: DeleteWorkspacesMut
     .toPromise();
 };
 
-export const runFinishLoginMutation = async (variables: FinishLoginMutationVariables, options: any) => {
+export const runFinishLoginMutation = async (variables: FinishLoginMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<FinishLoginMutation, FinishLoginMutationVariables>(
       FinishLoginDocument,
@@ -2741,7 +2876,7 @@ export const runFinishLoginMutation = async (variables: FinishLoginMutationVaria
     .toPromise();
 };
 
-export const runFinishRegistrationMutation = async (variables: FinishRegistrationMutationVariables, options: any) => {
+export const runFinishRegistrationMutation = async (variables: FinishRegistrationMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<FinishRegistrationMutation, FinishRegistrationMutationVariables>(
       FinishRegistrationDocument,
@@ -2755,7 +2890,7 @@ export const runFinishRegistrationMutation = async (variables: FinishRegistratio
     .toPromise();
 };
 
-export const runInitiateFileUploadMutation = async (variables: InitiateFileUploadMutationVariables, options: any) => {
+export const runInitiateFileUploadMutation = async (variables: InitiateFileUploadMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<InitiateFileUploadMutation, InitiateFileUploadMutationVariables>(
       InitiateFileUploadDocument,
@@ -2769,7 +2904,7 @@ export const runInitiateFileUploadMutation = async (variables: InitiateFileUploa
     .toPromise();
 };
 
-export const runLogoutMutation = async (variables: LogoutMutationVariables, options: any) => {
+export const runLogoutMutation = async (variables: LogoutMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<LogoutMutation, LogoutMutationVariables>(
       LogoutDocument,
@@ -2783,7 +2918,7 @@ export const runLogoutMutation = async (variables: LogoutMutationVariables, opti
     .toPromise();
 };
 
-export const runRemoveDocumentShareLinkMutation = async (variables: RemoveDocumentShareLinkMutationVariables, options: any) => {
+export const runRemoveDocumentShareLinkMutation = async (variables: RemoveDocumentShareLinkMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<RemoveDocumentShareLinkMutation, RemoveDocumentShareLinkMutationVariables>(
       RemoveDocumentShareLinkDocument,
@@ -2797,7 +2932,7 @@ export const runRemoveDocumentShareLinkMutation = async (variables: RemoveDocume
     .toPromise();
 };
 
-export const runRemoveMembersAndRotateWorkspaceKeyMutation = async (variables: RemoveMembersAndRotateWorkspaceKeyMutationVariables, options: any) => {
+export const runRemoveMembersAndRotateWorkspaceKeyMutation = async (variables: RemoveMembersAndRotateWorkspaceKeyMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<RemoveMembersAndRotateWorkspaceKeyMutation, RemoveMembersAndRotateWorkspaceKeyMutationVariables>(
       RemoveMembersAndRotateWorkspaceKeyDocument,
@@ -2811,7 +2946,7 @@ export const runRemoveMembersAndRotateWorkspaceKeyMutation = async (variables: R
     .toPromise();
 };
 
-export const runStartLoginMutation = async (variables: StartLoginMutationVariables, options: any) => {
+export const runStartLoginMutation = async (variables: StartLoginMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<StartLoginMutation, StartLoginMutationVariables>(
       StartLoginDocument,
@@ -2825,7 +2960,7 @@ export const runStartLoginMutation = async (variables: StartLoginMutationVariabl
     .toPromise();
 };
 
-export const runStartRegistrationMutation = async (variables: StartRegistrationMutationVariables, options: any) => {
+export const runStartRegistrationMutation = async (variables: StartRegistrationMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<StartRegistrationMutation, StartRegistrationMutationVariables>(
       StartRegistrationDocument,
@@ -2839,7 +2974,7 @@ export const runStartRegistrationMutation = async (variables: StartRegistrationM
     .toPromise();
 };
 
-export const runUpdateDocumentNameMutation = async (variables: UpdateDocumentNameMutationVariables, options: any) => {
+export const runUpdateDocumentNameMutation = async (variables: UpdateDocumentNameMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<UpdateDocumentNameMutation, UpdateDocumentNameMutationVariables>(
       UpdateDocumentNameDocument,
@@ -2853,7 +2988,7 @@ export const runUpdateDocumentNameMutation = async (variables: UpdateDocumentNam
     .toPromise();
 };
 
-export const runUpdateFolderNameMutation = async (variables: UpdateFolderNameMutationVariables, options: any) => {
+export const runUpdateFolderNameMutation = async (variables: UpdateFolderNameMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<UpdateFolderNameMutation, UpdateFolderNameMutationVariables>(
       UpdateFolderNameDocument,
@@ -2867,7 +3002,7 @@ export const runUpdateFolderNameMutation = async (variables: UpdateFolderNameMut
     .toPromise();
 };
 
-export const runUpdateWorkspaceMembersRolesMutation = async (variables: UpdateWorkspaceMembersRolesMutationVariables, options: any) => {
+export const runUpdateWorkspaceMembersRolesMutation = async (variables: UpdateWorkspaceMembersRolesMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<UpdateWorkspaceMembersRolesMutation, UpdateWorkspaceMembersRolesMutationVariables>(
       UpdateWorkspaceMembersRolesDocument,
@@ -2881,7 +3016,7 @@ export const runUpdateWorkspaceMembersRolesMutation = async (variables: UpdateWo
     .toPromise();
 };
 
-export const runUpdateWorkspaceNameMutation = async (variables: UpdateWorkspaceNameMutationVariables, options: any) => {
+export const runUpdateWorkspaceNameMutation = async (variables: UpdateWorkspaceNameMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<UpdateWorkspaceNameMutation, UpdateWorkspaceNameMutationVariables>(
       UpdateWorkspaceNameDocument,
@@ -2895,7 +3030,7 @@ export const runUpdateWorkspaceNameMutation = async (variables: UpdateWorkspaceN
     .toPromise();
 };
 
-export const runVerifyPasswordMutation = async (variables: VerifyPasswordMutationVariables, options: any) => {
+export const runVerifyPasswordMutation = async (variables: VerifyPasswordMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<VerifyPasswordMutation, VerifyPasswordMutationVariables>(
       VerifyPasswordDocument,
@@ -2909,7 +3044,7 @@ export const runVerifyPasswordMutation = async (variables: VerifyPasswordMutatio
     .toPromise();
 };
 
-export const runVerifyRegistrationMutation = async (variables: VerifyRegistrationMutationVariables, options: any) => {
+export const runVerifyRegistrationMutation = async (variables: VerifyRegistrationMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(
       VerifyRegistrationDocument,
@@ -2922,6 +3057,109 @@ export const runVerifyRegistrationMutation = async (variables: VerifyRegistratio
     )
     .toPromise();
 };
+
+export const runCommentsByDocumentIdQuery = async (variables: CommentsByDocumentIdQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<CommentsByDocumentIdQuery, CommentsByDocumentIdQueryVariables>(
+      CommentsByDocumentIdDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type CommentsByDocumentIdQueryResult = Urql.OperationResult<CommentsByDocumentIdQuery, CommentsByDocumentIdQueryVariables>;
+
+export type CommentsByDocumentIdQueryUpdateResultEvent = {
+  type: "CommentsByDocumentIdQuery.UPDATE_RESULT";
+  result: CommentsByDocumentIdQueryResult;
+};
+
+export type CommentsByDocumentIdQueryErrorEvent = {
+  type: "CommentsByDocumentIdQuery.ERROR";
+  result: CommentsByDocumentIdQueryResult;
+};
+
+export type CommentsByDocumentIdQueryServiceEvent = CommentsByDocumentIdQueryUpdateResultEvent | CommentsByDocumentIdQueryErrorEvent;
+
+type CommentsByDocumentIdQueryServiceSubscribersEntry = {
+  variables: CommentsByDocumentIdQueryVariables;
+  callbacks: ((event: CommentsByDocumentIdQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type CommentsByDocumentIdQueryServiceSubscribers = {
+  [variables: string]: CommentsByDocumentIdQueryServiceSubscribersEntry;
+};
+
+const commentsByDocumentIdQueryServiceSubscribers: CommentsByDocumentIdQueryServiceSubscribers = {};
+
+const triggerCommentsByDocumentIdQuery = (variablesString: string, variables: CommentsByDocumentIdQueryVariables) => {
+  getUrqlClient()
+    .query<CommentsByDocumentIdQuery, CommentsByDocumentIdQueryVariables>(CommentsByDocumentIdDocument, variables)
+    .toPromise()
+    .then((result) => {
+      commentsByDocumentIdQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "CommentsByDocumentIdQuery.ERROR" : "CommentsByDocumentIdQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const commentsByDocumentIdQueryService =
+  (variables: CommentsByDocumentIdQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (commentsByDocumentIdQueryServiceSubscribers[variablesString]) {
+      commentsByDocumentIdQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      commentsByDocumentIdQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerCommentsByDocumentIdQuery(variablesString, variables);
+    if (!commentsByDocumentIdQueryServiceSubscribers[variablesString].intervalId) {
+      commentsByDocumentIdQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerCommentsByDocumentIdQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = commentsByDocumentIdQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        commentsByDocumentIdQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        commentsByDocumentIdQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
 
 export const runDeviceBySigningPublicKeyQuery = async (variables: DeviceBySigningPublicKeyQueryVariables, options?: any) => {
   return await getUrqlClient()

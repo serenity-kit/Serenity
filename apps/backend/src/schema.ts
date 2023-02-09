@@ -7,6 +7,8 @@ import * as StartLoginTypes from "./graphql/mutations/authentication/startLogin"
 import * as StartRegistrationTypes from "./graphql/mutations/authentication/startRegistration";
 import * as VerifyPasswordTypes from "./graphql/mutations/authentication/verifyPassword";
 import * as VerifyRegistrationTypes from "./graphql/mutations/authentication/verifyRegistration";
+import * as CreateCommentMutationTypes from "./graphql/mutations/comment/createComment";
+import * as DeleteCommentsMutationTypes from "./graphql/mutations/comment/deleteComments";
 import * as AttachDevicesToWorkspacesMutationTypes from "./graphql/mutations/device/attachDevicesToWorkspaces";
 import * as AttachDeviceToWorkspacesMutationTypes from "./graphql/mutations/device/attachDeviceToWorkspaces";
 import * as DeleteDevicesMutationTypes from "./graphql/mutations/device/deleteDevices";
@@ -28,6 +30,7 @@ import * as RemoveMembersAndRotateWorkspaceKeyMutationTypes from "./graphql/muta
 import * as UpdateWorkspaceMembersRolesMutationTypes from "./graphql/mutations/workspace/updateWorkspaceMembersRoles";
 import * as UpdateWorkspaceNameMutationTypes from "./graphql/mutations/workspace/updateWorkspaceName";
 import * as MeQueryTypes from "./graphql/queries/authentication/me";
+import * as CommentsByDocumentIdQueryTypes from "./graphql/queries/comment/commentsByDocumentId";
 import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
 import * as DevicesQueryTypes from "./graphql/queries/device/devices";
 import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
@@ -125,6 +128,10 @@ export const schema = makeSchema({
     AttachDeviceToWorkspacesMutationTypes,
     UnauthorizedDevicesForWorkspacesTypes,
     AttachDevicesToWorkspacesMutationTypes,
+
+    CreateCommentMutationTypes,
+    DeleteCommentsMutationTypes,
+    CommentsByDocumentIdQueryTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),

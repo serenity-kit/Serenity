@@ -1,0 +1,16 @@
+mutation createComment($input: CreateCommentInput!) {
+  createComment(input: $input) {
+    comment {
+      id
+      documentId
+      encryptedContent
+      encryptedContentNonce
+      creatorDevice {
+        signingPublicKey
+        encryptionPublicKey
+        encryptionPublicKeySignature
+        createdAt
+      }
+    }
+  }
+}
