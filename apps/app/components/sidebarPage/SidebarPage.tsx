@@ -58,9 +58,10 @@ export default function SidebarPage(props: Props) {
         workspaceId: props.workspaceId,
         screen: "WorkspaceDrawer",
         params: {
-          screen: "Page",
+          screen: "PageCommentsDrawer",
           params: {
             pageId: props.documentId,
+            screen: "Page",
           },
         },
       },
