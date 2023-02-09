@@ -1,13 +1,7 @@
 import { AuthenticationError } from "apollo-server-express";
-import {
-  arg,
-  inputObjectType,
-  mutationField,
-  nonNull,
-  objectType,
-} from "nexus";
+import { arg, inputObjectType, mutationField, nonNull } from "nexus";
 import { createComment } from "../../../database/comment/createComment";
-import { CreatorDevice } from "../../types/device";
+import { CommentResult } from "../../types/comment";
 import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const CreateCommentInput = inputObjectType({
@@ -22,19 +16,8 @@ export const CreateCommentInput = inputObjectType({
   },
 });
 
-export const CreateCommentResult = objectType({
-  name: "CreateCommentResult",
-  definition(t) {
-    t.nonNull.string("id");
-    t.nonNull.string("documentId");
-    t.nonNull.string("encryptedContent");
-    t.nonNull.string("encryptedContentNonce");
-    t.nonNull.field("creatorDevice", { type: CreatorDevice });
-  },
-});
-
 export const createCommentMutation = mutationField("createComment", {
-  type: CreateCommentResult,
+  type: CommentResult,
   args: {
     input: nonNull(
       arg({
