@@ -17,6 +17,7 @@ interface Context {
   commentsByDocumentIdQueryResult?: CommentsByDocumentIdQueryResult;
   commentsByDocumentIdQueryError: boolean;
   commentsByDocumentIdQueryActor?: AnyActorRef;
+  commentText: string;
 }
 
 export const commentsSidebarMachine = createMachine(
@@ -24,6 +25,7 @@ export const commentsSidebarMachine = createMachine(
     schema: {
       events: {} as
         | CommentsByDocumentIdQueryServiceEvent
+        | { type: "UPDATE_COMMENT_TEXT"; text: string }
         | { type: "CREATE_COMMENT" },
       context: {} as Context,
     },
@@ -34,6 +36,7 @@ export const commentsSidebarMachine = createMachine(
         pageId: "",
       },
       commentsByDocumentIdQueryError: false,
+      commentText: "",
     },
     initial: "idle",
     on: {
@@ -53,6 +56,9 @@ export const commentsSidebarMachine = createMachine(
           assign({ commentsByDocumentIdQueryError: true }),
         ],
       },
+      UPDATE_COMMENT_TEXT: {
+        actions: ["updateCommentText"],
+      },
     },
     states: {
       idle: {
@@ -65,7 +71,7 @@ export const commentsSidebarMachine = createMachine(
           id: "createComment",
           onDone: [
             {
-              actions: ["stopActors", "spawnActors"], // respawn to trigger a request,
+              actions: ["clearCommentText", "stopActors", "spawnActors"], // respawn to trigger a request,
               cond: "hasNoNetworkError",
               target: "idle",
             },
@@ -106,14 +112,22 @@ export const commentsSidebarMachine = createMachine(
           context.commentsByDocumentIdQueryActor.stop();
         }
       },
+      clearCommentText: assign({ commentText: "" }),
+      updateCommentText: assign((context, event) => {
+        return {
+          commentText:
+            event.type === "UPDATE_COMMENT_TEXT"
+              ? event.text
+              : context.commentText,
+        };
+      }),
     },
     services: {
       createComment: (context, event) => {
-        console.log("event", event);
         return runCreateCommentMutation({
           input: {
             documentId: context.params.pageId,
-            encryptedContent: "encryptedContent",
+            encryptedContent: context.commentText,
             encryptedContentNonce: "encryptedContentNonce",
             contentKeyDerivationTrace: {
               workspaceKeyId: "workspaceKeyId",

@@ -23,27 +23,27 @@ export interface Typegen0 {
   };
   missingImplementations: {
     actions: never;
-    delays: never;
-    guards: never;
     services: never;
+    guards: never;
+    delays: never;
   };
   eventsCausingActions: {
     redirectToLobby: "";
     redirectToLogin: "";
     redirectToNotFoundOrNoWorkspaces: "";
   };
-  eventsCausingDelays: {};
+  eventsCausingServices: {
+    fetchMeWithWorkspaceLoadingInfo:
+      | "xstate.after(2000)#loadInitialData.failure"
+      | "xstate.init";
+  };
   eventsCausingGuards: {
     hasAccessToWorkspace: "";
     hasNoNetworkError: "done.invoke.fetchMeWithWorkspaceLoadingInfo";
     isAuthorized: "";
     isValidSession: "";
   };
-  eventsCausingServices: {
-    fetchMeWithWorkspaceLoadingInfo:
-      | "xstate.after(2000)#loadInitialData.failure"
-      | "xstate.init";
-  };
+  eventsCausingDelays: {};
   matchesStates:
     | "failure"
     | "hasWorkspaceAccess"

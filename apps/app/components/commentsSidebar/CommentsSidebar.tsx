@@ -1,5 +1,12 @@
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
-import { Button, ScrollView, Text, tw, View } from "@serenity-tools/ui";
+import {
+  Button,
+  RawInput,
+  ScrollView,
+  Text,
+  tw,
+  View,
+} from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { usePage } from "../../context/PageContext";
 import { commentsSidebarMachine } from "./commentsSidebarMachine";
@@ -18,11 +25,12 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
       <Text>Comments WIP</Text>
 
       <View>
-        <Button
-          onPress={() =>
-            send({ type: "CREATE_COMMENT", comment: { body: "test" } })
-          }
-        >
+        <RawInput
+          multiline
+          value={state.context.commentText}
+          onChangeText={(text) => send({ type: "UPDATE_COMMENT_TEXT", text })}
+        />
+        <Button onPress={() => send({ type: "CREATE_COMMENT" })}>
           Create Comment
         </Button>
       </View>
@@ -33,7 +41,7 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
             if (!comment) return null;
             return (
               <View key={comment.id}>
-                <Text>{comment.id}</Text>
+                <Text>{comment.encryptedContent}</Text>
               </View>
             );
           }

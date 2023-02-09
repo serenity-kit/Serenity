@@ -8,9 +8,9 @@ export interface Typegen0 {
   invokeSrcNameMap: {};
   missingImplementations: {
     actions: never;
-    delays: never;
-    guards: never;
     services: never;
+    guards: never;
+    delays: never;
   };
   eventsCausingActions: {
     showErrorToast:
@@ -20,9 +20,9 @@ export interface Typegen0 {
     spawnActors: "CLOSE" | "OPEN" | "xstate.init";
     stopActors: "CLOSE" | "OPEN" | "xstate.init";
   };
-  eventsCausingDelays: {};
-  eventsCausingGuards: {};
   eventsCausingServices: {};
+  eventsCausingGuards: {};
+  eventsCausingDelays: {};
   matchesStates: "closed" | "open";
   tags: never;
 }
