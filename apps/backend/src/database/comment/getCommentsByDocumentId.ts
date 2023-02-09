@@ -46,6 +46,7 @@ export async function getCommentsByDocumentId({
       creatorDevice: true,
       commentReplies: {
         orderBy: { createdAt: "desc" },
+        include: { creatorDevice: true },
       },
     },
   });

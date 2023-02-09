@@ -1,6 +1,7 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getCommentsByDocumentId } from "../../../database/comment/getCommentsByDocumentId";
+import { formatComment } from "../../../types/comment";
 import { Comment } from "../../types/comment";
 
 export const devices = queryField((t) => {
@@ -34,7 +35,10 @@ export const devices = queryField((t) => {
         skip,
         take,
       });
-      return comments;
+      const formattedComments = comments.map((comment) =>
+        formatComment(comment)
+      );
+      return formattedComments;
     },
   });
 });
