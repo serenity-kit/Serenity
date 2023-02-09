@@ -38,7 +38,7 @@ test("owner comments", async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
-  const comment = createCommentResult.createComment;
+  const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
   expect(comment.documentId).toBe(documentId1);
   expect(typeof comment.encryptedContent).toBe("string");
@@ -70,7 +70,7 @@ test("admin comments", async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
-  const comment = createCommentResult.createComment;
+  const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
   expect(comment.documentId).toBe(documentId1);
   expect(typeof comment.encryptedContent).toBe("string");
@@ -102,7 +102,7 @@ test("editor comments", async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
-  const comment = createCommentResult.createComment;
+  const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
   expect(comment.documentId).toBe(documentId1);
   expect(typeof comment.encryptedContent).toBe("string");
@@ -134,7 +134,7 @@ test("commenter comment", async () => {
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
-  const comment = createCommentResult.createComment;
+  const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
   expect(comment.documentId).toBe(documentId1);
   expect(typeof comment.encryptedContent).toBe("string");
@@ -229,19 +229,20 @@ describe("Input errors", () => {
   const authorizationHeaders = {
     authorization: sessionKey,
   };
-  const id = uuidv4();
   const query = gql`
     mutation createComment($input: CreateCommentInput!) {
       createComment(input: $input) {
-        id
-        documentId
-        encryptedContent
-        encryptedContentNonce
-        creatorDevice {
-          signingPublicKey
-          encryptionPublicKey
-          encryptionPublicKeySignature
-          createdAt
+        comment {
+          id
+          documentId
+          encryptedContent
+          encryptedContentNonce
+          creatorDevice {
+            signingPublicKey
+            encryptionPublicKey
+            encryptionPublicKeySignature
+            createdAt
+          }
         }
       }
     }

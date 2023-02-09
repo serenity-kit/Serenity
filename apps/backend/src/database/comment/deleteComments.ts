@@ -18,14 +18,15 @@ export async function deleteComments({ userId, commentIds }: Params) {
       where: { id: { in: commentIds } },
       select: { id: true, document: true, creatorDeviceSigningPublicKey: true },
     });
-
     const requestedWorkspaceIds: string[] = [];
     requestedComments.forEach((requestedComment) => {
-      if (requestedComment.document.workspaceId in requestedWorkspaceIds) {
+      if (
+        !requestedWorkspaceIds.includes(requestedComment.document.workspaceId)
+      ) {
         requestedWorkspaceIds.push(requestedComment.document.workspaceId);
       }
     });
-    // make a list of all the workspaces the user has access to
+    // make a list of all the workspaces the user has rights to change
     const allowedRoles = [Role.ADMIN, Role.EDITOR];
     const userWorkspaceRoles = await prisma.usersToWorkspaces.findMany({
       where: {
@@ -33,10 +34,23 @@ export async function deleteComments({ userId, commentIds }: Params) {
         workspaceId: { in: requestedWorkspaceIds },
         role: { in: allowedRoles },
       },
+      select: { workspaceId: true, role: true },
+    });
+    const userPrivilegedWorkspaceIds: string[] = [];
+    userWorkspaceRoles.forEach((userWorkspaceRole) => {
+      userPrivilegedWorkspaceIds.push(userWorkspaceRole.workspaceId);
+    });
+
+    // make a list of workspaces the user has access to
+    const userWorkspaces = await prisma.usersToWorkspaces.findMany({
+      where: {
+        userId,
+        workspaceId: { in: requestedWorkspaceIds },
+      },
       select: { workspaceId: true },
     });
     const userWorkspaceIds: string[] = [];
-    userWorkspaceRoles.forEach((userWorkspaceRole) => {
+    userWorkspaces.forEach((userWorkspaceRole) => {
       userWorkspaceIds.push(userWorkspaceRole.workspaceId);
     });
 
@@ -50,13 +64,19 @@ export async function deleteComments({ userId, commentIds }: Params) {
     );
 
     // create a list of deletable comments
+    // comments are deletable if the user is an admin or editor of the workspace
+    // or if the user is the creator of the comment and still has
+    // access to the workspace
     const deletableCommentIds: string[] = [];
     requestedComments.forEach((requestedComment) => {
       if (
-        userWorkspaceIds.includes(requestedComment.document.workspaceId) ||
-        userDeviceSigningPublicKeys.includes(
+        userPrivilegedWorkspaceIds.includes(
+          requestedComment.document.workspaceId
+        ) ||
+        (userDeviceSigningPublicKeys.includes(
           requestedComment.creatorDeviceSigningPublicKey
-        )
+        ) &&
+          userWorkspaceIds.includes(requestedComment.document.workspaceId))
       ) {
         deletableCommentIds.push(requestedComment.id);
       }

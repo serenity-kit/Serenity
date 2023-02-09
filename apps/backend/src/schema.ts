@@ -30,6 +30,7 @@ import * as RemoveMembersAndRotateWorkspaceKeyMutationTypes from "./graphql/muta
 import * as UpdateWorkspaceMembersRolesMutationTypes from "./graphql/mutations/workspace/updateWorkspaceMembersRoles";
 import * as UpdateWorkspaceNameMutationTypes from "./graphql/mutations/workspace/updateWorkspaceName";
 import * as MeQueryTypes from "./graphql/queries/authentication/me";
+import * as CommentsByDocumentIdQueryTypes from "./graphql/queries/comment/commentsByDocumentId";
 import * as deviceBySigningPublicKeyQueryTypes from "./graphql/queries/device/deviceBySigningPublicKey";
 import * as DevicesQueryTypes from "./graphql/queries/device/devices";
 import * as MainDeviceQueryTypes from "./graphql/queries/device/mainDevice";
@@ -130,6 +131,7 @@ export const schema = makeSchema({
 
     CreateCommentMutationTypes,
     DeleteCommentsMutationTypes,
+    CommentsByDocumentIdQueryTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),

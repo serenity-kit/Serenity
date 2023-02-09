@@ -88,15 +88,17 @@ export const createComment = async ({
   const query = gql`
     mutation createComment($input: CreateCommentInput!) {
       createComment(input: $input) {
-        id
-        documentId
-        encryptedContent
-        encryptedContentNonce
-        creatorDevice {
-          signingPublicKey
-          encryptionPublicKey
-          encryptionPublicKeySignature
-          createdAt
+        comment {
+          id
+          documentId
+          encryptedContent
+          encryptedContentNonce
+          creatorDevice {
+            signingPublicKey
+            encryptionPublicKey
+            encryptionPublicKeySignature
+            createdAt
+          }
         }
       }
     }
