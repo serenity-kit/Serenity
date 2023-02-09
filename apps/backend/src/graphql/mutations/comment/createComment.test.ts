@@ -257,10 +257,9 @@ describe("Input errors", () => {
               documentId: null,
               encryptedContent: "",
               encryptedContentNonce: "",
-              contentKeyDerivationTrace: {
+              keyDerivationTrace: {
                 workspaceKeyId: 1,
-                subkeyId: 1,
-                parentFolders: [],
+                trace: [],
               },
             },
           },
@@ -278,10 +277,9 @@ describe("Input errors", () => {
               id: uuidv4(),
               encryptedContent: null,
               encryptedContentNonce: "",
-              contentKeyDerivationTrace: {
+              keyDerivationTrace: {
                 workspaceKeyId: 1,
-                subkeyId: 1,
-                parentFolders: [],
+                trace: [],
               },
             },
           },
@@ -299,10 +297,9 @@ describe("Input errors", () => {
               id: uuidv4(),
               encryptedContent: "",
               encryptedContentNonce: null,
-              contentKeyDerivationTrace: {
+              keyDerivationTrace: {
                 workspaceKeyId: 1,
-                subkeyId: 1,
-                parentFolders: [],
+                trace: [],
               },
             },
           },
@@ -310,7 +307,7 @@ describe("Input errors", () => {
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid contentKeyDerivationTrace", async () => {
+  test("Invalid keyDerivationTrace", async () => {
     await expect(
       (async () =>
         await graphql.client.request(
@@ -320,7 +317,7 @@ describe("Input errors", () => {
               id: uuidv4(),
               encryptedContent: "",
               encryptedContentNonce: null,
-              contentKeyDerivationTrace: null,
+              keyDerivationTrace: null,
             },
           },
           authorizationHeaders

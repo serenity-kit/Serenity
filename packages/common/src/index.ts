@@ -13,6 +13,7 @@ export * from "./decryptDocumentTitle/decryptDocumentTitle";
 export * from "./decryptFolderName/decryptFolderName";
 export * from "./decryptWorkspaceInvitationKey/decryptWorkspaceInvitationKey";
 export * from "./decryptWorkspaceKey/decryptWorkspaceKey";
+export * from "./deriveKeysFromKeyDerivationTrace/deriveKeysFromKeyDerivationTrace";
 export * from "./encryptComment/encryptComment";
 export * from "./encryptDocumentTitle/encryptDocumentTitle";
 export * from "./encryptFolderName/encryptFolderName";

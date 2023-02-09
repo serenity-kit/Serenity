@@ -1,3 +1,14 @@
+import { KeyDerivationTrace2 } from "@naisho/core";
+import {
+  commentDerivedKeyContext,
+  createCommentKey,
+  decryptComment,
+  deriveKeysFromKeyDerivationTrace,
+  documentDerivedKeyContext,
+  encryptComment,
+  LocalDevice,
+  recreateDocumentKey,
+} from "@serenity-tools/common";
 import { AnyActorRef, assign, createMachine, spawn } from "xstate";
 import {
   CommentsByDocumentIdQueryResult,
@@ -6,10 +17,20 @@ import {
   CommentsByDocumentIdQueryUpdateResultEvent,
   runCreateCommentMutation,
 } from "../../generated/graphql";
+import { getDocument } from "../../utils/document/getDocument";
+import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
+import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { showToast } from "../../utils/toast/showToast";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 type Params = {
   pageId: string;
+  activeDevice: LocalDevice | null;
+};
+
+type DecryptedComment = {
+  id: string;
+  text: string;
 };
 
 interface Context {
@@ -17,6 +38,7 @@ interface Context {
   commentsByDocumentIdQueryResult?: CommentsByDocumentIdQueryResult;
   commentsByDocumentIdQueryError: boolean;
   commentsByDocumentIdQueryActor?: AnyActorRef;
+  decryptedComments: DecryptedComment[];
   commentText: string;
 }
 
@@ -34,9 +56,11 @@ export const commentsSidebarMachine = createMachine(
     context: {
       params: {
         pageId: "",
+        activeDevice: null,
       },
       commentsByDocumentIdQueryError: false,
       commentText: "",
+      decryptedComments: [],
     },
     initial: "idle",
     on: {
@@ -48,6 +72,7 @@ export const commentsSidebarMachine = createMachine(
               commentsByDocumentIdQueryResult: event.result,
             };
           }),
+          "decryptComments",
         ],
       },
       "CommentsByDocumentIdQuery.ERROR": {
@@ -101,7 +126,11 @@ export const commentsSidebarMachine = createMachine(
         return {
           commentsByDocumentIdQueryActor: spawn(
             commentsByDocumentIdQueryService(
-              { documentId: context.params.pageId },
+              {
+                documentId: context.params.pageId,
+                deviceSigningPublicKey:
+                  context.params.activeDevice!.signingPublicKey,
+              },
               10000 // poll only every 10 seconds
             )
           ),
@@ -121,24 +150,105 @@ export const commentsSidebarMachine = createMachine(
               : context.commentText,
         };
       }),
+      decryptComments: assign((context, event) => {
+        const decryptedComments =
+          context.commentsByDocumentIdQueryResult?.data?.commentsByDocumentId?.nodes?.map(
+            (encryptedComment) => {
+              const keyDerivationTraceWithKeys =
+                deriveKeysFromKeyDerivationTrace({
+                  keyDerivationTrace: encryptedComment?.keyDerivationTrace!,
+                  activeDevice: context.params.activeDevice!,
+                  workspaceKeyBox:
+                    context.commentsByDocumentIdQueryResult?.data
+                      ?.workspaceKeyByDocumentId?.nameWorkspaceKey
+                      .workspaceKeyBox!,
+                });
+
+              console.log(keyDerivationTraceWithKeys);
+
+              const decryptedComment = decryptComment({
+                key: keyDerivationTraceWithKeys.trace.at(-1)?.key!,
+                ciphertext: encryptedComment!.encryptedContent,
+                publicNonce: encryptedComment!.encryptedContentNonce,
+              });
+              return {
+                id: encryptedComment!.id,
+                ...JSON.parse(decryptedComment),
+              };
+            }
+          );
+
+        return {
+          decryptedComments,
+        };
+      }),
     },
     services: {
-      createComment: (context, event) => {
-        return runCreateCommentMutation({
+      createComment: async (context, event) => {
+        const document = await getDocument({
+          documentId: context.params.pageId,
+        });
+        const workspace = await getWorkspace({
+          workspaceId: document.workspaceId!,
+          deviceSigningPublicKey: context.params.activeDevice!.signingPublicKey,
+        });
+        const folderKeyChainData = await deriveFolderKey({
+          folderId: document.parentFolderId!,
+          workspaceId: document.workspaceId!,
+          keyDerivationTrace: document.nameKeyDerivationTrace,
+          activeDevice: context.params.activeDevice!,
+        });
+
+        const folderKey = folderKeyChainData[folderKeyChainData.length - 2];
+        const documentKeyData = recreateDocumentKey({
+          folderKey: folderKey.key,
+          subkeyId: document.nameKeyDerivationTrace.subkeyId,
+        });
+
+        const commentKey = createCommentKey({
+          documentNameKey: documentKeyData.key,
+        });
+
+        const result = encryptComment({
+          key: commentKey.key,
+          comment: JSON.stringify({
+            text: context.commentText,
+          }),
+        });
+
+        const folderKeyDerivationTrace = await createFolderKeyDerivationTrace({
+          folderId: document.parentFolderId!,
+          workspaceKeyId: workspace!.currentWorkspaceKey!.id,
+        });
+
+        const fullKeyDerivationTrace: KeyDerivationTrace2 = {
+          ...folderKeyDerivationTrace,
+          trace: [
+            ...folderKeyDerivationTrace.trace,
+            {
+              parentId:
+                folderKeyDerivationTrace.trace[
+                  folderKeyDerivationTrace.trace.length - 1
+                ].entryId,
+              subkeyId: documentKeyData.subkeyId,
+              entryId: document.id,
+              context: documentDerivedKeyContext,
+            },
+            {
+              parentId: document.id,
+              subkeyId: commentKey.subkeyId,
+              entryId: "TODO",
+              context: commentDerivedKeyContext,
+            },
+          ],
+        };
+
+        return await runCreateCommentMutation({
           input: {
             documentId: context.params.pageId,
-            encryptedContent: context.commentText,
-            encryptedContentNonce: "encryptedContentNonce",
-            contentKeyDerivationTrace: {
-              workspaceKeyId: "workspaceKeyId",
-              subkeyId: 42,
-              parentFolders: [
-                {
-                  folderId: "folderId",
-                  subkeyId: 42,
-                },
-              ],
-            },
+            encryptedContent: result.ciphertext,
+            encryptedContentNonce: result.publicNonce,
+            keyDerivationTrace: fullKeyDerivationTrace,
           },
         });
       },

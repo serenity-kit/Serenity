@@ -15,6 +15,27 @@ export type KeyDerivationTrace = {
   parentFolders: KeyDerivationTraceParentFolder[];
 };
 
+export type KeyDerivationTraceEntry = {
+  entryId: string; // didn't use id because it often GraphQL clients normalize by the id field
+  subkeyId: number;
+  parentId?: string | undefined | null; // the first entry has no parent
+  context: string; // kdf context
+};
+
+export type KeyDerivationTraceEntryWithKey = KeyDerivationTraceEntry & {
+  key: string;
+};
+
+export type KeyDerivationTrace2 = {
+  workspaceKeyId: string;
+  trace: KeyDerivationTraceEntry[];
+};
+
+export type KeyDerivationTraceWithKeys = {
+  workspaceKeyId: string;
+  trace: KeyDerivationTraceEntryWithKey[];
+};
+
 export interface SnapshotPublicData {
   docId: string;
   pubKey: string; // public signing key

@@ -11,7 +11,8 @@ type Params = {
   documentId: string;
   encryptedContent: string;
   encryptedContentNonce: string;
-  contentKeyDerivationTrace: KeyDerivationTrace;
+
+  keyDerivationTrace: KeyDerivationTrace;
 };
 
 export async function createComment({
@@ -20,7 +21,7 @@ export async function createComment({
   documentId,
   encryptedContent,
   encryptedContentNonce,
-  contentKeyDerivationTrace,
+  keyDerivationTrace,
 }: Params) {
   // verify the document exists
   const document = await prisma.document.findFirst({
@@ -56,7 +57,7 @@ export async function createComment({
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
         encryptedContent,
         encryptedContentNonce,
-        contentKeyDerivationTrace,
+        contentKeyDerivationTrace: keyDerivationTrace,
       },
     });
     return {
