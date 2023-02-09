@@ -215,15 +215,16 @@ export const rootScreenMachine =
           ) {
             context.navigation.replace("Workspace", {
               workspaceId:
-                context.meWithWorkspaceLoadingInfoQueryResult?.data.me
+                context.meWithWorkspaceLoadingInfoQueryResult.data.me
                   .workspaceLoadingInfo.id,
               screen: "WorkspaceDrawer",
               params: {
-                screen: "Page",
+                screen: "PageCommentsDrawer",
                 params: {
                   pageId:
-                    context.meWithWorkspaceLoadingInfoQueryResult?.data.me
+                    context.meWithWorkspaceLoadingInfoQueryResult.data.me
                       .workspaceLoadingInfo.documentId,
+                  screen: "Page",
                 },
               },
             });

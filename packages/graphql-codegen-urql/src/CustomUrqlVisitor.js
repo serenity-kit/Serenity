@@ -23,7 +23,7 @@ class CustomUrqlVisitor extends ClientSideBaseVisitor {
 
     if (operationType === "Mutation") {
       return `
-export const run${operationName} = async (variables: ${operationVariablesTypes}, options: any) => {
+export const run${operationName} = async (variables: ${operationVariablesTypes}, options?: any) => {
   return await getUrqlClient()
     .mutation<${operationResultType}, ${operationVariablesTypes}>(
       ${documentVariableName},
