@@ -25,6 +25,7 @@ import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import { PageHeaderRight } from "../components/pageHeaderRight/PageHeaderRight";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
+import { PageProvider } from "../context/PageContext";
 import { WorkspaceProvider } from "../context/WorkspaceContext";
 import { useWorkspaceQuery } from "../generated/graphql";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
@@ -77,31 +78,39 @@ const styles = StyleSheet.create({
 
 const isPhoneDimensions = (width: number) => width < 768;
 
-const PageCommentsDrawerNavigator: React.FC<{ navigation: any }> = (props) => {
+const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
+  props
+) => {
   return (
-    <PageCommentsDrawer.Navigator
-      id="PageCommentsDrawer"
-      drawerContent={(props) => <CommentsSidebar {...props} />}
-      screenOptions={{
-        headerStyle: [styles.header],
-        headerLeft: (headerProps) => (
-          <PageHeaderLeft {...headerProps} navigation={props.navigation} />
-        ),
-        headerRight: () => <PageHeaderRight />,
-        headerTitle: () => <PageHeader />,
-        headerTitleAlign: "center",
-        drawerType: "front", // TODO should be front
-        unmountOnBlur: true,
-        drawerPosition: "left",
-        drawerStyle: {
-          width: 240,
-          // right: 0,
-        },
-        overlayColor: "transparent",
+    <PageProvider
+      value={{
+        pageId: props.route.params.pageId,
       }}
     >
-      <PageCommentsDrawer.Screen name="Page" component={PageScreen} />
-    </PageCommentsDrawer.Navigator>
+      <PageCommentsDrawer.Navigator
+        id="PageCommentsDrawer"
+        drawerContent={(props) => <CommentsSidebar {...props} />}
+        screenOptions={{
+          headerStyle: [styles.header],
+          headerLeft: (headerProps) => (
+            <PageHeaderLeft {...headerProps} navigation={props.navigation} />
+          ),
+          headerRight: () => <PageHeaderRight />,
+          headerTitle: () => <PageHeader />,
+          headerTitleAlign: "center",
+          drawerType: "front", // TODO should be front
+          unmountOnBlur: true,
+          drawerPosition: "left",
+          drawerStyle: {
+            width: 240,
+            // right: 0,
+          },
+          overlayColor: "transparent",
+        }}
+      >
+        <PageCommentsDrawer.Screen name="Page" component={PageScreen} />
+      </PageCommentsDrawer.Navigator>
+    </PageProvider>
   );
 };
 
@@ -483,10 +492,8 @@ const getLinking = (
               path: "/",
               screens: {
                 PageCommentsDrawer: {
-                  path: "page",
-                  screens: {
-                    Page: ":pageId",
-                  },
+                  path: "page/:pageId",
+                  screens: { Page: "" },
                 },
                 WorkspaceNotDecrypted: "lobby",
                 WorkspaceRoot: "",

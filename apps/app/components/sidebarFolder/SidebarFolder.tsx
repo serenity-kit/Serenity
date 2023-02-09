@@ -234,9 +234,9 @@ export default function SidebarFolder(props: Props) {
         params: {
           screen: "PageCommentsDrawer",
           params: {
+            pageId: result.data?.createDocument?.id,
             screen: "Page",
             params: {
-              pageId: result.data?.createDocument?.id,
               isNew: true,
             },
           },

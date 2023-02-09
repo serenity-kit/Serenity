@@ -194,10 +194,8 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         params: {
           screen: "PageCommentsDrawer",
           params: {
+            pageId: document.id,
             screen: "Page",
-            params: {
-              pageId: document.id,
-            },
           },
         },
       });

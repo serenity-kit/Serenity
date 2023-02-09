@@ -60,10 +60,8 @@ export default function SidebarPage(props: Props) {
         params: {
           screen: "PageCommentsDrawer",
           params: {
+            pageId: props.documentId,
             screen: "Page",
-            params: {
-              pageId: props.documentId,
-            },
           },
         },
       },

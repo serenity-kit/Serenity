@@ -8,6 +8,7 @@ import { PageCommentsDrawerScreenProps } from "../../../types/navigationProps";
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import sodium, { KeyPair } from "react-native-libsodium";
+import { usePage } from "../../../context/PageContext";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
 import {
   getDocumentPath,
@@ -22,7 +23,7 @@ import { loadPageMachine } from "./loadPageMachine";
 
 const PageRemountWrapper = (props: PageCommentsDrawerScreenProps<"Page">) => {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const pageId = props.route.params.pageId;
+  const { pageId } = usePage();
   const { activeDevice } = useAuthenticatedAppContext();
   const { workspaceId } = useWorkspace();
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
@@ -137,6 +138,6 @@ const PageRemountWrapper = (props: PageCommentsDrawerScreenProps<"Page">) => {
 export default function PageScreen(
   props: PageCommentsDrawerScreenProps<"Page">
 ) {
-  const pageId = props.route.params.pageId;
+  const { pageId } = usePage();
   return <PageRemountWrapper key={pageId} {...props} />;
 }

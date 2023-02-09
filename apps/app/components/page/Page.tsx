@@ -37,6 +37,7 @@ import {
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
+import { usePage } from "../../context/PageContext";
 import {
   Document,
   runDocumentQuery,
@@ -71,12 +72,8 @@ export default function Page({
   signatureKeyPair,
   workspaceId,
 }: Props) {
-  if (!route.params?.pageId) {
-    // should never happen
-    throw new Error("Page ID was not set");
-  }
-  const docId = route.params.pageId;
-  const isNew = route.params.isNew ?? false;
+  const { pageId: docId } = usePage();
+  const isNew = route.params?.isNew ?? false;
   const { activeDevice } = useAuthenticatedAppContext();
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
@@ -274,6 +271,7 @@ export default function Page({
       const me = await runMeQuery({});
 
       let document: Document | undefined = undefined;
+      console.log("fetch document", docId);
       try {
         const fetchedDocument = await getDocument({
           documentId: docId,
