@@ -7,6 +7,7 @@ import {
   objectType,
 } from "nexus";
 import { createComment } from "../../../database/comment/createComment";
+import { formatComment } from "../../../types/comment";
 import { Comment } from "../../types/comment";
 import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
@@ -52,6 +53,6 @@ export const createCommentMutation = mutationField("createComment", {
       encryptedContentNonce: args.input.encryptedContentNonce,
       contentKeyDerivationTrace: args.input.contentKeyDerivationTrace,
     });
-    return { comment };
+    return { comment: formatComment(comment) };
   },
 });

@@ -11,7 +11,7 @@ type Params = {
   documentId: string;
   encryptedContent: string;
   encryptedContentNonce: string;
-  contentKeyDerivationTrace: KeyDerivationTrace | undefined | null;
+  contentKeyDerivationTrace: KeyDerivationTrace;
 };
 
 export async function createComment({
@@ -56,11 +56,7 @@ export async function createComment({
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
         encryptedContent,
         encryptedContentNonce,
-        contentKeyDerivationTrace: contentKeyDerivationTrace || {
-          workspaceKeyId: "",
-          subkeyId: -1,
-          parentFolders: [],
-        },
+        contentKeyDerivationTrace,
       },
     });
     return {
