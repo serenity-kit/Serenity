@@ -166,11 +166,12 @@ export const workspaceNotDecryptedScreenMachine =
                   .workspaceLoadingInfo.id,
               screen: "WorkspaceDrawer",
               params: {
-                screen: "Page",
+                screen: "PageCommentsDrawer",
                 params: {
                   pageId:
                     context.meWithWorkspaceLoadingInfoQueryResult.data.me
                       .workspaceLoadingInfo.documentId,
+                  screen: "Page",
                 },
               },
             });
