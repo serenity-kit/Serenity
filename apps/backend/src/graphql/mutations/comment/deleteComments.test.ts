@@ -165,20 +165,15 @@ test("commentor tries to delete other comment", async () => {
     authorizationHeader: userData2.sessionKey,
   });
   const comment = commentResult.createComment.comment;
-  const numCommentsBeforeDelete = await prisma.comment.count({
-    where: { documentId: userData1.document.id },
-  });
-  expect(numCommentsBeforeDelete).toBeGreaterThanOrEqual(1);
-  const deleteCommentsResult = await deleteComments({
-    graphql,
-    commentIds: [comment.id],
-    authorizationHeader: userData1.sessionKey,
-  });
-  expect(deleteCommentsResult.deleteComments.status).toBe("success");
-  const numCommentsAfterDelete = await prisma.comment.count({
-    where: { documentId: userData1.document.id },
-  });
-  expect(numCommentsAfterDelete).toBe(numCommentsBeforeDelete);
+  expect(
+    (async () => {
+      await deleteComments({
+        graphql,
+        commentIds: [comment.id],
+        authorizationHeader: userData1.sessionKey,
+      });
+    })()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("viewer tries to delete other comment", async () => {
@@ -201,20 +196,15 @@ test("viewer tries to delete other comment", async () => {
     authorizationHeader: userData2.sessionKey,
   });
   const comment = commentResult.createComment.comment;
-  const numCommentsBeforeDelete = await prisma.comment.count({
-    where: { documentId: userData1.document.id },
-  });
-  expect(numCommentsBeforeDelete).toBeGreaterThanOrEqual(1);
-  const deleteCommentsResult = await deleteComments({
-    graphql,
-    commentIds: [comment.id],
-    authorizationHeader: userData1.sessionKey,
-  });
-  expect(deleteCommentsResult.deleteComments.status).toBe("success");
-  const numCommentsAfterDelete = await prisma.comment.count({
-    where: { documentId: userData1.document.id },
-  });
-  expect(numCommentsAfterDelete).toBe(numCommentsBeforeDelete);
+  expect(
+    (async () => {
+      await deleteComments({
+        graphql,
+        commentIds: [comment.id],
+        authorizationHeader: userData1.sessionKey,
+      });
+    })()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("delete some comments", async () => {
@@ -262,39 +252,27 @@ test("cant delete comments on outside document", async () => {
     },
   });
   const comment = commentResult.createComment.comment;
-  const numCommentsBeforeDelete = await prisma.comment.count({
-    where: { documentId: userData1.document.id },
-  });
-  expect(numCommentsBeforeDelete).toBeGreaterThanOrEqual(1);
-  const deleteCommentsResult = await deleteComments({
-    graphql,
-    commentIds: [comment.id],
-    authorizationHeader: userData2.sessionKey,
-  });
-  expect(deleteCommentsResult.deleteComments.status).toBe("success");
-  const numCommentsAfterDelete = await prisma.comment.count({
-    where: { documentId: userData1.document.id },
-  });
-  expect(numCommentsAfterDelete).toBeGreaterThanOrEqual(1);
-  expect(numCommentsAfterDelete).toBe(numCommentsBeforeDelete);
+  expect(
+    (async () => {
+      await deleteComments({
+        graphql,
+        commentIds: [comment.id],
+        authorizationHeader: userData2.sessionKey,
+      });
+    })()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("invalid comment", async () => {
-  const numCommentsBeforeDelete = await prisma.comment.count({
-    where: { documentId: userData1.document.id },
-  });
-  expect(numCommentsBeforeDelete).toBeGreaterThanOrEqual(1);
-  const deleteCommentsResult = await deleteComments({
-    graphql,
-    commentIds: ["bad-id"],
-    authorizationHeader: userData2.sessionKey,
-  });
-  expect(deleteCommentsResult.deleteComments.status).toBe("success");
-  const numCommentsAfterDelete = await prisma.comment.count({
-    where: { documentId: userData1.document.id },
-  });
-  expect(numCommentsAfterDelete).toBeGreaterThanOrEqual(1);
-  expect(numCommentsAfterDelete).toBe(numCommentsBeforeDelete);
+  expect(
+    (async () => {
+      await deleteComments({
+        graphql,
+        commentIds: ["bad-id"],
+        authorizationHeader: userData1.sessionKey,
+      });
+    })()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("no comments", async () => {

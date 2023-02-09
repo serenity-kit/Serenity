@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 
@@ -7,6 +8,9 @@ type Params = {
 };
 
 export async function deleteComments({ userId, commentIds }: Params) {
+  if (commentIds.length === 0) {
+    return;
+  }
   return await prisma.$transaction(async (prisma) => {
     // comments can be deleted by:
     // * their creators or
@@ -81,6 +85,10 @@ export async function deleteComments({ userId, commentIds }: Params) {
         deletableCommentIds.push(requestedComment.id);
       }
     });
+    // if some of the commentIds are invalid, throw an error
+    if (deletableCommentIds.length !== commentIds.length) {
+      throw new UserInputError("Invalid commentIds");
+    }
 
     // delete all related workspace keyboxes
     await prisma.comment.deleteMany({
