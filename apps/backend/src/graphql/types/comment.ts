@@ -1,8 +1,8 @@
 import { objectType } from "nexus";
 import { CreatorDevice } from "./device";
 
-export const CommentResult = objectType({
-  name: "CommentResult",
+export const Comment = objectType({
+  name: "Comment",
   definition(t) {
     t.nonNull.string("id");
     t.nonNull.string("documentId");

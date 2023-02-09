@@ -1,12 +1,12 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getCommentsByDocumentId } from "../../../database/comment/getCommentsByDocumentId";
-import { CommentResult } from "../../types/comment";
+import { Comment } from "../../types/comment";
 
 export const devices = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("commentsByDocumentId", {
-    type: CommentResult,
+    type: Comment,
     cursorFromNode: (node) => node?.id ?? "",
     additionalArgs: {
       documentId: nonNull(idArg()),

@@ -1,7 +1,13 @@
 import { AuthenticationError } from "apollo-server-express";
-import { arg, inputObjectType, mutationField, nonNull } from "nexus";
+import {
+  arg,
+  inputObjectType,
+  mutationField,
+  nonNull,
+  objectType,
+} from "nexus";
 import { createComment } from "../../../database/comment/createComment";
-import { CommentResult } from "../../types/comment";
+import { Comment } from "../../types/comment";
 import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const CreateCommentInput = inputObjectType({
@@ -16,8 +22,17 @@ export const CreateCommentInput = inputObjectType({
   },
 });
 
+export const CreateCommentResult = objectType({
+  name: "CreateCommentResult",
+  definition(t) {
+    t.field("comment", {
+      type: Comment,
+    });
+  },
+});
+
 export const createCommentMutation = mutationField("createComment", {
-  type: CommentResult,
+  type: CreateCommentResult,
   args: {
     input: nonNull(
       arg({
@@ -37,6 +52,6 @@ export const createCommentMutation = mutationField("createComment", {
       encryptedContentNonce: args.input.encryptedContentNonce,
       contentKeyDerivationTrace: args.input.contentKeyDerivationTrace,
     });
-    return comment;
+    return { comment };
   },
 });
