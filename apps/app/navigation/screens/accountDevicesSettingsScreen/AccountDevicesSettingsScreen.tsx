@@ -156,6 +156,7 @@ export default function AccountDevicesSettingsScreen(
               mainIsIconText
             />
           }
+          testID={"devices-list"}
         >
           {devices.map((device) => {
             const deviceInfoJson = JSON.parse(device.info!);
