@@ -34,7 +34,8 @@ test("key for main workspace", async () => {
     documentId: userData1.document.id,
     authorizationHeader: userData1.sessionKey,
   });
-  const workspaceKey = workspaceKeyResult.workspaceKeyByDocumentId;
+  const workspaceKey =
+    workspaceKeyResult.workspaceKeyByDocumentId.nameWorkspaceKey;
   expect(workspaceKey.generation).toBe(0);
   expect(workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
     userData1.webDevice.signingPublicKey
@@ -76,7 +77,8 @@ test("empty keys on incomplete workspace share", async () => {
     documentId: userData1.document.id,
     authorizationHeader: userData2.sessionKey,
   });
-  const workspaceKey = workspaceKeyResult.workspaceKeyByDocumentId;
+  const workspaceKey =
+    workspaceKeyResult.workspaceKeyByDocumentId.nameWorkspaceKey;
   expect(workspaceKey.generation).toBe(0);
   expect(workspaceKey.workspaceKeyBox).toBe(null);
   expect(workspaceKey.workspaceId).toBe(userData1.workspace.id);
@@ -106,7 +108,8 @@ test("key for shared workspace", async () => {
     documentId: userData1.document.id,
     authorizationHeader: userData2.sessionKey,
   });
-  const workspaceKey = workspaceKeyResult.workspaceKeyByDocumentId;
+  const workspaceKey =
+    workspaceKeyResult.workspaceKeyByDocumentId.nameWorkspaceKey;
   expect(workspaceKey.generation).toBe(0);
   expect(workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
     userData2.webDevice.signingPublicKey
@@ -162,9 +165,11 @@ describe("Input errors", () => {
   const query = gql`
     query workspaceKeyByDocumentId($documentId: ID!) {
       workspaceKeyByDocumentId(documentId: $documentId) {
-        id
-        workspaceId
-        generation
+        nameWorkspaceKey {
+          id
+          workspaceId
+          generation
+        }
       }
     }
   `;

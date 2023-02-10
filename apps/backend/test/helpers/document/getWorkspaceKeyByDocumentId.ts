@@ -17,21 +17,23 @@ export const getWorkspaceKeyByDocumentId = async ({
   const query = gql`
     query workspaceKeyByDocumentId($documentId: ID!) {
       workspaceKeyByDocumentId(documentId: $documentId) {
-        id
-        workspaceId
-        generation
-        workspaceKeyBox {
+        nameWorkspaceKey {
           id
-          workspaceKeyId
-          deviceSigningPublicKey
-          creatorDeviceSigningPublicKey
-          nonce
-          ciphertext
-          creatorDevice {
-            signingPublicKey
-            encryptionPublicKey
-            encryptionPublicKeySignature
-            createdAt
+          workspaceId
+          generation
+          workspaceKeyBox {
+            id
+            workspaceKeyId
+            deviceSigningPublicKey
+            creatorDeviceSigningPublicKey
+            nonce
+            ciphertext
+            creatorDevice {
+              signingPublicKey
+              encryptionPublicKey
+              encryptionPublicKeySignature
+              createdAt
+            }
           }
         }
       }

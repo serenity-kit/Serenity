@@ -1,12 +1,19 @@
 import { AuthenticationError } from "apollo-server-express";
-import { idArg, nonNull, queryField } from "nexus";
+import { idArg, nonNull, objectType, queryField } from "nexus";
 import { getWorkspaceKeyByDocumentId } from "../../../database/document/getWorkspaceKeyByDocumentId";
 import { formatWorkspaceKey } from "../../../types/workspace";
 import { WorkspaceKey } from "../../types/workspace";
 
+export const NameWorkspaceKey = objectType({
+  name: "NameWorkspaceKey",
+  definition(t) {
+    t.nonNull.field("nameWorkspaceKey", { type: WorkspaceKey });
+  },
+});
+
 export const workspaces = queryField((t) => {
   t.field("workspaceKeyByDocumentId", {
-    type: WorkspaceKey,
+    type: NameWorkspaceKey,
     args: {
       documentId: nonNull(idArg()),
     },
@@ -20,7 +27,7 @@ export const workspaces = queryField((t) => {
         documentId: args.documentId,
         deviceSigningPublicKey: context.session.deviceSigningPublicKey,
       });
-      return formatWorkspaceKey(workspaceKey);
+      return { nameWorkspaceKey: formatWorkspaceKey(workspaceKey) };
     },
   });
 });
