@@ -9,7 +9,7 @@ export const UserIdFromUsernameResult = objectType({
   },
 });
 
-export const userIdFromUsername = queryField((t) => {
+export const userIdFromUsernameQuery = queryField((t) => {
   t.field("userIdFromUsername", {
     type: UserIdFromUsernameResult,
     args: {

@@ -2,7 +2,7 @@ import { idArg, nonNull, queryField } from "nexus";
 import { getWorkspaceInvitation } from "../../../database/workspace/getWorkspaceInvitation";
 import { WorkspaceInvitation } from "../../types/workspace";
 
-export const workspaceInvitation = queryField((t) => {
+export const workspaceInvitationQuery = queryField((t) => {
   t.field("workspaceInvitation", {
     type: WorkspaceInvitation,
     args: {

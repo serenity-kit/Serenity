@@ -3,22 +3,36 @@ import { gql } from "graphql-request";
 type Params = {
   graphql: any;
   documentId: string;
+  documentShareLinkToken?: string | null | undefined;
   first: number;
+  after?: string;
   authorizationHeader: string;
 };
 
 export const commentsByDocumentId = async ({
   graphql,
   documentId,
+  documentShareLinkToken,
   first,
+  after,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
   const query = gql`
-    query commentsByDocumentId($documentId: ID!, $first: Int) {
-      commentsByDocumentId(documentId: $documentId, first: $first) {
+    query commentsByDocumentId(
+      $documentId: ID!
+      $documentShareLinkToken: String
+      $first: Int!
+      $after: String
+    ) {
+      commentsByDocumentId(
+        documentId: $documentId
+        documentShareLinkToken: $documentShareLinkToken
+        first: $first
+        after: $after
+      ) {
         edges {
           node {
             id
@@ -56,6 +70,12 @@ export const commentsByDocumentId = async ({
             }
           }
         }
+        pageInfo {
+          hasNextPage
+          hasPreviousPage
+          startCursor
+          endCursor
+        }
       }
     }
   `;
@@ -63,7 +83,9 @@ export const commentsByDocumentId = async ({
     query,
     {
       documentId,
+      documentShareLinkToken,
       first,
+      after,
     },
     authorizationHeaders
   );

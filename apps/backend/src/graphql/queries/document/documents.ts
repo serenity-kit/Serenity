@@ -4,7 +4,7 @@ import { getDocuments } from "../../../database/document/getDocuments";
 import { formatDocument } from "../../../types/document";
 import { Document } from "../../types/document";
 
-export const documents = queryField((t) => {
+export const documentsQuery = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("documents", {
     type: Document,

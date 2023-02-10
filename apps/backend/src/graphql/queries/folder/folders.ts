@@ -4,7 +4,7 @@ import { getSubfolders } from "../../../database/folder/getSubfolders";
 import { formatFolder } from "../../../types/folder";
 import { Folder } from "../../types/folder";
 
-export const folders = queryField((t) => {
+export const foldersQuery = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("folders", {
     type: Folder,

@@ -1,16 +1,17 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
-import { idArg, nonNull, queryField } from "nexus";
+import { idArg, nonNull, queryField, stringArg } from "nexus";
 import { getCommentsByDocumentId } from "../../../database/comment/getCommentsByDocumentId";
 import { formatComment } from "../../../types/comment";
 import { Comment } from "../../types/comment";
 
-export const devices = queryField((t) => {
+export const commentsByDocumentIdQuery = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("commentsByDocumentId", {
     type: Comment,
     cursorFromNode: (node) => node?.id ?? "",
     additionalArgs: {
       documentId: nonNull(idArg()),
+      documentShareLinkToken: stringArg(),
     },
     async nodes(root, args, context) {
       if (args.first && args.first > 50) {
@@ -31,6 +32,7 @@ export const devices = queryField((t) => {
       const comments = await getCommentsByDocumentId({
         userId,
         documentId: args.documentId,
+        documentShareLinkToken: args.documentShareLinkToken,
         cursor,
         skip,
         take,

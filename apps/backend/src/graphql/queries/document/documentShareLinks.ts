@@ -3,7 +3,7 @@ import { idArg, nonNull, queryField } from "nexus";
 import { getDocumentShareLinks } from "../../../database/document/getDocumentShareLinks";
 import { DocumentShareLink } from "../../types/documentShareLink";
 
-export const documents = queryField((t) => {
+export const documentShareLinksQuery = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("documentShareLinks", {
     type: DocumentShareLink,

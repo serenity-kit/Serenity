@@ -11,7 +11,7 @@ export const UnauthorizedMembersResult = objectType({
   },
 });
 
-export const unauthorizedMembers = queryField((t) => {
+export const unauthorizedMembersQuery = queryField((t) => {
   t.field("unauthorizedMembers", {
     type: UnauthorizedMembersResult,
     args: {
