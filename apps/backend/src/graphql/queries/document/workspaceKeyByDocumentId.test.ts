@@ -12,6 +12,8 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 const graphql = setupGraphql();
 let userData1: any = undefined;
 let sessionKey = "";
+let documentId = "";
+let deviceSigningPublicKey = "";
 const password = "password";
 
 const setup = async () => {
@@ -21,6 +23,8 @@ const setup = async () => {
     password,
   });
   sessionKey = userData1.sessionKey;
+  documentId = userData1.document.id;
+  deviceSigningPublicKey = userData1.webDevice.signingPublicKey;
 };
 
 beforeAll(async () => {
@@ -32,6 +36,7 @@ test("key for main workspace", async () => {
   const workspaceKeyResult = await getWorkspaceKeyByDocumentId({
     graphql,
     documentId: userData1.document.id,
+    deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
     authorizationHeader: userData1.sessionKey,
   });
   const workspaceKey =
@@ -39,6 +44,25 @@ test("key for main workspace", async () => {
   expect(workspaceKey.generation).toBe(0);
   expect(workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
     userData1.webDevice.signingPublicKey
+  );
+  expect(workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey).toBe(
+    userData1.mainDevice.signingPublicKey
+  );
+  expect(workspaceKey.workspaceId).toBe(userData1.workspace.id);
+});
+
+test("key for main workspace, main device", async () => {
+  const workspaceKeyResult = await getWorkspaceKeyByDocumentId({
+    graphql,
+    documentId: userData1.document.id,
+    deviceSigningPublicKey: userData1.mainDevice.signingPublicKey,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const workspaceKey =
+    workspaceKeyResult.workspaceKeyByDocumentId.nameWorkspaceKey;
+  expect(workspaceKey.generation).toBe(0);
+  expect(workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
+    userData1.mainDevice.signingPublicKey
   );
   expect(workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey).toBe(
     userData1.mainDevice.signingPublicKey
@@ -75,6 +99,7 @@ test("empty keys on incomplete workspace share", async () => {
   const workspaceKeyResult = await getWorkspaceKeyByDocumentId({
     graphql,
     documentId: userData1.document.id,
+    deviceSigningPublicKey: userData2.webDevice.signingPublicKey,
     authorizationHeader: userData2.sessionKey,
   });
   const workspaceKey =
@@ -106,6 +131,7 @@ test("key for shared workspace", async () => {
   const workspaceKeyResult = await getWorkspaceKeyByDocumentId({
     graphql,
     documentId: userData1.document.id,
+    deviceSigningPublicKey: userData2.webDevice.signingPublicKey,
     authorizationHeader: userData2.sessionKey,
   });
   const workspaceKey =
@@ -131,6 +157,7 @@ test("error on unauthorized workspace", async () => {
       await getWorkspaceKeyByDocumentId({
         graphql,
         documentId: userData2.document.id,
+        deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
         authorizationHeader: userData1.sessionKey,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
@@ -142,9 +169,27 @@ test("error on invalid document", async () => {
       await getWorkspaceKeyByDocumentId({
         graphql,
         documentId: "bad-document-id",
+        deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
         authorizationHeader: userData1.sessionKey,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
+});
+
+test("bad deviceSigningPublicKey", async () => {
+  const userData2 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password,
+  });
+  await expect(
+    (async () =>
+      await getWorkspaceKeyByDocumentId({
+        graphql,
+        documentId: userData1.document.id,
+        deviceSigningPublicKey: userData2.webDevice.signingPublicKey,
+        authorizationHeader: userData1.sessionKey,
+      }))()
+  ).rejects.toThrowError();
 });
 
 test("unauthenticated", async () => {
@@ -153,6 +198,7 @@ test("unauthenticated", async () => {
       await getWorkspaceKeyByDocumentId({
         graphql,
         documentId: userData1.document.id,
+        deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
         authorizationHeader: "badauthkey",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
@@ -163,8 +209,14 @@ describe("Input errors", () => {
     authorization: sessionKey,
   };
   const query = gql`
-    query workspaceKeyByDocumentId($documentId: ID!) {
-      workspaceKeyByDocumentId(documentId: $documentId) {
+    query workspaceKeyByDocumentId(
+      $documentId: ID!
+      $deviceSigningPublicKey: String!
+    ) {
+      workspaceKeyByDocumentId(
+        documentId: $documentId
+        deviceSigningPublicKey: $deviceSigningPublicKey
+      ) {
         nameWorkspaceKey {
           id
           workspaceId
@@ -180,6 +232,20 @@ describe("Input errors", () => {
           query,
           {
             documentId: null,
+            deviceSigningPublicKey: deviceSigningPublicKey,
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+  test("Invalid deviceSigningPublicKey", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            documentId,
+            deviceSigningPublicKey: null,
           },
           authorizationHeaders
         ))()

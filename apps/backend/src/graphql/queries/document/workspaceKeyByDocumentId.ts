@@ -1,5 +1,5 @@
 import { AuthenticationError } from "apollo-server-express";
-import { idArg, nonNull, objectType, queryField } from "nexus";
+import { idArg, nonNull, objectType, queryField, stringArg } from "nexus";
 import { getWorkspaceKeyByDocumentId } from "../../../database/document/getWorkspaceKeyByDocumentId";
 import { formatWorkspaceKey } from "../../../types/workspace";
 import { WorkspaceKey } from "../../types/workspace";
@@ -16,16 +16,20 @@ export const workspaces = queryField((t) => {
     type: NameWorkspaceKey,
     args: {
       documentId: nonNull(idArg()),
+      deviceSigningPublicKey: nonNull(stringArg()),
     },
     async resolve(root, args, context) {
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
+      context.assertValidDeviceSigningPublicKeyForThisSession(
+        args.deviceSigningPublicKey
+      );
       const userId = context.user.id;
       const workspaceKey = await getWorkspaceKeyByDocumentId({
         userId,
         documentId: args.documentId,
-        deviceSigningPublicKey: context.session.deviceSigningPublicKey,
+        deviceSigningPublicKey: args.deviceSigningPublicKey,
       });
       return { nameWorkspaceKey: formatWorkspaceKey(workspaceKey) };
     },

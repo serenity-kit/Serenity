@@ -3,20 +3,28 @@ import { gql } from "graphql-request";
 type Params = {
   graphql: any;
   documentId: string;
+  deviceSigningPublicKey: string;
   authorizationHeader: string;
 };
 
 export const getWorkspaceKeyByDocumentId = async ({
   graphql,
   documentId,
+  deviceSigningPublicKey,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
   const query = gql`
-    query workspaceKeyByDocumentId($documentId: ID!) {
-      workspaceKeyByDocumentId(documentId: $documentId) {
+    query workspaceKeyByDocumentId(
+      $documentId: ID!
+      $deviceSigningPublicKey: String!
+    ) {
+      workspaceKeyByDocumentId(
+        documentId: $documentId
+        deviceSigningPublicKey: $deviceSigningPublicKey
+      ) {
         nameWorkspaceKey {
           id
           workspaceId
@@ -41,7 +49,7 @@ export const getWorkspaceKeyByDocumentId = async ({
   `;
   const result = await graphql.client.request(
     query,
-    { documentId },
+    { documentId, deviceSigningPublicKey },
     authorizationHeaders
   );
   return result;
