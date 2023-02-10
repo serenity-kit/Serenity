@@ -43,6 +43,7 @@ import * as DocumentsQueryTypes from "./graphql/queries/document/documents";
 import * as DocumentShareLinkQueryTypes from "./graphql/queries/document/documentShareLink";
 import * as DocumentShareLinksQueryTypes from "./graphql/queries/document/documentShareLinks";
 import * as FirstDocumentQueryTypes from "./graphql/queries/document/firstDocument";
+import * as WorkspaceKeyByDocumentIdQueryTypes from "./graphql/queries/document/workspaceKeyByDocumentId";
 import * as FileUrlQueryTypes from "./graphql/queries/file/fileUrl";
 import * as FolderQueryTypes from "./graphql/queries/folder/folder";
 import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
@@ -80,6 +81,7 @@ export const schema = makeSchema({
     DocumentQueryTypes,
     CreateDocumentShareLinkTypes,
     RemoveDocumentShareLinkTypes,
+    WorkspaceKeyByDocumentIdQueryTypes,
 
     DocumentShareLinkTypes,
     DocumentShareLinksQueryTypes,

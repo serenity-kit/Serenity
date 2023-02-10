@@ -55,6 +55,13 @@ export type WorkspaceInvitation = {
   expiresAt: Date;
 };
 
+export const formatWorkspaceKey = (workspaceKey: any): WorkspaceKey => {
+  if (workspaceKey.workspaceKeyBoxes) {
+    workspaceKey.workspaceKeyBox = workspaceKey.workspaceKeyBoxes[0];
+  }
+  return workspaceKey;
+};
+
 export const formatWorkspace = (workspace: any): Workspace => {
   const members: WorkspaceMember[] = [];
   workspace.usersToWorkspaces.forEach(
