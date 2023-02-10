@@ -4,7 +4,7 @@ import { getWorkspaceFolders } from "../../../database/folder/getWorkspaceFolder
 import { formatFolder } from "../../../types/folder";
 import { Folder } from "../../types/folder";
 
-export const workspaces = queryField((t) => {
+export const rootFoldersQuery = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("rootFolders", {
     type: Folder,

@@ -4,7 +4,7 @@ import { getWorkspace } from "../../../database/workspace/getWorkspace";
 import { getWorkspaces } from "../../../database/workspace/getWorkspaces";
 import { Workspace } from "../../types/workspace";
 
-export const workspaces = queryField((t) => {
+export const workspaceQuery = queryField((t) => {
   t.field("workspace", {
     type: Workspace,
     args: {

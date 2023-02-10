@@ -10,7 +10,7 @@ export const DeviceResult = objectType({
   },
 });
 
-export const deviceBySigningPublicKey = queryField((t) => {
+export const deviceBySigningPublicKeyQuery = queryField((t) => {
   t.field("deviceBySigningPublicKey", {
     type: DeviceResult,
     args: {

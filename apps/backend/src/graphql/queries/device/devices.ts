@@ -3,7 +3,7 @@ import { booleanArg, nonNull, queryField } from "nexus";
 import { getDevices } from "../../../database/device/getDevices";
 import { DeviceWithRecentSession } from "../../types/device";
 
-export const devices = queryField((t) => {
+export const devicesQuery = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("devices", {
     type: DeviceWithRecentSession,

@@ -4,16 +4,16 @@ import { getWorkspaceKeyByDocumentId } from "../../../database/document/getWorks
 import { formatWorkspaceKey } from "../../../types/workspace";
 import { WorkspaceKey } from "../../types/workspace";
 
-export const NameWorkspaceKey = objectType({
-  name: "NameWorkspaceKey",
+export const WorkspaceKeyByDocumentIdResult = objectType({
+  name: "WorkspaceKeyByDocumentIdResult",
   definition(t) {
     t.nonNull.field("nameWorkspaceKey", { type: WorkspaceKey });
   },
 });
 
-export const workspaces = queryField((t) => {
+export const workspaceKeyByDocumentIdQuery = queryField((t) => {
   t.field("workspaceKeyByDocumentId", {
-    type: NameWorkspaceKey,
+    type: WorkspaceKeyByDocumentIdResult,
     args: {
       documentId: nonNull(idArg()),
       deviceSigningPublicKey: nonNull(stringArg()),

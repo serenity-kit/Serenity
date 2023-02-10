@@ -4,7 +4,7 @@ import { getDocumentPath } from "../../../database/document/getDocumentPath";
 import { formatFolder } from "../../../types/folder";
 import { Folder } from "../../types/folder";
 
-export const documentPath = queryField((t) => {
+export const documentPathQuery = queryField((t) => {
   t.field("documentPath", {
     type: list(Folder),
     args: {

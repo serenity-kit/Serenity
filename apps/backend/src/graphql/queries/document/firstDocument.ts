@@ -4,7 +4,7 @@ import { getFirstDocument } from "../../../database/document/getFirstDocument";
 import { formatDocument } from "../../../types/document";
 import { Document } from "../../types/document";
 
-export const firstDocument = queryField((t) => {
+export const firstDocumentQuery = queryField((t) => {
   t.field("firstDocument", {
     type: Document,
     args: {
