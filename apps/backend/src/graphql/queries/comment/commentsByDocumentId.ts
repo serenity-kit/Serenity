@@ -4,7 +4,7 @@ import { getCommentsByDocumentId } from "../../../database/comment/getCommentsBy
 import { formatComment } from "../../../types/comment";
 import { Comment } from "../../types/comment";
 
-export const devices = queryField((t) => {
+export const commentsByDocumentIdQuery = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("commentsByDocumentId", {
     type: Comment,

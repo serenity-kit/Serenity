@@ -47,7 +47,7 @@ export const MeResult = objectType({
 });
 
 // return string type
-export const folders = queryField((t) => {
+export const meQuery = queryField((t) => {
   t.field("me", {
     type: MeResult,
     args: null,
