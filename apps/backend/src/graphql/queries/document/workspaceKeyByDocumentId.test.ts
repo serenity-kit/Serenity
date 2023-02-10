@@ -67,6 +67,9 @@ test("key for main workspace, main device", async () => {
   expect(workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey).toBe(
     userData1.mainDevice.signingPublicKey
   );
+  expect(workspaceKey.workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
+    userData1.mainDevice.signingPublicKey
+  );
   expect(workspaceKey.workspaceId).toBe(userData1.workspace.id);
 });
 
@@ -141,6 +144,9 @@ test("key for shared workspace", async () => {
     userData2.webDevice.signingPublicKey
   );
   expect(workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey).toBe(
+    userData1.webDevice.signingPublicKey
+  );
+  expect(workspaceKey.workspaceKeyBox.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
   expect(workspaceKey.workspaceId).toBe(userData1.workspace.id);
