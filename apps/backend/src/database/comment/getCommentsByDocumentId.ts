@@ -1,4 +1,4 @@
-import { ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { prisma } from "../prisma";
 
 type Cursor = {
@@ -8,6 +8,7 @@ type Cursor = {
 type Params = {
   userId: string;
   documentId: string;
+  documentShareLinkToken?: string | null | undefined;
   cursor?: Cursor;
   skip?: number;
   take: number;
@@ -16,6 +17,7 @@ type Params = {
 export async function getCommentsByDocumentId({
   userId,
   documentId,
+  documentShareLinkToken,
   cursor,
   skip,
   take,
@@ -27,25 +29,41 @@ export async function getCommentsByDocumentId({
   if (!document) {
     throw new ForbiddenError("Unauthorized");
   }
-  const user2Workspace = await prisma.usersToWorkspaces.findFirst({
-    where: {
-      userId,
-      workspaceId: document.workspaceId,
-    },
-  });
-  if (!user2Workspace) {
-    throw new ForbiddenError("Unauthorized");
+  // if the user has a documentShareLinkToken, verify it
+  let documentShareLink: any = null;
+  if (documentShareLinkToken) {
+    documentShareLink = await prisma.documentShareLink.findFirst({
+      where: {
+        token: documentShareLinkToken,
+        documentId,
+      },
+    });
+    if (!documentShareLink) {
+      throw new UserInputError("Invalid documentShareLinkToken");
+    }
+  }
+  // if no documentShareLinkToken, the user must have access to the workspace
+  if (!documentShareLink) {
+    const user2Workspace = await prisma.usersToWorkspaces.findFirst({
+      where: {
+        userId,
+        workspaceId: document.workspaceId,
+      },
+    });
+    if (!user2Workspace) {
+      throw new ForbiddenError("Unauthorized");
+    }
   }
   const comments = await prisma.comment.findMany({
     where: { documentId },
     cursor,
     skip,
     take,
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: "asc" },
     include: {
       creatorDevice: true,
       commentReplies: {
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: "asc" },
         include: { creatorDevice: true },
       },
     },
