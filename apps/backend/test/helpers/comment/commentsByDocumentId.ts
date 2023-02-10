@@ -25,11 +25,34 @@ export const commentsByDocumentId = async ({
             documentId
             encryptedContent
             encryptedContentNonce
+            contentKeyDerivationTrace {
+              workspaceKeyId
+              subkeyId
+              parentFolders {
+                folderId
+                subkeyId
+                parentFolderId
+              }
+            }
             creatorDevice {
               signingPublicKey
               encryptionPublicKey
               encryptionPublicKeySignature
               createdAt
+            }
+            commentReplies {
+              id
+              encryptedContent
+              encryptedContentNonce
+              contentKeyDerivationTrace {
+                workspaceKeyId
+                subkeyId
+                parentFolders {
+                  folderId
+                  subkeyId
+                  parentFolderId
+                }
+              }
             }
           }
         }
