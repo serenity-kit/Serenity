@@ -1,4 +1,4 @@
-import { KeyDerivationTrace } from "@naisho/core";
+import { KeyDerivationTrace, KeyDerivationTrace2 } from "@naisho/core";
 import { CreatorDevice } from "./device";
 
 export type Comment = {
@@ -35,8 +35,8 @@ export const formatCommentReply = (commentReply: any): CommentReply => {
 export const formatComment = (comment: any): Comment => {
   const formmattedComment = {
     ...comment,
-    contentKeyDerivationTrace:
-      comment.contentKeyDerivationTrace as KeyDerivationTrace,
+    keyDerivationTrace:
+      comment.contentKeyDerivationTrace as KeyDerivationTrace2,
   };
   if (comment.commentReplies) {
     formmattedComment.commentReplies = comment.commentReplies.map(

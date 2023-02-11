@@ -193,13 +193,13 @@ describe("Input Errors", () => {
             documentId
             encryptedContent
             encryptedContentNonce
-            contentKeyDerivationTrace {
+            keyDerivationTrace {
               workspaceKeyId
-              subkeyId
-              parentFolders {
-                folderId
+              trace {
+                entryId
                 subkeyId
-                parentFolderId
+                context
+                parentId
               }
             }
             creatorDevice {

@@ -58,11 +58,14 @@ export type AttachDevicesToWorkspacesResult = {
 
 export type Comment = {
   __typename?: 'Comment';
+  commentReplies?: Maybe<Array<Maybe<CommentReply>>>;
+  createdAt: Scalars['Date'];
   creatorDevice: CreatorDevice;
   documentId: Scalars['String'];
   encryptedContent: Scalars['String'];
   encryptedContentNonce: Scalars['String'];
   id: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTrace2;
 };
 
 export type CommentConnection = {
@@ -83,11 +86,36 @@ export type CommentEdge = {
   node?: Maybe<Comment>;
 };
 
+export type CommentReply = {
+  __typename?: 'CommentReply';
+  commentId: Scalars['String'];
+  contentKeyDerivationTrace: KeyDerivationTrace;
+  createdAt: Scalars['Date'];
+  creatorDevice: CreatorDevice;
+  documentId: Scalars['String'];
+  encryptedContent: Scalars['String'];
+  encryptedContentNonce: Scalars['String'];
+  id: Scalars['String'];
+};
+
 export type CreateCommentInput = {
+  documentId: Scalars['String'];
+  encryptedContent: Scalars['String'];
+  encryptedContentNonce: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTraceInput2;
+};
+
+export type CreateCommentReplyInput = {
+  commentId: Scalars['String'];
   contentKeyDerivationTrace?: InputMaybe<KeyDerivationTraceInput>;
   documentId: Scalars['String'];
   encryptedContent: Scalars['String'];
   encryptedContentNonce: Scalars['String'];
+};
+
+export type CreateCommentReplyResult = {
+  __typename?: 'CreateCommentReplyResult';
+  commentReply?: Maybe<CommentReply>;
 };
 
 export type CreateCommentResult = {
@@ -196,6 +224,24 @@ export type CreatorDevice = {
   encryptionPublicKey: Scalars['String'];
   encryptionPublicKeySignature: Scalars['String'];
   signingPublicKey: Scalars['String'];
+};
+
+export type DeleteCommentRepliesInput = {
+  commentReplyIds: Array<Scalars['String']>;
+};
+
+export type DeleteCommentRepliesResult = {
+  __typename?: 'DeleteCommentRepliesResult';
+  status: Scalars['String'];
+};
+
+export type DeleteCommentsInput = {
+  commentIds: Array<Scalars['String']>;
+};
+
+export type DeleteCommentsResult = {
+  __typename?: 'DeleteCommentsResult';
+  status: Scalars['String'];
 };
 
 export type DeleteDevicesInput = {
@@ -490,9 +536,35 @@ export type KeyDerivationTrace = {
   workspaceKeyId: Scalars['String'];
 };
 
+export type KeyDerivationTrace2 = {
+  __typename?: 'KeyDerivationTrace2';
+  trace: Array<KeyDerivationTraceEntry>;
+  workspaceKeyId: Scalars['String'];
+};
+
+export type KeyDerivationTraceEntry = {
+  __typename?: 'KeyDerivationTraceEntry';
+  context: Scalars['String'];
+  entryId: Scalars['String'];
+  parentId?: Maybe<Scalars['String']>;
+  subkeyId: Scalars['Int'];
+};
+
+export type KeyDerivationTraceEntryInput = {
+  context: Scalars['String'];
+  entryId: Scalars['String'];
+  parentId?: InputMaybe<Scalars['String']>;
+  subkeyId: Scalars['Int'];
+};
+
 export type KeyDerivationTraceInput = {
   parentFolders: Array<KeyDerivationTraceParentFolderInput>;
   subkeyId: Scalars['Int'];
+  workspaceKeyId: Scalars['String'];
+};
+
+export type KeyDerivationTraceInput2 = {
+  trace: Array<KeyDerivationTraceEntryInput>;
   workspaceKeyId: Scalars['String'];
 };
 
@@ -558,11 +630,14 @@ export type Mutation = {
   attachDeviceToWorkspaces?: Maybe<AttachDeviceToWorkspacesResult>;
   attachDevicesToWorkspaces?: Maybe<AttachDevicesToWorkspacesResult>;
   createComment?: Maybe<CreateCommentResult>;
+  createCommentReply?: Maybe<CreateCommentReplyResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createDocumentShareLink?: Maybe<CreateDocumentShareLinkResult>;
   createFolder?: Maybe<CreateFolderResult>;
   createInitialWorkspaceStructure?: Maybe<CreateInitialWorkspaceStructureResult>;
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
+  deleteCommentReplies?: Maybe<DeleteCommentRepliesResult>;
+  deleteComments?: Maybe<DeleteCommentsResult>;
   deleteDevices?: Maybe<DeleteDevicesResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteFolders?: Maybe<DeleteFoldersResult>;
@@ -605,6 +680,11 @@ export type MutationCreateCommentArgs = {
 };
 
 
+export type MutationCreateCommentReplyArgs = {
+  input: CreateCommentReplyInput;
+};
+
+
 export type MutationCreateDocumentArgs = {
   input: CreateDocumentInput;
 };
@@ -627,6 +707,16 @@ export type MutationCreateInitialWorkspaceStructureArgs = {
 
 export type MutationCreateWorkspaceInvitationArgs = {
   input: CreateWorkspaceInvitationInput;
+};
+
+
+export type MutationDeleteCommentRepliesArgs = {
+  input: DeleteCommentRepliesInput;
+};
+
+
+export type MutationDeleteCommentsArgs = {
+  input: DeleteCommentsInput;
 };
 
 
@@ -767,6 +857,7 @@ export type Query = {
   workspaceDevices?: Maybe<DeviceConnection>;
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
+  workspaceKeyByDocumentId?: Maybe<WorkspaceKeyByDocumentIdResult>;
   workspaces?: Maybe<WorkspaceConnection>;
 };
 
@@ -781,6 +872,7 @@ export type QueryCommentsByDocumentIdArgs = {
   after?: InputMaybe<Scalars['String']>;
   before?: InputMaybe<Scalars['String']>;
   documentId: Scalars['ID'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']>;
   first?: InputMaybe<Scalars['Int']>;
   last?: InputMaybe<Scalars['Int']>;
 };
@@ -892,6 +984,12 @@ export type QueryWorkspaceInvitationsArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
   workspaceId: Scalars['ID'];
+};
+
+
+export type QueryWorkspaceKeyByDocumentIdArgs = {
+  deviceSigningPublicKey: Scalars['String'];
+  documentId: Scalars['ID'];
 };
 
 
@@ -1174,6 +1272,11 @@ export type WorkspaceKeyBoxData = {
   workspaceKeyDevicePairs: Array<WorkspaceKeyDevicePair>;
 };
 
+export type WorkspaceKeyByDocumentIdResult = {
+  __typename?: 'WorkspaceKeyByDocumentIdResult';
+  nameWorkspaceKey: WorkspaceKey;
+};
+
 export type WorkspaceKeyDeviceInput = {
   id: Scalars['String'];
   members: Array<MemberDeviceParingInput>;
@@ -1419,12 +1522,13 @@ export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegist
 
 export type CommentsByDocumentIdQueryVariables = Exact<{
   documentId: Scalars['ID'];
+  deviceSigningPublicKey: Scalars['String'];
   first?: InputMaybe<Scalars['Int']>;
   after?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, encryptedContent: string, encryptedContentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, encryptedContent: string, encryptedContentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null }, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, context: string, parentId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null, workspaceKeyByDocumentId?: { __typename?: 'WorkspaceKeyByDocumentIdResult', nameWorkspaceKey: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, nonce: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } | null } | null } } | null };
 
 export type DeviceBySigningPublicKeyQueryVariables = Exact<{
   signingPublicKey: Scalars['ID'];
@@ -2085,7 +2189,7 @@ export function useVerifyRegistrationMutation() {
   return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
 };
 export const CommentsByDocumentIdDocument = gql`
-    query commentsByDocumentId($documentId: ID!, $first: Int = 50, $after: String) {
+    query commentsByDocumentId($documentId: ID!, $deviceSigningPublicKey: String!, $first: Int = 50, $after: String) {
   commentsByDocumentId(documentId: $documentId, first: $first, after: $after) {
     nodes {
       id
@@ -2098,12 +2202,45 @@ export const CommentsByDocumentIdDocument = gql`
         encryptionPublicKeySignature
         createdAt
       }
+      keyDerivationTrace {
+        workspaceKeyId
+        trace {
+          entryId
+          subkeyId
+          context
+          parentId
+        }
+      }
     }
     pageInfo {
       hasNextPage
       hasPreviousPage
       startCursor
       endCursor
+    }
+  }
+  workspaceKeyByDocumentId(
+    documentId: $documentId
+    deviceSigningPublicKey: $deviceSigningPublicKey
+  ) {
+    nameWorkspaceKey {
+      id
+      workspaceId
+      generation
+      workspaceKeyBox {
+        id
+        workspaceKeyId
+        deviceSigningPublicKey
+        creatorDeviceSigningPublicKey
+        nonce
+        ciphertext
+        creatorDevice {
+          signingPublicKey
+          encryptionPublicKey
+          encryptionPublicKeySignature
+          createdAt
+        }
+      }
     }
   }
 }

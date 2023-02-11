@@ -1,4 +1,9 @@
-query commentsByDocumentId($documentId: ID!, $first: Int = 50, $after: String) {
+query commentsByDocumentId(
+  $documentId: ID!
+  $deviceSigningPublicKey: String!
+  $first: Int = 50
+  $after: String
+) {
   commentsByDocumentId(documentId: $documentId, first: $first, after: $after) {
     nodes {
       id
@@ -11,12 +16,45 @@ query commentsByDocumentId($documentId: ID!, $first: Int = 50, $after: String) {
         encryptionPublicKeySignature
         createdAt
       }
+      keyDerivationTrace {
+        workspaceKeyId
+        trace {
+          entryId
+          subkeyId
+          context
+          parentId
+        }
+      }
     }
     pageInfo {
       hasNextPage
       hasPreviousPage
       startCursor
       endCursor
+    }
+  }
+  workspaceKeyByDocumentId(
+    documentId: $documentId
+    deviceSigningPublicKey: $deviceSigningPublicKey
+  ) {
+    nameWorkspaceKey {
+      id
+      workspaceId
+      generation
+      workspaceKeyBox {
+        id
+        workspaceKeyId
+        deviceSigningPublicKey
+        creatorDeviceSigningPublicKey
+        nonce
+        ciphertext
+        creatorDevice {
+          signingPublicKey
+          encryptionPublicKey
+          encryptionPublicKeySignature
+          createdAt
+        }
+      }
     }
   }
 }

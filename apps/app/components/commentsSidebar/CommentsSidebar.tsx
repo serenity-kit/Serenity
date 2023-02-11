@@ -1,4 +1,5 @@
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
+import { LocalDevice } from "@serenity-tools/common";
 import {
   Button,
   RawInput,
@@ -9,12 +10,14 @@ import {
 } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import { usePage } from "../../context/PageContext";
+import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { commentsSidebarMachine } from "./commentsSidebarMachine";
 
 const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
   const { pageId } = usePage();
+  const { activeDevice } = useAuthenticatedAppContext();
   const [state, send] = useMachine(commentsSidebarMachine, {
-    context: { params: { pageId } },
+    context: { params: { pageId, activeDevice: activeDevice as LocalDevice } },
   });
 
   return (
@@ -36,16 +39,14 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
       </View>
 
       <View>
-        {state.context.commentsByDocumentIdQueryResult?.data?.commentsByDocumentId?.nodes?.map(
-          (comment) => {
-            if (!comment) return null;
-            return (
-              <View key={comment.id}>
-                <Text>{comment.encryptedContent}</Text>
-              </View>
-            );
-          }
-        )}
+        {state.context.decryptedComments.map((comment) => {
+          if (!comment) return null;
+          return (
+            <View key={comment.id}>
+              <Text>{comment.text}</Text>
+            </View>
+          );
+        })}
       </View>
     </ScrollView>
   );

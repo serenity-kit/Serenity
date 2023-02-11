@@ -19,12 +19,13 @@ export interface Typegen0 {
   };
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: never;
   };
   eventsCausingActions: {
     clearCommentText: "done.invoke.createComment";
+    decryptComments: "CommentsByDocumentIdQuery.UPDATE_RESULT";
     showErrorToast: "CommentsByDocumentIdQuery.ERROR";
     spawnActors:
       | "done.invoke.createComment"
@@ -33,13 +34,13 @@ export interface Typegen0 {
     stopActors: "done.invoke.createComment";
     updateCommentText: "UPDATE_COMMENT_TEXT";
   };
-  eventsCausingServices: {
-    createComment: "CREATE_COMMENT";
-  };
+  eventsCausingDelays: {};
   eventsCausingGuards: {
     hasNoNetworkError: "done.invoke.createComment";
   };
-  eventsCausingDelays: {};
+  eventsCausingServices: {
+    createComment: "CREATE_COMMENT";
+  };
   matchesStates: "creatingComment" | "idle";
   tags: never;
 }

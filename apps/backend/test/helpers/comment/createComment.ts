@@ -6,7 +6,7 @@ import {
 import { gql } from "graphql-request";
 import { deriveDocumentKey } from "../document/deriveDocumentKey";
 import { getDocument } from "../document/getDocument";
-import { buildFolderKeyTrace } from "../folder/buildFolderKeyTrace";
+import { createFolderKeyDerivationTrace } from "../folder/createFolderKeyDerivationTrace";
 import { getFolder } from "../folder/getFolder";
 import { getWorkspace } from "../workspace/getWorkspace";
 
@@ -79,9 +79,8 @@ export const createComment = async ({
     key: commentKey.key,
   });
 
-  const contentKeyDerivationTrace = await buildFolderKeyTrace({
+  const keyDerivationTrace = await createFolderKeyDerivationTrace({
     workspaceKeyId,
-    subkeyId,
     parentFolderId,
   });
 
@@ -110,7 +109,7 @@ export const createComment = async ({
         documentId,
         encryptedContent: ciphertext,
         encryptedContentNonce: publicNonce,
-        contentKeyDerivationTrace,
+        keyDerivationTrace,
       },
     },
     authorizationHeaders
