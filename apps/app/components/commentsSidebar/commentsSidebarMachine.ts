@@ -16,6 +16,7 @@ import {
   CommentsByDocumentIdQueryServiceEvent,
   CommentsByDocumentIdQueryUpdateResultEvent,
   runCreateCommentMutation,
+  runDeleteCommentsMutation,
 } from "../../generated/graphql";
 import { getDocument } from "../../utils/document/getDocument";
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
@@ -48,7 +49,8 @@ export const commentsSidebarMachine = createMachine(
       events: {} as
         | CommentsByDocumentIdQueryServiceEvent
         | { type: "UPDATE_COMMENT_TEXT"; text: string }
-        | { type: "CREATE_COMMENT" },
+        | { type: "CREATE_COMMENT" }
+        | { type: "DELETE_COMMENT"; commentId: string },
       context: {} as Context,
     },
     tsTypes: {} as import("./commentsSidebarMachine.typegen").Typegen0,
@@ -88,7 +90,31 @@ export const commentsSidebarMachine = createMachine(
     states: {
       idle: {
         entry: ["spawnActors"],
-        on: { CREATE_COMMENT: "creatingComment" },
+        on: {
+          CREATE_COMMENT: "creatingComment",
+          DELETE_COMMENT: "deletingComment",
+        },
+      },
+      deletingComment: {
+        invoke: {
+          src: "deleteComment",
+          id: "deleteComment",
+          onDone: [
+            {
+              actions: ["stopActors", "spawnActors"], // respawn to trigger a request,
+              cond: "hasNoNetworkError",
+              target: "idle",
+            },
+            {
+              target: "idle",
+            },
+          ],
+          onError: [
+            {
+              target: "idle",
+            },
+          ],
+        },
       },
       creatingComment: {
         invoke: {
@@ -106,6 +132,7 @@ export const commentsSidebarMachine = createMachine(
           ],
           onError: [
             {
+              actions: ["showDeleteErrorToast"],
               target: "idle",
             },
           ],
@@ -121,6 +148,9 @@ export const commentsSidebarMachine = createMachine(
         if (!context.commentsByDocumentIdQueryError) {
           showToast("Failed to load comments.", "error");
         }
+      },
+      showDeleteErrorToast: () => {
+        showToast("Failed to delete the comment.", "error");
       },
       spawnActors: assign((context) => {
         return {
@@ -249,6 +279,13 @@ export const commentsSidebarMachine = createMachine(
             encryptedContent: result.ciphertext,
             encryptedContentNonce: result.publicNonce,
             keyDerivationTrace: fullKeyDerivationTrace,
+          },
+        });
+      },
+      deleteComment: async (context, event) => {
+        return await runDeleteCommentsMutation({
+          input: {
+            commentIds: [event.commentId],
           },
         });
       },
