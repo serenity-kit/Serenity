@@ -42,8 +42,16 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
         {state.context.decryptedComments.map((comment) => {
           if (!comment) return null;
           return (
-            <View key={comment.id}>
+            <View key={comment.id} style={tw`border-b border-gray-200`}>
               <Text>{comment.text}</Text>
+              <Button
+                size="sm"
+                onPress={() =>
+                  send({ type: "DELETE_COMMENT", commentId: comment.id })
+                }
+              >
+                Delete Comment
+              </Button>
             </View>
           );
         })}

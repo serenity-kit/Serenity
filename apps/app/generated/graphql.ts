@@ -1389,6 +1389,13 @@ export type CreateWorkspaceInvitationMutationVariables = Exact<{
 
 export type CreateWorkspaceInvitationMutation = { __typename?: 'Mutation', createWorkspaceInvitation?: { __typename?: 'CreateWorkspaceInvitationResult', workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, expiresAt: any } | null } | null };
 
+export type DeleteCommentsMutationVariables = Exact<{
+  input: DeleteCommentsInput;
+}>;
+
+
+export type DeleteCommentsMutation = { __typename?: 'Mutation', deleteComments?: { __typename?: 'DeleteCommentsResult', status: string } | null };
+
 export type DeleteDevicesMutationVariables = Exact<{
   input: DeleteDevicesInput;
 }>;
@@ -1917,6 +1924,17 @@ export const CreateWorkspaceInvitationDocument = gql`
 
 export function useCreateWorkspaceInvitationMutation() {
   return Urql.useMutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(CreateWorkspaceInvitationDocument);
+};
+export const DeleteCommentsDocument = gql`
+    mutation deleteComments($input: DeleteCommentsInput!) {
+  deleteComments(input: $input) {
+    status
+  }
+}
+    `;
+
+export function useDeleteCommentsMutation() {
+  return Urql.useMutation<DeleteCommentsMutation, DeleteCommentsMutationVariables>(DeleteCommentsDocument);
 };
 export const DeleteDevicesDocument = gql`
     mutation deleteDevices($input: DeleteDevicesInput!) {
@@ -2919,6 +2937,20 @@ export const runCreateWorkspaceInvitationMutation = async (variables: CreateWork
   return await getUrqlClient()
     .mutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(
       CreateWorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteCommentsMutation = async (variables: DeleteCommentsMutationVariables, options?: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteCommentsMutation, DeleteCommentsMutationVariables>(
+      DeleteCommentsDocument,
       variables,
       {
         // better to be safe here and always refetch
