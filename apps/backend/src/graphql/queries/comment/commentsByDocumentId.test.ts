@@ -191,8 +191,8 @@ describe("Input Errors", () => {
           node {
             id
             documentId
-            encryptedContent
-            encryptedContentNonce
+            contentCiphertext
+            contentNonce
             keyDerivationTrace {
               workspaceKeyId
               trace {
@@ -210,15 +210,15 @@ describe("Input Errors", () => {
             }
             commentReplies {
               id
-              encryptedContent
-              encryptedContentNonce
-              contentKeyDerivationTrace {
+              contentCiphertext
+              contentNonce
+              keyDerivationTrace {
                 workspaceKeyId
-                subkeyId
-                parentFolders {
-                  folderId
+                trace {
+                  entryId
                   subkeyId
-                  parentFolderId
+                  context
+                  parentId
                 }
               }
             }

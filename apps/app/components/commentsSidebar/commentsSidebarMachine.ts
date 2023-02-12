@@ -198,8 +198,8 @@ export const commentsSidebarMachine = createMachine(
 
               const decryptedComment = decryptComment({
                 key: keyDerivationTraceWithKeys.trace.at(-1)?.key!,
-                ciphertext: encryptedComment!.encryptedContent,
-                publicNonce: encryptedComment!.encryptedContentNonce,
+                ciphertext: encryptedComment!.contentCiphertext,
+                publicNonce: encryptedComment!.contentNonce,
               });
               return {
                 id: encryptedComment!.id,
@@ -276,8 +276,8 @@ export const commentsSidebarMachine = createMachine(
         return await runCreateCommentMutation({
           input: {
             documentId: context.params.pageId,
-            encryptedContent: result.ciphertext,
-            encryptedContentNonce: result.publicNonce,
+            contentCiphertext: result.ciphertext,
+            contentNonce: result.publicNonce,
             keyDerivationTrace: fullKeyDerivationTrace,
           },
         });

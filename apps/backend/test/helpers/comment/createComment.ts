@@ -90,8 +90,8 @@ export const createComment = async ({
         comment {
           id
           documentId
-          encryptedContent
-          encryptedContentNonce
+          contentCiphertext
+          contentNonce
           creatorDevice {
             signingPublicKey
             encryptionPublicKey
@@ -107,8 +107,8 @@ export const createComment = async ({
     {
       input: {
         documentId,
-        encryptedContent: ciphertext,
-        encryptedContentNonce: publicNonce,
+        contentCiphertext: ciphertext,
+        contentNonce: publicNonce,
         keyDerivationTrace,
       },
     },

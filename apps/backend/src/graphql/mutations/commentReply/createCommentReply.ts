@@ -9,17 +9,17 @@ import {
 import { createCommentReply } from "../../../database/commentreply/createCommentReply";
 import { formatCommentReply } from "../../../types/comment";
 import { CommentReply } from "../../types/commentReply";
-import { KeyDerivationTraceInput } from "../../types/keyDerivation";
+import { KeyDerivationTraceInput2 } from "../../types/keyDerivation";
 
 export const CreateCommentReplyInput = inputObjectType({
   name: "CreateCommentReplyInput",
   definition(t) {
     t.nonNull.string("commentId");
     t.nonNull.string("documentId");
-    t.nonNull.string("encryptedContent");
-    t.nonNull.string("encryptedContentNonce");
-    t.field("contentKeyDerivationTrace", {
-      type: KeyDerivationTraceInput,
+    t.nonNull.string("contentCiphertext");
+    t.nonNull.string("contentNonce");
+    t.nonNull.field("keyDerivationTrace", {
+      type: KeyDerivationTraceInput2,
     });
   },
 });
@@ -51,9 +51,9 @@ export const createCommentReplyMutation = mutationField("createCommentReply", {
       creatorDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
       commentId: args.input.commentId,
       documentId: args.input.documentId,
-      encryptedContent: args.input.encryptedContent,
-      encryptedContentNonce: args.input.encryptedContentNonce,
-      contentKeyDerivationTrace: args.input.contentKeyDerivationTrace,
+      contentCiphertext: args.input.contentCiphertext,
+      contentNonce: args.input.contentNonce,
+      keyDerivationTrace: args.input.keyDerivationTrace,
     });
     return { commentReply: formatCommentReply(commentReply) };
   },

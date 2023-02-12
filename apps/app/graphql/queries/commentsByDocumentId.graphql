@@ -8,8 +8,8 @@ query commentsByDocumentId(
     nodes {
       id
       documentId
-      encryptedContent
-      encryptedContentNonce
+      contentCiphertext
+      contentNonce
       creatorDevice {
         signingPublicKey
         encryptionPublicKey

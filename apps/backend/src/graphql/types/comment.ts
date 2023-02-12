@@ -8,8 +8,8 @@ export const Comment = objectType({
   definition(t) {
     t.nonNull.string("id");
     t.nonNull.string("documentId");
-    t.nonNull.string("encryptedContent");
-    t.nonNull.string("encryptedContentNonce");
+    t.nonNull.string("contentCiphertext");
+    t.nonNull.string("contentNonce");
     t.nonNull.field("createdAt", { type: "Date" });
     t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTrace2 });
     t.nonNull.field("creatorDevice", { type: CreatorDevice });

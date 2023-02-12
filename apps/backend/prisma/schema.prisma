@@ -287,9 +287,9 @@ model Comment {
   document                      Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
   documentId                    String
   createdAt                     DateTime       @default(now())
-  encryptedContent              String
-  encryptedContentNonce         String
-  contentKeyDerivationTrace     Json           @default("{}")
+  contentCiphertext             String
+  contentNonce                  String
+  keyDerivationTrace            Json           @default("{}")
   creatorDevice                 CreatorDevice  @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
   creatorDeviceSigningPublicKey String
   commentReplies                CommentReply[]
@@ -302,9 +302,9 @@ model CommentReply {
   comment                       Comment       @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId                     String
   createdAt                     DateTime      @default(now())
-  encryptedContent              String
-  encryptedContentNonce         String
-  contentKeyDerivationTrace     Json          @default("{}")
+  contentCiphertext             String
+  contentNonce                  String
+  keyDerivationTrace            Json          @default("{}")
   creatorDevice                 CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
   creatorDeviceSigningPublicKey String
 }
