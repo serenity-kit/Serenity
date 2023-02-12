@@ -37,8 +37,8 @@ export const commentsByDocumentId = async ({
           node {
             id
             documentId
-            encryptedContent
-            encryptedContentNonce
+            contentCiphertext
+            contentNonce
             keyDerivationTrace {
               workspaceKeyId
               trace {
@@ -56,15 +56,15 @@ export const commentsByDocumentId = async ({
             }
             commentReplies {
               id
-              encryptedContent
-              encryptedContentNonce
-              contentKeyDerivationTrace {
+              contentCiphertext
+              contentNonce
+              keyDerivationTrace {
                 workspaceKeyId
-                subkeyId
-                parentFolders {
-                  folderId
+                trace {
+                  entryId
                   subkeyId
-                  parentFolderId
+                  context
+                  parentId
                 }
               }
             }

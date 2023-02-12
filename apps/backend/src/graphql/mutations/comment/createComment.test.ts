@@ -41,8 +41,8 @@ test("owner comments", async () => {
   const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
   expect(comment.documentId).toBe(documentId1);
-  expect(typeof comment.encryptedContent).toBe("string");
-  expect(typeof comment.encryptedContentNonce).toBe("string");
+  expect(typeof comment.contentCiphertext).toBe("string");
+  expect(typeof comment.contentNonce).toBe("string");
   expect(comment.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -73,8 +73,8 @@ test("admin comments", async () => {
   const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
   expect(comment.documentId).toBe(documentId1);
-  expect(typeof comment.encryptedContent).toBe("string");
-  expect(typeof comment.encryptedContentNonce).toBe("string");
+  expect(typeof comment.contentCiphertext).toBe("string");
+  expect(typeof comment.contentNonce).toBe("string");
   expect(comment.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -105,8 +105,8 @@ test("editor comments", async () => {
   const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
   expect(comment.documentId).toBe(documentId1);
-  expect(typeof comment.encryptedContent).toBe("string");
-  expect(typeof comment.encryptedContentNonce).toBe("string");
+  expect(typeof comment.contentCiphertext).toBe("string");
+  expect(typeof comment.contentNonce).toBe("string");
   expect(comment.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -137,8 +137,8 @@ test("commenter comment", async () => {
   const comment = createCommentResult.createComment.comment;
   expect(typeof comment.id).toBe("string");
   expect(comment.documentId).toBe(documentId1);
-  expect(typeof comment.encryptedContent).toBe("string");
-  expect(typeof comment.encryptedContentNonce).toBe("string");
+  expect(typeof comment.contentCiphertext).toBe("string");
+  expect(typeof comment.contentNonce).toBe("string");
   expect(comment.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -235,8 +235,8 @@ describe("Input errors", () => {
         comment {
           id
           documentId
-          encryptedContent
-          encryptedContentNonce
+          contentCiphertext
+          contentNonce
           creatorDevice {
             signingPublicKey
             encryptionPublicKey
@@ -255,8 +255,8 @@ describe("Input errors", () => {
           {
             input: {
               documentId: null,
-              encryptedContent: "",
-              encryptedContentNonce: "",
+              contentCiphertext: "",
+              contentNonce: "",
               keyDerivationTrace: {
                 workspaceKeyId: 1,
                 trace: [],
@@ -267,7 +267,7 @@ describe("Input errors", () => {
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid encryptedContent", async () => {
+  test("Invalid contentCiphertext", async () => {
     await expect(
       (async () =>
         await graphql.client.request(
@@ -275,8 +275,8 @@ describe("Input errors", () => {
           {
             input: {
               id: uuidv4(),
-              encryptedContent: null,
-              encryptedContentNonce: "",
+              contentCiphertext: null,
+              contentNonce: "",
               keyDerivationTrace: {
                 workspaceKeyId: 1,
                 trace: [],
@@ -287,7 +287,7 @@ describe("Input errors", () => {
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid encryptedContentNonce", async () => {
+  test("Invalid contentNonce", async () => {
     await expect(
       (async () =>
         await graphql.client.request(
@@ -295,8 +295,8 @@ describe("Input errors", () => {
           {
             input: {
               id: uuidv4(),
-              encryptedContent: "",
-              encryptedContentNonce: null,
+              contentCiphertext: "",
+              contentNonce: null,
               keyDerivationTrace: {
                 workspaceKeyId: 1,
                 trace: [],
@@ -315,8 +315,8 @@ describe("Input errors", () => {
           {
             input: {
               id: uuidv4(),
-              encryptedContent: "",
-              encryptedContentNonce: null,
+              contentCiphertext: "",
+              contentNonce: null,
               keyDerivationTrace: null,
             },
           },

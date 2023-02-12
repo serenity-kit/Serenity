@@ -56,8 +56,8 @@ test("commenter responds to comment", async () => {
   expect(typeof commentReply.id).toBe("string");
   expect(commentReply.commentId).toBe(comment.id);
   expect(commentReply.documentId).toBe(documentId1);
-  expect(typeof commentReply.encryptedContent).toBe("string");
-  expect(typeof commentReply.encryptedContentNonce).toBe("string");
+  expect(typeof commentReply.contentCiphertext).toBe("string");
+  expect(typeof commentReply.contentNonce).toBe("string");
   expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -90,8 +90,8 @@ test("admin replies to comment", async () => {
   expect(typeof comment.id).toBe("string");
   expect(commentReply.commentId).toBe(comment.id);
   expect(comment.documentId).toBe(documentId1);
-  expect(typeof comment.encryptedContent).toBe("string");
-  expect(typeof comment.encryptedContentNonce).toBe("string");
+  expect(typeof comment.contentCiphertext).toBe("string");
+  expect(typeof comment.contentNonce).toBe("string");
   expect(comment.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -124,8 +124,8 @@ test("editor replies to comment", async () => {
   expect(typeof comment.id).toBe("string");
   expect(commentReply.commentId).toBe(comment.id);
   expect(comment.documentId).toBe(documentId1);
-  expect(typeof comment.encryptedContent).toBe("string");
-  expect(typeof comment.encryptedContentNonce).toBe("string");
+  expect(typeof comment.contentCiphertext).toBe("string");
+  expect(typeof comment.contentNonce).toBe("string");
   expect(comment.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -158,8 +158,8 @@ test("commenter replies to comment", async () => {
   expect(typeof comment.id).toBe("string");
   expect(commentReply.commentId).toBe(comment.id);
   expect(comment.documentId).toBe(documentId1);
-  expect(typeof comment.encryptedContent).toBe("string");
-  expect(typeof comment.encryptedContentNonce).toBe("string");
+  expect(typeof comment.contentCiphertext).toBe("string");
+  expect(typeof comment.contentNonce).toBe("string");
   expect(comment.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -261,8 +261,8 @@ describe("Input errors", () => {
           id
           commentId
           documentId
-          encryptedContent
-          encryptedContentNonce
+          contentCiphertext
+          contentNonce
           creatorDevice {
             signingPublicKey
             encryptionPublicKey
@@ -282,9 +282,9 @@ describe("Input errors", () => {
             input: {
               commentId: null,
               documentId: "",
-              encryptedContent: "",
-              encryptedContentNonce: "",
-              contentKeyDerivationTrace: {
+              contentCiphertext: "",
+              contentNonce: "",
+              keyDerivationTrace: {
                 workspaceKeyId: 1,
                 subkeyId: 1,
                 parentFolders: [],
@@ -304,9 +304,9 @@ describe("Input errors", () => {
             input: {
               commentId: uuidv4(),
               documentId: null,
-              encryptedContent: "",
-              encryptedContentNonce: "",
-              contentKeyDerivationTrace: {
+              contentCiphertext: "",
+              contentNonce: "",
+              keyDerivationTrace: {
                 workspaceKeyId: 1,
                 subkeyId: 1,
                 parentFolders: [],
@@ -317,7 +317,7 @@ describe("Input errors", () => {
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid encryptedContent", async () => {
+  test("Invalid contentCiphertext", async () => {
     await expect(
       (async () =>
         await graphql.client.request(
@@ -326,9 +326,9 @@ describe("Input errors", () => {
             input: {
               commentId: uuidv4(),
               documentId: uuidv4(),
-              encryptedContent: null,
-              encryptedContentNonce: "",
-              contentKeyDerivationTrace: {
+              contentCiphertext: null,
+              contentNonce: "",
+              keyDerivationTrace: {
                 workspaceKeyId: 1,
                 subkeyId: 1,
                 parentFolders: [],
@@ -339,7 +339,7 @@ describe("Input errors", () => {
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid encryptedContentNonce", async () => {
+  test("Invalid contentNonce", async () => {
     await expect(
       (async () =>
         await graphql.client.request(
@@ -348,9 +348,9 @@ describe("Input errors", () => {
             input: {
               commentId: uuidv4(),
               documentId: uuidv4(),
-              encryptedContent: "",
-              encryptedContentNonce: null,
-              contentKeyDerivationTrace: {
+              contentCiphertext: "",
+              contentNonce: null,
+              keyDerivationTrace: {
                 workspaceKeyId: 1,
                 subkeyId: 1,
                 parentFolders: [],
@@ -361,7 +361,7 @@ describe("Input errors", () => {
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid contentKeyDerivationTrace", async () => {
+  test("Invalid keyDerivationTrace", async () => {
     await expect(
       (async () =>
         await graphql.client.request(
@@ -370,9 +370,9 @@ describe("Input errors", () => {
             input: {
               commentId: uuidv4(),
               documentId: uuidv4(),
-              encryptedContent: "",
-              encryptedContentNonce: null,
-              contentKeyDerivationTrace: null,
+              contentCiphertext: "",
+              contentNonce: null,
+              keyDerivationTrace: null,
             },
           },
           authorizationHeaders

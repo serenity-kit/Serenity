@@ -59,11 +59,11 @@ export type AttachDevicesToWorkspacesResult = {
 export type Comment = {
   __typename?: 'Comment';
   commentReplies?: Maybe<Array<Maybe<CommentReply>>>;
+  contentCiphertext: Scalars['String'];
+  contentNonce: Scalars['String'];
   createdAt: Scalars['Date'];
   creatorDevice: CreatorDevice;
   documentId: Scalars['String'];
-  encryptedContent: Scalars['String'];
-  encryptedContentNonce: Scalars['String'];
   id: Scalars['String'];
   keyDerivationTrace: KeyDerivationTrace2;
 };
@@ -89,28 +89,28 @@ export type CommentEdge = {
 export type CommentReply = {
   __typename?: 'CommentReply';
   commentId: Scalars['String'];
-  contentKeyDerivationTrace: KeyDerivationTrace;
+  contentCiphertext: Scalars['String'];
+  contentNonce: Scalars['String'];
   createdAt: Scalars['Date'];
   creatorDevice: CreatorDevice;
   documentId: Scalars['String'];
-  encryptedContent: Scalars['String'];
-  encryptedContentNonce: Scalars['String'];
   id: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTrace2;
 };
 
 export type CreateCommentInput = {
+  contentCiphertext: Scalars['String'];
+  contentNonce: Scalars['String'];
   documentId: Scalars['String'];
-  encryptedContent: Scalars['String'];
-  encryptedContentNonce: Scalars['String'];
   keyDerivationTrace: KeyDerivationTraceInput2;
 };
 
 export type CreateCommentReplyInput = {
   commentId: Scalars['String'];
-  contentKeyDerivationTrace?: InputMaybe<KeyDerivationTraceInput>;
+  contentCiphertext: Scalars['String'];
+  contentNonce: Scalars['String'];
   documentId: Scalars['String'];
-  encryptedContent: Scalars['String'];
-  encryptedContentNonce: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTraceInput2;
 };
 
 export type CreateCommentReplyResult = {
@@ -1352,7 +1352,7 @@ export type CreateCommentMutationVariables = Exact<{
 }>;
 
 
-export type CreateCommentMutation = { __typename?: 'Mutation', createComment?: { __typename?: 'CreateCommentResult', comment?: { __typename?: 'Comment', id: string, documentId: string, encryptedContent: string, encryptedContentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } } | null } | null };
+export type CreateCommentMutation = { __typename?: 'Mutation', createComment?: { __typename?: 'CreateCommentResult', comment?: { __typename?: 'Comment', id: string, documentId: string, contentCiphertext: string, contentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } } | null } | null };
 
 export type CreateDocumentMutationVariables = Exact<{
   input: CreateDocumentInput;
@@ -1535,7 +1535,7 @@ export type CommentsByDocumentIdQueryVariables = Exact<{
 }>;
 
 
-export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, encryptedContent: string, encryptedContentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null }, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, context: string, parentId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null, workspaceKeyByDocumentId?: { __typename?: 'WorkspaceKeyByDocumentIdResult', nameWorkspaceKey: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, nonce: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } | null } | null } } | null };
+export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, contentCiphertext: string, contentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null }, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, context: string, parentId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null, workspaceKeyByDocumentId?: { __typename?: 'WorkspaceKeyByDocumentIdResult', nameWorkspaceKey: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, nonce: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } | null } | null } } | null };
 
 export type DeviceBySigningPublicKeyQueryVariables = Exact<{
   signingPublicKey: Scalars['ID'];
@@ -1792,8 +1792,8 @@ export const CreateCommentDocument = gql`
     comment {
       id
       documentId
-      encryptedContent
-      encryptedContentNonce
+      contentCiphertext
+      contentNonce
       creatorDevice {
         signingPublicKey
         encryptionPublicKey
@@ -2212,8 +2212,8 @@ export const CommentsByDocumentIdDocument = gql`
     nodes {
       id
       documentId
-      encryptedContent
-      encryptedContentNonce
+      contentCiphertext
+      contentNonce
       creatorDevice {
         signingPublicKey
         encryptionPublicKey
