@@ -1,5 +1,4 @@
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
-import { LocalDevice } from "@serenity-tools/common";
 import {
   Button,
   IconButton,
@@ -9,17 +8,12 @@ import {
   tw,
   View,
 } from "@serenity-tools/ui";
-import { useMachine } from "@xstate/react";
+import { useActor } from "@xstate/react";
 import { usePage } from "../../context/PageContext";
-import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
-import { commentsSidebarMachine } from "./commentsSidebarMachine";
 
 const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
-  const { pageId } = usePage();
-  const { activeDevice } = useAuthenticatedAppContext();
-  const [state, send] = useMachine(commentsSidebarMachine, {
-    context: { params: { pageId, activeDevice: activeDevice as LocalDevice } },
-  });
+  const { commentsService } = usePage();
+  const [state, send] = useActor(commentsService);
 
   return (
     // grow-0 overrides default of ScrollView to keep the assigned width
@@ -97,14 +91,4 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
   );
 };
 
-// By remounting the component we make sure that a fresh state machine gets started.
-// As an alternative we could also have an action that resets the state machine,
-// but with all the side-effects remounting seemed to be the stabler choice for now.
-const CommentsSidebarWrapper: React.FC<DrawerContentComponentProps> = (
-  props
-) => {
-  const { pageId } = usePage();
-  return <CommentsSidebar key={pageId} {...props} />;
-};
-
-export default CommentsSidebarWrapper;
+export default CommentsSidebar;

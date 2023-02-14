@@ -8,21 +8,29 @@ export interface Typegen0 {
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
+    "error.platform.loadInitialDataMachine": {
+      type: "error.platform.loadInitialDataMachine";
+      data: unknown;
+    };
     "xstate.init": { type: "xstate.init" };
   };
-  invokeSrcNameMap: {};
+  invokeSrcNameMap: {
+    loadInitialDataMachine: "done.invoke.loadInitialDataMachine";
+  };
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: never;
   };
   eventsCausingActions: {};
-  eventsCausingServices: {};
+  eventsCausingDelays: {};
   eventsCausingGuards: {
     hasDocumentAccess: "done.invoke.loadInitialDataMachine";
   };
-  eventsCausingDelays: {};
+  eventsCausingServices: {
+    loadInitialDataMachine: "xstate.init";
+  };
   matchesStates: "hasNoAccess" | "loadDocument" | "loadingInitialData";
   tags: never;
 }

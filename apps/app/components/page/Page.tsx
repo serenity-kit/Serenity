@@ -26,6 +26,7 @@ import {
   recreateSnapshotKey,
   sleep,
 } from "@serenity-tools/common";
+import { useActor } from "@xstate/react";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
@@ -583,6 +584,9 @@ export default function Page({
     };
   }, []);
 
+  const { commentsService } = usePage();
+  const [state, send] = useActor(commentsService);
+
   return (
     <Editor
       documentId={docId}
@@ -594,6 +598,13 @@ export default function Page({
       isNew={isNew}
       documentLoaded={documentLoadedInfo.loaded}
       username={documentLoadedInfo.username}
+      comments={state.context.decryptedComments.map((comment) => {
+        return {
+          commentId: comment.id,
+          from: 0,
+          to: 5,
+        };
+      })}
     />
   );
 }

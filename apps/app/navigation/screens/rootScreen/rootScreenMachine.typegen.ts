@@ -33,15 +33,22 @@ export interface Typegen0 {
   };
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: never;
   };
   eventsCausingActions: {
     redirectToDocument: "";
     redirectToLobby: "";
     redirectToLogin: "";
     redirectToNoWorkspaces: "";
+  };
+  eventsCausingDelays: {};
+  eventsCausingGuards: {
+    hasAccessToWorkspace: "";
+    hasNoNetworkError: "done.invoke.fetchMeWithWorkspaceLoadingInfo";
+    isAuthorized: "";
+    isValidSession: "";
   };
   eventsCausingServices: {
     fetchMeWithWorkspaceLoadingInfo:
@@ -50,13 +57,6 @@ export interface Typegen0 {
       | "xstate.after(2000)#rootScreen.inProgress.failure";
     getLastUsedWorkspaceAndDocumentId: "start";
   };
-  eventsCausingGuards: {
-    hasAccessToWorkspace: "";
-    hasNoNetworkError: "done.invoke.fetchMeWithWorkspaceLoadingInfo";
-    isAuthorized: "";
-    isValidSession: "";
-  };
-  eventsCausingDelays: {};
   matchesStates:
     | "idle"
     | "inProgress"

@@ -36,6 +36,7 @@ export default function Editor({
   isNew,
   updateTitle,
   username,
+  comments,
 }: EditorProps) {
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
@@ -138,6 +139,7 @@ export default function Editor({
         openDrawer={openDrawer}
         updateTitle={updateTitle}
         downloadAndDecryptFile={downloadAndDecryptFile}
+        comments={comments}
         onFocus={() => {
           editorIsFocusedRef.current = true;
           showAndPositionToolbar();

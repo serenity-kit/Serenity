@@ -13,6 +13,10 @@ export interface Typegen0 {
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
+    "error.platform.loadInitialDataMachine": {
+      type: "error.platform.loadInitialDataMachine";
+      data: unknown;
+    };
     "error.platform.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]": {
       type: "error.platform.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]";
       data: unknown;
@@ -21,23 +25,27 @@ export interface Typegen0 {
   };
   invokeSrcNameMap: {
     getLastUsedDocumentId: "done.invoke.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]";
+    loadInitialDataMachine: "done.invoke.loadInitialDataMachine";
   };
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: never;
   };
   eventsCausingActions: {
     redirectToDocument: "done.invoke.loadInitialDataMachine";
   };
-  eventsCausingServices: {
-    getLastUsedDocumentId: "xstate.init";
-  };
+  eventsCausingDelays: {};
   eventsCausingGuards: {
     hasDocumentId: "done.invoke.loadInitialDataMachine";
   };
-  eventsCausingDelays: {};
+  eventsCausingServices: {
+    getLastUsedDocumentId: "xstate.init";
+    loadInitialDataMachine:
+      | "done.invoke.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]"
+      | "error.platform.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]";
+  };
   matchesStates:
     | "loadLastUsedDocumentId"
     | "loadingInitialData"

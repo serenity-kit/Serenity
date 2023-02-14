@@ -47,6 +47,9 @@ export const workspaceSettingsLoadWorkspaceMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QBsD2BDCB1VAnA1rAA7oDGYAymAC7UCWAdlLAHRqaNQCSDd16yACLp+AYgioGYFowBuqfNPYQefOgOH8AsmQAWjMIlBFUsNZKMgAHogDMABgCMLABwB2ey9sAWRwCYATjd3ADYAGhAAT0RHFxCWAIBWFyC-EJdvYNtsgF8ciOUcAmIyShp6JlZlTlV+IRF0UTBcXDwWImQRADM8AFs2DBVeeg0GnVJ9KUsTM3oLJGsYtz8E+z8UkLcAwM90iOiEbMSWXwCXQL9bEN8Q+288gsGiwhJyKlpOKqe8F9LxSWkcgU0i6NAmzxK5GmpnMDEsNgQSRW3gCISSATutkc132iBSCXcfkcjm8iVufns9hCDxAhR+kLKH0qA0wENeYCaLTaHW6fRYoOo4Pp7Ohszo81ACLO8VsiVsGUSbl8aRCiVxhzczjcyxJIXSbj1yTy+RADFQEDgljpxXZ7wqzBZEBqw1G-FFsPheJWV1JDhCfkVqNs6sciWOqLccsSd0pxO8Lhp1t+b3Kn0dbNK7rmcIWCLJARYDgD-jcVyyARDYYSmyjMacJITJqTDLtaebtoArqRyLB4AsZh7czErsdbAaDajFY5S+EojFridrok-N4qXqI4nvjbSq3me3SgAxdB0ZCQLPinOS4eqwvjtGqzUz9UXBJ+bWJUnJf25Jtb5OM+0+2MGFs09BBkkLJc-QDLYQj9EMXBYSlKSxFFZXcbZjRyIA */
   createMachine(
     {
+      schema: {
+        context: {} as Context,
+      },
       context: { navigation: null } as Context,
       tsTypes:
         {} as import("./workspaceSettingsLoadWorkspaceMachine.typegen").Typegen0,
@@ -55,7 +58,7 @@ export const workspaceSettingsLoadWorkspaceMachine =
       states: {
         loadingInitialData: {
           invoke: {
-            src: loadInitialDataMachine,
+            src: "loadInitialDataMachine",
             id: "loadInitialDataMachine",
             data: (context) => {
               return {
@@ -126,6 +129,7 @@ export const workspaceSettingsLoadWorkspaceMachine =
       },
       services: {
         fetchWorkspace,
+        loadInitialDataMachine,
       },
     }
   );
