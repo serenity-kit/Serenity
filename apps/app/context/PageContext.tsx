@@ -1,15 +1,15 @@
 import React, { useContext } from "react";
 import { InterpreterFrom } from "xstate";
-import { commentsSidebarMachine } from "../machines/commentsMachine";
+import { commentsMachine } from "../machines/commentsMachine";
 
 type PageContext = {
   pageId: string;
-  commentsService: InterpreterFrom<typeof commentsSidebarMachine>;
+  commentsService: InterpreterFrom<typeof commentsMachine>;
 };
 
 const pageContext = React.createContext<PageContext>({
   pageId: "",
-  commentsService: {} as InterpreterFrom<typeof commentsSidebarMachine>,
+  commentsService: {} as InterpreterFrom<typeof commentsMachine>,
 });
 
 export const PageProvider = pageContext.Provider;

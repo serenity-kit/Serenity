@@ -24,18 +24,19 @@ export interface Typegen0 {
   };
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: "loadInitialDataMachine";
   };
   eventsCausingActions: {};
-  eventsCausingServices: {
-    fetchWorkspace: "done.invoke.loadInitialDataMachine";
-  };
+  eventsCausingDelays: {};
   eventsCausingGuards: {
     hasNoNetworkErrorAndWorkspaceFound: "done.invoke.fetchWorkspace";
   };
-  eventsCausingDelays: {};
+  eventsCausingServices: {
+    fetchWorkspace: "done.invoke.loadInitialDataMachine";
+    loadInitialDataMachine: "xstate.init";
+  };
   matchesStates:
     | "loadWorkspace"
     | "loadWorkspaceFailed"

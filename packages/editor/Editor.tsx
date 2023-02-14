@@ -16,7 +16,7 @@ import TaskList from "@tiptap/extension-task-list";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { HStack } from "native-base";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Awareness } from "y-protocols/awareness";
 import * as Y from "yjs";
 import {
@@ -26,7 +26,7 @@ import {
   ShareOrSaveFileFunction,
 } from "../editor-file-extension/src";
 import "./awareness.css";
-import { CommentsExtension } from "./comments-extension";
+import { CommentsExtension } from "./comments-extension/comments-extension";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
 import { AwarnessExtension } from "./naisho-awareness-extension";
@@ -63,6 +63,7 @@ export const Editor = (props: EditorProps) => {
     props.scrollIntoViewOnEditModeDelay ?? 150; // 150ms works well on iOS Safari
   const bubbleMenuRef = useRef<HTMLDivElement>(null);
 
+  console.log("Editor render", props.comments);
   const editor = useEditor(
     {
       extensions: [
@@ -177,6 +178,14 @@ export const Editor = (props: EditorProps) => {
     },
     [props.documentId]
   );
+
+  useEffect(() => {
+    if (editor) {
+      editor.storage.comments.comments = props.comments;
+      // empty transaction to make sure the comments are updated
+      editor.view.dispatch(editor.view.state.tr);
+    }
+  }, [props.comments, editor]);
 
   return (
     <div className="flex h-full flex-auto flex-row">

@@ -20,21 +20,21 @@ export interface Typegen0 {
   };
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: never;
   };
   eventsCausingActions: {
     redirectToLogin: "";
   };
-  eventsCausingServices: {
-    fetchMe: "xstate.after(2000)#loadMeAndVerify.failure" | "xstate.init";
-  };
+  eventsCausingDelays: {};
   eventsCausingGuards: {
     hasNoNetworkError: "done.invoke.fetchMe";
     isValidSession: "";
   };
-  eventsCausingDelays: {};
+  eventsCausingServices: {
+    fetchMe: "xstate.after(2000)#loadMeAndVerify.failure" | "xstate.init";
+  };
   matchesStates:
     | "failure"
     | "invalidSession"

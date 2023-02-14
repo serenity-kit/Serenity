@@ -26,14 +26,21 @@ export interface Typegen0 {
   };
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: never;
   };
   eventsCausingActions: {
     redirectToDocument: "";
     redirectToLogin: "";
     redirectToNotFoundOrNoWorkspaces: "";
+  };
+  eventsCausingDelays: {};
+  eventsCausingGuards: {
+    hasAccessToWorkspace: "";
+    hasNoNetworkError: "done.invoke.fetchMeWithWorkspaceLoadingInfo";
+    isAuthorized: "";
+    isValidSession: "";
   };
   eventsCausingServices: {
     fetchMeWithWorkspaceLoadingInfo:
@@ -41,13 +48,6 @@ export interface Typegen0 {
       | "xstate.after(5000)#workspaceNotDecrypted.notAuthorized"
       | "xstate.init";
   };
-  eventsCausingGuards: {
-    hasAccessToWorkspace: "";
-    hasNoNetworkError: "done.invoke.fetchMeWithWorkspaceLoadingInfo";
-    isAuthorized: "";
-    isValidSession: "";
-  };
-  eventsCausingDelays: {};
   matchesStates:
     | "failure"
     | "hasWorkspaceAccess"

@@ -46,16 +46,15 @@ export const CommentsExtension = Extension.create<
             );
           },
           apply(tr, old) {
-            return tr.docChanged
-              ? DecorationSet.create(
-                  tr.doc,
-                  storage.comments.comments.map((comment: EditorComment) => {
-                    return Decoration.inline(comment.from, comment.to, {
-                      style: "background-color: yellow",
-                    });
-                  })
-                )
-              : old;
+            console.log("APPLY");
+            return DecorationSet.create(
+              tr.doc,
+              storage.comments.comments.map((comment: EditorComment) => {
+                return Decoration.inline(comment.from, comment.to, {
+                  style: "background-color: yellow",
+                });
+              })
+            );
           },
         },
         props: {

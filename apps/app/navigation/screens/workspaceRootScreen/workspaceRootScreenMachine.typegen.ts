@@ -24,20 +24,23 @@ export interface Typegen0 {
   };
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: "loadInitialDataMachine";
   };
   eventsCausingActions: {
     redirectToDocument: "done.invoke.loadInitialDataMachine";
   };
-  eventsCausingServices: {
-    getLastUsedDocumentId: "xstate.init";
-  };
+  eventsCausingDelays: {};
   eventsCausingGuards: {
     hasDocumentId: "done.invoke.loadInitialDataMachine";
   };
-  eventsCausingDelays: {};
+  eventsCausingServices: {
+    getLastUsedDocumentId: "xstate.init";
+    loadInitialDataMachine:
+      | "done.invoke.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]"
+      | "error.platform.workspaceRootScreen.loadLastUsedDocumentId:invocation[0]";
+  };
   matchesStates:
     | "loadLastUsedDocumentId"
     | "loadingInitialData"

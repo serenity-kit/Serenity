@@ -33,7 +33,7 @@ import { useWorkspaceQuery } from "../generated/graphql";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
 import { useAuthenticatedAppContext } from "../hooks/useAuthenticatedAppContext";
 import { useInterval } from "../hooks/useInterval";
-import { commentsSidebarMachine } from "../machines/commentsMachine";
+import { commentsMachine } from "../machines/commentsMachine";
 import {
   RootStackParamList,
   WorkspaceStackParamList,
@@ -85,7 +85,7 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
   props
 ) => {
   const { activeDevice } = useAuthenticatedAppContext();
-  const commentsService = useInterpret(commentsSidebarMachine, {
+  const commentsService = useInterpret(commentsMachine, {
     context: {
       params: {
         pageId: props.route.params.pageId,

@@ -44,7 +44,7 @@ interface Context {
   replyTexts: Record<string, string>;
 }
 
-export const commentsSidebarMachine = createMachine(
+export const commentsMachine = createMachine(
   {
     schema: {
       events: {} as
@@ -194,7 +194,7 @@ export const commentsSidebarMachine = createMachine(
         },
       },
     },
-    id: "commentsSidebarMachine",
+    id: "commentsMachine",
   },
   {
     actions: {

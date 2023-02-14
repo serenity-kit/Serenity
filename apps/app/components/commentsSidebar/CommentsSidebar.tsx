@@ -91,14 +91,4 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
   );
 };
 
-// By remounting the component we make sure that a fresh state machine gets started.
-// As an alternative we could also have an action that resets the state machine,
-// but with all the side-effects remounting seemed to be the stabler choice for now.
-const CommentsSidebarWrapper: React.FC<DrawerContentComponentProps> = (
-  props
-) => {
-  const { pageId } = usePage();
-  return <CommentsSidebar key={pageId} {...props} />;
-};
-
-export default CommentsSidebarWrapper;
+export default CommentsSidebar;
