@@ -1,13 +1,8 @@
-import { KeyDerivationTrace2 } from "@naisho/core";
 import {
-  commentDerivedKeyContext,
-  createCommentKey,
   decryptComment,
   deriveKeysFromKeyDerivationTrace,
-  documentDerivedKeyContext,
   encryptComment,
   LocalDevice,
-  recreateDocumentKey,
 } from "@serenity-tools/common";
 import { AnyActorRef, assign, createMachine, spawn } from "xstate";
 import {
@@ -16,22 +11,27 @@ import {
   CommentsByDocumentIdQueryServiceEvent,
   CommentsByDocumentIdQueryUpdateResultEvent,
   runCreateCommentMutation,
+  runCreateCommentReplyMutation,
+  runDeleteCommentRepliesMutation,
   runDeleteCommentsMutation,
 } from "../../generated/graphql";
-import { getDocument } from "../../utils/document/getDocument";
-import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
-import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { showToast } from "../../utils/toast/showToast";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { createCommentKeyAndKeyDerivationTrace } from "./createCommentKeyAndKeyDerivationTrace";
 
 type Params = {
   pageId: string;
   activeDevice: LocalDevice | null;
 };
 
+type DecryptedReply = {
+  id: string;
+  text: string;
+};
+
 type DecryptedComment = {
   id: string;
   text: string;
+  replies: DecryptedReply[];
 };
 
 interface Context {
@@ -41,6 +41,7 @@ interface Context {
   commentsByDocumentIdQueryActor?: AnyActorRef;
   decryptedComments: DecryptedComment[];
   commentText: string;
+  replyTexts: Record<string, string>;
 }
 
 export const commentsSidebarMachine = createMachine(
@@ -50,7 +51,10 @@ export const commentsSidebarMachine = createMachine(
         | CommentsByDocumentIdQueryServiceEvent
         | { type: "UPDATE_COMMENT_TEXT"; text: string }
         | { type: "CREATE_COMMENT" }
-        | { type: "DELETE_COMMENT"; commentId: string },
+        | { type: "DELETE_COMMENT"; commentId: string }
+        | { type: "UPDATE_REPLY_TEXT"; text: string; commentId: string }
+        | { type: "CREATE_REPLY"; commentId: string }
+        | { type: "DELETE_REPLY"; replyId: string },
       context: {} as Context,
     },
     tsTypes: {} as import("./commentsSidebarMachine.typegen").Typegen0,
@@ -63,6 +67,7 @@ export const commentsSidebarMachine = createMachine(
       commentsByDocumentIdQueryError: false,
       commentText: "",
       decryptedComments: [],
+      replyTexts: {},
     },
     initial: "idle",
     on: {
@@ -86,6 +91,9 @@ export const commentsSidebarMachine = createMachine(
       UPDATE_COMMENT_TEXT: {
         actions: ["updateCommentText"],
       },
+      UPDATE_REPLY_TEXT: {
+        actions: ["updateReplyText"],
+      },
     },
     states: {
       idle: {
@@ -93,6 +101,8 @@ export const commentsSidebarMachine = createMachine(
         on: {
           CREATE_COMMENT: "creatingComment",
           DELETE_COMMENT: "deletingComment",
+          CREATE_REPLY: "creatingReply",
+          DELETE_REPLY: "deletingReply",
         },
       },
       deletingComment: {
@@ -111,6 +121,29 @@ export const commentsSidebarMachine = createMachine(
           ],
           onError: [
             {
+              actions: ["showDeleteErrorToast"],
+              target: "idle",
+            },
+          ],
+        },
+      },
+      deletingReply: {
+        invoke: {
+          src: "deleteReply",
+          id: "deleteReply",
+          onDone: [
+            {
+              actions: ["stopActors", "spawnActors"], // respawn to trigger a request,
+              cond: "hasNoNetworkError",
+              target: "idle",
+            },
+            {
+              target: "idle",
+            },
+          ],
+          onError: [
+            {
+              actions: ["showDeleteErrorToast"],
               target: "idle",
             },
           ],
@@ -132,7 +165,29 @@ export const commentsSidebarMachine = createMachine(
           ],
           onError: [
             {
-              actions: ["showDeleteErrorToast"],
+              actions: ["showCreateErrorToast"],
+              target: "idle",
+            },
+          ],
+        },
+      },
+      creatingReply: {
+        invoke: {
+          src: "createReply",
+          id: "createReply",
+          onDone: [
+            {
+              actions: ["clearReplyText", "stopActors", "spawnActors"], // respawn to trigger a request,
+              cond: "hasNoNetworkError",
+              target: "idle",
+            },
+            {
+              target: "idle",
+            },
+          ],
+          onError: [
+            {
+              actions: ["showCreateErrorReplyToast"],
               target: "idle",
             },
           ],
@@ -148,6 +203,12 @@ export const commentsSidebarMachine = createMachine(
         if (!context.commentsByDocumentIdQueryError) {
           showToast("Failed to load comments.", "error");
         }
+      },
+      showCreateErrorToast: () => {
+        showToast("Failed to create the comment.", "error");
+      },
+      showCreateErrorReplyToast: () => {
+        showToast("Failed to create the reply.", "error");
       },
       showDeleteErrorToast: () => {
         showToast("Failed to delete the comment.", "error");
@@ -174,17 +235,34 @@ export const commentsSidebarMachine = createMachine(
       clearCommentText: assign({ commentText: "" }),
       updateCommentText: assign((context, event) => {
         return {
-          commentText:
-            event.type === "UPDATE_COMMENT_TEXT"
-              ? event.text
-              : context.commentText,
+          commentText: event.text,
         };
+      }),
+      updateReplyText: assign((context, event) => {
+        return {
+          replyTexts: {
+            ...context.replyTexts,
+            [event.commentId]: event.text,
+          },
+        };
+      }),
+      clearReplyText: assign((context, event: any) => {
+        if (event.data.data.createCommentReply.commentReply.commentId) {
+          return {
+            replyTexts: {
+              ...context.replyTexts,
+              [event.data.data.createCommentReply.commentReply.commentId]: "",
+            },
+          };
+        } else {
+          return {};
+        }
       }),
       decryptComments: assign((context, event) => {
         const decryptedComments =
           context.commentsByDocumentIdQueryResult?.data?.commentsByDocumentId?.nodes?.map(
             (encryptedComment) => {
-              const keyDerivationTraceWithKeys =
+              const commentKeyDerivationTraceWithKeys =
                 deriveKeysFromKeyDerivationTrace({
                   keyDerivationTrace: encryptedComment?.keyDerivationTrace!,
                   activeDevice: context.params.activeDevice!,
@@ -194,16 +272,41 @@ export const commentsSidebarMachine = createMachine(
                       .workspaceKeyBox!,
                 });
 
-              console.log(keyDerivationTraceWithKeys);
-
               const decryptedComment = decryptComment({
-                key: keyDerivationTraceWithKeys.trace.at(-1)?.key!,
+                key: commentKeyDerivationTraceWithKeys.trace.at(-1)?.key!,
                 ciphertext: encryptedComment!.contentCiphertext,
                 publicNonce: encryptedComment!.contentNonce,
               });
+
+              const replies = encryptedComment?.commentReplies?.map(
+                (encryptedReply) => {
+                  const replyKeyDerivationTraceWithKeys =
+                    deriveKeysFromKeyDerivationTrace({
+                      keyDerivationTrace: encryptedReply?.keyDerivationTrace!,
+                      activeDevice: context.params.activeDevice!,
+                      workspaceKeyBox:
+                        context.commentsByDocumentIdQueryResult?.data
+                          ?.workspaceKeyByDocumentId?.nameWorkspaceKey
+                          .workspaceKeyBox!,
+                    });
+
+                  const decryptedReply = decryptComment({
+                    key: replyKeyDerivationTraceWithKeys.trace.at(-1)?.key!,
+                    ciphertext: encryptedReply!.contentCiphertext,
+                    publicNonce: encryptedReply!.contentNonce,
+                  });
+
+                  return {
+                    id: encryptedReply!.id,
+                    ...JSON.parse(decryptedReply),
+                  };
+                }
+              );
+
               return {
                 id: encryptedComment!.id,
                 ...JSON.parse(decryptedComment),
+                replies,
               };
             }
           );
@@ -215,29 +318,11 @@ export const commentsSidebarMachine = createMachine(
     },
     services: {
       createComment: async (context, event) => {
-        const document = await getDocument({
-          documentId: context.params.pageId,
-        });
-        const workspace = await getWorkspace({
-          workspaceId: document.workspaceId!,
-          deviceSigningPublicKey: context.params.activeDevice!.signingPublicKey,
-        });
-        const folderKeyChainData = await deriveFolderKey({
-          folderId: document.parentFolderId!,
-          workspaceId: document.workspaceId!,
-          keyDerivationTrace: document.nameKeyDerivationTrace,
-          activeDevice: context.params.activeDevice!,
-        });
-
-        const folderKey = folderKeyChainData[folderKeyChainData.length - 2];
-        const documentKeyData = recreateDocumentKey({
-          folderKey: folderKey.key,
-          subkeyId: document.nameKeyDerivationTrace.subkeyId,
-        });
-
-        const commentKey = createCommentKey({
-          documentNameKey: documentKeyData.key,
-        });
+        const { commentKey, keyDerivationTrace } =
+          await createCommentKeyAndKeyDerivationTrace({
+            documentId: context.params.pageId,
+            activeDevice: context.params.activeDevice!,
+          });
 
         const result = encryptComment({
           key: commentKey.key,
@@ -246,39 +331,35 @@ export const commentsSidebarMachine = createMachine(
           }),
         });
 
-        const folderKeyDerivationTrace = await createFolderKeyDerivationTrace({
-          folderId: document.parentFolderId!,
-          workspaceKeyId: workspace!.currentWorkspaceKey!.id,
-        });
-
-        const fullKeyDerivationTrace: KeyDerivationTrace2 = {
-          ...folderKeyDerivationTrace,
-          trace: [
-            ...folderKeyDerivationTrace.trace,
-            {
-              parentId:
-                folderKeyDerivationTrace.trace[
-                  folderKeyDerivationTrace.trace.length - 1
-                ].entryId,
-              subkeyId: documentKeyData.subkeyId,
-              entryId: document.id,
-              context: documentDerivedKeyContext,
-            },
-            {
-              parentId: document.id,
-              subkeyId: commentKey.subkeyId,
-              entryId: "TODO",
-              context: commentDerivedKeyContext,
-            },
-          ],
-        };
-
         return await runCreateCommentMutation({
           input: {
             documentId: context.params.pageId,
             contentCiphertext: result.ciphertext,
             contentNonce: result.publicNonce,
-            keyDerivationTrace: fullKeyDerivationTrace,
+            keyDerivationTrace,
+          },
+        });
+      },
+      createReply: async (context, event) => {
+        const { commentKey, keyDerivationTrace } =
+          await createCommentKeyAndKeyDerivationTrace({
+            documentId: context.params.pageId,
+            activeDevice: context.params.activeDevice!,
+          });
+
+        const result = encryptComment({
+          key: commentKey.key,
+          comment: JSON.stringify({
+            text: context.replyTexts[event.commentId],
+          }),
+        });
+        return await runCreateCommentReplyMutation({
+          input: {
+            documentId: context.params.pageId,
+            commentId: event.commentId,
+            contentCiphertext: result.ciphertext,
+            contentNonce: result.publicNonce,
+            keyDerivationTrace,
           },
         });
       },
@@ -286,6 +367,13 @@ export const commentsSidebarMachine = createMachine(
         return await runDeleteCommentsMutation({
           input: {
             commentIds: [event.commentId],
+          },
+        });
+      },
+      deleteReply: async (context, event) => {
+        return await runDeleteCommentRepliesMutation({
+          input: {
+            commentReplyIds: [event.replyId],
           },
         });
       },

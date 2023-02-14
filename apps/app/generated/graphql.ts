@@ -1354,6 +1354,13 @@ export type CreateCommentMutationVariables = Exact<{
 
 export type CreateCommentMutation = { __typename?: 'Mutation', createComment?: { __typename?: 'CreateCommentResult', comment?: { __typename?: 'Comment', id: string, documentId: string, contentCiphertext: string, contentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } } | null } | null };
 
+export type CreateCommentReplyMutationVariables = Exact<{
+  input: CreateCommentReplyInput;
+}>;
+
+
+export type CreateCommentReplyMutation = { __typename?: 'Mutation', createCommentReply?: { __typename?: 'CreateCommentReplyResult', commentReply?: { __typename?: 'CommentReply', id: string, commentId: string } | null } | null };
+
 export type CreateDocumentMutationVariables = Exact<{
   input: CreateDocumentInput;
 }>;
@@ -1388,6 +1395,13 @@ export type CreateWorkspaceInvitationMutationVariables = Exact<{
 
 
 export type CreateWorkspaceInvitationMutation = { __typename?: 'Mutation', createWorkspaceInvitation?: { __typename?: 'CreateWorkspaceInvitationResult', workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, expiresAt: any } | null } | null };
+
+export type DeleteCommentRepliesMutationVariables = Exact<{
+  input: DeleteCommentRepliesInput;
+}>;
+
+
+export type DeleteCommentRepliesMutation = { __typename?: 'Mutation', deleteCommentReplies?: { __typename?: 'DeleteCommentRepliesResult', status: string } | null };
 
 export type DeleteCommentsMutationVariables = Exact<{
   input: DeleteCommentsInput;
@@ -1535,7 +1549,7 @@ export type CommentsByDocumentIdQueryVariables = Exact<{
 }>;
 
 
-export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, contentCiphertext: string, contentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null }, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, context: string, parentId?: string | null }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null, workspaceKeyByDocumentId?: { __typename?: 'WorkspaceKeyByDocumentIdResult', nameWorkspaceKey: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, nonce: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } | null } | null } } | null };
+export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, contentCiphertext: string, contentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null }, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, context: string, parentId?: string | null }> }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, contentCiphertext: string, contentNonce: string, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, context: string, parentId?: string | null }> } } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null, workspaceKeyByDocumentId?: { __typename?: 'WorkspaceKeyByDocumentIdResult', nameWorkspaceKey: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, nonce: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } | null } | null } } | null };
 
 export type DeviceBySigningPublicKeyQueryVariables = Exact<{
   signingPublicKey: Scalars['ID'];
@@ -1808,6 +1822,20 @@ export const CreateCommentDocument = gql`
 export function useCreateCommentMutation() {
   return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
 };
+export const CreateCommentReplyDocument = gql`
+    mutation createCommentReply($input: CreateCommentReplyInput!) {
+  createCommentReply(input: $input) {
+    commentReply {
+      id
+      commentId
+    }
+  }
+}
+    `;
+
+export function useCreateCommentReplyMutation() {
+  return Urql.useMutation<CreateCommentReplyMutation, CreateCommentReplyMutationVariables>(CreateCommentReplyDocument);
+};
 export const CreateDocumentDocument = gql`
     mutation createDocument($input: CreateDocumentInput!) {
   createDocument(input: $input) {
@@ -1924,6 +1952,17 @@ export const CreateWorkspaceInvitationDocument = gql`
 
 export function useCreateWorkspaceInvitationMutation() {
   return Urql.useMutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(CreateWorkspaceInvitationDocument);
+};
+export const DeleteCommentRepliesDocument = gql`
+    mutation deleteCommentReplies($input: DeleteCommentRepliesInput!) {
+  deleteCommentReplies(input: $input) {
+    status
+  }
+}
+    `;
+
+export function useDeleteCommentRepliesMutation() {
+  return Urql.useMutation<DeleteCommentRepliesMutation, DeleteCommentRepliesMutationVariables>(DeleteCommentRepliesDocument);
 };
 export const DeleteCommentsDocument = gql`
     mutation deleteComments($input: DeleteCommentsInput!) {
@@ -2227,6 +2266,20 @@ export const CommentsByDocumentIdDocument = gql`
           subkeyId
           context
           parentId
+        }
+      }
+      commentReplies {
+        id
+        contentCiphertext
+        contentNonce
+        keyDerivationTrace {
+          workspaceKeyId
+          trace {
+            entryId
+            subkeyId
+            context
+            parentId
+          }
         }
       }
     }
@@ -2877,6 +2930,20 @@ export const runCreateCommentMutation = async (variables: CreateCommentMutationV
     .toPromise();
 };
 
+export const runCreateCommentReplyMutation = async (variables: CreateCommentReplyMutationVariables, options?: any) => {
+  return await getUrqlClient()
+    .mutation<CreateCommentReplyMutation, CreateCommentReplyMutationVariables>(
+      CreateCommentReplyDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
 export const runCreateDocumentMutation = async (variables: CreateDocumentMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<CreateDocumentMutation, CreateDocumentMutationVariables>(
@@ -2937,6 +3004,20 @@ export const runCreateWorkspaceInvitationMutation = async (variables: CreateWork
   return await getUrqlClient()
     .mutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(
       CreateWorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteCommentRepliesMutation = async (variables: DeleteCommentRepliesMutationVariables, options?: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteCommentRepliesMutation, DeleteCommentRepliesMutationVariables>(
+      DeleteCommentRepliesDocument,
       variables,
       {
         // better to be safe here and always refetch

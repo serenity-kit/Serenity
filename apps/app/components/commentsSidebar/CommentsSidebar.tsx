@@ -2,6 +2,7 @@ import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import { LocalDevice } from "@serenity-tools/common";
 import {
   Button,
+  IconButton,
   RawInput,
   ScrollView,
   Text,
@@ -44,14 +45,50 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
           return (
             <View key={comment.id} style={tw`border-b border-gray-200`}>
               <Text>{comment.text}</Text>
+              <View>
+                {comment.replies.map((reply) => {
+                  if (!reply) return null;
+                  return (
+                    <View key={reply.id}>
+                      <View>
+                        <Text>{reply.text}</Text>
+                      </View>
+                      <IconButton
+                        name="delete-bin-line"
+                        onPress={() =>
+                          send({ type: "DELETE_REPLY", replyId: reply.id })
+                        }
+                      />
+                    </View>
+                  );
+                })}
+              </View>
+              <RawInput
+                multiline
+                value={state.context.replyTexts[comment.id]}
+                onChangeText={(text) =>
+                  send({
+                    type: "UPDATE_REPLY_TEXT",
+                    commentId: comment.id,
+                    text,
+                  })
+                }
+              />
               <Button
                 size="sm"
                 onPress={() =>
-                  send({ type: "DELETE_COMMENT", commentId: comment.id })
+                  send({ type: "CREATE_REPLY", commentId: comment.id })
                 }
               >
-                Delete Comment
+                Add Reply
               </Button>
+
+              <IconButton
+                name="delete-bin-line"
+                onPress={() =>
+                  send({ type: "DELETE_COMMENT", commentId: comment.id })
+                }
+              />
             </View>
           );
         })}
