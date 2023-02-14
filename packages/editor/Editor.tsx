@@ -19,6 +19,10 @@ import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { HStack } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
+import {
+  absolutePositionToRelativePosition,
+  ySyncPluginKey,
+} from "y-prosemirror";
 import { Awareness } from "y-protocols/awareness";
 import * as Y from "yjs";
 import {
@@ -127,6 +131,7 @@ export const Editor = (props: EditorProps) => {
         }),
         CommentsExtension.configure({
           comments: props.comments,
+          yDoc: props.yDocRef.current,
         }),
       ],
       onCreate: (params) => {
@@ -315,10 +320,21 @@ export const Editor = (props: EditorProps) => {
                 <Button
                   size="sm"
                   onPress={() => {
+                    const ystate = ySyncPluginKey.getState(editor.state);
+                    const { type, binding } = ystate;
+
                     props.createComment({
                       text: commentText,
-                      from: editor.view.state.selection.from,
-                      to: editor.view.state.selection.to,
+                      from: absolutePositionToRelativePosition(
+                        editor.view.state.selection.from,
+                        type,
+                        binding.mapping
+                      ),
+                      to: absolutePositionToRelativePosition(
+                        editor.view.state.selection.to,
+                        type,
+                        binding.mapping
+                      ),
                     });
                   }}
                 >
