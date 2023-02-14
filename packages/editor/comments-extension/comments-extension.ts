@@ -46,7 +46,6 @@ export const CommentsExtension = Extension.create<
             );
           },
           apply(tr, old) {
-            console.log("APPLY");
             return DecorationSet.create(
               tr.doc,
               storage.comments.comments.map((comment: EditorComment) => {
