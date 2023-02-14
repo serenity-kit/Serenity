@@ -23,7 +23,7 @@ export const workspaceRootScreenMachine =
       states: {
         loadingInitialData: {
           invoke: {
-            src: loadInitialDataMachine,
+            src: "loadInitialDataMachine",
             id: "loadInitialDataMachine",
             data: (context) => {
               return {
@@ -117,6 +117,7 @@ export const workspaceRootScreenMachine =
         },
       },
       services: {
+        loadInitialDataMachine,
         getLastUsedDocumentId: async (context) => {
           return await getLastUsedDocumentId(context.workspaceId);
         },

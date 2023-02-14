@@ -22,7 +22,7 @@ export const loadPageMachine =
       states: {
         loadingInitialData: {
           invoke: {
-            src: loadInitialDataMachine,
+            src: "loadInitialDataMachine",
             id: "loadInitialDataMachine",
             data: (context) => {
               return {
@@ -69,5 +69,8 @@ export const loadPageMachine =
         },
       },
       actions: {},
+      services: {
+        loadInitialDataMachine,
+      },
     }
   );
