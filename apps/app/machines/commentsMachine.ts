@@ -31,6 +31,8 @@ type DecryptedReply = {
 type DecryptedComment = {
   id: string;
   text: string;
+  from: number;
+  to: number;
   replies: DecryptedReply[];
 };
 
@@ -40,7 +42,6 @@ interface Context {
   commentsByDocumentIdQueryError: boolean;
   commentsByDocumentIdQueryActor?: AnyActorRef;
   decryptedComments: DecryptedComment[];
-  commentText: string;
   replyTexts: Record<string, string>;
 }
 
@@ -49,8 +50,7 @@ export const commentsMachine = createMachine(
     schema: {
       events: {} as
         | CommentsByDocumentIdQueryServiceEvent
-        | { type: "UPDATE_COMMENT_TEXT"; text: string }
-        | { type: "CREATE_COMMENT" }
+        | { type: "CREATE_COMMENT"; text: string; from: number; to: number }
         | { type: "DELETE_COMMENT"; commentId: string }
         | { type: "UPDATE_REPLY_TEXT"; text: string; commentId: string }
         | { type: "CREATE_REPLY"; commentId: string }
@@ -65,7 +65,6 @@ export const commentsMachine = createMachine(
         activeDevice: null,
       },
       commentsByDocumentIdQueryError: false,
-      commentText: "",
       decryptedComments: [],
       replyTexts: {},
     },
@@ -87,9 +86,6 @@ export const commentsMachine = createMachine(
           "showErrorToast",
           assign({ commentsByDocumentIdQueryError: true }),
         ],
-      },
-      UPDATE_COMMENT_TEXT: {
-        actions: ["updateCommentText"],
       },
       UPDATE_REPLY_TEXT: {
         actions: ["updateReplyText"],
@@ -155,7 +151,7 @@ export const commentsMachine = createMachine(
           id: "createComment",
           onDone: [
             {
-              actions: ["clearCommentText", "stopActors", "spawnActors"], // respawn to trigger a request,
+              actions: ["stopActors", "spawnActors"], // respawn to trigger a request,
               cond: "hasNoNetworkError",
               target: "idle",
             },
@@ -232,12 +228,6 @@ export const commentsMachine = createMachine(
           context.commentsByDocumentIdQueryActor.stop();
         }
       },
-      clearCommentText: assign({ commentText: "" }),
-      updateCommentText: assign((context, event) => {
-        return {
-          commentText: event.text,
-        };
-      }),
       updateReplyText: assign((context, event) => {
         return {
           replyTexts: {
@@ -327,7 +317,9 @@ export const commentsMachine = createMachine(
         const result = encryptComment({
           key: commentKey.key,
           comment: JSON.stringify({
-            text: context.commentText,
+            text: event.text,
+            from: event.from,
+            to: event.to,
           }),
         });
 

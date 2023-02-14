@@ -13,8 +13,10 @@ import {
   View,
 } from "@serenity-tools/ui";
 import { Editor as TipTapEditor } from "@tiptap/core";
+import { useActor } from "@xstate/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { View as RNView } from "react-native";
+import { usePage } from "../../context/PageContext";
 import { editorToolbarService } from "../../machines/editorToolbarMachine";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
@@ -49,6 +51,9 @@ export default function Editor({
   const setIsInEditingMode = useEditorStore(
     (state) => state.setIsInEditingMode
   );
+
+  const { commentsService } = usePage();
+  const [, send] = useActor(commentsService);
 
   const positionToolbar = () => {
     if (editorBottombarWrapperRef.current && editorIsFocusedRef.current) {
@@ -140,6 +145,14 @@ export default function Editor({
         updateTitle={updateTitle}
         downloadAndDecryptFile={downloadAndDecryptFile}
         comments={comments}
+        createComment={(comment) => {
+          send({
+            type: "CREATE_COMMENT",
+            text: comment.text,
+            from: comment.from,
+            to: comment.to,
+          });
+        }}
         onFocus={() => {
           editorIsFocusedRef.current = true;
           showAndPositionToolbar();

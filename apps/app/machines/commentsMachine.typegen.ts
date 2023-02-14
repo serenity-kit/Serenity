@@ -54,7 +54,6 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    clearCommentText: "done.invoke.createComment";
     clearReplyText: "done.invoke.createReply";
     decryptComments: "CommentsByDocumentIdQuery.UPDATE_RESULT";
     showCreateErrorReplyToast: "error.platform.createReply";
@@ -78,7 +77,6 @@ export interface Typegen0 {
       | "done.invoke.createReply"
       | "done.invoke.deleteComment"
       | "done.invoke.deleteReply";
-    updateCommentText: "UPDATE_COMMENT_TEXT";
     updateReplyText: "UPDATE_REPLY_TEXT";
   };
   eventsCausingDelays: {};

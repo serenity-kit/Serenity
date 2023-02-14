@@ -601,8 +601,8 @@ export default function Page({
       comments={state.context.decryptedComments.map((comment) => {
         return {
           commentId: comment.id,
-          from: 0,
-          to: 5,
+          from: comment.from,
+          to: comment.to,
         };
       })}
     />

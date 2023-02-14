@@ -23,17 +23,6 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
       <Text>Comments WIP</Text>
 
       <View>
-        <RawInput
-          multiline
-          value={state.context.commentText}
-          onChangeText={(text) => send({ type: "UPDATE_COMMENT_TEXT", text })}
-        />
-        <Button onPress={() => send({ type: "CREATE_COMMENT" })}>
-          Create Comment
-        </Button>
-      </View>
-
-      <View>
         {state.context.decryptedComments.map((comment) => {
           if (!comment) return null;
           return (
