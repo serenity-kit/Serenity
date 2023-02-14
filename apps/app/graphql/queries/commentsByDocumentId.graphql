@@ -25,6 +25,20 @@ query commentsByDocumentId(
           parentId
         }
       }
+      commentReplies {
+        id
+        contentCiphertext
+        contentNonce
+        keyDerivationTrace {
+          workspaceKeyId
+          trace {
+            entryId
+            subkeyId
+            context
+            parentId
+          }
+        }
+      }
     }
     pageInfo {
       hasNextPage
