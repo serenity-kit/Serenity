@@ -1,7 +1,9 @@
 import {
   BoxShadow,
+  Button,
   EditorBottombarButton,
   EditorBottombarDivider,
+  RawInput,
   tw,
   useHasEditorSidebar,
   View,
@@ -49,6 +51,7 @@ type EditorProps = {
   downloadAndDecryptFile: DownloadAndDecryptFileFunction;
   shareOrSaveFile: ShareOrSaveFileFunction;
   comments: EditorComment[];
+  createComment: (comment: { from: number; to: number; text: string }) => void;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -57,13 +60,15 @@ export const Editor = (props: EditorProps) => {
   const hasEditorSidebar = useHasEditorSidebar();
   // using the state here since it's only true on the first render
   const [isNew] = useState(props.isNew ?? false);
+  const [hasCreateCommentBubble, setHasCreateCommentBubble] = useState(false);
+  const [commentText, setCommentText] = useState("");
+
   const newTitleRef = useRef("");
   const shouldCommitNewTitleRef = useRef(isNew);
   const scrollIntoViewOnEditModeDelay =
     props.scrollIntoViewOnEditModeDelay ?? 150; // 150ms works well on iOS Safari
   const bubbleMenuRef = useRef<HTMLDivElement>(null);
 
-  console.log("Editor render", props.comments);
   const editor = useEditor(
     {
       extensions: [
@@ -287,7 +292,40 @@ export const Editor = (props: EditorProps) => {
                 name="link"
                 isActive={editor.isActive("link")}
               />
+
+              {/* for some reason tailwind md:h-6 doesn't work on the Divider yet */}
+              <EditorBottombarDivider style={tw`h-6`} />
+
+              <EditorBottombarButton
+                onPress={() => {
+                  setHasCreateCommentBubble(true);
+                }}
+                name="cup-line"
+                isActive={true}
+              />
             </HStack>
+
+            {hasCreateCommentBubble && (
+              <View>
+                <RawInput
+                  multiline
+                  value={commentText}
+                  onChangeText={(text) => setCommentText(text)}
+                />
+                <Button
+                  size="sm"
+                  onPress={() => {
+                    props.createComment({
+                      text: commentText,
+                      from: editor.view.state.selection.from,
+                      to: editor.view.state.selection.to,
+                    });
+                  }}
+                >
+                  Create Comment
+                </Button>
+              </View>
+            )}
           </BoxShadow>
         </BubbleMenu>
       )}
