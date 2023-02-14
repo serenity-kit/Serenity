@@ -6,10 +6,10 @@ import {
   LocalDevice,
   recreateDocumentKey,
 } from "@serenity-tools/common";
-import { getDocument } from "../../utils/document/getDocument";
-import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
-import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { getDocument } from "../document/getDocument";
+import { createFolderKeyDerivationTrace } from "../folder/createFolderKeyDerivationTrace";
+import { deriveFolderKey } from "../folder/deriveFolderKeyData";
+import { getWorkspace } from "../workspace/getWorkspace";
 
 type Params = {
   documentId: string;

@@ -7,12 +7,14 @@ import {
   NavigationContainer,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { LocalDevice } from "@serenity-tools/common";
 import {
   Heading,
   tw,
   useIsDesktopDevice,
   useIsPermanentLeftSidebar,
 } from "@serenity-tools/ui";
+import { useInterpret } from "@xstate/react";
 import * as Linking from "expo-linking";
 import { useEffect } from "react";
 import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
@@ -31,6 +33,7 @@ import { useWorkspaceQuery } from "../generated/graphql";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
 import { useAuthenticatedAppContext } from "../hooks/useAuthenticatedAppContext";
 import { useInterval } from "../hooks/useInterval";
+import { commentsSidebarMachine } from "../machines/commentsMachine";
 import {
   RootStackParamList,
   WorkspaceStackParamList,
@@ -81,10 +84,21 @@ const isPhoneDimensions = (width: number) => width < 768;
 const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
   props
 ) => {
+  const { activeDevice } = useAuthenticatedAppContext();
+  const commentsService = useInterpret(commentsSidebarMachine, {
+    context: {
+      params: {
+        pageId: props.route.params.pageId,
+        activeDevice: activeDevice as LocalDevice,
+      },
+    },
+  });
+
   return (
     <PageProvider
       value={{
         pageId: props.route.params.pageId,
+        commentsService,
       }}
     >
       <PageCommentsDrawer.Navigator

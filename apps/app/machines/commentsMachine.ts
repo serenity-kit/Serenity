@@ -14,9 +14,9 @@ import {
   runCreateCommentReplyMutation,
   runDeleteCommentRepliesMutation,
   runDeleteCommentsMutation,
-} from "../../generated/graphql";
-import { showToast } from "../../utils/toast/showToast";
-import { createCommentKeyAndKeyDerivationTrace } from "./createCommentKeyAndKeyDerivationTrace";
+} from "../generated/graphql";
+import { createCommentKeyAndKeyDerivationTrace } from "../utils/createCommentKeyAndKeyDerivationTrace/createCommentKeyAndKeyDerivationTrace";
+import { showToast } from "../utils/toast/showToast";
 
 type Params = {
   pageId: string;
@@ -57,7 +57,7 @@ export const commentsSidebarMachine = createMachine(
         | { type: "DELETE_REPLY"; replyId: string },
       context: {} as Context,
     },
-    tsTypes: {} as import("./commentsSidebarMachine.typegen").Typegen0,
+    tsTypes: {} as import("./commentsMachine.typegen").Typegen0,
     predictableActionArguments: true,
     context: {
       params: {
