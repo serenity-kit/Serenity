@@ -13,6 +13,10 @@ import Collaboration from "@tiptap/extension-collaboration";
 import { Level } from "@tiptap/extension-heading";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
@@ -128,6 +132,14 @@ export const Editor = (props: EditorProps) => {
         CommentsExtension.configure({
           comments: props.comments,
         }),
+        Table.configure({
+          HTMLAttributes: {
+            class: "table-extension",
+          },
+        }),
+        TableRow,
+        TableHeader,
+        TableCell,
       ],
       onCreate: (params) => {
         if (isNew) {
