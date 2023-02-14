@@ -80,6 +80,12 @@ export type UpdateEditorParams =
 
 export type UpdateEditor = (params: UpdateEditorParams) => void;
 
+export type EditorComment = {
+  commentId: string;
+  from: number;
+  to: number;
+};
+
 type ReactNativeWebView = {
   postMessage: (message: string) => void;
 };

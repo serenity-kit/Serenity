@@ -26,10 +26,12 @@ import {
   ShareOrSaveFileFunction,
 } from "../editor-file-extension/src";
 import "./awareness.css";
+import { CommentsExtension } from "./comments-extension";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
 import { AwarnessExtension } from "./naisho-awareness-extension";
 import { SerenityScrollIntoViewForEditModeExtension } from "./scroll-into-view-for-edit-mode-extensions";
+import { EditorComment } from "./types";
 
 type EditorProps = {
   documentId: string;
@@ -46,6 +48,7 @@ type EditorProps = {
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
   downloadAndDecryptFile: DownloadAndDecryptFileFunction;
   shareOrSaveFile: ShareOrSaveFileFunction;
+  comments: EditorComment[];
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -115,6 +118,9 @@ export const Editor = (props: EditorProps) => {
           encryptAndUploadFile: props.encryptAndUploadFile,
           downloadAndDecryptFile: props.downloadAndDecryptFile,
           shareOrSaveFile: props.shareOrSaveFile,
+        }),
+        CommentsExtension.configure({
+          comments: props.comments,
         }),
       ],
       onCreate: (params) => {

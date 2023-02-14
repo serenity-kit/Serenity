@@ -594,6 +594,7 @@ export default function Page({
       isNew={isNew}
       documentLoaded={documentLoadedInfo.loaded}
       username={documentLoadedInfo.username}
+      comments={[{ commentId: "1", from: 0, to: 6 }]}
     />
   );
 }
