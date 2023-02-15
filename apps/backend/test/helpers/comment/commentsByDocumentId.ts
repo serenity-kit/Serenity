@@ -4,6 +4,7 @@ type Params = {
   graphql: any;
   documentId: string;
   documentShareLinkToken?: string | null | undefined;
+  deviceSigningPublicKey?: string | null | undefined;
   first: number;
   after?: string;
   authorizationHeader: string;
@@ -13,6 +14,7 @@ export const commentsByDocumentId = async ({
   graphql,
   documentId,
   documentShareLinkToken,
+  deviceSigningPublicKey,
   first,
   after,
   authorizationHeader,
@@ -24,12 +26,14 @@ export const commentsByDocumentId = async ({
     query commentsByDocumentId(
       $documentId: ID!
       $documentShareLinkToken: String
+      $deviceSigningPublicKey: String
       $first: Int!
       $after: String
     ) {
       commentsByDocumentId(
         documentId: $documentId
         documentShareLinkToken: $documentShareLinkToken
+        deviceSigningPublicKey: $deviceSigningPublicKey
         first: $first
         after: $after
       ) {
@@ -53,6 +57,25 @@ export const commentsByDocumentId = async ({
               encryptionPublicKey
               encryptionPublicKeySignature
               createdAt
+            }
+            workspaceKey {
+              id
+              workspaceId
+              generation
+              workspaceKeyBox {
+                id
+                workspaceKeyId
+                deviceSigningPublicKey
+                creatorDeviceSigningPublicKey
+                nonce
+                ciphertext
+                creatorDevice {
+                  signingPublicKey
+                  encryptionPublicKey
+                  encryptionPublicKeySignature
+                  createdAt
+                }
+              }
             }
             commentReplies {
               id
@@ -84,6 +107,7 @@ export const commentsByDocumentId = async ({
     {
       documentId,
       documentShareLinkToken,
+      deviceSigningPublicKey,
       first,
       after,
     },
