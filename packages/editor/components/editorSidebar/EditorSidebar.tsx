@@ -20,7 +20,6 @@ import {
   TabPanel,
   Text,
   tw,
-  View,
 } from "@serenity-tools/ui";
 import { Level } from "@tiptap/extension-heading";
 import { Editor } from "@tiptap/react";
@@ -334,6 +333,21 @@ export default function EditorSidebar({
               </Text>
             </SidebarButton>
           ) : null}
+
+          <SidebarDivider />
+
+          <Heading lvl={4} style={tw`ml-4`} padded>
+            Blocks
+          </Heading>
+
+          <SidebarButton
+            onPress={() => editor?.chain().focus().insertTable().run()}
+          >
+            <EditorSidebarIcon isActive={false} name="table-2" />
+            <Text variant="xs" bold={false}>
+              Table
+            </Text>
+          </SidebarButton>
         </TabPanel>
       )}
     </ScrollView>

@@ -1,0 +1,5 @@
+mutation deleteCommentReplies($input: DeleteCommentRepliesInput!) {
+  deleteCommentReplies(input: $input) {
+    status
+  }
+}

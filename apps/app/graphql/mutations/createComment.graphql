@@ -3,8 +3,8 @@ mutation createComment($input: CreateCommentInput!) {
     comment {
       id
       documentId
-      encryptedContent
-      encryptedContentNonce
+      contentCiphertext
+      contentNonce
       creatorDevice {
         signingPublicKey
         encryptionPublicKey

@@ -1,3 +1,4 @@
+import { EditorComment } from "@serenity-tools/editor";
 import { Awareness } from "y-protocols/awareness";
 import * as Y from "yjs";
 
@@ -11,4 +12,5 @@ export type EditorProps = {
   username: string;
   openDrawer: () => void;
   updateTitle: (title: string) => void;
+  comments: EditorComment[];
 };

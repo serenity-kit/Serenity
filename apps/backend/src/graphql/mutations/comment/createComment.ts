@@ -9,16 +9,16 @@ import {
 import { createComment } from "../../../database/comment/createComment";
 import { formatComment } from "../../../types/comment";
 import { Comment } from "../../types/comment";
-import { KeyDerivationTraceInput } from "../../types/keyDerivation";
+import { KeyDerivationTraceInput2 } from "../../types/keyDerivation";
 
 export const CreateCommentInput = inputObjectType({
   name: "CreateCommentInput",
   definition(t) {
     t.nonNull.string("documentId");
-    t.nonNull.string("encryptedContent");
-    t.nonNull.string("encryptedContentNonce");
-    t.nonNull.field("contentKeyDerivationTrace", {
-      type: KeyDerivationTraceInput,
+    t.nonNull.string("contentCiphertext");
+    t.nonNull.string("contentNonce");
+    t.nonNull.field("keyDerivationTrace", {
+      type: KeyDerivationTraceInput2,
     });
   },
 });
@@ -49,9 +49,9 @@ export const createCommentMutation = mutationField("createComment", {
       userId: context.user.id,
       creatorDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
       documentId: args.input.documentId,
-      encryptedContent: args.input.encryptedContent,
-      encryptedContentNonce: args.input.encryptedContentNonce,
-      contentKeyDerivationTrace: args.input.contentKeyDerivationTrace,
+      contentCiphertext: args.input.contentCiphertext,
+      contentNonce: args.input.contentNonce,
+      keyDerivationTrace: args.input.keyDerivationTrace,
     });
     return { comment: formatComment(comment) };
   },

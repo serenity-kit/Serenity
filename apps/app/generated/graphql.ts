@@ -58,11 +58,14 @@ export type AttachDevicesToWorkspacesResult = {
 
 export type Comment = {
   __typename?: 'Comment';
+  commentReplies?: Maybe<Array<Maybe<CommentReply>>>;
+  contentCiphertext: Scalars['String'];
+  contentNonce: Scalars['String'];
+  createdAt: Scalars['Date'];
   creatorDevice: CreatorDevice;
   documentId: Scalars['String'];
-  encryptedContent: Scalars['String'];
-  encryptedContentNonce: Scalars['String'];
   id: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTrace2;
 };
 
 export type CommentConnection = {
@@ -83,11 +86,36 @@ export type CommentEdge = {
   node?: Maybe<Comment>;
 };
 
-export type CreateCommentInput = {
-  contentKeyDerivationTrace?: InputMaybe<KeyDerivationTraceInput>;
+export type CommentReply = {
+  __typename?: 'CommentReply';
+  commentId: Scalars['String'];
+  contentCiphertext: Scalars['String'];
+  contentNonce: Scalars['String'];
+  createdAt: Scalars['Date'];
+  creatorDevice: CreatorDevice;
   documentId: Scalars['String'];
-  encryptedContent: Scalars['String'];
-  encryptedContentNonce: Scalars['String'];
+  id: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTrace2;
+};
+
+export type CreateCommentInput = {
+  contentCiphertext: Scalars['String'];
+  contentNonce: Scalars['String'];
+  documentId: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTraceInput2;
+};
+
+export type CreateCommentReplyInput = {
+  commentId: Scalars['String'];
+  contentCiphertext: Scalars['String'];
+  contentNonce: Scalars['String'];
+  documentId: Scalars['String'];
+  keyDerivationTrace: KeyDerivationTraceInput2;
+};
+
+export type CreateCommentReplyResult = {
+  __typename?: 'CreateCommentReplyResult';
+  commentReply?: Maybe<CommentReply>;
 };
 
 export type CreateCommentResult = {
@@ -196,6 +224,24 @@ export type CreatorDevice = {
   encryptionPublicKey: Scalars['String'];
   encryptionPublicKeySignature: Scalars['String'];
   signingPublicKey: Scalars['String'];
+};
+
+export type DeleteCommentRepliesInput = {
+  commentReplyIds: Array<Scalars['String']>;
+};
+
+export type DeleteCommentRepliesResult = {
+  __typename?: 'DeleteCommentRepliesResult';
+  status: Scalars['String'];
+};
+
+export type DeleteCommentsInput = {
+  commentIds: Array<Scalars['String']>;
+};
+
+export type DeleteCommentsResult = {
+  __typename?: 'DeleteCommentsResult';
+  status: Scalars['String'];
 };
 
 export type DeleteDevicesInput = {
@@ -490,9 +536,35 @@ export type KeyDerivationTrace = {
   workspaceKeyId: Scalars['String'];
 };
 
+export type KeyDerivationTrace2 = {
+  __typename?: 'KeyDerivationTrace2';
+  trace: Array<KeyDerivationTraceEntry>;
+  workspaceKeyId: Scalars['String'];
+};
+
+export type KeyDerivationTraceEntry = {
+  __typename?: 'KeyDerivationTraceEntry';
+  context: Scalars['String'];
+  entryId: Scalars['String'];
+  parentId?: Maybe<Scalars['String']>;
+  subkeyId: Scalars['Int'];
+};
+
+export type KeyDerivationTraceEntryInput = {
+  context: Scalars['String'];
+  entryId: Scalars['String'];
+  parentId?: InputMaybe<Scalars['String']>;
+  subkeyId: Scalars['Int'];
+};
+
 export type KeyDerivationTraceInput = {
   parentFolders: Array<KeyDerivationTraceParentFolderInput>;
   subkeyId: Scalars['Int'];
+  workspaceKeyId: Scalars['String'];
+};
+
+export type KeyDerivationTraceInput2 = {
+  trace: Array<KeyDerivationTraceEntryInput>;
   workspaceKeyId: Scalars['String'];
 };
 
@@ -558,11 +630,14 @@ export type Mutation = {
   attachDeviceToWorkspaces?: Maybe<AttachDeviceToWorkspacesResult>;
   attachDevicesToWorkspaces?: Maybe<AttachDevicesToWorkspacesResult>;
   createComment?: Maybe<CreateCommentResult>;
+  createCommentReply?: Maybe<CreateCommentReplyResult>;
   createDocument?: Maybe<CreateDocumentResult>;
   createDocumentShareLink?: Maybe<CreateDocumentShareLinkResult>;
   createFolder?: Maybe<CreateFolderResult>;
   createInitialWorkspaceStructure?: Maybe<CreateInitialWorkspaceStructureResult>;
   createWorkspaceInvitation?: Maybe<CreateWorkspaceInvitationResult>;
+  deleteCommentReplies?: Maybe<DeleteCommentRepliesResult>;
+  deleteComments?: Maybe<DeleteCommentsResult>;
   deleteDevices?: Maybe<DeleteDevicesResult>;
   deleteDocuments?: Maybe<DeleteDocumentsResult>;
   deleteFolders?: Maybe<DeleteFoldersResult>;
@@ -605,6 +680,11 @@ export type MutationCreateCommentArgs = {
 };
 
 
+export type MutationCreateCommentReplyArgs = {
+  input: CreateCommentReplyInput;
+};
+
+
 export type MutationCreateDocumentArgs = {
   input: CreateDocumentInput;
 };
@@ -627,6 +707,16 @@ export type MutationCreateInitialWorkspaceStructureArgs = {
 
 export type MutationCreateWorkspaceInvitationArgs = {
   input: CreateWorkspaceInvitationInput;
+};
+
+
+export type MutationDeleteCommentRepliesArgs = {
+  input: DeleteCommentRepliesInput;
+};
+
+
+export type MutationDeleteCommentsArgs = {
+  input: DeleteCommentsInput;
 };
 
 
@@ -767,6 +857,7 @@ export type Query = {
   workspaceDevices?: Maybe<DeviceConnection>;
   workspaceInvitation?: Maybe<WorkspaceInvitation>;
   workspaceInvitations?: Maybe<WorkspaceInvitationConnection>;
+  workspaceKeyByDocumentId?: Maybe<WorkspaceKeyByDocumentIdResult>;
   workspaces?: Maybe<WorkspaceConnection>;
 };
 
@@ -781,6 +872,7 @@ export type QueryCommentsByDocumentIdArgs = {
   after?: InputMaybe<Scalars['String']>;
   before?: InputMaybe<Scalars['String']>;
   documentId: Scalars['ID'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']>;
   first?: InputMaybe<Scalars['Int']>;
   last?: InputMaybe<Scalars['Int']>;
 };
@@ -892,6 +984,12 @@ export type QueryWorkspaceInvitationsArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
   workspaceId: Scalars['ID'];
+};
+
+
+export type QueryWorkspaceKeyByDocumentIdArgs = {
+  deviceSigningPublicKey: Scalars['String'];
+  documentId: Scalars['ID'];
 };
 
 
@@ -1174,6 +1272,11 @@ export type WorkspaceKeyBoxData = {
   workspaceKeyDevicePairs: Array<WorkspaceKeyDevicePair>;
 };
 
+export type WorkspaceKeyByDocumentIdResult = {
+  __typename?: 'WorkspaceKeyByDocumentIdResult';
+  nameWorkspaceKey: WorkspaceKey;
+};
+
 export type WorkspaceKeyDeviceInput = {
   id: Scalars['String'];
   members: Array<MemberDeviceParingInput>;
@@ -1249,7 +1352,14 @@ export type CreateCommentMutationVariables = Exact<{
 }>;
 
 
-export type CreateCommentMutation = { __typename?: 'Mutation', createComment?: { __typename?: 'CreateCommentResult', comment?: { __typename?: 'Comment', id: string, documentId: string, encryptedContent: string, encryptedContentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } } | null } | null };
+export type CreateCommentMutation = { __typename?: 'Mutation', createComment?: { __typename?: 'CreateCommentResult', comment?: { __typename?: 'Comment', id: string, documentId: string, contentCiphertext: string, contentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } } | null } | null };
+
+export type CreateCommentReplyMutationVariables = Exact<{
+  input: CreateCommentReplyInput;
+}>;
+
+
+export type CreateCommentReplyMutation = { __typename?: 'Mutation', createCommentReply?: { __typename?: 'CreateCommentReplyResult', commentReply?: { __typename?: 'CommentReply', id: string, commentId: string } | null } | null };
 
 export type CreateDocumentMutationVariables = Exact<{
   input: CreateDocumentInput;
@@ -1285,6 +1395,20 @@ export type CreateWorkspaceInvitationMutationVariables = Exact<{
 
 
 export type CreateWorkspaceInvitationMutation = { __typename?: 'Mutation', createWorkspaceInvitation?: { __typename?: 'CreateWorkspaceInvitationResult', workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, expiresAt: any } | null } | null };
+
+export type DeleteCommentRepliesMutationVariables = Exact<{
+  input: DeleteCommentRepliesInput;
+}>;
+
+
+export type DeleteCommentRepliesMutation = { __typename?: 'Mutation', deleteCommentReplies?: { __typename?: 'DeleteCommentRepliesResult', status: string } | null };
+
+export type DeleteCommentsMutationVariables = Exact<{
+  input: DeleteCommentsInput;
+}>;
+
+
+export type DeleteCommentsMutation = { __typename?: 'Mutation', deleteComments?: { __typename?: 'DeleteCommentsResult', status: string } | null };
 
 export type DeleteDevicesMutationVariables = Exact<{
   input: DeleteDevicesInput;
@@ -1419,12 +1543,13 @@ export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegist
 
 export type CommentsByDocumentIdQueryVariables = Exact<{
   documentId: Scalars['ID'];
+  deviceSigningPublicKey: Scalars['String'];
   first?: InputMaybe<Scalars['Int']>;
   after?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, encryptedContent: string, encryptedContentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, contentCiphertext: string, contentNonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null }, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, context: string, parentId?: string | null }> }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, contentCiphertext: string, contentNonce: string, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, context: string, parentId?: string | null }> } } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null, workspaceKeyByDocumentId?: { __typename?: 'WorkspaceKeyByDocumentIdResult', nameWorkspaceKey: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, nonce: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } | null } | null } } | null };
 
 export type DeviceBySigningPublicKeyQueryVariables = Exact<{
   signingPublicKey: Scalars['ID'];
@@ -1681,8 +1806,8 @@ export const CreateCommentDocument = gql`
     comment {
       id
       documentId
-      encryptedContent
-      encryptedContentNonce
+      contentCiphertext
+      contentNonce
       creatorDevice {
         signingPublicKey
         encryptionPublicKey
@@ -1696,6 +1821,20 @@ export const CreateCommentDocument = gql`
 
 export function useCreateCommentMutation() {
   return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
+};
+export const CreateCommentReplyDocument = gql`
+    mutation createCommentReply($input: CreateCommentReplyInput!) {
+  createCommentReply(input: $input) {
+    commentReply {
+      id
+      commentId
+    }
+  }
+}
+    `;
+
+export function useCreateCommentReplyMutation() {
+  return Urql.useMutation<CreateCommentReplyMutation, CreateCommentReplyMutationVariables>(CreateCommentReplyDocument);
 };
 export const CreateDocumentDocument = gql`
     mutation createDocument($input: CreateDocumentInput!) {
@@ -1813,6 +1952,28 @@ export const CreateWorkspaceInvitationDocument = gql`
 
 export function useCreateWorkspaceInvitationMutation() {
   return Urql.useMutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(CreateWorkspaceInvitationDocument);
+};
+export const DeleteCommentRepliesDocument = gql`
+    mutation deleteCommentReplies($input: DeleteCommentRepliesInput!) {
+  deleteCommentReplies(input: $input) {
+    status
+  }
+}
+    `;
+
+export function useDeleteCommentRepliesMutation() {
+  return Urql.useMutation<DeleteCommentRepliesMutation, DeleteCommentRepliesMutationVariables>(DeleteCommentRepliesDocument);
+};
+export const DeleteCommentsDocument = gql`
+    mutation deleteComments($input: DeleteCommentsInput!) {
+  deleteComments(input: $input) {
+    status
+  }
+}
+    `;
+
+export function useDeleteCommentsMutation() {
+  return Urql.useMutation<DeleteCommentsMutation, DeleteCommentsMutationVariables>(DeleteCommentsDocument);
 };
 export const DeleteDevicesDocument = gql`
     mutation deleteDevices($input: DeleteDevicesInput!) {
@@ -2085,18 +2246,41 @@ export function useVerifyRegistrationMutation() {
   return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
 };
 export const CommentsByDocumentIdDocument = gql`
-    query commentsByDocumentId($documentId: ID!, $first: Int = 50, $after: String) {
+    query commentsByDocumentId($documentId: ID!, $deviceSigningPublicKey: String!, $first: Int = 50, $after: String) {
   commentsByDocumentId(documentId: $documentId, first: $first, after: $after) {
     nodes {
       id
       documentId
-      encryptedContent
-      encryptedContentNonce
+      contentCiphertext
+      contentNonce
       creatorDevice {
         signingPublicKey
         encryptionPublicKey
         encryptionPublicKeySignature
         createdAt
+      }
+      keyDerivationTrace {
+        workspaceKeyId
+        trace {
+          entryId
+          subkeyId
+          context
+          parentId
+        }
+      }
+      commentReplies {
+        id
+        contentCiphertext
+        contentNonce
+        keyDerivationTrace {
+          workspaceKeyId
+          trace {
+            entryId
+            subkeyId
+            context
+            parentId
+          }
+        }
       }
     }
     pageInfo {
@@ -2104,6 +2288,30 @@ export const CommentsByDocumentIdDocument = gql`
       hasPreviousPage
       startCursor
       endCursor
+    }
+  }
+  workspaceKeyByDocumentId(
+    documentId: $documentId
+    deviceSigningPublicKey: $deviceSigningPublicKey
+  ) {
+    nameWorkspaceKey {
+      id
+      workspaceId
+      generation
+      workspaceKeyBox {
+        id
+        workspaceKeyId
+        deviceSigningPublicKey
+        creatorDeviceSigningPublicKey
+        nonce
+        ciphertext
+        creatorDevice {
+          signingPublicKey
+          encryptionPublicKey
+          encryptionPublicKeySignature
+          createdAt
+        }
+      }
     }
   }
 }
@@ -2722,6 +2930,20 @@ export const runCreateCommentMutation = async (variables: CreateCommentMutationV
     .toPromise();
 };
 
+export const runCreateCommentReplyMutation = async (variables: CreateCommentReplyMutationVariables, options?: any) => {
+  return await getUrqlClient()
+    .mutation<CreateCommentReplyMutation, CreateCommentReplyMutationVariables>(
+      CreateCommentReplyDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
 export const runCreateDocumentMutation = async (variables: CreateDocumentMutationVariables, options?: any) => {
   return await getUrqlClient()
     .mutation<CreateDocumentMutation, CreateDocumentMutationVariables>(
@@ -2782,6 +3004,34 @@ export const runCreateWorkspaceInvitationMutation = async (variables: CreateWork
   return await getUrqlClient()
     .mutation<CreateWorkspaceInvitationMutation, CreateWorkspaceInvitationMutationVariables>(
       CreateWorkspaceInvitationDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteCommentRepliesMutation = async (variables: DeleteCommentRepliesMutationVariables, options?: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteCommentRepliesMutation, DeleteCommentRepliesMutationVariables>(
+      DeleteCommentRepliesDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export const runDeleteCommentsMutation = async (variables: DeleteCommentsMutationVariables, options?: any) => {
+  return await getUrqlClient()
+    .mutation<DeleteCommentsMutation, DeleteCommentsMutationVariables>(
+      DeleteCommentsDocument,
       variables,
       {
         // better to be safe here and always refetch

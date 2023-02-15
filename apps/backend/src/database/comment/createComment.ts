@@ -1,4 +1,4 @@
-import { KeyDerivationTrace } from "@naisho/core";
+import { KeyDerivationTrace2 } from "@naisho/core";
 import { ForbiddenError } from "apollo-server-express";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../prisma/generated/output";
@@ -9,18 +9,18 @@ type Params = {
   userId: string;
   creatorDeviceSigningPublicKey: string;
   documentId: string;
-  encryptedContent: string;
-  encryptedContentNonce: string;
-  contentKeyDerivationTrace: KeyDerivationTrace;
+  contentCiphertext: string;
+  contentNonce: string;
+  keyDerivationTrace: KeyDerivationTrace2;
 };
 
 export async function createComment({
   userId,
   creatorDeviceSigningPublicKey,
   documentId,
-  encryptedContent,
-  encryptedContentNonce,
-  contentKeyDerivationTrace,
+  contentCiphertext,
+  contentNonce,
+  keyDerivationTrace,
 }: Params) {
   // verify the document exists
   const document = await prisma.document.findFirst({
@@ -54,9 +54,9 @@ export async function createComment({
         id: uuidv4(),
         documentId,
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
-        encryptedContent,
-        encryptedContentNonce,
-        contentKeyDerivationTrace,
+        contentCiphertext,
+        contentNonce,
+        keyDerivationTrace,
       },
     });
     return {

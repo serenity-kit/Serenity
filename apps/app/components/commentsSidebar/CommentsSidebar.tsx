@@ -1,21 +1,19 @@
 import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import {
   Button,
+  IconButton,
   RawInput,
   ScrollView,
   Text,
   tw,
   View,
 } from "@serenity-tools/ui";
-import { useMachine } from "@xstate/react";
+import { useActor } from "@xstate/react";
 import { usePage } from "../../context/PageContext";
-import { commentsSidebarMachine } from "./commentsSidebarMachine";
 
 const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
-  const { pageId } = usePage();
-  const [state, send] = useMachine(commentsSidebarMachine, {
-    context: { params: { pageId } },
-  });
+  const { commentsService } = usePage();
+  const [state, send] = useActor(commentsService);
 
   return (
     // grow-0 overrides default of ScrollView to keep the assigned width
@@ -25,27 +23,58 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
       <Text>Comments WIP</Text>
 
       <View>
-        <RawInput
-          multiline
-          value={state.context.commentText}
-          onChangeText={(text) => send({ type: "UPDATE_COMMENT_TEXT", text })}
-        />
-        <Button onPress={() => send({ type: "CREATE_COMMENT" })}>
-          Create Comment
-        </Button>
-      </View>
-
-      <View>
-        {state.context.commentsByDocumentIdQueryResult?.data?.commentsByDocumentId?.nodes?.map(
-          (comment) => {
-            if (!comment) return null;
-            return (
-              <View key={comment.id}>
-                <Text>{comment.encryptedContent}</Text>
+        {state.context.decryptedComments.map((comment) => {
+          if (!comment) return null;
+          return (
+            <View key={comment.id} style={tw`border-b border-gray-200`}>
+              <Text>{comment.text}</Text>
+              <View>
+                {comment.replies.map((reply) => {
+                  if (!reply) return null;
+                  return (
+                    <View key={reply.id}>
+                      <View>
+                        <Text>{reply.text}</Text>
+                      </View>
+                      <IconButton
+                        name="delete-bin-line"
+                        onPress={() =>
+                          send({ type: "DELETE_REPLY", replyId: reply.id })
+                        }
+                      />
+                    </View>
+                  );
+                })}
               </View>
-            );
-          }
-        )}
+              <RawInput
+                multiline
+                value={state.context.replyTexts[comment.id]}
+                onChangeText={(text) =>
+                  send({
+                    type: "UPDATE_REPLY_TEXT",
+                    commentId: comment.id,
+                    text,
+                  })
+                }
+              />
+              <Button
+                size="sm"
+                onPress={() =>
+                  send({ type: "CREATE_REPLY", commentId: comment.id })
+                }
+              >
+                Add Reply
+              </Button>
+
+              <IconButton
+                name="delete-bin-line"
+                onPress={() =>
+                  send({ type: "DELETE_COMMENT", commentId: comment.id })
+                }
+              />
+            </View>
+          );
+        })}
       </View>
     </ScrollView>
   );

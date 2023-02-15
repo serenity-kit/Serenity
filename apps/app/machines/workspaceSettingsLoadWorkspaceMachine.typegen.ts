@@ -17,25 +17,31 @@ export interface Typegen0 {
       type: "error.platform.fetchWorkspace";
       data: unknown;
     };
+    "error.platform.loadInitialDataMachine": {
+      type: "error.platform.loadInitialDataMachine";
+      data: unknown;
+    };
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {
     fetchWorkspace: "done.invoke.fetchWorkspace";
+    loadInitialDataMachine: "done.invoke.loadInitialDataMachine";
   };
   missingImplementations: {
     actions: never;
-    services: never;
-    guards: never;
     delays: never;
+    guards: never;
+    services: never;
   };
   eventsCausingActions: {};
-  eventsCausingServices: {
-    fetchWorkspace: "done.invoke.loadInitialDataMachine";
-  };
+  eventsCausingDelays: {};
   eventsCausingGuards: {
     hasNoNetworkErrorAndWorkspaceFound: "done.invoke.fetchWorkspace";
   };
-  eventsCausingDelays: {};
+  eventsCausingServices: {
+    fetchWorkspace: "done.invoke.loadInitialDataMachine";
+    loadInitialDataMachine: "xstate.init";
+  };
   matchesStates:
     | "loadWorkspace"
     | "loadWorkspaceFailed"

@@ -110,6 +110,7 @@ export default function AccountMenu({
           }
         }}
         icon={<Icon name={"user-settings-line"} color="gray-600" />}
+        testID={`${testIdPrefix}account-menu--account-settings`}
       >
         {state.context.meQueryResult?.data?.me?.username}
       </MenuLink>

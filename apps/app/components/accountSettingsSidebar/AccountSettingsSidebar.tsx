@@ -37,6 +37,7 @@ export default function AccountSettingsSidebar(
         }}
         iconName="device-line"
         active={currentRouteName === "Devices"}
+        testID="account-settings-sidebar--devices"
       >
         Devices
       </SidebarLink>

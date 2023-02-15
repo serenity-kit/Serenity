@@ -3,7 +3,7 @@ import { idArg, nonNull, queryField } from "nexus";
 import { getWorkspaceInvitations } from "../../../database/workspace/getWorkspaceInvitations";
 import { WorkspaceInvitation } from "../../types/workspace";
 
-export const workspaceInvitations = queryField((t) => {
+export const workspaceInvitationsQuery = queryField((t) => {
   // @ts-ignore sometimes the type is defined, sometimes not
   t.connectionField("workspaceInvitations", {
     type: WorkspaceInvitation,

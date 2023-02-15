@@ -1,7 +1,9 @@
 import {
   BoxShadow,
+  Button,
   EditorBottombarButton,
   EditorBottombarDivider,
+  RawInput,
   tw,
   useHasEditorSidebar,
   View,
@@ -11,12 +13,20 @@ import Collaboration from "@tiptap/extension-collaboration";
 import { Level } from "@tiptap/extension-heading";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { HStack } from "native-base";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  absolutePositionToRelativePosition,
+  ySyncPluginKey,
+} from "y-prosemirror";
 import { Awareness } from "y-protocols/awareness";
 import * as Y from "yjs";
 import {
@@ -26,10 +36,12 @@ import {
   ShareOrSaveFileFunction,
 } from "../editor-file-extension/src";
 import "./awareness.css";
+import { CommentsExtension } from "./comments-extension/comments-extension";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
 import { AwarnessExtension } from "./naisho-awareness-extension";
 import { SerenityScrollIntoViewForEditModeExtension } from "./scroll-into-view-for-edit-mode-extensions";
+import { EditorComment } from "./types";
 
 type EditorProps = {
   documentId: string;
@@ -46,6 +58,8 @@ type EditorProps = {
   encryptAndUploadFile: EncryptAndUploadFunctionFile;
   downloadAndDecryptFile: DownloadAndDecryptFileFunction;
   shareOrSaveFile: ShareOrSaveFileFunction;
+  comments: EditorComment[];
+  createComment: (comment: { from: number; to: number; text: string }) => void;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -54,6 +68,9 @@ export const Editor = (props: EditorProps) => {
   const hasEditorSidebar = useHasEditorSidebar();
   // using the state here since it's only true on the first render
   const [isNew] = useState(props.isNew ?? false);
+  const [hasCreateCommentBubble, setHasCreateCommentBubble] = useState(false);
+  const [commentText, setCommentText] = useState("");
+
   const newTitleRef = useRef("");
   const shouldCommitNewTitleRef = useRef(isNew);
   const scrollIntoViewOnEditModeDelay =
@@ -116,6 +133,18 @@ export const Editor = (props: EditorProps) => {
           downloadAndDecryptFile: props.downloadAndDecryptFile,
           shareOrSaveFile: props.shareOrSaveFile,
         }),
+        CommentsExtension.configure({
+          comments: props.comments,
+          yDoc: props.yDocRef.current,
+        }),
+        Table.configure({
+          HTMLAttributes: {
+            class: "table-extension",
+          },
+        }),
+        TableRow,
+        TableHeader,
+        TableCell,
       ],
       onCreate: (params) => {
         if (isNew) {
@@ -171,6 +200,14 @@ export const Editor = (props: EditorProps) => {
     },
     [props.documentId]
   );
+
+  useEffect(() => {
+    if (editor) {
+      editor.storage.comments.comments = props.comments;
+      // empty transaction to make sure the comments are updated
+      editor.view.dispatch(editor.view.state.tr);
+    }
+  }, [props.comments, editor]);
 
   return (
     <div className="flex h-full flex-auto flex-row">
@@ -272,7 +309,51 @@ export const Editor = (props: EditorProps) => {
                 name="link"
                 isActive={editor.isActive("link")}
               />
+
+              {/* for some reason tailwind md:h-6 doesn't work on the Divider yet */}
+              <EditorBottombarDivider style={tw`h-6`} />
+
+              <EditorBottombarButton
+                onPress={() => {
+                  setHasCreateCommentBubble(true);
+                }}
+                name="cup-line"
+                isActive={true}
+              />
             </HStack>
+
+            {hasCreateCommentBubble && (
+              <View>
+                <RawInput
+                  multiline
+                  value={commentText}
+                  onChangeText={(text) => setCommentText(text)}
+                />
+                <Button
+                  size="sm"
+                  onPress={() => {
+                    const ystate = ySyncPluginKey.getState(editor.state);
+                    const { type, binding } = ystate;
+
+                    props.createComment({
+                      text: commentText,
+                      from: absolutePositionToRelativePosition(
+                        editor.view.state.selection.from,
+                        type,
+                        binding.mapping
+                      ),
+                      to: absolutePositionToRelativePosition(
+                        editor.view.state.selection.to,
+                        type,
+                        binding.mapping
+                      ),
+                    });
+                  }}
+                >
+                  Create Comment
+                </Button>
+              </View>
+            )}
           </BoxShadow>
         </BubbleMenu>
       )}
