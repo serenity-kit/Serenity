@@ -73,6 +73,7 @@ test("one comment", async () => {
   const edges2 = result2.commentsByDocumentId.edges;
   expect(edges2.length).toBe(1);
   expect(edges2[0].node.id).toBe(comment2.id);
+  expect(typeof edges2[0].node.createdAt).toBe("object");
 });
 
 test("all comments", async () => {
@@ -193,6 +194,7 @@ describe("Input Errors", () => {
             documentId
             contentCiphertext
             contentNonce
+            createdAt
             keyDerivationTrace {
               workspaceKeyId
               trace {
@@ -212,6 +214,7 @@ describe("Input Errors", () => {
               id
               contentCiphertext
               contentNonce
+              createdAt
               keyDerivationTrace {
                 workspaceKeyId
                 trace {

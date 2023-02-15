@@ -87,15 +87,16 @@ test("admin replies to comment", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
-  expect(typeof comment.id).toBe("string");
+  expect(typeof commentReply.id).toBe("string");
   expect(commentReply.commentId).toBe(comment.id);
-  expect(comment.documentId).toBe(documentId1);
-  expect(typeof comment.contentCiphertext).toBe("string");
-  expect(typeof comment.contentNonce).toBe("string");
-  expect(comment.creatorDevice.signingPublicKey).toBe(
+  expect(commentReply.documentId).toBe(documentId1);
+  expect(typeof commentReply.contentCiphertext).toBe("string");
+  expect(typeof commentReply.contentNonce).toBe("string");
+  expect(typeof commentReply.createdAt).toBe("string");
+  expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
-  expect(comment.creatorDevice.encryptionPublicKey).toBe(
+  expect(commentReply.creatorDevice.encryptionPublicKey).toBe(
     userData1.webDevice.encryptionPublicKey
   );
 });
@@ -121,15 +122,16 @@ test("editor replies to comment", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
-  expect(typeof comment.id).toBe("string");
+  expect(typeof commentReply.id).toBe("string");
   expect(commentReply.commentId).toBe(comment.id);
-  expect(comment.documentId).toBe(documentId1);
-  expect(typeof comment.contentCiphertext).toBe("string");
-  expect(typeof comment.contentNonce).toBe("string");
-  expect(comment.creatorDevice.signingPublicKey).toBe(
+  expect(commentReply.documentId).toBe(documentId1);
+  expect(typeof commentReply.contentCiphertext).toBe("string");
+  expect(typeof commentReply.contentNonce).toBe("string");
+  expect(typeof commentReply.createdAt).toBe("string");
+  expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
-  expect(comment.creatorDevice.encryptionPublicKey).toBe(
+  expect(commentReply.creatorDevice.encryptionPublicKey).toBe(
     userData1.webDevice.encryptionPublicKey
   );
 });
@@ -155,15 +157,16 @@ test("commenter replies to comment", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const commentReply = createCommentReplyResult.createCommentReply.commentReply;
-  expect(typeof comment.id).toBe("string");
+  expect(typeof commentReply.id).toBe("string");
   expect(commentReply.commentId).toBe(comment.id);
-  expect(comment.documentId).toBe(documentId1);
-  expect(typeof comment.contentCiphertext).toBe("string");
-  expect(typeof comment.contentNonce).toBe("string");
-  expect(comment.creatorDevice.signingPublicKey).toBe(
+  expect(commentReply.documentId).toBe(documentId1);
+  expect(typeof commentReply.contentCiphertext).toBe("string");
+  expect(typeof commentReply.contentNonce).toBe("string");
+  expect(typeof commentReply.createdAt).toBe("string");
+  expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
-  expect(comment.creatorDevice.encryptionPublicKey).toBe(
+  expect(commentReply.creatorDevice.encryptionPublicKey).toBe(
     userData1.webDevice.encryptionPublicKey
   );
 });
@@ -263,6 +266,7 @@ describe("Input errors", () => {
           documentId
           contentCiphertext
           contentNonce
+          createdAt
           creatorDevice {
             signingPublicKey
             encryptionPublicKey
