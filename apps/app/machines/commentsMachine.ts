@@ -26,6 +26,7 @@ type Params = {
 type DecryptedReply = {
   id: string;
   text: string;
+  createdAt: string;
 };
 
 type DecryptedComment = {
@@ -34,6 +35,7 @@ type DecryptedComment = {
   from: number;
   to: number;
   replies: DecryptedReply[];
+  createdAt: string;
 };
 
 interface Context {
@@ -287,15 +289,17 @@ export const commentsMachine = createMachine(
                   });
 
                   return {
-                    id: encryptedReply!.id,
                     ...JSON.parse(decryptedReply),
+                    id: encryptedReply!.id,
+                    createdAt: encryptedReply!.createdAt,
                   };
                 }
               );
 
               return {
-                id: encryptedComment!.id,
                 ...JSON.parse(decryptedComment),
+                id: encryptedComment!.id,
+                createdAt: encryptedComment!.createdAt,
                 replies,
               };
             }
