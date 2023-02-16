@@ -313,7 +313,7 @@ export default async function createServer() {
         }
       });
 
-      connection.on("close", function () {
+      connection.on("close", async function () {
         console.log("close connection");
         removeConnection(documentId, connection);
       });

@@ -1,0 +1,50 @@
+import { expect, Locator, Page } from "@playwright/test";
+import { prisma } from "../../../src/database/prisma";
+import { delayForSeconds } from "../delayForSeconds";
+
+export type Props = {
+  page: Page;
+  documentId: string;
+  selectElement: Locator;
+  comment: string;
+};
+export const createCommentOnHtmlNode = async ({
+  page,
+  documentId,
+  selectElement,
+  comment,
+}: Props) => {
+  const numCommentsBefore = await prisma.comment.count({
+    where: { documentId },
+  });
+  selectElement.evaluate((element: any) => {
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  });
+  await delayForSeconds(1);
+  await page
+    .locator("[data-testid='bubble-menu__initiate-comment-button']")
+    .click();
+  const commentInput = page.locator(
+    "[data-testid='bubble-menu__create-comment-input']"
+  );
+  await commentInput.selectText();
+  await commentInput.press("Backspace");
+  await commentInput.type(comment);
+  await page
+    .locator("[data-testid='bubble-menu__save-comment-button']")
+    .click();
+  await delayForSeconds(1);
+  const numCommentsAfter = await prisma.comment.count({
+    where: { documentId },
+  });
+  expect(numCommentsAfter).toBe(numCommentsBefore + 1);
+  const createdComment = await prisma.comment.findFirst({
+    where: { documentId },
+    orderBy: { createdAt: "desc" },
+  });
+  return createdComment;
+};

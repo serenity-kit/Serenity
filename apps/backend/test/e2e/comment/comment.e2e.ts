@@ -2,8 +2,13 @@ import { test } from "@playwright/test";
 import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
+
 import { delayForSeconds } from "../../helpers/delayForSeconds";
+import { createCommentOnHtmlNode } from "../../helpers/e2e/comment/createCommentOnHtmlNode";
+import { openCommentsDrawer } from "../../helpers/e2e/comment/openCommentsDrawer";
+import { createCommentReply } from "../../helpers/e2e/commentReply/createCommentReply";
 import { login } from "../../helpers/e2e/login";
+import { reloadPage } from "../../helpers/e2e/reloadPage";
 
 type UserData = {
   id: string;
@@ -33,52 +38,76 @@ test.beforeAll(async () => {
   });
 });
 
-test.describe("Edit document", () => {
+test.describe("create a comment", () => {
   test("Add content", async ({ page }) => {
-    await page.goto("http://localhost:19006/register");
-    // const { user } = await e2eRegisterUser({
-    //   page,
-    //   username: user1.username,
-    //   password: user1.password,
-    //   workspaceName: "workspace",
-    // });
+    const comment = "First!";
     await login({
       page,
       username: user1.username,
       password: user1.password,
       stayLoggedIn: true,
     });
-    const header = page.locator("div[class='ProseMirror']");
-
-    // const header = editor.locator(".//h1");
-    // select text inside the editor
-    header.evaluate((element) => {
-      const selection = window.getSelection();
-      const range = document.createRange();
-      range.selectNodeContents(element);
-      selection?.removeAllRanges();
-      selection?.addRange(range);
+    const header = page.locator("//div[contains(@class,'ProseMirror')]//h2[1]");
+    await createCommentOnHtmlNode({
+      page,
+      documentId: user1.data.document.id,
+      selectElement: header,
+      comment,
     });
+  });
+});
 
+test.describe("create comment replies", () => {
+  test("Add content", async ({ page }) => {
+    const commentText1 = "Change title";
+    const commentText2 = "More lists";
+    await login({
+      page,
+      username: user1.username,
+      password: user1.password,
+      stayLoggedIn: true,
+    });
+    const header1 = page.locator("//div[contains(@class,'ProseMirror')]//h1");
+    const header2 = page.locator(
+      "//div[contains(@class,'ProseMirror')]//h2[2]"
+    );
+    const comment1 = await createCommentOnHtmlNode({
+      page,
+      documentId: user1.data.document.id,
+      selectElement: header1,
+      comment: commentText1,
+    });
+    if (!comment1) {
+      throw new Error("Comment 1 was not created");
+    }
+    const comment2 = await createCommentOnHtmlNode({
+      page,
+      documentId: user1.data.document.id,
+      selectElement: header2,
+      comment: commentText2,
+    });
+    if (!comment2) {
+      throw new Error("Comment 1 was not created");
+    }
+    await openCommentsDrawer({ page });
+    const commentReply1 = await createCommentReply({
+      page,
+      commentId: comment1.id,
+      replyText: "Reply to comment 1",
+    });
+    if (!commentReply1) {
+      throw new Error("Comment reply was not created");
+    }
+    const commentReply2 = await createCommentReply({
+      page,
+      commentId: comment1.id,
+      replyText: "Reply to comment 1",
+    });
+    if (!commentReply2) {
+      throw new Error("Comment reply was not created");
+    }
+    await delayForSeconds(1);
+    await reloadPage({ page });
     await delayForSeconds(20);
-
-    // const startingContent = await editor.innerHTML();
-    // await page.type("div[class='ProseMirror']", newContent);
-    // await delayForSeconds(2);
-    // await reloadPage({ page });
-    // await delayForSeconds(2);
-    // const endingContent = await editor.innerHTML();
-    // expect(startingContent).not.toBe(endingContent);
-    // await logout({ page });
-    // await login({
-    //   page,
-    //   username: user1.username,
-    //   password: user1.password,
-    //   stayLoggedIn: true,
-    // });
-    // await delayForSeconds(2); // wait a bit until the editor loads
-    // const editorAfterLogin = page.locator("div[class='ProseMirror']");
-    // const afterLoginContent = await editorAfterLogin.innerHTML();
-    // expect(afterLoginContent).toBe(endingContent);
   });
 });
