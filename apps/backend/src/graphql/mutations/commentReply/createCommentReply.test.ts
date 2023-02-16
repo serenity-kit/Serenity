@@ -41,7 +41,7 @@ beforeAll(async () => {
   await setup();
 });
 
-test.only("commenter responds to comment", async () => {
+test("commenter responds to comment", async () => {
   const createCommentReplyResult = await createCommentReply({
     graphql,
     commentId: comment.id,
