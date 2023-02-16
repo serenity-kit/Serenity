@@ -8,7 +8,7 @@ beforeAll(async () => {
 test("create new commentKey", () => {
   const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const result = createCommentKey({
-    documentNameKey: kdfKey,
+    snapshotKey: kdfKey,
   });
   const { subkeyId, key } = result;
   expect(typeof subkeyId).toBe("number");
