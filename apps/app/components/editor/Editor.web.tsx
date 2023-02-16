@@ -53,7 +53,7 @@ export default function Editor({
   );
 
   const { commentsService } = usePage();
-  const [, send] = useActor(commentsService);
+  const [commentsState, send] = useActor(commentsService);
 
   const positionToolbar = () => {
     if (editorBottombarWrapperRef.current && editorIsFocusedRef.current) {
@@ -153,10 +153,12 @@ export default function Editor({
             to: comment.to,
           });
         }}
-        onFocus={() => {
-          editorIsFocusedRef.current = true;
-          showAndPositionToolbar();
-          setIsInEditingMode(true);
+        highlightComment={(commentId) => {
+          // necessary check to avoid an endless loop
+          send({
+            type: "HIGHLIGHT_COMMENT",
+            commentId: commentId === null ? "NONE" : commentId, // there is a bug with setting it to null
+          });
         }}
         onBlur={(params) => {
           if (

@@ -56,6 +56,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     clearReplyText: "done.invoke.createReply";
     decryptComments: "CommentsByDocumentIdQuery.UPDATE_RESULT";
+    highlightComment: "HIGHLIGHT_COMMENT";
     showCreateErrorReplyToast: "error.platform.createReply";
     showCreateErrorToast: "error.platform.createComment";
     showDeleteErrorToast:
