@@ -9,6 +9,7 @@ import {
   View,
 } from "@serenity-tools/ui";
 import { useActor } from "@xstate/react";
+import { formatDistanceToNow, parseJSON } from "date-fns";
 import { usePage } from "../../context/PageContext";
 
 const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
@@ -28,6 +29,11 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
           return (
             <View key={comment.id} style={tw`border-b border-gray-200`}>
               <Text>{comment.text}</Text>
+              <Text variant="xs">
+                {formatDistanceToNow(parseJSON(comment.createdAt), {
+                  addSuffix: true,
+                })}
+              </Text>
               <View>
                 {comment.replies.map((reply) => {
                   if (!reply) return null;
@@ -35,6 +41,11 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
                     <View key={reply.id}>
                       <View>
                         <Text>{reply.text}</Text>
+                        <Text variant="xs">
+                          {formatDistanceToNow(parseJSON(reply.createdAt), {
+                            addSuffix: true,
+                          })}
+                        </Text>
                       </View>
                       <IconButton
                         name="delete-bin-line"

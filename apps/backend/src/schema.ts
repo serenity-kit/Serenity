@@ -47,6 +47,7 @@ import * as WorkspaceKeyByDocumentIdQueryTypes from "./graphql/queries/document/
 import * as FileUrlQueryTypes from "./graphql/queries/file/fileUrl";
 import * as FolderQueryTypes from "./graphql/queries/folder/folder";
 import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
+import * as FolderTraceQueryTypes from "./graphql/queries/folder/folderTrace";
 import * as RootFoldersQueryTypes from "./graphql/queries/folder/rootFolders";
 import * as UserIdFromUsernameQueryTypes from "./graphql/queries/userIdFromUsername";
 import * as ActiveWorkspaceKeysQueryTypes from "./graphql/queries/workspace/activeWorkspaceKeys";
@@ -93,6 +94,7 @@ export const schema = makeSchema({
     FoldersQueryTypes,
     DeleteFoldersMutationTypes,
     FolderQueryTypes,
+    FolderTraceQueryTypes,
 
     StartRegistrationTypes,
     FinishRegistrationTypes,

@@ -95,6 +95,7 @@ export const createCommentReply = async ({
           documentId
           contentCiphertext
           contentNonce
+          createdAt
           creatorDevice {
             signingPublicKey
             encryptionPublicKey

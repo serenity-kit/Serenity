@@ -57,6 +57,7 @@ export async function createComment({
         contentCiphertext,
         contentNonce,
         keyDerivationTrace,
+        workspaceKeyId: keyDerivationTrace.workspaceKeyId,
       },
     });
     return {

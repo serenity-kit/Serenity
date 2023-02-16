@@ -57,15 +57,22 @@ test("one comment", async () => {
   const result = await commentsByDocumentId({
     graphql,
     documentId: userData1.document.id,
+    deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
     first: 1,
     authorizationHeader: userData1.sessionKey,
   });
   const edges = result.commentsByDocumentId.edges;
   expect(edges.length).toBe(1);
   expect(edges[0].node.id).toBe(comment1.id);
+  expect(edges[0].node.workspaceKey.id).toBe(
+    userData1.workspace.currentWorkspaceKey.id
+  );
+  expect(edges[0].node.workspaceKey.workspaceKeyBox).not.toBe(null);
+  expect(typeof edges[0].node.createdAt).toBe("string");
   const result2 = await commentsByDocumentId({
     graphql,
     documentId: userData1.document.id,
+    deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
     first: 1,
     after: result.commentsByDocumentId.pageInfo.endCursor,
     authorizationHeader: userData1.sessionKey,
@@ -73,17 +80,35 @@ test("one comment", async () => {
   const edges2 = result2.commentsByDocumentId.edges;
   expect(edges2.length).toBe(1);
   expect(edges2[0].node.id).toBe(comment2.id);
+  expect(edges2[0].node.workspaceKey.id).toBe(
+    userData1.workspace.currentWorkspaceKey.id
+  );
+  expect(edges2[0].node.workspaceKey.workspaceKeyBox).not.toBe(null);
+  expect(typeof edges2[0].node.createdAt).toBe("string");
 });
 
 test("all comments", async () => {
   const result = await commentsByDocumentId({
     graphql,
     documentId: userData1.document.id,
+    deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
     first: 50,
     authorizationHeader: userData1.sessionKey,
   });
   const edges = result.commentsByDocumentId.edges;
   expect(edges.length).toBe(2);
+});
+
+test("no deviceSigningPublicKey", async () => {
+  await expect(
+    (async () =>
+      await commentsByDocumentId({
+        graphql,
+        documentId: userData1.document.id,
+        first: 50,
+        authorizationHeader: userData1.sessionKey,
+      }))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("bad document share token", async () => {
@@ -92,6 +117,7 @@ test("bad document share token", async () => {
       await commentsByDocumentId({
         graphql,
         documentId: userData1.document.id,
+        deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
         documentShareLinkToken: "badtoken",
         first: 50,
         authorizationHeader: userData1.sessionKey,
@@ -110,6 +136,7 @@ test("no access to workspace", async () => {
       await commentsByDocumentId({
         graphql,
         documentId: userData1.document.id,
+        deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
         first: 50,
         authorizationHeader: userData2.sessionKey,
       }))()
@@ -178,12 +205,14 @@ describe("Input Errors", () => {
     query commentsByDocumentId(
       $documentId: ID!
       $documentShareLinkToken: String
+      $deviceSigningPublicKey: String
       $first: Int!
       $after: String
     ) {
       commentsByDocumentId(
         documentId: $documentId
         documentShareLinkToken: $documentShareLinkToken
+        deviceSigningPublicKey: $deviceSigningPublicKey
         first: $first
         after: $after
       ) {
@@ -193,6 +222,7 @@ describe("Input Errors", () => {
             documentId
             contentCiphertext
             contentNonce
+            createdAt
             keyDerivationTrace {
               workspaceKeyId
               trace {
@@ -200,6 +230,25 @@ describe("Input Errors", () => {
                 subkeyId
                 context
                 parentId
+              }
+            }
+            workspaceKey {
+              id
+              workspaceId
+              generation
+              workspaceKeyBox {
+                id
+                workspaceKeyId
+                deviceSigningPublicKey
+                creatorDeviceSigningPublicKey
+                nonce
+                ciphertext
+                creatorDevice {
+                  signingPublicKey
+                  encryptionPublicKey
+                  encryptionPublicKeySignature
+                  createdAt
+                }
               }
             }
             creatorDevice {
@@ -212,6 +261,7 @@ describe("Input Errors", () => {
               id
               contentCiphertext
               contentNonce
+              createdAt
               keyDerivationTrace {
                 workspaceKeyId
                 trace {
@@ -235,6 +285,7 @@ describe("Input Errors", () => {
           {
             documentId: null,
             documentShareLink: null,
+            deviceSigningPublicKey: null,
             first: 50,
           },
           authorizationHeaders
@@ -249,6 +300,7 @@ describe("Input Errors", () => {
           {
             documentId: documentId1,
             documentShareLink: null,
+            deviceSigningPublicKey: null,
             first: null,
           },
           authorizationHeaders
