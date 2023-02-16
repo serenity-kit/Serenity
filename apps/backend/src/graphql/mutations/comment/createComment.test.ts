@@ -43,6 +43,7 @@ test("owner comments", async () => {
   expect(comment.documentId).toBe(documentId1);
   expect(typeof comment.contentCiphertext).toBe("string");
   expect(typeof comment.contentNonce).toBe("string");
+  expect(typeof comment.createdAt).toBe("string");
   expect(comment.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -75,6 +76,7 @@ test("admin comments", async () => {
   expect(comment.documentId).toBe(documentId1);
   expect(typeof comment.contentCiphertext).toBe("string");
   expect(typeof comment.contentNonce).toBe("string");
+  expect(typeof comment.createdAt).toBe("string");
   expect(comment.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -107,6 +109,7 @@ test("editor comments", async () => {
   expect(comment.documentId).toBe(documentId1);
   expect(typeof comment.contentCiphertext).toBe("string");
   expect(typeof comment.contentNonce).toBe("string");
+  expect(typeof comment.createdAt).toBe("string");
   expect(comment.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -139,6 +142,7 @@ test("commenter comment", async () => {
   expect(comment.documentId).toBe(documentId1);
   expect(typeof comment.contentCiphertext).toBe("string");
   expect(typeof comment.contentNonce).toBe("string");
+  expect(typeof comment.createdAt).toBe("string");
   expect(comment.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -237,6 +241,7 @@ describe("Input errors", () => {
           documentId
           contentCiphertext
           contentNonce
+          createdAt
           creatorDevice {
             signingPublicKey
             encryptionPublicKey

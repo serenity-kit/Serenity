@@ -68,6 +68,7 @@ test("one comment", async () => {
     userData1.workspace.currentWorkspaceKey.id
   );
   expect(edges[0].node.workspaceKey.workspaceKeyBox).not.toBe(null);
+  expect(typeof edges[0].node.createdAt).toBe("string");
   const result2 = await commentsByDocumentId({
     graphql,
     documentId: userData1.document.id,
@@ -83,6 +84,7 @@ test("one comment", async () => {
     userData1.workspace.currentWorkspaceKey.id
   );
   expect(edges2[0].node.workspaceKey.workspaceKeyBox).not.toBe(null);
+  expect(typeof edges2[0].node.createdAt).toBe("string");
 });
 
 test("all comments", async () => {
@@ -220,6 +222,7 @@ describe("Input Errors", () => {
             documentId
             contentCiphertext
             contentNonce
+            createdAt
             keyDerivationTrace {
               workspaceKeyId
               trace {
@@ -258,6 +261,7 @@ describe("Input Errors", () => {
               id
               contentCiphertext
               contentNonce
+              createdAt
               keyDerivationTrace {
                 workspaceKeyId
                 trace {
