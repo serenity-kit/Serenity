@@ -4,7 +4,12 @@ query commentsByDocumentId(
   $first: Int = 50
   $after: String
 ) {
-  commentsByDocumentId(documentId: $documentId, first: $first, after: $after) {
+  commentsByDocumentId(
+    documentId: $documentId
+    deviceSigningPublicKey: $deviceSigningPublicKey
+    first: $first
+    after: $after
+  ) {
     nodes {
       id
       documentId
@@ -26,6 +31,25 @@ query commentsByDocumentId(
           parentId
         }
       }
+      workspaceKey {
+        id
+        workspaceId
+        generation
+        workspaceKeyBox {
+          id
+          deviceSigningPublicKey
+          creatorDeviceSigningPublicKey
+          nonce
+          ciphertext
+          creatorDevice {
+            signingPublicKey
+            encryptionPublicKey
+            encryptionPublicKeySignature
+            createdAt
+          }
+        }
+      }
+
       commentReplies {
         id
         contentCiphertext

@@ -272,7 +272,6 @@ export default function Page({
       const me = await runMeQuery({});
 
       let document: Document | undefined = undefined;
-      console.log("fetch document", docId);
       try {
         const fetchedDocument = await getDocument({
           documentId: docId,

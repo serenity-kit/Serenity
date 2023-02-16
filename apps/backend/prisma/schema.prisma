@@ -216,6 +216,7 @@ model WorkspaceKey {
   generation        Int               @default(0)
   folders           Folder[]
   documents         Document[]
+  comments          Comment[]
 }
 
 model WorkspaceKeyBox {
@@ -293,6 +294,8 @@ model Comment {
   creatorDevice                 CreatorDevice  @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
   creatorDeviceSigningPublicKey String
   commentReplies                CommentReply[]
+  workspaceKey                  WorkspaceKey?  @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
+  workspaceKeyId                String?
 }
 
 model CommentReply {

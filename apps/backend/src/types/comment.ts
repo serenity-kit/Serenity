@@ -1,5 +1,6 @@
 import { KeyDerivationTrace2 } from "@naisho/core";
 import { CreatorDevice } from "./device";
+import { formatWorkspaceKey, WorkspaceKey } from "./workspace";
 
 export type Comment = {
   id: string;
@@ -10,6 +11,7 @@ export type Comment = {
   keyDerivationTrace: KeyDerivationTrace2;
   creatorDevice: CreatorDevice;
   commentReplies?: CommentReply[] | null;
+  workspaceKey?: WorkspaceKey | null;
 };
 
 export type CommentReply = {
@@ -40,6 +42,9 @@ export const formatComment = (comment: any): Comment => {
     formmattedComment.commentReplies = comment.commentReplies.map(
       (commentReply: any) => formatCommentReply(commentReply)
     );
+  }
+  if (comment.workspaceKey) {
+    formmattedComment.workspaceKey = formatWorkspaceKey(comment.workspaceKey);
   }
   return formmattedComment;
 };
