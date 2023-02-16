@@ -51,11 +51,6 @@ export const commentsByDocumentId = async ({
               contentCiphertext
               contentNonce
               createdAt
-              workspaceKey {
-                id
-                workspaceId
-                generation
-              }
               creatorDevice {
                 signingPublicKey
                 encryptionPublicKey
