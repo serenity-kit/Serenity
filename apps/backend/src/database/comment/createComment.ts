@@ -60,9 +60,24 @@ export async function createComment({
         workspaceKeyId: keyDerivationTrace.workspaceKeyId,
       },
     });
+    const workspaceKey = await prisma.workspaceKey.findFirst({
+      where: {
+        workspaceId: document.workspaceId,
+      },
+      orderBy: { generation: "desc" },
+      include: {
+        workspaceKeyBoxes: {
+          include: { creatorDevice: true },
+          where: {
+            deviceSigningPublicKey: creatorDevice.signingPublicKey,
+          },
+        },
+      },
+    });
     return {
       ...comment,
       creatorDevice,
+      workspaceKey,
     };
   } catch (e) {
     console.log(e);
