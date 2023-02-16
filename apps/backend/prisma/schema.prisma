@@ -217,6 +217,7 @@ model WorkspaceKey {
   folders           Folder[]
   documents         Document[]
   comments          Comment[]
+  commentReplies    CommentReply[]
 }
 
 model WorkspaceKeyBox {
@@ -310,4 +311,6 @@ model CommentReply {
   keyDerivationTrace            Json          @default("{}")
   creatorDevice                 CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
   creatorDeviceSigningPublicKey String
+  workspaceKey                  WorkspaceKey? @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
+  workspaceKeyId                String?
 }

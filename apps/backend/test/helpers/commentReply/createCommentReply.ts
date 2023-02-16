@@ -96,6 +96,34 @@ export const createCommentReply = async ({
           contentCiphertext
           contentNonce
           createdAt
+          workspaceKey {
+            id
+            workspaceId
+            generation
+            workspaceKeyBox {
+              id
+              workspaceKeyId
+              deviceSigningPublicKey
+              creatorDeviceSigningPublicKey
+              nonce
+              ciphertext
+              creatorDevice {
+                signingPublicKey
+                encryptionPublicKey
+                encryptionPublicKeySignature
+                createdAt
+              }
+            }
+          }
+          keyDerivationTrace {
+            workspaceKeyId
+            trace {
+              entryId
+              subkeyId
+              context
+              parentId
+            }
+          }
           creatorDevice {
             signingPublicKey
             encryptionPublicKey

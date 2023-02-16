@@ -24,13 +24,20 @@ export type CommentReply = {
   keyDerivationTrace: KeyDerivationTrace2;
   creatorDevice: CreatorDevice;
   comment?: Comment | null;
+  workspaceKey?: WorkspaceKey | null;
 };
 
 export const formatCommentReply = (commentReply: any): CommentReply => {
-  return {
+  const formattedCommentReply = {
     ...commentReply,
     keyDerivationTrace: commentReply.keyDerivationTrace as KeyDerivationTrace2,
   };
+  if (commentReply.workspaceKey) {
+    formattedCommentReply.workspaceKey = formatWorkspaceKey(
+      commentReply.workspaceKey
+    );
+  }
+  return formattedCommentReply;
 };
 
 export const formatComment = (comment: any): Comment => {

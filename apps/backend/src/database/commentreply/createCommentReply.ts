@@ -62,9 +62,24 @@ export async function createCommentReply({
         keyDerivationTrace,
       },
     });
+    const workspaceKey = await prisma.workspaceKey.findFirst({
+      where: {
+        workspaceId: document.workspaceId,
+      },
+      orderBy: { generation: "desc" },
+      include: {
+        workspaceKeyBoxes: {
+          include: { creatorDevice: true },
+          where: {
+            deviceSigningPublicKey: creatorDevice.signingPublicKey,
+          },
+        },
+      },
+    });
     return {
       ...commentReply,
       creatorDevice,
+      workspaceKey,
     };
   } catch (e) {
     console.log(e);
