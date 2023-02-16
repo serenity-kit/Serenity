@@ -60,6 +60,7 @@ type EditorProps = {
   shareOrSaveFile: ShareOrSaveFileFunction;
   comments: EditorComment[];
   createComment: (comment: { from: number; to: number; text: string }) => void;
+  highlightComment: (commentId: string | null) => void;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -136,6 +137,7 @@ export const Editor = (props: EditorProps) => {
         CommentsExtension.configure({
           comments: props.comments,
           yDoc: props.yDocRef.current,
+          highlightComment: props.highlightComment,
         }),
         Table.configure({
           HTMLAttributes: {
