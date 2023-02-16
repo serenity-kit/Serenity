@@ -11,11 +11,13 @@ import { EditorComment } from "../types";
 export interface CommentsExtensionOptions {
   comments: EditorComment[];
   yDoc: Y.Doc;
+  highlightComment: (commentId: string | null) => void;
 }
 
 type CommentsExtensionStorage = {
   comments: EditorComment[];
   yDoc: Y.Doc;
+  highlightComment: (commentId: string | null) => void;
 };
 
 // inspired by https://stackoverflow.com/a/46700791
@@ -25,16 +27,16 @@ export function notNull<TypeValue>(
   return value !== null;
 }
 
-const createDecorationSet = (
+const resolveCommentPositions = (
   comments: EditorComment[],
   state: EditorState,
   yDoc: Y.Doc
 ) => {
   const ystate = ySyncPluginKey.getState(state);
   const { type, binding } = ystate;
-  if (!binding) return DecorationSet.empty;
+  if (!binding) return [];
 
-  const commentDecorations = comments
+  return comments
     .map((comment: EditorComment) => {
       const from = relativePositionToAbsolutePosition(
         yDoc,
@@ -49,14 +51,30 @@ const createDecorationSet = (
         binding.mapping
       );
       if (from === null || to === null) return null;
-      return Decoration.inline(from, to, {
+      return {
+        ...comment,
+        absoluteFrom: from,
+        absoluteTo: to,
+      };
+    })
+    .filter(notNull);
+};
+
+const createCommentsDecorationSet = (
+  comments: (EditorComment & { absoluteFrom: number; absoluteTo: number })[],
+  state: EditorState
+) => {
+  return DecorationSet.create(
+    state.doc,
+    comments.map((comment) => {
+      return Decoration.inline(comment.absoluteFrom, comment.absoluteTo, {
         style: "background-color: yellow",
       });
     })
-    .filter(notNull);
-
-  return DecorationSet.create(state.doc, commentDecorations);
+  );
 };
+
+let prevHighlightedCommentId: null | string = null;
 
 export const CommentsExtension = Extension.create<
   CommentsExtensionOptions,
@@ -68,6 +86,7 @@ export const CommentsExtension = Extension.create<
     return {
       comments: [],
       yDoc: {} as Y.Doc,
+      highlightComment: () => undefined,
     };
   },
 
@@ -75,6 +94,7 @@ export const CommentsExtension = Extension.create<
     return {
       comments: this.options.comments,
       yDoc: this.options.yDoc,
+      highlightComment: this.options.highlightComment,
     };
   },
 
@@ -85,18 +105,40 @@ export const CommentsExtension = Extension.create<
       new Plugin({
         state: {
           init(editor, state) {
-            return createDecorationSet(
+            const resolvedComments = resolveCommentPositions(
               storage.comments.comments,
               state,
               storage.comments.yDoc
             );
+            return createCommentsDecorationSet(resolvedComments, state);
           },
           apply(tr, oldState, newState) {
-            return createDecorationSet(
+            const resolvedComments = resolveCommentPositions(
               storage.comments.comments,
               newState,
               storage.comments.yDoc
             );
+            const commentToHighlight = resolvedComments.find((comment) => {
+              return (
+                comment.absoluteFrom <= newState.selection.from &&
+                comment.absoluteTo >= newState.selection.to
+              );
+            });
+            if (commentToHighlight) {
+              if (prevHighlightedCommentId !== commentToHighlight.commentId) {
+                prevHighlightedCommentId = commentToHighlight.commentId;
+                storage.comments.highlightComment(commentToHighlight.commentId);
+              }
+            } else {
+              if (prevHighlightedCommentId !== null) {
+                // make sure an endless loop isn't triggered
+                prevHighlightedCommentId = null;
+                console.log("!!!! highlightComment(null)");
+                storage.comments.highlightComment(null);
+              }
+            }
+
+            return createCommentsDecorationSet(resolvedComments, newState);
           },
         },
         props: {

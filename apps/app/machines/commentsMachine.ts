@@ -45,6 +45,7 @@ interface Context {
   commentsByDocumentIdQueryActor?: AnyActorRef;
   decryptedComments: DecryptedComment[];
   replyTexts: Record<string, string>;
+  highlightedCommentId: string | null;
 }
 
 export const commentsMachine = createMachine(
@@ -56,7 +57,8 @@ export const commentsMachine = createMachine(
         | { type: "DELETE_COMMENT"; commentId: string }
         | { type: "UPDATE_REPLY_TEXT"; text: string; commentId: string }
         | { type: "CREATE_REPLY"; commentId: string }
-        | { type: "DELETE_REPLY"; replyId: string },
+        | { type: "DELETE_REPLY"; replyId: string }
+        | { type: "HIGHLIGHT_COMMENT"; commentId: string | null },
       context: {} as Context,
     },
     tsTypes: {} as import("./commentsMachine.typegen").Typegen0,
@@ -69,6 +71,7 @@ export const commentsMachine = createMachine(
       commentsByDocumentIdQueryError: false,
       decryptedComments: [],
       replyTexts: {},
+      highlightedCommentId: "bla",
     },
     initial: "idle",
     on: {
@@ -91,6 +94,9 @@ export const commentsMachine = createMachine(
       },
       UPDATE_REPLY_TEXT: {
         actions: ["updateReplyText"],
+      },
+      HIGHLIGHT_COMMENT: {
+        actions: ["highlightComment"],
       },
     },
     states: {
@@ -236,6 +242,12 @@ export const commentsMachine = createMachine(
             ...context.replyTexts,
             [event.commentId]: event.text,
           },
+        };
+      }),
+      highlightComment: assign((context, event) => {
+        console.log("highlightComment", event.commentId);
+        return {
+          highlightedCommentId: event.commentId,
         };
       }),
       clearReplyText: assign((context, event: any) => {
