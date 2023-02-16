@@ -10,6 +10,7 @@ query commentsByDocumentId(
       documentId
       contentCiphertext
       contentNonce
+      createdAt
       creatorDevice {
         signingPublicKey
         encryptionPublicKey
@@ -29,6 +30,7 @@ query commentsByDocumentId(
         id
         contentCiphertext
         contentNonce
+        createdAt
         keyDerivationTrace {
           workspaceKeyId
           trace {

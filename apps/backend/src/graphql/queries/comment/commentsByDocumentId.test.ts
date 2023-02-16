@@ -63,6 +63,7 @@ test("one comment", async () => {
   const edges = result.commentsByDocumentId.edges;
   expect(edges.length).toBe(1);
   expect(edges[0].node.id).toBe(comment1.id);
+  expect(typeof edges[0].node.createdAt).toBe("string");
   const result2 = await commentsByDocumentId({
     graphql,
     documentId: userData1.document.id,
@@ -73,6 +74,7 @@ test("one comment", async () => {
   const edges2 = result2.commentsByDocumentId.edges;
   expect(edges2.length).toBe(1);
   expect(edges2[0].node.id).toBe(comment2.id);
+  expect(typeof edges2[0].node.createdAt).toBe("string");
 });
 
 test("all comments", async () => {
@@ -193,6 +195,7 @@ describe("Input Errors", () => {
             documentId
             contentCiphertext
             contentNonce
+            createdAt
             keyDerivationTrace {
               workspaceKeyId
               trace {
@@ -212,6 +215,7 @@ describe("Input Errors", () => {
               id
               contentCiphertext
               contentNonce
+              createdAt
               keyDerivationTrace {
                 workspaceKeyId
                 trace {

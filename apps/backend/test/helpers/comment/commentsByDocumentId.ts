@@ -39,6 +39,7 @@ export const commentsByDocumentId = async ({
             documentId
             contentCiphertext
             contentNonce
+            createdAt
             keyDerivationTrace {
               workspaceKeyId
               trace {
@@ -58,6 +59,7 @@ export const commentsByDocumentId = async ({
               id
               contentCiphertext
               contentNonce
+              createdAt
               keyDerivationTrace {
                 workspaceKeyId
                 trace {
