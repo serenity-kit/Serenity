@@ -97,13 +97,15 @@ export type CommentReply = {
   documentId: Scalars['String'];
   id: Scalars['String'];
   keyDerivationTrace: KeyDerivationTrace2;
+  workspaceKey?: Maybe<WorkspaceKey>;
 };
 
 export type CreateCommentInput = {
   contentCiphertext: Scalars['String'];
   contentNonce: Scalars['String'];
   documentId: Scalars['String'];
-  keyDerivationTrace: KeyDerivationTraceInput2;
+  snapshotId: Scalars['String'];
+  subkeyId: Scalars['Int'];
 };
 
 export type CreateCommentReplyInput = {
@@ -1551,13 +1553,12 @@ export type VerifyRegistrationMutation = { __typename?: 'Mutation', verifyRegist
 
 export type CommentsByDocumentIdQueryVariables = Exact<{
   documentId: Scalars['ID'];
-  deviceSigningPublicKey: Scalars['String'];
   first?: InputMaybe<Scalars['Int']>;
   after?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, contentCiphertext: string, contentNonce: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null }, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, context: string, parentId?: string | null }> }, workspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, nonce: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } | null } | null } | null, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, contentCiphertext: string, contentNonce: string, createdAt: any, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, context: string, parentId?: string | null }> } } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null, workspaceKeyByDocumentId?: { __typename?: 'WorkspaceKeyByDocumentIdResult', nameWorkspaceKey: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, creatorDeviceSigningPublicKey: string, nonce: string, ciphertext: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null } | null } | null } } | null };
+export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, contentCiphertext: string, contentNonce: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, contentCiphertext: string, contentNonce: string, createdAt: any } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DeviceBySigningPublicKeyQueryVariables = Exact<{
   signingPublicKey: Scalars['ID'];
@@ -2254,13 +2255,8 @@ export function useVerifyRegistrationMutation() {
   return Urql.useMutation<VerifyRegistrationMutation, VerifyRegistrationMutationVariables>(VerifyRegistrationDocument);
 };
 export const CommentsByDocumentIdDocument = gql`
-    query commentsByDocumentId($documentId: ID!, $deviceSigningPublicKey: String!, $first: Int = 50, $after: String) {
-  commentsByDocumentId(
-    documentId: $documentId
-    deviceSigningPublicKey: $deviceSigningPublicKey
-    first: $first
-    after: $after
-  ) {
+    query commentsByDocumentId($documentId: ID!, $first: Int = 50, $after: String) {
+  commentsByDocumentId(documentId: $documentId, first: $first, after: $after) {
     nodes {
       id
       documentId
@@ -2273,47 +2269,11 @@ export const CommentsByDocumentIdDocument = gql`
         encryptionPublicKeySignature
         createdAt
       }
-      keyDerivationTrace {
-        workspaceKeyId
-        trace {
-          entryId
-          subkeyId
-          context
-          parentId
-        }
-      }
-      workspaceKey {
-        id
-        workspaceId
-        generation
-        workspaceKeyBox {
-          id
-          deviceSigningPublicKey
-          creatorDeviceSigningPublicKey
-          nonce
-          ciphertext
-          creatorDevice {
-            signingPublicKey
-            encryptionPublicKey
-            encryptionPublicKeySignature
-            createdAt
-          }
-        }
-      }
       commentReplies {
         id
         contentCiphertext
         contentNonce
         createdAt
-        keyDerivationTrace {
-          workspaceKeyId
-          trace {
-            entryId
-            subkeyId
-            context
-            parentId
-          }
-        }
       }
     }
     pageInfo {
@@ -2321,30 +2281,6 @@ export const CommentsByDocumentIdDocument = gql`
       hasPreviousPage
       startCursor
       endCursor
-    }
-  }
-  workspaceKeyByDocumentId(
-    documentId: $documentId
-    deviceSigningPublicKey: $deviceSigningPublicKey
-  ) {
-    nameWorkspaceKey {
-      id
-      workspaceId
-      generation
-      workspaceKeyBox {
-        id
-        workspaceKeyId
-        deviceSigningPublicKey
-        creatorDeviceSigningPublicKey
-        nonce
-        ciphertext
-        creatorDevice {
-          signingPublicKey
-          encryptionPublicKey
-          encryptionPublicKeySignature
-          createdAt
-        }
-      }
     }
   }
 }
