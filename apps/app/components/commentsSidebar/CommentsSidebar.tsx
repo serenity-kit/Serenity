@@ -27,7 +27,15 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
         {state.context.decryptedComments.map((comment) => {
           if (!comment) return null;
           return (
-            <View key={comment.id} style={tw`border-b border-gray-200`}>
+            <View
+              key={comment.id}
+              style={[
+                tw`border-b border-gray-200`,
+                comment.id === state.context.highlightedCommentId
+                  ? tw`bg-gray-200`
+                  : undefined,
+              ]}
+            >
               <Text>{comment.text}</Text>
               <Text variant="xs">
                 {formatDistanceToNow(parseJSON(comment.createdAt), {

@@ -113,6 +113,7 @@ ReactDOM.render(
       onCreate={(params) => (window.editor = params.editor)}
       comments={[]}
       createComment={() => {}}
+      highlightComment={() => {}}
       encryptAndUploadFile={async () => {
         // TODO: implement
         return Promise.resolve({
