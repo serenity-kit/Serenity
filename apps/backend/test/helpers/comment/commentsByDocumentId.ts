@@ -83,6 +83,25 @@ export const commentsByDocumentId = async ({
               contentCiphertext
               contentNonce
               createdAt
+              workspaceKey {
+                id
+                workspaceId
+                generation
+                workspaceKeyBox {
+                  id
+                  workspaceKeyId
+                  deviceSigningPublicKey
+                  creatorDeviceSigningPublicKey
+                  nonce
+                  ciphertext
+                  creatorDevice {
+                    signingPublicKey
+                    encryptionPublicKey
+                    encryptionPublicKeySignature
+                    createdAt
+                  }
+                }
+              }
               keyDerivationTrace {
                 workspaceKeyId
                 trace {
@@ -91,6 +110,12 @@ export const commentsByDocumentId = async ({
                   context
                   parentId
                 }
+              }
+              creatorDevice {
+                signingPublicKey
+                encryptionPublicKey
+                encryptionPublicKeySignature
+                createdAt
               }
             }
           }

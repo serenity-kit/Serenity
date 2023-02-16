@@ -73,7 +73,17 @@ export async function getCommentsByDocumentId({
       creatorDevice: true,
       commentReplies: {
         orderBy: { createdAt: "asc" },
-        include: { creatorDevice: true },
+        include: {
+          creatorDevice: true,
+          workspaceKey: {
+            include: {
+              workspaceKeyBoxes: {
+                include: { creatorDevice: true },
+                where: { deviceSigningPublicKey: userDeviceSigningPublicKey },
+              },
+            },
+          },
+        },
       },
       workspaceKey: {
         include: {
