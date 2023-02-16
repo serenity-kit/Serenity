@@ -58,6 +58,13 @@ test("commenter responds to comment", async () => {
   expect(commentReply.documentId).toBe(documentId1);
   expect(typeof commentReply.contentCiphertext).toBe("string");
   expect(typeof commentReply.contentNonce).toBe("string");
+  expect(commentReply.workspaceKey.workspaceId).toBe(userData1.workspace.id);
+  expect(commentReply.workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
+    userData1.webDevice.signingPublicKey
+  );
+  expect(
+    commentReply.workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey
+  ).toBe(userData1.mainDevice.signingPublicKey);
   expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -93,6 +100,13 @@ test("admin replies to comment", async () => {
   expect(typeof commentReply.contentCiphertext).toBe("string");
   expect(typeof commentReply.contentNonce).toBe("string");
   expect(typeof commentReply.createdAt).toBe("string");
+  expect(commentReply.workspaceKey.workspaceId).toBe(userData1.workspace.id);
+  expect(commentReply.workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
+    userData1.webDevice.signingPublicKey
+  );
+  expect(
+    commentReply.workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey
+  ).toBe(userData1.mainDevice.signingPublicKey);
   expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -128,6 +142,13 @@ test("editor replies to comment", async () => {
   expect(typeof commentReply.contentCiphertext).toBe("string");
   expect(typeof commentReply.contentNonce).toBe("string");
   expect(typeof commentReply.createdAt).toBe("string");
+  expect(commentReply.workspaceKey.workspaceId).toBe(userData1.workspace.id);
+  expect(commentReply.workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
+    userData1.webDevice.signingPublicKey
+  );
+  expect(
+    commentReply.workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey
+  ).toBe(userData1.mainDevice.signingPublicKey);
   expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -163,6 +184,13 @@ test("commenter replies to comment", async () => {
   expect(typeof commentReply.contentCiphertext).toBe("string");
   expect(typeof commentReply.contentNonce).toBe("string");
   expect(typeof commentReply.createdAt).toBe("string");
+  expect(commentReply.workspaceKey.workspaceId).toBe(userData1.workspace.id);
+  expect(commentReply.workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
+    userData1.webDevice.signingPublicKey
+  );
+  expect(
+    commentReply.workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey
+  ).toBe(userData1.mainDevice.signingPublicKey);
   expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -267,6 +295,34 @@ describe("Input errors", () => {
           contentCiphertext
           contentNonce
           createdAt
+          workspaceKey {
+            id
+            workspaceId
+            generation
+            workspaceKeyBox {
+              id
+              workspaceKeyId
+              deviceSigningPublicKey
+              creatorDeviceSigningPublicKey
+              nonce
+              ciphertext
+              creatorDevice {
+                signingPublicKey
+                encryptionPublicKey
+                encryptionPublicKeySignature
+                createdAt
+              }
+            }
+          }
+          keyDerivationTrace {
+            workspaceKeyId
+            trace {
+              entryId
+              subkeyId
+              context
+              parentId
+            }
+          }
           creatorDevice {
             signingPublicKey
             encryptionPublicKey
