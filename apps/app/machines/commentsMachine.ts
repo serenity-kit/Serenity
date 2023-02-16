@@ -259,9 +259,7 @@ export const commentsMachine = createMachine(
                   keyDerivationTrace: encryptedComment?.keyDerivationTrace!,
                   activeDevice: context.params.activeDevice!,
                   workspaceKeyBox:
-                    context.commentsByDocumentIdQueryResult?.data
-                      ?.workspaceKeyByDocumentId?.nameWorkspaceKey
-                      .workspaceKeyBox!,
+                    encryptedComment?.workspaceKey?.workspaceKeyBox!,
                 });
 
               const decryptedComment = decryptComment({
