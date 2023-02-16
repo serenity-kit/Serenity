@@ -3,6 +3,8 @@ query commentsByDocumentId($documentId: ID!, $first: Int = 50, $after: String) {
     nodes {
       id
       documentId
+      snapshotId
+      subkeyId
       contentCiphertext
       contentNonce
       createdAt
@@ -14,6 +16,8 @@ query commentsByDocumentId($documentId: ID!, $first: Int = 50, $after: String) {
       }
       commentReplies {
         id
+        snapshotId
+        subkeyId
         contentCiphertext
         contentNonce
         createdAt

@@ -65,8 +65,8 @@ export type Comment = {
   creatorDevice: CreatorDevice;
   documentId: Scalars['String'];
   id: Scalars['String'];
-  keyDerivationTrace: KeyDerivationTrace2;
-  workspaceKey?: Maybe<WorkspaceKey>;
+  snapshotId: Scalars['String'];
+  subkeyId: Scalars['Int'];
 };
 
 export type CommentConnection = {
@@ -96,14 +96,13 @@ export type CommentReply = {
   creatorDevice: CreatorDevice;
   documentId: Scalars['String'];
   id: Scalars['String'];
-  keyDerivationTrace: KeyDerivationTrace2;
-  workspaceKey?: Maybe<WorkspaceKey>;
+  snapshotId: Scalars['String'];
+  subkeyId: Scalars['Int'];
 };
 
 export type CreateCommentInput = {
   contentCiphertext: Scalars['String'];
   contentNonce: Scalars['String'];
-  documentId: Scalars['String'];
   snapshotId: Scalars['String'];
   subkeyId: Scalars['Int'];
 };
@@ -112,8 +111,8 @@ export type CreateCommentReplyInput = {
   commentId: Scalars['String'];
   contentCiphertext: Scalars['String'];
   contentNonce: Scalars['String'];
-  documentId: Scalars['String'];
-  keyDerivationTrace: KeyDerivationTraceInput2;
+  snapshotId: Scalars['String'];
+  subkeyId: Scalars['Int'];
 };
 
 export type CreateCommentReplyResult = {
@@ -539,35 +538,9 @@ export type KeyDerivationTrace = {
   workspaceKeyId: Scalars['String'];
 };
 
-export type KeyDerivationTrace2 = {
-  __typename?: 'KeyDerivationTrace2';
-  trace: Array<KeyDerivationTraceEntry>;
-  workspaceKeyId: Scalars['String'];
-};
-
-export type KeyDerivationTraceEntry = {
-  __typename?: 'KeyDerivationTraceEntry';
-  context: Scalars['String'];
-  entryId: Scalars['String'];
-  parentId?: Maybe<Scalars['String']>;
-  subkeyId: Scalars['Int'];
-};
-
-export type KeyDerivationTraceEntryInput = {
-  context: Scalars['String'];
-  entryId: Scalars['String'];
-  parentId?: InputMaybe<Scalars['String']>;
-  subkeyId: Scalars['Int'];
-};
-
 export type KeyDerivationTraceInput = {
   parentFolders: Array<KeyDerivationTraceParentFolderInput>;
   subkeyId: Scalars['Int'];
-  workspaceKeyId: Scalars['String'];
-};
-
-export type KeyDerivationTraceInput2 = {
-  trace: Array<KeyDerivationTraceEntryInput>;
   workspaceKeyId: Scalars['String'];
 };
 
@@ -875,7 +848,6 @@ export type QueryActiveWorkspaceKeysArgs = {
 export type QueryCommentsByDocumentIdArgs = {
   after?: InputMaybe<Scalars['String']>;
   before?: InputMaybe<Scalars['String']>;
-  deviceSigningPublicKey?: InputMaybe<Scalars['String']>;
   documentId: Scalars['ID'];
   documentShareLinkToken?: InputMaybe<Scalars['String']>;
   first?: InputMaybe<Scalars['Int']>;
@@ -1558,7 +1530,7 @@ export type CommentsByDocumentIdQueryVariables = Exact<{
 }>;
 
 
-export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, contentCiphertext: string, contentNonce: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, contentCiphertext: string, contentNonce: string, createdAt: any } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, createdAt: any } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DeviceBySigningPublicKeyQueryVariables = Exact<{
   signingPublicKey: Scalars['ID'];
@@ -2260,6 +2232,8 @@ export const CommentsByDocumentIdDocument = gql`
     nodes {
       id
       documentId
+      snapshotId
+      subkeyId
       contentCiphertext
       contentNonce
       createdAt
@@ -2271,6 +2245,8 @@ export const CommentsByDocumentIdDocument = gql`
       }
       commentReplies {
         id
+        snapshotId
+        subkeyId
         contentCiphertext
         contentNonce
         createdAt

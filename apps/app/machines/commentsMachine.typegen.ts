@@ -57,6 +57,7 @@ export interface Typegen0 {
     clearReplyText: "done.invoke.createReply";
     decryptComments: "CommentsByDocumentIdQuery.UPDATE_RESULT";
     highlightComment: "HIGHLIGHT_COMMENT";
+    setActiveSnapshotAndCommentKeys: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS";
     showCreateErrorReplyToast: "error.platform.createReply";
     showCreateErrorToast: "error.platform.createComment";
     showDeleteErrorToast:
@@ -64,6 +65,7 @@ export interface Typegen0 {
       | "error.platform.deleteReply";
     showErrorToast: "CommentsByDocumentIdQuery.ERROR";
     spawnActors:
+      | "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS"
       | "done.invoke.createComment"
       | "done.invoke.createReply"
       | "done.invoke.deleteComment"
@@ -71,8 +73,7 @@ export interface Typegen0 {
       | "error.platform.createComment"
       | "error.platform.createReply"
       | "error.platform.deleteComment"
-      | "error.platform.deleteReply"
-      | "xstate.init";
+      | "error.platform.deleteReply";
     stopActors:
       | "done.invoke.createComment"
       | "done.invoke.createReply"
@@ -99,6 +100,7 @@ export interface Typegen0 {
     | "creatingReply"
     | "deletingComment"
     | "deletingReply"
-    | "idle";
+    | "idle"
+    | "waitingForActiveSnapshot";
   tags: never;
 }
