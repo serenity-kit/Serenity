@@ -19,6 +19,7 @@ export const DeleteCommentsInput = inputObjectType({
   name: "DeleteCommentsInput",
   definition(t) {
     t.nonNull.list.nonNull.string("commentIds");
+    t.string("documentShareLinkToken");
   },
 });
 
@@ -38,6 +39,7 @@ export const deleteCommentsMutation = mutationField("deleteComments", {
     await deleteComments({
       userId: context.user.id,
       commentIds: args.input.commentIds,
+      documentShareLinkToken: args.input.documentShareLinkToken,
     });
     return {
       status: "success",
