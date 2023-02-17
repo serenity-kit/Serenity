@@ -13,4 +13,5 @@ export type EditorProps = {
   openDrawer: () => void;
   updateTitle: (title: string) => void;
   comments: EditorComment[];
+  highlightedCommentId: string | null;
 };

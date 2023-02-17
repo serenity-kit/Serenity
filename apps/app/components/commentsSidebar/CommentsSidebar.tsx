@@ -2,6 +2,7 @@ import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import {
   Button,
   IconButton,
+  Pressable,
   RawInput,
   ScrollView,
   Text,
@@ -27,7 +28,7 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
         {state.context.decryptedComments.map((comment) => {
           if (!comment) return null;
           return (
-            <View
+            <Pressable
               key={comment.id}
               style={[
                 tw`border-b border-gray-200`,
@@ -35,6 +36,9 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
                   ? tw`bg-gray-200`
                   : undefined,
               ]}
+              onPress={() => {
+                send({ type: "HIGHLIGHT_COMMENT", commentId: comment.id });
+              }}
             >
               <Text>{comment.text}</Text>
               <Text variant="xs">
@@ -91,7 +95,7 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
                   send({ type: "DELETE_COMMENT", commentId: comment.id })
                 }
               />
-            </View>
+            </Pressable>
           );
         })}
       </View>

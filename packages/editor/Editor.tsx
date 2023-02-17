@@ -61,6 +61,7 @@ type EditorProps = {
   comments: EditorComment[];
   createComment: (comment: { from: number; to: number; text: string }) => void;
   highlightComment: (commentId: string | null) => void;
+  highlightedCommentId: string | null;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -138,6 +139,7 @@ export const Editor = (props: EditorProps) => {
           comments: props.comments,
           yDoc: props.yDocRef.current,
           highlightComment: props.highlightComment,
+          highlightedCommentId: props.highlightedCommentId,
         }),
         Table.configure({
           HTMLAttributes: {
@@ -206,10 +208,11 @@ export const Editor = (props: EditorProps) => {
   useEffect(() => {
     if (editor) {
       editor.storage.comments.comments = props.comments;
+      editor.storage.comments.highlightedCommentId = props.highlightedCommentId;
       // empty transaction to make sure the comments are updated
       editor.view.dispatch(editor.view.state.tr);
     }
-  }, [props.comments, editor]);
+  }, [props.comments, props.highlightedCommentId, editor]);
 
   return (
     <div className="flex h-full flex-auto flex-row">

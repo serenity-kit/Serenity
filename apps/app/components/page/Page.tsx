@@ -581,6 +581,7 @@ export default function Page({
       isNew={isNew}
       documentLoaded={documentLoadedInfo.loaded}
       username={documentLoadedInfo.username}
+      highlightedCommentId={state.context.highlightedCommentId}
       comments={state.context.decryptedComments.map((comment) => {
         return {
           commentId: comment.id,
