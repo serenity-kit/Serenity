@@ -122,10 +122,11 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
           headerTitleAlign: "center",
           drawerType: "front", // TODO should be front
           unmountOnBlur: true,
-          drawerPosition: "left",
+          drawerPosition: "right",
           drawerStyle: {
             width: 240,
             // right: 0,
+            marginLeft: -240,
           },
           overlayColor: "transparent",
         }}
@@ -271,7 +272,12 @@ function WorkspaceStackNavigator(props) {
         <WorkspaceStack.Screen
           name="WorkspaceDrawer"
           component={WorkspaceDrawerNavigator}
-          options={{ headerShown: false, animation: "none" }}
+          options={{
+            headerShown: false,
+            animation: "none",
+            // necessary for comments sidear to not extend the screen view to the right
+            contentStyle: { overflow: "hidden" },
+          }}
         />
         {isPhoneDimensions(dimensions.width) ? (
           <>
