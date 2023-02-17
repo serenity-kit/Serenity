@@ -12,12 +12,14 @@ export interface CommentsExtensionOptions {
   comments: EditorComment[];
   yDoc: Y.Doc;
   highlightComment: (commentId: string | null) => void;
+  highlightedCommentId: string | null;
 }
 
 type CommentsExtensionStorage = {
   comments: EditorComment[];
   yDoc: Y.Doc;
   highlightComment: (commentId: string | null) => void;
+  highlightedCommentId: string | null;
 };
 
 // inspired by https://stackoverflow.com/a/46700791
@@ -62,13 +64,17 @@ const resolveCommentPositions = (
 
 const createCommentsDecorationSet = (
   comments: (EditorComment & { absoluteFrom: number; absoluteTo: number })[],
+  highlightedCommentId: string | null,
   state: EditorState
 ) => {
   return DecorationSet.create(
     state.doc,
     comments.map((comment) => {
       return Decoration.inline(comment.absoluteFrom, comment.absoluteTo, {
-        style: "background-color: yellow",
+        style:
+          comment.commentId === highlightedCommentId
+            ? "background-color: orange"
+            : "background-color: yellow",
       });
     })
   );
@@ -87,6 +93,7 @@ export const CommentsExtension = Extension.create<
       comments: [],
       yDoc: {} as Y.Doc,
       highlightComment: () => undefined,
+      highlightedCommentId: null,
     };
   },
 
@@ -95,6 +102,7 @@ export const CommentsExtension = Extension.create<
       comments: this.options.comments,
       yDoc: this.options.yDoc,
       highlightComment: this.options.highlightComment,
+      highlightedCommentId: this.options.highlightedCommentId,
     };
   },
 
@@ -110,7 +118,11 @@ export const CommentsExtension = Extension.create<
               state,
               storage.comments.yDoc
             );
-            return createCommentsDecorationSet(resolvedComments, state);
+            return createCommentsDecorationSet(
+              resolvedComments,
+              storage.comments.highlightedCommentId,
+              state
+            );
           },
           apply(tr, oldState, newState) {
             const resolvedComments = resolveCommentPositions(
@@ -137,30 +149,16 @@ export const CommentsExtension = Extension.create<
               }
             }
 
-            return createCommentsDecorationSet(resolvedComments, newState);
+            return createCommentsDecorationSet(
+              resolvedComments,
+              storage.comments.highlightedCommentId,
+              newState
+            );
           },
         },
         props: {
           decorations(state) {
             return this.getState(state);
-          },
-          handleClick(view, _, event) {
-            // commentDecorations.push(
-            //   Decoration.inline(0, 10, {
-            //     text: "hello-world",
-            //     style: "background-color: red",
-            //   })
-            // );
-            // console.log("click", commentDecorations);
-            // if (/lint-icon/.test(event.target.className)) {
-            //   let { from, to } = event.target.problem;
-            //   view.dispatch(
-            //     view.state.tr
-            //       .setSelection(TextSelection.create(view.state.doc, from, to))
-            //       .scrollIntoView()
-            //   );
-            //   return true;
-            // }
           },
         },
       }),

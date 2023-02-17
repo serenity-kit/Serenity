@@ -39,6 +39,7 @@ export default function Editor({
   updateTitle,
   username,
   comments,
+  highlightedCommentId,
 }: EditorProps) {
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
@@ -160,6 +161,7 @@ export default function Editor({
             commentId: commentId === null ? "NONE" : commentId, // there is a bug with setting it to null
           });
         }}
+        highlightedCommentId={highlightedCommentId}
         onBlur={(params) => {
           if (
             !(

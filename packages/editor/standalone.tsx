@@ -114,6 +114,7 @@ ReactDOM.render(
       comments={[]}
       createComment={() => {}}
       highlightComment={() => {}}
+      highlightedCommentId={null}
       encryptAndUploadFile={async () => {
         // TODO: implement
         return Promise.resolve({
