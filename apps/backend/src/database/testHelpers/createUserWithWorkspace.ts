@@ -227,5 +227,6 @@ export default async function createUserWithWorkspace({
     folder: createWorkspaceResult.folder,
     document: createWorkspaceResult.document,
     snapshot: createWorkspaceResult.snapshot,
+    snapshotKey,
   };
 }

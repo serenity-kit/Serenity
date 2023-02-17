@@ -1,7 +1,6 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField, stringArg } from "nexus";
 import { getCommentsByDocumentId } from "../../../database/comment/getCommentsByDocumentId";
-import { formatComment } from "../../../types/comment";
 import { Comment } from "../../types/comment";
 
 export const commentsByDocumentIdQuery = queryField((t) => {
@@ -12,7 +11,6 @@ export const commentsByDocumentIdQuery = queryField((t) => {
     additionalArgs: {
       documentId: nonNull(idArg()),
       documentShareLinkToken: stringArg(),
-      deviceSigningPublicKey: stringArg(),
     },
     async nodes(root, args, context) {
       if (args.first && args.first > 50) {
@@ -34,15 +32,11 @@ export const commentsByDocumentIdQuery = queryField((t) => {
         userId,
         documentId: args.documentId,
         documentShareLinkToken: args.documentShareLinkToken,
-        deviceSigningPublicKey: args.deviceSigningPublicKey,
         cursor,
         skip,
         take,
       });
-      const formattedComments = comments.map((comment) =>
-        formatComment(comment)
-      );
-      return formattedComments;
+      return comments;
     },
   });
 });

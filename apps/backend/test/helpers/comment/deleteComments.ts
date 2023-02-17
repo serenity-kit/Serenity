@@ -3,12 +3,14 @@ import { gql } from "graphql-request";
 type Params = {
   graphql: any;
   commentIds: string[];
+  documentShareLinkToken?: string | null | undefined;
   authorizationHeader: string;
 };
 
 export const deleteComments = async ({
   graphql,
   commentIds,
+  documentShareLinkToken,
   authorizationHeader,
 }: Params) => {
   const authorizationHeaders = {
@@ -26,6 +28,7 @@ export const deleteComments = async ({
     {
       input: {
         commentIds,
+        documentShareLinkToken,
       },
     },
     authorizationHeaders

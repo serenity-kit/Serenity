@@ -1,7 +1,7 @@
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {
-  documentNameKey: string;
+  snapshotKey: string;
 };
 
 // Having a specific "comment_" context allows us to use have the same subkeyId
@@ -12,7 +12,7 @@ export const createCommentKey = (params: Params) => {
   // TODO On the client and on the backend we should check no
   // subkeyId per documentNameKey is a duplicate.
   return kdfDeriveFromKey({
-    key: params.documentNameKey,
+    key: params.snapshotKey,
     context: commentDerivedKeyContext,
   });
 };

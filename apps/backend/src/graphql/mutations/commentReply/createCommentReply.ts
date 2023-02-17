@@ -7,20 +7,16 @@ import {
   objectType,
 } from "nexus";
 import { createCommentReply } from "../../../database/commentreply/createCommentReply";
-import { formatCommentReply } from "../../../types/comment";
 import { CommentReply } from "../../types/commentReply";
-import { KeyDerivationTraceInput2 } from "../../types/keyDerivation";
 
 export const CreateCommentReplyInput = inputObjectType({
   name: "CreateCommentReplyInput",
   definition(t) {
     t.nonNull.string("commentId");
-    t.nonNull.string("documentId");
+    t.nonNull.string("snapshotId");
+    t.nonNull.int("subkeyId");
     t.nonNull.string("contentCiphertext");
     t.nonNull.string("contentNonce");
-    t.nonNull.field("keyDerivationTrace", {
-      type: KeyDerivationTraceInput2,
-    });
   },
 });
 
@@ -50,11 +46,11 @@ export const createCommentReplyMutation = mutationField("createCommentReply", {
       userId: context.user.id,
       creatorDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
       commentId: args.input.commentId,
-      documentId: args.input.documentId,
+      snapshotId: args.input.snapshotId,
+      subkeyId: args.input.subkeyId,
       contentCiphertext: args.input.contentCiphertext,
       contentNonce: args.input.contentNonce,
-      keyDerivationTrace: args.input.keyDerivationTrace,
     });
-    return { commentReply: formatCommentReply(commentReply) };
+    return { commentReply };
   },
 });

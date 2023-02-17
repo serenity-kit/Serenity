@@ -15,20 +15,15 @@ import {
   removePending,
   removeSnapshotInProgress,
   removeUpdateFromInProgressQueue,
-  Snapshot,
   useWebsocketState,
   verifyAndDecryptAwarenessUpdate,
   verifyAndDecryptSnapshot,
   verifyAndDecryptUpdate,
 } from "@naisho/core";
-import {
-  createSnapshotKey,
-  recreateSnapshotKey,
-  sleep,
-} from "@serenity-tools/common";
+import { createSnapshotKey, LocalDevice, sleep } from "@serenity-tools/common";
 import { useActor } from "@xstate/react";
 import { useEffect, useRef, useState } from "react";
-import sodium, { KeyPair } from "react-native-libsodium";
+import sodium, { KeyPair, to_base64 } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import {
   applyAwarenessUpdate,
@@ -48,6 +43,7 @@ import {
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { PageCommentsDrawerScreenProps } from "../../types/navigationProps";
 import { getSessionKey } from "../../utils/authentication/sessionKeyStore";
+import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
@@ -73,7 +69,7 @@ export default function Page({
   signatureKeyPair,
   workspaceId,
 }: Props) {
-  const { pageId: docId } = usePage();
+  const { pageId: docId, setActiveSnapshotAndCommentKeys } = usePage();
   const isNew = route.params?.isNew ?? false;
   const { activeDevice } = useAuthenticatedAppContext();
   const activeSnapshotIdRef = useRef<string | null>(null);
@@ -94,27 +90,6 @@ export default function Page({
     (state) => state.update
   );
 
-  const deriveExistingSnapshotKey = async (snapshot: Snapshot) => {
-    // derive existing key if snapshot exists
-    const document = await getDocument({ documentId: docId });
-    const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
-    const folderKeyChainData = await deriveFolderKey({
-      folderId: document.parentFolderId!,
-      workspaceId: document.workspaceId!,
-      keyDerivationTrace: snapshotKeyDerivationTrace,
-      activeDevice,
-    });
-    // the last subkey key here is treated like a folder key
-    // but since we want to derive a snapshot key, we can just toss
-    // the last one out and use the rest
-    const lastChainItem = folderKeyChainData[folderKeyChainData.length - 2];
-    const snapshotKeyData = recreateSnapshotKey({
-      folderKey: lastChainItem.key,
-      subkeyId: snapshotKeyDerivationTrace.subkeyId,
-    });
-    return snapshotKeyData;
-  };
-
   const applySnapshot = (snapshot, key) => {
     try {
       activeSnapshotIdRef.current = snapshot.publicData.snapshotId;
@@ -126,6 +101,15 @@ export default function Page({
       if (initialResult) {
         Yjs.applyUpdate(yDocRef.current, initialResult, "naisho-remote");
       }
+      snapshot.publicData.snapshotId;
+
+      setActiveSnapshotAndCommentKeys(
+        {
+          id: snapshot.publicData.snapshotId,
+          key: to_base64(key),
+        },
+        {} // TODO extract and pass on comment keys from snapshot
+      );
     } catch (err) {
       // TODO
       console.log("Apply snapshot failed. TODO handle error");
@@ -301,7 +285,9 @@ export default function Page({
           case "document":
             if (data.snapshot) {
               const snapshotKeyData1 = await deriveExistingSnapshotKey(
-                data.snapshot
+                docId,
+                data.snapshot,
+                activeDevice as LocalDevice
               );
               snapshotKeyRef.current = sodium.from_base64(snapshotKeyData1.key);
               applySnapshot(data.snapshot, snapshotKeyRef.current);
@@ -328,18 +314,14 @@ export default function Page({
           case "snapshot":
             console.log("apply snapshot");
             const snapshotKeyData2 = await deriveExistingSnapshotKey(
-              data.snapshot
+              docId,
+              data.snapshot,
+              activeDevice as LocalDevice
             );
             snapshotKeyRef.current = sodium.from_base64(snapshotKeyData2.key);
-            const snapshotResult = verifyAndDecryptSnapshot(
-              data,
-              snapshotKeyRef.current,
-              sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-            );
-            activeSnapshotIdRef.current = data.publicData.snapshotId;
+            applySnapshot(data.snapshot, snapshotKeyRef.current);
             // @ts-expect-error TODO handle later
             latestServerVersionRef.current = undefined;
-            Yjs.applyUpdate(yDocRef.current, snapshotResult, "naisho-remote");
             break;
           case "snapshotSaved":
             console.log("snapshot saving confirmed");
@@ -364,7 +346,9 @@ export default function Page({
             console.log("snapshot saving failed", data);
             if (data.snapshot) {
               const snapshotKeyData3 = await deriveExistingSnapshotKey(
-                data.snapshot
+                docId,
+                data.snapshot,
+                activeDevice as LocalDevice
               );
               snapshotKeyRef.current = sodium.from_base64(snapshotKeyData3.key);
               applySnapshot(data.snapshot, snapshotKeyRef.current);

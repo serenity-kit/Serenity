@@ -48,6 +48,8 @@ model Snapshot {
   clocks                 Json
   snapshotKeyBoxes       SnapshotKeyBox[] // used for document share link
   subkeyId               Int
+  comments               Comment[]
+  commentReplies         CommentReply[]
 }
 
 model Update {
@@ -216,8 +218,6 @@ model WorkspaceKey {
   generation        Int               @default(0)
   folders           Folder[]
   documents         Document[]
-  comments          Comment[]
-  commentReplies    CommentReply[]
 }
 
 model WorkspaceKeyBox {
@@ -291,12 +291,12 @@ model Comment {
   createdAt                     DateTime       @default(now())
   contentCiphertext             String
   contentNonce                  String
-  keyDerivationTrace            Json           @default("{}")
   creatorDevice                 CreatorDevice  @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
   creatorDeviceSigningPublicKey String
   commentReplies                CommentReply[]
-  workspaceKey                  WorkspaceKey?  @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
-  workspaceKeyId                String?
+  snapshot                      Snapshot       @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  snapshotId                    String
+  subkeyId                      Int
 }
 
 model CommentReply {
@@ -308,9 +308,9 @@ model CommentReply {
   createdAt                     DateTime      @default(now())
   contentCiphertext             String
   contentNonce                  String
-  keyDerivationTrace            Json          @default("{}")
   creatorDevice                 CreatorDevice @relation(fields: [creatorDeviceSigningPublicKey], references: [signingPublicKey], onDelete: SetDefault)
   creatorDeviceSigningPublicKey String
-  workspaceKey                  WorkspaceKey? @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
-  workspaceKeyId                String?
+  snapshot                      Snapshot      @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  snapshotId                    String
+  subkeyId                      Int
 }

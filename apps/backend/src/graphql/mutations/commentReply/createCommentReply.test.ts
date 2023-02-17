@@ -13,6 +13,8 @@ let userData1: any = undefined;
 let comment: any = undefined;
 let sessionKey = "";
 let documentId1 = "";
+let snapshotId1 = "";
+let snapshotKey1 = "";
 const password = "password";
 
 const setup = async () => {
@@ -23,10 +25,13 @@ const setup = async () => {
   });
   documentId1 = userData1.document.id;
   sessionKey = userData1.sessionKey;
+  snapshotId1 = userData1.snapshot.id;
+  snapshotKey1 = userData1.snapshotKey.key;
 
   const createCommentResult = await createComment({
     graphql,
-    documentId: documentId1,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "nice job",
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
@@ -45,7 +50,8 @@ test("commenter responds to comment", async () => {
   const createCommentReplyResult = await createCommentReply({
     graphql,
     commentId: comment.id,
-    documentId: userData1.document.id,
+    snapshotId: snapshotId1,
+    snapshotKey: snapshotKey1,
     comment: "thanks",
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
@@ -58,13 +64,6 @@ test("commenter responds to comment", async () => {
   expect(commentReply.documentId).toBe(documentId1);
   expect(typeof commentReply.contentCiphertext).toBe("string");
   expect(typeof commentReply.contentNonce).toBe("string");
-  expect(commentReply.workspaceKey.workspaceId).toBe(userData1.workspace.id);
-  expect(commentReply.workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
-    userData1.webDevice.signingPublicKey
-  );
-  expect(
-    commentReply.workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey
-  ).toBe(userData1.mainDevice.signingPublicKey);
   expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -86,7 +85,8 @@ test("admin replies to comment", async () => {
   const createCommentReplyResult = await createCommentReply({
     graphql,
     commentId: comment.id,
-    documentId: userData1.document.id,
+    snapshotId: snapshotId1,
+    snapshotKey: snapshotKey1,
     comment: "thanks",
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
@@ -100,13 +100,6 @@ test("admin replies to comment", async () => {
   expect(typeof commentReply.contentCiphertext).toBe("string");
   expect(typeof commentReply.contentNonce).toBe("string");
   expect(typeof commentReply.createdAt).toBe("string");
-  expect(commentReply.workspaceKey.workspaceId).toBe(userData1.workspace.id);
-  expect(commentReply.workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
-    userData1.webDevice.signingPublicKey
-  );
-  expect(
-    commentReply.workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey
-  ).toBe(userData1.mainDevice.signingPublicKey);
   expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -128,7 +121,8 @@ test("editor replies to comment", async () => {
   const createCommentReplyResult = await createCommentReply({
     graphql,
     commentId: comment.id,
-    documentId: userData1.document.id,
+    snapshotId: snapshotId1,
+    snapshotKey: snapshotKey1,
     comment: "thanks",
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
@@ -142,13 +136,6 @@ test("editor replies to comment", async () => {
   expect(typeof commentReply.contentCiphertext).toBe("string");
   expect(typeof commentReply.contentNonce).toBe("string");
   expect(typeof commentReply.createdAt).toBe("string");
-  expect(commentReply.workspaceKey.workspaceId).toBe(userData1.workspace.id);
-  expect(commentReply.workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
-    userData1.webDevice.signingPublicKey
-  );
-  expect(
-    commentReply.workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey
-  ).toBe(userData1.mainDevice.signingPublicKey);
   expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -170,7 +157,8 @@ test("commenter replies to comment", async () => {
   const createCommentReplyResult = await createCommentReply({
     graphql,
     commentId: comment.id,
-    documentId: userData1.document.id,
+    snapshotId: snapshotId1,
+    snapshotKey: snapshotKey1,
     comment: "thanks",
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
@@ -184,13 +172,6 @@ test("commenter replies to comment", async () => {
   expect(typeof commentReply.contentCiphertext).toBe("string");
   expect(typeof commentReply.contentNonce).toBe("string");
   expect(typeof commentReply.createdAt).toBe("string");
-  expect(commentReply.workspaceKey.workspaceId).toBe(userData1.workspace.id);
-  expect(commentReply.workspaceKey.workspaceKeyBox.deviceSigningPublicKey).toBe(
-    userData1.webDevice.signingPublicKey
-  );
-  expect(
-    commentReply.workspaceKey.workspaceKeyBox.creatorDeviceSigningPublicKey
-  ).toBe(userData1.mainDevice.signingPublicKey);
   expect(commentReply.creatorDevice.signingPublicKey).toBe(
     userData1.webDevice.signingPublicKey
   );
@@ -214,7 +195,8 @@ test("viewer tries to comment", async () => {
       await createCommentReply({
         graphql,
         commentId: comment.id,
-        documentId: userData1.document.id,
+        snapshotId: snapshotId1,
+        snapshotKey: snapshotKey1,
         comment: "thanks",
         creatorDevice: userData1.webDevice,
         creatorDeviceEncryptionPrivateKey:
@@ -236,7 +218,8 @@ test("unauthorized document", async () => {
       await createCommentReply({
         graphql,
         commentId: comment.id,
-        documentId: userData1.document.id,
+        snapshotId: snapshotId1,
+        snapshotKey: snapshotKey1,
         comment: "thanks",
         creatorDevice: otherUser.device,
         creatorDeviceEncryptionPrivateKey: otherUser.deviceEncryptionPrivateKey,
@@ -247,13 +230,14 @@ test("unauthorized document", async () => {
 });
 
 test("invalid document", async () => {
-  const badDocumentId = uuidv4();
+  const badSnapshotId = uuidv4();
   await expect(
     (async () =>
       await createCommentReply({
         graphql,
         commentId: comment.id,
-        documentId: badDocumentId,
+        snapshotId: badSnapshotId,
+        snapshotKey: snapshotKey1,
         comment: "nice job",
         creatorDevice: userData1.webDevice,
         creatorDeviceEncryptionPrivateKey:
@@ -270,7 +254,8 @@ test("Unauthenticated", async () => {
       await createCommentReply({
         graphql,
         commentId: comment.id,
-        documentId: documentId1,
+        snapshotId: snapshotId1,
+        snapshotKey: snapshotKey1,
         comment: "nice job",
         creatorDevice: userData1.webDevice,
         creatorDeviceEncryptionPrivateKey:
@@ -292,37 +277,11 @@ describe("Input errors", () => {
           id
           commentId
           documentId
+          snapshotId
+          subkeyId
           contentCiphertext
           contentNonce
           createdAt
-          workspaceKey {
-            id
-            workspaceId
-            generation
-            workspaceKeyBox {
-              id
-              workspaceKeyId
-              deviceSigningPublicKey
-              creatorDeviceSigningPublicKey
-              nonce
-              ciphertext
-              creatorDevice {
-                signingPublicKey
-                encryptionPublicKey
-                encryptionPublicKeySignature
-                createdAt
-              }
-            }
-          }
-          keyDerivationTrace {
-            workspaceKeyId
-            trace {
-              entryId
-              subkeyId
-              context
-              parentId
-            }
-          }
           creatorDevice {
             signingPublicKey
             encryptionPublicKey
@@ -341,21 +300,17 @@ describe("Input errors", () => {
           {
             input: {
               commentId: null,
-              documentId: "",
+              snapshotId: snapshotId1,
+              subkeyId: 42,
               contentCiphertext: "",
               contentNonce: "",
-              keyDerivationTrace: {
-                workspaceKeyId: 1,
-                subkeyId: 1,
-                parentFolders: [],
-              },
             },
           },
           authorizationHeaders
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
-  test("Invalid documentId", async () => {
+  test("Invalid snapshotId", async () => {
     await expect(
       (async () =>
         await graphql.client.request(
@@ -363,20 +318,35 @@ describe("Input errors", () => {
           {
             input: {
               commentId: uuidv4(),
-              documentId: null,
+              snapshotId: null,
+              subkeyId: 42,
               contentCiphertext: "",
               contentNonce: "",
-              keyDerivationTrace: {
-                workspaceKeyId: 1,
-                subkeyId: 1,
-                parentFolders: [],
-              },
             },
           },
           authorizationHeaders
         ))()
     ).rejects.toThrowError(/BAD_USER_INPUT/);
   });
+  test("Invalid subkeyId", async () => {
+    await expect(
+      (async () =>
+        await graphql.client.request(
+          query,
+          {
+            input: {
+              commentId: uuidv4(),
+              snapshotId: snapshotId1,
+              subkeyId: null,
+              contentCiphertext: "",
+              contentNonce: "",
+            },
+          },
+          authorizationHeaders
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
+
   test("Invalid contentCiphertext", async () => {
     await expect(
       (async () =>
@@ -385,14 +355,10 @@ describe("Input errors", () => {
           {
             input: {
               commentId: uuidv4(),
-              documentId: uuidv4(),
+              snapshotId: snapshotId1,
+              subkeyId: 42,
               contentCiphertext: null,
               contentNonce: "",
-              keyDerivationTrace: {
-                workspaceKeyId: 1,
-                subkeyId: 1,
-                parentFolders: [],
-              },
             },
           },
           authorizationHeaders
@@ -407,14 +373,10 @@ describe("Input errors", () => {
           {
             input: {
               commentId: uuidv4(),
-              documentId: uuidv4(),
+              snapshotId: snapshotId1,
+              subkeyId: 42,
               contentCiphertext: "",
               contentNonce: null,
-              keyDerivationTrace: {
-                workspaceKeyId: 1,
-                subkeyId: 1,
-                parentFolders: [],
-              },
             },
           },
           authorizationHeaders
@@ -429,10 +391,10 @@ describe("Input errors", () => {
           {
             input: {
               commentId: uuidv4(),
-              documentId: uuidv4(),
+              snapshotId: snapshotId1,
+              subkeyId: 42,
               contentCiphertext: "",
               contentNonce: null,
-              keyDerivationTrace: null,
             },
           },
           authorizationHeaders

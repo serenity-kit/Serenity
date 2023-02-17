@@ -1,4 +1,3 @@
-import { KeyDerivationTrace2 } from "@naisho/core";
 import { ForbiddenError } from "apollo-server-express";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../prisma/generated/output";
@@ -9,24 +8,24 @@ type Params = {
   userId: string;
   creatorDeviceSigningPublicKey: string;
   commentId: string;
-  documentId: string;
+  snapshotId: string;
+  subkeyId: number;
   contentCiphertext: string;
   contentNonce: string;
-  keyDerivationTrace: KeyDerivationTrace2;
 };
 
 export async function createCommentReply({
   userId,
   creatorDeviceSigningPublicKey,
   commentId,
-  documentId,
+  snapshotId,
+  subkeyId,
   contentCiphertext,
   contentNonce,
-  keyDerivationTrace,
 }: Params) {
   // verify the document exists
   const document = await prisma.document.findFirst({
-    where: { id: documentId },
+    where: { activeSnapshotId: snapshotId },
   });
   if (!document) {
     throw new ForbiddenError("Unauthorized");
@@ -55,31 +54,17 @@ export async function createCommentReply({
       data: {
         id: uuidv4(),
         commentId,
-        documentId,
+        documentId: document.id,
+        snapshotId,
+        subkeyId,
         creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
         contentCiphertext,
         contentNonce,
-        keyDerivationTrace,
-      },
-    });
-    const workspaceKey = await prisma.workspaceKey.findFirst({
-      where: {
-        workspaceId: document.workspaceId,
-      },
-      orderBy: { generation: "desc" },
-      include: {
-        workspaceKeyBoxes: {
-          include: { creatorDevice: true },
-          where: {
-            deviceSigningPublicKey: creatorDevice.signingPublicKey,
-          },
-        },
       },
     });
     return {
       ...commentReply,
       creatorDevice,
-      workspaceKey,
     };
   } catch (e) {
     console.log(e);

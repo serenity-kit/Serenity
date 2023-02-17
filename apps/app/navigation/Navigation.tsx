@@ -14,7 +14,7 @@ import {
   useIsDesktopDevice,
   useIsPermanentLeftSidebar,
 } from "@serenity-tools/ui";
-import { useInterpret } from "@xstate/react";
+import { useActor, useInterpret } from "@xstate/react";
 import * as Linking from "expo-linking";
 import { useEffect } from "react";
 import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
@@ -93,12 +93,20 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
       },
     },
   });
+  const [, send] = useActor(commentsService);
 
   return (
     <PageProvider
       value={{
         pageId: props.route.params.pageId,
         commentsService,
+        setActiveSnapshotAndCommentKeys: (activeSnapshot, commentKeys) => {
+          send({
+            type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS",
+            activeSnapshot,
+            commentKeys,
+          });
+        },
       }}
     >
       <PageCommentsDrawer.Navigator
