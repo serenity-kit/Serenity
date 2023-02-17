@@ -6,7 +6,7 @@
   "description": "End-to-end encrypted workspaces for teams",
   "main": "src/index.ts",
   "scripts": {
-    "build": "cd ../app && yarn build:electron-web && cd -",
+    "build": "cd ../app && yarn build:electron-web better-sqlite3 && cd -",
     "dev": "yarn && NODE_ENV=\"development\" electron-forge start",
     "package": "DEBUG=electron-osx-sign* electron-forge package",
     "make": "electron-forge make",
@@ -16,6 +16,7 @@
     "ts:check": "yarn tsc --noEmit"
   },
   "dependencies": {
+    "better-sqlite3": "^8.1.0",
     "electron-squirrel-startup": "^1.0.0",
     "sqlite3": "^5.1.4"
   },
@@ -25,6 +26,7 @@
     "@electron-forge/maker-rpm": "^6.0.4",
     "@electron-forge/maker-squirrel": "^6.0.4",
     "@electron-forge/maker-zip": "^6.0.4",
+    "@types/better-sqlite3": "^7.6.3",
     "electron": "^22.0.0"
   }
 }

@@ -2,25 +2,22 @@ const electron = require("electron");
 const path = require("path");
 const fs = require("fs");
 const { promisify } = require("util");
-const sqlite3Import = require("sqlite3");
+const sqlite3 = require("better-sqlite3");
 
 const sqliteDbPath = path.join(electron.app.getPath("userData"), "serenity.db");
 console.log("Serenity sqlite DbPath:", sqliteDbPath);
 const isDevelopment = process.env.NODE_ENV === "development";
 
-const sqlite3 = isDevelopment ? sqlite3Import.verbose() : sqlite3Import;
-const db = new sqlite3.Database(sqliteDbPath);
+// const sqlite3 = isDevelopment ? sqlite3Import.verbose() : sqlite3Import;
+const db = sqlite3(sqliteDbPath);
+db.pragma("journal_mode = WAL");
 
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS "Document" (
-    "id" TEXT NOT NULL PRIMARY KEY,
-    "content" BLOB
-  );`);
-});
-
-const asyncDb = {
-  get: promisify(db.get.bind(db)),
-};
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS "Document" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "content" BLOB
+);`
+).run();
 
 // see https://cs.chromium.org/chromium/src/net/base/net_error_list.h
 const FILE_NOT_FOUND = -6;
@@ -111,15 +108,15 @@ const createWindow = async () => {
 // Some APIs can only be used after this event occurs
 app.on("ready", () => {
   ipcMain.handle("sqlite:setDocument", (event, document) => {
-    db.run(`REPLACE INTO "Document" VALUES (?, ?)`, [
+    db.prepare(`REPLACE INTO "Document" VALUES (?, ?)`).run(
       document.id,
-      document.content,
-    ]);
+      document.content
+    );
     return true;
   });
 
   ipcMain.handle("sqlite:getDocument", (event, documentId) => {
-    return asyncDb.get(`SELECT * FROM "Document" WHERE id = ?`, documentId);
+    return db.prepare(`SELECT * FROM "Document" WHERE id = ?`).run(documentId);
   });
 
   createWindow();
