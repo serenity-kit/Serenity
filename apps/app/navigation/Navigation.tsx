@@ -94,6 +94,7 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
     },
   });
   const [, send] = useActor(commentsService);
+  const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
 
   return (
     <PageProvider
@@ -125,8 +126,7 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
           drawerPosition: "right",
           drawerStyle: {
             width: 240,
-            // right: 0,
-            marginLeft: -240,
+            marginLeft: isPermanentLeftSidebar ? -240 : undefined,
           },
           overlayColor: "transparent",
         }}
