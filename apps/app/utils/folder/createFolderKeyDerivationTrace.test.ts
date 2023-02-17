@@ -1,12 +1,12 @@
 jest.mock("../../generated/graphql", () => ({ __esModule: true }));
-jest.mock("./getFolder", () => ({
+jest.mock("./getFolderTrace", () => ({
   __esModule: true,
-  getFolder: jest.fn(),
+  getFolderTrace: jest.fn(),
 }));
 
 import { folderDerivedKeyContext } from "@serenity-tools/common";
 import { createFolderKeyDerivationTrace } from "./createFolderKeyDerivationTrace";
-import { getFolder } from "./getFolder";
+import { getFolderTrace } from "./getFolderTrace";
 
 it("should return empty parentFolders", async () => {
   const result = await createFolderKeyDerivationTrace({
@@ -23,20 +23,22 @@ it("should return empty parentFolders", async () => {
 
 it("should return one parent folder", async () => {
   // @ts-ignore getFolder is mocked
-  getFolder.mockReturnValueOnce({
-    __typename: "Folder",
-    id: "folderId",
-    encryptedName: "encrypted folder name",
-    encryptedNameNonce: "encrypted folder nonce",
-    workspaceKeyId: "workspaceKeyId",
-    subkeyId: 1,
-    parentFolderId: null,
-    workspaceId: "workspaceId",
-    keyDerivationTrace: {
+  getFolderTrace.mockReturnValueOnce([
+    {
+      __typename: "Folder",
+      id: "folderId",
+      encryptedName: "encrypted folder name",
+      encryptedNameNonce: "encrypted folder nonce",
       workspaceKeyId: "workspaceKeyId",
-      parentFolders: [],
+      subkeyId: 1,
+      parentFolderId: null,
+      workspaceId: "workspaceId",
+      keyDerivationTrace: {
+        workspaceKeyId: "workspaceKeyId",
+        parentFolders: [],
+      },
     },
-  });
+  ]);
 
   const result = await createFolderKeyDerivationTrace({
     folderId: "folderId",
@@ -48,7 +50,7 @@ it("should return one parent folder", async () => {
         {
           "context": "${folderDerivedKeyContext}",
           "entryId": "folderId",
-          "parentId": undefined,
+          "parentId": null,
           "subkeyId": undefined,
         },
       ],
@@ -59,41 +61,36 @@ it("should return one parent folder", async () => {
 
 it("should return two parent folders", async () => {
   // @ts-ignore getFolder is mocked
-  getFolder.mockImplementation((props) => {
-    if (props.id === "childFolderId") {
-      return {
-        __typename: "Folder",
-        id: "childFolderId",
-        encryptedName: "child folder name",
-        encryptedNameNonce: "child folder nonce",
+  getFolderTrace.mockImplementation((props) => [
+    {
+      __typename: "Folder",
+      id: "parentFolderId",
+      encryptedName: "parent folder name",
+      encryptedNameNonce: "parent folder nonce",
+      workspaceKeyId: "workspaceKeyId",
+      subkeyId: 2,
+      parentFolderId: null,
+      workspaceId: "workspaceId",
+      keyDerivationTrace: {
         workspaceKeyId: "workspaceKeyId",
-        subkeyId: 1,
-        parentFolderId: "parentFolderId",
-        workspaceId: "workspaceId",
-        keyDerivationTrace: {
-          workspaceKeyId: "workspaceKeyId",
-          parentFolders: [],
-        },
-      };
-    }
-
-    if (props.id === "parentFolderId") {
-      return {
-        __typename: "Folder",
-        id: "parentFolderId",
-        encryptedName: "parent folder name",
-        encryptedNameNonce: "parent folder nonce",
+        parentFolders: [],
+      },
+    },
+    {
+      __typename: "Folder",
+      id: "childFolderId",
+      encryptedName: "child folder name",
+      encryptedNameNonce: "child folder nonce",
+      workspaceKeyId: "workspaceKeyId",
+      subkeyId: 1,
+      parentFolderId: "parentFolderId",
+      workspaceId: "workspaceId",
+      keyDerivationTrace: {
         workspaceKeyId: "workspaceKeyId",
-        subkeyId: 2,
-        parentFolderId: null,
-        workspaceId: "workspaceId",
-        keyDerivationTrace: {
-          workspaceKeyId: "workspaceKeyId",
-          parentFolders: [],
-        },
-      };
-    }
-  });
+        parentFolders: [],
+      },
+    },
+  ]);
 
   const result = await createFolderKeyDerivationTrace({
     folderId: "childFolderId",
@@ -105,7 +102,7 @@ it("should return two parent folders", async () => {
         {
           "context": "${folderDerivedKeyContext}",
           "entryId": "parentFolderId",
-          "parentId": undefined,
+          "parentId": null,
           "subkeyId": undefined,
         },
         {
