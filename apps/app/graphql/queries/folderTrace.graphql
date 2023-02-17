@@ -1,0 +1,19 @@
+query folderTrace($folderId: ID!) {
+  folderTrace(folderId: $folderId) {
+    id
+    parentFolderId
+    rootFolderId
+    workspaceId
+    encryptedName
+    encryptedNameNonce
+    keyDerivationTrace {
+      workspaceKeyId
+      subkeyId
+      parentFolders {
+        folderId
+        subkeyId
+        parentFolderId
+      }
+    }
+  }
+}

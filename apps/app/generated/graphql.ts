@@ -239,6 +239,7 @@ export type DeleteCommentRepliesResult = {
 
 export type DeleteCommentsInput = {
   commentIds: Array<Scalars['String']>;
+  documentShareLinkToken?: InputMaybe<Scalars['String']>;
 };
 
 export type DeleteCommentsResult = {
@@ -1610,6 +1611,13 @@ export type FolderQueryVariables = Exact<{
 
 export type FolderQuery = { __typename?: 'Query', folder?: { __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, parentFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } } | null };
 
+export type FolderTraceQueryVariables = Exact<{
+  folderId: Scalars['ID'];
+}>;
+
+
+export type FolderTraceQuery = { __typename?: 'Query', folderTrace: Array<{ __typename?: 'Folder', id: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, encryptedName: string, encryptedNameNonce: string, keyDerivationTrace: { __typename?: 'KeyDerivationTrace', workspaceKeyId: string, subkeyId: number, parentFolders: Array<{ __typename?: 'KeyDerivationTraceParentFolder', folderId: string, subkeyId: number, parentFolderId?: string | null }> } }> };
+
 export type FoldersQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
   first: Scalars['Int'];
@@ -2481,6 +2489,31 @@ export const FolderDocument = gql`
 
 export function useFolderQuery(options: Omit<Urql.UseQueryArgs<FolderQueryVariables>, 'query'>) {
   return Urql.useQuery<FolderQuery, FolderQueryVariables>({ query: FolderDocument, ...options });
+};
+export const FolderTraceDocument = gql`
+    query folderTrace($folderId: ID!) {
+  folderTrace(folderId: $folderId) {
+    id
+    parentFolderId
+    rootFolderId
+    workspaceId
+    encryptedName
+    encryptedNameNonce
+    keyDerivationTrace {
+      workspaceKeyId
+      subkeyId
+      parentFolders {
+        folderId
+        subkeyId
+        parentFolderId
+      }
+    }
+  }
+}
+    `;
+
+export function useFolderTraceQuery(options: Omit<Urql.UseQueryArgs<FolderTraceQueryVariables>, 'query'>) {
+  return Urql.useQuery<FolderTraceQuery, FolderTraceQueryVariables>({ query: FolderTraceDocument, ...options });
 };
 export const FoldersDocument = gql`
     query folders($parentFolderId: ID!, $first: Int!, $after: String) {
@@ -4380,6 +4413,109 @@ export const folderQueryService =
         // perform cleanup
         clearInterval(intervalId);
         folderQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runFolderTraceQuery = async (variables: FolderTraceQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<FolderTraceQuery, FolderTraceQueryVariables>(
+      FolderTraceDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type FolderTraceQueryResult = Urql.OperationResult<FolderTraceQuery, FolderTraceQueryVariables>;
+
+export type FolderTraceQueryUpdateResultEvent = {
+  type: "FolderTraceQuery.UPDATE_RESULT";
+  result: FolderTraceQueryResult;
+};
+
+export type FolderTraceQueryErrorEvent = {
+  type: "FolderTraceQuery.ERROR";
+  result: FolderTraceQueryResult;
+};
+
+export type FolderTraceQueryServiceEvent = FolderTraceQueryUpdateResultEvent | FolderTraceQueryErrorEvent;
+
+type FolderTraceQueryServiceSubscribersEntry = {
+  variables: FolderTraceQueryVariables;
+  callbacks: ((event: FolderTraceQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type FolderTraceQueryServiceSubscribers = {
+  [variables: string]: FolderTraceQueryServiceSubscribersEntry;
+};
+
+const folderTraceQueryServiceSubscribers: FolderTraceQueryServiceSubscribers = {};
+
+const triggerFolderTraceQuery = (variablesString: string, variables: FolderTraceQueryVariables) => {
+  getUrqlClient()
+    .query<FolderTraceQuery, FolderTraceQueryVariables>(FolderTraceDocument, variables)
+    .toPromise()
+    .then((result) => {
+      folderTraceQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "FolderTraceQuery.ERROR" : "FolderTraceQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const folderTraceQueryService =
+  (variables: FolderTraceQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (folderTraceQueryServiceSubscribers[variablesString]) {
+      folderTraceQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      folderTraceQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerFolderTraceQuery(variablesString, variables);
+    if (!folderTraceQueryServiceSubscribers[variablesString].intervalId) {
+      folderTraceQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerFolderTraceQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = folderTraceQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        folderTraceQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        folderTraceQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };
