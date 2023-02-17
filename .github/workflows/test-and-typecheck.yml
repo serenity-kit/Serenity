@@ -92,3 +92,8 @@ jobs:
         shell: bash
       - name: Run e2e tests
         run: yarn workspace backend test:e2e
+      - uses: actions/upload-artifact@v2
+        if: ${{ failure() || success() }}
+        with:
+          name: Recordings
+          path: videos/
