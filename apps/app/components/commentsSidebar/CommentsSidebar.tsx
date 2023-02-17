@@ -35,8 +35,11 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
                   ? tw`bg-gray-200`
                   : undefined,
               ]}
+              testID={`comment-${comment.id}`}
             >
-              <Text>{comment.text}</Text>
+              <Text testID={`comment-${comment.id}__text-content`}>
+                {comment.text}
+              </Text>
               <Text variant="xs">
                 {formatDistanceToNow(parseJSON(comment.createdAt), {
                   addSuffix: true,
@@ -46,9 +49,16 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
                 {comment.replies.map((reply) => {
                   if (!reply) return null;
                   return (
-                    <View key={reply.id}>
+                    <View
+                      key={reply.id}
+                      testID={`comment-${comment.id}__comment-reply-${reply.id}`}
+                    >
                       <View>
-                        <Text>{reply.text}</Text>
+                        <Text
+                          testID={`comment-${comment.id}__comment-reply-${reply.id}--text-content`}
+                        >
+                          {reply.text}
+                        </Text>
                         <Text variant="xs">
                           {formatDistanceToNow(parseJSON(reply.createdAt), {
                             addSuffix: true,
@@ -60,6 +70,7 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
                         onPress={() =>
                           send({ type: "DELETE_REPLY", replyId: reply.id })
                         }
+                        testID={`comment-${comment.id}__comment-reply-${reply.id}--delete-reply-button`}
                       />
                     </View>
                   );
@@ -75,12 +86,14 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
                     text,
                   })
                 }
+                testID={`comment-${comment.id}__reply-input`}
               />
               <Button
                 size="sm"
                 onPress={() =>
                   send({ type: "CREATE_REPLY", commentId: comment.id })
                 }
+                testID={`comment-${comment.id}__save-reply-button`}
               >
                 Add Reply
               </Button>
@@ -90,6 +103,7 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
                 onPress={() =>
                   send({ type: "DELETE_COMMENT", commentId: comment.id })
                 }
+                testID={`comment-${comment.id}__delete-button`}
               />
             </View>
           );

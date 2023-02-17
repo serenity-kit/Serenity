@@ -321,6 +321,7 @@ export const Editor = (props: EditorProps) => {
                 }}
                 name="cup-line"
                 isActive={true}
+                testID="bubble-menu__initiate-comment-button"
               />
             </HStack>
 
@@ -330,6 +331,7 @@ export const Editor = (props: EditorProps) => {
                   multiline
                   value={commentText}
                   onChangeText={(text) => setCommentText(text)}
+                  testID="bubble-menu__create-comment-input"
                 />
                 <Button
                   size="sm"
@@ -351,6 +353,7 @@ export const Editor = (props: EditorProps) => {
                       ),
                     });
                   }}
+                  testID="bubble-menu__save-comment-button"
                 >
                   Create Comment
                 </Button>

@@ -1,10 +1,12 @@
-import { test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
+import { prisma } from "../../../src/database/prisma";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { createCommentOnHtmlNode } from "../../helpers/e2e/comment/createCommentOnHtmlNode";
+import { deleteComment } from "../../helpers/e2e/comment/deleteComment";
 import { openCommentsDrawer } from "../../helpers/e2e/comment/openCommentsDrawer";
 import { createCommentReply } from "../../helpers/e2e/commentReply/createCommentReply";
 import { login } from "../../helpers/e2e/login";
@@ -57,7 +59,7 @@ test.describe("create a comment", () => {
   });
 });
 
-test.describe("create comment replies", () => {
+test.describe("comment replies, delete comment", () => {
   test("Add content", async ({ page }) => {
     const commentText1 = "Change title";
     const commentText2 = "More lists";
@@ -90,10 +92,12 @@ test.describe("create comment replies", () => {
       throw new Error("Comment 1 was not created");
     }
     await openCommentsDrawer({ page });
+    const commentReply1Text = "Reply to comment 1";
+    const commentReply2Text = "2nd reply to comment 1";
     const commentReply1 = await createCommentReply({
       page,
       commentId: comment1.id,
-      replyText: "Reply to comment 1",
+      replyText: commentReply1Text,
     });
     if (!commentReply1) {
       throw new Error("Comment reply was not created");
@@ -101,13 +105,40 @@ test.describe("create comment replies", () => {
     const commentReply2 = await createCommentReply({
       page,
       commentId: comment1.id,
-      replyText: "Reply to comment 1",
+      replyText: commentReply2Text,
     });
     if (!commentReply2) {
       throw new Error("Comment reply was not created");
     }
     await delayForSeconds(1);
     await reloadPage({ page });
-    await delayForSeconds(20);
+    await openCommentsDrawer({ page });
+    const commentReply1Content = await page
+      .locator(
+        `[data-testid='comment-${comment1.id}__comment-reply-${commentReply1.id}--text-content']`
+      )
+      .innerText();
+    const commentReply2Content = await page
+      .locator(
+        `[data-testid='comment-${comment1.id}__comment-reply-${commentReply2.id}--text-content']`
+      )
+      .innerText();
+    // await delayForSeconds(20);
+    expect(commentReply1Content).toBe(commentReply1Text);
+    expect(commentReply2Content).toBe(commentReply2Text);
+    // delete a comment with no replies
+    await deleteComment({
+      page,
+      commentId: comment2.id,
+    });
+    // delete the comment with replies
+    await deleteComment({
+      page,
+      commentId: comment1.id,
+    });
+    const numCommentsAfterDeletes = await prisma.comment.count({
+      where: { documentId: user1.data.document.id },
+    });
+    expect(numCommentsAfterDeletes).toBe(1);
   });
 });

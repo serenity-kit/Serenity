@@ -26,6 +26,7 @@ export const PageHeader: React.FC<{}> = () => {
         color={"gray-900"}
         size={isDesktopDevice ? "md" : "xl"}
         style={isDesktopDevice ? tw`` : tw`-mr-3`}
+        testID="open-comments-drawer-button"
       />
     </>
   );

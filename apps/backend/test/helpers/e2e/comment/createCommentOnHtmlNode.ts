@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { prisma } from "../../../src/database/prisma";
-import { delayForSeconds } from "../delayForSeconds";
+import { prisma } from "../../../../src/database/prisma";
+import { delayForSeconds } from "../../delayForSeconds";
 
 export type Props = {
   page: Page;
@@ -46,5 +46,12 @@ export const createCommentOnHtmlNode = async ({
     where: { documentId },
     orderBy: { createdAt: "desc" },
   });
+  if (!createdComment) {
+    throw new Error("Comment not created");
+  }
+  const createdCommentText = await page
+    .locator(`[data-testid="comment-${createdComment.id}__text-content"]`)
+    .innerText();
+  expect(createdCommentText).toBe(comment);
   return createdComment;
 };
