@@ -7,7 +7,6 @@ import {
   objectType,
 } from "nexus";
 import { createCommentReply } from "../../../database/commentreply/createCommentReply";
-import { formatCommentReply } from "../../../types/comment";
 import { CommentReply } from "../../types/commentReply";
 
 export const CreateCommentReplyInput = inputObjectType({
@@ -52,6 +51,6 @@ export const createCommentReplyMutation = mutationField("createCommentReply", {
       contentCiphertext: args.input.contentCiphertext,
       contentNonce: args.input.contentNonce,
     });
-    return { commentReply: formatCommentReply(commentReply) };
+    return { commentReply };
   },
 });

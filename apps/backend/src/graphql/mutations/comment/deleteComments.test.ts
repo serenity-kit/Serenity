@@ -254,7 +254,8 @@ test("admin share token", async () => {
   });
   const commentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment",
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
@@ -298,7 +299,8 @@ test("admin share token", async () => {
 test("editor share token", async () => {
   const commentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment",
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
@@ -342,7 +344,8 @@ test("editor share token", async () => {
 test("commenter share token", async () => {
   const commentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment",
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
@@ -382,7 +385,8 @@ test("commenter share token", async () => {
 test("viewer share token can't delete", async () => {
   const commentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment",
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,

@@ -7,7 +7,6 @@ import {
   objectType,
 } from "nexus";
 import { createComment } from "../../../database/comment/createComment";
-import { formatComment } from "../../../types/comment";
 import { Comment } from "../../types/comment";
 
 export const CreateCommentInput = inputObjectType({
@@ -50,6 +49,6 @@ export const createCommentMutation = mutationField("createComment", {
       contentCiphertext: args.input.contentCiphertext,
       contentNonce: args.input.contentNonce,
     });
-    return { comment: formatComment(comment) };
+    return { comment };
   },
 });
