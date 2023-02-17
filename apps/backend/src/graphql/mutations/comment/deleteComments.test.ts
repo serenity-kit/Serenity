@@ -49,7 +49,8 @@ beforeAll(async () => {
 test("commenter deletes own comment", async () => {
   const commentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
@@ -85,7 +86,8 @@ test("admin deletes comment", async () => {
   });
   const commentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
@@ -121,7 +123,8 @@ test("editor deletes comment", async () => {
   });
   const commentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
@@ -157,7 +160,8 @@ test("commentor tries to delete other comment", async () => {
   });
   const commentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
@@ -188,7 +192,8 @@ test("viewer tries to delete other comment", async () => {
   });
   const commentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
@@ -210,7 +215,8 @@ test("viewer tries to delete other comment", async () => {
 test("delete some comments", async () => {
   const commentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment three",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
@@ -238,7 +244,8 @@ test("delete some comments", async () => {
 test("cant delete comments on outside document", async () => {
   const commentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment three",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,

@@ -6,9 +6,9 @@ beforeAll(async () => {
   await sodium.ready;
 });
 
-test("documentNameKey", () => {
-  const documentNameKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const commentKey = createCommentKey({ documentNameKey });
+test("snapshotKey", () => {
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const commentKey = createCommentKey({ snapshotKey });
   const result = encryptComment({
     key: commentKey.key,
     comment: "Nice job",
@@ -17,9 +17,9 @@ test("documentNameKey", () => {
   expect(typeof result.publicNonce).toBe("string");
 });
 
-test("documentNameKey with publicData", () => {
-  const documentNameKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const commentKey = createCommentKey({ documentNameKey });
+test("snapshotKey with publicData", () => {
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const commentKey = createCommentKey({ snapshotKey });
   const result = encryptComment({
     key: commentKey.key,
     comment: "Nice job",
@@ -30,8 +30,8 @@ test("documentNameKey with publicData", () => {
 });
 
 test("encryptComment with publicData fails for invalid data", () => {
-  const documentNameKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const commentKey = createCommentKey({ documentNameKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const commentKey = createCommentKey({ snapshotKey });
   expect(() =>
     encryptComment({
       key: commentKey.key,

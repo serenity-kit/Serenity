@@ -2,15 +2,15 @@ import { commentDerivedKeyContext } from "../createCommentKey/createCommentKey";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {
-  documentNameKey: string;
+  snapshotKey: string;
   subkeyId: number;
 };
 
 export const recreateCommentKey = (params: Params) => {
   // TODO On the client and on the backend we should check no
-  // subkeyId per documentNameKey is a duplicate.
+  // subkeyId per snapshotKey is a duplicate.
   return kdfDeriveFromKey({
-    key: params.documentNameKey,
+    key: params.snapshotKey,
     context: commentDerivedKeyContext,
     subkeyId: params.subkeyId,
   });

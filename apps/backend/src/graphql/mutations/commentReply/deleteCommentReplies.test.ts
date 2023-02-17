@@ -44,7 +44,8 @@ const setup = async () => {
   });
   const user1CommentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
@@ -54,7 +55,8 @@ const setup = async () => {
   user1Comment = user1CommentResult.createComment.comment;
   const user2CommentResult = await createComment({
     graphql,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
@@ -73,7 +75,8 @@ test("commenter deletes own reply", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "good point",
     creatorDevice: userData1.webDevice,
     creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
@@ -112,7 +115,8 @@ test("admin deletes reply", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
@@ -151,7 +155,8 @@ test("editor deletes reply", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
@@ -190,7 +195,8 @@ test("commentor tries to delete other reply", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
@@ -222,7 +228,8 @@ test("viewer tries to delete other reply", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment 1",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
@@ -245,7 +252,8 @@ test("delete some replies", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment three",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
@@ -276,7 +284,8 @@ test("cant delete replies on outside document", async () => {
   const commentReplyResult = await createCommentReply({
     graphql,
     commentId: user1Comment.id,
-    documentId: userData1.document.id,
+    snapshotId: userData1.snapshot.id,
+    snapshotKey: userData1.snapshotKey.key,
     comment: "comment three",
     creatorDevice: userData2.webDevice,
     creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,

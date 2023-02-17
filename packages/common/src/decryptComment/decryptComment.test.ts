@@ -10,8 +10,8 @@ beforeAll(async () => {
 });
 
 test("decryptDocumentTitle", () => {
-  const documentNameKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialCommentKey = createCommentKey({ documentNameKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const initialCommentKey = createCommentKey({ snapshotKey });
   const comment = "Nice job";
   const result = encryptComment({
     key: initialCommentKey.key,
@@ -19,7 +19,7 @@ test("decryptDocumentTitle", () => {
   });
 
   const documentKey = recreateCommentKey({
-    documentNameKey,
+    snapshotKey,
     subkeyId: initialCommentKey.subkeyId,
   });
   const decryptedComment = decryptComment({
@@ -33,8 +33,8 @@ test("decryptDocumentTitle", () => {
 });
 
 test("decryptDocumentTitle fails for wrong key", () => {
-  const documentNameKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialCommentKey = createCommentKey({ documentNameKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const initialCommentKey = createCommentKey({ snapshotKey });
   const comment = "Nice job";
   const result = encryptComment({
     key: initialCommentKey.key,
@@ -42,7 +42,7 @@ test("decryptDocumentTitle fails for wrong key", () => {
   });
 
   const documentKey = recreateCommentKey({
-    documentNameKey,
+    snapshotKey,
     subkeyId: initialCommentKey.subkeyId,
   });
 
@@ -57,15 +57,15 @@ test("decryptDocumentTitle fails for wrong key", () => {
 });
 
 test("decryptComment fails for wrong publicData", () => {
-  const documentNameKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialCommentKey = createCommentKey({ documentNameKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const initialCommentKey = createCommentKey({ snapshotKey });
   const result = encryptDocumentTitle({
     key: initialCommentKey.key,
     title: "Todos",
   });
 
   const documentKey = recreateCommentKey({
-    documentNameKey,
+    snapshotKey,
     subkeyId: initialCommentKey.subkeyId,
   });
 
@@ -80,15 +80,15 @@ test("decryptComment fails for wrong publicData", () => {
 });
 
 test("decryptComment fails for invalid publicData", () => {
-  const documentNameKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialCommentKey = createCommentKey({ documentNameKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const initialCommentKey = createCommentKey({ snapshotKey });
   const result = encryptDocumentTitle({
     key: initialCommentKey.key,
     title: "Todos",
   });
 
   const documentKey = recreateCommentKey({
-    documentNameKey,
+    snapshotKey,
     subkeyId: initialCommentKey.subkeyId,
   });
 

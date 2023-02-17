@@ -4,15 +4,11 @@ import {
   encryptComment,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
-import { deriveDocumentKey } from "../document/deriveDocumentKey";
-import { getDocument } from "../document/getDocument";
-import { createFolderKeyDerivationTrace } from "../folder/createFolderKeyDerivationTrace";
-import { getFolder } from "../folder/getFolder";
-import { getWorkspace } from "../workspace/getWorkspace";
 
 type Params = {
   graphql: any;
-  documentId: string;
+  snapshotId: string;
+  snapshotKey: string;
   comment: string;
   authorizationHeader: string;
   creatorDevice: Device;
@@ -22,7 +18,8 @@ type Params = {
 
 export const createComment = async ({
   graphql,
-  documentId,
+  snapshotId,
+  snapshotKey,
   comment,
   creatorDevice,
   creatorDeviceEncryptionPrivateKey,
@@ -32,56 +29,10 @@ export const createComment = async ({
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const documentResult = await getDocument({
-    graphql,
-    id: documentId,
-    authorizationHeader,
-  });
-  const document = documentResult.document;
-
-  const workspaceKeyId = document.nameKeyDerivationTrace.workspaceKeyId;
-  const parentFolderId = document.parentFolderId;
-  const subkeyId = document.nameKeyDerivationTrace.subkeyId;
-
-  const workspaceResult = await getWorkspace({
-    graphql,
-    workspaceId: document.workspaceId!,
-    deviceSigningPublicKey: creatorDevice.signingPublicKey,
-    authorizationHeader,
-  });
-  const workspace = workspaceResult.workspace;
-
-  const folderResult = await getFolder({
-    graphql,
-    id: document.parentFolderId!,
-    authorizationHeader,
-  });
-  const folder = folderResult.folder;
-
-  const documentKeyData = await deriveDocumentKey({
-    documentSubkeyId: document.nameKeyDerivationTrace.subkeyId,
-    parentFolderId: document.parentFolderId!,
-    workspaceId: document.workspaceId!,
-    keyDerivationTrace: folder.keyDerivationTrace,
-    overrideWithWorkspaceKeyId: workspace.currentWorkspaceKey.id,
-    activeDevice: {
-      ...creatorDevice,
-      signingPrivateKey: creatorDeviceSigningPrivateKey,
-      encryptionPrivateKey: creatorDeviceEncryptionPrivateKey,
-    },
-  });
-  const documentNameKey = documentKeyData.documentKey;
-  const commentKey = createCommentKey({
-    documentNameKey: documentNameKey.key,
-  });
+  const commentKey = createCommentKey({ snapshotKey });
   const { ciphertext, publicNonce } = encryptComment({
     comment,
     key: commentKey.key,
-  });
-
-  const keyDerivationTrace = await createFolderKeyDerivationTrace({
-    workspaceKeyId,
-    parentFolderId,
   });
 
   const query = gql`
@@ -93,34 +44,8 @@ export const createComment = async ({
           contentCiphertext
           contentNonce
           createdAt
-          workspaceKey {
-            id
-            workspaceId
-            generation
-            workspaceKeyBox {
-              id
-              workspaceKeyId
-              deviceSigningPublicKey
-              creatorDeviceSigningPublicKey
-              nonce
-              ciphertext
-              creatorDevice {
-                signingPublicKey
-                encryptionPublicKey
-                encryptionPublicKeySignature
-                createdAt
-              }
-            }
-          }
-          keyDerivationTrace {
-            workspaceKeyId
-            trace {
-              entryId
-              subkeyId
-              context
-              parentId
-            }
-          }
+          snapshotId
+          subkeyId
           creatorDevice {
             signingPublicKey
             encryptionPublicKey
@@ -135,10 +60,10 @@ export const createComment = async ({
     query,
     {
       input: {
-        documentId,
+        snapshotId,
+        subkeyId: commentKey.subkeyId,
         contentCiphertext: ciphertext,
         contentNonce: publicNonce,
-        keyDerivationTrace,
       },
     },
     authorizationHeaders

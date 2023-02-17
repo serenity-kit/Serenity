@@ -133,7 +133,6 @@ export const CommentsExtension = Extension.create<
               if (prevHighlightedCommentId !== null) {
                 // make sure an endless loop isn't triggered
                 prevHighlightedCommentId = null;
-                console.log("!!!! highlightComment(null)");
                 storage.comments.highlightComment(null);
               }
             }

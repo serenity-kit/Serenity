@@ -12,7 +12,6 @@ export const commentsByDocumentIdQuery = queryField((t) => {
     additionalArgs: {
       documentId: nonNull(idArg()),
       documentShareLinkToken: stringArg(),
-      deviceSigningPublicKey: stringArg(),
     },
     async nodes(root, args, context) {
       if (args.first && args.first > 50) {
@@ -34,7 +33,6 @@ export const commentsByDocumentIdQuery = queryField((t) => {
         userId,
         documentId: args.documentId,
         documentShareLinkToken: args.documentShareLinkToken,
-        deviceSigningPublicKey: args.deviceSigningPublicKey,
         cursor,
         skip,
         take,
