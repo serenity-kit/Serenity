@@ -1,7 +1,7 @@
 jest.mock("../../generated/graphql", () => ({ __esModule: true }));
-jest.mock("./getFolder", () => ({
+jest.mock("./getFolderTrace", () => ({
   __esModule: true,
-  getFolder: jest.fn(),
+  getFolderTrace: jest.fn(),
 }));
 
 import { folderDerivedKeyContext } from "@serenity-tools/common";
@@ -50,7 +50,7 @@ it("should return one parent folder", async () => {
         {
           "context": "${folderDerivedKeyContext}",
           "entryId": "folderId",
-          "parentId": undefined,
+          "parentId": null,
           "subkeyId": undefined,
         },
       ],
@@ -102,7 +102,7 @@ it("should return two parent folders", async () => {
         {
           "context": "${folderDerivedKeyContext}",
           "entryId": "parentFolderId",
-          "parentId": undefined,
+          "parentId": null,
           "subkeyId": undefined,
         },
         {
