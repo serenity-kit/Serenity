@@ -1,7 +1,6 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField, stringArg } from "nexus";
 import { getCommentsByDocumentId } from "../../../database/comment/getCommentsByDocumentId";
-import { formatComment } from "../../../types/comment";
 import { Comment } from "../../types/comment";
 
 export const commentsByDocumentIdQuery = queryField((t) => {
@@ -37,10 +36,7 @@ export const commentsByDocumentIdQuery = queryField((t) => {
         skip,
         take,
       });
-      const formattedComments = comments.map((comment) =>
-        formatComment(comment)
-      );
-      return formattedComments;
+      return comments;
     },
   });
 });
