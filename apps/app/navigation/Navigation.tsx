@@ -137,6 +137,20 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
   );
 };
 
+// By remounting the component we make sure that a fresh state machine gets started.
+// As an alternative we could also have an action that resets the state machine,
+// but with all the side-effects remounting seemed to be the stabler choice for now
+// and also was recommended by the core team:
+// https://github.com/statelyai/xstate/discussions/2108#discussioncomment-4084125
+const PageCommentsDrawerNavigatorResetWrapper: React.FC<{
+  route: any;
+  navigation: any;
+}> = (props) => {
+  return (
+    <PageCommentsDrawerNavigator key={props.route.params.pageId} {...props} />
+  );
+};
+
 function WorkspaceDrawerNavigator(props) {
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
   const isDesktopDevice = useIsDesktopDevice();
@@ -160,7 +174,7 @@ function WorkspaceDrawerNavigator(props) {
     >
       <Drawer.Screen
         name="PageCommentsDrawer"
-        component={PageCommentsDrawerNavigator}
+        component={PageCommentsDrawerNavigatorResetWrapper}
       />
       <Drawer.Screen
         name="WorkspaceNotDecrypted"
