@@ -99,6 +99,19 @@ window.rejectImageRequest = (fileId, reason) => {
   }
 };
 
+window.updateCommentsInfo = (commentsInfoString: string) => {
+  const commentsInfo = JSON.parse(commentsInfoString);
+  const decryptedComments = commentsInfo.decryptedComments;
+  const highlightedCommentId = commentsInfo.highlightedCommentId;
+  if (!window.editor) {
+    return;
+  }
+  window.editor.storage.comments.comments = decryptedComments;
+  window.editor.storage.comments.highlightedCommentId = highlightedCommentId;
+  // empty transaction to make sure the comments are updated
+  window.editor.view.dispatch(window.editor.view.state.tr);
+};
+
 const domContainer = document.querySelector("#editor");
 ReactDOM.render(
   <NativeBaseProvider>

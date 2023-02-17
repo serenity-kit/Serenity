@@ -17,6 +17,7 @@ import {
   encodeAwarenessUpdate,
 } from "y-protocols/awareness";
 import * as Y from "yjs";
+import { usePage } from "../../context/PageContext";
 import { editorToolbarService } from "../../machines/editorToolbarMachine";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
@@ -100,6 +101,7 @@ export default function Editor({
   const setIsInEditingMode = useEditorStore(
     (state) => state.setIsInEditingMode
   );
+  const { commentsService } = usePage();
 
   const encryptAndUploadFile = useMemo(() => {
     return createEncryptAndUploadFileFunction({
@@ -153,6 +155,18 @@ export default function Editor({
     };
 
     editorToolbarService.onEvent(onEventListener);
+
+    commentsService.onChange((context) => {
+      const { decryptedComments, highlightedCommentId } = context;
+      const commentsJson = JSON.stringify({
+        decryptedComments,
+        highlightedCommentId,
+      });
+      webViewRef.current?.injectJavaScript(`
+        window.updateCommentsInfo(\`${commentsJson}\`);
+        true;
+      `);
+    });
 
     return () => {
       showSubscription.remove();
