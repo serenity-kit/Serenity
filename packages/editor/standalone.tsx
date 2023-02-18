@@ -113,7 +113,11 @@ ReactDOM.render(
       onCreate={(params) => (window.editor = params.editor)}
       comments={[]}
       createComment={() => {}}
-      highlightComment={() => {}}
+      highlightComment={(commentId) => {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({ type: "highlightComment", content: { commentId } })
+        );
+      }}
       highlightedCommentId={null}
       encryptAndUploadFile={async () => {
         // TODO: implement
