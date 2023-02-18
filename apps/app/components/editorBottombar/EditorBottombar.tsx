@@ -10,9 +10,10 @@ import {
   EditorBottombarDivider,
   ScrollView,
   tw,
+  View,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 
 export type EditorBottombarProps = {
   onUpdate: UpdateEditor;
@@ -31,6 +32,22 @@ export const EditorBottombar = forwardRef(
     }: EditorBottombarProps,
     ref
   ) => {
+    const [mode, setMode] = useState<"toolbar" | "createComment">("toolbar");
+
+    if (mode === "createComment") {
+      <View
+        style={[tw`h-${editorBottombarHeight / 2} border-t border-gray-200`]}
+      >
+        <EditorBottombarButton
+          onPress={(event) => {
+            onUpdate({ variant: "toggle-bold" });
+          }}
+          name="bold"
+          isActive={editorBottombarState.isBold}
+        />
+      </View>;
+    }
+
     return (
       <ScrollView
         horizontal={true}
@@ -146,6 +163,16 @@ export const EditorBottombar = forwardRef(
             }}
             name="image-line"
             isActive={false}
+          />
+
+          <EditorBottombarDivider />
+
+          <EditorBottombarButton
+            onPress={() => {
+              setMode("createComment");
+            }}
+            name="cup-line"
+            isActive={true}
           />
         </HStack>
       </ScrollView>
