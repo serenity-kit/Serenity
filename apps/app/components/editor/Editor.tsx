@@ -313,6 +313,13 @@ export default function Editor({
             const { contentAsBase64, fileName, mimeType } = message.content;
             shareFile({ contentAsBase64, mimeType, fileName });
           }
+          if (message.type === "highlightComment") {
+            const { commentId } = message.content;
+            commentsService.send({
+              type: "HIGHLIGHT_COMMENT",
+              commentId,
+            });
+          }
         }}
         // Needed for .focus() to work
         keyboardDisplayRequiresUserAction={false}
