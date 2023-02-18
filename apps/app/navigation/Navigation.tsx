@@ -125,7 +125,7 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
           headerRight: () => <PageHeaderRight />,
           headerTitle: () => <PageHeader />,
           headerTitleAlign: "center",
-          drawerType: "front", // TODO should be front
+          drawerType: "front",
           unmountOnBlur: true,
           drawerPosition: "right",
           drawerStyle: {

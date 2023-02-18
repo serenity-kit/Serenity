@@ -72,7 +72,7 @@ const createCommentsDecorationSet = (
     comments.map((comment) => {
       return Decoration.inline(comment.absoluteFrom, comment.absoluteTo, {
         style:
-          comment.commentId === highlightedCommentId
+          comment.id === highlightedCommentId
             ? "background-color: orange"
             : "background-color: yellow",
       });
@@ -137,9 +137,9 @@ export const CommentsExtension = Extension.create<
               );
             });
             if (commentToHighlight) {
-              if (prevHighlightedCommentId !== commentToHighlight.commentId) {
-                prevHighlightedCommentId = commentToHighlight.commentId;
-                storage.comments.highlightComment(commentToHighlight.commentId);
+              if (prevHighlightedCommentId !== commentToHighlight.id) {
+                prevHighlightedCommentId = commentToHighlight.id;
+                storage.comments.highlightComment(commentToHighlight.id);
               }
             } else {
               if (prevHighlightedCommentId !== null) {

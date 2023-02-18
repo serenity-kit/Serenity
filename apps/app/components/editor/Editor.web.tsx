@@ -38,8 +38,6 @@ export default function Editor({
   isNew,
   updateTitle,
   username,
-  comments,
-  highlightedCommentId,
 }: EditorProps) {
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
@@ -145,7 +143,7 @@ export default function Editor({
         openDrawer={openDrawer}
         updateTitle={updateTitle}
         downloadAndDecryptFile={downloadAndDecryptFile}
-        comments={comments}
+        comments={commentsState.context.decryptedComments}
         createComment={(comment) => {
           send({
             type: "CREATE_COMMENT",
@@ -161,7 +159,7 @@ export default function Editor({
             commentId: commentId === null ? "NONE" : commentId, // there is a bug with setting it to null
           });
         }}
-        highlightedCommentId={highlightedCommentId}
+        highlightedCommentId={commentsState.context.highlightedCommentId}
         onBlur={(params) => {
           if (
             !(

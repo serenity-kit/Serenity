@@ -81,7 +81,7 @@ export type UpdateEditorParams =
 export type UpdateEditor = (params: UpdateEditorParams) => void;
 
 export type EditorComment = {
-  commentId: string;
+  id: string;
   from: number;
   to: number;
 };
