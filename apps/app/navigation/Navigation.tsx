@@ -18,6 +18,7 @@ import { useActor, useInterpret } from "@xstate/react";
 import * as Linking from "expo-linking";
 import { useEffect } from "react";
 import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
 import CommentsSidebar from "../components/commentsSidebar/CommentsSidebar";
 import { HeaderLeft } from "../components/headerLeft/HeaderLeft";
@@ -81,6 +82,8 @@ const styles = StyleSheet.create({
 
 const isPhoneDimensions = (width: number) => width < 768;
 
+const drawerWidth = 240;
+
 const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
   props
 ) => {
@@ -95,6 +98,7 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
   });
   const [, send] = useActor(commentsService);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+  const insets = useSafeAreaInsets();
 
   return (
     <PageProvider
@@ -125,8 +129,12 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
           unmountOnBlur: true,
           drawerPosition: "right",
           drawerStyle: {
-            width: 240,
-            marginLeft: isPermanentLeftSidebar ? -240 : undefined,
+            width: drawerWidth,
+            marginLeft: isPermanentLeftSidebar ? -drawerWidth : undefined,
+            // necessary to avoid overlapping with the header
+            marginTop: 50 + insets.top,
+            borderLeftWidth: 1,
+            borderLeftColor: tw.color("gray-200"),
           },
           overlayColor: "transparent",
         }}
@@ -163,9 +171,7 @@ function WorkspaceDrawerNavigator(props) {
         unmountOnBlur: true,
         headerShown: false,
         drawerType: isPermanentLeftSidebar ? "permanent" : "front",
-        drawerStyle: {
-          width: isDesktopDevice ? 240 : width,
-        },
+        drawerStyle: { width: isDesktopDevice ? drawerWidth : width },
         overlayColor:
           !isPermanentLeftSidebar && isDesktopDevice
             ? tw.color("backdrop")
@@ -199,9 +205,7 @@ function WorkspaceSettingsDrawerNavigator(props) {
           unmountOnBlur: true,
           headerShown: false,
           drawerType: "permanent",
-          drawerStyle: {
-            width: 240,
-          },
+          drawerStyle: { width: drawerWidth },
         }}
       >
         <WorkspaceSettingsDrawer.Screen
@@ -226,9 +230,7 @@ function AccountSettingsDrawerScreen(props) {
           unmountOnBlur: true,
           headerShown: false,
           drawerType: "permanent",
-          drawerStyle: {
-            width: 240,
-          },
+          drawerStyle: { width: drawerWidth },
         }}
       >
         <AccountSettingsDrawer.Screen
