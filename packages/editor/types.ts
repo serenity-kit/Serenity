@@ -76,6 +76,13 @@ export type UpdateEditorParams =
     }
   | {
       variant: "redo";
+    }
+  | {
+      variant: "update-comments";
+      params: {
+        decryptedComments: EditorComment[];
+        highlightedCommentId: string | null;
+      };
     };
 
 export type UpdateEditor = (params: UpdateEditorParams) => void;
@@ -105,6 +112,5 @@ declare global {
     resolveImageRequest: (fileId: string, base64: string) => void;
     rejectImageRequest: (fileId: string, reason: string) => void;
     updateUsername: (username: string) => void;
-    updateCommentsInfo: (commentsInfoString: string) => void;
   }
 }

@@ -158,11 +158,14 @@ export default function Editor({
     commentsService.onChange((context) => {
       const { decryptedComments, highlightedCommentId } = context;
       const commentsJson = JSON.stringify({
-        decryptedComments,
-        highlightedCommentId,
+        variant: "update-comments",
+        params: {
+          decryptedComments,
+          highlightedCommentId,
+        },
       });
       webViewRef.current?.injectJavaScript(`
-        window.updateCommentsInfo(\`${commentsJson}\`);
+        window.updateEditor(\`${commentsJson}\`);
         true;
       `);
     });
