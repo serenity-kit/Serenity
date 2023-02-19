@@ -45,10 +45,11 @@ const getFolders = async ({
                   encryptedNameNonce
                   keyDerivationTrace {
                     workspaceKeyId
-                    parentFolders {
-                      folderId
+                    trace {
+                      entryId
                       subkeyId
-                      parentFolderId
+                      parentId
+                      context
                     }
                   }
               }

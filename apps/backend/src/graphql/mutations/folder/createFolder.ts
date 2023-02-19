@@ -8,7 +8,7 @@ import {
 } from "nexus";
 import { createFolder } from "../../../database/folder/createFolder";
 import { Folder } from "../../types/folder";
-import { KeyDerivationTraceInput } from "../../types/keyDerivation";
+import { KeyDerivationTraceInput2 } from "../../types/keyDerivation";
 
 export const CreateFolderInput = inputObjectType({
   name: "CreateFolderInput",
@@ -20,7 +20,7 @@ export const CreateFolderInput = inputObjectType({
     t.nonNull.int("subkeyId");
     t.string("parentFolderId");
     t.nonNull.string("workspaceId");
-    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput2 });
   },
 });
 

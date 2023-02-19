@@ -2,7 +2,10 @@ import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
 } from "@react-navigation/drawer";
-import { encryptFolderName } from "@serenity-tools/common";
+import {
+  encryptFolderName,
+  folderDerivedKeyContext,
+} from "@serenity-tools/common";
 import {
   Heading,
   Icon,
@@ -27,6 +30,7 @@ import {
   useRootFoldersQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { deriveCurrentWorkspaceKey } from "../../utils/workspace/deriveCurrentWorkspaceKey";
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
@@ -86,6 +90,16 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     let numCreateFolderAttempts = 0;
     let folderId: string | undefined = undefined;
     let result: any = undefined;
+    const keyDerivationTrace = await createFolderKeyDerivationTrace({
+      workspaceKeyId,
+      folderId: null,
+    });
+    keyDerivationTrace.trace.push({
+      entryId: id,
+      subkeyId: encryptedFolderResult.folderSubkeyId,
+      parentId: null,
+      context: folderDerivedKeyContext,
+    });
     do {
       numCreateFolderAttempts += 1;
       result = await runCreateFolderMutation(
@@ -97,11 +111,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
             encryptedNameNonce: encryptedFolderResult.publicNonce,
             workspaceKeyId,
             subkeyId: encryptedFolderResult.folderSubkeyId,
-            keyDerivationTrace: {
-              workspaceKeyId,
-              subkeyId: encryptedFolderResult.folderSubkeyId,
-              parentFolders: [],
-            },
+            keyDerivationTrace,
           },
         },
         {}
@@ -227,7 +237,11 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   parentFolderId={folder.parentFolderId}
                   encryptedName={folder.encryptedName}
                   encryptedNameNonce={folder.encryptedNameNonce}
-                  subkeyId={folder.keyDerivationTrace.subkeyId}
+                  subkeyId={
+                    folder.keyDerivationTrace.trace[
+                      folder.keyDerivationTrace.trace.length - 1
+                    ].subkeyId
+                  }
                   keyDerivationTrace={folder.keyDerivationTrace!}
                   workspaceId={workspaceId}
                   onStructureChange={refetchRootFolders}

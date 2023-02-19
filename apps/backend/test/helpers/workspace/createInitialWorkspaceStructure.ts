@@ -5,6 +5,7 @@ import {
   encryptDocumentTitle,
   encryptFolderName,
   encryptWorkspaceKeyForDevice,
+  folderDerivedKeyContext,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
@@ -50,11 +51,11 @@ const query = gql`
         workspaceId
         keyDerivationTrace {
           workspaceKeyId
-          subkeyId
-          parentFolders {
-            folderId
+          trace {
+            entryId
             subkeyId
-            parentFolderId
+            parentId
+            context
           }
         }
       }
@@ -151,10 +152,18 @@ export const createInitialWorkspaceStructure = async ({
     idSignature: folderIdSignature,
     encryptedName: encryptedFolderName,
     encryptedNameNonce: encryptedFolderNameNonce,
+    // since we haven't created the workspaceKey yet,
+    // we must derive the trace manually
     keyDerivationTrace: {
       workspaceKeyId,
-      subkeyId: folderSubkeyId,
-      parentFolders: [],
+      trace: [
+        {
+          entryId: folderId,
+          subkeyId: folderSubkeyId,
+          parentId: null,
+          context: folderDerivedKeyContext,
+        },
+      ],
     },
   };
 

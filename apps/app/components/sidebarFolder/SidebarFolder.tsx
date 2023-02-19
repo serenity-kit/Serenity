@@ -1,6 +1,11 @@
+import { KeyDerivationTrace2 } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { decryptFolderName, encryptFolderName } from "@serenity-tools/common";
+import {
+  decryptFolderName,
+  encryptFolderName,
+  folderDerivedKeyContext,
+} from "@serenity-tools/common";
 import {
   Icon,
   IconButton,
@@ -18,7 +23,6 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, StyleSheet } from "react-native";
 import { v4 as uuidv4 } from "uuid";
 import {
-  KeyDerivationTrace,
   runCreateDocumentMutation,
   runCreateFolderMutation,
   runDeleteFoldersMutation,
@@ -33,7 +37,7 @@ import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
-import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
+import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { getFolder } from "../../utils/folder/getFolder";
@@ -50,7 +54,7 @@ type Props = ViewProps & {
   encryptedName: string;
   encryptedNameNonce?: string;
   subkeyId: number;
-  keyDerivationTrace: KeyDerivationTrace;
+  keyDerivationTrace: KeyDerivationTrace2;
   depth?: number;
   onStructureChange: () => void;
 };
@@ -161,16 +165,22 @@ export default function SidebarFolder(props: Props) {
       name,
       parentKey: parentChainItem.key,
     });
-    const parentKeyDerivationTrace = await buildKeyDerivationTrace({
+    // const parentKeyDerivationTrace = await buildKeyDerivationTrace({
+    //   folderId: props.folderId,
+    //   subkeyId: encryptedFolderResult.folderSubkeyId,
+    //   workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+    // });
+    const keyDerivationTrace = await createFolderKeyDerivationTrace({
+      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
       folderId: props.folderId,
-      subkeyId: encryptedFolderResult.folderSubkeyId,
-      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
     });
-    const keyDerivationTrace = {
-      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+    keyDerivationTrace.trace.push({
+      entryId: id,
       subkeyId: encryptedFolderResult.folderSubkeyId,
-      parentFolders: parentKeyDerivationTrace.parentFolders,
-    };
+      parentId: props.folderId,
+      context: folderDerivedKeyContext,
+    });
+
     let didCreateFolderSucceed = false;
     let numCreateFolderAttempts = 0;
     let folderId: string | undefined = undefined;
@@ -288,7 +298,7 @@ export default function SidebarFolder(props: Props) {
       folderId: props.folderId,
       workspaceId: props.workspaceId,
       overrideWithWorkspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-      keyDerivationTrace: folder.keyDerivationTrace!,
+      keyDerivationTrace: folder.keyDerivationTrace,
       activeDevice,
     });
     // ignore the last chain item as it's the key for the old folder name
@@ -297,18 +307,9 @@ export default function SidebarFolder(props: Props) {
       name: newFolderName,
       parentKey: parentChainItem.key,
     });
-    const keyDerivationTrace = await buildKeyDerivationTrace({
-      folderId: props.parentFolderId,
-      subkeyId: encryptedFolderResult.folderSubkeyId,
-      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-    });
-
-    const reDerivedKeyTrace = await deriveFolderKey({
+    const keyDerivationTrace = await createFolderKeyDerivationTrace({
       folderId: props.folderId,
-      workspaceId: props.workspaceId,
-      overrideWithWorkspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-      keyDerivationTrace,
-      activeDevice,
+      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
     });
     const updateFolderNameResult = await runUpdateFolderNameMutation(
       {
@@ -506,7 +507,11 @@ export default function SidebarFolder(props: Props) {
                     folderId={folder.id}
                     parentFolderId={folder.parentFolderId}
                     workspaceId={props.workspaceId}
-                    subkeyId={folder.keyDerivationTrace.subkeyId}
+                    subkeyId={
+                      folder.keyDerivationTrace.trace[
+                        folder.keyDerivationTrace.trace.length - 1
+                      ].subkeyId
+                    }
                     encryptedName={folder.encryptedName}
                     encryptedNameNonce={folder.encryptedNameNonce}
                     keyDerivationTrace={folder.keyDerivationTrace}

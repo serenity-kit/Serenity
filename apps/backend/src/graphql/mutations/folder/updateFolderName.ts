@@ -9,7 +9,7 @@ import {
 } from "nexus";
 import { updateFolderName } from "../../../database/folder/updateFolderName";
 import { Folder } from "../../types/folder";
-import { KeyDerivationTraceInput } from "../../types/keyDerivation";
+import { KeyDerivationTraceInput2 } from "../../types/keyDerivation";
 
 export const UpdateFolderNameInput = inputObjectType({
   name: "UpdateFolderNameInput",
@@ -19,7 +19,7 @@ export const UpdateFolderNameInput = inputObjectType({
     t.nonNull.string("encryptedNameNonce");
     t.nonNull.string("workspaceKeyId");
     t.nonNull.int("subkeyId");
-    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput2 });
   },
 });
 

@@ -18,11 +18,9 @@ const graphql = setupGraphql();
 let userData1: any = undefined;
 const username = "user1";
 const password = "password";
-let userAndDevice: any = null;
 let workspaceKey: string = "";
 let addedWorkspace: any = null;
 let sessionKey = "";
-let addedWorkspaceStructure: any = null;
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
@@ -66,7 +64,16 @@ test("user should be able to create a root folder", async () => {
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
   expect(typeof folder.encryptedNameNonce).toBe("string");
-  expect(typeof folder.keyDerivationTrace.subkeyId).toBe("number");
+  expect(folder.keyDerivationTrace.workspaceKeyId).toBe(
+    userData1.workspace.currentWorkspaceKey.id
+  );
+  expect(folder.keyDerivationTrace.trace.length).toBe(1);
+  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("number");
+  expect(folder.keyDerivationTrace.trace[0].entryId).toBe(id);
+  expect(folder.keyDerivationTrace.trace[0].parentId).toBe(null);
+  expect(folder.keyDerivationTrace.trace[0].context).toBe(
+    folderDerivedKeyContext
+  );
 });
 
 test("user should be able to create a root folder with a name", async () => {
@@ -90,7 +97,16 @@ test("user should be able to create a root folder with a name", async () => {
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
   expect(typeof folder.encryptedNameNonce).toBe("string");
-  expect(typeof folder.keyDerivationTrace.subkeyId).toBe("number");
+  expect(folder.keyDerivationTrace.workspaceKeyId).toBe(
+    userData1.workspace.currentWorkspaceKey.id
+  );
+  expect(folder.keyDerivationTrace.trace.length).toBe(1);
+  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("number");
+  expect(folder.keyDerivationTrace.trace[0].entryId).toBe(id);
+  expect(folder.keyDerivationTrace.trace[0].parentId).toBe(null);
+  expect(folder.keyDerivationTrace.trace[0].context).toBe(
+    folderDerivedKeyContext
+  );
 });
 
 test("user should be able to create a child folder", async () => {
@@ -122,7 +138,22 @@ test("user should be able to create a child folder", async () => {
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
   expect(typeof folder.encryptedNameNonce).toBe("string");
-  expect(typeof folder.keyDerivationTrace.subkeyId).toBe("number");
+  expect(folder.keyDerivationTrace.workspaceKeyId).toBe(
+    userData1.workspace.currentWorkspaceKey.id
+  );
+  expect(folder.keyDerivationTrace.trace.length).toBe(2);
+  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("number");
+  expect(folder.keyDerivationTrace.trace[0].entryId).toBe(parentFolderId);
+  expect(folder.keyDerivationTrace.trace[0].parentId).toBe(null);
+  expect(folder.keyDerivationTrace.trace[0].context).toBe(
+    folderDerivedKeyContext
+  );
+  expect(typeof folder.keyDerivationTrace.trace[1].subkeyId).toBe("number");
+  expect(folder.keyDerivationTrace.trace[1].entryId).toBe(id);
+  expect(folder.keyDerivationTrace.trace[1].parentId).toBe(parentFolderId);
+  expect(folder.keyDerivationTrace.trace[1].context).toBe(
+    folderDerivedKeyContext
+  );
 });
 
 test("duplicate ID throws an error", async () => {
