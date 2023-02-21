@@ -98,6 +98,7 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
   });
   const [, send] = useActor(commentsService);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+  const isDesktopDevice = useIsDesktopDevice();
   const insets = useSafeAreaInsets();
 
   return (
@@ -124,6 +125,10 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
           ),
           headerRight: () => <PageHeaderRight />,
           headerTitle: () => <PageHeader />,
+          headerRightContainerStyle: {
+            flexBasis: isDesktopDevice ? drawerWidth : 0,
+            flexGrow: isDesktopDevice ? 0 : 1,
+          },
           headerTitleAlign: "center",
           drawerType: "front",
           unmountOnBlur: true,
