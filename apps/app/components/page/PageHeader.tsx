@@ -23,15 +23,17 @@ export const PageHeader: React.FC<{}> = () => {
         </HStack>
       ) : null}
       {isDesktopDevice ? (
-        <IconButton
-          onPress={() => {
-            // @ts-ignore
-            navigation.openDrawer();
-          }}
-          name="chat-4-line"
-          color={"gray-800"}
-          size={"lg"}
-        />
+        <Tooltip label="Toggle Comments" placement="left" offset={8}>
+          <IconButton
+            onPress={() => {
+              // @ts-ignore
+              navigation.openDrawer();
+            }}
+            name="chat-4-line"
+            color={"gray-800"}
+            size={"lg"}
+          />
+        </Tooltip>
       ) : null}
     </>
   );
