@@ -483,7 +483,7 @@ export type FinishRegistrationInput = {
 export type FinishRegistrationResult = {
   __typename?: 'FinishRegistrationResult';
   id: Scalars['String'];
-  verificationCode: Scalars['String'];
+  verificationCode?: Maybe<Scalars['String']>;
 };
 
 export type Folder = {
@@ -1466,7 +1466,7 @@ export type FinishRegistrationMutationVariables = Exact<{
 }>;
 
 
-export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode: string } | null };
+export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode?: string | null } | null };
 
 export type InitiateFileUploadMutationVariables = Exact<{
   initiateFileUpload: InitiateFileUploadInput;

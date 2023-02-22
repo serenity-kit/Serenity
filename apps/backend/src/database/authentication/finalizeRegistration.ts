@@ -116,7 +116,10 @@ export async function finalizeRegistration({
         subject: "Verify your Serenity account",
         text: emailRegistrationLines.join("\n"),
       };
-      if (process.env.IS_E2E_TEST != "true") {
+      if (
+        process.env.SERENITY_ENV !== "e2e" &&
+        process.env.SERENITY_ENV !== "development"
+      ) {
         console.log(`Sending verification email to "${username}"`);
         try {
           await sendgrid.send(registrationEmail);
@@ -127,10 +130,12 @@ export async function finalizeRegistration({
           console.error("Sendgrid error:");
           console.error(error);
         }
+      } else {
+        console.log(
+          `New user confirmation code: ${unverifiedUser.confirmationCode}`
+        );
       }
-      console.log(
-        `New user confirmation code: ${unverifiedUser.confirmationCode}`
-      );
+
       return unverifiedUser;
     });
   } catch (error) {
