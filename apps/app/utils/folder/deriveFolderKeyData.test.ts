@@ -100,11 +100,6 @@ it("should return empty parentFolders", async () => {
         "key": "${workspaceKeyString}",
         "subkeyId": undefined,
       },
-      {
-        "folderId": "${folderId}",
-        "key": "${folderNameData.folderSubkey}",
-        "subkeyId": ${folderNameData.folderSubkeyId},
-      },
     ]
   `);
 });
@@ -225,11 +220,6 @@ it("should return single parentFolders", async () => {
         "folderId": "${parentFolderId}",
         "key": "${parentFolderNameData.folderSubkey}",
         "subkeyId": ${parentFolderNameData.folderSubkeyId},
-      },
-      {
-        "folderId": "${folderId}",
-        "key": "${folderNameData.folderSubkey}",
-        "subkeyId": ${folderNameData.folderSubkeyId},
       },
     ]
   `);
@@ -393,11 +383,6 @@ it("should return deep parentFolders", async () => {
         "folderId": "${folderId}",
         "key": "${folderNameData.folderSubkey}",
         "subkeyId": ${folderNameData.folderSubkeyId},
-      },
-      {
-        "folderId": "${childFolderId}",
-        "key": "${childFolderNameData.folderSubkey}",
-        "subkeyId": ${childFolderNameData.folderSubkeyId},
       },
     ]
   `);

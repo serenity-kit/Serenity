@@ -57,20 +57,5 @@ export const deriveFolderKey = async ({
       folderId: ancestorKeySeedData.folderId,
     });
   }
-  // special case: append the current folder key
-  const folderSubkeyId =
-    keyDerivationTrace.parentFolders[
-      keyDerivationTrace.parentFolders.length - 1
-    ].subkeyId;
-  const folderKeyData = kdfDeriveFromKey({
-    key: parentKey,
-    context: folderDerivedKeyContext,
-    subkeyId: folderSubkeyId,
-  });
-  folderKeyDerivationTrace.push({
-    key: folderKeyData.key,
-    subkeyId: folderSubkeyId,
-    folderId,
-  });
   return folderKeyDerivationTrace;
 };
