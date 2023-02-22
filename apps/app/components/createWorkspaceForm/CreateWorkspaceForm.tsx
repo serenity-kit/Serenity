@@ -5,6 +5,7 @@ import {
   createSnapshotKey,
   encryptDocumentTitle,
   encryptFolderName,
+  folderDerivedKeyContext,
 } from "@serenity-tools/common";
 import {
   Button,
@@ -100,8 +101,14 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       );
       const folderKeyDerivationTrace = {
         workspaceKeyId,
-        subkeyId: encryptedFolderResult.folderSubkeyId,
-        parentFolders: [],
+        trace: [
+          {
+            entryId: folderId,
+            subkeyId: encryptedFolderResult.folderSubkeyId,
+            parentId: null,
+            context: folderDerivedKeyContext,
+          },
+        ],
       };
 
       // prepare document

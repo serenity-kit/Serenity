@@ -7,6 +7,7 @@ import {
   encryptDocumentTitle,
   encryptFolderName,
   encryptWorkspaceKeyForDevice,
+  folderDerivedKeyContext,
 } from "@serenity-tools/common";
 import { Registration } from "@serenity-tools/opaque-server";
 import sodium from "react-native-libsodium";
@@ -157,8 +158,14 @@ export default async function createUserWithWorkspace({
       encryptedNameNonce: encryptedFolderResult.publicNonce,
       keyDerivationTrace: {
         workspaceKeyId,
-        subkeyId: encryptedFolderResult.folderSubkeyId,
-        parentFolders: [],
+        trace: [
+          {
+            entryId: folderId,
+            subkeyId: encryptedFolderResult.folderSubkeyId,
+            parentId: null,
+            context: folderDerivedKeyContext,
+          },
+        ],
       },
     },
     document: {

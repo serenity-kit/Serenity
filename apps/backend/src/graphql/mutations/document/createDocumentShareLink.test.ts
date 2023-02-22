@@ -1,17 +1,21 @@
-import { createSnapshotKey } from "@serenity-tools/common";
+import {
+  createSnapshotKey,
+  deriveKeysFromKeyDerivationTrace,
+} from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocumentShareLink } from "../../../../test/helpers/document/createDocumentShareLink";
-import { deriveFolderKey } from "../../../../test/helpers/folder/deriveFolderKey";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { getWorkspace } from "../../../../test/helpers/workspace/getWorkspace";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
 const password = "password";
 let userData1: any = null;
+let user1Workspace: any = null;
 
 const setup = async () => {
   await sodium.ready;
@@ -20,6 +24,13 @@ const setup = async () => {
     username: `${uuidv4()}@example.com`,
     password,
   });
+  const getWorkspaceResult = await getWorkspace({
+    graphql,
+    workspaceId: userData1.workspace.id,
+    authorizationHeader: userData1.sessionKey,
+    deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
+  });
+  user1Workspace = getWorkspaceResult.workspace;
 };
 
 beforeAll(async () => {
@@ -30,14 +41,13 @@ beforeAll(async () => {
 test("create share link", async () => {
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
-  const folderKeyTrace = await deriveFolderKey({
-    workspaceId: userData1.workspace.id,
-    folderId: userData1.folder.id,
+  const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
+    workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
   });
   const snapshotKeyData = createSnapshotKey({
-    folderKey: folderKeyTrace[folderKeyTrace.length - 1].key,
+    folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
   const documentShareLinkResponse = await createDocumentShareLink({
     graphql,
@@ -62,14 +72,13 @@ test("Invalid ownership", async () => {
     otherUser.webDevice;
   const documentId = userData1.document.id;
   const authorizationHeader = otherUser.sessionKey;
-  const folderKeyTrace = await deriveFolderKey({
-    workspaceId: userData1.workspace.id,
-    folderId: userData1.folder.id,
+  const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: userData1.folder.keyDerivationTrace,
     activeDevice: userData1.webDevice,
+    workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
   });
   const snapshotKeyData = createSnapshotKey({
-    folderKey: folderKeyTrace[folderKeyTrace.length - 1].key,
+    folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
   await expect(
     (async () =>

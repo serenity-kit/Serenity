@@ -1,4 +1,7 @@
-import { decryptFolderName } from "@serenity-tools/common";
+import {
+  decryptFolderName,
+  deriveKeysFromKeyDerivationTrace,
+} from "@serenity-tools/common";
 import create from "zustand";
 import {
   DocumentPathDocument,
@@ -7,9 +10,10 @@ import {
   Folder,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { deriveFolderKey } from "../folder/deriveFolderKeyData";
 import { GetFolderKeyProps } from "../folder/folderKeyStore";
 import { getUrqlClient } from "../urqlClient/urqlClient";
+import { deriveWorkspaceKey } from "../workspace/deriveWorkspaceKey";
+import { getWorkspace } from "../workspace/getWorkspace";
 
 interface DocumentPathState {
   folders: Folder[];
@@ -45,24 +49,49 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
     // all documentPath folders should be in the same workspace
     const folderIds: string[] = [];
     const folderNames: { [id: string]: string } = {};
+    const workspaceId = folders[0].workspaceId;
+    const workspace = await getWorkspace({
+      workspaceId: workspaceId!,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
+    if (!workspace?.currentWorkspaceKey) {
+      throw new Error("No workspace key for this workspace and device");
+    }
+    const workspaceKeyData = await deriveWorkspaceKey({
+      workspaceId: workspaceId!,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
+      activeDevice,
+    });
+    const workspaceKey = workspaceKeyData.workspaceKey;
     for (let folder of folders) {
       folderIds.push(folder.id);
       let folderName = "decrypting…";
       try {
-        // TODO: optimize key derivation to look up
-        // parent keys and workspace keys more easily
-        const parentKeyTrace = await deriveFolderKey({
-          workspaceId: folder.workspaceId!,
-          folderId: folder.id,
+        const parentKeyTrace = deriveKeysFromKeyDerivationTrace({
           keyDerivationTrace: folder.keyDerivationTrace,
-          activeDevice,
+          activeDevice: {
+            signingPublicKey: activeDevice.signingPublicKey,
+            signingPrivateKey: activeDevice.signingPrivateKey!,
+            encryptionPublicKey: activeDevice.encryptionPublicKey,
+            encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+            encryptionPublicKeySignature:
+              activeDevice.encryptionPublicKeySignature!,
+          },
+          workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
         });
         // since decryptFolderName also derives the folder subkey,
         // we can pass the parentKeyTrace's parent key to it
-        const parentKey = parentKeyTrace[parentKeyTrace.length - 2].key;
+        const folderSubkeyId =
+          folder.keyDerivationTrace.trace[
+            folder.keyDerivationTrace.trace.length - 1
+          ].subkeyId;
+        let parentKey = workspaceKey;
+        if (parentKeyTrace.trace.length > 1) {
+          parentKey = parentKeyTrace.trace[parentKeyTrace.trace.length - 2].key;
+        }
         folderName = decryptFolderName({
           parentKey: parentKey,
-          subkeyId: folder.keyDerivationTrace.subkeyId!,
+          subkeyId: folderSubkeyId,
           ciphertext: folder.encryptedName,
           publicNonce: folder.encryptedNameNonce,
         });

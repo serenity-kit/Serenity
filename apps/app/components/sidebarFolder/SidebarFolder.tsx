@@ -3,6 +3,7 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   decryptFolderName,
+  deriveKeysFromKeyDerivationTrace,
   encryptFolderName,
   folderDerivedKeyContext,
 } from "@serenity-tools/common";
@@ -38,10 +39,9 @@ import {
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
-import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
-import { getFolder } from "../../utils/folder/getFolder";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+import { deriveWorkspaceKey } from "../../utils/workspace/deriveWorkspaceKey";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
 import SidebarPage from "../sidebarPage/SidebarPage";
@@ -103,31 +103,64 @@ export default function SidebarFolder(props: Props) {
 
   useEffect(() => {
     decryptName();
-  }, [props.encryptedName, props.keyDerivationTrace.subkeyId]);
+  }, [
+    props.encryptedName,
+    props.keyDerivationTrace.trace[props.keyDerivationTrace.trace.length - 1]
+      .subkeyId,
+  ]);
 
   const decryptName = async () => {
     if (
-      !props.keyDerivationTrace.subkeyId ||
+      !props.keyDerivationTrace.trace[props.keyDerivationTrace.trace.length - 1]
+        .subkeyId ||
       !props.encryptedName ||
       !props.encryptedNameNonce
     ) {
       setFolderName("Untitled");
       return;
     }
+    const folderSubkeyId =
+      props.keyDerivationTrace.trace[props.keyDerivationTrace.trace.length - 1]
+        .subkeyId;
+    const workspace = await getWorkspace({
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+      workspaceId: props.workspaceId,
+    });
+    if (!workspace?.currentWorkspaceKey) {
+      // TODO: handle error in UI
+      console.error("Workspace or workspaceKeys not found");
+      return;
+    }
+    const workspaceKeyData = await deriveWorkspaceKey({
+      workspaceId: workspace.id,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
+      activeDevice,
+    });
+    const workspaceKey = workspaceKeyData.workspaceKey;
     try {
-      const parentKeyChainData = await deriveFolderKey({
-        folderId: props.folderId,
-        workspaceId: props.workspaceId,
+      const parentKeyChainData = deriveKeysFromKeyDerivationTrace({
         keyDerivationTrace: props.keyDerivationTrace,
-        activeDevice,
+        workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+        activeDevice: {
+          signingPublicKey: activeDevice.signingPublicKey,
+          signingPrivateKey: activeDevice.signingPrivateKey!,
+          encryptionPublicKey: activeDevice.encryptionPublicKey,
+          encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+          encryptionPublicKeySignature:
+            activeDevice.encryptionPublicKeySignature!,
+        },
       });
       // since the decryptFolderName method takes a parent key
       // and the last item of the key chain is the current folder key,
       // we have to send in the parent key to the decryptFolderName method
-      const parentKeyData = parentKeyChainData[parentKeyChainData.length - 2];
+      let parentKey = workspaceKey;
+      if (parentKeyChainData.trace.length > 1) {
+        parentKey =
+          parentKeyChainData.trace[parentKeyChainData.trace.length - 2].key;
+      }
       const folderName = decryptFolderName({
-        parentKey: parentKeyData.key,
-        subkeyId: props.keyDerivationTrace.subkeyId!,
+        parentKey,
+        subkeyId: folderSubkeyId,
         ciphertext: props.encryptedName,
         publicNonce: props.encryptedNameNonce,
       });
@@ -151,25 +184,24 @@ export default function SidebarFolder(props: Props) {
       console.error("Workspace or workspaceKeys not found");
       return;
     }
-    // derive this (the new folder's parent) folder key trace:
-    const parentFolderKeyChainData = await deriveFolderKey({
-      folderId: props.folderId,
-      workspaceId: props.workspaceId,
+    const parentFolderKeyChainData = deriveKeysFromKeyDerivationTrace({
       keyDerivationTrace: props.keyDerivationTrace,
-      activeDevice,
-      overrideWithWorkspaceKeyId: workspace.currentWorkspaceKey?.id,
+      activeDevice: {
+        signingPublicKey: activeDevice.signingPublicKey,
+        signingPrivateKey: activeDevice.signingPrivateKey!,
+        encryptionPublicKey: activeDevice.encryptionPublicKey,
+        encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+        encryptionPublicKeySignature:
+          activeDevice.encryptionPublicKeySignature!,
+      },
+      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
     });
     const parentChainItem =
-      parentFolderKeyChainData[parentFolderKeyChainData.length - 1];
+      parentFolderKeyChainData.trace[parentFolderKeyChainData.trace.length - 1];
     const encryptedFolderResult = encryptFolderName({
       name,
       parentKey: parentChainItem.key,
     });
-    // const parentKeyDerivationTrace = await buildKeyDerivationTrace({
-    //   folderId: props.folderId,
-    //   subkeyId: encryptedFolderResult.folderSubkeyId,
-    //   workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-    // });
     const keyDerivationTrace = await createFolderKeyDerivationTrace({
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
       folderId: props.folderId,
@@ -293,24 +325,46 @@ export default function SidebarFolder(props: Props) {
       workspaceId: props.workspaceId,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
-    const folder = await getFolder({ id: props.folderId });
-    const folderKeyTrace = await deriveFolderKey({
-      folderId: props.folderId,
-      workspaceId: props.workspaceId,
-      overrideWithWorkspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-      keyDerivationTrace: folder.keyDerivationTrace,
+    if (!workspace) {
+      throw new Error("Workspace not found");
+    }
+    if (!workspace.currentWorkspaceKey!.workspaceKeyBox) {
+      throw new Error("no workspace key boxes for this workspace");
+    }
+    const workspaceKeyData = await deriveWorkspaceKey({
+      workspaceId: workspace.id,
+      workspaceKeyId: workspace.currentWorkspaceKey!.id,
       activeDevice,
     });
+    const workspaceKey = workspaceKeyData.workspaceKey;
+    const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
+      keyDerivationTrace: props.keyDerivationTrace,
+      activeDevice: {
+        signingPublicKey: activeDevice.signingPublicKey,
+        signingPrivateKey: activeDevice.signingPrivateKey!,
+        encryptionPublicKey: activeDevice.encryptionPublicKey,
+        encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+        encryptionPublicKeySignature:
+          activeDevice.encryptionPublicKeySignature!,
+      },
+      workspaceKeyBox: workspace.currentWorkspaceKey!.workspaceKeyBox!,
+    });
     // ignore the last chain item as it's the key for the old folder name
-    const parentChainItem = folderKeyTrace[folderKeyTrace.length - 2];
+    let parentKey = workspaceKey;
+    if (folderKeyTrace.trace.length > 1) {
+      parentKey = folderKeyTrace.trace[folderKeyTrace.trace.length - 2].key;
+    }
     const encryptedFolderResult = encryptFolderName({
       name: newFolderName,
-      parentKey: parentChainItem.key,
+      parentKey,
     });
     const keyDerivationTrace = await createFolderKeyDerivationTrace({
       folderId: props.folderId,
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
     });
+    // update the new subkey for this folder name encryption
+    keyDerivationTrace.trace[keyDerivationTrace.trace.length - 1].subkeyId =
+      encryptedFolderResult.folderSubkeyId;
     const updateFolderNameResult = await runUpdateFolderNameMutation(
       {
         input: {

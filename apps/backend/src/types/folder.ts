@@ -1,4 +1,4 @@
-import { KeyDerivationTrace, KeyDerivationTrace2 } from "@naisho/core";
+import { KeyDerivationTrace2 } from "@naisho/core";
 import { WorkspaceKey } from "./workspace";
 
 export type Folder = {
@@ -17,6 +17,6 @@ export type Folder = {
 export const formatFolder = (folder: any): Folder => {
   return {
     ...folder,
-    keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace,
+    keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace2,
   };
 };

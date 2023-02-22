@@ -4,6 +4,7 @@ jest.mock("./getFolder", () => ({
   getFolder: jest.fn(),
 }));
 
+import { folderDerivedKeyContext } from "@serenity-tools/common";
 import { buildKeyDerivationTrace } from "./buildKeyDerivationTrace";
 import { getFolder } from "./getFolder";
 
@@ -35,13 +36,20 @@ it("should return one parent folder", async () => {
     workspaceId: "aaa",
     keyDerivationTrace: {
       workspaceKeyId: "aaa",
-      parentFolders: [],
+      trace: [
+        {
+          entryId: "aaa",
+          parentId: null,
+          context: folderDerivedKeyContext,
+          subkeyId: 1,
+        },
+      ],
     },
   });
 
   const result = await buildKeyDerivationTrace({
     folderId: "aaa",
-    subkeyId: 234,
+    subkeyId: 1,
     workspaceKeyId: "abc",
   });
   expect(result).toMatchInlineSnapshot(`
@@ -50,10 +58,10 @@ it("should return one parent folder", async () => {
         {
           "folderId": "aaa",
           "parentFolderId": null,
-          "subkeyId": undefined,
+          "subkeyId": 1,
         },
       ],
-      "subkeyId": 234,
+      "subkeyId": 1,
       "workspaceKeyId": "abc",
     }
   `);
@@ -74,7 +82,14 @@ it("should return two parent folders", async () => {
         workspaceId: "aaa",
         keyDerivationTrace: {
           workspaceKeyId: "aaa",
-          parentFolders: [],
+          trace: [
+            {
+              entryId: "aaa",
+              parentId: null,
+              context: folderDerivedKeyContext,
+              subkeyId: 1,
+            },
+          ],
         },
       };
     }
@@ -91,7 +106,20 @@ it("should return two parent folders", async () => {
         workspaceId: "bbb",
         keyDerivationTrace: {
           workspaceKeyId: "bbb",
-          parentFolders: [],
+          trace: [
+            {
+              entryId: "aaa",
+              parentId: null,
+              context: folderDerivedKeyContext,
+              subkeyId: 1,
+            },
+            {
+              entryId: "b",
+              parentId: null,
+              context: folderDerivedKeyContext,
+              subkeyId: 2,
+            },
+          ],
         },
       };
     }
@@ -108,12 +136,12 @@ it("should return two parent folders", async () => {
         {
           "folderId": "aaa",
           "parentFolderId": "bbb",
-          "subkeyId": undefined,
+          "subkeyId": 1,
         },
         {
           "folderId": "bbb",
           "parentFolderId": null,
-          "subkeyId": undefined,
+          "subkeyId": 2,
         },
       ],
       "subkeyId": 345,

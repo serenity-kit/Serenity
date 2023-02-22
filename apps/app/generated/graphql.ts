@@ -183,7 +183,7 @@ export type CreateInitialFolderInput = {
   encryptedNameNonce: Scalars['String'];
   id: Scalars['String'];
   idSignature: Scalars['String'];
-  keyDerivationTrace: KeyDerivationTraceInput;
+  keyDerivationTrace: KeyDerivationTraceInput2;
 };
 
 export type CreateInitialWorkspaceInput = {

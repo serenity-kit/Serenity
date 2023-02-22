@@ -20,7 +20,12 @@ import {
   verifyAndDecryptSnapshot,
   verifyAndDecryptUpdate,
 } from "@naisho/core";
-import { createSnapshotKey, LocalDevice, sleep } from "@serenity-tools/common";
+import {
+  createSnapshotKey,
+  deriveKeysFromKeyDerivationTrace,
+  LocalDevice,
+  sleep,
+} from "@serenity-tools/common";
 import { useActor } from "@xstate/react";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair, to_base64 } from "react-native-libsodium";
@@ -45,14 +50,14 @@ import { PageCommentsDrawerScreenProps } from "../../types/navigationProps";
 import { getSessionKey } from "../../utils/authentication/sessionKeyStore";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
+import { createDocumentKeyDerivationTrace } from "../../utils/document/createDocumentKeyDerivationTrace";
 import { getDocument } from "../../utils/document/getDocument";
-import { buildKeyDerivationTrace } from "../../utils/folder/buildKeyDerivationTrace";
-import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
 import { getFolder } from "../../utils/folder/getFolder";
 import {
   getLocalDocument,
   setLocalDocument,
 } from "../../utils/localSqliteApi/localSqliteApi";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 const reconnectTimeout = 2000;
 
@@ -147,15 +152,28 @@ export default function Page({
     document: Document,
     workspaceKeyId: string
   ) => {
-    const folder = await getFolder({ id: document.parentFolderId! });
-    const folderKeyChainData = await deriveFolderKey({
-      folderId: document.parentFolderId!,
+    const workspace = await getWorkspace({
       workspaceId: document.workspaceId!,
-      overrideWithWorkspaceKeyId: workspaceKeyId,
-      keyDerivationTrace: folder.keyDerivationTrace,
-      activeDevice,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
-    const lastChainItem = folderKeyChainData[folderKeyChainData.length - 1];
+    if (!workspace?.currentWorkspaceKey) {
+      throw new Error("No workspace key for workspace and device");
+    }
+    const folder = await getFolder({ id: document.parentFolderId! });
+    const folderKeyChainData = deriveKeysFromKeyDerivationTrace({
+      keyDerivationTrace: folder.keyDerivationTrace,
+      activeDevice: {
+        signingPublicKey: activeDevice.signingPublicKey,
+        signingPrivateKey: activeDevice.signingPrivateKey!,
+        encryptionPublicKey: activeDevice.encryptionPublicKey,
+        encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+        encryptionPublicKeySignature:
+          activeDevice.encryptionPublicKeySignature!,
+      },
+      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+    });
+    const lastChainItem =
+      folderKeyChainData.trace[folderKeyChainData.trace.length - 1];
     const snapshotKeyData = createSnapshotKey({
       folderKey: lastChainItem.key,
     });
@@ -182,9 +200,10 @@ export default function Page({
     );
     snapshotKeyRef.current = sodium.from_base64(snapshotKey.key);
     const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
-    const keyDerivationTrace = await buildKeyDerivationTrace({
+    // TODO: derive snapshot key from folder key
+    const keyDerivationTrace = await createDocumentKeyDerivationTrace({
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-      subkeyId: snapshotKey.subkeyId,
+      subkeyId: document.nameKeyDerivationTrace.subkeyId,
       folderId: document.parentFolderId!,
     });
     const publicData = {
