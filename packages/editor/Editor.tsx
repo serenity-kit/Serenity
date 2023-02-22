@@ -1,9 +1,9 @@
 import {
   BoxShadow,
-  Button,
   EditorBottombarButton,
   EditorBottombarDivider,
   RawInput,
+  SubmitButton,
   tw,
   useHasEditorSidebar,
   View,
@@ -21,7 +21,7 @@ import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { HStack } from "native-base";
+import { HStack, VStack } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
 import {
   absolutePositionToRelativePosition,
@@ -323,42 +323,51 @@ export const Editor = (props: EditorProps) => {
                 onPress={() => {
                   setHasCreateCommentBubble(true);
                 }}
-                name="cup-line"
+                name="chat-1-line"
                 isActive={true}
               />
             </HStack>
 
             {hasCreateCommentBubble && (
-              <View>
+              <VStack style={tw`w-80 bg-white rounded`}>
                 <RawInput
-                  multiline
+                  placeholder="Add a comment"
                   value={commentText}
                   onChangeText={(text) => setCommentText(text)}
-                />
-                <Button
-                  size="sm"
-                  onPress={() => {
-                    const ystate = ySyncPluginKey.getState(editor.state);
-                    const { type, binding } = ystate;
-
-                    props.createComment({
-                      text: commentText,
-                      from: absolutePositionToRelativePosition(
-                        editor.view.state.selection.from,
-                        type,
-                        binding.mapping
-                      ),
-                      to: absolutePositionToRelativePosition(
-                        editor.view.state.selection.to,
-                        type,
-                        binding.mapping
-                      ),
-                    });
+                  variant={"unstyled"}
+                  multiline
+                  style={tw`p-3`}
+                  _stack={{
+                    height: 60,
                   }}
+                />
+                <HStack
+                  style={tw`p-3 border-t border-solid border-gray-200`}
+                  alignItems="center"
+                  justifyContent="flex-end"
                 >
-                  Create Comment
-                </Button>
-              </View>
+                  <SubmitButton
+                    onPress={() => {
+                      const ystate = ySyncPluginKey.getState(editor.state);
+                      const { type, binding } = ystate;
+
+                      props.createComment({
+                        text: commentText,
+                        from: absolutePositionToRelativePosition(
+                          editor.view.state.selection.from,
+                          type,
+                          binding.mapping
+                        ),
+                        to: absolutePositionToRelativePosition(
+                          editor.view.state.selection.to,
+                          type,
+                          binding.mapping
+                        ),
+                      });
+                    }}
+                  />
+                </HStack>
+              </VStack>
             )}
           </BoxShadow>
         </BubbleMenu>
