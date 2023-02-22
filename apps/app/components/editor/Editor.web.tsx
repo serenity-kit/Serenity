@@ -160,6 +160,11 @@ export default function Editor({
           });
         }}
         highlightedCommentId={commentsState.context.highlightedCommentId}
+        onFocus={() => {
+          editorIsFocusedRef.current = true;
+          showAndPositionToolbar();
+          setIsInEditingMode(true);
+        }}
         onBlur={(params) => {
           if (
             !(
