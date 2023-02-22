@@ -18,6 +18,7 @@ import { useActor, useInterpret } from "@xstate/react";
 import * as Linking from "expo-linking";
 import { useEffect } from "react";
 import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
 import CommentsSidebar from "../components/commentsSidebar/CommentsSidebar";
 import { HeaderLeft } from "../components/headerLeft/HeaderLeft";
@@ -81,6 +82,8 @@ const styles = StyleSheet.create({
 
 const isPhoneDimensions = (width: number) => width < 768;
 
+const drawerWidth = 240;
+
 const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
   props
 ) => {
@@ -94,6 +97,8 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
     },
   });
   const [, send] = useActor(commentsService);
+  const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+  const insets = useSafeAreaInsets();
 
   return (
     <PageProvider
@@ -120,12 +125,16 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
           headerRight: () => <PageHeaderRight />,
           headerTitle: () => <PageHeader />,
           headerTitleAlign: "center",
-          drawerType: "front", // TODO should be front
+          drawerType: "front",
           unmountOnBlur: true,
-          drawerPosition: "left",
+          drawerPosition: "right",
           drawerStyle: {
-            width: 240,
-            // right: 0,
+            width: drawerWidth,
+            marginLeft: isPermanentLeftSidebar ? -drawerWidth : undefined,
+            // necessary to avoid overlapping with the header
+            marginTop: 50 + insets.top,
+            borderLeftWidth: 1,
+            borderLeftColor: tw.color("gray-200"),
           },
           overlayColor: "transparent",
         }}
@@ -133,6 +142,20 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
         <PageCommentsDrawer.Screen name="Page" component={PageScreen} />
       </PageCommentsDrawer.Navigator>
     </PageProvider>
+  );
+};
+
+// By remounting the component we make sure that a fresh state machine gets started.
+// As an alternative we could also have an action that resets the state machine,
+// but with all the side-effects remounting seemed to be the stabler choice for now
+// and also was recommended by the core team:
+// https://github.com/statelyai/xstate/discussions/2108#discussioncomment-4084125
+const PageCommentsDrawerNavigatorResetWrapper: React.FC<{
+  route: any;
+  navigation: any;
+}> = (props) => {
+  return (
+    <PageCommentsDrawerNavigator key={props.route.params.pageId} {...props} />
   );
 };
 
@@ -148,9 +171,7 @@ function WorkspaceDrawerNavigator(props) {
         unmountOnBlur: true,
         headerShown: false,
         drawerType: isPermanentLeftSidebar ? "permanent" : "front",
-        drawerStyle: {
-          width: isDesktopDevice ? 240 : width,
-        },
+        drawerStyle: { width: isDesktopDevice ? drawerWidth : width },
         overlayColor:
           !isPermanentLeftSidebar && isDesktopDevice
             ? tw.color("backdrop")
@@ -159,7 +180,7 @@ function WorkspaceDrawerNavigator(props) {
     >
       <Drawer.Screen
         name="PageCommentsDrawer"
-        component={PageCommentsDrawerNavigator}
+        component={PageCommentsDrawerNavigatorResetWrapper}
       />
       <Drawer.Screen
         name="WorkspaceNotDecrypted"
@@ -184,9 +205,7 @@ function WorkspaceSettingsDrawerNavigator(props) {
           unmountOnBlur: true,
           headerShown: false,
           drawerType: "permanent",
-          drawerStyle: {
-            width: 240,
-          },
+          drawerStyle: { width: drawerWidth },
         }}
       >
         <WorkspaceSettingsDrawer.Screen
@@ -211,9 +230,7 @@ function AccountSettingsDrawerScreen(props) {
           unmountOnBlur: true,
           headerShown: false,
           drawerType: "permanent",
-          drawerStyle: {
-            width: 240,
-          },
+          drawerStyle: { width: drawerWidth },
         }}
       >
         <AccountSettingsDrawer.Screen
@@ -271,7 +288,12 @@ function WorkspaceStackNavigator(props) {
         <WorkspaceStack.Screen
           name="WorkspaceDrawer"
           component={WorkspaceDrawerNavigator}
-          options={{ headerShown: false, animation: "none" }}
+          options={{
+            headerShown: false,
+            animation: "none",
+            // necessary for comments sidear to not extend the screen view to the right
+            contentStyle: { overflow: "hidden" },
+          }}
         />
         {isPhoneDimensions(dimensions.width) ? (
           <>

@@ -76,12 +76,19 @@ export type UpdateEditorParams =
     }
   | {
       variant: "redo";
+    }
+  | {
+      variant: "update-comments";
+      params: {
+        decryptedComments: EditorComment[];
+        highlightedCommentId: string | null;
+      };
     };
 
 export type UpdateEditor = (params: UpdateEditorParams) => void;
 
 export type EditorComment = {
-  commentId: string;
+  id: string;
   from: number;
   to: number;
 };

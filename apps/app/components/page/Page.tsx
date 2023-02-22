@@ -26,7 +26,6 @@ import {
   LocalDevice,
   sleep,
 } from "@serenity-tools/common";
-import { useActor } from "@xstate/react";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair, to_base64 } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
@@ -586,9 +585,6 @@ export default function Page({
     };
   }, []);
 
-  const { commentsService } = usePage();
-  const [state, send] = useActor(commentsService);
-
   return (
     <Editor
       documentId={docId}
@@ -600,14 +596,6 @@ export default function Page({
       isNew={isNew}
       documentLoaded={documentLoadedInfo.loaded}
       username={documentLoadedInfo.username}
-      highlightedCommentId={state.context.highlightedCommentId}
-      comments={state.context.decryptedComments.map((comment) => {
-        return {
-          commentId: comment.id,
-          from: comment.from,
-          to: comment.to,
-        };
-      })}
     />
   );
 }
