@@ -10,6 +10,7 @@ export const deriveExistingSnapshotKey = async (
 ) => {
   // derive existing key if snapshot exists
   const document = await getDocument({ documentId: docId });
+  console.log({ snapshot });
   const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
   const folderKeyChainData = await deriveFolderKey({
     folderId: document.parentFolderId!,
@@ -17,6 +18,8 @@ export const deriveExistingSnapshotKey = async (
     keyDerivationTrace: snapshotKeyDerivationTrace,
     activeDevice,
   });
+  console.log({ snapshotKeyDerivationTrace });
+  console.log({ folderKeyChainData });
   // the last subkey key here is treated like a folder key
   // but since we want to derive a snapshot key, we can just toss
   // the last one out and use the rest

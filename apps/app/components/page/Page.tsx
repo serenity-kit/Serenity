@@ -171,11 +171,13 @@ export default function Page({
       },
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
     });
+    console.log({ folderKeyChainData });
     const lastChainItem =
       folderKeyChainData.trace[folderKeyChainData.trace.length - 1];
     const snapshotKeyData = createSnapshotKey({
       folderKey: lastChainItem.key,
     });
+    console.log({ snapshotKeyData });
     return snapshotKeyData;
   };
 
@@ -202,7 +204,7 @@ export default function Page({
     // TODO: derive snapshot key from folder key
     const keyDerivationTrace = await createDocumentKeyDerivationTrace({
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-      subkeyId: document.nameKeyDerivationTrace.subkeyId,
+      subkeyId: snapshotKey.subkeyId,
       folderId: document.parentFolderId!,
     });
     const publicData = {
