@@ -1,16 +1,27 @@
-import { useEffect, useLayoutEffect, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useWindowDimensions } from "react-native";
 import Page from "../../../components/page/Page";
 import { useWorkspace } from "../../../context/WorkspaceContext";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 
-import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
-import { useMachine } from "@xstate/react";
+import { LocalDevice } from "@serenity-tools/common";
+import {
+  CenterContent,
+  InfoMessage,
+  Spinner,
+  tw,
+  useIsPermanentLeftSidebar,
+} from "@serenity-tools/ui";
+import { useActor, useInterpret, useMachine } from "@xstate/react";
+import { Drawer } from "react-native-drawer-layout";
 import sodium, { KeyPair } from "react-native-libsodium";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import CommentsSidebar from "../../../components/commentsSidebar/CommentsSidebar";
 import { PageHeader } from "../../../components/page/PageHeader";
 import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
-import { usePage } from "../../../context/PageContext";
+import { PageProvider, usePage } from "../../../context/PageContext";
+import { commentsMachine } from "../../../machines/commentsMachine";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
 import {
   getDocumentPath,
@@ -23,7 +34,9 @@ import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { loadPageMachine } from "./loadPageMachine";
 
-const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
+const drawerWidth = 240;
+
+const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const { pageId } = usePage();
   const { activeDevice } = useAuthenticatedAppContext();
@@ -43,10 +56,29 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     },
   });
 
+  const [open, setOpen] = useState(false);
+  const commentsService = useInterpret(commentsMachine, {
+    context: {
+      params: {
+        pageId: props.route.params.pageId,
+        activeDevice: activeDevice as LocalDevice,
+      },
+    },
+  });
+  const [, send] = useActor(commentsService);
+  const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+  const insets = useSafeAreaInsets();
+
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerRight: PageHeaderRight,
-      headerTitle: PageHeader,
+      headerTitle: () => (
+        <PageHeader
+          toggleCommentsDrawer={() => {
+            setOpen((prevOpen) => !prevOpen);
+          }}
+        />
+      ),
     });
   }, []);
 
@@ -115,14 +147,50 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     );
   } else if (state.matches("loadDocument")) {
     return (
-      <Page
-        {...props}
-        // to force unmount and mount the page
-        key={pageId}
-        updateTitle={updateTitle}
-        signatureKeyPair={signatureKeyPair}
-        workspaceId={workspaceId}
-      />
+      <PageProvider
+        value={{
+          pageId: props.route.params.pageId,
+          commentsService,
+          setActiveSnapshotAndCommentKeys: (activeSnapshot, commentKeys) => {
+            send({
+              type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS",
+              activeSnapshot,
+              commentKeys,
+            });
+          },
+        }}
+      >
+        <Drawer
+          open={open}
+          onOpen={() => setOpen(true)}
+          onClose={() => setOpen(false)}
+          renderDrawerContent={() => {
+            return <CommentsSidebar />;
+          }}
+          drawerType="front"
+          drawerPosition="right"
+          overlayStyle={{
+            display: "none",
+          }}
+          drawerStyle={{
+            width: drawerWidth,
+            marginLeft: isPermanentLeftSidebar ? -drawerWidth : undefined,
+            // necessary to avoid overlapping with the header
+            marginTop: 50 + insets.top,
+            borderLeftWidth: 1,
+            borderLeftColor: tw.color("gray-200"),
+          }}
+        >
+          <Page
+            {...props}
+            // to force unmount and mount the page
+            key={pageId}
+            updateTitle={updateTitle}
+            signatureKeyPair={signatureKeyPair}
+            workspaceId={workspaceId}
+          />
+        </Drawer>
+      </PageProvider>
     );
   } else {
     return (
@@ -137,6 +205,6 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
 // As an alternative we could also have an action that resets the state machine,
 // but with all the side-effects remounting seemed to be the stabler choice for now.
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
-  const { pageId } = usePage();
-  return <PageRemountWrapper key={pageId} {...props} />;
+  const pageId = props.route.params.pageId;
+  return <ActualPageScreen key={pageId} {...props} />;
 }
