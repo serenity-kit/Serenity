@@ -71,6 +71,7 @@
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
+    "react-native-drawer-layout": "^3.1.0",
     "react-native-gesture-handler": "~2.8.0",
     "react-native-get-random-values": "~1.8.0",
     "react-native-libsodium": "^0.5.7",

@@ -1,4 +1,3 @@
-import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import {
   Button,
   IconButton,
@@ -13,7 +12,7 @@ import { useActor } from "@xstate/react";
 import { formatDistanceToNow, parseJSON } from "date-fns";
 import { usePage } from "../../context/PageContext";
 
-const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
+const CommentsSidebar: React.FC<{}> = () => {
   const { commentsService } = usePage();
   const [state, send] = useActor(commentsService);
 

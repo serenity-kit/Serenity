@@ -16,8 +16,10 @@ import {
 } from "@serenity-tools/ui";
 import { useActor, useInterpret } from "@xstate/react";
 import * as Linking from "expo-linking";
+import * as React from "react";
 import { useEffect } from "react";
 import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
+import { Drawer } from "react-native-drawer-layout";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
 import CommentsSidebar from "../components/commentsSidebar/CommentsSidebar";
@@ -70,7 +72,7 @@ import WorkspaceSettingsMobileOverviewScreen from "./screens/workspaceSettingsMo
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const WorkspaceStack = createNativeStackNavigator<WorkspaceStackParamList>();
-const Drawer = createDrawerNavigator();
+const WorkspaceDrawer = createDrawerNavigator();
 const AccountSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
 const WorkspaceSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
 const PageCommentsDrawer = createDrawerNavigator(); // for desktop and tablet
@@ -87,6 +89,7 @@ const drawerWidth = 240;
 const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
   props
 ) => {
+  const [open, setOpen] = React.useState(false);
   const { activeDevice } = useAuthenticatedAppContext();
   const commentsService = useInterpret(commentsMachine, {
     context: {
@@ -114,33 +117,61 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
         },
       }}
     >
-      <PageCommentsDrawer.Navigator
-        id="PageCommentsDrawer"
-        drawerContent={(props) => <CommentsSidebar {...props} />}
-        screenOptions={{
-          headerStyle: [styles.header],
-          headerLeft: (headerProps) => (
-            <PageHeaderLeft {...headerProps} navigation={props.navigation} />
-          ),
-          headerRight: () => <PageHeaderRight />,
-          headerTitle: () => <PageHeader />,
-          headerTitleAlign: "center",
-          drawerType: "front",
-          unmountOnBlur: true,
-          drawerPosition: "right",
-          drawerStyle: {
-            width: drawerWidth,
-            marginLeft: isPermanentLeftSidebar ? -drawerWidth : undefined,
-            // necessary to avoid overlapping with the header
-            marginTop: 50 + insets.top,
-            borderLeftWidth: 1,
-            borderLeftColor: tw.color("gray-200"),
-          },
-          overlayColor: "transparent",
+      <Drawer
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+        renderDrawerContent={() => {
+          return <CommentsSidebar />;
+        }}
+        drawerType="front"
+        drawerPosition="right"
+        overlayStyle={{
+          display: "none",
+        }}
+        drawerStyle={{
+          width: drawerWidth,
+          marginLeft: isPermanentLeftSidebar ? -drawerWidth : undefined,
+          // necessary to avoid overlapping with the header
+          marginTop: 50 + insets.top,
+          borderLeftWidth: 1,
+          borderLeftColor: tw.color("gray-200"),
         }}
       >
-        <PageCommentsDrawer.Screen name="Page" component={PageScreen} />
-      </PageCommentsDrawer.Navigator>
+        <PageCommentsDrawer.Navigator
+          id="PageCommentsDrawer"
+          drawerContent={(props) => null}
+          screenOptions={{
+            headerStyle: [styles.header],
+            headerLeft: (headerProps) => (
+              <PageHeaderLeft {...headerProps} navigation={props.navigation} />
+            ),
+            headerRight: () => <PageHeaderRight />,
+            headerTitle: () => (
+              <PageHeader
+                toggleCommentsDrawer={() => {
+                  setOpen((prevOpen) => !prevOpen);
+                }}
+              />
+            ),
+            headerTitleAlign: "center",
+            drawerType: "front",
+            unmountOnBlur: true,
+            drawerPosition: "right",
+            drawerStyle: {
+              width: drawerWidth,
+              marginLeft: isPermanentLeftSidebar ? -drawerWidth : undefined,
+              // necessary to avoid overlapping with the header
+              marginTop: 50 + insets.top,
+              borderLeftWidth: 1,
+              borderLeftColor: tw.color("gray-200"),
+            },
+            overlayColor: "transparent",
+          }}
+        >
+          <PageCommentsDrawer.Screen name="Page" component={PageScreen} />
+        </PageCommentsDrawer.Navigator>
+      </Drawer>
     </PageProvider>
   );
 };
@@ -165,7 +196,7 @@ function WorkspaceDrawerNavigator(props) {
   const { width } = useWindowDimensions();
 
   return (
-    <Drawer.Navigator
+    <WorkspaceDrawer.Navigator
       drawerContent={(props) => <Sidebar {...props} />}
       screenOptions={{
         unmountOnBlur: true,
@@ -178,21 +209,21 @@ function WorkspaceDrawerNavigator(props) {
             : "transparent",
       }}
     >
-      <Drawer.Screen
+      <WorkspaceDrawer.Screen
         name="PageCommentsDrawer"
         component={PageCommentsDrawerNavigatorResetWrapper}
       />
-      <Drawer.Screen
+      <WorkspaceDrawer.Screen
         name="WorkspaceNotDecrypted"
         component={WorkspaceNotDecryptedScreen}
         options={{ title: "" }}
       />
-      <Drawer.Screen
+      <WorkspaceDrawer.Screen
         name="WorkspaceRoot"
         component={WorkspaceRootScreen}
         options={{ headerShown: false }}
       />
-    </Drawer.Navigator>
+    </WorkspaceDrawer.Navigator>
   );
 }
 

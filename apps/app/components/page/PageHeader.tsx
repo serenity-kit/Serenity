@@ -3,7 +3,11 @@ import { IconButton, Text, tw, useIsDesktopDevice } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 
-export const PageHeader: React.FC<{}> = () => {
+type Props = {
+  toggleCommentsDrawer: () => void;
+};
+
+export const PageHeader: React.FC<Props> = ({ toggleCommentsDrawer }) => {
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
   const isDesktopDevice = useIsDesktopDevice();
   const navigation = useNavigation();
@@ -19,8 +23,7 @@ export const PageHeader: React.FC<{}> = () => {
       ) : null}
       <IconButton
         onPress={() => {
-          // @ts-ignore
-          navigation.openDrawer();
+          toggleCommentsDrawer();
         }}
         name="chat-4-line"
         color={"gray-900"}
