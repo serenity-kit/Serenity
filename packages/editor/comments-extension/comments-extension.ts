@@ -7,7 +7,6 @@ import {
 } from "y-prosemirror";
 import * as Y from "yjs";
 import { EditorComment } from "../types";
-import { tw } from "@serenity-tools/ui";
 
 export interface CommentsExtensionOptions {
   comments: EditorComment[];
@@ -72,14 +71,10 @@ const createCommentsDecorationSet = (
     state.doc,
     comments.map((comment) => {
       return Decoration.inline(comment.absoluteFrom, comment.absoluteTo, {
-        style:
-          // display setting needed to properly size background and add border
-          `display: inline-block; border-bottom: 0.125rem solid ${tw.color(
-            "comment-active"
-          )};` +
-          (comment.id === highlightedCommentId
-            ? `background-color: ${tw.color("comment-active")}`
-            : `background-color: ${tw.color("comment-default")}`),
+        class:
+          comment.id === highlightedCommentId
+            ? "editor-comment-active"
+            : "editor-comment",
       });
     })
   );
