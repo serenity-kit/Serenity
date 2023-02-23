@@ -4,6 +4,7 @@ import {
   decryptWorkspaceKey,
   folderDerivedKeyContext,
   LocalDevice,
+  snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import sodium, { KeyPair } from "react-native-libsodium";
@@ -86,17 +87,23 @@ test("successfully creates a snapshot", async () => {
   );
 
   await waitForClientState(client, client.OPEN);
-
+  const id = "be0fa80f-4c6b-47f9-b2d4-ac1cc9f3e31b";
   const snapshotKey = createSnapshotKey({ folderKey });
   lastSnapshotKey = snapshotKey.key;
   const keyDerivationTrace = {
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    subkeyId: snapshotKey.subkeyId,
-    parentFolders: [
+    trace: [
       {
-        folderId: addedFolder.id,
+        entryId: addedFolder.id,
+        parentId: null,
         subkeyId: addedFolder.subkeyId,
-        parentFolderId: null,
+        context: folderDerivedKeyContext,
+      },
+      {
+        entryId: id,
+        parentId: addedFolder.id,
+        subkeyId: snapshotKey.subkeyId,
+        context: snapshotDerivedKeyContext,
       },
     ],
   };
@@ -106,7 +113,7 @@ test("successfully creates a snapshot", async () => {
     keyType: "ed25519",
   };
   const publicData = {
-    snapshotId: "be0fa80f-4c6b-47f9-b2d4-ac1cc9f3e31b",
+    snapshotId: id,
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
@@ -221,7 +228,7 @@ test("successfully creates a snapshot", async () => {
   );
 
   await waitForClientState(client, client.OPEN);
-
+  const id = "9674b24a-bb14-4f7e-bc81-dd49906a28fd";
   const workspaceResult = await getWorkspace({
     graphql,
     workspaceId,
@@ -250,12 +257,18 @@ test("successfully creates a snapshot", async () => {
   lastSnapshotKey = snapshotKey.key;
   const keyDerivationTrace = {
     workspaceKeyId: workspaceResult.workspace.currentWorkspaceKey.id,
-    subkeyId: snapshotKey.subkeyId,
-    parentFolders: [
+    trace: [
       {
-        folderId: addedFolder.id,
+        entryId: addedFolder.id,
+        parentId: null,
         subkeyId: addedFolder.subkeyId,
-        parentFolderId: null,
+        context: folderDerivedKeyContext,
+      },
+      {
+        entryId: id,
+        parentId: addedFolder.id,
+        subkeyId: snapshotKey.subkeyId,
+        context: snapshotDerivedKeyContext,
       },
     ],
   };
@@ -265,7 +278,7 @@ test("successfully creates a snapshot", async () => {
     keyType: "ed25519",
   };
   const publicData = {
-    snapshotId: "9674b24a-bb14-4f7e-bc81-dd49906a28fd",
+    snapshotId: id,
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,

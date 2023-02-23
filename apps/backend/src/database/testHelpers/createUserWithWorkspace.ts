@@ -7,6 +7,8 @@ import {
   encryptDocumentTitle,
   encryptFolderName,
   encryptWorkspaceKeyForDevice,
+  folderDerivedKeyContext,
+  snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { Registration } from "@serenity-tools/opaque-server";
 import sodium from "react-native-libsodium";
@@ -119,18 +121,25 @@ export default async function createUserWithWorkspace({
   // const documentEncryptionKey = sodium.from_base64(
   //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
   // );
+  const snapshotId = uuidv4();
   const snapshot = createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
     subkeyId: snapshotKey.subkeyId,
     keyDerivationTrace: {
       workspaceKeyId,
-      subkeyId: snapshotKey.subkeyId,
-      parentFolders: [
+      trace: [
         {
-          folderId,
+          entryId: folderId,
+          parentId: null,
           subkeyId: encryptedFolderResult.folderSubkeyId,
-          parentFolderId: null,
+          context: folderDerivedKeyContext,
+        },
+        {
+          entryId: snapshotId,
+          parentId: folderId,
+          subkeyId: snapshotKey.subkeyId,
+          context: snapshotDerivedKeyContext,
         },
       ],
     },
@@ -157,8 +166,14 @@ export default async function createUserWithWorkspace({
       encryptedNameNonce: encryptedFolderResult.publicNonce,
       keyDerivationTrace: {
         workspaceKeyId,
-        subkeyId: encryptedFolderResult.folderSubkeyId,
-        parentFolders: [],
+        trace: [
+          {
+            entryId: folderId,
+            subkeyId: encryptedFolderResult.folderSubkeyId,
+            parentId: null,
+            context: folderDerivedKeyContext,
+          },
+        ],
       },
     },
     document: {

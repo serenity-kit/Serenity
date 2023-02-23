@@ -1,4 +1,3 @@
-import { KeyDerivationTrace } from "@naisho/core";
 import { AuthenticationError } from "apollo-server-express";
 import {
   arg,
@@ -8,8 +7,9 @@ import {
   objectType,
 } from "nexus";
 import { updateFolderName } from "../../../database/folder/updateFolderName";
+import { formatFolder } from "../../../types/folder";
 import { Folder } from "../../types/folder";
-import { KeyDerivationTraceInput } from "../../types/keyDerivation";
+import { KeyDerivationTraceInput2 } from "../../types/keyDerivation";
 
 export const UpdateFolderNameInput = inputObjectType({
   name: "UpdateFolderNameInput",
@@ -19,7 +19,7 @@ export const UpdateFolderNameInput = inputObjectType({
     t.nonNull.string("encryptedNameNonce");
     t.nonNull.string("workspaceKeyId");
     t.nonNull.int("subkeyId");
-    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput2 });
   },
 });
 
@@ -53,10 +53,7 @@ export const updateFolderNameMutation = mutationField("updateFolderName", {
       keyDerivationTrace: args.input.keyDerivationTrace,
     });
     return {
-      folder: {
-        ...folder,
-        keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace,
-      },
+      folder: formatFolder(folder),
     };
   },
 });

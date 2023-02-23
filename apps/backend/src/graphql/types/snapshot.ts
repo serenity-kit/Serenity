@@ -1,6 +1,6 @@
 import { objectType } from "nexus";
 import { Document } from "./document";
-import { KeyDerivationTrace } from "./keyDerivation";
+import { KeyDerivationTrace2 } from "./keyDerivation";
 
 export const Update = objectType({
   name: "Update",
@@ -26,7 +26,7 @@ export const Snapshot = objectType({
     t.list.nonNull.field("updates", { type: Update });
     t.field("activeDocumentSnapshot", { type: Document });
     t.nonNull.field("date", { type: "Date" });
-    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTrace });
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTrace2 });
     t.nonNull.list.nonNull.int("clocks");
   },
 });

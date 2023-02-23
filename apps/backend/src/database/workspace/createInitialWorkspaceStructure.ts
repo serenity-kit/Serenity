@@ -1,4 +1,8 @@
-import { KeyDerivationTrace, Snapshot } from "@naisho/core";
+import {
+  KeyDerivationTrace,
+  KeyDerivationTrace2,
+  Snapshot,
+} from "@naisho/core";
 import { Snapshot as SnapshotModel } from "../../../prisma/generated/output";
 import { Document, formatDocument } from "../../types/document";
 import { Folder, formatFolder } from "../../types/folder";
@@ -30,7 +34,7 @@ export type FolderParams = {
   idSignature: string;
   encryptedName: string;
   encryptedNameNonce: string;
-  keyDerivationTrace: KeyDerivationTrace;
+  keyDerivationTrace: KeyDerivationTrace2;
 };
 
 export type DocumentParams = {

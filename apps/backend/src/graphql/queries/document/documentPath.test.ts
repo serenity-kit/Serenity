@@ -191,10 +191,11 @@ export const getDocumentPath = async ({
         encryptedNameNonce
         keyDerivationTrace {
           workspaceKeyId
-          parentFolders {
-            folderId
+          trace {
+            entryId
             subkeyId
-            parentFolderId
+            parentId
+            context
           }
         }
       }

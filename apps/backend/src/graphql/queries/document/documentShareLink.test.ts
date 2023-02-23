@@ -1,15 +1,19 @@
-import { createSnapshotKey } from "@serenity-tools/common";
+import {
+  createSnapshotKey,
+  deriveKeysFromKeyDerivationTrace,
+} from "@serenity-tools/common";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocumentShareLink } from "../../../../test/helpers/document/createDocumentShareLink";
 import { getDocumentShareLink } from "../../../../test/helpers/document/getDocumentShareLink";
-import { deriveFolderKey } from "../../../../test/helpers/folder/deriveFolderKey";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { getWorkspace } from "../../../../test/helpers/workspace/getWorkspace";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
 let userData: any = undefined;
+let user1Workspace: any = undefined;
 let token = "";
 
 const setup = async () => {
@@ -17,14 +21,20 @@ const setup = async () => {
     id: uuidv4(),
     username: `${uuidv4()}@example.com`,
   });
-  const folderKeyTrace = await deriveFolderKey({
+  const getWorkspaceResult = await getWorkspace({
+    graphql,
     workspaceId: userData.workspace.id,
-    folderId: userData.folder.id,
+    authorizationHeader: userData.sessionKey,
+    deviceSigningPublicKey: userData.webDevice.signingPublicKey,
+  });
+  user1Workspace = getWorkspaceResult.workspace;
+  const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: userData.folder.keyDerivationTrace,
     activeDevice: userData.webDevice,
+    workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
   });
   const snapshotKeyData = createSnapshotKey({
-    folderKey: folderKeyTrace[folderKeyTrace.length - 1].key,
+    folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
   const createDocumentShareLinkResponse = await createDocumentShareLink({
     graphql,

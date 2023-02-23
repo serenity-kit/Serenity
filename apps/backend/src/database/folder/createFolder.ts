@@ -1,4 +1,4 @@
-import { KeyDerivationTrace } from "@naisho/core";
+import { KeyDerivationTrace2 } from "@naisho/core";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
 import { Folder } from "../../types/folder";
@@ -13,7 +13,7 @@ type Params = {
   subkeyId: number;
   parentFolderId?: string;
   workspaceId: string;
-  keyDerivationTrace: KeyDerivationTrace;
+  keyDerivationTrace: KeyDerivationTrace2;
 };
 
 export async function createFolder({
@@ -90,7 +90,7 @@ export async function createFolder({
     });
     const folder: Folder = {
       ...rawFolder,
-      keyDerivationTrace: rawFolder.keyDerivationTrace as KeyDerivationTrace,
+      keyDerivationTrace: rawFolder.keyDerivationTrace as KeyDerivationTrace2,
       parentFolders: [],
     };
     return folder;

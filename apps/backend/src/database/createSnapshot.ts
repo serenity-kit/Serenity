@@ -1,5 +1,5 @@
 import {
-  KeyDerivationTrace,
+  KeyDerivationTrace2,
   NaishoNewSnapshotWithKeyRotationRequired,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
@@ -42,7 +42,7 @@ export async function createSnapshot({
     ]);
 
     const snapshotKeyDerivationTrace = snapshot.publicData
-      .keyDerivationTrace as KeyDerivationTrace;
+      .keyDerivationTrace as KeyDerivationTrace2;
 
     if (
       // workspaceKey has been rotated

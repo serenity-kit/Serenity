@@ -1,6 +1,6 @@
 import { encryptFolderName } from "@serenity-tools/common";
 import { gql } from "graphql-request";
-import { buildFolderKeyTrace } from "./buildFolderKeyTrace";
+import { createFolderKeyDerivationTrace } from "./createFolderKeyDerivationTrace";
 
 type Params = {
   graphql: any;
@@ -29,10 +29,9 @@ export const updateFolderName = async ({
     parentKey: workspaceKey,
   });
 
-  const keyDerivationTrace = await buildFolderKeyTrace({
+  const keyDerivationTrace = await createFolderKeyDerivationTrace({
     workspaceKeyId,
-    subkeyId: encryptedFolderResult.folderSubkeyId,
-    parentFolderId,
+    parentFolderId: id,
   });
   const query = gql`
     mutation updateFolderName($input: UpdateFolderNameInput!) {
@@ -46,11 +45,11 @@ export const updateFolderName = async ({
           workspaceId
           keyDerivationTrace {
             workspaceKeyId
-            subkeyId
-            parentFolders {
-              folderId
+            trace {
+              entryId
               subkeyId
-              parentFolderId
+              parentId
+              context
             }
           }
         }
