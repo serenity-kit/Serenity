@@ -29,6 +29,9 @@ jobs:
         run: yarn lint
   test:
     runs-on: ubuntu-latest
+    env:
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
@@ -65,6 +68,8 @@ jobs:
       FILE_STORAGE_ACCESS_KEY_ID: ${{ secrets.FILE_STORAGE_ACCESS_KEY_ID }}
       FILE_STORAGE_SECRET_ACCESS_KEY: ${{ secrets.FILE_STORAGE_SECRET_ACCESS_KEY }}
       FILE_STORAGE_BUCKET: ${{ secrets.FILE_STORAGE_BUCKET }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
@@ -94,5 +99,7 @@ jobs:
         run: curl http://localhost:4001/graphql
       - name: Curl frontend
         run: curl --fail-with-body http://localhost:19006
+      - name: Echo SERENITY_ENV
+        run: echo $SERENITY_ENV
       - name: Run e2e tests
         run: yarn workspace backend test:e2e
