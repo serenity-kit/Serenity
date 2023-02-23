@@ -90,5 +90,9 @@ jobs:
       - name: Sleep for 5 seconds
         run: sleep 5s
         shell: bash
+      - name: Curl backend
+        run: curl http://localhost:4001/graphql
+      - name: Curl frontend
+        run: curl --fail-with-body http://localhost:19006
       - name: Run e2e tests
         run: yarn workspace backend test:e2e
