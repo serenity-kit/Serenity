@@ -102,12 +102,11 @@ export const workspaceRootScreenMachine =
                   .workspaceLoadingInfo.id,
               screen: "WorkspaceDrawer",
               params: {
-                screen: "PageCommentsDrawer",
+                screen: "Page",
                 params: {
                   pageId:
                     context.meWithWorkspaceLoadingInfoQueryResult.data.me
                       .workspaceLoadingInfo.documentId,
-                  screen: "Page",
                 },
               },
             });

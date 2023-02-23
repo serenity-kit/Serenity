@@ -25,9 +25,6 @@ import AccountSettingsSidebar from "../components/accountSettingsSidebar/Account
 import CommentsSidebar from "../components/commentsSidebar/CommentsSidebar";
 import { HeaderLeft } from "../components/headerLeft/HeaderLeft";
 import NavigationDrawerModal from "../components/navigationDrawerModal/NavigationDrawerModal";
-import { PageHeader } from "../components/page/PageHeader";
-import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
-import { PageHeaderRight } from "../components/pageHeaderRight/PageHeaderRight";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
 import { PageProvider } from "../context/PageContext";
@@ -75,7 +72,6 @@ const WorkspaceStack = createNativeStackNavigator<WorkspaceStackParamList>();
 const WorkspaceDrawer = createDrawerNavigator();
 const AccountSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
 const WorkspaceSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
-const PageCommentsDrawer = createDrawerNavigator(); // for desktop and tablet
 
 const styles = StyleSheet.create({
   // web prefix needed as this otherwise messes with the height-calculation for mobile
@@ -86,7 +82,7 @@ const isPhoneDimensions = (width: number) => width < 768;
 
 const drawerWidth = 240;
 
-const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
+const PageProviderWrapper: React.FC<{ route: any; navigation: any }> = (
   props
 ) => {
   const [open, setOpen] = React.useState(false);
@@ -138,39 +134,7 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
           borderLeftColor: tw.color("gray-200"),
         }}
       >
-        <PageCommentsDrawer.Navigator
-          id="PageCommentsDrawer"
-          drawerContent={(props) => null}
-          screenOptions={{
-            headerStyle: [styles.header],
-            headerLeft: (headerProps) => (
-              <PageHeaderLeft {...headerProps} navigation={props.navigation} />
-            ),
-            headerRight: () => <PageHeaderRight />,
-            headerTitle: () => (
-              <PageHeader
-                toggleCommentsDrawer={() => {
-                  setOpen((prevOpen) => !prevOpen);
-                }}
-              />
-            ),
-            headerTitleAlign: "center",
-            drawerType: "front",
-            unmountOnBlur: true,
-            drawerPosition: "right",
-            drawerStyle: {
-              width: drawerWidth,
-              marginLeft: isPermanentLeftSidebar ? -drawerWidth : undefined,
-              // necessary to avoid overlapping with the header
-              marginTop: 50 + insets.top,
-              borderLeftWidth: 1,
-              borderLeftColor: tw.color("gray-200"),
-            },
-            overlayColor: "transparent",
-          }}
-        >
-          <PageCommentsDrawer.Screen name="Page" component={PageScreen} />
-        </PageCommentsDrawer.Navigator>
+        <PageScreen key={props.route.params.pageId} {...props} />
       </Drawer>
     </PageProvider>
   );
@@ -181,13 +145,11 @@ const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
 // but with all the side-effects remounting seemed to be the stabler choice for now
 // and also was recommended by the core team:
 // https://github.com/statelyai/xstate/discussions/2108#discussioncomment-4084125
-const PageCommentsDrawerNavigatorResetWrapper: React.FC<{
+const PageScreenWrapper: React.FC<{
   route: any;
   navigation: any;
 }> = (props) => {
-  return (
-    <PageCommentsDrawerNavigator key={props.route.params.pageId} {...props} />
-  );
+  return <PageProviderWrapper key={props.route.params.pageId} {...props} />;
 };
 
 function WorkspaceDrawerNavigator(props) {
@@ -209,10 +171,7 @@ function WorkspaceDrawerNavigator(props) {
             : "transparent",
       }}
     >
-      <WorkspaceDrawer.Screen
-        name="PageCommentsDrawer"
-        component={PageCommentsDrawerNavigatorResetWrapper}
-      />
+      <WorkspaceDrawer.Screen name="Page" component={PageScreenWrapper} />
       <WorkspaceDrawer.Screen
         name="WorkspaceNotDecrypted"
         component={WorkspaceNotDecryptedScreen}
@@ -566,10 +525,7 @@ const getLinking = (
             WorkspaceDrawer: {
               path: "/",
               screens: {
-                PageCommentsDrawer: {
-                  path: "page/:pageId",
-                  screens: { Page: "" },
-                },
+                Page: "page/:pageId",
                 WorkspaceNotDecrypted: "lobby",
                 WorkspaceRoot: "",
               },

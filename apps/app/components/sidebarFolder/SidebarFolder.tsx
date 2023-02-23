@@ -232,13 +232,10 @@ export default function SidebarFolder(props: Props) {
         workspaceId: props.workspaceId,
         screen: "WorkspaceDrawer",
         params: {
-          screen: "PageCommentsDrawer",
+          screen: "Page",
           params: {
             pageId: result.data?.createDocument?.id,
-            screen: "Page",
-            params: {
-              isNew: true,
-            },
+            isNew: true,
           },
         },
       });

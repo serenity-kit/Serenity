@@ -192,10 +192,9 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         workspaceId: workspace.id,
         screen: "WorkspaceDrawer",
         params: {
-          screen: "PageCommentsDrawer",
+          screen: "Page",
           params: {
             pageId: document.id,
-            screen: "Page",
           },
         },
       });

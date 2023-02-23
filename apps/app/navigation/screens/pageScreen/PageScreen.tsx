@@ -3,7 +3,7 @@ import { useWindowDimensions } from "react-native";
 import Page from "../../../components/page/Page";
 import { useWorkspace } from "../../../context/WorkspaceContext";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
-import { PageCommentsDrawerScreenProps } from "../../../types/navigationProps";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
@@ -21,7 +21,7 @@ import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { loadPageMachine } from "./loadPageMachine";
 
-const PageRemountWrapper = (props: PageCommentsDrawerScreenProps<"Page">) => {
+const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const { pageId } = usePage();
   const { activeDevice } = useAuthenticatedAppContext();
@@ -135,9 +135,7 @@ const PageRemountWrapper = (props: PageCommentsDrawerScreenProps<"Page">) => {
 // By remounting the component we make sure that a fresh state machine gets started.
 // As an alternative we could also have an action that resets the state machine,
 // but with all the side-effects remounting seemed to be the stabler choice for now.
-export default function PageScreen(
-  props: PageCommentsDrawerScreenProps<"Page">
-) {
+export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
   const { pageId } = usePage();
   return <PageRemountWrapper key={pageId} {...props} />;
 }
