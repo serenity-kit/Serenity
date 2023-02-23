@@ -2,6 +2,7 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { useLinkProps } from "@react-navigation/native";
 import {
   decryptDocumentTitle,
+  deriveKeysFromKeyDerivationTrace,
   recreateDocumentKey,
 } from "@serenity-tools/common";
 import {
@@ -21,7 +22,8 @@ import { KeyDerivationTrace, useDocumentQuery } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
-import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
+import { getFolder } from "../../utils/folder/getFolder";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
 type Props = ViewProps & {
@@ -83,6 +85,13 @@ export default function SidebarPage(props: Props) {
       setDocumentTitle("Untitled");
       return;
     }
+    const workspace = await getWorkspace({
+      workspaceId: props.workspaceId,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
+    if (!workspace?.currentWorkspaceKey) {
+      console.error("No workspace key for workspace and device");
+    }
     try {
       const document = documentResult.data?.document;
       if (!document) {
@@ -91,18 +100,30 @@ export default function SidebarPage(props: Props) {
       }
       // TODO: optimize this by using the `getFolderKey()` function
       // so that we don't need to load each folder multiple times
-      const folderKeyData = await deriveFolderKey({
-        folderId: props.parentFolderId,
-        workspaceId: props.workspaceId,
-        activeDevice,
-        keyDerivationTrace: props.nameKeyDerivationTrace,
+      const folder = await getFolder({
+        id: props.parentFolderId,
       });
-      // the last subkey key is treated like a folder key, so we can toss it out
-      // we actually want to derive a document subkey
-      const folderKey = folderKeyData[folderKeyData.length - 2].key;
+      if (!folder) {
+        console.error("Unable to retrieve folder!");
+      }
+
+      const parentFolderKeyData = deriveKeysFromKeyDerivationTrace({
+        keyDerivationTrace: folder.keyDerivationTrace,
+        activeDevice: {
+          signingPublicKey: activeDevice.signingPublicKey,
+          signingPrivateKey: activeDevice.signingPrivateKey!,
+          encryptionPublicKey: activeDevice.encryptionPublicKey,
+          encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+          encryptionPublicKeySignature:
+            activeDevice.encryptionPublicKeySignature!,
+        },
+        workspaceKeyBox: workspace!.currentWorkspaceKey!.workspaceKeyBox!,
+      });
+      const folderKeyData =
+        parentFolderKeyData.trace[parentFolderKeyData.trace.length - 1];
       const documentKeyData = recreateDocumentKey({
-        folderKey: folderKey,
-        subkeyId: props.nameKeyDerivationTrace.subkeyId,
+        folderKey: folderKeyData.key,
+        subkeyId: props.subkeyId!,
       });
       const documentTitle = decryptDocumentTitle({
         key: documentKeyData.key,

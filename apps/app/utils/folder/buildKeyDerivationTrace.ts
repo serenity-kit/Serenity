@@ -22,7 +22,10 @@ export const buildKeyDerivationTrace = async ({
       folder = await getFolder({ id: folderIdToFetch });
       folderKeyData.push({
         folderId: folder.id,
-        subkeyId: folder.keyDerivationTrace.subkeyId,
+        subkeyId:
+          folder.keyDerivationTrace.trace[
+            folder.keyDerivationTrace.trace.length - 1
+          ].subkeyId,
         parentFolderId: folder.parentFolderId,
       });
       if (folder.parentFolderId) {

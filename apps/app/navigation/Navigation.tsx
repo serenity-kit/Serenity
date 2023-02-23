@@ -105,6 +105,10 @@ function WorkspaceDrawerNavigator(props) {
         headerTitle: (props) => <Text>{props.children}</Text>,
         headerStyle: [styles.header],
         headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
+        headerRightContainerStyle: {
+          flexBasis: isDesktopDevice ? drawerWidth : 0,
+          flexGrow: isDesktopDevice ? 0 : 1,
+        },
         overlayColor:
           !isPermanentLeftSidebar && isDesktopDevice
             ? tw.color("backdrop")

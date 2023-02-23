@@ -65,8 +65,14 @@ test("create initial workspace structure", async () => {
   expect(typeof folder.encryptedNameNonce).toBe("string");
   expect(typeof folder.keyDerivationTrace).toBe("object");
   expect(typeof folder.keyDerivationTrace.workspaceKeyId).toBe("string");
-  expect(typeof folder.keyDerivationTrace.subkeyId).toBe("number");
-  expect(typeof folder.keyDerivationTrace.parentFolders).toBe("object");
+  expect(typeof folder.keyDerivationTrace.trace[0].subkeyId).toBe("number");
+  expect(folder.keyDerivationTrace.trace[0].parentId).toBe(
+    folder.parentFolderId
+  );
+  expect(folder.keyDerivationTrace.trace[0].entryId).toBe(folder.id);
+  expect(folder.keyDerivationTrace.trace[0].context).toBe(
+    folderDerivedKeyContext
+  );
   expect(document.id).not.toBeNull();
   expect(document.id).not.toBeUndefined();
   expect(typeof document.encryptedName).toBe("string");
@@ -86,15 +92,14 @@ test("create initial workspace structure", async () => {
     receiverDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
   });
   expect(typeof workspaceKey).toBe("string");
-  // TODO: derive folder key from trace
   const folderKey = kdfDeriveFromKey({
     key: workspaceKey,
     context: folderDerivedKeyContext,
-    subkeyId: folder.keyDerivationTrace.subkeyId,
+    subkeyId: folder.keyDerivationTrace.trace[0].subkeyId,
   });
   const decryptedFolderName = decryptFolderName({
     parentKey: workspaceKey,
-    subkeyId: folder.keyDerivationTrace.subkeyId,
+    subkeyId: folder.keyDerivationTrace.trace[0].subkeyId,
     ciphertext: folder.encryptedName,
     publicNonce: folder.encryptedNameNonce,
   });

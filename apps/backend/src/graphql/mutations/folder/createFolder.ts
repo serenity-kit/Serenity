@@ -7,8 +7,9 @@ import {
   objectType,
 } from "nexus";
 import { createFolder } from "../../../database/folder/createFolder";
+import { formatFolder } from "../../../types/folder";
 import { Folder } from "../../types/folder";
-import { KeyDerivationTraceInput } from "../../types/keyDerivation";
+import { KeyDerivationTraceInput2 } from "../../types/keyDerivation";
 
 export const CreateFolderInput = inputObjectType({
   name: "CreateFolderInput",
@@ -20,7 +21,7 @@ export const CreateFolderInput = inputObjectType({
     t.nonNull.int("subkeyId");
     t.string("parentFolderId");
     t.nonNull.string("workspaceId");
-    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput2 });
   },
 });
 
@@ -55,11 +56,6 @@ export const createFolderMutation = mutationField("createFolder", {
       workspaceId: args.input.workspaceId,
       keyDerivationTrace: args.input.keyDerivationTrace,
     });
-    return {
-      folder: {
-        ...folder,
-        keyDerivationTrace: folder.keyDerivationTrace,
-      },
-    };
+    return { folder: formatFolder(folder) };
   },
 });

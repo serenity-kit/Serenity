@@ -1,25 +1,12 @@
 jest.mock("../../generated/graphql", () => ({ __esModule: true }));
-jest.mock("./getFolderTrace", () => ({
+jest.mock("../folder/getFolderTrace", () => ({
   __esModule: true,
   getFolderTrace: jest.fn(),
 }));
 
 import { folderDerivedKeyContext } from "@serenity-tools/common";
-import { createFolderKeyDerivationTrace } from "./createFolderKeyDerivationTrace";
-import { getFolderTrace } from "./getFolderTrace";
-
-it("should return empty parentFolders", async () => {
-  const result = await createFolderKeyDerivationTrace({
-    folderId: null,
-    workspaceKeyId: "workspaceId",
-  });
-  expect(result).toMatchInlineSnapshot(`
-    {
-      "trace": [],
-      "workspaceKeyId": "workspaceId",
-    }
-  `);
-});
+import { getFolderTrace } from "../folder/getFolderTrace";
+import { createDocumentKeyDerivationTrace } from "./createDocumentKeyDerivationTrace";
 
 it("should return one parent folder", async () => {
   // @ts-ignore getFolder is mocked
@@ -47,20 +34,21 @@ it("should return one parent folder", async () => {
     },
   ]);
 
-  const result = await createFolderKeyDerivationTrace({
+  const result = await createDocumentKeyDerivationTrace({
     folderId: "folderId",
+    subkeyId: 2,
     workspaceKeyId: "workspaceKeyId",
   });
   expect(result).toMatchInlineSnapshot(`
     {
-      "trace": [
+      "parentFolders": [
         {
-          "context": "${folderDerivedKeyContext}",
-          "entryId": "folderId",
-          "parentId": null,
+          "folderId": "folderId",
+          "parentFolderId": null,
           "subkeyId": 1,
         },
       ],
+      "subkeyId": 2,
       "workspaceKeyId": "workspaceKeyId",
     }
   `);
@@ -106,11 +94,10 @@ it("should return two parent folders", async () => {
             entryId: "parentFolderId",
             parentId: null,
             context: folderDerivedKeyContext,
-            subkeyId: 2,
           },
           {
             entryId: "childFolderId",
-            parentId: null,
+            parentId: "parentFolderId",
             context: folderDerivedKeyContext,
             subkeyId: 1,
           },
@@ -119,27 +106,27 @@ it("should return two parent folders", async () => {
     },
   ]);
 
-  const result = await createFolderKeyDerivationTrace({
+  const result = await createDocumentKeyDerivationTrace({
     folderId: "childFolderId",
-    workspaceKeyId: "workspaceId",
+    subkeyId: 3,
+    workspaceKeyId: "workspaceKeyId",
   });
   expect(result).toMatchInlineSnapshot(`
     {
-      "trace": [
+      "parentFolders": [
         {
-          "context": "${folderDerivedKeyContext}",
-          "entryId": "parentFolderId",
-          "parentId": null,
+          "folderId": "parentFolderId",
+          "parentFolderId": null,
           "subkeyId": 2,
         },
         {
-          "context": "${folderDerivedKeyContext}",
-          "entryId": "childFolderId",
-          "parentId": "parentFolderId",
+          "folderId": "childFolderId",
+          "parentFolderId": "parentFolderId",
           "subkeyId": 1,
         },
       ],
-      "workspaceKeyId": "workspaceId",
+      "subkeyId": 3,
+      "workspaceKeyId": "workspaceKeyId",
     }
   `);
 });

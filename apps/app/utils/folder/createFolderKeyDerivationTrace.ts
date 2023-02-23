@@ -14,13 +14,18 @@ export const createFolderKeyDerivationTrace = async ({
   if (folderId) {
     const folderTrace = await getFolderTrace({ folderId });
     folderTrace.forEach((folder) => {
-      const subkeyId = folder.keyDerivationTrace.subkeyId;
-      trace.push({
-        entryId: folder.id,
-        subkeyId,
-        parentId: folder.parentFolderId,
-        context: folderDerivedKeyContext,
-      });
+      if (folder.keyDerivationTrace.trace.length > 0) {
+        const subkeyId =
+          folder.keyDerivationTrace.trace[
+            folder.keyDerivationTrace.trace.length - 1
+          ].subkeyId;
+        trace.push({
+          entryId: folder.id,
+          subkeyId,
+          parentId: folder.parentFolderId,
+          context: folderDerivedKeyContext,
+        });
+      }
     });
   }
   return {

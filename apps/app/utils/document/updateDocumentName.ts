@@ -1,5 +1,6 @@
 import {
   createDocumentKey,
+  deriveKeysFromKeyDerivationTrace,
   encryptDocumentTitle,
 } from "@serenity-tools/common";
 import {
@@ -7,10 +8,9 @@ import {
   runUpdateDocumentNameMutation,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { buildKeyDerivationTrace } from "../folder/buildKeyDerivationTrace";
-import { deriveFolderKey } from "../folder/deriveFolderKeyData";
 import { getFolder } from "../folder/getFolder";
 import { getWorkspace } from "../workspace/getWorkspace";
+import { createDocumentKeyDerivationTrace } from "./createDocumentKeyDerivationTrace";
 
 export type Props = {
   document: Document;
@@ -30,14 +30,19 @@ export const updateDocumentName = async ({
     throw new Error("Workspace or workspaceKeys not found");
   }
   const folder = await getFolder({ id: document.parentFolderId! });
-  const parentFolderKeyData = await deriveFolderKey({
-    folderId: document.parentFolderId!,
-    workspaceId: document.workspaceId!,
+  const parentFolderKeyData = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: folder.keyDerivationTrace,
-    overrideWithWorkspaceKeyId: workspace.currentWorkspaceKey.id,
-    activeDevice,
+    activeDevice: {
+      signingPublicKey: activeDevice.signingPublicKey,
+      signingPrivateKey: activeDevice.signingPrivateKey!,
+      encryptionPublicKey: activeDevice.encryptionPublicKey,
+      encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+      encryptionPublicKeySignature: activeDevice.encryptionPublicKeySignature!,
+    },
+    workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
   });
-  const folderKeyData = parentFolderKeyData[parentFolderKeyData.length - 1];
+  const folderKeyData =
+    parentFolderKeyData.trace[parentFolderKeyData.trace.length - 1];
   const documentKeyData = createDocumentKey({
     folderKey: folderKeyData.key,
   });
@@ -46,7 +51,8 @@ export const updateDocumentName = async ({
     title: name,
     key: documentKey,
   });
-  const nameKeyDerivationTrace = await buildKeyDerivationTrace({
+  // TODO: derive document name key from snapshot key
+  const nameKeyDerivationTrace = await createDocumentKeyDerivationTrace({
     folderId: document.parentFolderId!,
     subkeyId: documentKeyData.subkeyId,
     workspaceKeyId: workspace.currentWorkspaceKey.id,

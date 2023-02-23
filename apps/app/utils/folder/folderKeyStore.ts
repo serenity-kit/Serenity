@@ -1,7 +1,7 @@
+import { deriveKeysFromKeyDerivationTrace } from "@serenity-tools/common";
 import create from "zustand";
 import { Device } from "../../types/Device";
 import { getWorkspace } from "../workspace/getWorkspace";
-import { deriveFolderKey } from "./deriveFolderKeyData";
 import { getFolder } from "./getFolder";
 
 /*
@@ -76,6 +76,13 @@ export const useFolderKeyStore = create<FolderKeyState>((set, get) => ({
       }
       usingWorkspaceKeyId = workspace.currentWorkspaceKey.id;
     }
+    const workspace = await getWorkspace({
+      workspaceId: usingWorkspaceKeyId,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
+    if (!workspace?.currentWorkspaceKey) {
+      throw new Error("No workspace key found for device");
+    }
     const folderKeyLookupForWorkspace = get().folderKeyLookupForWorkspace;
     let folderIdSubkeyLookup = folderKeyLookupForWorkspace[workspaceId];
     if (!folderIdSubkeyLookup) {
@@ -95,7 +102,10 @@ export const useFolderKeyStore = create<FolderKeyState>((set, get) => ({
     let usingFolderSubkeyId = folderSubkeyId;
     if (usingFolderSubkeyId === undefined) {
       const folder = await getFolder({ id: folderId });
-      usingFolderSubkeyId = folder.keyDerivationTrace.subkeyId;
+      usingFolderSubkeyId =
+        folder.keyDerivationTrace.trace[
+          folder.keyDerivationTrace.trace.length - 1
+        ].subkeyId;
     }
     let folderKey = folderSubkeyKeyLookup[folderSubkeyId];
     if (folderKey) {
@@ -103,25 +113,32 @@ export const useFolderKeyStore = create<FolderKeyState>((set, get) => ({
     }
     const folder = await getFolder({ id: folderId });
     // TODO: optimize by creating a single graphql query to get all folders
-    const derivedFolderKeyData = await deriveFolderKey({
-      folderId: folder.id,
-      workspaceId,
+    const derivedFolderKeyData = deriveKeysFromKeyDerivationTrace({
       keyDerivationTrace: folder.keyDerivationTrace,
-      activeDevice,
+      activeDevice: {
+        signingPublicKey: activeDevice.signingPublicKey,
+        signingPrivateKey: activeDevice.signingPrivateKey!,
+        encryptionPublicKey: activeDevice.encryptionPublicKey,
+        encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+        encryptionPublicKeySignature:
+          activeDevice.encryptionPublicKeySignature!,
+      },
+      workspaceKeyBox: workspace!.currentWorkspaceKey.workspaceKeyBox!,
     });
-    folderKey = derivedFolderKeyData[derivedFolderKeyData.length - 1].key;
-    let remainingFolderKeyData = [...derivedFolderKeyData];
+    folderKey =
+      derivedFolderKeyData.trace[derivedFolderKeyData.trace.length - 1].key;
+    let remainingFolderKeyData = [...derivedFolderKeyData.trace];
     // the first key in the trace is the workspace key
     while (remainingFolderKeyData.length > 1) {
       const lastFolderKeyData =
         remainingFolderKeyData[remainingFolderKeyData.length - 1];
-      const traceFolderId = lastFolderKeyData.folderId;
+      const traceFolderId = lastFolderKeyData.entryId;
       if (!folderWorkspaceKeyIdLookup[traceFolderId!]) {
         folderWorkspaceKeyIdLookup[traceFolderId!] = {};
       }
       folderWorkspaceKeyIdLookup[traceFolderId!][lastFolderKeyData.subkeyId] =
         lastFolderKeyData.key;
-      remainingFolderKeyData = [...derivedFolderKeyData];
+      remainingFolderKeyData = [...derivedFolderKeyData.trace];
       remainingFolderKeyData.pop();
     }
     set({ folderKeyLookupForWorkspace });

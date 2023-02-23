@@ -41,7 +41,7 @@ export interface SnapshotPublicData {
   pubKey: string; // public signing key
   snapshotId: string;
   subkeyId: number;
-  keyDerivationTrace: KeyDerivationTrace;
+  keyDerivationTrace: KeyDerivationTrace2;
 }
 
 export interface SnapshotServerData {

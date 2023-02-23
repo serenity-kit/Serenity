@@ -5,6 +5,8 @@ import {
   createSnapshotKey,
   encryptDocumentTitle,
   encryptFolderName,
+  folderDerivedKeyContext,
+  snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import {
   Button,
@@ -100,9 +102,43 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       );
       const folderKeyDerivationTrace = {
         workspaceKeyId,
-        subkeyId: encryptedFolderResult.folderSubkeyId,
-        parentFolders: [],
+        trace: [
+          {
+            entryId: folderId,
+            subkeyId: encryptedFolderResult.folderSubkeyId,
+            parentId: null,
+            context: folderDerivedKeyContext,
+          },
+        ],
       };
+
+      // prepare document snapshot
+      const snapshotKey = createSnapshotKey({
+        folderKey: encryptedFolderResult.folderSubkey,
+      });
+      const snapshotId = uuidv4();
+      const snapshot = createIntroductionDocumentSnapshot({
+        documentId,
+        snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
+        subkeyId: snapshotKey.subkeyId,
+        keyDerivationTrace: {
+          workspaceKeyId,
+          trace: [
+            {
+              entryId: folderId,
+              subkeyId: encryptedFolderResult.folderSubkeyId,
+              parentId: null,
+              context: folderDerivedKeyContext,
+            },
+            {
+              entryId: snapshotId,
+              parentId: folderId,
+              subkeyId: snapshotKey.subkeyId,
+              context: snapshotDerivedKeyContext,
+            },
+          ],
+        },
+      });
 
       // prepare document
       const documentKeyData = createDocumentKey({
@@ -118,32 +154,11 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         parentFolders: [
           {
             folderId,
-            subkeyId: encryptedFolderResult.folderSubkeyId,
             parentFolderId: null,
+            subkeyId: encryptedFolderResult.folderSubkeyId,
           },
         ],
       };
-
-      // prepare document snapshot
-      const snapshotKey = createSnapshotKey({
-        folderKey: encryptedFolderResult.folderSubkey,
-      });
-      const snapshot = createIntroductionDocumentSnapshot({
-        documentId,
-        snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
-        subkeyId: snapshotKey.subkeyId,
-        keyDerivationTrace: {
-          workspaceKeyId,
-          subkeyId: snapshotKey.subkeyId,
-          parentFolders: [
-            {
-              folderId,
-              subkeyId: encryptedFolderResult.folderSubkeyId,
-              parentFolderId: null,
-            },
-          ],
-        },
-      });
 
       const createInitialWorkspaceStructureResult =
         await createInitialWorkspaceStructure({

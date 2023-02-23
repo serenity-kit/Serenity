@@ -1,7 +1,10 @@
-import { encryptFolderName } from "@serenity-tools/common";
+import {
+  encryptFolderName,
+  folderDerivedKeyContext,
+} from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { TestContext } from "../setupGraphql";
-import { buildFolderKeyTrace } from "./buildFolderKeyTrace";
+import { createFolderKeyDerivationTrace } from "./createFolderKeyDerivationTrace";
 
 type Params = {
   graphql: TestContext;
@@ -35,10 +38,15 @@ export const createFolder = async ({
   const encryptedName = encryptedFolderResult.ciphertext;
   const encryptedNameNonce = encryptedFolderResult.publicNonce;
 
-  const keyDerivationTrace = await buildFolderKeyTrace({
+  const keyDerivationTrace = await createFolderKeyDerivationTrace({
     workspaceKeyId,
-    subkeyId,
     parentFolderId,
+  });
+  keyDerivationTrace.trace.push({
+    entryId: id,
+    subkeyId,
+    parentId: parentFolderId,
+    context: folderDerivedKeyContext,
   });
 
   const query = gql`
@@ -53,11 +61,11 @@ export const createFolder = async ({
           workspaceId
           keyDerivationTrace {
             workspaceKeyId
-            subkeyId
-            parentFolders {
-              folderId
+            trace {
+              entryId
               subkeyId
-              parentFolderId
+              parentId
+              context
             }
           }
         }
