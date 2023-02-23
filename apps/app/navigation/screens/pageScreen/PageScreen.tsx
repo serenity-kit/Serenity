@@ -16,11 +16,10 @@ import {
 import { useActor, useInterpret, useMachine } from "@xstate/react";
 import { Drawer } from "react-native-drawer-layout";
 import sodium, { KeyPair } from "react-native-libsodium";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CommentsSidebar from "../../../components/commentsSidebar/CommentsSidebar";
 import { PageHeader } from "../../../components/page/PageHeader";
 import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
-import { PageProvider, usePage } from "../../../context/PageContext";
+import { PageProvider } from "../../../context/PageContext";
 import { commentsMachine } from "../../../machines/commentsMachine";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
 import {
@@ -38,7 +37,7 @@ const drawerWidth = 240;
 
 const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const { pageId } = usePage();
+  const pageId = props.route.params.pageId;
   const { activeDevice } = useAuthenticatedAppContext();
   const { workspaceId } = useWorkspace();
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
@@ -67,7 +66,6 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
   });
   const [, send] = useActor(commentsService);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
-  const insets = useSafeAreaInsets();
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
