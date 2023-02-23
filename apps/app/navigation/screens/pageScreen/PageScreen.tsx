@@ -175,8 +175,6 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
           drawerStyle={{
             width: drawerWidth,
             marginLeft: isPermanentLeftSidebar ? -drawerWidth : undefined,
-            // necessary to avoid overlapping with the header
-            marginTop: 50 + insets.top,
             borderLeftWidth: 1,
             borderLeftColor: tw.color("gray-200"),
           }}
