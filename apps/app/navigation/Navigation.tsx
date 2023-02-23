@@ -10,6 +10,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { LocalDevice } from "@serenity-tools/common";
 import {
   Heading,
+  Text,
   tw,
   useIsDesktopDevice,
   useIsPermanentLeftSidebar,
@@ -25,6 +26,7 @@ import AccountSettingsSidebar from "../components/accountSettingsSidebar/Account
 import CommentsSidebar from "../components/commentsSidebar/CommentsSidebar";
 import { HeaderLeft } from "../components/headerLeft/HeaderLeft";
 import NavigationDrawerModal from "../components/navigationDrawerModal/NavigationDrawerModal";
+import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
 import { PageProvider } from "../context/PageContext";
@@ -159,12 +161,15 @@ function WorkspaceDrawerNavigator(props) {
 
   return (
     <WorkspaceDrawer.Navigator
-      drawerContent={(props) => <Sidebar {...props} />}
+      drawerContent={(drawerProps) => <Sidebar {...drawerProps} />}
       screenOptions={{
         unmountOnBlur: true,
-        headerShown: false,
         drawerType: isPermanentLeftSidebar ? "permanent" : "front",
         drawerStyle: { width: isDesktopDevice ? drawerWidth : width },
+        headerShown: true,
+        headerTitle: (props) => <Text>{props.children}</Text>,
+        headerStyle: [styles.header],
+        headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
         overlayColor:
           !isPermanentLeftSidebar && isDesktopDevice
             ? tw.color("backdrop")

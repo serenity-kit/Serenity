@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import { IconButton, Text, tw, useIsDesktopDevice } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
@@ -10,7 +9,6 @@ type Props = {
 export const PageHeader: React.FC<Props> = ({ toggleCommentsDrawer }) => {
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
   const isDesktopDevice = useIsDesktopDevice();
-  const navigation = useNavigation();
 
   return (
     <>

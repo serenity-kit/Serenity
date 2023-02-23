@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 import Page from "../../../components/page/Page";
 import { useWorkspace } from "../../../context/WorkspaceContext";
@@ -8,6 +8,8 @@ import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
 import { useMachine } from "@xstate/react";
 import sodium, { KeyPair } from "react-native-libsodium";
+import { PageHeader } from "../../../components/page/PageHeader";
+import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
 import { usePage } from "../../../context/PageContext";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
 import {
@@ -41,13 +43,12 @@ const PageRemountWrapper = (props: WorkspaceDrawerScreenProps<"Page">) => {
     },
   });
 
-  // useLayoutEffect(() => {
-  //   props.navigation.setOptions({
-  //     headerRight: PageHeaderRight,
-  //     headerTitle: PageHeader,
-  //     headerTitleAlign: "center",
-  //   });
-  // }, []);
+  useLayoutEffect(() => {
+    props.navigation.setOptions({
+      headerRight: PageHeaderRight,
+      headerTitle: PageHeader,
+    });
+  }, []);
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPath = await getDocumentPath(docId);
