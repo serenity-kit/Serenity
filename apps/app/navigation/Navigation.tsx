@@ -105,6 +105,9 @@ function WorkspaceDrawerNavigator(props) {
         headerTitle: (props) => <Text>{props.children}</Text>,
         headerStyle: [styles.header],
         headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
+        headerLeftContainerStyle: {
+          flex: 1,
+        },
         headerRightContainerStyle: {
           flexBasis: isDesktopDevice ? drawerWidth : 0,
           flexGrow: isDesktopDevice ? 0 : 1,
