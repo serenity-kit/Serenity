@@ -6,6 +6,7 @@ import {
   encryptFolderName,
   encryptWorkspaceKeyForDevice,
   folderDerivedKeyContext,
+  snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
@@ -185,18 +186,25 @@ export const createInitialWorkspaceStructure = async ({
   const snapshotKey = createSnapshotKey({
     folderKey,
   });
+  const snapshotId = uuidv4();
   const snapshot = createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
     subkeyId: snapshotKey.subkeyId,
     keyDerivationTrace: {
       workspaceKeyId,
-      subkeyId: snapshotKey.subkeyId,
-      parentFolders: [
+      trace: [
         {
-          folderId: folderId,
+          entryId: folderId,
+          parentId: null,
           subkeyId: encryptedFolderResult.folderSubkeyId,
-          parentFolderId: null,
+          context: folderDerivedKeyContext,
+        },
+        {
+          entryId: snapshotId,
+          parentId: folderId,
+          subkeyId: snapshotKey.subkeyId,
+          context: snapshotDerivedKeyContext,
         },
       ],
     },

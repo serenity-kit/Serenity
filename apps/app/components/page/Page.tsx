@@ -25,6 +25,7 @@ import {
   deriveKeysFromKeyDerivationTrace,
   LocalDevice,
   sleep,
+  snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair, to_base64 } from "react-native-libsodium";
@@ -49,8 +50,8 @@ import { PageCommentsDrawerScreenProps } from "../../types/navigationProps";
 import { getSessionKey } from "../../utils/authentication/sessionKeyStore";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
-import { createDocumentKeyDerivationTrace } from "../../utils/document/createDocumentKeyDerivationTrace";
 import { getDocument } from "../../utils/document/getDocument";
+import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { getFolder } from "../../utils/folder/getFolder";
 import {
   getLocalDocument,
@@ -200,10 +201,16 @@ export default function Page({
     snapshotKeyRef.current = sodium.from_base64(snapshotKey.key);
     const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
     // TODO: derive snapshot key from folder key
-    const keyDerivationTrace = await createDocumentKeyDerivationTrace({
+    const keyDerivationTrace = await createFolderKeyDerivationTrace({
       workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-      subkeyId: snapshotKey.subkeyId,
       folderId: document.parentFolderId!,
+    });
+    const snapshotId = uuidv4();
+    keyDerivationTrace.trace.push({
+      entryId: snapshotId,
+      parentId: document.parentFolderId,
+      subkeyId: snapshotKey.subkeyId,
+      context: snapshotDerivedKeyContext,
     });
     const publicData = {
       snapshotId: uuidv4(),
