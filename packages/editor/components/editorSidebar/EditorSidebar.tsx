@@ -12,7 +12,6 @@ import {
 import {
   EditorSidebarIcon,
   Heading,
-  ScrollView,
   SidebarButton,
   SidebarDivider,
   Tab,
@@ -43,10 +42,7 @@ export default function EditorSidebar({
   >("editing");
 
   return (
-    // grow-0 overrides default of ScrollView to keep the assigned width
-    <ScrollView
-      style={tw`w-sidebar grow-0 border-l border-gray-200 bg-gray-100`}
-    >
+    <>
       <TabList accessibilityLabel="Editor sidebar Tabs">
         <Tab
           tabId="editing"
@@ -350,6 +346,6 @@ export default function EditorSidebar({
           </SidebarButton>
         </TabPanel>
       )}
-    </ScrollView>
+    </>
   );
 }
