@@ -1,3 +1,4 @@
+import { useRoute } from "@react-navigation/native";
 import {
   Button,
   Description,
@@ -20,13 +21,12 @@ import * as Clipboard from "expo-clipboard";
 import { useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import sodium, { KeyPair } from "react-native-libsodium";
-import { usePage } from "../../context/PageContext";
 import {
   runRemoveDocumentShareLinkMutation,
   useDocumentShareLinksQuery,
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
-import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
+import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { createDocumentShareLink } from "../../utils/document/createDocumentShareLink";
 import { notNull } from "../../utils/notNull/notNull";
 
@@ -42,7 +42,8 @@ const styles = StyleSheet.create({
 const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 1;
 
 export function PageShareModalContent() {
-  const { pageId } = usePage();
+  const route = useRoute<WorkspaceDrawerScreenProps<"Page">["route"]>();
+  const pageId = route.params.pageId;
   const [documentShareLinksResult, refetchDocumentShareLinks] =
     useDocumentShareLinksQuery({
       variables: { documentId: pageId },
@@ -59,7 +60,6 @@ export function PageShareModalContent() {
 
   const [isClipboardNoticeActive, setIsClipboardNoticeActive] = useState(false);
   const [pageShareLink, setPageShareLink] = useState<string | null>(null);
-  const activeDocument = useActiveDocumentInfoStore((state) => state.document);
   const documentShareLinks =
     documentShareLinksResult.data?.documentShareLinks?.nodes?.filter(notNull) ||
     [];
