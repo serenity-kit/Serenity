@@ -331,8 +331,8 @@ export const Editor = (props: EditorProps) => {
                   onPress={() => {
                     setHasCreateCommentBubble(true);
                   }}
-                  name="cup-line"
-                  isActive={true}
+                  name="chat-1-line"
+                  isActive={false}
                 />
               </HStack>
 
