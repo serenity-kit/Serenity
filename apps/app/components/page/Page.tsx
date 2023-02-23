@@ -171,13 +171,11 @@ export default function Page({
       },
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
     });
-    console.log({ folderKeyChainData });
     const lastChainItem =
       folderKeyChainData.trace[folderKeyChainData.trace.length - 1];
     const snapshotKeyData = createSnapshotKey({
       folderKey: lastChainItem.key,
     });
-    console.log({ snapshotKeyData });
     return snapshotKeyData;
   };
 
