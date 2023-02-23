@@ -459,7 +459,7 @@ export default function Page({
         if (process.env.NODE_ENV === "development") {
           host = `ws://localhost:4000`;
         }
-        if (process.env.IS_E2E_TEST === "true") {
+        if (process.env.SERENITY_ENV === "e2e") {
           host = `ws://localhost:4001`;
         }
         const connection = new WebSocket(
