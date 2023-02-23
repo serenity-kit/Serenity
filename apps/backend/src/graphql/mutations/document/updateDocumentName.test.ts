@@ -1,6 +1,7 @@
 import {
   decryptDocumentTitle,
   decryptWorkspaceKey,
+  deriveKeysFromKeyDerivationTrace,
   folderDerivedKeyContext,
   recreateDocumentKey,
 } from "@serenity-tools/common";
@@ -18,7 +19,6 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 
 const graphql = setupGraphql();
 let userData1: any = undefined;
-const username = "user1";
 const password = "password";
 let addedWorkspace: any = null;
 let addedFolder: any = null;
@@ -26,6 +26,7 @@ let addedDocumentId = "";
 let sessionKey = "";
 let workspaceKey = "";
 let folderKey = "";
+let snapshotKey = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
@@ -58,6 +59,12 @@ const setup = async () => {
     workspaceId: addedWorkspace.id,
   });
   addedDocumentId = createDocumentResult.createDocument.id;
+  const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: userData1.snapshot.keyDerivationTrace,
+    activeDevice: userData1.mainDevice,
+    workspaceKeyBox: userData1.workspace.currentWorkspaceKey.workspaceKeyBox,
+  });
+  snapshotKey = snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
 };
 
 beforeAll(async () => {
@@ -75,16 +82,15 @@ test("user should be able to change a document name", async () => {
     name,
     parentFolderId: addedFolder.id,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    folderKey,
+    snapshotKey,
     authorizationHeader,
   });
   const updatedDocument = result.updateDocumentName.document;
   expect(typeof updatedDocument.encryptedName).toBe("string");
   expect(typeof updatedDocument.encryptedNameNonce).toBe("string");
-  expect(typeof updatedDocument.nameKeyDerivationTrace.subkeyId).toBe("number");
   const documentSubkey = recreateDocumentKey({
-    folderKey,
-    subkeyId: updatedDocument.nameKeyDerivationTrace.subkeyId,
+    snapshotKey,
+    subkeyId: updatedDocument.subkeyId,
   });
   const decryptedName = decryptDocumentTitle({
     key: documentSubkey.key,
@@ -107,7 +113,7 @@ test("Throw error when document doesn't exist", async () => {
         name,
         parentFolderId: addedFolder.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        folderKey,
+        snapshotKey,
         authorizationHeader,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
@@ -138,7 +144,7 @@ test("Throw error when user doesn't have access", async () => {
         name,
         parentFolderId: addedFolder.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        folderKey,
+        snapshotKey,
         authorizationHeader: userData2.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -167,7 +173,7 @@ test("Commenter tries to update", async () => {
         name,
         parentFolderId: addedFolder.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        folderKey,
+        snapshotKey,
         authorizationHeader: otherUser.sessionKey,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -196,7 +202,7 @@ test("Viewer tries to update", async () => {
         name,
         parentFolderId: addedFolder.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        folderKey,
+        snapshotKey,
         authorizationHeader: otherUser.sessionKey,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -213,7 +219,7 @@ test("Unauthenticated", async () => {
         name,
         parentFolderId: addedFolder.id,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        folderKey,
+        snapshotKey,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

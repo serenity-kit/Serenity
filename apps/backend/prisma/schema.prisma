@@ -11,26 +11,25 @@ generator client {
 }
 
 model Document {
-  id                     String              @id
+  id                 String              @id
   // can be optional because a document is created without a snapshot at first
-  activeSnapshot         Snapshot?           @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
-  activeSnapshotId       String?             @unique
-  snapshots              Snapshot[]
-  createdAt              DateTime            @default(now())
-  workspace              Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  workspaceId            String
-  workspaceKey           WorkspaceKey?       @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
-  workspaceKeyId         String?
-  parentFolder           Folder              @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
-  parentFolderId         String
-  encryptedName          String? // a document is first created without a name
-  encryptedNameNonce     String? // a document is first created without a name
-  subkeyId               Int? // used for the name - a document is first created without a name
-  nameKeyDerivationTrace Json                @default("{}")
-  documentShareLinks     DocumentShareLink[]
-  requiresSnapshot       Boolean             @default(false)
-  comments               Comment[]
-  commentReplies         CommentReply[]
+  activeSnapshot     Snapshot?           @relation(name: "activeSnapshot", fields: [activeSnapshotId], references: [id], onDelete: Cascade)
+  activeSnapshotId   String?             @unique
+  snapshots          Snapshot[]
+  createdAt          DateTime            @default(now())
+  workspace          Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspaceId        String
+  workspaceKey       WorkspaceKey?       @relation(fields: [workspaceKeyId], references: [id], onDelete: SetNull)
+  workspaceKeyId     String?
+  parentFolder       Folder              @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
+  parentFolderId     String
+  encryptedName      String? // a document is first created without a name
+  encryptedNameNonce String? // a document is first created without a name
+  subkeyId           Int? // used for the name - a document is first created without a name
+  documentShareLinks DocumentShareLink[]
+  requiresSnapshot   Boolean             @default(false)
+  comments           Comment[]
+  commentReplies     CommentReply[]
 
   @@unique([subkeyId, workspaceId])
 }

@@ -1,4 +1,4 @@
-import { KeyDerivationTrace } from "@naisho/core";
+import { KeyDerivationTrace2 } from "@naisho/core";
 import { Document } from "./document";
 
 export type Snapshot = {
@@ -10,7 +10,7 @@ export type Snapshot = {
   updates?: Update[];
   activeSnapshotDocument: Document;
   createdAt: Date;
-  keyDerivationTrace: KeyDerivationTrace;
+  keyDerivationTrace: KeyDerivationTrace2;
   clocks: number[];
 };
 
@@ -24,14 +24,16 @@ export type Update = {
   pubKey: string;
 };
 
-export const formatSnapshot = (snapshot: any): Document => {
+export const formatSnapshot = (snapshot: any): Snapshot => {
   let clocks = [];
-  if (snapshot.clocks) {
+  if (snapshot.clocks && typeof snapshot.clocks == "string") {
     clocks = JSON.parse(snapshot.clocks);
+  } else {
+    clocks = snapshot.clocks;
   }
   return {
     ...snapshot,
-    keyDerivationTrace: snapshot.keyDerivationTrace as KeyDerivationTrace,
+    keyDerivationTrace: snapshot.keyDerivationTrace as KeyDerivationTrace2,
     clocks,
   };
 };

@@ -7,7 +7,6 @@ import {
   objectType,
 } from "nexus";
 import { createDocument } from "../../../database/document/createDocument";
-import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const CreateDocumentInput = inputObjectType({
   name: "CreateDocumentInput",
@@ -15,9 +14,6 @@ export const CreateDocumentInput = inputObjectType({
     t.nonNull.string("id");
     t.nonNull.string("parentFolderId");
     t.nonNull.string("workspaceId");
-    t.field("nameKeyDerivationTrace", {
-      type: KeyDerivationTraceInput,
-    });
   },
 });
 
@@ -47,10 +43,9 @@ export const createDocumentMutation = mutationField("createDocument", {
       encryptedName: null,
       encryptedNameNonce: null,
       workspaceKeyId: null,
-      subkeyId: null, // name subkey id
+      subkeyId: null,
       parentFolderId: args.input.parentFolderId,
       workspaceId: args.input.workspaceId,
-      nameKeyDerivationTrace: args.input.nameKeyDerivationTrace,
     });
     return {
       id: document.id,

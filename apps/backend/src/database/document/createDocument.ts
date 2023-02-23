@@ -1,4 +1,3 @@
-import { KeyDerivationTrace } from "@naisho/core";
 import { ForbiddenError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
@@ -12,7 +11,6 @@ type Params = {
   subkeyId?: number | null;
   parentFolderId: string;
   workspaceId: string;
-  nameKeyDerivationTrace: KeyDerivationTrace | undefined | null;
 };
 
 export async function createDocument({
@@ -24,7 +22,6 @@ export async function createDocument({
   subkeyId,
   parentFolderId,
   workspaceId,
-  nameKeyDerivationTrace,
 }: Params) {
   const allowedRoles = [Role.ADMIN, Role.EDITOR];
   // verify that the user is an admin or editor of the workspace
@@ -43,11 +40,6 @@ export async function createDocument({
       subkeyId,
       parentFolderId,
       workspaceId,
-      nameKeyDerivationTrace: nameKeyDerivationTrace || {
-        workspaceKeyId: "",
-        subkeyId: -1,
-        parentFolders: [],
-      },
     },
   });
   return document;

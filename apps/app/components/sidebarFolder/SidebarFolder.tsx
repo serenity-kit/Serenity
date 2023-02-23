@@ -587,8 +587,7 @@ export default function SidebarFolder(props: Props) {
                     documentId={document.id}
                     encryptedName={document.encryptedName}
                     encryptedNameNonce={document.encryptedNameNonce}
-                    subkeyId={document.nameKeyDerivationTrace.subkeyId}
-                    nameKeyDerivationTrace={document.nameKeyDerivationTrace}
+                    subkeyId={document.subkeyId}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}
                     depth={depth}

@@ -3,13 +3,12 @@ import {
   encryptDocumentTitle,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
-import { buildFolderKeyTrace } from "../folder/buildFolderKeyTrace";
 
 type Params = {
   graphql: any;
   id: string;
   name: string;
-  folderKey: string;
+  snapshotKey: string;
   parentFolderId: string;
   workspaceKeyId: string;
   authorizationHeader: string;
@@ -19,7 +18,7 @@ export const updateDocumentName = async ({
   graphql,
   id,
   name,
-  folderKey,
+  snapshotKey,
   parentFolderId,
   workspaceKeyId,
   authorizationHeader,
@@ -28,17 +27,11 @@ export const updateDocumentName = async ({
     authorization: authorizationHeader,
   };
   const documentKeyData = createDocumentKey({
-    folderKey,
+    snapshotKey,
   });
   const encryptedDocumentResult = encryptDocumentTitle({
     title: name,
     key: documentKeyData.key,
-  });
-
-  const nameKeyDerivationTrace = await buildFolderKeyTrace({
-    workspaceKeyId,
-    subkeyId: documentKeyData.subkeyId,
-    parentFolderId,
   });
 
   const query = gql`
@@ -50,15 +43,7 @@ export const updateDocumentName = async ({
           id
           parentFolderId
           workspaceId
-          nameKeyDerivationTrace {
-            workspaceKeyId
-            subkeyId
-            parentFolders {
-              folderId
-              subkeyId
-              parentFolderId
-            }
-          }
+          subkeyId
         }
       }
     }
@@ -72,7 +57,6 @@ export const updateDocumentName = async ({
         encryptedNameNonce: encryptedDocumentResult.publicNonce,
         workspaceKeyId,
         subkeyId: documentKeyData.subkeyId,
-        nameKeyDerivationTrace,
       },
     },
     authorizationHeaders
