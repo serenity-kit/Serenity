@@ -1,7 +1,11 @@
 import { Snapshot } from "@naisho/core";
-import { LocalDevice, recreateSnapshotKey } from "@serenity-tools/common";
+import {
+  deriveKeysFromKeyDerivationTrace,
+  LocalDevice,
+  recreateSnapshotKey,
+} from "@serenity-tools/common";
 import { getDocument } from "../document/getDocument";
-import { deriveFolderKey } from "../folder/deriveFolderKeyData";
+import { getWorkspace } from "../workspace/getWorkspace";
 
 export const deriveExistingSnapshotKey = async (
   docId: string,
@@ -10,20 +14,32 @@ export const deriveExistingSnapshotKey = async (
 ) => {
   // derive existing key if snapshot exists
   const document = await getDocument({ documentId: docId });
-  const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
-  const folderKeyChainData = await deriveFolderKey({
-    folderId: document.parentFolderId!,
+  const workspace = await getWorkspace({
     workspaceId: document.workspaceId!,
-    keyDerivationTrace: snapshotKeyDerivationTrace,
-    activeDevice,
+    deviceSigningPublicKey: activeDevice.signingPublicKey,
   });
-  // the last subkey key here is treated like a folder key
-  // but since we want to derive a snapshot key, we can just toss
-  // the last one out and use the rest
-  const lastChainItem = folderKeyChainData[folderKeyChainData.length - 2];
+  if (!workspace?.currentWorkspaceKey) {
+    throw new Error("No workspace key found for this device");
+  }
+  const snapshotKeyDerivationTrace = snapshot.publicData.keyDerivationTrace;
+  const folderKeyChainData = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: snapshotKeyDerivationTrace,
+    activeDevice: {
+      signingPublicKey: activeDevice.signingPublicKey,
+      signingPrivateKey: activeDevice.signingPrivateKey!,
+      encryptionPublicKey: activeDevice.encryptionPublicKey,
+      encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+      encryptionPublicKeySignature: activeDevice.encryptionPublicKeySignature!,
+    },
+    workspaceKeyBox: workspace?.currentWorkspaceKey.workspaceKeyBox!,
+  });
+  const folderChainItem =
+    folderKeyChainData.trace[folderKeyChainData.trace.length - 2];
+  const snapshotChainItem =
+    folderKeyChainData.trace[folderKeyChainData.trace.length - 1];
   const snapshotKeyData = recreateSnapshotKey({
-    folderKey: lastChainItem.key,
-    subkeyId: snapshotKeyDerivationTrace.subkeyId,
+    folderKey: folderChainItem.key,
+    subkeyId: snapshotChainItem.subkeyId,
   });
   return snapshotKeyData;
 };
