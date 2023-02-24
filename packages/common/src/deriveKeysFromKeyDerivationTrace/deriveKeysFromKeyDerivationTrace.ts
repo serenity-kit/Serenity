@@ -18,6 +18,7 @@ export const deriveKeysFromKeyDerivationTrace = ({
   activeDevice,
   workspaceKeyBox,
 }: Params): KeyDerivationTraceWithKeys => {
+  console.log({ workspaceKeyBox });
   const workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox.ciphertext!,
     nonce: workspaceKeyBox.nonce!,

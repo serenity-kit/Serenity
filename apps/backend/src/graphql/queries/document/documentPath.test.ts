@@ -37,29 +37,6 @@ const setup = async () => {
     username: `${uuidv4()}@example.com`,
     password,
   });
-
-  // const registerUserResult = await registerUser(graphql, username, password);
-  // sessionKey = registerUserResult.sessionKey;
-  // const device = registerUserResult.mainDevice;
-  // const initialWorkspaceStructureResult = await createInitialWorkspaceStructure(
-  //   {
-  //     workspaceName: "workspace 1",
-  //     workspaceId: workspaceId,
-  //     deviceSigningPublicKey: device.signingPublicKey,
-  //     deviceEncryptionPublicKey: device.encryptionPublicKey,
-  //     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-  //     webDevice: registerUserResult.webDevice,
-  //     folderId: uuidv4(),
-  //     folderIdSignature: `TODO+${uuidv4()}`,
-  //     folderName: "Getting started",
-  //     documentName: "Introduction",
-  //     documentId: uuidv4(),
-  //     graphql,
-  //     authorizationHeader: sessionKey,
-  //   }
-  // );
-  // const workspace =
-  //   initialWorkspaceStructureResult.createInitialWorkspaceStructure.workspace;
   workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
@@ -143,7 +120,7 @@ const setup = async () => {
     id: otherDocumentId,
     parentFolderId: otherFolderId,
     workspaceId: userData2.workspace.id,
-    activeDevice: userData1.webDevice,
+    activeDevice: userData2.webDevice,
     authorizationHeader: userData2.sessionKey,
   });
 };

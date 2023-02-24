@@ -1,6 +1,7 @@
 import {
   createSnapshot,
   KeyDerivationTrace2,
+  Snapshot,
   SnapshotPublicData,
 } from "@naisho/core";
 import {
@@ -15,6 +16,46 @@ import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../../src/database/prisma";
 import { createFolderKeyDerivationTrace } from "../folder/createFolderKeyDerivationTrace";
+
+type RunCreateDocumentMutationParams = {
+  graphql: any;
+  id: string;
+  parentFolderId: string | null;
+  workspaceId: string;
+  snapshot?: Snapshot | null | undefined;
+  authorizationHeader: string;
+};
+const runCreateDocumentMutation = async ({
+  graphql,
+  id,
+  parentFolderId,
+  workspaceId,
+  snapshot,
+  authorizationHeader,
+}: RunCreateDocumentMutationParams) => {
+  const authorizationHeaders = {
+    authorization: authorizationHeader,
+  };
+  const query = gql`
+    mutation createDocument($input: CreateDocumentInput!) {
+      createDocument(input: $input) {
+        id
+      }
+    }
+  `;
+  return graphql.client.request(
+    query,
+    {
+      input: {
+        id,
+        parentFolderId,
+        workspaceId,
+        snapshot,
+      },
+    },
+    authorizationHeaders
+  );
+};
 
 type Params = {
   graphql: any;
@@ -33,16 +74,6 @@ export const createDocument = async ({
   activeDevice,
   authorizationHeader,
 }: Params) => {
-  const authorizationHeaders = {
-    authorization: authorizationHeader,
-  };
-  const query = gql`
-    mutation createDocument($input: CreateDocumentInput!) {
-      createDocument(input: $input) {
-        id
-      }
-    }
-  `;
   const workspace = await prisma.workspace.findFirst({
     where: {
       id: workspaceId,
@@ -61,7 +92,15 @@ export const createDocument = async ({
     },
   });
   if (!workspace) {
-    throw new Error("Workspace not found");
+    // return the query to produce an error
+    return runCreateDocumentMutation({
+      graphql,
+      id,
+      parentFolderId,
+      workspaceId,
+      snapshot: null,
+      authorizationHeader,
+    });
   }
   const workspaceKeyBox = workspace.workspaceKeys[0].workspaceKeyBoxes[0];
 
@@ -72,8 +111,17 @@ export const createDocument = async ({
     },
   });
   if (!folder) {
-    throw new Error("Folder not found");
+    // return the query to produce an error
+    return runCreateDocumentMutation({
+      graphql,
+      id,
+      parentFolderId,
+      workspaceId,
+      snapshot: null,
+      authorizationHeader,
+    });
   }
+  console.log({ workspaceKeyBox });
   const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace2,
     activeDevice,
@@ -118,17 +166,12 @@ export const createDocument = async ({
     signatureKeyPair
   );
 
-  const result = await graphql.client.request(
-    query,
-    {
-      input: {
-        id,
-        parentFolderId,
-        workspaceId,
-        snapshot,
-      },
-    },
-    authorizationHeaders
-  );
-  return result;
+  return runCreateDocumentMutation({
+    graphql,
+    id,
+    parentFolderId,
+    workspaceId,
+    snapshot,
+    authorizationHeader,
+  });
 };
