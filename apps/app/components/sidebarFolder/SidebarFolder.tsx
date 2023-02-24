@@ -301,7 +301,6 @@ export default function SidebarFolder(props: Props) {
     };
     // created using:
     // const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
-    // console.log(sodium.to_base64(yDocState));
     const initialDocument = `AQK21au7CAAHAQRwYWdlAwdoZWFkaW5nKAC21au7CAAFbGV2ZWwBfQEA-wENhI6Il6QJiAIEcGFnZYeOiJekCdMBAwh0YXNrSXRlbQcAjoiXpAmNAgMJcGFyYWdyYXBoKACOiJekCY0CB2NoZWNrZWQBeQcAjoiXpAmOAgYEAI6Il6QJkAIUQ3JlYXRlIHlvdXIgb3duIHBhZ2WBjoiXpAmNAgEAAsGOiJekCakBjoiXpAmdAQEAKMeOiJekCakBjoiXpAmoAgMHaGVhZGluZygAjoiXpAnRAgVsZXZlbAF9AgcAjoiXpAnRAgYEAI6Il6QJ0wIWSGlnaGxpZ2h0cyBvZiBTZXJlbml0ecGOiJekCdECjoiXpAmoAgHHjoiXpAnRAo6Il6QJ6gIDCmJ1bGxldExpc3QHAI6Il6QJ6wIDCGxpc3RJdGVtBwCOiJekCewCAwlwYXJhZ3JhcGgHAI6Il6QJ7QIGBACOiJekCe4CCEdyZWF0IFVYh46Il6QJ7AIDCGxpc3RJdGVtBwCOiJekCfcCAwlwYXJhZ3JhcGgHAI6Il6QJ-AIGBACOiJekCfkCA0VuZIGOiJekCfwCAYSOiJekCf0CEC10by1lbmQgZW5jcnlwdGWEjoiXpAmNAwFkAfD8moQIAISOiJekCY4DAWQBjoiXpAkRLBxJBVYBZwVtA4oBAZEBAZcBEqwBEcoBAdcBAt8BDPwBDaUCLOoCAf0CAY4DAQ`;
     const snapshot = createSnapshot(
       sodium.from_base64(initialDocument),

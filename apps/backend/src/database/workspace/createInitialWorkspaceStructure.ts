@@ -1,7 +1,10 @@
 import { KeyDerivationTrace2, Snapshot } from "@naisho/core";
-import { Snapshot as SnapshotModel } from "../../../prisma/generated/output";
 import { Document } from "../../types/document";
 import { Folder, formatFolder } from "../../types/folder";
+import {
+  formatSnapshot,
+  Snapshot as SnapshotModel,
+} from "../../types/snapshot";
 import { Workspace } from "../../types/workspace";
 import { createSnapshot } from "../createSnapshot";
 import { createFolder } from "../folder/createFolder";
@@ -97,6 +100,6 @@ export async function createInitialWorkspaceStructure({
     workspace: createdWorkspace,
     document: createdDocument,
     folder: formatFolder(createdFolder),
-    snapshot,
+    snapshot: formatSnapshot(snapshot),
   };
 }

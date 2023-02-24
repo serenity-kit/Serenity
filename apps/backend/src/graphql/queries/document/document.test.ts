@@ -53,15 +53,15 @@ test("user should be retrieve a document", async () => {
     id: documentId,
     parentFolderId: userData1.folder.id,
     workspaceId: userData1.workspace.id,
+    activeDevice: userData1.webDevice,
     authorizationHeader,
   });
   await updateDocumentName({
     graphql,
     id: documentId,
     name: documentName,
-    parentFolderId: userData1.folder.id,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-    snapshotKey,
+    activeDevice: userData1.webDevice,
     authorizationHeader,
   });
 

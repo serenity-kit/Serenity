@@ -66,6 +66,7 @@ const setup = async () => {
     id: documentId,
     parentFolderId: addedFolder.id,
     workspaceId,
+    activeDevice: result.webDevice,
     authorizationHeader: sessionKey,
   });
 };

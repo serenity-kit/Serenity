@@ -1,4 +1,5 @@
-import { AuthenticationError } from "apollo-server-express";
+import { Snapshot } from "@naisho/core";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import {
   arg,
   inputObjectType,
@@ -39,6 +40,10 @@ export const createDocumentMutation = mutationField("createDocument", {
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
     }
+    if (!args.input.snapshot.publicData.snapshotId) {
+      throw new UserInputError("Invalid input: snapshotId cannot be null");
+    }
+    const snapshot = args.input.snapshot as Snapshot;
     const document = await createDocument({
       userId: context.user.id,
       id: args.input.id,
@@ -48,7 +53,7 @@ export const createDocumentMutation = mutationField("createDocument", {
       subkeyId: null,
       parentFolderId: args.input.parentFolderId,
       workspaceId: args.input.workspaceId,
-      snapshot: args.input.snapshot,
+      snapshot,
     });
     return {
       id: document.id,

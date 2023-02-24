@@ -7,8 +7,8 @@ beforeAll(async () => {
 });
 
 test("encryptDocumentTitle", () => {
-  const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const documentKey = createDocumentKey({ folderKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const documentKey = createDocumentKey({ snapshotKey });
   const result = encryptDocumentTitle({
     key: documentKey.key,
     title: "Todos",
@@ -18,8 +18,8 @@ test("encryptDocumentTitle", () => {
 });
 
 test("encryptDocumentTitle with publicData", () => {
-  const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const documentKey = createDocumentKey({ folderKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const documentKey = createDocumentKey({ snapshotKey });
   const result = encryptDocumentTitle({
     key: documentKey.key,
     title: "Todos",
@@ -30,8 +30,8 @@ test("encryptDocumentTitle with publicData", () => {
 });
 
 test("encryptDocumentTitle with publicData fails for invalid data", () => {
-  const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const documentKey = createDocumentKey({ folderKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const documentKey = createDocumentKey({ snapshotKey });
   expect(() =>
     encryptDocumentTitle({
       key: documentKey.key,

@@ -46,7 +46,6 @@ model Snapshot {
   keyDerivationTrace     Json             @default("{}")
   clocks                 Json
   snapshotKeyBoxes       SnapshotKeyBox[] // used for document share link
-  subkeyId               Int
   comments               Comment[]
   commentReplies         CommentReply[]
 }
