@@ -1,6 +1,5 @@
 import {
   BoxShadow,
-  EditorBottombarButton,
   EditorBottombarDivider,
   RawInput,
   SubmitButton,
@@ -8,6 +7,7 @@ import {
   tw,
   useHasEditorSidebar,
   View,
+  ToggleButton,
 } from "@serenity-tools/ui";
 import { EditorEvents, isTextSelection } from "@tiptap/core";
 import Collaboration from "@tiptap/extension-collaboration";
@@ -295,19 +295,19 @@ export const Editor = (props: EditorProps) => {
                 style={tw`p-1 bg-white border border-gray-200 rounded`}
                 alignItems="center"
               >
-                <EditorBottombarButton
+                <ToggleButton
                   onPress={() => editor.chain().focus().toggleBold().run()}
                   name="bold"
                   isActive={editor.isActive("bold")}
                 />
 
-                <EditorBottombarButton
+                <ToggleButton
                   onPress={() => editor.chain().focus().toggleItalic().run()}
                   name="italic"
                   isActive={editor.isActive("italic")}
                 />
 
-                <EditorBottombarButton
+                <ToggleButton
                   onPress={() => editor.chain().focus().toggleCode().run()}
                   name="code-view"
                   isActive={editor.isActive("code")}
@@ -315,7 +315,7 @@ export const Editor = (props: EditorProps) => {
 
                 <EditorBottombarDivider />
 
-                <EditorBottombarButton
+                <ToggleButton
                   onPress={() =>
                     editor.chain().focus().toggleLink({ href: "#" }).run()
                   }
@@ -325,7 +325,7 @@ export const Editor = (props: EditorProps) => {
 
                 <EditorBottombarDivider />
 
-                <EditorBottombarButton
+                <ToggleButton
                   onPress={() => {
                     setHasCreateCommentBubble(true);
                   }}
