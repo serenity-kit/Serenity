@@ -133,7 +133,7 @@ test("successfully retrieves a document", async () => {
   expect(messages[0].doc.id).toEqual(documentId);
   expect(messages[0].doc.parentFolderId).toEqual(addedFolder.id);
   expect(messages[0].doc.workspaceId).toEqual(workspaceId);
-  expect(messages[0].snapshot).toBeNull();
+  expect(messages[0].snapshot.publicData.docId).toBe(documentId);
   expect(messages[0].type).toEqual("document");
 });
 

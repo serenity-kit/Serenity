@@ -121,7 +121,6 @@ export const createDocument = async ({
       authorizationHeader,
     });
   }
-  console.log({ workspaceKeyBox });
   const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace2,
     activeDevice,

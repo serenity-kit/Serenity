@@ -10,6 +10,7 @@ import { createDocument } from "../../../../test/helpers/document/createDocument
 import { getDocument } from "../../../../test/helpers/document/getDocument";
 import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { getSnapshot } from "../../../../test/helpers/snapshot/getSnapshot";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
@@ -79,6 +80,21 @@ test("user should be retrieve a document", async () => {
   expect(typeof retrievedDocument.encryptedName).toBe("string");
   expect(typeof retrievedDocument.encryptedNameNonce).toBe("string");
   expect(typeof retrievedDocument.subkeyId).toBe("number");
+
+  const snapshotResult = await getSnapshot({
+    graphql,
+    documentId,
+    authorizationHeader,
+  });
+  const snapshot = snapshotResult.snapshot;
+  const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: snapshot.keyDerivationTrace,
+    activeDevice: userData1.mainDevice,
+    workspaceKeyBox: userData1.workspace.currentWorkspaceKey.workspaceKeyBox,
+  });
+  const snapshotKey =
+    snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
+
   const documentSubkey = recreateDocumentKey({
     snapshotKey,
     subkeyId: retrievedDocument.subkeyId,
