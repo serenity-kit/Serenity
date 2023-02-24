@@ -142,23 +142,12 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
 
       // prepare document
       const documentKeyData = createDocumentKey({
-        folderKey: encryptedFolderResult.folderSubkey,
+        snapshotKey: snapshotKey.key,
       });
       const encryptedDocumentTitle = encryptDocumentTitle({
         title: documentName,
         key: documentKeyData.key,
       });
-      const documentKeyDerivationTrace = {
-        workspaceKeyId,
-        subkeyId: documentKeyData.subkeyId,
-        parentFolders: [
-          {
-            folderId,
-            parentFolderId: null,
-            subkeyId: encryptedFolderResult.folderSubkeyId,
-          },
-        ],
-      };
 
       const createInitialWorkspaceStructureResult =
         await createInitialWorkspaceStructure({
@@ -180,7 +169,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
               id: documentId,
               encryptedName: encryptedDocumentTitle.ciphertext,
               encryptedNameNonce: encryptedDocumentTitle.publicNonce,
-              nameKeyDerivationTrace: documentKeyDerivationTrace,
+              subkeyId: documentKeyData.subkeyId,
               snapshot,
             },
             creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,

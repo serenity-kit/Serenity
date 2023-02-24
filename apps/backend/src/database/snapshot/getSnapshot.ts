@@ -1,17 +1,18 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
+import { Snapshot } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 
 type Params = {
   userId: string;
   documentId: string;
-  documentShareLinkToken?: string;
+  documentShareLinkToken?: string | null | undefined;
 };
 
 export async function getSnapshot({
   userId,
   documentId,
   documentShareLinkToken,
-}: Params) {
+}: Params): Promise<Snapshot> {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,

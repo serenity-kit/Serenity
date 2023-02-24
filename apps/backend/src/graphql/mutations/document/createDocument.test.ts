@@ -45,6 +45,7 @@ test("user should be able to create a document", async () => {
     graphql,
     authorizationHeader: userData1.sessionKey,
     parentFolderId: userData1.folder.id,
+    activeDevice: userData1.webDevice,
     workspaceId: userData1.workspace.id,
   });
   expect(result.createDocument.id).toBe(id);
@@ -70,6 +71,7 @@ test("commenter tries to create", async () => {
         graphql,
         authorizationHeader: otherUser.sessionKey,
         parentFolderId: userData1.folder.id,
+        activeDevice: userData1.webDevice,
         workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -95,6 +97,7 @@ test("viewer attempts to create", async () => {
         graphql,
         authorizationHeader: otherUser.sessionKey,
         parentFolderId: userData1.folder.id,
+        activeDevice: userData1.webDevice,
         workspaceId: userData1.workspace.id,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -109,6 +112,7 @@ test("Unauthenticated", async () => {
         authorizationHeader: "badauthkey",
         parentFolderId: userData1.folder.id,
         workspaceId: userData1.workspace.id,
+        activeDevice: userData1.webDevice,
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);
 });

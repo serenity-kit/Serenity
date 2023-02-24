@@ -14,6 +14,7 @@ import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { getSnapshot } from "../../../../test/helpers/snapshot/getSnapshot";
 import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
@@ -23,6 +24,7 @@ const password = "password";
 let addedWorkspace: any = null;
 let addedFolder: any = null;
 let addedDocumentId = "";
+let addedDocumentSnapshot: any = null;
 let sessionKey = "";
 let workspaceKey = "";
 let folderKey = "";
@@ -52,15 +54,22 @@ const setup = async () => {
   });
   folderKey = folderKeyResult.key;
   const createDocumentResult = await createDocument({
-    id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     graphql,
-    authorizationHeader: sessionKey,
+    id: "5a3484e6-c46e-42ce-a285-088fc1fd6915",
     parentFolderId: addedFolder.id,
     workspaceId: addedWorkspace.id,
+    activeDevice: userData1.webDevice,
+    authorizationHeader: sessionKey,
   });
   addedDocumentId = createDocumentResult.createDocument.id;
+  const snapshotResult = await getSnapshot({
+    graphql,
+    documentId: addedDocumentId,
+    authorizationHeader: sessionKey,
+  });
+  addedDocumentSnapshot = snapshotResult.snapshot;
   const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
-    keyDerivationTrace: userData1.snapshot.keyDerivationTrace,
+    keyDerivationTrace: addedDocumentSnapshot.keyDerivationTrace,
     activeDevice: userData1.mainDevice,
     workspaceKeyBox: userData1.workspace.currentWorkspaceKey.workspaceKeyBox,
   });
@@ -80,9 +89,8 @@ test("user should be able to change a document name", async () => {
     graphql,
     id,
     name,
-    parentFolderId: addedFolder.id,
+    activeDevice: userData1.webDevice,
     workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    snapshotKey,
     authorizationHeader,
   });
   const updatedDocument = result.updateDocumentName.document;
@@ -92,6 +100,7 @@ test("user should be able to change a document name", async () => {
     snapshotKey,
     subkeyId: updatedDocument.subkeyId,
   });
+
   const decryptedName = decryptDocumentTitle({
     key: documentSubkey.key,
     ciphertext: updatedDocument.encryptedName,
@@ -111,9 +120,8 @@ test("Throw error when document doesn't exist", async () => {
         graphql,
         id,
         name,
-        parentFolderId: addedFolder.id,
+        activeDevice: userData1.webDevice,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        snapshotKey,
         authorizationHeader,
       }))()
   ).rejects.toThrowError(/FORBIDDEN/);
@@ -131,9 +139,9 @@ test("Throw error when user doesn't have access", async () => {
     id: "97a4c517-5ef2-4ea8-ac40-86a1e182bf23",
     parentFolderId: userData1.folder.id,
     workspaceId: userData1.workspace.id,
+    activeDevice: userData1.webDevice,
     authorizationHeader: userData1.sessionKey,
   });
-  const authorizationHeader = sessionKey;
   const id = otherUserDocumentResult.createDocument.id;
   const name = "Unauthorized Name";
   await expect(
@@ -142,9 +150,8 @@ test("Throw error when user doesn't have access", async () => {
         graphql,
         id,
         name,
-        parentFolderId: addedFolder.id,
+        activeDevice: userData1.webDevice,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        snapshotKey,
         authorizationHeader: userData2.sessionKey,
       }))()
   ).rejects.toThrow("Unauthorized");
@@ -171,9 +178,8 @@ test("Commenter tries to update", async () => {
         graphql,
         id,
         name,
-        parentFolderId: addedFolder.id,
+        activeDevice: userData1.webDevice,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        snapshotKey,
         authorizationHeader: otherUser.sessionKey,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -200,9 +206,8 @@ test("Viewer tries to update", async () => {
         graphql,
         id,
         name,
-        parentFolderId: addedFolder.id,
+        activeDevice: userData1.webDevice,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        snapshotKey,
         authorizationHeader: otherUser.sessionKey,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -217,9 +222,8 @@ test("Unauthenticated", async () => {
         graphql,
         id,
         name,
-        parentFolderId: addedFolder.id,
+        activeDevice: userData1.webDevice,
         workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-        snapshotKey,
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

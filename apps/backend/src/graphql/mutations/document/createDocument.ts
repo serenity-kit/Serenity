@@ -7,6 +7,7 @@ import {
   objectType,
 } from "nexus";
 import { createDocument } from "../../../database/document/createDocument";
+import { DocumentSnapshotInput } from "../../types/document";
 
 export const CreateDocumentInput = inputObjectType({
   name: "CreateDocumentInput",
@@ -14,6 +15,7 @@ export const CreateDocumentInput = inputObjectType({
     t.nonNull.string("id");
     t.nonNull.string("parentFolderId");
     t.nonNull.string("workspaceId");
+    t.nonNull.field("snapshot", { type: DocumentSnapshotInput });
   },
 });
 
@@ -46,6 +48,7 @@ export const createDocumentMutation = mutationField("createDocument", {
       subkeyId: null,
       parentFolderId: args.input.parentFolderId,
       workspaceId: args.input.workspaceId,
+      snapshot: args.input.snapshot,
     });
     return {
       id: document.id,

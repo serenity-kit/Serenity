@@ -38,6 +38,11 @@ test.beforeAll(async () => {
     username: user1.username,
     password: user1.password,
   });
+  user2.data = await createUserWithWorkspace({
+    id: user2.id,
+    username: user2.username,
+    password: user2.password,
+  });
 });
 
 test.describe("Edit document", () => {
@@ -76,11 +81,6 @@ test.describe("Edit document", () => {
       username: user1.username,
       password: user1.password,
       stayLoggedIn: true,
-    });
-    user2.data = await createUserWithWorkspace({
-      id: user2.id,
-      username: user2.username,
-      password: user2.password,
     });
     const workspaceInvitationResult = await createWorkspaceInvitation({ page });
     const workspaceInvitationUrl = workspaceInvitationResult.url;

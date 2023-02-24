@@ -1,11 +1,13 @@
-import { KeyDerivationTrace2 } from "@naisho/core";
+import { createSnapshot, KeyDerivationTrace2 } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
+  createSnapshotKey,
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
   encryptFolderName,
   folderDerivedKeyContext,
+  snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import {
   Icon,
@@ -22,6 +24,7 @@ import {
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, StyleSheet } from "react-native";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import {
   runCreateDocumentMutation,
@@ -250,7 +253,8 @@ export default function SidebarFolder(props: Props) {
   };
 
   const createDocument = async () => {
-    const id = uuidv4();
+    const documentId = uuidv4();
+    const snapshotId = uuidv4();
     const workspace = await getWorkspace({
       deviceSigningPublicKey: activeDevice.signingPublicKey,
       workspaceId: props.workspaceId,
@@ -259,12 +263,60 @@ export default function SidebarFolder(props: Props) {
       console.error("Workspace or workspaceKeys not found");
       return;
     }
+    const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
+      keyDerivationTrace: props.keyDerivationTrace,
+      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+      activeDevice: {
+        signingPublicKey: activeDevice.signingPublicKey,
+        signingPrivateKey: activeDevice.signingPrivateKey!,
+        encryptionPublicKey: activeDevice.encryptionPublicKey,
+        encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+        encryptionPublicKeySignature:
+          activeDevice.encryptionPublicKeySignature!,
+      },
+    });
+    const folderKey = folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key;
+    const snapshotKey = createSnapshotKey({ folderKey });
+    const snapshotKeyDerivationTrace = await createFolderKeyDerivationTrace({
+      folderId: props.folderId,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
+    });
+    snapshotKeyDerivationTrace.trace.push({
+      entryId: snapshotId,
+      parentId: props.folderId,
+      subkeyId: snapshotKey.subkeyId,
+      context: snapshotDerivedKeyContext,
+    });
+    const signatureKeyPair: KeyPair = {
+      publicKey: sodium.from_base64(activeDevice.signingPublicKey),
+      privateKey: sodium.from_base64(activeDevice.signingPrivateKey!),
+      keyType: "ed25519",
+    };
+    const publicData = {
+      snapshotId: snapshotId,
+      docId: documentId,
+      pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+      keyDerivationTrace: snapshotKeyDerivationTrace,
+      subkeyId: snapshotKey.subkeyId,
+    };
+    // created using:
+    // const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
+    // console.log(sodium.to_base64(yDocState));
+    // TODO: update initialDocument to be a real document snapshot
+    const initialDocument = `AlCOiJekCQAHAQRwYWdlAwdoZWFkaW5nKACOiJekCQAFbGV2ZWwBfQEHAI6Il6QJAAYEAI6Il6QJAgxJbnRyb2R1Y3Rpb26HjoiXpAkAAwlwYXJhZ3JhcGgHAI6Il6QJDwYEAI6Il6QJEBtXZWxjb21lIHRvIHlvdXIgZmlyc3QgcGFnZSGBjoiXpAkPAQAbh46Il6QJLAMJcGFyYWdyYXBoAAXHjoiXpAkPjoiXpAksAwdoZWFkaW5nBwCOiJekCU4GBACOiJekCU8FTGlzdHMoAI6Il6QJTgVsZXZlbAF9AoGOiJekCUgBBwCOiJekCUgGBACOiJekCVcPWW91IGNhbiBjcmVhdGUggY6Il6QJZgWHjoiXpAlWAwlwYXJhZ3JhcGiBjoiXpAlrA4SOiJekCW8aYnVsbGV0LCBudW1iZXJlZCBhbmQgY2hlY2uBjoiXpAmJAQGEjoiXpAmKAQYtbGlzdHPBjoiXpAlIjoiXpAlWAYSOiJekCZABBSBlLmcuwY6Il6QJSI6Il6QJkQEBAALBjoiXpAlIjoiXpAmXAQEAAsGOiJekCUiOiJekCZoBAQALx46Il6QJSI6Il6QJnQEDCHRhc2tMaXN0BwCOiJekCakBAwh0YXNrSXRlbQcAjoiXpAmqAQMJcGFyYWdyYXBoIQCOiJekCaoBB2NoZWNrZWQBAQCOiJekCasBAQAPR46Il6QJrQEGBACOiJekCb0BDFNpZ24gdXAgZm9yIIGOiJekCckBAYSOiJekCcoBCFNlcmVuaXR5h46Il6QJqgEDCHRhc2tJdGVtBwCOiJekCdMBAwlwYXJhZ3JhcGgoAI6Il6QJ0wEHY2hlY2tlZAF5qI6Il6QJrAEBeAEAjoiXpAnUAQEAAUeOiJekCdcBBgQAjoiXpAnZAQVSZWFkIIGOiJekCd4BDISOiJekCeoBEXRoZSBJbnRyb2R1Y3Rpb24ggY6Il6QJ-wENhI6Il6QJiAIEcGFnZYeOiJekCdMBAwh0YXNrSXRlbQcAjoiXpAmNAgMJcGFyYWdyYXBoKACOiJekCY0CB2NoZWNrZWQBeQcAjoiXpAmOAgYEAI6Il6QJkAIUQ3JlYXRlIHlvdXIgb3duIHBhZ2WBjoiXpAmNAgEAAsGOiJekCakBjoiXpAmdAQEAKMeOiJekCakBjoiXpAmoAgMHaGVhZGluZygAjoiXpAnRAgVsZXZlbAF9AgcAjoiXpAnRAgYEAI6Il6QJ0wIWSGlnaGxpZ2h0cyBvZiBTZXJlbml0ecGOiJekCdECjoiXpAmoAgHHjoiXpAnRAo6Il6QJ6gIDCmJ1bGxldExpc3QHAI6Il6QJ6wIDCGxpc3RJdGVtBwCOiJekCewCAwlwYXJhZ3JhcGgHAI6Il6QJ7QIGBACOiJekCe4CCEdyZWF0IFVYh46Il6QJ7AIDCGxpc3RJdGVtBwCOiJekCfcCAwlwYXJhZ3JhcGgHAI6Il6QJ-AIGBACOiJekCfkCA0VuZIGOiJekCfwCAYSOiJekCf0CEC10by1lbmQgZW5jcnlwdGWEjoiXpAmNAwFkAfD8moQIAISOiJekCY4DAWQBjoiXpAkRLBxJBVYBZwVtA4oBAZEBAZcBEqwBEcoBAdcBAt8BDPwBDaUCLOoCAf0CAY4DAQ`;
+    const snapshot = createSnapshot(
+      initialDocument,
+      publicData,
+      sodium.from_base64(snapshotKey.key),
+      signatureKeyPair
+    );
     const result = await runCreateDocumentMutation(
       {
         input: {
-          id,
+          id: documentId,
           workspaceId: props.workspaceId,
           parentFolderId: props.folderId,
+          snapshot,
         },
       },
       {}

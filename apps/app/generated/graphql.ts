@@ -128,6 +128,7 @@ export type CreateCommentResult = {
 export type CreateDocumentInput = {
   id: Scalars['String'];
   parentFolderId: Scalars['String'];
+  snapshot: DocumentSnapshotInput;
   workspaceId: Scalars['String'];
 };
 
@@ -828,6 +829,7 @@ export type Query = {
   me?: Maybe<MeResult>;
   pendingWorkspaceInvitation?: Maybe<PendingWorkspaceInvitationResult>;
   rootFolders?: Maybe<FolderConnection>;
+  snapshot?: Maybe<Snapshot>;
   unauthorizedDevicesForWorkspaces?: Maybe<UnauthorizedDevicesForWorkspacesResult>;
   unauthorizedMembers?: Maybe<UnauthorizedMembersResult>;
   userIdFromUsername?: Maybe<UserIdFromUsernameResult>;
@@ -932,6 +934,12 @@ export type QueryRootFoldersArgs = {
   after?: InputMaybe<Scalars['String']>;
   first: Scalars['Int'];
   workspaceId: Scalars['ID'];
+};
+
+
+export type QuerySnapshotArgs = {
+  documentId: Scalars['ID'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -1684,6 +1692,13 @@ export type RootFoldersQueryVariables = Exact<{
 
 
 export type RootFoldersQuery = { __typename?: 'Query', rootFolders?: { __typename?: 'FolderConnection', nodes?: Array<{ __typename?: 'Folder', id: string, encryptedName: string, encryptedNameNonce: string, parentFolderId?: string | null, rootFolderId?: string | null, workspaceId?: string | null, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+
+export type SnapshotQueryVariables = Exact<{
+  documentId: Scalars['ID'];
+}>;
+
+
+export type SnapshotQuery = { __typename?: 'Query', snapshot?: { __typename?: 'Snapshot', id: string, latestVersion: number, data: string, documentId: string, keyDerivationTrace: { __typename?: 'KeyDerivationTrace2', workspaceKeyId: string, trace: Array<{ __typename?: 'KeyDerivationTraceEntry', entryId: string, subkeyId: number, parentId?: string | null, context: string }> } } | null };
 
 export type UnauthorizedDevicesForWorkspacesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2658,6 +2673,29 @@ export const RootFoldersDocument = gql`
 
 export function useRootFoldersQuery(options: Omit<Urql.UseQueryArgs<RootFoldersQueryVariables>, 'query'>) {
   return Urql.useQuery<RootFoldersQuery, RootFoldersQueryVariables>({ query: RootFoldersDocument, ...options });
+};
+export const SnapshotDocument = gql`
+    query snapshot($documentId: ID!) {
+  snapshot(documentId: $documentId) {
+    id
+    latestVersion
+    data
+    documentId
+    keyDerivationTrace {
+      workspaceKeyId
+      trace {
+        entryId
+        subkeyId
+        parentId
+        context
+      }
+    }
+  }
+}
+    `;
+
+export function useSnapshotQuery(options: Omit<Urql.UseQueryArgs<SnapshotQueryVariables>, 'query'>) {
+  return Urql.useQuery<SnapshotQuery, SnapshotQueryVariables>({ query: SnapshotDocument, ...options });
 };
 export const UnauthorizedDevicesForWorkspacesDocument = gql`
     query unauthorizedDevicesForWorkspaces {
@@ -5149,6 +5187,109 @@ export const rootFoldersQueryService =
         // perform cleanup
         clearInterval(intervalId);
         rootFoldersQueryServiceSubscribers[variablesString].intervalId = null;
+      }
+    };
+  };
+
+
+
+export const runSnapshotQuery = async (variables: SnapshotQueryVariables, options?: any) => {
+  return await getUrqlClient()
+    .query<SnapshotQuery, SnapshotQueryVariables>(
+      SnapshotDocument,
+      variables,
+      {
+        // better to be safe here and always refetch
+        requestPolicy: "network-only",
+        ...options
+      }
+    )
+    .toPromise();
+};
+
+export type SnapshotQueryResult = Urql.OperationResult<SnapshotQuery, SnapshotQueryVariables>;
+
+export type SnapshotQueryUpdateResultEvent = {
+  type: "SnapshotQuery.UPDATE_RESULT";
+  result: SnapshotQueryResult;
+};
+
+export type SnapshotQueryErrorEvent = {
+  type: "SnapshotQuery.ERROR";
+  result: SnapshotQueryResult;
+};
+
+export type SnapshotQueryServiceEvent = SnapshotQueryUpdateResultEvent | SnapshotQueryErrorEvent;
+
+type SnapshotQueryServiceSubscribersEntry = {
+  variables: SnapshotQueryVariables;
+  callbacks: ((event: SnapshotQueryServiceEvent) => void)[];
+  intervalId: NodeJS.Timer | null;
+};
+
+type SnapshotQueryServiceSubscribers = {
+  [variables: string]: SnapshotQueryServiceSubscribersEntry;
+};
+
+const snapshotQueryServiceSubscribers: SnapshotQueryServiceSubscribers = {};
+
+const triggerSnapshotQuery = (variablesString: string, variables: SnapshotQueryVariables) => {
+  getUrqlClient()
+    .query<SnapshotQuery, SnapshotQueryVariables>(SnapshotDocument, variables)
+    .toPromise()
+    .then((result) => {
+      snapshotQueryServiceSubscribers[variablesString].callbacks.forEach(
+        (callback) => {
+          callback({
+            type: result.error ? "SnapshotQuery.ERROR" : "SnapshotQuery.UPDATE_RESULT",
+            result: result,
+          });
+        }
+      );
+    });
+};
+
+/**
+ * This service is used to query results every 4 seconds.
+ *
+ * It allows machines to spawn a service that will fetch the query
+ * and send the result to the machine.
+ * It will share the same interval for all machines.
+ * When the last subscription is stopped, the interval will be cleared.
+ * It also considers the variables passed to the service.
+ */
+export const snapshotQueryService =
+  (variables: SnapshotQueryVariables, intervalInMs?: number) => (callback, onReceive) => {
+    const variablesString = canonicalize(variables) as string;
+    if (snapshotQueryServiceSubscribers[variablesString]) {
+      snapshotQueryServiceSubscribers[variablesString].callbacks.push(callback);
+    } else {
+      snapshotQueryServiceSubscribers[variablesString] = {
+        variables,
+        callbacks: [callback],
+        intervalId: null,
+      };
+    }
+
+    triggerSnapshotQuery(variablesString, variables);
+    if (!snapshotQueryServiceSubscribers[variablesString].intervalId) {
+      snapshotQueryServiceSubscribers[variablesString].intervalId = setInterval(
+        () => {
+          triggerSnapshotQuery(variablesString, variables);
+        },
+        intervalInMs || 4000
+      );
+    }
+
+    const intervalId = snapshotQueryServiceSubscribers[variablesString].intervalId;
+    return () => {
+      if (
+        snapshotQueryServiceSubscribers[variablesString].callbacks.length === 0 &&
+        intervalId
+      ) {
+        // perform cleanup
+        clearInterval(intervalId);
+        snapshotQueryServiceSubscribers[variablesString].intervalId = null;
       }
     };
   };

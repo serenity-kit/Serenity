@@ -4,7 +4,7 @@ import {
   recreateDocumentKey,
 } from "@serenity-tools/common";
 import create from "zustand";
-import { Document } from "../../generated/graphql";
+import { Document, runSnapshotQuery } from "../../generated/graphql";
 import { Device } from "../../types/Device";
 import { getWorkspace } from "../workspace/getWorkspace";
 
@@ -32,6 +32,16 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
         workspaceId: document.workspaceId!,
         deviceSigningPublicKey: activeDevice.signingPublicKey,
       });
+      // TODO: include documentShareLink in the query
+      const snapshotResult = await runSnapshotQuery({
+        documentId: document.id!,
+      });
+      if (!snapshotResult.data?.snapshot) {
+        throw new Error(
+          snapshotResult.error?.message || "Could not find snapshot"
+        );
+      }
+      const snapshot = snapshotResult.data.snapshot;
       try {
         const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
           keyDerivationTrace: snapshot.keyDerivationTrace,

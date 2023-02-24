@@ -5,6 +5,7 @@ import {
 } from "@serenity-tools/common";
 import {
   Document,
+  runSnapshotQuery,
   runUpdateDocumentNameMutation,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
@@ -27,6 +28,13 @@ export const updateDocumentName = async ({
   if (!workspace?.currentWorkspaceKey) {
     throw new Error("Workspace or workspaceKeys not found");
   }
+  const snapshotResult = await runSnapshotQuery({
+    documentId: document.id,
+  });
+  if (!snapshotResult.data?.snapshot) {
+    throw new Error(snapshotResult.error?.message || "Could not get snapshot");
+  }
+  const snapshot = snapshotResult.data.snapshot;
   const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
     keyDerivationTrace: snapshot.keyDerivationTrace,
     activeDevice: {

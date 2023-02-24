@@ -1,6 +1,5 @@
 import { expect, Page } from "@playwright/test";
 import { prisma } from "../../../src/database/prisma";
-import { formatDocument } from "../../../src/types/document";
 import { formatFolder } from "../../../src/types/folder";
 import { delayForSeconds } from "../delayForSeconds";
 import { verifyPassword } from "./verifyPassword";
@@ -83,12 +82,11 @@ export const createWorkspaceOnOnboarding = async ({
     `http://localhost:19006/workspace/${workspaceId}/page/${documentId}`
   );
   const formattedFolder = formatFolder(folder);
-  const formattedDocument = formatDocument(document);
   return {
     user,
     workspace,
     folder: formattedFolder,
-    document: formattedDocument,
+    document,
     mainDevice,
   };
 };

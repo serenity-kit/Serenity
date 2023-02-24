@@ -18,7 +18,7 @@ import {
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
-import { useDocumentQuery } from "../../generated/graphql";
+import { runSnapshotQuery, useDocumentQuery } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
@@ -93,6 +93,16 @@ export default function SidebarPage(props: Props) {
         console.error("Unable to retrieve document!");
         return;
       }
+      const snapshotResult = await runSnapshotQuery({
+        documentId: document.id,
+      });
+      if (!snapshotResult.data?.snapshot) {
+        console.error(
+          snapshotResult.error?.message || "Unable to retrieve snapshot!"
+        );
+        return;
+      }
+      const snapshot = snapshotResult.data.snapshot;
       const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
         keyDerivationTrace: snapshot.keyDerivationTrace,
         activeDevice: {
