@@ -52,11 +52,7 @@ const computeStyle = ({
   }
 
   let style: any = isFocusVisible
-    ? tw.style(
-        size === "lg"
-          ? "border-3 border-primary-700"
-          : "border-2 border-primary-700"
-      ) // web only
+    ? tw.style(variant === "danger" ? "border-error-500" : "border-primary-700") // web only
     : {};
 
   if (isPressed) {
@@ -139,7 +135,9 @@ export const Button = forwardRef((props: ButtonProps, ref) => {
 
   const styles = StyleSheet.create({
     wrapper: tw.style(
-      `flex justify-center border border-solid rounded`,
+      `flex justify-center ${
+        size === "lg" ? "border-3" : "border-2"
+      } border-solid rounded`,
       wrapperStyle.size[size],
       wrapperStyle.variant[variant]
     ),

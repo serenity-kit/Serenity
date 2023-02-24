@@ -15,6 +15,7 @@ import { ArrowLeftSLine } from "./icons/ArrowLeftSLine";
 import { ArrowRight } from "./icons/ArrowRight";
 import { ArrowRightFilled } from "./icons/ArrowRightFilled";
 import { ArrowRightSLine } from "./icons/ArrowRightSLine";
+import { ArrowUpLine } from "./icons/ArrowUpLine";
 import { ArrowUpDownLine } from "./icons/ArrowUpDownLine";
 import { ArrowUpDownSLine } from "./icons/ArrowUpDownSLine";
 import { Attachment2 } from "./icons/Attachment2";
@@ -133,6 +134,7 @@ export type IconNames =
   | "arrow-right"
   | "arrow-right-filled"
   | "arrow-right-s-line"
+  | "arrow-up-line"
   | "arrow-up-down-line"
   | "arrow-up-down-s-line"
   | "at-line"
@@ -293,6 +295,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "arrow-right") {
     icon = <ArrowRight color={color} size={iconSize} />;
+  }
+  if (name === "arrow-up-line") {
+    icon = <ArrowUpLine color={color} size={iconSize} />;
   }
   if (name === "arrow-up-down-line") {
     icon = <ArrowUpDownLine color={color} size={iconSize} />;

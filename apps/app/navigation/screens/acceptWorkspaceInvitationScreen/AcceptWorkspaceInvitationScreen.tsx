@@ -18,12 +18,11 @@ import { LoginForm } from "../../../components/login/LoginForm";
 import { OnboardingScreenWrapper } from "../../../components/onboardingScreenWrapper/OnboardingScreenWrapper";
 import RegisterForm from "../../../components/register/RegisterForm";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
+import { useAppContext } from "../../../context/AppContext";
 import { useWorkspaceInvitationQuery } from "../../../generated/graphql";
 import { RootStackScreenProps } from "../../../types/navigationProps";
-import { getExportKey } from "../../../utils/authentication/exportKeyStore";
 import { getMainDevice } from "../../../utils/device/mainDeviceMemoryStore";
 import { acceptWorkspaceInvitation } from "../../../utils/workspace/acceptWorkspaceInvitation";
-import { useAppContext } from "../../../context/AppContext";
 
 const Wrapper = ({ children }) => (
   <OnboardingScreenWrapper>

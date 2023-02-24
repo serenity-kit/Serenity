@@ -29,6 +29,7 @@
     "@aws-sdk/s3-request-presigner": "^3.194.0",
     "@naisho/core": "*",
     "@prisma/client": "^4.8.0",
+    "@sendgrid/mail": "^7.7.0",
     "@serenity-tools/common": "*",
     "@serenity-tools/opaque-server": "*",
     "apollo-server-express": "^3.10.2",

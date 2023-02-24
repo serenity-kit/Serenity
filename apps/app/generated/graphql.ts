@@ -1,7 +1,7 @@
-import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 import canonicalize from 'canonicalize';
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
+import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -484,7 +484,7 @@ export type FinishRegistrationInput = {
 export type FinishRegistrationResult = {
   __typename?: 'FinishRegistrationResult';
   id: Scalars['String'];
-  verificationCode: Scalars['String'];
+  verificationCode?: Maybe<Scalars['String']>;
 };
 
 export type Folder = {
@@ -1472,7 +1472,7 @@ export type FinishRegistrationMutationVariables = Exact<{
 }>;
 
 
-export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode: string } | null };
+export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode?: string | null } | null };
 
 export type InitiateFileUploadMutationVariables = Exact<{
   initiateFileUpload: InitiateFileUploadInput;

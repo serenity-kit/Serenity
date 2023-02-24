@@ -1196,6 +1196,7 @@ export default function DesignSystemScreen(
             <IconTile name="arrow-go-back-line" />
             <IconTile name="arrow-go-forward-line" />
             <IconTile name="arrow-up-down-s-line" />
+            <IconTile name="arrow-up-line" />
             <IconTile name="attachment-2" />
             <IconTile name="font-size-2" />
             <IconTile name="format-clear" />

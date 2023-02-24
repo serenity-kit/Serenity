@@ -71,10 +71,10 @@ const createCommentsDecorationSet = (
     state.doc,
     comments.map((comment) => {
       return Decoration.inline(comment.absoluteFrom, comment.absoluteTo, {
-        style:
+        class:
           comment.id === highlightedCommentId
-            ? "background-color: orange"
-            : "background-color: yellow",
+            ? "editor-comment-active"
+            : "editor-comment",
       });
     })
   );

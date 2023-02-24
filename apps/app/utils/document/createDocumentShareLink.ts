@@ -19,7 +19,7 @@ export const getDocumentShareLinkUrl = (
   key: string
 ) => {
   const rootUrl =
-    process.env.NODE_ENV === "development" || process.env.IS_E2E_TEST === "true"
+    process.env.NODE_ENV === "development" || process.env.SERENITY_ENV === "e2e"
       ? Platform.OS === "web"
         ? `http://${window.location.host}`
         : // on iOS window.location.host is not available

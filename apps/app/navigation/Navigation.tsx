@@ -7,34 +7,28 @@ import {
   NavigationContainer,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { LocalDevice } from "@serenity-tools/common";
 import {
   Heading,
+  Text,
   tw,
   useIsDesktopDevice,
   useIsPermanentLeftSidebar,
 } from "@serenity-tools/ui";
-import { useActor, useInterpret } from "@xstate/react";
 import * as Linking from "expo-linking";
+import * as React from "react";
 import { useEffect } from "react";
 import { ColorSchemeName, StyleSheet, useWindowDimensions } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AccountSettingsSidebar from "../components/accountSettingsSidebar/AccountSettingsSidebar";
-import CommentsSidebar from "../components/commentsSidebar/CommentsSidebar";
 import { HeaderLeft } from "../components/headerLeft/HeaderLeft";
 import NavigationDrawerModal from "../components/navigationDrawerModal/NavigationDrawerModal";
-import { PageHeader } from "../components/page/PageHeader";
 import { PageHeaderLeft } from "../components/pageHeaderLeft/PageHeaderLeft";
-import { PageHeaderRight } from "../components/pageHeaderRight/PageHeaderRight";
 import Sidebar from "../components/sidebar/Sidebar";
 import WorkspaceSettingsSidebar from "../components/workspaceSettingsSidebar/WorkspaceSettingsSidebar";
-import { PageProvider } from "../context/PageContext";
 import { WorkspaceProvider } from "../context/WorkspaceContext";
 import { useWorkspaceQuery } from "../generated/graphql";
 import { redirectToLoginIfMissingTheActiveDeviceOrSessionKey } from "../higherOrderComponents/redirectToLoginIfMissingTheActiveDeviceOrSessionKey";
 import { useAuthenticatedAppContext } from "../hooks/useAuthenticatedAppContext";
 import { useInterval } from "../hooks/useInterval";
-import { commentsMachine } from "../machines/commentsMachine";
 import {
   RootStackParamList,
   WorkspaceStackParamList,
@@ -70,10 +64,9 @@ import WorkspaceSettingsMobileOverviewScreen from "./screens/workspaceSettingsMo
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const WorkspaceStack = createNativeStackNavigator<WorkspaceStackParamList>();
-const Drawer = createDrawerNavigator();
+const WorkspaceDrawer = createDrawerNavigator();
 const AccountSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
 const WorkspaceSettingsDrawer = createDrawerNavigator(); // for desktop and tablet
-const PageCommentsDrawer = createDrawerNavigator(); // for desktop and tablet
 
 const styles = StyleSheet.create({
   // web prefix needed as this otherwise messes with the height-calculation for mobile
@@ -84,79 +77,16 @@ const isPhoneDimensions = (width: number) => width < 768;
 
 const drawerWidth = 240;
 
-const PageCommentsDrawerNavigator: React.FC<{ route: any; navigation: any }> = (
-  props
-) => {
-  const { activeDevice } = useAuthenticatedAppContext();
-  const commentsService = useInterpret(commentsMachine, {
-    context: {
-      params: {
-        pageId: props.route.params.pageId,
-        activeDevice: activeDevice as LocalDevice,
-      },
-    },
-  });
-  const [, send] = useActor(commentsService);
-  const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
-  const insets = useSafeAreaInsets();
-
-  return (
-    <PageProvider
-      value={{
-        pageId: props.route.params.pageId,
-        commentsService,
-        setActiveSnapshotAndCommentKeys: (activeSnapshot, commentKeys) => {
-          send({
-            type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS",
-            activeSnapshot,
-            commentKeys,
-          });
-        },
-      }}
-    >
-      <PageCommentsDrawer.Navigator
-        id="PageCommentsDrawer"
-        drawerContent={(props) => <CommentsSidebar {...props} />}
-        screenOptions={{
-          headerStyle: [styles.header],
-          headerLeft: (headerProps) => (
-            <PageHeaderLeft {...headerProps} navigation={props.navigation} />
-          ),
-          headerRight: () => <PageHeaderRight />,
-          headerTitle: () => <PageHeader />,
-          headerTitleAlign: "center",
-          drawerType: "front",
-          unmountOnBlur: true,
-          drawerPosition: "right",
-          drawerStyle: {
-            width: drawerWidth,
-            marginLeft: isPermanentLeftSidebar ? -drawerWidth : undefined,
-            // necessary to avoid overlapping with the header
-            marginTop: 50 + insets.top,
-            borderLeftWidth: 1,
-            borderLeftColor: tw.color("gray-200"),
-          },
-          overlayColor: "transparent",
-        }}
-      >
-        <PageCommentsDrawer.Screen name="Page" component={PageScreen} />
-      </PageCommentsDrawer.Navigator>
-    </PageProvider>
-  );
-};
-
 // By remounting the component we make sure that a fresh state machine gets started.
 // As an alternative we could also have an action that resets the state machine,
 // but with all the side-effects remounting seemed to be the stabler choice for now
 // and also was recommended by the core team:
 // https://github.com/statelyai/xstate/discussions/2108#discussioncomment-4084125
-const PageCommentsDrawerNavigatorResetWrapper: React.FC<{
+const PageScreenWrapper: React.FC<{
   route: any;
   navigation: any;
 }> = (props) => {
-  return (
-    <PageCommentsDrawerNavigator key={props.route.params.pageId} {...props} />
-  );
+  return <PageScreen key={props.route.params.pageId} {...props} />;
 };
 
 function WorkspaceDrawerNavigator(props) {
@@ -165,34 +95,41 @@ function WorkspaceDrawerNavigator(props) {
   const { width } = useWindowDimensions();
 
   return (
-    <Drawer.Navigator
-      drawerContent={(props) => <Sidebar {...props} />}
+    <WorkspaceDrawer.Navigator
+      drawerContent={(drawerProps) => <Sidebar {...drawerProps} />}
       screenOptions={{
         unmountOnBlur: true,
-        headerShown: false,
         drawerType: isPermanentLeftSidebar ? "permanent" : "front",
         drawerStyle: { width: isDesktopDevice ? drawerWidth : width },
+        headerShown: true,
+        headerTitle: (props) => <Text>{props.children}</Text>,
+        headerStyle: [styles.header],
+        headerLeft: () => <PageHeaderLeft navigation={props.navigation} />,
+        headerLeftContainerStyle: {
+          flex: 1,
+        },
+        headerRightContainerStyle: {
+          flexBasis: isDesktopDevice ? drawerWidth : 0,
+          flexGrow: isDesktopDevice ? 0 : 1,
+        },
         overlayColor:
           !isPermanentLeftSidebar && isDesktopDevice
             ? tw.color("backdrop")
             : "transparent",
       }}
     >
-      <Drawer.Screen
-        name="PageCommentsDrawer"
-        component={PageCommentsDrawerNavigatorResetWrapper}
-      />
-      <Drawer.Screen
+      <WorkspaceDrawer.Screen name="Page" component={PageScreenWrapper} />
+      <WorkspaceDrawer.Screen
         name="WorkspaceNotDecrypted"
         component={WorkspaceNotDecryptedScreen}
         options={{ title: "" }}
       />
-      <Drawer.Screen
+      <WorkspaceDrawer.Screen
         name="WorkspaceRoot"
         component={WorkspaceRootScreen}
         options={{ headerShown: false }}
       />
-    </Drawer.Navigator>
+    </WorkspaceDrawer.Navigator>
   );
 }
 
@@ -535,10 +472,7 @@ const getLinking = (
             WorkspaceDrawer: {
               path: "/",
               screens: {
-                PageCommentsDrawer: {
-                  path: "page/:pageId",
-                  screens: { Page: "" },
-                },
+                Page: "page/:pageId",
                 WorkspaceNotDecrypted: "lobby",
                 WorkspaceRoot: "",
               },
