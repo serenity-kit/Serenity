@@ -313,8 +313,7 @@ export const Editor = (props: EditorProps) => {
                   isActive={editor.isActive("code")}
                 />
 
-                {/* for some reason tailwind md:h-6 doesn't work on the Divider yet */}
-                <EditorBottombarDivider style={tw`h-6`} />
+                <EditorBottombarDivider />
 
                 <EditorBottombarButton
                   onPress={() =>
@@ -324,8 +323,7 @@ export const Editor = (props: EditorProps) => {
                   isActive={editor.isActive("link")}
                 />
 
-                {/* for some reason tailwind md:h-6 doesn't work on the Divider yet */}
-                <EditorBottombarDivider style={tw`h-6`} />
+                <EditorBottombarDivider />
 
                 <EditorBottombarButton
                   onPress={() => {

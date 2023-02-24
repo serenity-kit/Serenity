@@ -7,8 +7,7 @@ export type EditorBottombarDividerProps = RNView["props"] & {
 };
 
 const styles = StyleSheet.create({
-  // TODO make tailwind md:h-6 work here
-  default: tw`h-8 md:h-6 mx-0.5 border-r border-gray-200`,
+  default: tw`h-6 mx-0.5 border-r border-gray-300`,
   collapsed: tw`mx-0`,
 });
 
