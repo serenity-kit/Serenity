@@ -6,6 +6,7 @@ import {
   Pressable,
   RawInput,
   ScrollView,
+  SubmitButton,
   Text,
   tw,
   View,
@@ -116,25 +117,35 @@ const CommentsSidebar: React.FC<{}> = () => {
                   );
                 })}
               </View>
-              <RawInput
-                multiline
-                value={state.context.replyTexts[comment.id]}
-                onChangeText={(text) =>
-                  send({
-                    type: "UPDATE_REPLY_TEXT",
-                    commentId: comment.id,
-                    text,
-                  })
-                }
-              />
-              <Button
+
+              <HStack space="1.5">
+                <Avatar color="emerald" size="xs">
+                  PE
+                </Avatar>
+                <RawInput
+                  multiline
+                  value={state.context.replyTexts[comment.id]}
+                  onChangeText={(text) =>
+                    send({
+                      type: "UPDATE_REPLY_TEXT",
+                      commentId: comment.id,
+                      text,
+                    })
+                  }
+                  _stack={{
+                    height: 16,
+                    flexShrink: 1,
+                  }}
+                />
+              </HStack>
+
+              <SubmitButton
                 size="sm"
                 onPress={() =>
                   send({ type: "CREATE_REPLY", commentId: comment.id })
                 }
-              >
-                Add Reply
-              </Button>
+                style={tw`mt-1 self-end`}
+              />
 
               <IconButton
                 name="delete-bin-line"
