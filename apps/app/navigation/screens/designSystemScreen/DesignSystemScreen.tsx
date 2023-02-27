@@ -43,6 +43,7 @@ import {
   Spinner,
   Text,
   TextArea,
+  ToggleButton,
   Tooltip,
   tw,
   useIsDesktopDevice,
@@ -134,6 +135,9 @@ export default function DesignSystemScreen(
 
   // for Select
   const [userRole, setUserRole] = React.useState("");
+
+  // for Toggle
+  const [isActive, setIsActive] = React.useState<boolean>(false);
 
   return (
     <ScrollSafeAreaView>
@@ -420,7 +424,7 @@ export default function DesignSystemScreen(
           The default is medium, to make it a bit bigger use the{" "}
           <DSMono variant="property">lg</DSMono> property.
         </Text>
-        <Text variant="sm" style={tw`mt-4`}>
+        <Text variant="sm" style={tw`mt-1`}>
           For special cases such as the navigation-bar, which one should be able
           to use with one hand, we use the{" "}
           <DSMono variant="property">xl</DSMono> version for mobile to increase
@@ -1121,7 +1125,7 @@ export default function DesignSystemScreen(
           Icons don't have a style property, but you can still dye them with the{" "}
           <DSMono variant="property">color</DSMono> property.
         </Text>
-        <Text variant="sm" style={tw`mt-4`}>
+        <Text variant="sm" style={tw`mt-1`}>
           You can use all of our custom colors defined for the application by
           typing the name and if necessary the hue value:{" "}
           <DSMono variant="type">collaboration-honey</DSMono>,{" "}
@@ -1446,7 +1450,7 @@ export default function DesignSystemScreen(
           <DSMono variant="type">font-family</DSMono> as well as when said
           parent is set to <DSMono variant="property">bold</DSMono>.
         </Text>
-        <Text variant="sm" style={tw`mt-2`}>
+        <Text variant="sm" style={tw`mt-1`}>
           Be aware that the color stays the same no matter if the parent{" "}
           <DSMono variant="component">Text</DSMono> is set to be{" "}
           <DSMono variant="property">muted</DSMono> or the color is changed, to
@@ -1480,7 +1484,7 @@ export default function DesignSystemScreen(
           <DSMono variant="property">quiet</DSMono> property to avoid the
           primary-color override.
         </Text>
-        <Text variant="sm" style={tw`mt-2`}>
+        <Text variant="sm" style={tw`mt-1`}>
           Notice though you will need to set both the{" "}
           <DSMono variant="property">variant</DSMono> and if need be the{" "}
           <DSMono variant="property">muted</DSMono> properties to match the{" "}
@@ -1623,7 +1627,7 @@ export default function DesignSystemScreen(
           for the user to understand and learn the common actions of the
           application.
         </Text>
-        <Text variant="sm" style={tw`mt-2`}>
+        <Text variant="sm" style={tw`mt-1`}>
           Add the optional property <DSMono variant="property">danger</DSMono>{" "}
           to show the user irreversible actions.
         </Text>
@@ -1706,7 +1710,7 @@ export default function DesignSystemScreen(
           <DSMono variant="component">Shortcut</DSMono> component via{" "}
           <DSMono variant="property">shortcut</DSMono> .
         </Text>
-        <Text variant="sm" style={tw`mt-2 text-left`}>
+        <Text variant="sm" style={tw`mt-1 text-left`}>
           To avoid accidents don't put a shortcut on a{" "}
           <DSMono variant="context">dangerous</DSMono> action.
         </Text>
@@ -1789,7 +1793,7 @@ export default function DesignSystemScreen(
           the
           <DSMono variant="component">ModalButtonFooter</DSMono> component.
         </Text>
-        <Text variant="sm" style={tw`mt-2`}>
+        <Text variant="sm" style={tw`mt-1`}>
           This component requires to be passed a{" "}
           <DSMono variant="component">Button</DSMono> via the Footers{" "}
           <DSMono variant="property">confirm</DSMono> property. To add a{" "}
@@ -2233,6 +2237,49 @@ export default function DesignSystemScreen(
             This will fail
           </Button>
         </DSExampleArea>
+
+        <Heading lvl={1}>ToggleButton</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="md">
+            ToggleButton
+          </DSMono>{" "}
+          is used to switch between two options and the result of the change is
+          immediate.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="sm">
+          A <DSMono variant="component">ToggleButton</DSMono> has the usual
+          properties of a simple icon-button wihout color variants.
+        </Text>
+        <DSExampleArea>
+          <ToggleButton
+            name="chat-4-line"
+            isActive={isActive}
+            onPress={() => setIsActive((prevIsActive) => !prevIsActive)}
+          />
+          <ToggleButton name="chat-4-line" disabled />
+        </DSExampleArea>
+        <Heading lvl={3}>Size</Heading>
+        <Text variant="sm">
+          It comes in 2 predefined sizes <DSMono variant="type">md</DSMono> and{" "}
+          <DSMono variant="type">lg</DSMono>.
+        </Text>
+        <Text variant="sm" style={tw`mt-1`}>
+          One can use different proportions by adding height and width-classes
+          via the <DSMono variant="property">style</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <ToggleButton name="chat-4-line" />
+          <ToggleButton size="lg" name="chat-4-line" />
+          <ToggleButton size="lg" name="chat-4-line" style={tw`h-7 w-8.5`} />
+          <ToggleButton size="lg" name="chat-4-line" style={tw`h-10 w-10`} />
+        </DSExampleArea>
+        <Text variant="xxs" style={tw`mt-4`} muted>
+          Notice though that the Icon will stay the same size as we should only
+          use the custom-sizing for very special cases if it improves the
+          usability like in the EditorBottombar on mobile.
+        </Text>
 
         <Heading lvl={1}>Tooltip</Heading>
         <Text>
