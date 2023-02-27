@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   EditorBottombarDivider,
   IconButton,
@@ -64,6 +65,22 @@ const CommentsSidebar: React.FC<{}> = () => {
                 send({ type: "HIGHLIGHT_COMMENT", commentId: comment.id });
               }}
             >
+              <HStack alignItems="center">
+                <HStack alignItems="center" space="1.5">
+                  {/* TODO if comment has been read change color to gray-400 */}
+                  <Avatar color="arctic" size="xs">
+                    KD
+                  </Avatar>
+                  <Text variant="xs" bold>
+                    Karen Doe
+                  </Text>
+                  <Text variant="xxs" muted>
+                    {formatDistanceToNow(parseJSON(comment.createdAt), {
+                      addSuffix: true,
+                    })}
+                  </Text>
+                </HStack>
+              </HStack>
               <Text>{comment.text}</Text>
               <Text variant="xs">
                 {formatDistanceToNow(parseJSON(comment.createdAt), {
