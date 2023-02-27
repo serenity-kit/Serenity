@@ -66,6 +66,11 @@ const CommentsSidebar: React.FC<{}> = () => {
               }}
             >
               <HStack alignItems="center">
+                {/* new comment indicator */}
+                <View style={tw`w-4 -ml-4 flex-row justify-center`}>
+                  <View style={tw`h-1.5 w-1.5 rounded-full bg-primary-500`} />
+                </View>
+
                 <HStack alignItems="center" space="1.5">
                   {/* TODO if comment has been read change color to gray-400 */}
                   <Avatar color="arctic" size="xs">
