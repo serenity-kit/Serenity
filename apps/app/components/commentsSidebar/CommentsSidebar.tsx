@@ -10,11 +10,17 @@ import {
 } from "@serenity-tools/ui";
 import { useActor } from "@xstate/react";
 import { formatDistanceToNow, parseJSON } from "date-fns";
+import { StyleSheet } from "react-native";
 import { usePage } from "../../context/PageContext";
 
 const CommentsSidebar: React.FC<{}> = () => {
   const { commentsService } = usePage();
   const [state, send] = useActor(commentsService);
+
+  const styles = StyleSheet.create({
+    header: tw`h-editor-sidebar-header px-4 border-b border-solid border-gray-200`,
+    wrapper: tw`p-4`,
+  });
 
   return (
     // grow-0 overrides default of ScrollView to keep the assigned width
