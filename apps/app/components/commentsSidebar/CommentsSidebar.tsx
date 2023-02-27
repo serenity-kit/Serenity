@@ -86,12 +86,13 @@ const CommentsSidebar: React.FC<{}> = () => {
                   </Text>
                 </HStack>
               </HStack>
-              <Text>{comment.text}</Text>
-              <Text variant="xs">
-                {formatDistanceToNow(parseJSON(comment.createdAt), {
-                  addSuffix: true,
-                })}
+              <Text variant="sm" style={tw`py-2`}>
+                {comment.text}
               </Text>
+              {/* <Text variant="xs" style={tw`text-primary-500`}>
+                Reply...
+              </Text> */}
+
               <View>
                 {comment.replies.map((reply) => {
                   if (!reply) return null;
