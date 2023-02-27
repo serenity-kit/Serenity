@@ -1,5 +1,6 @@
 import {
   Button,
+  EditorBottombarDivider,
   IconButton,
   Pressable,
   RawInput,
@@ -8,6 +9,7 @@ import {
   tw,
   View,
 } from "@serenity-tools/ui";
+import { HStack } from "native-base";
 import { useActor } from "@xstate/react";
 import { formatDistanceToNow, parseJSON } from "date-fns";
 import { StyleSheet } from "react-native";
@@ -19,13 +21,32 @@ const CommentsSidebar: React.FC<{}> = () => {
 
   const styles = StyleSheet.create({
     header: tw`h-editor-sidebar-header px-4 border-b border-solid border-gray-200`,
-    wrapper: tw`p-4`,
+    wrapper: tw`p-4 border-b border-gray-200`,
   });
 
   return (
     // grow-0 overrides default of ScrollView to keep the assigned width
     <ScrollView style={tw`w-sidebar grow-0 bg-gray-100`}>
-      <Text>Comments WIP</Text>
+      <HStack
+        alignItems="center"
+        justifyContent="space-between"
+        style={styles.header}
+      >
+        <Text variant="sm" bold>
+          Comments
+        </Text>
+        <HStack alignItems={"center"} style={tw`-mr-1`}>
+          <Text variant="xxs" muted style={tw`p-1`}>
+            Open
+          </Text>
+          <EditorBottombarDivider
+            style={tw`h-4 border-r-1.5 border-gray-600`}
+          />
+          <Text variant="xxs" muted style={tw`p-1`}>
+            Resolved
+          </Text>
+        </HStack>
+      </HStack>
 
       <View>
         {state.context.decryptedComments.map((comment) => {
@@ -34,7 +55,7 @@ const CommentsSidebar: React.FC<{}> = () => {
             <Pressable
               key={comment.id}
               style={[
-                tw`border-b border-gray-200`,
+                styles.wrapper,
                 comment.id === state.context.highlightedCommentId
                   ? tw`bg-gray-200`
                   : undefined,
