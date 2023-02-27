@@ -53,14 +53,17 @@ const CommentsSidebar: React.FC<{}> = () => {
       <View>
         {state.context.decryptedComments.map((comment) => {
           if (!comment) return null;
+
+          const isActiveComment =
+            comment.id === state.context.highlightedCommentId;
+
           return (
             <Pressable
               key={comment.id}
               style={[
                 styles.wrapper,
-                comment.id === state.context.highlightedCommentId
-                  ? tw`bg-gray-200`
-                  : undefined,
+                isActiveComment ? tw`bg-collaboration-honey/5` : undefined,
+                { cursor: isActiveComment ? "default" : "pointer" },
               ]}
               onPress={() => {
                 send({ type: "HIGHLIGHT_COMMENT", commentId: comment.id });
