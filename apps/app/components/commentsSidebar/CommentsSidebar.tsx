@@ -140,6 +140,10 @@ const CommentsSidebar: React.FC<{}> = () => {
               </HStack>
 
               <SubmitButton
+                disabled={
+                  state.context.replyTexts[comment.id] === undefined ||
+                  state.context.replyTexts[comment.id] === ""
+                }
                 size="sm"
                 onPress={() =>
                   send({ type: "CREATE_REPLY", commentId: comment.id })
