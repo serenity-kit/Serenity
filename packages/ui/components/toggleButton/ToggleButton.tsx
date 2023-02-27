@@ -14,7 +14,7 @@ export type ToggleButtonProps = PressableProps & {
 
 export const ToggleButton = forwardRef((props: ToggleButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
-  const { name, isActive, size = "md", ...rest } = props;
+  const { name, isActive, size = "md", disabled, ...rest } = props;
 
   const dimensions = size === "md" ? "h-6 w-6" : "h-8 w-8";
 
@@ -56,6 +56,8 @@ export const ToggleButton = forwardRef((props: ToggleButtonProps, ref) => {
               isHovered && styles.hover,
               isPressed && styles.pressed,
               isFocusVisible && styles.focusVisible,
+              disabled && styles.disabled,
+              { cursor: disabled ? "not-allowed" : "pointer" }, // web only
             ]}
           >
             <Icon
