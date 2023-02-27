@@ -24,9 +24,7 @@ const CommentsSidebar: React.FC<{}> = () => {
 
   return (
     // grow-0 overrides default of ScrollView to keep the assigned width
-    <ScrollView
-      style={tw`w-sidebar grow-0 border-l border-gray-200 bg-gray-100`}
-    >
+    <ScrollView style={tw`w-sidebar grow-0 bg-gray-100`}>
       <Text>Comments WIP</Text>
 
       <View>
