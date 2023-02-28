@@ -93,18 +93,32 @@ const CommentsSidebar: React.FC<{}> = () => {
                 Reply...
               </Text> */}
 
-              <View>
+              <View style={tw`mt-2`}>
                 {comment.replies.map((reply) => {
                   if (!reply) return null;
                   return (
                     <View key={reply.id}>
-                      <View>
-                        <Text>{reply.text}</Text>
-                        <Text variant="xs">
+                      <HStack alignItems="center">
+                        <HStack alignItems="center" space="1.5">
+                          {/* TODO if comment has been read change color to gray-400 */}
+                          <Avatar color="emerald" size="xs">
+                            ND
+                          </Avatar>
+                          <Text variant="xs" bold>
+                            Norman Dean
+                          </Text>
+                        </HStack>
+                        <IconButton name="more-line" style={tw`ml-auto`} />
+                      </HStack>
+                      <View
+                        style={tw`ml-2.75 pb-2 pl-4.25 border-l-2 border-solid border-gray-200`}
+                      >
+                        <Text variant="xxs" muted style={tw`mt-1 mb-1.5`}>
                           {formatDistanceToNow(parseJSON(reply.createdAt), {
                             addSuffix: true,
                           })}
                         </Text>
+                        <Text variant="sm">{reply.text}</Text>
                       </View>
                       <IconButton
                         name="delete-bin-line"
