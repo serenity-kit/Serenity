@@ -46,6 +46,7 @@ export const ToggleButton = forwardRef((props: ToggleButtonProps, ref) => {
       }}
       // @ts-expect-error - native base style mismatch
       style={[styles.pressable, rest.style]}
+      accessibilityPressed={isActive}
     >
       {({ isPressed, isHovered, isFocused }) => {
         return (
