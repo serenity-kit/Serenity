@@ -12,6 +12,7 @@ export * from "./components/designSystem/DesignSystemMono";
 export * from "./components/editorBottombarButton/EditorBottombarButton";
 export * from "./components/editorBottombarDivider/EditorBottombarDivider";
 export * from "./components/editorSidebarIcon/EditorSidebarIcon";
+export * from "./components/editorSidebarHeader/EditorSidebarHeader";
 export * from "./components/formWrapper/FormWrapper";
 export * from "./components/heading/Heading";
 export * from "./components/icon/Icon";

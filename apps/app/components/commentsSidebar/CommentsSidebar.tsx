@@ -1,7 +1,7 @@
 import {
   Avatar,
-  Button,
   EditorBottombarDivider,
+  EditorSidebarHeader,
   IconButton,
   Pressable,
   RawInput,
@@ -22,18 +22,14 @@ const CommentsSidebar: React.FC<{}> = () => {
   const [state, send] = useActor(commentsService);
 
   const styles = StyleSheet.create({
-    header: tw`h-editor-sidebar-header px-4 border-b border-solid border-gray-200`,
+    header: tw`justify-between`,
     wrapper: tw`p-4 border-b border-gray-200`,
   });
 
   return (
     // grow-0 overrides default of ScrollView to keep the assigned width
     <ScrollView style={tw`w-sidebar grow-0 bg-gray-100`}>
-      <HStack
-        alignItems="center"
-        justifyContent="space-between"
-        style={styles.header}
-      >
+      <EditorSidebarHeader style={styles.header}>
         <Text variant="sm" bold>
           Comments
         </Text>
@@ -48,7 +44,7 @@ const CommentsSidebar: React.FC<{}> = () => {
             Resolved
           </Text>
         </HStack>
-      </HStack>
+      </EditorSidebarHeader>
 
       <View>
         {state.context.decryptedComments.map((comment) => {
