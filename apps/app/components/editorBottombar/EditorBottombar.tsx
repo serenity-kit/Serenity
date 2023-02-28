@@ -34,7 +34,7 @@ export const EditorBottombar = forwardRef(
     return (
       <ScrollView
         horizontal={true}
-        style={[tw`h-${editorBottombarHeight / 4} border-t border-gray-200`]}
+        style={[tw`h-${editorBottombarHeight / 4} border-t border-gray-300`]}
         contentContainerStyle={tw`px-2.5`} // needed here as it isn't handled correctly on the parent element
         ref={ref}
       >
