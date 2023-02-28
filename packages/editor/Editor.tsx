@@ -15,7 +15,6 @@ import { Level } from "@tiptap/extension-heading";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Table from "@tiptap/extension-table";
-import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
@@ -36,12 +35,13 @@ import {
   ShareOrSaveFileFunction,
 } from "../editor-file-extension/src";
 import "./awareness.css";
-import { CommentsExtension } from "./comments-extension/comments-extension";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
+import { CommentsExtension } from "./extensions/commentsExtension/commentsExtension";
+import { AwarnessExtension } from "./extensions/naishoAwarnessExtension/naishoAwarenessExtension";
+import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
-import { AwarnessExtension } from "./naisho-awareness-extension";
-import { SerenityScrollIntoViewForEditModeExtension } from "./scroll-into-view-for-edit-mode-extensions";
+import { TableHeaderExtension } from "./extensions/tableHeaderExtension/tableHeaderExtension";
 import { EditorComment } from "./types";
 
 type EditorProps = {
@@ -148,7 +148,7 @@ export const Editor = (props: EditorProps) => {
           },
         }),
         TableRow,
-        TableHeader,
+        TableHeaderExtension,
         TableCellExtension,
       ],
       onCreate: (params) => {
