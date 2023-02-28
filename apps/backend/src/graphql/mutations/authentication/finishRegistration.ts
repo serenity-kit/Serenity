@@ -70,9 +70,18 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
         args.input.pendingWorkspaceInvitationKeyPublicNonce,
       createChainEvent,
     });
+
+    let verificationCode: null | string = null;
+    if (
+      process.env.SERENITY_ENV !== "e2e" &&
+      process.env.SERENITY_ENV !== "development"
+    ) {
+      verificationCode = unverifiedUser.confirmationCode;
+    }
+
     return {
       id: unverifiedUser.id,
-      verificationCode: unverifiedUser.confirmationCode,
+      verificationCode,
     };
   },
 });
