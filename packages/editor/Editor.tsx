@@ -4,10 +4,10 @@ import {
   RawInput,
   ScrollView,
   SubmitButton,
+  ToggleButton,
   tw,
   useHasEditorSidebar,
   View,
-  ToggleButton,
 } from "@serenity-tools/ui";
 import { EditorEvents, isTextSelection } from "@tiptap/core";
 import Collaboration from "@tiptap/extension-collaboration";
@@ -15,7 +15,6 @@ import { Level } from "@tiptap/extension-heading";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Table from "@tiptap/extension-table";
-import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
 import TaskItem from "@tiptap/extension-task-item";
@@ -40,6 +39,7 @@ import "./awareness.css";
 import { CommentsExtension } from "./comments-extension/comments-extension";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
+import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
 import { AwarnessExtension } from "./naisho-awareness-extension";
 import { SerenityScrollIntoViewForEditModeExtension } from "./scroll-into-view-for-edit-mode-extensions";
 import { EditorComment } from "./types";
@@ -149,7 +149,7 @@ export const Editor = (props: EditorProps) => {
         }),
         TableRow,
         TableHeader,
-        TableCell,
+        TableCellExtension,
       ],
       onCreate: (params) => {
         if (isNew) {
