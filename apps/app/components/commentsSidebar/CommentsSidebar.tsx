@@ -79,19 +79,20 @@ const CommentsSidebar: React.FC<{}> = () => {
                   <Text variant="xs" bold>
                     Karen Doe
                   </Text>
-                  <Text variant="xxs" muted>
-                    {formatDistanceToNow(parseJSON(comment.createdAt), {
-                      addSuffix: true,
-                    })}
-                  </Text>
                 </HStack>
+                <IconButton name="more-line" style={tw`ml-auto`} />
               </HStack>
-              <Text variant="sm" style={tw`py-2`}>
-                {comment.text}
-              </Text>
-              {/* <Text variant="xs" style={tw`text-primary-500`}>
+              <View style={tw`pl-0.5 py-2`}>
+                <Text variant="xxs" muted style={tw`mb-1.5`}>
+                  {formatDistanceToNow(parseJSON(comment.createdAt), {
+                    addSuffix: true,
+                  })}
+                </Text>
+                <Text variant="sm">{comment.text}</Text>
+                {/* <Text variant="xs" style={tw`py-2 text-primary-500`}>
                 Reply...
               </Text> */}
+              </View>
 
               <View style={tw`mt-2`}>
                 {comment.replies.map((reply) => {
@@ -132,8 +133,8 @@ const CommentsSidebar: React.FC<{}> = () => {
               </View>
 
               <HStack space="1.5">
-                <Avatar color="emerald" size="xs">
-                  PE
+                <Avatar color="rose" size="xs">
+                  FO
                 </Avatar>
                 <RawInput
                   multiline
