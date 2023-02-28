@@ -12,10 +12,13 @@ export async function getSnapshot({
   userId,
   documentId,
   documentShareLinkToken,
-}: Params): Promise<Snapshot> {
+}: Params): Promise<Snapshot | null> {
   const document = await prisma.document.findFirst({
     where: {
       id: documentId,
+    },
+    include: {
+      activeSnapshot: true,
     },
   });
   if (!document) {
@@ -44,16 +47,5 @@ export async function getSnapshot({
       throw new ForbiddenError("Unauthorized");
     }
   }
-  const snapshot = await prisma.snapshot.findFirst({
-    where: {
-      documentId,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-  if (!snapshot) {
-    throw new UserInputError("No snapshot found");
-  }
-  return snapshot;
+  return document.activeSnapshot;
 }

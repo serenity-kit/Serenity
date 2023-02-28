@@ -69,7 +69,7 @@ export const createWorkspaceOnOnboarding = async ({
   await expect(page).toHaveURL(
     `http://localhost:19006/workspace/${workspaceId}/page/${documentId}`
   );
-  const folder = await prisma.folder.findFirst({
+  const folder = await prisma.folder.findFirstOrThrow({
     where: { workspaceId },
   });
   const mainDevice = await prisma.device.findFirst({

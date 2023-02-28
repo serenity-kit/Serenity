@@ -1,17 +1,10 @@
 import { ForbiddenError } from "apollo-server-express";
-import { Folder } from "../../types/folder";
+import { Folder, formatFolder } from "../../types/folder";
 import { prisma } from "../prisma";
 
 type Params = {
   id: string;
   userId: string;
-};
-
-const toFolderType = (folder: any): Folder => {
-  return {
-    parentFolders: [],
-    ...folder,
-  };
 };
 
 const reduceParentFolderTreeToList = (folder: any) => {
@@ -46,7 +39,7 @@ export async function getFolder({ userId, id }: Params) {
       throw new ForbiddenError("Unauthorized");
     }
     // next let's build the folder tree up to this folder
-    const folder = toFolderType(rawFolder);
+    const folder = formatFolder(rawFolder);
     folder.parentFolders = [];
     if (rawFolder.rootFolderId) {
       const relatedFolders = await prisma.folder.findMany({
@@ -59,17 +52,17 @@ export async function getFolder({ userId, id }: Params) {
           createdAt: "desc",
         },
       });
-      const rootFolder = await prisma.folder.findUnique({
+      const rootFolder = await prisma.folder.findUniqueOrThrow({
         where: {
           id: rawFolder.rootFolderId,
         },
       });
 
       const treeFolderLookup = {
-        [rawFolder.rootFolderId]: toFolderType(rootFolder),
+        [rawFolder.rootFolderId]: formatFolder(rootFolder),
       };
       relatedFolders.forEach((relatedFolder) => {
-        treeFolderLookup[relatedFolder.id] = toFolderType(relatedFolder);
+        treeFolderLookup[relatedFolder.id] = formatFolder(relatedFolder);
       });
 
       // trace the parent folders back up to the root

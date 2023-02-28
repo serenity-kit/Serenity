@@ -23,7 +23,11 @@ export const snapshotQuery = queryField((t) => {
         documentId: args.documentId,
         documentShareLinkToken: args.documentShareLinkToken,
       });
-      return formatSnapshot(snapshot);
+      if (snapshot) {
+        return formatSnapshot(snapshot);
+      } else {
+        return null;
+      }
     },
   });
 });

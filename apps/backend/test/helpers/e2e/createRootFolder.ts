@@ -23,7 +23,7 @@ export const createRootFolder = async (
   // TODO: investigate why GitHub reports
   // numFoldersAfterAdd = numFoldersBeforeAdd + 2
   expect(numFoldersAfterAdd).toBeGreaterThan(numFoldersBeforeAdd);
-  const folder = await prisma.folder.findFirst({
+  const folder = await prisma.folder.findFirstOrThrow({
     where: { workspaceId: workspaceId },
     orderBy: { createdAt: "desc" },
   });
