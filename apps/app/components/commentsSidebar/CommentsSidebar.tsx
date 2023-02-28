@@ -58,7 +58,7 @@ const CommentsSidebar: React.FC<{}> = () => {
               key={comment.id}
               style={[
                 styles.wrapper,
-                isActiveComment ? tw`bg-collaboration-honey/5` : undefined,
+                isActiveComment ? tw`bg-collaboration-honey/7` : undefined,
                 { cursor: isActiveComment ? "default" : "pointer" },
               ]}
               onPress={() => {
