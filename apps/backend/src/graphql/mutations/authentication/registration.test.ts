@@ -11,7 +11,7 @@ import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
-const username = "user";
+const username = `${uuidv4()}@example.com`;
 const password = "password";
 let result: any = null;
 

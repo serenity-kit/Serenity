@@ -1,20 +1,12 @@
 import { KeyDerivationTrace2 } from "@naisho/core";
-import { WorkspaceKey } from "./workspace";
+import { Folder as PrismaFolder } from "../../prisma/generated/output";
 
-export type Folder = {
-  id: string;
-  encryptedName: string;
-  encryptedNameNonce: string;
-  idSignature: string;
-  parentFolderId: string | null;
-  rootFolderId: string | null;
-  workspaceId: string;
-  workspaceKey?: WorkspaceKey | null;
-  parentFolders: Folder[] | null;
+export type Folder = PrismaFolder & {
+  parentFolders?: Folder[] | null;
   keyDerivationTrace: KeyDerivationTrace2;
 };
 
-export const formatFolder = (folder: any): Folder => {
+export const formatFolder = (folder: PrismaFolder): Folder => {
   return {
     ...folder,
     keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace2,

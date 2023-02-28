@@ -1,11 +1,13 @@
-import { KeyDerivationTrace2 } from "@naisho/core";
+import { createSnapshot, KeyDerivationTrace2 } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
+  createSnapshotKey,
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
   encryptFolderName,
   folderDerivedKeyContext,
+  snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import {
   Icon,
@@ -22,6 +24,7 @@ import {
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, StyleSheet } from "react-native";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import {
   runCreateDocumentMutation,
@@ -41,6 +44,7 @@ import {
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
+
 import { deriveWorkspaceKey } from "../../utils/workspace/deriveWorkspaceKey";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarFolderMenu from "../sidebarFolderMenu/SidebarFolderMenu";
@@ -250,7 +254,8 @@ export default function SidebarFolder(props: Props) {
   };
 
   const createDocument = async () => {
-    const id = uuidv4();
+    const documentId = uuidv4();
+    const snapshotId = uuidv4();
     const workspace = await getWorkspace({
       deviceSigningPublicKey: activeDevice.signingPublicKey,
       workspaceId: props.workspaceId,
@@ -259,12 +264,62 @@ export default function SidebarFolder(props: Props) {
       console.error("Workspace or workspaceKeys not found");
       return;
     }
+    const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
+      keyDerivationTrace: props.keyDerivationTrace,
+      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+      activeDevice: {
+        signingPublicKey: activeDevice.signingPublicKey,
+        signingPrivateKey: activeDevice.signingPrivateKey!,
+        encryptionPublicKey: activeDevice.encryptionPublicKey,
+        encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+        encryptionPublicKeySignature:
+          activeDevice.encryptionPublicKeySignature!,
+      },
+    });
+    const folderKey = folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key;
+    const snapshotKey = createSnapshotKey({ folderKey });
+    const snapshotKeyDerivationTrace = await createFolderKeyDerivationTrace({
+      folderId: props.folderId,
+      workspaceKeyId: workspace.currentWorkspaceKey.id,
+    });
+    snapshotKeyDerivationTrace.trace.push({
+      entryId: snapshotId,
+      parentId: props.folderId,
+      subkeyId: snapshotKey.subkeyId,
+      context: snapshotDerivedKeyContext,
+    });
+    const signatureKeyPair: KeyPair = {
+      publicKey: sodium.from_base64(activeDevice.signingPublicKey),
+      privateKey: sodium.from_base64(activeDevice.signingPrivateKey!),
+      keyType: "ed25519",
+    };
+    const publicData = {
+      snapshotId: snapshotId,
+      docId: documentId,
+      pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+      keyDerivationTrace: snapshotKeyDerivationTrace,
+      subkeyId: snapshotKey.subkeyId,
+    };
+    // created using:
+    // const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
+    // console.log(sodium.to_base64(yDocState));
+    //
+    // to do so create an initial document without any yDoc ref and set the first
+    // line to have a H1 header
+    const initialDocument = `AQLGkrivDwAHAQRwYWdlAwdoZWFkaW5nKADGkrivDwAFbGV2ZWwBfQEA`;
+    const snapshot = createSnapshot(
+      sodium.from_base64(initialDocument),
+      publicData,
+      sodium.from_base64(snapshotKey.key),
+      signatureKeyPair
+    );
     const result = await runCreateDocumentMutation(
       {
         input: {
-          id,
+          id: documentId,
           workspaceId: props.workspaceId,
           parentFolderId: props.folderId,
+          snapshot,
         },
       },
       {}
@@ -584,8 +639,7 @@ export default function SidebarFolder(props: Props) {
                     documentId={document.id}
                     encryptedName={document.encryptedName}
                     encryptedNameNonce={document.encryptedNameNonce}
-                    subkeyId={document.nameKeyDerivationTrace.subkeyId}
-                    nameKeyDerivationTrace={document.nameKeyDerivationTrace}
+                    subkeyId={document.subkeyId}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}
                     depth={depth}

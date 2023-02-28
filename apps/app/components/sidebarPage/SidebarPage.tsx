@@ -18,11 +18,10 @@ import {
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
-import { KeyDerivationTrace, useDocumentQuery } from "../../generated/graphql";
+import { runSnapshotQuery, useDocumentQuery } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
-import { getFolder } from "../../utils/folder/getFolder";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
@@ -33,7 +32,6 @@ type Props = ViewProps & {
   encryptedName?: string | null;
   encryptedNameNonce?: string | null;
   subkeyId?: number | null;
-  nameKeyDerivationTrace: KeyDerivationTrace;
   depth?: number;
   onRefetchDocumentsPress: () => void;
 };
@@ -73,11 +71,7 @@ export default function SidebarPage(props: Props) {
     if (documentResult.data?.document?.id) {
       decryptTitle();
     }
-  }, [
-    props.encryptedName,
-    props.nameKeyDerivationTrace.subkeyId,
-    documentResult.data?.document?.id,
-  ]);
+  }, [props.encryptedName, props.subkeyId, documentResult.data?.document?.id]);
 
   const decryptTitle = async () => {
     if (!props.encryptedName || !props.encryptedNameNonce) {
@@ -98,17 +92,18 @@ export default function SidebarPage(props: Props) {
         console.error("Unable to retrieve document!");
         return;
       }
-      // TODO: optimize this by using the `getFolderKey()` function
-      // so that we don't need to load each folder multiple times
-      const folder = await getFolder({
-        id: props.parentFolderId,
+      const snapshotResult = await runSnapshotQuery({
+        documentId: document.id,
       });
-      if (!folder) {
-        console.error("Unable to retrieve folder!");
+      if (!snapshotResult.data?.snapshot) {
+        console.error(
+          snapshotResult.error?.message || "Unable to retrieve snapshot!"
+        );
+        return;
       }
-
-      const parentFolderKeyData = deriveKeysFromKeyDerivationTrace({
-        keyDerivationTrace: folder.keyDerivationTrace,
+      const snapshot = snapshotResult.data.snapshot;
+      const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
+        keyDerivationTrace: snapshot.keyDerivationTrace,
         activeDevice: {
           signingPublicKey: activeDevice.signingPublicKey,
           signingPrivateKey: activeDevice.signingPrivateKey!,
@@ -119,10 +114,10 @@ export default function SidebarPage(props: Props) {
         },
         workspaceKeyBox: workspace!.currentWorkspaceKey!.workspaceKeyBox!,
       });
-      const folderKeyData =
-        parentFolderKeyData.trace[parentFolderKeyData.trace.length - 1];
+      const snapshotKeyData =
+        snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];
       const documentKeyData = recreateDocumentKey({
-        folderKey: folderKeyData.key,
+        snapshotKey: snapshotKeyData.key,
         subkeyId: props.subkeyId!,
       });
       const documentTitle = decryptDocumentTitle({

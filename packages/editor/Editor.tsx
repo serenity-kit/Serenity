@@ -3,8 +3,8 @@ import {
   EditorBottombarButton,
   EditorBottombarDivider,
   RawInput,
-  SubmitButton,
   ScrollView,
+  SubmitButton,
   tw,
   useHasEditorSidebar,
   View,
@@ -153,10 +153,7 @@ export const Editor = (props: EditorProps) => {
       ],
       onCreate: (params) => {
         if (isNew) {
-          const json = params.editor.getJSON();
-          if (json.content?.length === 1) {
-            params.editor.chain().toggleHeading({ level: 1 }).focus().run();
-          }
+          params.editor.chain().focus().run();
         }
         if (props.onCreate) {
           props.onCreate(params);

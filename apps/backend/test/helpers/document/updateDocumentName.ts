@@ -1,46 +1,34 @@
 import {
   createDocumentKey,
+  deriveKeysFromKeyDerivationTrace,
   encryptDocumentTitle,
+  LocalDevice,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
-import { buildFolderKeyTrace } from "../folder/buildFolderKeyTrace";
+import { prisma } from "../../../src/database/prisma";
+import { getSnapshot } from "../snapshot/getSnapshot";
 
-type Params = {
+type RunUpdateDocumentNameMutationParams = {
   graphql: any;
   id: string;
-  name: string;
-  folderKey: string;
-  parentFolderId: string;
+  encryptedName: string;
+  encryptedNameNonce: string;
+  subkeyId: number;
   workspaceKeyId: string;
   authorizationHeader: string;
 };
-
-export const updateDocumentName = async ({
+const runUpdateDocumentNameMutation = async ({
   graphql,
   id,
-  name,
-  folderKey,
-  parentFolderId,
+  encryptedName,
+  encryptedNameNonce,
+  subkeyId,
   workspaceKeyId,
   authorizationHeader,
-}: Params) => {
+}: RunUpdateDocumentNameMutationParams) => {
   const authorizationHeaders = {
     authorization: authorizationHeader,
   };
-  const documentKeyData = createDocumentKey({
-    folderKey,
-  });
-  const encryptedDocumentResult = encryptDocumentTitle({
-    title: name,
-    key: documentKeyData.key,
-  });
-
-  const nameKeyDerivationTrace = await buildFolderKeyTrace({
-    workspaceKeyId,
-    subkeyId: documentKeyData.subkeyId,
-    parentFolderId,
-  });
-
   const query = gql`
     mutation updateDocumentName($input: UpdateDocumentNameInput!) {
       updateDocumentName(input: $input) {
@@ -50,32 +38,130 @@ export const updateDocumentName = async ({
           id
           parentFolderId
           workspaceId
-          nameKeyDerivationTrace {
-            workspaceKeyId
-            subkeyId
-            parentFolders {
-              folderId
-              subkeyId
-              parentFolderId
-            }
-          }
+          subkeyId
         }
       }
     }
   `;
-  const result = await graphql.client.request(
+  return graphql.client.request(
     query,
     {
       input: {
         id,
-        encryptedName: encryptedDocumentResult.ciphertext,
-        encryptedNameNonce: encryptedDocumentResult.publicNonce,
+        encryptedName,
+        encryptedNameNonce,
         workspaceKeyId,
-        subkeyId: documentKeyData.subkeyId,
-        nameKeyDerivationTrace,
+        subkeyId,
       },
     },
     authorizationHeaders
   );
-  return result;
+};
+
+type Params = {
+  graphql: any;
+  id: string;
+  name: string;
+  activeDevice: LocalDevice;
+  workspaceKeyId: string;
+  authorizationHeader: string;
+};
+
+export const updateDocumentName = async ({
+  graphql,
+  id,
+  name,
+  activeDevice,
+  workspaceKeyId,
+  authorizationHeader,
+}: Params) => {
+  const document = await prisma.document.findFirst({
+    where: { id },
+  });
+  if (!document) {
+    // return the same result as if the document was found but had no snapshot
+    return runUpdateDocumentNameMutation({
+      graphql,
+      id,
+      encryptedName: "",
+      encryptedNameNonce: "",
+      subkeyId: 123,
+      workspaceKeyId,
+      authorizationHeader,
+    });
+  }
+  const workspace = await prisma.workspace.findFirst({
+    where: {
+      id: document.workspaceId!,
+    },
+    include: {
+      workspaceKeys: {
+        orderBy: { generation: "desc" },
+        take: 1,
+        include: {
+          workspaceKeyBoxes: {
+            where: { deviceSigningPublicKey: activeDevice.signingPublicKey },
+            include: { creatorDevice: true },
+          },
+        },
+      },
+    },
+  });
+  if (!workspace) {
+    // return the same result as if the document was found but had no workspace
+    return runUpdateDocumentNameMutation({
+      graphql,
+      id,
+      encryptedName: "",
+      encryptedNameNonce: "",
+      subkeyId: 123,
+      workspaceKeyId,
+      authorizationHeader,
+    });
+  }
+  const workspaceKeyBox = workspace.workspaceKeys[0].workspaceKeyBoxes[0];
+
+  const snapshotResult = await getSnapshot({
+    graphql,
+    documentId: id,
+    documentShareLinkToken: null,
+    authorizationHeader,
+  });
+  if (!snapshotResult.snapshot) {
+    // return the same result as if the document was found but had no snapshot
+    return runUpdateDocumentNameMutation({
+      graphql,
+      id,
+      encryptedName: "",
+      encryptedNameNonce: "",
+      subkeyId: 123,
+      workspaceKeyId,
+      authorizationHeader,
+    });
+  }
+  const snapshot = snapshotResult.snapshot;
+  const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: snapshot.keyDerivationTrace,
+    activeDevice,
+    workspaceKeyBox,
+  });
+  const snapshotKey =
+    snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
+  const documentKeyData = createDocumentKey({
+    snapshotKey,
+  });
+  const encryptedDocumentResult = encryptDocumentTitle({
+    title: name,
+    key: documentKeyData.key,
+  });
+
+  return runUpdateDocumentNameMutation({
+    graphql,
+    id,
+    encryptedName: encryptedDocumentResult.ciphertext,
+    encryptedNameNonce: encryptedDocumentResult.publicNonce,
+    subkeyId: documentKeyData.subkeyId,
+    workspaceKeyId,
+    authorizationHeader,
+  });
 };

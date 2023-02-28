@@ -107,20 +107,17 @@ export default async function createUserWithWorkspace({
     parentKey: workspaceKey,
   });
   const folderKey = encryptedFolderResult.folderSubkey;
-  const docmentKeyResult = createDocumentKey({
-    folderKey,
-  });
   const snapshotKey = createSnapshotKey({
     folderKey,
+  });
+  const docmentKeyResult = createDocumentKey({
+    snapshotKey: snapshotKey.key,
   });
   const documentKey = docmentKeyResult.key;
   const encryptedDocumentTitleResult = encryptDocumentTitle({
     title: documentName,
     key: documentKey,
   });
-  // const documentEncryptionKey = sodium.from_base64(
-  //   "cksJKBDshtfjXJ0GdwKzHvkLxDp7WYYmdJkU1qPgM-0"
-  // );
   const snapshotId = uuidv4();
   const snapshot = createIntroductionDocumentSnapshot({
     documentId,
@@ -180,17 +177,7 @@ export default async function createUserWithWorkspace({
       id: documentId,
       encryptedName: encryptedDocumentTitleResult.ciphertext,
       encryptedNameNonce: encryptedDocumentTitleResult.publicNonce,
-      nameKeyDerivationTrace: {
-        workspaceKeyId,
-        subkeyId: docmentKeyResult.subkeyId,
-        parentFolders: [
-          {
-            folderId,
-            subkeyId: encryptedFolderResult.folderSubkeyId,
-            parentFolderId: null,
-          },
-        ],
-      },
+      subkeyId: docmentKeyResult.subkeyId,
       snapshot,
     },
     creatorDeviceSigningPublicKey: device.signingPublicKey,
@@ -226,6 +213,11 @@ export default async function createUserWithWorkspace({
       },
     ],
   });
+
+  if (createWorkspaceResult.workspace.currentWorkspaceKey?.workspaceKeyBox) {
+    createWorkspaceResult.workspace.currentWorkspaceKey.workspaceKeyBox.creatorDevice =
+      mainDevice;
+  }
 
   return {
     ...result,

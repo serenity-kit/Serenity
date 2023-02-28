@@ -1,0 +1,17 @@
+query snapshot($documentId: ID!) {
+  snapshot(documentId: $documentId) {
+    id
+    latestVersion
+    data
+    documentId
+    keyDerivationTrace {
+      workspaceKeyId
+      trace {
+        entryId
+        subkeyId
+        parentId
+        context
+      }
+    }
+  }
+}

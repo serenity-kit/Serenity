@@ -25,7 +25,7 @@ export const Snapshot = objectType({
     t.nonNull.string("documentId");
     t.list.nonNull.field("updates", { type: Update });
     t.field("activeDocumentSnapshot", { type: Document });
-    t.nonNull.field("date", { type: "Date" });
+    t.nonNull.field("createdAt", { type: "Date" });
     t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTrace2 });
     t.nonNull.list.nonNull.int("clocks");
   },

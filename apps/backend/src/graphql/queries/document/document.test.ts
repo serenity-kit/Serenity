@@ -1,53 +1,44 @@
 import {
   decryptDocumentTitle,
   decryptWorkspaceKey,
-  folderDerivedKeyContext,
+  deriveKeysFromKeyDerivationTrace,
   recreateDocumentKey,
 } from "@serenity-tools/common";
-import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { getDocument } from "../../../../test/helpers/document/getDocument";
 import { updateDocumentName } from "../../../../test/helpers/document/updateDocumentName";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
+import { getSnapshot } from "../../../../test/helpers/snapshot/getSnapshot";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
-import { Device } from "../../../types/device";
 
 const graphql = setupGraphql();
-const username = "7dfb4dd9-88be-414c-8a40-b5c030003d89@example.com";
-const workspaceId = "5a3484e6-c46e-42ce-a285-088fc1fd6915";
-let userId: string | null = null;
-let device: Device | null = null;
-let sessionKey = "";
+let userData1: any = null;
 let workspaceKey = "";
-let addedFolder: any = null;
-let folderKey = "";
-let addedWorkspace: any = null;
+let snapshotKey = "";
+let sessionKey = "";
 
 const setup = async () => {
-  const result = await createUserWithWorkspace({
-    id: workspaceId,
-    username,
+  userData1 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
   });
-  userId = result.user.id;
-  device = result.device;
-  sessionKey = result.sessionKey;
-  addedWorkspace = result.workspace;
-  const workspaceKeyBox = addedWorkspace.currentWorkspaceKey?.workspaceKeyBox;
+  const workspaceKeyBox =
+    userData1.workspace.currentWorkspaceKey?.workspaceKeyBox;
   workspaceKey = decryptWorkspaceKey({
     ciphertext: workspaceKeyBox?.ciphertext!,
     nonce: workspaceKeyBox?.nonce!,
-    creatorDeviceEncryptionPublicKey: result.device.encryptionPublicKey,
-    receiverDeviceEncryptionPrivateKey: result.encryptionPrivateKey,
+    creatorDeviceEncryptionPublicKey: userData1.device.encryptionPublicKey,
+    receiverDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
   });
-  addedFolder = result.folder;
-  const folderKeyResult = kdfDeriveFromKey({
-    key: workspaceKey,
-    context: folderDerivedKeyContext,
-    subkeyId: addedFolder.subkeyId,
+  const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: userData1.snapshot.keyDerivationTrace,
+    activeDevice: userData1.mainDevice,
+    workspaceKeyBox: userData1.workspace.currentWorkspaceKey.workspaceKeyBox,
   });
-  folderKey = folderKeyResult.key;
+  snapshotKey = snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
+  sessionKey = userData1.sessionKey;
 };
 beforeAll(async () => {
   await deleteAllRecords();
@@ -55,23 +46,23 @@ beforeAll(async () => {
 });
 
 test("user should be retrieve a document", async () => {
-  const authorizationHeader = sessionKey;
+  const authorizationHeader = userData1.sessionKey;
   const documentId = uuidv4();
   const documentName = "Test document";
   const createDocumentResponse = await createDocument({
     graphql,
     id: documentId,
-    parentFolderId: addedFolder.id,
-    workspaceId,
+    parentFolderId: userData1.folder.id,
+    workspaceId: userData1.workspace.id,
+    activeDevice: userData1.webDevice,
     authorizationHeader,
   });
   await updateDocumentName({
     graphql,
     id: documentId,
     name: documentName,
-    parentFolderId: addedFolder.id,
-    workspaceKeyId: addedWorkspace.currentWorkspaceKey.id,
-    folderKey,
+    workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+    activeDevice: userData1.webDevice,
     authorizationHeader,
   });
 
@@ -84,22 +75,29 @@ test("user should be retrieve a document", async () => {
   });
   const retrievedDocument = result.document;
   expect(retrievedDocument.id).toBe(documentId);
-  expect(retrievedDocument.workspaceId).toBe(workspaceId);
-  expect(retrievedDocument.parentFolderId).toBe(addedFolder.id);
+  expect(retrievedDocument.workspaceId).toBe(userData1.workspace.id);
+  expect(retrievedDocument.parentFolderId).toBe(userData1.folder.id);
   expect(typeof retrievedDocument.encryptedName).toBe("string");
   expect(typeof retrievedDocument.encryptedNameNonce).toBe("string");
-  expect(typeof retrievedDocument.nameKeyDerivationTrace.subkeyId).toBe(
-    "number"
-  );
+  expect(typeof retrievedDocument.subkeyId).toBe("number");
 
-  expect(typeof retrievedDocument.encryptedName).toBe("string");
-  expect(typeof retrievedDocument.encryptedNameNonce).toBe("string");
-  expect(typeof retrievedDocument.nameKeyDerivationTrace.subkeyId).toBe(
-    "number"
-  );
+  const snapshotResult = await getSnapshot({
+    graphql,
+    documentId,
+    authorizationHeader,
+  });
+  const snapshot = snapshotResult.snapshot;
+  const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: snapshot.keyDerivationTrace,
+    activeDevice: userData1.mainDevice,
+    workspaceKeyBox: userData1.workspace.currentWorkspaceKey.workspaceKeyBox,
+  });
+  const snapshotKey =
+    snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
+
   const documentSubkey = recreateDocumentKey({
-    folderKey,
-    subkeyId: retrievedDocument.nameKeyDerivationTrace.subkeyId,
+    snapshotKey,
+    subkeyId: retrievedDocument.subkeyId,
   });
   const decryptedName = decryptDocumentTitle({
     key: documentSubkey.key,

@@ -66,13 +66,20 @@ const query = gql`
         encryptedNameNonce
         parentFolderId
         workspaceId
-        nameKeyDerivationTrace {
+        subkeyId
+      }
+      snapshot {
+        id
+        latestVersion
+        data
+        documentId
+        keyDerivationTrace {
           workspaceKeyId
-          subkeyId
-          parentFolders {
-            folderId
+          trace {
+            entryId
             subkeyId
-            parentFolderId
+            parentId
+            context
           }
         }
       }
@@ -168,9 +175,13 @@ export const createInitialWorkspaceStructure = async ({
     },
   };
 
+  // prepare the snapshot key
+  const snapshotKey = createSnapshotKey({
+    folderKey,
+  });
   // propare the document key
   const documentKeyResult = createDocumentKey({
-    folderKey,
+    snapshotKey: snapshotKey.key,
   });
   const documentKey = documentKeyResult.key;
   const documentSubkeyId = documentKeyResult.subkeyId;
@@ -182,10 +193,6 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedDocumentName = encryptedDocumentTitleResult.ciphertext;
   const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;
 
-  // prepare the snapshot key
-  const snapshotKey = createSnapshotKey({
-    folderKey,
-  });
   const snapshotId = uuidv4();
   const snapshot = createIntroductionDocumentSnapshot({
     documentId,
@@ -215,17 +222,7 @@ export const createInitialWorkspaceStructure = async ({
     id: documentId,
     encryptedName: encryptedDocumentName,
     encryptedNameNonce: encryptedDocumentNameNonce,
-    nameKeyDerivationTrace: {
-      workspaceKeyId,
-      subkeyId: documentSubkeyId,
-      parentFolders: [
-        {
-          folderId: folderId,
-          subkeyId: folderSubkeyId,
-          parentFolderId: null,
-        },
-      ],
-    },
+    subkeyId: documentSubkeyId,
     snapshot,
   };
 

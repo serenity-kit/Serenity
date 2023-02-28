@@ -51,6 +51,7 @@ import { getSessionKey } from "../../utils/authentication/sessionKeyStore";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../utils/document/getDocument";
+import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { getFolder } from "../../utils/folder/getFolder";
 import {
@@ -90,6 +91,9 @@ export default function Page({
   });
   const websocketState = useWebsocketState();
   const snapshotKeyRef = useRef<Uint8Array | null>(null);
+  const documentName = useActiveDocumentInfoStore(
+    (state) => state.documentName
+  );
 
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
@@ -236,6 +240,20 @@ export default function Page({
         latestServerVersion: latestServerVersionRef.current,
       })
     );
+    // if the document has a name, update it
+    if (documentName) {
+      try {
+        const updatedDocument = await updateDocumentName({
+          document,
+          name: documentName,
+          activeDevice,
+        });
+        // FIXME: do we update this when it's not the active document?
+        updateActiveDocumentInfoStore(updatedDocument, activeDevice);
+      } catch (error) {
+        console.error(error);
+      }
+    }
   };
 
   const createAndSendUpdate = (update, key, clockOverwrite?: number) => {

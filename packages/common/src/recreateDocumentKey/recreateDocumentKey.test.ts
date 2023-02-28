@@ -8,9 +8,9 @@ beforeAll(async () => {
 
 test("recreate documentKey", () => {
   const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const documentKey = createDocumentKey({ folderKey: kdfKey });
+  const documentKey = createDocumentKey({ snapshotKey: kdfKey });
   const result = recreateDocumentKey({
-    folderKey: kdfKey,
+    snapshotKey: kdfKey,
     subkeyId: documentKey.subkeyId,
   });
   expect(result.key).toBe(documentKey.key);

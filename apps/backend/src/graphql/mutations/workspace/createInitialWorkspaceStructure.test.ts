@@ -3,10 +3,10 @@ import {
   decryptDocumentTitle,
   decryptFolderName,
   decryptWorkspaceKey,
+  deriveKeysFromKeyDerivationTrace,
   folderDerivedKeyContext,
   recreateDocumentKey,
 } from "@serenity-tools/common";
-import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
@@ -49,6 +49,9 @@ test("create initial workspace structure", async () => {
   const workspace = result.createInitialWorkspaceStructure.workspace;
   const document = result.createInitialWorkspaceStructure.document;
   const folder = result.createInitialWorkspaceStructure.folder;
+  const snapshot = result.createInitialWorkspaceStructure.snapshot;
+  workspace.currentWorkspaceKey.workspaceKeyBox.creatorDevice =
+    userData1.mainDevice;
   expect(workspace.id).not.toBeNull();
   expect(workspace.id).not.toBeUndefined();
   expect(workspace.name).toBe(workspaceName);
@@ -77,12 +80,7 @@ test("create initial workspace structure", async () => {
   expect(document.id).not.toBeUndefined();
   expect(typeof document.encryptedName).toBe("string");
   expect(typeof document.encryptedNameNonce).toBe("string");
-  expect(typeof document.nameKeyDerivationTrace).toBe("object");
-  expect(typeof document.nameKeyDerivationTrace.workspaceKeyId).toBe("string");
-  expect(typeof document.nameKeyDerivationTrace.subkeyId).toBe("number");
-  expect(typeof document.nameKeyDerivationTrace.parentFolders).toBe("object");
-  // expect(typeof document.snapshot.keyDerivationTrace).toBe(KeyDerivationTrace);
-
+  expect(typeof document.subkeyId).toBe("number");
   // attempt to decrypt the folder and document names
   const workspaceKeyBox = workspace.currentWorkspaceKey.workspaceKeyBox;
   const workspaceKey = decryptWorkspaceKey({
@@ -92,11 +90,6 @@ test("create initial workspace structure", async () => {
     receiverDeviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
   });
   expect(typeof workspaceKey).toBe("string");
-  const folderKey = kdfDeriveFromKey({
-    key: workspaceKey,
-    context: folderDerivedKeyContext,
-    subkeyId: folder.keyDerivationTrace.trace[0].subkeyId,
-  });
   const decryptedFolderName = decryptFolderName({
     parentKey: workspaceKey,
     subkeyId: folder.keyDerivationTrace.trace[0].subkeyId,
@@ -105,9 +98,22 @@ test("create initial workspace structure", async () => {
   });
   // TODO: derive document key from trace
   expect(decryptedFolderName).toBe("Getting Started");
+
+  const snapshotKeyTrace = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: snapshot.keyDerivationTrace,
+    activeDevice: {
+      ...userData1.mainDevice,
+      encryptionPrivateKey: userData1.encryptionPrivateKey,
+      signingPrivateKey: userData1.signingPrivateKey,
+    },
+    workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox,
+  });
+  const snapshotKey =
+    snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
+
   const documentKey = recreateDocumentKey({
-    folderKey: folderKey.key,
-    subkeyId: document.nameKeyDerivationTrace.subkeyId,
+    snapshotKey,
+    subkeyId: document.subkeyId,
   });
   const decryptedDocumentName = decryptDocumentTitle({
     key: documentKey.key,
@@ -203,11 +209,7 @@ test("Invalid workspace name", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: "",
               encryptedNameNonce: "",
-              nameKeyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
-                subkeyId: 0,
-                parentFolders: [],
-              },
+              subkeyId: 123,
             },
             creatorDeviceSigningPublicKey: "",
           },
@@ -245,11 +247,7 @@ test("Invalid workspace id", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: "",
               encryptedNameNonce: "",
-              nameKeyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
-                subkeyId: 0,
-                parentFolders: [],
-              },
+              subkeyId: 123,
             },
             creatorDeviceSigningPublicKey: "",
           },
@@ -287,11 +285,7 @@ test("Invalid folder id", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: "",
               encryptedNameNonce: "",
-              nameKeyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
-                subkeyId: 0,
-                parentFolders: [],
-              },
+              subkeyId: 123,
             },
             creatorDeviceSigningPublicKey: "",
           },
@@ -329,11 +323,7 @@ test("Invalid folder name", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: "",
               encryptedNameNonce: "",
-              nameKeyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
-                subkeyId: 0,
-                parentFolders: [],
-              },
+              subkeyId: 123,
             },
             creatorDeviceSigningPublicKey: "",
           },
@@ -371,11 +361,7 @@ test("Invalid folder nonce", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: "",
               encryptedNameNonce: "",
-              nameKeyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
-                subkeyId: 0,
-                parentFolders: [],
-              },
+              subkeyId: 123,
             },
             creatorDeviceSigningPublicKey: "",
           },
@@ -409,11 +395,7 @@ test("Invalid folder trace", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: "",
               encryptedNameNonce: "",
-              nameKeyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
-                subkeyId: 0,
-                parentFolders: [],
-              },
+              subkeyId: 123,
             },
             creatorDeviceSigningPublicKey: "",
           },
@@ -451,11 +433,7 @@ test("Invalid document id", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: "",
               encryptedNameNonce: "",
-              nameKeyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
-                subkeyId: 0,
-                parentFolders: [],
-              },
+              subkeyId: 123,
             },
             creatorDeviceSigningPublicKey: "",
           },
@@ -493,11 +471,7 @@ test("Invalid document name", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: null,
               encryptedNameNonce: "",
-              nameKeyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
-                subkeyId: 0,
-                parentFolders: [],
-              },
+              subkeyId: 123,
             },
             creatorDeviceSigningPublicKey: "",
           },
@@ -535,11 +509,7 @@ test("Invalid document nonce", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: "",
               encryptedNameNonce: null,
-              nameKeyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
-                subkeyId: 0,
-                parentFolders: [],
-              },
+              subkeyId: 123,
             },
             creatorDeviceSigningPublicKey: "",
           },
@@ -549,7 +519,7 @@ test("Invalid document nonce", async () => {
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
-test("Invalid document trace", async () => {
+test("Invalid subkeyId", async () => {
   await expect(
     (async () =>
       await graphql.client.request(
@@ -577,7 +547,7 @@ test("Invalid document trace", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: "",
               encryptedNameNonce: "",
-              nameKeyDerivationTrace: null,
+              subkeyId: null,
             },
             creatorDeviceSigningPublicKey: "",
           },
@@ -615,11 +585,7 @@ test("Invalid creator device", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: "",
               encryptedNameNonce: "",
-              nameKeyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
-                subkeyId: 0,
-                parentFolders: [],
-              },
+              subkeyId: 123,
             },
             creatorDeviceSigningPublicKey: null,
           },
@@ -657,11 +623,7 @@ test("creator device must belong to user", async () => {
               idSignature: `TODO+${uuidv4()}`,
               encryptedName: "",
               encryptedNameNonce: "",
-              nameKeyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
-                subkeyId: 0,
-                parentFolders: [],
-              },
+              subkeyId: 123,
             },
             creatorDeviceSigningPublicKey: "invalid-device-public-key",
           },

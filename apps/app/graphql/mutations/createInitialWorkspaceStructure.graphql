@@ -45,5 +45,20 @@ mutation createInitialWorkspaceStructure(
     document {
       id
     }
+    snapshot {
+      id
+      latestVersion
+      data
+      documentId
+      keyDerivationTrace {
+        workspaceKeyId
+        trace {
+          entryId
+          subkeyId
+          parentId
+          context
+        }
+      }
+    }
   }
 }

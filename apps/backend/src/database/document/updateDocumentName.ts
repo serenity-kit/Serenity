@@ -1,4 +1,3 @@
-import { KeyDerivationTrace } from "@naisho/core";
 import { ForbiddenError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
@@ -10,7 +9,6 @@ type Params = {
   workspaceKeyId: string;
   subkeyId: number;
   userId: string;
-  nameKeyDerivationTrace: KeyDerivationTrace;
 };
 
 export async function updateDocumentName({
@@ -20,7 +18,6 @@ export async function updateDocumentName({
   workspaceKeyId,
   subkeyId,
   userId,
-  nameKeyDerivationTrace,
 }: Params) {
   const allowedRoles = [Role.ADMIN, Role.EDITOR];
   try {
@@ -53,7 +50,6 @@ export async function updateDocumentName({
           encryptedNameNonce,
           workspaceKeyId,
           subkeyId,
-          nameKeyDerivationTrace,
         },
       });
       return updatedDocument;

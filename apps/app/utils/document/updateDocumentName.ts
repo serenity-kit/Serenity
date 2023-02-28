@@ -5,12 +5,11 @@ import {
 } from "@serenity-tools/common";
 import {
   Document,
+  runSnapshotQuery,
   runUpdateDocumentNameMutation,
 } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { getFolder } from "../folder/getFolder";
 import { getWorkspace } from "../workspace/getWorkspace";
-import { createDocumentKeyDerivationTrace } from "./createDocumentKeyDerivationTrace";
 
 export type Props = {
   document: Document;
@@ -29,9 +28,15 @@ export const updateDocumentName = async ({
   if (!workspace?.currentWorkspaceKey) {
     throw new Error("Workspace or workspaceKeys not found");
   }
-  const folder = await getFolder({ id: document.parentFolderId! });
-  const parentFolderKeyData = deriveKeysFromKeyDerivationTrace({
-    keyDerivationTrace: folder.keyDerivationTrace,
+  const snapshotResult = await runSnapshotQuery({
+    documentId: document.id,
+  });
+  if (!snapshotResult.data?.snapshot) {
+    throw new Error(snapshotResult.error?.message || "Could not get snapshot");
+  }
+  const snapshot = snapshotResult.data.snapshot;
+  const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: snapshot.keyDerivationTrace,
     activeDevice: {
       signingPublicKey: activeDevice.signingPublicKey,
       signingPrivateKey: activeDevice.signingPrivateKey!,
@@ -41,21 +46,15 @@ export const updateDocumentName = async ({
     },
     workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
   });
-  const folderKeyData =
-    parentFolderKeyData.trace[parentFolderKeyData.trace.length - 1];
+  const snapshotKeyData =
+    snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];
   const documentKeyData = createDocumentKey({
-    folderKey: folderKeyData.key,
+    snapshotKey: snapshotKeyData.key,
   });
   const documentKey = documentKeyData.key;
   const encryptedDocumentTitle = encryptDocumentTitle({
     title: name,
     key: documentKey,
-  });
-  // TODO: derive document name key from snapshot key
-  const nameKeyDerivationTrace = await createDocumentKeyDerivationTrace({
-    folderId: document.parentFolderId!,
-    subkeyId: documentKeyData.subkeyId,
-    workspaceKeyId: workspace.currentWorkspaceKey.id,
   });
   const updateDocumentNameResult = await runUpdateDocumentNameMutation(
     {
@@ -65,7 +64,6 @@ export const updateDocumentName = async ({
         encryptedNameNonce: encryptedDocumentTitle.publicNonce,
         workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
         subkeyId: documentKeyData.subkeyId,
-        nameKeyDerivationTrace,
       },
     },
     {}

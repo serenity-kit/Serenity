@@ -110,7 +110,6 @@ export async function createSnapshot({
         },
         document: { connect: { id: snapshot.publicData.docId } },
         keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
-        subkeyId: snapshot.publicData.subkeyId,
         clocks: {},
       },
     });

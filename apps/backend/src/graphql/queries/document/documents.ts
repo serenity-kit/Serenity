@@ -1,7 +1,6 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { booleanArg, idArg, nonNull, queryField } from "nexus";
 import { getDocuments } from "../../../database/document/getDocuments";
-import { formatDocument } from "../../../types/document";
 import { Document } from "../../types/document";
 
 export const documentsQuery = queryField((t) => {
@@ -46,10 +45,7 @@ export const documentsQuery = queryField((t) => {
         skip,
         take,
       });
-      const formattedDocuments = documents.map((document) =>
-        formatDocument(document)
-      );
-      return formattedDocuments;
+      return documents;
     },
   });
 });

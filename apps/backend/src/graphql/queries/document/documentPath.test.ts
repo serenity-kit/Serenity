@@ -37,29 +37,6 @@ const setup = async () => {
     username: `${uuidv4()}@example.com`,
     password,
   });
-
-  // const registerUserResult = await registerUser(graphql, username, password);
-  // sessionKey = registerUserResult.sessionKey;
-  // const device = registerUserResult.mainDevice;
-  // const initialWorkspaceStructureResult = await createInitialWorkspaceStructure(
-  //   {
-  //     workspaceName: "workspace 1",
-  //     workspaceId: workspaceId,
-  //     deviceSigningPublicKey: device.signingPublicKey,
-  //     deviceEncryptionPublicKey: device.encryptionPublicKey,
-  //     deviceEncryptionPrivateKey: registerUserResult.encryptionPrivateKey,
-  //     webDevice: registerUserResult.webDevice,
-  //     folderId: uuidv4(),
-  //     folderIdSignature: `TODO+${uuidv4()}`,
-  //     folderName: "Getting started",
-  //     documentName: "Introduction",
-  //     documentId: uuidv4(),
-  //     graphql,
-  //     authorizationHeader: sessionKey,
-  //   }
-  // );
-  // const workspace =
-  //   initialWorkspaceStructureResult.createInitialWorkspaceStructure.workspace;
   workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
     device: userData1.device,
     deviceEncryptionPrivateKey: userData1.encryptionPrivateKey,
@@ -103,6 +80,7 @@ const setup = async () => {
     id: parentDocumentId,
     parentFolderId: parentFolderId,
     workspaceId: userData1.workspace.id,
+    activeDevice: userData1.webDevice,
     authorizationHeader: userData1.sessionKey,
   });
   await createDocument({
@@ -110,6 +88,7 @@ const setup = async () => {
     id: documentId,
     parentFolderId: folderId,
     workspaceId: userData1.workspace.id,
+    activeDevice: userData1.webDevice,
     authorizationHeader: userData1.sessionKey,
   });
 
@@ -118,26 +97,6 @@ const setup = async () => {
     username: `${uuidv4()}@example.com`,
     password,
   });
-
-  // const registerUserResult2 = await registerUser(graphql, username2, password);
-  // sessionKey2 = registerUserResult2.sessionKey;
-  // const device2 = registerUserResult2.mainDevice;
-  // const initialWorkspaceStructureResult2 =
-  //   await createInitialWorkspaceStructure({
-  //     workspaceName: "other user workspace",
-  //     workspaceId: otherWorkspaceId,
-  //     deviceSigningPublicKey: device2.signingPublicKey,
-  //     deviceEncryptionPublicKey: device2.encryptionPublicKey,
-  //     deviceEncryptionPrivateKey: registerUserResult2.encryptionPrivateKey,
-  //     webDevice: registerUserResult2.webDevice,
-  //     folderId: uuidv4(),
-  //     folderIdSignature: `TODO+${uuidv4()}`,
-  //     folderName: "Getting started",
-  //     documentName: "Introduction",
-  //     documentId: uuidv4(),
-  //     graphql,
-  //     authorizationHeader: sessionKey2,
-  //   });
 
   const workspace2 = userData2.workspace;
   workspaceKey2 = getWorkspaceKeyForWorkspaceAndDevice({
@@ -161,6 +120,7 @@ const setup = async () => {
     id: otherDocumentId,
     parentFolderId: otherFolderId,
     workspaceId: userData2.workspace.id,
+    activeDevice: userData2.webDevice,
     authorizationHeader: userData2.sessionKey,
   });
 };

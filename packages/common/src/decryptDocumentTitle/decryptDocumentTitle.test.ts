@@ -9,15 +9,15 @@ beforeAll(async () => {
 });
 
 test("decryptDocumentTitle", () => {
-  const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialDocumentKey = createDocumentKey({ folderKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const initialDocumentKey = createDocumentKey({ snapshotKey });
   const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
 
   const documentKey = recreateDocumentKey({
-    folderKey,
+    snapshotKey,
     subkeyId: initialDocumentKey.subkeyId,
   });
   const documentTitle = decryptDocumentTitle({
@@ -31,15 +31,15 @@ test("decryptDocumentTitle", () => {
 });
 
 test("decryptDocumentTitle fails for wrong key", () => {
-  const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialDocumentKey = createDocumentKey({ folderKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const initialDocumentKey = createDocumentKey({ snapshotKey });
   const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
 
   const documentKey = recreateDocumentKey({
-    folderKey,
+    snapshotKey,
     subkeyId: initialDocumentKey.subkeyId,
   });
 
@@ -54,15 +54,15 @@ test("decryptDocumentTitle fails for wrong key", () => {
 });
 
 test("decryptDocumentTitle fails for wrong publicData", () => {
-  const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialDocumentKey = createDocumentKey({ folderKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const initialDocumentKey = createDocumentKey({ snapshotKey });
   const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
 
   const documentKey = recreateDocumentKey({
-    folderKey,
+    snapshotKey,
     subkeyId: initialDocumentKey.subkeyId,
   });
 
@@ -77,15 +77,15 @@ test("decryptDocumentTitle fails for wrong publicData", () => {
 });
 
 test("decryptDocumentTitle fails for invalid publicData", () => {
-  const folderKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const initialDocumentKey = createDocumentKey({ folderKey });
+  const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
+  const initialDocumentKey = createDocumentKey({ snapshotKey });
   const result = encryptDocumentTitle({
     key: initialDocumentKey.key,
     title: "Todos",
   });
 
   const documentKey = recreateDocumentKey({
-    folderKey,
+    snapshotKey,
     subkeyId: initialDocumentKey.subkeyId,
   });
 
