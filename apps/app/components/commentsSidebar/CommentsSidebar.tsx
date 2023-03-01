@@ -89,9 +89,6 @@ const CommentsSidebar: React.FC<{}> = () => {
                   })}
                 </Text>
                 <Text variant="sm">{comment.text}</Text>
-                {/* <Text variant="xs" style={tw`py-2 text-primary-500`}>
-                Reply...
-              </Text> */}
               </View>
 
               <View style={tw`mt-2`}>
@@ -133,6 +130,7 @@ const CommentsSidebar: React.FC<{}> = () => {
               </View>
 
               <HStack space="1.5">
+                {/* TODO use active user for reply */}
                 <Avatar color="rose" size="xs">
                   FO
                 </Avatar>
