@@ -328,6 +328,7 @@ export const Editor = (props: EditorProps) => {
                   }}
                   name="chat-1-line"
                   isActive={false}
+                  testID="bubble-menu__initiate-comment-button"
                 />
               </HStack>
 
