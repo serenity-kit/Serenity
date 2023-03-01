@@ -123,7 +123,7 @@ export function PageShareModalContent() {
               <ModalHeader>Share a page</ModalHeader>
               <View>
                 <TextArea
-                  testID="workspaceLinkText"
+                  testID="document-share-modal__share-link-text"
                   selectable={pageShareLink !== null}
                   onCopyPress={copyLinkText}
                   isClipboardNoticeActive={isClipboardNoticeActive}
@@ -135,6 +135,7 @@ export function PageShareModalContent() {
                 <Button
                   onPress={createShareLink}
                   style={styles.createShareLinkButton}
+                  testID="document-share-modal__create-share-link-button"
                 >
                   Create page link
                 </Button>
@@ -151,6 +152,7 @@ export function PageShareModalContent() {
                 data={documentShareLinks}
                 emptyString={"No active share links"}
                 header={<ListHeader data={["Page Share Links"]} />}
+                testID="document-share-modal__share-links-list"
               >
                 {documentShareLinks.map((documentShareLink) => {
                   return (

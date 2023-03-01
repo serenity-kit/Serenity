@@ -50,7 +50,7 @@ export default function SharePageScreen(
   ) {
     return (
       <CenterContent>
-        <InfoMessage variant="error">
+        <InfoMessage variant="error" testID="document-share-error">
           Failed decrypting document access. Please ask for a new share link.
           <br />
           Reason: {state.value}.
