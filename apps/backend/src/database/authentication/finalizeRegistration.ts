@@ -122,6 +122,7 @@ export async function finalizeRegistration({
         process.env.SERENITY_ENV !== "development"
       ) {
         console.log(`Sending verification email to "${username}"`);
+        console.log(`Verification code: "${unverifiedUser.confirmationCode}"`);
         try {
           await sendgrid.send(registrationEmail);
         } catch (error) {
