@@ -14,7 +14,7 @@ export const fillRegisterForm = async ({ page, username, password }: Props) => {
     .locator('[aria-label="This is the terms and condition checkbox"] >> nth=1')
     .click();
   await page.locator('div[role="button"]:has-text("Register")').click();
-  await delayForSeconds(1);
+  await delayForSeconds(3);
   // unverified user should have been created
   const unverifiedUser = await prisma.unverifiedUser.findFirst({
     where: { username },

@@ -96,13 +96,9 @@ export default function AcceptWorkspaceInvitationScreen(
     setAuthForm("login");
   };
 
-  const onRegisterSuccess = async (
-    username: string,
-    verificationCode: string
-  ) => {
+  const onRegisterSuccess = async (username: string) => {
     props.navigation.navigate("RegistrationVerification", {
       username,
-      verification: verificationCode,
     });
   };
 
