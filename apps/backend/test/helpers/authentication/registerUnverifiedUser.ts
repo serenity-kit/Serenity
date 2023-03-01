@@ -32,7 +32,6 @@ export const registerUnverifiedUser = async ({
     mutation finishRegistration($input: FinishRegistrationInput!) {
       finishRegistration(input: $input) {
         id
-        verificationCode
       }
     }
   `;

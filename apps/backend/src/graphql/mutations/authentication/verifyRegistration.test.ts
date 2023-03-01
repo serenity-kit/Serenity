@@ -12,7 +12,7 @@ import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 
-const username = "user1";
+const username = `${uuidv4()}@example.com`;
 const password = "abc123";
 let unverifiedUser: any;
 let isUserRegistered = false;
@@ -103,7 +103,7 @@ test("verify registration 5 times resets code", async () => {
 });
 
 test("server should verify a user", async () => {
-  const username = "user1";
+  const username = `${uuidv4()}@example.com`;
   const password = "password";
   const pendingWorkspaceInvitationId = undefined;
   const registrationResponse = await registerUnverifiedUser({
@@ -112,8 +112,13 @@ test("server should verify a user", async () => {
     password,
     pendingWorkspaceInvitationId,
   });
-  const verificationCode =
-    registrationResponse.finishRegistration.verificationCode;
+  const registeredUser = await prisma.unverifiedUser.findFirst({
+    where: { id: registrationResponse.finishRegistration.id },
+  });
+  if (!registeredUser) {
+    throw new Error("User not found");
+  }
+  const verificationCode = registeredUser.confirmationCode;
   const verifyRegistrationResponse = await verifyUser({
     graphql,
     username,
@@ -131,7 +136,7 @@ test("server should verify a user", async () => {
 });
 
 test("server should verify a user with a pending workspace id", async () => {
-  const username = "user2";
+  const username = `${uuidv4()}@example.com`;
   const password = "password";
   const pendingWorkspaceInvitationId = uuidv4();
   const registrationResponse = await registerUnverifiedUser({
@@ -140,8 +145,13 @@ test("server should verify a user with a pending workspace id", async () => {
     password,
     pendingWorkspaceInvitationId,
   });
-  const verificationCode =
-    registrationResponse.finishRegistration.verificationCode;
+  const registeredUser = await prisma.unverifiedUser.findFirst({
+    where: { id: registrationResponse.finishRegistration.id },
+  });
+  if (!registeredUser) {
+    throw new Error("User not found");
+  }
+  const verificationCode = registeredUser.confirmationCode;
   const verifyRegistrationResponse = await verifyUser({
     graphql,
     username,

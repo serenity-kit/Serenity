@@ -4,6 +4,7 @@ import {
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
+import { prisma } from "../../../src/database/prisma";
 import { loginUser } from "./loginUser";
 import { requestRegistrationChallengeResponse } from "./requestRegistrationChallengeResponse";
 import { verifyUser } from "./verifyUser";
@@ -30,7 +31,6 @@ export const registerUser = async (
     mutation finishRegistration($input: FinishRegistrationInput!) {
       finishRegistration(input: $input) {
         id
-        verificationCode
       }
     }
   `;
@@ -72,11 +72,18 @@ export const registerUser = async (
       pendingWorkspaceInvitationKeyEncryptionSalt,
     },
   });
-
+  const registeredUser = await prisma.unverifiedUser.findFirst({
+    where: {
+      id: registrationResponse.finishRegistration.id,
+    },
+  });
+  if (!registeredUser) {
+    throw new Error("User not registered");
+  }
   const verifyRegistrationResponse = await verifyUser({
     graphql,
     username,
-    verificationCode: registrationResponse.finishRegistration.verificationCode,
+    verificationCode: registeredUser.confirmationCode,
   });
 
   const { sessionKey, device } = await loginUser({
