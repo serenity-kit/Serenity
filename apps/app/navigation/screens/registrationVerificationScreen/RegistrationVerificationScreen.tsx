@@ -48,7 +48,9 @@ export default function RegistrationVerificationScreen(
   props: RootStackScreenProps<"RegistrationVerification">
 ) {
   const [, verifyRegistrationMutation] = useVerifyRegistrationMutation();
-  const [verificationCode, setVerificationCode] = useState("");
+  const [verificationCode, setVerificationCode] = useState(
+    props.route.params.verification || ""
+  );
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [invalidCodeError, setInvalidCodeError] = useState(false);
