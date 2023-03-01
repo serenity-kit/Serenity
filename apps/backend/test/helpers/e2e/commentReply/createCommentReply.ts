@@ -25,7 +25,7 @@ export const createCommentReply = async ({
   await page
     .locator(`[data-testid="comment-${commentId}__save-reply-button"]`)
     .click();
-  await delayForSeconds(1);
+  await delayForSeconds(2);
   const numCommentRepliesAfter = await prisma.commentReply.count({
     where: { commentId: commentId },
   });

@@ -24,7 +24,7 @@ export const createCommentOnHtmlNode = async ({
     selection?.removeAllRanges();
     selection?.addRange(range);
   });
-  await delayForSeconds(1);
+  await delayForSeconds(2);
   await page
     .locator("[data-testid='bubble-menu__initiate-comment-button']")
     .click();
@@ -37,7 +37,7 @@ export const createCommentOnHtmlNode = async ({
   await page
     .locator("[data-testid='bubble-menu__save-comment-button']")
     .click();
-  await delayForSeconds(1);
+  await delayForSeconds(2);
   const numCommentsAfter = await prisma.comment.count({
     where: { documentId },
   });

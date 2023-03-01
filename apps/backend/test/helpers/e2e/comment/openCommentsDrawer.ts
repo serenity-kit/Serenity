@@ -6,5 +6,5 @@ export type Props = {
 };
 export const openCommentsDrawer = async ({ page }: Props) => {
   await page.locator('[data-testid="open-comments-drawer-button"]').click();
-  await delayForSeconds(1);
+  await delayForSeconds(2);
 };

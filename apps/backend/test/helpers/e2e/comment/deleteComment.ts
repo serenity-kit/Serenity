@@ -16,7 +16,7 @@ export const deleteComment = async ({ page, commentId }: Props) => {
   await page
     .locator(`[data-testid="comment-${commentId}__delete-button"]`)
     .click();
-  await delayForSeconds(1);
+  await delayForSeconds(2);
   const commentAfterDelete = await prisma.comment.findFirst({
     where: { id: commentId },
   });
