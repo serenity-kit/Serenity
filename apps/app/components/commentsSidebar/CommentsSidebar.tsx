@@ -67,20 +67,20 @@ const CommentsSidebar: React.FC<{}> = () => {
             >
               <HStack alignItems="center">
                 {/* new comment indicator */}
-                <View style={tw`w-4 -ml-4 flex-row justify-center`}>
+                {/* <View style={tw`w-4 -ml-4 flex-row justify-center`}>
                   <View style={tw`h-1.5 w-1.5 rounded-full bg-primary-500`} />
-                </View>
+                </View> */}
 
                 <HStack alignItems="center" space="1.5">
                   {/* TODO if comment has been read change color to gray-400 */}
-                  <Avatar color="arctic" size="xs">
+                  {/* <Avatar color="arctic" size="xs">
                     KD
                   </Avatar>
                   <Text variant="xs" bold>
                     Karen Doe
-                  </Text>
+                  </Text> */}
                 </HStack>
-                <IconButton name="more-line" style={tw`ml-auto`} />
+                {/* <IconButton name="more-line" style={tw`ml-auto`} /> */}
               </HStack>
               <View style={tw`pl-0.5 py-2`}>
                 <Text variant="xxs" muted style={tw`mb-1.5`}>
@@ -99,14 +99,14 @@ const CommentsSidebar: React.FC<{}> = () => {
                       <HStack alignItems="center">
                         <HStack alignItems="center" space="1.5">
                           {/* TODO if comment has been read change color to gray-400 */}
-                          <Avatar color="emerald" size="xs">
+                          {/* <Avatar color="emerald" size="xs">
                             ND
                           </Avatar>
                           <Text variant="xs" bold>
                             Norman Dean
-                          </Text>
+                          </Text> */}
                         </HStack>
-                        <IconButton name="more-line" style={tw`ml-auto`} />
+                        {/* <IconButton name="more-line" style={tw`ml-auto`} /> */}
                       </HStack>
                       <View
                         style={tw`ml-2.75 pb-2 pl-4.25 border-l-2 border-solid border-gray-200`}
@@ -131,9 +131,9 @@ const CommentsSidebar: React.FC<{}> = () => {
 
               <HStack space="1.5">
                 {/* TODO use active user for reply */}
-                <Avatar color="rose" size="xs">
+                {/* <Avatar color="rose" size="xs">
                   FO
-                </Avatar>
+                </Avatar> */}
                 <RawInput
                   multiline
                   value={state.context.replyTexts[comment.id]}
