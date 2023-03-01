@@ -102,26 +102,12 @@ export async function finalizeRegistration({
         },
       });
 
-      // TODO: consider including user-set flag to trigger universal link
-      // when the user is on a mobile device
-      const rootUrl =
-        process.env.NODE_ENV === "development" ||
-        process.env.SERENITY_ENV === "e2e"
-          ? `http://localhost:19006/`
-          : "https://www.serenity.li";
-      const encodedUsername = encodeURIComponent(unverifiedUser.username);
-      const encodedConfirmationCode = encodeURIComponent(
-        unverifiedUser.confirmationCode
-      );
-      const emailRegistrationLink = `${rootUrl}registration-verification?username=${encodedUsername}&verification=${encodedConfirmationCode}`;
       const emailRegistrationLines = [
         `Welcome to Serenity!`,
         ``,
         `Please complete your registration by copying your verification code into the app:`,
         ``,
         `${unverifiedUser.confirmationCode}`,
-        ``,
-        `Alternatively you can visit ${emailRegistrationLink}`,
         ``,
         `If you didn't try to create an account, please ignore this email.`,
       ];
