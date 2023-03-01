@@ -40,6 +40,8 @@ test.beforeAll(async () => {
   });
 });
 
+test.use({ video: "retain-on-failure" });
+
 test.describe("create a comment", () => {
   test("Add content", async ({ page }) => {
     const comment = "First!";
