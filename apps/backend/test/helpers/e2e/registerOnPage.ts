@@ -38,7 +38,7 @@ export const registerOnPage = async ({
   const confirmationCode = unverifiedUser?.confirmationCode || "";
   const confirmRegistrationUrl = `http://localhost:19006/registration-verification?username=${encodeURIComponent(
     username
-  )}`;
+  )}&verification=${encodeURIComponent(confirmationCode)}`;
 
   await expect(page).toHaveURL(confirmRegistrationUrl);
   await verifyRegistration({ page, confirmationCode });
