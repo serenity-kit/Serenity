@@ -9,9 +9,8 @@ import { Spinner } from "../spinner/Spinner";
 import { Text } from "../text/Text";
 
 export type SubmitButtonProps = PressableProps & {
-  // name: IconNames;
   label?: string;
-  size?: "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl";
   isLoading?: boolean;
 };
 
@@ -23,17 +22,19 @@ export const SubmitButton = forwardRef((props: SubmitButtonProps, ref) => {
 
   // the pressable style sizing defines the clickable area
   const pressableSize = {
+    sm: "h-6 w-6",
     md: "h-6 w-6",
     lg: "h-8 w-8",
     xl: "h-12 w-12",
   };
 
   // the dimensions of the button define the visible area when clicked or hovered
-  let dimensions = size === "md" ? "w-6 h-6" : "w-8 h-8";
-
-  if (label) {
-    dimensions = "w-auto h-auto";
-  }
+  const dimensions = {
+    sm: "w-5 h-5",
+    md: "w-6 h-6",
+    lg: "w-8 h-8",
+    xl: "w-8 h-8",
+  };
 
   // --- dev only
   // const showClickableArea = true;
@@ -41,12 +42,12 @@ export const SubmitButton = forwardRef((props: SubmitButtonProps, ref) => {
   const styles = StyleSheet.create({
     pressable: tw.style(
       label
-        ? dimensions
+        ? "w-auto h-auto"
         : tw`flex justify-center items-center ${pressableSize[size]}`
       // showClickableArea && tw`bg-collaboration-honey/40`
     ),
     stack: tw.style(
-      `${dimensions} flex ${
+      `${dimensions[size]} flex ${
         !label ? "justify-center" : ""
       } items-center rounded-full ${label ? `pl-1.5 pr-3 py-1 rounded` : ""}`
     ),
@@ -111,6 +112,8 @@ export const SubmitButton = forwardRef((props: SubmitButtonProps, ref) => {
               <Icon
                 name={"arrow-up-line"}
                 color={disabled ? "primary-300" : "gray-100"}
+                size={size === "sm" ? 3 : 4}
+                mobileSize={size === "sm" ? 4 : 5}
               />
             )}
 

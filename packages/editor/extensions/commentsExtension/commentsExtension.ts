@@ -6,7 +6,7 @@ import {
   ySyncPluginKey,
 } from "y-prosemirror";
 import * as Y from "yjs";
-import { EditorComment } from "../types";
+import { EditorComment } from "../../types";
 
 export interface CommentsExtensionOptions {
   comments: EditorComment[];

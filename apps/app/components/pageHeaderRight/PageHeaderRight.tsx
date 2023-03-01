@@ -26,7 +26,7 @@ export function PageHeaderRight() {
       <HStack
         style={tw`h-full ${
           hasEditorSidebar ? "w-sidebar border-l bg-gray-100" : ""
-        } px-3 border-b border-gray-200`}
+        } pl-3 pr-4 border-b border-gray-200`}
         justifyContent="space-between"
         alignItems="center"
         space={hasEditorSidebar ? 0 : 4}
