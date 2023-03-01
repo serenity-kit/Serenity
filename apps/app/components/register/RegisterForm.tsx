@@ -25,10 +25,7 @@ import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 type Props = {
   pendingWorkspaceInvitationId?: string;
   workspaceInvitationKey?: string;
-  onRegisterSuccess?: (
-    username: string,
-    verificationCode?: string | null
-  ) => void;
+  onRegisterSuccess?: (username: string) => void;
   isFocused: boolean;
 };
 
@@ -126,10 +123,7 @@ export default function RegisterForm(props: Props) {
         // check for an error
         if (finishRegistrationResult.data?.finishRegistration?.id) {
           if (props.onRegisterSuccess) {
-            props.onRegisterSuccess(
-              username,
-              finishRegistrationResult.data?.finishRegistration.verificationCode
-            );
+            props.onRegisterSuccess(username);
           }
           storeUsernamePassword(username, password);
           // reset since the user might end up on this screen again

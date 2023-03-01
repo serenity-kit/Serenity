@@ -14,8 +14,7 @@ export const fillRegisterForm = async ({ page, username, password }: Props) => {
     .locator('[aria-label="This is the terms and condition checkbox"] >> nth=1')
     .click();
   await page.locator('div[role="button"]:has-text("Register")').click();
-
-  await delayForSeconds(3);
+  await delayForSeconds(1);
   // unverified user should have been created
   const unverifiedUser = await prisma.unverifiedUser.findFirst({
     where: { username },
@@ -24,7 +23,7 @@ export const fillRegisterForm = async ({ page, username, password }: Props) => {
   const confirmationCode = unverifiedUser?.confirmationCode || "";
   const confirmRegistrationUrl = `http://localhost:19006/registration-verification?username=${encodeURIComponent(
     username
-  )}&verification=${encodeURIComponent(confirmationCode)}`;
+  )}`;
 
   await expect(page).toHaveURL(confirmRegistrationUrl);
   return {

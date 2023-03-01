@@ -38,7 +38,6 @@ export const FinishRegistrationResult = objectType({
   name: "FinishRegistrationResult",
   definition(t) {
     t.nonNull.string("id");
-    t.string("verificationCode"); // TODO remove once email verifiaction is implemented
   },
 });
 
@@ -73,7 +72,6 @@ export const finishRegistrationMutation = mutationField("finishRegistration", {
     });
     return {
       id: unverifiedUser.id,
-      verificationCode: unverifiedUser.confirmationCode,
     };
   },
 });

@@ -1,7 +1,7 @@
+import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 import canonicalize from 'canonicalize';
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
-import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -1034,8 +1034,8 @@ export type Snapshot = {
   __typename?: 'Snapshot';
   activeDocumentSnapshot?: Maybe<Document>;
   clocks: Array<Scalars['Int']>;
+  createdAt: Scalars['Date'];
   data: Scalars['String'];
-  date: Scalars['Date'];
   document?: Maybe<Document>;
   documentId: Scalars['String'];
   id: Scalars['String'];
@@ -1472,7 +1472,7 @@ export type FinishRegistrationMutationVariables = Exact<{
 }>;
 
 
-export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string, verificationCode?: string | null } | null };
+export type FinishRegistrationMutation = { __typename?: 'Mutation', finishRegistration?: { __typename?: 'FinishRegistrationResult', id: string } | null };
 
 export type InitiateFileUploadMutationVariables = Exact<{
   initiateFileUpload: InitiateFileUploadInput;
@@ -2088,7 +2088,6 @@ export const FinishRegistrationDocument = gql`
     mutation finishRegistration($input: FinishRegistrationInput!) {
   finishRegistration(input: $input) {
     id
-    verificationCode
   }
 }
     `;

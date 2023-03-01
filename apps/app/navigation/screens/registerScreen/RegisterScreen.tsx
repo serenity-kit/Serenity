@@ -17,10 +17,9 @@ export default function RegisterScreen(
   props: RootStackScreenProps<"Register">
 ) {
   const isFocused = useIsFocused();
-  const onRegisterSuccess = (username: string, verificationCode?: string) => {
+  const onRegisterSuccess = (username: string) => {
     props.navigation.push("RegistrationVerification", {
       username,
-      verification: verificationCode,
     });
   };
 
