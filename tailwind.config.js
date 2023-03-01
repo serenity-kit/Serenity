@@ -124,6 +124,7 @@ const customTheme = {
     height: {
       "top-bar": "3rem",
       "form-element": "3rem",
+      "editor-sidebar-header": "3.125rem",
     },
     margin: {
       4.5: "1.125rem",
