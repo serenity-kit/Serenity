@@ -49,6 +49,7 @@ import * as FolderQueryTypes from "./graphql/queries/folder/folder";
 import * as FoldersQueryTypes from "./graphql/queries/folder/folders";
 import * as FolderTraceQueryTypes from "./graphql/queries/folder/folderTrace";
 import * as RootFoldersQueryTypes from "./graphql/queries/folder/rootFolders";
+import * as SnapshotQueryTypes from "./graphql/queries/snapshot/snapshot";
 import * as UserIdFromUsernameQueryTypes from "./graphql/queries/userIdFromUsername";
 import * as ActiveWorkspaceKeysQueryTypes from "./graphql/queries/workspace/activeWorkspaceKeys";
 import * as PendingingWorkspaceInvitationQueryTypes from "./graphql/queries/workspace/pendingWorkspaceInvitation";
@@ -141,6 +142,8 @@ export const schema = makeSchema({
 
     CreateCommentReplyMutationTypes,
     DeleteCommentRepliessMutationTypes,
+
+    SnapshotQueryTypes,
   ],
   outputs: {
     schema: path.join(__dirname, "/generated/schema.graphql"),

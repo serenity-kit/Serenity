@@ -22,15 +22,7 @@ export const getDocument = async ({
         encryptedNameNonce
         parentFolderId
         workspaceId
-        nameKeyDerivationTrace {
-          workspaceKeyId
-          subkeyId
-          parentFolders {
-            folderId
-            subkeyId
-            parentFolderId
-          }
-        }
+        subkeyId
       }
     }
   `;

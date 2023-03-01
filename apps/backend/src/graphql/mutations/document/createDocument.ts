@@ -1,4 +1,5 @@
-import { AuthenticationError } from "apollo-server-express";
+import { Snapshot } from "@naisho/core";
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import {
   arg,
   inputObjectType,
@@ -7,7 +8,7 @@ import {
   objectType,
 } from "nexus";
 import { createDocument } from "../../../database/document/createDocument";
-import { KeyDerivationTraceInput } from "../../types/keyDerivation";
+import { DocumentSnapshotInput } from "../../types/document";
 
 export const CreateDocumentInput = inputObjectType({
   name: "CreateDocumentInput",
@@ -15,9 +16,7 @@ export const CreateDocumentInput = inputObjectType({
     t.nonNull.string("id");
     t.nonNull.string("parentFolderId");
     t.nonNull.string("workspaceId");
-    t.field("nameKeyDerivationTrace", {
-      type: KeyDerivationTraceInput,
-    });
+    t.nonNull.field("snapshot", { type: DocumentSnapshotInput });
   },
 });
 
@@ -41,16 +40,20 @@ export const createDocumentMutation = mutationField("createDocument", {
     if (!context.user) {
       throw new AuthenticationError("Not authenticated");
     }
+    if (!args.input.snapshot.publicData.snapshotId) {
+      throw new UserInputError("Invalid input: snapshotId cannot be null");
+    }
+    const snapshot = args.input.snapshot as Snapshot;
     const document = await createDocument({
       userId: context.user.id,
       id: args.input.id,
       encryptedName: null,
       encryptedNameNonce: null,
       workspaceKeyId: null,
-      subkeyId: null, // name subkey id
+      subkeyId: null,
       parentFolderId: args.input.parentFolderId,
       workspaceId: args.input.workspaceId,
-      nameKeyDerivationTrace: args.input.nameKeyDerivationTrace,
+      snapshot,
     });
     return {
       id: document.id,

@@ -20,7 +20,7 @@ test.describe("Devices", () => {
     });
     await delayForSeconds(2);
     await expect(page).toHaveURL(
-      `http://localhost:19006/workspace/${workspace!.id}/page/${document.id}`
+      `http://localhost:19006/workspace/${workspace!.id}/page/${document!.id}`
     );
     await openDevicesPanel(page);
     const devices1BeforeLogin = page.locator(

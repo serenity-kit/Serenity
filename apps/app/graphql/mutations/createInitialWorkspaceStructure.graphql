@@ -34,16 +34,31 @@ mutation createInitialWorkspaceStructure(
       workspaceId
       keyDerivationTrace {
         workspaceKeyId
-        subkeyId
-        parentFolders {
-          folderId
+        trace {
+          entryId
           subkeyId
-          parentFolderId
+          parentId
+          context
         }
       }
     }
     document {
       id
+    }
+    snapshot {
+      id
+      latestVersion
+      data
+      documentId
+      keyDerivationTrace {
+        workspaceKeyId
+        trace {
+          entryId
+          subkeyId
+          parentId
+          context
+        }
+      }
     }
   }
 }

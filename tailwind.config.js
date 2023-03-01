@@ -55,6 +55,11 @@ const customColors = {
   success: {
     500: "#48AD83",
   },
+  comment: {
+    default: "#FFB92120", // collaboration-honey 20%
+    hover: "#FFB92130", // collaboration-honey 30%
+    active: "#FFB921", // collaboration-honey
+  },
   muted: "#8A8B96", // gray 600
   backdrop: "#1F1F2140", // backdrop color including opacity
 };
@@ -154,6 +159,9 @@ module.exports = {
         },
         "se-outline-focus-mini": {
           boxShadow: `0px 0px 0px 0.125rem ${customTheme.colors.primary["200"]}`, // web-only
+        },
+        "se-outline-focus-submit": {
+          boxShadow: `0px 0px 0px 0.1rem ${customTheme.colors.primary["700"]}`, // web-only
         },
         "se-inset-focus": {
           boxShadow: `inset 0px 0px 0px 0.25rem ${customTheme.colors.primary["200"]}`, // web-only

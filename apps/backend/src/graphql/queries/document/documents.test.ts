@@ -182,6 +182,7 @@ test("user should be able to list documents in a folder with one item", async ()
     id: documentId1,
     parentFolderId,
     workspaceId: userData1.workspace.id,
+    activeDevice: userData1.webDevice,
     authorizationHeader: userData1.sessionKey,
   });
   const result = await getDocuments({
@@ -216,6 +217,7 @@ test("user should be able to list documents in a folder with multiple items", as
     id: documentId2,
     parentFolderId,
     workspaceId: userData1.workspace.id,
+    activeDevice: userData1.webDevice,
     authorizationHeader: userData1.sessionKey,
   });
   const result = await getDocuments({
@@ -258,6 +260,7 @@ test("user should be able to list without showing subfolder documents", async ()
     id: childDocumentId,
     parentFolderId: folderId,
     workspaceId: userData1.workspace.id,
+    activeDevice: userData1.webDevice,
     authorizationHeader: userData1.sessionKey,
   });
   const result = await getDocuments({

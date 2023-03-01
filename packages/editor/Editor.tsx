@@ -1,9 +1,10 @@
 import {
   BoxShadow,
-  Button,
-  EditorBottombarButton,
   EditorBottombarDivider,
   RawInput,
+  ScrollView,
+  SubmitButton,
+  ToggleButton,
   tw,
   useHasEditorSidebar,
   View,
@@ -21,7 +22,7 @@ import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { HStack } from "native-base";
+import { HStack, VStack } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
 import {
   absolutePositionToRelativePosition,
@@ -61,6 +62,7 @@ type EditorProps = {
   comments: EditorComment[];
   createComment: (comment: { from: number; to: number; text: string }) => void;
   highlightComment: (commentId: string | null) => void;
+  highlightedCommentId: string | null;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -138,6 +140,7 @@ export const Editor = (props: EditorProps) => {
           comments: props.comments,
           yDoc: props.yDocRef.current,
           highlightComment: props.highlightComment,
+          highlightedCommentId: props.highlightedCommentId,
         }),
         Table.configure({
           HTMLAttributes: {
@@ -150,10 +153,7 @@ export const Editor = (props: EditorProps) => {
       ],
       onCreate: (params) => {
         if (isNew) {
-          const json = params.editor.getJSON();
-          if (json.content?.length === 1) {
-            params.editor.chain().toggleHeading({ level: 1 }).focus().run();
-          }
+          params.editor.chain().focus().run();
         }
         if (props.onCreate) {
           props.onCreate(params);
@@ -206,14 +206,16 @@ export const Editor = (props: EditorProps) => {
   useEffect(() => {
     if (editor) {
       editor.storage.comments.comments = props.comments;
+      editor.storage.comments.highlightedCommentId = props.highlightedCommentId;
       // empty transaction to make sure the comments are updated
       editor.view.dispatch(editor.view.state.tr);
     }
-  }, [props.comments, editor]);
+  }, [props.comments, props.highlightedCommentId, editor]);
 
   return (
     <div className="flex h-full flex-auto flex-row">
-      <View style={tw`flex-auto text-gray-900 dark:text-white`}>
+      {/* z-index needed so BubbleMenu overlaps with Sidebar */}
+      <View style={tw`flex-auto text-gray-900 dark:text-white z-10`}>
         <div className="flex-auto overflow-y-auto overflow-x-hidden">
           <EditorContent
             style={{
@@ -229,138 +231,152 @@ export const Editor = (props: EditorProps) => {
           />
         </div>
       </View>
-      {hasEditorSidebar && (
-        <EditorSidebar
-          editor={editor}
-          headingLevels={headingLevels}
-          encryptAndUploadFile={props.encryptAndUploadFile}
-        />
-      )}
       {hasEditorSidebar && editor && (
-        <BubbleMenu
-          editor={editor}
-          tippyOptions={{ duration: 100 }}
-          // modified default from https://github.com/ueberdosis/tiptap/blob/main/packages/extension-bubble-menu/src/bubble-menu-plugin.ts#L47-L79
-          shouldShow={({ state, from, to, view, editor }) => {
-            const { doc, selection } = state;
-            const { empty } = selection;
-
-            // Sometime check for `empty` is not enough.
-            // Doubleclick an empty paragraph returns a node size of 2.
-            // So we check also for an empty text size.
-            const isEmptyTextBlock =
-              !doc.textBetween(from, to).length &&
-              isTextSelection(state.selection);
-
-            // When clicking on a element inside the bubble menu the editor "blur" event
-            // is called and the bubble menu item is focussed. In this case we should
-            // consider the menu as part of the editor and keep showing the menu
-            let isChildOfMenu = false;
-            if (bubbleMenuRef.current) {
-              isChildOfMenu = bubbleMenuRef.current.contains(
-                document.activeElement
-              );
-            }
-
-            const hasEditorFocus = view.hasFocus() || isChildOfMenu;
-
-            if (
-              !hasEditorFocus ||
-              empty ||
-              isEmptyTextBlock ||
-              !editor.isEditable ||
-              editor.isActive("file")
-            ) {
-              return false;
-            }
-
-            return true;
-          }}
+        // the ScrollView should be part of the EditorSidebar, but there is a wierd bug
+        // where react crashes when view is resized in the Web client from desktop to mobile
+        // or the other way around
+        //
+        // grow-0 overrides default of ScrollView to keep the assigned width
+        <ScrollView
+          style={tw`w-sidebar grow-0 border-l border-gray-200 bg-gray-100`}
         >
-          <BoxShadow elevation={3} rounded ref={bubbleMenuRef}>
-            <HStack
-              space={1}
-              style={tw`p-1 bg-white border border-gray-200 rounded`}
-              alignItems="center"
-            >
-              <EditorBottombarButton
-                onPress={() => editor.chain().focus().toggleBold().run()}
-                name="bold"
-                isActive={editor.isActive("bold")}
-              />
+          <EditorSidebar
+            editor={editor}
+            headingLevels={headingLevels}
+            encryptAndUploadFile={props.encryptAndUploadFile}
+          />
 
-              <EditorBottombarButton
-                onPress={() => editor.chain().focus().toggleItalic().run()}
-                name="italic"
-                isActive={editor.isActive("italic")}
-              />
+          <BubbleMenu
+            editor={editor}
+            tippyOptions={{ duration: 100 }}
+            // modified default from https://github.com/ueberdosis/tiptap/blob/main/packages/extension-bubble-menu/src/bubble-menu-plugin.ts#L47-L79
+            shouldShow={({ state, from, to, view, editor }) => {
+              const { doc, selection } = state;
+              const { empty } = selection;
 
-              <EditorBottombarButton
-                onPress={() => editor.chain().focus().toggleCode().run()}
-                name="code-view"
-                isActive={editor.isActive("code")}
-              />
+              // Sometime check for `empty` is not enough.
+              // Doubleclick an empty paragraph returns a node size of 2.
+              // So we check also for an empty text size.
+              const isEmptyTextBlock =
+                !doc.textBetween(from, to).length &&
+                isTextSelection(state.selection);
 
-              {/* for some reason tailwind md:h-6 doesn't work on the Divider yet */}
-              <EditorBottombarDivider style={tw`h-6`} />
+              // When clicking on a element inside the bubble menu the editor "blur" event
+              // is called and the bubble menu item is focussed. In this case we should
+              // consider the menu as part of the editor and keep showing the menu
+              let isChildOfMenu = false;
+              if (bubbleMenuRef.current) {
+                isChildOfMenu = bubbleMenuRef.current.contains(
+                  document.activeElement
+                );
+              }
 
-              <EditorBottombarButton
-                onPress={() =>
-                  editor.chain().focus().toggleLink({ href: "#" }).run()
-                }
-                name="link"
-                isActive={editor.isActive("link")}
-              />
+              const hasEditorFocus = view.hasFocus() || isChildOfMenu;
 
-              {/* for some reason tailwind md:h-6 doesn't work on the Divider yet */}
-              <EditorBottombarDivider style={tw`h-6`} />
+              if (
+                !hasEditorFocus ||
+                empty ||
+                isEmptyTextBlock ||
+                !editor.isEditable ||
+                editor.isActive("file")
+              ) {
+                return false;
+              }
 
-              <EditorBottombarButton
-                onPress={() => {
-                  setHasCreateCommentBubble(true);
-                }}
-                name="cup-line"
-                isActive={true}
-                testID="bubble-menu__initiate-comment-button"
-              />
-            </HStack>
-
-            {hasCreateCommentBubble && (
-              <View>
-                <RawInput
-                  multiline
-                  value={commentText}
-                  onChangeText={(text) => setCommentText(text)}
-                  testID="bubble-menu__create-comment-input"
+              return true;
+            }}
+          >
+            <BoxShadow elevation={3} rounded ref={bubbleMenuRef}>
+              <HStack
+                space={1}
+                style={tw`p-1 bg-white border border-gray-200 rounded`}
+                alignItems="center"
+              >
+                <ToggleButton
+                  onPress={() => editor.chain().focus().toggleBold().run()}
+                  name="bold"
+                  isActive={editor.isActive("bold")}
                 />
-                <Button
-                  size="sm"
-                  onPress={() => {
-                    const ystate = ySyncPluginKey.getState(editor.state);
-                    const { type, binding } = ystate;
 
-                    props.createComment({
-                      text: commentText,
-                      from: absolutePositionToRelativePosition(
-                        editor.view.state.selection.from,
-                        type,
-                        binding.mapping
-                      ),
-                      to: absolutePositionToRelativePosition(
-                        editor.view.state.selection.to,
-                        type,
-                        binding.mapping
-                      ),
-                    });
+                <ToggleButton
+                  onPress={() => editor.chain().focus().toggleItalic().run()}
+                  name="italic"
+                  isActive={editor.isActive("italic")}
+                />
+
+                <ToggleButton
+                  onPress={() => editor.chain().focus().toggleCode().run()}
+                  name="code-view"
+                  isActive={editor.isActive("code")}
+                />
+
+                <EditorBottombarDivider />
+
+                <ToggleButton
+                  onPress={() =>
+                    editor.chain().focus().toggleLink({ href: "#" }).run()
+                  }
+                  name="link"
+                  isActive={editor.isActive("link")}
+                />
+
+                <EditorBottombarDivider />
+
+                <ToggleButton
+                  onPress={() => {
+                    setHasCreateCommentBubble(true);
                   }}
-                  testID="bubble-menu__save-comment-button"
-                >
-                  Create Comment
-                </Button>
-              </View>
-            )}
-          </BoxShadow>
-        </BubbleMenu>
+                  name="chat-1-line"
+                  isActive={false}
+                />
+              </HStack>
+
+              {hasCreateCommentBubble && (
+                <VStack style={tw`w-80 bg-white rounded`}>
+                  <RawInput
+                    placeholder="Add a comment"
+                    value={commentText}
+                    onChangeText={(text) => setCommentText(text)}
+                    variant={"unstyled"}
+                    multiline
+                    style={tw`p-3`}
+                    _stack={{
+                      height: 60,
+                    }}
+                    testID="bubble-menu__create-comment-input"
+                  />
+                  <HStack
+                    style={tw`p-3 border-t border-solid border-gray-200`}
+                    alignItems="center"
+                    justifyContent="flex-end"
+                  >
+                    <SubmitButton
+                      onPress={() => {
+                        const ystate = ySyncPluginKey.getState(editor.state);
+                        const { type, binding } = ystate;
+
+                        props.createComment({
+                          text: commentText,
+                          from: absolutePositionToRelativePosition(
+                            editor.view.state.selection.from,
+                            type,
+                            binding.mapping
+                          ),
+                          to: absolutePositionToRelativePosition(
+                            editor.view.state.selection.to,
+                            type,
+                            binding.mapping
+                          ),
+                        });
+                      }}
+                      testID="bubble-menu__save-comment-button"
+                    />
+                  </HStack>
+                </VStack>
+              )}
+            </BoxShadow>
+          </BubbleMenu>
+        </ScrollView>
       )}
     </div>
   );

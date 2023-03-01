@@ -1,7 +1,10 @@
-import { KeyDerivationTrace, Snapshot } from "@naisho/core";
-import { Snapshot as SnapshotModel } from "../../../prisma/generated/output";
-import { Document, formatDocument } from "../../types/document";
+import { KeyDerivationTrace2, Snapshot } from "@naisho/core";
+import { Document } from "../../types/document";
 import { Folder, formatFolder } from "../../types/folder";
+import {
+  formatSnapshot,
+  Snapshot as SnapshotModel,
+} from "../../types/snapshot";
 import { Workspace } from "../../types/workspace";
 import { createSnapshot } from "../createSnapshot";
 import { createFolder } from "../folder/createFolder";
@@ -30,14 +33,14 @@ export type FolderParams = {
   idSignature: string;
   encryptedName: string;
   encryptedNameNonce: string;
-  keyDerivationTrace: KeyDerivationTrace;
+  keyDerivationTrace: KeyDerivationTrace2;
 };
 
 export type DocumentParams = {
   id: string;
   encryptedName: string;
   encryptedNameNonce: string;
-  nameKeyDerivationTrace: KeyDerivationTrace;
+  subkeyId: number;
   snapshot: Snapshot;
 };
 
@@ -83,10 +86,9 @@ export async function createInitialWorkspaceStructure({
       encryptedName: document.encryptedName,
       encryptedNameNonce: document.encryptedNameNonce,
       workspaceKeyId: createdWorkspace.currentWorkspaceKey?.id,
-      subkeyId: 123, // TODO: remove
+      subkeyId: document.subkeyId,
       parentFolderId: folder.id,
       workspaceId: createdWorkspace.id,
-      nameKeyDerivationTrace: document.nameKeyDerivationTrace,
     },
   });
 
@@ -96,8 +98,8 @@ export async function createInitialWorkspaceStructure({
   });
   return {
     workspace: createdWorkspace,
-    document: formatDocument(createdDocument),
+    document: createdDocument,
     folder: formatFolder(createdFolder),
-    snapshot,
+    snapshot: formatSnapshot(snapshot),
   };
 }

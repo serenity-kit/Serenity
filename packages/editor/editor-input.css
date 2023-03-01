@@ -348,6 +348,20 @@
   .table-extension p {
     margin: 0;
   }
+
+  .editor-comment {
+    /* display setting needed to properly size background and add border */
+    display: inline-block;
+    border-bottom: 0.125rem solid theme("colors.comment.active");
+    background-color: theme("colors.comment.default");
+  }
+
+  .editor-comment-active {
+    /* display setting needed to properly size background and add border */
+    display: inline-block;
+    border-bottom: 0.125rem solid theme("colors.comment.active");
+    background-color: theme("colors.comment.active");
+  }
 }
 
 @layer utilities {

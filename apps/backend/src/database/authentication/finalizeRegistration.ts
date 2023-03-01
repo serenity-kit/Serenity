@@ -1,8 +1,16 @@
+import sendgrid from "@sendgrid/mail";
 import { UserInputError } from "apollo-server-express";
 import { Device } from "../../types/device";
 import { createConfirmationCode } from "../../utils/confirmationCode";
 import { ExpectedGraphqlError } from "../../utils/expectedGraphqlError/expectedGraphqlError";
 import { prisma } from "../prisma";
+if (!process.env.FROM_EMAIL) {
+  throw new Error("Missing process.env.FROM_EMAIL");
+}
+if (!process.env.SENDGRID_API_KEY) {
+  throw new Error("Missing process.env.SENDGRID_API_KEY");
+}
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
 type DeviceInput = Device & {
   ciphertext: string;
@@ -93,10 +101,41 @@ export async function finalizeRegistration({
           pendingWorkspaceInvitationKeyEncryptionSalt,
         },
       });
-      // TODO: send an email to the user's email address
-      console.log(
-        `New user confirmation code: ${unverifiedUser.confirmationCode}`
-      );
+      const emailRegistrationLines = [
+        `Welcome to Serenity!`,
+        ``,
+        `Please complete your registration by copying your verification code into the app:`,
+        ``,
+        `${unverifiedUser.confirmationCode}`,
+        ``,
+        `If you didn't try to create an account, please ignore this email.`,
+      ];
+      const registrationEmail = {
+        to: username,
+        from: process.env.FROM_EMAIL!,
+        subject: "Verify your Serenity account",
+        text: emailRegistrationLines.join("\n"),
+      };
+      if (
+        process.env.SERENITY_ENV !== "e2e" &&
+        process.env.SERENITY_ENV !== "development"
+      ) {
+        console.log(`Sending verification email to "${username}"`);
+        try {
+          await sendgrid.send(registrationEmail);
+        } catch (error) {
+          console.error(`Error sending email to "${username}"`);
+          console.error("Sendgrid error response body:");
+          console.error(error.response.body);
+          console.error("Sendgrid error:");
+          console.error(error);
+        }
+      } else {
+        console.log(
+          `New user confirmation code: ${unverifiedUser.confirmationCode}`
+        );
+      }
+
       return unverifiedUser;
     });
   } catch (error) {

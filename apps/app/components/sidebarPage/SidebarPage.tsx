@@ -2,6 +2,7 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { useLinkProps } from "@react-navigation/native";
 import {
   decryptDocumentTitle,
+  deriveKeysFromKeyDerivationTrace,
   recreateDocumentKey,
 } from "@serenity-tools/common";
 import {
@@ -17,11 +18,11 @@ import {
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
-import { KeyDerivationTrace, useDocumentQuery } from "../../generated/graphql";
+import { runSnapshotQuery, useDocumentQuery } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
-import { deriveFolderKey } from "../../utils/folder/deriveFolderKeyData";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
 
 type Props = ViewProps & {
@@ -31,7 +32,6 @@ type Props = ViewProps & {
   encryptedName?: string | null;
   encryptedNameNonce?: string | null;
   subkeyId?: number | null;
-  nameKeyDerivationTrace: KeyDerivationTrace;
   depth?: number;
   onRefetchDocumentsPress: () => void;
 };
@@ -58,10 +58,9 @@ export default function SidebarPage(props: Props) {
         workspaceId: props.workspaceId,
         screen: "WorkspaceDrawer",
         params: {
-          screen: "PageCommentsDrawer",
+          screen: "Page",
           params: {
             pageId: props.documentId,
-            screen: "Page",
           },
         },
       },
@@ -72,11 +71,7 @@ export default function SidebarPage(props: Props) {
     if (documentResult.data?.document?.id) {
       decryptTitle();
     }
-  }, [
-    props.encryptedName,
-    props.nameKeyDerivationTrace.subkeyId,
-    documentResult.data?.document?.id,
-  ]);
+  }, [props.encryptedName, props.subkeyId, documentResult.data?.document?.id]);
 
   const decryptTitle = async () => {
     if (!props.encryptedName || !props.encryptedNameNonce) {
@@ -84,26 +79,46 @@ export default function SidebarPage(props: Props) {
       setDocumentTitle("Untitled");
       return;
     }
+    const workspace = await getWorkspace({
+      workspaceId: props.workspaceId,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
+    if (!workspace?.currentWorkspaceKey) {
+      console.error("No workspace key for workspace and device");
+    }
     try {
       const document = documentResult.data?.document;
       if (!document) {
         console.error("Unable to retrieve document!");
         return;
       }
-      // TODO: optimize this by using the `getFolderKey()` function
-      // so that we don't need to load each folder multiple times
-      const folderKeyData = await deriveFolderKey({
-        folderId: props.parentFolderId,
-        workspaceId: props.workspaceId,
-        activeDevice,
-        keyDerivationTrace: props.nameKeyDerivationTrace,
+      const snapshotResult = await runSnapshotQuery({
+        documentId: document.id,
       });
-      // the last subkey key is treated like a folder key, so we can toss it out
-      // we actually want to derive a document subkey
-      const folderKey = folderKeyData[folderKeyData.length - 2].key;
+      if (!snapshotResult.data?.snapshot) {
+        console.error(
+          snapshotResult.error?.message || "Unable to retrieve snapshot!"
+        );
+        return;
+      }
+      const snapshot = snapshotResult.data.snapshot;
+      const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
+        keyDerivationTrace: snapshot.keyDerivationTrace,
+        activeDevice: {
+          signingPublicKey: activeDevice.signingPublicKey,
+          signingPrivateKey: activeDevice.signingPrivateKey!,
+          encryptionPublicKey: activeDevice.encryptionPublicKey,
+          encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+          encryptionPublicKeySignature:
+            activeDevice.encryptionPublicKeySignature!,
+        },
+        workspaceKeyBox: workspace!.currentWorkspaceKey!.workspaceKeyBox!,
+      });
+      const snapshotKeyData =
+        snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];
       const documentKeyData = recreateDocumentKey({
-        folderKey: folderKey,
-        subkeyId: props.nameKeyDerivationTrace.subkeyId,
+        snapshotKey: snapshotKeyData.key,
+        subkeyId: props.subkeyId!,
       });
       const documentTitle = decryptDocumentTitle({
         key: documentKeyData.key,

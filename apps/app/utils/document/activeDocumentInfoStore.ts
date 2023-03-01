@@ -1,11 +1,12 @@
 import {
   decryptDocumentTitle,
+  deriveKeysFromKeyDerivationTrace,
   recreateDocumentKey,
 } from "@serenity-tools/common";
 import create from "zustand";
-import { Document } from "../../generated/graphql";
+import { Document, runSnapshotQuery } from "../../generated/graphql";
 import { Device } from "../../types/Device";
-import { deriveFolderKey } from "../folder/deriveFolderKeyData";
+import { getWorkspace } from "../workspace/getWorkspace";
 
 interface DocumentState {
   document: Document | null | undefined;
@@ -25,22 +26,40 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
       document &&
       document.encryptedName &&
       document.encryptedNameNonce &&
-      document.nameKeyDerivationTrace.subkeyId >= 0
+      document.subkeyId
     ) {
+      const workspace = await getWorkspace({
+        workspaceId: document.workspaceId!,
+        deviceSigningPublicKey: activeDevice.signingPublicKey,
+      });
+      // TODO: include documentShareLink in the query
+      const snapshotResult = await runSnapshotQuery({
+        documentId: document.id!,
+      });
+      if (!snapshotResult.data?.snapshot) {
+        throw new Error(
+          snapshotResult.error?.message || "Could not find snapshot"
+        );
+      }
+      const snapshot = snapshotResult.data.snapshot;
       try {
-        const folderKeyChainData = await deriveFolderKey({
-          folderId: document.parentFolderId!,
-          workspaceId: document.workspaceId!,
-          keyDerivationTrace: document.nameKeyDerivationTrace,
-          activeDevice,
+        const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
+          keyDerivationTrace: snapshot.keyDerivationTrace,
+          activeDevice: {
+            signingPublicKey: activeDevice.signingPublicKey,
+            signingPrivateKey: activeDevice.signingPrivateKey!,
+            encryptionPublicKey: activeDevice.encryptionPublicKey,
+            encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+            encryptionPublicKeySignature:
+              activeDevice.encryptionPublicKeySignature!,
+          },
+          workspaceKeyBox: workspace!.currentWorkspaceKey!.workspaceKeyBox!,
         });
-        // the last subkey key is treated like a folder key,
-        // but actually we want to create a document subkey, so we can
-        // use all subkeys up to the last one
-        const lastChainItem = folderKeyChainData[folderKeyChainData.length - 2];
+        const snapshotKeyData =
+          snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];
         const documentKeyData = recreateDocumentKey({
-          folderKey: lastChainItem.key,
-          subkeyId: document.nameKeyDerivationTrace.subkeyId,
+          snapshotKey: snapshotKeyData.key,
+          subkeyId: document.subkeyId!,
         });
         documentName = decryptDocumentTitle({
           key: documentKeyData.key,

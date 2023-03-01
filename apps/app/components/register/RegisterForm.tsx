@@ -25,7 +25,10 @@ import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 type Props = {
   pendingWorkspaceInvitationId?: string;
   workspaceInvitationKey?: string;
-  onRegisterSuccess?: (username: string, verificationCode: string) => void;
+  onRegisterSuccess?: (
+    username: string,
+    verificationCode?: string | null
+  ) => void;
   isFocused: boolean;
 };
 

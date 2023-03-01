@@ -17,6 +17,7 @@ import {
   encodeAwarenessUpdate,
 } from "y-protocols/awareness";
 import * as Y from "yjs";
+import { usePage } from "../../context/PageContext";
 import { editorToolbarService } from "../../machines/editorToolbarMachine";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { createDownloadAndDecryptFileFunction } from "../../utils/file/createDownloadAndDecryptFileFunction";
@@ -99,6 +100,7 @@ export default function Editor({
   const setIsInEditingMode = useEditorStore(
     (state) => state.setIsInEditingMode
   );
+  const { commentsService } = usePage();
 
   const encryptAndUploadFile = useMemo(() => {
     return createEncryptAndUploadFileFunction({
@@ -152,6 +154,21 @@ export default function Editor({
     };
 
     editorToolbarService.onEvent(onEventListener);
+
+    commentsService.onChange((context) => {
+      const { decryptedComments, highlightedCommentId } = context;
+      const commentsJson = JSON.stringify({
+        variant: "update-comments",
+        params: {
+          decryptedComments,
+          highlightedCommentId,
+        },
+      });
+      webViewRef.current?.injectJavaScript(`
+        window.updateEditor(\`${commentsJson}\`);
+        true;
+      `);
+    });
 
     return () => {
       showSubscription.remove();
@@ -295,6 +312,13 @@ export default function Editor({
           if (message.type === "downloadFile") {
             const { contentAsBase64, fileName, mimeType } = message.content;
             shareFile({ contentAsBase64, mimeType, fileName });
+          }
+          if (message.type === "highlightComment") {
+            const { commentId } = message.content;
+            commentsService.send({
+              type: "HIGHLIGHT_COMMENT",
+              commentId,
+            });
           }
         }}
         // Needed for .focus() to work

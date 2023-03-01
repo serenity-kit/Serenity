@@ -26,7 +26,7 @@ export const createSubFolder = async (
     where: { workspaceId },
   });
   expect(numFoldersAfterAdd).toBe(numFoldersBeforeAdd + 1);
-  const folder = await prisma.folder.findFirst({
+  const folder = await prisma.folder.findFirstOrThrow({
     where: { workspaceId },
     orderBy: { createdAt: "desc" },
   });

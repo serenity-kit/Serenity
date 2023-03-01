@@ -1,37 +1,24 @@
-import { KeyDerivationTrace } from "@naisho/core";
-import { Document } from "./document";
+import { KeyDerivationTrace2 } from "@naisho/core";
+import {
+  Snapshot as PrismaSnapshot,
+  Update as PrismaUpdate,
+} from "../../prisma/generated/output";
 
-export type Snapshot = {
-  id: string;
-  latestVersion: number;
-  data: string;
-  document?: Document | null | undefined;
-  documentId: string;
-  updates?: Update[];
-  activeSnapshotDocument: Document;
-  createdAt: Date;
-  keyDerivationTrace: KeyDerivationTrace;
+export type Snapshot = PrismaSnapshot & {
+  keyDerivationTrace: KeyDerivationTrace2;
   clocks: number[];
 };
 
-export type Update = {
-  id: string;
-  version: number;
-  data: string;
-  snapshot?: Snapshot | null | undefined;
-  snapshotId: string;
-  snapshotVersion: number;
-  pubKey: string;
-};
+export type Update = PrismaUpdate;
 
-export const formatSnapshot = (snapshot: any): Document => {
-  let clocks = [];
-  if (snapshot.clocks) {
+export const formatSnapshot = (snapshot: PrismaSnapshot): Snapshot => {
+  let clocks: number[] = [];
+  if (snapshot.clocks && typeof snapshot.clocks == "string") {
     clocks = JSON.parse(snapshot.clocks);
   }
   return {
     ...snapshot,
-    keyDerivationTrace: snapshot.keyDerivationTrace as KeyDerivationTrace,
+    keyDerivationTrace: snapshot.keyDerivationTrace as KeyDerivationTrace2,
     clocks,
   };
 };

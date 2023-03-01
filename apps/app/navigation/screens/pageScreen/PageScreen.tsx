@@ -1,14 +1,26 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { useWindowDimensions } from "react-native";
 import Page from "../../../components/page/Page";
 import { useWorkspace } from "../../../context/WorkspaceContext";
 import { useAuthenticatedAppContext } from "../../../hooks/useAuthenticatedAppContext";
-import { PageCommentsDrawerScreenProps } from "../../../types/navigationProps";
+import { WorkspaceDrawerScreenProps } from "../../../types/navigationProps";
 
-import { CenterContent, InfoMessage, Spinner } from "@serenity-tools/ui";
-import { useMachine } from "@xstate/react";
+import { LocalDevice } from "@serenity-tools/common";
+import {
+  CenterContent,
+  InfoMessage,
+  Spinner,
+  tw,
+  useIsPermanentLeftSidebar,
+} from "@serenity-tools/ui";
+import { useActor, useInterpret, useMachine } from "@xstate/react";
+import { Drawer } from "react-native-drawer-layout";
 import sodium, { KeyPair } from "react-native-libsodium";
-import { usePage } from "../../../context/PageContext";
+import CommentsSidebar from "../../../components/commentsSidebar/CommentsSidebar";
+import { PageHeader } from "../../../components/page/PageHeader";
+import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
+import { PageProvider } from "../../../context/PageContext";
+import { commentsMachine } from "../../../machines/commentsMachine";
 import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
 import {
   getDocumentPath,
@@ -21,9 +33,11 @@ import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { loadPageMachine } from "./loadPageMachine";
 
-const PageRemountWrapper = (props: PageCommentsDrawerScreenProps<"Page">) => {
+const drawerWidth = 240;
+
+const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
-  const { pageId } = usePage();
+  const pageId = props.route.params.pageId;
   const { activeDevice } = useAuthenticatedAppContext();
   const { workspaceId } = useWorkspace();
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
@@ -41,13 +55,30 @@ const PageRemountWrapper = (props: PageCommentsDrawerScreenProps<"Page">) => {
     },
   });
 
-  // useLayoutEffect(() => {
-  //   props.navigation.setOptions({
-  //     headerRight: PageHeaderRight,
-  //     headerTitle: PageHeader,
-  //     headerTitleAlign: "center",
-  //   });
-  // }, []);
+  const [open, setOpen] = useState(false);
+  const commentsService = useInterpret(commentsMachine, {
+    context: {
+      params: {
+        pageId: props.route.params.pageId,
+        activeDevice: activeDevice as LocalDevice,
+      },
+    },
+  });
+  const [, send] = useActor(commentsService);
+  const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
+
+  useLayoutEffect(() => {
+    props.navigation.setOptions({
+      headerRight: PageHeaderRight,
+      headerTitle: () => (
+        <PageHeader
+          toggleCommentsDrawer={() => {
+            setOpen((prevOpen) => !prevOpen);
+          }}
+        />
+      ),
+    });
+  }, []);
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPath = await getDocumentPath(docId);
@@ -114,14 +145,48 @@ const PageRemountWrapper = (props: PageCommentsDrawerScreenProps<"Page">) => {
     );
   } else if (state.matches("loadDocument")) {
     return (
-      <Page
-        {...props}
-        // to force unmount and mount the page
-        key={pageId}
-        updateTitle={updateTitle}
-        signatureKeyPair={signatureKeyPair}
-        workspaceId={workspaceId}
-      />
+      <PageProvider
+        value={{
+          pageId: props.route.params.pageId,
+          commentsService,
+          setActiveSnapshotAndCommentKeys: (activeSnapshot, commentKeys) => {
+            send({
+              type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS",
+              activeSnapshot,
+              commentKeys,
+            });
+          },
+        }}
+      >
+        <Drawer
+          open={open}
+          onOpen={() => setOpen(true)}
+          onClose={() => setOpen(false)}
+          renderDrawerContent={() => {
+            return <CommentsSidebar />;
+          }}
+          drawerType="front"
+          drawerPosition="right"
+          overlayStyle={{
+            display: "none",
+          }}
+          drawerStyle={{
+            width: drawerWidth,
+            marginLeft: isPermanentLeftSidebar ? -drawerWidth : undefined,
+            borderLeftWidth: 1,
+            borderLeftColor: tw.color("gray-200"),
+          }}
+        >
+          <Page
+            {...props}
+            // to force unmount and mount the page
+            key={pageId}
+            updateTitle={updateTitle}
+            signatureKeyPair={signatureKeyPair}
+            workspaceId={workspaceId}
+          />
+        </Drawer>
+      </PageProvider>
     );
   } else {
     return (
@@ -135,9 +200,7 @@ const PageRemountWrapper = (props: PageCommentsDrawerScreenProps<"Page">) => {
 // By remounting the component we make sure that a fresh state machine gets started.
 // As an alternative we could also have an action that resets the state machine,
 // but with all the side-effects remounting seemed to be the stabler choice for now.
-export default function PageScreen(
-  props: PageCommentsDrawerScreenProps<"Page">
-) {
-  const { pageId } = usePage();
-  return <PageRemountWrapper key={pageId} {...props} />;
+export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
+  const pageId = props.route.params.pageId;
+  return <ActualPageScreen key={pageId} {...props} />;
 }

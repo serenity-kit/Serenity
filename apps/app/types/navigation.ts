@@ -8,6 +8,7 @@ interface ISubNavigator<T extends ParamListBase, K extends keyof T> {
 
 type PageParamList = {
   isNew?: boolean;
+  pageId: string;
 };
 
 type WorkspacePageParamList = {
@@ -19,15 +20,8 @@ type RegistrationVerificationParamsList = {
   verification?: string;
 };
 
-export type PageCommentsDrawerParamList = {
-  Page: PageParamList;
-};
-
 export type WorkspaceDrawerParamList = {
-  PageCommentsDrawer: ISubNavigator<
-    PageCommentsDrawerParamList,
-    keyof PageCommentsDrawerParamList
-  > & { pageId: string };
+  Page: PageParamList;
   WorkspaceNotDecrypted: undefined;
   WorkspaceRoot: undefined;
 };

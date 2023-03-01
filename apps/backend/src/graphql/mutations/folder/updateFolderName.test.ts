@@ -1,3 +1,4 @@
+import { folderDerivedKeyContext } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
@@ -52,11 +53,10 @@ beforeAll(async () => {
 });
 
 test("user should be able to change a folder name", async () => {
-  const id = addedFolderId;
   const name = "Updated Name";
   const result = await updateFolderName({
     graphql,
-    id,
+    id: userData1.folder.id,
     name,
     workspaceKey,
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
@@ -64,10 +64,19 @@ test("user should be able to change a folder name", async () => {
     authorizationHeader: userData1.sessionKey,
   });
   const updatedFolder = result.updateFolderName.folder;
-  expect(updatedFolder.id).toBe(addedFolderId);
+  expect(updatedFolder.id).toBe(userData1.folder.id);
   expect(typeof updatedFolder.encryptedName).toBe("string");
   expect(typeof updatedFolder.encryptedNameNonce).toBe("string");
-  expect(typeof updatedFolder.keyDerivationTrace.subkeyId).toBe("number");
+  expect(typeof updatedFolder.keyDerivationTrace.trace[0].subkeyId).toBe(
+    "number"
+  );
+  expect(updatedFolder.keyDerivationTrace.trace[0].entryId).toBe(
+    userData1.folder.id
+  );
+  expect(updatedFolder.keyDerivationTrace.trace[0].parentId).toBe(null);
+  expect(updatedFolder.keyDerivationTrace.trace[0].context).toBe(
+    folderDerivedKeyContext
+  );
   expect(updatedFolder.parentFolderId).toBe(null);
   expect(updatedFolder.rootFolderId).toBe(null);
   expect(updatedFolder.workspaceId).toBe(addedWorkspace.id);

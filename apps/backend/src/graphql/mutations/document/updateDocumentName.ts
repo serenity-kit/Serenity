@@ -7,9 +7,7 @@ import {
   objectType,
 } from "nexus";
 import { updateDocumentName } from "../../../database/document/updateDocumentName";
-import { formatDocument } from "../../../types/document";
 import { Document } from "../../types/document";
-import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const UpdateDocumentNameInput = inputObjectType({
   name: "UpdateDocumentNameInput",
@@ -19,9 +17,6 @@ export const UpdateDocumentNameInput = inputObjectType({
     t.nonNull.string("encryptedNameNonce");
     t.nonNull.string("workspaceKeyId");
     t.nonNull.int("subkeyId");
-    t.nonNull.field("nameKeyDerivationTrace", {
-      type: KeyDerivationTraceInput,
-    });
   },
 });
 
@@ -50,10 +45,9 @@ export const updateDocumentNameMutation = mutationField("updateDocumentName", {
       encryptedName: args.input.encryptedName,
       encryptedNameNonce: args.input.encryptedNameNonce,
       workspaceKeyId: args.input.workspaceKeyId,
-      subkeyId: args.input.subkeyId, // TODO: remove
+      subkeyId: args.input.subkeyId,
       userId: context.user.id,
-      nameKeyDerivationTrace: args.input.nameKeyDerivationTrace,
     });
-    return { document: formatDocument(document) };
+    return { document };
   },
 });

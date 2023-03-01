@@ -1,5 +1,5 @@
 import {
-  KeyDerivationTrace,
+  KeyDerivationTrace2,
   NaishoNewSnapshotWithKeyRotationRequired,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
@@ -42,7 +42,7 @@ export async function createSnapshot({
     ]);
 
     const snapshotKeyDerivationTrace = snapshot.publicData
-      .keyDerivationTrace as KeyDerivationTrace;
+      .keyDerivationTrace as KeyDerivationTrace2;
 
     if (
       // workspaceKey has been rotated
@@ -110,7 +110,6 @@ export async function createSnapshot({
         },
         document: { connect: { id: snapshot.publicData.docId } },
         keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
-        subkeyId: snapshot.publicData.subkeyId,
         clocks: {},
       },
     });

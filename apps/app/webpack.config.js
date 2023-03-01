@@ -33,7 +33,9 @@ module.exports = async function (env, argv) {
     config.resolve.extensions.unshift(".electron.ts");
   }
 
-  config.plugins.push(new webpack.EnvironmentPlugin({ IS_E2E_TEST: false }));
+  config.plugins.push(
+    new webpack.EnvironmentPlugin({ SERENITY_ENV: "production" })
+  );
 
   return config;
 };

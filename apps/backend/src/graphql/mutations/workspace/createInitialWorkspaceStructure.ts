@@ -9,7 +9,8 @@ import {
 import { createInitialWorkspaceStructure } from "../../../database/workspace/createInitialWorkspaceStructure";
 import { Document, DocumentSnapshotInput } from "../../types/document";
 import { Folder } from "../../types/folder";
-import { KeyDerivationTraceInput } from "../../types/keyDerivation";
+import { KeyDerivationTraceInput2 } from "../../types/keyDerivation";
+import { Snapshot } from "../../types/snapshot";
 import { Workspace } from "../../types/workspace";
 
 export const DeviceWorkspaceKeyBoxInput = inputObjectType({
@@ -41,7 +42,7 @@ export const CreateInitialFolderInput = inputObjectType({
     t.nonNull.string("encryptedName");
     t.nonNull.string("encryptedNameNonce");
     t.nonNull.field("keyDerivationTrace", {
-      type: KeyDerivationTraceInput,
+      type: KeyDerivationTraceInput2,
     });
   },
 });
@@ -52,9 +53,7 @@ export const CreateInitialDocumentInput = inputObjectType({
     t.nonNull.string("id");
     t.nonNull.string("encryptedName");
     t.nonNull.string("encryptedNameNonce");
-    t.nonNull.field("nameKeyDerivationTrace", {
-      type: KeyDerivationTraceInput,
-    });
+    t.nonNull.int("subkeyId");
     t.nonNull.field("snapshot", { type: DocumentSnapshotInput });
   },
 });
@@ -75,6 +74,7 @@ export const CreateInitialWorkspaceStructureResult = objectType({
     t.field("workspace", { type: Workspace });
     t.field("folder", { type: Folder });
     t.field("document", { type: Document });
+    t.field("snapshot", { type: Snapshot });
   },
 });
 

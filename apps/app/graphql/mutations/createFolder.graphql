@@ -9,11 +9,11 @@ mutation createFolder($input: CreateFolderInput!) {
       workspaceId
       keyDerivationTrace {
         workspaceKeyId
-        subkeyId
-        parentFolders {
-          folderId
+        trace {
+          entryId
           subkeyId
-          parentFolderId
+          parentId
+          context
         }
       }
     }

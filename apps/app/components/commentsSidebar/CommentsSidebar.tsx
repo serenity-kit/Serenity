@@ -1,7 +1,7 @@
-import { DrawerContentComponentProps } from "@react-navigation/drawer";
 import {
   Button,
   IconButton,
+  Pressable,
   RawInput,
   ScrollView,
   Text,
@@ -12,7 +12,7 @@ import { useActor } from "@xstate/react";
 import { formatDistanceToNow, parseJSON } from "date-fns";
 import { usePage } from "../../context/PageContext";
 
-const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
+const CommentsSidebar: React.FC<{}> = () => {
   const { commentsService } = usePage();
   const [state, send] = useActor(commentsService);
 
@@ -27,7 +27,7 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
         {state.context.decryptedComments.map((comment) => {
           if (!comment) return null;
           return (
-            <View
+            <Pressable
               key={comment.id}
               style={[
                 tw`border-b border-gray-200`,
@@ -35,6 +35,9 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
                   ? tw`bg-gray-200`
                   : undefined,
               ]}
+              onPress={() => {
+                send({ type: "HIGHLIGHT_COMMENT", commentId: comment.id });
+              }}
               testID={`comment-${comment.id}`}
             >
               <Text testID={`comment-${comment.id}__text-content`}>
@@ -105,7 +108,7 @@ const CommentsSidebar: React.FC<DrawerContentComponentProps> = () => {
                 }
                 testID={`comment-${comment.id}__delete-button`}
               />
-            </View>
+            </Pressable>
           );
         })}
       </View>

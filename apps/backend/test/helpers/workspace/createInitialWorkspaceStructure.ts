@@ -5,6 +5,8 @@ import {
   encryptDocumentTitle,
   encryptFolderName,
   encryptWorkspaceKeyForDevice,
+  folderDerivedKeyContext,
+  snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
@@ -50,11 +52,11 @@ const query = gql`
         workspaceId
         keyDerivationTrace {
           workspaceKeyId
-          subkeyId
-          parentFolders {
-            folderId
+          trace {
+            entryId
             subkeyId
-            parentFolderId
+            parentId
+            context
           }
         }
       }
@@ -64,13 +66,20 @@ const query = gql`
         encryptedNameNonce
         parentFolderId
         workspaceId
-        nameKeyDerivationTrace {
+        subkeyId
+      }
+      snapshot {
+        id
+        latestVersion
+        data
+        documentId
+        keyDerivationTrace {
           workspaceKeyId
-          subkeyId
-          parentFolders {
-            folderId
+          trace {
+            entryId
             subkeyId
-            parentFolderId
+            parentId
+            context
           }
         }
       }
@@ -151,16 +160,28 @@ export const createInitialWorkspaceStructure = async ({
     idSignature: folderIdSignature,
     encryptedName: encryptedFolderName,
     encryptedNameNonce: encryptedFolderNameNonce,
+    // since we haven't created the workspaceKey yet,
+    // we must derive the trace manually
     keyDerivationTrace: {
       workspaceKeyId,
-      subkeyId: folderSubkeyId,
-      parentFolders: [],
+      trace: [
+        {
+          entryId: folderId,
+          subkeyId: folderSubkeyId,
+          parentId: null,
+          context: folderDerivedKeyContext,
+        },
+      ],
     },
   };
 
+  // prepare the snapshot key
+  const snapshotKey = createSnapshotKey({
+    folderKey,
+  });
   // propare the document key
   const documentKeyResult = createDocumentKey({
-    folderKey,
+    snapshotKey: snapshotKey.key,
   });
   const documentKey = documentKeyResult.key;
   const documentSubkeyId = documentKeyResult.subkeyId;
@@ -172,22 +193,25 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedDocumentName = encryptedDocumentTitleResult.ciphertext;
   const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;
 
-  // prepare the snapshot key
-  const snapshotKey = createSnapshotKey({
-    folderKey,
-  });
+  const snapshotId = uuidv4();
   const snapshot = createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
     subkeyId: snapshotKey.subkeyId,
     keyDerivationTrace: {
       workspaceKeyId,
-      subkeyId: snapshotKey.subkeyId,
-      parentFolders: [
+      trace: [
         {
-          folderId: folderId,
+          entryId: folderId,
+          parentId: null,
           subkeyId: encryptedFolderResult.folderSubkeyId,
-          parentFolderId: null,
+          context: folderDerivedKeyContext,
+        },
+        {
+          entryId: snapshotId,
+          parentId: folderId,
+          subkeyId: snapshotKey.subkeyId,
+          context: snapshotDerivedKeyContext,
         },
       ],
     },
@@ -198,17 +222,7 @@ export const createInitialWorkspaceStructure = async ({
     id: documentId,
     encryptedName: encryptedDocumentName,
     encryptedNameNonce: encryptedDocumentNameNonce,
-    nameKeyDerivationTrace: {
-      workspaceKeyId,
-      subkeyId: documentSubkeyId,
-      parentFolders: [
-        {
-          folderId: folderId,
-          subkeyId: folderSubkeyId,
-          parentFolderId: null,
-        },
-      ],
-    },
+    subkeyId: documentSubkeyId,
     snapshot,
   };
 

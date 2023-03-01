@@ -5,6 +5,8 @@ import {
   createSnapshotKey,
   encryptDocumentTitle,
   encryptFolderName,
+  folderDerivedKeyContext,
+  snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import {
   Button,
@@ -100,26 +102,12 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       );
       const folderKeyDerivationTrace = {
         workspaceKeyId,
-        subkeyId: encryptedFolderResult.folderSubkeyId,
-        parentFolders: [],
-      };
-
-      // prepare document
-      const documentKeyData = createDocumentKey({
-        folderKey: encryptedFolderResult.folderSubkey,
-      });
-      const encryptedDocumentTitle = encryptDocumentTitle({
-        title: documentName,
-        key: documentKeyData.key,
-      });
-      const documentKeyDerivationTrace = {
-        workspaceKeyId,
-        subkeyId: documentKeyData.subkeyId,
-        parentFolders: [
+        trace: [
           {
-            folderId,
+            entryId: folderId,
             subkeyId: encryptedFolderResult.folderSubkeyId,
-            parentFolderId: null,
+            parentId: null,
+            context: folderDerivedKeyContext,
           },
         ],
       };
@@ -128,21 +116,37 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const snapshotKey = createSnapshotKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
+      const snapshotId = uuidv4();
       const snapshot = createIntroductionDocumentSnapshot({
         documentId,
         snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
         subkeyId: snapshotKey.subkeyId,
         keyDerivationTrace: {
           workspaceKeyId,
-          subkeyId: snapshotKey.subkeyId,
-          parentFolders: [
+          trace: [
             {
-              folderId,
+              entryId: folderId,
               subkeyId: encryptedFolderResult.folderSubkeyId,
-              parentFolderId: null,
+              parentId: null,
+              context: folderDerivedKeyContext,
+            },
+            {
+              entryId: snapshotId,
+              parentId: folderId,
+              subkeyId: snapshotKey.subkeyId,
+              context: snapshotDerivedKeyContext,
             },
           ],
         },
+      });
+
+      // prepare document
+      const documentKeyData = createDocumentKey({
+        snapshotKey: snapshotKey.key,
+      });
+      const encryptedDocumentTitle = encryptDocumentTitle({
+        title: documentName,
+        key: documentKeyData.key,
       });
 
       const createInitialWorkspaceStructureResult =
@@ -165,7 +169,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
               id: documentId,
               encryptedName: encryptedDocumentTitle.ciphertext,
               encryptedNameNonce: encryptedDocumentTitle.publicNonce,
-              nameKeyDerivationTrace: documentKeyDerivationTrace,
+              subkeyId: documentKeyData.subkeyId,
               snapshot,
             },
             creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,
@@ -192,10 +196,9 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         workspaceId: workspace.id,
         screen: "WorkspaceDrawer",
         params: {
-          screen: "PageCommentsDrawer",
+          screen: "Page",
           params: {
             pageId: document.id,
-            screen: "Page",
           },
         },
       });
