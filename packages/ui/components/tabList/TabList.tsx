@@ -1,17 +1,20 @@
 import React from "react";
 import { tw } from "../../tailwind";
-import { View, ViewProps } from "../view/View";
+import {
+  EditorSidebarHeader,
+  EditorSidebarHeaderProps,
+} from "../editorSidebarHeader/EditorSidebarHeader";
 
-export type TabListProps = ViewProps & {
+export type TabListProps = EditorSidebarHeaderProps & {
   accessibilityLabel: string;
 };
 
 export function TabList(props: TabListProps) {
   return (
-    <View
+    <EditorSidebarHeader
       {...props}
       accessibilityRole="tablist"
-      style={[tw`flex-row py-2.5 px-2 border-b border-gray-200`, props.style]}
+      style={tw`px-2`}
     />
   );
 }
