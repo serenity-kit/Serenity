@@ -7,10 +7,10 @@ import { prisma } from "../prisma";
 type Params = {
   userId: string;
   id: string;
-  nameCiphertext?: string | null;
-  nameNonce?: string | null;
+  nameCiphertext: string;
+  nameNonce: string;
   workspaceKeyId?: string | null;
-  subkeyId?: number | null;
+  subkeyId: number;
   parentFolderId: string;
   workspaceId: string;
   snapshot: Snapshot;
@@ -40,8 +40,8 @@ export async function createDocument({
       id,
       nameCiphertext,
       nameNonce,
-      workspaceKeyId,
       subkeyId,
+      workspaceKeyId,
       parentFolderId,
       workspaceId,
     },

@@ -6,12 +6,12 @@ export const Document = objectType({
   name: "Document",
   definition(t) {
     t.nonNull.string("id");
-    t.string("nameCiphertext");
-    t.string("nameNonce");
+    t.nonNull.string("nameCiphertext");
+    t.nonNull.string("nameNonce");
+    t.nonNull.int("subkeyId");
     t.string("parentFolderId");
     t.string("rootFolderId");
-    t.string("workspaceId");
-    t.int("subkeyId");
+    t.nonNull.string("workspaceId");
     t.field("workspaceKey", { type: WorkspaceKey });
   },
 });

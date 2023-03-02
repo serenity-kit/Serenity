@@ -23,9 +23,9 @@ model Document {
   workspaceKeyId     String?
   parentFolder       Folder              @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
   parentFolderId     String
-  nameCiphertext     String? // a document is first created without a name
-  nameNonce          String? // a document is first created without a name
-  subkeyId           Int? // used for the name - a document is first created without a name
+  nameCiphertext     String
+  nameNonce          String
+  subkeyId           Int
   documentShareLinks DocumentShareLink[]
   requiresSnapshot   Boolean             @default(false)
   comments           Comment[]

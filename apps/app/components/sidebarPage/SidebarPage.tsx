@@ -29,9 +29,9 @@ type Props = ViewProps & {
   documentId: string;
   workspaceId: string;
   parentFolderId: string;
-  nameCiphertext?: string | null;
-  nameNonce?: string | null;
-  subkeyId?: number | null;
+  nameCiphertext: string;
+  nameNonce: string;
+  subkeyId: number;
   depth?: number;
   onRefetchDocumentsPress: () => void;
 };
@@ -74,11 +74,6 @@ export default function SidebarPage(props: Props) {
   }, [props.nameCiphertext, props.subkeyId, documentResult.data?.document?.id]);
 
   const decryptTitle = async () => {
-    if (!props.nameCiphertext || !props.nameNonce) {
-      // this case can happen when the document is created but the title is not yet set
-      setDocumentTitle("Untitled");
-      return;
-    }
     const workspace = await getWorkspace({
       workspaceId: props.workspaceId,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
@@ -118,7 +113,7 @@ export default function SidebarPage(props: Props) {
         snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];
       const documentKeyData = recreateDocumentKey({
         snapshotKey: snapshotKeyData.key,
-        subkeyId: props.subkeyId!,
+        subkeyId: props.subkeyId,
       });
       const documentTitle = decryptDocumentTitle({
         key: documentKeyData.key,

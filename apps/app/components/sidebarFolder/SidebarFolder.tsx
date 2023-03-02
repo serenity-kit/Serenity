@@ -2,9 +2,11 @@ import { createSnapshot, KeyDerivationTrace2 } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
+  createDocumentKey,
   createSnapshotKey,
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
+  encryptDocumentTitle,
   encryptFolderName,
   folderDerivedKeyContext,
   snapshotDerivedKeyContext,
@@ -56,7 +58,7 @@ type Props = ViewProps & {
   parentFolderId?: string | null | undefined;
   folderName?: string;
   nameCiphertext: string;
-  nameNonce?: string;
+  nameNonce: string;
   subkeyId: number;
   keyDerivationTrace: KeyDerivationTrace2;
   depth?: number;
@@ -114,15 +116,6 @@ export default function SidebarFolder(props: Props) {
   ]);
 
   const decryptName = async () => {
-    if (
-      !props.keyDerivationTrace.trace[props.keyDerivationTrace.trace.length - 1]
-        .subkeyId ||
-      !props.nameCiphertext ||
-      !props.nameNonce
-    ) {
-      setFolderName("Untitled");
-      return;
-    }
     const folderSubkeyId =
       props.keyDerivationTrace.trace[props.keyDerivationTrace.trace.length - 1]
         .subkeyId;
@@ -256,6 +249,7 @@ export default function SidebarFolder(props: Props) {
   const createDocument = async () => {
     const documentId = uuidv4();
     const snapshotId = uuidv4();
+    const documentName = "Untitled";
     const workspace = await getWorkspace({
       deviceSigningPublicKey: activeDevice.signingPublicKey,
       workspaceId: props.workspaceId,
@@ -313,10 +307,18 @@ export default function SidebarFolder(props: Props) {
       sodium.from_base64(snapshotKey.key),
       signatureKeyPair
     );
+    const documentNameKey = createDocumentKey({ snapshotKey: snapshotKey.key });
+    const documentNameData = encryptDocumentTitle({
+      title: documentName,
+      key: documentNameKey.key,
+    });
     const result = await runCreateDocumentMutation(
       {
         input: {
           id: documentId,
+          nameCiphertext: documentNameData.ciphertext,
+          nameNonce: documentNameData.publicNonce,
+          subkeyId: documentNameKey.subkeyId,
           workspaceId: props.workspaceId,
           parentFolderId: props.folderId,
           snapshot,
