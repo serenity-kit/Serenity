@@ -8,6 +8,7 @@ import {
 } from "@serenity-tools/ui";
 import { useEffect, useState } from "react";
 import { Platform, useWindowDimensions } from "react-native";
+import { z } from "zod";
 import { useAppContext } from "../../context/AppContext";
 import {
   useFinishLoginMutation,
@@ -54,6 +55,15 @@ export function LoginForm(props: Props) {
   }, [props.isFocused]);
 
   const onLoginPress = async () => {
+    // verify the username is a valid email address using the zod module
+    try {
+      z.string().email().parse(username);
+    } catch (error) {
+      setGqlErrorMessage("Invalid email address");
+      setIsLoggingIn(false);
+      return;
+    }
+
     try {
       setGqlErrorMessage("");
       setIsLoggingIn(true);

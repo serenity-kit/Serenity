@@ -14,6 +14,7 @@ import {
 } from "@serenity-tools/ui";
 import { useEffect, useState } from "react";
 import { useWindowDimensions } from "react-native";
+import { z } from "zod";
 import { useAppContext } from "../../context/AppContext";
 import {
   useFinishRegistrationMutation,
@@ -63,6 +64,15 @@ export default function RegisterForm(props: Props) {
     }
     setErrorMessage("");
     setIsRegistering(true);
+
+    // verify the username is a valid email address using the zod module
+    try {
+      z.string().email().parse(username);
+    } catch (error) {
+      setErrorMessage("Invalid email address");
+      setIsRegistering(false);
+      return;
+    }
     try {
       // TODO the getServerChallenge should include a signature of the challenge response and be verified that it belongs to
       // the server public to make sure it wasn't tampered with
