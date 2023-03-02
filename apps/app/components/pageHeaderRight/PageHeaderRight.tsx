@@ -67,6 +67,7 @@ export function PageHeaderRight() {
                 onPress={() => {
                   setIsActiveShareModal(true);
                 }}
+                testID="document-share-button"
               >
                 Share
               </Button>
