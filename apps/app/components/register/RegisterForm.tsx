@@ -74,6 +74,14 @@ export default function RegisterForm(props: Props) {
       return;
     }
     try {
+      z.string().min(6).parse(password);
+    } catch (error) {
+      setErrorMessage("Password must be at least 6 characters");
+      setIsRegistering(false);
+      return;
+    }
+
+    try {
       // TODO the getServerChallenge should include a signature of the challenge response and be verified that it belongs to
       // the server public to make sure it wasn't tampered with
       await updateAuthentication(null);

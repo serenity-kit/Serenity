@@ -63,6 +63,13 @@ export function LoginForm(props: Props) {
       setIsLoggingIn(false);
       return;
     }
+    try {
+      z.string().min(6).parse(password);
+    } catch (error) {
+      setGqlErrorMessage("Password must be at least 6 characters");
+      setIsLoggingIn(false);
+      return;
+    }
 
     try {
       setGqlErrorMessage("");
