@@ -1,4 +1,4 @@
-import { ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../prisma/generated/output";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
@@ -6,6 +6,7 @@ import { prisma } from "../prisma";
 
 type Params = {
   userId: string;
+  documentShareLinkToken?: string | null | undefined;
   creatorDeviceSigningPublicKey: string;
   commentId: string;
   snapshotId: string;
@@ -16,6 +17,7 @@ type Params = {
 
 export async function createCommentReply({
   userId,
+  documentShareLinkToken,
   creatorDeviceSigningPublicKey,
   commentId,
   snapshotId,
@@ -30,18 +32,41 @@ export async function createCommentReply({
   if (!document) {
     throw new ForbiddenError("Unauthorized");
   }
-  const allowedRoles = [Role.ADMIN, Role.EDITOR, Role.COMMENTER];
-  // verify that the user is an admin or editor, or commentor of the workspace
-  const user2Workspace = await prisma.usersToWorkspaces.findFirst({
-    where: {
-      userId,
-      workspaceId: document.workspaceId,
-      role: { in: allowedRoles },
-    },
+  // ensure this comment exists also
+  const comment = await prisma.comment.findFirst({
+    where: { id: commentId },
   });
-  if (!user2Workspace) {
-    throw new ForbiddenError("Unauthorized");
+  if (!comment) {
+    throw new UserInputError("Invalid comment id");
   }
+  const allowedRoles = [Role.ADMIN, Role.EDITOR, Role.COMMENTER];
+  // if the user has a documentShareLinkToken, verify it
+  let documentShareLink: any = null;
+  if (documentShareLinkToken) {
+    documentShareLink = await prisma.documentShareLink.findFirst({
+      where: {
+        token: documentShareLinkToken,
+        documentId: document.id,
+        role: { in: allowedRoles },
+      },
+    });
+    if (!documentShareLink) {
+      throw new UserInputError("Invalid documentShareLinkToken");
+    }
+  } else {
+    // if no documentShareLinkToken, the user must have access to the workspace
+    const user2Workspace = await prisma.usersToWorkspaces.findFirst({
+      where: {
+        userId,
+        workspaceId: document.workspaceId,
+        role: { in: allowedRoles },
+      },
+    });
+    if (!user2Workspace) {
+      throw new ForbiddenError("Unauthorized");
+    }
+  }
+
   // convert the user's device into a creatorDevice
   const creatorDevice = await getOrCreateCreatorDevice({
     prisma,

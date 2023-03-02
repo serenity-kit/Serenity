@@ -112,6 +112,7 @@ export type CreateCommentReplyInput = {
   commentId: Scalars['String'];
   contentCiphertext: Scalars['String'];
   contentNonce: Scalars['String'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']>;
   snapshotId: Scalars['String'];
   subkeyId: Scalars['Int'];
 };
