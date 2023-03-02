@@ -1,7 +1,7 @@
+import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 import canonicalize from 'canonicalize';
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
-import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -103,6 +103,7 @@ export type CommentReply = {
 export type CreateCommentInput = {
   contentCiphertext: Scalars['String'];
   contentNonce: Scalars['String'];
+  documentShareLinkToken?: InputMaybe<Scalars['String']>;
   snapshotId: Scalars['String'];
   subkeyId: Scalars['Int'];
 };
@@ -1034,8 +1035,8 @@ export type Snapshot = {
   __typename?: 'Snapshot';
   activeDocumentSnapshot?: Maybe<Document>;
   clocks: Array<Scalars['Int']>;
+  createdAt: Scalars['Date'];
   data: Scalars['String'];
-  date: Scalars['Date'];
   document?: Maybe<Document>;
   documentId: Scalars['String'];
   id: Scalars['String'];

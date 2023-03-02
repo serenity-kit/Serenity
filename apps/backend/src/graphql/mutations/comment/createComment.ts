@@ -15,6 +15,7 @@ export const CreateCommentInput = inputObjectType({
     t.nonNull.string("contentCiphertext");
     t.nonNull.string("contentNonce");
     t.nonNull.string("snapshotId");
+    t.string("documentShareLinkToken");
     t.nonNull.int("subkeyId");
   },
 });
@@ -45,6 +46,7 @@ export const createCommentMutation = mutationField("createComment", {
       userId: context.user.id,
       creatorDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
       snapshotId: args.input.snapshotId,
+      documentShareLinkToken: args.input.documentShareLinkToken,
       subkeyId: args.input.subkeyId,
       contentCiphertext: args.input.contentCiphertext,
       contentNonce: args.input.contentNonce,
