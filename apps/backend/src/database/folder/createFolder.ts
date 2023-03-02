@@ -7,8 +7,8 @@ import { prisma } from "../prisma";
 type Params = {
   userId: string;
   id: string;
-  encryptedName: string;
-  encryptedNameNonce: string;
+  nameCiphertext: string;
+  nameNonce: string;
   workspaceKeyId: string;
   subkeyId: number;
   parentFolderId?: string;
@@ -19,8 +19,8 @@ type Params = {
 export async function createFolder({
   userId,
   id,
-  encryptedName,
-  encryptedNameNonce,
+  nameCiphertext,
+  nameNonce,
   workspaceKeyId,
   subkeyId,
   parentFolderId,
@@ -78,8 +78,8 @@ export async function createFolder({
       data: {
         id,
         idSignature: "TODO",
-        encryptedName,
-        encryptedNameNonce,
+        nameCiphertext,
+        nameNonce,
         workspaceKeyId,
         subkeyId,
         parentFolderId,

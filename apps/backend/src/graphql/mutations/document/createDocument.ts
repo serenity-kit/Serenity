@@ -14,6 +14,9 @@ export const CreateDocumentInput = inputObjectType({
   name: "CreateDocumentInput",
   definition(t) {
     t.nonNull.string("id");
+    t.nonNull.string("nameCiphertext");
+    t.nonNull.string("nameNonce");
+    t.nonNull.int("subkeyId");
     t.nonNull.string("parentFolderId");
     t.nonNull.string("workspaceId");
     t.nonNull.field("snapshot", { type: DocumentSnapshotInput });
@@ -47,10 +50,10 @@ export const createDocumentMutation = mutationField("createDocument", {
     const document = await createDocument({
       userId: context.user.id,
       id: args.input.id,
-      encryptedName: null,
-      encryptedNameNonce: null,
+      nameCiphertext: args.input.nameCiphertext,
+      nameNonce: args.input.nameNonce,
       workspaceKeyId: null,
-      subkeyId: null,
+      subkeyId: args.input.subkeyId,
       parentFolderId: args.input.parentFolderId,
       workspaceId: args.input.workspaceId,
       snapshot,

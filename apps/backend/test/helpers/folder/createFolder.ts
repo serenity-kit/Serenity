@@ -35,8 +35,8 @@ export const createFolder = async ({
     parentKey,
   });
   const subkeyId = encryptedFolderResult.folderSubkeyId;
-  const encryptedName = encryptedFolderResult.ciphertext;
-  const encryptedNameNonce = encryptedFolderResult.publicNonce;
+  const nameCiphertext = encryptedFolderResult.ciphertext;
+  const nameNonce = encryptedFolderResult.publicNonce;
 
   const keyDerivationTrace = await createFolderKeyDerivationTrace({
     workspaceKeyId,
@@ -54,8 +54,8 @@ export const createFolder = async ({
       createFolder(input: $input) {
         folder {
           id
-          encryptedName
-          encryptedNameNonce
+          nameCiphertext
+          nameNonce
           parentFolderId
           rootFolderId
           workspaceId
@@ -77,8 +77,8 @@ export const createFolder = async ({
     {
       input: {
         id,
-        encryptedName,
-        encryptedNameNonce,
+        nameCiphertext,
+        nameNonce,
         parentFolderId,
         workspaceKeyId,
         subkeyId,

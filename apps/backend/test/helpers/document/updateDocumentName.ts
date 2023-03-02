@@ -11,8 +11,8 @@ import { getSnapshot } from "../snapshot/getSnapshot";
 type RunUpdateDocumentNameMutationParams = {
   graphql: any;
   id: string;
-  encryptedName: string;
-  encryptedNameNonce: string;
+  nameCiphertext: string;
+  nameNonce: string;
   subkeyId: number;
   workspaceKeyId: string;
   authorizationHeader: string;
@@ -20,8 +20,8 @@ type RunUpdateDocumentNameMutationParams = {
 const runUpdateDocumentNameMutation = async ({
   graphql,
   id,
-  encryptedName,
-  encryptedNameNonce,
+  nameCiphertext,
+  nameNonce,
   subkeyId,
   workspaceKeyId,
   authorizationHeader,
@@ -33,8 +33,8 @@ const runUpdateDocumentNameMutation = async ({
     mutation updateDocumentName($input: UpdateDocumentNameInput!) {
       updateDocumentName(input: $input) {
         document {
-          encryptedName
-          encryptedNameNonce
+          nameCiphertext
+          nameNonce
           id
           parentFolderId
           workspaceId
@@ -48,8 +48,8 @@ const runUpdateDocumentNameMutation = async ({
     {
       input: {
         id,
-        encryptedName,
-        encryptedNameNonce,
+        nameCiphertext,
+        nameNonce,
         workspaceKeyId,
         subkeyId,
       },
@@ -83,8 +83,8 @@ export const updateDocumentName = async ({
     return runUpdateDocumentNameMutation({
       graphql,
       id,
-      encryptedName: "",
-      encryptedNameNonce: "",
+      nameCiphertext: "",
+      nameNonce: "",
       subkeyId: 123,
       workspaceKeyId,
       authorizationHeader,
@@ -112,8 +112,8 @@ export const updateDocumentName = async ({
     return runUpdateDocumentNameMutation({
       graphql,
       id,
-      encryptedName: "",
-      encryptedNameNonce: "",
+      nameCiphertext: "",
+      nameNonce: "",
       subkeyId: 123,
       workspaceKeyId,
       authorizationHeader,
@@ -132,8 +132,8 @@ export const updateDocumentName = async ({
     return runUpdateDocumentNameMutation({
       graphql,
       id,
-      encryptedName: "",
-      encryptedNameNonce: "",
+      nameCiphertext: "",
+      nameNonce: "",
       subkeyId: 123,
       workspaceKeyId,
       authorizationHeader,
@@ -158,8 +158,8 @@ export const updateDocumentName = async ({
   return runUpdateDocumentNameMutation({
     graphql,
     id,
-    encryptedName: encryptedDocumentResult.ciphertext,
-    encryptedNameNonce: encryptedDocumentResult.publicNonce,
+    nameCiphertext: encryptedDocumentResult.ciphertext,
+    nameNonce: encryptedDocumentResult.publicNonce,
     subkeyId: documentKeyData.subkeyId,
     workspaceKeyId,
     authorizationHeader,

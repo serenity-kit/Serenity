@@ -1,8 +1,8 @@
 query documentPath($id: ID!) {
   documentPath(id: $id) {
     id
-    encryptedName
-    encryptedNameNonce
+    nameCiphertext
+    nameNonce
     parentFolderId
     rootFolderId
     workspaceId

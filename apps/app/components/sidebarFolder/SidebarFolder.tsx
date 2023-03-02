@@ -2,9 +2,11 @@ import { createSnapshot, KeyDerivationTrace2 } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
+  createDocumentKey,
   createSnapshotKey,
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
+  encryptDocumentTitle,
   encryptFolderName,
   folderDerivedKeyContext,
   snapshotDerivedKeyContext,
@@ -55,8 +57,8 @@ type Props = ViewProps & {
   folderId: string;
   parentFolderId?: string | null | undefined;
   folderName?: string;
-  encryptedName: string;
-  encryptedNameNonce?: string;
+  nameCiphertext: string;
+  nameNonce: string;
   subkeyId: number;
   keyDerivationTrace: KeyDerivationTrace2;
   depth?: number;
@@ -108,21 +110,12 @@ export default function SidebarFolder(props: Props) {
   useEffect(() => {
     decryptName();
   }, [
-    props.encryptedName,
+    props.nameCiphertext,
     props.keyDerivationTrace.trace[props.keyDerivationTrace.trace.length - 1]
       .subkeyId,
   ]);
 
   const decryptName = async () => {
-    if (
-      !props.keyDerivationTrace.trace[props.keyDerivationTrace.trace.length - 1]
-        .subkeyId ||
-      !props.encryptedName ||
-      !props.encryptedNameNonce
-    ) {
-      setFolderName("Untitled");
-      return;
-    }
     const folderSubkeyId =
       props.keyDerivationTrace.trace[props.keyDerivationTrace.trace.length - 1]
         .subkeyId;
@@ -165,8 +158,8 @@ export default function SidebarFolder(props: Props) {
       const folderName = decryptFolderName({
         parentKey,
         subkeyId: folderSubkeyId,
-        ciphertext: props.encryptedName,
-        publicNonce: props.encryptedNameNonce,
+        ciphertext: props.nameCiphertext,
+        publicNonce: props.nameNonce,
       });
       setFolderName(folderName);
     } catch (error) {
@@ -228,8 +221,8 @@ export default function SidebarFolder(props: Props) {
           input: {
             id,
             workspaceId: props.workspaceId,
-            encryptedName: encryptedFolderResult.ciphertext,
-            encryptedNameNonce: encryptedFolderResult.publicNonce,
+            nameCiphertext: encryptedFolderResult.ciphertext,
+            nameNonce: encryptedFolderResult.publicNonce,
             workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
             subkeyId: encryptedFolderResult.folderSubkeyId,
             parentFolderId: props.folderId,
@@ -256,6 +249,7 @@ export default function SidebarFolder(props: Props) {
   const createDocument = async () => {
     const documentId = uuidv4();
     const snapshotId = uuidv4();
+    const documentName = "Untitled";
     const workspace = await getWorkspace({
       deviceSigningPublicKey: activeDevice.signingPublicKey,
       workspaceId: props.workspaceId,
@@ -313,10 +307,18 @@ export default function SidebarFolder(props: Props) {
       sodium.from_base64(snapshotKey.key),
       signatureKeyPair
     );
+    const documentNameKey = createDocumentKey({ snapshotKey: snapshotKey.key });
+    const documentNameData = encryptDocumentTitle({
+      title: documentName,
+      key: documentNameKey.key,
+    });
     const result = await runCreateDocumentMutation(
       {
         input: {
           id: documentId,
+          nameCiphertext: documentNameData.ciphertext,
+          nameNonce: documentNameData.publicNonce,
+          subkeyId: documentNameKey.subkeyId,
           workspaceId: props.workspaceId,
           parentFolderId: props.folderId,
           snapshot,
@@ -421,8 +423,8 @@ export default function SidebarFolder(props: Props) {
       {
         input: {
           id: props.folderId,
-          encryptedName: encryptedFolderResult.ciphertext,
-          encryptedNameNonce: encryptedFolderResult.publicNonce,
+          nameCiphertext: encryptedFolderResult.ciphertext,
+          nameNonce: encryptedFolderResult.publicNonce,
           workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
           subkeyId: encryptedFolderResult.folderSubkeyId!,
           keyDerivationTrace,
@@ -618,8 +620,8 @@ export default function SidebarFolder(props: Props) {
                         folder.keyDerivationTrace.trace.length - 1
                       ].subkeyId
                     }
-                    encryptedName={folder.encryptedName}
-                    encryptedNameNonce={folder.encryptedNameNonce}
+                    nameCiphertext={folder.nameCiphertext}
+                    nameNonce={folder.nameNonce}
                     keyDerivationTrace={folder.keyDerivationTrace}
                     onStructureChange={props.onStructureChange}
                     depth={depth + 1}
@@ -637,8 +639,8 @@ export default function SidebarFolder(props: Props) {
                     key={document.id}
                     parentFolderId={props.folderId}
                     documentId={document.id}
-                    encryptedName={document.encryptedName}
-                    encryptedNameNonce={document.encryptedNameNonce}
+                    nameCiphertext={document.nameCiphertext}
+                    nameNonce={document.nameNonce}
                     subkeyId={document.subkeyId}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}

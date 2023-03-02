@@ -24,8 +24,8 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
     let documentName: string | null = "Untitled";
     if (
       document &&
-      document.encryptedName &&
-      document.encryptedNameNonce &&
+      document.nameCiphertext &&
+      document.nameNonce &&
       document.subkeyId
     ) {
       const workspace = await getWorkspace({
@@ -63,8 +63,8 @@ export const useActiveDocumentInfoStore = create<DocumentState>((set) => ({
         });
         documentName = decryptDocumentTitle({
           key: documentKeyData.key,
-          ciphertext: document.encryptedName,
-          publicNonce: document.encryptedNameNonce,
+          ciphertext: document.nameCiphertext,
+          publicNonce: document.nameNonce,
         });
       } catch (error) {
         documentName = "Could not decrypt";

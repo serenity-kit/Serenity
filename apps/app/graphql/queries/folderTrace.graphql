@@ -4,8 +4,8 @@ query folderTrace($folderId: ID!) {
     parentFolderId
     rootFolderId
     workspaceId
-    encryptedName
-    encryptedNameNonce
+    nameCiphertext
+    nameNonce
     keyDerivationTrace {
       workspaceKeyId
       trace {

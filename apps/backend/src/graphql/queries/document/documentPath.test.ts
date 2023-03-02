@@ -147,8 +147,8 @@ export const getDocumentPath = async ({
         parentFolderId
         rootFolderId
         workspaceId
-        encryptedName
-        encryptedNameNonce
+        nameCiphertext
+        nameNonce
         keyDerivationTrace {
           workspaceKeyId
           trace {
@@ -182,8 +182,8 @@ test("user should be able to get a document path", async () => {
     expect(documentPathItem.parentFolderId).toBe(null);
     expect(documentPathItem.rootFolderId).toBe(null);
     expect(documentPathItem.workspaceId).toBe(userData1.workspace.id);
-    expect(typeof documentPathItem.encryptedName).toBe("string");
-    expect(typeof documentPathItem.encryptedNameNonce).toBe("string");
+    expect(typeof documentPathItem.nameCiphertext).toBe("string");
+    expect(typeof documentPathItem.nameNonce).toBe("string");
   }
 });
 
@@ -196,8 +196,8 @@ test("user should be able to get a document path for a deep tree", async () => {
   const documentPath = result.documentPath;
   expect(documentPath.length).toBe(2);
   for (const documentPathItem of documentPath) {
-    expect(typeof documentPathItem.encryptedName).toBe("string");
-    expect(typeof documentPathItem.encryptedNameNonce).toBe("string");
+    expect(typeof documentPathItem.nameCiphertext).toBe("string");
+    expect(typeof documentPathItem.nameNonce).toBe("string");
     expect(documentPathItem.workspaceId).toBe(userData1.workspace.id);
     if (documentPathItem.id === parentFolderId) {
       expect(documentPathItem.id).toBe(parentFolderId);

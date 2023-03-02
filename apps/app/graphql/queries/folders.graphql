@@ -2,8 +2,8 @@ query folders($parentFolderId: ID!, $first: Int!, $after: String) {
   folders(parentFolderId: $parentFolderId, first: $first, after: $after) {
     nodes {
       id
-      encryptedName
-      encryptedNameNonce
+      nameCiphertext
+      nameNonce
       parentFolderId
       rootFolderId
       workspaceId

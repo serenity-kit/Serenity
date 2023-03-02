@@ -31,15 +31,15 @@ export type WorkspaceParams = {
 export type FolderParams = {
   id: string;
   idSignature: string;
-  encryptedName: string;
-  encryptedNameNonce: string;
+  nameCiphertext: string;
+  nameNonce: string;
   keyDerivationTrace: KeyDerivationTrace2;
 };
 
 export type DocumentParams = {
   id: string;
-  encryptedName: string;
-  encryptedNameNonce: string;
+  nameCiphertext: string;
+  nameNonce: string;
   subkeyId: number;
   snapshot: Snapshot;
 };
@@ -71,8 +71,8 @@ export async function createInitialWorkspaceStructure({
   const createdFolder = await createFolder({
     userId,
     id: folder.id,
-    encryptedName: folder.encryptedName,
-    encryptedNameNonce: folder.encryptedNameNonce,
+    nameCiphertext: folder.nameCiphertext,
+    nameNonce: folder.nameNonce,
     workspaceKeyId: workspaceKey?.id!,
     subkeyId: 123, // TODO: remove
     parentFolderId: undefined,
@@ -83,8 +83,8 @@ export async function createInitialWorkspaceStructure({
   const createdDocument = await prisma.document.create({
     data: {
       id: document.id,
-      encryptedName: document.encryptedName,
-      encryptedNameNonce: document.encryptedNameNonce,
+      nameCiphertext: document.nameCiphertext,
+      nameNonce: document.nameNonce,
       workspaceKeyId: createdWorkspace.currentWorkspaceKey?.id,
       subkeyId: document.subkeyId,
       parentFolderId: folder.id,

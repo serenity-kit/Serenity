@@ -39,8 +39,8 @@ export const CreateInitialFolderInput = inputObjectType({
   definition(t) {
     t.nonNull.string("id");
     t.nonNull.string("idSignature");
-    t.nonNull.string("encryptedName");
-    t.nonNull.string("encryptedNameNonce");
+    t.nonNull.string("nameCiphertext");
+    t.nonNull.string("nameNonce");
     t.nonNull.field("keyDerivationTrace", {
       type: KeyDerivationTraceInput2,
     });
@@ -51,8 +51,8 @@ export const CreateInitialDocumentInput = inputObjectType({
   name: "CreateInitialDocumentInput",
   definition(t) {
     t.nonNull.string("id");
-    t.nonNull.string("encryptedName");
-    t.nonNull.string("encryptedNameNonce");
+    t.nonNull.string("nameCiphertext");
+    t.nonNull.string("nameNonce");
     t.nonNull.int("subkeyId");
     t.nonNull.field("snapshot", { type: DocumentSnapshotInput });
   },
