@@ -40,6 +40,7 @@ export const startLoginMutation = mutationField("startLogin", {
     try {
       z.string().email().parse(username);
     } catch (error) {
+      console.log(`Invalid email address: ${username}`);
       throw new UserInputError("Input error: invalid email address");
     }
     let result: any = undefined;
