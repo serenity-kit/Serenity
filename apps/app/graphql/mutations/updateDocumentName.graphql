@@ -2,8 +2,8 @@ mutation updateDocumentName($input: UpdateDocumentNameInput!) {
   updateDocumentName(input: $input) {
     document {
       id
-      encryptedName
-      encryptedNameNonce
+      nameCiphertext
+      nameNonce
       parentFolderId
       workspaceId
       subkeyId

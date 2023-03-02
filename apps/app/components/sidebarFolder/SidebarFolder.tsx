@@ -55,8 +55,8 @@ type Props = ViewProps & {
   folderId: string;
   parentFolderId?: string | null | undefined;
   folderName?: string;
-  encryptedName: string;
-  encryptedNameNonce?: string;
+  nameCiphertext: string;
+  nameNonce?: string;
   subkeyId: number;
   keyDerivationTrace: KeyDerivationTrace2;
   depth?: number;
@@ -108,7 +108,7 @@ export default function SidebarFolder(props: Props) {
   useEffect(() => {
     decryptName();
   }, [
-    props.encryptedName,
+    props.nameCiphertext,
     props.keyDerivationTrace.trace[props.keyDerivationTrace.trace.length - 1]
       .subkeyId,
   ]);
@@ -117,8 +117,8 @@ export default function SidebarFolder(props: Props) {
     if (
       !props.keyDerivationTrace.trace[props.keyDerivationTrace.trace.length - 1]
         .subkeyId ||
-      !props.encryptedName ||
-      !props.encryptedNameNonce
+      !props.nameCiphertext ||
+      !props.nameNonce
     ) {
       setFolderName("Untitled");
       return;
@@ -165,8 +165,8 @@ export default function SidebarFolder(props: Props) {
       const folderName = decryptFolderName({
         parentKey,
         subkeyId: folderSubkeyId,
-        ciphertext: props.encryptedName,
-        publicNonce: props.encryptedNameNonce,
+        ciphertext: props.nameCiphertext,
+        publicNonce: props.nameNonce,
       });
       setFolderName(folderName);
     } catch (error) {
@@ -228,8 +228,8 @@ export default function SidebarFolder(props: Props) {
           input: {
             id,
             workspaceId: props.workspaceId,
-            encryptedName: encryptedFolderResult.ciphertext,
-            encryptedNameNonce: encryptedFolderResult.publicNonce,
+            nameCiphertext: encryptedFolderResult.ciphertext,
+            nameNonce: encryptedFolderResult.publicNonce,
             workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
             subkeyId: encryptedFolderResult.folderSubkeyId,
             parentFolderId: props.folderId,
@@ -421,8 +421,8 @@ export default function SidebarFolder(props: Props) {
       {
         input: {
           id: props.folderId,
-          encryptedName: encryptedFolderResult.ciphertext,
-          encryptedNameNonce: encryptedFolderResult.publicNonce,
+          nameCiphertext: encryptedFolderResult.ciphertext,
+          nameNonce: encryptedFolderResult.publicNonce,
           workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
           subkeyId: encryptedFolderResult.folderSubkeyId!,
           keyDerivationTrace,
@@ -618,8 +618,8 @@ export default function SidebarFolder(props: Props) {
                         folder.keyDerivationTrace.trace.length - 1
                       ].subkeyId
                     }
-                    encryptedName={folder.encryptedName}
-                    encryptedNameNonce={folder.encryptedNameNonce}
+                    nameCiphertext={folder.nameCiphertext}
+                    nameNonce={folder.nameNonce}
                     keyDerivationTrace={folder.keyDerivationTrace}
                     onStructureChange={props.onStructureChange}
                     depth={depth + 1}
@@ -637,8 +637,8 @@ export default function SidebarFolder(props: Props) {
                     key={document.id}
                     parentFolderId={props.folderId}
                     documentId={document.id}
-                    encryptedName={document.encryptedName}
-                    encryptedNameNonce={document.encryptedNameNonce}
+                    nameCiphertext={document.nameCiphertext}
+                    nameNonce={document.nameNonce}
                     subkeyId={document.subkeyId}
                     workspaceId={props.workspaceId}
                     onRefetchDocumentsPress={refetchDocuments}

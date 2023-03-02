@@ -23,8 +23,8 @@ model Document {
   workspaceKeyId     String?
   parentFolder       Folder              @relation(fields: [parentFolderId], references: [id], onDelete: Cascade)
   parentFolderId     String
-  encryptedName      String? // a document is first created without a name
-  encryptedNameNonce String? // a document is first created without a name
+  nameCiphertext     String? // a document is first created without a name
+  nameNonce          String? // a document is first created without a name
   subkeyId           Int? // used for the name - a document is first created without a name
   documentShareLinks DocumentShareLink[]
   requiresSnapshot   Boolean             @default(false)
@@ -232,8 +232,8 @@ model WorkspaceKeyBox {
 model Folder {
   id                 String       @id @unique
   idSignature        String
-  encryptedName      String
-  encryptedNameNonce String
+  nameCiphertext     String
+  nameNonce          String
   subkeyId           Int
   workspace          Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId        String

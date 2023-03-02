@@ -2,8 +2,8 @@ mutation createFolder($input: CreateFolderInput!) {
   createFolder(input: $input) {
     folder {
       id
-      encryptedName
-      encryptedNameNonce
+      nameCiphertext
+      nameNonce
       parentFolderId
       rootFolderId
       workspaceId

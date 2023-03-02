@@ -94,8 +94,8 @@ test("user should be able to change a document name", async () => {
     authorizationHeader,
   });
   const updatedDocument = result.updateDocumentName.document;
-  expect(typeof updatedDocument.encryptedName).toBe("string");
-  expect(typeof updatedDocument.encryptedNameNonce).toBe("string");
+  expect(typeof updatedDocument.nameCiphertext).toBe("string");
+  expect(typeof updatedDocument.nameNonce).toBe("string");
   const documentSubkey = recreateDocumentKey({
     snapshotKey,
     subkeyId: updatedDocument.subkeyId,
@@ -103,8 +103,8 @@ test("user should be able to change a document name", async () => {
 
   const decryptedName = decryptDocumentTitle({
     key: documentSubkey.key,
-    ciphertext: updatedDocument.encryptedName,
-    publicNonce: updatedDocument.encryptedNameNonce,
+    ciphertext: updatedDocument.nameCiphertext,
+    publicNonce: updatedDocument.nameNonce,
     publicData: null,
   });
   expect(decryptedName).toBe(name);
@@ -238,12 +238,7 @@ describe("Input errors", () => {
     const query = gql`
       mutation {
         updateDocumentName(
-          input: {
-            id: 2
-            encryptedName: ""
-            encryptedNameNonce: ""
-            subkeyId: 1
-          }
+          input: { id: 2, nameCiphertext: "", nameNonce: "", subkeyId: 1 }
         ) {
           document {
             id
@@ -262,8 +257,8 @@ describe("Input errors", () => {
             updateDocumentName(
             input: {
               id: "${id}"
-              encryptedName: null
-              encryptedNameNonce: null
+              nameCiphertext: null
+              nameNonce: null
               subkeyId: 1
             }
           ) {
@@ -284,8 +279,8 @@ describe("Input errors", () => {
         updateDocumentName(
           input: {
             id: ""
-            encryptedName: "abc123"
-            encryptedNameNonce: "abc123"
+            nameCiphertext: "abc123"
+            nameNonce: "abc123"
             subkeyId: "lala"
           }
         ) {

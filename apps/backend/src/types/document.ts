@@ -2,8 +2,8 @@ import { WorkspaceKey } from "./workspace";
 
 export type Document = {
   id: string;
-  encryptedName?: string | null;
-  encryptedNameNonce?: string | null;
+  nameCiphertext?: string | null;
+  nameNonce?: string | null;
   workspaceKey?: WorkspaceKey | null;
   parentFolderId: string | null;
   workspaceId: string;

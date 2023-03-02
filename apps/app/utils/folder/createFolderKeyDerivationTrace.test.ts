@@ -27,8 +27,8 @@ it("should return one parent folder", async () => {
     {
       __typename: "Folder",
       id: "folderId",
-      encryptedName: "encrypted folder name",
-      encryptedNameNonce: "encrypted folder nonce",
+      nameCiphertext: "encrypted folder name",
+      nameNonce: "encrypted folder nonce",
       workspaceKeyId: "workspaceKeyId",
       subkeyId: 1,
       parentFolderId: null,
@@ -72,8 +72,8 @@ it("should return two parent folders", async () => {
     {
       __typename: "Folder",
       id: "parentFolderId",
-      encryptedName: "parent folder name",
-      encryptedNameNonce: "parent folder nonce",
+      nameCiphertext: "parent folder name",
+      nameNonce: "parent folder nonce",
       workspaceKeyId: "workspaceKeyId",
       subkeyId: 2,
       parentFolderId: null,
@@ -93,8 +93,8 @@ it("should return two parent folders", async () => {
     {
       __typename: "Folder",
       id: "childFolderId",
-      encryptedName: "child folder name",
-      encryptedNameNonce: "child folder nonce",
+      nameCiphertext: "child folder name",
+      nameNonce: "child folder nonce",
       workspaceKeyId: "workspaceKeyId",
       subkeyId: 1,
       parentFolderId: "parentFolderId",

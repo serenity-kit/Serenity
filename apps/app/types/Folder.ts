@@ -2,8 +2,8 @@ import { WorkspaceKey } from "./workspace";
 
 export type Folder = {
   id: string;
-  encryptedName: string;
-  encryptedNameNonce: string;
+  nameCiphertext: string;
+  nameNonce: string;
   subkeyId: number;
   idSignature?: string;
   parentFolderId: string | null;

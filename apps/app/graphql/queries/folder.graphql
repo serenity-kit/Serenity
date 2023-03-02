@@ -1,8 +1,8 @@
 query folder($id: ID!) {
   folder(id: $id) {
     id
-    encryptedName
-    encryptedNameNonce
+    nameCiphertext
+    nameNonce
     parentFolderId
     workspaceId
     keyDerivationTrace {
