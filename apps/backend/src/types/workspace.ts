@@ -74,7 +74,7 @@ type DbWorkspace = PrismaWorkspace & {
       }[];
     };
   })[];
-  workspaceKeys: (PrismaWorkspaceKey & {
+  workspaceKeys?: (PrismaWorkspaceKey & {
     workspaceKeyBoxes: (PrismaWorkspaceKeyBox & {
       creatorDevice: PrismaCreatorDevice;
     })[];

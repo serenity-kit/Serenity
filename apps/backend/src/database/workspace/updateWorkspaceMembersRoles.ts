@@ -76,10 +76,25 @@ export async function updateWorkspaceMembersRoles({
       where: { workspaceId: id, userId: { in: validViewerUserIds } },
       data: { role: Role.EDITOR },
     });
-    const updatedWorkspace = await prisma.workspace.findFirst({
+    const updatedWorkspace = await prisma.workspace.findFirstOrThrow({
       where: { id },
       include: {
-        usersToWorkspaces: { include: { user: true } },
+        usersToWorkspaces: {
+          include: {
+            user: {
+              select: {
+                username: true,
+                devices: {
+                  select: {
+                    signingPublicKey: true,
+                    encryptionPublicKey: true,
+                    encryptionPublicKeySignature: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
     return formatWorkspace(updatedWorkspace);

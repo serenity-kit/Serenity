@@ -27,7 +27,7 @@ export async function getWorkspace({
     include: {
       usersToWorkspaces: {
         orderBy: {
-          userId: "desc",
+          userId: "asc",
         },
         include: {
           user: {
