@@ -80,6 +80,8 @@ export default function Page({
   const { pageId: docId, setActiveSnapshotAndCommentKeys } = usePage();
   const isNew = route.params?.isNew ?? false;
   const { activeDevice, sessionKey } = useAuthenticatedAppContext();
+  const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
+  const snapshotKeyRef = useRef<Uint8Array | null>(null);
 
   let websocketHost = `wss://serenity-dev.fly.dev`;
   if (process.env.NODE_ENV === "development") {
@@ -94,15 +96,37 @@ export default function Page({
       documentId: docId,
       websocketHost,
       websocketSessionKey: sessionKey,
+      documentLoaded: () => {
+        setDocumentLoadedInfo({
+          loaded: true,
+          username: "Unknown user",
+        });
+      },
+      applySnapshot: (decryptedSnapshot) => {
+        Yjs.applyUpdate(yDocRef.current, decryptedSnapshot, "naisho-remote");
+      },
+      getSnapshotKey: async (snapshot) => {
+        const snapshotKeyData = await deriveExistingSnapshotKey(
+          docId,
+          snapshot,
+          activeDevice as LocalDevice
+        );
+        snapshotKeyRef.current = sodium.from_base64(snapshotKeyData.key);
+        return snapshotKeyRef.current;
+      },
+      applyUpdates: (decryptedUpdates) => {
+        decryptedUpdates.map((update) => {
+          Yjs.applyUpdate(yDocRef.current, update, "naisho-remote");
+        });
+      },
+      getUpdateKey: async (update) => {
+        return snapshotKeyRef.current as Uint8Array;
+      },
+      sodium,
     },
   });
 
-  console.log(state.value);
-
-  return null;
-
   const activeSnapshotIdRef = useRef<string | null>(null);
-  const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
   const websocketConnectionRef = useRef<WebSocket>(null);
   const shouldReconnectWebsocketConnectionRef = useRef(true);
@@ -113,7 +137,6 @@ export default function Page({
     username: "Unknown user",
   });
   const websocketState = useWebsocketState();
-  const snapshotKeyRef = useRef<Uint8Array | null>(null);
   const documentName = useActiveDocumentInfoStore(
     (state) => state.documentName
   );
@@ -133,7 +156,6 @@ export default function Page({
       if (initialResult) {
         Yjs.applyUpdate(yDocRef.current, initialResult, "naisho-remote");
       }
-      snapshot.publicData.snapshotId;
 
       setActiveSnapshotAndCommentKeys(
         {
@@ -539,7 +561,7 @@ export default function Page({
         });
       };
 
-      setupWebsocket();
+      // setupWebsocket();
 
       // remove awareness state when closing the window
       // TODO re-add
