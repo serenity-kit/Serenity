@@ -280,6 +280,9 @@ export const Editor = (props: EditorProps) => {
                 !editor.isEditable ||
                 editor.isActive("file")
               ) {
+                // hide the create comment bubble and clear the text when the bubble menu is blured
+                setCommentText("");
+                setHasCreateCommentBubble(false);
                 return false;
               }
 
@@ -287,51 +290,7 @@ export const Editor = (props: EditorProps) => {
             }}
           >
             <BoxShadow elevation={3} rounded ref={bubbleMenuRef}>
-              <HStack
-                space={1}
-                style={tw`p-1 bg-white border border-gray-200 rounded`}
-                alignItems="center"
-              >
-                <ToggleButton
-                  onPress={() => editor.chain().focus().toggleBold().run()}
-                  name="bold"
-                  isActive={editor.isActive("bold")}
-                />
-
-                <ToggleButton
-                  onPress={() => editor.chain().focus().toggleItalic().run()}
-                  name="italic"
-                  isActive={editor.isActive("italic")}
-                />
-
-                <ToggleButton
-                  onPress={() => editor.chain().focus().toggleCode().run()}
-                  name="code-view"
-                  isActive={editor.isActive("code")}
-                />
-
-                <EditorBottombarDivider />
-
-                <ToggleButton
-                  onPress={() =>
-                    editor.chain().focus().toggleLink({ href: "#" }).run()
-                  }
-                  name="link"
-                  isActive={editor.isActive("link")}
-                />
-
-                <EditorBottombarDivider />
-
-                <ToggleButton
-                  onPress={() => {
-                    setHasCreateCommentBubble(true);
-                  }}
-                  name="chat-1-line"
-                  isActive={false}
-                />
-              </HStack>
-
-              {hasCreateCommentBubble && (
+              {hasCreateCommentBubble ? (
                 <VStack style={tw`w-80 bg-white rounded`}>
                   <RawInput
                     placeholder="Add a comment"
@@ -339,6 +298,7 @@ export const Editor = (props: EditorProps) => {
                     onChangeText={(text) => setCommentText(text)}
                     variant={"unstyled"}
                     multiline
+                    autoFocus
                     style={tw`p-3`}
                     _stack={{
                       height: 60,
@@ -367,10 +327,57 @@ export const Editor = (props: EditorProps) => {
                             binding.mapping
                           ),
                         });
+                        setCommentText("");
+                        setHasCreateCommentBubble(false);
+                        editor.chain().focus().run();
                       }}
                     />
                   </HStack>
                 </VStack>
+              ) : (
+                <HStack
+                  space={1}
+                  style={tw`p-1 bg-white border border-gray-200 rounded`}
+                  alignItems="center"
+                >
+                  <ToggleButton
+                    onPress={() => editor.chain().focus().toggleBold().run()}
+                    name="bold"
+                    isActive={editor.isActive("bold")}
+                  />
+
+                  <ToggleButton
+                    onPress={() => editor.chain().focus().toggleItalic().run()}
+                    name="italic"
+                    isActive={editor.isActive("italic")}
+                  />
+
+                  <ToggleButton
+                    onPress={() => editor.chain().focus().toggleCode().run()}
+                    name="code-view"
+                    isActive={editor.isActive("code")}
+                  />
+
+                  <EditorBottombarDivider />
+
+                  <ToggleButton
+                    onPress={() =>
+                      editor.chain().focus().toggleLink({ href: "#" }).run()
+                    }
+                    name="link"
+                    isActive={editor.isActive("link")}
+                  />
+
+                  <EditorBottombarDivider />
+
+                  <ToggleButton
+                    onPress={() => {
+                      setHasCreateCommentBubble(true);
+                    }}
+                    name="chat-1-line"
+                    isActive={false}
+                  />
+                </HStack>
               )}
             </BoxShadow>
           </BubbleMenu>
