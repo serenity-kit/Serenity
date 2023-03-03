@@ -62,6 +62,13 @@ export const formatWorkspaceKey = (workspaceKey: any): WorkspaceKey => {
   return workspaceKey;
 };
 
+export const formatWorkspaceInvitation = (workspaceInvitation: any) => {
+  return {
+    ...workspaceInvitation,
+    role: workspaceInvitation.role as Role,
+  };
+};
+
 export const formatWorkspace = (workspace: any): Workspace => {
   const members: WorkspaceMember[] = [];
   workspace.usersToWorkspaces.forEach(

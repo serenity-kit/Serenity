@@ -1,6 +1,7 @@
 import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
@@ -119,6 +120,7 @@ test("user can remove another user", async () => {
 
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
+    role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
   });
@@ -250,6 +252,7 @@ test("user can rotate key for multiple devices", async () => {
   });
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
+    role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
   });

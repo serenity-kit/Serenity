@@ -2,6 +2,8 @@ import {
   Button,
   Description,
   Heading,
+  Select,
+  SelectItem,
   TextArea,
   tw,
   View,
@@ -12,6 +14,7 @@ import { useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import sodium from "react-native-libsodium";
 import {
+  Role,
   useCreateWorkspaceInvitationMutation,
   useDeleteWorkspaceInvitationsMutation,
   useWorkspaceInvitationsQuery,
@@ -25,6 +28,7 @@ type WorkspaceInvitation = {
   workspaceId: string;
   inviterUserId: string;
   inviterUsername: string;
+  role: Role;
   expiresAt: Date;
 };
 
@@ -53,7 +57,38 @@ export function CreateWorkspaceInvitation(props: Props) {
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [isClipboardNoticeActive, setIsClipboardNoticeActive] =
     useState<boolean>(false);
+  const [sharingRole, _setSharingRole] = useState<Role>(Role.Viewer);
   const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 2;
+
+  const setSharingRole = (role: string) => {
+    if (role === "admin") {
+      _setSharingRole(Role.Admin);
+    } else if (role === "editor") {
+      _setSharingRole(Role.Editor);
+    } else if (role === "viewer") {
+      _setSharingRole(Role.Viewer);
+    } else if (role === "commenter") {
+      _setSharingRole(Role.Commenter);
+    } else {
+      console.error(`Unknown role: ${role}`);
+      _setSharingRole(Role.Commenter);
+    }
+  };
+
+  const getRoleAsString = (role: Role): string | undefined => {
+    if (role === Role.Admin) {
+      return "admin";
+    } else if (role === Role.Editor) {
+      return "editor";
+    } else if (role === Role.Viewer) {
+      return "viewer";
+    } else if (role === Role.Commenter) {
+      return "commenter";
+    } else {
+      console.error(`Unknown role: ${role}`);
+      return undefined;
+    }
+  };
 
   const getWorkspaceInvitationText = () => {
     if (!selectedWorkspaceInvitationId) {
@@ -75,15 +110,17 @@ export function CreateWorkspaceInvitation(props: Props) {
   };
 
   const createWorkspaceInvitationPreflight = async () => {
+    console.log("createWorkspaceInvitationPreflight()");
     const mainDevice = getMainDevice();
     if (!mainDevice) {
       setIsPasswordModalVisible(true);
       return;
     }
-    createWorkspaceInvitation();
+    createWorkspaceInvitation(sharingRole);
   };
 
-  const createWorkspaceInvitation = async () => {
+  const createWorkspaceInvitation = async (sharingRole: Role) => {
+    console.log("createWorkspaceInvitation()");
     const invitationSigningKeys = sodium.crypto_sign_keypair();
     const invitationIdLengthBytes = 24;
     const invitationId = sodium.to_base64(
@@ -98,13 +135,14 @@ export function CreateWorkspaceInvitation(props: Props) {
       invitationSigningPublicKey: sodium.to_base64(
         invitationSigningKeys.publicKey
       ),
+      role: getRoleAsString(sharingRole),
       expiresAt: expiresAt.toISOString(),
     });
     const invitationDataSignature = sodium.crypto_sign_detached(
       invitationData!,
       invitationSigningKeys.privateKey
     );
-
+    console.log("invitationDataSignature", invitationDataSignature);
     const createWorkspaceInvitationResult =
       await createWorkspaceInvitationMutation({
         input: {
@@ -114,9 +152,14 @@ export function CreateWorkspaceInvitation(props: Props) {
             invitationSigningKeys.publicKey
           ),
           expiresAt,
+          role: sharingRole,
           invitationDataSignature: sodium.to_base64(invitationDataSignature),
         },
       });
+    console.log(
+      "createWorkspaceInvitationResult",
+      createWorkspaceInvitationResult
+    );
     refetchWorkspaceInvitationsResult();
     if (
       createWorkspaceInvitationResult.data?.createWorkspaceInvitation &&
@@ -170,12 +213,27 @@ export function CreateWorkspaceInvitation(props: Props) {
           ? getWorkspaceInvitationText()
           : 'The invitation text and link will be generated here\nClick on "Create invitation" to generate a new invitation'}
       </TextArea>
-      <Button
-        onPress={createWorkspaceInvitationPreflight}
-        style={styles.invitationButton}
-      >
-        Create Invitation
-      </Button>
+      <View style={tw`flex-row justify-between`}>
+        <Select
+          defaultValue="viewer"
+          onValueChange={(value) => {
+            setSharingRole(value);
+          }}
+          testID="invite-members__select-role"
+        >
+          <SelectItem label="Admin" value="admin" />
+          <SelectItem label="Editor" value="editor" />
+          <SelectItem label="Commenter" value="admin" />
+          <SelectItem label="Viewer" value="viewer" />
+        </Select>
+        <Button
+          onPress={createWorkspaceInvitationPreflight}
+          style={styles.invitationButton}
+          testID="invite-members__create-invitation-button"
+        >
+          Create Invitation
+        </Button>
+      </View>
       <View style={tw`mb-5`}>
         <Heading lvl={3} padded>
           Invite links
@@ -203,7 +261,7 @@ export function CreateWorkspaceInvitation(props: Props) {
         description="Creating a workspace invitation requires access to the main account and therefore verifying your password is required"
         onSuccess={() => {
           setIsPasswordModalVisible(false);
-          createWorkspaceInvitation();
+          createWorkspaceInvitation(sharingRole);
         }}
         onCancel={() => {
           setIsPasswordModalVisible(false);

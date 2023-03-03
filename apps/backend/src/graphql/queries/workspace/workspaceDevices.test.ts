@@ -1,5 +1,6 @@
 import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDevicesToWorkspaces } from "../../../../test/helpers/device/attachDevicesToWorkspaces";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
@@ -60,6 +61,7 @@ test("One key on first run", async () => {
 test("new user results in added device", async () => {
   const invitationResult = await createWorkspaceInvitation({
     graphql,
+    role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
   });
