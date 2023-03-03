@@ -11,7 +11,7 @@ test.describe("Workspace Sharing", () => {
   let workspaceInvitationUrl = "";
   let sharedWorkspaceId = "";
 
-  test.only("User 1 can create a sharing link", async ({ page }) => {
+  test("User 1 can create a sharing link", async ({ page }) => {
     const userId = uuidv4();
     const username = `${uuidv4()}@example.com`;
     const password = "pass";
