@@ -15,11 +15,14 @@ import { Platform, StyleSheet } from "react-native";
 import sodium from "react-native-libsodium";
 import {
   Role,
+  runCreateWorkspaceInvitationMutation,
   useCreateWorkspaceInvitationMutation,
   useDeleteWorkspaceInvitationsMutation,
   useWorkspaceInvitationsQuery,
 } from "../../generated/graphql";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
+import { getRoleAsString } from "../../utils/workspace/getRoleAsString";
+
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { WorkspaceInvitationList } from "./WorkspaceInvitationList";
 
@@ -71,22 +74,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       _setSharingRole(Role.Commenter);
     } else {
       console.error(`Unknown role: ${role}`);
-      _setSharingRole(Role.Commenter);
-    }
-  };
-
-  const getRoleAsString = (role: Role): string | undefined => {
-    if (role === Role.Admin) {
-      return "admin";
-    } else if (role === Role.Editor) {
-      return "editor";
-    } else if (role === Role.Viewer) {
-      return "viewer";
-    } else if (role === Role.Commenter) {
-      return "commenter";
-    } else {
-      console.error(`Unknown role: ${role}`);
-      return undefined;
+      _setSharingRole(Role.Viewer);
     }
   };
 
@@ -110,7 +98,6 @@ export function CreateWorkspaceInvitation(props: Props) {
   };
 
   const createWorkspaceInvitationPreflight = async () => {
-    console.log("createWorkspaceInvitationPreflight()");
     const mainDevice = getMainDevice();
     if (!mainDevice) {
       setIsPasswordModalVisible(true);
@@ -120,7 +107,6 @@ export function CreateWorkspaceInvitation(props: Props) {
   };
 
   const createWorkspaceInvitation = async (sharingRole: Role) => {
-    console.log("createWorkspaceInvitation()");
     const invitationSigningKeys = sodium.crypto_sign_keypair();
     const invitationIdLengthBytes = 24;
     const invitationId = sodium.to_base64(
@@ -142,9 +128,8 @@ export function CreateWorkspaceInvitation(props: Props) {
       invitationData!,
       invitationSigningKeys.privateKey
     );
-    console.log("invitationDataSignature", invitationDataSignature);
     const createWorkspaceInvitationResult =
-      await createWorkspaceInvitationMutation({
+      await runCreateWorkspaceInvitationMutation({
         input: {
           workspaceId,
           invitationId,

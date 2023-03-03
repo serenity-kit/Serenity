@@ -28,15 +28,6 @@ export async function createWorkspaceInvitation({
   role,
   inviterUserId,
 }: Params) {
-  console.log({
-    workspaceId,
-    invitationId,
-    invitationSigningPublicKey,
-    invitationDataSignature,
-    expiresAt,
-    role,
-    inviterUserId,
-  });
   const expiresAtErrorMarginMillis = 1000 * 60 * 60 * 2; // 2 hours
   const maxExpirationTime = new Date(Date.now() + expiresAtErrorMarginMillis);
   if (maxExpirationTime > expiresAt) {
@@ -55,13 +46,11 @@ export async function createWorkspaceInvitation({
     role: roleAsString,
     expiresAt: expiresAt.toISOString(),
   });
-  console.log({ expectedSigningData });
   const doesSignatureVerify = sodium.crypto_sign_verify_detached(
     sodium.from_base64(invitationDataSignature),
     expectedSigningData!,
     sodium.from_base64(invitationSigningPublicKey)
   );
-  console.log({ doesSignatureVerify });
   if (!doesSignatureVerify) {
     throw new UserInputError("invalid invitationDataSignature");
   }
@@ -89,11 +78,9 @@ export async function createWorkspaceInvitation({
       role: true,
     },
   });
-  console.log({ userToWorkspace });
   if (!userToWorkspace || !userToWorkspace.role) {
     throw new ForbiddenError("Unauthorized");
   }
-  console.log({ userToWorkspace });
   const rawWorkspaceInvitation = await prisma.workspaceInvitations.create({
     data: {
       id: invitationId,
@@ -101,16 +88,14 @@ export async function createWorkspaceInvitation({
       inviterUserId,
       invitationSigningPublicKey,
       invitationDataSignature,
-      role: Role.ADMIN,
+      role,
       expiresAt: new Date(Date.now() + INVITATION_EXPIRATION_TIME),
     },
   });
-  console.log({ rawWorkspaceInvitation });
   const workspaceInvitation: WorkspaceInvitation = {
     ...rawWorkspaceInvitation,
     inviterUsername: userToWorkspace.user.username,
     workspaceName: userToWorkspace.workspace.name,
   };
-  console.log({ workspaceInvitation });
   return workspaceInvitation;
 }

@@ -57,7 +57,6 @@ export const createWorkspaceInvitationMutation = mutationField(
       ),
     },
     async resolve(root, args, context) {
-      console.log({ args });
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
