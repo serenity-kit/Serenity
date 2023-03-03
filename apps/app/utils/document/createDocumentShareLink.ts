@@ -30,11 +30,13 @@ export const getDocumentShareLinkUrl = (
 
 export type Props = {
   documentId: string;
+  sharingRole: Role;
   creatorDevice: Device;
   creatorDeviceEncryptionPrivateKey: string;
 };
 export const createDocumentShareLink = async ({
   documentId,
+  sharingRole,
   creatorDevice,
   creatorDeviceEncryptionPrivateKey,
 }: Props) => {
@@ -83,7 +85,7 @@ export const createDocumentShareLink = async ({
         deviceEncryptionPublicKeySignature:
           virtualDevice.encryptionPublicKeySignature,
         documentId: documentId,
-        sharingRole: Role.Viewer,
+        sharingRole,
         snapshotDeviceKeyBox,
       },
     },
