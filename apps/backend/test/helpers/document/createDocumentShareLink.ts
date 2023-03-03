@@ -62,6 +62,7 @@ export const createDocumentShareLink = async ({
     mutation createDocumentShareLink($input: CreateDocumentShareLinkInput!) {
       createDocumentShareLink(input: $input) {
         token
+        role
       }
     }
   `;

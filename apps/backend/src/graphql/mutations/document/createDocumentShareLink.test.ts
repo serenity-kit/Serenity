@@ -38,7 +38,8 @@ beforeAll(async () => {
   await setup();
 });
 
-test("create share link", async () => {
+test("create admin share link", async () => {
+  const sharingRole = Role.ADMIN;
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
   const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
@@ -52,14 +53,119 @@ test("create share link", async () => {
   const documentShareLinkResponse = await createDocumentShareLink({
     graphql,
     documentId: userData1.document.id,
-    sharingRole: Role.EDITOR,
+    sharingRole,
     creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
     creatorDevice,
     snapshotKey: snapshotKeyData.key,
     authorizationHeader: userData1.sessionKey,
   });
-  const token = documentShareLinkResponse.createDocumentShareLink.token;
-  expect(typeof token).toBe("string");
+  const documentShareLink = documentShareLinkResponse.createDocumentShareLink;
+  expect(typeof documentShareLink.token).toBe("string");
+  expect(documentShareLink.role).toBe(sharingRole);
+});
+
+test("create editor share link", async () => {
+  const sharingRole = Role.EDITOR;
+  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
+    userData1.webDevice;
+  const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: userData1.folder.keyDerivationTrace,
+    activeDevice: userData1.webDevice,
+    workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+  });
+  const snapshotKeyData = createSnapshotKey({
+    folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
+  });
+  const documentShareLinkResponse = await createDocumentShareLink({
+    graphql,
+    documentId: userData1.document.id,
+    sharingRole,
+    creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+    creatorDevice,
+    snapshotKey: snapshotKeyData.key,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const documentShareLink = documentShareLinkResponse.createDocumentShareLink;
+  expect(typeof documentShareLink.token).toBe("string");
+  expect(documentShareLink.role).toBe(sharingRole);
+});
+
+test("create commenter share link", async () => {
+  const sharingRole = Role.COMMENTER;
+  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
+    userData1.webDevice;
+  const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: userData1.folder.keyDerivationTrace,
+    activeDevice: userData1.webDevice,
+    workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+  });
+  const snapshotKeyData = createSnapshotKey({
+    folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
+  });
+  const documentShareLinkResponse = await createDocumentShareLink({
+    graphql,
+    documentId: userData1.document.id,
+    sharingRole,
+    creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+    creatorDevice,
+    snapshotKey: snapshotKeyData.key,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const documentShareLink = documentShareLinkResponse.createDocumentShareLink;
+  expect(typeof documentShareLink.token).toBe("string");
+  expect(documentShareLink.role).toBe(sharingRole);
+});
+
+test("create viewer share link", async () => {
+  const sharingRole = Role.VIEWER;
+  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
+    userData1.webDevice;
+  const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: userData1.folder.keyDerivationTrace,
+    activeDevice: userData1.webDevice,
+    workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+  });
+  const snapshotKeyData = createSnapshotKey({
+    folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
+  });
+  const documentShareLinkResponse = await createDocumentShareLink({
+    graphql,
+    documentId: userData1.document.id,
+    sharingRole,
+    creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+    creatorDevice,
+    snapshotKey: snapshotKeyData.key,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const documentShareLink = documentShareLinkResponse.createDocumentShareLink;
+  expect(typeof documentShareLink.token).toBe("string");
+  expect(documentShareLink.role).toBe(sharingRole);
+});
+
+test("Invalid ownership", async () => {
+  const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
+    userData1.webDevice;
+  const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: userData1.folder.keyDerivationTrace,
+    activeDevice: userData1.webDevice,
+    workspaceKeyBox: user1Workspace.currentWorkspaceKey.workspaceKeyBox,
+  });
+  const snapshotKeyData = createSnapshotKey({
+    folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
+  });
+  await expect(
+    (async () =>
+      await createDocumentShareLink({
+        graphql,
+        documentId: userData1.document.id,
+        //@ts-ignore: invalid role type
+        sharingRole: "bad-role",
+        creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+        creatorDevice,
+        snapshotKey: snapshotKeyData.key,
+        authorizationHeader: userData1.sessionKey,
+      }))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("Invalid ownership", async () => {
