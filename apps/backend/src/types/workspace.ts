@@ -1,5 +1,12 @@
-import { Role } from "../../prisma/generated/output";
-import { CreatorDevice, Device } from "./device";
+import {
+  CreatorDevice as PrismaCreatorDevice,
+  Role,
+  UsersToWorkspaces,
+  Workspace as PrismaWorkspace,
+  WorkspaceKey as PrismaWorkspaceKey,
+  WorkspaceKeyBox as PrismaWorkspaceKeyBox,
+} from "../../prisma/generated/output";
+import { CreatorDevice, Device, MinimalDevice } from "./device";
 
 export type MemberIdWithDevice = {
   id: string;
@@ -33,6 +40,7 @@ export type WorkspaceMember = {
   userId: string;
   username: string | undefined | null;
   role: Role;
+  devices: MinimalDevice[];
 };
 
 export type Workspace = {
@@ -55,6 +63,24 @@ export type WorkspaceInvitation = {
   expiresAt: Date;
 };
 
+type DbWorkspace = PrismaWorkspace & {
+  usersToWorkspaces: (UsersToWorkspaces & {
+    user: {
+      username: string;
+      devices: {
+        signingPublicKey: string;
+        encryptionPublicKey: string;
+        encryptionPublicKeySignature: string;
+      }[];
+    };
+  })[];
+  workspaceKeys: (PrismaWorkspaceKey & {
+    workspaceKeyBoxes: (PrismaWorkspaceKeyBox & {
+      creatorDevice: PrismaCreatorDevice;
+    })[];
+  })[];
+};
+
 export const formatWorkspaceKey = (workspaceKey: any): WorkspaceKey => {
   if (workspaceKey.workspaceKeyBoxes) {
     workspaceKey.workspaceKeyBox = workspaceKey.workspaceKeyBoxes[0];
@@ -62,32 +88,38 @@ export const formatWorkspaceKey = (workspaceKey: any): WorkspaceKey => {
   return workspaceKey;
 };
 
-export const formatWorkspace = (workspace: any): Workspace => {
+export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
   const members: WorkspaceMember[] = [];
-  workspace.usersToWorkspaces.forEach(
-    (member: { userId: string; user: any; role: Role }) => {
-      const workspaceMember: WorkspaceMember = {
-        userId: member.userId,
-        username: member.user.username,
-        role: member.role,
-      };
-      members.push(workspaceMember);
-    }
-  );
+  workspace.usersToWorkspaces.forEach((member) => {
+    const workspaceMember: WorkspaceMember = {
+      userId: member.userId,
+      username: member.user.username,
+      role: member.role,
+      devices: member.user.devices,
+    };
+    members.push(workspaceMember);
+  });
   let currentWorkspaceKey: WorkspaceKey | undefined = undefined;
+  const workspaceKeys: WorkspaceKey[] = [];
   if (workspace.workspaceKeys) {
     for (let workspaceKey of workspace.workspaceKeys) {
       if (!currentWorkspaceKey) {
         currentWorkspaceKey = workspaceKey;
       }
-      if (workspaceKey.workspaceKeyBoxes) {
-        workspaceKey.workspaceKeyBox = workspaceKey.workspaceKeyBoxes[0];
-      }
+
+      workspaceKeys.push({
+        ...workspaceKey,
+        workspaceKeyBox:
+          workspaceKey.workspaceKeyBoxes?.length > 0
+            ? workspaceKey.workspaceKeyBoxes[0]
+            : undefined,
+      });
     }
   }
   return {
     ...workspace,
     members: members,
     currentWorkspaceKey: currentWorkspaceKey,
+    workspaceKeys,
   };
 };

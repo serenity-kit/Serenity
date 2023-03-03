@@ -12,7 +12,6 @@ query commentsByDocumentId($documentId: ID!, $first: Int = 50, $after: String) {
         signingPublicKey
         encryptionPublicKey
         encryptionPublicKeySignature
-        createdAt
       }
       commentReplies {
         id
@@ -21,6 +20,11 @@ query commentsByDocumentId($documentId: ID!, $first: Int = 50, $after: String) {
         contentCiphertext
         contentNonce
         createdAt
+        creatorDevice {
+          signingPublicKey
+          encryptionPublicKey
+          encryptionPublicKeySignature
+        }
       }
     }
     pageInfo {

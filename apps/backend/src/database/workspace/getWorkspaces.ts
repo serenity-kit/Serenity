@@ -47,6 +47,13 @@ export async function getWorkspaces({
           user: {
             select: {
               username: true,
+              devices: {
+                select: {
+                  signingPublicKey: true,
+                  encryptionPublicKey: true,
+                  encryptionPublicKeySignature: true,
+                },
+              },
             },
           },
         },
