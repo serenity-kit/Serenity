@@ -19,13 +19,13 @@ type UserData = {
 const user1: UserData = {
   id: uuidv4(),
   username: `${uuidv4()}@example.com`,
-  password: "pass",
+  password: "password",
   data: undefined,
 };
 const user2: UserData = {
   id: uuidv4(),
   username: `${uuidv4()}@example.com`,
-  password: "pass",
+  password: "password",
   data: undefined,
 };
 

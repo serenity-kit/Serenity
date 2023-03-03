@@ -10,7 +10,7 @@ import { verifyPassword } from "../../helpers/e2e/verifyPassword";
 test.describe("Devices", () => {
   test("User can log in from two devices", async ({ browser, page }) => {
     const username = `${uuidv4()}@example.com`;
-    const password = "pass";
+    const password = "password";
     await page.goto("http://localhost:19006/register");
     const { workspace, document } = await e2eRegisterUser({
       page,

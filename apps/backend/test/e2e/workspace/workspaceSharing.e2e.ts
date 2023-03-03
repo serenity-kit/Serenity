@@ -14,7 +14,7 @@ test.describe("Workspace Sharing", () => {
   test("User 1 can create a sharing link", async ({ page }) => {
     const userId = uuidv4();
     const username = `${uuidv4()}@example.com`;
-    const password = "pass";
+    const password = "password";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
       username,
@@ -38,7 +38,7 @@ test.describe("Workspace Sharing", () => {
   test("Existing other user can accept workspace", async ({ page }) => {
     const userId = uuidv4();
     const username = `${uuidv4()}@example.com`;
-    const password = "pass";
+    const password = "password";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
       username,
@@ -72,7 +72,7 @@ test.describe("Workspace Sharing", () => {
   test("Unauthenticated other user can accept workspace", async ({ page }) => {
     const userId = uuidv4();
     const username = `${uuidv4()}@example.com`;
-    const password = "pass";
+    const password = "password";
     await createUserWithWorkspace({
       id: userId,
       username,
@@ -93,7 +93,7 @@ test.describe("Workspace Sharing", () => {
 
   test("Unregistered other user can accept workspace", async ({ page }) => {
     const username = `${uuidv4()}@example.com`;
-    const password = "pass";
+    const password = "password";
     const workspaceName = "my workspace";
     await page.goto(workspaceInvitationUrl);
     await delayForSeconds(2);
