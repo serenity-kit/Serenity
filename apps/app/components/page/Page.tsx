@@ -12,6 +12,7 @@ import {
   getSnapshotInProgress,
   getUpdateInProgress,
   getWebsocketState,
+  naishoMachine,
   removePending,
   removeSnapshotInProgress,
   removeUpdateFromInProgressQueue,
@@ -27,6 +28,7 @@ import {
   sleep,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
+import { useMachine } from "@xstate/react";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair, to_base64 } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
@@ -77,7 +79,28 @@ export default function Page({
 }: Props) {
   const { pageId: docId, setActiveSnapshotAndCommentKeys } = usePage();
   const isNew = route.params?.isNew ?? false;
-  const { activeDevice } = useAuthenticatedAppContext();
+  const { activeDevice, sessionKey } = useAuthenticatedAppContext();
+
+  let websocketHost = `wss://serenity-dev.fly.dev`;
+  if (process.env.NODE_ENV === "development") {
+    websocketHost = `ws://localhost:4000`;
+  }
+  if (process.env.SERENITY_ENV === "e2e") {
+    websocketHost = `ws://localhost:4001`;
+  }
+
+  const [state, send] = useMachine(naishoMachine, {
+    context: {
+      documentId: docId,
+      websocketHost,
+      websocketSessionKey: sessionKey,
+    },
+  });
+
+  console.log(state.value);
+
+  return null;
+
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
