@@ -4,7 +4,7 @@ import {
   createAwarenessUpdate,
   verifyAndDecryptAwarenessUpdate,
 } from "./awarenessUpdate";
-import { verifyAndDecryptSnapshot } from "./snapshot";
+import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
 import { createUpdate, verifyAndDecryptUpdate } from "./update";
 
 interface Context {
@@ -13,11 +13,21 @@ interface Context {
   websocketHost: string;
   websocketSessionKey: string;
   applySnapshot: (decryptedSnapshot: any) => void;
-  getSnapshotKey: (snapshot: any) => Promise<Uint8Array>;
+  getSnapshotKey: (snapshot: any | undefined) => Promise<Uint8Array>;
+  getNewSnapshotData: () => Promise<{
+    readonly id: string;
+    readonly data: Uint8Array | string;
+    readonly key: Uint8Array;
+    readonly publicData: any;
+  }>;
   applyUpdates: (updates: any[]) => void;
   getUpdateKey: (update: any) => Promise<Uint8Array>;
   applyEphemeralUpdates: (ephemeralUpdates: any[]) => void;
   getEphemeralUpdateKey: () => Promise<Uint8Array>;
+  shouldSendSnapshot: (info: {
+    activeSnapshotId: string | null;
+    latestServerVersion: number | null;
+  }) => boolean;
   documentLoaded: () => void;
   websocketActor?: any;
   incomingQueue: any[];
@@ -43,6 +53,9 @@ interface Context {
 // TODO rename awareness to ephemeral
 
 // TODO remove event listener
+// TODO websocket reconnecting
+// TODO snapshot in progress & failed snapshot retrying
+// TODO updates retrying
 
 const websocketService = (context) => (send, onReceive) => {
   const websocketConnection = new WebSocket(
@@ -165,10 +178,18 @@ export const syncMachine =
         applySnapshot: () => undefined,
         getSnapshotKey: () => Promise.resolve(new Uint8Array()),
         applyUpdates: () => undefined,
+        getNewSnapshotData: () =>
+          Promise.resolve({
+            id: "",
+            data: "",
+            key: new Uint8Array(),
+            publicData: {},
+          }),
         getUpdateKey: () => Promise.resolve(new Uint8Array()),
         applyEphemeralUpdates: () => undefined,
         getEphemeralUpdateKey: () => Promise.resolve(new Uint8Array()),
         documentLoaded: () => undefined,
+        shouldSendSnapshot: () => false,
         incomingQueue: [],
         pendingUpdatesQueue: [],
         sodium: {},
@@ -317,6 +338,35 @@ export const syncMachine =
           let activeSnapshotId = context.activeSnapshotId;
           let latestServerVersion = context.latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
+
+          const createAndSendSnapshot = async () => {
+            const snapshotData = await context.getNewSnapshotData();
+            const publicData = {
+              ...snapshotData.publicData,
+              snapshotId: snapshotData.id,
+              docId: context.documentId,
+              pubKey: context.sodium.to_base64(
+                context.signatureKeyPair.publicKey
+              ),
+            };
+            const snapshot = createSnapshot(
+              snapshotData.data,
+              publicData,
+              snapshotData.key,
+              context.signatureKeyPair
+            );
+
+            // addSnapshotToInProgress(snapshot);
+
+            send({
+              type: "SEND",
+              message: JSON.stringify({
+                ...snapshot,
+                lastKnownSnapshotId: context.activeSnapshotId,
+                latestServerVersion: context.latestServerVersion,
+              }),
+            });
+          };
 
           const createAndSendUpdate = (
             update,
@@ -532,13 +582,23 @@ export const syncMachine =
             }
           } else if (context.pendingUpdatesQueue.length > 0) {
             handledQueue = "pending";
-            const key = await context.getUpdateKey(event);
-            const rawUpdates = context.pendingUpdatesQueue;
-            // add a compact changes function to queue and make sure all pending updates are sent as one update
-            if (activeSnapshotId === null) {
-              throw new Error("No active snapshot id");
+
+            if (
+              context.shouldSendSnapshot({
+                activeSnapshotId,
+                latestServerVersion,
+              })
+            ) {
+              createAndSendSnapshot();
+            } else {
+              const key = await context.getUpdateKey(event);
+              const rawUpdates = context.pendingUpdatesQueue;
+              // TODO add a compact changes function to queue and make sure all pending updates are sent as one update
+              if (activeSnapshotId === null) {
+                throw new Error("No active snapshot id");
+              }
+              createAndSendUpdate(rawUpdates[0], key, activeSnapshotId);
             }
-            createAndSendUpdate(rawUpdates[0], key, activeSnapshotId);
           }
 
           return {

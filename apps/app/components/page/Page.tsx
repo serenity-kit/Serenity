@@ -4,6 +4,7 @@ import {
   createSnapshot,
   dispatchWebsocketState,
   getWebsocketState,
+  KeyDerivationTrace2,
   syncMachine,
   useWebsocketState,
 } from "@naisho/core";
@@ -66,7 +67,11 @@ export default function Page({
   const isNew = route.params?.isNew ?? false;
   const { activeDevice, sessionKey } = useAuthenticatedAppContext();
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
-  const snapshotKeyRef = useRef<Uint8Array | null>(null);
+  const snapshotKeyRef = useRef<{
+    keyDerivationTrace: KeyDerivationTrace2;
+    subkeyId: string;
+    key: Uint8Array;
+  } | null>(null);
 
   let websocketHost = `wss://serenity-dev.fly.dev`;
   if (process.env.NODE_ENV === "development") {
@@ -88,8 +93,23 @@ export default function Page({
           username: "Unknown user",
         });
       },
-      applySnapshot: (decryptedSnapshot) => {
-        Yjs.applyUpdate(yDocRef.current, decryptedSnapshot, "naisho-remote");
+      applySnapshot: (decryptedSnapshotData) => {
+        Yjs.applyUpdate(
+          yDocRef.current,
+          decryptedSnapshotData,
+          "naisho-remote"
+        );
+      },
+      getNewSnapshotData: async () => {
+        return {
+          id: uuidv4(),
+          data: Yjs.encodeStateAsUpdate(yDocRef.current),
+          key: snapshotKeyRef.current?.key as Uint8Array,
+          publicData: {
+            keyDerivationTrace: snapshotKeyRef.current?.keyDerivationTrace,
+            subkeyId: snapshotKeyRef.current?.subkeyId,
+          },
+        };
       },
       getSnapshotKey: async (snapshot) => {
         const snapshotKeyData = await deriveExistingSnapshotKey(
@@ -97,8 +117,15 @@ export default function Page({
           snapshot,
           activeDevice as LocalDevice
         );
-        snapshotKeyRef.current = sodium.from_base64(snapshotKeyData.key);
-        return snapshotKeyRef.current;
+
+        const key = sodium.from_base64(snapshotKeyData.key);
+        snapshotKeyRef.current = {
+          keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
+          subkeyId: snapshot.publicData.subkeyId,
+          key,
+        };
+
+        return key;
       },
       applyUpdates: (decryptedUpdates) => {
         decryptedUpdates.map((update) => {
@@ -106,7 +133,11 @@ export default function Page({
         });
       },
       getUpdateKey: async (update) => {
-        return snapshotKeyRef.current as Uint8Array;
+        return snapshotKeyRef.current?.key as Uint8Array;
+      },
+      shouldSendSnapshot: ({ latestServerVersion }) => {
+        // create a new snapshot if the active snapshot has more than 100 updates
+        return latestServerVersion !== null && latestServerVersion > 100;
       },
       applyEphemeralUpdates: (decryptedEphemeralUpdates) => {
         decryptedEphemeralUpdates.map((ephemeralUpdate) => {
@@ -114,7 +145,7 @@ export default function Page({
         });
       },
       getEphemeralUpdateKey: async () => {
-        return snapshotKeyRef.current as Uint8Array;
+        return snapshotKeyRef.current?.key as Uint8Array;
       },
       sodium,
     },
