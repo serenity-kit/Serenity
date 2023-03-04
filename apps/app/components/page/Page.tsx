@@ -1,21 +1,17 @@
 import {
-  addPendingSnapshot,
-  addPendingUpdate,
   addSnapshotToInProgress,
   addUpdateToInProgressQueue,
   cleanupUpdates,
-  createAwarenessUpdate,
   createSnapshot,
   createUpdate,
   dispatchWebsocketState,
   getPending,
-  getSnapshotInProgress,
   getUpdateInProgress,
   getWebsocketState,
-  naishoMachine,
   removePending,
   removeSnapshotInProgress,
   removeUpdateFromInProgressQueue,
+  syncMachine,
   useWebsocketState,
   verifyAndDecryptAwarenessUpdate,
   verifyAndDecryptSnapshot,
@@ -35,7 +31,6 @@ import { v4 as uuidv4 } from "uuid";
 import {
   applyAwarenessUpdate,
   Awareness,
-  encodeAwarenessUpdate,
   removeAwarenessStates,
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
@@ -91,9 +86,10 @@ export default function Page({
     websocketHost = `ws://localhost:4001`;
   }
 
-  const [state, send] = useMachine(naishoMachine, {
+  const [state, send] = useMachine(syncMachine, {
     context: {
       documentId: docId,
+      signatureKeyPair,
       websocketHost,
       websocketSessionKey: sessionKey,
       documentLoaded: () => {
@@ -125,6 +121,8 @@ export default function Page({
       sodium,
     },
   });
+
+  console.log("Page state: ", state.value);
 
   const activeSnapshotIdRef = useRef<string | null>(null);
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
@@ -327,6 +325,7 @@ export default function Page({
   useEffect(() => {
     async function initDocument() {
       await sodium.ready;
+      let loaded = false;
 
       const localDocument = await getLocalDocument(docId);
       if (localDocument) {
@@ -335,6 +334,7 @@ export default function Page({
           localDocument.content,
           "serenity-local-sqlite"
         );
+        loaded = true;
         setDocumentLoadedInfo({
           loaded: true,
           username: "Unknown user",
@@ -342,6 +342,10 @@ export default function Page({
       }
 
       const me = await runMeQuery({});
+      setDocumentLoadedInfo({
+        loaded,
+        username: me.data?.me?.username ?? "Unknown user",
+      });
 
       let document: Document | undefined = undefined;
       try {
@@ -364,28 +368,7 @@ export default function Page({
       const onWebsocketMessage = async (event) => {
         const data = JSON.parse(event.data);
         switch (data.type) {
-          case "documentNotFound":
-            // TODO stop reconnecting
-            break;
-          case "unauthorized":
-            // TODO stop reconnecting
-            break;
           case "document":
-            if (data.snapshot) {
-              const snapshotKeyData1 = await deriveExistingSnapshotKey(
-                docId,
-                data.snapshot,
-                activeDevice as LocalDevice
-              );
-              snapshotKeyRef.current = sodium.from_base64(snapshotKeyData1.key);
-              applySnapshot(data.snapshot, snapshotKeyRef.current);
-            }
-            applyUpdates(data.updates, snapshotKeyRef.current);
-            setDocumentLoadedInfo({
-              loaded: true,
-              username: me.data?.me?.username ?? "Unknown user",
-            });
-
             // check for pending snapshots or pending updates and run them
             const pendingChanges = getPending(docId);
             if (pendingChanges.type === "snapshot") {
@@ -573,30 +556,30 @@ export default function Page({
       // );
       // });
 
-      yAwarenessRef.current.on("update", ({ added, updated, removed }) => {
-        if (!getWebsocketState().connected || !snapshotKeyRef.current) {
-          return;
-        }
+      // yAwarenessRef.current.on("update", ({ added, updated, removed }) => {
+      //   if (!getWebsocketState().connected || !snapshotKeyRef.current) {
+      //     return;
+      //   }
 
-        const changedClients = added.concat(updated).concat(removed);
-        const yAwarenessUpdate = encodeAwarenessUpdate(
-          yAwarenessRef.current,
-          changedClients
-        );
-        const publicData = {
-          docId,
-          pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-        };
-        const awarenessUpdate = createAwarenessUpdate(
-          yAwarenessUpdate,
-          publicData,
-          snapshotKeyRef.current,
-          signatureKeyPair
-        );
-        console.log("send awarenessUpdate");
-        // @ts-expect-error TODO handle later
-        websocketConnectionRef.current.send(JSON.stringify(awarenessUpdate));
-      });
+      //   const changedClients = added.concat(updated).concat(removed);
+      //   const yAwarenessUpdate = encodeAwarenessUpdate(
+      //     yAwarenessRef.current,
+      //     changedClients
+      //   );
+      //   const publicData = {
+      //     docId,
+      //     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+      //   };
+      //   const awarenessUpdate = createAwarenessUpdate(
+      //     yAwarenessUpdate,
+      //     publicData,
+      //     snapshotKeyRef.current,
+      //     signatureKeyPair
+      //   );
+      //   console.log("send awarenessUpdate");
+      //   // @ts-expect-error TODO handle later
+      //   websocketConnectionRef.current.send(JSON.stringify(awarenessUpdate));
+      // });
 
       // TODO switch to v2 updates
       yDocRef.current.on("update", async (update, origin) => {
@@ -608,35 +591,35 @@ export default function Page({
         });
 
         if (origin?.key === "y-sync$" || origin === "mobile-webview") {
-          if (
-            !activeSnapshotIdRef.current &&
-            !createSnapshotInProgressRef.current
-          ) {
-            // createAndSendSnapshot takes a while to set the snapshot in
-            // progress and therefore we need another mechanism
-            createSnapshotInProgressRef.current = true;
-
-            if (
-              getSnapshotInProgress(docId) ||
-              !getWebsocketState().connected
-            ) {
-              addPendingSnapshot(docId);
-            } else {
-              await createAndSendSnapshot();
-            }
-          } else {
-            if (
-              !snapshotKeyRef.current ||
-              getSnapshotInProgress(docId) ||
-              !getWebsocketState().connected
-            ) {
-              // don't send updates when a snapshot is in progress, because they
-              // must be based on the new snapshot
-              addPendingUpdate(docId, update);
-            } else {
-              createAndSendUpdate(update, snapshotKeyRef.current);
-            }
-          }
+          send({ type: "ADD_LOCAL_UPDATE", data: update });
+          // if (
+          //   !activeSnapshotIdRef.current &&
+          //   !createSnapshotInProgressRef.current
+          // ) {
+          //   // createAndSendSnapshot takes a while to set the snapshot in
+          //   // progress and therefore we need another mechanism
+          //   createSnapshotInProgressRef.current = true;
+          //   if (
+          //     getSnapshotInProgress(docId) ||
+          //     !getWebsocketState().connected
+          //   ) {
+          //     addPendingSnapshot(docId);
+          //   } else {
+          //     await createAndSendSnapshot();
+          //   }
+          // } else {
+          //   if (
+          //     !snapshotKeyRef.current ||
+          //     getSnapshotInProgress(docId) ||
+          //     !getWebsocketState().connected
+          //   ) {
+          //     // don't send updates when a snapshot is in progress, because they
+          //     // must be based on the new snapshot
+          //     addPendingUpdate(docId, update);
+          //   } else {
+          //     createAndSendUpdate(update, snapshotKeyRef.current);
+          //   }
+          // }
         }
       });
     }
