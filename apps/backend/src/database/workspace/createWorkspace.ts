@@ -124,6 +124,13 @@ export async function createWorkspace({
         user: {
           select: {
             username: true,
+            devices: {
+              select: {
+                signingPublicKey: true,
+                encryptionPublicKey: true,
+                encryptionPublicKeySignature: true,
+              },
+            },
           },
         },
       },
@@ -138,6 +145,7 @@ export async function createWorkspace({
         userId: userToWorkspace.userId,
         username: userToWorkspace.user.username,
         role: userToWorkspace.role,
+        devices: userToWorkspace.user.devices,
       });
     });
     const workspace: Workspace = {

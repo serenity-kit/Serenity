@@ -41,12 +41,17 @@ export async function getWorkspaces({
         orderBy: {
           userId: "asc",
         },
-        select: {
-          userId: true,
-          role: true,
+        include: {
           user: {
             select: {
               username: true,
+              devices: {
+                select: {
+                  signingPublicKey: true,
+                  encryptionPublicKey: true,
+                  encryptionPublicKeySignature: true,
+                },
+              },
             },
           },
         },

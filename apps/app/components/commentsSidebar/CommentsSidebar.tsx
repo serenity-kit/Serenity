@@ -1,3 +1,4 @@
+import { hashToCollaboratorColor } from "@serenity-tools/common";
 import {
   Avatar,
   EditorBottombarDivider,
@@ -11,13 +12,16 @@ import {
   tw,
   View,
 } from "@serenity-tools/ui";
-import { HStack } from "native-base";
 import { useActor } from "@xstate/react";
 import { formatDistanceToNow, parseJSON } from "date-fns";
+import { HStack } from "native-base";
 import { StyleSheet } from "react-native";
 import { usePage } from "../../context/PageContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
 
 const CommentsSidebar: React.FC<{}> = () => {
+  const { workspaceQueryResult } = useWorkspace();
   const { commentsService } = usePage();
   const [state, send] = useActor(commentsService);
 
@@ -50,6 +54,11 @@ const CommentsSidebar: React.FC<{}> = () => {
         {state.context.decryptedComments.map((comment) => {
           if (!comment) return null;
 
+          const commentCreator = getUserFromWorkspaceQueryResultByDeviceInfo(
+            workspaceQueryResult.data!,
+            comment.creatorDevice
+          );
+
           const isActiveComment =
             comment.id === state.context.highlightedCommentId;
 
@@ -73,12 +82,22 @@ const CommentsSidebar: React.FC<{}> = () => {
 
                 <HStack alignItems="center" space="1.5">
                   {/* TODO if comment has been read change color to gray-400 */}
-                  {/* <Avatar color="arctic" size="xs">
-                    KD
-                  </Avatar>
+                  {commentCreator ? (
+                    <Avatar
+                      key={commentCreator.userId}
+                      color={hashToCollaboratorColor(commentCreator.userId)}
+                    >
+                      {commentCreator.username?.split("@")[0].substring(0, 2)}
+                    </Avatar>
+                  ) : (
+                    <Avatar color="arctic" size="xs">
+                      E
+                    </Avatar>
+                  )}
+
                   <Text variant="xs" bold>
-                    Karen Doe
-                  </Text> */}
+                    {commentCreator?.username || "External"}
+                  </Text>
                 </HStack>
                 {/* <IconButton name="more-line" style={tw`ml-auto`} /> */}
               </HStack>
@@ -94,17 +113,36 @@ const CommentsSidebar: React.FC<{}> = () => {
               <View style={tw`mt-2`}>
                 {comment.replies.map((reply) => {
                   if (!reply) return null;
+
+                  const replyCreator =
+                    getUserFromWorkspaceQueryResultByDeviceInfo(
+                      workspaceQueryResult.data!,
+                      reply.creatorDevice
+                    );
                   return (
                     <View key={reply.id}>
                       <HStack alignItems="center">
                         <HStack alignItems="center" space="1.5">
                           {/* TODO if comment has been read change color to gray-400 */}
-                          {/* <Avatar color="emerald" size="xs">
-                            ND
-                          </Avatar>
+                          {replyCreator ? (
+                            <Avatar
+                              key={replyCreator.userId}
+                              color={hashToCollaboratorColor(
+                                replyCreator.userId
+                              )}
+                            >
+                              {replyCreator.username
+                                ?.split("@")[0]
+                                .substring(0, 2)}
+                            </Avatar>
+                          ) : (
+                            <Avatar color="arctic" size="xs">
+                              E
+                            </Avatar>
+                          )}
                           <Text variant="xs" bold>
-                            Norman Dean
-                          </Text> */}
+                            {replyCreator?.username || "External"}
+                          </Text>
                         </HStack>
                         {/* <IconButton name="more-line" style={tw`ml-auto`} /> */}
                       </HStack>

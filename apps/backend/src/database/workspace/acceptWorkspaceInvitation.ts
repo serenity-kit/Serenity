@@ -62,17 +62,19 @@ export async function acceptWorkspaceInvitation({
       },
       select: {
         workspace: {
-          select: {
-            id: true,
-            idSignature: true,
-            name: true,
+          include: {
             usersToWorkspaces: {
-              select: {
-                userId: true,
-                role: true,
+              include: {
                 user: {
                   select: {
                     username: true,
+                    devices: {
+                      select: {
+                        signingPublicKey: true,
+                        encryptionPublicKey: true,
+                        encryptionPublicKeySignature: true,
+                      },
+                    },
                   },
                 },
               },
@@ -96,21 +98,23 @@ export async function acceptWorkspaceInvitation({
         },
       });
       // and return the workspace
-      const connectedWorkspace = await prisma.workspace.findFirst({
+      const connectedWorkspace = await prisma.workspace.findFirstOrThrow({
         where: {
           id: workspaceId,
         },
-        select: {
-          id: true,
-          idSignature: true,
-          name: true,
+        include: {
           usersToWorkspaces: {
-            select: {
-              userId: true,
-              role: true,
+            include: {
               user: {
                 select: {
                   username: true,
+                  devices: {
+                    select: {
+                      signingPublicKey: true,
+                      encryptionPublicKey: true,
+                      encryptionPublicKeySignature: true,
+                    },
+                  },
                 },
               },
             },

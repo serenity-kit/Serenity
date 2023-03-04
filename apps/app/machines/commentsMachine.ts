@@ -11,6 +11,7 @@ import {
   commentsByDocumentIdQueryService,
   CommentsByDocumentIdQueryServiceEvent,
   CommentsByDocumentIdQueryUpdateResultEvent,
+  MinimalDevice,
   runCreateCommentMutation,
   runCreateCommentReplyMutation,
   runDeleteCommentRepliesMutation,
@@ -28,6 +29,7 @@ type DecryptedReply = {
   id: string;
   text: string;
   createdAt: string;
+  creatorDevice: MinimalDevice;
 };
 
 type DecryptedComment = {
@@ -37,6 +39,7 @@ type DecryptedComment = {
   to: number;
   replies: DecryptedReply[];
   createdAt: string;
+  creatorDevice: MinimalDevice;
 };
 
 type CommentKeyEntry = {
@@ -335,6 +338,7 @@ export const commentsMachine =
                       ...JSON.parse(decryptedReply),
                       id: encryptedReply!.id,
                       createdAt: encryptedReply!.createdAt,
+                      creatorDevice: encryptedReply!.creatorDevice,
                     };
                   }
                 );
@@ -344,6 +348,7 @@ export const commentsMachine =
                   id: encryptedComment!.id,
                   createdAt: encryptedComment!.createdAt,
                   replies,
+                  creatorDevice: encryptedComment!.creatorDevice,
                 };
               }
             );
