@@ -27,7 +27,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     addToIncomingQueue: "WEBSOCKET_ADD_TO_QUEUE";
     addToPendingUpdatesQueue: "ADD_LOCAL_UPDATE";
-    removeOldestItemFromQueue: "done.invoke.processQueues";
+    removeOldestItemFromQueueAndUpdateContext: "done.invoke.processQueues";
     spawnWebsocketActor: "xstate.init";
     stopWebsocketActor: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
   };

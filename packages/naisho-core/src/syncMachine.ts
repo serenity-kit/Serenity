@@ -17,6 +17,8 @@ interface Context {
   incomingQueue: any[];
   pendingUpdatesQueue: any[];
   sodium: any;
+  activeSnapshotId: null | string;
+  latestServerVersion: null | number;
 }
 
 // TODO pass in function to verify the creator
@@ -130,6 +132,8 @@ export const syncMachine =
         incomingQueue: [],
         pendingUpdatesQueue: [],
         sodium: {},
+        activeSnapshotId: null,
+        latestServerVersion: null,
       },
       initial: "connecting",
       on: {
@@ -173,7 +177,7 @@ export const syncMachine =
                 id: "processQueues",
                 src: "processQueues",
                 onDone: {
-                  actions: ["removeOldestItemFromQueue"],
+                  actions: ["removeOldestItemFromQueueAndUpdateContext"],
                   target: "checkingForMoreQueueItems",
                 },
                 onError: {
@@ -243,31 +247,36 @@ export const syncMachine =
             pendingUpdatesQueue: [...context.pendingUpdatesQueue, event.data],
           };
         }),
-        removeOldestItemFromQueue: assign((context, event) => {
+        removeOldestItemFromQueueAndUpdateContext: assign((context, event) => {
           if (event.data.handledQueue === "incoming") {
             return {
               incomingQueue: context.incomingQueue.slice(1),
+              activeSnapshotId: event.data.activeSnapshotId,
+              latestServerVersion: event.data.latestServerVersion,
             };
           } else {
             return {
               pendingUpdatesQueue: context.pendingUpdatesQueue.slice(1),
+              activeSnapshotId: event.data.activeSnapshotId,
+              latestServerVersion: event.data.latestServerVersion,
             };
           }
         }),
       },
       services: {
         processQueues: (context) => async (send) => {
-          let activeSnapshotId = "";
-          let latestServerVersion = null;
+          let activeSnapshotId = context.activeSnapshotId;
+          let latestServerVersion = context.latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
 
           const createAndSendUpdate = (
             update,
             key,
+            refSnapshotId: string,
             clockOverwrite?: number
           ) => {
             const publicData = {
-              refSnapshotId: activeSnapshotId,
+              refSnapshotId,
               docId: context.documentId,
               pubKey: context.sodium.to_base64(
                 context.signatureKeyPair.publicKey
@@ -312,6 +321,7 @@ export const syncMachine =
                   context.applySnapshot(decryptedSnapshot);
 
                   const updates = event.updates;
+                  console.log("updates", updates);
                   const decryptedUpdates = updates.map((update) => {
                     const updateResult = verifyAndDecryptUpdate(
                       update,
@@ -384,19 +394,58 @@ export const syncMachine =
 
                 latestServerVersion = event.serverData.version;
                 break;
+              case "updateSaved":
+                console.log("update saved", event);
+                // console.log(
+                //   "update saving confirmed",
+                //   data.snapshotId,
+                //   data.clock
+                // );
+                // latestServerVersionRef.current = data.serverVersion;
+                // removeUpdateFromInProgressQueue(
+                //   data.docId,
+                //   data.snapshotId,
+                //   data.clock
+                // );
+
+                break;
+              case "updateFailed":
+                console.log("update failed", event);
+
+                // console.log(
+                //   "update saving failed",
+                //   data.snapshotId,
+                //   data.clock,
+                //   data.requiresNewSnapshotWithKeyRotation
+                // );
+
+                // if (data.requiresNewSnapshotWithKeyRotation) {
+                //   await createAndSendSnapshot();
+                // } else {
+                //   // TODO retry with an increasing offset instead of just trying again
+                //   const rawUpdate = getUpdateInProgress(
+                //     data.docId,
+                //     data.snapshotId,
+                //     data.clock
+                //   );
+                //   createAndSendUpdate(
+                //     rawUpdate,
+                //     snapshotKeyRef.current,
+                //     data.clock
+                //   );
+                // }
+
+                break;
             }
           } else if (context.pendingUpdatesQueue.length > 0) {
             handledQueue = "pending";
             const key = await context.getUpdateKey(event);
             const rawUpdates = context.pendingUpdatesQueue;
             // add a compact changes function to queue and make sure all pending updates are sent as one update
-            try {
-              createAndSendUpdate(rawUpdates[0], key);
-            } catch (err) {
-              // TODO
-              console.log("createAndSendUpdate. TODO handle error");
-              console.error(err);
+            if (activeSnapshotId === null) {
+              throw new Error("No active snapshot id");
             }
+            createAndSendUpdate(rawUpdates[0], key, activeSnapshotId);
           }
 
           return {
