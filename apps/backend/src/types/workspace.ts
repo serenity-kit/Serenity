@@ -103,17 +103,18 @@ export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
   const workspaceKeys: WorkspaceKey[] = [];
   if (workspace.workspaceKeys) {
     for (let workspaceKey of workspace.workspaceKeys) {
-      if (!currentWorkspaceKey) {
-        currentWorkspaceKey = workspaceKey;
-      }
-
-      workspaceKeys.push({
+      const workspaceKeyWithworkspaceKeyBox = {
         ...workspaceKey,
         workspaceKeyBox:
           workspaceKey.workspaceKeyBoxes?.length > 0
             ? workspaceKey.workspaceKeyBoxes[0]
             : undefined,
-      });
+      };
+      if (!currentWorkspaceKey) {
+        currentWorkspaceKey = workspaceKeyWithworkspaceKeyBox;
+      }
+
+      workspaceKeys.push(workspaceKeyWithworkspaceKeyBox);
     }
   }
   return {
