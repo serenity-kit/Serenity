@@ -13,6 +13,7 @@ export const getDocumentShareLink = async ({
     query documentShareLink($token: ID!) {
       documentShareLink(token: $token) {
         token
+        role
         deviceSecretBoxCiphertext
         deviceSecretBoxNonce
       }
