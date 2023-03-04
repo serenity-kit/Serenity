@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server-express";
 import {
   arg,
   inputObjectType,
@@ -5,6 +6,7 @@ import {
   nonNull,
   objectType,
 } from "nexus";
+import { z } from "zod";
 import { getEnvelope } from "../../../database/authentication/getEnvelope";
 import { startLogin } from "../../../utils/opaque";
 
@@ -35,6 +37,12 @@ export const startLoginMutation = mutationField("startLogin", {
   },
   async resolve(root, args, context) {
     const username = args.input.username;
+    try {
+      z.string().email().parse(username);
+    } catch (error) {
+      console.log(`Invalid email address: ${username}`);
+      throw new UserInputError("Input error: invalid email address");
+    }
     let result: any = undefined;
     try {
       result = await getEnvelope(username);

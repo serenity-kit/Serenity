@@ -126,6 +126,16 @@ describe("Input errors", () => {
       }
     }
   `;
+  test("Invalid email", async () => {
+    await expect(
+      (async () =>
+        await requestRegistrationChallengeResponse(
+          graphql,
+          "invalid-email",
+          password
+        ))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
   test("Invalid registrationId", async () => {
     const result = await requestRegistrationChallengeResponse(
       graphql,

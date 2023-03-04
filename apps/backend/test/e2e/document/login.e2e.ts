@@ -10,7 +10,7 @@ import { renameDocument } from "../../helpers/e2e/renameDocument";
 
 const userId = uuidv4();
 const username = `${uuidv4()}@example.com`;
-const password = "pass";
+const password = "password";
 let createdWorkspace: any = null;
 let workspaceId = "";
 let firstFolder: any = null;
