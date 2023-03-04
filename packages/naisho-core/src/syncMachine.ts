@@ -1,5 +1,9 @@
 import { KeyPair } from "libsodium-wrappers";
-import { assign, createMachine, forwardTo, spawn } from "xstate";
+import { assign, createMachine, forwardTo, sendTo, spawn } from "xstate";
+import {
+  createAwarenessUpdate,
+  verifyAndDecryptAwarenessUpdate,
+} from "./awarenessUpdate";
 import { verifyAndDecryptSnapshot } from "./snapshot";
 import { createUpdate, verifyAndDecryptUpdate } from "./update";
 
@@ -12,6 +16,8 @@ interface Context {
   getSnapshotKey: (snapshot: any) => Promise<Uint8Array>;
   applyUpdates: (updates: any[]) => void;
   getUpdateKey: (update: any) => Promise<Uint8Array>;
+  applyEphemeralUpdates: (ephemeralUpdates: any[]) => void;
+  getEphemeralUpdateKey: () => Promise<Uint8Array>;
   documentLoaded: () => void;
   websocketActor?: any;
   incomingQueue: any[];
@@ -33,6 +39,8 @@ interface Context {
 // first handle all incoming message
 // then handle all pending updates
 // Background: there might be a new snapshot and this way we avoid retries
+
+// TODO rename awareness to ephemeral
 
 // TODO remove event listener
 
@@ -91,6 +99,30 @@ const websocketService = (context) => (send, onReceive) => {
     if (event.type === "SEND") {
       websocketConnection.send(event.message);
     }
+    if (event.type === "SEND_EPHEMERAL_UPDATE") {
+      const prepareAndSendEphemeralUpdate = async () => {
+        const publicData = {
+          docId: context.documentId,
+          pubKey: context.sodium.to_base64(context.signatureKeyPair.publicKey),
+        };
+        const ephemeralUpdateKey = await event.getEphemeralUpdateKey();
+        const awarenessUpdate = createAwarenessUpdate(
+          event.data,
+          publicData,
+          ephemeralUpdateKey,
+          context.signatureKeyPair
+        );
+        console.log("send awarenessUpdate");
+        send({ type: "SEND", message: JSON.stringify(awarenessUpdate) });
+      };
+
+      try {
+        prepareAndSendEphemeralUpdate();
+      } catch (error) {
+        // TODO send a error event to the parent
+        console.error(error);
+      }
+    }
   });
 
   return () => {
@@ -113,7 +145,13 @@ export const syncMachine =
           | { type: "WEBSOCKET_ADD_TO_QUEUE"; data: any }
           | { type: "WEBSOCKET_KEY_MATERIAL" }
           | { type: "DISCONNECT" }
-          | { type: "ADD_LOCAL_UPDATE"; data: any }
+          | { type: "ADD_UPDATE"; data: any }
+          | { type: "ADD_EPHEMERAL_UPDATE"; data: any }
+          | {
+              type: "SEND_EPHEMERAL_UPDATE";
+              data: any;
+              getEphemeralUpdateKey: () => Promise<Uint8Array>;
+            }
           | { type: "SEND"; message: any },
         context: {} as Context,
       },
@@ -128,6 +166,8 @@ export const syncMachine =
         getSnapshotKey: () => Promise.resolve(new Uint8Array()),
         applyUpdates: () => undefined,
         getUpdateKey: () => Promise.resolve(new Uint8Array()),
+        applyEphemeralUpdates: () => undefined,
+        getEphemeralUpdateKey: () => Promise.resolve(new Uint8Array()),
         documentLoaded: () => undefined,
         incomingQueue: [],
         pendingUpdatesQueue: [],
@@ -139,6 +179,15 @@ export const syncMachine =
       on: {
         SEND: {
           actions: forwardTo("websocketActor"),
+        },
+        ADD_EPHEMERAL_UPDATE: {
+          actions: sendTo("websocketActor", (context, event) => {
+            return {
+              type: "SEND_EPHEMERAL_UPDATE",
+              data: event.data,
+              getEphemeralUpdateKey: context.getEphemeralUpdateKey,
+            };
+          }),
         },
       },
       states: {
@@ -158,7 +207,7 @@ export const syncMachine =
                   actions: ["addToIncomingQueue"],
                   target: "processingQueues",
                 },
-                ADD_LOCAL_UPDATE: {
+                ADD_UPDATE: {
                   actions: ["addToPendingUpdatesQueue"],
                   target: "processingQueues",
                 },
@@ -169,7 +218,7 @@ export const syncMachine =
                 WEBSOCKET_ADD_TO_QUEUE: {
                   actions: ["addToIncomingQueue"],
                 },
-                ADD_LOCAL_UPDATE: {
+                ADD_UPDATE: {
                   actions: ["addToPendingUpdatesQueue"],
                 },
               },
@@ -191,7 +240,7 @@ export const syncMachine =
                   actions: ["addToIncomingQueue"],
                 },
 
-                ADD_LOCAL_UPDATE: {
+                ADD_UPDATE: {
                   actions: ["addToPendingUpdatesQueue"],
                 },
               },
@@ -365,22 +414,62 @@ export const syncMachine =
                 break;
 
               case "snapshot":
-                try {
-                  activeSnapshotId = event.snapshot.publicData.snapshotId;
-                  const snapshot = event.snapshot;
-                  const key = await context.getSnapshotKey(snapshot);
-                  const decryptedSnapshot = verifyAndDecryptSnapshot(
-                    snapshot,
-                    key,
-                    context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                  );
-                  context.applySnapshot(decryptedSnapshot);
-                  // setActiveSnapshotAndCommentKeys
-                } catch (err) {
-                  // TODO
-                  console.log("Apply snapshot failed. TODO handle error");
-                  console.error(err);
-                }
+                console.log("snapshot saved", event);
+                activeSnapshotId = event.snapshot.publicData.snapshotId;
+                const snapshot = event.snapshot;
+                const snapshotKey = await context.getSnapshotKey(snapshot);
+                const decryptedSnapshot = verifyAndDecryptSnapshot(
+                  snapshot,
+                  snapshotKey,
+                  context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+                );
+                context.applySnapshot(decryptedSnapshot);
+                // setActiveSnapshotAndCommentKeys
+
+                break;
+
+              case "snapshotSaved":
+                console.log("snapshot saved", event);
+                activeSnapshotId = event.snapshotId;
+                latestServerVersion = null;
+                // removeSnapshotInProgress(data.docId);
+
+                // const pending = getPending(data.docId);
+                // if (pending.type === "snapshot") {
+                //   await createAndSendSnapshot();
+                //   removePending(data.docId);
+                // } else if (pending.type === "updates") {
+                //   // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
+                //   removePending(data.docId);
+                //   pending.rawUpdates.forEach((rawUpdate) => {
+                //     createAndSendUpdate(rawUpdate, snapshotKeyRef.current);
+                //   });
+                // }
+                break;
+              case "snapshotFailed":
+                // console.log("snapshot saving failed", data);
+                // if (data.snapshot) {
+                //   const snapshotKeyData3 = await deriveExistingSnapshotKey(
+                //     docId,
+                //     data.snapshot,
+                //     activeDevice as LocalDevice
+                //   );
+                //   snapshotKeyRef.current = sodium.from_base64(snapshotKeyData3.key);
+                //   applySnapshot(data.snapshot, snapshotKeyRef.current);
+                // }
+                // if (data.updates) {
+                //   applyUpdates(data.updates, snapshotKeyRef.current);
+                // }
+
+                // // TODO add a backoff after multiple failed tries
+
+                // // removed here since again added in createAndSendSnapshot
+                // removeSnapshotInProgress(data.docId);
+                // // all pending can be removed since a new snapshot will include all local changes
+                // removePending(data.docId);
+
+                // await sleep(1000); // TODO add randomised backoff
+                // await createAndSendSnapshot();
                 break;
 
               case "update":
@@ -391,17 +480,11 @@ export const syncMachine =
                   context.sodium.from_base64(event.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
                 );
                 context.applyUpdates([decryptedUpdate]);
-
                 latestServerVersion = event.serverData.version;
                 break;
               case "updateSaved":
                 console.log("update saved", event);
-                // console.log(
-                //   "update saving confirmed",
-                //   data.snapshotId,
-                //   data.clock
-                // );
-                // latestServerVersionRef.current = data.serverVersion;
+                latestServerVersion = event.serverVersion;
                 // removeUpdateFromInProgressQueue(
                 //   data.docId,
                 //   data.snapshotId,
@@ -435,6 +518,16 @@ export const syncMachine =
                 //   );
                 // }
 
+                break;
+              case "awarenessUpdate":
+                const ephemeralUpdateKey =
+                  await context.getEphemeralUpdateKey();
+                const ephemeralUpdateResult = verifyAndDecryptAwarenessUpdate(
+                  event,
+                  ephemeralUpdateKey,
+                  context.sodium.from_base64(event.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+                );
+                context.applyEphemeralUpdates([ephemeralUpdateResult]);
                 break;
             }
           } else if (context.pendingUpdatesQueue.length > 0) {

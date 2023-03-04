@@ -1,36 +1,26 @@
 import {
   addSnapshotToInProgress,
-  addUpdateToInProgressQueue,
   cleanupUpdates,
   createSnapshot,
-  createUpdate,
   dispatchWebsocketState,
-  getPending,
-  getUpdateInProgress,
   getWebsocketState,
-  removePending,
-  removeSnapshotInProgress,
-  removeUpdateFromInProgressQueue,
   syncMachine,
   useWebsocketState,
-  verifyAndDecryptAwarenessUpdate,
-  verifyAndDecryptSnapshot,
-  verifyAndDecryptUpdate,
 } from "@naisho/core";
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
   LocalDevice,
-  sleep,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { useMachine } from "@xstate/react";
 import { useEffect, useRef, useState } from "react";
-import sodium, { KeyPair, to_base64 } from "react-native-libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import {
   applyAwarenessUpdate,
   Awareness,
+  encodeAwarenessUpdate,
   removeAwarenessStates,
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
@@ -118,6 +108,14 @@ export default function Page({
       getUpdateKey: async (update) => {
         return snapshotKeyRef.current as Uint8Array;
       },
+      applyEphemeralUpdates: (decryptedEphemeralUpdates) => {
+        decryptedEphemeralUpdates.map((ephemeralUpdate) => {
+          applyAwarenessUpdate(yAwarenessRef.current, ephemeralUpdate, null);
+        });
+      },
+      getEphemeralUpdateKey: async () => {
+        return snapshotKeyRef.current as Uint8Array;
+      },
       sodium,
     },
   });
@@ -142,58 +140,6 @@ export default function Page({
   const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
     (state) => state.update
   );
-
-  const applySnapshot = (snapshot, key) => {
-    try {
-      activeSnapshotIdRef.current = snapshot.publicData.snapshotId;
-      const initialResult = verifyAndDecryptSnapshot(
-        snapshot,
-        key,
-        sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-      );
-      if (initialResult) {
-        Yjs.applyUpdate(yDocRef.current, initialResult, "naisho-remote");
-      }
-
-      setActiveSnapshotAndCommentKeys(
-        {
-          id: snapshot.publicData.snapshotId,
-          key: to_base64(key),
-        },
-        {} // TODO extract and pass on comment keys from snapshot
-      );
-    } catch (err) {
-      // TODO
-      console.log("Apply snapshot failed. TODO handle error");
-      console.error(err);
-    }
-  };
-
-  const applyUpdates = (updates, key) => {
-    try {
-      updates.map((update) => {
-        console.log(
-          update.serverData.version,
-          update.publicData.pubKey,
-          update.publicData.clock
-        );
-        const updateResult = verifyAndDecryptUpdate(
-          update,
-          key,
-          sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-        );
-        // when reconnecting the server might send already processed data updates. these then are ignored
-        if (updateResult) {
-          Yjs.applyUpdate(yDocRef.current, updateResult, "naisho-remote");
-          latestServerVersionRef.current = update.serverData.version;
-        }
-      });
-    } catch (err) {
-      // TODO
-      console.log("Apply updates failed. TODO handle error");
-      console.error(err);
-    }
-  };
 
   const createNewSnapshotKey = async (
     document: Document,
@@ -299,29 +245,6 @@ export default function Page({
     }
   };
 
-  const createAndSendUpdate = (update, key, clockOverwrite?: number) => {
-    console.log("createAndSendUpdate");
-    const publicData = {
-      refSnapshotId: activeSnapshotIdRef.current,
-      docId,
-      pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-    };
-    const updateToSend = createUpdate(
-      update,
-      // @ts-expect-error TODO handle later
-      publicData,
-      key,
-      signatureKeyPair,
-      clockOverwrite
-    );
-
-    if (clockOverwrite === undefined) {
-      addUpdateToInProgressQueue(updateToSend, update);
-    }
-    // @ts-expect-error TODO handle later
-    websocketConnectionRef.current.send(JSON.stringify(updateToSend));
-  };
-
   useEffect(() => {
     async function initDocument() {
       await sodium.ready;
@@ -368,133 +291,6 @@ export default function Page({
       const onWebsocketMessage = async (event) => {
         const data = JSON.parse(event.data);
         switch (data.type) {
-          case "document":
-            // check for pending snapshots or pending updates and run them
-            const pendingChanges = getPending(docId);
-            if (pendingChanges.type === "snapshot") {
-              await createAndSendSnapshot();
-              removePending(docId);
-            } else if (pendingChanges.type === "updates") {
-              // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
-              removePending(docId);
-              pendingChanges.rawUpdates.forEach((rawUpdate) => {
-                createAndSendUpdate(rawUpdate, snapshotKeyRef.current);
-              });
-            }
-            break;
-          case "snapshot":
-            console.log("apply snapshot");
-            const snapshotKeyData2 = await deriveExistingSnapshotKey(
-              docId,
-              data.snapshot,
-              activeDevice as LocalDevice
-            );
-            snapshotKeyRef.current = sodium.from_base64(snapshotKeyData2.key);
-            applySnapshot(data.snapshot, snapshotKeyRef.current);
-            // @ts-expect-error TODO handle later
-            latestServerVersionRef.current = undefined;
-            break;
-          case "snapshotSaved":
-            console.log("snapshot saving confirmed");
-            activeSnapshotIdRef.current = data.snapshotId;
-            // @ts-expect-error TODO handle later
-            latestServerVersionRef.current = undefined;
-            removeSnapshotInProgress(data.docId);
-
-            const pending = getPending(data.docId);
-            if (pending.type === "snapshot") {
-              await createAndSendSnapshot();
-              removePending(data.docId);
-            } else if (pending.type === "updates") {
-              // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
-              removePending(data.docId);
-              pending.rawUpdates.forEach((rawUpdate) => {
-                createAndSendUpdate(rawUpdate, snapshotKeyRef.current);
-              });
-            }
-            break;
-          case "snapshotFailed":
-            console.log("snapshot saving failed", data);
-            if (data.snapshot) {
-              const snapshotKeyData3 = await deriveExistingSnapshotKey(
-                docId,
-                data.snapshot,
-                activeDevice as LocalDevice
-              );
-              snapshotKeyRef.current = sodium.from_base64(snapshotKeyData3.key);
-              applySnapshot(data.snapshot, snapshotKeyRef.current);
-            }
-            if (data.updates) {
-              applyUpdates(data.updates, snapshotKeyRef.current);
-            }
-
-            // TODO add a backoff after multiple failed tries
-
-            // removed here since again added in createAndSendSnapshot
-            removeSnapshotInProgress(data.docId);
-            // all pending can be removed since a new snapshot will include all local changes
-            removePending(data.docId);
-
-            await sleep(1000); // TODO add randomised backoff
-            await createAndSendSnapshot();
-            break;
-          case "update":
-            const updateResult = verifyAndDecryptUpdate(
-              data,
-              snapshotKeyRef.current,
-              sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-            );
-            Yjs.applyUpdate(yDocRef.current, updateResult, "naisho-remote");
-            latestServerVersionRef.current = data.serverData.version;
-            break;
-          case "updateSaved":
-            console.log("update saving confirmed", data.snapshotId, data.clock);
-            latestServerVersionRef.current = data.serverVersion;
-            removeUpdateFromInProgressQueue(
-              data.docId,
-              data.snapshotId,
-              data.clock
-            );
-
-            break;
-          case "updateFailed":
-            console.log(
-              "update saving failed",
-              data.snapshotId,
-              data.clock,
-              data.requiresNewSnapshotWithKeyRotation
-            );
-
-            if (data.requiresNewSnapshotWithKeyRotation) {
-              await createAndSendSnapshot();
-            } else {
-              // TODO retry with an increasing offset instead of just trying again
-              const rawUpdate = getUpdateInProgress(
-                data.docId,
-                data.snapshotId,
-                data.clock
-              );
-              createAndSendUpdate(
-                rawUpdate,
-                snapshotKeyRef.current,
-                data.clock
-              );
-            }
-
-            break;
-          case "awarenessUpdate":
-            const awarenessUpdateResult = verifyAndDecryptAwarenessUpdate(
-              data,
-              snapshotKeyRef.current,
-              sodium.from_base64(data.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-            );
-            console.log("awarenessUpdate");
-            applyAwarenessUpdate(
-              yAwarenessRef.current,
-              awarenessUpdateResult,
-              null
-            );
-            break;
         }
       };
 
@@ -556,30 +352,14 @@ export default function Page({
       // );
       // });
 
-      // yAwarenessRef.current.on("update", ({ added, updated, removed }) => {
-      //   if (!getWebsocketState().connected || !snapshotKeyRef.current) {
-      //     return;
-      //   }
-
-      //   const changedClients = added.concat(updated).concat(removed);
-      //   const yAwarenessUpdate = encodeAwarenessUpdate(
-      //     yAwarenessRef.current,
-      //     changedClients
-      //   );
-      //   const publicData = {
-      //     docId,
-      //     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-      //   };
-      //   const awarenessUpdate = createAwarenessUpdate(
-      //     yAwarenessUpdate,
-      //     publicData,
-      //     snapshotKeyRef.current,
-      //     signatureKeyPair
-      //   );
-      //   console.log("send awarenessUpdate");
-      //   // @ts-expect-error TODO handle later
-      //   websocketConnectionRef.current.send(JSON.stringify(awarenessUpdate));
-      // });
+      yAwarenessRef.current.on("update", ({ added, updated, removed }) => {
+        const changedClients = added.concat(updated).concat(removed);
+        const yAwarenessUpdate = encodeAwarenessUpdate(
+          yAwarenessRef.current,
+          changedClients
+        );
+        send({ type: "ADD_EPHEMERAL_UPDATE", data: yAwarenessUpdate });
+      });
 
       // TODO switch to v2 updates
       yDocRef.current.on("update", async (update, origin) => {
@@ -591,7 +371,7 @@ export default function Page({
         });
 
         if (origin?.key === "y-sync$" || origin === "mobile-webview") {
-          send({ type: "ADD_LOCAL_UPDATE", data: update });
+          send({ type: "ADD_UPDATE", data: update });
           // if (
           //   !activeSnapshotIdRef.current &&
           //   !createSnapshotInProgressRef.current

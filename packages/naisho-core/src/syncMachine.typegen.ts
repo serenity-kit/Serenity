@@ -26,7 +26,7 @@ export interface Typegen0 {
   };
   eventsCausingActions: {
     addToIncomingQueue: "WEBSOCKET_ADD_TO_QUEUE";
-    addToPendingUpdatesQueue: "ADD_LOCAL_UPDATE";
+    addToPendingUpdatesQueue: "ADD_UPDATE";
     removeOldestItemFromQueueAndUpdateContext: "done.invoke.processQueues";
     spawnWebsocketActor: "xstate.init";
     stopWebsocketActor: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
@@ -36,7 +36,7 @@ export interface Typegen0 {
     hasMoreItemsInQueues: "";
   };
   eventsCausingServices: {
-    processQueues: "" | "ADD_LOCAL_UPDATE" | "WEBSOCKET_ADD_TO_QUEUE";
+    processQueues: "" | "ADD_UPDATE" | "WEBSOCKET_ADD_TO_QUEUE";
   };
   matchesStates:
     | "connected"
