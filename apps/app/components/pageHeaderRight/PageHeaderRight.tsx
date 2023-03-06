@@ -54,7 +54,7 @@ export function PageHeaderRight() {
                       key={member.userId}
                       color={hashToCollaboratorColor(member.userId)}
                     >
-                      {member.username?.split("@")[0].substring(0, 2)}
+                      {member.username?.split("@")[0].substring(0, 1)}
                     </Avatar>
                   );
                 })}

@@ -87,7 +87,7 @@ const CommentsSidebar: React.FC<{}> = () => {
                       key={commentCreator.userId}
                       color={hashToCollaboratorColor(commentCreator.userId)}
                     >
-                      {commentCreator.username?.split("@")[0].substring(0, 2)}
+                      {commentCreator.username?.split("@")[0].substring(0, 1)}
                     </Avatar>
                   ) : (
                     <Avatar color="arctic" size="xs">
@@ -133,7 +133,7 @@ const CommentsSidebar: React.FC<{}> = () => {
                             >
                               {replyCreator.username
                                 ?.split("@")[0]
-                                .substring(0, 2)}
+                                .substring(0, 1)}
                             </Avatar>
                           ) : (
                             <Avatar color="arctic" size="xs">
