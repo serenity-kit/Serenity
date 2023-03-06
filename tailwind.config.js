@@ -59,7 +59,7 @@ const customColors = {
   comment: {
     default: "#FFB92120", // collaboration-honey 20%
     hover: "#FFB92130", // collaboration-honey 30%
-    active: "#FFB921", // collaboration-honey
+    active: "#FFB92180", // collaboration-honey 80%
   },
   muted: "#8A8B96", // gray 600
   backdrop: "#1F1F2140", // backdrop color including opacity
