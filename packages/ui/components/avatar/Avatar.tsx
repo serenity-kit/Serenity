@@ -3,10 +3,9 @@ import React, { forwardRef } from "react";
 import { StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
 import { CollaborationColor } from "../../types";
-import { View } from "../view/View";
 
 export type AvatarSize = "2xl" | "xl" | "lg" | "md" | "sm" | "xs" | "xxs";
-export type AvatarStatus = "active" | "inactive" | "default";
+export type AvatarStatus = "active" | "inactive";
 
 type CustomAvatarProps = {
   color?: CollaborationColor;
@@ -20,26 +19,35 @@ export const Avatar = forwardRef((props: AvatarProps, ref) => {
   const {
     size = "sm",
     color = "serenity",
-    status = "default",
+    status = "active",
   }: CustomAvatarProps = props;
   const styles = StyleSheet.create({
     avatar: tw``,
   });
 
-  const statusStyling = {
-    active: tw`border-2 border-white`,
-    inactive: tw`opacity-50`,
-    default: tw``,
+  const borderWidth = {
+    "2xl": 4,
+    xl: 4,
+    lg: 3,
+    md: 3,
+    sm: 2,
+    xs: 2,
+    xxs: 0,
   };
 
-  const activeIndicatorSize = {
-    "2xl": 33,
-    xl: 25,
-    lg: 17,
-    md: 13,
-    sm: 9,
-    xs: 7,
-    xxs: 6,
+  const fontSize = {
+    "2xl": 64,
+    xl: 48,
+    lg: 32,
+    md: 24,
+    sm: 14,
+    xs: 11,
+    xxs: 8,
+  };
+
+  const statusStyling = {
+    active: tw`border-${borderWidth[size]} border-solid border-white/60`,
+    inactive: tw`opacity-40`,
   };
 
   return (
@@ -49,19 +57,11 @@ export const Avatar = forwardRef((props: AvatarProps, ref) => {
       style={[styles.avatar, statusStyling[status], props.style]}
       _text={{
         fontFamily: "Inter_600SemiBold",
+        fontSize: fontSize[size],
         style: tw`uppercase`,
       }}
       bg={`collaboration.${color}`}
     >
-      {status === "active" ? (
-        <View
-          style={[
-            tw`absolute w-${activeIndicatorSize[size]} h-${activeIndicatorSize[size]} bg-transparent`,
-            tw`rounded-full border-2 border-collaboration-${color}`,
-            { zIndex: -1 },
-          ]}
-        />
-      ) : null}
       {props.children}
     </NbAvatar>
   );

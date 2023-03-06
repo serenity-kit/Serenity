@@ -43,6 +43,7 @@ const customColors = {
     lavender: "#515DCE",
     purple: "#9E36CF",
     slate: "#4F5D78",
+    gray: "#CBCBD3", // for read comment
   },
   error: {
     100: "#FFEDEF",

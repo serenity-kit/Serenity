@@ -34,7 +34,7 @@ const CommentsSidebar: React.FC<{}> = () => {
     // grow-0 overrides default of ScrollView to keep the assigned width
     <ScrollView style={tw`w-sidebar grow-0 bg-gray-100`}>
       <EditorSidebarHeader style={styles.header}>
-        <Text variant="sm" bold>
+        <Text variant="xs" bold>
           Comments
         </Text>
         <HStack alignItems={"center"} style={tw`-mr-1`}>
@@ -86,8 +86,9 @@ const CommentsSidebar: React.FC<{}> = () => {
                     <Avatar
                       key={commentCreator.userId}
                       color={hashToCollaboratorColor(commentCreator.userId)}
+                      size="xs"
                     >
-                      {commentCreator.username?.split("@")[0].substring(0, 2)}
+                      {commentCreator.username?.split("@")[0].substring(0, 1)}
                     </Avatar>
                   ) : (
                     <Avatar color="arctic" size="xs">
@@ -95,7 +96,7 @@ const CommentsSidebar: React.FC<{}> = () => {
                     </Avatar>
                   )}
 
-                  <Text variant="xs" bold>
+                  <Text variant="xxs" bold>
                     {commentCreator?.username || "External"}
                   </Text>
                 </HStack>
@@ -107,7 +108,7 @@ const CommentsSidebar: React.FC<{}> = () => {
                     addSuffix: true,
                   })}
                 </Text>
-                <Text variant="sm">{comment.text}</Text>
+                <Text variant="xs">{comment.text}</Text>
               </View>
 
               <View style={tw`mt-2`}>
@@ -123,24 +124,25 @@ const CommentsSidebar: React.FC<{}> = () => {
                     <View key={reply.id}>
                       <HStack alignItems="center">
                         <HStack alignItems="center" space="1.5">
-                          {/* TODO if comment has been read change color to gray-400 */}
+                          {/* TODO if comment has been read change color to gray */}
                           {replyCreator ? (
                             <Avatar
                               key={replyCreator.userId}
                               color={hashToCollaboratorColor(
                                 replyCreator.userId
                               )}
+                              size="xs"
                             >
                               {replyCreator.username
                                 ?.split("@")[0]
-                                .substring(0, 2)}
+                                .substring(0, 1)}
                             </Avatar>
                           ) : (
                             <Avatar color="arctic" size="xs">
                               E
                             </Avatar>
                           )}
-                          <Text variant="xs" bold>
+                          <Text variant="xxs" bold>
                             {replyCreator?.username || "External"}
                           </Text>
                         </HStack>
@@ -154,7 +156,7 @@ const CommentsSidebar: React.FC<{}> = () => {
                             addSuffix: true,
                           })}
                         </Text>
-                        <Text variant="sm">{reply.text}</Text>
+                        <Text variant="xs">{reply.text}</Text>
                       </View>
                       <IconButton
                         name="delete-bin-line"
