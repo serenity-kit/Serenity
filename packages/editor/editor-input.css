@@ -49,7 +49,7 @@
 
   /* needed to make all area of the editor clickable which enables activating the cursor on each written line */
   .ProseMirror > * {
-    @apply mx-auto w-full max-w-prose-rem;
+    @apply mx-auto w-full max-w-editor-content;
   }
 
   /* needed so margin of first element doesn't make content 'jump' */
