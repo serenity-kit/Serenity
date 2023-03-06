@@ -71,10 +71,9 @@ const createCommentsDecorationSet = (
     state.doc,
     comments.map((comment) => {
       return Decoration.inline(comment.absoluteFrom, comment.absoluteTo, {
-        class:
-          comment.id === highlightedCommentId
-            ? "editor-comment-active"
-            : "editor-comment",
+        class: `editor-comment ${
+          comment.id === highlightedCommentId && "editor-comment--active"
+        }`,
       });
     })
   );

@@ -356,10 +356,12 @@
     background-color: theme("colors.comment.default");
   }
 
-  .editor-comment-active {
-    /* display setting needed to properly size background and add border */
-    display: inline-block;
-    border-bottom: 0.125rem solid theme("colors.comment.active");
+  .editor-comment:hover {
+    background-color: theme("colors.comment.hover");
+  }
+
+  .editor-comment-active,
+  .editor-comment-active:hover {
     background-color: theme("colors.comment.active");
   }
 }
