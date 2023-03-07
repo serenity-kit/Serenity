@@ -47,7 +47,7 @@ const CommentsSidebar: React.FC<{}> = () => {
           <Text variant="xxs" muted style={tw`p-1`}>
             Open
           </Text>
-          <EditorBottombarDivider style={tw`h-4 border-r-1 border-gray-600`} />
+          <EditorBottombarDivider style={tw`h-4 border-r border-gray-600`} />
           <Text variant="xxs" muted style={tw`p-1`}>
             Resolved
           </Text>
@@ -195,10 +195,9 @@ const CommentsSidebar: React.FC<{}> = () => {
               </View>
 
               <HStack space="1.5">
-                {/* TODO use active user for reply */}
-                {/* <Avatar color="rose" size="xs">
-                  FO
-                </Avatar> */}
+                <Avatar color={hashToCollaboratorColor(me.id)} size="xs">
+                  {me.username?.split("@")[0].substring(0, 1)}
+                </Avatar>
                 <RawInput
                   multiline
                   value={state.context.replyTexts[comment.id]}
