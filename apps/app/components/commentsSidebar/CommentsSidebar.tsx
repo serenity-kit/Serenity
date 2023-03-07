@@ -1,3 +1,4 @@
+import React from "react";
 import { hashToCollaboratorColor } from "@serenity-tools/common";
 import {
   Avatar,
@@ -25,6 +26,7 @@ const CommentsSidebar: React.FC<{}> = () => {
   const { workspaceQueryResult } = useWorkspace();
   const { commentsService } = usePage();
   const [state, send] = useActor(commentsService);
+  const [isHovered, setIsHovered] = React.useState(false);
 
   const styles = StyleSheet.create({
     header: tw`justify-between`,
@@ -72,6 +74,9 @@ const CommentsSidebar: React.FC<{}> = () => {
               onPress={() => {
                 send({ type: "HIGHLIGHT_COMMENT", commentId: comment.id });
               }}
+              // @ts-expect-error native-base mismatch
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
             >
               <HStack alignItems="center">
                 {/* new comment indicator */}
@@ -99,13 +104,15 @@ const CommentsSidebar: React.FC<{}> = () => {
                     {commentCreator?.username || "External"}
                   </Text>
                 </HStack>
-                <View style={tw`ml-auto`}>
-                  <CommentsMenu
-                    onDeletePressed={() =>
-                      send({ type: "DELETE_COMMENT", commentId: comment.id })
-                    }
-                  />
-                </View>
+                {isActiveComment || isHovered ? (
+                  <View style={tw`ml-auto`}>
+                    <CommentsMenu
+                      onDeletePressed={() =>
+                        send({ type: "DELETE_COMMENT", commentId: comment.id })
+                      }
+                    />
+                  </View>
+                ) : null}
               </HStack>
               <View style={tw`pl-0.5 py-2`}>
                 <Text variant="xxs" muted style={tw`mb-1.5`}>
