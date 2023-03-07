@@ -42,9 +42,7 @@ const CommentsSidebar: React.FC<{}> = () => {
           <Text variant="xxs" muted style={tw`p-1`}>
             Open
           </Text>
-          <EditorBottombarDivider
-            style={tw`h-4 border-r-1.5 border-gray-600`}
-          />
+          <EditorBottombarDivider style={tw`h-4 border-r-1 border-gray-600`} />
           <Text variant="xxs" muted style={tw`p-1`}>
             Resolved
           </Text>
