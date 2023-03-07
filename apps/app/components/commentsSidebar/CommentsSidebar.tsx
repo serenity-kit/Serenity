@@ -4,7 +4,6 @@ import {
   Avatar,
   EditorBottombarDivider,
   EditorSidebarHeader,
-  IconButton,
   Pressable,
   RawInput,
   ScrollView,
@@ -21,12 +20,16 @@ import { usePage } from "../../context/PageContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
 import CommentsMenu from "../commentsMenu/CommentsMenu";
+import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 
 const CommentsSidebar: React.FC<{}> = () => {
   const { workspaceQueryResult } = useWorkspace();
   const { commentsService } = usePage();
+  const { me } = useAuthenticatedAppContext();
   const [state, send] = useActor(commentsService);
   const [isHovered, setIsHovered] = React.useState(false);
+
+  if (!me) return null;
 
   const styles = StyleSheet.create({
     header: tw`justify-between`,
@@ -62,6 +65,8 @@ const CommentsSidebar: React.FC<{}> = () => {
 
           const isActiveComment =
             comment.id === state.context.highlightedCommentId;
+
+          const isMyComment = commentCreator?.userId === me.id;
 
           return (
             <Pressable
@@ -104,7 +109,7 @@ const CommentsSidebar: React.FC<{}> = () => {
                     {commentCreator?.username || "External"}
                   </Text>
                 </HStack>
-                {isActiveComment || isHovered ? (
+                {isMyComment && (isActiveComment || isHovered) ? (
                   <View style={tw`ml-auto`}>
                     <CommentsMenu
                       onDeletePressed={() =>
@@ -132,6 +137,9 @@ const CommentsSidebar: React.FC<{}> = () => {
                       workspaceQueryResult.data!,
                       reply.creatorDevice
                     );
+
+                  const isMyReply = replyCreator?.userId === me.id;
+
                   return (
                     <View key={reply.id}>
                       <HStack alignItems="center">
@@ -158,13 +166,18 @@ const CommentsSidebar: React.FC<{}> = () => {
                             {replyCreator?.username || "External"}
                           </Text>
                         </HStack>
-                        <View style={tw`ml-auto`}>
-                          <CommentsMenu
-                            onDeletePressed={() =>
-                              send({ type: "DELETE_REPLY", replyId: reply.id })
-                            }
-                          />
-                        </View>
+                        {isMyReply && (isActiveComment || isHovered) ? (
+                          <View style={tw`ml-auto`}>
+                            <CommentsMenu
+                              onDeletePressed={() =>
+                                send({
+                                  type: "DELETE_REPLY",
+                                  replyId: reply.id,
+                                })
+                              }
+                            />
+                          </View>
+                        ) : null}
                       </HStack>
                       <View
                         style={tw`ml-2.75 pb-2 pl-4.25 border-l-2 border-solid border-gray-200`}
