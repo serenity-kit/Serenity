@@ -19,6 +19,7 @@ import { StyleSheet } from "react-native";
 import { usePage } from "../../context/PageContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
+import CommentsMenu from "../commentsMenu/CommentsMenu";
 
 const CommentsSidebar: React.FC<{}> = () => {
   const { workspaceQueryResult } = useWorkspace();
@@ -100,7 +101,13 @@ const CommentsSidebar: React.FC<{}> = () => {
                     {commentCreator?.username || "External"}
                   </Text>
                 </HStack>
-                {/* <IconButton name="more-line" style={tw`ml-auto`} /> */}
+                <View style={tw`ml-auto`}>
+                  <CommentsMenu
+                    onDeletePressed={() =>
+                      send({ type: "DELETE_COMMENT", commentId: comment.id })
+                    }
+                  />
+                </View>
               </HStack>
               <View style={tw`pl-0.5 py-2`}>
                 <Text variant="xxs" muted style={tw`mb-1.5`}>
@@ -146,7 +153,13 @@ const CommentsSidebar: React.FC<{}> = () => {
                             {replyCreator?.username || "External"}
                           </Text>
                         </HStack>
-                        {/* <IconButton name="more-line" style={tw`ml-auto`} /> */}
+                        <View style={tw`ml-auto`}>
+                          <CommentsMenu
+                            onDeletePressed={() =>
+                              send({ type: "DELETE_REPLY", replyId: reply.id })
+                            }
+                          />
+                        </View>
                       </HStack>
                       <View
                         style={tw`ml-2.75 pb-2 pl-4.25 border-l-2 border-solid border-gray-200`}
@@ -158,12 +171,6 @@ const CommentsSidebar: React.FC<{}> = () => {
                         </Text>
                         <Text variant="xs">{reply.text}</Text>
                       </View>
-                      <IconButton
-                        name="delete-bin-line"
-                        onPress={() =>
-                          send({ type: "DELETE_REPLY", replyId: reply.id })
-                        }
-                      />
                     </View>
                   );
                 })}
@@ -201,13 +208,6 @@ const CommentsSidebar: React.FC<{}> = () => {
                   send({ type: "CREATE_REPLY", commentId: comment.id })
                 }
                 style={tw`mt-1 self-end`}
-              />
-
-              <IconButton
-                name="delete-bin-line"
-                onPress={() =>
-                  send({ type: "DELETE_COMMENT", commentId: comment.id })
-                }
               />
             </Pressable>
           );
