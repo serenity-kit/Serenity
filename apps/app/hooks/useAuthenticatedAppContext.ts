@@ -1,8 +1,6 @@
 import { useAppContext } from "../context/AppContext";
-import { useMeQuery } from "../generated/graphql";
 
 export const useAuthenticatedAppContext = () => {
-  const [meResult] = useMeQuery();
   const { activeDevice, sessionKey, updateActiveDevice, updateAuthentication } =
     useAppContext();
 
@@ -20,6 +18,5 @@ export const useAuthenticatedAppContext = () => {
     sessionKey,
     updateActiveDevice,
     updateAuthentication,
-    me: meResult.data?.me,
   };
 };

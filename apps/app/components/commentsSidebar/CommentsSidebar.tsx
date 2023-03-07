@@ -20,14 +20,16 @@ import { usePage } from "../../context/PageContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
 import CommentsMenu from "../commentsMenu/CommentsMenu";
-import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
+import { useMeQuery } from "../../generated/graphql";
 
 const CommentsSidebar: React.FC<{}> = () => {
   const { workspaceQueryResult } = useWorkspace();
   const { commentsService } = usePage();
-  const { me } = useAuthenticatedAppContext();
+  const [meResult] = useMeQuery();
   const [state, send] = useActor(commentsService);
   const [isHovered, setIsHovered] = React.useState(false);
+
+  const me = meResult.data?.me;
 
   if (!me) return null;
 
@@ -79,7 +81,7 @@ const CommentsSidebar: React.FC<{}> = () => {
               onPress={() => {
                 send({ type: "HIGHLIGHT_COMMENT", commentId: comment.id });
               }}
-              // @ts-expect-error native-base mismatch
+              //@ts-expect-error native-base mismatch
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
