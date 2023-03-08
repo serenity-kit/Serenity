@@ -17,5 +17,5 @@ export const selectValueFromOptions = async ({
   const isSelectElementVisible = await selectElement.isVisible();
   expect(isSelectElementVisible).toBe(true);
   await selectElement.selectOption({ value });
-  delayForSeconds(1);
+  await delayForSeconds(1);
 };
