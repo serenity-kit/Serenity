@@ -408,6 +408,7 @@ export type DocumentShareLink = {
   deviceSecretBoxCiphertext: Scalars['String'];
   deviceSecretBoxNonce: Scalars['String'];
   deviceSigningPublicKey: Scalars['String'];
+  role: Role;
   snapshotKeyBoxs?: Maybe<Array<SnapshotKeyBox>>;
   token: Scalars['String'];
 };
@@ -606,6 +607,13 @@ export type MemberWithWorkspaceKeyBoxes = {
   __typename?: 'MemberWithWorkspaceKeyBoxes';
   id: Scalars['String'];
   workspaceKeyBoxes: Array<WorkspaceKeyBox>;
+};
+
+export type MinimalDevice = {
+  __typename?: 'MinimalDevice';
+  encryptionPublicKey: Scalars['String'];
+  encryptionPublicKeySignature: Scalars['String'];
+  signingPublicKey: Scalars['String'];
 };
 
 export type Mutation = {
@@ -1327,6 +1335,7 @@ export type WorkspaceLoadingInfo = {
 
 export type WorkspaceMember = {
   __typename?: 'WorkspaceMember';
+  devices?: Maybe<Array<MinimalDevice>>;
   role: Role;
   userId: Scalars['String'];
   username?: Maybe<Scalars['String']>;
@@ -1570,7 +1579,7 @@ export type CommentsByDocumentIdQueryVariables = Exact<{
 }>;
 
 
-export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string, createdAt?: any | null }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, createdAt: any } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type CommentsByDocumentIdQuery = { __typename?: 'Query', commentsByDocumentId?: { __typename?: 'CommentConnection', nodes?: Array<{ __typename?: 'Comment', id: string, documentId: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }, commentReplies?: Array<{ __typename?: 'CommentReply', id: string, snapshotId: string, subkeyId: number, contentCiphertext: string, contentNonce: string, createdAt: any, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string } } | null> | null } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DeviceBySigningPublicKeyQueryVariables = Exact<{
   signingPublicKey: Scalars['ID'];
@@ -1607,7 +1616,7 @@ export type DocumentShareLinkQueryVariables = Exact<{
 }>;
 
 
-export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLink', token: string, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string, snapshotKeyBoxs?: Array<{ __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } }> | null } | null };
+export type DocumentShareLinkQuery = { __typename?: 'Query', documentShareLink?: { __typename?: 'DocumentShareLink', token: string, role: Role, deviceSecretBoxCiphertext: string, deviceSecretBoxNonce: string, snapshotKeyBoxs?: Array<{ __typename?: 'SnapshotKeyBox', id: string, ciphertext: string, nonce: string, creatorDevice: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } }> | null } | null };
 
 export type DocumentShareLinksQueryVariables = Exact<{
   documentId: Scalars['ID'];
@@ -1616,7 +1625,7 @@ export type DocumentShareLinksQueryVariables = Exact<{
 }>;
 
 
-export type DocumentShareLinksQuery = { __typename?: 'Query', documentShareLinks?: { __typename?: 'DocumentShareLinkConnection', nodes?: Array<{ __typename?: 'DocumentShareLink', token: string } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
+export type DocumentShareLinksQuery = { __typename?: 'Query', documentShareLinks?: { __typename?: 'DocumentShareLinkConnection', nodes?: Array<{ __typename?: 'DocumentShareLink', token: string, role: Role } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: string | null, endCursor?: string | null } } | null };
 
 export type DocumentsQueryVariables = Exact<{
   parentFolderId: Scalars['ID'];
@@ -1732,7 +1741,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, role: Role }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null }> | null } | null };
+export type WorkspaceQuery = { __typename?: 'Query', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, role: Role, devices?: Array<{ __typename?: 'MinimalDevice', signingPublicKey: string, encryptionPublicKey: string, encryptionPublicKeySignature: string }> | null }> | null, currentWorkspaceKey?: { __typename?: 'WorkspaceKey', id: string, workspaceId: string, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null } | null, workspaceKeys?: Array<{ __typename?: 'WorkspaceKey', id: string, workspaceId: string, generation: number, workspaceKeyBox?: { __typename?: 'WorkspaceKeyBox', id: string, workspaceKeyId: string, deviceSigningPublicKey: string, ciphertext: string, nonce: string, creatorDevice?: { __typename?: 'CreatorDevice', signingPublicKey: string, encryptionPublicKey: string } | null } | null }> | null } | null };
 
 export type WorkspaceDevicesQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
@@ -2303,7 +2312,6 @@ export const CommentsByDocumentIdDocument = gql`
         signingPublicKey
         encryptionPublicKey
         encryptionPublicKeySignature
-        createdAt
       }
       commentReplies {
         id
@@ -2312,6 +2320,11 @@ export const CommentsByDocumentIdDocument = gql`
         contentCiphertext
         contentNonce
         createdAt
+        creatorDevice {
+          signingPublicKey
+          encryptionPublicKey
+          encryptionPublicKeySignature
+        }
       }
     }
     pageInfo {
@@ -2419,6 +2432,7 @@ export const DocumentShareLinkDocument = gql`
     query documentShareLink($token: ID!) {
   documentShareLink(token: $token) {
     token
+    role
     deviceSecretBoxCiphertext
     deviceSecretBoxNonce
     snapshotKeyBoxs {
@@ -2442,6 +2456,7 @@ export const DocumentShareLinksDocument = gql`
   documentShareLinks(documentId: $documentId, first: $first, after: $after) {
     nodes {
       token
+      role
     }
     pageInfo {
       hasNextPage
@@ -2760,6 +2775,11 @@ export const WorkspaceDocument = gql`
       userId
       username
       role
+      devices {
+        signingPublicKey
+        encryptionPublicKey
+        encryptionPublicKeySignature
+      }
     }
     currentWorkspaceKey {
       id

@@ -20,3 +20,9 @@ export type CreatorDevice = {
   createdAt?: Date;
   userId?: string | null;
 };
+
+export type MinimalDevice = {
+  signingPublicKey: string;
+  encryptionPublicKey: string;
+  encryptionPublicKeySignature: string;
+};

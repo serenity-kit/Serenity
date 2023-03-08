@@ -1,3 +1,4 @@
+import { UserInputError } from "apollo-server-express";
 import {
   arg,
   inputObjectType,
@@ -5,6 +6,7 @@ import {
   nonNull,
   objectType,
 } from "nexus";
+import { z } from "zod";
 import { startRegistration } from "../../../utils/opaque";
 
 export const StartRegistrationInput = inputObjectType({
@@ -33,6 +35,11 @@ export const startRegistrationMutation = mutationField("startRegistration", {
     ),
   },
   async resolve(root, args) {
+    try {
+      z.string().email().parse(args.input.username);
+    } catch (error) {
+      throw new UserInputError("Invalid email address");
+    }
     const result = startRegistration({
       username: args.input.username,
       challenge: args.input.challenge,

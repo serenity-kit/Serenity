@@ -1,3 +1,4 @@
+import { hashToCollaboratorColor } from "@serenity-tools/common";
 import {
   Avatar,
   EditorBottombarDivider,
@@ -11,13 +12,16 @@ import {
   tw,
   View,
 } from "@serenity-tools/ui";
-import { HStack } from "native-base";
 import { useActor } from "@xstate/react";
 import { formatDistanceToNow, parseJSON } from "date-fns";
+import { HStack } from "native-base";
 import { StyleSheet } from "react-native";
 import { usePage } from "../../context/PageContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
+import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
 
 const CommentsSidebar: React.FC<{}> = () => {
+  const { workspaceQueryResult } = useWorkspace();
   const { commentsService } = usePage();
   const [state, send] = useActor(commentsService);
 
@@ -30,7 +34,7 @@ const CommentsSidebar: React.FC<{}> = () => {
     // grow-0 overrides default of ScrollView to keep the assigned width
     <ScrollView style={tw`w-sidebar grow-0 bg-gray-100`}>
       <EditorSidebarHeader style={styles.header}>
-        <Text variant="sm" bold>
+        <Text variant="xs" bold>
           Comments
         </Text>
         <HStack alignItems={"center"} style={tw`-mr-1`}>
@@ -49,6 +53,11 @@ const CommentsSidebar: React.FC<{}> = () => {
       <View>
         {state.context.decryptedComments.map((comment) => {
           if (!comment) return null;
+
+          const commentCreator = getUserFromWorkspaceQueryResultByDeviceInfo(
+            workspaceQueryResult.data!,
+            comment.creatorDevice
+          );
 
           const isActiveComment =
             comment.id === state.context.highlightedCommentId;
@@ -73,12 +82,23 @@ const CommentsSidebar: React.FC<{}> = () => {
 
                 <HStack alignItems="center" space="1.5">
                   {/* TODO if comment has been read change color to gray-400 */}
-                  {/* <Avatar color="arctic" size="xs">
-                    KD
-                  </Avatar>
-                  <Text variant="xs" bold>
-                    Karen Doe
-                  </Text> */}
+                  {commentCreator ? (
+                    <Avatar
+                      key={commentCreator.userId}
+                      color={hashToCollaboratorColor(commentCreator.userId)}
+                      size="xs"
+                    >
+                      {commentCreator.username?.split("@")[0].substring(0, 1)}
+                    </Avatar>
+                  ) : (
+                    <Avatar color="arctic" size="xs">
+                      E
+                    </Avatar>
+                  )}
+
+                  <Text variant="xxs" bold>
+                    {commentCreator?.username || "External"}
+                  </Text>
                 </HStack>
                 {/* <IconButton name="more-line" style={tw`ml-auto`} /> */}
               </HStack>
@@ -88,23 +108,43 @@ const CommentsSidebar: React.FC<{}> = () => {
                     addSuffix: true,
                   })}
                 </Text>
-                <Text variant="sm">{comment.text}</Text>
+                <Text variant="xs">{comment.text}</Text>
               </View>
 
               <View style={tw`mt-2`}>
                 {comment.replies.map((reply) => {
                   if (!reply) return null;
+
+                  const replyCreator =
+                    getUserFromWorkspaceQueryResultByDeviceInfo(
+                      workspaceQueryResult.data!,
+                      reply.creatorDevice
+                    );
                   return (
                     <View key={reply.id}>
                       <HStack alignItems="center">
                         <HStack alignItems="center" space="1.5">
-                          {/* TODO if comment has been read change color to gray-400 */}
-                          {/* <Avatar color="emerald" size="xs">
-                            ND
-                          </Avatar>
-                          <Text variant="xs" bold>
-                            Norman Dean
-                          </Text> */}
+                          {/* TODO if comment has been read change color to gray */}
+                          {replyCreator ? (
+                            <Avatar
+                              key={replyCreator.userId}
+                              color={hashToCollaboratorColor(
+                                replyCreator.userId
+                              )}
+                              size="xs"
+                            >
+                              {replyCreator.username
+                                ?.split("@")[0]
+                                .substring(0, 1)}
+                            </Avatar>
+                          ) : (
+                            <Avatar color="arctic" size="xs">
+                              E
+                            </Avatar>
+                          )}
+                          <Text variant="xxs" bold>
+                            {replyCreator?.username || "External"}
+                          </Text>
                         </HStack>
                         {/* <IconButton name="more-line" style={tw`ml-auto`} /> */}
                       </HStack>
@@ -116,7 +156,7 @@ const CommentsSidebar: React.FC<{}> = () => {
                             addSuffix: true,
                           })}
                         </Text>
-                        <Text variant="sm">{reply.text}</Text>
+                        <Text variant="xs">{reply.text}</Text>
                       </View>
                       <IconButton
                         name="delete-bin-line"

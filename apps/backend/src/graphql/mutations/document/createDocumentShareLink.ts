@@ -6,6 +6,7 @@ import {
   nonNull,
   objectType,
 } from "nexus";
+import { Role } from "../../../../prisma/generated/output";
 import { createDocumentShareLink } from "../../../database/document/createDocumentShareLink";
 import { MemberRoleEnum } from "../../types/workspace";
 
@@ -39,6 +40,7 @@ export const CreateDocumentShareLinkResult = objectType({
   name: "CreateDocumentShareLinkResult",
   definition(t) {
     t.nonNull.string("token");
+    t.nonNull.field("role", { type: MemberRoleEnum });
   },
 });
 
@@ -75,6 +77,7 @@ export const createDocumentLinkShareMutation = mutationField(
       });
       return {
         token: documentShareLink.token,
+        role: documentShareLink.role as Role,
       };
     },
   }

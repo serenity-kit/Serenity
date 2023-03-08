@@ -104,6 +104,7 @@ describe("Input errors", () => {
       documentShareLinks(documentId: $documentId, first: $first) {
         nodes {
           token
+          role
         }
         pageInfo {
           hasNextPage

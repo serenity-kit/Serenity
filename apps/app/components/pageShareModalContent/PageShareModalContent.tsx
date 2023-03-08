@@ -11,6 +11,8 @@ import {
   ListItem,
   ListText,
   ModalHeader,
+  Select,
+  SelectItem,
   Spinner,
   TextArea,
   tw,
@@ -22,6 +24,7 @@ import { useMemo, useState } from "react";
 import { StyleSheet } from "react-native";
 import sodium, { KeyPair } from "react-native-libsodium";
 import {
+  Role,
   runRemoveDocumentShareLinkMutation,
   useDocumentShareLinksQuery,
 } from "../../generated/graphql";
@@ -31,12 +34,13 @@ import { createDocumentShareLink } from "../../utils/document/createDocumentShar
 import { notNull } from "../../utils/notNull/notNull";
 
 const styles = StyleSheet.create({
-  createShareLinkButton: tw`mb-4 self-start`,
+  createShareLinkButton: tw`self-start`,
   shareLinkWrapperBase: tw`relative mb-2 py-4 px-5 border rounded`,
   shareLinkWrapperActive: tw`bg-primary-100/40 border-primary-200`,
   shareLinkWrapperInactive: tw`bg-gray-100 border-gray-200`,
   shareLinkTextActive: tw`text-primary-900`,
   shareLinkTextInactive: tw`text-gray-400`,
+  createShareLinkOptions: tw`flex-row justify-between items-center mb-4`,
 });
 
 const CLIPBOARD_NOTICE_TIMEOUT_SECONDS = 1;
@@ -63,8 +67,37 @@ export function PageShareModalContent() {
   const documentShareLinks =
     documentShareLinksResult.data?.documentShareLinks?.nodes?.filter(notNull) ||
     [];
+  const [sharingRole, _setSharingRole] = useState(Role.Viewer);
 
-  const createShareLink = async () => {
+  const setSharingRole = (role: string) => {
+    if (role === "admin") {
+      _setSharingRole(Role.Admin);
+    } else if (role === "editor") {
+      _setSharingRole(Role.Editor);
+    } else if (role === "commenter") {
+      _setSharingRole(Role.Commenter);
+    } else if (role === "viewer") {
+      _setSharingRole(Role.Viewer);
+    } else {
+      console.log("Unknown role: ", role);
+      _setSharingRole(Role.Viewer);
+    }
+  };
+
+  const getSharingRoleText = (role: Role) => {
+    if (role === Role.Admin) {
+      return "Admin";
+    } else if (role === Role.Editor) {
+      return "Editor";
+    } else if (role === Role.Commenter) {
+      return "Commenter";
+    } else if (role === Role.Viewer) {
+      return "Viewer";
+    }
+    return "Unknown";
+  };
+
+  const createShareLink = async (sharingRole: Role) => {
     if (!activeDevice.encryptionPrivateKey) {
       console.error("active device doesn't have encryptionPrivateKey");
       return;
@@ -74,6 +107,7 @@ export function PageShareModalContent() {
     try {
       const shareLinkData = await createDocumentShareLink({
         documentId: pageId,
+        sharingRole,
         creatorDevice,
         creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
       });
@@ -132,13 +166,30 @@ export function PageShareModalContent() {
                     ? pageShareLink
                     : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
                 </TextArea>
-                <Button
-                  onPress={createShareLink}
-                  style={styles.createShareLinkButton}
-                  testID="document-share-modal__create-share-link-button"
-                >
-                  Create page link
-                </Button>
+                <View style={styles.createShareLinkOptions}>
+                  <Select
+                    onValueChange={(value: Role) => {
+                      setSharingRole(value);
+                    }}
+                    testID={`document-share-modal__select-role-menu`}
+                    accessibilityLabel="Set sharing access level"
+                    defaultValue="viewer"
+                  >
+                    <SelectItem label="Admin" value="admin" />
+                    <SelectItem label="Editor" value="editor" />
+                    <SelectItem label="Commenter" value="commenter" />
+                    <SelectItem label="Viewer" value="viewer" />
+                  </Select>
+                  <Button
+                    onPress={() => {
+                      createShareLink(sharingRole);
+                    }}
+                    style={styles.createShareLinkButton}
+                    testID="document-share-modal__create-share-link-button"
+                  >
+                    Create page link
+                  </Button>
+                </View>
               </View>
               <View>
                 <Heading lvl={3} padded>
@@ -169,6 +220,11 @@ export function PageShareModalContent() {
                             {documentShareLink.token}
                           </ListText>
                         </>
+                      }
+                      secondaryItem={
+                        <ListText>
+                          {getSharingRoleText(documentShareLink.role)}
+                        </ListText>
                       }
                       actionItem={
                         <IconButton

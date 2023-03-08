@@ -9,7 +9,7 @@ import { login } from "../../helpers/e2e/login";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
 import { renameFolder } from "../../helpers/e2e/renameFolder";
 
-const password = "pass";
+const password = "password";
 
 test.beforeAll(async () => {
   await sodium.ready;

@@ -290,7 +290,7 @@ export default function WorkspaceSettingsMembersScreen(
                   member.username.indexOf("@")
                 );
                 // TODO actually use initials when we have a username
-                const initials = username.substring(0, 2);
+                const initials = username.substring(0, 1);
                 const email = member.username;
 
                 const allowEditing = isAdmin && member.userId !== adminUserId;

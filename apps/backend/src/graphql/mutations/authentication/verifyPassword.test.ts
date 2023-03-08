@@ -7,7 +7,7 @@ import setupGraphql from "../../../../test/helpers/setupGraphql";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const username = "user";
+const username = `${uuidv4()}@example.com`;
 const password = "password";
 let userData: any = undefined;
 
@@ -106,12 +106,23 @@ test("bad password", async () => {
   }).toThrow();
 });
 
+test("invalid email address", async () => {
+  await expect(
+    (async () =>
+      await requestLoginChallengeResponse({
+        graphql,
+        username: "invalid-email",
+        password,
+      }))()
+  ).rejects.toThrowError();
+});
+
 test("bad username", async () => {
   await expect(
     (async () =>
       await requestLoginChallengeResponse({
         graphql,
-        username: "baduser",
+        username: "baduser@examplec.om",
         password,
       }))()
   ).rejects.toThrowError();
