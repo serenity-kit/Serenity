@@ -29,7 +29,7 @@ test.beforeAll(async () => {
   });
 });
 
-test.only.describe("Share links", () => {
+test.describe.only("Share links", () => {
   test("editor share link", async ({ browser, page }) => {
     const role = Role.EDITOR;
     await login({
@@ -68,6 +68,7 @@ test.only.describe("Share links", () => {
       .isVisible();
     expect(hasDecriptionError).toBe(false);
   });
+
   test("viewer share link", async ({ browser, page }) => {
     const role = Role.VIEWER;
     await login({
