@@ -65,7 +65,7 @@ test.beforeAll(async () => {
 test.describe("Workspace Sharing", () => {
   let workspaceInvitationUrl = "";
 
-  test("User 1 can create a sharing link", async ({ browser, page }) => {
+  test.only("User 1 can create a sharing link", async ({ browser, page }) => {
     // const workspaceName = "sharable";
     // await page.goto("http://localhost:19006/register");
     // await registerOnPage({ page, username, password, workspaceName });
@@ -142,6 +142,7 @@ test.describe("Workspace Sharing", () => {
       await invalidAccessMessage.isVisible();
     expect(user3Url).toBe(expectedUser3Url);
     expect(doesInvalidAccessMessageExist).toBe(true);
+    console.log("user2 renaming folder");
     await renameFolder(user2Page, user1.data.folder.id, "user2 re-renamed");
 
     // re-add user3
@@ -153,6 +154,7 @@ test.describe("Workspace Sharing", () => {
       password: user3.password,
     });
     await delayForSeconds(2);
+    console.log("user3 renaming");
     await renameFolder(user3Page, user1.data.folder.id, "user3 re-added");
   });
 });
