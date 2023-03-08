@@ -2,6 +2,7 @@ import React from "react";
 import {
   EditorBottombarDivider,
   EditorSidebarHeader,
+  Icon,
   ScrollView,
   Text,
   tw,
@@ -47,20 +48,33 @@ const CommentsSidebar: React.FC<{}> = () => {
         </HStack>
       </EditorSidebarHeader>
 
-      <View>
-        {state.context.decryptedComments.map((comment) => {
-          if (!comment) return null;
+      {comments.length >= 1 ? (
+        <View>
+          {state.context.decryptedComments.map((comment) => {
+            if (!comment) return null;
 
-          return (
-            <Comment
-              key={`comment_${comment.id}`}
-              comment={comment}
-              meId={me.id}
-              meName={me.username}
-            />
-          );
-        })}
-      </View>
+            return (
+              <Comment
+                key={`comment_${comment.id}`}
+                comment={comment}
+                meId={me.id}
+                meName={me.username}
+              />
+            );
+          })}
+        </View>
+      ) : (
+        <HStack space={3} style={tw`p-4`}>
+          <View style={tw``}>
+            <Icon name="chat-1-line-message" color={"gray-500"} size={5} />
+          </View>
+          <Text variant="xs" muted>
+            Add suggestions, questions or appreciations by marking a
+            text-passage or image and then clicking on the comment icon in the
+            floating menu.
+          </Text>
+        </HStack>
+      )}
     </ScrollView>
   );
 };
