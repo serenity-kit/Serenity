@@ -65,10 +65,15 @@ const CommentsSidebar: React.FC = () => {
         state.event.type === "HIGHLIGHT_COMMENT" &&
         state.context.highlightedCommentId
       ) {
-        const comment = comments.find(
+        const index = comments.findIndex(
           (comment) => comment.id === state.context.highlightedCommentId
         );
-        flatListRef.current?.scrollToItem({ item: comment, animated: true });
+        if (index === -1) return; // in case the list isn't yet loaded
+        flatListRef.current.scrollToIndex({
+          index,
+          animated: true,
+          viewPosition: 0,
+        });
       } else if (
         state.event.type === "OPEN_SIDEBAR" ||
         state.event.type === "TOGGLE_SIDEBAR"
@@ -76,10 +81,15 @@ const CommentsSidebar: React.FC = () => {
         // should alays immediately scroll to top once the scrollbar opens
         // and now highlighted comment is set
         if (state.context.highlightedCommentId) {
-          const comment = comments.find(
+          const index = comments.findIndex(
             (comment) => comment.id === state.context.highlightedCommentId
           );
-          flatListRef.current?.scrollToItem({ item: comment, animated: false });
+          if (index === -1) return; // in case the list isn't yet loaded
+          flatListRef.current.scrollToIndex({
+            index,
+            animated: false,
+            viewPosition: 0,
+          });
         } else {
           flatListRef.current.scrollToOffset({ offset: 0, animated: false });
         }
