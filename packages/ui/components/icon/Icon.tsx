@@ -26,8 +26,10 @@ import { BookmarkLine } from "./icons/BookmarkLine";
 import { BookOpenLine } from "./icons/BookOpenLine";
 import { CalendarCheckFill } from "./icons/CalendarCheckFill";
 import { Chat1Line } from "./icons/Chat1Line";
+import { Chat1LineMessage } from "./icons/Chat1LineMessage";
 import { Chat4Line } from "./icons/Chat4Line";
 import { CheckLine } from "./icons/CheckLine";
+import { ChitChat } from "./icons/ChitChat";
 import { CloseCircleFill } from "./icons/CloseCircleFill";
 import { CodeSSlashLine } from "./icons/CodeSSlashLine";
 import { CodeView } from "./icons/CodeView";
@@ -145,8 +147,10 @@ export type IconNames =
   | "book-open-line"
   | "calendar-check-fill"
   | "chat-1-line"
+  | "chat-1-line-message"
   | "chat-4-line"
   | "check-line"
+  | "chit-chat"
   | "close-circle-fill"
   | "code-s-slash-line"
   | "code-view"
@@ -329,11 +333,17 @@ export const Icon = (props: IconProps) => {
   if (name === "chat-1-line") {
     icon = <Chat1Line color={color} size={iconSize} />;
   }
+  if (name === "chat-1-line-message") {
+    icon = <Chat1LineMessage color={color} size={iconSize} />;
+  }
   if (name === "chat-4-line") {
     icon = <Chat4Line color={color} size={iconSize} />;
   }
   if (name === "check-line") {
     icon = <CheckLine color={color} size={iconSize} />;
+  }
+  if (name === "chit-chat") {
+    icon = <ChitChat color={color} size={iconSize} />;
   }
   if (name === "close-circle-fill") {
     icon = <CloseCircleFill color={color} size={iconSize} />;
