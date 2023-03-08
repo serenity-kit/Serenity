@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
 import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
-import { prisma } from "../../../src/database/prisma";
+import { Role } from "../../../prisma/generated/output";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
-import { delayForSeconds } from "../../helpers/delayForSeconds";
+import { createDocumentShareLink } from "../../helpers/e2e/documentShareLink/createDocumentShareLink";
+import { openDocumentShareLinkModal } from "../../helpers/e2e/documentShareLink/openDocumentShareLinkModal";
 import { login } from "../../helpers/e2e/login";
 
 type UserData = {
@@ -28,34 +29,58 @@ test.beforeAll(async () => {
   });
 });
 
-test.describe("Edit document", () => {
-  test("Create share link", async ({ browser, page }) => {
+test.only.describe("Share links", () => {
+  test("editor share link", async ({ browser, page }) => {
+    const role = Role.EDITOR;
     await login({
       page,
       username: user1.username,
       password: user1.password,
       stayLoggedIn: true,
     });
-    const numLinksBefore = await prisma.documentShareLink.count();
-    await page.locator("data-testid=document-share-button").click();
-    await delayForSeconds(1);
-
-    await page
-      .locator("data-testid=document-share-modal__create-share-link-button")
-      .click();
-    await delayForSeconds(1);
-
-    const numLinksAfter = await prisma.documentShareLink.count();
-    expect(numLinksAfter).toBe(numLinksBefore + 1);
-    const shareLink = await page
-      .locator("data-testid=document-share-modal__share-link-text")
-      .textContent();
-    if (!shareLink) {
-      throw new Error("Share link not found");
-    }
+    await openDocumentShareLinkModal({ page });
+    const { sharingUrl } = await createDocumentShareLink({ page, role });
     const context2 = await browser.newContext();
     const page2 = await context2.newPage();
-    await page2.goto(shareLink);
+    await page2.goto(sharingUrl);
+
+    const hasDecriptionError = await page
+      .locator("data-testid=document-share-error")
+      .isVisible();
+    expect(hasDecriptionError).toBe(false);
+  });
+  test("commenter share link", async ({ browser, page }) => {
+    const role = Role.COMMENTER;
+    await login({
+      page,
+      username: user1.username,
+      password: user1.password,
+      stayLoggedIn: true,
+    });
+    await openDocumentShareLinkModal({ page });
+    const { sharingUrl } = await createDocumentShareLink({ page, role });
+    const context2 = await browser.newContext();
+    const page2 = await context2.newPage();
+    await page2.goto(sharingUrl);
+
+    const hasDecriptionError = await page
+      .locator("data-testid=document-share-error")
+      .isVisible();
+    expect(hasDecriptionError).toBe(false);
+  });
+  test("viewer share link", async ({ browser, page }) => {
+    const role = Role.VIEWER;
+    await login({
+      page,
+      username: user1.username,
+      password: user1.password,
+      stayLoggedIn: true,
+    });
+    await openDocumentShareLinkModal({ page });
+    const { sharingUrl } = await createDocumentShareLink({ page, role });
+    const context2 = await browser.newContext();
+    const page2 = await context2.newPage();
+    await page2.goto(sharingUrl);
 
     const hasDecriptionError = await page
       .locator("data-testid=document-share-error")
