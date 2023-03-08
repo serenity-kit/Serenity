@@ -13,5 +13,10 @@ export const useAuthenticatedAppContext = () => {
     throw new Error("No sessionKey available");
   }
 
-  return { activeDevice, sessionKey, updateActiveDevice, updateAuthentication };
+  return {
+    activeDevice,
+    sessionKey,
+    updateActiveDevice,
+    updateAuthentication,
+  };
 };

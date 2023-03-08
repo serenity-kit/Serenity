@@ -5,6 +5,7 @@ import {
   ScrollView,
   SubmitButton,
   ToggleButton,
+  Tooltip,
   tw,
   useHasEditorSidebar,
   View,
@@ -340,43 +341,59 @@ export const Editor = (props: EditorProps) => {
                   style={tw`p-1 bg-white border border-gray-200 rounded`}
                   alignItems="center"
                 >
-                  <ToggleButton
-                    onPress={() => editor.chain().focus().toggleBold().run()}
-                    name="bold"
-                    isActive={editor.isActive("bold")}
-                  />
+                  <Tooltip label={"Bold"} placement={"top"} hasArrow={false}>
+                    <ToggleButton
+                      onPress={() => editor.chain().focus().toggleBold().run()}
+                      name="bold"
+                      isActive={editor.isActive("bold")}
+                    />
+                  </Tooltip>
 
-                  <ToggleButton
-                    onPress={() => editor.chain().focus().toggleItalic().run()}
-                    name="italic"
-                    isActive={editor.isActive("italic")}
-                  />
+                  <Tooltip label={"Italic"} placement={"top"} hasArrow={false}>
+                    <ToggleButton
+                      onPress={() =>
+                        editor.chain().focus().toggleItalic().run()
+                      }
+                      name="italic"
+                      isActive={editor.isActive("italic")}
+                    />
+                  </Tooltip>
 
-                  <ToggleButton
-                    onPress={() => editor.chain().focus().toggleCode().run()}
-                    name="code-view"
-                    isActive={editor.isActive("code")}
-                  />
-
-                  <EditorBottombarDivider />
-
-                  <ToggleButton
-                    onPress={() =>
-                      editor.chain().focus().toggleLink({ href: "#" }).run()
-                    }
-                    name="link"
-                    isActive={editor.isActive("link")}
-                  />
+                  <Tooltip label={"Code"} placement={"top"} hasArrow={false}>
+                    <ToggleButton
+                      onPress={() => editor.chain().focus().toggleCode().run()}
+                      name="code-view"
+                      isActive={editor.isActive("code")}
+                    />
+                  </Tooltip>
 
                   <EditorBottombarDivider />
 
-                  <ToggleButton
-                    onPress={() => {
-                      setHasCreateCommentBubble(true);
-                    }}
-                    name="chat-1-line"
-                    isActive={false}
-                  />
+                  <Tooltip label={"Link"} placement={"top"} hasArrow={false}>
+                    <ToggleButton
+                      onPress={() =>
+                        editor.chain().focus().toggleLink({ href: "#" }).run()
+                      }
+                      name="link"
+                      isActive={editor.isActive("link")}
+                    />
+                  </Tooltip>
+
+                  <EditorBottombarDivider />
+
+                  <Tooltip
+                    label={"Add comment"}
+                    placement={"top"}
+                    hasArrow={false}
+                  >
+                    <ToggleButton
+                      onPress={() => {
+                        setHasCreateCommentBubble(true);
+                      }}
+                      name="chat-1-line"
+                      isActive={false}
+                    />
+                  </Tooltip>
                 </HStack>
               )}
             </BoxShadow>

@@ -1250,7 +1250,9 @@ export default function DesignSystemScreen(
             <IconTile name="question-mark" />
             <IconTile name="file-copy-line" />
             <IconTile name="chat-1-line" />
+            <IconTile name="chat-1-line-message" />
             <IconTile name="chat-4-line" />
+            <IconTile name="chit-chat" />
             <IconTile name="pencil-line" />
             <IconTile name="error-warning-line" />
           </DSTiles>

@@ -25,14 +25,14 @@ type Params = {
   activeDevice: LocalDevice | null;
 };
 
-type DecryptedReply = {
+export type DecryptedReply = {
   id: string;
   text: string;
   createdAt: string;
   creatorDevice: MinimalDevice;
 };
 
-type DecryptedComment = {
+export type DecryptedComment = {
   id: string;
   text: string;
   from: number;

@@ -72,7 +72,7 @@ const createCommentsDecorationSet = (
     comments.map((comment) => {
       return Decoration.inline(comment.absoluteFrom, comment.absoluteTo, {
         class: `editor-comment ${
-          comment.id === highlightedCommentId && "editor-comment--active"
+          comment.id === highlightedCommentId && "editor-comment-active"
         }`,
       });
     })
