@@ -1,4 +1,3 @@
-import React from "react";
 import { hashToCollaboratorColor } from "@serenity-tools/common";
 import {
   Avatar,
@@ -12,13 +11,14 @@ import {
 import { useActor } from "@xstate/react";
 import { formatDistanceToNow, parseJSON } from "date-fns";
 import { HStack } from "native-base";
+import React from "react";
 import { StyleSheet } from "react-native";
 import { usePage } from "../../context/PageContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
-import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
-import CommentsMenu from "../commentsMenu/CommentsMenu";
 import { DecryptedComment } from "../../machines/commentsMachine";
+import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
 import CommentReply from "../commentReply/CommentReply";
+import CommentsMenu from "../commentsMenu/CommentsMenu";
 
 type Props = {
   comment: DecryptedComment;
@@ -108,7 +108,7 @@ export default function Comment({ comment, meId, meName }: Props) {
         {comment.replies.map((reply) => {
           if (!reply) return null;
 
-          return <CommentReply reply={reply} meId={meId} />;
+          return <CommentReply key={reply.id} reply={reply} meId={meId} />;
         })}
       </View>
 
