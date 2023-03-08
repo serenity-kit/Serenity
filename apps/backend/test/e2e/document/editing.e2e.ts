@@ -75,7 +75,7 @@ test.describe("Edit document", () => {
     expect(afterLoginContent).toBe(endingContent);
   });
 
-  test.only("Add content shows for shared user", async ({ browser, page }) => {
+  test("Add content shows for shared user", async ({ browser, page }) => {
     await login({
       page,
       username: user1.username,
