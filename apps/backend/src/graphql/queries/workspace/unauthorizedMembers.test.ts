@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
@@ -48,6 +49,7 @@ test("unauthorized members when workspace added", async () => {
   const otherUserId = otherUserAndDevice.user.id;
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
+    role: Role.VIEWER,
     workspaceId: workspace1Id,
     authorizationHeader: sessionKey,
   });
