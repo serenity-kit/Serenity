@@ -66,7 +66,7 @@ test.beforeAll(async () => {
 test.describe("Workspace Sharing", () => {
   let workspaceInvitationUrl = "";
 
-  test.only("User 1 can create a sharing link", async ({ browser, page }) => {
+  test("User 1 can create a sharing link", async ({ browser, page }) => {
     // const workspaceName = "sharable";
     // await page.goto("http://localhost:19006/register");
     // await registerOnPage({ page, username, password, workspaceName });
