@@ -12,6 +12,7 @@ import {
   Spinner,
   useHasEditorSidebar,
 } from "@serenity-tools/ui";
+import sodium, { base64_variants } from "react-native-libsodium";
 import {
   applyAwarenessUpdate,
   encodeAwarenessUpdate,
@@ -164,8 +165,12 @@ export default function Editor({
           highlightedComment,
         },
       });
+
       webViewRef.current?.injectJavaScript(`
-        window.updateEditor(\`${commentsJson}\`);
+        window.updateEditor("BASE64${sodium.to_base64(
+          commentsJson,
+          base64_variants.ORIGINAL
+        )}");
         true;
       `);
     });

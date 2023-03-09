@@ -38,13 +38,15 @@ import {
 import "./awareness.css";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
-import { CommentsExtension } from "./extensions/commentsExtension/commentsExtension";
+import {
+  CommentsExtension,
+  updateCommentsDataAndScrollToHighlighted,
+} from "./extensions/commentsExtension/commentsExtension";
 import { AwarnessExtension } from "./extensions/naishoAwarnessExtension/naishoAwarenessExtension";
 import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
 import { TableHeaderExtension } from "./extensions/tableHeaderExtension/tableHeaderExtension";
 import { EditorComment } from "./types";
-import { scrollToPos } from "./utils/scrollToPos";
 
 type HighlightedCommentSource = "editor" | "sidebar";
 
@@ -211,26 +213,11 @@ export const Editor = (props: EditorProps) => {
 
   useEffect(() => {
     if (editor) {
-      const shouldScrollToHighlightedComment =
-        props.highlightedComment?.id &&
-        props.highlightedComment.id !==
-          editor.storage.comments.highlightedComment?.id &&
-        props.highlightedComment.source === "sidebar";
-
-      editor.storage.comments.comments = props.comments;
-      editor.storage.comments.highlightedComment = props.highlightedComment;
-
-      // empty transaction to make sure the comments are updated
-      editor.view.dispatch(editor.view.state.tr);
-      if (
-        shouldScrollToHighlightedComment &&
-        editor.storage.comments.highlightedCommentFromPos !== null
-      ) {
-        scrollToPos(
-          editor.view,
-          editor.storage.comments.highlightedCommentFromPos
-        );
-      }
+      updateCommentsDataAndScrollToHighlighted(
+        editor,
+        props.comments,
+        props.highlightedComment
+      );
     }
   }, [props.comments, props.highlightedComment, editor]);
 
