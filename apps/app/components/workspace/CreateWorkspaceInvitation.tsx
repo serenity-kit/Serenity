@@ -208,7 +208,7 @@ export function CreateWorkspaceInvitation(props: Props) {
         >
           <SelectItem label="Admin" value="admin" />
           <SelectItem label="Editor" value="editor" />
-          <SelectItem label="Commenter" value="admin" />
+          <SelectItem label="Commenter" value="commenter" />
           <SelectItem label="Viewer" value="viewer" />
         </Select>
         <Button

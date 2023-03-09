@@ -1,6 +1,7 @@
 import { expect, Page, test } from "@playwright/test";
 import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../prisma/generated/output";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { acceptWorkspaceInvitation } from "../../helpers/e2e/acceptWorkspaceInvitation";
@@ -80,6 +81,7 @@ test.describe("Workspace Sharing", () => {
 
     const { url } = await createWorkspaceInvitation({
       page,
+      role: Role.EDITOR,
     });
     workspaceInvitationUrl = url;
 
@@ -142,7 +144,6 @@ test.describe("Workspace Sharing", () => {
       await invalidAccessMessage.isVisible();
     expect(user3Url).toBe(expectedUser3Url);
     expect(doesInvalidAccessMessageExist).toBe(true);
-    console.log("user2 renaming folder");
     await renameFolder(user2Page, user1.data.folder.id, "user2 re-renamed");
 
     // re-add user3
@@ -154,7 +155,6 @@ test.describe("Workspace Sharing", () => {
       password: user3.password,
     });
     await delayForSeconds(2);
-    console.log("user3 renaming");
     await renameFolder(user3Page, user1.data.folder.id, "user3 re-added");
   });
 });
