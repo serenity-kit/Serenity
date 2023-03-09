@@ -141,10 +141,6 @@ export function CreateWorkspaceInvitation(props: Props) {
           invitationDataSignature: sodium.to_base64(invitationDataSignature),
         },
       });
-    console.log(
-      "createWorkspaceInvitationResult",
-      createWorkspaceInvitationResult
-    );
     refetchWorkspaceInvitationsResult();
     if (
       createWorkspaceInvitationResult.data?.createWorkspaceInvitation &&
