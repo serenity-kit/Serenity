@@ -45,8 +45,12 @@ export type WorkspaceMember = {
 
 export type Workspace = {
   id: string;
-  name: string;
   idSignature: string;
+  name?: string | undefined | null;
+  infoCiphertext?: string | undefined | null;
+  infoNonce?: string | undefined | null;
+  infoWorkspaceKeyId?: string | undefined | null;
+  infoWorkspaceKey?: WorkspaceKey | undefined | null;
   members: WorkspaceMember[];
   workspaceKeys?: WorkspaceKey[];
   currentWorkspaceKey?: WorkspaceKey;
