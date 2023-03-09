@@ -79,7 +79,8 @@ export const commentsMachine =
           | { type: "UPDATE_REPLY_TEXT"; text: string; commentId: string }
           | { type: "CREATE_REPLY"; commentId: string }
           | { type: "DELETE_REPLY"; replyId: string }
-          | { type: "HIGHLIGHT_COMMENT"; commentId: string | null }
+          | { type: "HIGHLIGHT_COMMENT_FROM_EDITOR"; commentId: string | null }
+          | { type: "HIGHLIGHT_COMMENT_FROM_SIDEBAR"; commentId: string | null }
           | {
               type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS";
               activeSnapshot: ActiveSnapshot;
@@ -127,7 +128,10 @@ export const commentsMachine =
         UPDATE_REPLY_TEXT: {
           actions: ["updateReplyText"],
         },
-        HIGHLIGHT_COMMENT: {
+        HIGHLIGHT_COMMENT_FROM_EDITOR: {
+          actions: ["highlightComment"],
+        },
+        HIGHLIGHT_COMMENT_FROM_SIDEBAR: {
           actions: ["highlightComment"],
         },
         SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS: {

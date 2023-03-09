@@ -62,7 +62,7 @@ const CommentsSidebar: React.FC = () => {
   commentsService.onTransition((state) => {
     if (state.context.isOpenSidebar && flatListRef.current) {
       if (
-        state.event.type === "HIGHLIGHT_COMMENT" &&
+        state.event.type === "HIGHLIGHT_COMMENT_FROM_EDITOR" &&
         state.context.highlightedCommentId
       ) {
         const index = comments.findIndex(

@@ -316,7 +316,7 @@ export default function Editor({
           if (message.type === "highlightComment") {
             const { commentId } = message.content;
             commentsService.send({
-              type: "HIGHLIGHT_COMMENT",
+              type: "HIGHLIGHT_COMMENT_FROM_EDITOR",
               commentId,
             });
           }
