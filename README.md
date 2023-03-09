@@ -222,6 +222,6 @@ The reason here is that signatures often include other data as well end it's eas
 
 ## License
 
-Copyright 2022–2022 Naisho GmbH
+Copyright 2022–2023 Naisho GmbH
 
 Licensed under the AGPLv3: https://opensource.org/licenses/agpl-3.0
