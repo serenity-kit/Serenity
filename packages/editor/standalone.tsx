@@ -118,7 +118,7 @@ ReactDOM.render(
           JSON.stringify({ type: "highlightComment", content: { commentId } })
         );
       }}
-      highlightedCommentId={null}
+      highlightedComment={null}
       encryptAndUploadFile={async () => {
         // TODO: implement
         return Promise.resolve({

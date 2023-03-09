@@ -159,7 +159,7 @@ export default function Editor({
             commentId: commentId === null ? "NONE" : commentId, // there is a bug with setting it to null
           });
         }}
-        highlightedCommentId={commentsState.context.highlightedCommentId}
+        highlightedComment={commentsState.context.highlightedComment}
         onFocus={() => {
           editorIsFocusedRef.current = true;
           showAndPositionToolbar();

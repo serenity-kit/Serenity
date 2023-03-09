@@ -54,8 +54,8 @@ export const updateEditor = (editor: Editor, params: UpdateEditorParams) => {
     editor.chain().redo().focus().run();
   } else if (params.variant === "update-comments") {
     editor.storage.comments.comments = params.params.decryptedComments;
-    editor.storage.comments.highlightedCommentId =
-      params.params.highlightedCommentId;
+    editor.storage.comments.highlightedComment =
+      params.params.highlightedComment;
     // empty transaction to make sure the comments are updated
     editor.view.dispatch(editor.view.state.tr);
   }

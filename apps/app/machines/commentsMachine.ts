@@ -47,6 +47,10 @@ type CommentKeyEntry = {
   replyKeys: Record<string, string>;
 };
 
+type HighlightedCommentSource = "editor" | "sidebar";
+
+type HighlightedComment = { id: string; source: HighlightedCommentSource };
+
 export type CommentKeys = Record<string, CommentKeyEntry>;
 
 export type ActiveSnapshot = {
@@ -61,7 +65,7 @@ interface Context {
   commentsByDocumentIdQueryActor?: AnyActorRef;
   decryptedComments: DecryptedComment[];
   replyTexts: Record<string, string>;
-  highlightedCommentId: string | null;
+  highlightedComment: HighlightedComment | null;
   activeSnapshot: ActiveSnapshot | undefined;
   commentKeys: CommentKeys;
   isOpenSidebar: boolean;
@@ -101,7 +105,7 @@ export const commentsMachine =
         commentsByDocumentIdQueryError: false,
         decryptedComments: [],
         replyTexts: {},
-        highlightedCommentId: null,
+        highlightedComment: null,
         commentKeys: {},
         activeSnapshot: undefined,
         isOpenSidebar: false,
@@ -149,7 +153,7 @@ export const commentsMachine =
               if (context.isOpenSidebar) {
                 return {
                   isOpenSidebar: false,
-                  highlightedCommentId: null,
+                  highlightedComment: null,
                 };
               }
               return {
@@ -310,9 +314,19 @@ export const commentsMachine =
             },
           };
         }),
-        highlightComment: assign((context, event) => {
+        highlightComment: assign((_context, event) => {
+          if (event.commentId) {
+            return {
+              highlightedComment: {
+                id: event.commentId,
+                source: (event.type === "HIGHLIGHT_COMMENT_FROM_SIDEBAR"
+                  ? "sidebar"
+                  : "editor") as HighlightedCommentSource,
+              },
+            };
+          }
           return {
-            highlightedCommentId: event.commentId,
+            highlightedComment: null,
           };
         }),
         clearReplyText: assign((context, event: any) => {

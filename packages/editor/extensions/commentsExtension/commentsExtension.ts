@@ -8,18 +8,23 @@ import {
 import * as Y from "yjs";
 import { EditorComment } from "../../types";
 
+type HighlightedCommentSource = "editor" | "sidebar";
+
+type HighlightedComment = { id: string; source: HighlightedCommentSource };
+
 export interface CommentsExtensionOptions {
   comments: EditorComment[];
   yDoc: Y.Doc;
   highlightComment: (commentId: string | null) => void;
-  highlightedCommentId: string | null;
+  highlightedComment: HighlightedComment | null;
 }
 
 type CommentsExtensionStorage = {
   comments: EditorComment[];
   yDoc: Y.Doc;
   highlightComment: (commentId: string | null) => void;
-  highlightedCommentId: string | null;
+  highlightedComment: HighlightedComment | null;
+  highlightedCommentFromPos: number | null;
 };
 
 // inspired by https://stackoverflow.com/a/46700791
@@ -64,15 +69,20 @@ const resolveCommentPositions = (
 
 const createCommentsDecorationSet = (
   comments: (EditorComment & { absoluteFrom: number; absoluteTo: number })[],
-  highlightedCommentId: string | null,
-  state: EditorState
+  highlightedComment: HighlightedComment | null,
+  state: EditorState,
+  editor: any
 ) => {
   return DecorationSet.create(
     state.doc,
     comments.map((comment) => {
+      if (comment.id === highlightedComment?.id) {
+        editor.storage.comments.highlightedCommentFromPos =
+          comment.absoluteFrom;
+      }
       return Decoration.inline(comment.absoluteFrom, comment.absoluteTo, {
         class: `editor-comment ${
-          comment.id === highlightedCommentId && "editor-comment-active"
+          comment.id === highlightedComment?.id && "editor-comment-active"
         }`,
       });
     })
@@ -92,7 +102,7 @@ export const CommentsExtension = Extension.create<
       comments: [],
       yDoc: {} as Y.Doc,
       highlightComment: () => undefined,
-      highlightedCommentId: null,
+      highlightedComment: null,
     };
   },
 
@@ -101,12 +111,14 @@ export const CommentsExtension = Extension.create<
       comments: this.options.comments,
       yDoc: this.options.yDoc,
       highlightComment: this.options.highlightComment,
-      highlightedCommentId: this.options.highlightedCommentId,
+      highlightedComment: this.options.highlightedComment,
+      highlightedCommentFromPos: null,
     };
   },
 
   addProseMirrorPlugins() {
     const storage = this.editor.storage;
+    const thisEditor = this.editor;
 
     return [
       new Plugin({
@@ -119,8 +131,9 @@ export const CommentsExtension = Extension.create<
             );
             return createCommentsDecorationSet(
               resolvedComments,
-              storage.comments.highlightedCommentId,
-              state
+              storage.comments.highlightedComment,
+              state,
+              thisEditor
             );
           },
           apply(tr, oldState, newState) {
@@ -150,8 +163,9 @@ export const CommentsExtension = Extension.create<
 
             return createCommentsDecorationSet(
               resolvedComments,
-              storage.comments.highlightedCommentId,
-              newState
+              storage.comments.highlightedComment,
+              newState,
+              thisEditor
             );
           },
         },

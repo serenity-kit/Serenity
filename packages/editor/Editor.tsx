@@ -44,6 +44,11 @@ import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollI
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
 import { TableHeaderExtension } from "./extensions/tableHeaderExtension/tableHeaderExtension";
 import { EditorComment } from "./types";
+import { scrollToPos } from "./utils/scrollToPos";
+
+type HighlightedCommentSource = "editor" | "sidebar";
+
+type HighlightedComment = { id: string; source: HighlightedCommentSource };
 
 type EditorProps = {
   documentId: string;
@@ -63,7 +68,7 @@ type EditorProps = {
   comments: EditorComment[];
   createComment: (comment: { from: number; to: number; text: string }) => void;
   highlightComment: (commentId: string | null) => void;
-  highlightedCommentId: string | null;
+  highlightedComment: HighlightedComment | null;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -141,7 +146,7 @@ export const Editor = (props: EditorProps) => {
           comments: props.comments,
           yDoc: props.yDocRef.current,
           highlightComment: props.highlightComment,
-          highlightedCommentId: props.highlightedCommentId,
+          highlightedComment: props.highlightedComment,
         }),
         Table.configure({
           HTMLAttributes: {
@@ -206,12 +211,28 @@ export const Editor = (props: EditorProps) => {
 
   useEffect(() => {
     if (editor) {
+      const shouldScrollToHighlightedComment =
+        props.highlightedComment?.id &&
+        props.highlightedComment.id !==
+          editor.storage.comments.highlightedComment?.id &&
+        props.highlightedComment.source === "sidebar";
+
       editor.storage.comments.comments = props.comments;
-      editor.storage.comments.highlightedCommentId = props.highlightedCommentId;
+      editor.storage.comments.highlightedComment = props.highlightedComment;
+
       // empty transaction to make sure the comments are updated
       editor.view.dispatch(editor.view.state.tr);
+      if (
+        shouldScrollToHighlightedComment &&
+        editor.storage.comments.highlightedCommentFromPos !== null
+      ) {
+        scrollToPos(
+          editor.view,
+          editor.storage.comments.highlightedCommentFromPos
+        );
+      }
     }
-  }, [props.comments, props.highlightedCommentId, editor]);
+  }, [props.comments, props.highlightedComment, editor]);
 
   return (
     <div className="flex h-full flex-auto flex-row">

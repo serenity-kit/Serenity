@@ -37,7 +37,7 @@ export default function Comment({ comment, meId, meName }: Props) {
     comment.creatorDevice
   );
 
-  const isActiveComment = comment.id === state.context.highlightedCommentId;
+  const isActiveComment = comment.id === state.context.highlightedComment?.id;
   const isMyComment = commentCreator?.userId === meId;
 
   const styles = StyleSheet.create({

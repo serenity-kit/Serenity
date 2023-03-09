@@ -156,12 +156,12 @@ export default function Editor({
     editorToolbarService.onEvent(onEventListener);
 
     commentsService.onChange((context) => {
-      const { decryptedComments, highlightedCommentId } = context;
+      const { decryptedComments, highlightedComment } = context;
       const commentsJson = JSON.stringify({
         variant: "update-comments",
         params: {
           decryptedComments,
-          highlightedCommentId,
+          highlightedComment,
         },
       });
       webViewRef.current?.injectJavaScript(`
