@@ -38,12 +38,19 @@ import {
 import "./awareness.css";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
-import { CommentsExtension } from "./extensions/commentsExtension/commentsExtension";
+import {
+  CommentsExtension,
+  updateCommentsDataAndScrollToHighlighted,
+} from "./extensions/commentsExtension/commentsExtension";
 import { AwarnessExtension } from "./extensions/naishoAwarnessExtension/naishoAwarenessExtension";
 import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
 import { TableHeaderExtension } from "./extensions/tableHeaderExtension/tableHeaderExtension";
 import { EditorComment } from "./types";
+
+type HighlightedCommentSource = "editor" | "sidebar";
+
+type HighlightedComment = { id: string; source: HighlightedCommentSource };
 
 type EditorProps = {
   documentId: string;
@@ -63,7 +70,7 @@ type EditorProps = {
   comments: EditorComment[];
   createComment: (comment: { from: number; to: number; text: string }) => void;
   highlightComment: (commentId: string | null) => void;
-  highlightedCommentId: string | null;
+  highlightedComment: HighlightedComment | null;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -141,7 +148,7 @@ export const Editor = (props: EditorProps) => {
           comments: props.comments,
           yDoc: props.yDocRef.current,
           highlightComment: props.highlightComment,
-          highlightedCommentId: props.highlightedCommentId,
+          highlightedComment: props.highlightedComment,
         }),
         Table.configure({
           HTMLAttributes: {
@@ -206,12 +213,13 @@ export const Editor = (props: EditorProps) => {
 
   useEffect(() => {
     if (editor) {
-      editor.storage.comments.comments = props.comments;
-      editor.storage.comments.highlightedCommentId = props.highlightedCommentId;
-      // empty transaction to make sure the comments are updated
-      editor.view.dispatch(editor.view.state.tr);
+      updateCommentsDataAndScrollToHighlighted(
+        editor,
+        props.comments,
+        props.highlightedComment
+      );
     }
-  }, [props.comments, props.highlightedCommentId, editor]);
+  }, [props.comments, props.highlightedComment, editor]);
 
   return (
     <div className="flex h-full flex-auto flex-row">

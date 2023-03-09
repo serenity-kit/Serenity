@@ -62,11 +62,11 @@ const CommentsSidebar: React.FC = () => {
   commentsService.onTransition((state) => {
     if (state.context.isOpenSidebar && flatListRef.current) {
       if (
-        state.event.type === "HIGHLIGHT_COMMENT" &&
-        state.context.highlightedCommentId
+        state.event.type === "HIGHLIGHT_COMMENT_FROM_EDITOR" &&
+        state.context.highlightedComment?.id
       ) {
         const index = comments.findIndex(
-          (comment) => comment.id === state.context.highlightedCommentId
+          (comment) => comment.id === state.context.highlightedComment?.id
         );
         if (index === -1) return; // in case the list isn't yet loaded
         flatListRef.current.scrollToIndex({
@@ -80,9 +80,9 @@ const CommentsSidebar: React.FC = () => {
       ) {
         // should alays immediately scroll to top once the scrollbar opens
         // and now highlighted comment is set
-        if (state.context.highlightedCommentId) {
+        if (state.context.highlightedComment?.id) {
           const index = comments.findIndex(
-            (comment) => comment.id === state.context.highlightedCommentId
+            (comment) => comment.id === state.context.highlightedComment?.id
           );
           if (index === -1) return; // in case the list isn't yet loaded
           flatListRef.current.scrollToIndex({
@@ -112,6 +112,14 @@ const CommentsSidebar: React.FC = () => {
         return <Comment comment={item} meId={me.id} meName={me.username} />;
       }}
       keyExtractor={(comment) => comment.id}
+      onScrollToIndexFailed={async (info) => {
+        // TODO should there be a delay here and cancel the scroll after x tries?
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        flatListRef.current?.scrollToIndex({
+          index: info.index,
+          animated: true,
+        });
+      }}
     />
   );
 };

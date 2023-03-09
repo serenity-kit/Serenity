@@ -3,6 +3,7 @@ import {
   updateFileAttributes,
 } from "@serenity-tools/editor-file-extension";
 import { Editor } from "@tiptap/core";
+import { updateCommentsDataAndScrollToHighlighted } from "./extensions/commentsExtension/commentsExtension";
 import { UpdateEditorParams } from "./types";
 
 export const updateEditor = (editor: Editor, params: UpdateEditorParams) => {
@@ -53,10 +54,11 @@ export const updateEditor = (editor: Editor, params: UpdateEditorParams) => {
   } else if (params.variant === "redo") {
     editor.chain().redo().focus().run();
   } else if (params.variant === "update-comments") {
-    editor.storage.comments.comments = params.params.decryptedComments;
-    editor.storage.comments.highlightedCommentId =
-      params.params.highlightedCommentId;
-    // empty transaction to make sure the comments are updated
-    editor.view.dispatch(editor.view.state.tr);
+    updateCommentsDataAndScrollToHighlighted(
+      editor,
+      params.params.decryptedComments,
+      params.params.highlightedComment
+    );
   }
+  return true;
 };
