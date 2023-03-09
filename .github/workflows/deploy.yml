@@ -24,6 +24,7 @@ jobs:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
   deploy-staging-frontend:
     runs-on: ubuntu-latest
+    environment: staging
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3 # needed until 18 becomes the default
@@ -36,13 +37,12 @@ jobs:
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2
         with:
-          publish-dir: "./web-build"
+          publish-dir: "./apps/app/web-build"
           production-branch: main
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
           enable-pull-request-comment: false
           enable-commit-comment: false
-        github-deployment-environment: staging
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
