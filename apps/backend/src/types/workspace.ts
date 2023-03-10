@@ -83,6 +83,14 @@ type DbWorkspace = PrismaWorkspace & {
       creatorDevice: PrismaCreatorDevice;
     })[];
   })[];
+  infoWorkspaceKey?:
+    | (PrismaWorkspaceKey & {
+        workspaceKeyBoxes: (PrismaWorkspaceKeyBox & {
+          creatorDevice: PrismaCreatorDevice;
+        })[];
+      })
+    | undefined
+    | null;
 };
 
 export const formatWorkspaceKey = (workspaceKey: any): WorkspaceKey => {
@@ -128,10 +136,16 @@ export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
       workspaceKeys.push(workspaceKeyWithworkspaceKeyBox);
     }
   }
+  const infoWorkspaceKey: WorkspaceKey | undefined | null =
+    workspace.infoWorkspaceKey;
+  if (infoWorkspaceKey?.workspaceKeyBoxes) {
+    infoWorkspaceKey.workspaceKeyBox = infoWorkspaceKey.workspaceKeyBoxes[0];
+  }
   return {
     ...workspace,
     members: members,
-    currentWorkspaceKey: currentWorkspaceKey,
+    currentWorkspaceKey,
+    infoWorkspaceKey,
     workspaceKeys,
   };
 };

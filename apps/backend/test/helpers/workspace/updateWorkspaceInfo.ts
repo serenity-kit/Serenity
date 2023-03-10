@@ -4,6 +4,72 @@ import sodium from "react-native-libsodium";
 import { Device } from "../../../src/types/device";
 import { TestContext } from "../setupGraphql";
 
+export const query = gql`
+  mutation updateWorkspaceInfo($input: UpdateWorkspaceInfoInput!) {
+    updateWorkspaceInfo(input: $input) {
+      workspace {
+        id
+        name
+        infoCiphertext
+        infoNonce
+        infoWorkspaceKeyId
+        members {
+          username
+          role
+        }
+        infoWorkspaceKey {
+          workspaceId
+          generation
+          workspaceKeyBox {
+            id
+            workspaceKeyId
+            deviceSigningPublicKey
+            creatorDeviceSigningPublicKey
+            ciphertext
+            nonce
+            creatorDevice {
+              signingPublicKey
+              encryptionPublicKey
+            }
+          }
+        }
+        currentWorkspaceKey {
+          id
+          workspaceId
+          generation
+          workspaceKeyBox {
+            id
+            workspaceKeyId
+            deviceSigningPublicKey
+            creatorDeviceSigningPublicKey
+            ciphertext
+            nonce
+            creatorDevice {
+              signingPublicKey
+              encryptionPublicKey
+            }
+          }
+        }
+        workspaceKeys {
+          id
+          workspaceId
+          generation
+          workspaceKeyBox {
+            id
+            workspaceKeyId
+            deviceSigningPublicKey
+            creatorDeviceSigningPublicKey
+            ciphertext
+            creatorDevice {
+              signingPublicKey
+              encryptionPublicKey
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 export type Props = {
   graphql: TestContext;
   workspaceId: string;
@@ -46,72 +112,6 @@ export const updateWorkspaceInfo = async ({
       nonce: sodium.to_base64(deviceKeyBoxNonce),
     });
   }
-  const query = gql`
-    mutation updateWorkspaceInfo($input: UpdateWorkspaceInfoInput!) {
-      updateWorkspaceInfo(input: $input) {
-        workspace {
-          id
-          name
-          infoCiphertext
-          infoNonce
-          infoWorkspaceKeyId
-          members {
-            username
-            role
-          }
-          infoWorkspaceKey {
-            workspaceId
-            generation
-            workspaceKeyBox {
-              id
-              workspaceKeyId
-              deviceSigningPublicKey
-              creatorDeviceSigningPublicKey
-              ciphertext
-              nonce
-              creatorDevice {
-                signingPublicKey
-                encryptionPublicKey
-              }
-            }
-          }
-          currentWorkspaceKey {
-            id
-            workspaceId
-            generation
-            workspaceKeyBox {
-              id
-              workspaceKeyId
-              deviceSigningPublicKey
-              creatorDeviceSigningPublicKey
-              ciphertext
-              nonce
-              creatorDevice {
-                signingPublicKey
-                encryptionPublicKey
-              }
-            }
-          }
-          workspaceKeys {
-            id
-            workspaceId
-            generation
-            workspaceKeyBox {
-              id
-              workspaceKeyId
-              deviceSigningPublicKey
-              creatorDeviceSigningPublicKey
-              ciphertext
-              creatorDevice {
-                signingPublicKey
-                encryptionPublicKey
-              }
-            }
-          }
-        }
-      }
-    }
-  `;
   const result = await graphql.client.request(
     query,
     {

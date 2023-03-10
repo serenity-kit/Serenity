@@ -52,9 +52,6 @@ export const updateWorkspaceInfoMutation = mutationField(
       ),
     },
     async resolve(_root, args, context) {
-      console.log({
-        deviceSigningPublicKey: context.session.deviceSigningPublicKey,
-      });
       if (!context.user) {
         throw new AuthenticationError("Not authenticated");
       }
