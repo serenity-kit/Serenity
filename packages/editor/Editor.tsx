@@ -1,6 +1,7 @@
 import {
   BoxShadow,
   EditorBottombarDivider,
+  MenuButton,
   RawInput,
   ScrollView,
   SubmitButton,
@@ -42,6 +43,7 @@ import {
   CommentsExtension,
   updateCommentsDataAndScrollToHighlighted,
 } from "./extensions/commentsExtension/commentsExtension";
+import { findCommentForPos } from "./extensions/commentsExtension/findCommentForPos";
 import { AwarnessExtension } from "./extensions/naishoAwarnessExtension/naishoAwarenessExtension";
 import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
@@ -69,8 +71,9 @@ type EditorProps = {
   shareOrSaveFile: ShareOrSaveFileFunction;
   comments: EditorComment[];
   createComment: (comment: { from: number; to: number; text: string }) => void;
-  highlightComment: (commentId: string | null) => void;
+  highlightComment: (commentId: string | null, openSidebar: boolean) => void;
   highlightedComment: HighlightedComment | null;
+  hasOpenCommentsSidebar: () => boolean;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -404,6 +407,46 @@ export const Editor = (props: EditorProps) => {
                   </Tooltip>
                 </HStack>
               )}
+            </BoxShadow>
+          </BubbleMenu>
+
+          <BubbleMenu
+            editor={editor}
+            tippyOptions={{ duration: 100 }}
+            // modified default from https://github.com/ueberdosis/tiptap/blob/main/packages/extension-bubble-menu/src/bubble-menu-plugin.ts#L47-L79
+            shouldShow={({ state, from, to, view, editor }) => {
+              if (from !== to || props.hasOpenCommentsSidebar()) {
+                return false;
+              }
+              const comment = findCommentForPos({ editor, pos: from });
+
+              if (comment) {
+                return true;
+              }
+              return false;
+            }}
+          >
+            <BoxShadow elevation={3} rounded>
+              <HStack
+                space={1}
+                style={tw`p-1 bg-white border border-gray-200 rounded`}
+                alignItems="center"
+              >
+                <MenuButton
+                  iconName="chat-1-line"
+                  onPress={() => {
+                    const comment = findCommentForPos({
+                      editor,
+                      pos: editor.state.selection.from,
+                    });
+                    if (comment) {
+                      props.highlightComment(comment.id, true);
+                    }
+                  }}
+                >
+                  Open Comment
+                </MenuButton>
+              </HStack>
             </BoxShadow>
           </BubbleMenu>
         </ScrollView>

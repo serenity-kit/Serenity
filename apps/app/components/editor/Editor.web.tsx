@@ -54,6 +54,12 @@ export default function Editor({
   const { commentsService } = usePage();
   const [commentsState, send] = useActor(commentsService);
 
+  // hasOpenCommentsSidebarRef is a hack needed since the shouldShow prop
+  // of the BubbleMenu seems to be cached internally in the BubbleMenu component
+  // and new props are not tacking into account.
+  const hasOpenCommentsSidebarRef = useRef(commentsState.context.isOpenSidebar);
+  hasOpenCommentsSidebarRef.current = commentsState.context.isOpenSidebar;
+
   const positionToolbar = () => {
     if (editorBottombarWrapperRef.current && editorIsFocusedRef.current) {
       const topPos =
@@ -152,14 +158,18 @@ export default function Editor({
             to: comment.to,
           });
         }}
-        highlightComment={(commentId) => {
+        highlightComment={(commentId, openSidebar) => {
           // necessary check to avoid an endless loop
           send({
             type: "HIGHLIGHT_COMMENT_FROM_EDITOR",
             commentId: commentId === null ? "NONE" : commentId, // there is a bug with setting it to null
+            openSidebar: openSidebar || false,
           });
         }}
         highlightedComment={commentsState.context.highlightedComment}
+        hasOpenCommentsSidebar={() => {
+          return hasOpenCommentsSidebarRef.current;
+        }}
         onFocus={() => {
           editorIsFocusedRef.current = true;
           showAndPositionToolbar();

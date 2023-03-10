@@ -103,6 +103,11 @@ window.rejectImageRequest = (fileId, reason) => {
   }
 };
 
+let hasOpenCommentsSidebar = false;
+window.updateHasOpenCommentsSidebar = (newHasOpenCommentsSidebar: boolean) => {
+  hasOpenCommentsSidebar = newHasOpenCommentsSidebar;
+};
+
 const domContainer = document.querySelector("#editor");
 ReactDOM.render(
   <NativeBaseProvider>
@@ -117,12 +122,18 @@ ReactDOM.render(
       onCreate={(params) => (window.editor = params.editor)}
       comments={[]}
       createComment={() => {}}
-      highlightComment={(commentId) => {
+      highlightComment={(commentId, openSidebar) => {
         window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: "highlightComment", content: { commentId } })
+          JSON.stringify({
+            type: "highlightComment",
+            content: { commentId, openSidebar },
+          })
         );
       }}
       highlightedComment={null}
+      hasOpenCommentsSidebar={() => {
+        return hasOpenCommentsSidebar;
+      }}
       encryptAndUploadFile={async () => {
         // TODO: implement
         return Promise.resolve({
