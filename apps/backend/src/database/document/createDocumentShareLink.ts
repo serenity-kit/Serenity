@@ -1,4 +1,4 @@
-import { ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { DocumentShareLink, Role } from "../../../prisma/generated/output";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
@@ -33,6 +33,14 @@ export const createDocumentShareLink = async ({
   deviceEncryptionPublicKeySignature,
   snapshotDeviceKeyBox,
 }: Props): Promise<DocumentShareLink> => {
+  // admin access not allowed
+  if (
+    sharingRole !== Role.EDITOR &&
+    sharingRole !== Role.VIEWER &&
+    sharingRole !== Role.COMMENTER
+  ) {
+    throw new UserInputError("invalid sharing role");
+  }
   // get the document
   const document = await prisma.document.findFirst({
     where: { id: documentId },

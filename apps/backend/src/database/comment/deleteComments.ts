@@ -134,12 +134,10 @@ export async function deleteComments({
         });
       }
     }
-
     // if some of the commentIds are invalid, throw an error
     if (deletableCommentIds.length !== commentIds.length) {
       throw new UserInputError("Invalid commentIds");
     }
-
     // delete all related workspace keyboxes
     await prisma.comment.deleteMany({
       where: {

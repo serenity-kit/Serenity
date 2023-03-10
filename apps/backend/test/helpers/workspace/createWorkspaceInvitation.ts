@@ -1,12 +1,13 @@
 import canonicalize from "canonicalize";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
+import { Role } from "../../../prisma/generated/output";
 import { getRoleAsString } from "../../../src/utils/getRoleAsString";
 
 type Params = {
   graphql: any;
   workspaceId: string;
-  role: string;
+  role: Role;
   authorizationHeader: string;
 };
 
