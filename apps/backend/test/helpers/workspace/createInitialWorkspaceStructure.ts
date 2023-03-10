@@ -45,8 +45,8 @@ const query = gql`
       }
       folder {
         id
-        encryptedName
-        encryptedNameNonce
+        nameCiphertext
+        nameNonce
         parentFolderId
         rootFolderId
         workspaceId
@@ -62,8 +62,8 @@ const query = gql`
       }
       document {
         id
-        encryptedName
-        encryptedNameNonce
+        nameCiphertext
+        nameNonce
         parentFolderId
         workspaceId
         subkeyId
@@ -158,8 +158,8 @@ export const createInitialWorkspaceStructure = async ({
   const readyFolder = {
     id: folderId,
     idSignature: folderIdSignature,
-    encryptedName: encryptedFolderName,
-    encryptedNameNonce: encryptedFolderNameNonce,
+    nameCiphertext: encryptedFolderName,
+    nameNonce: encryptedFolderNameNonce,
     // since we haven't created the workspaceKey yet,
     // we must derive the trace manually
     keyDerivationTrace: {
@@ -220,8 +220,8 @@ export const createInitialWorkspaceStructure = async ({
   // prepare the document
   const readyDocument = {
     id: documentId,
-    encryptedName: encryptedDocumentName,
-    encryptedNameNonce: encryptedDocumentNameNonce,
+    nameCiphertext: encryptedDocumentName,
+    nameNonce: encryptedDocumentNameNonce,
     subkeyId: documentSubkeyId,
     snapshot,
   };

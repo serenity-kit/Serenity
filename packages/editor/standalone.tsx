@@ -77,7 +77,11 @@ const updateTitle = (title: string) => {
 };
 
 window.updateEditor = (paramsString: string) => {
-  const params: UpdateEditorParams = JSON.parse(paramsString);
+  let decodedParamsString = paramsString;
+  if (paramsString.startsWith("BASE64")) {
+    decodedParamsString = atob(paramsString.slice(6));
+  }
+  const params: UpdateEditorParams = JSON.parse(decodedParamsString);
   updateEditor(window.editor, params);
 };
 
@@ -118,7 +122,7 @@ ReactDOM.render(
           JSON.stringify({ type: "highlightComment", content: { commentId } })
         );
       }}
-      highlightedCommentId={null}
+      highlightedComment={null}
       encryptAndUploadFile={async () => {
         // TODO: implement
         return Promise.resolve({

@@ -1,188 +1,126 @@
 import {
   EditorBottombarDivider,
   EditorSidebarHeader,
-  IconButton,
-  Pressable,
-  RawInput,
-  ScrollView,
-  SubmitButton,
+  Icon,
   Text,
   tw,
   View,
 } from "@serenity-tools/ui";
 import { useActor } from "@xstate/react";
-import { formatDistanceToNow, parseJSON } from "date-fns";
 import { HStack } from "native-base";
-import { StyleSheet } from "react-native";
+import React, { useRef } from "react";
+import { FlatList, StyleSheet } from "react-native";
 import { usePage } from "../../context/PageContext";
+import { useMeQuery } from "../../generated/graphql";
+import Comment from "../comment/Comment";
 
-const CommentsSidebar: React.FC<{}> = () => {
+const styles = StyleSheet.create({
+  header: tw`justify-between`,
+  wrapper: tw`p-4 border-b border-gray-200`,
+});
+
+const Header: React.FC = () => {
+  return (
+    <EditorSidebarHeader style={styles.header}>
+      <Text variant="xs" bold>
+        Comments
+      </Text>
+      <HStack alignItems={"center"} style={tw`-mr-1`}>
+        <Text variant="xxs" muted style={tw`p-1`}>
+          Open
+        </Text>
+        <EditorBottombarDivider style={tw`h-4 border-r border-gray-600`} />
+        <Text variant="xxs" muted style={tw`p-1`}>
+          Resolved
+        </Text>
+      </HStack>
+    </EditorSidebarHeader>
+  );
+};
+
+const EmptyState: React.FC = () => {
+  return (
+    <HStack space={3} style={tw`p-4`}>
+      <View style={tw``}>
+        <Icon name="chat-1-line-message" color={"gray-500"} size={5} />
+      </View>
+      <Text variant="xs" muted>
+        Add suggestions, questions or appreciations by marking a text-passage or
+        image and then clicking on the comment icon in the floating menu.
+      </Text>
+    </HStack>
+  );
+};
+
+const CommentsSidebar: React.FC = () => {
   const { commentsService } = usePage();
-  const [state, send] = useActor(commentsService);
+  const [meResult] = useMeQuery();
+  const [state] = useActor(commentsService);
+  const comments = state.context.decryptedComments;
+  const flatListRef = useRef<FlatList>(null);
 
-  const styles = StyleSheet.create({
-    header: tw`justify-between`,
-    wrapper: tw`p-4 border-b border-gray-200`,
+  commentsService.onTransition((state) => {
+    if (state.context.isOpenSidebar && flatListRef.current) {
+      if (
+        state.event.type === "HIGHLIGHT_COMMENT_FROM_EDITOR" &&
+        state.context.highlightedComment?.id
+      ) {
+        const index = comments.findIndex(
+          (comment) => comment.id === state.context.highlightedComment?.id
+        );
+        if (index === -1) return; // in case the list isn't yet loaded
+        flatListRef.current.scrollToIndex({
+          index,
+          animated: true,
+          viewPosition: 0,
+        });
+      } else if (
+        state.event.type === "OPEN_SIDEBAR" ||
+        state.event.type === "TOGGLE_SIDEBAR"
+      ) {
+        // should alays immediately scroll to top once the scrollbar opens
+        // and now highlighted comment is set
+        if (state.context.highlightedComment?.id) {
+          const index = comments.findIndex(
+            (comment) => comment.id === state.context.highlightedComment?.id
+          );
+          if (index === -1) return; // in case the list isn't yet loaded
+          flatListRef.current.scrollToIndex({
+            index,
+            animated: false,
+            viewPosition: 0,
+          });
+        } else {
+          flatListRef.current.scrollToOffset({ offset: 0, animated: false });
+        }
+      }
+    }
   });
 
+  const me = meResult.data?.me;
+  if (!me) return null;
+
   return (
-    // grow-0 overrides default of ScrollView to keep the assigned width
-    <ScrollView style={tw`w-sidebar grow-0 bg-gray-100`}>
-      <EditorSidebarHeader style={styles.header}>
-        <Text variant="sm" bold>
-          Comments
-        </Text>
-        <HStack alignItems={"center"} style={tw`-mr-1`}>
-          <Text variant="xxs" muted style={tw`p-1`}>
-            Open
-          </Text>
-          <EditorBottombarDivider
-            style={tw`h-4 border-r-1.5 border-gray-600`}
-          />
-          <Text variant="xxs" muted style={tw`p-1`}>
-            Resolved
-          </Text>
-        </HStack>
-      </EditorSidebarHeader>
-
-      <View>
-        {state.context.decryptedComments.map((comment) => {
-          if (!comment) return null;
-
-          const isActiveComment =
-            comment.id === state.context.highlightedCommentId;
-
-          return (
-            <Pressable
-              key={comment.id}
-              style={[
-                styles.wrapper,
-                isActiveComment ? tw`bg-collaboration-honey/7` : undefined,
-                { cursor: isActiveComment ? "default" : "pointer" },
-              ]}
-              onPress={() => {
-                send({ type: "HIGHLIGHT_COMMENT", commentId: comment.id });
-              }}
-              testID={`comment-${comment.id}`}
-            >
-              <HStack alignItems="center">
-                {/* new comment indicator */}
-                {/* <View style={tw`w-4 -ml-4 flex-row justify-center`}>
-                  <View style={tw`h-1.5 w-1.5 rounded-full bg-primary-500`} />
-                </View> */}
-
-                <HStack alignItems="center" space="1.5">
-                  {/* TODO if comment has been read change color to gray-400 */}
-                  {/* <Avatar color="arctic" size="xs">
-                    KD
-                  </Avatar>
-                  <Text variant="xs" bold>
-                    Karen Doe
-                  </Text> */}
-                </HStack>
-                {/* <IconButton name="more-line" style={tw`ml-auto`} /> */}
-              </HStack>
-              <View style={tw`pl-0.5 py-2`}>
-                <Text variant="xxs" muted style={tw`mb-1.5`}>
-                  {formatDistanceToNow(parseJSON(comment.createdAt), {
-                    addSuffix: true,
-                  })}
-                </Text>
-                <Text
-                  testID={`comment-${comment.id}__text-content`}
-                  variant="sm"
-                >
-                  {comment.text}
-                </Text>
-              </View>
-
-              <View style={tw`mt-2`}>
-                {comment.replies.map((reply) => {
-                  if (!reply) return null;
-                  return (
-                    <View key={reply.id}>
-                      <HStack alignItems="center">
-                        <HStack alignItems="center" space="1.5">
-                          {/* TODO if comment has been read change color to gray-400 */}
-                          {/* <Avatar color="emerald" size="xs">
-                            ND
-                          </Avatar>
-                          <Text variant="xs" bold>
-                            Norman Dean
-                          </Text> */}
-                        </HStack>
-                        {/* <IconButton name="more-line" style={tw`ml-auto`} /> */}
-                      </HStack>
-                      <View
-                        style={tw`ml-2.75 pb-2 pl-4.25 border-l-2 border-solid border-gray-200`}
-                      >
-                        <Text variant="xxs" muted style={tw`mt-1 mb-1.5`}>
-                          {formatDistanceToNow(parseJSON(reply.createdAt), {
-                            addSuffix: true,
-                          })}
-                        </Text>
-                        <Text variant="sm">{reply.text}</Text>
-                      </View>
-                      <IconButton
-                        name="delete-bin-line"
-                        onPress={() =>
-                          send({ type: "DELETE_REPLY", replyId: reply.id })
-                        }
-                        testID={`comment-${comment.id}__comment-reply-${reply.id}--delete-reply-button`}
-                      />
-                    </View>
-                  );
-                })}
-              </View>
-
-              <HStack space="1.5">
-                {/* TODO use active user for reply */}
-                {/* <Avatar color="rose" size="xs">
-                  FO
-                </Avatar> */}
-                <RawInput
-                  multiline
-                  value={state.context.replyTexts[comment.id]}
-                  onChangeText={(text) =>
-                    send({
-                      type: "UPDATE_REPLY_TEXT",
-                      commentId: comment.id,
-                      text,
-                    })
-                  }
-                  _stack={{
-                    height: 16,
-                    flexShrink: 1,
-                  }}
-                  testID={`comment-${comment.id}__reply-input`}
-                />
-              </HStack>
-
-              <SubmitButton
-                disabled={
-                  state.context.replyTexts[comment.id] === undefined ||
-                  state.context.replyTexts[comment.id] === ""
-                }
-                size="sm"
-                onPress={() =>
-                  send({ type: "CREATE_REPLY", commentId: comment.id })
-                }
-                style={tw`mt-1 self-end`}
-                testID={`comment-${comment.id}__save-reply-button`}
-              />
-
-              <IconButton
-                name="delete-bin-line"
-                onPress={() =>
-                  send({ type: "DELETE_COMMENT", commentId: comment.id })
-                }
-                testID={`comment-${comment.id}__delete-button`}
-              />
-            </Pressable>
-          );
-        })}
-      </View>
-    </ScrollView>
+    <FlatList
+      ListHeaderComponent={Header}
+      ListEmptyComponent={EmptyState}
+      // grow-0 overrides default of ScrollView to keep the assigned width
+      style={tw`w-sidebar grow-0 bg-gray-100`}
+      ref={flatListRef}
+      data={comments}
+      renderItem={({ item }) => {
+        return <Comment comment={item} meId={me.id} meName={me.username} />;
+      }}
+      keyExtractor={(comment) => comment.id}
+      onScrollToIndexFailed={async (info) => {
+        // TODO should there be a delay here and cancel the scroll after x tries?
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        flatListRef.current?.scrollToIndex({
+          index: info.index,
+          animated: true,
+        });
+      }}
+    />
   );
 };
 

@@ -14,6 +14,7 @@ export const CreateCommentReplyInput = inputObjectType({
   definition(t) {
     t.nonNull.string("commentId");
     t.nonNull.string("snapshotId");
+    t.string("documentShareLinkToken");
     t.nonNull.int("subkeyId");
     t.nonNull.string("contentCiphertext");
     t.nonNull.string("contentNonce");
@@ -47,6 +48,7 @@ export const createCommentReplyMutation = mutationField("createCommentReply", {
       creatorDeviceSigningPublicKey: context.session.deviceSigningPublicKey,
       commentId: args.input.commentId,
       snapshotId: args.input.snapshotId,
+      documentShareLinkToken: args.input.documentShareLinkToken,
       subkeyId: args.input.subkeyId,
       contentCiphertext: args.input.contentCiphertext,
       contentNonce: args.input.contentNonce,

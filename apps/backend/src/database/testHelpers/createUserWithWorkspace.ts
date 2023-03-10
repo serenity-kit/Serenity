@@ -159,8 +159,8 @@ export default async function createUserWithWorkspace({
     folder: {
       id: folderId,
       idSignature: folderIdSignature,
-      encryptedName: encryptedFolderResult.ciphertext,
-      encryptedNameNonce: encryptedFolderResult.publicNonce,
+      nameCiphertext: encryptedFolderResult.ciphertext,
+      nameNonce: encryptedFolderResult.publicNonce,
       keyDerivationTrace: {
         workspaceKeyId,
         trace: [
@@ -175,8 +175,8 @@ export default async function createUserWithWorkspace({
     },
     document: {
       id: documentId,
-      encryptedName: encryptedDocumentTitleResult.ciphertext,
-      encryptedNameNonce: encryptedDocumentTitleResult.publicNonce,
+      nameCiphertext: encryptedDocumentTitleResult.ciphertext,
+      nameNonce: encryptedDocumentTitleResult.publicNonce,
       subkeyId: docmentKeyResult.subkeyId,
       snapshot,
     },

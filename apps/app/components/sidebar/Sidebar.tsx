@@ -107,8 +107,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
           input: {
             id,
             workspaceId,
-            encryptedName: encryptedFolderResult.ciphertext,
-            encryptedNameNonce: encryptedFolderResult.publicNonce,
+            nameCiphertext: encryptedFolderResult.ciphertext,
+            nameNonce: encryptedFolderResult.publicNonce,
             workspaceKeyId,
             subkeyId: encryptedFolderResult.folderSubkeyId,
             keyDerivationTrace,
@@ -235,8 +235,8 @@ export default function Sidebar(props: DrawerContentComponentProps) {
                   key={folder.id}
                   folderId={folder.id}
                   parentFolderId={folder.parentFolderId}
-                  encryptedName={folder.encryptedName}
-                  encryptedNameNonce={folder.encryptedNameNonce}
+                  nameCiphertext={folder.nameCiphertext}
+                  nameNonce={folder.nameNonce}
                   subkeyId={
                     folder.keyDerivationTrace.trace[
                       folder.keyDerivationTrace.trace.length - 1

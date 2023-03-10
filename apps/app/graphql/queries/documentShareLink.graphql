@@ -1,6 +1,7 @@
 query documentShareLink($token: ID!) {
   documentShareLink(token: $token) {
     token
+    role
     deviceSecretBoxCiphertext
     deviceSecretBoxNonce
     snapshotKeyBoxs {

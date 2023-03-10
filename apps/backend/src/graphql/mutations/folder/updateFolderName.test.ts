@@ -65,8 +65,8 @@ test("user should be able to change a folder name", async () => {
   });
   const updatedFolder = result.updateFolderName.folder;
   expect(updatedFolder.id).toBe(userData1.folder.id);
-  expect(typeof updatedFolder.encryptedName).toBe("string");
-  expect(typeof updatedFolder.encryptedNameNonce).toBe("string");
+  expect(typeof updatedFolder.nameCiphertext).toBe("string");
+  expect(typeof updatedFolder.nameNonce).toBe("string");
   expect(typeof updatedFolder.keyDerivationTrace.trace[0].subkeyId).toBe(
     "number"
   );

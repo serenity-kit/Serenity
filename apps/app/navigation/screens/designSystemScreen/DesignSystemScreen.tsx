@@ -169,13 +169,13 @@ export default function DesignSystemScreen(
         </Text>
         <DSExampleArea>
           <HStack space={2} alignItems="center" style={tw`pr-2`}>
-            <Avatar size={"xxs"}>BE</Avatar>
-            <Avatar size={"xs"}>BE</Avatar>
-            <Avatar size={"sm"}>NG</Avatar>
-            <Avatar size={"md"}>AB</Avatar>
-            <Avatar size={"lg"}>SK</Avatar>
-            <Avatar size={"xl"}>AD</Avatar>
-            <Avatar size={"2xl"}>HG</Avatar>
+            <Avatar size={"xxs"}>B</Avatar>
+            <Avatar size={"xs"}>B</Avatar>
+            <Avatar size={"sm"}>N</Avatar>
+            <Avatar size={"md"}>A</Avatar>
+            <Avatar size={"lg"}>S</Avatar>
+            <Avatar size={"xl"}>A</Avatar>
+            <Avatar size={"2xl"}>H</Avatar>
           </HStack>
         </DSExampleArea>
         <Heading lvl={3}>Styling</Heading>
@@ -184,11 +184,11 @@ export default function DesignSystemScreen(
           <DSMono variant="property">color</DSMono> property.
         </Text>
         <DSExampleArea>
-          <Avatar color="arctic">BE</Avatar>
-          <Avatar color="lavender">NG</Avatar>
-          <Avatar color="rose">AB</Avatar>
-          <Avatar color="honey">SK</Avatar>
-          <Avatar color="emerald">AD</Avatar>
+          <Avatar color="arctic">B</Avatar>
+          <Avatar color="lavender">N</Avatar>
+          <Avatar color="rose">A</Avatar>
+          <Avatar color="honey">S</Avatar>
+          <Avatar color="emerald">A</Avatar>
         </DSExampleArea>
         <Heading lvl={3}>Grouping</Heading>
         <Text variant="sm">
@@ -198,11 +198,11 @@ export default function DesignSystemScreen(
         </Text>
         <DSExampleArea>
           <AvatarGroup max={3} _avatar={{ size: "sm" }}>
-            <Avatar color="arctic">SK</Avatar>
-            <Avatar color="lavender">NG</Avatar>
-            <Avatar color="rose">AN</Avatar>
-            <Avatar color="honey">NG</Avatar>
-            <Avatar color="sky">NG</Avatar>
+            <Avatar color="arctic">S</Avatar>
+            <Avatar color="lavender">N</Avatar>
+            <Avatar color="rose">A</Avatar>
+            <Avatar color="honey">N</Avatar>
+            <Avatar color="sky">N</Avatar>
           </AvatarGroup>
         </DSExampleArea>
         <Heading lvl={3}>Status</Heading>
@@ -215,19 +215,19 @@ export default function DesignSystemScreen(
         <DSExampleArea>
           <AvatarGroup max={3} _avatar={{ size: "sm" }}>
             <Avatar status="active" color="arctic">
-              SK
+              S
             </Avatar>
             <Avatar status="active" color="lavender">
-              NG
+              N
             </Avatar>
             <Avatar status="inactive" color="rose">
-              AN
+              A
             </Avatar>
             <Avatar status="inactive" color="honey">
-              NG
+              N
             </Avatar>
             <Avatar status="inactive" color="sky">
-              NG
+              N
             </Avatar>
           </AvatarGroup>
         </DSExampleArea>
@@ -592,7 +592,7 @@ export default function DesignSystemScreen(
           style={tw`h-40 mt-4 border border-gray-200 rounded overflow-hidden`}
         >
           <CenterContent>
-            <Avatar size={"md"}>AV</Avatar>
+            <Avatar size={"md"}>A</Avatar>
           </CenterContent>
         </View>
         <Heading lvl={3}>Background</Heading>
@@ -1250,7 +1250,9 @@ export default function DesignSystemScreen(
             <IconTile name="question-mark" />
             <IconTile name="file-copy-line" />
             <IconTile name="chat-1-line" />
+            <IconTile name="chat-1-line-message" />
             <IconTile name="chat-4-line" />
+            <IconTile name="chit-chat" />
             <IconTile name="pencil-line" />
             <IconTile name="error-warning-line" />
           </DSTiles>

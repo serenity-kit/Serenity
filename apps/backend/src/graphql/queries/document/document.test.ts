@@ -77,8 +77,8 @@ test("user should be retrieve a document", async () => {
   expect(retrievedDocument.id).toBe(documentId);
   expect(retrievedDocument.workspaceId).toBe(userData1.workspace.id);
   expect(retrievedDocument.parentFolderId).toBe(userData1.folder.id);
-  expect(typeof retrievedDocument.encryptedName).toBe("string");
-  expect(typeof retrievedDocument.encryptedNameNonce).toBe("string");
+  expect(typeof retrievedDocument.nameCiphertext).toBe("string");
+  expect(typeof retrievedDocument.nameNonce).toBe("string");
   expect(typeof retrievedDocument.subkeyId).toBe("number");
 
   const snapshotResult = await getSnapshot({
@@ -101,8 +101,8 @@ test("user should be retrieve a document", async () => {
   });
   const decryptedName = decryptDocumentTitle({
     key: documentSubkey.key,
-    ciphertext: retrievedDocument.encryptedName,
-    publicNonce: retrievedDocument.encryptedNameNonce,
+    ciphertext: retrievedDocument.nameCiphertext,
+    publicNonce: retrievedDocument.nameNonce,
     publicData: null,
   });
   expect(decryptedName).toBe(documentName);

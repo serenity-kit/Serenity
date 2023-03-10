@@ -60,10 +60,10 @@ test("user should be able to create a root folder", async () => {
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
-  expect(typeof folder.encryptedName).toBe("string");
+  expect(typeof folder.nameCiphertext).toBe("string");
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
-  expect(typeof folder.encryptedNameNonce).toBe("string");
+  expect(typeof folder.nameNonce).toBe("string");
   expect(folder.keyDerivationTrace.workspaceKeyId).toBe(
     userData1.workspace.currentWorkspaceKey.id
   );
@@ -93,10 +93,10 @@ test("user should be able to create a root folder with a name", async () => {
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
-  expect(typeof folder.encryptedName).toBe("string");
+  expect(typeof folder.nameCiphertext).toBe("string");
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
-  expect(typeof folder.encryptedNameNonce).toBe("string");
+  expect(typeof folder.nameNonce).toBe("string");
   expect(folder.keyDerivationTrace.workspaceKeyId).toBe(
     userData1.workspace.currentWorkspaceKey.id
   );
@@ -134,10 +134,10 @@ test("user should be able to create a child folder", async () => {
   });
   const folder = result.createFolder.folder;
   expect(folder.id).toBe(id);
-  expect(typeof folder.encryptedName).toBe("string");
+  expect(typeof folder.nameCiphertext).toBe("string");
   expect(folder.parentFolderId).toBe(parentFolderId);
   expect(folder.workspaceId).toBe(addedWorkspace.id);
-  expect(typeof folder.encryptedNameNonce).toBe("string");
+  expect(typeof folder.nameNonce).toBe("string");
   expect(folder.keyDerivationTrace.workspaceKeyId).toBe(
     userData1.workspace.currentWorkspaceKey.id
   );
@@ -195,15 +195,15 @@ test("Throw error on duplicate subkeyId, workspaceId", async () => {
   });
   const workspaceId = userData1.workspace.id;
   const existingSubkeyId = userData1.folder.subkeyId;
-  const encryptedName = encryptedFolderResult.ciphertext;
-  const encryptedNameNonce = encryptedFolderResult.publicNonce;
+  const nameCiphertext = encryptedFolderResult.ciphertext;
+  const nameNonce = encryptedFolderResult.publicNonce;
   const query = gql`
     mutation createFolder($input: CreateFolderInput!) {
       createFolder(input: $input) {
         folder {
           id
-          encryptedName
-          encryptedNameNonce
+          nameCiphertext
+          nameNonce
           parentFolderId
           rootFolderId
           workspaceId
@@ -219,8 +219,8 @@ test("Throw error on duplicate subkeyId, workspaceId", async () => {
           input: {
             id: "abc123",
             name,
-            encryptedName,
-            encryptedNameNonce,
+            nameCiphertext,
+            nameNonce,
             subkeyId: existingSubkeyId,
             parentFolderId: null,
             workspaceId: workspaceId,
@@ -358,8 +358,8 @@ describe("Input errors", () => {
       createFolder(input: $input) {
         folder {
           id
-          encryptedName
-          encryptedNameNonce
+          nameCiphertext
+          nameNonce
           parentFolderId
           rootFolderId
           workspaceId
@@ -373,8 +373,8 @@ describe("Input errors", () => {
       name,
       parentKey: workspaceKey,
     });
-    const encryptedName = encryptedFolderResult.ciphertext;
-    const encryptedNameNonce = encryptedFolderResult.publicNonce;
+    const nameCiphertext = encryptedFolderResult.ciphertext;
+    const nameNonce = encryptedFolderResult.publicNonce;
     const subkeyId = encryptedFolderResult.folderSubkeyId;
     await expect(
       (async () =>
@@ -384,8 +384,8 @@ describe("Input errors", () => {
             input: {
               id: null,
               name,
-              encryptedName,
-              encryptedNameNonce,
+              nameCiphertext,
+              nameNonce,
               subkeyId,
               parentFolderId: null,
               workspaceId: addedWorkspace.id,
@@ -401,8 +401,8 @@ describe("Input errors", () => {
       name,
       parentKey: workspaceKey,
     });
-    const encryptedName = encryptedFolderResult.ciphertext;
-    const encryptedNameNonce = encryptedFolderResult.publicNonce;
+    const nameCiphertext = encryptedFolderResult.ciphertext;
+    const nameNonce = encryptedFolderResult.publicNonce;
     const subkeyId = encryptedFolderResult.folderSubkeyId;
     await expect(
       (async () =>
@@ -412,8 +412,8 @@ describe("Input errors", () => {
             input: {
               id: "abc123",
               name,
-              encryptedName,
-              encryptedNameNonce,
+              nameCiphertext,
+              nameNonce,
               subkeyId,
               parentFolderId: null,
               workspaceId: null,

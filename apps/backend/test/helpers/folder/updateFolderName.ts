@@ -38,8 +38,8 @@ export const updateFolderName = async ({
       updateFolderName(input: $input) {
         folder {
           id
-          encryptedName
-          encryptedNameNonce
+          nameCiphertext
+          nameNonce
           parentFolderId
           rootFolderId
           workspaceId
@@ -61,8 +61,8 @@ export const updateFolderName = async ({
     {
       input: {
         id,
-        encryptedName: encryptedFolderResult.ciphertext,
-        encryptedNameNonce: encryptedFolderResult.publicNonce,
+        nameCiphertext: encryptedFolderResult.ciphertext,
+        nameNonce: encryptedFolderResult.publicNonce,
         workspaceKeyId,
         subkeyId: encryptedFolderResult.folderSubkeyId,
         keyDerivationTrace,

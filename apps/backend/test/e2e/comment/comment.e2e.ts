@@ -100,6 +100,9 @@ test.describe("comment replies, delete comment", () => {
     if (!comment2) {
       throw new Error("Comment 1 was not created");
     }
+    const numCommentsBeforeDeletes = await prisma.comment.count({
+      where: { documentId: user1.data.document.id },
+    });
     await openCommentsDrawer({ page });
     const commentReply1Text = "Reply to comment 1";
     const commentReply2Text = "2nd reply to comment 1";
@@ -124,30 +127,30 @@ test.describe("comment replies, delete comment", () => {
     await openCommentsDrawer({ page });
     const commentReply1Content = await page
       .locator(
-        `[data-testid='comment-${comment1.id}__comment-reply-${commentReply1.id}--text-content']`
+        `data-testid=comment-${comment1.id}__comment-reply-${commentReply1.id}--text-content`
       )
       .innerText();
     const commentReply2Content = await page
       .locator(
-        `[data-testid='comment-${comment1.id}__comment-reply-${commentReply2.id}--text-content']`
+        `data-testid=comment-${comment1.id}__comment-reply-${commentReply2.id}--text-content`
       )
       .innerText();
     // await delayForSeconds(20);
     expect(commentReply1Content).toBe(commentReply1Text);
     expect(commentReply2Content).toBe(commentReply2Text);
-    // delete a comment with no replies
-    await deleteComment({
-      page,
-      commentId: comment2.id,
-    });
     // delete the comment with replies
     await deleteComment({
       page,
       commentId: comment1.id,
     });
+    // delete a comment with no replies
+    await deleteComment({
+      page,
+      commentId: comment2.id,
+    });
     const numCommentsAfterDeletes = await prisma.comment.count({
       where: { documentId: user1.data.document.id },
     });
-    expect(numCommentsAfterDeletes).toBe(1);
+    expect(numCommentsAfterDeletes).toBe(numCommentsBeforeDeletes - 2);
   });
 });

@@ -2,7 +2,6 @@ import { Device } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
-import { Role } from "../../../prisma/generated/output";
 import { formatWorkspace, Workspace } from "../../types/workspace";
 import { prisma } from "../prisma";
 
@@ -62,17 +61,19 @@ export async function acceptWorkspaceInvitation({
       },
       select: {
         workspace: {
-          select: {
-            id: true,
-            idSignature: true,
-            name: true,
+          include: {
             usersToWorkspaces: {
-              select: {
-                userId: true,
-                role: true,
+              include: {
                 user: {
                   select: {
                     username: true,
+                    devices: {
+                      select: {
+                        signingPublicKey: true,
+                        encryptionPublicKey: true,
+                        encryptionPublicKeySignature: true,
+                      },
+                    },
                   },
                 },
               },
@@ -91,26 +92,28 @@ export async function acceptWorkspaceInvitation({
         data: {
           userId,
           workspaceId,
-          role: Role.EDITOR,
+          role: workspaceInvitation.role,
           isAuthorizedMember: false,
         },
       });
       // and return the workspace
-      const connectedWorkspace = await prisma.workspace.findFirst({
+      const connectedWorkspace = await prisma.workspace.findFirstOrThrow({
         where: {
           id: workspaceId,
         },
-        select: {
-          id: true,
-          idSignature: true,
-          name: true,
+        include: {
           usersToWorkspaces: {
-            select: {
-              userId: true,
-              role: true,
+            include: {
               user: {
                 select: {
                   username: true,
+                  devices: {
+                    select: {
+                      signingPublicKey: true,
+                      encryptionPublicKey: true,
+                      encryptionPublicKeySignature: true,
+                    },
+                  },
                 },
               },
             },

@@ -6,8 +6,8 @@ export const Folder = objectType({
   name: "Folder",
   definition(t) {
     t.nonNull.string("id");
-    t.nonNull.string("encryptedName");
-    t.nonNull.string("encryptedNameNonce");
+    t.nonNull.string("nameCiphertext");
+    t.nonNull.string("nameNonce");
     t.string("parentFolderId");
     t.string("rootFolderId");
     t.string("workspaceId");

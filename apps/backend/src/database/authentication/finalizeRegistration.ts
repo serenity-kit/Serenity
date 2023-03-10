@@ -133,7 +133,8 @@ export async function finalizeRegistration({
       };
       if (
         process.env.SERENITY_ENV !== "e2e" &&
-        process.env.SERENITY_ENV !== "development"
+        process.env.NODE_ENV !== "development" &&
+        process.env.NODE_ENV !== "test"
       ) {
         console.log(`Sending verification email to "${username}"`);
         try {

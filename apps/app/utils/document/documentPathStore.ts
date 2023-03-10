@@ -50,16 +50,26 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
     const folderIds: string[] = [];
     const folderNames: { [id: string]: string } = {};
     const workspaceId = folders[0].workspaceId;
+    const workspaceKeyId = folders[0].keyDerivationTrace.workspaceKeyId;
     const workspace = await getWorkspace({
       workspaceId: workspaceId!,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
     });
-    if (!workspace?.currentWorkspaceKey) {
+    if (!workspace?.workspaceKeys) {
       throw new Error("No workspace key for this workspace and device");
+    }
+    let folderWorkspaceKey: any = undefined;
+    for (const workspaceKey of workspace.workspaceKeys!) {
+      if (workspaceKey.id === workspaceKeyId) {
+        folderWorkspaceKey = workspaceKey;
+      }
+    }
+    if (!folderWorkspaceKey?.workspaceKeyBox) {
+      console.error("Folder workspace key not found");
     }
     const workspaceKeyData = await deriveWorkspaceKey({
       workspaceId: workspaceId!,
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
+      workspaceKeyId,
       activeDevice,
     });
     const workspaceKey = workspaceKeyData.workspaceKey;
@@ -77,7 +87,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
             encryptionPublicKeySignature:
               activeDevice.encryptionPublicKeySignature!,
           },
-          workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+          workspaceKeyBox: folderWorkspaceKey.workspaceKeyBox!,
         });
         // since decryptFolderName also derives the folder subkey,
         // we can pass the parentKeyTrace's parent key to it
@@ -92,8 +102,8 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
         folderName = decryptFolderName({
           parentKey: parentKey,
           subkeyId: folderSubkeyId,
-          ciphertext: folder.encryptedName,
-          publicNonce: folder.encryptedNameNonce,
+          ciphertext: folder.nameCiphertext,
+          publicNonce: folder.nameNonce,
         });
       } catch (error) {
         console.error(error);

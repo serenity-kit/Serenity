@@ -26,17 +26,15 @@ export const createCommentOnHtmlNode = async ({
   });
   await delayForSeconds(2);
   await page
-    .locator("[data-testid='bubble-menu__initiate-comment-button']")
+    .locator("data-testid=bubble-menu__initiate-comment-button")
     .click();
   const commentInput = page.locator(
-    "[data-testid='bubble-menu__create-comment-input']"
+    "data-testid=bubble-menu__create-comment-input"
   );
   await commentInput.selectText();
   await commentInput.press("Backspace");
   await commentInput.type(comment);
-  await page
-    .locator("[data-testid='bubble-menu__save-comment-button']")
-    .click();
+  await page.locator("data-testid=bubble-menu__save-comment-button").click();
   await delayForSeconds(2);
   const numCommentsAfter = await prisma.comment.count({
     where: { documentId },
@@ -50,7 +48,7 @@ export const createCommentOnHtmlNode = async ({
     throw new Error("Comment not created");
   }
   const createdCommentText = await page
-    .locator(`[data-testid="comment-${createdComment.id}__text-content"]`)
+    .locator(`data-testid=comment-${createdComment.id}__text-content`)
     .innerText();
   expect(createdCommentText).toBe(comment);
   return createdComment;

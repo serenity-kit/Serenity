@@ -5,8 +5,10 @@ import {
   SnapshotPublicData,
 } from "@naisho/core";
 import {
+  createDocumentKey,
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
+  encryptDocumentTitle,
   LocalDevice,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
@@ -20,6 +22,9 @@ import { createFolderKeyDerivationTrace } from "../folder/createFolderKeyDerivat
 type RunCreateDocumentMutationParams = {
   graphql: any;
   id: string;
+  nameCiphertext: string;
+  nameNonce: string;
+  subkeyId: number;
   parentFolderId: string | null;
   workspaceId: string;
   snapshot?: Snapshot | null | undefined;
@@ -28,6 +33,9 @@ type RunCreateDocumentMutationParams = {
 const runCreateDocumentMutation = async ({
   graphql,
   id,
+  nameCiphertext,
+  nameNonce,
+  subkeyId,
   parentFolderId,
   workspaceId,
   snapshot,
@@ -48,6 +56,9 @@ const runCreateDocumentMutation = async ({
     {
       input: {
         id,
+        nameCiphertext,
+        nameNonce,
+        subkeyId,
         parentFolderId,
         workspaceId,
         snapshot,
@@ -60,6 +71,7 @@ const runCreateDocumentMutation = async ({
 type Params = {
   graphql: any;
   id: string;
+  name?: string | null | undefined;
   parentFolderId: string | null;
   workspaceId: string;
   activeDevice: LocalDevice;
@@ -69,6 +81,7 @@ type Params = {
 export const createDocument = async ({
   graphql,
   id,
+  name,
   parentFolderId,
   workspaceId,
   activeDevice,
@@ -91,11 +104,15 @@ export const createDocument = async ({
       },
     },
   });
+
   if (!workspace) {
     // return the query to produce an error
     return runCreateDocumentMutation({
       graphql,
       id,
+      nameCiphertext: "",
+      nameNonce: "",
+      subkeyId: 1,
       parentFolderId,
       workspaceId,
       snapshot: null,
@@ -115,6 +132,9 @@ export const createDocument = async ({
     return runCreateDocumentMutation({
       graphql,
       id,
+      nameCiphertext: "",
+      nameNonce: "",
+      subkeyId: 1,
       parentFolderId,
       workspaceId,
       snapshot: null,
@@ -165,9 +185,22 @@ export const createDocument = async ({
     signatureKeyPair
   );
 
+  let useName = "Untitled";
+  if (name) {
+    useName = name;
+  }
+  const documentNameKey = createDocumentKey({ snapshotKey: snapshotKey.key });
+  const documentNameData = encryptDocumentTitle({
+    title: useName,
+    key: documentNameKey.key,
+  });
+
   return runCreateDocumentMutation({
     graphql,
     id,
+    nameCiphertext: documentNameData.ciphertext,
+    nameNonce: documentNameData.publicNonce,
+    subkeyId: documentNameKey.subkeyId,
     parentFolderId,
     workspaceId,
     snapshot,

@@ -29,9 +29,9 @@ type Props = ViewProps & {
   documentId: string;
   workspaceId: string;
   parentFolderId: string;
-  encryptedName?: string | null;
-  encryptedNameNonce?: string | null;
-  subkeyId?: number | null;
+  nameCiphertext: string;
+  nameNonce: string;
+  subkeyId: number;
   depth?: number;
   onRefetchDocumentsPress: () => void;
 };
@@ -71,37 +71,44 @@ export default function SidebarPage(props: Props) {
     if (documentResult.data?.document?.id) {
       decryptTitle();
     }
-  }, [props.encryptedName, props.subkeyId, documentResult.data?.document?.id]);
+  }, [props.nameCiphertext, props.subkeyId, documentResult.data?.document?.id]);
 
   const decryptTitle = async () => {
-    if (!props.encryptedName || !props.encryptedNameNonce) {
-      // this case can happen when the document is created but the title is not yet set
-      setDocumentTitle("Untitled");
-      return;
-    }
-    const workspace = await getWorkspace({
-      workspaceId: props.workspaceId,
-      deviceSigningPublicKey: activeDevice.signingPublicKey,
-    });
-    if (!workspace?.currentWorkspaceKey) {
-      console.error("No workspace key for workspace and device");
-    }
     try {
       const document = documentResult.data?.document;
       if (!document) {
-        console.error("Unable to retrieve document!");
-        return;
+        throw new Error("Unable to retrieve document!");
       }
       const snapshotResult = await runSnapshotQuery({
         documentId: document.id,
       });
       if (!snapshotResult.data?.snapshot) {
-        console.error(
+        throw new Error(
           snapshotResult.error?.message || "Unable to retrieve snapshot!"
         );
-        return;
       }
       const snapshot = snapshotResult.data.snapshot;
+      if (!snapshotResult.data?.snapshot) {
+        throw new Error(
+          snapshotResult.error?.message || "Unable to retrieve snapshot!"
+        );
+      }
+      const workspace = await getWorkspace({
+        workspaceId: props.workspaceId,
+        deviceSigningPublicKey: activeDevice.signingPublicKey,
+      });
+      if (!workspace?.workspaceKeys) {
+        throw new Error("No workspace key for this workspace and device");
+      }
+      let documentWorkspaceKey: any = undefined;
+      for (const workspaceKey of workspace.workspaceKeys!) {
+        if (workspaceKey.id === snapshot.keyDerivationTrace.workspaceKeyId) {
+          documentWorkspaceKey = workspaceKey;
+        }
+      }
+      if (!documentWorkspaceKey?.workspaceKeyBox) {
+        throw new Error("Document workspace key not found");
+      }
       const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
         keyDerivationTrace: snapshot.keyDerivationTrace,
         activeDevice: {
@@ -112,18 +119,18 @@ export default function SidebarPage(props: Props) {
           encryptionPublicKeySignature:
             activeDevice.encryptionPublicKeySignature!,
         },
-        workspaceKeyBox: workspace!.currentWorkspaceKey!.workspaceKeyBox!,
+        workspaceKeyBox: documentWorkspaceKey.workspaceKeyBox!,
       });
       const snapshotKeyData =
         snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];
       const documentKeyData = recreateDocumentKey({
         snapshotKey: snapshotKeyData.key,
-        subkeyId: props.subkeyId!,
+        subkeyId: props.subkeyId,
       });
       const documentTitle = decryptDocumentTitle({
         key: documentKeyData.key,
-        ciphertext: props.encryptedName,
-        publicNonce: props.encryptedNameNonce,
+        ciphertext: props.nameCiphertext,
+        publicNonce: props.nameNonce,
       });
       setDocumentTitle(documentTitle);
     } catch (error) {

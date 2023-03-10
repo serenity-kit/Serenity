@@ -3,6 +3,7 @@ import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../prisma/generated/output";
 import { WorkspaceInvitation } from "../../types/workspace";
+import { getRoleAsString } from "../../utils/getRoleAsString";
 import { prisma } from "../prisma";
 
 // by default, invitation expires in 48 hours
@@ -14,6 +15,7 @@ type Params = {
   invitationSigningPublicKey: string;
   expiresAt: Date;
   invitationDataSignature: string;
+  role: Role;
   inviterUserId: string;
 };
 
@@ -23,6 +25,7 @@ export async function createWorkspaceInvitation({
   invitationSigningPublicKey,
   invitationDataSignature,
   expiresAt,
+  role,
   inviterUserId,
 }: Params) {
   const expiresAtErrorMarginMillis = 1000 * 60 * 60 * 2; // 2 hours
@@ -32,10 +35,15 @@ export async function createWorkspaceInvitation({
       "The invitation expiration time is too far in the future"
     );
   }
+  const roleAsString = getRoleAsString(role);
+  if (!roleAsString) {
+    throw new UserInputError("Invalid sharing role");
+  }
   const expectedSigningData = canonicalize({
     workspaceId,
     invitationId,
     invitationSigningPublicKey,
+    role: roleAsString,
     expiresAt: expiresAt.toISOString(),
   });
   const doesSignatureVerify = sodium.crypto_sign_verify_detached(
@@ -80,6 +88,7 @@ export async function createWorkspaceInvitation({
       inviterUserId,
       invitationSigningPublicKey,
       invitationDataSignature,
+      role,
       expiresAt: new Date(Date.now() + INVITATION_EXPIRATION_TIME),
     },
   });

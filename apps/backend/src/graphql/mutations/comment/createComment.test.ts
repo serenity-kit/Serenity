@@ -1,8 +1,10 @@
 import { gql } from "graphql-request";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { createComment } from "../../../../test/helpers/comment/createComment";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
+import { createDocumentShareLink } from "../../../../test/helpers/document/createDocumentShareLink";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
@@ -40,7 +42,7 @@ test("owner comments", async () => {
     comment: "nice job",
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
+    creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
   const comment = createCommentResult.createComment.comment;
@@ -56,6 +58,169 @@ test("owner comments", async () => {
   expect(comment.creatorDevice.encryptionPublicKey).toBe(
     userData1.webDevice.encryptionPublicKey
   );
+});
+
+test("shared admin comments", async () => {
+  const userData2 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password: "password",
+  });
+  const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
+  const documentShareLinkResult = await createDocumentShareLink({
+    graphql,
+    documentId: userData1.document.id,
+    sharingRole: Role.ADMIN,
+    creatorDevice: userData1.webDevice,
+    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    snapshotKey,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const documentShareLinkToken =
+    documentShareLinkResult.createDocumentShareLink.token;
+  const createCommentResult = await createComment({
+    graphql,
+    snapshotId: snapshotId1,
+    snapshotKey: snapshotKey1,
+    comment: "nice job",
+    creatorDevice: userData2.webDevice,
+    creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
+    creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
+    documentShareLinkToken,
+    authorizationHeader: userData2.sessionKey,
+  });
+  const comment = createCommentResult.createComment.comment;
+  expect(typeof comment.id).toBe("string");
+  expect(comment.documentId).toBe(documentId1);
+  expect(typeof comment.contentCiphertext).toBe("string");
+  expect(typeof comment.contentNonce).toBe("string");
+  expect(typeof comment.createdAt).toBe("string");
+  expect(comment.creatorDevice.signingPublicKey).toBe(
+    userData2.webDevice.signingPublicKey
+  );
+  expect(comment.creatorDevice.encryptionPublicKey).toBe(
+    userData2.webDevice.encryptionPublicKey
+  );
+});
+
+test("shared editor comments", async () => {
+  const userData2 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password: "password",
+  });
+  const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
+  const documentShareLinkResult = await createDocumentShareLink({
+    graphql,
+    documentId: userData1.document.id,
+    sharingRole: Role.EDITOR,
+    creatorDevice: userData1.webDevice,
+    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    snapshotKey,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const documentShareLinkToken =
+    documentShareLinkResult.createDocumentShareLink.token;
+  const createCommentResult = await createComment({
+    graphql,
+    snapshotId: snapshotId1,
+    snapshotKey: snapshotKey1,
+    comment: "nice job",
+    creatorDevice: userData2.webDevice,
+    creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
+    creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
+    documentShareLinkToken,
+    authorizationHeader: userData2.sessionKey,
+  });
+  const comment = createCommentResult.createComment.comment;
+  expect(typeof comment.id).toBe("string");
+  expect(comment.documentId).toBe(documentId1);
+  expect(typeof comment.contentCiphertext).toBe("string");
+  expect(typeof comment.contentNonce).toBe("string");
+  expect(typeof comment.createdAt).toBe("string");
+  expect(comment.creatorDevice.signingPublicKey).toBe(
+    userData2.webDevice.signingPublicKey
+  );
+  expect(comment.creatorDevice.encryptionPublicKey).toBe(
+    userData2.webDevice.encryptionPublicKey
+  );
+});
+
+test("shared commentor comments", async () => {
+  const userData2 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password: "password",
+  });
+  const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
+  const documentShareLinkResult = await createDocumentShareLink({
+    graphql,
+    documentId: userData1.document.id,
+    sharingRole: Role.COMMENTER,
+    creatorDevice: userData1.webDevice,
+    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    snapshotKey,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const documentShareLinkToken =
+    documentShareLinkResult.createDocumentShareLink.token;
+  const createCommentResult = await createComment({
+    graphql,
+    snapshotId: snapshotId1,
+    snapshotKey: snapshotKey1,
+    comment: "nice job",
+    creatorDevice: userData2.webDevice,
+    creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
+    creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
+    documentShareLinkToken,
+    authorizationHeader: userData2.sessionKey,
+  });
+  const comment = createCommentResult.createComment.comment;
+  expect(typeof comment.id).toBe("string");
+  expect(comment.documentId).toBe(documentId1);
+  expect(typeof comment.contentCiphertext).toBe("string");
+  expect(typeof comment.contentNonce).toBe("string");
+  expect(typeof comment.createdAt).toBe("string");
+  expect(comment.creatorDevice.signingPublicKey).toBe(
+    userData2.webDevice.signingPublicKey
+  );
+  expect(comment.creatorDevice.encryptionPublicKey).toBe(
+    userData2.webDevice.encryptionPublicKey
+  );
+});
+
+test("shared viewer cannot comment", async () => {
+  const userData2 = await createUserWithWorkspace({
+    id: uuidv4(),
+    username: `${uuidv4()}@example.com`,
+    password: "password",
+  });
+  const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
+  const documentShareLinkResult = await createDocumentShareLink({
+    graphql,
+    documentId: userData1.document.id,
+    sharingRole: Role.VIEWER,
+    creatorDevice: userData1.webDevice,
+    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    snapshotKey,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const documentShareLinkToken =
+    documentShareLinkResult.createDocumentShareLink.token;
+  await expect(
+    (async () =>
+      await createComment({
+        graphql,
+        snapshotId: snapshotId1,
+        snapshotKey: snapshotKey1,
+        comment: "nice job",
+        creatorDevice: userData2.device,
+        creatorDeviceEncryptionPrivateKey: userData2.deviceEncryptionPrivateKey,
+        creatorDeviceSigningPrivateKey: userData2.deviceSigningPrivateKey,
+        documentShareLinkToken,
+        authorizationHeader: userData2.sessionKey,
+      }))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("admin comments", async () => {
@@ -75,7 +240,7 @@ test("admin comments", async () => {
     comment: "nice job",
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
+    creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
   const comment = createCommentResult.createComment.comment;
@@ -109,7 +274,7 @@ test("editor comments", async () => {
     comment: "nice job",
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
+    creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
   const comment = createCommentResult.createComment.comment;
@@ -143,7 +308,7 @@ test("commenter comment", async () => {
     comment: "nice job",
     creatorDevice: userData1.webDevice,
     creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
+    creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
     authorizationHeader: userData1.sessionKey,
   });
   const comment = createCommentResult.createComment.comment;
@@ -180,7 +345,7 @@ test("viewer tries to comment", async () => {
         creatorDevice: userData1.webDevice,
         creatorDeviceEncryptionPrivateKey:
           userData1.webDevice.encryptionPrivateKey,
-        creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
+        creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
         authorizationHeader: userData1.sessionKey,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -219,7 +384,7 @@ test("invalid document", async () => {
         creatorDevice: userData1.webDevice,
         creatorDeviceEncryptionPrivateKey:
           userData1.webDevice.encryptionPrivateKey,
-        creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
+        creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
         authorizationHeader: userData1.sessionKey,
       }))()
   ).rejects.toThrowError("Unauthorized");
@@ -236,7 +401,7 @@ test("Unauthenticated", async () => {
         creatorDevice: userData1.webDevice,
         creatorDeviceEncryptionPrivateKey:
           userData1.webDevice.encryptionPrivateKey,
-        creatorDeviceSigningPrivateKey: userData1.webDevice.signingrivateKey,
+        creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
         authorizationHeader: "badauthkey",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

@@ -43,6 +43,7 @@ const customColors = {
     lavender: "#515DCE",
     purple: "#9E36CF",
     slate: "#4F5D78",
+    gray: "#CBCBD3", // for read comment
   },
   error: {
     100: "#FFEDEF",
@@ -58,7 +59,7 @@ const customColors = {
   comment: {
     default: "#FFB92120", // collaboration-honey 20%
     hover: "#FFB92130", // collaboration-honey 30%
-    active: "#FFB921", // collaboration-honey
+    active: "#FFB92180", // collaboration-honey 80%
   },
   muted: "#8A8B96", // gray 600
   backdrop: "#1F1F2140", // backdrop color including opacity
@@ -134,6 +135,7 @@ const customTheme = {
     },
     maxWidth: {
       "prose-rem": "36.5rem", // editor specific .. needed as representation of a 65ch content-width as the "ch"-unit would only work on text-elements
+      "editor-content": "44rem",
       "navigation-drawer-modal": "61rem",
     },
     width: {

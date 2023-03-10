@@ -7,7 +7,7 @@ import { reloadPage } from "../../helpers/e2e/reloadPage";
 
 test("Bad login then good login", async ({ page }) => {
   const username = `${uuidv4()}@example.com`;
-  const password = "pass";
+  const password = "password";
   const { user, workspace, document } = await createUserWithWorkspace({
     id: uuidv4(),
     username,
@@ -43,7 +43,7 @@ test("Bad login then good login", async ({ page }) => {
   expect(isModalVisible1).toBe(true);
   // enter correct password. Modal should close
   await passwordInput.selectText();
-  await passwordInput.type("pass");
+  await passwordInput.type(password);
   await verifyButton.click();
   await delayForSeconds(1);
   const isModalVisible2 = await passwordModal.isVisible();

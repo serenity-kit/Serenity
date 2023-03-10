@@ -7,10 +7,10 @@ import { prisma } from "../prisma";
 type Params = {
   userId: string;
   id: string;
-  encryptedName?: string | null;
-  encryptedNameNonce?: string | null;
+  nameCiphertext: string;
+  nameNonce: string;
   workspaceKeyId?: string | null;
-  subkeyId?: number | null;
+  subkeyId: number;
   parentFolderId: string;
   workspaceId: string;
   snapshot: Snapshot;
@@ -19,8 +19,8 @@ type Params = {
 export async function createDocument({
   userId,
   id,
-  encryptedName,
-  encryptedNameNonce,
+  nameCiphertext,
+  nameNonce,
   workspaceKeyId,
   subkeyId,
   parentFolderId,
@@ -38,10 +38,10 @@ export async function createDocument({
   const document = await prisma.document.create({
     data: {
       id,
-      encryptedName,
-      encryptedNameNonce,
-      workspaceKeyId,
+      nameCiphertext,
+      nameNonce,
       subkeyId,
+      workspaceKeyId,
       parentFolderId,
       workspaceId,
     },

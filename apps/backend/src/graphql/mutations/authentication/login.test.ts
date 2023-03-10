@@ -1,13 +1,14 @@
 import { createDevice as createdDeviceHelper } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
+import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { requestLoginChallengeResponse } from "../../../../test/helpers/authentication/requestLoginChallengeResponse";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 
 const graphql = setupGraphql();
-const username = "user";
+const username = `${uuidv4()}@example.com`;
 const password = "password";
 
 beforeAll(async () => {
@@ -46,7 +47,7 @@ test("server should login a user", async () => {
 
   const sessionKey = sodium.to_base64(result.login.getSessionKey());
 
-  const device = await createdDeviceHelper();
+  const device = createdDeviceHelper();
   const deviceInfoJson = {
     type: "web",
     OS: "MacOS",
@@ -94,6 +95,16 @@ describe("Input errors", () => {
       }
     }
   `;
+  test("Invalid email", async () => {
+    await expect(
+      (async () =>
+        await requestLoginChallengeResponse({
+          graphql,
+          username: "invalid-email",
+          password,
+        }))()
+    ).rejects.toThrowError(/BAD_USER_INPUT/);
+  });
   test("Invalid loginId", async () => {
     const result = await requestLoginChallengeResponse({
       graphql,

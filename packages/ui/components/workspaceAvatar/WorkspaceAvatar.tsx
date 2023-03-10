@@ -27,6 +27,7 @@ export const WorkspaceAvatar = React.forwardRef(
         {...props}
         // TODO adjust color for each workspace if no image is set
         bg={tw.color(`collaboration-${customColor}`)}
+        style={tw`border-0`} // override for Avatar
         borderRadius={4}
         size={size}
       >

@@ -1,5 +1,6 @@
 import { objectType } from "nexus";
 import { CreatorDevice } from "./device";
+import { MemberRoleEnum } from "./workspace";
 
 export const SnapshotKeyBox = objectType({
   name: "SnapshotKeyBox",
@@ -17,6 +18,7 @@ export const DocumentShareLink = objectType({
   name: "DocumentShareLink",
   definition(t) {
     t.nonNull.string("token");
+    t.nonNull.field("role", { type: MemberRoleEnum });
     t.nonNull.string("deviceSecretBoxCiphertext");
     t.nonNull.string("deviceSecretBoxNonce");
     t.nonNull.string("deviceSigningPublicKey");

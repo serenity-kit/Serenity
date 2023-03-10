@@ -41,28 +41,14 @@ test("should return a list of workspace invitations if they are admin", async ()
   await createWorkspaceInvitation({
     graphql,
     workspaceId,
+    role: Role.ADMIN,
     authorizationHeader: inviterUserAndDevice1.sessionKey,
-  });
-  // add user2 as an admin
-  await prisma.usersToWorkspaces.create({
-    data: {
-      user: {
-        connect: {
-          username: inviter2Username,
-        },
-      },
-      workspace: {
-        connect: {
-          id: workspaceId,
-        },
-      },
-      role: Role.ADMIN,
-    },
   });
   await createWorkspaceInvitation({
     graphql,
     workspaceId,
-    authorizationHeader: inviterUserAndDevice2.sessionKey,
+    role: Role.EDITOR,
+    authorizationHeader: inviterUserAndDevice1.sessionKey,
   });
   const workspaceInvitationsResult = await workspaceInvitations({
     graphql,

@@ -60,8 +60,8 @@ export const updateDocumentName = async ({
     {
       input: {
         id: document.id,
-        encryptedName: encryptedDocumentTitle.ciphertext,
-        encryptedNameNonce: encryptedDocumentTitle.publicNonce,
+        nameCiphertext: encryptedDocumentTitle.ciphertext,
+        nameNonce: encryptedDocumentTitle.publicNonce,
         workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
         subkeyId: documentKeyData.subkeyId,
       },

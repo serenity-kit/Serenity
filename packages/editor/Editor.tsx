@@ -5,6 +5,7 @@ import {
   ScrollView,
   SubmitButton,
   ToggleButton,
+  Tooltip,
   tw,
   useHasEditorSidebar,
   View,
@@ -37,12 +38,19 @@ import {
 import "./awareness.css";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
-import { CommentsExtension } from "./extensions/commentsExtension/commentsExtension";
+import {
+  CommentsExtension,
+  updateCommentsDataAndScrollToHighlighted,
+} from "./extensions/commentsExtension/commentsExtension";
 import { AwarnessExtension } from "./extensions/naishoAwarnessExtension/naishoAwarenessExtension";
 import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
 import { TableHeaderExtension } from "./extensions/tableHeaderExtension/tableHeaderExtension";
 import { EditorComment } from "./types";
+
+type HighlightedCommentSource = "editor" | "sidebar";
+
+type HighlightedComment = { id: string; source: HighlightedCommentSource };
 
 type EditorProps = {
   documentId: string;
@@ -62,7 +70,7 @@ type EditorProps = {
   comments: EditorComment[];
   createComment: (comment: { from: number; to: number; text: string }) => void;
   highlightComment: (commentId: string | null) => void;
-  highlightedCommentId: string | null;
+  highlightedComment: HighlightedComment | null;
 };
 
 const headingLevels: Level[] = [1, 2, 3];
@@ -140,7 +148,7 @@ export const Editor = (props: EditorProps) => {
           comments: props.comments,
           yDoc: props.yDocRef.current,
           highlightComment: props.highlightComment,
-          highlightedCommentId: props.highlightedCommentId,
+          highlightedComment: props.highlightedComment,
         }),
         Table.configure({
           HTMLAttributes: {
@@ -205,12 +213,13 @@ export const Editor = (props: EditorProps) => {
 
   useEffect(() => {
     if (editor) {
-      editor.storage.comments.comments = props.comments;
-      editor.storage.comments.highlightedCommentId = props.highlightedCommentId;
-      // empty transaction to make sure the comments are updated
-      editor.view.dispatch(editor.view.state.tr);
+      updateCommentsDataAndScrollToHighlighted(
+        editor,
+        props.comments,
+        props.highlightedComment
+      );
     }
-  }, [props.comments, props.highlightedCommentId, editor]);
+  }, [props.comments, props.highlightedComment, editor]);
 
   return (
     <div className="flex h-full flex-auto flex-row">
@@ -280,6 +289,9 @@ export const Editor = (props: EditorProps) => {
                 !editor.isEditable ||
                 editor.isActive("file")
               ) {
+                // hide the create comment bubble and clear the text when the bubble menu is blured
+                setCommentText("");
+                setHasCreateCommentBubble(false);
                 return false;
               }
 
@@ -287,52 +299,7 @@ export const Editor = (props: EditorProps) => {
             }}
           >
             <BoxShadow elevation={3} rounded ref={bubbleMenuRef}>
-              <HStack
-                space={1}
-                style={tw`p-1 bg-white border border-gray-200 rounded`}
-                alignItems="center"
-              >
-                <ToggleButton
-                  onPress={() => editor.chain().focus().toggleBold().run()}
-                  name="bold"
-                  isActive={editor.isActive("bold")}
-                />
-
-                <ToggleButton
-                  onPress={() => editor.chain().focus().toggleItalic().run()}
-                  name="italic"
-                  isActive={editor.isActive("italic")}
-                />
-
-                <ToggleButton
-                  onPress={() => editor.chain().focus().toggleCode().run()}
-                  name="code-view"
-                  isActive={editor.isActive("code")}
-                />
-
-                <EditorBottombarDivider />
-
-                <ToggleButton
-                  onPress={() =>
-                    editor.chain().focus().toggleLink({ href: "#" }).run()
-                  }
-                  name="link"
-                  isActive={editor.isActive("link")}
-                />
-
-                <EditorBottombarDivider />
-
-                <ToggleButton
-                  onPress={() => {
-                    setHasCreateCommentBubble(true);
-                  }}
-                  name="chat-1-line"
-                  isActive={false}
-                  testID="bubble-menu__initiate-comment-button"
-                />
-              </HStack>
-
-              {hasCreateCommentBubble && (
+              {hasCreateCommentBubble ? (
                 <VStack style={tw`w-80 bg-white rounded`}>
                   <RawInput
                     placeholder="Add a comment"
@@ -340,6 +307,7 @@ export const Editor = (props: EditorProps) => {
                     onChangeText={(text) => setCommentText(text)}
                     variant={"unstyled"}
                     multiline
+                    autoFocus
                     style={tw`p-3`}
                     _stack={{
                       height: 60,
@@ -369,11 +337,75 @@ export const Editor = (props: EditorProps) => {
                             binding.mapping
                           ),
                         });
+                        setCommentText("");
+                        setHasCreateCommentBubble(false);
+                        editor.chain().focus().run();
                       }}
                       testID="bubble-menu__save-comment-button"
                     />
                   </HStack>
                 </VStack>
+              ) : (
+                <HStack
+                  space={1}
+                  style={tw`p-1 bg-white border border-gray-200 rounded`}
+                  alignItems="center"
+                >
+                  <Tooltip label={"Bold"} placement={"top"} hasArrow={false}>
+                    <ToggleButton
+                      onPress={() => editor.chain().focus().toggleBold().run()}
+                      name="bold"
+                      isActive={editor.isActive("bold")}
+                    />
+                  </Tooltip>
+
+                  <Tooltip label={"Italic"} placement={"top"} hasArrow={false}>
+                    <ToggleButton
+                      onPress={() =>
+                        editor.chain().focus().toggleItalic().run()
+                      }
+                      name="italic"
+                      isActive={editor.isActive("italic")}
+                    />
+                  </Tooltip>
+
+                  <Tooltip label={"Code"} placement={"top"} hasArrow={false}>
+                    <ToggleButton
+                      onPress={() => editor.chain().focus().toggleCode().run()}
+                      name="code-view"
+                      isActive={editor.isActive("code")}
+                    />
+                  </Tooltip>
+
+                  <EditorBottombarDivider />
+
+                  <Tooltip label={"Link"} placement={"top"} hasArrow={false}>
+                    <ToggleButton
+                      onPress={() =>
+                        editor.chain().focus().toggleLink({ href: "#" }).run()
+                      }
+                      name="link"
+                      isActive={editor.isActive("link")}
+                    />
+                  </Tooltip>
+
+                  <EditorBottombarDivider />
+
+                  <Tooltip
+                    label={"Add comment"}
+                    placement={"top"}
+                    hasArrow={false}
+                  >
+                    <ToggleButton
+                      onPress={() => {
+                        setHasCreateCommentBubble(true);
+                      }}
+                      name="chat-1-line"
+                      isActive={false}
+                      testID="bubble-menu__initiate-comment-button"
+                    />
+                  </Tooltip>
+                </HStack>
               )}
             </BoxShadow>
           </BubbleMenu>

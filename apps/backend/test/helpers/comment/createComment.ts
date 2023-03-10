@@ -9,6 +9,7 @@ type Params = {
   graphql: any;
   snapshotId: string;
   snapshotKey: string;
+  documentShareLinkToken?: string | null | undefined;
   comment: string;
   authorizationHeader: string;
   creatorDevice: Device;
@@ -20,6 +21,7 @@ export const createComment = async ({
   graphql,
   snapshotId,
   snapshotKey,
+  documentShareLinkToken,
   comment,
   creatorDevice,
   creatorDeviceEncryptionPrivateKey,
@@ -62,6 +64,7 @@ export const createComment = async ({
       input: {
         snapshotId,
         subkeyId: commentKey.subkeyId,
+        documentShareLinkToken,
         contentCiphertext: ciphertext,
         contentNonce: publicNonce,
       },

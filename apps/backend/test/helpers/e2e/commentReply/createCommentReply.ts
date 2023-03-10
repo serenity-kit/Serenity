@@ -17,13 +17,13 @@ export const createCommentReply = async ({
     where: { commentId: commentId },
   });
   const commentReplyInput = page.locator(
-    `[data-testid="comment-${commentId}__reply-input"]`
+    `data-testid=comment-${commentId}__reply-input`
   );
   await commentReplyInput.selectText();
   await commentReplyInput.press("Backspace");
   await commentReplyInput.type(replyText);
   await page
-    .locator(`[data-testid="comment-${commentId}__save-reply-button"]`)
+    .locator(`data-testid=comment-${commentId}__save-reply-button`)
     .click();
   await delayForSeconds(2);
   const numCommentRepliesAfter = await prisma.commentReply.count({
@@ -39,7 +39,7 @@ export const createCommentReply = async ({
   }
   const commentReplyText = await page
     .locator(
-      `[data-testid='comment-${commentId}__comment-reply-${commentReply.id}--text-content']`
+      `data-testid=comment-${commentId}__comment-reply-${commentReply.id}--text-content`
     )
     .innerText();
   expect(commentReplyText).toBe(replyText);

@@ -42,6 +42,15 @@ export const CreatorDevice = objectType({
   },
 });
 
+export const MinimalDevice = objectType({
+  name: "MinimalDevice",
+  definition(t) {
+    t.nonNull.string("signingPublicKey");
+    t.nonNull.string("encryptionPublicKey");
+    t.nonNull.string("encryptionPublicKeySignature");
+  },
+});
+
 export const DeviceInput = inputObjectType({
   name: "DeviceInput",
   definition(t) {

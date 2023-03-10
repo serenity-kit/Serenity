@@ -161,14 +161,14 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
             folder: {
               id: folderId,
               idSignature: sodium.to_base64(folderIdSignature),
-              encryptedName: encryptedFolderResult.ciphertext,
-              encryptedNameNonce: encryptedFolderResult.publicNonce,
+              nameCiphertext: encryptedFolderResult.ciphertext,
+              nameNonce: encryptedFolderResult.publicNonce,
               keyDerivationTrace: folderKeyDerivationTrace,
             },
             document: {
               id: documentId,
-              encryptedName: encryptedDocumentTitle.ciphertext,
-              encryptedNameNonce: encryptedDocumentTitle.publicNonce,
+              nameCiphertext: encryptedDocumentTitle.ciphertext,
+              nameNonce: encryptedDocumentTitle.publicNonce,
               subkeyId: documentKeyData.subkeyId,
               snapshot,
             },

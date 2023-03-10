@@ -27,8 +27,8 @@ mutation createInitialWorkspaceStructure(
     }
     folder {
       id
-      encryptedName
-      encryptedNameNonce
+      nameCiphertext
+      nameNonce
       parentFolderId
       rootFolderId
       workspaceId

@@ -1,6 +1,7 @@
 import { expect, Page, test } from "@playwright/test";
 import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../prisma/generated/output";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { acceptWorkspaceInvitation } from "../../helpers/e2e/acceptWorkspaceInvitation";
@@ -19,19 +20,19 @@ type UserData = {
 const user1: UserData = {
   id: uuidv4(),
   username: `${uuidv4()}@example.com`,
-  password: "pass",
+  password: "password",
   data: undefined,
 };
 const user2: UserData = {
   id: uuidv4(),
   username: `${uuidv4()}@example.com`,
-  password: "pass",
+  password: "password",
   data: undefined,
 };
 const user3: UserData = {
   id: uuidv4(),
   username: `${uuidv4()}@example.com`,
-  password: "pass",
+  password: "password",
   data: undefined,
 };
 
@@ -80,6 +81,7 @@ test.describe("Workspace Sharing", () => {
 
     const { url } = await createWorkspaceInvitation({
       page,
+      role: Role.EDITOR,
     });
     workspaceInvitationUrl = url;
 
