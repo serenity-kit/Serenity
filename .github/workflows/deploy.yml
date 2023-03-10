@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - main
+      - move-frontend-deploy-to-actions
 
 jobs:
-  deploy-staging:
+  deploy-staging-api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -21,3 +22,28 @@ jobs:
       - run: flyctl deploy --remote-only ./apps/backend
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  deploy-staging-frontend:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3 # needed until 18 becomes the default
+        with:
+          node-version: 18
+          cache: yarn
+      - name: Build
+        working-directory: ./apps/app
+        run: yarn build:web
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2
+        with:
+          publish-dir: "./apps/app/web-build"
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 7
