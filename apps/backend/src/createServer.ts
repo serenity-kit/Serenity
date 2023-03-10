@@ -71,7 +71,9 @@ export default async function createServer() {
     },
     formatError: (err) => {
       // useful for debugging
-      // console.error(err);
+      if (process.env.NODE_ENV !== "test") {
+        console.error(err);
+      }
       if (
         err.originalError instanceof AuthenticationError ||
         err.originalError instanceof ForbiddenError ||
