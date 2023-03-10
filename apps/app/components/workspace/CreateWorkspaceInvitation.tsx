@@ -2,7 +2,7 @@ import {
   Button,
   Description,
   Heading,
-  TextArea,
+  SharetextBox,
   tw,
   View,
 } from "@serenity-tools/ui";
@@ -160,7 +160,7 @@ export function CreateWorkspaceInvitation(props: Props) {
 
   return (
     <>
-      <TextArea
+      <SharetextBox
         testID="workspaceInvitationInstructionsText"
         selectable={selectedWorkspaceInvitationId !== null}
         onCopyPress={copyInvitationText}
@@ -169,7 +169,7 @@ export function CreateWorkspaceInvitation(props: Props) {
         {selectedWorkspaceInvitationId !== null
           ? getWorkspaceInvitationText()
           : 'The invitation text and link will be generated here\nClick on "Create invitation" to generate a new invitation'}
-      </TextArea>
+      </SharetextBox>
       <Button
         onPress={createWorkspaceInvitationPreflight}
         style={styles.invitationButton}

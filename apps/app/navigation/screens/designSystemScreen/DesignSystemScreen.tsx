@@ -42,7 +42,7 @@ import {
   SidebarText,
   Spinner,
   Text,
-  TextArea,
+  SharetextBox,
   ToggleButton,
   Tooltip,
   tw,
@@ -82,7 +82,7 @@ export default function DesignSystemScreen(
     );
   };
 
-  const copyTextAreaText = async () => {
+  const copySharetextBoxText = async () => {
     if (!pageShareLink) {
       return;
     }
@@ -2109,11 +2109,11 @@ export default function DesignSystemScreen(
           </Text>
         </DSExampleArea>
 
-        <Heading lvl={1}>TextArea</Heading>
+        <Heading lvl={1}>SharetextBox</Heading>
         <Text>
           The{" "}
           <DSMono variant="component" size="md">
-            TextArea
+            SharetextBox
           </DSMono>{" "}
           component is used for system generated text which the user might use
           elsewhere.
@@ -2122,17 +2122,17 @@ export default function DesignSystemScreen(
         <Text variant="sm">
           The basic{" "}
           <DSMono variant="component" size="md">
-            TextArea
+            SharetextBox
           </DSMono>{" "}
           is muted to show the user the Text inside is just an Info and not
           something they can interact with.
         </Text>
         <DSExampleArea>
-          <TextArea>
+          <SharetextBox>
             {
               'The share link will be generated here\nClick on "Create page link" to generate a new link'
             }
-          </TextArea>
+          </SharetextBox>
         </DSExampleArea>
         <Text variant="xxs" muted style={tw`mt-4`}>
           Note: as there are currently troubles with react native that prevent
@@ -2144,16 +2144,16 @@ export default function DesignSystemScreen(
         <Text variant="sm">
           To allow the user to interact with the{" "}
           <DSMono variant="component" size="md">
-            TextArea
+            SharetextBox
           </DSMono>{" "}
           add the <DSMono variant="property">selectable</DSMono> property.
         </Text>
         <DSExampleArea>
-          <TextArea selectable style={tw`max-w-150`}>
+          <SharetextBox selectable style={tw`max-w-150`}>
             {
               "http://serenity.re/share/b80d1184-04f7-4965-a4e4/078967c0-c829-4870-b64c-#key=_gpZeFjmIHZzhmJwDp2chGYRiaKB0DdzTacl_uFV9ZU"
             }
-          </TextArea>
+          </SharetextBox>
         </DSExampleArea>
         <Text variant="sm" style={tw`mt-2.5`}>
           To add even more functionality you can allow the user to copy the Text
@@ -2168,15 +2168,15 @@ export default function DesignSystemScreen(
         >
           <Box style={tw`w-100`}>
             <UIHeading lvl={3}>Share a page</UIHeading>
-            <TextArea
+            <SharetextBox
               selectable={pageShareLink !== ""}
-              onCopyPress={copyTextAreaText}
+              onCopyPress={copySharetextBoxText}
               isClipboardNoticeActive={isClipboardNoticeActive}
             >
               {pageShareLink !== ""
                 ? pageShareLink
                 : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
-            </TextArea>
+            </SharetextBox>
             <HStack space={4}>
               <Button
                 onPress={() => {

@@ -6,7 +6,7 @@ import { Tooltip } from "../tooltip/Tooltip";
 import { View, ViewProps } from "../view/View";
 import { Text, TextVariants } from "../text/Text";
 
-export type TextAreaProps = ViewProps & {
+export type SharetextBoxProps = ViewProps & {
   variant?: TextVariants;
   selectable?: boolean;
   testID?: string;
@@ -14,7 +14,7 @@ export type TextAreaProps = ViewProps & {
   onCopyPress?: () => void;
 };
 
-export function TextArea(props: TextAreaProps) {
+export function SharetextBox(props: SharetextBoxProps) {
   const { variant = "xs", selectable, isClipboardNoticeActive } = props;
   const styles = StyleSheet.create({
     wrapper: tw`flex-auto relative mb-2 py-4 px-5 border rounded ${

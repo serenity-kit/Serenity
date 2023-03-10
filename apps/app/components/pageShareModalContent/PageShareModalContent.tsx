@@ -14,7 +14,7 @@ import {
   Select,
   SelectItem,
   Spinner,
-  TextArea,
+  SharetextBox,
   tw,
   useIsDesktopDevice,
   View,
@@ -156,7 +156,7 @@ export function PageShareModalContent() {
             <FormWrapper>
               <ModalHeader>Share a page</ModalHeader>
               <View>
-                <TextArea
+                <SharetextBox
                   testID="document-share-modal__share-link-text"
                   selectable={pageShareLink !== null}
                   onCopyPress={copyLinkText}
@@ -165,7 +165,7 @@ export function PageShareModalContent() {
                   {pageShareLink !== null
                     ? pageShareLink
                     : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
-                </TextArea>
+                </SharetextBox>
                 <View style={styles.createShareLinkOptions}>
                   <Select
                     onValueChange={(value: Role) => {
