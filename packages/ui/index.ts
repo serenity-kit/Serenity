@@ -58,6 +58,7 @@ export * from "./components/tableOfContentButton/TableOfContentButton";
 export * from "./components/tabList/TabList";
 export * from "./components/tabPanel/TabPanel";
 export * from "./components/text/Text";
+export * from "./components/textArea/TextArea";
 export * from "./components/toggleButton/ToggleButton";
 export * from "./components/tooltip/Tooltip";
 export * from "./components/view/View";

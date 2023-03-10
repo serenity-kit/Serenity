@@ -1,10 +1,10 @@
-import { RawInput } from "@serenity-tools/ui";
-import { useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { Platform } from "react-native";
+import { RawInput } from "../rawInput/RawInput";
 
 const twoRowsHeight = 58;
 
-export const Textarea = (props) => {
+export const TextArea = (props) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useLayoutEffect(() => {
