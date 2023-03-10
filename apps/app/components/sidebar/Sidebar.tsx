@@ -35,7 +35,6 @@ import { deriveCurrentWorkspaceKey } from "../../utils/workspace/deriveCurrentWo
 import AccountMenu from "../accountMenu/AccountMenu";
 import Folder from "../sidebarFolder/SidebarFolder";
 import { CreateWorkspaceModal } from "../workspace/CreateWorkspaceModal";
-import { Textarea } from "./Textarea";
 
 export default function Sidebar(props: DrawerContentComponentProps) {
   const { activeDevice } = useAuthenticatedAppContext();
@@ -61,8 +60,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
   });
   const [showCreateWorkspaceModal, setShowCreateWorkspaceModal] =
     useState(false);
-
-  const [textareaText, setTextareaText] = useState("");
 
   const createFolder = async (name: string) => {
     const id = uuidv4();
@@ -184,11 +181,6 @@ export default function Sidebar(props: DrawerContentComponentProps) {
       </View>
 
       {isDesktopDevice ? <SidebarDivider /> : null}
-
-      <Textarea
-        value={textareaText}
-        onChangeText={(text) => setTextareaText(text)}
-      />
 
       {isAuthorizedForThisWorkspace ? (
         <>
