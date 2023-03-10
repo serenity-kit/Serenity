@@ -29,7 +29,7 @@ test.beforeAll(async () => {
   });
 });
 
-test.describe.only("Share links", () => {
+test.describe("Share links", () => {
   test("editor share link", async ({ browser, page }) => {
     const role = Role.EDITOR;
     await login({

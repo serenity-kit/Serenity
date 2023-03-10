@@ -1,5 +1,6 @@
 import { idArg, nonNull, queryField } from "nexus";
 import { getWorkspaceInvitation } from "../../../database/workspace/getWorkspaceInvitation";
+import { formatWorkspaceInvitation } from "../../../types/workspace";
 import { WorkspaceInvitation } from "../../types/workspace";
 
 export const workspaceInvitationQuery = queryField((t) => {
@@ -13,7 +14,7 @@ export const workspaceInvitationQuery = queryField((t) => {
       const workspaceInvitation = await getWorkspaceInvitation({
         workspaceInvitationId,
       });
-      return workspaceInvitation;
+      return formatWorkspaceInvitation(workspaceInvitation);
     },
   });
 });

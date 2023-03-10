@@ -25,14 +25,14 @@ type Params = {
   activeDevice: LocalDevice | null;
 };
 
-type DecryptedReply = {
+export type DecryptedReply = {
   id: string;
   text: string;
   createdAt: string;
   creatorDevice: MinimalDevice;
 };
 
-type DecryptedComment = {
+export type DecryptedComment = {
   id: string;
   text: string;
   from: number;
@@ -64,6 +64,7 @@ interface Context {
   highlightedCommentId: string | null;
   activeSnapshot: ActiveSnapshot | undefined;
   commentKeys: CommentKeys;
+  isOpenSidebar: boolean;
 }
 
 export const commentsMachine =
@@ -83,7 +84,10 @@ export const commentsMachine =
               type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS";
               activeSnapshot: ActiveSnapshot;
               commentKeys: CommentKeys;
-            },
+            }
+          | { type: "OPEN_SIDEBAR" }
+          | { type: "CLOSE_SIDEBAR" }
+          | { type: "TOGGLE_SIDEBAR" },
         context: {} as Context,
       },
       tsTypes: {} as import("./commentsMachine.typegen").Typegen0,
@@ -99,6 +103,7 @@ export const commentsMachine =
         highlightedCommentId: null,
         commentKeys: {},
         activeSnapshot: undefined,
+        isOpenSidebar: false,
       },
       initial: "waitingForActiveSnapshot",
       on: {
@@ -127,6 +132,27 @@ export const commentsMachine =
         },
         SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS: {
           actions: ["setActiveSnapshotAndCommentKeys"],
+        },
+        OPEN_SIDEBAR: {
+          actions: [assign({ isOpenSidebar: true })],
+        },
+        CLOSE_SIDEBAR: {
+          actions: [assign({ isOpenSidebar: false })],
+        },
+        TOGGLE_SIDEBAR: {
+          actions: [
+            assign((context) => {
+              if (context.isOpenSidebar) {
+                return {
+                  isOpenSidebar: false,
+                  highlightedCommentId: null,
+                };
+              }
+              return {
+                isOpenSidebar: true,
+              };
+            }),
+          ],
         },
       },
       states: {

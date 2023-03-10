@@ -11,6 +11,8 @@ export const selectValueFromOptions = async ({
   testID,
   value,
 }: Props) => {
+  // delaying for one second seems to help the page locate the element
+  await delayForSeconds(1);
   const selectElement = page.locator(
     `//input[@data-testid="${testID}"]/../../select`
   );

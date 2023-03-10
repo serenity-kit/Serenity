@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo } from "react";
 import { useWindowDimensions } from "react-native";
 import Page from "../../../components/page/Page";
 import { useWorkspace } from "../../../context/WorkspaceContext";
@@ -55,7 +55,6 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
     },
   });
 
-  const [open, setOpen] = useState(false);
   const commentsService = useInterpret(commentsMachine, {
     context: {
       params: {
@@ -64,7 +63,7 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
       },
     },
   });
-  const [, send] = useActor(commentsService);
+  const [commentsState, send] = useActor(commentsService);
   const isPermanentLeftSidebar = useIsPermanentLeftSidebar();
 
   useLayoutEffect(() => {
@@ -73,7 +72,7 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
       headerTitle: () => (
         <PageHeader
           toggleCommentsDrawer={() => {
-            setOpen((prevOpen) => !prevOpen);
+            send({ type: "TOGGLE_SIDEBAR" });
           }}
         />
       ),
@@ -159,9 +158,17 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
         }}
       >
         <Drawer
-          open={open}
-          onOpen={() => setOpen(true)}
-          onClose={() => setOpen(false)}
+          open={commentsState.context.isOpenSidebar}
+          onOpen={() => {
+            if (!commentsState.context.isOpenSidebar) {
+              send({ type: "OPEN_SIDEBAR" });
+            }
+          }}
+          onClose={() => {
+            if (commentsState.context.isOpenSidebar) {
+              send({ type: "CLOSE_SIDEBAR" });
+            }
+          }}
           renderDrawerContent={() => {
             return <CommentsSidebar />;
           }}

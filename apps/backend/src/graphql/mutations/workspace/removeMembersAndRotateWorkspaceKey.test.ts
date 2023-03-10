@@ -1,9 +1,15 @@
-import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
+import {
+  decryptFolderName,
+  deriveKeysFromKeyDerivationTrace,
+  encryptWorkspaceKeyForDevice,
+} from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
+import { getRootFolders } from "../../../../test/helpers/folder/getRootFolders";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { acceptWorkspaceInvitation } from "../../../../test/helpers/workspace/acceptWorkspaceInvitation";
 import { createWorkspaceInvitation } from "../../../../test/helpers/workspace/createWorkspaceInvitation";
@@ -119,6 +125,7 @@ test("user can remove another user", async () => {
 
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
+    role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
   });
@@ -133,19 +140,43 @@ test("user can remove another user", async () => {
       workspaceInvitationResult.invitationSigningPrivateKey,
     authorizationHeader: userData2.sessionKey,
   });
-  const user2DeviceKeyBox = encryptWorkspaceKeyForDevice({
-    receiverDeviceEncryptionPublicKey: userData1.device.signingPublicKey,
-    creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
+  const user2WebDeviceKeyBox = encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: userData1.webDevice.signingPublicKey,
+    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
     workspaceKey,
   });
-  const user2DeviceKeyBoxes = [
+  const user2MainDeviceKeyBox = encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: userData1.mainDevice.signingPublicKey,
+    creatorDeviceEncryptionPrivateKey:
+      userData1.mainDevice.encryptionPrivateKey,
+    workspaceKey,
+  });
+  const user1WebDeviceDeviceKeyBox = encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: userData1.webDevice.signingPublicKey,
+    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
+    workspaceKey,
+  });
+  const approvedDeviceKeyBoxes = [
     {
       workspaceId: userData1.workspace.id,
       workspaceKeyDevicePairs: [
+        // user2 webDevice
         {
           workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-          nonce: user2DeviceKeyBox.nonce,
-          ciphertext: user2DeviceKeyBox.nonce,
+          nonce: user2WebDeviceKeyBox.nonce,
+          ciphertext: user2WebDeviceKeyBox.nonce,
+        },
+        // user2 mainDevice
+        {
+          workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+          nonce: user2MainDeviceKeyBox.nonce,
+          ciphertext: user2MainDeviceKeyBox.nonce,
+        },
+        // user1 webDevice
+        {
+          workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
+          nonce: user1WebDeviceDeviceKeyBox.nonce,
+          ciphertext: user1WebDeviceDeviceKeyBox.nonce,
         },
       ],
     },
@@ -155,11 +186,18 @@ test("user can remove another user", async () => {
     deviceSigningPublicKey: userData2.device.signingPublicKey,
     creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
     authorizationHeader: userData1.sessionKey,
-    deviceWorkspaceKeyBoxes: user2DeviceKeyBoxes,
+    deviceWorkspaceKeyBoxes: approvedDeviceKeyBoxes,
   });
-  const { ciphertext, nonce } = encryptWorkspaceKeyForDevice({
-    receiverDeviceEncryptionPublicKey: userData1.device.signingPublicKey,
-    creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
+  const user1MainDeviceGen1 = encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: userData1.mainDevice.signingPublicKey,
+    creatorDeviceEncryptionPrivateKey:
+      userData1.mainDevice.encryptionPrivateKey,
+    workspaceKey,
+  });
+  const user1WebDeviceGen1 = encryptWorkspaceKeyForDevice({
+    receiverDeviceEncryptionPublicKey: userData1.webDevice.signingPublicKey,
+    creatorDeviceEncryptionPrivateKey:
+      userData1.mainDevice.encryptionPrivateKey,
     workspaceKey,
   });
   const workspaceUsersBefore = await prisma.usersToWorkspaces.findMany({
@@ -177,9 +215,14 @@ test("user can remove another user", async () => {
   ).toBeGreaterThanOrEqual(0);
   const deviceWorkspaceKeyBoxes: WorkspaceDeviceParing[] = [
     {
-      ciphertext,
-      nonce,
-      receiverDeviceSigningPublicKey: userData1.device.signingPublicKey,
+      ciphertext: user1MainDeviceGen1.ciphertext,
+      nonce: user1MainDeviceGen1.nonce,
+      receiverDeviceSigningPublicKey: userData1.mainDevice.signingPublicKey,
+    },
+    {
+      ciphertext: user1WebDeviceGen1.ciphertext,
+      nonce: user1WebDeviceGen1.nonce,
+      receiverDeviceSigningPublicKey: userData1.webDevice.signingPublicKey,
     },
   ];
   const revokedUserIds = [userData2.user.id];
@@ -187,23 +230,41 @@ test("user can remove another user", async () => {
     graphql,
     workspaceId: userData1.workspace.id,
     revokedUserIds,
-    creatorDeviceSigningPublicKey: userData1.device.signingPublicKey,
+    creatorDeviceSigningPublicKey: userData1.mainDevice.signingPublicKey,
     deviceWorkspaceKeyBoxes,
     authorizationHeader: userData1.sessionKey,
   });
   const resultingWorkspaceKey =
     workspaceKeyResult.removeMembersAndRotateWorkspaceKey.workspaceKey;
   expect(resultingWorkspaceKey.generation).toBe(1);
-  expect(resultingWorkspaceKey.workspaceKeyBoxes.length).toBe(1);
-  const workspaceKeyBox = resultingWorkspaceKey.workspaceKeyBoxes[0];
-  expect(workspaceKeyBox.ciphertext).toBe(ciphertext);
-  expect(workspaceKeyBox.nonce).toBe(nonce);
-  expect(workspaceKeyBox.creatorDeviceSigningPublicKey).toBe(
-    userData1.device.signingPublicKey
-  );
-  expect(workspaceKeyBox.deviceSigningPublicKey).toBe(
-    userData1.device.signingPublicKey
-  );
+  // workspaceKeyBoxes will only return the device the user used for login
+  expect(resultingWorkspaceKey.workspaceKeyBoxes.length).toBe(2);
+  for (const workspaceKeyBox of resultingWorkspaceKey.workspaceKeyBoxes) {
+    if (
+      workspaceKeyBox.deviceSigningPublicKey ===
+      userData1.mainDevice.signingPublicKey
+    ) {
+      expect(workspaceKeyBox.ciphertext).toBe(user1MainDeviceGen1.ciphertext);
+      expect(workspaceKeyBox.nonce).toBe(user1MainDeviceGen1.nonce);
+      expect(workspaceKeyBox.creatorDeviceSigningPublicKey).toBe(
+        userData1.mainDevice.signingPublicKey
+      );
+    } else if (
+      workspaceKeyBox.deviceSigningPublicKey ===
+      userData1.webDevice.signingPublicKey
+    ) {
+      expect(workspaceKeyBox.ciphertext).toBe(user1WebDeviceGen1.ciphertext);
+      expect(workspaceKeyBox.nonce).toBe(user1WebDeviceGen1.nonce);
+      expect(workspaceKeyBox.creatorDeviceSigningPublicKey).toBe(
+        userData1.mainDevice.signingPublicKey
+      );
+    } else {
+      throw new Error("unexpected workspaceKeyBox");
+    }
+    expect(workspaceKeyBox.creatorDeviceSigningPublicKey).toBe(
+      userData1.mainDevice.signingPublicKey
+    );
+  }
   const workspaceUsersAfter = await prisma.usersToWorkspaces.findMany({
     where: { workspaceId: userData1.workspace.id },
   });
@@ -219,9 +280,10 @@ test("user can remove another user", async () => {
   const workspaceResult = await getWorkspace({
     graphql,
     workspaceId: userData1.workspace.id,
-    deviceSigningPublicKey: userData1.device.signingPublicKey,
+    deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
     authorizationHeader: userData1.sessionKey,
   });
+
   const workspace = workspaceResult.workspace;
   expect(workspace.currentWorkspaceKey.id).toBe(resultingWorkspaceKey.id);
   expect(workspace.workspaceKeys.length).toBe(2);
@@ -237,9 +299,38 @@ test("user can remove another user", async () => {
     expect(workspaceKey.workspaceKeyBox).not.toBe(null);
     const workspaceKeyBox = workspaceKey.workspaceKeyBox;
     expect(workspaceKeyBox.deviceSigningPublicKey).toBe(
-      userData1.device.signingPublicKey
+      userData1.webDevice.signingPublicKey
     );
   }
+
+  const oldWorkspaceKeyBox = workspace.workspaceKeys[1].workspaceKeyBox;
+  // get the root folders
+  const rootFoldersResult = await getRootFolders({
+    graphql,
+    workspaceId: workspace.id,
+    first: 50,
+    authorizationHeader: userData1.sessionKey,
+  });
+  const firstFolder = rootFoldersResult.rootFolders.edges[0].node;
+  // fetch the workspaceKey for the folder
+  const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
+    keyDerivationTrace: firstFolder.keyDerivationTrace,
+    activeDevice: userData1.webDevice,
+    workspaceKeyBox: oldWorkspaceKeyBox,
+  });
+  let parentKey = workspaceKey;
+  if (folderKeyTrace.trace.length > 1) {
+    parentKey = folderKeyTrace.trace[folderKeyTrace.trace.length - 2].key;
+  }
+  const folderSubkeyId =
+    folderKeyTrace.trace[folderKeyTrace.trace.length - 1].subkeyId;
+  const decryptedFolderName = decryptFolderName({
+    parentKey: parentKey,
+    subkeyId: folderSubkeyId,
+    ciphertext: firstFolder.nameCiphertext,
+    publicNonce: firstFolder.nameNonce,
+  });
+  expect(decryptedFolderName).toBe("Getting Started");
 });
 
 test("user can rotate key for multiple devices", async () => {
@@ -250,6 +341,7 @@ test("user can rotate key for multiple devices", async () => {
   });
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
+    role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
   });

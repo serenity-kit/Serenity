@@ -1,6 +1,7 @@
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import { idArg, nonNull, queryField } from "nexus";
 import { getWorkspaceInvitations } from "../../../database/workspace/getWorkspaceInvitations";
+import { formatWorkspaceInvitation } from "../../../types/workspace";
 import { WorkspaceInvitation } from "../../types/workspace";
 
 export const workspaceInvitationsQuery = queryField((t) => {
@@ -36,14 +37,16 @@ export const workspaceInvitationsQuery = queryField((t) => {
       const take: any = args.first ? args.first + 1 : undefined;
       const workspaceId = args.workspaceId;
 
-      const workspaces = await getWorkspaceInvitations({
+      const workspaceInvitations = await getWorkspaceInvitations({
         userId,
         workspaceId,
         cursor,
         skip,
         take,
       });
-      return workspaces;
+      return workspaceInvitations.map((workspaceInvitation) => {
+        return formatWorkspaceInvitation(workspaceInvitation);
+      });
     },
   });
 });
