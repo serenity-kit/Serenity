@@ -3,6 +3,7 @@ import {
   encryptWorkspaceKeyForDevice,
 } from "@serenity-tools/common";
 import { v4 as uuidv4 } from "uuid";
+import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDevicesToWorkspaces } from "../../../../test/helpers/device/attachDevicesToWorkspaces";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -33,6 +34,7 @@ test("Existing workspace does nothing", async () => {
   });
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
+    role: Role.VIEWER,
     workspaceId,
     authorizationHeader,
   });

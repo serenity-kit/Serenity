@@ -155,11 +155,11 @@ export default function Editor({
         highlightComment={(commentId) => {
           // necessary check to avoid an endless loop
           send({
-            type: "HIGHLIGHT_COMMENT",
+            type: "HIGHLIGHT_COMMENT_FROM_EDITOR",
             commentId: commentId === null ? "NONE" : commentId, // there is a bug with setting it to null
           });
         }}
-        highlightedCommentId={commentsState.context.highlightedCommentId}
+        highlightedComment={commentsState.context.highlightedComment}
         onFocus={() => {
           editorIsFocusedRef.current = true;
           showAndPositionToolbar();

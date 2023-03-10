@@ -1,5 +1,6 @@
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
+import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -10,22 +11,24 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { getWorkspace } from "../../../database/workspace/getWorkspace";
 
 const graphql = setupGraphql();
-const workspaceId = "workspace1";
-const otherWorkspaceId = "workspace2";
 let workspaceInvitationId = "";
 let invitationSigningPrivateKey = "";
-let inviteeUsername = "invitee@example.com";
+const inviteeUsername = `invitee-${uuidv4()}@example.com`;
 let inviteeUserAndDevice: any = null;
 
 beforeAll(async () => {
   await deleteAllRecords();
 });
 
-test("user should be able to accept an invitation", async () => {
-  const inviterUserName = "inviter@example.com";
+test("accept admin role", async () => {
+  const inviterUsername = `invite-${uuidv4()}@example.com`;
+  const inviteeUsername = `invitee-${uuidv4()}@example.com`;
+  const workspaceId = uuidv4();
+  const otherWorkspaceId = uuidv4();
+  const role = Role.ADMIN;
   const inviterUserAndDevice = await createUserWithWorkspace({
     id: workspaceId,
-    username: inviterUserName,
+    username: inviterUsername,
   });
   const device = inviterUserAndDevice.device;
   inviteeUserAndDevice = await createUserWithWorkspace({
@@ -42,6 +45,7 @@ test("user should be able to accept an invitation", async () => {
   }
   const createWorkspaceResult = await createWorkspaceInvitation({
     graphql,
+    role,
     workspaceId,
     authorizationHeader: inviterUserAndDevice.sessionKey,
   });
@@ -76,8 +80,8 @@ test("user should be able to accept an invitation", async () => {
   sharedWorkspace.members.forEach(
     (member: { username: string; role: Role }) => {
       if (member.username === inviteeUsername) {
-        expect(member.role).not.toBe(Role.ADMIN);
-      } else if (member.username === inviterUserName) {
+        expect(member.role).toBe(role);
+      } else if (member.username === inviterUsername) {
         expect(member.role).toBe(Role.ADMIN);
       }
     }
@@ -85,6 +89,7 @@ test("user should be able to accept an invitation", async () => {
 });
 
 test("double-accepting invitation does nothing", async () => {
+  const lastInviteeAssignedRole = Role.ADMIN;
   const encryptionPublicKeySignature = sodium.to_base64(
     sodium.crypto_sign_detached(
       inviteeUserAndDevice.mainDevice.encryptionPublicKey,
@@ -111,9 +116,213 @@ test("double-accepting invitation does nothing", async () => {
   expect(sharedWorkspace.members.length).toBe(2);
   sharedWorkspace.members.forEach((member: { userId: string; role: Role }) => {
     if (member.userId === inviteeUsername) {
-      expect(member.role).not.toBe(Role.ADMIN);
+      expect(member.role).toBe(lastInviteeAssignedRole);
     }
   });
+});
+
+test("accept editor role", async () => {
+  const inviterUsername = `invite-${uuidv4()}@example.com`;
+  const inviteeUsername = `invitee-${uuidv4()}@example.com`;
+  const workspaceId = uuidv4();
+  const otherWorkspaceId = uuidv4();
+  const role = Role.EDITOR;
+  const inviterUserAndDevice = await createUserWithWorkspace({
+    id: workspaceId,
+    username: inviterUsername,
+  });
+  const device = inviterUserAndDevice.device;
+  inviteeUserAndDevice = await createUserWithWorkspace({
+    id: otherWorkspaceId,
+    username: inviteeUsername,
+  });
+  const workspace = await getWorkspace({
+    id: workspaceId,
+    userId: inviterUserAndDevice.user.id,
+    deviceSigningPublicKey: device.signingPublicKey,
+  });
+  if (!workspace) {
+    throw new Error("workspace not found");
+  }
+  const createWorkspaceResult = await createWorkspaceInvitation({
+    graphql,
+    role,
+    workspaceId,
+    authorizationHeader: inviterUserAndDevice.sessionKey,
+  });
+  workspaceInvitationId =
+    createWorkspaceResult.createWorkspaceInvitation.workspaceInvitation.id;
+  invitationSigningPrivateKey =
+    createWorkspaceResult.invitationSigningPrivateKey;
+  const encryptionPublicKeySignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      sodium.from_base64(inviteeUserAndDevice.signingPrivateKey)
+    )
+  );
+  const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
+    graphql,
+    workspaceInvitationId,
+    inviteeUsername: inviteeUserAndDevice.user.username,
+    inviteeMainDevice: {
+      userId: inviteeUserAndDevice.user.id,
+      signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
+      encryptionPublicKey: inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      encryptionPublicKeySignature: encryptionPublicKeySignature,
+    },
+    invitationSigningPrivateKey,
+    authorizationHeader: inviteeUserAndDevice.sessionKey,
+  });
+  const sharedWorkspace =
+    acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
+  expect(typeof sharedWorkspace.id).toBe("string");
+  expect(sharedWorkspace.name).toBe(sharedWorkspace.name);
+  expect(sharedWorkspace.members.length).toBe(2);
+  sharedWorkspace.members.forEach(
+    (member: { username: string; role: Role }) => {
+      if (member.username === inviteeUsername) {
+        expect(member.role).toBe(role);
+      } else if (member.username === inviterUsername) {
+        expect(member.role).toBe(Role.ADMIN);
+      }
+    }
+  );
+});
+
+test("accept commenter role", async () => {
+  const inviterUsername = `invite-${uuidv4()}@example.com`;
+  const inviteeUsername = `invitee-${uuidv4()}@example.com`;
+  const workspaceId = uuidv4();
+  const otherWorkspaceId = uuidv4();
+  const role = Role.COMMENTER;
+  const inviterUserAndDevice = await createUserWithWorkspace({
+    id: workspaceId,
+    username: inviterUsername,
+  });
+  const device = inviterUserAndDevice.device;
+  inviteeUserAndDevice = await createUserWithWorkspace({
+    id: otherWorkspaceId,
+    username: inviteeUsername,
+  });
+  const workspace = await getWorkspace({
+    id: workspaceId,
+    userId: inviterUserAndDevice.user.id,
+    deviceSigningPublicKey: device.signingPublicKey,
+  });
+  if (!workspace) {
+    throw new Error("workspace not found");
+  }
+  const createWorkspaceResult = await createWorkspaceInvitation({
+    graphql,
+    role,
+    workspaceId,
+    authorizationHeader: inviterUserAndDevice.sessionKey,
+  });
+  workspaceInvitationId =
+    createWorkspaceResult.createWorkspaceInvitation.workspaceInvitation.id;
+  invitationSigningPrivateKey =
+    createWorkspaceResult.invitationSigningPrivateKey;
+  const encryptionPublicKeySignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      sodium.from_base64(inviteeUserAndDevice.signingPrivateKey)
+    )
+  );
+  const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
+    graphql,
+    workspaceInvitationId,
+    inviteeUsername: inviteeUserAndDevice.user.username,
+    inviteeMainDevice: {
+      userId: inviteeUserAndDevice.user.id,
+      signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
+      encryptionPublicKey: inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      encryptionPublicKeySignature: encryptionPublicKeySignature,
+    },
+    invitationSigningPrivateKey,
+    authorizationHeader: inviteeUserAndDevice.sessionKey,
+  });
+  const sharedWorkspace =
+    acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
+  expect(typeof sharedWorkspace.id).toBe("string");
+  expect(sharedWorkspace.name).toBe(sharedWorkspace.name);
+  expect(sharedWorkspace.members.length).toBe(2);
+  sharedWorkspace.members.forEach(
+    (member: { username: string; role: Role }) => {
+      if (member.username === inviteeUsername) {
+        expect(member.role).toBe(role);
+      } else if (member.username === inviterUsername) {
+        expect(member.role).toBe(Role.ADMIN);
+      }
+    }
+  );
+});
+
+test("accept viewer role", async () => {
+  const inviterUsername = `invite-${uuidv4()}@example.com`;
+  const inviteeUsername = `invitee-${uuidv4()}@example.com`;
+  const workspaceId = uuidv4();
+  const otherWorkspaceId = uuidv4();
+  const role = Role.VIEWER;
+  const inviterUserAndDevice = await createUserWithWorkspace({
+    id: workspaceId,
+    username: inviterUsername,
+  });
+  const device = inviterUserAndDevice.device;
+  inviteeUserAndDevice = await createUserWithWorkspace({
+    id: otherWorkspaceId,
+    username: inviteeUsername,
+  });
+  const workspace = await getWorkspace({
+    id: workspaceId,
+    userId: inviterUserAndDevice.user.id,
+    deviceSigningPublicKey: device.signingPublicKey,
+  });
+  if (!workspace) {
+    throw new Error("workspace not found");
+  }
+  const createWorkspaceResult = await createWorkspaceInvitation({
+    graphql,
+    role,
+    workspaceId,
+    authorizationHeader: inviterUserAndDevice.sessionKey,
+  });
+  workspaceInvitationId =
+    createWorkspaceResult.createWorkspaceInvitation.workspaceInvitation.id;
+  invitationSigningPrivateKey =
+    createWorkspaceResult.invitationSigningPrivateKey;
+  const encryptionPublicKeySignature = sodium.to_base64(
+    sodium.crypto_sign_detached(
+      inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      sodium.from_base64(inviteeUserAndDevice.signingPrivateKey)
+    )
+  );
+  const acceptedWorkspaceResult = await acceptWorkspaceInvitation({
+    graphql,
+    workspaceInvitationId,
+    inviteeUsername: inviteeUserAndDevice.user.username,
+    inviteeMainDevice: {
+      userId: inviteeUserAndDevice.user.id,
+      signingPublicKey: inviteeUserAndDevice.mainDevice.signingPublicKey,
+      encryptionPublicKey: inviteeUserAndDevice.mainDevice.encryptionPublicKey,
+      encryptionPublicKeySignature: encryptionPublicKeySignature,
+    },
+    invitationSigningPrivateKey,
+    authorizationHeader: inviteeUserAndDevice.sessionKey,
+  });
+  const sharedWorkspace =
+    acceptedWorkspaceResult.acceptWorkspaceInvitation.workspace;
+  expect(typeof sharedWorkspace.id).toBe("string");
+  expect(sharedWorkspace.name).toBe(sharedWorkspace.name);
+  expect(sharedWorkspace.members.length).toBe(2);
+  sharedWorkspace.members.forEach(
+    (member: { username: string; role: Role }) => {
+      if (member.username === inviteeUsername) {
+        expect(member.role).toBe(role);
+      } else if (member.username === inviterUsername) {
+        expect(member.role).toBe(Role.ADMIN);
+      }
+    }
+  );
 });
 
 test("invalid invitation id should throw error", async () => {

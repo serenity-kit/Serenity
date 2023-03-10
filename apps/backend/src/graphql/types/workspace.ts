@@ -113,6 +113,7 @@ export const WorkspaceInvitation = objectType({
     t.nonNull.string("workspaceId");
     t.nonNull.string("inviterUserId");
     t.nonNull.string("inviterUsername");
+    t.nonNull.field("role", { type: MemberRoleEnum });
     t.string("workspaceName");
     t.field("expiresAt", { type: nonNull("Date") });
   },

@@ -37,7 +37,7 @@ export default function Comment({ comment, meId, meName }: Props) {
     comment.creatorDevice
   );
 
-  const isActiveComment = comment.id === state.context.highlightedCommentId;
+  const isActiveComment = comment.id === state.context.highlightedComment?.id;
   const isMyComment = commentCreator?.userId === meId;
 
   const styles = StyleSheet.create({
@@ -53,7 +53,7 @@ export default function Comment({ comment, meId, meName }: Props) {
         { cursor: isActiveComment ? "default" : "pointer" },
       ]}
       onPress={() => {
-        send({ type: "HIGHLIGHT_COMMENT", commentId: comment.id });
+        send({ type: "HIGHLIGHT_COMMENT_FROM_SIDEBAR", commentId: comment.id });
       }}
       //@ts-expect-error native-base mismatch
       onMouseEnter={() => setIsHovered(true)}
