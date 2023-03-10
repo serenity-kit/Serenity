@@ -44,6 +44,7 @@ export const attachUserToWorkspace = async ({
   }
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
+    role,
     workspaceId,
     authorizationHeader: hostSessionKey,
   });
@@ -136,14 +137,5 @@ export const attachUserToWorkspace = async ({
     creatorDeviceSigningPublicKey: hostWebDevice.signingPublicKey,
     workspaceMemberDevices,
     authorizationHeader: hostSessionKey,
-  });
-  await prisma.usersToWorkspaces.updateMany({
-    where: {
-      workspaceId,
-      userId: guestUserId,
-    },
-    data: {
-      role,
-    },
   });
 };

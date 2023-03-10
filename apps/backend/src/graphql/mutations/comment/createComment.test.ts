@@ -60,49 +60,6 @@ test("owner comments", async () => {
   );
 });
 
-test("shared admin comments", async () => {
-  const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
-    password: "password",
-  });
-  const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
-    graphql,
-    documentId: userData1.document.id,
-    sharingRole: Role.ADMIN,
-    creatorDevice: userData1.webDevice,
-    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    snapshotKey,
-    authorizationHeader: userData1.sessionKey,
-  });
-  const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
-  const createCommentResult = await createComment({
-    graphql,
-    snapshotId: snapshotId1,
-    snapshotKey: snapshotKey1,
-    comment: "nice job",
-    creatorDevice: userData2.webDevice,
-    creatorDeviceEncryptionPrivateKey: userData2.webDevice.encryptionPrivateKey,
-    creatorDeviceSigningPrivateKey: userData2.webDevice.signingPrivateKey,
-    documentShareLinkToken,
-    authorizationHeader: userData2.sessionKey,
-  });
-  const comment = createCommentResult.createComment.comment;
-  expect(typeof comment.id).toBe("string");
-  expect(comment.documentId).toBe(documentId1);
-  expect(typeof comment.contentCiphertext).toBe("string");
-  expect(typeof comment.contentNonce).toBe("string");
-  expect(typeof comment.createdAt).toBe("string");
-  expect(comment.creatorDevice.signingPublicKey).toBe(
-    userData2.webDevice.signingPublicKey
-  );
-  expect(comment.creatorDevice.encryptionPublicKey).toBe(
-    userData2.webDevice.encryptionPublicKey
-  );
-});
-
 test("shared editor comments", async () => {
   const userData2 = await createUserWithWorkspace({
     id: uuidv4(),

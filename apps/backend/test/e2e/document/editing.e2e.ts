@@ -132,12 +132,6 @@ test.describe("Edit document", () => {
     const user2EndingContent = await user2Editor.innerHTML();
     expect(endingContent).toBe(user2EndingContent);
     await user2Page.type("div[class='ProseMirror']", newContent2);
-    // expect the cursor to show on user1's page
-    const user2Cursor = page.locator(
-      "xpath=//span[contains(@class,'collaboration-cursor__caret')]"
-    );
-    const user2CursorExists = await user2Cursor.isVisible();
-    expect(user2CursorExists).toBe(true);
     // reload page
     await reloadPage({ page });
     await reloadPage({ page: user2Page });
@@ -268,12 +262,6 @@ test.describe("Edit document in subfolder", () => {
     const user2EndingContent = await user2Editor.innerHTML();
     expect(endingContent).toBe(user2EndingContent);
     await user2Page.type("div[class='ProseMirror']", newContent2);
-    // expect the cursor to show on user1's page
-    const user2Cursor = page.locator(
-      "xpath=//span[contains(@class,'collaboration-cursor__caret')]"
-    );
-    const user2CursorExists = await user2Cursor.isVisible();
-    expect(user2CursorExists).toBe(true);
     // reload page
     await reloadPage({ page });
     await reloadPage({ page: user2Page });

@@ -38,7 +38,7 @@ beforeAll(async () => {
   await setup();
 });
 
-test("create admin share link", async () => {
+test("create admin share link fails", async () => {
   const sharingRole = Role.ADMIN;
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
     userData1.webDevice;
@@ -50,18 +50,18 @@ test("create admin share link", async () => {
   const snapshotKeyData = createSnapshotKey({
     folderKey: folderKeyTrace.trace[folderKeyTrace.trace.length - 1].key,
   });
-  const documentShareLinkResponse = await createDocumentShareLink({
-    graphql,
-    documentId: userData1.document.id,
-    sharingRole,
-    creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
-    creatorDevice,
-    snapshotKey: snapshotKeyData.key,
-    authorizationHeader: userData1.sessionKey,
-  });
-  const documentShareLink = documentShareLinkResponse.createDocumentShareLink;
-  expect(typeof documentShareLink.token).toBe("string");
-  expect(documentShareLink.role).toBe(sharingRole);
+  await expect(
+    (async () =>
+      await createDocumentShareLink({
+        graphql,
+        documentId: userData1.document.id,
+        sharingRole,
+        creatorDeviceEncryptionPrivateKey: encryptionPrivateKey,
+        creatorDevice,
+        snapshotKey: snapshotKeyData.key,
+        authorizationHeader: userData1.sessionKey,
+      }))()
+  ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
 test("create editor share link", async () => {

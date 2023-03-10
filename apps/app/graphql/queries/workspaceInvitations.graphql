@@ -5,6 +5,7 @@ query workspaceInvitations($workspaceId: ID!) {
       workspaceId
       inviterUserId
       inviterUsername
+      role
       expiresAt
     }
     pageInfo {

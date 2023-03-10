@@ -26,6 +26,10 @@ export type EditorBottombarState = {
   canRedo: boolean;
 };
 
+type HighlightedCommentSource = "editor" | "sidebar";
+
+type HighlightedComment = { id: string; source: HighlightedCommentSource };
+
 export type UpdateEditorParams =
   | {
       variant: "toggle-bold";
@@ -81,7 +85,7 @@ export type UpdateEditorParams =
       variant: "update-comments";
       params: {
         decryptedComments: EditorComment[];
-        highlightedCommentId: string | null;
+        highlightedComment: HighlightedComment | null;
       };
     };
 

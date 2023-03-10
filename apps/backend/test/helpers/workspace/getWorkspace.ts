@@ -50,6 +50,7 @@ export const getWorkspace = async ({
             deviceSigningPublicKey
             creatorDeviceSigningPublicKey
             ciphertext
+            nonce
             creatorDevice {
               signingPublicKey
               encryptionPublicKey
