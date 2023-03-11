@@ -96,8 +96,13 @@ export type UpdateEditor = (params: UpdateEditorParams) => void;
 
 export type EditorComment = {
   id: string;
-  from: number;
-  to: number;
+  from: unknown;
+  to: unknown;
+};
+
+export type EditorCommentWithResolvedPositions = EditorComment & {
+  absoluteFrom: number;
+  absoluteTo: number;
 };
 
 type ReactNativeWebView = {

@@ -6,7 +6,12 @@ import {
   ySyncPluginKey,
 } from "y-prosemirror";
 import * as Y from "yjs";
-import { EditorComment, HighlightedComment } from "../../types";
+import {
+  EditorComment,
+  EditorCommentWithResolvedPositions,
+  HighlightedComment,
+} from "../../types";
+import { getOverlappingRanges } from "./calculateCommentRanges";
 
 export interface CommentsExtensionOptions {
   comments: EditorComment[];
@@ -63,26 +68,41 @@ const resolveCommentPositions = (
     .filter(notNull);
 };
 
+interface CommentRange {
+  from: number;
+  to: number;
+  commentCount: number;
+  isHighlighted: boolean;
+}
+
 const createCommentsDecorationSet = (
-  comments: (EditorComment & { absoluteFrom: number; absoluteTo: number })[],
+  comments: EditorCommentWithResolvedPositions[],
   highlightedComment: HighlightedComment | null,
   state: EditorState,
   editor: any
 ) => {
-  const decorationSet = DecorationSet.create(
-    state.doc,
-    comments.map((comment) => {
+  const decorationSet = DecorationSet.create(state.doc, [
+    ...getOverlappingRanges(comments).map((commentRange) => {
+      return Decoration.inline(
+        commentRange.absoluteFrom,
+        commentRange.absoluteTo,
+        {
+          class: `editor-comment-overlap`,
+        }
+      );
+    }),
+    ...comments.map((comment) => {
       if (comment.id === highlightedComment?.id) {
         editor.storage.comments.highlightedCommentFromPos =
           comment.absoluteFrom;
       }
       return Decoration.inline(comment.absoluteFrom, comment.absoluteTo, {
         class: `editor-comment ${
-          comment.id === highlightedComment?.id && "editor-comment-active"
+          comment.id === highlightedComment?.id ? "editor-comment-active" : ""
         }`,
       });
-    })
-  );
+    }),
+  ]);
   // @ts-expect-error adding them here so we can read them out from the editor state
   decorationSet.comments = comments;
   return decorationSet;
