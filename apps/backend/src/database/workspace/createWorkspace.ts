@@ -76,6 +76,20 @@ export async function createWorkspace({
           },
         },
       },
+      include: {
+        infoWorkspaceKey: {
+          include: {
+            workspaceKeyBoxes: {
+              where: {
+                deviceSigningPublicKey: creatorDeviceSigningPublicKey,
+              },
+              include: {
+                creatorDevice: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     // make sure the user controls this creatorDevice
