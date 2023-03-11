@@ -83,7 +83,11 @@ export const commentsMachine =
           | { type: "UPDATE_REPLY_TEXT"; text: string; commentId: string }
           | { type: "CREATE_REPLY"; commentId: string }
           | { type: "DELETE_REPLY"; replyId: string }
-          | { type: "HIGHLIGHT_COMMENT_FROM_EDITOR"; commentId: string | null }
+          | {
+              type: "HIGHLIGHT_COMMENT_FROM_EDITOR";
+              commentId: string | null;
+              openSidebar: boolean;
+            }
           | { type: "HIGHLIGHT_COMMENT_FROM_SIDEBAR"; commentId: string | null }
           | {
               type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS";
@@ -314,9 +318,14 @@ export const commentsMachine =
             },
           };
         }),
-        highlightComment: assign((_context, event) => {
+        highlightComment: assign((context, event) => {
           if (event.commentId) {
             return {
+              isOpenSidebar:
+                event.type === "HIGHLIGHT_COMMENT_FROM_EDITOR" &&
+                event.openSidebar
+                  ? true
+                  : context.isOpenSidebar,
               highlightedComment: {
                 id: event.commentId,
                 source: (event.type === "HIGHLIGHT_COMMENT_FROM_SIDEBAR"

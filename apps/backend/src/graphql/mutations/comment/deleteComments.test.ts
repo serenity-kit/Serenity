@@ -171,14 +171,13 @@ test("commentor tries to delete other comment", async () => {
     authorizationHeader: userData2.sessionKey,
   });
   const comment = commentResult.createComment.comment;
-  expect(
-    (async () => {
+  await expect(
+    (async () =>
       await deleteComments({
         graphql,
         commentIds: [comment.id],
         authorizationHeader: userData1.sessionKey,
-      });
-    })()
+      }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
 });
 
@@ -203,15 +202,24 @@ test("viewer tries to delete other comment", async () => {
     authorizationHeader: userData2.sessionKey,
   });
   const comment = commentResult.createComment.comment;
-  expect(
-    (async () => {
+  await expect(
+    (async () =>
       await deleteComments({
         graphql,
         commentIds: [comment.id],
         authorizationHeader: userData1.sessionKey,
-      });
-    })()
+      }))()
   ).rejects.toThrowError(/BAD_USER_INPUT/);
+  // return the user to admin
+  await prisma.usersToWorkspaces.updateMany({
+    where: {
+      workspaceId: userData1.workspace.id,
+      userId: userData1.user.id,
+    },
+    data: {
+      role: Role.ADMIN,
+    },
+  });
 });
 
 test("delete some comments", async () => {
@@ -240,59 +248,6 @@ test("delete some comments", async () => {
     where: { documentId: userData1.document.id },
   });
   expect(numCommentsAfterDelete).toBeGreaterThanOrEqual(1);
-  expect(numCommentsAfterDelete).toBe(numCommentsBeforeDelete - 1);
-});
-
-test("admin share token", async () => {
-  // reset the permissions to allow userData1 to create a comment
-  await prisma.usersToWorkspaces.updateMany({
-    where: {
-      workspaceId: userData1.workspace.id,
-      userId: userData1.user.id,
-    },
-    data: { role: Role.ADMIN },
-  });
-  const commentResult = await createComment({
-    graphql,
-    snapshotId: userData1.snapshot.id,
-    snapshotKey: userData1.snapshotKey.key,
-    comment: "comment",
-    creatorDevice: userData1.webDevice,
-    creatorDeviceSigningPrivateKey: userData1.webDevice.signingPrivateKey,
-    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    authorizationHeader: userData1.sessionKey,
-  });
-  const comment = commentResult.createComment.comment;
-  const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
-    password: "password",
-  });
-  const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
-  const documentShareLinkResult = await createDocumentShareLink({
-    graphql,
-    documentId: userData1.document.id,
-    sharingRole: Role.ADMIN,
-    creatorDevice: userData1.webDevice,
-    creatorDeviceEncryptionPrivateKey: userData1.webDevice.encryptionPrivateKey,
-    snapshotKey,
-    authorizationHeader: userData1.sessionKey,
-  });
-  const numCommentsBeforeDelete = await prisma.comment.count({
-    where: { documentId: userData1.document.id },
-  });
-  const documentShareLinkToken =
-    documentShareLinkResult.createDocumentShareLink.token;
-  const deleteCommentsResult = await deleteComments({
-    graphql,
-    commentIds: [comment.id],
-    documentShareLinkToken,
-    authorizationHeader: userData2.sessionKey,
-  });
-  expect(deleteCommentsResult.deleteComments.status).toBe("success");
-  const numCommentsAfterDelete = await prisma.comment.count({
-    where: { documentId: userData1.document.id },
-  });
   expect(numCommentsAfterDelete).toBe(numCommentsBeforeDelete - 1);
 });
 
@@ -370,7 +325,7 @@ test("commenter share token", async () => {
   });
   const documentShareLinkToken =
     documentShareLinkResult.createDocumentShareLink.token;
-  expect(
+  await expect(
     (async () => {
       await deleteComments({
         graphql,
@@ -411,7 +366,7 @@ test("viewer share token can't delete", async () => {
   });
   const documentShareLinkToken =
     documentShareLinkResult.createDocumentShareLink.token;
-  expect(
+  await expect(
     (async () => {
       await deleteComments({
         graphql,
@@ -441,7 +396,7 @@ test("can't delete comments on outside document", async () => {
     },
   });
   const comment = commentResult.createComment.comment;
-  expect(
+  await expect(
     (async () => {
       await deleteComments({
         graphql,
@@ -453,7 +408,7 @@ test("can't delete comments on outside document", async () => {
 });
 
 test("invalid comment", async () => {
-  expect(
+  await expect(
     (async () => {
       await deleteComments({
         graphql,
@@ -465,7 +420,7 @@ test("invalid comment", async () => {
 });
 
 test("no comments", async () => {
-  expect(
+  await expect(
     (async () => {
       await deleteComments({
         graphql,

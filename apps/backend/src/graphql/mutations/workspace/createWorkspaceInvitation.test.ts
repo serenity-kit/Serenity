@@ -155,6 +155,7 @@ test("fail on unknown role", async () => {
       await createWorkspaceInvitation({
         graphql,
         workspaceId,
+        //@ts-expect-error: bad role type
         role: "bad-role",
         authorizationHeader: userAndDevice.sessionKey,
       }))()

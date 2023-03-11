@@ -3,7 +3,7 @@ import {
   updateFileAttributes,
 } from "@serenity-tools/editor-file-extension";
 import { Editor } from "@tiptap/core";
-import { updateCommentsDataAndScrollToHighlighted } from "./extensions/commentsExtension/commentsExtension";
+import { updateCommentsDataAndScrollToHighlighted } from "./extensions/commentsExtension/updateCommentsDataAndScrollToHighlighted";
 import { UpdateEditorParams } from "./types";
 
 export const updateEditor = (editor: Editor, params: UpdateEditorParams) => {

@@ -157,7 +157,8 @@ export default function Editor({
     editorToolbarService.onEvent(onEventListener);
 
     commentsService.onChange((context) => {
-      const { decryptedComments, highlightedComment } = context;
+      const { decryptedComments, highlightedComment, isOpenSidebar } = context;
+
       const commentsJson = JSON.stringify({
         variant: "update-comments",
         params: {
@@ -171,6 +172,11 @@ export default function Editor({
           commentsJson,
           base64_variants.ORIGINAL
         )}");
+        true;
+      `);
+
+      webViewRef.current?.injectJavaScript(`
+        window.updateHasOpenCommentsSidebar(${isOpenSidebar});
         true;
       `);
     });
@@ -319,10 +325,11 @@ export default function Editor({
             shareFile({ contentAsBase64, mimeType, fileName });
           }
           if (message.type === "highlightComment") {
-            const { commentId } = message.content;
+            const { commentId, openSidebar } = message.content;
             commentsService.send({
               type: "HIGHLIGHT_COMMENT_FROM_EDITOR",
               commentId,
+              openSidebar,
             });
           }
         }}

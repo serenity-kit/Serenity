@@ -44,6 +44,18 @@ export async function getWorkspace({
           },
         },
       },
+      infoWorkspaceKey: {
+        include: {
+          workspaceKeyBoxes: {
+            where: {
+              deviceSigningPublicKey,
+            },
+            include: {
+              creatorDevice: true,
+            },
+          },
+        },
+      },
       workspaceKeys: {
         include: {
           workspaceKeyBoxes: {

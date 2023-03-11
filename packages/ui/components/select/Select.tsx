@@ -1,9 +1,9 @@
+import { ISelectProps, Select as NbSelect } from "native-base";
 import React from "react";
 import { StyleSheet } from "react-native";
-import { Select as NbSelect, ISelectProps } from "native-base";
-import { Icon } from "../icon/Icon";
-import { tw } from "../../tailwind";
 import { useIsEqualOrLargerThanBreakpoint } from "../../hooks/useIsEqualOrLargerThanBreakpoint/useIsEqualOrLargerThanBreakpoint";
+import { tw } from "../../tailwind";
+import { Icon } from "../icon/Icon";
 import { View } from "../view/View";
 
 export type SelectProps = ISelectProps & {};

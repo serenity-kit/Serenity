@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - move-frontend-deploy-to-actions
 
 jobs:
   deploy-staging-api:

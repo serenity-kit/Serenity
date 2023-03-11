@@ -178,15 +178,19 @@ model CreatorDevice {
 }
 
 model Workspace {
-  id                String                 @id
-  idSignature       String
-  name              String // TODO must be encrypted
-  folders           Folder[]
-  documents         Document[]
-  usersToWorkspaces UsersToWorkspaces[]
-  invitations       WorkspaceInvitations[]
-  workspaceKeys     WorkspaceKey[]
-  createdAt         DateTime               @default(now())
+  id                 String                 @id
+  idSignature        String
+  name               String // TODO must be encrypted
+  infoCiphertext     String?
+  infoNonce          String?
+  infoWorkspaceKeyId String?                @unique
+  folders            Folder[]
+  documents          Document[]
+  usersToWorkspaces  UsersToWorkspaces[]
+  invitations        WorkspaceInvitations[]
+  workspaceKeys      WorkspaceKey[]         @relation(name: "workspace")
+  infoWorkspaceKey   WorkspaceKey?          @relation(name: "infoWorkspaceKey", fields: [infoWorkspaceKeyId], references: [id])
+  createdAt          DateTime               @default(now())
 
   @@index([createdAt(sort: Desc)])
 }
@@ -212,11 +216,12 @@ model UsersToWorkspaces {
 model WorkspaceKey {
   id                String            @id @unique
   workspaceKeyBoxes WorkspaceKeyBox[]
-  workspace         Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace         Workspace         @relation(name: "workspace", fields: [workspaceId], references: [id], onDelete: Cascade)
   workspaceId       String
   generation        Int               @default(0)
   folders           Folder[]
   documents         Document[]
+  infoWorkspaces    Workspace[]       @relation(name: "infoWorkspaceKey")
 }
 
 model WorkspaceKeyBox {

@@ -1,29 +1,29 @@
-import { Editor, Extension } from "@tiptap/core";
-import { EditorState, Plugin } from "prosemirror-state";
+import { Extension } from "@tiptap/core";
+import { EditorState, Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import {
   relativePositionToAbsolutePosition,
   ySyncPluginKey,
 } from "y-prosemirror";
 import * as Y from "yjs";
-import { EditorComment } from "../../types";
-import { scrollToPos } from "../../utils/scrollToPos";
-
-type HighlightedCommentSource = "editor" | "sidebar";
-
-type HighlightedComment = { id: string; source: HighlightedCommentSource };
+import {
+  EditorComment,
+  EditorCommentWithResolvedPositions,
+  HighlightedComment,
+} from "../../types";
+import { getOverlappingRanges } from "./calculateCommentRanges";
 
 export interface CommentsExtensionOptions {
   comments: EditorComment[];
   yDoc: Y.Doc;
-  highlightComment: (commentId: string | null) => void;
+  highlightComment: (commentId: string | null, openSidebar: boolean) => void;
   highlightedComment: HighlightedComment | null;
 }
 
 type CommentsExtensionStorage = {
   comments: EditorComment[];
   yDoc: Y.Doc;
-  highlightComment: (commentId: string | null) => void;
+  highlightComment: (commentId: string | null, openSidebar: boolean) => void;
   highlightedComment: HighlightedComment | null;
   highlightedCommentFromPos: number | null;
 };
@@ -68,53 +68,47 @@ const resolveCommentPositions = (
     .filter(notNull);
 };
 
+interface CommentRange {
+  from: number;
+  to: number;
+  commentCount: number;
+  isHighlighted: boolean;
+}
+
 const createCommentsDecorationSet = (
-  comments: (EditorComment & { absoluteFrom: number; absoluteTo: number })[],
+  comments: EditorCommentWithResolvedPositions[],
   highlightedComment: HighlightedComment | null,
   state: EditorState,
   editor: any
 ) => {
-  return DecorationSet.create(
-    state.doc,
-    comments.map((comment) => {
+  const decorationSet = DecorationSet.create(state.doc, [
+    ...getOverlappingRanges(comments).map((commentRange) => {
+      return Decoration.inline(
+        commentRange.absoluteFrom,
+        commentRange.absoluteTo,
+        {
+          class: `editor-comment-overlap`,
+        }
+      );
+    }),
+    ...comments.map((comment) => {
       if (comment.id === highlightedComment?.id) {
         editor.storage.comments.highlightedCommentFromPos =
           comment.absoluteFrom;
       }
       return Decoration.inline(comment.absoluteFrom, comment.absoluteTo, {
         class: `editor-comment ${
-          comment.id === highlightedComment?.id && "editor-comment-active"
+          comment.id === highlightedComment?.id ? "editor-comment-active" : ""
         }`,
       });
-    })
-  );
+    }),
+  ]);
+  // @ts-expect-error adding them here so we can read them out from the editor state
+  decorationSet.comments = comments;
+  return decorationSet;
 };
 
 let prevHighlightedCommentId: null | string = null;
-
-export const updateCommentsDataAndScrollToHighlighted = (
-  editor: Editor,
-  comments: EditorComment[],
-  highlightedComment: HighlightedComment | null
-) => {
-  const shouldScrollToHighlightedComment =
-    highlightedComment?.id &&
-    editor.storage?.comments &&
-    highlightedComment.id !== editor.storage.comments.highlightedComment?.id &&
-    highlightedComment.source === "sidebar";
-
-  editor.storage.comments.comments = comments;
-  editor.storage.comments.highlightedComment = highlightedComment;
-
-  // empty transaction to make sure the comments are updated
-  editor.view.dispatch(editor.view.state.tr);
-  if (
-    shouldScrollToHighlightedComment &&
-    editor.storage.comments.highlightedCommentFromPos !== null
-  ) {
-    scrollToPos(editor.view, editor.storage.comments.highlightedCommentFromPos);
-  }
-};
 
 export const CommentsExtension = Extension.create<
   CommentsExtensionOptions,
@@ -147,6 +141,7 @@ export const CommentsExtension = Extension.create<
 
     return [
       new Plugin({
+        key: new PluginKey("comments"),
         state: {
           init(editor, state) {
             const resolvedComments = resolveCommentPositions(
@@ -176,13 +171,13 @@ export const CommentsExtension = Extension.create<
             if (commentToHighlight) {
               if (prevHighlightedCommentId !== commentToHighlight.id) {
                 prevHighlightedCommentId = commentToHighlight.id;
-                storage.comments.highlightComment(commentToHighlight.id);
+                storage.comments.highlightComment(commentToHighlight.id, false);
               }
             } else {
               if (prevHighlightedCommentId !== null) {
                 // make sure an endless loop isn't triggered
                 prevHighlightedCommentId = null;
-                storage.comments.highlightComment(null);
+                storage.comments.highlightComment(null, false);
               }
             }
 
