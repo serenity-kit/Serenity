@@ -39,11 +39,9 @@ import {
 import "./awareness.css";
 import EditorSidebar from "./components/editorSidebar/EditorSidebar";
 import "./editor-output.css";
-import {
-  CommentsExtension,
-  updateCommentsDataAndScrollToHighlighted,
-} from "./extensions/commentsExtension/commentsExtension";
+import { CommentsExtension } from "./extensions/commentsExtension/commentsExtension";
 import { findCommentForPos } from "./extensions/commentsExtension/findCommentForPos";
+import { updateCommentsDataAndScrollToHighlighted } from "./extensions/commentsExtension/updateCommentsDataAndScrollToHighlighted";
 import { AwarnessExtension } from "./extensions/naishoAwarnessExtension/naishoAwarenessExtension";
 import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";

@@ -26,9 +26,12 @@ export type EditorBottombarState = {
   canRedo: boolean;
 };
 
-type HighlightedCommentSource = "editor" | "sidebar";
+export type HighlightedCommentSource = "editor" | "sidebar";
 
-type HighlightedComment = { id: string; source: HighlightedCommentSource };
+export type HighlightedComment = {
+  id: string;
+  source: HighlightedCommentSource;
+};
 
 export type UpdateEditorParams =
   | {
@@ -93,8 +96,13 @@ export type UpdateEditor = (params: UpdateEditorParams) => void;
 
 export type EditorComment = {
   id: string;
-  from: number;
-  to: number;
+  from: unknown;
+  to: unknown;
+};
+
+export type EditorCommentWithResolvedPositions = EditorComment & {
+  absoluteFrom: number;
+  absoluteTo: number;
 };
 
 type ReactNativeWebView = {
