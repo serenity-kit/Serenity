@@ -26,9 +26,12 @@ export type EditorBottombarState = {
   canRedo: boolean;
 };
 
-type HighlightedCommentSource = "editor" | "sidebar";
+export type HighlightedCommentSource = "editor" | "sidebar";
 
-type HighlightedComment = { id: string; source: HighlightedCommentSource };
+export type HighlightedComment = {
+  id: string;
+  source: HighlightedCommentSource;
+};
 
 export type UpdateEditorParams =
   | {

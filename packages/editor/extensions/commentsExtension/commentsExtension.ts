@@ -1,4 +1,4 @@
-import { Editor, Extension } from "@tiptap/core";
+import { Extension } from "@tiptap/core";
 import { EditorState, Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import {
@@ -6,12 +6,7 @@ import {
   ySyncPluginKey,
 } from "y-prosemirror";
 import * as Y from "yjs";
-import { EditorComment } from "../../types";
-import { scrollToPos } from "../../utils/scrollToPos";
-
-type HighlightedCommentSource = "editor" | "sidebar";
-
-type HighlightedComment = { id: string; source: HighlightedCommentSource };
+import { EditorComment, HighlightedComment } from "../../types";
 
 export interface CommentsExtensionOptions {
   comments: EditorComment[];
@@ -94,30 +89,6 @@ const createCommentsDecorationSet = (
 };
 
 let prevHighlightedCommentId: null | string = null;
-
-export const updateCommentsDataAndScrollToHighlighted = (
-  editor: Editor,
-  comments: EditorComment[],
-  highlightedComment: HighlightedComment | null
-) => {
-  const shouldScrollToHighlightedComment =
-    highlightedComment?.id &&
-    editor.storage?.comments &&
-    highlightedComment.id !== editor.storage.comments.highlightedComment?.id &&
-    highlightedComment.source === "sidebar";
-
-  editor.storage.comments.comments = comments;
-  editor.storage.comments.highlightedComment = highlightedComment;
-
-  // empty transaction to make sure the comments are updated
-  editor.view.dispatch(editor.view.state.tr);
-  if (
-    shouldScrollToHighlightedComment &&
-    editor.storage.comments.highlightedCommentFromPos !== null
-  ) {
-    scrollToPos(editor.view, editor.storage.comments.highlightedCommentFromPos);
-  }
-};
 
 export const CommentsExtension = Extension.create<
   CommentsExtensionOptions,
