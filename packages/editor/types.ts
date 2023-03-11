@@ -116,5 +116,6 @@ declare global {
     resolveImageRequest: (fileId: string, base64: string) => void;
     rejectImageRequest: (fileId: string, reason: string) => void;
     updateUsername: (username: string) => void;
+    updateHasOpenCommentsSidebar: (hasOpenCommentsSidebar: boolean) => void;
   }
 }

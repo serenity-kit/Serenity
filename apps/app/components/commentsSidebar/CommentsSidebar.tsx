@@ -71,7 +71,8 @@ const CommentsSidebar: React.FC = () => {
         if (index === -1) return; // in case the list isn't yet loaded
         flatListRef.current.scrollToIndex({
           index,
-          animated: true,
+          // in case sidebar opens and highlighted at the same time
+          animated: !Boolean(state.event.openSidebar),
           viewPosition: 0,
         });
       } else if (

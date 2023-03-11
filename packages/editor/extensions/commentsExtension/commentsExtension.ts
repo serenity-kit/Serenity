@@ -1,5 +1,5 @@
 import { Editor, Extension } from "@tiptap/core";
-import { EditorState, Plugin } from "prosemirror-state";
+import { EditorState, Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import {
   relativePositionToAbsolutePosition,
@@ -16,14 +16,14 @@ type HighlightedComment = { id: string; source: HighlightedCommentSource };
 export interface CommentsExtensionOptions {
   comments: EditorComment[];
   yDoc: Y.Doc;
-  highlightComment: (commentId: string | null) => void;
+  highlightComment: (commentId: string | null, openSidebar: boolean) => void;
   highlightedComment: HighlightedComment | null;
 }
 
 type CommentsExtensionStorage = {
   comments: EditorComment[];
   yDoc: Y.Doc;
-  highlightComment: (commentId: string | null) => void;
+  highlightComment: (commentId: string | null, openSidebar: boolean) => void;
   highlightedComment: HighlightedComment | null;
   highlightedCommentFromPos: number | null;
 };
@@ -74,7 +74,7 @@ const createCommentsDecorationSet = (
   state: EditorState,
   editor: any
 ) => {
-  return DecorationSet.create(
+  const decorationSet = DecorationSet.create(
     state.doc,
     comments.map((comment) => {
       if (comment.id === highlightedComment?.id) {
@@ -88,6 +88,9 @@ const createCommentsDecorationSet = (
       });
     })
   );
+  // @ts-expect-error adding them here so we can read them out from the editor state
+  decorationSet.comments = comments;
+  return decorationSet;
 };
 
 let prevHighlightedCommentId: null | string = null;
@@ -147,6 +150,7 @@ export const CommentsExtension = Extension.create<
 
     return [
       new Plugin({
+        key: new PluginKey("comments"),
         state: {
           init(editor, state) {
             const resolvedComments = resolveCommentPositions(
@@ -176,13 +180,13 @@ export const CommentsExtension = Extension.create<
             if (commentToHighlight) {
               if (prevHighlightedCommentId !== commentToHighlight.id) {
                 prevHighlightedCommentId = commentToHighlight.id;
-                storage.comments.highlightComment(commentToHighlight.id);
+                storage.comments.highlightComment(commentToHighlight.id, false);
               }
             } else {
               if (prevHighlightedCommentId !== null) {
                 // make sure an endless loop isn't triggered
                 prevHighlightedCommentId = null;
-                storage.comments.highlightComment(null);
+                storage.comments.highlightComment(null, false);
               }
             }
 
