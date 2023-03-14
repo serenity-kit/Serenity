@@ -31,7 +31,7 @@ export function getUpdateInProgress(
 }
 
 export function createUpdate(
-  content,
+  content: string | Uint8Array,
   publicData: UpdatePublicData,
   key: Uint8Array,
   signatureKeyPair: KeyPair,

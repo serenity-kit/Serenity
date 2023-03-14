@@ -7,6 +7,6 @@ global.WebSocket = WebSocket;
 
 jest.setTimeout(25000);
 
-(async function () {
+beforeEach(async () => {
   await sodium.ready;
-})();
+});

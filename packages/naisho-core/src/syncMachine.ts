@@ -20,7 +20,7 @@ interface Context {
     readonly key: Uint8Array;
     readonly publicData: any;
   }>;
-  applyUpdates: (updates: any[]) => void;
+  applyChanges: (updates: any[]) => void;
   getUpdateKey: (update: any) => Promise<Uint8Array>;
   applyEphemeralUpdates: (ephemeralUpdates: any[]) => void;
   getEphemeralUpdateKey: () => Promise<Uint8Array>;
@@ -35,6 +35,8 @@ interface Context {
   sodium: any;
   activeSnapshotId: null | string;
   latestServerVersion: null | number;
+  serializeChanges: (changes: unknown[]) => string;
+  deserializeChanges: (string) => unknown[];
 }
 
 // TODO pass in function to verify the creator
@@ -175,7 +177,7 @@ export const syncMachine =
         websocketSessionKey: "",
         applySnapshot: () => undefined,
         getSnapshotKey: () => Promise.resolve(new Uint8Array()),
-        applyUpdates: () => undefined,
+        applyChanges: () => undefined,
         getNewSnapshotData: () =>
           Promise.resolve({
             id: "",
@@ -193,6 +195,8 @@ export const syncMachine =
         sodium: {},
         activeSnapshotId: null,
         latestServerVersion: null,
+        serializeChanges: () => "",
+        deserializeChanges: () => [],
       },
       initial: "connecting",
       on: {
@@ -324,7 +328,9 @@ export const syncMachine =
             };
           } else {
             return {
-              pendingUpdatesQueue: context.pendingUpdatesQueue.slice(1),
+              pendingUpdatesQueue: context.pendingUpdatesQueue.slice(
+                event.data.pendingUpdatesQueueTakenCount
+              ),
               activeSnapshotId: event.data.activeSnapshotId,
               latestServerVersion: event.data.latestServerVersion,
             };
@@ -336,6 +342,7 @@ export const syncMachine =
           let activeSnapshotId = context.activeSnapshotId;
           let latestServerVersion = context.latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
+          let pendingUpdatesQueueTakenCount = 0;
 
           const createAndSendSnapshot = async () => {
             const snapshotData = await context.getNewSnapshotData();
@@ -367,8 +374,8 @@ export const syncMachine =
           };
 
           const createAndSendUpdate = (
-            update,
-            key,
+            update: string | Uint8Array,
+            key: Uint8Array,
             refSnapshotId: string,
             clockOverwrite?: number
           ) => {
@@ -419,18 +426,22 @@ export const syncMachine =
 
                   const updates = event.updates;
                   console.log("updates", updates);
-                  const decryptedUpdates = updates.map((update) => {
-                    const updateResult = verifyAndDecryptUpdate(
-                      update,
-                      key,
-                      context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                    );
+                  const changes = updates
+                    .map((update) => {
+                      const updateResult = verifyAndDecryptUpdate(
+                        update,
+                        key,
+                        context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+                      );
 
-                    latestServerVersion = update.serverData.version;
-
-                    return updateResult;
-                  });
-                  context.applyUpdates(decryptedUpdates);
+                      latestServerVersion = update.serverData.version;
+                      const changes = context.deserializeChanges(
+                        context.sodium.to_string(updateResult)
+                      );
+                      return changes;
+                    })
+                    .flat();
+                  context.applyChanges(changes);
                   context.documentLoaded();
 
                   // setActiveSnapshotAndCommentKeys(
@@ -506,7 +517,7 @@ export const syncMachine =
                 //   applySnapshot(data.snapshot, snapshotKeyRef.current);
                 // }
                 // if (data.updates) {
-                //   applyUpdates(data.updates, snapshotKeyRef.current);
+                //   applyChanges(data.updates, snapshotKeyRef.current);
                 // }
 
                 // // TODO add a backoff after multiple failed tries
@@ -527,7 +538,11 @@ export const syncMachine =
                   key,
                   context.sodium.from_base64(event.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
                 );
-                context.applyUpdates([decryptedUpdate]);
+                const changes = context.deserializeChanges(
+                  // TODO should this be part deserializeChanges?
+                  context.sodium.to_string(decryptedUpdate)
+                );
+                context.applyChanges(changes);
                 latestServerVersion = event.serverData.version;
                 break;
               case "updateSaved":
@@ -588,12 +603,19 @@ export const syncMachine =
               createAndSendSnapshot();
             } else {
               const key = await context.getUpdateKey(event);
+              pendingUpdatesQueueTakenCount =
+                context.pendingUpdatesQueue.length;
               const rawUpdates = context.pendingUpdatesQueue;
               // TODO add a compact changes function to queue and make sure all pending updates are sent as one update
               if (activeSnapshotId === null) {
                 throw new Error("No active snapshot id");
               }
-              createAndSendUpdate(rawUpdates[0], key, activeSnapshotId);
+
+              createAndSendUpdate(
+                context.serializeChanges(rawUpdates),
+                key,
+                activeSnapshotId
+              );
             }
           }
 
@@ -601,6 +623,7 @@ export const syncMachine =
             handledQueue,
             activeSnapshotId,
             latestServerVersion,
+            pendingUpdatesQueueTakenCount,
           };
         },
       },

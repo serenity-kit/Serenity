@@ -2,9 +2,11 @@ import {
   addSnapshotToInProgress,
   cleanupUpdates,
   createSnapshot,
+  deserializeUint8ArrayUpdates,
   dispatchWebsocketState,
   getWebsocketState,
   KeyDerivationTrace2,
+  serializeUint8ArrayUpdates,
   syncMachine,
   useWebsocketState,
 } from "@naisho/core";
@@ -127,7 +129,7 @@ export default function Page({
 
         return key;
       },
-      applyUpdates: (decryptedUpdates) => {
+      applyChanges: (decryptedUpdates) => {
         decryptedUpdates.map((update) => {
           Yjs.applyUpdate(yDocRef.current, update, "naisho-remote");
         });
@@ -147,6 +149,8 @@ export default function Page({
       getEphemeralUpdateKey: async () => {
         return snapshotKeyRef.current?.key as Uint8Array;
       },
+      serializeChanges: serializeUint8ArrayUpdates,
+      deserializeChanges: deserializeUint8ArrayUpdates,
       sodium,
     },
   });
