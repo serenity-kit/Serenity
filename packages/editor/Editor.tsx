@@ -313,6 +313,7 @@ export const Editor = (props: EditorProps) => {
                     _stack={{
                       height: 60,
                     }}
+                    testID="bubble-menu__create-comment-input"
                   />
                   <HStack
                     style={tw`p-3 border-t border-solid border-gray-200`}
@@ -341,6 +342,7 @@ export const Editor = (props: EditorProps) => {
                         setHasCreateCommentBubble(false);
                         editor.chain().focus().run();
                       }}
+                      testID="bubble-menu__save-comment-button"
                     />
                   </HStack>
                 </VStack>
@@ -401,6 +403,7 @@ export const Editor = (props: EditorProps) => {
                       }}
                       name="chat-1-line"
                       isActive={false}
+                      testID="bubble-menu__initiate-comment-button"
                     />
                   </Tooltip>
                 </HStack>

@@ -31,6 +31,7 @@ export const PageHeader: React.FC<Props> = ({ toggleCommentsDrawer }) => {
           }}
           name="chat-4-line"
           size={"lg"}
+          testID="open-comments-drawer-button"
         />
       </Tooltip>
     </>

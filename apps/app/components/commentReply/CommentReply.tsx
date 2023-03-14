@@ -1,21 +1,22 @@
-import React from "react";
 import { hashToCollaboratorColor } from "@serenity-tools/common";
 import { Avatar, Text, tw, View } from "@serenity-tools/ui";
 import { useActor } from "@xstate/react";
 import { formatDistanceToNow, parseJSON } from "date-fns";
 import { HStack } from "native-base";
+import React from "react";
 import { usePage } from "../../context/PageContext";
 import { useWorkspace } from "../../context/WorkspaceContext";
+import { DecryptedReply } from "../../machines/commentsMachine";
 import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
 import CommentsMenu from "../commentsMenu/CommentsMenu";
-import { DecryptedReply } from "../../machines/commentsMachine";
 
 type Props = {
   reply: DecryptedReply;
   meId: string;
+  commentId: string;
 };
 
-export default function CommentReply({ reply, meId }: Props) {
+export default function CommentReply({ reply, meId, commentId }: Props) {
   const { workspaceQueryResult } = useWorkspace();
   const { commentsService } = usePage();
   const [, send] = useActor(commentsService);
@@ -33,6 +34,7 @@ export default function CommentReply({ reply, meId }: Props) {
       //@ts-expect-error as Views usually not have a hover
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      testID={`comment-${commentId}__comment-reply-${reply.id}`}
     >
       <HStack alignItems="center">
         <HStack alignItems="center" space="1.5">
@@ -50,13 +52,21 @@ export default function CommentReply({ reply, meId }: Props) {
               E
             </Avatar>
           )}
-          <Text variant="xxs" bold>
+          <Text
+            variant="xxs"
+            bold
+            style={tw`max-w-40`}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {replyCreator?.username || "External"}
           </Text>
         </HStack>
         {isMyReply && isHovered ? (
           <View style={tw`ml-auto`}>
             <CommentsMenu
+              commentId={commentId}
+              commentReplyId={reply.id}
               onDeletePressed={() =>
                 send({
                   type: "DELETE_REPLY",
@@ -75,7 +85,12 @@ export default function CommentReply({ reply, meId }: Props) {
             addSuffix: true,
           })}
         </Text>
-        <Text variant="xs">{reply.text}</Text>
+        <Text
+          variant="xs"
+          testID={`comment-${commentId}__comment-reply-${reply.id}--text-content`}
+        >
+          {reply.text}
+        </Text>
       </View>
     </View>
   );

@@ -58,6 +58,7 @@ export default function Comment({ comment, meId, meName }: Props) {
       //@ts-expect-error native-base mismatch
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      testID={`comment-${comment.id}`}
     >
       <HStack alignItems="center">
         {/* new comment indicator */}
@@ -81,7 +82,13 @@ export default function Comment({ comment, meId, meName }: Props) {
             </Avatar>
           )}
 
-          <Text variant="xxs" bold>
+          <Text
+            variant="xxs"
+            bold
+            style={tw`max-w-40`}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
             {commentCreator?.username || "External"}
           </Text>
         </HStack>
@@ -91,6 +98,7 @@ export default function Comment({ comment, meId, meName }: Props) {
               onDeletePressed={() =>
                 send({ type: "DELETE_COMMENT", commentId: comment.id })
               }
+              commentId={comment.id}
             />
           </View>
         ) : null}
@@ -101,14 +109,23 @@ export default function Comment({ comment, meId, meName }: Props) {
             addSuffix: true,
           })}
         </Text>
-        <Text variant="xs">{comment.text}</Text>
+        <Text variant="xs" testID={`comment-${comment.id}__text-content`}>
+          {comment.text}
+        </Text>
       </View>
 
       <View style={tw`mt-2`}>
         {comment.replies.map((reply) => {
           if (!reply) return null;
 
-          return <CommentReply key={reply.id} reply={reply} meId={meId} />;
+          return (
+            <CommentReply
+              key={reply.id}
+              reply={reply}
+              meId={meId}
+              commentId={comment.id}
+            />
+          );
         })}
       </View>
 
@@ -130,6 +147,7 @@ export default function Comment({ comment, meId, meName }: Props) {
             height: 16,
             flexShrink: 1,
           }}
+          testID={`comment-${comment.id}__reply-input`}
         />
       </HStack>
 
@@ -141,6 +159,7 @@ export default function Comment({ comment, meId, meName }: Props) {
         size="sm"
         onPress={() => send({ type: "CREATE_REPLY", commentId: comment.id })}
         style={tw`mt-1 self-end`}
+        testID={`comment-${comment.id}__save-reply-button`}
       />
     </Pressable>
   );
