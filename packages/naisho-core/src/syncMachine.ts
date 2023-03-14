@@ -42,13 +42,11 @@ interface Context {
 // add new document key - add function to handle the new key material
 // write a connector for automerge & naisho
 // make it work for automerge?
-// add every event to a queue and work it off?
-// process queues in parallel to avoid blocking each other
 
-// Queue processing
-// first handle all incoming message
-// then handle all pending updates
-// Background: there might be a new snapshot and this way we avoid retries
+// How Queue processing:
+// 1. first handle all incoming message
+// 2. then handle all pending updates
+// Background: There might be a new snapshot and this way we avoid retries
 
 // TODO rename awareness to ephemeral
 
@@ -543,30 +541,28 @@ export const syncMachine =
 
                 break;
               case "updateFailed":
-                console.log("update failed", event);
+                console.log(
+                  "update saving failed",
+                  event.snapshotId,
+                  event.clock,
+                  event.requiresNewSnapshotWithKeyRotation
+                );
 
-                // console.log(
-                //   "update saving failed",
-                //   data.snapshotId,
-                //   data.clock,
-                //   data.requiresNewSnapshotWithKeyRotation
-                // );
-
-                // if (data.requiresNewSnapshotWithKeyRotation) {
-                //   await createAndSendSnapshot();
-                // } else {
-                //   // TODO retry with an increasing offset instead of just trying again
-                //   const rawUpdate = getUpdateInProgress(
-                //     data.docId,
-                //     data.snapshotId,
-                //     data.clock
-                //   );
-                //   createAndSendUpdate(
-                //     rawUpdate,
-                //     snapshotKeyRef.current,
-                //     data.clock
-                //   );
-                // }
+                if (event.requiresNewSnapshotWithKeyRotation) {
+                  // await createAndSendSnapshot();
+                } else {
+                  // TODO retry with an increasing offset instead of just trying again
+                  // const rawUpdate = getUpdateInProgress(
+                  //   data.docId,
+                  //   data.snapshotId,
+                  //   data.clock
+                  // );
+                  // createAndSendUpdate(
+                  //   rawUpdate,
+                  //   snapshotKeyRef.current,
+                  //   data.clock
+                  // );
+                }
 
                 break;
               case "awarenessUpdate":
