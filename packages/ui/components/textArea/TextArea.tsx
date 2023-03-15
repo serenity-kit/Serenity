@@ -41,7 +41,8 @@ export const TextArea = (props: TextAreaProps) => {
       _input={{
         // needs to be on the textarea element directly for correct overflow scroll behaviour
         minHeight: `${minRowsHeight}px`,
-        maxHeight: unlimited ? "none" : `${calculateHeight(maxRows)}px`,
+        // "none" would be the correct value but doesn't work in IOs, so we need to take a large number
+        maxHeight: unlimited ? "9999px" : `${calculateHeight(maxRows)}px`,
       }}
     />
   );
