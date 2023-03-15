@@ -37,6 +37,7 @@ export * from "./components/modalHeader/ModalHeader";
 export * from "./components/mono/Mono";
 export * from "./components/pressable/Pressable";
 export * from "./components/rawInput/RawInput";
+export * from "./components/replyArea/ReplyArea";
 export * from "./components/safeAreaBottomSpacer/SafeAreaBottomSpacer";
 export * from "./components/scrollSafeAreaView/ScrollSafeAreaView";
 export * from "./components/scrollView/ScrollView";
