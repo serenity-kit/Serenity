@@ -218,6 +218,7 @@ export type CreateWorkspaceInvitationInput = {
   invitationDataSignature: Scalars['String'];
   invitationId: Scalars['String'];
   invitationSigningPublicKey: Scalars['String'];
+  role: Role;
   workspaceId: Scalars['String'];
 };
 
@@ -1253,6 +1254,7 @@ export type WorkspaceInvitation = {
   id: Scalars['String'];
   inviterUserId: Scalars['String'];
   inviterUsername: Scalars['String'];
+  role: Role;
   workspaceId: Scalars['String'];
   workspaceName?: Maybe<Scalars['String']>;
 };
@@ -1423,7 +1425,7 @@ export type CreateWorkspaceInvitationMutationVariables = Exact<{
 }>;
 
 
-export type CreateWorkspaceInvitationMutation = { __typename?: 'Mutation', createWorkspaceInvitation?: { __typename?: 'CreateWorkspaceInvitationResult', workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, expiresAt: any } | null } | null };
+export type CreateWorkspaceInvitationMutation = { __typename?: 'Mutation', createWorkspaceInvitation?: { __typename?: 'CreateWorkspaceInvitationResult', workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, role: Role, expiresAt: any } | null } | null };
 
 export type DeleteCommentRepliesMutationVariables = Exact<{
   input: DeleteCommentRepliesInput;
@@ -1753,14 +1755,14 @@ export type WorkspaceInvitationQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceInvitationQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null, workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, workspaceName?: string | null, expiresAt: any } | null };
+export type WorkspaceInvitationQuery = { __typename?: 'Query', me?: { __typename?: 'MeResult', id: string, username: string } | null, workspaceInvitation?: { __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, workspaceName?: string | null, role: Role, expiresAt: any } | null };
 
 export type WorkspaceInvitationsQueryVariables = Exact<{
   workspaceId: Scalars['ID'];
 }>;
 
 
-export type WorkspaceInvitationsQuery = { __typename?: 'Query', workspaceInvitations?: { __typename?: 'WorkspaceInvitationConnection', nodes?: Array<{ __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, expiresAt: any } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
+export type WorkspaceInvitationsQuery = { __typename?: 'Query', workspaceInvitations?: { __typename?: 'WorkspaceInvitationConnection', nodes?: Array<{ __typename?: 'WorkspaceInvitation', id: string, workspaceId: string, inviterUserId: string, inviterUsername: string, role: Role, expiresAt: any } | null> | null, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null } } | null };
 
 export type WorkspacesQueryVariables = Exact<{
   deviceSigningPublicKey: Scalars['String'];
@@ -2001,6 +2003,7 @@ export const CreateWorkspaceInvitationDocument = gql`
     workspaceInvitation {
       id
       workspaceId
+      role
       expiresAt
     }
   }
@@ -2850,6 +2853,7 @@ export const WorkspaceInvitationDocument = gql`
     inviterUserId
     inviterUsername
     workspaceName
+    role
     expiresAt
   }
 }
@@ -2866,6 +2870,7 @@ export const WorkspaceInvitationsDocument = gql`
       workspaceId
       inviterUserId
       inviterUsername
+      role
       expiresAt
     }
     pageInfo {

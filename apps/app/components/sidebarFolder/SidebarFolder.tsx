@@ -123,21 +123,30 @@ export default function SidebarFolder(props: Props) {
       deviceSigningPublicKey: activeDevice.signingPublicKey,
       workspaceId: props.workspaceId,
     });
-    if (!workspace?.currentWorkspaceKey) {
+    if (!workspace?.workspaceKeys) {
       // TODO: handle error in UI
       console.error("Workspace or workspaceKeys not found");
       return;
     }
+    let folderWorkspaceKey: any = undefined;
+    for (const workspaceKey of workspace.workspaceKeys!) {
+      if (workspaceKey.id === props.keyDerivationTrace.workspaceKeyId) {
+        folderWorkspaceKey = workspaceKey;
+      }
+    }
+    if (!folderWorkspaceKey?.workspaceKeyBox) {
+      console.error("Folder workspace key not found");
+    }
     const workspaceKeyData = await deriveWorkspaceKey({
       workspaceId: workspace.id,
-      workspaceKeyId: workspace.currentWorkspaceKey.id,
+      workspaceKeyId: props.keyDerivationTrace.workspaceKeyId,
       activeDevice,
     });
     const workspaceKey = workspaceKeyData.workspaceKey;
     try {
       const parentKeyChainData = deriveKeysFromKeyDerivationTrace({
         keyDerivationTrace: props.keyDerivationTrace,
-        workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+        workspaceKeyBox: folderWorkspaceKey.workspaceKeyBox!,
         activeDevice: {
           signingPublicKey: activeDevice.signingPublicKey,
           signingPrivateKey: activeDevice.signingPrivateKey!,

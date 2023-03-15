@@ -1,3 +1,4 @@
+import { getExpiredTextFromString } from "@serenity-tools/common";
 import {
   IconButton,
   List,
@@ -8,9 +9,9 @@ import {
   useIsDesktopDevice,
   View,
 } from "@serenity-tools/ui";
-import { parseJSON, isPast } from "date-fns";
+import { isPast, parseJSON } from "date-fns";
 import { StyleSheet } from "react-native";
-import { getExpiredTextFromString } from "@serenity-tools/common";
+import { getDisplayRole } from "../../utils/workspace/getDisplayRole";
 
 type Props = {
   workspaceInvitations: any[];
@@ -48,12 +49,17 @@ export function WorkspaceInvitationList(props: Props) {
                 </>
               }
               secondaryItem={
-                <ListText muted={expired} secondary>
-                  {getExpiredTextFromString(
-                    invitation.expiresAt,
-                    isDesktopDevice
-                  )}
-                </ListText>
+                <View style={tw`flex-row items-center justify-between w-full`}>
+                  <ListText muted={expired} secondary style={[tw`mr-4`]}>
+                    {getDisplayRole(invitation.role)}
+                  </ListText>
+                  <ListText muted={expired} secondary>
+                    {getExpiredTextFromString(
+                      invitation.expiresAt,
+                      isDesktopDevice
+                    )}
+                  </ListText>
+                </View>
               }
               actionItem={
                 !expired ? (

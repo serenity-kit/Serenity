@@ -4,9 +4,13 @@ import { tw } from "../../tailwind";
 import { Tooltip as NBTooltip } from "native-base";
 import { ITooltipProps } from "native-base/lib/typescript/components/composites/Tooltip/types.d";
 
-type TooltipProps = ITooltipProps & {};
+type TooltipProps = ITooltipProps & {
+  hasArrow?: boolean;
+};
 
 export const Tooltip = React.forwardRef((props: TooltipProps, ref) => {
+  const { hasArrow = true } = props;
+
   const styles = StyleSheet.create({
     default: tw`shadow-none`,
     text: tw`text-xxs font-inter-semi`,
@@ -20,7 +24,7 @@ export const Tooltip = React.forwardRef((props: TooltipProps, ref) => {
       backgroundColor={"gray.800"} // needed here so arrow-color is set accordingly
       borderWidth={0}
       borderRadius={2}
-      hasArrow={true}
+      hasArrow={hasArrow}
       arrowSize={10}
       _text={{
         style: styles.text,

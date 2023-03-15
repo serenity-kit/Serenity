@@ -12,6 +12,7 @@ import {
   Spinner,
   useHasEditorSidebar,
 } from "@serenity-tools/ui";
+import sodium, { base64_variants } from "react-native-libsodium";
 import {
   applyAwarenessUpdate,
   encodeAwarenessUpdate,
@@ -156,16 +157,26 @@ export default function Editor({
     editorToolbarService.onEvent(onEventListener);
 
     commentsService.onChange((context) => {
-      const { decryptedComments, highlightedCommentId } = context;
+      const { decryptedComments, highlightedComment, isOpenSidebar } = context;
+
       const commentsJson = JSON.stringify({
         variant: "update-comments",
         params: {
           decryptedComments,
-          highlightedCommentId,
+          highlightedComment,
         },
       });
+
       webViewRef.current?.injectJavaScript(`
-        window.updateEditor(\`${commentsJson}\`);
+        window.updateEditor("BASE64${sodium.to_base64(
+          commentsJson,
+          base64_variants.ORIGINAL
+        )}");
+        true;
+      `);
+
+      webViewRef.current?.injectJavaScript(`
+        window.updateHasOpenCommentsSidebar(${isOpenSidebar});
         true;
       `);
     });
@@ -314,10 +325,11 @@ export default function Editor({
             shareFile({ contentAsBase64, mimeType, fileName });
           }
           if (message.type === "highlightComment") {
-            const { commentId } = message.content;
+            const { commentId, openSidebar } = message.content;
             commentsService.send({
-              type: "HIGHLIGHT_COMMENT",
+              type: "HIGHLIGHT_COMMENT_FROM_EDITOR",
               commentId,
+              openSidebar,
             });
           }
         }}

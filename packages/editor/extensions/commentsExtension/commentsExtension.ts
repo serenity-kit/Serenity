@@ -1,25 +1,31 @@
 import { Extension } from "@tiptap/core";
-import { EditorState, Plugin } from "prosemirror-state";
+import { EditorState, Plugin, PluginKey } from "prosemirror-state";
 import { Decoration, DecorationSet } from "prosemirror-view";
 import {
   relativePositionToAbsolutePosition,
   ySyncPluginKey,
 } from "y-prosemirror";
 import * as Y from "yjs";
-import { EditorComment } from "../../types";
+import {
+  EditorComment,
+  EditorCommentWithResolvedPositions,
+  HighlightedComment,
+} from "../../types";
+import { getOverlappingRanges } from "./calculateCommentRanges";
 
 export interface CommentsExtensionOptions {
   comments: EditorComment[];
   yDoc: Y.Doc;
-  highlightComment: (commentId: string | null) => void;
-  highlightedCommentId: string | null;
+  highlightComment: (commentId: string | null, openSidebar: boolean) => void;
+  highlightedComment: HighlightedComment | null;
 }
 
 type CommentsExtensionStorage = {
   comments: EditorComment[];
   yDoc: Y.Doc;
-  highlightComment: (commentId: string | null) => void;
-  highlightedCommentId: string | null;
+  highlightComment: (commentId: string | null, openSidebar: boolean) => void;
+  highlightedComment: HighlightedComment | null;
+  highlightedCommentFromPos: number | null;
 };
 
 // inspired by https://stackoverflow.com/a/46700791
@@ -62,21 +68,44 @@ const resolveCommentPositions = (
     .filter(notNull);
 };
 
+interface CommentRange {
+  from: number;
+  to: number;
+  commentCount: number;
+  isHighlighted: boolean;
+}
+
 const createCommentsDecorationSet = (
-  comments: (EditorComment & { absoluteFrom: number; absoluteTo: number })[],
-  highlightedCommentId: string | null,
-  state: EditorState
+  comments: EditorCommentWithResolvedPositions[],
+  highlightedComment: HighlightedComment | null,
+  state: EditorState,
+  editor: any
 ) => {
-  return DecorationSet.create(
-    state.doc,
-    comments.map((comment) => {
+  const decorationSet = DecorationSet.create(state.doc, [
+    ...getOverlappingRanges(comments).map((commentRange) => {
+      return Decoration.inline(
+        commentRange.absoluteFrom,
+        commentRange.absoluteTo,
+        {
+          class: `editor-comment-overlap`,
+        }
+      );
+    }),
+    ...comments.map((comment) => {
+      if (comment.id === highlightedComment?.id) {
+        editor.storage.comments.highlightedCommentFromPos =
+          comment.absoluteFrom;
+      }
       return Decoration.inline(comment.absoluteFrom, comment.absoluteTo, {
         class: `editor-comment ${
-          comment.id === highlightedCommentId && "editor-comment--active"
+          comment.id === highlightedComment?.id ? "editor-comment-active" : ""
         }`,
       });
-    })
-  );
+    }),
+  ]);
+  // @ts-expect-error adding them here so we can read them out from the editor state
+  decorationSet.comments = comments;
+  return decorationSet;
 };
 
 let prevHighlightedCommentId: null | string = null;
@@ -92,7 +121,7 @@ export const CommentsExtension = Extension.create<
       comments: [],
       yDoc: {} as Y.Doc,
       highlightComment: () => undefined,
-      highlightedCommentId: null,
+      highlightedComment: null,
     };
   },
 
@@ -101,15 +130,18 @@ export const CommentsExtension = Extension.create<
       comments: this.options.comments,
       yDoc: this.options.yDoc,
       highlightComment: this.options.highlightComment,
-      highlightedCommentId: this.options.highlightedCommentId,
+      highlightedComment: this.options.highlightedComment,
+      highlightedCommentFromPos: null,
     };
   },
 
   addProseMirrorPlugins() {
     const storage = this.editor.storage;
+    const thisEditor = this.editor;
 
     return [
       new Plugin({
+        key: new PluginKey("comments"),
         state: {
           init(editor, state) {
             const resolvedComments = resolveCommentPositions(
@@ -119,8 +151,9 @@ export const CommentsExtension = Extension.create<
             );
             return createCommentsDecorationSet(
               resolvedComments,
-              storage.comments.highlightedCommentId,
-              state
+              storage.comments.highlightedComment,
+              state,
+              thisEditor
             );
           },
           apply(tr, oldState, newState) {
@@ -138,20 +171,21 @@ export const CommentsExtension = Extension.create<
             if (commentToHighlight) {
               if (prevHighlightedCommentId !== commentToHighlight.id) {
                 prevHighlightedCommentId = commentToHighlight.id;
-                storage.comments.highlightComment(commentToHighlight.id);
+                storage.comments.highlightComment(commentToHighlight.id, false);
               }
             } else {
               if (prevHighlightedCommentId !== null) {
                 // make sure an endless loop isn't triggered
                 prevHighlightedCommentId = null;
-                storage.comments.highlightComment(null);
+                storage.comments.highlightComment(null, false);
               }
             }
 
             return createCommentsDecorationSet(
               resolvedComments,
-              storage.comments.highlightedCommentId,
-              newState
+              storage.comments.highlightedComment,
+              newState,
+              thisEditor
             );
           },
         },

@@ -25,14 +25,14 @@ type Params = {
   activeDevice: LocalDevice | null;
 };
 
-type DecryptedReply = {
+export type DecryptedReply = {
   id: string;
   text: string;
   createdAt: string;
   creatorDevice: MinimalDevice;
 };
 
-type DecryptedComment = {
+export type DecryptedComment = {
   id: string;
   text: string;
   from: number;
@@ -46,6 +46,10 @@ type CommentKeyEntry = {
   key: string;
   replyKeys: Record<string, string>;
 };
+
+type HighlightedCommentSource = "editor" | "sidebar";
+
+type HighlightedComment = { id: string; source: HighlightedCommentSource };
 
 export type CommentKeys = Record<string, CommentKeyEntry>;
 
@@ -61,9 +65,10 @@ interface Context {
   commentsByDocumentIdQueryActor?: AnyActorRef;
   decryptedComments: DecryptedComment[];
   replyTexts: Record<string, string>;
-  highlightedCommentId: string | null;
+  highlightedComment: HighlightedComment | null;
   activeSnapshot: ActiveSnapshot | undefined;
   commentKeys: CommentKeys;
+  isOpenSidebar: boolean;
 }
 
 export const commentsMachine =
@@ -78,12 +83,20 @@ export const commentsMachine =
           | { type: "UPDATE_REPLY_TEXT"; text: string; commentId: string }
           | { type: "CREATE_REPLY"; commentId: string }
           | { type: "DELETE_REPLY"; replyId: string }
-          | { type: "HIGHLIGHT_COMMENT"; commentId: string | null }
+          | {
+              type: "HIGHLIGHT_COMMENT_FROM_EDITOR";
+              commentId: string | null;
+              openSidebar: boolean;
+            }
+          | { type: "HIGHLIGHT_COMMENT_FROM_SIDEBAR"; commentId: string | null }
           | {
               type: "SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS";
               activeSnapshot: ActiveSnapshot;
               commentKeys: CommentKeys;
-            },
+            }
+          | { type: "OPEN_SIDEBAR" }
+          | { type: "CLOSE_SIDEBAR" }
+          | { type: "TOGGLE_SIDEBAR" },
         context: {} as Context,
       },
       tsTypes: {} as import("./commentsMachine.typegen").Typegen0,
@@ -96,9 +109,10 @@ export const commentsMachine =
         commentsByDocumentIdQueryError: false,
         decryptedComments: [],
         replyTexts: {},
-        highlightedCommentId: null,
+        highlightedComment: null,
         commentKeys: {},
         activeSnapshot: undefined,
+        isOpenSidebar: false,
       },
       initial: "waitingForActiveSnapshot",
       on: {
@@ -122,11 +136,35 @@ export const commentsMachine =
         UPDATE_REPLY_TEXT: {
           actions: ["updateReplyText"],
         },
-        HIGHLIGHT_COMMENT: {
+        HIGHLIGHT_COMMENT_FROM_EDITOR: {
+          actions: ["highlightComment"],
+        },
+        HIGHLIGHT_COMMENT_FROM_SIDEBAR: {
           actions: ["highlightComment"],
         },
         SET_ACTIVE_SNAPSHOT_AND_COMMENT_KEYS: {
           actions: ["setActiveSnapshotAndCommentKeys"],
+        },
+        OPEN_SIDEBAR: {
+          actions: [assign({ isOpenSidebar: true })],
+        },
+        CLOSE_SIDEBAR: {
+          actions: [assign({ isOpenSidebar: false })],
+        },
+        TOGGLE_SIDEBAR: {
+          actions: [
+            assign((context) => {
+              if (context.isOpenSidebar) {
+                return {
+                  isOpenSidebar: false,
+                  highlightedComment: null,
+                };
+              }
+              return {
+                isOpenSidebar: true,
+              };
+            }),
+          ],
         },
       },
       states: {
@@ -281,8 +319,23 @@ export const commentsMachine =
           };
         }),
         highlightComment: assign((context, event) => {
+          if (event.commentId) {
+            return {
+              isOpenSidebar:
+                event.type === "HIGHLIGHT_COMMENT_FROM_EDITOR" &&
+                event.openSidebar
+                  ? true
+                  : context.isOpenSidebar,
+              highlightedComment: {
+                id: event.commentId,
+                source: (event.type === "HIGHLIGHT_COMMENT_FROM_SIDEBAR"
+                  ? "sidebar"
+                  : "editor") as HighlightedCommentSource,
+              },
+            };
+          }
           return {
-            highlightedCommentId: event.commentId,
+            highlightedComment: null,
           };
         }),
         clearReplyText: assign((context, event: any) => {

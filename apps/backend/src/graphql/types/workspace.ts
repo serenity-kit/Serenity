@@ -71,6 +71,10 @@ export const Workspace = objectType({
     t.nonNull.string("id");
     t.string("name");
     t.string("idSignature");
+    t.string("infoCiphertext");
+    t.string("infoNonce");
+    t.string("infoWorkspaceKeyId");
+    t.field("infoWorkspaceKey", { type: WorkspaceKey });
     t.list.nonNull.field("members", { type: WorkspaceMember });
     t.list.nonNull.field("workspaceKeys", { type: WorkspaceKey });
     t.field("currentWorkspaceKey", { type: WorkspaceKey });
@@ -113,6 +117,7 @@ export const WorkspaceInvitation = objectType({
     t.nonNull.string("workspaceId");
     t.nonNull.string("inviterUserId");
     t.nonNull.string("inviterUsername");
+    t.nonNull.field("role", { type: MemberRoleEnum });
     t.string("workspaceName");
     t.field("expiresAt", { type: nonNull("Date") });
   },

@@ -77,7 +77,11 @@ const updateTitle = (title: string) => {
 };
 
 window.updateEditor = (paramsString: string) => {
-  const params: UpdateEditorParams = JSON.parse(paramsString);
+  let decodedParamsString = paramsString;
+  if (paramsString.startsWith("BASE64")) {
+    decodedParamsString = atob(paramsString.slice(6));
+  }
+  const params: UpdateEditorParams = JSON.parse(decodedParamsString);
   updateEditor(window.editor, params);
 };
 
@@ -99,6 +103,11 @@ window.rejectImageRequest = (fileId, reason) => {
   }
 };
 
+let hasOpenCommentsSidebar = false;
+window.updateHasOpenCommentsSidebar = (newHasOpenCommentsSidebar: boolean) => {
+  hasOpenCommentsSidebar = newHasOpenCommentsSidebar;
+};
+
 const domContainer = document.querySelector("#editor");
 ReactDOM.render(
   <NativeBaseProvider>
@@ -113,12 +122,18 @@ ReactDOM.render(
       onCreate={(params) => (window.editor = params.editor)}
       comments={[]}
       createComment={() => {}}
-      highlightComment={(commentId) => {
+      highlightComment={(commentId, openSidebar) => {
         window.ReactNativeWebView.postMessage(
-          JSON.stringify({ type: "highlightComment", content: { commentId } })
+          JSON.stringify({
+            type: "highlightComment",
+            content: { commentId, openSidebar },
+          })
         );
       }}
-      highlightedCommentId={null}
+      highlightedComment={null}
+      hasOpenCommentsSidebar={() => {
+        return hasOpenCommentsSidebar;
+      }}
       encryptAndUploadFile={async () => {
         // TODO: implement
         return Promise.resolve({

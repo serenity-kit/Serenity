@@ -9,6 +9,8 @@ type Params = {
   returnOtherDocumentIfNotFound: boolean;
 };
 
+// TODO: add infoWorkspaceKeyBox
+
 const getFirstWorkspace = async ({ userId }: { userId: string }) => {
   return await prisma.workspace.findFirst({
     include: {

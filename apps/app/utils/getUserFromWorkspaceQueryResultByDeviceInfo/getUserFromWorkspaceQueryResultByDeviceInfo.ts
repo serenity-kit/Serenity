@@ -15,7 +15,6 @@ export const getUserFromWorkspaceQueryResultByDeviceInfo = (
         return false;
       }
       return member.devices.some((memberDevice) => {
-        console.log(memberDevice, device);
         return memberDevice.signingPublicKey === device.signingPublicKey;
       });
     });

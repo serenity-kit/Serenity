@@ -41,7 +41,7 @@ export const Avatar = forwardRef((props: AvatarProps, ref) => {
     lg: 32,
     md: 24,
     sm: 14,
-    xs: 11,
+    xs: 10,
     xxs: 8,
   };
 

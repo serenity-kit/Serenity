@@ -45,8 +45,12 @@ export type WorkspaceMember = {
 
 export type Workspace = {
   id: string;
-  name: string;
   idSignature: string;
+  name?: string | undefined | null;
+  infoCiphertext?: string | undefined | null;
+  infoNonce?: string | undefined | null;
+  infoWorkspaceKeyId?: string | undefined | null;
+  infoWorkspaceKey?: WorkspaceKey | undefined | null;
   members: WorkspaceMember[];
   workspaceKeys?: WorkspaceKey[];
   currentWorkspaceKey?: WorkspaceKey;
@@ -79,6 +83,14 @@ type DbWorkspace = PrismaWorkspace & {
       creatorDevice: PrismaCreatorDevice;
     })[];
   })[];
+  infoWorkspaceKey?:
+    | (PrismaWorkspaceKey & {
+        workspaceKeyBoxes: (PrismaWorkspaceKeyBox & {
+          creatorDevice: PrismaCreatorDevice;
+        })[];
+      })
+    | undefined
+    | null;
 };
 
 export const formatWorkspaceKey = (workspaceKey: any): WorkspaceKey => {
@@ -86,6 +98,13 @@ export const formatWorkspaceKey = (workspaceKey: any): WorkspaceKey => {
     workspaceKey.workspaceKeyBox = workspaceKey.workspaceKeyBoxes[0];
   }
   return workspaceKey;
+};
+
+export const formatWorkspaceInvitation = (workspaceInvitation: any) => {
+  return {
+    ...workspaceInvitation,
+    role: workspaceInvitation.role as Role,
+  };
 };
 
 export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
@@ -117,10 +136,16 @@ export const formatWorkspace = (workspace: DbWorkspace): Workspace => {
       workspaceKeys.push(workspaceKeyWithworkspaceKeyBox);
     }
   }
+  const infoWorkspaceKey: WorkspaceKey | undefined | null =
+    workspace.infoWorkspaceKey;
+  if (infoWorkspaceKey?.workspaceKeyBoxes) {
+    infoWorkspaceKey.workspaceKeyBox = infoWorkspaceKey.workspaceKeyBoxes[0];
+  }
   return {
     ...workspace,
     members: members,
-    currentWorkspaceKey: currentWorkspaceKey,
+    currentWorkspaceKey,
+    infoWorkspaceKey,
     workspaceKeys,
   };
 };

@@ -356,12 +356,11 @@
     background-color: theme("colors.comment.default");
   }
 
-  .editor-comment:hover {
+  .editor-comment-overlap {
     background-color: theme("colors.comment.hover");
   }
 
-  .editor-comment-active,
-  .editor-comment-active:hover {
+  .editor-comment-active {
     background-color: theme("colors.comment.active");
   }
 }

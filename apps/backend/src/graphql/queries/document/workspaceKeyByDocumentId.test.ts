@@ -83,6 +83,7 @@ test("empty keys on incomplete workspace share", async () => {
   // invite to workspace
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,
+    role: Role.VIEWER,
     workspaceId: userData1.workspace.id,
     authorizationHeader: userData1.sessionKey,
   });

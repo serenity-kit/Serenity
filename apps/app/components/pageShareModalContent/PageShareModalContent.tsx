@@ -13,8 +13,8 @@ import {
   ModalHeader,
   Select,
   SelectItem,
-  Spinner,
   SharetextBox,
+  Spinner,
   tw,
   useIsDesktopDevice,
   View,
@@ -70,16 +70,15 @@ export function PageShareModalContent() {
   const [sharingRole, _setSharingRole] = useState(Role.Viewer);
 
   const setSharingRole = (role: string) => {
-    if (role === "admin") {
-      _setSharingRole(Role.Admin);
-    } else if (role === "editor") {
+    // admin sharing is disallowed
+    if (role === "editor") {
       _setSharingRole(Role.Editor);
     } else if (role === "commenter") {
       _setSharingRole(Role.Commenter);
     } else if (role === "viewer") {
       _setSharingRole(Role.Viewer);
     } else {
-      console.log("Unknown role: ", role);
+      console.error("Unknown role: ", role);
       _setSharingRole(Role.Viewer);
     }
   };
@@ -155,7 +154,7 @@ export function PageShareModalContent() {
           ) : (
             <FormWrapper>
               <ModalHeader>Share a page</ModalHeader>
-              <View>
+              <View testID="document-share-modal">
                 <SharetextBox
                   testID="document-share-modal__share-link-text"
                   selectable={pageShareLink !== null}
@@ -175,7 +174,6 @@ export function PageShareModalContent() {
                     accessibilityLabel="Set sharing access level"
                     defaultValue="viewer"
                   >
-                    <SelectItem label="Admin" value="admin" />
                     <SelectItem label="Editor" value="editor" />
                     <SelectItem label="Commenter" value="commenter" />
                     <SelectItem label="Viewer" value="viewer" />

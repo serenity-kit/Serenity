@@ -1,11 +1,9 @@
-import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
-import setupGraphql, {
-  TestContext,
-} from "../../../../test/helpers/setupGraphql";
+import { getRootFolders } from "../../../../test/helpers/folder/getRootFolders";
+import setupGraphql from "../../../../test/helpers/setupGraphql";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
@@ -65,58 +63,6 @@ beforeAll(async () => {
   await deleteAllRecords();
   await setup();
 });
-
-type Props = {
-  graphql: TestContext;
-  workspaceId: string;
-  first: number;
-  authorizationHeader: string;
-};
-const getRootFolders = async ({
-  graphql,
-  workspaceId,
-  first,
-  authorizationHeader,
-}: Props) => {
-  const query = gql`
-    query rootFolders($workspaceId: ID!, $first: Int!) {
-      rootFolders(workspaceId: $workspaceId, first: $first) {
-        edges {
-          node {
-            id
-            parentFolderId
-            rootFolderId
-            workspaceId
-            nameCiphertext
-            nameNonce
-            keyDerivationTrace {
-              workspaceKeyId
-              trace {
-                entryId
-                subkeyId
-                parentId
-                context
-              }
-            }
-          }
-        }
-        pageInfo {
-          hasNextPage
-          endCursor
-        }
-      }
-    }
-  `;
-  const result = await graphql.client.request(
-    query,
-    {
-      workspaceId,
-      first,
-    },
-    { authorization: authorizationHeader }
-  );
-  return result;
-};
 
 test("list folders in a workspace when preloaded with initial workspace", async () => {
   const result = await getRootFolders({
