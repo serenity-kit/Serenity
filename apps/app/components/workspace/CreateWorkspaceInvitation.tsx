@@ -4,7 +4,7 @@ import {
   Heading,
   Select,
   SelectItem,
-  TextArea,
+  SharetextBox,
   tw,
   View,
 } from "@serenity-tools/ui";
@@ -184,7 +184,7 @@ export function CreateWorkspaceInvitation(props: Props) {
 
   return (
     <>
-      <TextArea
+      <SharetextBox
         testID="workspaceInvitationInstructionsText"
         selectable={selectedWorkspaceInvitationId !== null}
         onCopyPress={copyInvitationText}
@@ -193,7 +193,7 @@ export function CreateWorkspaceInvitation(props: Props) {
         {selectedWorkspaceInvitationId !== null
           ? getWorkspaceInvitationText()
           : 'The invitation text and link will be generated here\nClick on "Create invitation" to generate a new invitation'}
-      </TextArea>
+      </SharetextBox>
       <View style={tw`flex-row justify-between`}>
         <Select
           defaultValue="viewer"

@@ -42,13 +42,14 @@ import {
   SidebarText,
   Spinner,
   Text,
-  TextArea,
+  SharetextBox,
   ToggleButton,
   Tooltip,
   tw,
   useIsDesktopDevice,
   View,
   WorkspaceAvatar,
+  TextArea,
 } from "@serenity-tools/ui";
 import * as Clipboard from "expo-clipboard";
 import { HStack, VStack } from "native-base";
@@ -82,7 +83,7 @@ export default function DesignSystemScreen(
     );
   };
 
-  const copyTextAreaText = async () => {
+  const copySharetextBoxText = async () => {
     if (!pageShareLink) {
       return;
     }
@@ -138,6 +139,11 @@ export default function DesignSystemScreen(
 
   // for Toggle
   const [isActive, setIsActive] = React.useState<boolean>(false);
+
+  // for TextArea
+  const [textareaText, setTextareaText] = useState("");
+  const [limitedareaText, setLimitedareaText] = useState("");
+  const [unlimitedareaText, setUnlimitedareaText] = useState("");
 
   return (
     <ScrollSafeAreaView>
@@ -1913,6 +1919,96 @@ export default function DesignSystemScreen(
           </Button>
         </DSExampleArea>
 
+        <Heading lvl={1}>SharetextBox</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="md">
+            SharetextBox
+          </DSMono>{" "}
+          component is used for system generated text which the user might use
+          elsewhere.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <Text variant="sm">
+          The basic{" "}
+          <DSMono variant="component" size="md">
+            SharetextBox
+          </DSMono>{" "}
+          is muted to show the user the Text inside is just an Info and not
+          something they can interact with.
+        </Text>
+        <DSExampleArea>
+          <SharetextBox>
+            {
+              'The share link will be generated here\nClick on "Create page link" to generate a new link'
+            }
+          </SharetextBox>
+        </DSExampleArea>
+        <Text variant="xxs" muted style={tw`mt-4`}>
+          Note: as there are currently troubles with react native that prevent
+          users to select text in the web version and even editing in Safari
+          (desktop & iOS), all Text on web will be selectable until this issue
+          is fixed
+        </Text>
+        <Heading lvl={3}>Select & Copy</Heading>
+        <Text variant="sm">
+          To allow the user to interact with the{" "}
+          <DSMono variant="component" size="md">
+            SharetextBox
+          </DSMono>{" "}
+          add the <DSMono variant="property">selectable</DSMono> property.
+        </Text>
+        <DSExampleArea>
+          <SharetextBox selectable style={tw`max-w-150`}>
+            {
+              "http://serenity.re/share/b80d1184-04f7-4965-a4e4/078967c0-c829-4870-b64c-#key=_gpZeFjmIHZzhmJwDp2chGYRiaKB0DdzTacl_uFV9ZU"
+            }
+          </SharetextBox>
+        </DSExampleArea>
+        <Text variant="sm" style={tw`mt-2.5`}>
+          To add even more functionality you can allow the user to copy the Text
+          to the clipboard, by adding{" "}
+          <DSMono variant="property">isClipboardNoticeActive</DSMono> and a{" "}
+          <DSMono variant="property">onCopyPress</DSMono> .
+        </Text>
+        <DSExampleArea
+          vertical
+          style={tw`mb-4 py-12 bg-gray-900/30 items-center`}
+          center
+        >
+          <Box style={tw`w-100`}>
+            <UIHeading lvl={3}>Share a page</UIHeading>
+            <SharetextBox
+              selectable={pageShareLink !== ""}
+              onCopyPress={copySharetextBoxText}
+              isClipboardNoticeActive={isClipboardNoticeActive}
+            >
+              {pageShareLink !== ""
+                ? pageShareLink
+                : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
+            </SharetextBox>
+            <HStack space={4}>
+              <Button
+                onPress={() => {
+                  setPageShareLink(
+                    "http://serenity.re/share/b80d1184-04f7-4965-a4e4/078967c0-c829-4870-b64c-#key=_gpZeFjmIHZzhmJwDp2chGYRiaKB0DdzTacl_uFV9ZU"
+                  );
+                }}
+              >
+                Create page link
+              </Button>
+              <Button
+                onPress={() => {
+                  setPageShareLink("");
+                }}
+                variant={"secondary"}
+              >
+                Reset
+              </Button>
+            </HStack>
+          </Box>
+        </DSExampleArea>
+
         <Heading lvl={1}>Sidebar</Heading>
         <Text>
           The{" "}
@@ -2117,89 +2213,49 @@ export default function DesignSystemScreen(
           <DSMono variant="component" size="md">
             TextArea
           </DSMono>{" "}
-          component is used for system generated text which the user might use
-          elsewhere.
+          component allows you to easily create growing multi-line text inputs.
         </Text>
-        <Heading lvl={3}>Basic</Heading>
+        <Heading lvl={3}>Rows</Heading>
         <Text variant="sm">
-          The basic{" "}
-          <DSMono variant="component" size="md">
-            TextArea
-          </DSMono>{" "}
-          is muted to show the user the Text inside is just an Info and not
-          something they can interact with.
+          To set a default height of a certain number of rows, or limit the
+          space a <DSMono variant="component">TextArea</DSMono> should grow to,
+          you can adjust the <DSMono variant="property">minRows</DSMono> and{" "}
+          <DSMono variant="property">maxRows</DSMono> properties.
         </Text>
-        <DSExampleArea>
-          <TextArea>
-            {
-              'The share link will be generated here\nClick on "Create page link" to generate a new link'
-            }
-          </TextArea>
+        <Text variant="sm" style={tw`mt-1`}>
+          Per default the min-height is <DSMono variant={"type"}>2</DSMono> rows
+          and the max-height <DSMono variant={"type"}>5</DSMono>. You can adjust
+          those settings by changing the properties respectively.
+        </Text>
+        <DSExampleArea vertical>
+          <TextArea
+            value={textareaText}
+            onChangeText={(text) => setTextareaText(text)}
+          />
+          <TextArea
+            value={limitedareaText}
+            onChangeText={(text) => setLimitedareaText(text)}
+            minRows={1}
+            maxRows={3}
+          />
         </DSExampleArea>
-        <Text variant="xxs" muted style={tw`mt-4`}>
-          Note: as there are currently troubles with react native that prevent
-          users to select text in the web version and even editing in Safari
-          (desktop & iOS), all Text on web will be selectable until this issue
-          is fixed
-        </Text>
-        <Heading lvl={3}>Select & Copy</Heading>
+        <Heading lvl={3}>Unlimited growing</Heading>
         <Text variant="sm">
-          To allow the user to interact with the{" "}
-          <DSMono variant="component" size="md">
-            TextArea
-          </DSMono>{" "}
-          add the <DSMono variant="property">selectable</DSMono> property.
+          To enable endless growing of a{" "}
+          <DSMono variant="component">TextArea</DSMono> just add the{" "}
+          <DSMono variant="property">unlimited</DSMono> property.
         </Text>
-        <DSExampleArea>
-          <TextArea selectable style={tw`max-w-150`}>
-            {
-              "http://serenity.re/share/b80d1184-04f7-4965-a4e4/078967c0-c829-4870-b64c-#key=_gpZeFjmIHZzhmJwDp2chGYRiaKB0DdzTacl_uFV9ZU"
-            }
-          </TextArea>
+        <DSExampleArea vertical>
+          <TextArea
+            value={unlimitedareaText}
+            onChangeText={(text) => setUnlimitedareaText(text)}
+            unlimited
+          />
         </DSExampleArea>
-        <Text variant="sm" style={tw`mt-2.5`}>
-          To add even more functionality you can allow the user to copy the Text
-          to the clipboard, by adding{" "}
-          <DSMono variant="property">isClipboardNoticeActive</DSMono> and a{" "}
-          <DSMono variant="property">onCopyPress</DSMono> .
+        <Text style={tw`mt-4`} variant="xxs" muted>
+          Note that setting a TextArea to unlimited will overrule any set
+          maxRows.
         </Text>
-        <DSExampleArea
-          vertical
-          style={tw`mb-4 py-12 bg-gray-900/30 items-center`}
-          center
-        >
-          <Box style={tw`w-100`}>
-            <UIHeading lvl={3}>Share a page</UIHeading>
-            <TextArea
-              selectable={pageShareLink !== ""}
-              onCopyPress={copyTextAreaText}
-              isClipboardNoticeActive={isClipboardNoticeActive}
-            >
-              {pageShareLink !== ""
-                ? pageShareLink
-                : 'The share link will be generated here\nClick on "Create page link" to generate a new link'}
-            </TextArea>
-            <HStack space={4}>
-              <Button
-                onPress={() => {
-                  setPageShareLink(
-                    "http://serenity.re/share/b80d1184-04f7-4965-a4e4/078967c0-c829-4870-b64c-#key=_gpZeFjmIHZzhmJwDp2chGYRiaKB0DdzTacl_uFV9ZU"
-                  );
-                }}
-              >
-                Create page link
-              </Button>
-              <Button
-                onPress={() => {
-                  setPageShareLink("");
-                }}
-                variant={"secondary"}
-              >
-                Reset
-              </Button>
-            </HStack>
-          </Box>
-        </DSExampleArea>
 
         <Heading lvl={1}>Toast</Heading>
         <Text>

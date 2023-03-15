@@ -1,57 +1,49 @@
-import React from "react";
-import { StyleSheet } from "react-native";
-import { tw } from "../../tailwind";
-import { IconButton } from "../iconButton/IconButton";
-import { Tooltip } from "../tooltip/Tooltip";
-import { View, ViewProps } from "../view/View";
-import { Text, TextVariants } from "../text/Text";
+import React, { useLayoutEffect, useRef } from "react";
+import { Platform } from "react-native";
+import { RawInput, RawInputProps } from "../rawInput/RawInput";
 
-export type TextAreaProps = ViewProps & {
-  variant?: TextVariants;
-  selectable?: boolean;
-  testID?: string;
-  isClipboardNoticeActive?: boolean;
-  onCopyPress?: () => void;
+export type TextAreaProps = RawInputProps & {
+  minRows?: number;
+  maxRows?: number;
+  unlimited?: boolean;
 };
 
-export function TextArea(props: TextAreaProps) {
-  const { variant = "xs", selectable, isClipboardNoticeActive } = props;
-  const styles = StyleSheet.create({
-    wrapper: tw`flex-auto relative mb-2 py-4 px-5 border rounded ${
-      selectable
-        ? `pr-9 bg-primary-100/40 border-primary-200`
-        : `bg-gray-100 border-gray-200`
-    }`,
-    text: selectable ? tw`text-primary-900` : tw`text-gray-400`,
-  });
+const calculateHeight = (rows: number) => {
+  // rows * lineheight + y-padding + border-width
+  return rows * 18 + 16 + 2;
+};
+
+export const TextArea = (props: TextAreaProps) => {
+  const { minRows = 2, maxRows = 5, unlimited = false } = props;
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const minRowsHeight = calculateHeight(minRows);
+
+  useLayoutEffect(() => {
+    if (Platform.OS === "web" && textareaRef.current) {
+      // reset the height to get the correct scrollHeight for the textarea
+      textareaRef.current.style.height = "0px";
+      const height = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = `${Math.max(height, minRowsHeight)}px`;
+    }
+  }, [props.value, minRowsHeight]);
 
   return (
-    <View style={[styles.wrapper, props.style]}>
-      <Text
-        variant={variant}
-        style={styles.text}
-        testID={props.testID}
-        selectable={selectable}
-      >
-        {props.children}
-      </Text>
-
-      {selectable && props.onCopyPress ? (
-        <View style={tw`absolute right-3 top-3`}>
-          <Tooltip
-            label={isClipboardNoticeActive ? "Copying..." : "Copy to clipboard"}
-            placement={"left"}
-          >
-            <IconButton
-              name="file-copy-line"
-              color={"primary-300"}
-              transparent
-              onPress={props.onCopyPress}
-              isLoading={isClipboardNoticeActive}
-            />
-          </Tooltip>
-        </View>
-      ) : null}
-    </View>
+    <RawInput
+      // px needed as a sheer number can result in inconsistent behaviour, as nativebase has a type ISizes
+      // and if the number matches with one from this type it is automagically converted in a different
+      // px-size (entered number x 4) => e.g. 10 => 40px but 11 => 11px and then 12 => 48px
+      minHeight={`${minRowsHeight}px`}
+      height="auto"
+      {...props}
+      multiline
+      ref={textareaRef}
+      _input={{
+        // needs to be on the textarea element directly for correct overflow scroll behaviour
+        minHeight: `${minRowsHeight}px`,
+        // "none" would be the correct value but doesn't work in IOs, so we need to take a large number
+        maxHeight: unlimited ? "9999px" : `${calculateHeight(maxRows)}px`,
+      }}
+    />
   );
-}
+};
