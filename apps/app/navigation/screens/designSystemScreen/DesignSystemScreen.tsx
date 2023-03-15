@@ -49,6 +49,7 @@ import {
   useIsDesktopDevice,
   View,
   WorkspaceAvatar,
+  TextArea,
 } from "@serenity-tools/ui";
 import * as Clipboard from "expo-clipboard";
 import { HStack, VStack } from "native-base";
@@ -2198,6 +2199,44 @@ export default function DesignSystemScreen(
             the quick brown fox
           </Text>
         </DSExampleArea>
+
+        <Heading lvl={1}>TextArea</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="md">
+            TextArea
+          </DSMono>{" "}
+          component allows you to easily create growing multi-line text inputs.
+        </Text>
+        <Heading lvl={3}>Rows</Heading>
+        <Text variant="sm">
+          To set a default height of a certain number of rows, or limit the
+          space a <DSMono variant="component">TextArea</DSMono> should grow to,
+          you can adjust the <DSMono variant="property">minRows</DSMono> and{" "}
+          <DSMono variant="property">maxRows</DSMono> properties.
+        </Text>
+        <Text variant="sm" style={tw`mt-1`}>
+          Per default the min-height is <DSMono variant={"type"}>2</DSMono> rows
+          and the max-height <DSMono variant={"type"}>5</DSMono>. You can adjust
+          those settings by changing the properties respectively.
+        </Text>
+        <DSExampleArea vertical>
+          <TextArea />
+          <TextArea minRows={1} maxRows={3} />
+        </DSExampleArea>
+        <Heading lvl={3}>Unlimited growing</Heading>
+        <Text variant="sm">
+          To enable endless growing of a{" "}
+          <DSMono variant="component">TextArea</DSMono> just add the{" "}
+          <DSMono variant="property">unlimited</DSMono> property.
+        </Text>
+        <DSExampleArea vertical>
+          <TextArea unlimited />
+        </DSExampleArea>
+        <Text style={tw`mt-4`} variant="xxs" muted>
+          Note that setting a TextArea to unlimited will overrule any set
+          maxRows.
+        </Text>
 
         <Heading lvl={1}>Toast</Heading>
         <Text>
