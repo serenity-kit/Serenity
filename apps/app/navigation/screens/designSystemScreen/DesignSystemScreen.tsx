@@ -140,6 +140,11 @@ export default function DesignSystemScreen(
   // for Toggle
   const [isActive, setIsActive] = React.useState<boolean>(false);
 
+  // for TextArea
+  const [textareaText, setTextareaText] = useState("");
+  const [limitedareaText, setLimitedareaText] = useState("");
+  const [unlimitedareaText, setUnlimitedareaText] = useState("");
+
   return (
     <ScrollSafeAreaView>
       <View style={tw`w-full max-w-4xl mx-auto px-4 pt-2 pb-12`}>
@@ -2223,8 +2228,16 @@ export default function DesignSystemScreen(
           those settings by changing the properties respectively.
         </Text>
         <DSExampleArea vertical>
-          <TextArea />
-          <TextArea minRows={1} maxRows={3} />
+          <TextArea
+            value={textareaText}
+            onChangeText={(text) => setTextareaText(text)}
+          />
+          <TextArea
+            value={limitedareaText}
+            onChangeText={(text) => setLimitedareaText(text)}
+            minRows={1}
+            maxRows={3}
+          />
         </DSExampleArea>
         <Heading lvl={3}>Unlimited growing</Heading>
         <Text variant="sm">
@@ -2233,7 +2246,11 @@ export default function DesignSystemScreen(
           <DSMono variant="property">unlimited</DSMono> property.
         </Text>
         <DSExampleArea vertical>
-          <TextArea unlimited />
+          <TextArea
+            value={unlimitedareaText}
+            onChangeText={(text) => setUnlimitedareaText(text)}
+            unlimited
+          />
         </DSExampleArea>
         <Text style={tw`mt-4`} variant="xxs" muted>
           Note that setting a TextArea to unlimited will overrule any set
