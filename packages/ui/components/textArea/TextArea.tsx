@@ -8,8 +8,8 @@ export type TextAreaProps = RawInputProps & {
 };
 
 const calculateHeight = (rows: number) => {
-  // rows * lineheight + top-padding as the bottom padding needs to be on the container
-  return rows * 18 + 16;
+  // rows * lineheight + y-padding + border-width
+  return rows * 18 + 16 + 2;
 };
 
 export const TextArea = (props: TextAreaProps) => {
