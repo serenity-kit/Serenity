@@ -1,4 +1,5 @@
 import sodium from "libsodium-wrappers";
+// @ts-expect-error no types available
 import { WebSocket } from "mock-socket";
 
 // @ts-expect-error

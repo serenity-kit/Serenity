@@ -148,7 +148,8 @@ export default function SidebarPage(props: Props) {
     }
     try {
       const updatedDocument = await updateDocumentName({
-        document,
+        documentId: document.id,
+        workspaceId: document.workspaceId,
         name,
         activeDevice,
       });

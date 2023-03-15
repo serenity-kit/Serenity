@@ -1,20 +1,13 @@
 import {
-  addSnapshotToInProgress,
-  cleanupUpdates,
-  createSnapshot,
   deserializeUint8ArrayUpdates,
-  dispatchWebsocketState,
-  getWebsocketState,
   KeyDerivationTrace2,
   serializeUint8ArrayUpdates,
   syncMachine,
-  useWebsocketState,
 } from "@naisho/core";
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
   LocalDevice,
-  snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { useMachine } from "@xstate/react";
 import { useEffect, useRef, useState } from "react";
@@ -29,28 +22,19 @@ import {
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
 import { usePage } from "../../context/PageContext";
-import {
-  Document,
-  runDocumentQuery,
-  runMeQuery,
-  runWorkspaceQuery,
-} from "../../generated/graphql";
+import { Document, runMeQuery } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
-import { getSessionKey } from "../../utils/authentication/sessionKeyStore";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
-import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { getFolder } from "../../utils/folder/getFolder";
 import {
   getLocalDocument,
   setLocalDocument,
 } from "../../utils/localSqliteApi/localSqliteApi";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
-
-const reconnectTimeout = 2000;
 
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
   updateTitle: (title: string) => void;
@@ -74,6 +58,18 @@ export default function Page({
     subkeyId: string;
     key: Uint8Array;
   } | null>(null);
+  const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
+  const [documentLoadedInfo, setDocumentLoadedInfo] = useState({
+    loaded: false,
+    username: "Unknown user",
+  });
+  const documentName = useActiveDocumentInfoStore(
+    (state) => state.documentName
+  );
+
+  const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
+    (state) => state.update
+  );
 
   let websocketHost = `wss://serenity-dev.fly.dev`;
   if (process.env.NODE_ENV === "development") {
@@ -89,11 +85,28 @@ export default function Page({
       signatureKeyPair,
       websocketHost,
       websocketSessionKey: sessionKey,
-      documentLoaded: () => {
+      onDocumentLoaded: () => {
         setDocumentLoadedInfo({
           loaded: true,
           username: "Unknown user",
         });
+      },
+      onSnapshotSent: async () => {
+        // if the document has a name, update it
+        if (documentName) {
+          try {
+            const updatedDocument = await updateDocumentName({
+              documentId: docId,
+              workspaceId,
+              name: documentName,
+              activeDevice,
+            });
+            // FIXME: do we update this when it's not the active document?
+            updateActiveDocumentInfoStore(updatedDocument, activeDevice);
+          } catch (error) {
+            console.error(error);
+          }
+        }
       },
       applySnapshot: (decryptedSnapshotData) => {
         Yjs.applyUpdate(
@@ -127,6 +140,14 @@ export default function Page({
           key,
         };
 
+        setActiveSnapshotAndCommentKeys(
+          {
+            id: snapshot.id,
+            key: snapshotKeyData.key,
+          },
+          {}
+        );
+
         return key;
       },
       applyChanges: (decryptedUpdates) => {
@@ -154,27 +175,6 @@ export default function Page({
       sodium,
     },
   });
-
-  console.log("Page state: ", state.value);
-
-  const activeSnapshotIdRef = useRef<string | null>(null);
-  const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
-  const websocketConnectionRef = useRef<WebSocket>(null);
-  const shouldReconnectWebsocketConnectionRef = useRef(true);
-  const createSnapshotInProgressRef = useRef<boolean>(false); // only used for the UI
-  const latestServerVersionRef = useRef<number | null>(null);
-  const [documentLoadedInfo, setDocumentLoadedInfo] = useState({
-    loaded: false,
-    username: "Unknown user",
-  });
-  const websocketState = useWebsocketState();
-  const documentName = useActiveDocumentInfoStore(
-    (state) => state.documentName
-  );
-
-  const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
-    (state) => state.update
-  );
 
   const createNewSnapshotKey = async (
     document: Document,
@@ -206,78 +206,6 @@ export default function Page({
       folderKey: lastChainItem.key,
     });
     return snapshotKeyData;
-  };
-
-  const createAndSendSnapshot = async () => {
-    const workspaceResult = await runWorkspaceQuery({
-      id: workspaceId,
-      deviceSigningPublicKey: activeDevice?.signingPublicKey,
-    });
-    const workspace = workspaceResult?.data?.workspace;
-    if (!workspace) {
-      throw new Error("Workspace not found");
-    }
-    const documentResult = await runDocumentQuery({ id: docId });
-    const document = documentResult.data?.document;
-    if (!document) {
-      throw new Error("Document not found");
-    }
-    const snapshotKey = await createNewSnapshotKey(
-      document,
-      workspace.currentWorkspaceKey?.id!
-    );
-    snapshotKeyRef.current = sodium.from_base64(snapshotKey.key);
-    const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
-    // TODO: derive snapshot key from folder key
-    const keyDerivationTrace = await createFolderKeyDerivationTrace({
-      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-      folderId: document.parentFolderId!,
-    });
-    const snapshotId = uuidv4();
-    keyDerivationTrace.trace.push({
-      entryId: snapshotId,
-      parentId: document.parentFolderId,
-      subkeyId: snapshotKey.subkeyId,
-      context: snapshotDerivedKeyContext,
-    });
-    const publicData = {
-      snapshotId: uuidv4(),
-      docId,
-      pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-      keyDerivationTrace,
-      subkeyId: snapshotKey.subkeyId,
-    };
-    const snapshot = createSnapshot(
-      yDocState,
-      publicData,
-      sodium.from_base64(snapshotKey.key),
-      signatureKeyPair
-    );
-
-    addSnapshotToInProgress(snapshot);
-
-    // @ts-expect-error TODO handle later
-    websocketConnectionRef.current.send(
-      JSON.stringify({
-        ...snapshot,
-        lastKnownSnapshotId: activeSnapshotIdRef.current,
-        latestServerVersion: latestServerVersionRef.current,
-      })
-    );
-    // if the document has a name, update it
-    if (documentName) {
-      try {
-        const updatedDocument = await updateDocumentName({
-          document,
-          name: documentName,
-          activeDevice,
-        });
-        // FIXME: do we update this when it's not the active document?
-        updateActiveDocumentInfoStore(updatedDocument, activeDevice);
-      } catch (error) {
-        console.error(error);
-      }
-    }
   };
 
   useEffect(() => {
@@ -323,60 +251,6 @@ export default function Page({
       // the currently active document
       updateActiveDocumentInfoStore(document, activeDevice);
 
-      const onWebsocketMessage = async (event) => {
-        const data = JSON.parse(event.data);
-        switch (data.type) {
-        }
-      };
-
-      const sessionKey = await getSessionKey();
-
-      const setupWebsocket = () => {
-        let host = `wss://serenity-dev.fly.dev`;
-        if (process.env.NODE_ENV === "development") {
-          host = `ws://localhost:4000`;
-        }
-        if (process.env.SERENITY_ENV === "e2e") {
-          host = `ws://localhost:4001`;
-        }
-        const connection = new WebSocket(
-          `${host}/${docId}?sessionKey=${sessionKey}`
-        );
-        // @ts-expect-error TODO handle later
-        websocketConnectionRef.current = connection;
-
-        // Listen for messages
-        connection.addEventListener("message", onWebsocketMessage);
-
-        connection.addEventListener("open", function (event) {
-          console.log("connection opened");
-          dispatchWebsocketState({ type: "connected" });
-        });
-
-        connection.addEventListener("close", function (event) {
-          console.log("connection closed");
-          dispatchWebsocketState({ type: "disconnected" });
-          // remove the awareness states of everyone else
-          removeAwarenessStates(
-            yAwarenessRef.current,
-            Array.from(yAwarenessRef.current.getStates().keys()).filter(
-              (client) => client !== yDocRef.current.clientID
-            ),
-            "TODOprovider"
-          );
-
-          // retry connecting
-          if (shouldReconnectWebsocketConnectionRef.current) {
-            setTimeout(() => {
-              dispatchWebsocketState({ type: "reconnecting" });
-              setupWebsocket();
-            }, reconnectTimeout * (1 + getWebsocketState().unsuccessfulReconnects));
-          }
-        });
-      };
-
-      // setupWebsocket();
-
       // remove awareness state when closing the window
       // TODO re-add
       // window.addEventListener("beforeunload", () => {
@@ -407,34 +281,6 @@ export default function Page({
 
         if (origin?.key === "y-sync$" || origin === "mobile-webview") {
           send({ type: "ADD_CHANGE", data: update });
-          // if (
-          //   !activeSnapshotIdRef.current &&
-          //   !createSnapshotInProgressRef.current
-          // ) {
-          //   // createAndSendSnapshot takes a while to set the snapshot in
-          //   // progress and therefore we need another mechanism
-          //   createSnapshotInProgressRef.current = true;
-          //   if (
-          //     getSnapshotInProgress(docId) ||
-          //     !getWebsocketState().connected
-          //   ) {
-          //     addPendingSnapshot(docId);
-          //   } else {
-          //     await createAndSendSnapshot();
-          //   }
-          // } else {
-          //   if (
-          //     !snapshotKeyRef.current ||
-          //     getSnapshotInProgress(docId) ||
-          //     !getWebsocketState().connected
-          //   ) {
-          //     // don't send updates when a snapshot is in progress, because they
-          //     // must be based on the new snapshot
-          //     addPendingUpdate(docId, update);
-          //   } else {
-          //     createAndSendUpdate(update, snapshotKeyRef.current);
-          //   }
-          // }
         }
       });
     }
@@ -447,9 +293,6 @@ export default function Page({
         [yDocRef.current.clientID],
         "document unmount"
       );
-      cleanupUpdates();
-      shouldReconnectWebsocketConnectionRef.current = false;
-      websocketConnectionRef.current?.close();
     };
   }, []);
 

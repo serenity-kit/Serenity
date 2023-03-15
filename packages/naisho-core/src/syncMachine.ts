@@ -4,7 +4,11 @@ import {
   createAwarenessUpdate,
   verifyAndDecryptAwarenessUpdate,
 } from "./awarenessUpdate";
-import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
+import {
+  addSnapshotToInProgress,
+  createSnapshot,
+  verifyAndDecryptSnapshot,
+} from "./snapshot";
 import {
   addUpdateToInProgressQueue,
   createUpdate,
@@ -12,6 +16,12 @@ import {
   removeUpdateFromInProgressQueue,
   verifyAndDecryptUpdate,
 } from "./update";
+
+type ProcessQueueData = {
+  handledQueue: "incoming" | "pending" | "none";
+  activeSnapshotId: string | null;
+  latestServerVersion: number | null;
+};
 
 interface Context {
   documentId: string;
@@ -34,7 +44,6 @@ interface Context {
     activeSnapshotId: string | null;
     latestServerVersion: number | null;
   }) => boolean;
-  documentLoaded: () => void;
   websocketActor?: any;
   incomingQueue: any[];
   pendingChangesQueue: any[];
@@ -43,25 +52,14 @@ interface Context {
   latestServerVersion: null | number;
   serializeChanges: (changes: unknown[]) => string;
   deserializeChanges: (string) => unknown[];
+  onDocumentLoaded: () => void;
+  onSnapshotSent: () => void | Promise<void>;
 }
 
-// TODO pass in function to verify the creator
-// retry logic
-// add new document key - add function to handle the new key material
-// write a connector for automerge & naisho
-// make it work for automerge?
-
-// How Queue processing:
+// How Queue processing works:
 // 1. first handle all incoming message
 // 2. then handle all pending updates
 // Background: There might be a new snapshot and this way we avoid retries
-
-// TODO rename awareness to ephemeral
-
-// TODO remove event listener
-// TODO websocket reconnecting
-// TODO snapshot in progress & failed snapshot retrying
-// TODO updates retrying
 
 const websocketService = (context) => (send, onReceive) => {
   const websocketConnection = new WebSocket(
@@ -173,6 +171,9 @@ export const syncMachine =
             }
           | { type: "SEND"; message: any },
         context: {} as Context,
+        services: {} as {
+          processQueues: { data: ProcessQueueData };
+        },
       },
       tsTypes: {} as import("./syncMachine.typegen").Typegen0,
       predictableActionArguments: true,
@@ -194,7 +195,6 @@ export const syncMachine =
         getUpdateKey: () => Promise.resolve(new Uint8Array()),
         applyEphemeralUpdates: () => undefined,
         getEphemeralUpdateKey: () => Promise.resolve(new Uint8Array()),
-        documentLoaded: () => undefined,
         shouldSendSnapshot: () => false,
         incomingQueue: [],
         pendingChangesQueue: [],
@@ -203,6 +203,8 @@ export const syncMachine =
         latestServerVersion: null,
         serializeChanges: () => "",
         deserializeChanges: () => [],
+        onDocumentLoaded: () => undefined,
+        onSnapshotSent: () => undefined,
       },
       initial: "connecting",
       on: {
@@ -364,7 +366,7 @@ export const syncMachine =
               context.signatureKeyPair
             );
 
-            // addSnapshotToInProgress(snapshot);
+            addSnapshotToInProgress(snapshot);
 
             send({
               type: "SEND",
@@ -374,6 +376,7 @@ export const syncMachine =
                 latestServerVersion: context.latestServerVersion,
               }),
             });
+            context.onSnapshotSent();
           };
 
           const createAndSendUpdate = (
@@ -443,7 +446,7 @@ export const syncMachine =
                     })
                     .flat();
                   context.applyChanges(changes);
-                  context.documentLoaded();
+                  context.onDocumentLoaded();
 
                   // setActiveSnapshotAndCommentKeys(
                   //   {
@@ -457,19 +460,6 @@ export const syncMachine =
                   console.log("Apply snapshot failed. TODO handle error");
                   console.error(err);
                 }
-
-                // // check for pending snapshots or pending updates and run them
-                // const pendingChanges = getPending(docId);
-                // if (pendingChanges.type === "snapshot") {
-                //   await createAndSendSnapshot();
-                //   removePending(docId);
-                // } else if (pendingChanges.type === "updates") {
-                //   // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
-                //   removePending(docId);
-                //   pendingChanges.rawUpdates.forEach((rawUpdate) => {
-                //     createAndSendUpdate(rawUpdate, snapshotKeyRef.current);
-                //   });
-                // }
 
                 break;
 
@@ -492,44 +482,37 @@ export const syncMachine =
                 console.log("snapshot saved", event);
                 activeSnapshotId = event.snapshotId;
                 latestServerVersion = null;
-                // removeSnapshotInProgress(data.docId);
-
-                // const pending = getPending(data.docId);
-                // if (pending.type === "snapshot") {
-                //   await createAndSendSnapshot();
-                //   removePending(data.docId);
-                // } else if (pending.type === "updates") {
-                //   // TODO send multiple pending.rawUpdates as one update, this requires different applying as well
-                //   removePending(data.docId);
-                //   pending.rawUpdates.forEach((rawUpdate) => {
-                //     createAndSendUpdate(rawUpdate, snapshotKeyRef.current);
-                //   });
-                // }
                 break;
               case "snapshotFailed":
-                // console.log("snapshot saving failed", data);
-                // if (data.snapshot) {
-                //   const snapshotKeyData3 = await deriveExistingSnapshotKey(
-                //     docId,
-                //     data.snapshot,
-                //     activeDevice as LocalDevice
-                //   );
-                //   snapshotKeyRef.current = sodium.from_base64(snapshotKeyData3.key);
-                //   applySnapshot(data.snapshot, snapshotKeyRef.current);
-                // }
-                // if (data.updates) {
-                //   applyChanges(data.updates, snapshotKeyRef.current);
-                // }
+                console.log("snapshot saving failed", event);
+                if (event.snapshot) {
+                  const snapshot = event.snapshot;
+                  const snapshotKey = await context.getSnapshotKey(snapshot);
+                  const decryptedSnapshot = verifyAndDecryptSnapshot(
+                    snapshot,
+                    snapshotKey,
+                    context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+                  );
+                  context.applySnapshot(decryptedSnapshot);
+                }
+                if (event.updates) {
+                  for (let update of event.updates) {
+                    const key = await context.getUpdateKey(update);
+                    const decryptedUpdate = verifyAndDecryptUpdate(
+                      update,
+                      key,
+                      context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+                    );
+                    const changes = context.deserializeChanges(
+                      // TODO should this be part deserializeChanges?
+                      context.sodium.to_string(decryptedUpdate)
+                    );
+                    context.applyChanges(changes);
+                    latestServerVersion = update.serverData.version;
+                  }
+                }
 
-                // // TODO add a backoff after multiple failed tries
-
-                // // removed here since again added in createAndSendSnapshot
-                // removeSnapshotInProgress(data.docId);
-                // // all pending can be removed since a new snapshot will include all local changes
-                // removePending(data.docId);
-
-                // await sleep(1000); // TODO add randomised backoff
-                // await createAndSendSnapshot();
+                // TODO retry creating a snapshot
                 break;
 
               case "update":

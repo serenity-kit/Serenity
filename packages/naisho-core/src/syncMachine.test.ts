@@ -1,3 +1,4 @@
+// @ts-expect-error no types available
 import { Server } from "mock-socket";
 import { interpret } from "xstate";
 import { syncMachine } from "./syncMachine";

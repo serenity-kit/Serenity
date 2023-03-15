@@ -12,24 +12,26 @@ import { Device } from "../../types/Device";
 import { getWorkspace } from "../workspace/getWorkspace";
 
 export type Props = {
-  document: Document;
+  documentId: string;
+  workspaceId: string;
   name: string;
   activeDevice: Device;
 };
 export const updateDocumentName = async ({
-  document,
+  documentId,
+  workspaceId,
   name,
   activeDevice,
 }: Props): Promise<Document> => {
   const workspace = await getWorkspace({
-    workspaceId: document.workspaceId!,
+    workspaceId,
     deviceSigningPublicKey: activeDevice.signingPublicKey,
   });
   if (!workspace?.currentWorkspaceKey) {
     throw new Error("Workspace or workspaceKeys not found");
   }
   const snapshotResult = await runSnapshotQuery({
-    documentId: document.id,
+    documentId: documentId,
   });
   if (!snapshotResult.data?.snapshot) {
     throw new Error(snapshotResult.error?.message || "Could not get snapshot");
@@ -59,7 +61,7 @@ export const updateDocumentName = async ({
   const updateDocumentNameResult = await runUpdateDocumentNameMutation(
     {
       input: {
-        id: document.id,
+        id: documentId,
         nameCiphertext: encryptedDocumentTitle.ciphertext,
         nameNonce: encryptedDocumentTitle.publicNonce,
         workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
