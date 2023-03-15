@@ -5,6 +5,7 @@ import { RawInput, RawInputProps } from "../rawInput/RawInput";
 export type TextAreaProps = RawInputProps & {
   minRows?: number;
   maxRows?: number;
+  unlimited?: boolean;
 };
 
 const calculateHeight = (rows: number) => {
@@ -13,7 +14,7 @@ const calculateHeight = (rows: number) => {
 };
 
 export const TextArea = (props: TextAreaProps) => {
-  const { minRows = 2, maxRows = 5 } = props;
+  const { minRows = 2, maxRows = 5, unlimited = false } = props;
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   const minRowsHeight = calculateHeight(minRows);
@@ -40,7 +41,7 @@ export const TextArea = (props: TextAreaProps) => {
       _input={{
         // needs to be on the textarea element directly for correct overflow scroll behaviour
         minHeight: `${minRowsHeight}px`,
-        maxHeight: `${calculateHeight(maxRows)}px`,
+        maxHeight: unlimited ? "none" : `${calculateHeight(maxRows)}px`,
       }}
     />
   );
