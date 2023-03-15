@@ -5,7 +5,13 @@ import {
   verifyAndDecryptAwarenessUpdate,
 } from "./awarenessUpdate";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
-import { createUpdate, verifyAndDecryptUpdate } from "./update";
+import {
+  addUpdateToInProgressQueue,
+  createUpdate,
+  getUpdateInProgress,
+  removeUpdateFromInProgressQueue,
+  verifyAndDecryptUpdate,
+} from "./update";
 
 interface Context {
   documentId: string;
@@ -31,7 +37,7 @@ interface Context {
   documentLoaded: () => void;
   websocketActor?: any;
   incomingQueue: any[];
-  pendingUpdatesQueue: any[];
+  pendingChangesQueue: any[];
   sodium: any;
   activeSnapshotId: null | string;
   latestServerVersion: null | number;
@@ -158,7 +164,7 @@ export const syncMachine =
           | { type: "WEBSOCKET_ADD_TO_QUEUE"; data: any }
           | { type: "WEBSOCKET_KEY_MATERIAL" }
           | { type: "DISCONNECT" }
-          | { type: "ADD_UPDATE"; data: any }
+          | { type: "ADD_CHANGE"; data: any }
           | { type: "ADD_EPHEMERAL_UPDATE"; data: any }
           | {
               type: "SEND_EPHEMERAL_UPDATE";
@@ -191,7 +197,7 @@ export const syncMachine =
         documentLoaded: () => undefined,
         shouldSendSnapshot: () => false,
         incomingQueue: [],
-        pendingUpdatesQueue: [],
+        pendingChangesQueue: [],
         sodium: {},
         activeSnapshotId: null,
         latestServerVersion: null,
@@ -230,7 +236,7 @@ export const syncMachine =
                   actions: ["addToIncomingQueue"],
                   target: "processingQueues",
                 },
-                ADD_UPDATE: {
+                ADD_CHANGE: {
                   actions: ["addToPendingUpdatesQueue"],
                   target: "processingQueues",
                 },
@@ -241,7 +247,7 @@ export const syncMachine =
                 WEBSOCKET_ADD_TO_QUEUE: {
                   actions: ["addToIncomingQueue"],
                 },
-                ADD_UPDATE: {
+                ADD_CHANGE: {
                   actions: ["addToPendingUpdatesQueue"],
                 },
               },
@@ -263,7 +269,7 @@ export const syncMachine =
                   actions: ["addToIncomingQueue"],
                 },
 
-                ADD_UPDATE: {
+                ADD_CHANGE: {
                   actions: ["addToPendingUpdatesQueue"],
                 },
               },
@@ -316,7 +322,7 @@ export const syncMachine =
         }),
         addToPendingUpdatesQueue: assign((context, event) => {
           return {
-            pendingUpdatesQueue: [...context.pendingUpdatesQueue, event.data],
+            pendingChangesQueue: [...context.pendingChangesQueue, event.data],
           };
         }),
         removeOldestItemFromQueueAndUpdateContext: assign((context, event) => {
@@ -328,9 +334,7 @@ export const syncMachine =
             };
           } else {
             return {
-              pendingUpdatesQueue: context.pendingUpdatesQueue.slice(
-                event.data.pendingUpdatesQueueTakenCount
-              ),
+              pendingChangesQueue: [],
               activeSnapshotId: event.data.activeSnapshotId,
               latestServerVersion: event.data.latestServerVersion,
             };
@@ -342,7 +346,6 @@ export const syncMachine =
           let activeSnapshotId = context.activeSnapshotId;
           let latestServerVersion = context.latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
-          let pendingUpdatesQueueTakenCount = 0;
 
           const createAndSendSnapshot = async () => {
             const snapshotData = await context.getNewSnapshotData();
@@ -394,12 +397,10 @@ export const syncMachine =
               clockOverwrite
             );
 
+            if (clockOverwrite === undefined) {
+              addUpdateToInProgressQueue(message, update);
+            }
             send({ type: "SEND", message: JSON.stringify(message) });
-
-            // if (clockOverwrite === undefined) {
-            //   addUpdateToInProgressQueue(updateToSend, update);
-            // }
-            // websocketConnectionRef.current.send(JSON.stringify(updateToSend));
           };
 
           if (context.incomingQueue.length > 0) {
@@ -548,11 +549,11 @@ export const syncMachine =
               case "updateSaved":
                 console.log("update saved", event);
                 latestServerVersion = event.serverVersion;
-                // removeUpdateFromInProgressQueue(
-                //   data.docId,
-                //   data.snapshotId,
-                //   data.clock
-                // );
+                removeUpdateFromInProgressQueue(
+                  event.docId,
+                  event.snapshotId,
+                  event.clock
+                );
 
                 break;
               case "updateFailed":
@@ -564,19 +565,17 @@ export const syncMachine =
                 );
 
                 if (event.requiresNewSnapshotWithKeyRotation) {
-                  // await createAndSendSnapshot();
+                  await createAndSendSnapshot();
                 } else {
+                  const key = await context.getUpdateKey(event);
+
                   // TODO retry with an increasing offset instead of just trying again
-                  // const rawUpdate = getUpdateInProgress(
-                  //   data.docId,
-                  //   data.snapshotId,
-                  //   data.clock
-                  // );
-                  // createAndSendUpdate(
-                  //   rawUpdate,
-                  //   snapshotKeyRef.current,
-                  //   data.clock
-                  // );
+                  const rawUpdate = getUpdateInProgress(
+                    event.docId,
+                    event.snapshotId,
+                    event.clock
+                  );
+                  createAndSendUpdate(rawUpdate, key, event.snapshotId);
                 }
 
                 break;
@@ -591,7 +590,7 @@ export const syncMachine =
                 context.applyEphemeralUpdates([ephemeralUpdateResult]);
                 break;
             }
-          } else if (context.pendingUpdatesQueue.length > 0) {
+          } else if (context.pendingChangesQueue.length > 0) {
             handledQueue = "pending";
 
             if (
@@ -603,16 +602,15 @@ export const syncMachine =
               createAndSendSnapshot();
             } else {
               const key = await context.getUpdateKey(event);
-              pendingUpdatesQueueTakenCount =
-                context.pendingUpdatesQueue.length;
-              const rawUpdates = context.pendingUpdatesQueue;
+              const rawChanges = context.pendingChangesQueue;
+
               // TODO add a compact changes function to queue and make sure all pending updates are sent as one update
               if (activeSnapshotId === null) {
                 throw new Error("No active snapshot id");
               }
 
               createAndSendUpdate(
-                context.serializeChanges(rawUpdates),
+                context.serializeChanges(rawChanges),
                 key,
                 activeSnapshotId
               );
@@ -623,7 +621,6 @@ export const syncMachine =
             handledQueue,
             activeSnapshotId,
             latestServerVersion,
-            pendingUpdatesQueueTakenCount,
           };
         },
       },
@@ -631,7 +628,7 @@ export const syncMachine =
         hasMoreItemsInQueues: (context) => {
           return (
             context.incomingQueue.length > 0 ||
-            context.pendingUpdatesQueue.length > 0
+            context.pendingChangesQueue.length > 0
           );
         },
       },

@@ -406,7 +406,7 @@ export default function Page({
         });
 
         if (origin?.key === "y-sync$" || origin === "mobile-webview") {
-          send({ type: "ADD_UPDATE", data: update });
+          send({ type: "ADD_CHANGE", data: update });
           // if (
           //   !activeSnapshotIdRef.current &&
           //   !createSnapshotInProgressRef.current
