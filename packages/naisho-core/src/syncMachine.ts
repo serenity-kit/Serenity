@@ -40,6 +40,13 @@ import {
 // 1. first handle all incoming message
 // 2. then handle all pending updates
 // Background: There might be a new snapshot and this way we avoid retries
+//
+// Websockets reconnection logic:
+// During the state connecting the sync machine will try to reconnect to the server.
+// If no connection can be established after 5 seconds it will trigger a retry after a delay.
+// The delay is based on the number of retries that have already been done using an exponential
+// formula: (100 * 1.8 ** websocketRetries).
+// The websocketRetries is capped at 13 so that the delay doesn't get too large.
 
 type ProcessQueueData = {
   handledQueue: "incoming" | "pending" | "none";
@@ -83,9 +90,20 @@ export type Context = SyncMachineConfig & {
   _incomingQueue: any[];
   _pendingChangesQueue: any[];
   _activeSendingSnapshotId: string | null;
+  _shouldReconnect: boolean;
+  _websocketRetries: number;
 };
 
 const websocketService = (context) => (send, onReceive) => {
+  let connected = false;
+
+  // timeout the connection try after 5 seconds
+  setTimeout(() => {
+    if (!connected) {
+      send({ type: "WEBSOCKET_DISCONNECTED" });
+    }
+  }, 5000);
+
   const websocketConnection = new WebSocket(
     `${context.websocketHost}/${context.documentId}?sessionKey=${context.websocketSessionKey}`
   );
@@ -108,15 +126,18 @@ const websocketService = (context) => (send, onReceive) => {
 
   websocketConnection.addEventListener("message", onWebsocketMessage);
 
-  websocketConnection.addEventListener("error", (event) => {
-    console.log("error", event);
-  });
-
   websocketConnection.addEventListener("open", (event) => {
+    connected = true;
     send({ type: "WEBSOCKET_CONNECTED", websocket: websocketConnection });
   });
 
+  websocketConnection.addEventListener("error", (event) => {
+    console.log("websocket error", event);
+    send({ type: "WEBSOCKET_DISCONNECTED" });
+  });
+
   websocketConnection.addEventListener("close", function (event) {
+    console.log("websocket closed");
     send({ type: "WEBSOCKET_DISCONNECTED" });
     // remove the awareness states of everyone else
     // removeAwarenessStates(
@@ -166,7 +187,7 @@ const websocketService = (context) => (send, onReceive) => {
 };
 
 export const syncMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5SwJ4DsDGBZAhhgFgJZpgDEAygKIByAIgNoAMAuoqAA4D2shALoZzRsQAD0QBORuIB0AdgAs8gIyyATEtUBmAKwAOedoA0IFIg0Bfc8dSZcBYmGkZBJDPzRRSAdUoAhcgDyAMIA0pQAKgD6QQHU1JRB4ZQMLMJcPPyCwmIImkry0nryAGyaxaXamqqyxqYIqozahbqaVdpKjZqyxeKW1ujYeEQkTi5gbpDefoGhEZG0AJLkMXEJSSmsSCDpfAJCWzlKrTKyspryZ+dVShq1iLLastLi+nny50rt530gNoP2I2caFcvEmPn8wTCUVowQAqlgaFFqAEogAxAKwuhMTYcbi7LIHMzHORnC6td7qW4mCSaRjSFRKXSfVTFVQtC4-P52YaOIEgsHTSFzTEAQVh4QAEgEAEoLABayWxaTxmX2oEOxNO50uFJuqjuCH0BUYsl0jQap3Eps5A25DlGwPGoIgUwhsyiYQAmpEsCKkrKRQAZJVbHaq7KIPQyJmPHq03QVA3abR082MXSVAzvHo22xDe18p2TRbLWLxRIh3EZPYRhBHTQnUk665UurFWRKaS6SSx4qNRjyXpWX62-OAsYTCDSQgQAA2ZHBMyhkRFtFokXCAUiAEVYZQ95Xtiqa4S68UmufdBnGZoWrJxK2JEoZJJdPeWtps1Jc-8eQ7+VOM7zqQq7roGwRBpEsIAAq0H6lCHmGJ7qmY57SJe14tHeD76tShpaF2JosmSpq6NUP52uOjqTtI7AAE6cBgcA8B424AK5gBxsCkBAgiOMQABunAANaOPRjHMexnFwIhx4EihCCmpohQdO8UiyOmWYGuI6jSPIUiKD0ZriMUCYUWOvITs6tEMUxsAsVAUlcaQYB0QxdG0bOOC8AAZpwdEALY2RJ9lOTJqShnJaqiJGSjFNIA6qC8qgpYo1S6AaCZPFoiVMqyFzduZAKWdR1niXZDlhdxi5ClEoEbluu77ghEVVvi0U5BcTyacUyj6SUGiaAapydhoV4XNovU6DoRV-oWNHlcxxCORxzn1eBQSQTBcFJLJ1byTFCCDspJryClvUaeUxQGu2TSMNUeQNgVDyaLNBZWZATj4OMwnLai-lYP5YBhQsoIBdVgruiua4NTue4Hq1R77R1ZiMFUzwppND4aco4jyJlg7SGU+QlFaeMKG9VEAV9P1-QDQMg2D3HrRBgZQbB8F7e1taqbozz6fkvWMMUz5vsNlTSKo2gvGRA6Mla2iUyV1MELTHj-XRgN0cDq1gKDYDg6QXPhqeHSTXpJSme8pqMDeBp6qoXbnlI+jaFoz6yEr-5FlOqsYL96v09rjMG9x9BKDiSPc6bjTxYZVtdGadt4RowtdoObt4-peiWMOaCcBAcDCFyFnKsjtYALT5NpTQdJ87R6HFyiVF783uFAZfRwpFz22RzRqNU3RXWjxStx9ECdybCnnEmb6FMovXJuIj2NGPpWfUBYCT8hh1kdpZRyOILzS1l6jfMOJfFd7C22UtrG6-AkXl6eihPPITIje2DJH9pz5yIyPRqjtnfumNeKtvr+zpprBmut9bg23gdQ45ouwdDUMLVkPQjB4SPi+ZMOhkyPD0EyL2EBCCwDbpABBKMzyqAKI8JucZyifCGnhcoykrQXCPmdMiOglBex8sQHAs4qE8x6HSPGlRuitEaFaTKKZnjiHaPeXqHQpaqH4TgQg84J5Py7odHueE2R82FpINGb57xWlzuYIAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5SwJ4DsDGBZAhhgFgJZpgDEAygKIByAIgNoAMAuoqAA4D2shALoZzRsQAD0QBORuIB0AdgAs8gIyyATEtUBmAKwAOedoA0IFIg0Bfc8dSZcBYmQCCtWgH1KABQASlLJQBKjgAyrgCqHrSOACqUTKxIIFw8-ILCpggAtCry0uKySjpKAGxa2oVFxmIIqoyq2tKaRfJFStpFukUtZZbW6Nh4RCTSGIIkGPxoUKQA6pQAQuQA8gDCANKUUa7Li9TUlMsxDCzCSXwCQglVmko5es2NRTqaqrLG6TX1eprP2kqMZbIiuIeiAbP17EMRmgxrxIDN5ks1htXLQAJLkba7faHOInbhnVKXMzfGSyWSaeTkinPJQaN6IWTaWS5fTXeQU1oFeQgsF2QZgYajMDjOGzBYrdabWgrUJ+aibaiLTYAMUWoTouISpxSF1AVQKmlJ5Mp33Z6jpJgkmkY0hUSl0rVUJV0FNkPL6fIcguhwthEHh4qRm3VjlCUS8i38qIAWpQjvEOPidcJ9SS5MaqWbaap6Qh9DlGLJdP8amS8rp3bYBl6oTDRQiJcj1gBNVxYaIBVHBTWJ5LnFOIPQyB1MoHWjo6XPabQ2kuMXRlAzsoGV8H8711-1ojE7PYHHuJJP9okIDQaaRSWS1eSMZRtF65yk5cSGsqde2qAxFbSrz2QoUihA0iEBAAA2ZBioikquM4bhRIsrgAIqhJQKEHtqx56mY37SN+ugLvamgurI4gWukpEyJIugkS62jLlIv7Vv+PqAcBYFOC4WxeI41AAOKxMcWpHoSWHVDheEESUTy-BUlp5vkuTzjROj0cCVigh6TECrWvqQNI7AAE6cBgcA8JMiEAK5gFZsCkBAggCsQABunAANYCoZxmmZZ1lwOhwm6qIDIutIvy3taeTzkuubiOo0g3uIihAsW4jtEUjEQtpAF+vpRkmbAZlQD5NmkGABlGQZ+mgTgvAAGacAZAC2uVeQVxV+YJvYEoFVQyRe8iqOIuiqCNigvLouYdMyWi3qoDolJSuhqb0VaZRuulAZ5+WFe1tmQY2mywa48FIShaGdYefYiUFCCUsyUVNDct4tFouZkkotpzfojJNNJGXrjprFbaZxBFVZJVHcs3F8QJCaXd1A55g6uTKIaQKtB0-yTeS8VSElQ1SGl-01tlekEMKrmg8qDVYA1YDtaisKNXtDZBjBnEnchqGw3iV09WYjDPLkM5tKRV7KIlk3yDIjQ3M0eSJQoxPMZuwz4BTVM03TDNM7ZkPQ-x-l82kEjiJR046NOTJ6A6lRmMouhyK0eE3u0OhuupvJaetrHkxglOTNTBm0wZ9Pg2AjNgMzpBGwjJ5-G08XNO07JFowhG5tmqjSB0M5DQYWhKHkytZSxOV+wHUBByHYe+ZH0f0EocMYdd+r-EUSedKyacZ3JGiMB3+jiNog2KP8Fae5pa0QIQsCA36McXS3-OnkUgs548RRFiUV6MhNcnuxeQ1aAYw+JbUljqWgnAQHAwhe5lvNx6JWTyJn9pH4CJFtHRC5myXPsJhQCfsmE8nRs6jW+BoSQc1XpyTmh9EiaNtBUTaOnH8k9VoA1JhAEBmEboUlzG7XC7JihDQdLSJaAD556RAuBPBrdEDDRio0OQZs-5TXUBSahOCWrbVBrtBhK9FDMnkA6d6W87RmxikXJ2HRYpfzEfOHhZcybq39prYO2tw713gEJY28cSw5z+GoAeJQgRGDkmbc2ZQrbW3wkoABM8544KEYjZ29QnSfkNAUYevwlBTmaE7PIe9UoDTEQA2qxAcCgTcfHIENpEoAkeNaFBrw5ILkScPFQYS-h1FUJEnAhBwK4P0c-G6fxzzEWuFIYsqccxyTaI7WKXQtBNAMBPSwQA */
   createMachine(
     {
       schema: {
@@ -177,6 +198,7 @@ export const syncMachine =
           | { type: "WEBSOCKET_UNAUTHORIZED" }
           | { type: "WEBSOCKET_ADD_TO_QUEUE"; data: any }
           | { type: "WEBSOCKET_KEY_MATERIAL" }
+          | { type: "WEBSOCKET_RETRY" }
           | { type: "DISCONNECT" }
           | { type: "ADD_CHANGE"; data: any }
           | { type: "ADD_EPHEMERAL_UPDATE"; data: any }
@@ -212,16 +234,20 @@ export const syncMachine =
         applyEphemeralUpdates: () => undefined,
         getEphemeralUpdateKey: () => Promise.resolve(new Uint8Array()),
         shouldSendSnapshot: () => false,
-        _incomingQueue: [],
-        _pendingChangesQueue: [],
+
         sodium: {},
-        _activeSnapshotId: null,
-        _latestServerVersion: null,
+
         serializeChanges: () => "",
         deserializeChanges: () => [],
         onDocumentLoaded: () => undefined,
         onSnapshotSent: () => undefined,
+        _activeSnapshotId: null,
+        _latestServerVersion: null,
+        _incomingQueue: [],
+        _pendingChangesQueue: [],
         _activeSendingSnapshotId: null,
+        _shouldReconnect: false,
+        _websocketRetries: 0,
       },
       initial: "connecting",
       on: {
@@ -237,17 +263,37 @@ export const syncMachine =
             };
           }),
         },
+        WEBSOCKET_DISCONNECTED: { target: "disconnected" },
+        DISCONNECT: { target: "disconnected" },
       },
       states: {
         connecting: {
-          entry: ["spawnWebsocketActor"],
+          initial: "waiting",
+          states: {
+            retrying: {
+              entry: ["increaseWebsocketRetry", "spawnWebsocketActor"],
+            },
+            waiting: {
+              invoke: {
+                id: "sheduleRetry",
+                src: "sheduleRetry",
+              },
+              on: {
+                WEBSOCKET_RETRY: {
+                  target: "retrying",
+                },
+              },
+            },
+          },
           on: {
             WEBSOCKET_CONNECTED: {
               target: "connected",
             },
           },
         },
+
         connected: {
+          entry: ["resetWebsocketRetries"],
           states: {
             idle: {
               on: {
@@ -261,6 +307,7 @@ export const syncMachine =
                 },
               },
             },
+
             processingQueues: {
               on: {
                 WEBSOCKET_ADD_TO_QUEUE: {
@@ -282,6 +329,7 @@ export const syncMachine =
                 },
               },
             },
+
             checkingForMoreQueueItems: {
               on: {
                 WEBSOCKET_ADD_TO_QUEUE: {
@@ -302,20 +350,23 @@ export const syncMachine =
               ],
             },
           },
-
           on: {
-            WEBSOCKET_DISCONNECTED: { target: "disconnected" },
             WEBSOCKET_DOCUMENT_NOT_FOUND: { target: "final" },
             WEBSOCKET_UNAUTHORIZED: { target: "final" },
             WEBSOCKET_KEY_MATERIAL: {},
-            DISCONNECT: { target: "disconnected" },
           },
 
           initial: "idle",
         },
+
         disconnected: {
-          entry: ["stopWebsocketActor"],
+          entry: ["updateShouldReconnect", "stopWebsocketActor"],
+          always: {
+            target: "connecting",
+            cond: "shouldReconnect",
+          },
         },
+
         final: { type: "final" },
         failed: { type: "final" },
       },
@@ -323,6 +374,16 @@ export const syncMachine =
     },
     {
       actions: {
+        resetWebsocketRetries: assign({
+          _websocketRetries: 0,
+        }),
+        increaseWebsocketRetry: assign((context) => {
+          // limit it to 13 to prevent too long apart retries
+          if (context._websocketRetries < 13) {
+            return { _websocketRetries: context._websocketRetries + 1 };
+          }
+          return { _websocketRetries: context._websocketRetries };
+        }),
         spawnWebsocketActor: assign((context) => {
           return {
             _websocketActor: spawn(websocketService(context), "websocketActor"),
@@ -334,6 +395,11 @@ export const syncMachine =
           }
           return {
             _websocketActor: undefined,
+          };
+        }),
+        updateShouldReconnect: assign((context, event) => {
+          return {
+            _shouldReconnect: event.type !== "DISCONNECT",
           };
         }),
         addToIncomingQueue: assign((context, event) => {
@@ -365,6 +431,14 @@ export const syncMachine =
         }),
       },
       services: {
+        sheduleRetry: (context) => (callback) => {
+          const delay = 100 * 1.8 ** context._websocketRetries;
+          console.log("schedule websocket connection in ", delay);
+          setTimeout(() => {
+            callback("WEBSOCKET_RETRY");
+            // calculating slow exponential backoff
+          }, delay);
+        },
         processQueues: (context) => async (send) => {
           let activeSnapshotId = context._activeSnapshotId;
           let latestServerVersion = context._latestServerVersion;
@@ -649,6 +723,9 @@ export const syncMachine =
             context._incomingQueue.length > 0 ||
             context._pendingChangesQueue.length > 0
           );
+        },
+        shouldReconnect: (context, event) => {
+          return context._shouldReconnect;
         },
       },
     }
