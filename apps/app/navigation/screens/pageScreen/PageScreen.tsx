@@ -106,7 +106,8 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
     }
     try {
       const updatedDocument = await updateDocumentName({
-        document,
+        documentId: pageId,
+        workspaceId,
         name: title,
         activeDevice,
       });

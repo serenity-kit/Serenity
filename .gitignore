@@ -25,6 +25,6 @@ apps/app/ios
 apps/app/webviews/editor/index.html
 # opaque bridge built for mobile
 apps/app/webviews/opaque/index.html
-/test-results/
+test-results/
 /playwright-report/
 /playwright/.cache/
