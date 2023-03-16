@@ -1,25 +1,17 @@
 import {
   cleanupUpdates,
-  deserializeUint8ArrayUpdates,
   KeyDerivationTrace2,
-  serializeUint8ArrayUpdates,
-  syncMachine,
+  useYjsSyncMachine,
 } from "@naisho/core";
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
   LocalDevice,
 } from "@serenity-tools/common";
-import { useMachine } from "@xstate/react";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
-import {
-  applyAwarenessUpdate,
-  Awareness,
-  encodeAwarenessUpdate,
-  removeAwarenessStates,
-} from "y-protocols/awareness";
+import { Awareness } from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
 import { usePage } from "../../context/PageContext";
@@ -112,110 +104,90 @@ export default function Page({
     return snapshotKeyData;
   };
 
-  const [state, send] = useMachine(syncMachine, {
-    context: {
-      documentId: docId,
-      signatureKeyPair,
-      websocketHost,
-      websocketSessionKey: sessionKey,
-      onDocumentLoaded: () => {
-        setDocumentLoaded(true);
-      },
-      onSnapshotSent: async () => {
-        // if the document has a name, update it
-        if (documentName) {
-          try {
-            const updatedDocument = await updateDocumentName({
-              documentId: docId,
-              workspaceId,
-              name: documentName,
-              activeDevice,
-            });
-            // FIXME: do we update this when it's not the active document?
-            updateActiveDocumentInfoStore(updatedDocument, activeDevice);
-          } catch (error) {
-            console.error(error);
-          }
-        }
-      },
-      applySnapshot: (decryptedSnapshotData) => {
-        Yjs.applyUpdate(
-          yDocRef.current,
-          decryptedSnapshotData,
-          "naisho-remote"
-        );
-      },
-      getNewSnapshotData: async () => {
-        const documentResult = await runDocumentQuery({ id: docId });
-        const document = documentResult.data?.document;
-        if (!document) {
-          throw new Error("Document not found");
-        }
-        // currently we create a new key for every snapshot
-        const snapshotKeyData = await createNewSnapshotKey(document);
-        return {
-          id: uuidv4(),
-          data: Yjs.encodeStateAsUpdate(yDocRef.current),
-          key: sodium.from_base64(snapshotKeyData.key),
-          publicData: {
-            keyDerivationTrace: snapshotKeyRef.current?.keyDerivationTrace,
-            subkeyId: snapshotKeyRef.current?.subkeyId,
-          },
-        };
-      },
-      getSnapshotKey: async (snapshot) => {
-        const snapshotKeyData = await deriveExistingSnapshotKey(
-          docId,
-          snapshot,
-          activeDevice as LocalDevice
-        );
-
-        const key = sodium.from_base64(snapshotKeyData.key);
-        snapshotKeyRef.current = {
-          keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
-          subkeyId: snapshot.publicData.subkeyId,
-          key,
-        };
-        setActiveSnapshotAndCommentKeys(
-          {
-            id: snapshot.publicData.snapshotId,
-            key: snapshotKeyData.key,
-          },
-          {}
-        );
-
-        return key;
-      },
-      applyChanges: (decryptedUpdates) => {
-        decryptedUpdates.map((update) => {
-          Yjs.applyUpdate(yDocRef.current, update, "naisho-remote");
-        });
-      },
-      getUpdateKey: async (update) => {
-        return snapshotKeyRef.current?.key as Uint8Array;
-      },
-      shouldSendSnapshot: ({ latestServerVersion }) => {
-        // create a new snapshot if the active snapshot has more than 100 updates
-        return latestServerVersion !== null && latestServerVersion > 100;
-      },
-      applyEphemeralUpdates: (decryptedEphemeralUpdates) => {
-        decryptedEphemeralUpdates.map((ephemeralUpdate) => {
-          applyAwarenessUpdate(yAwarenessRef.current, ephemeralUpdate, null);
-        });
-      },
-      getEphemeralUpdateKey: async () => {
-        return snapshotKeyRef.current?.key as Uint8Array;
-      },
-      serializeChanges: serializeUint8ArrayUpdates,
-      deserializeChanges: deserializeUint8ArrayUpdates,
-      sodium,
+  const [state, send] = useYjsSyncMachine({
+    yDoc: yDocRef.current,
+    yAwareness: yAwarenessRef.current,
+    documentId: docId,
+    signatureKeyPair,
+    websocketHost,
+    websocketSessionKey: sessionKey,
+    onDocumentLoaded: () => {
+      setDocumentLoaded(true);
     },
+    onSnapshotSent: async () => {
+      // if the document has a name, update it
+      if (documentName) {
+        try {
+          const updatedDocument = await updateDocumentName({
+            documentId: docId,
+            workspaceId,
+            name: documentName,
+            activeDevice,
+          });
+          // FIXME: do we update this when it's not the active document?
+          updateActiveDocumentInfoStore(updatedDocument, activeDevice);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    },
+    getNewSnapshotData: async () => {
+      const documentResult = await runDocumentQuery({ id: docId });
+      const document = documentResult.data?.document;
+      if (!document) {
+        throw new Error("Document not found");
+      }
+      // currently we create a new key for every snapshot
+      const snapshotKeyData = await createNewSnapshotKey(document);
+      return {
+        id: uuidv4(),
+        data: Yjs.encodeStateAsUpdate(yDocRef.current),
+        key: sodium.from_base64(snapshotKeyData.key),
+        publicData: {
+          keyDerivationTrace: snapshotKeyRef.current?.keyDerivationTrace,
+          subkeyId: snapshotKeyRef.current?.subkeyId,
+        },
+      };
+    },
+    getSnapshotKey: async (snapshot) => {
+      const snapshotKeyData = await deriveExistingSnapshotKey(
+        docId,
+        snapshot,
+        activeDevice as LocalDevice
+      );
+
+      const key = sodium.from_base64(snapshotKeyData.key);
+      snapshotKeyRef.current = {
+        keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
+        subkeyId: snapshot.publicData.subkeyId,
+        key,
+      };
+      setActiveSnapshotAndCommentKeys(
+        {
+          id: snapshot.publicData.snapshotId,
+          key: snapshotKeyData.key,
+        },
+        {}
+      );
+
+      return key;
+    },
+    getUpdateKey: async (update) => {
+      return snapshotKeyRef.current?.key as Uint8Array;
+    },
+    shouldSendSnapshot: ({ latestServerVersion }) => {
+      // create a new snapshot if the active snapshot has more than 100 updates
+      return latestServerVersion !== null && latestServerVersion > 100;
+    },
+    getEphemeralUpdateKey: async () => {
+      return snapshotKeyRef.current?.key as Uint8Array;
+    },
+    sodium,
   });
 
   useEffect(() => {
     async function initDocument() {
       await sodium.ready;
-      let loaded = false;
 
       const localDocument = await getLocalDocument(docId);
       if (localDocument) {
@@ -224,7 +196,6 @@ export default function Page({
           localDocument.content,
           "serenity-local-sqlite"
         );
-        loaded = true;
         setDocumentLoaded(true);
       }
 
@@ -259,15 +230,6 @@ export default function Page({
       // );
       // });
 
-      yAwarenessRef.current.on("update", ({ added, updated, removed }) => {
-        const changedClients = added.concat(updated).concat(removed);
-        const yAwarenessUpdate = encodeAwarenessUpdate(
-          yAwarenessRef.current,
-          changedClients
-        );
-        send({ type: "ADD_EPHEMERAL_UPDATE", data: yAwarenessUpdate });
-      });
-
       // TODO switch to v2 updates
       yDocRef.current.on("update", async (update, origin) => {
         // TODO pending updates should be stored in the local db if possible (not possible on web)
@@ -276,10 +238,6 @@ export default function Page({
           id: docId,
           content: Yjs.encodeStateAsUpdate(yDocRef.current),
         });
-
-        if (origin?.key === "y-sync$" || origin === "mobile-webview") {
-          send({ type: "ADD_CHANGE", data: update });
-        }
       });
     }
 
@@ -287,11 +245,6 @@ export default function Page({
 
     return () => {
       cleanupUpdates();
-      removeAwarenessStates(
-        yAwarenessRef.current,
-        [yDocRef.current.clientID],
-        "document unmount"
-      );
     };
   }, []);
 

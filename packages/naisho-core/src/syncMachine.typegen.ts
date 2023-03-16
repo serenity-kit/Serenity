@@ -9,14 +9,24 @@ export interface Typegen0 {
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
+    "done.invoke.sheduleRetry": {
+      type: "done.invoke.sheduleRetry";
+      data: unknown;
+      __tip: "See the XState TS docs to learn how to strongly type this.";
+    };
     "error.platform.processQueues": {
       type: "error.platform.processQueues";
+      data: unknown;
+    };
+    "error.platform.sheduleRetry": {
+      type: "error.platform.sheduleRetry";
       data: unknown;
     };
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {
     processQueues: "done.invoke.processQueues";
+    sheduleRetry: "done.invoke.sheduleRetry";
   };
   missingImplementations: {
     actions: never;
@@ -27,16 +37,21 @@ export interface Typegen0 {
   eventsCausingActions: {
     addToIncomingQueue: "WEBSOCKET_ADD_TO_QUEUE";
     addToPendingUpdatesQueue: "ADD_CHANGE";
+    increaseWebsocketRetry: "WEBSOCKET_RETRY";
     removeOldestItemFromQueueAndUpdateContext: "done.invoke.processQueues";
-    spawnWebsocketActor: "xstate.init";
+    resetWebsocketRetries: "WEBSOCKET_CONNECTED";
+    spawnWebsocketActor: "WEBSOCKET_RETRY";
     stopWebsocketActor: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
+    updateShouldReconnect: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {
     hasMoreItemsInQueues: "";
+    shouldReconnect: "";
   };
   eventsCausingServices: {
     processQueues: "" | "ADD_CHANGE" | "WEBSOCKET_ADD_TO_QUEUE";
+    sheduleRetry: "" | "DISCONNECT" | "WEBSOCKET_DISCONNECTED" | "xstate.init";
   };
   matchesStates:
     | "connected"
@@ -44,9 +59,14 @@ export interface Typegen0 {
     | "connected.idle"
     | "connected.processingQueues"
     | "connecting"
+    | "connecting.retrying"
+    | "connecting.waiting"
     | "disconnected"
     | "failed"
     | "final"
-    | { connected?: "checkingForMoreQueueItems" | "idle" | "processingQueues" };
+    | {
+        connected?: "checkingForMoreQueueItems" | "idle" | "processingQueues";
+        connecting?: "retrying" | "waiting";
+      };
   tags: never;
 }
