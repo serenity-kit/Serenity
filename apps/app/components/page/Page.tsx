@@ -1,4 +1,5 @@
 import {
+  cleanupUpdates,
   deserializeUint8ArrayUpdates,
   KeyDerivationTrace2,
   serializeUint8ArrayUpdates,
@@ -59,10 +60,9 @@ export default function Page({
     key: Uint8Array;
   } | null>(null);
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
-  const [documentLoadedInfo, setDocumentLoadedInfo] = useState({
-    loaded: false,
-    username: "Unknown user",
-  });
+  const [documentLoaded, setDocumentLoaded] = useState(false);
+  const [username, setUsername] = useState("Unknown user");
+
   const documentName = useActiveDocumentInfoStore(
     (state) => state.documentName
   );
@@ -86,10 +86,7 @@ export default function Page({
       websocketHost,
       websocketSessionKey: sessionKey,
       onDocumentLoaded: () => {
-        setDocumentLoadedInfo({
-          loaded: true,
-          username: "Unknown user",
-        });
+        setDocumentLoaded(true);
       },
       onSnapshotSent: async () => {
         // if the document has a name, update it
@@ -221,17 +218,11 @@ export default function Page({
           "serenity-local-sqlite"
         );
         loaded = true;
-        setDocumentLoadedInfo({
-          loaded: true,
-          username: "Unknown user",
-        });
+        setDocumentLoaded(true);
       }
 
       const me = await runMeQuery({});
-      setDocumentLoadedInfo({
-        loaded,
-        username: me.data?.me?.username ?? "Unknown user",
-      });
+      setUsername(me.data?.me?.username ?? "Unknown user");
 
       let document: Document | undefined = undefined;
       try {
@@ -288,6 +279,7 @@ export default function Page({
     initDocument();
 
     return () => {
+      cleanupUpdates();
       removeAwarenessStates(
         yAwarenessRef.current,
         [yDocRef.current.clientID],
@@ -305,8 +297,8 @@ export default function Page({
       openDrawer={navigation.openDrawer}
       updateTitle={updateTitle}
       isNew={isNew}
-      documentLoaded={documentLoadedInfo.loaded}
-      username={documentLoadedInfo.username}
+      documentLoaded={documentLoaded}
+      username={username}
     />
   );
 }

@@ -115,11 +115,11 @@ export function verifyAndDecryptUpdate(update: Update, key, publicKey) {
         1 !==
       update.publicData.clock
     ) {
-      throw new Error("Invalid update");
+      throw new Error("Invalid update - clock is not in order");
     }
   } else {
     if (update.publicData.clock !== 0) {
-      throw new Error("Invalid update");
+      throw new Error("Invalid update - clock was not 0");
     }
   }
 
