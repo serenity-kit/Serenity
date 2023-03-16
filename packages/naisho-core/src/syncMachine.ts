@@ -1,4 +1,4 @@
-import { KeyPair } from "libsodium-wrappers";
+import type { KeyPair } from "libsodium-wrappers";
 import {
   AnyActorRef,
   assign,
@@ -52,7 +52,7 @@ type ProcessQueueData = {
   activeSendingSnapshotId: string | null;
 };
 
-type Context = {
+export type SyncMachineConfig = {
   documentId: string;
   signatureKeyPair: KeyPair;
   websocketHost: string;
@@ -75,9 +75,12 @@ type Context = {
   }) => boolean;
   serializeChanges: (changes: unknown[]) => string;
   deserializeChanges: (string) => unknown[];
-  onDocumentLoaded: () => void;
-  onSnapshotSent: () => void | Promise<void>;
   sodium: any;
+  onDocumentLoaded?: () => void;
+  onSnapshotSent?: () => void | Promise<void>;
+};
+
+export type Context = SyncMachineConfig & {
   _latestServerVersion: null | number;
   _activeSnapshotId: null | string;
   _websocketActor?: AnyActorRef;
@@ -359,15 +362,15 @@ export const syncMachine =
           if (event.data.handledQueue === "incoming") {
             return {
               _incomingQueue: context._incomingQueue.slice(1),
-              activeSnapshotId: event.data.activeSnapshotId,
-              latestServerVersion: event.data.latestServerVersion,
+              _activeSnapshotId: event.data.activeSnapshotId,
+              _latestServerVersion: event.data.latestServerVersion,
               _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
             };
           } else {
             return {
-              pendingChangesQueue: [],
-              activeSnapshotId: event.data.activeSnapshotId,
-              latestServerVersion: event.data.latestServerVersion,
+              _pendingChangesQueue: [],
+              _activeSnapshotId: event.data.activeSnapshotId,
+              _latestServerVersion: event.data.latestServerVersion,
               _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
             };
           }
@@ -408,7 +411,9 @@ export const syncMachine =
                 latestServerVersion: context._latestServerVersion,
               }),
             });
-            context.onSnapshotSent();
+            if (context.onSnapshotSent) {
+              context.onSnapshotSent();
+            }
           };
 
           const createAndSendUpdate = (
@@ -478,7 +483,9 @@ export const syncMachine =
                     })
                     .flat();
                   context.applyChanges(changes);
-                  context.onDocumentLoaded();
+                  if (context.onDocumentLoaded) {
+                    context.onDocumentLoaded();
+                  }
 
                   // setActiveSnapshotAndCommentKeys(
                   //   {
@@ -626,6 +633,7 @@ export const syncMachine =
               console.log("send snapshot");
               createAndSendSnapshot();
             } else {
+              console.log("send update");
               const key = await context.getUpdateKey(event);
               const rawChanges = context._pendingChangesQueue;
 
@@ -633,7 +641,6 @@ export const syncMachine =
               if (activeSnapshotId === null) {
                 throw new Error("No active snapshot id");
               }
-              console.log("send update");
               createAndSendUpdate(
                 context.serializeChanges(rawChanges),
                 key,
