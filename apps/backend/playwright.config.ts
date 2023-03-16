@@ -21,6 +21,6 @@ const config: PlaywrightTestConfig = {
     // },
   ],
   testMatch: /.*.e2e\.ts/,
-  timeout: 1200000,
+  timeout: 600000,
 };
 export default config;
