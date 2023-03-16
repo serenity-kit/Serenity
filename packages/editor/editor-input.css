@@ -352,8 +352,10 @@
   .editor-comment {
     /* display setting needed to properly size background and add border */
     display: inline-block;
-    border-bottom: 0.125rem solid theme("colors.comment.active");
     background-color: theme("colors.comment.default");
+    -webkit-box-shadow: 0px 2px 0px 0px theme("colors.comment.active");
+    -moz-box-shadow: 0px 2px 0px 0px theme("colors.comment.active");
+    box-shadow: 0px 2px 0px 0px theme("colors.comment.active");
   }
 
   .editor-comment-overlap {
