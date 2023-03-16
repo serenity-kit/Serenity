@@ -196,7 +196,7 @@ export default function Page({
       },
       shouldSendSnapshot: ({ latestServerVersion }) => {
         // create a new snapshot if the active snapshot has more than 100 updates
-        return latestServerVersion !== null && latestServerVersion > 10;
+        return latestServerVersion !== null && latestServerVersion > 100;
       },
       applyEphemeralUpdates: (decryptedEphemeralUpdates) => {
         decryptedEphemeralUpdates.map((ephemeralUpdate) => {

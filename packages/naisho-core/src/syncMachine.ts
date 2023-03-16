@@ -17,13 +17,18 @@ import {
   verifyAndDecryptUpdate,
 } from "./update";
 
+type InternalContext = {
+  activeSendingSnapshotId: string | null;
+};
+
 type ProcessQueueData = {
   handledQueue: "incoming" | "pending" | "none";
   activeSnapshotId: string | null;
   latestServerVersion: number | null;
+  activeSendingSnapshotId: string | null;
 };
 
-interface Context {
+type Context = {
   documentId: string;
   signatureKeyPair: KeyPair;
   websocketHost: string;
@@ -54,7 +59,8 @@ interface Context {
   deserializeChanges: (string) => unknown[];
   onDocumentLoaded: () => void;
   onSnapshotSent: () => void | Promise<void>;
-}
+  _internal: InternalContext;
+};
 
 // How Queue processing works:
 // 1. first handle all incoming message
@@ -205,6 +211,9 @@ export const syncMachine =
         deserializeChanges: () => [],
         onDocumentLoaded: () => undefined,
         onSnapshotSent: () => undefined,
+        _internal: {
+          activeSendingSnapshotId: null,
+        },
       },
       initial: "connecting",
       on: {
@@ -333,12 +342,18 @@ export const syncMachine =
               incomingQueue: context.incomingQueue.slice(1),
               activeSnapshotId: event.data.activeSnapshotId,
               latestServerVersion: event.data.latestServerVersion,
+              _internal: {
+                activeSendingSnapshotId: event.data.activeSendingSnapshotId,
+              },
             };
           } else {
             return {
               pendingChangesQueue: [],
               activeSnapshotId: event.data.activeSnapshotId,
               latestServerVersion: event.data.latestServerVersion,
+              _internal: {
+                activeSendingSnapshotId: event.data.activeSendingSnapshotId,
+              },
             };
           }
         }),
@@ -348,9 +363,12 @@ export const syncMachine =
           let activeSnapshotId = context.activeSnapshotId;
           let latestServerVersion = context.latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
+          let activeSendingSnapshotId =
+            context._internal.activeSendingSnapshotId;
 
           const createAndSendSnapshot = async () => {
             const snapshotData = await context.getNewSnapshotData();
+            activeSendingSnapshotId = snapshotData.id;
             const publicData = {
               ...snapshotData.publicData,
               snapshotId: snapshotData.id,
@@ -481,6 +499,9 @@ export const syncMachine =
               case "snapshotSaved":
                 console.log("snapshot saved", event);
                 activeSnapshotId = event.snapshotId;
+                if (activeSnapshotId === activeSendingSnapshotId) {
+                  activeSendingSnapshotId = null;
+                }
                 latestServerVersion = null;
                 break;
               case "snapshotFailed":
@@ -495,6 +516,9 @@ export const syncMachine =
                   );
                   context.applySnapshot(decryptedSnapshot);
                 }
+                // TODO fix test-case:
+                // snapshot is sending, but haven’t received confirmation for the updates I already sent
+                // currently this breaks (assumption due the incoming and outgoing clock being the same)
                 if (event.updates) {
                   for (let update of event.updates) {
                     const key = await context.getUpdateKey(update);
@@ -573,7 +597,10 @@ export const syncMachine =
                 context.applyEphemeralUpdates([ephemeralUpdateResult]);
                 break;
             }
-          } else if (context.pendingChangesQueue.length > 0) {
+          } else if (
+            context.pendingChangesQueue.length > 0 &&
+            activeSendingSnapshotId === null
+          ) {
             handledQueue = "pending";
 
             if (
@@ -582,6 +609,7 @@ export const syncMachine =
                 latestServerVersion,
               })
             ) {
+              console.log("send snapshot");
               createAndSendSnapshot();
             } else {
               const key = await context.getUpdateKey(event);
@@ -591,7 +619,7 @@ export const syncMachine =
               if (activeSnapshotId === null) {
                 throw new Error("No active snapshot id");
               }
-
+              console.log("send update");
               createAndSendUpdate(
                 context.serializeChanges(rawChanges),
                 key,
@@ -604,6 +632,7 @@ export const syncMachine =
             handledQueue,
             activeSnapshotId,
             latestServerVersion,
+            activeSendingSnapshotId,
           };
         },
       },
