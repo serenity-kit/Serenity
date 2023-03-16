@@ -23,7 +23,11 @@ import {
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
 import { usePage } from "../../context/PageContext";
-import { Document, runMeQuery } from "../../generated/graphql";
+import {
+  Document,
+  runDocumentQuery,
+  runMeQuery,
+} from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
@@ -79,6 +83,35 @@ export default function Page({
     websocketHost = `ws://localhost:4001`;
   }
 
+  const createNewSnapshotKey = async (document: Document) => {
+    const workspace = await getWorkspace({
+      workspaceId: document.workspaceId!,
+      deviceSigningPublicKey: activeDevice.signingPublicKey,
+    });
+    if (!workspace?.currentWorkspaceKey) {
+      throw new Error("No workspace key for workspace and device");
+    }
+    const folder = await getFolder({ id: document.parentFolderId! });
+    const folderKeyChainData = deriveKeysFromKeyDerivationTrace({
+      keyDerivationTrace: folder.keyDerivationTrace,
+      activeDevice: {
+        signingPublicKey: activeDevice.signingPublicKey,
+        signingPrivateKey: activeDevice.signingPrivateKey!,
+        encryptionPublicKey: activeDevice.encryptionPublicKey,
+        encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
+        encryptionPublicKeySignature:
+          activeDevice.encryptionPublicKeySignature!,
+      },
+      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+    });
+    const lastChainItem =
+      folderKeyChainData.trace[folderKeyChainData.trace.length - 1];
+    const snapshotKeyData = createSnapshotKey({
+      folderKey: lastChainItem.key,
+    });
+    return snapshotKeyData;
+  };
+
   const [state, send] = useMachine(syncMachine, {
     context: {
       documentId: docId,
@@ -113,10 +146,17 @@ export default function Page({
         );
       },
       getNewSnapshotData: async () => {
+        const documentResult = await runDocumentQuery({ id: docId });
+        const document = documentResult.data?.document;
+        if (!document) {
+          throw new Error("Document not found");
+        }
+        // currently we create a new key for every snapshot
+        const snapshotKeyData = await createNewSnapshotKey(document);
         return {
           id: uuidv4(),
           data: Yjs.encodeStateAsUpdate(yDocRef.current),
-          key: snapshotKeyRef.current?.key as Uint8Array,
+          key: sodium.from_base64(snapshotKeyData.key),
           publicData: {
             keyDerivationTrace: snapshotKeyRef.current?.keyDerivationTrace,
             subkeyId: snapshotKeyRef.current?.subkeyId,
@@ -156,7 +196,7 @@ export default function Page({
       },
       shouldSendSnapshot: ({ latestServerVersion }) => {
         // create a new snapshot if the active snapshot has more than 100 updates
-        return latestServerVersion !== null && latestServerVersion > 100;
+        return latestServerVersion !== null && latestServerVersion > 10;
       },
       applyEphemeralUpdates: (decryptedEphemeralUpdates) => {
         decryptedEphemeralUpdates.map((ephemeralUpdate) => {
@@ -171,38 +211,6 @@ export default function Page({
       sodium,
     },
   });
-
-  const createNewSnapshotKey = async (
-    document: Document,
-    workspaceKeyId: string
-  ) => {
-    const workspace = await getWorkspace({
-      workspaceId: document.workspaceId!,
-      deviceSigningPublicKey: activeDevice.signingPublicKey,
-    });
-    if (!workspace?.currentWorkspaceKey) {
-      throw new Error("No workspace key for workspace and device");
-    }
-    const folder = await getFolder({ id: document.parentFolderId! });
-    const folderKeyChainData = deriveKeysFromKeyDerivationTrace({
-      keyDerivationTrace: folder.keyDerivationTrace,
-      activeDevice: {
-        signingPublicKey: activeDevice.signingPublicKey,
-        signingPrivateKey: activeDevice.signingPrivateKey!,
-        encryptionPublicKey: activeDevice.encryptionPublicKey,
-        encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
-        encryptionPublicKeySignature:
-          activeDevice.encryptionPublicKeySignature!,
-      },
-      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
-    });
-    const lastChainItem =
-      folderKeyChainData.trace[folderKeyChainData.trace.length - 1];
-    const snapshotKeyData = createSnapshotKey({
-      folderKey: lastChainItem.key,
-    });
-    return snapshotKeyData;
-  };
 
   useEffect(() => {
     async function initDocument() {
