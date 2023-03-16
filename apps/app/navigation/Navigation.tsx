@@ -55,6 +55,7 @@ import RegisterScreen from "./screens/registerScreen/RegisterScreen";
 import RegistrationVerificationScreen from "./screens/registrationVerificationScreen/RegistrationVerificationScreen";
 import RootScreen from "./screens/rootScreen/RootScreen";
 import SharePageScreen from "./screens/sharePageScreen/SharePageScreen";
+import UITestScreen from "./screens/uITestScreen/UITestScreen";
 import WorkspaceNotDecryptedScreen from "./screens/workspaceNotDecryptedScreen/WorkspaceNotDecryptedScreen";
 import WorkspaceNotFoundScreen from "./screens/workspaceNotFoundScreen/WorkspaceNotFoundScreen";
 import WorkspaceRootScreen from "./screens/workspaceRootScreen/WorkspaceRootScreen";
@@ -328,6 +329,7 @@ function RootNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen name="DesignSystem" component={DesignSystemScreen} />
+        <Stack.Screen name="UITest" component={UITestScreen} />
         <Stack.Screen
           name="Onboarding"
           component={OnboardingScreen}
@@ -482,6 +484,7 @@ const getLinking = (
         Onboarding: "onboarding",
         DevDashboard: "dev-dashboard",
         DesignSystem: "design-system",
+        UITest: "ui-test",
         Register: "register",
         RegistrationVerification: "registration-verification",
         Login: "login",
