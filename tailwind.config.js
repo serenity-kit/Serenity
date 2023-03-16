@@ -58,7 +58,7 @@ const customColors = {
   },
   comment: {
     default: "#FFB92120", // collaboration-honey 20%
-    hover: "#FFB92130", // collaboration-honey 30%
+    hover: "#FFB92140", // collaboration-honey 40%
     active: "#FFB92180", // collaboration-honey 80%
   },
   muted: "#8A8B96", // gray 600
