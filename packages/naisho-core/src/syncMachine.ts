@@ -1,5 +1,12 @@
 import { KeyPair } from "libsodium-wrappers";
-import { assign, createMachine, forwardTo, sendTo, spawn } from "xstate";
+import {
+  AnyActorRef,
+  assign,
+  createMachine,
+  forwardTo,
+  sendTo,
+  spawn,
+} from "xstate";
 import {
   createAwarenessUpdate,
   verifyAndDecryptAwarenessUpdate,
@@ -17,9 +24,26 @@ import {
   verifyAndDecryptUpdate,
 } from "./update";
 
-type InternalContext = {
-  activeSendingSnapshotId: string | null;
-};
+// The sync machine is responsible for syncing the document with the server.
+// Specifically it is responsible for:
+// - sending snapshots
+// - sending updates
+// - sending ephemeral updates
+// - receiving snapshots
+// - receiving updates
+// - receiving ephemeral updates
+//
+// In general the first thing that happens is that a websocket connection is established.
+// Once that's done the latest snapshot including it's related updates should be received.
+//
+// In order to process incoming and outgoing changes the sync machine uses two queues:
+// - _incomingQueue: contains all incoming messages from the server
+// - pendingChangesQueue: contains all outgoing messages that are not yet sent to the server
+//
+// How Queue processing works:
+// 1. first handle all incoming message
+// 2. then handle all pending updates
+// Background: There might be a new snapshot and this way we avoid retries
 
 type ProcessQueueData = {
   handledQueue: "incoming" | "pending" | "none";
@@ -49,23 +73,18 @@ type Context = {
     activeSnapshotId: string | null;
     latestServerVersion: number | null;
   }) => boolean;
-  websocketActor?: any;
-  incomingQueue: any[];
-  pendingChangesQueue: any[];
-  sodium: any;
-  activeSnapshotId: null | string;
-  latestServerVersion: null | number;
   serializeChanges: (changes: unknown[]) => string;
   deserializeChanges: (string) => unknown[];
   onDocumentLoaded: () => void;
   onSnapshotSent: () => void | Promise<void>;
-  _internal: InternalContext;
+  sodium: any;
+  _latestServerVersion: null | number;
+  _activeSnapshotId: null | string;
+  _websocketActor?: AnyActorRef;
+  _incomingQueue: any[];
+  _pendingChangesQueue: any[];
+  _activeSendingSnapshotId: string | null;
 };
-
-// How Queue processing works:
-// 1. first handle all incoming message
-// 2. then handle all pending updates
-// Background: There might be a new snapshot and this way we avoid retries
 
 const websocketService = (context) => (send, onReceive) => {
   const websocketConnection = new WebSocket(
@@ -202,18 +221,16 @@ export const syncMachine =
         applyEphemeralUpdates: () => undefined,
         getEphemeralUpdateKey: () => Promise.resolve(new Uint8Array()),
         shouldSendSnapshot: () => false,
-        incomingQueue: [],
-        pendingChangesQueue: [],
+        _incomingQueue: [],
+        _pendingChangesQueue: [],
         sodium: {},
-        activeSnapshotId: null,
-        latestServerVersion: null,
+        _activeSnapshotId: null,
+        _latestServerVersion: null,
         serializeChanges: () => "",
         deserializeChanges: () => [],
         onDocumentLoaded: () => undefined,
         onSnapshotSent: () => undefined,
-        _internal: {
-          activeSendingSnapshotId: null,
-        },
+        _activeSendingSnapshotId: null,
       },
       initial: "connecting",
       on: {
@@ -317,54 +334,51 @@ export const syncMachine =
       actions: {
         spawnWebsocketActor: assign((context) => {
           return {
-            websocketActor: spawn(websocketService(context), "websocketActor"),
+            _websocketActor: spawn(websocketService(context), "websocketActor"),
           };
         }),
         stopWebsocketActor: assign((context) => {
-          context.websocketActor?.stop();
+          if (context._websocketActor?.stop) {
+            context._websocketActor?.stop();
+          }
           return {
-            websocketActor: undefined,
+            _websocketActor: undefined,
           };
         }),
         addToIncomingQueue: assign((context, event) => {
           return {
-            incomingQueue: [...context.incomingQueue, event.data],
+            _incomingQueue: [...context._incomingQueue, event.data],
           };
         }),
         addToPendingUpdatesQueue: assign((context, event) => {
           return {
-            pendingChangesQueue: [...context.pendingChangesQueue, event.data],
+            _pendingChangesQueue: [...context._pendingChangesQueue, event.data],
           };
         }),
         removeOldestItemFromQueueAndUpdateContext: assign((context, event) => {
           if (event.data.handledQueue === "incoming") {
             return {
-              incomingQueue: context.incomingQueue.slice(1),
+              _incomingQueue: context._incomingQueue.slice(1),
               activeSnapshotId: event.data.activeSnapshotId,
               latestServerVersion: event.data.latestServerVersion,
-              _internal: {
-                activeSendingSnapshotId: event.data.activeSendingSnapshotId,
-              },
+              _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
             };
           } else {
             return {
               pendingChangesQueue: [],
               activeSnapshotId: event.data.activeSnapshotId,
               latestServerVersion: event.data.latestServerVersion,
-              _internal: {
-                activeSendingSnapshotId: event.data.activeSendingSnapshotId,
-              },
+              _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
             };
           }
         }),
       },
       services: {
         processQueues: (context) => async (send) => {
-          let activeSnapshotId = context.activeSnapshotId;
-          let latestServerVersion = context.latestServerVersion;
+          let activeSnapshotId = context._activeSnapshotId;
+          let latestServerVersion = context._latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
-          let activeSendingSnapshotId =
-            context._internal.activeSendingSnapshotId;
+          let activeSendingSnapshotId = context._activeSendingSnapshotId;
 
           const createAndSendSnapshot = async () => {
             const snapshotData = await context.getNewSnapshotData();
@@ -390,8 +404,8 @@ export const syncMachine =
               type: "SEND",
               message: JSON.stringify({
                 ...snapshot,
-                lastKnownSnapshotId: context.activeSnapshotId,
-                latestServerVersion: context.latestServerVersion,
+                lastKnownSnapshotId: context._activeSnapshotId,
+                latestServerVersion: context._latestServerVersion,
               }),
             });
             context.onSnapshotSent();
@@ -424,9 +438,9 @@ export const syncMachine =
             send({ type: "SEND", message: JSON.stringify(message) });
           };
 
-          if (context.incomingQueue.length > 0) {
+          if (context._incomingQueue.length > 0) {
             handledQueue = "incoming";
-            const event = context.incomingQueue[0];
+            const event = context._incomingQueue[0];
             switch (event.type) {
               case "documentNotFound":
                 // TODO stop reconnecting
@@ -598,7 +612,7 @@ export const syncMachine =
                 break;
             }
           } else if (
-            context.pendingChangesQueue.length > 0 &&
+            context._pendingChangesQueue.length > 0 &&
             activeSendingSnapshotId === null
           ) {
             handledQueue = "pending";
@@ -613,7 +627,7 @@ export const syncMachine =
               createAndSendSnapshot();
             } else {
               const key = await context.getUpdateKey(event);
-              const rawChanges = context.pendingChangesQueue;
+              const rawChanges = context._pendingChangesQueue;
 
               // TODO add a compact changes function to queue and make sure all pending updates are sent as one update
               if (activeSnapshotId === null) {
@@ -639,8 +653,8 @@ export const syncMachine =
       guards: {
         hasMoreItemsInQueues: (context) => {
           return (
-            context.incomingQueue.length > 0 ||
-            context.pendingChangesQueue.length > 0
+            context._incomingQueue.length > 0 ||
+            context._pendingChangesQueue.length > 0
           );
         },
       },
