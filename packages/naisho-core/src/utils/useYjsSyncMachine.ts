@@ -1,5 +1,5 @@
 import { useMachine } from "@xstate/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   applyAwarenessUpdate,
   Awareness,
@@ -24,7 +24,8 @@ export type YjsSyncMachineConfig = Omit<
 };
 
 export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
-  const { yDoc, yAwareness, ...rest } = config;
+  const { yDoc, yAwareness, onDocumentLoaded, ...rest } = config;
+  const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
   const machine = useMachine(syncMachine, {
     context: {
       ...rest,
@@ -43,11 +44,21 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
       },
       serializeChanges: serializeUint8ArrayUpdates,
       deserializeChanges: deserializeUint8ArrayUpdates,
+      onDocumentLoaded: () => {
+        setIsDocumentLoaded(true);
+        if (onDocumentLoaded) {
+          onDocumentLoaded();
+        }
+      },
     },
   });
   const [, send] = machine;
 
   useEffect(() => {
+    if (!isDocumentLoaded) {
+      return;
+    }
+
     const onAwarenessUpdate = ({ added, updated, removed }) => {
       const changedClients = added.concat(updated).concat(removed);
       const yAwarenessUpdate = encodeAwarenessUpdate(
@@ -62,11 +73,9 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
       }
     };
 
-    setTimeout(() => {
-      yAwareness.on("update", onAwarenessUpdate);
-      // TODO switch to v2 updates
-      yDoc.on("update", onUpdate);
-    }, 400);
+    yAwareness.on("update", onAwarenessUpdate);
+    // TODO switch to v2 updates
+    yDoc.on("update", onUpdate);
 
     return () => {
       removeAwarenessStates(yAwareness, [yDoc.clientID], "document unmount");
@@ -74,7 +83,7 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
       yDoc.off("update", onUpdate);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isDocumentLoaded]);
 
   return machine;
 };
