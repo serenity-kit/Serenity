@@ -342,6 +342,7 @@ export const Editor = (props: EditorProps) => {
                         setHasCreateCommentBubble(false);
                         editor.chain().focus().run();
                       }}
+                      disabled={commentText === ""}
                       testID="bubble-menu__save-comment-button"
                     />
                   </HStack>
