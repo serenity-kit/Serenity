@@ -64,9 +64,9 @@ test.describe("create a comment", () => {
 test.describe("comment replies, delete comment", () => {
   test("Add content", async ({ browser }) => {
     const context = await browser.newContext({
-      recordVideo: {
-        dir: "./videos",
-      },
+      // recordVideo: {
+      //   dir: "./videos",
+      // },
     });
     const page = await context.newPage();
 

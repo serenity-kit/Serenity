@@ -136,10 +136,9 @@ export default function Page({
           subkeyId: snapshot.publicData.subkeyId,
           key,
         };
-
         setActiveSnapshotAndCommentKeys(
           {
-            id: snapshot.id,
+            id: snapshot.publicData.snapshotId,
             key: snapshotKeyData.key,
           },
           {}
