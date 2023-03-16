@@ -28,6 +28,7 @@ export const createCommentOnHtmlNode = async ({
   await page
     .locator("data-testid=bubble-menu__initiate-comment-button")
     .click();
+  await delayForSeconds(1);
   const commentInput = page.locator(
     "data-testid=bubble-menu__create-comment-input"
   );
