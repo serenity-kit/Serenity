@@ -2,9 +2,9 @@ import {
   BoxShadow,
   EditorBottombarDivider,
   MenuButton,
-  RawInput,
   ScrollView,
   SubmitButton,
+  TextArea,
   ToggleButton,
   Tooltip,
   tw,
@@ -302,18 +302,14 @@ export const Editor = (props: EditorProps) => {
             <BoxShadow elevation={3} rounded ref={bubbleMenuRef}>
               {hasCreateCommentBubble ? (
                 <VStack style={tw`w-80 bg-white rounded`}>
-                  <RawInput
+                  <TextArea
                     placeholder="Add a comment"
-                    value={commentText}
-                    onChangeText={(text) => setCommentText(text)}
                     variant={"unstyled"}
-                    multiline
+                    value={commentText}
                     autoFocus
-                    style={tw`p-3`}
-                    _stack={{
-                      height: 60,
-                    }}
+                    onChangeText={(text) => setCommentText(text)}
                     testID="bubble-menu__create-comment-input"
+                    maxRows={3}
                   />
                   <HStack
                     style={tw`p-3 border-t border-solid border-gray-200`}
@@ -342,6 +338,7 @@ export const Editor = (props: EditorProps) => {
                         setHasCreateCommentBubble(false);
                         editor.chain().focus().run();
                       }}
+                      disabled={commentText === ""}
                       testID="bubble-menu__save-comment-button"
                     />
                   </HStack>
