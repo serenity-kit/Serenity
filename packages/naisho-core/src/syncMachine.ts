@@ -11,11 +11,7 @@ import {
   createAwarenessUpdate,
   verifyAndDecryptAwarenessUpdate,
 } from "./awarenessUpdate";
-import {
-  addSnapshotToInProgress,
-  createSnapshot,
-  verifyAndDecryptSnapshot,
-} from "./snapshot";
+import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
 import {
   addUpdateToInProgressQueue,
   createUpdate,
@@ -392,8 +388,6 @@ export const syncMachine =
               snapshotData.key,
               context.signatureKeyPair
             );
-
-            addSnapshotToInProgress(snapshot);
 
             send({
               type: "SEND",
