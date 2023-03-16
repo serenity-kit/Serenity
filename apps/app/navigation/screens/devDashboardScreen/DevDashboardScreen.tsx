@@ -15,6 +15,9 @@ export default function DevDashboardScreen(
       <SidebarLink to={{ screen: "DesignSystem" }} iconName="dashboard-line">
         Design System
       </SidebarLink>
+      <SidebarLink to={{ screen: "UITest" }} iconName="dashboard-line">
+        UI Testing Area
+      </SidebarLink>
       <SidebarLink to={{ screen: "TestLibsodium" }} iconName="dashboard-line">
         Libsodium Test Screen
       </SidebarLink>

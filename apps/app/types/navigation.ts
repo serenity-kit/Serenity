@@ -80,6 +80,7 @@ export type RootStackParamList = {
   Workspace: WorkspaceStackParams;
   Onboarding: undefined;
   DesignSystem: undefined;
+  UITest: undefined;
   DevDashboard: undefined;
   Register: undefined;
   RegistrationVerification: RegistrationVerificationParamsList;
