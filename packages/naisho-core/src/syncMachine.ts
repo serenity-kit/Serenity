@@ -130,14 +130,6 @@ const websocketService = (context) => (send, onReceive) => {
     //   ),
     //   "TODOprovider"
     // );
-
-    // retry connecting
-    // if (shouldReconnectWebsocketConnectionRef.current) {
-    //   setTimeout(() => {
-    //     dispatchWebsocketState({ type: "reconnecting" });
-    //     setupWebsocket();
-    //   }, reconnectTimeout * (1 + getWebsocketState().unsuccessfulReconnects));
-    // }
   });
 
   onReceive((event) => {
