@@ -14,6 +14,7 @@ export const createCommentOnHtmlNode = async ({
   selectElement,
   comment,
 }: Props) => {
+  await delayForSeconds(2); // wait a bit in the beginning until comments are loaded?
   const numCommentsBefore = await prisma.comment.count({
     where: { documentId },
   });
