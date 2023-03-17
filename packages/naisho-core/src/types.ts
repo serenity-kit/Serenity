@@ -122,9 +122,14 @@ export const EphemeralUpdate = z.object({
 
 export type EphemeralUpdate = z.infer<typeof EphemeralUpdate>;
 
-export type ClientEvent = Snapshot | Update | EphemeralUpdate;
+export const ClientEvent = z.union([Snapshot, Update, EphemeralUpdate]);
 
-export type ServerEvent =
-  | SnapshotWithServerData
-  | UpdateWithServerData
-  | EphemeralUpdate;
+export type ClientEvent = z.infer<typeof ClientEvent>;
+
+export const ServerEvent = z.union([
+  SnapshotWithServerData,
+  UpdateWithServerData,
+  EphemeralUpdate,
+]);
+
+export type ServerEvent = z.infer<typeof ServerEvent>;

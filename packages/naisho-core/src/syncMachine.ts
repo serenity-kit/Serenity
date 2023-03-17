@@ -7,11 +7,13 @@ import {
   sendTo,
   spawn,
 } from "xstate";
+import { z } from "zod";
 import {
   createEphemeralUpdate,
   verifyAndDecryptEphemeralUpdate,
 } from "./ephemeralUpdate";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
+import { SnapshotWithServerData, UpdateWithServerData } from "./types";
 import { createUpdate, verifyAndDecryptUpdate } from "./update";
 
 // The sync machine is responsible for syncing the document with the server.
@@ -565,7 +567,7 @@ export const syncMachine =
               case "document":
                 try {
                   activeSnapshotId = event.snapshot.publicData.snapshotId;
-                  const snapshot = event.snapshot;
+                  const snapshot = SnapshotWithServerData.parse(event.snapshot);
                   const key = await context.getSnapshotKey(snapshot);
                   const decryptedSnapshot = verifyAndDecryptSnapshot(
                     snapshot,
@@ -574,7 +576,9 @@ export const syncMachine =
                   );
                   context.applySnapshot(decryptedSnapshot);
 
-                  const updates = event.updates;
+                  const updates = z
+                    .array(UpdateWithServerData)
+                    .parse(event.updates);
                   console.log("updates", updates);
                   const changes = updates
                     .map((update) => {
@@ -615,8 +619,8 @@ export const syncMachine =
 
               case "snapshot":
                 console.log("snapshot saved", event);
+                const snapshot = SnapshotWithServerData.parse(event.snapshot);
                 activeSnapshotId = event.snapshot.publicData.snapshotId;
-                const snapshot = event.snapshot;
                 const snapshotKey = await context.getSnapshotKey(snapshot);
                 const decryptedSnapshot = verifyAndDecryptSnapshot(
                   snapshot,
@@ -674,18 +678,19 @@ export const syncMachine =
                 break;
 
               case "update":
-                const key = await context.getUpdateKey(event);
+                const update = UpdateWithServerData.parse(event);
+                const key = await context.getUpdateKey(update);
                 const decryptedUpdate = verifyAndDecryptUpdate(
-                  event,
+                  update,
                   key,
-                  context.sodium.from_base64(event.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+                  context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
                 );
                 const changes = context.deserializeChanges(
                   // TODO should this be part deserializeChanges?
                   context.sodium.to_string(decryptedUpdate)
                 );
                 context.applyChanges(changes);
-                latestServerVersion = event.serverData.version;
+                latestServerVersion = update.serverData.version;
                 break;
               case "updateSaved":
                 console.log("update saved", event);
