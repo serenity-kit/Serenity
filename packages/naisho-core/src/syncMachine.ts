@@ -558,6 +558,17 @@ export const syncMachine =
             send({ type: "SEND", message: JSON.stringify(message) });
           };
 
+          const processSnapshot = async (snapshot: SnapshotWithServerData) => {
+            const snapshotKey = await context.getSnapshotKey(snapshot);
+            const decryptedSnapshot = verifyAndDecryptSnapshot(
+              snapshot,
+              snapshotKey,
+              context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+            );
+            context.applySnapshot(decryptedSnapshot);
+            activeSnapshotId = snapshot.publicData.snapshotId;
+          };
+
           const processUpdates = async (updates: UpdateWithServerData[]) => {
             let changes: unknown[] = [];
             for (let update of updates) {
@@ -598,13 +609,7 @@ export const syncMachine =
                 try {
                   activeSnapshotId = event.snapshot.publicData.snapshotId;
                   const snapshot = SnapshotWithServerData.parse(event.snapshot);
-                  const key = await context.getSnapshotKey(snapshot);
-                  const decryptedSnapshot = verifyAndDecryptSnapshot(
-                    snapshot,
-                    key,
-                    context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                  );
-                  context.applySnapshot(decryptedSnapshot);
+                  await processSnapshot(snapshot);
 
                   const updates = z
                     .array(UpdateWithServerData)
@@ -624,16 +629,7 @@ export const syncMachine =
               case "snapshot":
                 console.log("snapshot saved", event);
                 const snapshot = SnapshotWithServerData.parse(event.snapshot);
-                activeSnapshotId = event.snapshot.publicData.snapshotId;
-                const snapshotKey = await context.getSnapshotKey(snapshot);
-                const decryptedSnapshot = verifyAndDecryptSnapshot(
-                  snapshot,
-                  snapshotKey,
-                  context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                );
-                context.applySnapshot(decryptedSnapshot);
-                // setActiveSnapshotAndCommentKeys
-
+                await processSnapshot(snapshot);
                 break;
 
               case "snapshotSaved":
@@ -651,15 +647,9 @@ export const syncMachine =
                 console.log("snapshot saving failed", event);
                 if (parsedEvent.snapshot) {
                   const snapshot = event.snapshot;
-                  const snapshotKey = await context.getSnapshotKey(snapshot);
-                  const decryptedSnapshot = verifyAndDecryptSnapshot(
-                    snapshot,
-                    snapshotKey,
-                    context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                  );
-                  context.applySnapshot(decryptedSnapshot);
+                  processSnapshot(snapshot);
                 }
-                // TODO fix test-case:
+                // TODO test-case:
                 // snapshot is sending, but haven’t received confirmation for the updates I already sent
                 // currently this breaks (assumption due the incoming and outgoing clock being the same)
                 if (parsedEvent.updates) {
