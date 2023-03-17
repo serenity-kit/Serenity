@@ -8,9 +8,9 @@ import {
   spawn,
 } from "xstate";
 import {
-  createAwarenessUpdate,
-  verifyAndDecryptAwarenessUpdate,
-} from "./awarenessUpdate";
+  createEphemeralUpdate,
+  verifyAndDecryptEphemeralUpdate,
+} from "./ephemeralUpdate";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
 import {
   addUpdateToInProgressQueue,
@@ -160,14 +160,14 @@ const websocketService = (context) => (send, onReceive) => {
           pubKey: context.sodium.to_base64(context.signatureKeyPair.publicKey),
         };
         const ephemeralUpdateKey = await event.getEphemeralUpdateKey();
-        const awarenessUpdate = createAwarenessUpdate(
+        const ephemeralUpdate = createEphemeralUpdate(
           event.data,
           publicData,
           ephemeralUpdateKey,
           context.signatureKeyPair
         );
-        console.log("send awarenessUpdate");
-        send({ type: "SEND", message: JSON.stringify(awarenessUpdate) });
+        console.log("send ephemeralUpdate");
+        send({ type: "SEND", message: JSON.stringify(ephemeralUpdate) });
       };
 
       try {
@@ -667,10 +667,10 @@ export const syncMachine =
                 }
 
                 break;
-              case "awarenessUpdate":
+              case "ephemeralUpdate":
                 const ephemeralUpdateKey =
                   await context.getEphemeralUpdateKey();
-                const ephemeralUpdateResult = verifyAndDecryptAwarenessUpdate(
+                const ephemeralUpdateResult = verifyAndDecryptEphemeralUpdate(
                   event,
                   ephemeralUpdateKey,
                   context.sodium.from_base64(event.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators

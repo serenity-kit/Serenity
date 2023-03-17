@@ -1,8 +1,8 @@
 import sodium, { KeyPair } from "react-native-libsodium";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
-import { AwarenessUpdate, EphemeralUpdatePublicData } from "./types";
+import { EphemeralUpdate, EphemeralUpdatePublicData } from "./types";
 
-export function createAwarenessUpdate(
+export function createEphemeralUpdate(
   content,
   publicData: EphemeralUpdatePublicData,
   key: Uint8Array,
@@ -18,37 +18,37 @@ export function createAwarenessUpdate(
     `${publicNonce}${ciphertext}${publicDataAsBase64}`,
     signatureKeyPair.privateKey
   );
-  const awarenessUpdate: AwarenessUpdate = {
+  const ephemeralUpdate: EphemeralUpdate = {
     nonce: publicNonce,
     ciphertext,
     publicData,
     signature,
   };
 
-  return awarenessUpdate;
+  return ephemeralUpdate;
 }
 
-export function verifyAndDecryptAwarenessUpdate(
-  update: AwarenessUpdate,
+export function verifyAndDecryptEphemeralUpdate(
+  ephemeralUpdate: EphemeralUpdate,
   key,
   publicKey: Uint8Array
 ) {
   const publicDataAsBase64 = sodium.to_base64(
-    JSON.stringify(update.publicData)
+    JSON.stringify(ephemeralUpdate.publicData)
   );
 
   const isValid = verifySignature(
-    `${update.nonce}${update.ciphertext}${publicDataAsBase64}`,
-    update.signature,
+    `${ephemeralUpdate.nonce}${ephemeralUpdate.ciphertext}${publicDataAsBase64}`,
+    ephemeralUpdate.signature,
     publicKey
   );
   if (!isValid) {
-    throw new Error("Invalid awareness update");
+    throw new Error("Invalid ephemeral update");
   }
   return decryptAead(
-    sodium.from_base64(update.ciphertext),
-    sodium.to_base64(JSON.stringify(update.publicData)),
+    sodium.from_base64(ephemeralUpdate.ciphertext),
+    sodium.to_base64(JSON.stringify(ephemeralUpdate.publicData)),
     key,
-    update.nonce
+    ephemeralUpdate.nonce
   );
 }

@@ -113,18 +113,18 @@ export const UpdateWithServerData = Update.extend({
 
 export type UpdateWithServerData = z.infer<typeof UpdateWithServerData>;
 
-export const AwarenessUpdate = z.object({
+export const EphemeralUpdate = z.object({
   ciphertext: z.string(),
   nonce: z.string(),
   signature: z.string(), // ciphertext + nonce + publicData
   publicData: EphemeralUpdatePublicData,
 });
 
-export type AwarenessUpdate = z.infer<typeof AwarenessUpdate>;
+export type EphemeralUpdate = z.infer<typeof EphemeralUpdate>;
 
-export type ClientEvent = Snapshot | Update | AwarenessUpdate;
+export type ClientEvent = Snapshot | Update | EphemeralUpdate;
 
 export type ServerEvent =
   | SnapshotWithServerData
   | UpdateWithServerData
-  | AwarenessUpdate;
+  | EphemeralUpdate;

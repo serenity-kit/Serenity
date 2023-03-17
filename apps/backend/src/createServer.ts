@@ -192,7 +192,7 @@ export default async function createServer() {
               activeSnapshotInfo,
               workspaceId: userToWorkspace.workspaceId,
             });
-            console.log("addUpdate snapshot");
+            console.log("add snapshot");
             connection.send(
               JSON.stringify({
                 type: "snapshotSaved",
@@ -282,7 +282,7 @@ export default async function createServer() {
                 serverVersion: savedUpdate.serverData.version,
               })
             );
-            console.log("addUpdate update");
+            console.log("add update");
             addUpdate(
               documentId,
               // @ts-expect-error not sure why savedUpdate is "never"
@@ -303,13 +303,13 @@ export default async function createServer() {
               );
             }
           }
-          // new awareness update
+          // new ephemeral update
         } else {
-          console.log("addUpdate awarenessUpdate");
+          console.log("add ephemeralUpdate");
           // TODO check if user still has access to the document
           addUpdate(
             documentId,
-            { ...data, type: "awarenessUpdate" },
+            { ...data, type: "ephemeralUpdate" },
             connection
           );
         }
