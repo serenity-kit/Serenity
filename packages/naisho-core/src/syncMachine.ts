@@ -34,9 +34,10 @@ import {
 //
 // In order to process incoming and outgoing changes the sync machine uses two queues:
 // - _incomingQueue: contains all incoming messages from the server
-// - pendingChangesQueue: contains all outgoing messages that are not yet sent to the server
+// - _pendingChangesQueue: contains all outgoing messages that are not yet sent to the server
 //
-// How Queue processing works:
+// How Queue processing works
+// -------------------------
 // 1. first handle all incoming message
 // 2. then handle all pending updates
 // Background: There might be a new snapshot and this way we avoid retries
@@ -47,6 +48,33 @@ import {
 // The delay is based on the number of retries that have already been done using an exponential
 // formula: (100 * 1.8 ** websocketRetries).
 // The websocketRetries is capped at 13 so that the delay doesn't get too large.
+//
+// Handling outgoing messages
+// -------------------------
+// Once a change is added and the `_pendingChangesQueue` is processed it will collect all changes
+// and depending on `shouldSendSnapshot` either send a snapshot or an update.
+// In case a snapshot is sent `_pendingChangesQueue` is cleared and the `_activeSendingSnapshotId` set to the snapshot ID.
+// In case an update is sent the changes will be added to the `_updatesInFlight` and the `_sendingClock` increased by one.
+//
+// If a snapshot saved is received
+// - the `_activeSnapshotId` is set to the snapshot ID and
+// - the `_activeSendingSnapshotId` is cleared.
+// Queue processing for sending messages is resumed.
+//
+// If an update is received
+// - the `_latestServerVersion` is set to the update version
+// - the `_confirmedUpdatesClock`
+// - the update removed from the `_updatesInFlight` removed
+//
+// IF a snapshot failed to save
+// - the snapshot and changes that came with it are applied and another snapshot is created and sent
+//
+// If an update failed to save
+// - check if the update is in the `_updatesInFlight` - only if it's there a retry is necessary
+// since we know it was not handled by a new snapshot or update
+// - set the `_sendingClock` to the `_confirmedUpdatesClock`
+// - all the changes from this failed and later updates are taken and a new update is created and
+// sent with the clock set to the latest confirmed clock + 1
 
 type ProcessQueueData = {
   handledQueue: "incoming" | "pending" | "none";
