@@ -73,7 +73,7 @@ import { createUpdate, verifyAndDecryptUpdate } from "./update";
 // - check if the update is in the `_updatesInFlight` - only if it's there a retry is necessary
 // since we know it was not handled by a new snapshot or update
 // - set the `_sendingUpdatesClock` to the `_confirmedUpdatesClock`
-// - all the changes from this failed and later updates are taken and a new update is created and
+// - all the changes from this failed and later updates plus the new pendingChanges are taken and a new update is created and
 // sent with the clock set to the latest confirmed clock + 1
 //
 // When loading the initial document it's important to make sure these variables are correctly set:
@@ -96,6 +96,7 @@ type ProcessQueueData = {
   sendingUpdatesClock: number;
   confirmedUpdatesClock: number;
   updatesInFlight: UpdateInFlight[];
+  pendingChangesQueue: any[];
 };
 
 export type SyncMachineConfig = {
@@ -465,6 +466,7 @@ export const syncMachine =
           if (event.data.handledQueue === "incoming") {
             return {
               _incomingQueue: context._incomingQueue.slice(1),
+              _pendingChangesQueue: event.data.pendingChangesQueue,
               _activeSnapshotId: event.data.activeSnapshotId,
               _latestServerVersion: event.data.latestServerVersion,
               _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
@@ -474,7 +476,7 @@ export const syncMachine =
             };
           } else {
             return {
-              _pendingChangesQueue: [],
+              _pendingChangesQueue: event.data.pendingChangesQueue,
               _activeSnapshotId: event.data.activeSnapshotId,
               _latestServerVersion: event.data.latestServerVersion,
               _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
@@ -502,6 +504,7 @@ export const syncMachine =
           let sendingUpdatesClock = context._sendingUpdatesClock;
           let confirmedUpdatesClock = context._confirmedUpdatesClock;
           let updatesInFlight = context._updatesInFlight;
+          let pendingChangesQueue = context._pendingChangesQueue;
 
           const createAndSendSnapshot = async () => {
             const snapshotData = await context.getNewSnapshotData();
@@ -521,6 +524,7 @@ export const syncMachine =
               context.signatureKeyPair
             );
 
+            pendingChangesQueue = [];
             send({
               type: "SEND",
               message: JSON.stringify({
@@ -529,17 +533,21 @@ export const syncMachine =
                 latestServerVersion: context._latestServerVersion,
               }),
             });
+
             if (context.onSnapshotSent) {
               context.onSnapshotSent();
             }
           };
 
           const createAndSendUpdate = (
-            update: string | Uint8Array,
+            changes: unknown[],
             key: Uint8Array,
             refSnapshotId: string,
             clock: number
           ) => {
+            const update = context.serializeChanges(changes);
+            sendingUpdatesClock = sendingUpdatesClock + 1;
+
             const publicData = {
               refSnapshotId,
               docId: context.documentId,
@@ -555,6 +563,10 @@ export const syncMachine =
               clock
             );
 
+            updatesInFlight.push({
+              clock: sendingUpdatesClock,
+              changes,
+            });
             send({ type: "SEND", message: JSON.stringify(message) });
           };
 
@@ -647,7 +659,7 @@ export const syncMachine =
                 console.log("snapshot saving failed", event);
                 if (parsedEvent.snapshot) {
                   const snapshot = event.snapshot;
-                  processSnapshot(snapshot);
+                  await processSnapshot(snapshot);
                 }
                 // TODO test-case:
                 // snapshot is sending, but haven’t received confirmation for the updates I already sent
@@ -656,7 +668,8 @@ export const syncMachine =
                   await processUpdates(parsedEvent.updates);
                 }
 
-                // TODO retry creating a snapshot
+                console.log("retry send snapshot");
+                await createAndSendSnapshot();
                 break;
 
               case "update":
@@ -680,19 +693,39 @@ export const syncMachine =
                   event.requiresNewSnapshotWithKeyRotation
                 );
 
-                // if (event.requiresNewSnapshotWithKeyRotation) {
-                //   await createAndSendSnapshot();
-                // } else {
-                //   const key = await context.getUpdateKey(event);
+                if (event.requiresNewSnapshotWithKeyRotation) {
+                  await createAndSendSnapshot();
+                } else {
+                  const updateIndex = updatesInFlight.findIndex(
+                    (updateInFlight) => updateInFlight.clock === event.clock
+                  );
+                  if (updateIndex !== -1) {
+                    updatesInFlight.slice(updateIndex);
 
-                //   // TODO retry with an increasing offset instead of just trying again
-                //   const rawUpdate = getUpdateInProgress(
-                //     event.docId,
-                //     event.snapshotId,
-                //     event.clock
-                //   );
-                //   createAndSendUpdate(rawUpdate, key, event.snapshotId);
-                // }
+                    const changes = updatesInFlight.reduce(
+                      (acc, updateInFlight) =>
+                        acc.concat(updateInFlight.changes),
+                      [] as unknown[]
+                    );
+
+                    changes.push(...context._pendingChangesQueue);
+                    pendingChangesQueue = [];
+
+                    const key = await context.getUpdateKey(event);
+
+                    if (activeSnapshotId === null) {
+                      throw new Error("No active snapshot id");
+                    }
+                    sendingUpdatesClock = confirmedUpdatesClock ?? -1;
+                    updatesInFlight = [];
+                    createAndSendUpdate(
+                      changes,
+                      key,
+                      activeSnapshotId,
+                      sendingUpdatesClock
+                    );
+                  }
+                }
 
                 break;
               case "ephemeralUpdate":
@@ -719,31 +752,25 @@ export const syncMachine =
               })
             ) {
               console.log("send snapshot");
-              createAndSendSnapshot();
+              await createAndSendSnapshot();
             } else {
               console.log("send update");
               const key = await context.getUpdateKey(event);
               const rawChanges = context._pendingChangesQueue;
+              pendingChangesQueue = [];
 
               // TODO add a compact changes function to queue and make sure all pending updates are sent as one update
               if (activeSnapshotId === null) {
                 throw new Error("No active snapshot id");
               }
-              sendingUpdatesClock = sendingUpdatesClock + 1;
               createAndSendUpdate(
-                context.serializeChanges(rawChanges),
+                rawChanges,
                 key,
                 activeSnapshotId,
                 sendingUpdatesClock
               );
-              updatesInFlight.push({
-                clock: sendingUpdatesClock,
-                changes: rawChanges,
-              });
             }
           }
-
-          console.log(confirmedUpdatesClock, sendingUpdatesClock);
 
           return {
             handledQueue,
@@ -753,6 +780,7 @@ export const syncMachine =
             confirmedUpdatesClock,
             sendingUpdatesClock,
             updatesInFlight,
+            pendingChangesQueue,
           };
         },
       },
