@@ -14,6 +14,7 @@ export const createCommentOnHtmlNode = async ({
   selectElement,
   comment,
 }: Props) => {
+  await delayForSeconds(2); // wait a bit in the beginning until comments are loaded?
   const numCommentsBefore = await prisma.comment.count({
     where: { documentId },
   });
@@ -32,8 +33,6 @@ export const createCommentOnHtmlNode = async ({
   const commentInput = page.locator(
     "data-testid=bubble-menu__create-comment-input"
   );
-  await commentInput.selectText();
-  await commentInput.press("Backspace");
   await commentInput.type(comment);
   await page.locator("data-testid=bubble-menu__save-comment-button").click();
   await delayForSeconds(2);
