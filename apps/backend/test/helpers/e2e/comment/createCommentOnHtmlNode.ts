@@ -32,8 +32,6 @@ export const createCommentOnHtmlNode = async ({
   const commentInput = page.locator(
     "data-testid=bubble-menu__create-comment-input"
   );
-  await commentInput.selectText();
-  await commentInput.press("Backspace");
   await commentInput.type(comment);
   await page.locator("data-testid=bubble-menu__save-comment-button").click();
   await delayForSeconds(2);
