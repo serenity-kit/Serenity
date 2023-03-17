@@ -103,8 +103,8 @@ jobs:
         run: echo $SERENITY_ENV
       - name: Run e2e tests
         run: yarn workspace backend test:e2e test/e2e/comment/comment.e2e.ts
-        continue-on-error: true
       - name: Upload artifacts
+        if: always() # to make sure it runs even if the e2e tests fail
         uses: actions/upload-artifact@v3
         with:
           path: apps/backend/test-results/**/*
