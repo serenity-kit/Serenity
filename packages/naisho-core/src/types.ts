@@ -1,35 +1,28 @@
-export type CiphertextContent = {
-  accessReference: string; // hash of the access chain // TODO should this be in the unencrypted part?
-  content: string;
-};
+import { z } from "zod";
 
-export type KeyDerivationTraceParentFolder = {
-  folderId: string;
-  subkeyId: number;
-  parentFolderId?: string | undefined | null;
-};
+const KeyDerivationTraceEntry = z.object({
+  entryId: z.string(), // didn't use id because it often GraphQL clients normalize by the id field
+  subkeyId: z.number(),
+  parentId: z.union([z.string(), z.null(), z.undefined()]), // the first entry has no parent
+  context: z.string(), // kdf context
+});
 
-export type KeyDerivationTrace = {
-  workspaceKeyId: string;
-  subkeyId: number;
-  parentFolders: KeyDerivationTraceParentFolder[];
-};
+export type KeyDerivationTraceEntry = z.infer<typeof KeyDerivationTraceEntry>;
 
-export type KeyDerivationTraceEntry = {
-  entryId: string; // didn't use id because it often GraphQL clients normalize by the id field
-  subkeyId: number;
-  parentId?: string | undefined | null; // the first entry has no parent
-  context: string; // kdf context
-};
+const KeyDerivationTraceEntryWithKey = KeyDerivationTraceEntry.extend({
+  key: z.string(),
+});
 
-export type KeyDerivationTraceEntryWithKey = KeyDerivationTraceEntry & {
-  key: string;
-};
+export type KeyDerivationTraceEntryWithKey = z.infer<
+  typeof KeyDerivationTraceEntryWithKey
+>;
 
-export type KeyDerivationTrace2 = {
-  workspaceKeyId: string;
-  trace: KeyDerivationTraceEntry[];
-};
+const KeyDerivationTrace2 = z.object({
+  workspaceKeyId: z.string(),
+  trace: z.array(KeyDerivationTraceEntry),
+});
+
+export type KeyDerivationTrace2 = z.infer<typeof KeyDerivationTrace2>;
 
 export type KeyDerivationTraceWithKeys = {
   workspaceKeyId: string;
