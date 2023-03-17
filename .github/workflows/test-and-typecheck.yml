@@ -103,3 +103,7 @@ jobs:
         run: echo $SERENITY_ENV
       - name: Run e2e tests
         run: yarn workspace backend test:e2e test/e2e/comment/comment.e2e.ts
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: apps/backend/videos/**/*
