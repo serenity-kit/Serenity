@@ -1,10 +1,10 @@
 import sodium, { KeyPair } from "react-native-libsodium";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
-import { AwarenessUpdate, AwarenessUpdatePublicData } from "./types";
+import { AwarenessUpdate, EphemeralUpdatePublicData } from "./types";
 
 export function createAwarenessUpdate(
   content,
-  publicData: AwarenessUpdatePublicData,
+  publicData: EphemeralUpdatePublicData,
   key: Uint8Array,
   signatureKeyPair: KeyPair
 ) {

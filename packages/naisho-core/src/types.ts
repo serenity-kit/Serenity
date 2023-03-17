@@ -74,13 +74,13 @@ export const UpdateServerData = z.object({
 
 export type UpdateServerData = z.infer<typeof UpdateServerData>;
 
-export const AwarenessUpdatePublicData = z.object({
+export const EphemeralUpdatePublicData = z.object({
   docId: z.string(),
   pubKey: z.string(), // public signing key
 });
 
-export type AwarenessUpdatePublicData = z.infer<
-  typeof AwarenessUpdatePublicData
+export type EphemeralUpdatePublicData = z.infer<
+  typeof EphemeralUpdatePublicData
 >;
 
 export const Snapshot = z.object({
@@ -117,7 +117,7 @@ export const AwarenessUpdate = z.object({
   ciphertext: z.string(),
   nonce: z.string(),
   signature: z.string(), // ciphertext + nonce + publicData
-  publicData: AwarenessUpdatePublicData,
+  publicData: EphemeralUpdatePublicData,
 });
 
 export type AwarenessUpdate = z.infer<typeof AwarenessUpdate>;
