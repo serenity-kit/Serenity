@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const KeyDerivationTraceEntry = z.object({
+export const KeyDerivationTraceEntry = z.object({
   entryId: z.string(), // didn't use id because it often GraphQL clients normalize by the id field
   subkeyId: z.number(),
   parentId: z.union([z.string(), z.null(), z.undefined()]), // the first entry has no parent
@@ -9,7 +9,7 @@ const KeyDerivationTraceEntry = z.object({
 
 export type KeyDerivationTraceEntry = z.infer<typeof KeyDerivationTraceEntry>;
 
-const KeyDerivationTraceEntryWithKey = KeyDerivationTraceEntry.extend({
+export const KeyDerivationTraceEntryWithKey = KeyDerivationTraceEntry.extend({
   key: z.string(),
 });
 
@@ -17,80 +17,110 @@ export type KeyDerivationTraceEntryWithKey = z.infer<
   typeof KeyDerivationTraceEntryWithKey
 >;
 
-const KeyDerivationTrace2 = z.object({
+export const KeyDerivationTrace2 = z.object({
   workspaceKeyId: z.string(),
   trace: z.array(KeyDerivationTraceEntry),
 });
 
 export type KeyDerivationTrace2 = z.infer<typeof KeyDerivationTrace2>;
 
-export type KeyDerivationTraceWithKeys = {
-  workspaceKeyId: string;
-  trace: KeyDerivationTraceEntryWithKey[];
-};
+export const KeyDerivationTraceWithKeys = z.object({
+  workspaceKeyId: z.string(),
+  trace: z.array(KeyDerivationTraceEntryWithKey),
+});
 
-export interface SnapshotPublicData {
-  docId: string;
-  pubKey: string; // public signing key
-  snapshotId: string;
-  subkeyId: number;
-  keyDerivationTrace: KeyDerivationTrace2;
-}
+export type KeyDerivationTraceWithKeys = z.infer<
+  typeof KeyDerivationTraceWithKeys
+>;
 
-export interface SnapshotServerData {
-  latestVersion: number;
-}
+export const SnapshotPublicData = z.object({
+  docId: z.string(),
+  pubKey: z.string(), // public signing key
+  snapshotId: z.string(),
+  subkeyId: z.number(),
+  keyDerivationTrace: KeyDerivationTrace2,
+});
 
-export interface UpdatePublicData {
-  docId: string;
-  pubKey: string; // public signing key
-  refSnapshotId: string;
-}
+export type SnapshotPublicData = z.infer<typeof SnapshotPublicData>;
 
-export interface UpdatePublicDataWithClock {
-  docId: string;
-  pubKey: string; // public signing key
-  refSnapshotId: string;
-  clock: number;
-}
+export const SnapshotServerData = z.object({
+  latestVersion: z.number(),
+});
 
-export interface UpdateServerData {
-  version: number;
-}
+export type SnapshotServerData = z.infer<typeof SnapshotServerData>;
 
-export interface AwarenessUpdatePublicData {
-  docId: string;
-  pubKey: string; // public signing key
-}
+export const UpdatePublicData = z.object({
+  docId: z.string(),
+  pubKey: z.string(), // public signing key
+  refSnapshotId: z.string(),
+});
 
-export interface Snapshot {
-  ciphertext: string;
-  nonce: string;
-  signature: string; // ciphertext + nonce + publicData
-  publicData: SnapshotPublicData;
-}
+export type UpdatePublicData = z.infer<typeof UpdatePublicData>;
 
-export interface SnapshotWithServerData extends Snapshot {
-  serverData: SnapshotServerData;
-}
+export const UpdatePublicDataWithClock = z.object({
+  docId: z.string(),
+  pubKey: z.string(), // public signing key
+  refSnapshotId: z.string(),
+  clock: z.number(),
+});
 
-export interface Update {
-  ciphertext: string;
-  nonce: string;
-  signature: string; // ciphertext + nonce + publicData
-  publicData: UpdatePublicDataWithClock;
-}
+export type UpdatePublicDataWithClock = z.infer<
+  typeof UpdatePublicDataWithClock
+>;
 
-export interface UpdateWithServerData extends Snapshot {
-  serverData: UpdateServerData;
-}
+export const UpdateServerData = z.object({
+  version: z.number(),
+});
 
-export interface AwarenessUpdate {
-  ciphertext: string;
-  nonce: string;
-  signature: string; // ciphertext + nonce + publicData
-  publicData: AwarenessUpdatePublicData;
-}
+export type UpdateServerData = z.infer<typeof UpdateServerData>;
+
+export const AwarenessUpdatePublicData = z.object({
+  docId: z.string(),
+  pubKey: z.string(), // public signing key
+});
+
+export type AwarenessUpdatePublicData = z.infer<
+  typeof AwarenessUpdatePublicData
+>;
+
+export const Snapshot = z.object({
+  ciphertext: z.string(),
+  nonce: z.string(),
+  signature: z.string(), // ciphertext + nonce + publicData
+  publicData: SnapshotPublicData,
+});
+
+export type Snapshot = z.infer<typeof Snapshot>;
+
+export const SnapshotWithServerData = Snapshot.extend({
+  serverData: SnapshotServerData,
+});
+
+export type SnapshotWithServerData = z.infer<typeof SnapshotWithServerData>;
+
+export const Update = z.object({
+  ciphertext: z.string(),
+  nonce: z.string(),
+  signature: z.string(), // ciphertext + nonce + publicData
+  publicData: UpdatePublicDataWithClock,
+});
+
+export type Update = z.infer<typeof Update>;
+
+export const UpdateWithServerData = Update.extend({
+  serverData: UpdateServerData,
+});
+
+export type UpdateWithServerData = z.infer<typeof UpdateWithServerData>;
+
+export const AwarenessUpdate = z.object({
+  ciphertext: z.string(),
+  nonce: z.string(),
+  signature: z.string(), // ciphertext + nonce + publicData
+  publicData: AwarenessUpdatePublicData,
+});
+
+export type AwarenessUpdate = z.infer<typeof AwarenessUpdate>;
 
 export type ClientEvent = Snapshot | Update | AwarenessUpdate;
 
