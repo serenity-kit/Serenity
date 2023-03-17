@@ -1,107 +1,130 @@
-export type CiphertextContent = {
-  accessReference: string; // hash of the access chain // TODO should this be in the unencrypted part?
-  content: string;
-};
+import { z } from "zod";
 
-export type KeyDerivationTraceParentFolder = {
-  folderId: string;
-  subkeyId: number;
-  parentFolderId?: string | undefined | null;
-};
+export const KeyDerivationTraceEntry = z.object({
+  entryId: z.string(), // didn't use id because it often GraphQL clients normalize by the id field
+  subkeyId: z.number(),
+  parentId: z.union([z.string(), z.null(), z.undefined()]), // the first entry has no parent
+  context: z.string(), // kdf context
+});
 
-export type KeyDerivationTrace = {
-  workspaceKeyId: string;
-  subkeyId: number;
-  parentFolders: KeyDerivationTraceParentFolder[];
-};
+export type KeyDerivationTraceEntry = z.infer<typeof KeyDerivationTraceEntry>;
 
-export type KeyDerivationTraceEntry = {
-  entryId: string; // didn't use id because it often GraphQL clients normalize by the id field
-  subkeyId: number;
-  parentId?: string | undefined | null; // the first entry has no parent
-  context: string; // kdf context
-};
+export const KeyDerivationTraceEntryWithKey = KeyDerivationTraceEntry.extend({
+  key: z.string(),
+});
 
-export type KeyDerivationTraceEntryWithKey = KeyDerivationTraceEntry & {
-  key: string;
-};
+export type KeyDerivationTraceEntryWithKey = z.infer<
+  typeof KeyDerivationTraceEntryWithKey
+>;
 
-export type KeyDerivationTrace2 = {
-  workspaceKeyId: string;
-  trace: KeyDerivationTraceEntry[];
-};
+export const KeyDerivationTrace2 = z.object({
+  workspaceKeyId: z.string(),
+  trace: z.array(KeyDerivationTraceEntry),
+});
 
-export type KeyDerivationTraceWithKeys = {
-  workspaceKeyId: string;
-  trace: KeyDerivationTraceEntryWithKey[];
-};
+export type KeyDerivationTrace2 = z.infer<typeof KeyDerivationTrace2>;
 
-export interface SnapshotPublicData {
-  docId: string;
-  pubKey: string; // public signing key
-  snapshotId: string;
-  subkeyId: number;
-  keyDerivationTrace: KeyDerivationTrace2;
-}
+export const KeyDerivationTraceWithKeys = z.object({
+  workspaceKeyId: z.string(),
+  trace: z.array(KeyDerivationTraceEntryWithKey),
+});
 
-export interface SnapshotServerData {
-  latestVersion: number;
-}
+export type KeyDerivationTraceWithKeys = z.infer<
+  typeof KeyDerivationTraceWithKeys
+>;
 
-export interface UpdatePublicData {
-  docId: string;
-  pubKey: string; // public signing key
-  refSnapshotId: string;
-}
+export const SnapshotPublicData = z.object({
+  docId: z.string(),
+  pubKey: z.string(), // public signing key
+  snapshotId: z.string(),
+  subkeyId: z.number(),
+  keyDerivationTrace: KeyDerivationTrace2,
+});
 
-export interface UpdatePublicDataWithClock {
-  docId: string;
-  pubKey: string; // public signing key
-  refSnapshotId: string;
-  clock: number;
-}
+export type SnapshotPublicData = z.infer<typeof SnapshotPublicData>;
 
-export interface UpdateServerData {
-  version: number;
-}
+export const SnapshotServerData = z.object({
+  latestVersion: z.number(),
+});
 
-export interface AwarenessUpdatePublicData {
-  docId: string;
-  pubKey: string; // public signing key
-}
+export type SnapshotServerData = z.infer<typeof SnapshotServerData>;
 
-export interface Snapshot {
-  ciphertext: string;
-  nonce: string;
-  signature: string; // ciphertext + nonce + publicData
-  publicData: SnapshotPublicData;
-}
+export const UpdatePublicData = z.object({
+  docId: z.string(),
+  pubKey: z.string(), // public signing key
+  refSnapshotId: z.string(),
+});
 
-export interface SnapshotWithServerData extends Snapshot {
-  serverData: SnapshotServerData;
-}
+export type UpdatePublicData = z.infer<typeof UpdatePublicData>;
 
-export interface Update {
-  ciphertext: string;
-  nonce: string;
-  signature: string; // ciphertext + nonce + publicData
-  publicData: UpdatePublicDataWithClock;
-}
+export const UpdatePublicDataWithClock = z.object({
+  docId: z.string(),
+  pubKey: z.string(), // public signing key
+  refSnapshotId: z.string(),
+  clock: z.number(),
+});
 
-export interface UpdateWithServerData extends Snapshot {
-  serverData: UpdateServerData;
-}
+export type UpdatePublicDataWithClock = z.infer<
+  typeof UpdatePublicDataWithClock
+>;
 
-export interface AwarenessUpdate {
-  ciphertext: string;
-  nonce: string;
-  signature: string; // ciphertext + nonce + publicData
-  publicData: AwarenessUpdatePublicData;
-}
+export const UpdateServerData = z.object({
+  version: z.number(),
+});
 
-export type ClientEvent = Snapshot | Update | AwarenessUpdate;
+export type UpdateServerData = z.infer<typeof UpdateServerData>;
+
+export const EphemeralUpdatePublicData = z.object({
+  docId: z.string(),
+  pubKey: z.string(), // public signing key
+});
+
+export type EphemeralUpdatePublicData = z.infer<
+  typeof EphemeralUpdatePublicData
+>;
+
+export const Snapshot = z.object({
+  ciphertext: z.string(),
+  nonce: z.string(),
+  signature: z.string(), // ciphertext + nonce + publicData
+  publicData: SnapshotPublicData,
+});
+
+export type Snapshot = z.infer<typeof Snapshot>;
+
+export const SnapshotWithServerData = Snapshot.extend({
+  serverData: SnapshotServerData,
+});
+
+export type SnapshotWithServerData = z.infer<typeof SnapshotWithServerData>;
+
+export const Update = z.object({
+  ciphertext: z.string(),
+  nonce: z.string(),
+  signature: z.string(), // ciphertext + nonce + publicData
+  publicData: UpdatePublicDataWithClock,
+});
+
+export type Update = z.infer<typeof Update>;
+
+export const UpdateWithServerData = Update.extend({
+  serverData: UpdateServerData,
+});
+
+export type UpdateWithServerData = z.infer<typeof UpdateWithServerData>;
+
+export const EphemeralUpdate = z.object({
+  ciphertext: z.string(),
+  nonce: z.string(),
+  signature: z.string(), // ciphertext + nonce + publicData
+  publicData: EphemeralUpdatePublicData,
+});
+
+export type EphemeralUpdate = z.infer<typeof EphemeralUpdate>;
+
+export type ClientEvent = Snapshot | Update | EphemeralUpdate;
 
 export type ServerEvent =
   | SnapshotWithServerData
   | UpdateWithServerData
-  | AwarenessUpdate;
+  | EphemeralUpdate;

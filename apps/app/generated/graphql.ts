@@ -156,6 +156,7 @@ export type CreateDocumentShareLinkInput = {
 
 export type CreateDocumentShareLinkResult = {
   __typename?: 'CreateDocumentShareLinkResult';
+  role: Role;
   token: Scalars['String'];
 };
 
@@ -529,6 +530,12 @@ export type GetWorkspaceDevicesResult = {
   devices: Array<Device>;
 };
 
+export type InfoWorkspaceKeyBoxInput = {
+  ciphertext: Scalars['String'];
+  deviceSigningPublicKey: Scalars['String'];
+  nonce: Scalars['String'];
+};
+
 export type InitiateFileUploadInput = {
   documentId: Scalars['String'];
   workspaceId: Scalars['String'];
@@ -645,6 +652,7 @@ export type Mutation = {
   startRegistration?: Maybe<StartRegistrationResult>;
   updateDocumentName?: Maybe<UpdateDocumentNameResult>;
   updateFolderName?: Maybe<UpdateFolderNameResult>;
+  updateWorkspaceInfo?: Maybe<UpdateWorkspaceInfoResult>;
   updateWorkspaceMembersRoles?: Maybe<UpdateWorkspaceMembersRolesResult>;
   updateWorkspaceName?: Maybe<UpdateWorkspaceNameResult>;
   verifyPassword?: Maybe<VerifyLoginResult>;
@@ -779,6 +787,11 @@ export type MutationUpdateDocumentNameArgs = {
 
 export type MutationUpdateFolderNameArgs = {
   input: UpdateFolderNameInput;
+};
+
+
+export type MutationUpdateWorkspaceInfoArgs = {
+  input: UpdateWorkspaceInfoInput;
 };
 
 
@@ -1144,6 +1157,19 @@ export type UpdateFolderNameResult = {
   folder?: Maybe<Folder>;
 };
 
+export type UpdateWorkspaceInfoInput = {
+  creatorDeviceSigningPublicKey: Scalars['String'];
+  infoCiphertext: Scalars['String'];
+  infoNonce: Scalars['String'];
+  infoWorkspaceKeyBoxes: Array<InfoWorkspaceKeyBoxInput>;
+  workspaceId: Scalars['String'];
+};
+
+export type UpdateWorkspaceInfoResult = {
+  __typename?: 'UpdateWorkspaceInfoResult';
+  workspace: Workspace;
+};
+
 export type UpdateWorkspaceMembersRolesInput = {
   id: Scalars['String'];
   members: Array<WorkspaceMemberInput>;
@@ -1196,6 +1222,10 @@ export type Workspace = {
   currentWorkspaceKey?: Maybe<WorkspaceKey>;
   id: Scalars['String'];
   idSignature?: Maybe<Scalars['String']>;
+  infoCiphertext?: Maybe<Scalars['String']>;
+  infoNonce?: Maybe<Scalars['String']>;
+  infoWorkspaceKey?: Maybe<WorkspaceKey>;
+  infoWorkspaceKeyId?: Maybe<Scalars['String']>;
   members?: Maybe<Array<WorkspaceMember>>;
   name?: Maybe<Scalars['String']>;
   workspaceKeys?: Maybe<Array<WorkspaceKey>>;
