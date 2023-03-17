@@ -13,7 +13,11 @@ import {
   verifyAndDecryptEphemeralUpdate,
 } from "./ephemeralUpdate";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
-import { SnapshotWithServerData, UpdateWithServerData } from "./types";
+import {
+  SnapshotFailedEvent,
+  SnapshotWithServerData,
+  UpdateWithServerData,
+} from "./types";
 import { createUpdate, verifyAndDecryptUpdate } from "./update";
 
 // The sync machine is responsible for syncing the document with the server.
@@ -554,6 +558,32 @@ export const syncMachine =
             send({ type: "SEND", message: JSON.stringify(message) });
           };
 
+          const processUpdates = async (updates: UpdateWithServerData[]) => {
+            let changes: unknown[] = [];
+            for (let update of updates) {
+              const key = await context.getUpdateKey(update);
+              const updateResult = verifyAndDecryptUpdate(
+                update,
+                key,
+                context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+              );
+
+              latestServerVersion = update.serverData.version;
+              if (
+                update.publicData.pubKey ===
+                context.sodium.to_base64(context.signatureKeyPair.publicKey)
+              ) {
+                confirmedUpdatesClock = update.publicData.clock;
+                sendingUpdatesClock = update.publicData.clock;
+              }
+              const additionalChanges = context.deserializeChanges(
+                context.sodium.to_string(updateResult)
+              );
+              changes = changes.concat(additionalChanges);
+            }
+            context.applyChanges(changes);
+          };
+
           if (context._incomingQueue.length > 0) {
             handledQueue = "incoming";
             const event = context._incomingQueue[0];
@@ -579,33 +609,7 @@ export const syncMachine =
                   const updates = z
                     .array(UpdateWithServerData)
                     .parse(event.updates);
-                  console.log("updates", updates);
-                  const changes = updates
-                    .map((update) => {
-                      const updateResult = verifyAndDecryptUpdate(
-                        update,
-                        key,
-                        context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                      );
-
-                      latestServerVersion = update.serverData.version;
-                      console.log(update);
-                      if (
-                        update.publicData.pubKey ===
-                        context.sodium.to_base64(
-                          context.signatureKeyPair.publicKey
-                        )
-                      ) {
-                        confirmedUpdatesClock = update.publicData.clock;
-                        sendingUpdatesClock = update.publicData.clock;
-                      }
-                      const changes = context.deserializeChanges(
-                        context.sodium.to_string(updateResult)
-                      );
-                      return changes;
-                    })
-                    .flat();
-                  context.applyChanges(changes);
+                  await processUpdates(updates);
                   if (context.onDocumentLoaded) {
                     context.onDocumentLoaded();
                   }
@@ -643,8 +647,9 @@ export const syncMachine =
                 confirmedUpdatesClock = null;
                 break;
               case "snapshotFailed":
+                const parsedEvent = SnapshotFailedEvent.parse(event);
                 console.log("snapshot saving failed", event);
-                if (event.snapshot) {
+                if (parsedEvent.snapshot) {
                   const snapshot = event.snapshot;
                   const snapshotKey = await context.getSnapshotKey(snapshot);
                   const decryptedSnapshot = verifyAndDecryptSnapshot(
@@ -657,21 +662,8 @@ export const syncMachine =
                 // TODO fix test-case:
                 // snapshot is sending, but haven’t received confirmation for the updates I already sent
                 // currently this breaks (assumption due the incoming and outgoing clock being the same)
-                if (event.updates) {
-                  for (let update of event.updates) {
-                    const key = await context.getUpdateKey(update);
-                    const decryptedUpdate = verifyAndDecryptUpdate(
-                      update,
-                      key,
-                      context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                    );
-                    const changes = context.deserializeChanges(
-                      // TODO should this be part deserializeChanges?
-                      context.sodium.to_string(decryptedUpdate)
-                    );
-                    context.applyChanges(changes);
-                    latestServerVersion = update.serverData.version;
-                  }
+                if (parsedEvent.updates) {
+                  await processUpdates(parsedEvent.updates);
                 }
 
                 // TODO retry creating a snapshot
@@ -679,18 +671,7 @@ export const syncMachine =
 
               case "update":
                 const update = UpdateWithServerData.parse(event);
-                const key = await context.getUpdateKey(update);
-                const decryptedUpdate = verifyAndDecryptUpdate(
-                  update,
-                  key,
-                  context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                );
-                const changes = context.deserializeChanges(
-                  // TODO should this be part deserializeChanges?
-                  context.sodium.to_string(decryptedUpdate)
-                );
-                context.applyChanges(changes);
-                latestServerVersion = update.serverData.version;
+                await processUpdates([update]);
                 break;
               case "updateSaved":
                 console.log("update saved", event);
@@ -771,6 +752,8 @@ export const syncMachine =
               });
             }
           }
+
+          console.log(confirmedUpdatesClock, sendingUpdatesClock);
 
           return {
             handledQueue,

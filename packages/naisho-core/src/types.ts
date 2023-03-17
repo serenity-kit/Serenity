@@ -133,3 +133,11 @@ export const ServerEvent = z.union([
 ]);
 
 export type ServerEvent = z.infer<typeof ServerEvent>;
+
+export const SnapshotFailedEvent = z.object({
+  type: z.literal("snapshotFailed"),
+  snapshot: z.optional(SnapshotWithServerData),
+  updates: z.array(UpdateWithServerData).optional(),
+});
+
+export type SnapshotFailedEvent = z.infer<typeof SnapshotFailedEvent>;

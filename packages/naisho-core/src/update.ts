@@ -1,3 +1,4 @@
+import canonicalize from "canonicalize";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
 import { Update, UpdatePublicData } from "./types";
@@ -15,7 +16,7 @@ export function createUpdate(
   };
 
   const publicDataAsBase64 = sodium.to_base64(
-    JSON.stringify(publicDataWithClock)
+    canonicalize(publicDataWithClock) as string
   );
   const { ciphertext, publicNonce } = encryptAead(
     content,
@@ -37,9 +38,13 @@ export function createUpdate(
   return update;
 }
 
-export function verifyAndDecryptUpdate(update: Update, key, publicKey) {
+export function verifyAndDecryptUpdate(
+  update: Update,
+  key: Uint8Array,
+  publicKey: Uint8Array
+) {
   const publicDataAsBase64 = sodium.to_base64(
-    JSON.stringify(update.publicData)
+    canonicalize(update.publicData) as string
   );
 
   const isValid = verifySignature(
@@ -53,7 +58,7 @@ export function verifyAndDecryptUpdate(update: Update, key, publicKey) {
 
   const result = decryptAead(
     sodium.from_base64(update.ciphertext),
-    sodium.to_base64(JSON.stringify(update.publicData)),
+    sodium.to_base64(canonicalize(update.publicData) as string),
     key,
     update.nonce
   );
