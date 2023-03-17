@@ -290,6 +290,7 @@ export default async function createServer() {
               connection
             );
           } catch (err) {
+            console.log("update failed", err);
             if (savedUpdate === null || savedUpdate === undefined) {
               connection.send(
                 JSON.stringify({

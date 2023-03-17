@@ -12,13 +12,7 @@ import {
   verifyAndDecryptEphemeralUpdate,
 } from "./ephemeralUpdate";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
-import {
-  addUpdateToInProgressQueue,
-  createUpdate,
-  getUpdateInProgress,
-  removeUpdateFromInProgressQueue,
-  verifyAndDecryptUpdate,
-} from "./update";
+import { createUpdate, verifyAndDecryptUpdate } from "./update";
 
 // The sync machine is responsible for syncing the document with the server.
 // Specifically it is responsible for:
@@ -54,33 +48,48 @@ import {
 // Once a change is added and the `_pendingChangesQueue` is processed it will collect all changes
 // and depending on `shouldSendSnapshot` either send a snapshot or an update.
 // In case a snapshot is sent `_pendingChangesQueue` is cleared and the `_activeSendingSnapshotId` set to the snapshot ID.
-// In case an update is sent the changes will be added to the `_updatesInFlight` and the `_sendingClock` increased by one.
+// In case an update is sent the changes will be added to the `_updatesInFlight` and the `_sendingUpdatesClock` increased by one.
 //
-// If a snapshot saved is received
+// If a snapshot saved event is received
 // - the `_activeSnapshotId` is set to the snapshot ID and
 // - the `_activeSendingSnapshotId` is cleared.
 // Queue processing for sending messages is resumed.
 //
-// If an update is received
+// If an update saved event is received
 // - the `_latestServerVersion` is set to the update version
 // - the `_confirmedUpdatesClock`
 // - the update removed from the `_updatesInFlight` removed
 //
 // IF a snapshot failed to save
-// - the snapshot and changes that came with it are applied and another snapshot is created and sent
+// - the snapshot and changes that came with the response are applied and another snapshot is created and sent
 //
 // If an update failed to save
 // - check if the update is in the `_updatesInFlight` - only if it's there a retry is necessary
 // since we know it was not handled by a new snapshot or update
-// - set the `_sendingClock` to the `_confirmedUpdatesClock`
+// - set the `_sendingUpdatesClock` to the `_confirmedUpdatesClock`
 // - all the changes from this failed and later updates are taken and a new update is created and
 // sent with the clock set to the latest confirmed clock + 1
+//
+// When loading the initial document it's important to make sure these variables are correctly set:
+// - `_confirmedUpdatesClock`
+// - `_sendingUpdatesClock` (same as `_confirmedUpdatesClock`)
+// - `_latestServerVersion`
+// - `_activeSnapshotId`
+// Otherwise you might try to send an update that the server will reject.
+
+type UpdateInFlight = {
+  clock: number;
+  changes: any[];
+};
 
 type ProcessQueueData = {
   handledQueue: "incoming" | "pending" | "none";
   activeSnapshotId: string | null;
   latestServerVersion: number | null;
   activeSendingSnapshotId: string | null;
+  sendingUpdatesClock: number;
+  confirmedUpdatesClock: number;
+  updatesInFlight: UpdateInFlight[];
 };
 
 export type SyncMachineConfig = {
@@ -120,6 +129,9 @@ export type Context = SyncMachineConfig & {
   _activeSendingSnapshotId: string | null;
   _shouldReconnect: boolean;
   _websocketRetries: number;
+  _updatesInFlight: UpdateInFlight[];
+  _confirmedUpdatesClock: number | null;
+  _sendingUpdatesClock: number;
 };
 
 const websocketService = (context) => (send, onReceive) => {
@@ -276,6 +288,9 @@ export const syncMachine =
         _activeSendingSnapshotId: null,
         _shouldReconnect: false,
         _websocketRetries: 0,
+        _updatesInFlight: [],
+        _confirmedUpdatesClock: null,
+        _sendingUpdatesClock: -1,
       },
       initial: "connecting",
       on: {
@@ -447,6 +462,9 @@ export const syncMachine =
               _activeSnapshotId: event.data.activeSnapshotId,
               _latestServerVersion: event.data.latestServerVersion,
               _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
+              _sendingUpdatesClock: event.data.sendingUpdatesClock,
+              _confirmedUpdatesClock: event.data.confirmedUpdatesClock,
+              _updatesInFlight: event.data.updatesInFlight,
             };
           } else {
             return {
@@ -454,6 +472,9 @@ export const syncMachine =
               _activeSnapshotId: event.data.activeSnapshotId,
               _latestServerVersion: event.data.latestServerVersion,
               _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
+              _sendingUpdatesClock: event.data.sendingUpdatesClock,
+              _confirmedUpdatesClock: event.data.confirmedUpdatesClock,
+              _updatesInFlight: event.data.updatesInFlight,
             };
           }
         }),
@@ -472,6 +493,9 @@ export const syncMachine =
           let latestServerVersion = context._latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
           let activeSendingSnapshotId = context._activeSendingSnapshotId;
+          let sendingUpdatesClock = context._sendingUpdatesClock;
+          let confirmedUpdatesClock = context._confirmedUpdatesClock;
+          let updatesInFlight = context._updatesInFlight;
 
           const createAndSendSnapshot = async () => {
             const snapshotData = await context.getNewSnapshotData();
@@ -508,7 +532,7 @@ export const syncMachine =
             update: string | Uint8Array,
             key: Uint8Array,
             refSnapshotId: string,
-            clockOverwrite?: number
+            clock: number
           ) => {
             const publicData = {
               refSnapshotId,
@@ -522,12 +546,9 @@ export const syncMachine =
               publicData,
               key,
               context.signatureKeyPair,
-              clockOverwrite
+              clock
             );
 
-            if (clockOverwrite === undefined) {
-              addUpdateToInProgressQueue(message, update);
-            }
             send({ type: "SEND", message: JSON.stringify(message) });
           };
 
@@ -564,6 +585,16 @@ export const syncMachine =
                       );
 
                       latestServerVersion = update.serverData.version;
+                      console.log(update);
+                      if (
+                        update.publicData.pubKey ===
+                        context.sodium.to_base64(
+                          context.signatureKeyPair.publicKey
+                        )
+                      ) {
+                        confirmedUpdatesClock = update.publicData.clock;
+                        sendingUpdatesClock = update.publicData.clock;
+                      }
                       const changes = context.deserializeChanges(
                         context.sodium.to_string(updateResult)
                       );
@@ -574,14 +605,6 @@ export const syncMachine =
                   if (context.onDocumentLoaded) {
                     context.onDocumentLoaded();
                   }
-
-                  // setActiveSnapshotAndCommentKeys(
-                  //   {
-                  //     id: snapshot.publicData.snapshotId,
-                  //     key: to_base64(key),
-                  //   },
-                  //   {} // TODO extract and pass on comment keys from snapshot
-                  // );
                 } catch (err) {
                   // TODO
                   console.log("Apply snapshot failed. TODO handle error");
@@ -612,6 +635,8 @@ export const syncMachine =
                   activeSendingSnapshotId = null;
                 }
                 latestServerVersion = null;
+                sendingUpdatesClock = -1;
+                confirmedUpdatesClock = null;
                 break;
               case "snapshotFailed":
                 console.log("snapshot saving failed", event);
@@ -665,10 +690,9 @@ export const syncMachine =
               case "updateSaved":
                 console.log("update saved", event);
                 latestServerVersion = event.serverVersion;
-                removeUpdateFromInProgressQueue(
-                  event.docId,
-                  event.snapshotId,
-                  event.clock
+                confirmedUpdatesClock = event.clock;
+                updatesInFlight = updatesInFlight.filter(
+                  (updateInFlight) => updateInFlight.clock !== event.clock
                 );
 
                 break;
@@ -680,19 +704,19 @@ export const syncMachine =
                   event.requiresNewSnapshotWithKeyRotation
                 );
 
-                if (event.requiresNewSnapshotWithKeyRotation) {
-                  await createAndSendSnapshot();
-                } else {
-                  const key = await context.getUpdateKey(event);
+                // if (event.requiresNewSnapshotWithKeyRotation) {
+                //   await createAndSendSnapshot();
+                // } else {
+                //   const key = await context.getUpdateKey(event);
 
-                  // TODO retry with an increasing offset instead of just trying again
-                  const rawUpdate = getUpdateInProgress(
-                    event.docId,
-                    event.snapshotId,
-                    event.clock
-                  );
-                  createAndSendUpdate(rawUpdate, key, event.snapshotId);
-                }
+                //   // TODO retry with an increasing offset instead of just trying again
+                //   const rawUpdate = getUpdateInProgress(
+                //     event.docId,
+                //     event.snapshotId,
+                //     event.clock
+                //   );
+                //   createAndSendUpdate(rawUpdate, key, event.snapshotId);
+                // }
 
                 break;
               case "ephemeralUpdate":
@@ -729,11 +753,17 @@ export const syncMachine =
               if (activeSnapshotId === null) {
                 throw new Error("No active snapshot id");
               }
+              sendingUpdatesClock = sendingUpdatesClock + 1;
               createAndSendUpdate(
                 context.serializeChanges(rawChanges),
                 key,
-                activeSnapshotId
+                activeSnapshotId,
+                sendingUpdatesClock
               );
+              updatesInFlight.push({
+                clock: sendingUpdatesClock,
+                changes: rawChanges,
+              });
             }
           }
 
@@ -742,6 +772,9 @@ export const syncMachine =
             activeSnapshotId,
             latestServerVersion,
             activeSendingSnapshotId,
+            confirmedUpdatesClock,
+            sendingUpdatesClock,
+            updatesInFlight,
           };
         },
       },

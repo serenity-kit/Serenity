@@ -1,8 +1,4 @@
-import {
-  cleanupUpdates,
-  KeyDerivationTrace2,
-  useYjsSyncMachine,
-} from "@naisho/core";
+import { KeyDerivationTrace2, useYjsSyncMachine } from "@naisho/core";
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
@@ -177,7 +173,7 @@ export default function Page({
     },
     shouldSendSnapshot: ({ latestServerVersion }) => {
       // create a new snapshot if the active snapshot has more than 100 updates
-      return latestServerVersion !== null && latestServerVersion > 100;
+      return latestServerVersion !== null && latestServerVersion > 10;
     },
     getEphemeralUpdateKey: async () => {
       return snapshotKeyRef.current?.key as Uint8Array;
@@ -243,9 +239,7 @@ export default function Page({
 
     initDocument();
 
-    return () => {
-      cleanupUpdates();
-    };
+    return () => {};
   }, []);
 
   return (

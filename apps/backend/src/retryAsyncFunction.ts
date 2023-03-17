@@ -12,6 +12,7 @@ export async function retryAsyncFunction(
       result = await func();
       keepTrying = false;
     } catch (err) {
+      console.log(err);
       for (const error of errorsToBailOn) {
         if (err instanceof error) {
           throw err;
