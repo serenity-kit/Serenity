@@ -1,10 +1,5 @@
 import { KeyDerivationTrace2, useYjsSyncMachine } from "@naisho/core";
-import {
-  createSnapshotKey,
-  deriveKeysFromKeyDerivationTrace,
-  LocalDevice,
-  snapshotDerivedKeyContext,
-} from "@serenity-tools/common";
+import { LocalDevice } from "@serenity-tools/common";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
@@ -19,17 +14,15 @@ import {
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
+import { createNewSnapshotKey } from "../../utils/createNewSnapshotKey/createNewSnapshotKey";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
-import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
-import { getFolder } from "../../utils/folder/getFolder";
 import {
   getLocalDocument,
   setLocalDocument,
 } from "../../utils/localSqliteApi/localSqliteApi";
-import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
   updateTitle: (title: string) => void;
@@ -73,56 +66,6 @@ export default function Page({
     websocketHost = `ws://localhost:4001`;
   }
 
-  const createNewSnapshotKey = async (
-    document: Document,
-    snapshotId: string
-  ) => {
-    const workspace = await getWorkspace({
-      workspaceId: document.workspaceId!,
-      deviceSigningPublicKey: activeDevice.signingPublicKey,
-    });
-    if (!workspace?.currentWorkspaceKey) {
-      throw new Error("No workspace key for workspace and device");
-    }
-    const folder = await getFolder({ id: document.parentFolderId! });
-    const keyDerivationTrace = await createFolderKeyDerivationTrace({
-      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-      folderId: document.parentFolderId,
-    });
-    const folderKeyChainData = deriveKeysFromKeyDerivationTrace({
-      keyDerivationTrace: folder.keyDerivationTrace,
-      activeDevice: {
-        signingPublicKey: activeDevice.signingPublicKey,
-        signingPrivateKey: activeDevice.signingPrivateKey!,
-        encryptionPublicKey: activeDevice.encryptionPublicKey,
-        encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
-        encryptionPublicKeySignature:
-          activeDevice.encryptionPublicKeySignature!,
-      },
-      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
-    });
-
-    const parentFolderChainItem =
-      folderKeyChainData.trace[folderKeyChainData.trace.length - 1];
-
-    const snapshotKeyData = createSnapshotKey({
-      folderKey: parentFolderChainItem.key,
-    });
-
-    keyDerivationTrace.trace.push({
-      entryId: snapshotId,
-      subkeyId: snapshotKeyData.subkeyId,
-      parentId: parentFolderChainItem.entryId,
-      context: snapshotDerivedKeyContext,
-    });
-
-    return {
-      key: snapshotKeyData.key,
-      subkeyId: snapshotKeyData.subkeyId,
-      keyDerivationTrace,
-    };
-  };
-
   const [state, send] = useYjsSyncMachine({
     yDoc: yDocRef.current,
     yAwareness: yAwarenessRef.current,
@@ -157,7 +100,11 @@ export default function Page({
       }
       const snapshotId = uuidv4();
       // currently we create a new key for every snapshot
-      const snapshotKeyData = await createNewSnapshotKey(document, snapshotId);
+      const snapshotKeyData = await createNewSnapshotKey({
+        document,
+        snapshotId,
+        activeDevice,
+      });
       return {
         id: snapshotId,
         data: Yjs.encodeStateAsUpdate(yDocRef.current),
