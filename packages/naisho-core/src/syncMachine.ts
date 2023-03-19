@@ -496,7 +496,8 @@ export const syncMachine =
             // calculating slow exponential backoff
           }, delay);
         },
-        processQueues: (context) => async (send) => {
+        processQueues: (context, event) => async (send) => {
+          console.log("processQueues event", event);
           let activeSnapshotId = context._activeSnapshotId;
           let latestServerVersion = context._latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
@@ -546,7 +547,7 @@ export const syncMachine =
             clock: number
           ) => {
             const update = context.serializeChanges(changes);
-            sendingUpdatesClock = sendingUpdatesClock + 1;
+            sendingUpdatesClock = clock + 1;
 
             const publicData = {
               refSnapshotId,
@@ -560,7 +561,7 @@ export const syncMachine =
               publicData,
               key,
               context.signatureKeyPair,
-              clock
+              sendingUpdatesClock
             );
 
             updatesInFlight.push({
@@ -583,6 +584,7 @@ export const syncMachine =
 
           const processUpdates = async (updates: UpdateWithServerData[]) => {
             let changes: unknown[] = [];
+
             for (let update of updates) {
               const key = await context.getUpdateKey(update);
               const updateResult = verifyAndDecryptUpdate(

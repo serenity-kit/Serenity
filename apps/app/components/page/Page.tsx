@@ -3,6 +3,7 @@ import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
   LocalDevice,
+  snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
@@ -22,6 +23,7 @@ import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey
 import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
+import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { getFolder } from "../../utils/folder/getFolder";
 import {
   getLocalDocument,
@@ -71,7 +73,10 @@ export default function Page({
     websocketHost = `ws://localhost:4001`;
   }
 
-  const createNewSnapshotKey = async (document: Document) => {
+  const createNewSnapshotKey = async (
+    document: Document,
+    snapshotId: string
+  ) => {
     const workspace = await getWorkspace({
       workspaceId: document.workspaceId!,
       deviceSigningPublicKey: activeDevice.signingPublicKey,
@@ -80,6 +85,10 @@ export default function Page({
       throw new Error("No workspace key for workspace and device");
     }
     const folder = await getFolder({ id: document.parentFolderId! });
+    const keyDerivationTrace = await createFolderKeyDerivationTrace({
+      workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
+      folderId: document.parentFolderId,
+    });
     const folderKeyChainData = deriveKeysFromKeyDerivationTrace({
       keyDerivationTrace: folder.keyDerivationTrace,
       activeDevice: {
@@ -92,12 +101,26 @@ export default function Page({
       },
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
     });
-    const lastChainItem =
+
+    const parentFolderChainItem =
       folderKeyChainData.trace[folderKeyChainData.trace.length - 1];
+
     const snapshotKeyData = createSnapshotKey({
-      folderKey: lastChainItem.key,
+      folderKey: parentFolderChainItem.key,
     });
-    return snapshotKeyData;
+
+    keyDerivationTrace.trace.push({
+      entryId: snapshotId,
+      subkeyId: snapshotKeyData.subkeyId,
+      parentId: parentFolderChainItem.entryId,
+      context: snapshotDerivedKeyContext,
+    });
+
+    return {
+      key: snapshotKeyData.key,
+      subkeyId: snapshotKeyData.subkeyId,
+      keyDerivationTrace,
+    };
   };
 
   const [state, send] = useYjsSyncMachine({
@@ -120,7 +143,6 @@ export default function Page({
             name: documentName,
             activeDevice,
           });
-          // FIXME: do we update this when it's not the active document?
           updateActiveDocumentInfoStore(updatedDocument, activeDevice);
         } catch (error) {
           console.error(error);
@@ -133,15 +155,16 @@ export default function Page({
       if (!document) {
         throw new Error("Document not found");
       }
+      const snapshotId = uuidv4();
       // currently we create a new key for every snapshot
-      const snapshotKeyData = await createNewSnapshotKey(document);
+      const snapshotKeyData = await createNewSnapshotKey(document, snapshotId);
       return {
-        id: uuidv4(),
+        id: snapshotId,
         data: Yjs.encodeStateAsUpdate(yDocRef.current),
         key: sodium.from_base64(snapshotKeyData.key),
         publicData: {
-          keyDerivationTrace: snapshotKeyRef.current?.keyDerivationTrace,
-          subkeyId: snapshotKeyRef.current?.subkeyId,
+          keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
+          subkeyId: snapshotKeyData.subkeyId,
         },
       };
     },
