@@ -44,9 +44,6 @@ export default function SidebarPage(props: Props) {
   const [documentTitle, setDocumentTitle] = useState("decrypting…");
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
   const activeDocument = useActiveDocumentInfoStore((state) => state.document);
-  const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
-    (state) => state.update
-  );
   const [documentResult] = useDocumentQuery({
     variables: { id: props.documentId },
   });
@@ -147,14 +144,12 @@ export default function SidebarPage(props: Props) {
       return;
     }
     try {
-      const updatedDocument = await updateDocumentName({
+      await updateDocumentName({
         documentId: document.id,
         workspaceId: document.workspaceId,
         name,
         activeDevice,
       });
-      // FIXME: do we update this when it's not the active document?
-      updateActiveDocumentInfoStore(updatedDocument, activeDevice);
     } catch (error) {
       console.error(error);
     }

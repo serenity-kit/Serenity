@@ -23,6 +23,7 @@ export const updateDocumentName = async ({
   name,
   activeDevice,
 }: Props): Promise<Document> => {
+  console.log("updateDocumentName", { name });
   const workspace = await getWorkspace({
     workspaceId,
     deviceSigningPublicKey: activeDevice.signingPublicKey,

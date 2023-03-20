@@ -25,7 +25,6 @@ import {
 } from "../../utils/localSqliteApi/localSqliteApi";
 
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
-  updateTitle: (title: string) => void;
   signatureKeyPair: KeyPair;
   workspaceId: string;
 };
@@ -33,7 +32,6 @@ type Props = WorkspaceDrawerScreenProps<"Page"> & {
 export default function Page({
   navigation,
   route,
-  updateTitle,
   signatureKeyPair,
   workspaceId,
 }: Props) {
@@ -76,7 +74,8 @@ export default function Page({
     onDocumentLoaded: () => {
       setDocumentLoaded(true);
     },
-    onSnapshotSent: async () => {
+    onSnapshotSaved: async () => {
+      console.log("SNAPSHOT SAVED", documentName);
       // if the document has a name, update it
       if (documentName) {
         try {
@@ -211,6 +210,29 @@ export default function Page({
 
     return () => {};
   }, []);
+
+  const updateTitle = async (title: string) => {
+    const document = await getDocument({
+      documentId: docId,
+    });
+    // this is necessary to propagate document name update to the sidebar and header
+    await updateActiveDocumentInfoStore(document, activeDevice);
+    if (document?.id !== docId) {
+      console.error("document ID doesn't match page ID");
+      return;
+    }
+    try {
+      const updatedDocument = await updateDocumentName({
+        documentId: docId,
+        workspaceId,
+        name: title,
+        activeDevice,
+      });
+      await updateActiveDocumentInfoStore(updatedDocument, activeDevice);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Editor

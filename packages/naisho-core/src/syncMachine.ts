@@ -124,7 +124,7 @@ export type SyncMachineConfig = {
   deserializeChanges: (string) => unknown[];
   sodium: any;
   onDocumentLoaded?: () => void;
-  onSnapshotSent?: () => void | Promise<void>;
+  onSnapshotSaved?: () => void | Promise<void>;
 };
 
 export type Context = SyncMachineConfig & {
@@ -287,7 +287,7 @@ export const syncMachine =
         serializeChanges: () => "",
         deserializeChanges: () => [],
         onDocumentLoaded: () => undefined,
-        onSnapshotSent: () => undefined,
+        onSnapshotSaved: () => undefined,
         _activeSnapshotId: null,
         _latestServerVersion: null,
         _incomingQueue: [],
@@ -534,10 +534,6 @@ export const syncMachine =
                 latestServerVersion: context._latestServerVersion,
               }),
             });
-
-            if (context.onSnapshotSent) {
-              context.onSnapshotSent();
-            }
           };
 
           const createAndSendUpdate = (
@@ -655,6 +651,9 @@ export const syncMachine =
                 latestServerVersion = null;
                 sendingUpdatesClock = -1;
                 confirmedUpdatesClock = null;
+                if (context.onSnapshotSaved) {
+                  context.onSnapshotSaved();
+                }
                 break;
               case "snapshotFailed":
                 const parsedEvent = SnapshotFailedEvent.parse(event);
