@@ -41,7 +41,12 @@ export default function Page({
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const snapshotKeyRef = useRef<{
     keyDerivationTrace: KeyDerivationTrace2;
-    subkeyId: string;
+    subkeyId: number;
+    key: Uint8Array;
+  } | null>(null);
+  const snapshotInFlightKeyRef = useRef<{
+    keyDerivationTrace: KeyDerivationTrace2;
+    subkeyId: number;
     key: Uint8Array;
   } | null>(null);
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
@@ -75,21 +80,22 @@ export default function Page({
       setDocumentLoaded(true);
     },
     onSnapshotSaved: async () => {
-      console.log("SNAPSHOT SAVED", documentName);
+      snapshotKeyRef.current = snapshotInFlightKeyRef.current;
+      snapshotInFlightKeyRef.current = null;
       // if the document has a name, update it
-      if (documentName) {
-        try {
-          const updatedDocument = await updateDocumentName({
-            documentId: docId,
-            workspaceId,
-            name: documentName,
-            activeDevice,
-          });
-          updateActiveDocumentInfoStore(updatedDocument, activeDevice);
-        } catch (error) {
-          console.error(error);
-        }
-      }
+      // if (documentName) {
+      //   try {
+      //     const updatedDocument = await updateDocumentName({
+      //       documentId: docId,
+      //       workspaceId,
+      //       name: documentName,
+      //       activeDevice,
+      //     });
+      //     updateActiveDocumentInfoStore(updatedDocument, activeDevice);
+      //   } catch (error) {
+      //     console.error(error);
+      //   }
+      // }
     },
     getNewSnapshotData: async () => {
       const documentResult = await runDocumentQuery({ id: docId });
@@ -104,6 +110,11 @@ export default function Page({
         snapshotId,
         activeDevice,
       });
+      snapshotInFlightKeyRef.current = {
+        keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
+        subkeyId: snapshotKeyData.subkeyId,
+        key: sodium.from_base64(snapshotKeyData.key),
+      };
       return {
         id: snapshotId,
         data: Yjs.encodeStateAsUpdate(yDocRef.current),

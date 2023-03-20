@@ -65,9 +65,9 @@ export default function SidebarPage(props: Props) {
   });
 
   useEffect(() => {
-    if (documentResult.data?.document?.id) {
-      decryptTitle();
-    }
+    // if (documentResult.data?.document?.id) {
+    //   decryptTitle();
+    // }
   }, [props.nameCiphertext, props.subkeyId, documentResult.data?.document?.id]);
 
   const decryptTitle = async () => {

@@ -509,6 +509,7 @@ export const syncMachine =
 
           const createAndSendSnapshot = async () => {
             const snapshotData = await context.getNewSnapshotData();
+            console.log("createAndSendSnapshot", snapshotData);
             activeSendingSnapshotId = snapshotData.id;
             const publicData = {
               ...snapshotData.publicData,
@@ -542,6 +543,7 @@ export const syncMachine =
             refSnapshotId: string,
             clock: number
           ) => {
+            console.log("createAndSendUpdate", key);
             const update = context.serializeChanges(changes);
             sendingUpdatesClock = clock + 1;
 
@@ -568,7 +570,9 @@ export const syncMachine =
           };
 
           const processSnapshot = async (snapshot: SnapshotWithServerData) => {
+            console.log("processSnapshot", snapshot);
             const snapshotKey = await context.getSnapshotKey(snapshot);
+            console.log("processSnapshot key", snapshotKey);
             const decryptedSnapshot = verifyAndDecryptSnapshot(
               snapshot,
               snapshotKey,
@@ -583,6 +587,7 @@ export const syncMachine =
 
             for (let update of updates) {
               const key = await context.getUpdateKey(update);
+              console.log("processUpdates key", key);
               const updateResult = verifyAndDecryptUpdate(
                 update,
                 key,
@@ -630,16 +635,23 @@ export const syncMachine =
                   }
                 } catch (err) {
                   // TODO
-                  console.log("Apply snapshot failed. TODO handle error");
+                  console.log("Apply document failed. TODO handle error");
                   console.error(err);
                 }
 
                 break;
 
               case "snapshot":
-                console.log("snapshot saved", event);
-                const snapshot = SnapshotWithServerData.parse(event.snapshot);
-                await processSnapshot(snapshot);
+                console.log("snapshot", event);
+                try {
+                  const snapshot = SnapshotWithServerData.parse(event.snapshot);
+                  console.log("snapshot parsed");
+                  await processSnapshot(snapshot);
+                } catch (err) {
+                  console.log("Apply snapshot failed. TODO handle error", err);
+                  // TODO
+                }
+
                 break;
 
               case "snapshotSaved":
