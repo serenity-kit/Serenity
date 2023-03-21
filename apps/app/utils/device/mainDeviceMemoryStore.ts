@@ -1,11 +1,11 @@
-import { Device } from "../../types/Device";
+import { LocalDevice } from "@serenity-tools/common";
 
-let device: Device | null = null;
+let device: LocalDevice | null = null;
 
-export const setMainDevice = (newDevice: Device) => {
+export const setMainDevice = (newDevice: LocalDevice) => {
   device = newDevice;
 };
 
-export const getMainDevice = (): Device | null => {
+export const getMainDevice = (): LocalDevice | null => {
   return device;
 };

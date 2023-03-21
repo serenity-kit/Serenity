@@ -123,6 +123,7 @@ export const useFolderKeyStore = create<FolderKeyState>((set, get) => ({
         encryptionPublicKeySignature:
           activeDevice.encryptionPublicKeySignature!,
       },
+      // @ts-expect-error
       workspaceKeyBox: workspace!.currentWorkspaceKey.workspaceKeyBox!,
     });
     folderKey =
