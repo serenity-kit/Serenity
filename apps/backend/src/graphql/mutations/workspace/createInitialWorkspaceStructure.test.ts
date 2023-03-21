@@ -1,12 +1,11 @@
 import {
   createDevice,
-  decryptDocumentTitle,
   decryptFolderName,
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
   folderDerivedKeyContext,
-  recreateDocumentKey,
 } from "@serenity-tools/common";
+import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
@@ -111,14 +110,11 @@ test("create initial workspace structure", async () => {
   const snapshotKey =
     snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
 
-  const documentKey = recreateDocumentKey({
+  const decryptedDocumentName = decryptDocumentTitleBasedOnSnapshotKey({
     snapshotKey,
     subkeyId: document.subkeyId,
-  });
-  const decryptedDocumentName = decryptDocumentTitle({
-    key: documentKey.key,
     ciphertext: document.nameCiphertext,
-    publicNonce: document.nameNonce,
+    nonce: document.nameNonce,
   });
   expect(decryptedDocumentName).toBe("Introduction");
 });

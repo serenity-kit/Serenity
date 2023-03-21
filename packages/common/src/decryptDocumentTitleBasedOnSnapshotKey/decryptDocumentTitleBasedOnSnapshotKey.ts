@@ -11,7 +11,7 @@ type Params = {
   publicData?: any;
 };
 
-export const decryptDocumenTitleBasedOnSnapshotKey = ({
+export const decryptDocumentTitleBasedOnSnapshotKey = ({
   snapshotKey,
   subkeyId,
   ciphertext,

@@ -21,6 +21,27 @@ type Params = {
   publicData?: any;
 };
 
+type EncryptDocumentTitleByKeyParams = {
+  title: string;
+  publicData?: any;
+  key: string;
+};
+
+export const encryptDocumentTitleByKey = (
+  params: EncryptDocumentTitleByKeyParams
+) => {
+  const publicData = params.publicData || {};
+  const canonicalizedPublicData = canonicalize(publicData);
+  if (!canonicalizedPublicData) {
+    throw new Error("Invalid public data for encrypting the title.");
+  }
+  return encryptAead(
+    params.title,
+    canonicalizedPublicData,
+    sodium.from_base64(params.key)
+  );
+};
+
 export const encryptDocumentTitle = (params: Params) => {
   const { activeDevice, workspaceKeyBox } = params;
   const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
@@ -40,15 +61,11 @@ export const encryptDocumentTitle = (params: Params) => {
     snapshotKey: snapshotKeyData.key,
   });
   const publicData = params.publicData || {};
-  const canonicalizedPublicData = canonicalize(publicData);
-  if (!canonicalizedPublicData) {
-    throw new Error("Invalid public data for encrypting the title.");
-  }
-  const result = encryptAead(
-    params.title,
-    canonicalizedPublicData,
-    sodium.from_base64(documentKeyData.key)
-  );
+  const result = encryptDocumentTitleByKey({
+    title: params.title,
+    publicData,
+    key: documentKeyData.key,
+  });
   return {
     ciphertext: result.ciphertext,
     publicNonce: result.publicNonce,

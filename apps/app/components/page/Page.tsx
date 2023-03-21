@@ -1,6 +1,6 @@
 import { KeyDerivationTrace2, useYjsSyncMachine } from "@naisho/core";
 import { encryptDocumentTitle, LocalDevice } from "@serenity-tools/common";
-import { decryptDocumenTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumenTitleBasedOnSnapshotKey/decryptDocumenTitleBasedOnSnapshotKey";
+import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
@@ -112,7 +112,7 @@ export default function Page({
         throw new Error("Workspace or workspaceKeys not found");
       }
 
-      const documentTitle = decryptDocumenTitleBasedOnSnapshotKey({
+      const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
         snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
         ciphertext: document.nameCiphertext,
         nonce: document.nameNonce,

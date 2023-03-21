@@ -2,7 +2,7 @@ import {
   createDocumentKey,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
-  encryptDocumentTitle,
+  encryptDocumentTitleByKey,
   encryptFolderName,
   encryptWorkspaceKeyForDevice,
   folderDerivedKeyContext,
@@ -186,7 +186,7 @@ export const createInitialWorkspaceStructure = async ({
   const documentKey = documentKeyResult.key;
   const documentSubkeyId = documentKeyResult.subkeyId;
 
-  const encryptedDocumentTitleResult = encryptDocumentTitle({
+  const encryptedDocumentTitleResult = encryptDocumentTitleByKey({
     title: documentName,
     key: documentKey,
   });

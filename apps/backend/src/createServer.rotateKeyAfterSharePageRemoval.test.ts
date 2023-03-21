@@ -165,7 +165,8 @@ test("successfully creates an update", async () => {
     "UPDATE CONTENT DUMMY",
     publicData,
     sodium.from_base64(lastSnapshotKey),
-    signatureKeyPair
+    signatureKeyPair,
+    0
   );
 
   client.send(JSON.stringify(updateToSend));
@@ -208,7 +209,8 @@ test("if document is set to requiresSnapshot updates will fail", async () => {
     "UPDATE CONTENT DUMMY",
     publicData,
     sodium.from_base64(lastSnapshotKey),
-    signatureKeyPair
+    signatureKeyPair,
+    1
   );
 
   client.send(JSON.stringify(updateToSend));
@@ -331,7 +333,8 @@ test("successfully creates an update", async () => {
     "UPDATE CONTENT DUMMY",
     updatePublicData,
     sodium.from_base64(lastSnapshotKey),
-    signatureKeyPair
+    signatureKeyPair,
+    2
   );
 
   client.send(JSON.stringify(updateToSend));

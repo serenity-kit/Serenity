@@ -222,7 +222,8 @@ test("successfully creates an update", async () => {
     "UPDATE CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
-    signatureKeyPair
+    signatureKeyPair,
+    0
   );
 
   client.send(JSON.stringify(updateToSend));

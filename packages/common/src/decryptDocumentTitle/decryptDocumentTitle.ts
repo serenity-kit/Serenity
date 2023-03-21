@@ -1,5 +1,5 @@
 import { KeyDerivationTrace2 } from "@naisho/core";
-import { decryptDocumenTitleBasedOnSnapshotKey } from "../decryptDocumenTitleBasedOnSnapshotKey/decryptDocumenTitleBasedOnSnapshotKey";
+import { decryptDocumentTitleBasedOnSnapshotKey } from "../decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { deriveKeysFromKeyDerivationTrace } from "../deriveKeysFromKeyDerivationTrace/deriveKeysFromKeyDerivationTrace";
 import { Device, LocalDevice } from "../types";
 
@@ -41,7 +41,7 @@ export const decryptDocumentTitle = ({
   });
   const snapshotKeyData =
     snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];
-  return decryptDocumenTitleBasedOnSnapshotKey({
+  return decryptDocumentTitleBasedOnSnapshotKey({
     snapshotKey: snapshotKeyData.key,
     subkeyId,
     ciphertext,
