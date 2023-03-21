@@ -1,5 +1,6 @@
 import { KeyDerivationTrace2, useYjsSyncMachine } from "@naisho/core";
-import { LocalDevice } from "@serenity-tools/common";
+import { encryptDocumentTitle, LocalDevice } from "@serenity-tools/common";
+import { decryptDocumenTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumenTitleBasedOnSnapshotKey/decryptDocumenTitleBasedOnSnapshotKey";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
@@ -16,13 +17,14 @@ import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppConte
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
 import { createNewSnapshotKey } from "../../utils/createNewSnapshotKey/createNewSnapshotKey";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
-import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
+import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import {
   getLocalDocument,
   setLocalDocument,
 } from "../../utils/localSqliteApi/localSqliteApi";
+import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
   signatureKeyPair: KeyPair;
@@ -53,12 +55,11 @@ export default function Page({
   const [documentLoaded, setDocumentLoaded] = useState(false);
   const [username, setUsername] = useState("Unknown user");
 
-  const documentName = useActiveDocumentInfoStore(
-    (state) => state.documentName
+  const setActiveDocumentId = useDocumentTitleStore(
+    (state) => state.setActiveDocumentId
   );
-
-  const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
-    (state) => state.update
+  const updateDocumentTitle = useDocumentTitleStore(
+    (state) => state.updateDocumentTitle
   );
 
   let websocketHost = `wss://serenity-dev.fly.dev`;
@@ -82,20 +83,6 @@ export default function Page({
     onSnapshotSaved: async () => {
       snapshotKeyRef.current = snapshotInFlightKeyRef.current;
       snapshotInFlightKeyRef.current = null;
-      // if the document has a name, update it
-      // if (documentName) {
-      //   try {
-      //     const updatedDocument = await updateDocumentName({
-      //       documentId: docId,
-      //       workspaceId,
-      //       name: documentName,
-      //       activeDevice,
-      //     });
-      //     updateActiveDocumentInfoStore(updatedDocument, activeDevice);
-      //   } catch (error) {
-      //     console.error(error);
-      //   }
-      // }
     },
     getNewSnapshotData: async () => {
       const documentResult = await runDocumentQuery({ id: docId });
@@ -115,6 +102,33 @@ export default function Page({
         subkeyId: snapshotKeyData.subkeyId,
         key: sodium.from_base64(snapshotKeyData.key),
       };
+
+      const workspace = await getWorkspace({
+        deviceSigningPublicKey: activeDevice.signingPublicKey,
+        workspaceId,
+      });
+      if (!workspace?.currentWorkspaceKey) {
+        console.error("Workspace or workspaceKeys not found");
+        throw new Error("Workspace or workspaceKeys not found");
+      }
+
+      const documentTitle = decryptDocumenTitleBasedOnSnapshotKey({
+        snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
+        ciphertext: document.nameCiphertext,
+        nonce: document.nameNonce,
+        subkeyId: document.subkeyId,
+      });
+
+      const documentTitleData = encryptDocumentTitle({
+        title: documentTitle,
+        activeDevice,
+        snapshot: {
+          keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
+        },
+        // @ts-expect-error
+        workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+      });
+
       return {
         id: snapshotId,
         data: Yjs.encodeStateAsUpdate(yDocRef.current),
@@ -123,6 +137,7 @@ export default function Page({
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
           subkeyId: snapshotKeyData.subkeyId,
         },
+        additionalServerData: { documentTitleData },
       };
     },
     getSnapshotKey: async (snapshot) => {
@@ -194,7 +209,7 @@ export default function Page({
       }
       // communicate to other components e.g. sidebar or topbar
       // the currently active document
-      updateActiveDocumentInfoStore(document, activeDevice);
+      setActiveDocumentId({ documentId: docId });
 
       // remove awareness state when closing the window
       // TODO re-add
@@ -227,19 +242,18 @@ export default function Page({
       documentId: docId,
     });
     // this is necessary to propagate document name update to the sidebar and header
-    await updateActiveDocumentInfoStore(document, activeDevice);
+    updateDocumentTitle({ documentId: docId, title });
     if (document?.id !== docId) {
       console.error("document ID doesn't match page ID");
       return;
     }
     try {
-      const updatedDocument = await updateDocumentName({
+      await updateDocumentName({
         documentId: docId,
         workspaceId,
         name: title,
         activeDevice,
       });
-      await updateActiveDocumentInfoStore(updatedDocument, activeDevice);
     } catch (error) {
       console.error(error);
     }

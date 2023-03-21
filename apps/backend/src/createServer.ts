@@ -182,6 +182,7 @@ export default async function createServer() {
         // new snapshot
         if (data?.publicData?.snapshotId) {
           const snapshotMessage = SnapshotWithClientData.parse(data);
+          console.log("snapshotMessage", snapshotMessage);
           try {
             const activeSnapshotInfo =
               snapshotMessage.lastKnownSnapshotId &&
@@ -195,6 +196,9 @@ export default async function createServer() {
               snapshot: snapshotMessage,
               activeSnapshotInfo,
               workspaceId: userToWorkspace.workspaceId,
+              documentTitle:
+                // @ts-expect-error
+                snapshotMessage.additionalServerData.documentTitleData,
             });
             console.log("add snapshot");
             connection.send(

@@ -1,6 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
 import {
-  createDocumentKey,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
   encryptDocumentTitle,
@@ -140,13 +139,21 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         },
       });
 
-      // prepare document
-      const documentKeyData = createDocumentKey({
-        snapshotKey: snapshotKey.key,
+      const workspaceKeyBox = deviceWorkspaceKeyBoxes.find((device) => {
+        return device.deviceSigningPublicKey === activeDevice.signingPublicKey;
       });
+
+      // prepare document
       const encryptedDocumentTitle = encryptDocumentTitle({
         title: documentName,
-        key: documentKeyData.key,
+        activeDevice,
+        snapshot: {
+          keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
+        },
+        workspaceKeyBox: {
+          ...workspaceKeyBox!,
+          creatorDevice: activeDevice,
+        },
       });
 
       const createInitialWorkspaceStructureResult =
@@ -169,7 +176,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
               id: documentId,
               nameCiphertext: encryptedDocumentTitle.ciphertext,
               nameNonce: encryptedDocumentTitle.publicNonce,
-              subkeyId: documentKeyData.subkeyId,
+              subkeyId: encryptedDocumentTitle.subkeyId,
               snapshot,
             },
             creatorDeviceSigningPublicKey: activeDevice?.signingPublicKey!,

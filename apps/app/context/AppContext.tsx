@@ -1,6 +1,6 @@
+import { LocalDevice } from "@serenity-tools/common";
 import React, { useContext } from "react";
 import { Client } from "urql";
-import { Device } from "../types/Device";
 import { getUrqlClient } from "../utils/urqlClient/urqlClient";
 
 export type UpdateAuthenticationFunction = (
@@ -11,7 +11,7 @@ export type AppContext = {
   sessionKey: string | null;
   updateAuthentication: UpdateAuthenticationFunction;
   updateActiveDevice: () => Promise<void>;
-  activeDevice: Device | null;
+  activeDevice: LocalDevice | null;
 };
 
 const appContext = React.createContext<AppContext>({

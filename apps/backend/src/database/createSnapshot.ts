@@ -12,16 +12,26 @@ type ActiveSnapshotInfo = {
   snapshotId: string;
 };
 
+export type CreateSnapshotDocumentTitleData = {
+  ciphertext: string;
+  publicNonce: string;
+  publicData: string;
+  workspaceKeyId: string;
+  subkeyId: number;
+};
+
 type CreateSnapshotParams = {
   snapshot: Snapshot;
   workspaceId: string;
   activeSnapshotInfo?: ActiveSnapshotInfo;
+  documentTitle?: CreateSnapshotDocumentTitleData;
 };
 
 export async function createSnapshot({
   snapshot,
   activeSnapshotInfo,
   workspaceId,
+  documentTitle,
 }: CreateSnapshotParams) {
   return await prisma.$transaction(async (prisma) => {
     const documentPromise = prisma.document.findUniqueOrThrow({
@@ -90,6 +100,18 @@ export async function createSnapshot({
       throw new NaishoSnapshotMissesUpdatesError(
         "Snapshot does not include the latest changes."
       );
+    }
+
+    if (documentTitle) {
+      await prisma.document.update({
+        where: { id: snapshot.publicData.docId },
+        data: {
+          nameCiphertext: documentTitle.ciphertext,
+          nameNonce: documentTitle.publicNonce,
+          workspaceKeyId: documentTitle.workspaceKeyId,
+          subkeyId: documentTitle.subkeyId,
+        },
+      });
     }
 
     // only update when necessary

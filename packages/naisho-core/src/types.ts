@@ -95,6 +95,7 @@ export type Snapshot = z.infer<typeof Snapshot>;
 export const SnapshotWithClientData = Snapshot.extend({
   lastKnownSnapshotId: z.string().optional(),
   latestServerVersion: z.number().optional(),
+  additionalServerData: z.unknown().optional(),
 });
 
 export type SnapshotWithClientData = z.infer<typeof SnapshotWithClientData>;

@@ -111,6 +111,7 @@ export type SyncMachineConfig = {
     readonly data: Uint8Array | string;
     readonly key: Uint8Array;
     readonly publicData: any;
+    readonly additionalServerData?: any;
   }>;
   applyChanges: (updates: any[]) => void;
   getUpdateKey: (update: any) => Promise<Uint8Array>;
@@ -533,6 +534,7 @@ export const syncMachine =
                 ...snapshot,
                 lastKnownSnapshotId: context._activeSnapshotId,
                 latestServerVersion: context._latestServerVersion,
+                additionalServerData: snapshotData.additionalServerData,
               }),
             });
           };
@@ -543,7 +545,7 @@ export const syncMachine =
             refSnapshotId: string,
             clock: number
           ) => {
-            console.log("createAndSendUpdate", key);
+            // console.log("createAndSendUpdate", key);
             const update = context.serializeChanges(changes);
             sendingUpdatesClock = clock + 1;
 
@@ -572,7 +574,7 @@ export const syncMachine =
           const processSnapshot = async (snapshot: SnapshotWithServerData) => {
             console.log("processSnapshot", snapshot);
             const snapshotKey = await context.getSnapshotKey(snapshot);
-            console.log("processSnapshot key", snapshotKey);
+            // console.log("processSnapshot key", snapshotKey);
             const decryptedSnapshot = verifyAndDecryptSnapshot(
               snapshot,
               snapshotKey,
@@ -587,7 +589,7 @@ export const syncMachine =
 
             for (let update of updates) {
               const key = await context.getUpdateKey(update);
-              console.log("processUpdates key", key);
+              // console.log("processUpdates key", key);
               const updateResult = verifyAndDecryptUpdate(
                 update,
                 key,
