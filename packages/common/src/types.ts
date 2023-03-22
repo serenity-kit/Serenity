@@ -10,6 +10,7 @@ export type LocalDevice = {
   encryptionPublicKey: string;
   encryptionPrivateKey: string;
   encryptionPublicKeySignature: string;
+  info?: string;
 };
 
 /*

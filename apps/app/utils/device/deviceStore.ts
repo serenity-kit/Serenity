@@ -1,13 +1,13 @@
+import { LocalDevice } from "@serenity-tools/common";
 import * as SecureStore from "expo-secure-store";
-import { Device } from "../../types/Device";
 
 export const deviceStorageKey = "device.device";
 
-export const setDevice = async (device: Device) => {
+export const setDevice = async (device: LocalDevice) => {
   await SecureStore.setItemAsync(deviceStorageKey, JSON.stringify(device));
 };
 
-export const getDevice = async (): Promise<Device | null> => {
+export const getDevice = async (): Promise<LocalDevice | null> => {
   const jsonDevice = await SecureStore.getItemAsync(deviceStorageKey);
   if (!jsonDevice) {
     return null;

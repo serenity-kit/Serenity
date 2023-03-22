@@ -4,7 +4,7 @@ import {
   createDocumentKey,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
-  encryptDocumentTitle,
+  encryptDocumentTitleByKey,
   encryptFolderName,
   encryptWorkspaceKeyForDevice,
   folderDerivedKeyContext,
@@ -114,7 +114,7 @@ export default async function createUserWithWorkspace({
     snapshotKey: snapshotKey.key,
   });
   const documentKey = docmentKeyResult.key;
-  const encryptedDocumentTitleResult = encryptDocumentTitle({
+  const encryptedDocumentTitleResult = encryptDocumentTitleByKey({
     title: documentName,
     key: documentKey,
   });

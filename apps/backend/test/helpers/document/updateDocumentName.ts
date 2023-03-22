@@ -1,7 +1,7 @@
 import {
   createDocumentKey,
   deriveKeysFromKeyDerivationTrace,
-  encryptDocumentTitle,
+  encryptDocumentTitleByKey,
   LocalDevice,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
@@ -150,7 +150,7 @@ export const updateDocumentName = async ({
   const documentKeyData = createDocumentKey({
     snapshotKey,
   });
-  const encryptedDocumentResult = encryptDocumentTitle({
+  const encryptedDocumentResult = encryptDocumentTitleByKey({
     title: name,
     key: documentKeyData.key,
   });

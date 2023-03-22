@@ -1,9 +1,9 @@
+import { LocalDevice } from "@serenity-tools/common";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useCallback, useEffect, useState } from "react";
 import sodium from "react-native-libsodium";
 import { Client } from "urql";
-import { Device } from "../types/Device";
 import * as SessionKeyStore from "../utils/authentication/sessionKeyStore";
 import { getSessionKey } from "../utils/authentication/sessionKeyStore";
 import { getActiveDevice } from "../utils/device/getActiveDevice";
@@ -12,7 +12,7 @@ import { getUrqlClient, recreateClient } from "../utils/urqlClient/urqlClient";
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
   const [sessionKey, setSessionKey] = useState<null | string>(null);
-  const [activeDevice, setActiveDevice] = useState<null | Device>(null);
+  const [activeDevice, setActiveDevice] = useState<null | LocalDevice>(null);
   const [urqlClient, setUrqlClient] = useState<Client>(getUrqlClient());
 
   // Load any resources or data that we need prior to rendering the app

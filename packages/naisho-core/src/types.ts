@@ -92,6 +92,14 @@ export const Snapshot = z.object({
 
 export type Snapshot = z.infer<typeof Snapshot>;
 
+export const SnapshotWithClientData = Snapshot.extend({
+  lastKnownSnapshotId: z.string().nullable().optional(),
+  latestServerVersion: z.number().nullable().optional(),
+  additionalServerData: z.unknown().optional(),
+});
+
+export type SnapshotWithClientData = z.infer<typeof SnapshotWithClientData>;
+
 export const SnapshotWithServerData = Snapshot.extend({
   serverData: SnapshotServerData,
 });
@@ -122,9 +130,22 @@ export const EphemeralUpdate = z.object({
 
 export type EphemeralUpdate = z.infer<typeof EphemeralUpdate>;
 
-export type ClientEvent = Snapshot | Update | EphemeralUpdate;
+export const ClientEvent = z.union([Snapshot, Update, EphemeralUpdate]);
 
-export type ServerEvent =
-  | SnapshotWithServerData
-  | UpdateWithServerData
-  | EphemeralUpdate;
+export type ClientEvent = z.infer<typeof ClientEvent>;
+
+export const ServerEvent = z.union([
+  SnapshotWithServerData,
+  UpdateWithServerData,
+  EphemeralUpdate,
+]);
+
+export type ServerEvent = z.infer<typeof ServerEvent>;
+
+export const SnapshotFailedEvent = z.object({
+  type: z.literal("snapshotFailed"),
+  snapshot: z.optional(SnapshotWithServerData),
+  updates: z.array(UpdateWithServerData).optional(),
+});
+
+export type SnapshotFailedEvent = z.infer<typeof SnapshotFailedEvent>;

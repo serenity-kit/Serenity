@@ -1,3 +1,4 @@
+import canonicalize from "canonicalize";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
 import { EphemeralUpdate, EphemeralUpdatePublicData } from "./types";
@@ -8,7 +9,9 @@ export function createEphemeralUpdate(
   key: Uint8Array,
   signatureKeyPair: KeyPair
 ) {
-  const publicDataAsBase64 = sodium.to_base64(JSON.stringify(publicData));
+  const publicDataAsBase64 = sodium.to_base64(
+    canonicalize(publicData) as string
+  );
   const { ciphertext, publicNonce } = encryptAead(
     content,
     publicDataAsBase64,
@@ -34,7 +37,7 @@ export function verifyAndDecryptEphemeralUpdate(
   publicKey: Uint8Array
 ) {
   const publicDataAsBase64 = sodium.to_base64(
-    JSON.stringify(ephemeralUpdate.publicData)
+    canonicalize(ephemeralUpdate.publicData) as string
   );
 
   const isValid = verifySignature(
@@ -47,7 +50,7 @@ export function verifyAndDecryptEphemeralUpdate(
   }
   return decryptAead(
     sodium.from_base64(ephemeralUpdate.ciphertext),
-    sodium.to_base64(JSON.stringify(ephemeralUpdate.publicData)),
+    sodium.to_base64(canonicalize(ephemeralUpdate.publicData) as string),
     key,
     ephemeralUpdate.nonce
   );

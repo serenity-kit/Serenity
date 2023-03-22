@@ -2,6 +2,8 @@ import {
   NaishoNewSnapshotWithKeyRotationRequired,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
+  SnapshotWithClientData,
+  SnapshotWithServerData,
   UpdateWithServerData,
 } from "@naisho/core";
 import {
@@ -179,18 +181,24 @@ export default async function createServer() {
 
         // new snapshot
         if (data?.publicData?.snapshotId) {
+          const snapshotMessage = SnapshotWithClientData.parse(data);
+          console.log("snapshotMessage", snapshotMessage);
           try {
             const activeSnapshotInfo =
-              data.lastKnownSnapshotId && data.latestServerVersion
+              snapshotMessage.lastKnownSnapshotId &&
+              snapshotMessage.latestServerVersion
                 ? {
-                    latestVersion: data.latestServerVersion,
-                    snapshotId: data.lastKnownSnapshotId,
+                    latestVersion: snapshotMessage.latestServerVersion,
+                    snapshotId: snapshotMessage.lastKnownSnapshotId,
                   }
                 : undefined;
             const snapshot = await createSnapshot({
-              snapshot: data,
+              snapshot: snapshotMessage,
               activeSnapshotInfo,
               workspaceId: userToWorkspace.workspaceId,
+              documentTitle:
+                // @ts-expect-error
+                snapshotMessage.additionalServerData?.documentTitleData,
             });
             console.log("add snapshot");
             connection.send(
@@ -200,15 +208,18 @@ export default async function createServer() {
                 docId: snapshot.documentId,
               })
             );
+            const snapshotMsgForOtherClients: SnapshotWithServerData = {
+              ciphertext: snapshotMessage.ciphertext,
+              nonce: snapshotMessage.nonce,
+              publicData: snapshotMessage.publicData,
+              signature: snapshotMessage.signature,
+              serverData: {
+                latestVersion: snapshot.latestVersion,
+              },
+            };
             addUpdate(
               documentId,
-              {
-                ...data,
-                type: "snapshot",
-                serverData: {
-                  latestVersion: snapshot.latestVersion,
-                },
-              },
+              { type: "snapshot", snapshot: snapshotMsgForOtherClients },
               connection
             );
           } catch (error) {
@@ -290,6 +301,7 @@ export default async function createServer() {
               connection
             );
           } catch (err) {
+            console.log("update failed", err);
             if (savedUpdate === null || savedUpdate === undefined) {
               connection.send(
                 JSON.stringify({

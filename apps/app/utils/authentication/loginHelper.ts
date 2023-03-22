@@ -153,6 +153,7 @@ export const fetchMainDevice = async ({ exportKey }: FetchMainDeviceParams) => {
     signingPrivateKey: privateKeys.signingPrivateKey,
     signingPublicKey: mainDevice.signingPublicKey,
     encryptionPublicKey: mainDevice.encryptionPublicKey,
+    encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
   });
 };
 

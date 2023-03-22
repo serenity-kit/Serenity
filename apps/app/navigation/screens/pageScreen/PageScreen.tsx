@@ -21,13 +21,10 @@ import { PageHeader } from "../../../components/page/PageHeader";
 import { PageHeaderRight } from "../../../components/pageHeaderRight/PageHeaderRight";
 import { PageProvider } from "../../../context/PageContext";
 import { commentsMachine } from "../../../machines/commentsMachine";
-import { useActiveDocumentInfoStore } from "../../../utils/document/activeDocumentInfoStore";
 import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../../utils/document/documentPathStore";
-import { getDocument } from "../../../utils/document/getDocument";
-import { updateDocumentName } from "../../../utils/document/updateDocumentName";
 import { useFolderKeyStore } from "../../../utils/folder/folderKeyStore";
 import { useOpenFolderStore } from "../../../utils/folder/openFolderStore";
 import { setLastUsedDocumentId } from "../../../utils/lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
@@ -40,9 +37,6 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
   const pageId = props.route.params.pageId;
   const { activeDevice } = useAuthenticatedAppContext();
   const { workspaceId } = useWorkspace();
-  const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
-    (state) => state.update
-  );
   const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
   const folderStore = useOpenFolderStore();
   const documentPathStore = useDocumentPathStore();
@@ -92,29 +86,6 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
     });
     folderStore.update(openFolderIds);
     documentPathStore.update(documentPath, activeDevice, getFolderKey);
-  };
-
-  const updateTitle = async (title: string) => {
-    const document = await getDocument({
-      documentId: pageId,
-    });
-    // this is necessary to propagate document name update to the sidebar and header
-    await updateActiveDocumentInfoStore(document, activeDevice);
-    if (document?.id !== pageId) {
-      console.error("document ID doesn't match page ID");
-      return;
-    }
-    try {
-      const updatedDocument = await updateDocumentName({
-        documentId: pageId,
-        workspaceId,
-        name: title,
-        activeDevice,
-      });
-      await updateActiveDocumentInfoStore(updatedDocument, activeDevice);
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   useEffect(() => {
@@ -189,7 +160,6 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
             {...props}
             // to force unmount and mount the page
             key={pageId}
-            updateTitle={updateTitle}
             signatureKeyPair={signatureKeyPair}
             workspaceId={workspaceId}
           />

@@ -38,11 +38,11 @@ import {
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { RootStackScreenProps } from "../../types/navigationProps";
-import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
 import {
   getDocumentPath,
   useDocumentPathStore,
 } from "../../utils/document/documentPathStore";
+import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { createFolderKeyDerivationTrace } from "../../utils/folder/createFolderKeyDerivationTrace";
 import { useFolderKeyStore } from "../../utils/folder/folderKeyStore";
 import { useOpenFolderStore } from "../../utils/folder/openFolderStore";
@@ -94,7 +94,7 @@ export default function SidebarFolder(props: Props) {
   const { depth = 0 } = props;
   const { activeDevice } = useAuthenticatedAppContext();
   const documentPathStore = useDocumentPathStore();
-  const document = useActiveDocumentInfoStore((state) => state.document);
+  const documentTitleStore = useDocumentTitleStore();
   const documentPathIds = useDocumentPathStore((state) => state.folderIds);
   const [folderName, setFolderName] = useState("decrypting…");
   const getFolderKey = useFolderKeyStore((state) => state.getFolderKey);
@@ -200,6 +200,7 @@ export default function SidebarFolder(props: Props) {
         encryptionPublicKeySignature:
           activeDevice.encryptionPublicKeySignature!,
       },
+      // @ts-expect-error
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
     });
     const parentChainItem =
@@ -269,6 +270,7 @@ export default function SidebarFolder(props: Props) {
     }
     const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
       keyDerivationTrace: props.keyDerivationTrace,
+      // @ts-expect-error
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
       activeDevice: {
         signingPublicKey: activeDevice.signingPublicKey,
@@ -319,7 +321,12 @@ export default function SidebarFolder(props: Props) {
     const documentNameKey = createDocumentKey({ snapshotKey: snapshotKey.key });
     const documentNameData = encryptDocumentTitle({
       title: documentName,
-      key: documentNameKey.key,
+      activeDevice,
+      snapshot: {
+        keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
+      },
+      // @ts-expect-error
+      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
     });
     const result = await runCreateDocumentMutation(
       {
@@ -410,6 +417,7 @@ export default function SidebarFolder(props: Props) {
         encryptionPublicKeySignature:
           activeDevice.encryptionPublicKeySignature!,
       },
+      // @ts-expect-error
       workspaceKeyBox: workspace.currentWorkspaceKey!.workspaceKeyBox!,
     });
     // ignore the last chain item as it's the key for the old folder name
@@ -446,8 +454,13 @@ export default function SidebarFolder(props: Props) {
       setFolderName(newFolderName);
       // refetch the document path
       // TODO: Optimize by checking if the current folder is in the document path
-      if (document && documentPathIds.includes(props.folderId)) {
-        const documentPath = await getDocumentPath(document.id);
+      if (
+        documentTitleStore?.activeDocumentId &&
+        documentPathIds.includes(props.folderId)
+      ) {
+        const documentPath = await getDocumentPath(
+          documentTitleStore.activeDocumentId
+        );
         documentPathStore.update(documentPath, activeDevice, getFolderKey);
       }
     } else {

@@ -131,6 +131,7 @@ export function VerifyPasswordModal(props: Props) {
         throw new Error("Could not query mainDevice. Probably not logged in");
       }
       const mainDevice = mainDeviceResult.data.mainDevice;
+      // @ts-expect-error TODO invesigate this!!!
       setMainDevice(mainDevice);
       if (props.onSuccess) {
         props.onSuccess();

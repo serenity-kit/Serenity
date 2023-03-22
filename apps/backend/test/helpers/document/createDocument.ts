@@ -8,7 +8,7 @@ import {
   createDocumentKey,
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
-  encryptDocumentTitle,
+  encryptDocumentTitleByKey,
   LocalDevice,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
@@ -190,7 +190,7 @@ export const createDocument = async ({
     useName = name;
   }
   const documentNameKey = createDocumentKey({ snapshotKey: snapshotKey.key });
-  const documentNameData = encryptDocumentTitle({
+  const documentNameData = encryptDocumentTitleByKey({
     title: useName,
     key: documentNameKey.key,
   });

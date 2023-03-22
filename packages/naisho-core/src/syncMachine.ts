@@ -7,18 +7,18 @@ import {
   sendTo,
   spawn,
 } from "xstate";
+import { z } from "zod";
 import {
   createEphemeralUpdate,
   verifyAndDecryptEphemeralUpdate,
 } from "./ephemeralUpdate";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
 import {
-  addUpdateToInProgressQueue,
-  createUpdate,
-  getUpdateInProgress,
-  removeUpdateFromInProgressQueue,
-  verifyAndDecryptUpdate,
-} from "./update";
+  SnapshotFailedEvent,
+  SnapshotWithServerData,
+  UpdateWithServerData,
+} from "./types";
+import { createUpdate, verifyAndDecryptUpdate } from "./update";
 
 // The sync machine is responsible for syncing the document with the server.
 // Specifically it is responsible for:
@@ -34,9 +34,10 @@ import {
 //
 // In order to process incoming and outgoing changes the sync machine uses two queues:
 // - _incomingQueue: contains all incoming messages from the server
-// - pendingChangesQueue: contains all outgoing messages that are not yet sent to the server
+// - _pendingChangesQueue: contains all outgoing messages that are not yet sent to the server
 //
-// How Queue processing works:
+// How Queue processing works
+// -------------------------
 // 1. first handle all incoming message
 // 2. then handle all pending updates
 // Background: There might be a new snapshot and this way we avoid retries
@@ -47,12 +48,55 @@ import {
 // The delay is based on the number of retries that have already been done using an exponential
 // formula: (100 * 1.8 ** websocketRetries).
 // The websocketRetries is capped at 13 so that the delay doesn't get too large.
+//
+// Handling outgoing messages
+// -------------------------
+// Once a change is added and the `_pendingChangesQueue` is processed it will collect all changes
+// and depending on `shouldSendSnapshot` either send a snapshot or an update.
+// In case a snapshot is sent `_pendingChangesQueue` is cleared and the `_activeSendingSnapshotId` set to the snapshot ID.
+// In case an update is sent the changes will be added to the `_updatesInFlight` and the `_sendingUpdatesClock` increased by one.
+//
+// If a snapshot saved event is received
+// - the `_activeSnapshotId` is set to the snapshot ID and
+// - the `_activeSendingSnapshotId` is cleared.
+// Queue processing for sending messages is resumed.
+//
+// If an update saved event is received
+// - the `_latestServerVersion` is set to the update version
+// - the `_confirmedUpdatesClock`
+// - the update removed from the `_updatesInFlight` removed
+//
+// IF a snapshot failed to save
+// - the snapshot and changes that came with the response are applied and another snapshot is created and sent
+//
+// If an update failed to save
+// - check if the update is in the `_updatesInFlight` - only if it's there a retry is necessary
+// since we know it was not handled by a new snapshot or update
+// - set the `_sendingUpdatesClock` to the `_confirmedUpdatesClock`
+// - all the changes from this failed and later updates plus the new pendingChanges are taken and a new update is created and
+// sent with the clock set to the latest confirmed clock + 1
+//
+// When loading the initial document it's important to make sure these variables are correctly set:
+// - `_confirmedUpdatesClock`
+// - `_sendingUpdatesClock` (same as `_confirmedUpdatesClock`)
+// - `_latestServerVersion`
+// - `_activeSnapshotId`
+// Otherwise you might try to send an update that the server will reject.
+
+type UpdateInFlight = {
+  clock: number;
+  changes: any[];
+};
 
 type ProcessQueueData = {
   handledQueue: "incoming" | "pending" | "none";
   activeSnapshotId: string | null;
   latestServerVersion: number | null;
   activeSendingSnapshotId: string | null;
+  sendingUpdatesClock: number;
+  confirmedUpdatesClock: number;
+  updatesInFlight: UpdateInFlight[];
+  pendingChangesQueue: any[];
 };
 
 export type SyncMachineConfig = {
@@ -67,6 +111,7 @@ export type SyncMachineConfig = {
     readonly data: Uint8Array | string;
     readonly key: Uint8Array;
     readonly publicData: any;
+    readonly additionalServerData?: any;
   }>;
   applyChanges: (updates: any[]) => void;
   getUpdateKey: (update: any) => Promise<Uint8Array>;
@@ -80,7 +125,7 @@ export type SyncMachineConfig = {
   deserializeChanges: (string) => unknown[];
   sodium: any;
   onDocumentLoaded?: () => void;
-  onSnapshotSent?: () => void | Promise<void>;
+  onSnapshotSaved?: () => void | Promise<void>;
 };
 
 export type Context = SyncMachineConfig & {
@@ -92,6 +137,9 @@ export type Context = SyncMachineConfig & {
   _activeSendingSnapshotId: string | null;
   _shouldReconnect: boolean;
   _websocketRetries: number;
+  _updatesInFlight: UpdateInFlight[];
+  _confirmedUpdatesClock: number | null;
+  _sendingUpdatesClock: number;
 };
 
 const websocketService = (context) => (send, onReceive) => {
@@ -240,7 +288,7 @@ export const syncMachine =
         serializeChanges: () => "",
         deserializeChanges: () => [],
         onDocumentLoaded: () => undefined,
-        onSnapshotSent: () => undefined,
+        onSnapshotSaved: () => undefined,
         _activeSnapshotId: null,
         _latestServerVersion: null,
         _incomingQueue: [],
@@ -248,6 +296,9 @@ export const syncMachine =
         _activeSendingSnapshotId: null,
         _shouldReconnect: false,
         _websocketRetries: 0,
+        _updatesInFlight: [],
+        _confirmedUpdatesClock: null,
+        _sendingUpdatesClock: -1,
       },
       initial: "connecting",
       on: {
@@ -416,16 +467,23 @@ export const syncMachine =
           if (event.data.handledQueue === "incoming") {
             return {
               _incomingQueue: context._incomingQueue.slice(1),
+              _pendingChangesQueue: event.data.pendingChangesQueue,
               _activeSnapshotId: event.data.activeSnapshotId,
               _latestServerVersion: event.data.latestServerVersion,
               _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
+              _sendingUpdatesClock: event.data.sendingUpdatesClock,
+              _confirmedUpdatesClock: event.data.confirmedUpdatesClock,
+              _updatesInFlight: event.data.updatesInFlight,
             };
           } else {
             return {
-              _pendingChangesQueue: [],
+              _pendingChangesQueue: event.data.pendingChangesQueue,
               _activeSnapshotId: event.data.activeSnapshotId,
               _latestServerVersion: event.data.latestServerVersion,
               _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
+              _sendingUpdatesClock: event.data.sendingUpdatesClock,
+              _confirmedUpdatesClock: event.data.confirmedUpdatesClock,
+              _updatesInFlight: event.data.updatesInFlight,
             };
           }
         }),
@@ -439,14 +497,20 @@ export const syncMachine =
             // calculating slow exponential backoff
           }, delay);
         },
-        processQueues: (context) => async (send) => {
+        processQueues: (context, event) => async (send) => {
+          console.log("processQueues event", event);
           let activeSnapshotId = context._activeSnapshotId;
           let latestServerVersion = context._latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
           let activeSendingSnapshotId = context._activeSendingSnapshotId;
+          let sendingUpdatesClock = context._sendingUpdatesClock;
+          let confirmedUpdatesClock = context._confirmedUpdatesClock;
+          let updatesInFlight = context._updatesInFlight;
+          let pendingChangesQueue = context._pendingChangesQueue;
 
           const createAndSendSnapshot = async () => {
             const snapshotData = await context.getNewSnapshotData();
+            console.log("createAndSendSnapshot", snapshotData);
             activeSendingSnapshotId = snapshotData.id;
             const publicData = {
               ...snapshotData.publicData,
@@ -463,25 +527,28 @@ export const syncMachine =
               context.signatureKeyPair
             );
 
+            pendingChangesQueue = [];
             send({
               type: "SEND",
               message: JSON.stringify({
                 ...snapshot,
                 lastKnownSnapshotId: context._activeSnapshotId,
                 latestServerVersion: context._latestServerVersion,
+                additionalServerData: snapshotData.additionalServerData,
               }),
             });
-            if (context.onSnapshotSent) {
-              context.onSnapshotSent();
-            }
           };
 
           const createAndSendUpdate = (
-            update: string | Uint8Array,
+            changes: unknown[],
             key: Uint8Array,
             refSnapshotId: string,
-            clockOverwrite?: number
+            clock: number
           ) => {
+            // console.log("createAndSendUpdate", key);
+            const update = context.serializeChanges(changes);
+            sendingUpdatesClock = clock + 1;
+
             const publicData = {
               refSnapshotId,
               docId: context.documentId,
@@ -494,13 +561,55 @@ export const syncMachine =
               publicData,
               key,
               context.signatureKeyPair,
-              clockOverwrite
+              sendingUpdatesClock
             );
 
-            if (clockOverwrite === undefined) {
-              addUpdateToInProgressQueue(message, update);
-            }
+            updatesInFlight.push({
+              clock: sendingUpdatesClock,
+              changes,
+            });
             send({ type: "SEND", message: JSON.stringify(message) });
+          };
+
+          const processSnapshot = async (snapshot: SnapshotWithServerData) => {
+            console.log("processSnapshot", snapshot);
+            const snapshotKey = await context.getSnapshotKey(snapshot);
+            // console.log("processSnapshot key", snapshotKey);
+            const decryptedSnapshot = verifyAndDecryptSnapshot(
+              snapshot,
+              snapshotKey,
+              context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+            );
+            context.applySnapshot(decryptedSnapshot);
+            activeSnapshotId = snapshot.publicData.snapshotId;
+          };
+
+          const processUpdates = async (updates: UpdateWithServerData[]) => {
+            let changes: unknown[] = [];
+
+            for (let update of updates) {
+              const key = await context.getUpdateKey(update);
+              // console.log("processUpdates key", key);
+              const updateResult = verifyAndDecryptUpdate(
+                update,
+                key,
+                context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+              );
+
+              latestServerVersion = update.serverData.version;
+              if (
+                update.publicData.pubKey ===
+                context.sodium.to_base64(context.signatureKeyPair.publicKey)
+              ) {
+                confirmedUpdatesClock = update.publicData.clock;
+                sendingUpdatesClock = update.publicData.clock;
+              }
+              const additionalChanges = context.deserializeChanges(
+                context.sodium.to_string(updateResult)
+              );
+              changes = changes.concat(additionalChanges);
+            }
+            context.applyChanges(changes);
           };
 
           if (context._incomingQueue.length > 0) {
@@ -516,64 +625,34 @@ export const syncMachine =
               case "document":
                 try {
                   activeSnapshotId = event.snapshot.publicData.snapshotId;
-                  const snapshot = event.snapshot;
-                  const key = await context.getSnapshotKey(snapshot);
-                  const decryptedSnapshot = verifyAndDecryptSnapshot(
-                    snapshot,
-                    key,
-                    context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                  );
-                  context.applySnapshot(decryptedSnapshot);
+                  const snapshot = SnapshotWithServerData.parse(event.snapshot);
+                  await processSnapshot(snapshot);
 
-                  const updates = event.updates;
-                  console.log("updates", updates);
-                  const changes = updates
-                    .map((update) => {
-                      const updateResult = verifyAndDecryptUpdate(
-                        update,
-                        key,
-                        context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                      );
-
-                      latestServerVersion = update.serverData.version;
-                      const changes = context.deserializeChanges(
-                        context.sodium.to_string(updateResult)
-                      );
-                      return changes;
-                    })
-                    .flat();
-                  context.applyChanges(changes);
+                  const updates = z
+                    .array(UpdateWithServerData)
+                    .parse(event.updates);
+                  await processUpdates(updates);
                   if (context.onDocumentLoaded) {
                     context.onDocumentLoaded();
                   }
-
-                  // setActiveSnapshotAndCommentKeys(
-                  //   {
-                  //     id: snapshot.publicData.snapshotId,
-                  //     key: to_base64(key),
-                  //   },
-                  //   {} // TODO extract and pass on comment keys from snapshot
-                  // );
                 } catch (err) {
                   // TODO
-                  console.log("Apply snapshot failed. TODO handle error");
+                  console.log("Apply document failed. TODO handle error");
                   console.error(err);
                 }
 
                 break;
 
               case "snapshot":
-                console.log("snapshot saved", event);
-                activeSnapshotId = event.snapshot.publicData.snapshotId;
-                const snapshot = event.snapshot;
-                const snapshotKey = await context.getSnapshotKey(snapshot);
-                const decryptedSnapshot = verifyAndDecryptSnapshot(
-                  snapshot,
-                  snapshotKey,
-                  context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                );
-                context.applySnapshot(decryptedSnapshot);
-                // setActiveSnapshotAndCommentKeys
+                console.log("snapshot", event);
+                try {
+                  const snapshot = SnapshotWithServerData.parse(event.snapshot);
+                  console.log("snapshot parsed");
+                  await processSnapshot(snapshot);
+                } catch (err) {
+                  console.log("Apply snapshot failed. TODO handle error", err);
+                  // TODO
+                }
 
                 break;
 
@@ -584,63 +663,40 @@ export const syncMachine =
                   activeSendingSnapshotId = null;
                 }
                 latestServerVersion = null;
+                sendingUpdatesClock = -1;
+                confirmedUpdatesClock = null;
+                if (context.onSnapshotSaved) {
+                  context.onSnapshotSaved();
+                }
                 break;
               case "snapshotFailed":
+                const parsedEvent = SnapshotFailedEvent.parse(event);
                 console.log("snapshot saving failed", event);
-                if (event.snapshot) {
+                if (parsedEvent.snapshot) {
                   const snapshot = event.snapshot;
-                  const snapshotKey = await context.getSnapshotKey(snapshot);
-                  const decryptedSnapshot = verifyAndDecryptSnapshot(
-                    snapshot,
-                    snapshotKey,
-                    context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                  );
-                  context.applySnapshot(decryptedSnapshot);
+                  await processSnapshot(snapshot);
                 }
-                // TODO fix test-case:
+                // TODO test-case:
                 // snapshot is sending, but haven’t received confirmation for the updates I already sent
                 // currently this breaks (assumption due the incoming and outgoing clock being the same)
-                if (event.updates) {
-                  for (let update of event.updates) {
-                    const key = await context.getUpdateKey(update);
-                    const decryptedUpdate = verifyAndDecryptUpdate(
-                      update,
-                      key,
-                      context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                    );
-                    const changes = context.deserializeChanges(
-                      // TODO should this be part deserializeChanges?
-                      context.sodium.to_string(decryptedUpdate)
-                    );
-                    context.applyChanges(changes);
-                    latestServerVersion = update.serverData.version;
-                  }
+                if (parsedEvent.updates) {
+                  await processUpdates(parsedEvent.updates);
                 }
 
-                // TODO retry creating a snapshot
+                console.log("retry send snapshot");
+                await createAndSendSnapshot();
                 break;
 
               case "update":
-                const key = await context.getUpdateKey(event);
-                const decryptedUpdate = verifyAndDecryptUpdate(
-                  event,
-                  key,
-                  context.sodium.from_base64(event.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
-                );
-                const changes = context.deserializeChanges(
-                  // TODO should this be part deserializeChanges?
-                  context.sodium.to_string(decryptedUpdate)
-                );
-                context.applyChanges(changes);
-                latestServerVersion = event.serverData.version;
+                const update = UpdateWithServerData.parse(event);
+                await processUpdates([update]);
                 break;
               case "updateSaved":
                 console.log("update saved", event);
                 latestServerVersion = event.serverVersion;
-                removeUpdateFromInProgressQueue(
-                  event.docId,
-                  event.snapshotId,
-                  event.clock
+                confirmedUpdatesClock = event.clock;
+                updatesInFlight = updatesInFlight.filter(
+                  (updateInFlight) => updateInFlight.clock !== event.clock
                 );
 
                 break;
@@ -655,15 +711,35 @@ export const syncMachine =
                 if (event.requiresNewSnapshotWithKeyRotation) {
                   await createAndSendSnapshot();
                 } else {
-                  const key = await context.getUpdateKey(event);
-
-                  // TODO retry with an increasing offset instead of just trying again
-                  const rawUpdate = getUpdateInProgress(
-                    event.docId,
-                    event.snapshotId,
-                    event.clock
+                  const updateIndex = updatesInFlight.findIndex(
+                    (updateInFlight) => updateInFlight.clock === event.clock
                   );
-                  createAndSendUpdate(rawUpdate, key, event.snapshotId);
+                  if (updateIndex !== -1) {
+                    updatesInFlight.slice(updateIndex);
+
+                    const changes = updatesInFlight.reduce(
+                      (acc, updateInFlight) =>
+                        acc.concat(updateInFlight.changes),
+                      [] as unknown[]
+                    );
+
+                    changes.push(...context._pendingChangesQueue);
+                    pendingChangesQueue = [];
+
+                    const key = await context.getUpdateKey(event);
+
+                    if (activeSnapshotId === null) {
+                      throw new Error("No active snapshot id");
+                    }
+                    sendingUpdatesClock = confirmedUpdatesClock ?? -1;
+                    updatesInFlight = [];
+                    createAndSendUpdate(
+                      changes,
+                      key,
+                      activeSnapshotId,
+                      sendingUpdatesClock
+                    );
+                  }
                 }
 
                 break;
@@ -691,20 +767,22 @@ export const syncMachine =
               })
             ) {
               console.log("send snapshot");
-              createAndSendSnapshot();
+              await createAndSendSnapshot();
             } else {
               console.log("send update");
               const key = await context.getUpdateKey(event);
               const rawChanges = context._pendingChangesQueue;
+              pendingChangesQueue = [];
 
               // TODO add a compact changes function to queue and make sure all pending updates are sent as one update
               if (activeSnapshotId === null) {
                 throw new Error("No active snapshot id");
               }
               createAndSendUpdate(
-                context.serializeChanges(rawChanges),
+                rawChanges,
                 key,
-                activeSnapshotId
+                activeSnapshotId,
+                sendingUpdatesClock
               );
             }
           }
@@ -714,6 +792,10 @@ export const syncMachine =
             activeSnapshotId,
             latestServerVersion,
             activeSendingSnapshotId,
+            confirmedUpdatesClock,
+            sendingUpdatesClock,
+            updatesInFlight,
+            pendingChangesQueue,
           };
         },
       },

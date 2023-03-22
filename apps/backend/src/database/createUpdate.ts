@@ -64,7 +64,9 @@ export async function createUpdate({
     ) {
       if (snapshot.clocks[update.publicData.pubKey] === undefined) {
         if (update.publicData.clock !== 0) {
-          throw new Error("Update clock incorrect."); // TODO return additional data with the error?
+          throw new Error(
+            `Update clock incorrect: ${update.publicData.clock} 0`
+          ); // TODO return additional data with the error?
         }
         // update the clock for the public key
         snapshot.clocks[update.publicData.pubKey] = update.publicData.clock;
@@ -74,7 +76,12 @@ export async function createUpdate({
           snapshot.clocks[update.publicData.pubKey] + 1 !==
           update.publicData.clock
         ) {
-          throw new Error("Update clock incorrect."); // TODO return additional data with the error?
+          throw new Error(
+            `Update clock incorrect. ${update.publicData.clock} ${
+              // @ts-expect-error
+              snapshot.clocks[update.publicData.pubKey] + 1
+            } `
+          ); // TODO return additional data with the error?
         }
         // update the clock for the public key
         snapshot.clocks[update.publicData.pubKey] = update.publicData.clock;

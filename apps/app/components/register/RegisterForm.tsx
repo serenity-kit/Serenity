@@ -105,6 +105,7 @@ export default function RegisterForm(props: Props) {
           signingPrivateKey: signingPrivateKey,
           signingPublicKey: mainDevice.signingPublicKey,
           encryptionPublicKey: mainDevice.encryptionPublicKey,
+          encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
           info: JSON.stringify({ type: "main" }),
         });
 

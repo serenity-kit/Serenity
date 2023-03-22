@@ -1,10 +1,9 @@
 import {
-  decryptDocumentTitle,
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
   folderDerivedKeyContext,
-  recreateDocumentKey,
 } from "@serenity-tools/common";
+import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
@@ -96,15 +95,12 @@ test("user should be able to change a document name", async () => {
   const updatedDocument = result.updateDocumentName.document;
   expect(typeof updatedDocument.nameCiphertext).toBe("string");
   expect(typeof updatedDocument.nameNonce).toBe("string");
-  const documentSubkey = recreateDocumentKey({
+
+  const decryptedName = decryptDocumentTitleBasedOnSnapshotKey({
     snapshotKey,
     subkeyId: updatedDocument.subkeyId,
-  });
-
-  const decryptedName = decryptDocumentTitle({
-    key: documentSubkey.key,
     ciphertext: updatedDocument.nameCiphertext,
-    publicNonce: updatedDocument.nameNonce,
+    nonce: updatedDocument.nameNonce,
     publicData: null,
   });
   expect(decryptedName).toBe(name);

@@ -1,9 +1,8 @@
 import {
-  decryptDocumentTitle,
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
-  recreateDocumentKey,
 } from "@serenity-tools/common";
+import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
@@ -95,15 +94,12 @@ test("user should be retrieve a document", async () => {
   const snapshotKey =
     snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
 
-  const documentSubkey = recreateDocumentKey({
+  const decryptedName = decryptDocumentTitleBasedOnSnapshotKey({
+    ciphertext: retrievedDocument.nameCiphertext,
+    nonce: retrievedDocument.nameNonce,
+    publicData: null,
     snapshotKey,
     subkeyId: retrievedDocument.subkeyId,
-  });
-  const decryptedName = decryptDocumentTitle({
-    key: documentSubkey.key,
-    ciphertext: retrievedDocument.nameCiphertext,
-    publicNonce: retrievedDocument.nameNonce,
-    publicData: null,
   });
   expect(decryptedName).toBe(documentName);
 });

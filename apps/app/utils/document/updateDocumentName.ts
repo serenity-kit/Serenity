@@ -1,21 +1,16 @@
-import {
-  createDocumentKey,
-  deriveKeysFromKeyDerivationTrace,
-  encryptDocumentTitle,
-} from "@serenity-tools/common";
+import { encryptDocumentTitle, LocalDevice } from "@serenity-tools/common";
 import {
   Document,
   runSnapshotQuery,
   runUpdateDocumentNameMutation,
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { getWorkspace } from "../workspace/getWorkspace";
 
 export type Props = {
   documentId: string;
   workspaceId: string;
   name: string;
-  activeDevice: Device;
+  activeDevice: LocalDevice;
 };
 export const updateDocumentName = async ({
   documentId,
@@ -36,27 +31,13 @@ export const updateDocumentName = async ({
   if (!snapshotResult.data?.snapshot) {
     throw new Error(snapshotResult.error?.message || "Could not get snapshot");
   }
-  const snapshot = snapshotResult.data.snapshot;
-  const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
-    keyDerivationTrace: snapshot.keyDerivationTrace,
-    activeDevice: {
-      signingPublicKey: activeDevice.signingPublicKey,
-      signingPrivateKey: activeDevice.signingPrivateKey!,
-      encryptionPublicKey: activeDevice.encryptionPublicKey,
-      encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
-      encryptionPublicKeySignature: activeDevice.encryptionPublicKeySignature!,
-    },
-    workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
-  });
-  const snapshotKeyData =
-    snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];
-  const documentKeyData = createDocumentKey({
-    snapshotKey: snapshotKeyData.key,
-  });
-  const documentKey = documentKeyData.key;
+
   const encryptedDocumentTitle = encryptDocumentTitle({
     title: name,
-    key: documentKey,
+    activeDevice,
+    // @ts-expect-error
+    workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox,
+    snapshot: snapshotResult.data.snapshot,
   });
   const updateDocumentNameResult = await runUpdateDocumentNameMutation(
     {
@@ -65,7 +46,7 @@ export const updateDocumentName = async ({
         nameCiphertext: encryptedDocumentTitle.ciphertext,
         nameNonce: encryptedDocumentTitle.publicNonce,
         workspaceKeyId: workspace?.currentWorkspaceKey?.id!,
-        subkeyId: documentKeyData.subkeyId,
+        subkeyId: encryptedDocumentTitle.subkeyId,
       },
     },
     {}

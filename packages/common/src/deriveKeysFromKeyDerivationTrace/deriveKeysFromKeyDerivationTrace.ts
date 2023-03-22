@@ -7,9 +7,9 @@ type Params = {
   keyDerivationTrace: KeyDerivationTrace2;
   activeDevice: LocalDevice;
   workspaceKeyBox: {
-    ciphertext?: string;
-    nonce?: string;
-    creatorDevice?: Device | null;
+    ciphertext: string;
+    nonce: string;
+    creatorDevice: Device;
   };
 };
 
@@ -19,10 +19,10 @@ export const deriveKeysFromKeyDerivationTrace = ({
   workspaceKeyBox,
 }: Params): KeyDerivationTraceWithKeys => {
   const workspaceKey = decryptWorkspaceKey({
-    ciphertext: workspaceKeyBox.ciphertext!,
-    nonce: workspaceKeyBox.nonce!,
+    ciphertext: workspaceKeyBox.ciphertext,
+    nonce: workspaceKeyBox.nonce,
     creatorDeviceEncryptionPublicKey:
-      workspaceKeyBox.creatorDevice!.encryptionPublicKey,
+      workspaceKeyBox.creatorDevice.encryptionPublicKey,
     receiverDeviceEncryptionPrivateKey: activeDevice.encryptionPrivateKey!,
   });
 

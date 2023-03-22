@@ -1,13 +1,6 @@
-import {
-  cleanupUpdates,
-  KeyDerivationTrace2,
-  useYjsSyncMachine,
-} from "@naisho/core";
-import {
-  createSnapshotKey,
-  deriveKeysFromKeyDerivationTrace,
-  LocalDevice,
-} from "@serenity-tools/common";
+import { KeyDerivationTrace2, useYjsSyncMachine } from "@naisho/core";
+import { encryptDocumentTitle, LocalDevice } from "@serenity-tools/common";
+import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
@@ -22,11 +15,11 @@ import {
 } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
 import { WorkspaceDrawerScreenProps } from "../../types/navigationProps";
+import { createNewSnapshotKey } from "../../utils/createNewSnapshotKey/createNewSnapshotKey";
 import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey/deriveExistingSnapshotKey";
-import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
+import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
-import { getFolder } from "../../utils/folder/getFolder";
 import {
   getLocalDocument,
   setLocalDocument,
@@ -34,7 +27,6 @@ import {
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
-  updateTitle: (title: string) => void;
   signatureKeyPair: KeyPair;
   workspaceId: string;
 };
@@ -42,7 +34,6 @@ type Props = WorkspaceDrawerScreenProps<"Page"> & {
 export default function Page({
   navigation,
   route,
-  updateTitle,
   signatureKeyPair,
   workspaceId,
 }: Props) {
@@ -52,19 +43,23 @@ export default function Page({
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const snapshotKeyRef = useRef<{
     keyDerivationTrace: KeyDerivationTrace2;
-    subkeyId: string;
+    subkeyId: number;
+    key: Uint8Array;
+  } | null>(null);
+  const snapshotInFlightKeyRef = useRef<{
+    keyDerivationTrace: KeyDerivationTrace2;
+    subkeyId: number;
     key: Uint8Array;
   } | null>(null);
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
   const [documentLoaded, setDocumentLoaded] = useState(false);
   const [username, setUsername] = useState("Unknown user");
 
-  const documentName = useActiveDocumentInfoStore(
-    (state) => state.documentName
+  const setActiveDocumentId = useDocumentTitleStore(
+    (state) => state.setActiveDocumentId
   );
-
-  const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
-    (state) => state.update
+  const updateDocumentTitle = useDocumentTitleStore(
+    (state) => state.updateDocumentTitle
   );
 
   let websocketHost = `wss://serenity-dev.fly.dev`;
@@ -74,35 +69,6 @@ export default function Page({
   if (process.env.SERENITY_ENV === "e2e") {
     websocketHost = `ws://localhost:4001`;
   }
-
-  const createNewSnapshotKey = async (document: Document) => {
-    const workspace = await getWorkspace({
-      workspaceId: document.workspaceId!,
-      deviceSigningPublicKey: activeDevice.signingPublicKey,
-    });
-    if (!workspace?.currentWorkspaceKey) {
-      throw new Error("No workspace key for workspace and device");
-    }
-    const folder = await getFolder({ id: document.parentFolderId! });
-    const folderKeyChainData = deriveKeysFromKeyDerivationTrace({
-      keyDerivationTrace: folder.keyDerivationTrace,
-      activeDevice: {
-        signingPublicKey: activeDevice.signingPublicKey,
-        signingPrivateKey: activeDevice.signingPrivateKey!,
-        encryptionPublicKey: activeDevice.encryptionPublicKey,
-        encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
-        encryptionPublicKeySignature:
-          activeDevice.encryptionPublicKeySignature!,
-      },
-      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
-    });
-    const lastChainItem =
-      folderKeyChainData.trace[folderKeyChainData.trace.length - 1];
-    const snapshotKeyData = createSnapshotKey({
-      folderKey: lastChainItem.key,
-    });
-    return snapshotKeyData;
-  };
 
   const [state, send] = useYjsSyncMachine({
     yDoc: yDocRef.current,
@@ -114,22 +80,9 @@ export default function Page({
     onDocumentLoaded: () => {
       setDocumentLoaded(true);
     },
-    onSnapshotSent: async () => {
-      // if the document has a name, update it
-      if (documentName) {
-        try {
-          const updatedDocument = await updateDocumentName({
-            documentId: docId,
-            workspaceId,
-            name: documentName,
-            activeDevice,
-          });
-          // FIXME: do we update this when it's not the active document?
-          updateActiveDocumentInfoStore(updatedDocument, activeDevice);
-        } catch (error) {
-          console.error(error);
-        }
-      }
+    onSnapshotSaved: async () => {
+      snapshotKeyRef.current = snapshotInFlightKeyRef.current;
+      snapshotInFlightKeyRef.current = null;
     },
     getNewSnapshotData: async () => {
       const documentResult = await runDocumentQuery({ id: docId });
@@ -137,16 +90,54 @@ export default function Page({
       if (!document) {
         throw new Error("Document not found");
       }
+      const snapshotId = uuidv4();
       // currently we create a new key for every snapshot
-      const snapshotKeyData = await createNewSnapshotKey(document);
+      const snapshotKeyData = await createNewSnapshotKey({
+        document,
+        snapshotId,
+        activeDevice,
+      });
+      snapshotInFlightKeyRef.current = {
+        keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
+        subkeyId: snapshotKeyData.subkeyId,
+        key: sodium.from_base64(snapshotKeyData.key),
+      };
+
+      const workspace = await getWorkspace({
+        deviceSigningPublicKey: activeDevice.signingPublicKey,
+        workspaceId,
+      });
+      if (!workspace?.currentWorkspaceKey) {
+        console.error("Workspace or workspaceKeys not found");
+        throw new Error("Workspace or workspaceKeys not found");
+      }
+
+      const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
+        snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
+        ciphertext: document.nameCiphertext,
+        nonce: document.nameNonce,
+        subkeyId: document.subkeyId,
+      });
+
+      const documentTitleData = encryptDocumentTitle({
+        title: documentTitle,
+        activeDevice,
+        snapshot: {
+          keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
+        },
+        // @ts-expect-error
+        workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+      });
+
       return {
-        id: uuidv4(),
+        id: snapshotId,
         data: Yjs.encodeStateAsUpdate(yDocRef.current),
         key: sodium.from_base64(snapshotKeyData.key),
         publicData: {
-          keyDerivationTrace: snapshotKeyRef.current?.keyDerivationTrace,
-          subkeyId: snapshotKeyRef.current?.subkeyId,
+          keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
+          subkeyId: snapshotKeyData.subkeyId,
         },
+        additionalServerData: { documentTitleData },
       };
     },
     getSnapshotKey: async (snapshot) => {
@@ -218,7 +209,7 @@ export default function Page({
       }
       // communicate to other components e.g. sidebar or topbar
       // the currently active document
-      updateActiveDocumentInfoStore(document, activeDevice);
+      setActiveDocumentId({ documentId: docId });
 
       // remove awareness state when closing the window
       // TODO re-add
@@ -243,10 +234,30 @@ export default function Page({
 
     initDocument();
 
-    return () => {
-      cleanupUpdates();
-    };
+    return () => {};
   }, []);
+
+  const updateTitle = async (title: string) => {
+    const document = await getDocument({
+      documentId: docId,
+    });
+    // this is necessary to propagate document name update to the sidebar and header
+    updateDocumentTitle({ documentId: docId, title });
+    if (document?.id !== docId) {
+      console.error("document ID doesn't match page ID");
+      return;
+    }
+    try {
+      await updateDocumentName({
+        documentId: docId,
+        workspaceId,
+        name: title,
+        activeDevice,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Editor

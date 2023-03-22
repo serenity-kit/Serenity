@@ -1,7 +1,7 @@
 import sodium from "react-native-libsodium";
 import { createCommentKey } from "../createCommentKey/createCommentKey";
 import { encryptComment } from "../encryptComment/encryptComment";
-import { encryptDocumentTitle } from "../encryptDocumentTitle/encryptDocumentTitle";
+import { encryptDocumentTitleByKey } from "../encryptDocumentTitle/encryptDocumentTitle";
 import { recreateCommentKey } from "../recreateCommentKey/recreateCommentKey";
 import { decryptComment } from "./decryptComment";
 
@@ -59,7 +59,7 @@ test("decryptDocumentTitle fails for wrong key", () => {
 test("decryptComment fails for wrong publicData", () => {
   const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const initialCommentKey = createCommentKey({ snapshotKey });
-  const result = encryptDocumentTitle({
+  const result = encryptDocumentTitleByKey({
     key: initialCommentKey.key,
     title: "Todos",
   });
@@ -82,7 +82,7 @@ test("decryptComment fails for wrong publicData", () => {
 test("decryptComment fails for invalid publicData", () => {
   const snapshotKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
   const initialCommentKey = createCommentKey({ snapshotKey });
-  const result = encryptDocumentTitle({
+  const result = encryptDocumentTitleByKey({
     key: initialCommentKey.key,
     title: "Todos",
   });

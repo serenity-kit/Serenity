@@ -1,10 +1,6 @@
 import { useFocusRing } from "@react-native-aria/focus";
 import { useLinkProps } from "@react-navigation/native";
-import {
-  decryptDocumentTitle,
-  deriveKeysFromKeyDerivationTrace,
-  recreateDocumentKey,
-} from "@serenity-tools/common";
+import { decryptDocumentTitle } from "@serenity-tools/common";
 import {
   Icon,
   InlineInput,
@@ -20,7 +16,7 @@ import { useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import { runSnapshotQuery, useDocumentQuery } from "../../generated/graphql";
 import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
-import { useActiveDocumentInfoStore } from "../../utils/document/activeDocumentInfoStore";
+import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
 import SidebarPageMenu from "../sidebarPageMenu/SidebarPageMenu";
@@ -43,10 +39,7 @@ export default function SidebarPage(props: Props) {
   const [isHovered, setIsHovered] = useState(false);
   const [documentTitle, setDocumentTitle] = useState("decrypting…");
   const { isFocusVisible, focusProps: focusRingProps }: any = useFocusRing();
-  const activeDocument = useActiveDocumentInfoStore((state) => state.document);
-  const updateActiveDocumentInfoStore = useActiveDocumentInfoStore(
-    (state) => state.update
-  );
+  const documentTitleStore = useDocumentTitleStore();
   const [documentResult] = useDocumentQuery({
     variables: { id: props.documentId },
   });
@@ -66,12 +59,6 @@ export default function SidebarPage(props: Props) {
       },
     },
   });
-
-  useEffect(() => {
-    if (documentResult.data?.document?.id) {
-      decryptTitle();
-    }
-  }, [props.nameCiphertext, props.subkeyId, documentResult.data?.document?.id]);
 
   const decryptTitle = async () => {
     try {
@@ -109,36 +96,33 @@ export default function SidebarPage(props: Props) {
       if (!documentWorkspaceKey?.workspaceKeyBox) {
         throw new Error("Document workspace key not found");
       }
-      const snapshotFolderKeyData = deriveKeysFromKeyDerivationTrace({
-        keyDerivationTrace: snapshot.keyDerivationTrace,
-        activeDevice: {
-          signingPublicKey: activeDevice.signingPublicKey,
-          signingPrivateKey: activeDevice.signingPrivateKey!,
-          encryptionPublicKey: activeDevice.encryptionPublicKey,
-          encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
-          encryptionPublicKeySignature:
-            activeDevice.encryptionPublicKeySignature!,
+      const documentTitle = decryptDocumentTitle({
+        ciphertext: props.nameCiphertext,
+        nonce: props.nameNonce,
+        activeDevice,
+        subkeyId: props.subkeyId,
+        snapshot: {
+          keyDerivationTrace: snapshot.keyDerivationTrace,
         },
         workspaceKeyBox: documentWorkspaceKey.workspaceKeyBox!,
       });
-      const snapshotKeyData =
-        snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];
-      const documentKeyData = recreateDocumentKey({
-        snapshotKey: snapshotKeyData.key,
-        subkeyId: props.subkeyId,
-      });
-      const documentTitle = decryptDocumentTitle({
-        key: documentKeyData.key,
-        ciphertext: props.nameCiphertext,
-        publicNonce: props.nameNonce,
-      });
       setDocumentTitle(documentTitle);
+      documentTitleStore.updateDocumentTitle({
+        documentId: document.id,
+        title: documentTitle,
+      });
     } catch (error) {
       console.error(error);
       setDocumentTitle("decryption error");
     }
   };
   const { depth = 0 } = props;
+
+  useEffect(() => {
+    if (documentResult.data?.document?.id) {
+      decryptTitle();
+    }
+  }, [props.nameCiphertext, props.subkeyId, documentResult.data?.document?.id]);
 
   const updateDocumentTitle = async (name: string) => {
     const document = documentResult.data?.document;
@@ -147,14 +131,12 @@ export default function SidebarPage(props: Props) {
       return;
     }
     try {
-      const updatedDocument = await updateDocumentName({
+      await updateDocumentName({
         documentId: document.id,
         workspaceId: document.workspaceId,
         name,
         activeDevice,
       });
-      // FIXME: do we update this when it's not the active document?
-      updateActiveDocumentInfoStore(updatedDocument, activeDevice);
     } catch (error) {
       console.error(error);
     }
@@ -220,10 +202,14 @@ export default function SidebarPage(props: Props) {
                   style={[tw`pl-2 md:pl-1.5 max-w-${maxWidth}`]}
                   numberOfLines={1}
                   ellipsizeMode="tail"
-                  bold={activeDocument?.id === props.documentId}
+                  bold={
+                    documentTitleStore?.activeDocumentId === props.documentId
+                  }
                   testID={`sidebar-document--${props.documentId}`}
                 >
-                  {documentTitle}
+                  {documentTitleStore?.activeDocumentId === props.documentId
+                    ? documentTitleStore.activeDocumentTitle ?? "Untitled"
+                    : documentTitle}
                 </SidebarText>
               )}
             </HStack>

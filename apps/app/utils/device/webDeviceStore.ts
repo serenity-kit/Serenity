@@ -1,4 +1,4 @@
-import { Device } from "../../types/Device";
+import { LocalDevice } from "@serenity-tools/common";
 import { getItem, removeItem, setItem } from "../storage/storage";
 
 export const webDeviceStorageKey = "webDevice.device";
@@ -6,7 +6,7 @@ export const webDeviceExpirationStorageKey = "webDevice.expiration";
 export const webDeviceExpirationSeconds = 1000 * 60 * 60 * 24 * 30;
 
 export const setWebDevice = async (
-  newDevice: Device,
+  newDevice: LocalDevice,
   useExtendedLogin: boolean
 ) => {
   const expirationExpireTime =
@@ -24,7 +24,7 @@ export const setWebDevice = async (
   }
 };
 
-export const getWebDevice = async (): Promise<Device | null> => {
+export const getWebDevice = async (): Promise<LocalDevice | null> => {
   let isoExpirationDate = sessionStorage.getItem(webDeviceExpirationStorageKey);
   let jsonWebDevice = sessionStorage.getItem(webDeviceStorageKey);
   if (!isoExpirationDate) {
