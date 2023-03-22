@@ -143,7 +143,7 @@ test("successfully creates a snapshot", async () => {
   client.send(
     JSON.stringify({
       ...snapshot,
-      lastKnownSnapshotId: null,
+      lastKnownSnapshotId: undefined,
       latestServerVersion,
     })
   );
@@ -441,7 +441,7 @@ test("successfully creates an update", async () => {
     updatePublicData,
     sodium.from_base64(lastSnapshotKey),
     signatureKeyPair,
-    2
+    0
   );
 
   client.send(JSON.stringify(updateToSend));

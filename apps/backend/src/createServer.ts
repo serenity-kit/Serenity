@@ -198,7 +198,7 @@ export default async function createServer() {
               workspaceId: userToWorkspace.workspaceId,
               documentTitle:
                 // @ts-expect-error
-                snapshotMessage.additionalServerData.documentTitleData,
+                snapshotMessage.additionalServerData?.documentTitleData,
             });
             console.log("add snapshot");
             connection.send(

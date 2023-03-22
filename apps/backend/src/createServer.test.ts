@@ -186,7 +186,6 @@ test("successfully creates a snapshot", async () => {
   client.send(
     JSON.stringify({
       ...snapshot,
-      lastKnownSnapshotId: null,
       latestServerVersion,
     })
   );
