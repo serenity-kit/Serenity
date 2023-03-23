@@ -6,6 +6,7 @@ import {
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { AwarenessUserInfo } from "@serenity-tools/editor";
+import { collaboratorColorToHex } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
@@ -202,7 +203,7 @@ export default function Page({
       setUserInfo({
         name: me.data?.me?.username ?? "Unknown user",
         color: me.data?.me?.id
-          ? hashToCollaboratorColor(me.data?.me?.id)
+          ? collaboratorColorToHex(hashToCollaboratorColor(me.data?.me?.id))
           : "#000000",
       });
 
