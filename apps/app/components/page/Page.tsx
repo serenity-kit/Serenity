@@ -1,4 +1,4 @@
-import { KeyDerivationTrace2, useYjsSyncMachine } from "@naisho/core";
+import { KeyDerivationTrace, useYjsSyncMachine } from "@naisho/core";
 import {
   encryptDocumentTitle,
   hashToCollaboratorColor,
@@ -47,12 +47,12 @@ export default function Page({
   const { activeDevice, sessionKey } = useAuthenticatedAppContext();
   const yDocRef = useRef<Yjs.Doc>(new Yjs.Doc());
   const snapshotKeyRef = useRef<{
-    keyDerivationTrace: KeyDerivationTrace2;
+    keyDerivationTrace: KeyDerivationTrace;
     subkeyId: number;
     key: Uint8Array;
   } | null>(null);
   const snapshotInFlightKeyRef = useRef<{
-    keyDerivationTrace: KeyDerivationTrace2;
+    keyDerivationTrace: KeyDerivationTrace;
     subkeyId: number;
     key: Uint8Array;
   } | null>(null);

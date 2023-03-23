@@ -10,8 +10,8 @@ export const KeyDerivationTraceEntry = objectType({
   },
 });
 
-export const KeyDerivationTrace2 = objectType({
-  name: "KeyDerivationTrace2",
+export const KeyDerivationTrace = objectType({
+  name: "KeyDerivationTrace",
   definition(t) {
     t.nonNull.string("workspaceKeyId");
     t.nonNull.list.nonNull.field("trace", {
@@ -30,8 +30,8 @@ export const KeyDerivationTraceEntryInput = inputObjectType({
   },
 });
 
-export const KeyDerivationTraceInput2 = inputObjectType({
-  name: "KeyDerivationTraceInput2",
+export const KeyDerivationTraceInput = inputObjectType({
+  name: "KeyDerivationTraceInput",
   definition(t) {
     t.nonNull.string("workspaceKeyId");
     t.nonNull.list.nonNull.field("trace", {

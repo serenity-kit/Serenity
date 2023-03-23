@@ -1,6 +1,6 @@
 import {
   createSnapshot,
-  KeyDerivationTrace2,
+  KeyDerivationTrace,
   Snapshot,
   SnapshotPublicData,
 } from "@naisho/core";
@@ -142,7 +142,7 @@ export const createDocument = async ({
     });
   }
   const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
-    keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace2,
+    keyDerivationTrace: folder.keyDerivationTrace as KeyDerivationTrace,
     activeDevice,
     workspaceKeyBox,
   });

@@ -25,7 +25,7 @@ const exchanges = [
       UnauthorizedMembersResult: () => null, // since it has no unique key
       PendingWorkspaceInvitationResult: () => null, // since it is just an id
       UnauthorizedDevicesForWorkspacesResult: () => null, // should not be normalised
-      KeyDerivationTrace2: () => null, // should not be normalised
+      KeyDerivationTrace: () => null, // should not be normalised
       KeyDerivationTraceEntry: () => null, // should not be normalised
       WorkspaceKeyByDocumentIdResult: () => null, // should not be normalised
       // @ts-expect-error the type seems to be wrong,

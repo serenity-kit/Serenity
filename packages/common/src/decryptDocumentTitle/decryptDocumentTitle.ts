@@ -1,4 +1,4 @@
-import { KeyDerivationTrace2 } from "@naisho/core";
+import { KeyDerivationTrace } from "@naisho/core";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "../decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { deriveKeysFromKeyDerivationTrace } from "../deriveKeysFromKeyDerivationTrace/deriveKeysFromKeyDerivationTrace";
 import { Device, LocalDevice } from "../types";
@@ -9,7 +9,7 @@ type Params = {
   publicData?: any;
   activeDevice: LocalDevice;
   snapshot: {
-    keyDerivationTrace: KeyDerivationTrace2;
+    keyDerivationTrace: KeyDerivationTrace;
   };
   subkeyId: number;
   workspaceKeyBox: {

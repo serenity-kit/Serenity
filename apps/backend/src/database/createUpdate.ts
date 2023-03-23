@@ -1,5 +1,5 @@
 import {
-  KeyDerivationTrace2,
+  KeyDerivationTrace,
   NaishoNewSnapshotWithKeyRotationRequired,
   Update,
 } from "@naisho/core";
@@ -45,7 +45,7 @@ export async function createUpdate({
     }
 
     const snapshotKeyDerivationTrace =
-      snapshot.keyDerivationTrace as KeyDerivationTrace2;
+      snapshot.keyDerivationTrace as KeyDerivationTrace;
     if (
       // page share link has been removed
       snapshot.document.requiresSnapshot ||

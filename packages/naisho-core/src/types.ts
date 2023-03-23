@@ -17,12 +17,12 @@ export type KeyDerivationTraceEntryWithKey = z.infer<
   typeof KeyDerivationTraceEntryWithKey
 >;
 
-export const KeyDerivationTrace2 = z.object({
+export const KeyDerivationTrace = z.object({
   workspaceKeyId: z.string(),
   trace: z.array(KeyDerivationTraceEntry),
 });
 
-export type KeyDerivationTrace2 = z.infer<typeof KeyDerivationTrace2>;
+export type KeyDerivationTrace = z.infer<typeof KeyDerivationTrace>;
 
 export const KeyDerivationTraceWithKeys = z.object({
   workspaceKeyId: z.string(),
@@ -38,7 +38,7 @@ export const SnapshotPublicData = z.object({
   pubKey: z.string(), // public signing key
   snapshotId: z.string(),
   subkeyId: z.number(),
-  keyDerivationTrace: KeyDerivationTrace2,
+  keyDerivationTrace: KeyDerivationTrace,
 });
 
 export type SnapshotPublicData = z.infer<typeof SnapshotPublicData>;

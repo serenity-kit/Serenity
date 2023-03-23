@@ -1,11 +1,11 @@
-import { KeyDerivationTrace2 } from "@naisho/core";
+import { KeyDerivationTrace } from "@naisho/core";
 import {
   Snapshot as PrismaSnapshot,
   Update as PrismaUpdate,
 } from "../../prisma/generated/output";
 
 export type Snapshot = PrismaSnapshot & {
-  keyDerivationTrace: KeyDerivationTrace2;
+  keyDerivationTrace: KeyDerivationTrace;
   clocks: number[];
 };
 
@@ -18,7 +18,7 @@ export const formatSnapshot = (snapshot: PrismaSnapshot): Snapshot => {
   }
   return {
     ...snapshot,
-    keyDerivationTrace: snapshot.keyDerivationTrace as KeyDerivationTrace2,
+    keyDerivationTrace: snapshot.keyDerivationTrace as KeyDerivationTrace,
     clocks,
   };
 };

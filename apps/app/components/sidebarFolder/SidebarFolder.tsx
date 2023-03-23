@@ -1,4 +1,4 @@
-import { createSnapshot, KeyDerivationTrace2 } from "@naisho/core";
+import { createSnapshot, KeyDerivationTrace } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -60,7 +60,7 @@ type Props = ViewProps & {
   nameCiphertext: string;
   nameNonce: string;
   subkeyId: number;
-  keyDerivationTrace: KeyDerivationTrace2;
+  keyDerivationTrace: KeyDerivationTrace;
   depth?: number;
   onStructureChange: () => void;
 };

@@ -9,7 +9,7 @@ import {
 import { createFolder } from "../../../database/folder/createFolder";
 import { formatFolder } from "../../../types/folder";
 import { Folder } from "../../types/folder";
-import { KeyDerivationTraceInput2 } from "../../types/keyDerivation";
+import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const CreateFolderInput = inputObjectType({
   name: "CreateFolderInput",
@@ -21,7 +21,7 @@ export const CreateFolderInput = inputObjectType({
     t.nonNull.int("subkeyId");
     t.string("parentFolderId");
     t.nonNull.string("workspaceId");
-    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput2 });
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
   },
 });
 

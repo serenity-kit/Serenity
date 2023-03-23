@@ -1,4 +1,4 @@
-import { encryptAead, KeyDerivationTrace2 } from "@naisho/core";
+import { encryptAead, KeyDerivationTrace } from "@naisho/core";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { createDocumentTitleKey } from "../createDocumentTitleKey/createDocumentTitleKey";
@@ -13,7 +13,7 @@ type WorkspaceKeyBox = {
 
 type Params = {
   snapshot: {
-    keyDerivationTrace: KeyDerivationTrace2;
+    keyDerivationTrace: KeyDerivationTrace;
   };
   activeDevice: LocalDevice;
   workspaceKeyBox: WorkspaceKeyBox;

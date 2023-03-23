@@ -1,4 +1,4 @@
-import { KeyDerivationTrace2, Snapshot } from "@naisho/core";
+import { KeyDerivationTrace, Snapshot } from "@naisho/core";
 import { Document } from "../../types/document";
 import { Folder, formatFolder } from "../../types/folder";
 import {
@@ -33,7 +33,7 @@ export type FolderParams = {
   idSignature: string;
   nameCiphertext: string;
   nameNonce: string;
-  keyDerivationTrace: KeyDerivationTrace2;
+  keyDerivationTrace: KeyDerivationTrace;
 };
 
 export type DocumentParams = {

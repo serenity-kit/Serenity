@@ -1,5 +1,5 @@
 import { objectType } from "nexus";
-import { KeyDerivationTrace2 } from "./keyDerivation";
+import { KeyDerivationTrace } from "./keyDerivation";
 import { WorkspaceKey } from "./workspace";
 
 export const Folder = objectType({
@@ -11,7 +11,7 @@ export const Folder = objectType({
     t.string("parentFolderId");
     t.string("rootFolderId");
     t.string("workspaceId");
-    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTrace2 });
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTrace });
     t.field("workspaceKey", { type: WorkspaceKey });
   },
 });

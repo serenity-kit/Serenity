@@ -1,5 +1,5 @@
 import { inputObjectType, objectType } from "nexus";
-import { KeyDerivationTraceInput2 } from "./keyDerivation";
+import { KeyDerivationTraceInput } from "./keyDerivation";
 import { WorkspaceKey } from "./workspace";
 
 export const Document = objectType({
@@ -23,7 +23,7 @@ export const DocumentSnapshotPublicDataInput = inputObjectType({
     t.nonNull.string("pubKey");
     t.string("snapshotId");
     // TODO make it nonNull
-    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput2 });
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
     t.int("subkeyId");
   },
 });

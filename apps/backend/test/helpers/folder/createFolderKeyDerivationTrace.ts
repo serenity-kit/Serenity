@@ -1,4 +1,4 @@
-import { KeyDerivationTrace2, KeyDerivationTraceEntry } from "@naisho/core";
+import { KeyDerivationTrace, KeyDerivationTraceEntry } from "@naisho/core";
 import { folderDerivedKeyContext } from "@serenity-tools/common";
 import { prisma } from "../../../src/database/prisma";
 
@@ -9,7 +9,7 @@ export type Params = {
 export const createFolderKeyDerivationTrace = async ({
   workspaceKeyId,
   parentFolderId,
-}: Params): Promise<KeyDerivationTrace2> => {
+}: Params): Promise<KeyDerivationTrace> => {
   const workspaceKey = await prisma.workspaceKey.findFirst({
     where: {
       id: workspaceKeyId,
@@ -43,7 +43,7 @@ export const createFolderKeyDerivationTrace = async ({
       tracedParentFolderId = undefined;
     }
   }
-  const keyDerivationTrace: KeyDerivationTrace2 = {
+  const keyDerivationTrace: KeyDerivationTrace = {
     workspaceKeyId,
     trace: parentFolderKeyDerivationTrace,
   };
