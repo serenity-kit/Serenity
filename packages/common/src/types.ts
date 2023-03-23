@@ -11,7 +11,7 @@ export type LocalDevice = {
   encryptionPrivateKey: string;
   encryptionPublicKeySignature: string;
   createdAt?: Date;
-  info?: string | null;
+  info?: string;
 };
 
 /*
