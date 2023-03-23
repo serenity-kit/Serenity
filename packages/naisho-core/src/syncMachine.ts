@@ -235,7 +235,7 @@ const websocketService = (context) => (send, onReceive) => {
 };
 
 export const syncMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5SwJ4DsDGBZAhhgFgJZpgDEAygKIByAIgNoAMAuoqAA4D2shALoZzRsQAD0QBORuIB0AdgAs8gIyyATEtUBmAKwAOedoA0IFIg0Bfc8dSZcBYmQCCtWgH1KABQASlLJQBKjgAyrgCqHrSOACqUTKxIIFw8-ILCpggAtCry0uKySjpKAGxa2oVFxmIIqoyq2tKaRfJFStpFukUtZZbW6Nh4RCTSGIIkGPxoUKQA6pQAQuQA8gDCANKUUa7Li9TUlMsxDCzCSXwCQglVmko5es2NRTqaqrLG6TX1eprP2kqMZbIiuIeiAbP17EMRmgxrxIDN5ks1htXLQAJLkba7faHOInbhnVKXMzfGSyWSaeTkinPJQaN6IWTaWS5fTXeQU1oFeQgsF2QZgYajMDjOGzBYrdabWgrUJ+aibaiLTYAMUWoTouISpxSF1AVQKmlJ5Mp33Z6jpJgkmkY0hUSl0rVUJV0FNkPL6fIcguhwthEHh4qRm3VjlCUS8i38qIAWpQjvEOPidcJ9SS5MaqWbaap6Qh9DlGLJdP8amS8rp3bYBl6oTDRQiJcj1gBNVxYaIBVHBTWJ5LnFOIPQyB1MoHWjo6XPabQ2kuMXRlAzsoGV8H8711-1ojE7PYHHuJJP9okIDQaaRSWS1eSMZRtF65yk5cSGsqde2qAxFbSrz2QoUihA0iEBAAA2ZBioikquM4bhRIsrgAIqhJQKEHtqx56mY37SN+ugLvamgurI4gWukpEyJIugkS62jLlIv7Vv+PqAcBYFOC4WxeI41AAOKxMcWpHoSWHVDheEESUTy-BUlp5vkuTzjROj0cCVigh6TECrWvqQNI7AAE6cBgcA8JMiEAK5gFZsCkBAggCsQABunAANYCoZxmmZZ1lwOhwm6qIDIutIvy3taeTzkuubiOo0g3uIihAsW4jtEUjEQtpAF+vpRkmbAZlQD5NmkGABlGQZ+mgTgvAAGacAZAC2uVeQVxV+YJvYEoFVQyRe8iqOIuiqCNigvLouYdMyWi3qoDolJSuhqb0VaZRuulAZ5+WFe1tmQY2mywa48FIShaGdYefYiUFCCUsyUVNDct4tFouZkkotpzfojJNNJGXrjprFbaZxBFVZJVHcs3F8QJCaXd1A55g6uTKIaQKtB0-yTeS8VSElQ1SGl-01tlekEMKrmg8qDVYA1YDtaisKNXtDZBjBnEnchqGw3iV09WYjDPLkM5tKRV7KIlk3yDIjQ3M0eSJQoxPMZuwz4BTVM03TDNM7ZkPQ-x-l82kEjiJR046NOTJ6A6lRmMouhyK0eE3u0OhuupvJaetrHkxglOTNTBm0wZ9Pg2AjNgMzpBGwjJ5-G08XNO07JFowhG5tmqjSB0M5DQYWhKHkytZSxOV+wHUBByHYe+ZH0f0EocMYdd+r-EUSedKyacZ3JGiMB3+jiNog2KP8Fae5pa0QIQsCA36McXS3-OnkUgs548RRFiUV6MhNcnuxeQ1aAYw+JbUljqWgnAQHAwhe5lvNx6JWTyJn9pH4CJFtHRC5myXPsJhQCfsmE8nRs6jW+BoSQc1XpyTmh9EiaNtBUTaOnH8k9VoA1JhAEBmEboUlzG7XC7JihDQdLSJaAD556RAuBPBrdEDDRio0OQZs-5TXUBSahOCWrbVBrtBhK9FDMnkA6d6W87RmxikXJ2HRYpfzEfOHhZcybq39prYO2tw713gEJY28cSw5z+GoAeJQgRGDkmbc2ZQrbW3wkoABM8544KEYjZ29QnSfkNAUYevwlBTmaE7PIe9UoDTEQA2qxAcCgTcfHIENpEoAkeNaFBrw5ILkScPFQYS-h1FUJEnAhBwK4P0c-G6fxzzEWuFIYsqccxyTaI7WKXQtBNAMBPSwQA */
+  /** @xstate-layout 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 */
   createMachine(
     {
       schema: {
@@ -391,14 +391,16 @@ export const syncMachine =
                   actions: ["addToPendingUpdatesQueue"],
                 },
               },
-
-              always: [
-                {
-                  target: "processingQueues",
-                  cond: "hasMoreItemsInQueues",
-                },
-                "idle",
-              ],
+              after: {
+                // move to the next tick so that the queue is no causing an endless loop of processing
+                0: [
+                  {
+                    target: "processingQueues",
+                    cond: "hasMoreItemsInQueues",
+                  },
+                  { target: "idle" },
+                ],
+              },
             },
           },
           on: {
@@ -499,6 +501,12 @@ export const syncMachine =
         },
         processQueues: (context, event) => async (send) => {
           console.log("processQueues event", event);
+          console.log("_incomingQueue", context._incomingQueue.length);
+          console.log(
+            "_pendingChangesQueue",
+            context._pendingChangesQueue.length
+          );
+
           let activeSnapshotId = context._activeSnapshotId;
           let latestServerVersion = context._latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
