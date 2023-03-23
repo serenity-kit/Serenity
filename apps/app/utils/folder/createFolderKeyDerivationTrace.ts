@@ -1,4 +1,4 @@
-import { KeyDerivationTrace2, KeyDerivationTraceEntry } from "@naisho/core";
+import { KeyDerivationTrace, KeyDerivationTraceEntry } from "@naisho/core";
 import { folderDerivedKeyContext } from "@serenity-tools/common";
 import { getFolderTrace } from "./getFolderTrace";
 
@@ -9,7 +9,7 @@ export type Params = {
 export const createFolderKeyDerivationTrace = async ({
   folderId,
   workspaceKeyId,
-}: Params): Promise<KeyDerivationTrace2> => {
+}: Params): Promise<KeyDerivationTrace> => {
   let trace: KeyDerivationTraceEntry[] = [];
   if (folderId) {
     const folderTrace = await getFolderTrace({ folderId });

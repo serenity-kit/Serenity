@@ -1,4 +1,4 @@
-import { KeyDerivationTrace2 } from "@naisho/core";
+import { KeyDerivationTrace } from "@naisho/core";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
@@ -10,7 +10,7 @@ type Params = {
   workspaceKeyId: string;
   subkeyId: number;
   userId: string;
-  keyDerivationTrace: KeyDerivationTrace2;
+  keyDerivationTrace: KeyDerivationTrace;
 };
 
 export async function updateFolderName({

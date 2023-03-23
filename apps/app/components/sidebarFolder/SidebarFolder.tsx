@@ -1,8 +1,8 @@
-import { createSnapshot, KeyDerivationTrace2 } from "@naisho/core";
+import { createSnapshot, KeyDerivationTrace } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
-  createDocumentKey,
+  createDocumentTitleKey,
   createSnapshotKey,
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
@@ -60,7 +60,7 @@ type Props = ViewProps & {
   nameCiphertext: string;
   nameNonce: string;
   subkeyId: number;
-  keyDerivationTrace: KeyDerivationTrace2;
+  keyDerivationTrace: KeyDerivationTrace;
   depth?: number;
   onStructureChange: () => void;
 };
@@ -318,7 +318,9 @@ export default function SidebarFolder(props: Props) {
       sodium.from_base64(snapshotKey.key),
       signatureKeyPair
     );
-    const documentNameKey = createDocumentKey({ snapshotKey: snapshotKey.key });
+    const documentNameKey = createDocumentTitleKey({
+      snapshotKey: snapshotKey.key,
+    });
     const documentNameData = encryptDocumentTitle({
       title: documentName,
       activeDevice,

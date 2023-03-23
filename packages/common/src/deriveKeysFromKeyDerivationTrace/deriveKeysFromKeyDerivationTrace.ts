@@ -1,10 +1,10 @@
-import { KeyDerivationTrace2, KeyDerivationTraceWithKeys } from "@naisho/core";
+import { KeyDerivationTrace, KeyDerivationTraceWithKeys } from "@naisho/core";
 import { decryptWorkspaceKey } from "../decryptWorkspaceKey/decryptWorkspaceKey";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 import { Device, LocalDevice } from "../types";
 
 type Params = {
-  keyDerivationTrace: KeyDerivationTrace2;
+  keyDerivationTrace: KeyDerivationTrace;
   activeDevice: LocalDevice;
   workspaceKeyBox: {
     ciphertext: string;

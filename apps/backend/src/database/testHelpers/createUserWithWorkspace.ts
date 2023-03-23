@@ -1,7 +1,7 @@
 import {
   createAndEncryptDevice,
   createAndEncryptWorkspaceKeyForDevice,
-  createDocumentKey,
+  createDocumentTitleKey,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
   encryptDocumentTitleByKey,
@@ -110,13 +110,13 @@ export default async function createUserWithWorkspace({
   const snapshotKey = createSnapshotKey({
     folderKey,
   });
-  const docmentKeyResult = createDocumentKey({
+  const documentTitleKeyResult = createDocumentTitleKey({
     snapshotKey: snapshotKey.key,
   });
-  const documentKey = docmentKeyResult.key;
+  const documentTitleKey = documentTitleKeyResult.key;
   const encryptedDocumentTitleResult = encryptDocumentTitleByKey({
     title: documentName,
-    key: documentKey,
+    key: documentTitleKey,
   });
   const snapshotId = uuidv4();
   const snapshot = createIntroductionDocumentSnapshot({
@@ -177,7 +177,7 @@ export default async function createUserWithWorkspace({
       id: documentId,
       nameCiphertext: encryptedDocumentTitleResult.ciphertext,
       nameNonce: encryptedDocumentTitleResult.publicNonce,
-      subkeyId: docmentKeyResult.subkeyId,
+      subkeyId: documentTitleKeyResult.subkeyId,
       snapshot,
     },
     creatorDeviceSigningPublicKey: device.signingPublicKey,

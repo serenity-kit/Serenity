@@ -9,7 +9,7 @@ import {
 import { createInitialWorkspaceStructure } from "../../../database/workspace/createInitialWorkspaceStructure";
 import { Document, DocumentSnapshotInput } from "../../types/document";
 import { Folder } from "../../types/folder";
-import { KeyDerivationTraceInput2 } from "../../types/keyDerivation";
+import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 import { Snapshot } from "../../types/snapshot";
 import { Workspace } from "../../types/workspace";
 
@@ -42,7 +42,7 @@ export const CreateInitialFolderInput = inputObjectType({
     t.nonNull.string("nameCiphertext");
     t.nonNull.string("nameNonce");
     t.nonNull.field("keyDerivationTrace", {
-      type: KeyDerivationTraceInput2,
+      type: KeyDerivationTraceInput,
     });
   },
 });

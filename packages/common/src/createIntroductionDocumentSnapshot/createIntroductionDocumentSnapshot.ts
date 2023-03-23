@@ -1,7 +1,7 @@
 import {
   createSignatureKeyPair,
   createSnapshot,
-  KeyDerivationTrace2,
+  KeyDerivationTrace,
   SnapshotPublicData,
 } from "@naisho/core";
 import sodium from "react-native-libsodium";
@@ -21,7 +21,7 @@ export const createIntroductionDocumentSnapshot = ({
   documentId: string;
   snapshotEncryptionKey: Uint8Array;
   subkeyId: number;
-  keyDerivationTrace: KeyDerivationTrace2;
+  keyDerivationTrace: KeyDerivationTrace;
 }) => {
   // TODO in the future use the main device
   const signatureKeyPair = createSignatureKeyPair();

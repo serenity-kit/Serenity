@@ -9,7 +9,7 @@ import {
 import { updateFolderName } from "../../../database/folder/updateFolderName";
 import { formatFolder } from "../../../types/folder";
 import { Folder } from "../../types/folder";
-import { KeyDerivationTraceInput2 } from "../../types/keyDerivation";
+import { KeyDerivationTraceInput } from "../../types/keyDerivation";
 
 export const UpdateFolderNameInput = inputObjectType({
   name: "UpdateFolderNameInput",
@@ -19,7 +19,7 @@ export const UpdateFolderNameInput = inputObjectType({
     t.nonNull.string("nameNonce");
     t.nonNull.string("workspaceKeyId");
     t.nonNull.int("subkeyId");
-    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput2 });
+    t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
   },
 });
 

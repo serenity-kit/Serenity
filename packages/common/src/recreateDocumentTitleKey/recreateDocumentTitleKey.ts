@@ -1,4 +1,4 @@
-import { documentDerivedKeyContext } from "../createDocumentKey/createDocumentKey";
+import { documentDerivedKeyContext } from "../createDocumentTitleKey/createDocumentTitleKey";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 
 type Params = {
@@ -6,7 +6,7 @@ type Params = {
   subkeyId: number;
 };
 
-export const recreateDocumentKey = (params: Params) => {
+export const recreateDocumentTitleKey = (params: Params) => {
   // TODO On the client and on the backend we should check no
   // subkeyId per folderKey is a duplicate.
   return kdfDeriveFromKey({

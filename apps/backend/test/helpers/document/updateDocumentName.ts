@@ -1,5 +1,5 @@
 import {
-  createDocumentKey,
+  createDocumentTitleKey,
   deriveKeysFromKeyDerivationTrace,
   encryptDocumentTitleByKey,
   LocalDevice,
@@ -147,12 +147,12 @@ export const updateDocumentName = async ({
   });
   const snapshotKey =
     snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].key;
-  const documentKeyData = createDocumentKey({
+  const documentTitleKeyData = createDocumentTitleKey({
     snapshotKey,
   });
   const encryptedDocumentResult = encryptDocumentTitleByKey({
     title: name,
-    key: documentKeyData.key,
+    key: documentTitleKeyData.key,
   });
 
   return runUpdateDocumentNameMutation({
@@ -160,7 +160,7 @@ export const updateDocumentName = async ({
     id,
     nameCiphertext: encryptedDocumentResult.ciphertext,
     nameNonce: encryptedDocumentResult.publicNonce,
-    subkeyId: documentKeyData.subkeyId,
+    subkeyId: documentTitleKeyData.subkeyId,
     workspaceKeyId,
     authorizationHeader,
   });
