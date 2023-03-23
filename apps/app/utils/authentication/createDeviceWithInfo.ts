@@ -2,10 +2,8 @@ import { createDevice, LocalDevice } from "@serenity-tools/common";
 import { detect } from "detect-browser";
 import { Platform } from "react-native";
 
-export type LocalDeviceInclInfo = LocalDevice & { info?: string };
-
 export const createDeviceWithInfo = () => {
-  let device: LocalDeviceInclInfo = createDevice();
+  let device: LocalDevice = createDevice();
   const browser = detect();
   if (Platform.OS === "web") {
     const deviceInfoJson = {

@@ -1,12 +1,11 @@
-import { decryptWorkspaceKey } from "@serenity-tools/common";
+import { decryptWorkspaceKey, LocalDevice } from "@serenity-tools/common";
 import { WorkspaceKeyBox } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { getWorkspace } from "./getWorkspace";
 
 export type Props = {
   workspaceId: string;
   workspaceKeyId: string;
-  activeDevice: Device;
+  activeDevice: LocalDevice;
 };
 export const deriveWorkspaceKey = async ({
   workspaceId,

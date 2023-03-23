@@ -1,16 +1,16 @@
+import { LocalDevice } from "@serenity-tools/common";
 import {
   UnauthorizedMembersDocument,
   UnauthorizedMembersQuery,
   UnauthorizedMembersQueryVariables,
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { getUrqlClient } from "../urqlClient/urqlClient";
 import { authorizeNewDevices } from "../workspaceDevice/authorizeNewDevices";
 import { getWorkspaces } from "./getWorkspaces";
 
 export const secondsBetweenNewMemberChecks = 5;
 
-export type Props = { activeDevice: Device };
+export type Props = { activeDevice: LocalDevice };
 
 export const addNewMembersIfNecessary = async ({ activeDevice }: Props) => {
   const deviceSigningPublicKey = activeDevice.signingPublicKey;

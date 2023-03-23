@@ -1,10 +1,10 @@
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
+  LocalDevice,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { Document } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { createFolderKeyDerivationTrace } from "../folder/createFolderKeyDerivationTrace";
 import { getFolder } from "../folder/getFolder";
 import { getWorkspace } from "../workspace/getWorkspace";
@@ -12,7 +12,7 @@ import { getWorkspace } from "../workspace/getWorkspace";
 type Params = {
   document: Document;
   snapshotId: string;
-  activeDevice: Device;
+  activeDevice: LocalDevice;
 };
 
 export const createNewSnapshotKey = async ({

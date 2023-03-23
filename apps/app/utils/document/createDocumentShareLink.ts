@@ -1,11 +1,10 @@
-import { createDevice } from "@serenity-tools/common";
+import { createDevice, Device } from "@serenity-tools/common";
 import { Platform } from "react-native";
 import sodium from "react-native-libsodium";
 import {
   Role,
   runCreateDocumentShareLinkMutation,
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 
 type SnapshotDeviceKeyBox = {
   ciphertext: string;

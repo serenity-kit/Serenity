@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import {
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
+  Device,
   encryptDocumentTitle,
   encryptFolderName,
   folderDerivedKeyContext,
@@ -24,7 +25,6 @@ import {
   useCreateInitialWorkspaceStructureMutation,
   useDevicesQuery,
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { createWorkspaceKeyBoxesForDevices } from "../../utils/device/createWorkspaceKeyBoxesForDevices";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";

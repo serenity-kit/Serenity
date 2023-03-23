@@ -1,10 +1,10 @@
+import { LocalDevice } from "@serenity-tools/common";
 import { assign, createMachine } from "xstate";
 import {
   WorkspaceDocument,
   WorkspaceQuery,
   WorkspaceQueryVariables,
 } from "../generated/graphql";
-import { Device } from "../types/Device";
 import { getUrqlClient } from "../utils/urqlClient/urqlClient";
 import {
   loadInitialDataMachine,
@@ -21,7 +21,7 @@ export type WorkspaceQueryResult = {
 type Context = {
   workspaceId?: string;
   navigation: any;
-  activeDevice: Device;
+  activeDevice: LocalDevice;
   meWithWorkspaceLoadingInfoQueryResult?: MeWithWorkspaceLoadingInfoQueryResult;
   workspaceQueryResult?: WorkspaceQueryResult;
 };
