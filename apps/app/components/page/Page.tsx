@@ -60,7 +60,7 @@ export default function Page({
   const [documentLoaded, setDocumentLoaded] = useState(false);
   const [userInfo, setUserInfo] = useState<AwarenessUserInfo>({
     name: "Unknown user",
-    color: "#ffffff",
+    color: "#000000",
   });
 
   const setActiveDocumentId = useDocumentTitleStore(
@@ -203,7 +203,7 @@ export default function Page({
         name: me.data?.me?.username ?? "Unknown user",
         color: me.data?.me?.id
           ? hashToCollaboratorColor(me.data?.me?.id)
-          : "#ffffff",
+          : "#000000",
       });
 
       let document: Document | undefined = undefined;
