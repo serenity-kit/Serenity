@@ -1,5 +1,5 @@
 import {
-  createDocumentKey,
+  createDocumentTitleKey,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
   encryptDocumentTitleByKey,
@@ -180,15 +180,15 @@ export const createInitialWorkspaceStructure = async ({
     folderKey,
   });
   // propare the document key
-  const documentKeyResult = createDocumentKey({
+  const documentTitleKeyResult = createDocumentTitleKey({
     snapshotKey: snapshotKey.key,
   });
-  const documentKey = documentKeyResult.key;
-  const documentSubkeyId = documentKeyResult.subkeyId;
+  const documentTitleKey = documentTitleKeyResult.key;
+  const documentSubkeyId = documentTitleKeyResult.subkeyId;
 
   const encryptedDocumentTitleResult = encryptDocumentTitleByKey({
     title: documentName,
-    key: documentKey,
+    key: documentTitleKey,
   });
   const encryptedDocumentName = encryptedDocumentTitleResult.ciphertext;
   const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;

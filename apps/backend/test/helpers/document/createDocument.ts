@@ -5,7 +5,7 @@ import {
   SnapshotPublicData,
 } from "@naisho/core";
 import {
-  createDocumentKey,
+  createDocumentTitleKey,
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
   encryptDocumentTitleByKey,
@@ -189,7 +189,9 @@ export const createDocument = async ({
   if (name) {
     useName = name;
   }
-  const documentNameKey = createDocumentKey({ snapshotKey: snapshotKey.key });
+  const documentNameKey = createDocumentTitleKey({
+    snapshotKey: snapshotKey.key,
+  });
   const documentNameData = encryptDocumentTitleByKey({
     title: useName,
     key: documentNameKey.key,

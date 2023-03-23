@@ -18,12 +18,12 @@ test("decryptDocumentTitle", () => {
     comment,
   });
 
-  const documentKey = recreateCommentKey({
+  const documentTitleKey = recreateCommentKey({
     snapshotKey,
     subkeyId: initialCommentKey.subkeyId,
   });
   const decryptedComment = decryptComment({
-    key: documentKey.key,
+    key: documentTitleKey.key,
     ciphertext: result.ciphertext,
     publicNonce: result.publicNonce,
     publicData: result.publicData,
@@ -41,14 +41,14 @@ test("decryptDocumentTitle fails for wrong key", () => {
     comment,
   });
 
-  const documentKey = recreateCommentKey({
+  const documentTitleKey = recreateCommentKey({
     snapshotKey,
     subkeyId: initialCommentKey.subkeyId,
   });
 
   expect(() =>
     decryptComment({
-      key: "0000" + documentKey.key.substring(4),
+      key: "0000" + documentTitleKey.key.substring(4),
       ciphertext: result.ciphertext,
       publicNonce: result.publicNonce,
       publicData: result.publicData,
@@ -64,14 +64,14 @@ test("decryptComment fails for wrong publicData", () => {
     title: "Todos",
   });
 
-  const documentKey = recreateCommentKey({
+  const documentTitleKey = recreateCommentKey({
     snapshotKey,
     subkeyId: initialCommentKey.subkeyId,
   });
 
   expect(() =>
     decryptComment({
-      key: documentKey.key,
+      key: documentTitleKey.key,
       ciphertext: result.ciphertext,
       publicNonce: result.publicNonce,
       publicData: { something: 4 },
@@ -87,14 +87,14 @@ test("decryptComment fails for invalid publicData", () => {
     title: "Todos",
   });
 
-  const documentKey = recreateCommentKey({
+  const documentTitleKey = recreateCommentKey({
     snapshotKey,
     subkeyId: initialCommentKey.subkeyId,
   });
 
   expect(() =>
     decryptComment({
-      key: documentKey.key,
+      key: documentTitleKey.key,
       ciphertext: result.ciphertext,
       publicNonce: result.publicNonce,
       publicData: function foo() {},

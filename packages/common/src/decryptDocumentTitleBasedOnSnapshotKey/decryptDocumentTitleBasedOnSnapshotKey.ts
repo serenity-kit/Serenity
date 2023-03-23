@@ -1,7 +1,7 @@
 import { decryptAead } from "@naisho/core";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
-import { recreateDocumentKey } from "../recreateDocumentKey/recreateDocumentKey";
+import { recreateDocumentTitleKey } from "../recreateDocumentTitleKey/recreateDocumentTitleKey";
 
 type Params = {
   snapshotKey: string;
@@ -18,7 +18,7 @@ export const decryptDocumentTitleBasedOnSnapshotKey = ({
   nonce,
   publicData,
 }: Params) => {
-  const documentKeyData = recreateDocumentKey({
+  const documentTitleKeyData = recreateDocumentTitleKey({
     snapshotKey: snapshotKey,
     subkeyId: subkeyId,
   });
@@ -30,7 +30,7 @@ export const decryptDocumentTitleBasedOnSnapshotKey = ({
   const result = decryptAead(
     sodium.from_base64(ciphertext),
     canonicalizedPublicData,
-    sodium.from_base64(documentKeyData.key),
+    sodium.from_base64(documentTitleKeyData.key),
     nonce
   );
   return sodium.to_string(result);

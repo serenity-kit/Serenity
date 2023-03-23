@@ -1,7 +1,7 @@
 import { encryptAead, KeyDerivationTrace2 } from "@naisho/core";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
-import { createDocumentKey } from "../createDocumentKey/createDocumentKey";
+import { createDocumentTitleKey } from "../createDocumentTitleKey/createDocumentTitleKey";
 import { deriveKeysFromKeyDerivationTrace } from "../deriveKeysFromKeyDerivationTrace/deriveKeysFromKeyDerivationTrace";
 import { Device, LocalDevice } from "../types";
 
@@ -57,20 +57,20 @@ export const encryptDocumentTitle = (params: Params) => {
   });
   const snapshotKeyData =
     snapshotFolderKeyData.trace[snapshotFolderKeyData.trace.length - 1];
-  const documentKeyData = createDocumentKey({
+  const documentTitleKeyData = createDocumentTitleKey({
     snapshotKey: snapshotKeyData.key,
   });
   const publicData = params.publicData || {};
   const result = encryptDocumentTitleByKey({
     title: params.title,
     publicData,
-    key: documentKeyData.key,
+    key: documentTitleKeyData.key,
   });
   return {
     ciphertext: result.ciphertext,
     publicNonce: result.publicNonce,
     publicData,
-    subkeyId: documentKeyData.subkeyId,
+    subkeyId: documentTitleKeyData.subkeyId,
     workspaceKeyId: params.snapshot.keyDerivationTrace.workspaceKeyId,
   };
 };

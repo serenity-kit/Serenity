@@ -1,13 +1,13 @@
 import sodium from "react-native-libsodium";
-import { createDocumentKey } from "./createDocumentKey";
+import { createDocumentTitleKey } from "./createDocumentTitleKey";
 
 beforeAll(async () => {
   await sodium.ready;
 });
 
-test("create new documentKey", () => {
+test("create new documentTitleKey", () => {
   const kdfKey = "3NmUk0ywlom5Re-ShkR_nE3lKLxq5FSJxm56YdbOJto";
-  const result = createDocumentKey({
+  const result = createDocumentTitleKey({
     snapshotKey: kdfKey,
   });
   const { subkeyId, key } = result;
