@@ -24,6 +24,7 @@ export const applyCreateChainEvent = (
 
   return {
     id: event.transaction.id,
+    invitations: {},
     members,
     lastEventHash: hashTransaction(event.transaction),
     encryptedStateClock: 0,

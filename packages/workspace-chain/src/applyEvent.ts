@@ -54,7 +54,8 @@ export const applyEvent = (
     invitations[event.transaction.invitationId] = {
       expiresAt: event.transaction.expiresAt,
       role: event.transaction.role,
-      invitationInviterProof: event.transaction.invitationInviterProof,
+      invitationDataSignature: event.transaction.invitationDataSignature,
+      invitationSigningPublicKey: event.transaction.invitationSigningPublicKey,
       addedBy: event.authors.map((author) => author.publicKey),
     };
   }

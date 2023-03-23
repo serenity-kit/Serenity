@@ -59,9 +59,10 @@ export type TrustChainEvent =
   | DefaultTrustChainEvent;
 
 export type Invitation = {
-  expiresAt: string;
   role: Role;
-  invitationInviterProof: string;
+  expiresAt: string;
+  invitationSigningPublicKey: string;
+  invitationDataSignature: string;
   addedBy: string[];
 };
 
