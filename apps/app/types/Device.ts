@@ -1,5 +1,3 @@
-import { Session } from "./session";
-
 export type Device = {
   encryptionPrivateKey?: string;
   encryptionPublicKey: string;
@@ -8,8 +6,4 @@ export type Device = {
   encryptionPublicKeySignature?: string;
   createdAt?: Date;
   info?: string | null;
-};
-
-export type DeviceWithRecentSession = Device & {
-  mostRecentSession?: Session | null;
 };
