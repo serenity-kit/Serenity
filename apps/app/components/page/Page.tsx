@@ -1,6 +1,11 @@
 import { KeyDerivationTrace2, useYjsSyncMachine } from "@naisho/core";
-import { encryptDocumentTitle, LocalDevice } from "@serenity-tools/common";
+import {
+  encryptDocumentTitle,
+  hashToCollaboratorColor,
+  LocalDevice,
+} from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
+import { AwarenessUserInfo } from "@serenity-tools/editor";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
@@ -53,7 +58,10 @@ export default function Page({
   } | null>(null);
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
   const [documentLoaded, setDocumentLoaded] = useState(false);
-  const [username, setUsername] = useState("Unknown user");
+  const [userInfo, setUserInfo] = useState<AwarenessUserInfo>({
+    name: "Unknown user",
+    color: "#ffffff",
+  });
 
   const setActiveDocumentId = useDocumentTitleStore(
     (state) => state.setActiveDocumentId
@@ -191,7 +199,12 @@ export default function Page({
       }
 
       const me = await runMeQuery({});
-      setUsername(me.data?.me?.username ?? "Unknown user");
+      setUserInfo({
+        name: me.data?.me?.username ?? "Unknown user",
+        color: me.data?.me?.id
+          ? hashToCollaboratorColor(me.data?.me?.id)
+          : "#ffffff",
+      });
 
       let document: Document | undefined = undefined;
       try {
@@ -269,7 +282,7 @@ export default function Page({
       updateTitle={updateTitle}
       isNew={isNew}
       documentLoaded={documentLoaded}
-      username={username}
+      userInfo={userInfo}
     />
   );
 }

@@ -100,6 +100,11 @@ export type EditorComment = {
   to: unknown;
 };
 
+export type AwarenessUserInfo = {
+  name: string;
+  color: string;
+};
+
 export type EditorCommentWithResolvedPositions = EditorComment & {
   absoluteFrom: number;
   absoluteTo: number;
@@ -116,7 +121,7 @@ declare global {
     editor: any;
     isNew: boolean;
     initialContent: any;
-    username: string;
+    userInfo: AwarenessUserInfo;
     updateEditor: (paramsString: string) => void;
     applyYjsUpdate: (update: any) => void;
     applyYAwarenessUpdate: (update: any) => void;
