@@ -23,15 +23,12 @@ export const AwarnessExtension = Extension.create<
       awareness: undefined,
       render: (user) => {
         const cursor = document.createElement("span");
-        console.log("user", user);
-
+        cursor.style.setProperty("--collab-color", user.color);
         cursor.classList.add("collaboration-cursor__caret");
-        cursor.setAttribute("style", `border-color: ${user.color}`);
 
         const label = document.createElement("div");
-
         label.classList.add("collaboration-cursor__label");
-        label.setAttribute("style", `background-color: ${user.color}`);
+
         label.insertBefore(document.createTextNode(user.name), null);
         cursor.insertBefore(label, null);
 
