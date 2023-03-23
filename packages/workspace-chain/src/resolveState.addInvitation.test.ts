@@ -1,7 +1,11 @@
 import sodium from "libsodium-wrappers";
-import { addInvitation } from "./addInvitation";
-import { InvalidTrustChainError } from "./errors";
-import { addMember, createChain, resolveState } from "./index";
+import {
+  addInvitation,
+  addMember,
+  createChain,
+  InvalidTrustChainError,
+  resolveState,
+} from "./index";
 import {
   getKeyPairA,
   getKeyPairB,
@@ -35,19 +39,16 @@ test("should be able to add a invitation as ADMIN", async () => {
     role: "EDITOR",
   });
   const state = resolveState([createEvent, addInvitationEvent]);
-  expect(state.invitations).toMatchInlineSnapshot(`
-    {
-      "n5UCejsuWTcBksSnT4BsP6BV12WivoFN": {
-        "addedBy": [
-          "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
-        ],
-        "expiresAt": "2023-03-23T19:53:36.158Z",
-        "invitationDataSignature": "FIw6NSxHdd0Ev0ZjXa7FLjfyEEW8-Rm_Y0eQ1Cq1-rQkCW4kMwlOhcn897dTcimsZkhfoNRQFjkdXRqsJ9MUAA",
-        "invitationSigningPublicKey": "fRHmz6wRU4BrVv4QX260UC97_yLqcJo1V80cI27lbxE",
-        "role": "EDITOR",
-      },
-    }
-  `);
+  if (addInvitationEvent.transaction.type !== "add-invitation") {
+    throw new Error("Invalid transaction type");
+  }
+  const invitation =
+    state.invitations[addInvitationEvent.transaction.invitationId];
+  expect(invitation.role).toBe("EDITOR");
+  expect(invitation.invitationDataSignature).toBeDefined();
+  expect(invitation.invitationSigningPublicKey).toBeDefined();
+  expect(invitation.expiresAt).toBeDefined();
+  expect(invitation.addedBy).toBeDefined();
 });
 
 test("should not be able to add an invitation as editor", async () => {
