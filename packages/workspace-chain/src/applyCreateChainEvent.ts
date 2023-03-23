@@ -17,9 +17,7 @@ export const applyCreateChainEvent = (
   event.authors.forEach((author) => {
     members[author.publicKey] = {
       lockboxPublicKey: event.transaction.lockboxPublicKeys[author.publicKey],
-      isAdmin: true,
-      canAddMembers: true,
-      canRemoveMembers: true,
+      role: "ADMIN",
       addedBy: event.authors.map((author) => author.publicKey),
     };
   });

@@ -24,7 +24,7 @@ beforeAll(async () => {
   keyPairsB = getKeyPairsB();
 });
 
-test("should be able to promote a member to an admin", async () => {
+test("should be able to promote an EDITOR to an ADMIN", async () => {
   const createEvent = createChain(keyPairsA.sign, {
     [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
   });
@@ -33,13 +33,13 @@ test("should be able to promote a member to an admin", async () => {
     keyPairA,
     keyPairsB.sign.publicKey,
     keyPairsB.box.publicKey,
-    { isAdmin: false, canAddMembers: true, canRemoveMembers: false }
+    "EDITOR"
   );
   const updateMemberEvent = updateMember(
     hashTransaction(addMemberEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    { isAdmin: true, canAddMembers: true, canRemoveMembers: true }
+    "ADMIN"
   );
   const state = resolveState([createEvent, addMemberEvent, updateMemberEvent]);
   expect(state.members).toMatchInlineSnapshot(`
@@ -48,25 +48,21 @@ test("should be able to promote a member to an admin", async () => {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "canAddMembers": true,
-        "canRemoveMembers": true,
-        "isAdmin": true,
         "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
+        "role": "ADMIN",
       },
       "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "canAddMembers": true,
-        "canRemoveMembers": true,
-        "isAdmin": true,
         "lockboxPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
+        "role": "ADMIN",
       },
     }
   `);
 });
 
-test("should be able to demote an admin to a member", async () => {
+test("should be able to demote an ADMIN to an EDITOR", async () => {
   const createEvent = createChain(keyPairsA.sign, {
     [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
   });
@@ -75,13 +71,13 @@ test("should be able to demote an admin to a member", async () => {
     keyPairA,
     keyPairsB.sign.publicKey,
     keyPairsB.box.publicKey,
-    { isAdmin: true, canAddMembers: true, canRemoveMembers: true }
+    "ADMIN"
   );
   const updateMemberEvent = updateMember(
     hashTransaction(addAdminEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: false }
+    "EDITOR"
   );
   const updateMemberEvent2 = addAuthorToEvent(updateMemberEvent, keyPairB);
   const state = resolveState([createEvent, addAdminEvent, updateMemberEvent2]);
@@ -91,151 +87,21 @@ test("should be able to demote an admin to a member", async () => {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "canAddMembers": true,
-        "canRemoveMembers": true,
-        "isAdmin": true,
         "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
+        "role": "ADMIN",
       },
       "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "canAddMembers": false,
-        "canRemoveMembers": false,
-        "isAdmin": false,
         "lockboxPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
+        "role": "EDITOR",
       },
     }
   `);
 });
 
-test("should be able to update a member's canAddMembers", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
-  const addMemberEvent = addMember(
-    hashTransaction(createEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: false }
-  );
-  const updateMemberEvent = updateMember(
-    hashTransaction(addMemberEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    { isAdmin: false, canAddMembers: true, canRemoveMembers: false }
-  );
-  const state = resolveState([createEvent, addMemberEvent, updateMemberEvent]);
-  expect(state.members).toMatchInlineSnapshot(`
-    {
-      "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM": {
-        "addedBy": [
-          "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
-        ],
-        "canAddMembers": true,
-        "canRemoveMembers": true,
-        "isAdmin": true,
-        "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
-      },
-      "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
-        "addedBy": [
-          "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
-        ],
-        "canAddMembers": true,
-        "canRemoveMembers": false,
-        "isAdmin": false,
-        "lockboxPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
-      },
-    }
-  `);
-});
-
-test("should be able to update a member's canRemoveMembers", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
-  const addMemberEvent = addMember(
-    hashTransaction(createEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: false }
-  );
-  const updateMemberEvent = updateMember(
-    hashTransaction(addMemberEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: true }
-  );
-  const state = resolveState([createEvent, addMemberEvent, updateMemberEvent]);
-  expect(state.members).toMatchInlineSnapshot(`
-    {
-      "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM": {
-        "addedBy": [
-          "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
-        ],
-        "canAddMembers": true,
-        "canRemoveMembers": true,
-        "isAdmin": true,
-        "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
-      },
-      "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
-        "addedBy": [
-          "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
-        ],
-        "canAddMembers": false,
-        "canRemoveMembers": true,
-        "isAdmin": false,
-        "lockboxPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
-      },
-    }
-  `);
-});
-
-test("should be able to update a member's canAddMembers and canRemoveMembers", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
-  const addMemberEvent = addMember(
-    hashTransaction(createEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: false }
-  );
-  const updateMemberEvent = updateMember(
-    hashTransaction(addMemberEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    { isAdmin: false, canAddMembers: true, canRemoveMembers: true }
-  );
-  const state = resolveState([createEvent, addMemberEvent, updateMemberEvent]);
-  expect(state.members).toMatchInlineSnapshot(`
-    {
-      "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM": {
-        "addedBy": [
-          "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
-        ],
-        "canAddMembers": true,
-        "canRemoveMembers": true,
-        "isAdmin": true,
-        "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
-      },
-      "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
-        "addedBy": [
-          "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
-        ],
-        "canAddMembers": true,
-        "canRemoveMembers": true,
-        "isAdmin": false,
-        "lockboxPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
-      },
-    }
-  `);
-});
-
-test("should fail to demote the last admin to a member", async () => {
+test("should fail to demote the last ADMIN to a EDITOR", async () => {
   const createEvent = createChain(keyPairsA.sign, {
     [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
   });
@@ -243,7 +109,7 @@ test("should fail to demote the last admin to a member", async () => {
     hashTransaction(createEvent.transaction),
     keyPairA,
     keyPairsA.sign.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: false }
+    "EDITOR"
   );
   const chain = [createEvent, updateMemberEvent];
   expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
@@ -252,7 +118,7 @@ test("should fail to demote the last admin to a member", async () => {
   );
 });
 
-test("should fail to demote an admin to a member if not more than 50% admins agree", async () => {
+test("should fail to promote an ADMIN that is already an ADMIN", async () => {
   const createEvent = createChain(keyPairsA.sign, {
     [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
   });
@@ -261,35 +127,13 @@ test("should fail to demote an admin to a member if not more than 50% admins agr
     keyPairA,
     keyPairsB.sign.publicKey,
     keyPairsB.box.publicKey,
-    { isAdmin: true, canAddMembers: true, canRemoveMembers: true }
+    "ADMIN"
   );
   const updateMemberEvent = updateMember(
     hashTransaction(addAdminEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: false }
-  );
-  const chain = [createEvent, addAdminEvent, updateMemberEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
-  expect(() => resolveState(chain)).toThrow("Not allowed member update.");
-});
-
-test("should fail to promote an admin that is already an admin", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
-  const addAdminEvent = addMember(
-    hashTransaction(createEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
-    { isAdmin: true, canAddMembers: true, canRemoveMembers: true }
-  );
-  const updateMemberEvent = updateMember(
-    hashTransaction(addAdminEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    { isAdmin: true, canAddMembers: true, canRemoveMembers: true }
+    "ADMIN"
   );
   const updateMemberEvent2 = addAuthorToEvent(updateMemberEvent, keyPairB);
   const chain = [createEvent, addAdminEvent, updateMemberEvent2];
@@ -297,7 +141,7 @@ test("should fail to promote an admin that is already an admin", async () => {
   expect(() => resolveState(chain)).toThrow("Not allowed member update.");
 });
 
-test("should fail to update a member if nothing changes and canAddMembers and canRemoveMembers are false", async () => {
+test("should fail to update a member if nothing changes", async () => {
   const createEvent = createChain(keyPairsA.sign, {
     [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
   });
@@ -306,79 +150,13 @@ test("should fail to update a member if nothing changes and canAddMembers and ca
     keyPairA,
     keyPairsB.sign.publicKey,
     keyPairsB.box.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: false }
+    "EDITOR"
   );
   const updateMemberEvent = updateMember(
     hashTransaction(addMemberEvent.transaction),
     keyPairA,
     keyPairsB.sign.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: false }
-  );
-  const chain = [createEvent, addMemberEvent, updateMemberEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
-  expect(() => resolveState(chain)).toThrow("Not allowed member update.");
-});
-
-test("should fail to update a member if nothing changes and canAddMembers and canRemoveMembers are true", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
-  const addMemberEvent = addMember(
-    hashTransaction(createEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
-    { isAdmin: false, canAddMembers: true, canRemoveMembers: true }
-  );
-  const updateMemberEvent = updateMember(
-    hashTransaction(addMemberEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    { isAdmin: false, canAddMembers: true, canRemoveMembers: true }
-  );
-  const chain = [createEvent, addMemberEvent, updateMemberEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
-  expect(() => resolveState(chain)).toThrow("Not allowed member update.");
-});
-
-test("should fail to update a member if nothing changes and canAddMembers is true and canRemoveMembers is false", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
-  const addMemberEvent = addMember(
-    hashTransaction(createEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
-    { isAdmin: false, canAddMembers: true, canRemoveMembers: false }
-  );
-  const updateMemberEvent = updateMember(
-    hashTransaction(addMemberEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    { isAdmin: false, canAddMembers: true, canRemoveMembers: false }
-  );
-  const chain = [createEvent, addMemberEvent, updateMemberEvent];
-  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
-  expect(() => resolveState(chain)).toThrow("Not allowed member update.");
-});
-
-test("should fail to update a member if nothing changes and canAddMembers is false and canRemoveMembers is true", async () => {
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
-  const addMemberEvent = addMember(
-    hashTransaction(createEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    keyPairsB.box.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: true }
-  );
-  const updateMemberEvent = updateMember(
-    hashTransaction(addMemberEvent.transaction),
-    keyPairA,
-    keyPairsB.sign.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: true }
+    "EDITOR"
   );
   const chain = [createEvent, addMemberEvent, updateMemberEvent];
   expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);

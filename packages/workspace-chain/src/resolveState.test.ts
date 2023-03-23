@@ -35,14 +35,14 @@ test("should fail in case the chain is not correctly ordered", async () => {
     keyPairA,
     keyPairsB.sign.publicKey,
     keyPairsB.box.publicKey,
-    { isAdmin: false, canAddMembers: true, canRemoveMembers: false }
+    "ADMIN"
   );
   const addMemberEvent2 = addMember(
     hashTransaction(addMemberEvent.transaction),
     keyPairB,
     keyPairsC.sign.publicKey,
     keyPairsC.box.publicKey,
-    { isAdmin: false, canAddMembers: false, canRemoveMembers: false }
+    "ADMIN"
   );
   const chain = [createEvent, addMemberEvent2, addMemberEvent];
   expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);

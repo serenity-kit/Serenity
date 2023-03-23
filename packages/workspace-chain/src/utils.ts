@@ -2,7 +2,6 @@ import canonicalize from "canonicalize";
 import sodium from "libsodium-wrappers";
 import {
   DefaultTrustChainEvent,
-  Permission,
   TrustChainEvent,
   TrustChainState,
 } from "./types";
@@ -37,22 +36,6 @@ export const isValidCreateChainEvent = (event: TrustChainEvent) => {
   });
 };
 
-export const areValidPermissions = (
-  state: TrustChainState,
-  event: DefaultTrustChainEvent,
-  permission: Permission
-) => {
-  return event.authors.every((author) => {
-    if (!state.members.hasOwnProperty(author.publicKey)) {
-      return false;
-    }
-    if (!state.members[author.publicKey][permission]) {
-      return false;
-    }
-    return true;
-  });
-};
-
 export const allAuthorsAreValidAdmins = (
   state: TrustChainState,
   event: DefaultTrustChainEvent
@@ -61,7 +44,7 @@ export const allAuthorsAreValidAdmins = (
     if (!state.members.hasOwnProperty(author.publicKey)) {
       return false;
     }
-    if (!state.members[author.publicKey].isAdmin) {
+    if (state.members[author.publicKey].role !== "ADMIN") {
       return false;
     }
     return true;
@@ -71,7 +54,7 @@ export const allAuthorsAreValidAdmins = (
 export const getAdminCount = (state: TrustChainState) => {
   let adminCount = 0;
   Object.keys(state.members).forEach((memberKey) => {
-    if (state.members[memberKey].isAdmin) {
+    if (state.members[memberKey].role === "ADMIN") {
       adminCount = adminCount + 1;
     }
   });
@@ -85,9 +68,14 @@ export const isValidAdminDecision = (
   if (!allAuthorsAreValidAdmins(state, event as DefaultTrustChainEvent)) {
     return false;
   }
-  const adminCount = getAdminCount(state);
-  if (event.authors.length > adminCount / 2) {
+  if (event.authors.length > 0) {
     return true;
   }
+  // Mode where a majority is needed:
+  //
+  // const adminCount = getAdminCount(state);
+  // if (event.authors.length > adminCount / 2) {
+  //   return true;
+  // }
   return false;
 };

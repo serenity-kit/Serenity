@@ -1,9 +1,5 @@
 import sodium from "libsodium-wrappers";
-import {
-  AddMemberTransaction,
-  DefaultTrustChainEvent,
-  MemberAuthorization,
-} from "./types";
+import { AddMemberTransaction, DefaultTrustChainEvent, Role } from "./types";
 import { hashTransaction } from "./utils";
 
 export const addMember = (
@@ -11,13 +7,13 @@ export const addMember = (
   authorKeyPair: sodium.KeyPair,
   memberSigningPublicKey: string,
   memberLockboxPublicKey: string,
-  memberAuthorization: MemberAuthorization
+  memberRole: Role
 ): DefaultTrustChainEvent => {
   const transaction: AddMemberTransaction = {
-    ...memberAuthorization,
     type: "add-member",
     memberSigningPublicKey,
     memberLockboxPublicKey,
+    role: memberRole,
   };
 
   const hash = hashTransaction(transaction);

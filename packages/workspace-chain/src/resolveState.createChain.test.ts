@@ -38,10 +38,8 @@ test("should resolve to one admin after creating a chain", async () => {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
         ],
-        "canAddMembers": true,
-        "canRemoveMembers": true,
-        "isAdmin": true,
         "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
+        "role": "ADMIN",
       },
     }
   `);
@@ -61,20 +59,16 @@ test("should resolve to two admins after creating a chain with two authors", asy
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
           "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY",
         ],
-        "canAddMembers": true,
-        "canRemoveMembers": true,
-        "isAdmin": true,
         "lockboxPublicKey": "wevxDsZ-L7wpy3ePZcQNfG8WDh0wB0d27phr5OMdLwI",
+        "role": "ADMIN",
       },
       "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY": {
         "addedBy": [
           "74IPzs2dhoERLRuxeS7zadzEvKfb7IqOK-jKu0mQxIM",
           "MTDhqVIMflTD0Car-KSP1MWCIEYqs2LBaXfU20di0tY",
         ],
-        "canAddMembers": true,
-        "canRemoveMembers": true,
-        "isAdmin": true,
         "lockboxPublicKey": "b_skeL8qudNQji-HuOldPNFDzYSBENNqmFMlawhtrHg",
+        "role": "ADMIN",
       },
     }
   `);
