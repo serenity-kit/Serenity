@@ -1,15 +1,15 @@
+import { LocalDevice } from "@serenity-tools/common";
 import {
   AttachDevicesToWorkspacesDocument,
   AttachDevicesToWorkspacesMutation,
   AttachDevicesToWorkspacesMutationVariables,
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { getUrqlClient } from "../urqlClient/urqlClient";
 import { createWorkspaceMemberDevices } from "./createWorkspaceMemberDevices";
 import { getUnauthorizedWorkspaceDevices } from "./getUnauthorizedWorkspaceDevices";
 
 export type Props = {
-  activeDevice: Device;
+  activeDevice: LocalDevice;
 };
 export const authorizeNewDevices = async ({ activeDevice }: Props) => {
   const unauthorizedWorkspaceDevices = await getUnauthorizedWorkspaceDevices(

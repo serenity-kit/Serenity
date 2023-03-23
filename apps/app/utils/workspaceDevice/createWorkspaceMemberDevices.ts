@@ -1,18 +1,18 @@
 import {
   decryptWorkspaceKey,
   encryptWorkspaceKeyForDevice,
+  LocalDevice,
 } from "@serenity-tools/common";
 import {
   WorkspaceDevicePairingInput,
   WorkspaceKeyDeviceInput,
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { MemberDevices } from "../../types/workspaceDevice";
 import { getWorkspaces } from "../workspace/getWorkspaces";
 
 export type Props = {
   unauthorizedWorkspaceDevices: any;
-  activeDevice: Device;
+  activeDevice: LocalDevice;
 };
 export const createWorkspaceMemberDevices = async ({
   activeDevice,

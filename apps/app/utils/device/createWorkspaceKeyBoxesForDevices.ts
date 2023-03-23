@@ -1,7 +1,10 @@
-import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
+import {
+  Device,
+  encryptWorkspaceKeyForDevice,
+  LocalDevice,
+} from "@serenity-tools/common";
 import sodium from "react-native-libsodium";
 import { DeviceWorkspaceKeyBoxInput } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { getMainDevice } from "./mainDeviceMemoryStore";
 
 export type DeviceWorkspaceKeyBoxParams = {
@@ -12,7 +15,7 @@ export type DeviceWorkspaceKeyBoxParams = {
 };
 export type Props = {
   devices: Device[];
-  activeDevice: Device;
+  activeDevice: LocalDevice;
 };
 export const createWorkspaceKeyBoxesForDevices = ({
   devices,

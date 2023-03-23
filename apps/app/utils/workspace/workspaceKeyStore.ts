@@ -1,5 +1,5 @@
+import { LocalDevice } from "@serenity-tools/common";
 import create from "zustand";
-import { Device } from "../../types/Device";
 import { deriveWorkspaceKey } from "./deriveWorkspaceKey";
 
 export type WorskpaceKeyLookup = {
@@ -11,7 +11,7 @@ export type WorskpaceKeyLookupForWorkspace = {
 export type GetWorkspaceKeyProps = {
   workspaceId: string;
   workspaceKeyId: string;
-  activeDevice: Device;
+  activeDevice: LocalDevice;
 };
 export type SetWorkspaceKeyProps = {
   workspaceId: string;

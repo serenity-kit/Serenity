@@ -1,3 +1,4 @@
+import { LocalDevice } from "@serenity-tools/common";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
@@ -5,11 +6,10 @@ import {
   runMeQuery,
   Workspace,
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 
 export type Props = {
   workspaceInvitationId: string;
-  mainDevice: Device;
+  mainDevice: LocalDevice;
   signingPrivateKey: string;
 };
 

@@ -1,3 +1,4 @@
+import { LocalDevice } from "@serenity-tools/common";
 import { AnyActorRef, assign, createMachine, spawn } from "xstate";
 import {
   MeQueryResult,
@@ -13,12 +14,11 @@ import {
   WorkspacesQueryServiceEvent,
   WorkspacesQueryUpdateResultEvent,
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { showToast } from "../../utils/toast/showToast";
 
 type Params = {
   workspaceId?: string;
-  activeDevice: Device | null;
+  activeDevice: LocalDevice | null;
 };
 
 interface Context {

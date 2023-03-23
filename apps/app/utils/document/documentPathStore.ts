@@ -1,6 +1,7 @@
 import {
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
+  LocalDevice,
 } from "@serenity-tools/common";
 import create from "zustand";
 import {
@@ -9,7 +10,6 @@ import {
   DocumentPathQueryVariables,
   Folder,
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { GetFolderKeyProps } from "../folder/folderKeyStore";
 import { getUrqlClient } from "../urqlClient/urqlClient";
 import { deriveWorkspaceKey } from "../workspace/deriveWorkspaceKey";
@@ -22,7 +22,7 @@ interface DocumentPathState {
   getName: (folderId: string) => string;
   update: (
     folders: Folder[],
-    activeDevice: Device,
+    activeDevice: LocalDevice,
     getFolderKey: ({
       workspaceId,
       workspaceKeyId,

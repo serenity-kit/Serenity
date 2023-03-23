@@ -1,13 +1,13 @@
 import {
   decryptWorkspaceKey,
   encryptWorkspaceKeyForDevice,
+  LocalDevice,
 } from "@serenity-tools/common";
 import {
   WorkspaceKeyBox,
   WorkspaceKeyBoxData,
   WorkspaceKeyDevicePair,
 } from "../../generated/graphql";
-import { Device } from "../../types/Device";
 import { getWorkspace } from "../workspace/getWorkspace";
 import { getWorkspaces } from "../workspace/getWorkspaces";
 import { getDevices } from "./getDevices";
@@ -33,7 +33,7 @@ const getWorkspaceKeyBoxByDeviceSigningPublicKey = ({
 };
 
 export type Props = {
-  activeDevice: Device;
+  activeDevice: LocalDevice;
 };
 export const createNewWorkspaceKeyBoxesForActiveDevice = async ({
   activeDevice,

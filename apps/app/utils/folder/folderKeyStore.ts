@@ -1,6 +1,8 @@
-import { deriveKeysFromKeyDerivationTrace } from "@serenity-tools/common";
+import {
+  deriveKeysFromKeyDerivationTrace,
+  LocalDevice,
+} from "@serenity-tools/common";
 import create from "zustand";
-import { Device } from "../../types/Device";
 import { getWorkspace } from "../workspace/getWorkspace";
 import { getFolder } from "./getFolder";
 
@@ -29,7 +31,7 @@ export type GetFolderKeyProps = {
   workspaceKeyId: string | undefined | null;
   folderId: string;
   folderSubkeyId?: number | undefined | null;
-  activeDevice: Device;
+  activeDevice: LocalDevice;
 };
 // export type SetFolderKeyProps = {
 //   folderId: string;

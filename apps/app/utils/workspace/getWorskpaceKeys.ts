@@ -1,10 +1,9 @@
-import { decryptWorkspaceKey } from "@serenity-tools/common";
-import { Device } from "../../types/Device";
+import { decryptWorkspaceKey, LocalDevice } from "@serenity-tools/common";
 import { getWorkspace } from "./getWorkspace";
 
 export type Props = {
   workspaceId: string;
-  activeDevice: Device;
+  activeDevice: LocalDevice;
 };
 export const getWorkspaceKeys = async ({
   workspaceId,

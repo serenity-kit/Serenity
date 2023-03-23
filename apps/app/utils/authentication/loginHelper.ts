@@ -1,4 +1,4 @@
-import { decryptDevice } from "@serenity-tools/common";
+import { decryptDevice, LocalDevice } from "@serenity-tools/common";
 import { finishLogin, startLogin } from "@serenity-tools/opaque";
 import { Platform } from "react-native";
 import sodium from "react-native-libsodium";
@@ -12,7 +12,6 @@ import {
 import { setMainDevice } from "../device/mainDeviceMemoryStore";
 import { removeLastUsedDocumentIdAndWorkspaceId } from "../lastUsedWorkspaceAndDocumentStore/lastUsedWorkspaceAndDocumentStore";
 import { getUrqlClient } from "../urqlClient/urqlClient";
-import { LocalDeviceInclInfo } from "./createDeviceWithInfo";
 import {
   isUserIdSameAsLastLogin,
   removeLastLogin,
@@ -48,7 +47,7 @@ export type LoginParams = {
   startLoginMutation: any;
   finishLoginMutation: any;
   updateAuthentication: UpdateAuthenticationFunction;
-  device: LocalDeviceInclInfo;
+  device: LocalDevice;
   useExtendedLogin: boolean;
 };
 export const login = async ({
