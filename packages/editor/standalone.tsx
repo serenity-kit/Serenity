@@ -17,7 +17,7 @@ import { updateEditor } from "./updateEditor";
 const ydoc = new Y.Doc();
 window.ydoc = ydoc;
 window.isNew = window.isNew === undefined ? false : window.isNew;
-window.username = window.username || "Unknown user";
+window.userInfo = window.userInfo || { name: "Unknown user", color: "#ffffff" }; // should neber be an Unknown user
 if (window.initialContent) {
   const update = new Uint8Array(window.initialContent);
   Y.applyUpdateV2(window.ydoc, update, "react-native-bridge");
@@ -64,7 +64,10 @@ yAwareness.on("update", ({ added, updated, removed }: any, origin: string) => {
     );
   }
 });
-yAwareness.setLocalStateField("user", { name: window.username });
+yAwareness.setLocalStateField("user", {
+  name: window.userInfo.name,
+  color: window.userInfo.color,
+});
 
 const openDrawer = () => {
   window.ReactNativeWebView.postMessage(JSON.stringify({ type: "openDrawer" }));

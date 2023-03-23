@@ -23,6 +23,7 @@ export const AwarnessExtension = Extension.create<
       awareness: undefined,
       render: (user) => {
         const cursor = document.createElement("span");
+        console.log("user", user);
 
         cursor.classList.add("collaboration-cursor__caret");
         cursor.setAttribute("style", `border-color: ${user.color}`);
