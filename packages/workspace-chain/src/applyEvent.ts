@@ -2,6 +2,7 @@ import sodium from "libsodium-wrappers";
 import { InvalidTrustChainError } from "./errors";
 import {
   DefaultTrustChainEvent,
+  Invitation,
   MemberProperties,
   TrustChainEvent,
   TrustChainState,
@@ -12,6 +13,9 @@ export const applyEvent = (
   state: TrustChainState,
   event: TrustChainEvent
 ): TrustChainState => {
+  let invitations: { [invitationId: string]: Invitation } = {
+    ...state.invitations,
+  };
   let members: { [publicKey: string]: MemberProperties } = {
     ...state.members,
   };
@@ -41,6 +45,18 @@ export const applyEvent = (
 
   if (event.transaction.type === "create") {
     throw new InvalidTrustChainError("Only one create event is allowed.");
+  }
+
+  if (event.transaction.type === "add-invitation") {
+    if (!isValidAdminDecision(state, event as DefaultTrustChainEvent)) {
+      throw new InvalidTrustChainError("Not allowed to add an invitation.");
+    }
+    invitations[event.transaction.invitationId] = {
+      expiresAt: event.transaction.expiresAt,
+      role: event.transaction.role,
+      invitationInviterProof: event.transaction.invitationInviterProof,
+      addedBy: event.authors.map((author) => author.publicKey),
+    };
   }
 
   if (event.transaction.type === "add-member") {
@@ -111,6 +127,7 @@ export const applyEvent = (
 
   return {
     id: state.id,
+    invitations,
     members,
     lastEventHash: hash,
     trustChainVersion: 1,

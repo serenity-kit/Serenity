@@ -1,4 +1,5 @@
 export * from "./addAuthorToEvent";
+export * from "./addInvitation";
 export * from "./addMember";
 export * from "./applyEvent";
 export * from "./createChain";

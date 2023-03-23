@@ -1,3 +1,4 @@
+import { addInvitation } from "@serenity-kit/workspace-chain";
 import {
   Button,
   Description,
@@ -8,7 +9,6 @@ import {
   tw,
   View,
 } from "@serenity-tools/ui";
-import canonicalize from "canonicalize";
 import * as Clipboard from "expo-clipboard";
 import { useState } from "react";
 import { Platform, StyleSheet } from "react-native";
@@ -16,13 +16,10 @@ import sodium from "react-native-libsodium";
 import {
   Role,
   runCreateWorkspaceInvitationMutation,
-  useCreateWorkspaceInvitationMutation,
   useDeleteWorkspaceInvitationsMutation,
   useWorkspaceInvitationsQuery,
 } from "../../generated/graphql";
 import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
-import { getRoleAsString } from "../../utils/workspace/getRoleAsString";
-
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { WorkspaceInvitationList } from "./WorkspaceInvitationList";
 
@@ -47,8 +44,6 @@ export function CreateWorkspaceInvitation(props: Props) {
   const workspaceId = props.workspaceId;
   const [workspaceInvitationsResult, refetchWorkspaceInvitationsResult] =
     useWorkspaceInvitationsQuery({ variables: { workspaceId } });
-  const [, createWorkspaceInvitationMutation] =
-    useCreateWorkspaceInvitationMutation();
   const [, deleteWorkspaceInvitationsMutation] =
     useDeleteWorkspaceInvitationsMutation();
   const [selectedWorkspaceInvitationId, setSelectedWorkspaceInvitationId] =
@@ -107,38 +102,36 @@ export function CreateWorkspaceInvitation(props: Props) {
   };
 
   const createWorkspaceInvitation = async (sharingRole: Role) => {
-    const invitationSigningKeys = sodium.crypto_sign_keypair();
-    const invitationIdLengthBytes = 24;
-    const invitationId = sodium.to_base64(
-      sodium.randombytes_buf(invitationIdLengthBytes)
-    );
     const currentTime = new Date();
     const twoDaysMillis = 2 * 24 * 60 * 60 * 1000;
     const expiresAt = new Date(currentTime.getTime() + twoDaysMillis);
-    const invitationData = canonicalize({
-      workspaceId,
-      invitationId,
-      invitationSigningPublicKey: sodium.to_base64(
-        invitationSigningKeys.publicKey
-      ),
-      role: getRoleAsString(sharingRole),
-      expiresAt: expiresAt.toISOString(),
+    const mainDevice = getMainDevice()!;
+    const invitation = addInvitation({
+      authorKeyPair: {
+        keyType: "ed25519",
+        privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
+        publicKey: sodium.from_base64(mainDevice.signingPublicKey),
+      },
+      expiresAt,
+      role: sharingRole,
+      prevHash: "TODO",
     });
-    const invitationDataSignature = sodium.crypto_sign_detached(
-      invitationData!,
-      invitationSigningKeys.privateKey
-    );
+
+    if (invitation.transaction.type !== "add-invitation") {
+      throw new Error("Expected invitation transaction");
+    }
+
     const createWorkspaceInvitationResult =
       await runCreateWorkspaceInvitationMutation({
         input: {
           workspaceId,
-          invitationId,
-          invitationSigningPublicKey: sodium.to_base64(
-            invitationSigningKeys.publicKey
-          ),
-          expiresAt,
+          invitationId: invitation.transaction.invitationId,
+          invitationSigningPublicKey:
+            invitation.transaction.invitationSigningPublicKey,
+          expiresAt: expiresAt.toISOString(),
           role: sharingRole,
-          invitationDataSignature: sodium.to_base64(invitationDataSignature),
+          invitationDataSignature:
+            invitation.transaction.invitationDataSignature,
         },
       });
     refetchWorkspaceInvitationsResult();
@@ -151,7 +144,7 @@ export function CreateWorkspaceInvitation(props: Props) {
       props.onWorkspaceInvitationCreated({ workspaceInvitation });
       setSelectedWorkspaceInvitationId(workspaceInvitation.id);
       setSelectedWorkspaceInvitationSigningPrivateKey(
-        sodium.to_base64(invitationSigningKeys.privateKey)
+        invitation.invitationSigningPrivateKey
       );
     }
   };

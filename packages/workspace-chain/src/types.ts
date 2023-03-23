@@ -6,6 +6,15 @@ export type CreateChainTransaction = {
   lockboxPublicKeys: { [signingPublicKey: string]: string };
 };
 
+export type AddInvitationTransaction = {
+  type: "add-invitation";
+  invitationId: string;
+  role: Role;
+  expiresAt: string;
+  invitationSigningPublicKey: string;
+  invitationDataSignature: string;
+};
+
 export type AddMemberTransaction = {
   type: "add-member";
   memberSigningPublicKey: string;
@@ -38,6 +47,7 @@ export type CreateChainTrustChainEvent = {
 export type DefaultTrustChainEvent = {
   authors: Author[];
   transaction:
+    | AddInvitationTransaction
     | AddMemberTransaction
     | UpdateMemberTransaction
     | RemoveMemberTransaction;
@@ -48,17 +58,22 @@ export type TrustChainEvent =
   | CreateChainTrustChainEvent
   | DefaultTrustChainEvent;
 
+export type Invitation = {
+  expiresAt: string;
+  role: Role;
+  invitationInviterProof: string;
+  addedBy: string[];
+};
+
 export type MemberProperties = {
   lockboxPublicKey: string;
   role: Role;
   addedBy: string[];
-  name?: string;
-  profileUpdatedBy?: string;
 };
 
 export type TrustChainState = {
   id: string;
-  // TODO split up into a better structure
+  invitations: { [invitationId: string]: Invitation };
   members: { [publicKey: string]: MemberProperties };
   lastEventHash: string;
   encryptedStateClock: number;
