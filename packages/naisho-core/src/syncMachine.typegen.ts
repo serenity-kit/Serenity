@@ -22,6 +22,9 @@ export interface Typegen0 {
       type: "error.platform.sheduleRetry";
       data: unknown;
     };
+    "xstate.after(0)#syncMachine.connected.checkingForMoreQueueItems": {
+      type: "xstate.after(0)#syncMachine.connected.checkingForMoreQueueItems";
+    };
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {
@@ -46,11 +49,14 @@ export interface Typegen0 {
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {
-    hasMoreItemsInQueues: "";
+    hasMoreItemsInQueues: "xstate.after(0)#syncMachine.connected.checkingForMoreQueueItems";
     shouldReconnect: "";
   };
   eventsCausingServices: {
-    processQueues: "" | "ADD_CHANGE" | "WEBSOCKET_ADD_TO_QUEUE";
+    processQueues:
+      | "ADD_CHANGE"
+      | "WEBSOCKET_ADD_TO_QUEUE"
+      | "xstate.after(0)#syncMachine.connected.checkingForMoreQueueItems";
     sheduleRetry: "" | "DISCONNECT" | "WEBSOCKET_DISCONNECTED" | "xstate.init";
   };
   matchesStates:
