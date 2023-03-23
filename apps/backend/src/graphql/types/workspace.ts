@@ -26,7 +26,7 @@ export const WorkspaceKeyBox = objectType({
     t.nonNull.string("creatorDeviceSigningPublicKey");
     t.nonNull.string("nonce");
     t.nonNull.string("ciphertext");
-    t.field("creatorDevice", { type: CreatorDevice });
+    t.nonNull.field("creatorDevice", { type: CreatorDevice });
   },
 });
 
@@ -36,7 +36,7 @@ export const WorkspaceKey = objectType({
     t.nonNull.string("id");
     t.nonNull.string("workspaceId");
     t.nonNull.int("generation");
-    t.field("workspaceKeyBox", {
+    t.nonNull.field("workspaceKeyBox", {
       type: WorkspaceKeyBox,
     });
     t.list.nonNull.field("workspaceKeyBoxes", {

@@ -146,7 +146,7 @@ export default function SidebarFolder(props: Props) {
     try {
       const parentKeyChainData = deriveKeysFromKeyDerivationTrace({
         keyDerivationTrace: props.keyDerivationTrace,
-        workspaceKeyBox: folderWorkspaceKey.workspaceKeyBox!,
+        workspaceKeyBox: folderWorkspaceKey.workspaceKeyBox,
         activeDevice: {
           signingPublicKey: activeDevice.signingPublicKey,
           signingPrivateKey: activeDevice.signingPrivateKey!,
@@ -200,8 +200,7 @@ export default function SidebarFolder(props: Props) {
         encryptionPublicKeySignature:
           activeDevice.encryptionPublicKeySignature!,
       },
-      // @ts-expect-error
-      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox,
     });
     const parentChainItem =
       parentFolderKeyChainData.trace[parentFolderKeyChainData.trace.length - 1];
@@ -270,8 +269,7 @@ export default function SidebarFolder(props: Props) {
     }
     const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
       keyDerivationTrace: props.keyDerivationTrace,
-      // @ts-expect-error
-      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox,
       activeDevice: {
         signingPublicKey: activeDevice.signingPublicKey,
         signingPrivateKey: activeDevice.signingPrivateKey!,
@@ -325,8 +323,7 @@ export default function SidebarFolder(props: Props) {
       snapshot: {
         keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
       },
-      // @ts-expect-error
-      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+      workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox,
     });
     const result = await runCreateDocumentMutation(
       {
@@ -417,8 +414,7 @@ export default function SidebarFolder(props: Props) {
         encryptionPublicKeySignature:
           activeDevice.encryptionPublicKeySignature!,
       },
-      // @ts-expect-error
-      workspaceKeyBox: workspace.currentWorkspaceKey!.workspaceKeyBox!,
+      workspaceKeyBox: workspace.currentWorkspaceKey!.workspaceKeyBox,
     });
     // ignore the last chain item as it's the key for the old folder name
     let parentKey = workspaceKey;

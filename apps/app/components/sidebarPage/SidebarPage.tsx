@@ -104,7 +104,7 @@ export default function SidebarPage(props: Props) {
         snapshot: {
           keyDerivationTrace: snapshot.keyDerivationTrace,
         },
-        workspaceKeyBox: documentWorkspaceKey.workspaceKeyBox!,
+        workspaceKeyBox: documentWorkspaceKey.workspaceKeyBox,
       });
       setDocumentTitle(documentTitle);
       documentTitleStore.updateDocumentTitle({

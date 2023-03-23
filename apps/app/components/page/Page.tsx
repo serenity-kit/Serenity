@@ -125,8 +125,7 @@ export default function Page({
         snapshot: {
           keyDerivationTrace: snapshotKeyData.keyDerivationTrace,
         },
-        // @ts-expect-error
-        workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+        workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox,
       });
 
       return {

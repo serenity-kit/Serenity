@@ -87,7 +87,7 @@ export const useDocumentPathStore = create<DocumentPathState>((set, get) => ({
             encryptionPublicKeySignature:
               activeDevice.encryptionPublicKeySignature!,
           },
-          workspaceKeyBox: folderWorkspaceKey.workspaceKeyBox!,
+          workspaceKeyBox: folderWorkspaceKey.workspaceKeyBox,
         });
         // since decryptFolderName also derives the folder subkey,
         // we can pass the parentKeyTrace's parent key to it
