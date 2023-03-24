@@ -14,7 +14,6 @@ import {
   DesignSystemHeading as Heading,
   DesignSystemMono as DSMono,
   EditorBottombarButton,
-  EditorBottombarDivider,
   EditorSidebarIcon,
   Heading as UIHeading,
   HorizontalDivider,
@@ -47,6 +46,7 @@ import {
   Tooltip,
   tw,
   useIsDesktopDevice,
+  VerticalDivider,
   View,
   WorkspaceAvatar,
   TextArea,
@@ -875,14 +875,14 @@ export default function DesignSystemScreen(
         <Heading lvl={3}>Divider</Heading>
         <Text variant="sm">
           To section the different functionalities you can use the{" "}
-          <DSMono variant="component">EditorBottombarDivider</DSMono>.
+          <DSMono variant="component">VerticalDivider</DSMono>.
         </Text>
         <DSExampleArea>
           <EditorBottombarButton name="bold" />
           <EditorBottombarButton name="italic" />
           <EditorBottombarButton name="code-view" />
           <EditorBottombarButton name="link" isActive />
-          <EditorBottombarDivider />
+          <VerticalDivider />
           <EditorBottombarButton name="list-unordered" />
           <EditorBottombarButton name="list-ordered" />
           <EditorBottombarButton name="list-check-2" />

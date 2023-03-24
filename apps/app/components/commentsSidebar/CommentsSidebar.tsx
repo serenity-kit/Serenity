@@ -1,5 +1,5 @@
 import {
-  EditorBottombarDivider,
+  VerticalDivider,
   EditorSidebarHeader,
   Icon,
   Text,
@@ -29,7 +29,7 @@ const Header: React.FC = () => {
         <Text variant="xxs" muted style={tw`p-1`}>
           Open
         </Text>
-        <EditorBottombarDivider style={tw`h-4 border-r border-gray-600`} />
+        <VerticalDivider style={tw`h-4 border-r border-gray-600`} />
         <Text variant="xxs" muted style={tw`p-1`}>
           Resolved
         </Text>

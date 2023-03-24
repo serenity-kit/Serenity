@@ -1,6 +1,6 @@
 import {
   BubbleMenuContentWrapper,
-  EditorBottombarDivider,
+  VerticalDivider,
   EditorContentButton,
   ScrollView,
   SubmitButton,
@@ -375,7 +375,7 @@ export const Editor = (props: EditorProps) => {
                     />
                   </Tooltip>
 
-                  <EditorBottombarDivider />
+                  <VerticalDivider />
 
                   <Tooltip label={"Link"} placement={"top"} hasArrow={false}>
                     <ToggleButton
@@ -387,7 +387,7 @@ export const Editor = (props: EditorProps) => {
                     />
                   </Tooltip>
 
-                  <EditorBottombarDivider />
+                  <VerticalDivider />
 
                   <Tooltip
                     label={"Add comment"}

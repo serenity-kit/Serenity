@@ -7,7 +7,7 @@ import {
 } from "@serenity-tools/editor-file-extension";
 import {
   EditorBottombarButton,
-  EditorBottombarDivider,
+  VerticalDivider,
   ScrollView,
   tw,
 } from "@serenity-tools/ui";
@@ -68,7 +68,7 @@ export const EditorBottombar = forwardRef(
             isActive={editorBottombarState.isLink}
           />
 
-          <EditorBottombarDivider />
+          <VerticalDivider />
 
           <EditorBottombarButton
             onPress={(event) => {
@@ -106,7 +106,7 @@ export const EditorBottombar = forwardRef(
             isActive={editorBottombarState.isBlockquote}
           />
 
-          <EditorBottombarDivider />
+          <VerticalDivider />
 
           <EditorBottombarButton
             onPress={(event) => {
@@ -130,7 +130,7 @@ export const EditorBottombar = forwardRef(
             isActive={editorBottombarState.isTaskList}
           />
 
-          <EditorBottombarDivider />
+          <VerticalDivider />
 
           <EditorBottombarButton
             onPress={(event) => {
