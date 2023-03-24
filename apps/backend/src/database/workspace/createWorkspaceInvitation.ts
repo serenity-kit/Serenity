@@ -43,7 +43,7 @@ export async function createWorkspaceInvitation({
     workspaceId,
     invitationId,
     invitationSigningPublicKey,
-    role: roleAsString,
+    role,
     expiresAt: expiresAt.toISOString(),
   });
   const doesSignatureVerify = sodium.crypto_sign_verify_detached(

@@ -12,17 +12,8 @@ import {
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import { TextInput } from "react-native";
-import sodium from "react-native-libsodium";
-import {
-  MainDeviceDocument,
-  MainDeviceQuery,
-  runMeQuery,
-  useStartLoginMutation,
-  useVerifyPasswordMutation,
-} from "../../generated/graphql";
-import { useAuthenticatedAppContext } from "../../hooks/useAuthenticatedAppContext";
-import { setMainDevice } from "../../utils/device/mainDeviceMemoryStore";
-import { getUrqlClient } from "../../utils/urqlClient/urqlClient";
+import { runMeQuery, useStartLoginMutation } from "../../generated/graphql";
+import { fetchMainDevice } from "../../utils/authentication/loginHelper";
 
 export type Props = {
   isVisible: boolean;
@@ -35,9 +26,7 @@ export function VerifyPasswordModal(props: Props) {
   const [password, setPassword] = useState("");
   const [isPasswordInvalid, setIsPasswordInvalid] = useState(false);
   const [isVerifyingPassword, setIsVerifyingPassword] = useState(false);
-  const { activeDevice, sessionKey } = useAuthenticatedAppContext();
   const [, startLoginMutation] = useStartLoginMutation();
-  const [, verifyPasswordMutation] = useVerifyPasswordMutation();
 
   const onModalHide = () => {
     setPassword("");
@@ -87,7 +76,7 @@ export function VerifyPasswordModal(props: Props) {
         // TODO: show this error to user
         throw new Error("Could not start login");
       }
-      let finishLoginResponse: any = undefined;
+      let finishLoginResponse;
       try {
         finishLoginResponse = await finishLogin(
           password,
@@ -96,43 +85,9 @@ export function VerifyPasswordModal(props: Props) {
       } catch (error) {
         throw error;
       }
-      const sessionTokenSignature = sodium.crypto_sign_detached(
-        sessionKey,
-        sodium.from_base64(activeDevice.signingPrivateKey!)
-      );
-      const verifyPasswordResponse = await verifyPasswordMutation({
-        input: {
-          loginId: startLoginResult.data.startLogin.loginId,
-          message: finishLoginResponse.response,
-          deviceSigningPublicKey: activeDevice.signingPublicKey,
-          sessionTokenSignature: sodium.to_base64(sessionTokenSignature),
-        },
-      });
-      if (verifyPasswordResponse.error) {
-        throw new Error(verifyPasswordResponse.error.message);
-      }
-      const isPasswordValid =
-        verifyPasswordResponse.data?.verifyPassword?.isValid;
-      if (isPasswordValid !== true) {
-        throw new Error("Password is not valid");
-      }
-      // verify login
-      const mainDeviceResult = await getUrqlClient()
-        .query<MainDeviceQuery>(MainDeviceDocument, undefined, {
-          requestPolicy: "network-only",
-        })
-        .toPromise();
-      if (mainDeviceResult.error) {
-        // TODO: handle this error in the UI
-        throw new Error(mainDeviceResult.error.message);
-      }
-      if (!mainDeviceResult.data?.mainDevice) {
-        // TODO: handle this error in the UI
-        throw new Error("Could not query mainDevice. Probably not logged in");
-      }
-      const mainDevice = mainDeviceResult.data.mainDevice;
-      // @ts-expect-error TODO invesigate this!!!
-      setMainDevice(mainDevice);
+
+      await fetchMainDevice({ exportKey: finishLoginResponse.exportKey });
+
       if (props.onSuccess) {
         props.onSuccess();
       }

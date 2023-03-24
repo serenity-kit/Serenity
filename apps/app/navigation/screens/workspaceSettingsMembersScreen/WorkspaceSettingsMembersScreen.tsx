@@ -258,15 +258,10 @@ export default function WorkspaceSettingsMembersScreen(
                   <Description variant="form">
                     Send invitation links to new workspace members. Only Admins
                     can see and invite new members.{"\n"}New members must accept
-                    your invitation within 3 days.
+                    your invitation within 2 days.
                   </Description>
                 </View>
-                <CreateWorkspaceInvitation
-                  workspaceId={workspaceId}
-                  onWorkspaceInvitationCreated={(workspaceInvitation: any) => {
-                    // do nothing
-                  }}
-                />
+                <CreateWorkspaceInvitation workspaceId={workspaceId} />
               </>
             )}
             <Heading lvl={3} style={tw`mt-3`}>
