@@ -1208,6 +1208,7 @@ export default function DesignSystemScreen(
             <IconTile name="arrow-up-down-s-line" />
             <IconTile name="arrow-up-line" />
             <IconTile name="attachment-2" />
+            <IconTile name="earth-fill" />
             <IconTile name="font-size-2" />
             <IconTile name="format-clear" />
             <IconTile name="functions" />
@@ -1257,6 +1258,7 @@ export default function DesignSystemScreen(
             <IconTile name="file-copy-line" />
             <IconTile name="chat-1-line" />
             <IconTile name="chat-1-line-message" />
+            <IconTile name="chat-4-fill" />
             <IconTile name="chat-4-line" />
             <IconTile name="chit-chat" />
             <IconTile name="pencil-line" />
