@@ -29,6 +29,7 @@ import { Chat1Line } from "./icons/Chat1Line";
 import { Chat1LineMessage } from "./icons/Chat1LineMessage";
 import { Chat4Fill } from "./icons/Chat4Fill";
 import { Chat4Line } from "./icons/Chat4Line";
+import { Chat4LineMessage } from "./icons/Chat4LineMessage";
 import { CheckLine } from "./icons/CheckLine";
 import { ChitChat } from "./icons/ChitChat";
 import { CloseCircleFill } from "./icons/CloseCircleFill";
@@ -152,6 +153,7 @@ export type IconNames =
   | "chat-1-line-message"
   | "chat-4-fill"
   | "chat-4-line"
+  | "chat-4-line-message"
   | "check-line"
   | "chit-chat"
   | "close-circle-fill"
@@ -345,6 +347,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "chat-4-line") {
     icon = <Chat4Line color={color} size={iconSize} />;
+  }
+  if (name === "chat-4-line-message") {
+    icon = <Chat4LineMessage color={color} size={iconSize} />;
   }
   if (name === "check-line") {
     icon = <CheckLine color={color} size={iconSize} />;

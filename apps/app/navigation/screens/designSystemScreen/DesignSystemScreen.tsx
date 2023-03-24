@@ -1260,6 +1260,7 @@ export default function DesignSystemScreen(
             <IconTile name="chat-1-line-message" />
             <IconTile name="chat-4-fill" />
             <IconTile name="chat-4-line" />
+            <IconTile name="chat-4-line-message" />
             <IconTile name="chit-chat" />
             <IconTile name="pencil-line" />
             <IconTile name="error-warning-line" />
