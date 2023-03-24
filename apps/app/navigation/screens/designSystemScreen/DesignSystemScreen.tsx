@@ -17,6 +17,7 @@ import {
   EditorBottombarDivider,
   EditorSidebarIcon,
   Heading as UIHeading,
+  HorizontalDivider,
   Icon,
   IconButton,
   InfoMessage,
@@ -36,7 +37,6 @@ import {
   SelectItem,
   Shortcut,
   SidebarButton,
-  SidebarDivider,
   SidebarIconLeft,
   SidebarLink,
   SidebarText,
@@ -805,7 +805,7 @@ export default function DesignSystemScreen(
                   >
                     Devices
                   </SidebarLink>
-                  <SidebarDivider style={tw`my-2`} />
+                  <HorizontalDivider style={tw`my-2`} />
                   <SidebarLink
                     to={{ screen: "EncryptDecryptImageTest" }}
                     iconName="history-line"
@@ -952,7 +952,7 @@ export default function DesignSystemScreen(
         <Heading lvl={3}>Divider</Heading>
         <Text variant="sm">
           To section the different functionalities you can use the generic{" "}
-          <DSMono variant="component">SidebarDivider</DSMono>.
+          <DSMono variant="component">HorizontalDivider</DSMono>.
         </Text>
         <DSExampleArea>
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
@@ -962,7 +962,7 @@ export default function DesignSystemScreen(
                 Codeblock
               </Text>
             </SidebarButton>
-            <SidebarDivider></SidebarDivider>
+            <HorizontalDivider></HorizontalDivider>
             <SidebarButton>
               <EditorSidebarIcon name="list-unordered" />
               <Text variant="sm">Bullet-List</Text>
@@ -1617,7 +1617,7 @@ export default function DesignSystemScreen(
         <Heading lvl={3}>Divider</Heading>
         <Text variant="sm">
           To section the different functionalities you can use the{" "}
-          <DSMono variant="component">SidebarDivider</DSMono> with added{" "}
+          <DSMono variant="component">HorizontalDivider</DSMono> with added{" "}
           <DSMono variant="property">collapsed</DSMono> property.
         </Text>
         <DSExampleArea>
@@ -1625,7 +1625,7 @@ export default function DesignSystemScreen(
             <VStack style={tw`py-1.5 bg-white rounded overflow-hidden`}>
               <MenuButton>Create folder</MenuButton>
               <MenuButton>Rename</MenuButton>
-              <SidebarDivider collapsed />
+              <HorizontalDivider collapsed />
               <MenuButton>Delete</MenuButton>
             </VStack>
           </BoxShadow>
@@ -1646,7 +1646,7 @@ export default function DesignSystemScreen(
             <VStack style={tw`w-50 py-1.5 bg-white rounded overflow-hidden`}>
               <MenuButton iconName="folder-line">Create folder</MenuButton>
               <MenuButton iconName="font-size-2">Rename</MenuButton>
-              <SidebarDivider collapsed />
+              <HorizontalDivider collapsed />
               <MenuButton iconName="delete-bin-line" danger>
                 Delete
               </MenuButton>
@@ -1698,7 +1698,7 @@ export default function DesignSystemScreen(
             >
               Rename
             </MenuButton>
-            <SidebarDivider collapsed />
+            <HorizontalDivider collapsed />
             <MenuButton
               onPress={() => {
                 setIsOpenPopover(false);
@@ -1739,7 +1739,7 @@ export default function DesignSystemScreen(
               >
                 Rename
               </MenuButton>
-              <SidebarDivider collapsed />
+              <HorizontalDivider collapsed />
               <MenuButton iconName="delete-bin-line" danger>
                 Delete
               </MenuButton>
@@ -1780,7 +1780,7 @@ export default function DesignSystemScreen(
                 <IconButton name="plus" label="New workspace" />
               </View>
 
-              <SidebarDivider collapsed />
+              <HorizontalDivider collapsed />
               <MenuButton>Logout</MenuButton>
             </VStack>
           </BoxShadow>
@@ -2050,7 +2050,7 @@ export default function DesignSystemScreen(
         <Heading lvl={3}>Divider</Heading>
         <Text variant="sm">
           To section the different elements you can use the{" "}
-          <DSMono variant="component">SidebarDivider</DSMono>.
+          <DSMono variant="component">HorizontalDivider</DSMono>.
         </Text>
         <DSExampleArea>
           <VStack style={tw`w-sidebar py-4 border border-gray-200 bg-gray-100`}>
@@ -2066,7 +2066,7 @@ export default function DesignSystemScreen(
             >
               Settings
             </SidebarLink>
-            <SidebarDivider />
+            <HorizontalDivider />
             <HStack
               justifyContent="space-between"
               alignItems="center"
@@ -2370,7 +2370,7 @@ export default function DesignSystemScreen(
             >
               Settings
             </SidebarLink>
-            <SidebarDivider />
+            <HorizontalDivider />
             <HStack
               justifyContent="space-between"
               alignItems="center"

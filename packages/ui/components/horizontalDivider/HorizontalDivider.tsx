@@ -2,7 +2,7 @@ import React from "react";
 import { View as RNView, StyleSheet } from "react-native";
 import { tw } from "../../tailwind";
 
-export type SidebarDividerProps = RNView["props"] & {
+export type HorizontalDividerProps = RNView["props"] & {
   collapsed?: boolean;
 };
 
@@ -11,8 +11,8 @@ const styles = StyleSheet.create({
   collapsed: tw`my-0`,
 });
 
-export const SidebarDivider = React.forwardRef(function View(
-  props: SidebarDividerProps,
+export const HorizontalDivider = React.forwardRef(function View(
+  props: HorizontalDividerProps,
   ref: React.Ref<RNView> | undefined
 ) {
   return (

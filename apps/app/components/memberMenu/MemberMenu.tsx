@@ -2,7 +2,7 @@ import {
   IconButton,
   Menu,
   MenuButton,
-  SidebarDivider,
+  HorizontalDivider,
   tw,
 } from "@serenity-tools/ui";
 import { useState } from "react";
@@ -64,7 +64,7 @@ export default function MemberMenu(props: Props) {
       >
         Admin
       </MenuButton>
-      <SidebarDivider collapsed />
+      <HorizontalDivider collapsed />
       <MenuButton
         testID={`member-menu--${memberId}__delete`}
         onPress={() => {

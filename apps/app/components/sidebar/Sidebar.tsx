@@ -11,7 +11,7 @@ import {
   Icon,
   IconButton,
   InlineInput,
-  SidebarDivider,
+  HorizontalDivider,
   SidebarLink,
   Text,
   Tooltip,
@@ -180,7 +180,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
         </SidebarLink>
       </View>
 
-      {isDesktopDevice ? <SidebarDivider /> : null}
+      {isDesktopDevice ? <HorizontalDivider /> : null}
 
       {isAuthorizedForThisWorkspace ? (
         <>
