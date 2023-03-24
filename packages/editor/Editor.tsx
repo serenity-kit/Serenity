@@ -1,7 +1,7 @@
 import {
   BubbleMenuContentWrapper,
   EditorBottombarDivider,
-  MenuButton,
+  EditorContentButton,
   ScrollView,
   SubmitButton,
   TextArea,
@@ -424,9 +424,9 @@ export const Editor = (props: EditorProps) => {
               return false;
             }}
           >
-            <BubbleMenuContentWrapper>
-              <MenuButton
-                iconName="chat-1-line"
+            <BubbleMenuContentWrapper style={tw`p-0`}>
+              <EditorContentButton
+                iconName="chat-4-fill"
                 onPress={() => {
                   const comment = findCommentForPos({
                     editor,
@@ -437,8 +437,8 @@ export const Editor = (props: EditorProps) => {
                   }
                 }}
               >
-                Open Comment
-              </MenuButton>
+                View Comment
+              </EditorContentButton>
             </BubbleMenuContentWrapper>
           </BubbleMenu>
         </ScrollView>
