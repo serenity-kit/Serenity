@@ -424,7 +424,7 @@ export const Editor = (props: EditorProps) => {
               return false;
             }}
           >
-            <BubbleMenuContentWrapper style={tw`p-0`}>
+            <BubbleMenuContentWrapper padded={false}>
               <EditorContentButton
                 iconName="chat-4-fill"
                 onPress={() => {
