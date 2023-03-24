@@ -2,6 +2,7 @@ export * from "./components/avatar/Avatar";
 export * from "./components/avatarGroup/AvatarGroup";
 export * from "./components/box/Box";
 export * from "./components/boxShadow/BoxShadow";
+export * from "./components/bubbleMenuContentWrapper/BubbleMenuContentWrapper";
 export * from "./components/button/Button";
 export * from "./components/centerContent/CenterContent";
 export * from "./components/checkbox/Checkbox";
