@@ -62,7 +62,13 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
 
   useLayoutEffect(() => {
     props.navigation.setOptions({
-      headerRight: PageHeaderRight,
+      headerRight: () => (
+        <PageHeaderRight
+          toggleCommentsDrawer={() => {
+            send({ type: "TOGGLE_SIDEBAR" });
+          }}
+        />
+      ),
       headerTitle: () => (
         <PageHeader
           toggleCommentsDrawer={() => {
