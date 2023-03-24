@@ -1,5 +1,5 @@
 import {
-  BoxShadow,
+  BubbleMenuContentWrapper,
   EditorBottombarDivider,
   MenuButton,
   ScrollView,
@@ -299,9 +299,13 @@ export const Editor = (props: EditorProps) => {
               return true;
             }}
           >
-            <BoxShadow elevation={3} rounded ref={bubbleMenuRef}>
+            <BubbleMenuContentWrapper
+              ref={bubbleMenuRef}
+              vertical={hasCreateCommentBubble}
+              style={hasCreateCommentBubble ? tw`w-80` : tw``}
+            >
               {hasCreateCommentBubble ? (
-                <VStack style={tw`w-80 bg-white rounded`}>
+                <>
                   <TextArea
                     placeholder="Add a comment"
                     variant={"unstyled"}
@@ -342,13 +346,9 @@ export const Editor = (props: EditorProps) => {
                       testID="bubble-menu__save-comment-button"
                     />
                   </HStack>
-                </VStack>
+                </>
               ) : (
-                <HStack
-                  space={1}
-                  style={tw`p-1 bg-white border border-gray-200 rounded`}
-                  alignItems="center"
-                >
+                <>
                   <Tooltip label={"Bold"} placement={"top"} hasArrow={false}>
                     <ToggleButton
                       onPress={() => editor.chain().focus().toggleBold().run()}
@@ -403,9 +403,9 @@ export const Editor = (props: EditorProps) => {
                       testID="bubble-menu__initiate-comment-button"
                     />
                   </Tooltip>
-                </HStack>
+                </>
               )}
-            </BoxShadow>
+            </BubbleMenuContentWrapper>
           </BubbleMenu>
 
           <BubbleMenu
@@ -424,28 +424,22 @@ export const Editor = (props: EditorProps) => {
               return false;
             }}
           >
-            <BoxShadow elevation={3} rounded>
-              <HStack
-                space={1}
-                style={tw`p-1 bg-white border border-gray-200 rounded`}
-                alignItems="center"
+            <BubbleMenuContentWrapper>
+              <MenuButton
+                iconName="chat-1-line"
+                onPress={() => {
+                  const comment = findCommentForPos({
+                    editor,
+                    pos: editor.state.selection.from,
+                  });
+                  if (comment) {
+                    props.highlightComment(comment.id, true);
+                  }
+                }}
               >
-                <MenuButton
-                  iconName="chat-1-line"
-                  onPress={() => {
-                    const comment = findCommentForPos({
-                      editor,
-                      pos: editor.state.selection.from,
-                    });
-                    if (comment) {
-                      props.highlightComment(comment.id, true);
-                    }
-                  }}
-                >
-                  Open Comment
-                </MenuButton>
-              </HStack>
-            </BoxShadow>
+                Open Comment
+              </MenuButton>
+            </BubbleMenuContentWrapper>
           </BubbleMenu>
         </ScrollView>
       )}
