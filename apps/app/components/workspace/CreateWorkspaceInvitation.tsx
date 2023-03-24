@@ -23,20 +23,8 @@ import { getMainDevice } from "../../utils/device/mainDeviceMemoryStore";
 import { VerifyPasswordModal } from "../verifyPasswordModal/VerifyPasswordModal";
 import { WorkspaceInvitationList } from "./WorkspaceInvitationList";
 
-type WorkspaceInvitation = {
-  id: string;
-  workspaceId: string;
-  inviterUserId: string;
-  inviterUsername: string;
-  role: Role;
-  expiresAt: Date;
-};
-
 type Props = {
   workspaceId: string;
-  onWorkspaceInvitationCreated: (params: {
-    workspaceInvitation: WorkspaceInvitation;
-  }) => void;
 };
 
 export function CreateWorkspaceInvitation(props: Props) {
@@ -109,8 +97,8 @@ export function CreateWorkspaceInvitation(props: Props) {
     if (!mainDevice) {
       throw new Error("No main device");
     }
-    console.log("mainDevice", mainDevice);
     const invitation = addInvitation({
+      workspaceId,
       authorKeyPair: {
         keyType: "ed25519",
         privateKey: sodium.from_base64(mainDevice.signingPrivateKey),
@@ -139,14 +127,8 @@ export function CreateWorkspaceInvitation(props: Props) {
         },
       });
     refetchWorkspaceInvitationsResult();
-    if (
-      createWorkspaceInvitationResult.data?.createWorkspaceInvitation &&
-      props.onWorkspaceInvitationCreated
-    ) {
-      const workspaceInvitation = createWorkspaceInvitationResult.data
-        .createWorkspaceInvitation.workspaceInvitation as WorkspaceInvitation;
-      props.onWorkspaceInvitationCreated({ workspaceInvitation });
-      setSelectedWorkspaceInvitationId(workspaceInvitation.id);
+    if (createWorkspaceInvitationResult.data?.createWorkspaceInvitation) {
+      setSelectedWorkspaceInvitationId(invitation.transaction.invitationId);
       setSelectedWorkspaceInvitationSigningPrivateKey(
         invitation.invitationSigningPrivateKey
       );

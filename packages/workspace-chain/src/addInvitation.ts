@@ -12,6 +12,7 @@ type AddInvitationParams = {
   authorKeyPair: sodium.KeyPair;
   expiresAt: Date;
   role: Role;
+  workspaceId: string;
 };
 
 export const addInvitation = ({
@@ -19,6 +20,7 @@ export const addInvitation = ({
   authorKeyPair,
   expiresAt,
   role,
+  workspaceId,
 }: AddInvitationParams): DefaultTrustChainEvent & {
   invitationSigningPrivateKey: string;
 } => {
@@ -32,6 +34,7 @@ export const addInvitation = ({
   );
 
   const invitationData = canonicalize({
+    workspaceId,
     invitationId,
     invitationSigningPublicKey: sodium.to_base64(
       invitationSigningKeys.publicKey
