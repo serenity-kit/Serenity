@@ -105,7 +105,11 @@ export function CreateWorkspaceInvitation(props: Props) {
     const currentTime = new Date();
     const twoDaysMillis = 2 * 24 * 60 * 60 * 1000;
     const expiresAt = new Date(currentTime.getTime() + twoDaysMillis);
-    const mainDevice = getMainDevice()!;
+    const mainDevice = getMainDevice();
+    if (!mainDevice) {
+      throw new Error("No main device");
+    }
+    console.log("mainDevice", mainDevice);
     const invitation = addInvitation({
       authorKeyPair: {
         keyType: "ed25519",
