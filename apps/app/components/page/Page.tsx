@@ -1,12 +1,11 @@
 import { KeyDerivationTrace, useYjsSyncMachine } from "@naisho/core";
-import {
-  encryptDocumentTitle,
-  hashToCollaboratorColor,
-  LocalDevice,
-} from "@serenity-tools/common";
+import { encryptDocumentTitle, LocalDevice } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { AwarenessUserInfo } from "@serenity-tools/editor";
-import { collaboratorColorToHex } from "@serenity-tools/ui";
+import {
+  collaboratorColorToHex,
+  hashToCollaboratorColor,
+} from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";

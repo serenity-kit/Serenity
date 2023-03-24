@@ -1,8 +1,8 @@
-import { hashToCollaboratorColor } from "@serenity-tools/common";
 import {
   Avatar,
   AvatarGroup,
   Button,
+  hashToCollaboratorColor,
   IconButton,
   Modal,
   tw,

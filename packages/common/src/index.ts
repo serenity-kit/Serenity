@@ -21,7 +21,6 @@ export * from "./encryptWorkspaceInvitationKey/encryptWorkspaceInvitationKey";
 export * from "./encryptWorkspaceKeyForDevice/encryptWorkspaceKeyForDevice";
 export * from "./equalArrayContent/equalArrayContent";
 export * from "./getExpiredTextFromString/getExpiredTextFromString";
-export * from "./hashToCollaboratorColor/hashToCollaboratorColor";
 export * from "./recreateCommentKey/recreateCommentKey";
 export * from "./recreateDocumentTitleKey/recreateDocumentTitleKey";
 export * from "./recreateSnapshotKey/recreateSnapshotKey";

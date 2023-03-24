@@ -1,9 +1,7 @@
-import { customColors } from "../../../../tailwind.config.js";
-import { SLeaves } from "../types";
+import { colors } from "../../tailwind";
+import { CollaborationColor } from "../../types";
 
-export type CollaborationColor = SLeaves<typeof customColors.collaboration>;
-
-const collaboratorColorNames = Object.keys(customColors.collaboration);
+const collaboratorColorNames = Object.keys(colors.collaboration);
 
 // this is a very simple and not secure hash function that takes a string and returns a collaboratorColor
 export const hashToCollaboratorColor = (value: string): CollaborationColor => {
