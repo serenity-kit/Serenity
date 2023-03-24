@@ -410,7 +410,7 @@ export const Editor = (props: EditorProps) => {
 
           <BubbleMenu
             editor={editor}
-            tippyOptions={{ duration: 100 }}
+            tippyOptions={{ duration: 100, placement: "bottom" }}
             // modified default from https://github.com/ueberdosis/tiptap/blob/main/packages/extension-bubble-menu/src/bubble-menu-plugin.ts#L47-L79
             shouldShow={({ state, from, to, view, editor }) => {
               if (from !== to || props.hasOpenCommentsSidebar()) {
