@@ -7,7 +7,7 @@ export type VerticalDividerProps = RNView["props"] & {
 };
 
 const styles = StyleSheet.create({
-  default: tw`h-6 mx-0.5 border-r border-gray-300`,
+  default: tw`h-full mx-0.5 border-r border-gray-150`,
   collapsed: tw`mx-0`,
 });
 

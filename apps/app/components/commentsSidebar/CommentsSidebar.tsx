@@ -29,7 +29,7 @@ const Header: React.FC = () => {
         <Text variant="xxs" muted style={tw`p-1`}>
           Open
         </Text>
-        <VerticalDivider style={tw`h-4 border-r border-gray-600`} />
+        <VerticalDivider style={tw`h-4 border-r border-gray-500`} />
         <Text variant="xxs" muted style={tw`p-1`}>
           Resolved
         </Text>
