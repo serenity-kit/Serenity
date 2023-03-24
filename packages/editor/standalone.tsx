@@ -17,7 +17,7 @@ import { updateEditor } from "./updateEditor";
 const ydoc = new Y.Doc();
 window.ydoc = ydoc;
 window.isNew = window.isNew === undefined ? false : window.isNew;
-window.userInfo = window.userInfo || { name: "Unknown user", color: "#ffffff" }; // should neber be an Unknown user
+window.userInfo = window.userInfo || { name: "Unknown user", color: "#000000" }; // should neber be an Unknown user
 if (window.initialContent) {
   const update = new Uint8Array(window.initialContent);
   Y.applyUpdateV2(window.ydoc, update, "react-native-bridge");

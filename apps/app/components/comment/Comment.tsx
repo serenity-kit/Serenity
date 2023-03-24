@@ -1,6 +1,6 @@
-import { hashToCollaboratorColor } from "@serenity-tools/common";
 import {
   Avatar,
+  hashToCollaboratorColor,
   Pressable,
   RawInput,
   SubmitButton,

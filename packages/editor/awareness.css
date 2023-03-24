@@ -1,9 +1,10 @@
 /* caret for remote user */
 .collaboration-cursor__caret {
-  border-left: 1px solid #0d0d0d;
-  border-right: 1px solid #0d0d0d;
-  margin-left: -1px;
-  margin-right: -1px;
+  --collab-color: #0d0d0d;
+  border-left: 0.0625rem solid var(--collab-color);
+  border-right: 0.0625rem solid var(--collab-color);
+  margin-left: -0.0625rem;
+  margin-right: -0.0625rem;
   pointer-events: none;
   position: relative;
   word-break: normal;
@@ -11,16 +12,30 @@
 
 /* Render the username above the caret */
 .collaboration-cursor__label {
-  border-radius: 3px 3px 3px 0;
-  color: #0d0d0d;
-  font-size: 12px;
+  background-color: var(--collab-color);
+  border-radius: 0.125rem 0.125rem 0.125rem 0;
+  color: white;
+  font-size: 0.75rem;
   font-style: normal;
   font-weight: 600;
-  left: -1px;
+  left: -0.0625rem;
   line-height: normal;
-  padding: 0.1rem 0.3rem;
+  padding: 0.1rem 0.3rem 0.15rem 0.3rem;
   position: absolute;
-  top: -1.4em;
+  top: -1.6rem;
   user-select: none;
   white-space: nowrap;
+}
+
+.collaboration-cursor__label:after {
+  content: " ";
+  position: absolute;
+  width: 0;
+  height: 0;
+  left: 0px;
+  top: auto;
+  bottom: -0.375rem;
+  border: 0.375rem solid;
+  border-color: transparent transparent transparent var(--collab-color);
+  z-index: -1;
 }

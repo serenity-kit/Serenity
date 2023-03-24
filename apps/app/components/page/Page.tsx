@@ -1,11 +1,11 @@
 import { KeyDerivationTrace, useYjsSyncMachine } from "@naisho/core";
-import {
-  encryptDocumentTitle,
-  hashToCollaboratorColor,
-  LocalDevice,
-} from "@serenity-tools/common";
+import { encryptDocumentTitle, LocalDevice } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { AwarenessUserInfo } from "@serenity-tools/editor";
+import {
+  collaboratorColorToHex,
+  hashToCollaboratorColor,
+} from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
@@ -60,7 +60,7 @@ export default function Page({
   const [documentLoaded, setDocumentLoaded] = useState(false);
   const [userInfo, setUserInfo] = useState<AwarenessUserInfo>({
     name: "Unknown user",
-    color: "#ffffff",
+    color: "#000000",
   });
 
   const setActiveDocumentId = useDocumentTitleStore(
@@ -202,8 +202,8 @@ export default function Page({
       setUserInfo({
         name: me.data?.me?.username ?? "Unknown user",
         color: me.data?.me?.id
-          ? hashToCollaboratorColor(me.data?.me?.id)
-          : "#ffffff",
+          ? collaboratorColorToHex(hashToCollaboratorColor(me.data?.me?.id))
+          : "#000000",
       });
 
       let document: Document | undefined = undefined;

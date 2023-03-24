@@ -1,5 +1,10 @@
-import { hashToCollaboratorColor } from "@serenity-tools/common";
-import { Avatar, Text, tw, View } from "@serenity-tools/ui";
+import {
+  Avatar,
+  hashToCollaboratorColor,
+  Text,
+  tw,
+  View,
+} from "@serenity-tools/ui";
 import { useActor } from "@xstate/react";
 import { formatDistanceToNow, parseJSON } from "date-fns";
 import { HStack } from "native-base";
