@@ -2,7 +2,6 @@ import canonicalize from "canonicalize";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { Role } from "../../../prisma/generated/output";
-import { getRoleAsString } from "../../../src/utils/getRoleAsString";
 
 type Params = {
   graphql: any;
@@ -46,7 +45,7 @@ export const createWorkspaceInvitation = async ({
     workspaceId,
     invitationId,
     invitationSigningPublicKey: sodium.to_base64(signingKeys.publicKey),
-    role: getRoleAsString(role),
+    role,
     expiresAt,
   });
   const invitationDataSignature = sodium.crypto_sign_detached(

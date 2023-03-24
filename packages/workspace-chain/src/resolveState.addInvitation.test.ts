@@ -37,6 +37,7 @@ test("should be able to add a invitation as ADMIN", async () => {
     authorKeyPair: keyPairA,
     expiresAt: new Date(),
     role: "EDITOR",
+    workspaceId: "test",
   });
   const state = resolveState([createEvent, addInvitationEvent]);
   if (addInvitationEvent.transaction.type !== "add-invitation") {
@@ -67,6 +68,7 @@ test("should not be able to add an invitation as editor", async () => {
     authorKeyPair: keyPairB,
     expiresAt: new Date(),
     role: "EDITOR",
+    workspaceId: "test",
   });
   const chain = [createEvent, addMemberEvent, addInvitationEvent];
   expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
