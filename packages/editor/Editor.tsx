@@ -398,7 +398,7 @@ export const Editor = (props: EditorProps) => {
                       onPress={() => {
                         setHasCreateCommentBubble(true);
                       }}
-                      name="chat-1-line"
+                      name="chat-4-line"
                       isActive={false}
                       testID="bubble-menu__initiate-comment-button"
                     />

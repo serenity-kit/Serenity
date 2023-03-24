@@ -42,7 +42,7 @@ const EmptyState: React.FC = () => {
   return (
     <HStack space={3} style={tw`p-4`}>
       <View style={tw``}>
-        <Icon name="chat-1-line-message" color={"gray-500"} size={5} />
+        <Icon name="chat-4-line-message" color={"gray-500"} size={5} />
       </View>
       <Text variant="xs" muted>
         Add suggestions, questions or appreciations by marking a text-passage or
