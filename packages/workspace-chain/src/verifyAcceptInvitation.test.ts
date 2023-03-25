@@ -8,7 +8,7 @@ import {
   KeyPairs,
 } from "../test/testUtils";
 import { acceptInvitation } from "./acceptInvitation";
-import { addInvitation, createChain } from "./index";
+import { addInvitation, AddInvitationResult, createChain } from "./index";
 import { hashTransaction } from "./utils";
 import { verifyAcceptInvitation } from "./verifyAcceptInvitation";
 
@@ -16,6 +16,13 @@ let keyPairA: sodium.KeyPair;
 let keyPairsA: KeyPairs;
 let keyPairB: sodium.KeyPair;
 let keyPairsB: KeyPairs;
+let addInvitationEvent: AddInvitationResult;
+let acceptInvitationSignature: Uint8Array;
+let mainDevice: {
+  mainDeviceEncryptionPublicKey: string;
+  mainDeviceSigningPublicKey: string;
+  mainDeviceEncryptionPublicKeySignature: string;
+};
 
 beforeAll(async () => {
   await sodium.ready;
@@ -23,10 +30,17 @@ beforeAll(async () => {
   keyPairsA = getKeyPairsA();
   keyPairB = getKeyPairB();
   keyPairsB = getKeyPairsB();
-});
-
-test("should be able to verify a accepted invitation", async () => {
-  const mainDevice = {
+  const createEvent = createChain(keyPairsA.sign, {
+    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
+  });
+  addInvitationEvent = addInvitation({
+    prevHash: hashTransaction(createEvent.transaction),
+    authorKeyPair: keyPairA,
+    expiresAt: getDateIn2Min(),
+    role: "EDITOR",
+    workspaceId: "test",
+  });
+  mainDevice = {
     mainDeviceEncryptionPublicKey: keyPairsB.box.publicKey,
     mainDeviceSigningPublicKey: keyPairsB.sign.publicKey,
     mainDeviceEncryptionPublicKeySignature: sodium.to_base64(
@@ -36,36 +50,23 @@ test("should be able to verify a accepted invitation", async () => {
       )
     ),
   };
-
-  const createEvent = createChain(keyPairsA.sign, {
-    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
-  });
-  const addInvitationEvent = addInvitation({
-    prevHash: hashTransaction(createEvent.transaction),
-    authorKeyPair: keyPairA,
-    expiresAt: getDateIn2Min(),
-    role: "EDITOR",
-    workspaceId: "test",
-  });
-
   if (addInvitationEvent.transaction.type !== "add-invitation") {
     throw new Error("Invalid transaction type");
   }
 
-  const acceptInvitationSignature = acceptInvitation({
+  acceptInvitationSignature = acceptInvitation({
     invitationSigningKeyPairSeed:
       addInvitationEvent.invitationSigningKeyPairSeed,
-    invitationId: addInvitationEvent.transaction.invitationId,
-    role: addInvitationEvent.transaction.role,
-    workspaceId: addInvitationEvent.transaction.workspaceId,
-    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-    invitationDataSignature:
-      addInvitationEvent.transaction.invitationDataSignature,
-    invitationSigningPublicKey:
-      addInvitationEvent.transaction.invitationSigningPublicKey,
+    ...addInvitationEvent.transaction,
     ...mainDevice,
+    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
   });
+});
 
+test("should be able to verify a accepted invitation", async () => {
+  if (addInvitationEvent.transaction.type !== "add-invitation") {
+    throw new Error("Invalid transaction type");
+  }
   const result = verifyAcceptInvitation({
     acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
     ...mainDevice,
@@ -74,4 +75,19 @@ test("should be able to verify a accepted invitation", async () => {
   });
 
   expect(result).toBe(true);
+});
+
+test("should fail to verify if the acceptInvitationSignature has been modified", async () => {
+  if (addInvitationEvent.transaction.type !== "add-invitation") {
+    throw new Error("Invalid transaction type");
+  }
+  const result = verifyAcceptInvitation({
+    acceptInvitationSignature:
+      "b" + sodium.to_base64(acceptInvitationSignature).substring(1),
+    ...mainDevice,
+    ...addInvitationEvent.transaction,
+    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+  });
+
+  expect(result).toBe(false);
 });

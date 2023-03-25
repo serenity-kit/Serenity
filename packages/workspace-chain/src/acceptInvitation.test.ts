@@ -116,22 +116,6 @@ test("should throw an error if the invitationSigningPublicKey has been replaced"
   }).toThrow("Invitation signing public key doesn't match the seed");
 });
 
-test("should throw an error if the invitationSigningPublicKey has been replaced", async () => {
-  expect(() => {
-    if (addInvitationEvent.transaction.type !== "add-invitation") {
-      return;
-    }
-    acceptInvitation({
-      invitationSigningKeyPairSeed:
-        addInvitationEvent.invitationSigningKeyPairSeed,
-      ...addInvitationEvent.transaction,
-      ...mainDevice,
-      expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-      invitationSigningPublicKey: keyPairsA.sign.publicKey,
-    });
-  }).toThrow("Invitation signing public key doesn't match the seed");
-});
-
 test("should throw an error if the workspaceId has been replaced", async () => {
   expect(() => {
     if (addInvitationEvent.transaction.type !== "add-invitation") {
