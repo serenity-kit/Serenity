@@ -77,7 +77,7 @@ test("should be able to verify a accepted invitation", async () => {
   expect(result).toBe(true);
 });
 
-test("should fail to verify if the acceptInvitationSignature has been modified", async () => {
+test("should fail to verify if acceptInvitationSignature has been modified", async () => {
   if (addInvitationEvent.transaction.type !== "add-invitation") {
     throw new Error("Invalid transaction type");
   }
@@ -87,6 +87,113 @@ test("should fail to verify if the acceptInvitationSignature has been modified",
     ...mainDevice,
     ...addInvitationEvent.transaction,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+  });
+
+  expect(result).toBe(false);
+});
+
+test("should fail to verify if mainDeviceEncryptionPublicKey has been modified", async () => {
+  if (addInvitationEvent.transaction.type !== "add-invitation") {
+    throw new Error("Invalid transaction type");
+  }
+  const result = verifyAcceptInvitation({
+    acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    ...mainDevice,
+    ...addInvitationEvent.transaction,
+    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+    mainDeviceEncryptionPublicKey:
+      "c" + mainDevice.mainDeviceEncryptionPublicKey.substring(1),
+  });
+
+  expect(result).toBe(false);
+});
+
+test("should fail to verify if mainDeviceSigningPublicKey has been modified", async () => {
+  if (addInvitationEvent.transaction.type !== "add-invitation") {
+    throw new Error("Invalid transaction type");
+  }
+  const result = verifyAcceptInvitation({
+    acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    ...mainDevice,
+    ...addInvitationEvent.transaction,
+    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+    mainDeviceSigningPublicKey:
+      "b" + mainDevice.mainDeviceSigningPublicKey.substring(1),
+  });
+
+  expect(result).toBe(false);
+});
+
+test("should fail to verify if mainDeviceEncryptionPublicKeySignature has been modified", async () => {
+  if (addInvitationEvent.transaction.type !== "add-invitation") {
+    throw new Error("Invalid transaction type");
+  }
+  const result = verifyAcceptInvitation({
+    acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    ...mainDevice,
+    ...addInvitationEvent.transaction,
+    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+    mainDeviceEncryptionPublicKeySignature:
+      "b" + mainDevice.mainDeviceEncryptionPublicKeySignature.substring(1),
+  });
+
+  expect(result).toBe(false);
+});
+
+test("should fail to verify if expiresAt has been modified", async () => {
+  if (addInvitationEvent.transaction.type !== "add-invitation") {
+    throw new Error("Invalid transaction type");
+  }
+  const result = verifyAcceptInvitation({
+    acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    ...mainDevice,
+    ...addInvitationEvent.transaction,
+    expiresAt: getDateIn2Min(),
+  });
+
+  expect(result).toBe(false);
+});
+
+test("should fail to verify if role has been modified", async () => {
+  if (addInvitationEvent.transaction.type !== "add-invitation") {
+    throw new Error("Invalid transaction type");
+  }
+  const result = verifyAcceptInvitation({
+    acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    ...mainDevice,
+    ...addInvitationEvent.transaction,
+    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+    role: "ADMIN",
+  });
+
+  expect(result).toBe(false);
+});
+
+test("should fail to verify if workspaceId has been modified", async () => {
+  if (addInvitationEvent.transaction.type !== "add-invitation") {
+    throw new Error("Invalid transaction type");
+  }
+  const result = verifyAcceptInvitation({
+    acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    ...mainDevice,
+    ...addInvitationEvent.transaction,
+    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+    workspaceId: "wrong",
+  });
+
+  expect(result).toBe(false);
+});
+
+test("should fail to verify if invitationId has been modified", async () => {
+  if (addInvitationEvent.transaction.type !== "add-invitation") {
+    throw new Error("Invalid transaction type");
+  }
+  const result = verifyAcceptInvitation({
+    acceptInvitationSignature: sodium.to_base64(acceptInvitationSignature),
+    ...mainDevice,
+    ...addInvitationEvent.transaction,
+    expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
+    invitationId: "wrong",
   });
 
   expect(result).toBe(false);
