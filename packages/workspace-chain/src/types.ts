@@ -13,6 +13,7 @@ export type AddInvitationTransaction = {
   expiresAt: string;
   invitationSigningPublicKey: string;
   invitationDataSignature: string;
+  workspaceId: string;
 };
 
 export type AddMemberTransaction = {

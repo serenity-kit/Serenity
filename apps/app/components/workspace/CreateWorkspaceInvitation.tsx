@@ -37,8 +37,8 @@ export function CreateWorkspaceInvitation(props: Props) {
   const [selectedWorkspaceInvitationId, setSelectedWorkspaceInvitationId] =
     useState<string | null>(null);
   const [
-    selectedWorkspaceInvitationSigningPrivateKey,
-    setSelectedWorkspaceInvitationSigningPrivateKey,
+    selectedWorkspaceInvitationSigningKeyPairSeed,
+    setSelectedWorkspaceInvitationSigningKeyPairSeed,
   ] = useState<string | null>(null);
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const [isClipboardNoticeActive, setIsClipboardNoticeActive] =
@@ -65,7 +65,7 @@ export function CreateWorkspaceInvitation(props: Props) {
     if (!selectedWorkspaceInvitationId) {
       return;
     }
-    if (!selectedWorkspaceInvitationSigningPrivateKey) {
+    if (!selectedWorkspaceInvitationSigningKeyPairSeed) {
       return;
     }
     const rootUrl =
@@ -77,7 +77,7 @@ export function CreateWorkspaceInvitation(props: Props) {
             `http://localhost:19006/`
         : "https://www.serenity.li";
 
-    return `You are invited to a Serenity Workspace. To join, use this link to accept the invitation:\n${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}#key=${selectedWorkspaceInvitationSigningPrivateKey}`;
+    return `You are invited to a Serenity Workspace. To join, use this link to accept the invitation:\n${rootUrl}/accept-workspace-invitation/${selectedWorkspaceInvitationId}#key=${selectedWorkspaceInvitationSigningKeyPairSeed}`;
   };
 
   const createWorkspaceInvitationPreflight = async () => {
@@ -129,8 +129,8 @@ export function CreateWorkspaceInvitation(props: Props) {
     refetchWorkspaceInvitationsResult();
     if (createWorkspaceInvitationResult.data?.createWorkspaceInvitation) {
       setSelectedWorkspaceInvitationId(invitation.transaction.invitationId);
-      setSelectedWorkspaceInvitationSigningPrivateKey(
-        invitation.invitationSigningPrivateKey
+      setSelectedWorkspaceInvitationSigningKeyPairSeed(
+        invitation.invitationSigningKeyPairSeed
       );
     }
   };
