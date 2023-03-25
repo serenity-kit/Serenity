@@ -65,6 +65,11 @@ export const applyEvent = (
     if (!isValidAdminDecision(state, event as DefaultTrustChainEvent)) {
       throw new InvalidTrustChainError("Not allowed to add a member.");
     }
+
+    if (members.hasOwnProperty(event.transaction.memberSigningPublicKey)) {
+      throw new InvalidTrustChainError("Member already exists.");
+    }
+
     members[event.transaction.memberSigningPublicKey] = {
       lockboxPublicKey: event.transaction.memberLockboxPublicKey,
       role: event.transaction.role,
@@ -78,6 +83,12 @@ export const applyEvent = (
       throw new InvalidTrustChainError("Invitation doesn't exist.");
     }
 
+    event.authors.forEach((author) => {
+      if (!members.hasOwnProperty(author.publicKey)) {
+        throw new InvalidTrustChainError("Author is not a member.");
+      }
+    });
+
     const invitation = invitations[event.transaction.invitationId];
     invitation.invitationDataSignature;
     if (
@@ -86,6 +97,10 @@ export const applyEvent = (
       invitation.role !== event.transaction.role
     ) {
       throw new InvalidTrustChainError("Invitation invalid.");
+    }
+
+    if (members.hasOwnProperty(event.transaction.memberSigningPublicKey)) {
+      throw new InvalidTrustChainError("Member already exists.");
     }
 
     const validInvitation = verifyAcceptInvitation({
