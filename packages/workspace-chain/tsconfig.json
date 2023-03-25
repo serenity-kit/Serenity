@@ -6,5 +6,5 @@
     "types": ["jest"]
   },
 
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "test/testUtils.ts"]
 }

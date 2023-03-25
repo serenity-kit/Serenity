@@ -1,11 +1,4 @@
 import sodium from "libsodium-wrappers";
-import { acceptInvitation } from "./acceptInvitation";
-import {
-  addInvitation,
-  AddInvitationResult,
-  createChain,
-  CreateChainTrustChainEvent,
-} from "./index";
 import {
   getDate2MinAgo,
   getDateIn2Min,
@@ -14,7 +7,14 @@ import {
   getKeyPairsA,
   getKeyPairsB,
   KeyPairs,
-} from "./testUtils";
+} from "../test/testUtils";
+import { acceptInvitation } from "./acceptInvitation";
+import {
+  addInvitation,
+  AddInvitationResult,
+  createChain,
+  CreateChainTrustChainEvent,
+} from "./index";
 import { hashTransaction } from "./utils";
 
 let keyPairA: sodium.KeyPair;

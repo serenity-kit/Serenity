@@ -1,6 +1,4 @@
 import sodium from "libsodium-wrappers";
-import { acceptInvitation } from "./acceptInvitation";
-import { addInvitation, createChain } from "./index";
 import {
   getDateIn2Min,
   getKeyPairA,
@@ -8,7 +6,9 @@ import {
   getKeyPairsA,
   getKeyPairsB,
   KeyPairs,
-} from "./testUtils";
+} from "../test/testUtils";
+import { acceptInvitation } from "./acceptInvitation";
+import { addInvitation, createChain } from "./index";
 import { hashTransaction } from "./utils";
 import { verifyAcceptInvitation } from "./verifyAcceptInvitation";
 

@@ -23,6 +23,11 @@ export type AddMemberTransaction = {
   role: Role;
 };
 
+export type AddMemberViaInvitationTransaction = {
+  type: "add-member-via-invitation";
+  role: Role;
+};
+
 export type UpdateMemberTransaction = {
   type: "update-member";
   memberSigningPublicKey: string;

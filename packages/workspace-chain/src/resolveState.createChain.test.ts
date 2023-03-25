@@ -1,14 +1,14 @@
 import sodium from "libsodium-wrappers";
-import { addAuthorToEvent } from "./addAuthorToEvent";
-import { InvalidTrustChainError } from "./errors";
-import { createChain, resolveState } from "./index";
 import {
   getKeyPairB,
   getKeyPairsA,
   getKeyPairsB,
   getKeyPairsC,
   KeyPairs,
-} from "./testUtils";
+} from "../test/testUtils";
+import { addAuthorToEvent } from "./addAuthorToEvent";
+import { InvalidTrustChainError } from "./errors";
+import { createChain, resolveState } from "./index";
 
 let keyPairsA: KeyPairs;
 let keyPairB: sodium.KeyPair;

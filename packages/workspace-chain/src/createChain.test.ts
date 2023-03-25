@@ -1,6 +1,6 @@
 import sodium from "libsodium-wrappers";
+import { getKeyPairsA, KeyPairs } from "../test/testUtils";
 import { createChain } from "./index";
-import { getKeyPairsA, KeyPairs } from "./testUtils";
 import { isValidCreateChainEvent } from "./utils";
 
 let keyPairsA: KeyPairs;

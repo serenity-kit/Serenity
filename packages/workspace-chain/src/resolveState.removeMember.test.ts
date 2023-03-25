@@ -1,6 +1,4 @@
 import sodium from "libsodium-wrappers";
-import { InvalidTrustChainError } from "./errors";
-import { addMember, createChain, removeMember, resolveState } from "./index";
 import {
   getKeyPairA,
   getKeyPairB,
@@ -9,7 +7,9 @@ import {
   getKeyPairsB,
   getKeyPairsC,
   KeyPairs,
-} from "./testUtils";
+} from "../test/testUtils";
+import { InvalidTrustChainError } from "./errors";
+import { addMember, createChain, removeMember, resolveState } from "./index";
 import { hashTransaction } from "./utils";
 
 let keyPairA: sodium.KeyPair;

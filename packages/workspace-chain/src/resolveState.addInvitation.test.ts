@@ -1,18 +1,18 @@
 import sodium from "libsodium-wrappers";
 import {
+  getKeyPairA,
+  getKeyPairB,
+  getKeyPairsA,
+  getKeyPairsB,
+  KeyPairs,
+} from "../test/testUtils";
+import {
   addInvitation,
   addMember,
   createChain,
   InvalidTrustChainError,
   resolveState,
 } from "./index";
-import {
-  getKeyPairA,
-  getKeyPairB,
-  getKeyPairsA,
-  getKeyPairsB,
-  KeyPairs,
-} from "./testUtils";
 import { hashTransaction } from "./utils";
 
 let keyPairA: sodium.KeyPair;
