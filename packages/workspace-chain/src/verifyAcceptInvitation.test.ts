@@ -2,6 +2,7 @@ import sodium from "libsodium-wrappers";
 import { acceptInvitation } from "./acceptInvitation";
 import { addInvitation, createChain } from "./index";
 import {
+  getDateIn2Min,
   getKeyPairA,
   getKeyPairB,
   getKeyPairsA,
@@ -31,7 +32,7 @@ test("should be able to verify a accepted invitation", async () => {
     mainDeviceEncryptionPublicKeySignature: sodium.to_base64(
       sodium.crypto_sign_detached(
         keyPairsB.box.publicKey,
-        sodium.from_base64(keyPairsA.sign.privateKey)
+        sodium.from_base64(keyPairsB.sign.privateKey)
       )
     ),
   };
@@ -42,7 +43,7 @@ test("should be able to verify a accepted invitation", async () => {
   const addInvitationEvent = addInvitation({
     prevHash: hashTransaction(createEvent.transaction),
     authorKeyPair: keyPairA,
-    expiresAt: new Date(),
+    expiresAt: getDateIn2Min(),
     role: "EDITOR",
     workspaceId: "test",
   });

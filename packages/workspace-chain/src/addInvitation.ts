@@ -15,15 +15,17 @@ type AddInvitationParams = {
   workspaceId: string;
 };
 
+export type AddInvitationResult = DefaultTrustChainEvent & {
+  invitationSigningKeyPairSeed: string;
+};
+
 export const addInvitation = ({
   prevHash,
   authorKeyPair,
   expiresAt,
   role,
   workspaceId,
-}: AddInvitationParams): DefaultTrustChainEvent & {
-  invitationSigningKeyPairSeed: string;
-} => {
+}: AddInvitationParams): AddInvitationResult => {
   const seed = sodium.randombytes_buf(sodium.crypto_sign_SEEDBYTES);
   const invitationSigningKeys = sodium.crypto_sign_seed_keypair(seed);
   const invitationSigningPublicKey = sodium.to_base64(

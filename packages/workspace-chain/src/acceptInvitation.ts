@@ -36,6 +36,17 @@ export const acceptInvitation = ({
   ) {
     throw new Error("Invitation signing public key doesn't match the seed");
   }
+  // verify main device encryption public key signature
+  const isValidMainDeviceEncryptionPublicKeySignature =
+    sodium.crypto_sign_verify_detached(
+      sodium.from_base64(mainDeviceEncryptionPublicKeySignature),
+      mainDeviceEncryptionPublicKey,
+      sodium.from_base64(mainDeviceSigningPublicKey)
+    );
+  if (!isValidMainDeviceEncryptionPublicKeySignature) {
+    throw new Error("Main device encryption public key signature is invalid");
+  }
+
   // verify invitation data signature
   const invitationData = canonicalize({
     workspaceId,
@@ -54,6 +65,10 @@ export const acceptInvitation = ({
   );
   if (!invitationDataSignatureVerified) {
     throw new Error("Invitation data signature is invalid");
+  }
+
+  if (new Date() >= expiresAt) {
+    throw new Error("Invitation has expired");
   }
 
   const acceptInvitationData = canonicalize({

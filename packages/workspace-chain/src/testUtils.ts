@@ -88,3 +88,15 @@ export const getKeyPairsC = (): KeyPairs => {
     },
   };
 };
+
+export const getDateIn2Min = (): Date => {
+  const currentTime = new Date();
+  const twoMinMillis = 2 * 60 * 1000;
+  return new Date(currentTime.getTime() + twoMinMillis);
+};
+
+export const getDate2MinAgo = (): Date => {
+  const currentTime = new Date();
+  const twoMinMillis = 2 * 60 * 1000;
+  return new Date(currentTime.getTime() - twoMinMillis);
+};
