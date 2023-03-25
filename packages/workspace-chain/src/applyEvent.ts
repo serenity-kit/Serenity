@@ -8,6 +8,7 @@ import {
   TrustChainState,
 } from "./types";
 import { getAdminCount, hashTransaction, isValidAdminDecision } from "./utils";
+import { verifyAcceptInvitation } from "./verifyAcceptInvitation";
 
 export const applyEvent = (
   state: TrustChainState,
@@ -64,6 +65,47 @@ export const applyEvent = (
     if (!isValidAdminDecision(state, event as DefaultTrustChainEvent)) {
       throw new InvalidTrustChainError("Not allowed to add a member.");
     }
+    members[event.transaction.memberSigningPublicKey] = {
+      lockboxPublicKey: event.transaction.memberLockboxPublicKey,
+      role: event.transaction.role,
+      addedBy: event.authors.map((author) => author.publicKey),
+    };
+  }
+
+  if (event.transaction.type === "add-member-via-invitation") {
+    // check that the invitation exists in the current state
+    if (!invitations.hasOwnProperty(event.transaction.invitationId)) {
+      throw new InvalidTrustChainError("Invitation doesn't exist.");
+    }
+
+    const invitation = invitations[event.transaction.invitationId];
+    invitation.invitationDataSignature;
+    if (
+      invitation.invitationSigningPublicKey !==
+        event.transaction.invitationSigningPublicKey ||
+      invitation.role !== event.transaction.role
+    ) {
+      throw new InvalidTrustChainError("Invitation invalid.");
+    }
+
+    const validInvitation = verifyAcceptInvitation({
+      acceptInvitationSignature: event.transaction.acceptInvitationSignature,
+      invitationSigningPublicKey: event.transaction.invitationSigningPublicKey,
+      invitationId: event.transaction.invitationId,
+      workspaceId: event.transaction.workspaceId,
+      expiresAt: new Date(event.transaction.expiresAt),
+      mainDeviceEncryptionPublicKey: event.transaction.memberLockboxPublicKey,
+      mainDeviceSigningPublicKey: event.transaction.memberSigningPublicKey,
+      mainDeviceEncryptionPublicKeySignature:
+        event.transaction.mainDeviceEncryptionPublicKeySignature,
+      role: event.transaction.role,
+    });
+    if (!validInvitation) {
+      throw new InvalidTrustChainError(
+        "Invalid add member via invitation event."
+      );
+    }
+
     members[event.transaction.memberSigningPublicKey] = {
       lockboxPublicKey: event.transaction.memberLockboxPublicKey,
       role: event.transaction.role,

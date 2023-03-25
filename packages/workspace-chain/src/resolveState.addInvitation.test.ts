@@ -76,3 +76,5 @@ test("should not be able to add an invitation as editor", async () => {
     "Not allowed to add an invitation."
   );
 });
+
+// TODO should fail in case the invitation can't be verified

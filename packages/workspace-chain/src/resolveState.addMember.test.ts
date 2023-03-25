@@ -169,3 +169,5 @@ test("should not be able to add the same admin twice as author", async () => {
     "An author can sign the event only once."
   );
 });
+
+// TODO should not be able to add a member twice via an invitation

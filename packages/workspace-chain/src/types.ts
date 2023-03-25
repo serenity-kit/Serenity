@@ -26,6 +26,14 @@ export type AddMemberTransaction = {
 export type AddMemberViaInvitationTransaction = {
   type: "add-member-via-invitation";
   role: Role;
+  acceptInvitationSignature: string;
+  invitationSigningPublicKey: string;
+  invitationId: string;
+  memberSigningPublicKey: string;
+  memberLockboxPublicKey: string;
+  mainDeviceEncryptionPublicKeySignature: string;
+  workspaceId: string;
+  expiresAt: string;
 };
 
 export type UpdateMemberTransaction = {
@@ -55,6 +63,7 @@ export type DefaultTrustChainEvent = {
   transaction:
     | AddInvitationTransaction
     | AddMemberTransaction
+    | AddMemberViaInvitationTransaction
     | UpdateMemberTransaction
     | RemoveMemberTransaction;
   prevHash: string;

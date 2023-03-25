@@ -1,19 +1,49 @@
 import sodium from "libsodium-wrappers";
-import { AddMemberTransaction, DefaultTrustChainEvent, Role } from "./types";
+import {
+  AddMemberViaInvitationTransaction,
+  DefaultTrustChainEvent,
+  Role,
+} from "./types";
 import { hashTransaction } from "./utils";
 
-export const addMember = (
-  prevHash: string,
-  authorKeyPair: sodium.KeyPair,
-  memberSigningPublicKey: string,
-  memberLockboxPublicKey: string,
-  memberRole: Role
-): DefaultTrustChainEvent => {
-  const transaction: AddMemberTransaction = {
-    type: "add-member",
-    memberSigningPublicKey,
-    memberLockboxPublicKey,
-    role: memberRole,
+type AddMemberViaInvitationParams = {
+  prevHash: string;
+  authorKeyPair: sodium.KeyPair;
+  role: Role;
+  acceptInvitationSignature: string;
+  invitationSigningPublicKey: string;
+  invitationId: string;
+  mainDeviceSigningPublicKey: string;
+  mainDeviceEncryptionPublicKey: string;
+  mainDeviceEncryptionPublicKeySignature: string;
+  workspaceId: string;
+  expiresAt: Date;
+};
+
+export const addMemberViaInvitation = ({
+  prevHash,
+  authorKeyPair,
+  role,
+  acceptInvitationSignature,
+  invitationSigningPublicKey,
+  invitationId,
+  mainDeviceSigningPublicKey,
+  mainDeviceEncryptionPublicKey,
+  mainDeviceEncryptionPublicKeySignature,
+  workspaceId,
+  expiresAt,
+}: AddMemberViaInvitationParams): DefaultTrustChainEvent => {
+  const transaction: AddMemberViaInvitationTransaction = {
+    type: "add-member-via-invitation",
+    memberSigningPublicKey: mainDeviceSigningPublicKey,
+    memberLockboxPublicKey: mainDeviceEncryptionPublicKey,
+    role,
+    mainDeviceEncryptionPublicKeySignature,
+    acceptInvitationSignature,
+    invitationSigningPublicKey,
+    invitationId,
+    workspaceId,
+    expiresAt: expiresAt.toISOString(),
   };
 
   const hash = hashTransaction(transaction);
