@@ -1,4 +1,4 @@
-import sodium from "libsodium-wrappers";
+import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
 import {
   CreateChainTransaction,

@@ -1,4 +1,4 @@
-import sodium from "libsodium-wrappers";
+import sodium from "react-native-libsodium";
 import {
   getKeyPairB,
   getKeyPairsA,

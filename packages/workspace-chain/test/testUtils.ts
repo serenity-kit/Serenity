@@ -1,4 +1,4 @@
-import sodium from "libsodium-wrappers";
+import sodium from "react-native-libsodium";
 
 export type KeyPairs = {
   sign: { privateKey: string; publicKey: string; keyType: "ed25519" };

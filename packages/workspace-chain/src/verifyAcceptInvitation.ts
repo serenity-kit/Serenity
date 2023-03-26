@@ -1,5 +1,5 @@
 import canonicalize from "canonicalize";
-import sodium from "libsodium-wrappers";
+import sodium from "react-native-libsodium";
 import { Role } from "./types";
 
 export type AcceptInvitationParams = {
