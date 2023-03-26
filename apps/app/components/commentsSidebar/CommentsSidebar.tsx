@@ -1,5 +1,5 @@
 import {
-  EditorBottombarDivider,
+  VerticalDivider,
   EditorSidebarHeader,
   Icon,
   Text,
@@ -29,7 +29,7 @@ const Header: React.FC = () => {
         <Text variant="xxs" muted style={tw`p-1`}>
           Open
         </Text>
-        <EditorBottombarDivider style={tw`h-4 border-r border-gray-600`} />
+        <VerticalDivider style={tw`h-4 border-r border-gray-500`} />
         <Text variant="xxs" muted style={tw`p-1`}>
           Resolved
         </Text>
@@ -42,7 +42,7 @@ const EmptyState: React.FC = () => {
   return (
     <HStack space={3} style={tw`p-4`}>
       <View style={tw``}>
-        <Icon name="chat-1-line-message" color={"gray-500"} size={5} />
+        <Icon name="chat-4-line-message" color={"gray-500"} size={5} />
       </View>
       <Text variant="xs" muted>
         Add suggestions, questions or appreciations by marking a text-passage or

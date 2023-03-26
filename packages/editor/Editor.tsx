@@ -1,7 +1,7 @@
 import {
-  BoxShadow,
-  EditorBottombarDivider,
-  MenuButton,
+  BubbleMenuContentWrapper,
+  VerticalDivider,
+  EditorContentButton,
   ScrollView,
   SubmitButton,
   TextArea,
@@ -299,9 +299,13 @@ export const Editor = (props: EditorProps) => {
               return true;
             }}
           >
-            <BoxShadow elevation={3} rounded ref={bubbleMenuRef}>
+            <BubbleMenuContentWrapper
+              ref={bubbleMenuRef}
+              vertical={hasCreateCommentBubble}
+              style={hasCreateCommentBubble ? tw`w-80` : tw``}
+            >
               {hasCreateCommentBubble ? (
-                <VStack style={tw`w-80 bg-white rounded`}>
+                <>
                   <TextArea
                     placeholder="Add a comment"
                     variant={"unstyled"}
@@ -342,13 +346,9 @@ export const Editor = (props: EditorProps) => {
                       testID="bubble-menu__save-comment-button"
                     />
                   </HStack>
-                </VStack>
+                </>
               ) : (
-                <HStack
-                  space={1}
-                  style={tw`p-1 bg-white border border-gray-200 rounded`}
-                  alignItems="center"
-                >
+                <>
                   <Tooltip label={"Bold"} placement={"top"} hasArrow={false}>
                     <ToggleButton
                       onPress={() => editor.chain().focus().toggleBold().run()}
@@ -375,7 +375,7 @@ export const Editor = (props: EditorProps) => {
                     />
                   </Tooltip>
 
-                  <EditorBottombarDivider />
+                  <VerticalDivider />
 
                   <Tooltip label={"Link"} placement={"top"} hasArrow={false}>
                     <ToggleButton
@@ -387,7 +387,7 @@ export const Editor = (props: EditorProps) => {
                     />
                   </Tooltip>
 
-                  <EditorBottombarDivider />
+                  <VerticalDivider />
 
                   <Tooltip
                     label={"Add comment"}
@@ -398,19 +398,19 @@ export const Editor = (props: EditorProps) => {
                       onPress={() => {
                         setHasCreateCommentBubble(true);
                       }}
-                      name="chat-1-line"
+                      name="chat-4-line"
                       isActive={false}
                       testID="bubble-menu__initiate-comment-button"
                     />
                   </Tooltip>
-                </HStack>
+                </>
               )}
-            </BoxShadow>
+            </BubbleMenuContentWrapper>
           </BubbleMenu>
 
           <BubbleMenu
             editor={editor}
-            tippyOptions={{ duration: 100 }}
+            tippyOptions={{ duration: 100, placement: "bottom" }}
             // modified default from https://github.com/ueberdosis/tiptap/blob/main/packages/extension-bubble-menu/src/bubble-menu-plugin.ts#L47-L79
             shouldShow={({ state, from, to, view, editor }) => {
               if (from !== to || props.hasOpenCommentsSidebar()) {
@@ -424,28 +424,22 @@ export const Editor = (props: EditorProps) => {
               return false;
             }}
           >
-            <BoxShadow elevation={3} rounded>
-              <HStack
-                space={1}
-                style={tw`p-1 bg-white border border-gray-200 rounded`}
-                alignItems="center"
+            <BubbleMenuContentWrapper padded={false}>
+              <EditorContentButton
+                iconName="chat-4-fill"
+                onPress={() => {
+                  const comment = findCommentForPos({
+                    editor,
+                    pos: editor.state.selection.from,
+                  });
+                  if (comment) {
+                    props.highlightComment(comment.id, true);
+                  }
+                }}
               >
-                <MenuButton
-                  iconName="chat-1-line"
-                  onPress={() => {
-                    const comment = findCommentForPos({
-                      editor,
-                      pos: editor.state.selection.from,
-                    });
-                    if (comment) {
-                      props.highlightComment(comment.id, true);
-                    }
-                  }}
-                >
-                  Open Comment
-                </MenuButton>
-              </HStack>
-            </BoxShadow>
+                View Comment
+              </EditorContentButton>
+            </BubbleMenuContentWrapper>
           </BubbleMenu>
         </ScrollView>
       )}

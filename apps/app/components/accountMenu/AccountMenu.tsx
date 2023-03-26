@@ -7,7 +7,7 @@ import {
   MenuButton,
   MenuLink,
   Pressable,
-  SidebarDivider,
+  HorizontalDivider,
   Spinner,
   Text,
   tw,
@@ -176,7 +176,7 @@ export default function AccountMenu({
         </MenuButton>
       )}
 
-      <SidebarDivider collapsed />
+      <HorizontalDivider collapsed />
       <MenuButton
         onPress={() => {
           send("CLOSE");

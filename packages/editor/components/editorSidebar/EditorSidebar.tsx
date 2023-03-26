@@ -13,7 +13,7 @@ import {
   EditorSidebarIcon,
   Heading,
   SidebarButton,
-  SidebarDivider,
+  HorizontalDivider,
   Tab,
   TabList,
   TabPanel,
@@ -122,7 +122,7 @@ export default function EditorSidebar({
             </Text>
           </SidebarButton>
 
-          <SidebarDivider />
+          <HorizontalDivider />
 
           <Heading lvl={4} style={tw`ml-4`} padded>
             Lists
@@ -164,7 +164,7 @@ export default function EditorSidebar({
             </Text>
           </SidebarButton>
 
-          <SidebarDivider />
+          <HorizontalDivider />
 
           <Heading lvl={4} style={tw`ml-4`} padded>
             Media
@@ -330,7 +330,7 @@ export default function EditorSidebar({
             </SidebarButton>
           ) : null}
 
-          <SidebarDivider />
+          <HorizontalDivider />
 
           <Heading lvl={4} style={tw`ml-4`} padded>
             Blocks

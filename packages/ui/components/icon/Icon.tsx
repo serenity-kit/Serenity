@@ -27,7 +27,9 @@ import { BookOpenLine } from "./icons/BookOpenLine";
 import { CalendarCheckFill } from "./icons/CalendarCheckFill";
 import { Chat1Line } from "./icons/Chat1Line";
 import { Chat1LineMessage } from "./icons/Chat1LineMessage";
+import { Chat4Fill } from "./icons/Chat4Fill";
 import { Chat4Line } from "./icons/Chat4Line";
+import { Chat4LineMessage } from "./icons/Chat4LineMessage";
 import { CheckLine } from "./icons/CheckLine";
 import { ChitChat } from "./icons/ChitChat";
 import { CloseCircleFill } from "./icons/CloseCircleFill";
@@ -45,6 +47,7 @@ import { DoubleArrowRight } from "./icons/DoubleArrowRight";
 import { DoubleQuotesL } from "./icons/DoubleQuotesL";
 import { DownloadLine } from "./icons/DownloadLine";
 import { DraftLine } from "./icons/DraftLine";
+import { EarthFill } from "./icons/EarthFill";
 import { EmotionLine } from "./icons/EmotionLine";
 import { ErrorWarningLine } from "./icons/ErrorWarningLine";
 import { ExternalLinkLine } from "./icons/ExternalLinkLine";
@@ -148,7 +151,9 @@ export type IconNames =
   | "calendar-check-fill"
   | "chat-1-line"
   | "chat-1-line-message"
+  | "chat-4-fill"
   | "chat-4-line"
+  | "chat-4-line-message"
   | "check-line"
   | "chit-chat"
   | "close-circle-fill"
@@ -166,6 +171,7 @@ export type IconNames =
   | "double-quotes-l"
   | "download-line"
   | "draft-line"
+  | "earth-fill"
   | "emotion-line"
   | "error-warning-line"
   | "external-link-line"
@@ -336,8 +342,14 @@ export const Icon = (props: IconProps) => {
   if (name === "chat-1-line-message") {
     icon = <Chat1LineMessage color={color} size={iconSize} />;
   }
+  if (name === "chat-4-fill") {
+    icon = <Chat4Fill color={color} size={iconSize} />;
+  }
   if (name === "chat-4-line") {
     icon = <Chat4Line color={color} size={iconSize} />;
+  }
+  if (name === "chat-4-line-message") {
+    icon = <Chat4LineMessage color={color} size={iconSize} />;
   }
   if (name === "check-line") {
     icon = <CheckLine color={color} size={iconSize} />;
@@ -389,6 +401,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "draft-line") {
     icon = <DraftLine color={color} size={iconSize} />;
+  }
+  if (name === "earth-fill") {
+    icon = <EarthFill color={color} size={iconSize} />;
   }
   if (name === "emotion-line") {
     icon = <EmotionLine color={color} size={iconSize} />;
