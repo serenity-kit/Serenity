@@ -12,9 +12,14 @@ import { HStack } from "native-base";
 import { useState } from "react";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import { useEditorStore } from "../../utils/editorStore/editorStore";
+import PageHeaderRightMenu from "../pageHeaderRightMenu/PageHeaderRightMenu";
 import { PageShareModalContent } from "../pageShareModalContent/PageShareModalContent";
 
-export function PageHeaderRight() {
+type Props = {
+  toggleCommentsDrawer: () => void;
+};
+
+export const PageHeaderRight: React.FC<Props> = ({ toggleCommentsDrawer }) => {
   const hasEditorSidebar = useHasEditorSidebar();
   const { workspaceQueryResult } = useWorkspace();
   const [isActiveShareModal, setIsActiveShareModal] = useState(false);
@@ -72,16 +77,14 @@ export function PageHeaderRight() {
                 Share
               </Button>
             ) : (
-              <>
-                <IconButton
-                  name="share-line"
-                  size="xl"
-                  color="gray-900"
-                  onPress={() => {
-                    setIsActiveShareModal(true);
-                  }}
-                />
-              </>
+              <PageHeaderRightMenu
+                onSharePressed={() => {
+                  setIsActiveShareModal(true);
+                }}
+                onCommentsPressed={() => {
+                  toggleCommentsDrawer();
+                }}
+              />
             )}
           </>
         )}
@@ -96,4 +99,4 @@ export function PageHeaderRight() {
       </Modal>
     </>
   );
-}
+};

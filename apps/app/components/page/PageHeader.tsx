@@ -24,16 +24,18 @@ export const PageHeader: React.FC<Props> = ({ toggleCommentsDrawer }) => {
           </Text>
         </HStack>
       ) : null}
-      <Tooltip label="Toggle Comments" placement="left" offset={8}>
-        <ToggleButton
-          onPress={() => {
-            toggleCommentsDrawer();
-          }}
-          name="chat-4-line"
-          size={"lg"}
-          testID="open-comments-drawer-button"
-        />
-      </Tooltip>
+      {isDesktopDevice ? (
+        <Tooltip label="Toggle Comments" placement="left" offset={8}>
+          <ToggleButton
+            onPress={() => {
+              toggleCommentsDrawer();
+            }}
+            name="chat-4-line"
+            size={"lg"}
+            testID="open-comments-drawer-button"
+          />
+        </Tooltip>
+      ) : null}
     </>
   );
 };
