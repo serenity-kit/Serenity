@@ -45,7 +45,7 @@ export default function AcceptWorkspaceInvitationScreen(
   props: RootStackScreenProps<"AcceptWorkspaceInvitation">
 ) {
   // TODO: display error if there is no key
-  const [signingPrivateKey] = useState(window.location.hash.split("=")[1]);
+  const [signingKeyPairSeed] = useState(window.location.hash.split("=")[1]);
 
   const workspaceInvitationId = props.route.params?.workspaceInvitationId;
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
@@ -72,7 +72,7 @@ export default function AcceptWorkspaceInvitationScreen(
       const workspace = await acceptWorkspaceInvitation({
         workspaceInvitationId,
         mainDevice,
-        signingPrivateKey,
+        signingKeyPairSeed,
       });
       props.navigation.navigate("Workspace", {
         workspaceId: workspace!.id,
@@ -116,7 +116,7 @@ export default function AcceptWorkspaceInvitationScreen(
     );
   }
 
-  if (!signingPrivateKey) {
+  if (!signingKeyPairSeed) {
     return (
       <ErrorWrapper>
         <InfoMessage variant="error" icon>
@@ -248,7 +248,7 @@ export default function AcceptWorkspaceInvitationScreen(
                 pendingWorkspaceInvitationId={
                   props.route.params.workspaceInvitationId
                 }
-                workspaceInvitationKey={signingPrivateKey}
+                workspaceInvitationKey={signingKeyPairSeed}
                 onRegisterSuccess={onRegisterSuccess}
                 isFocused={true}
               />

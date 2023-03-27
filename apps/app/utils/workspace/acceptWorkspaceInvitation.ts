@@ -10,13 +10,13 @@ import {
 export type Props = {
   workspaceInvitationId: string;
   mainDevice: LocalDevice;
-  signingPrivateKey: string;
+  signingKeyPairSeed: string;
 };
 
 export const acceptWorkspaceInvitation = async ({
   workspaceInvitationId,
   mainDevice,
-  signingPrivateKey,
+  signingKeyPairSeed,
 }: Props): Promise<Workspace | undefined> => {
   const meResult = await runMeQuery({});
   if (!meResult.data?.me) {
@@ -27,16 +27,8 @@ export const acceptWorkspaceInvitation = async ({
     userId: me.id,
     signingPublicKey: mainDevice.signingPublicKey,
     encryptionPublicKey: mainDevice.encryptionPublicKey,
-    encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature!,
+    encryptionPublicKeySignature: mainDevice.encryptionPublicKeySignature,
   };
-  if (!safeMainDevice.encryptionPublicKeySignature) {
-    safeMainDevice.encryptionPublicKeySignature = sodium.to_base64(
-      sodium.crypto_sign_detached(
-        safeMainDevice.encryptionPublicKey,
-        sodium.from_base64(mainDevice.signingPrivateKey!)
-      )
-    );
-  }
   const inviteeInfo = canonicalize({
     username: me.username,
     mainDevice: {
@@ -44,10 +36,14 @@ export const acceptWorkspaceInvitation = async ({
       encryptionPublicKey: safeMainDevice.encryptionPublicKey,
       encryptionPublicKeySignature: safeMainDevice.encryptionPublicKeySignature,
     },
-  });
+  })!;
+  const invitationSigningPrivateKey = sodium.crypto_sign_seed_keypair(
+    sodium.from_base64(signingKeyPairSeed)
+  ).privateKey;
+
   const inviteeUsernameAndDeviceSignature = sodium.crypto_sign_detached(
-    inviteeInfo!,
-    sodium.from_base64(signingPrivateKey)
+    inviteeInfo,
+    invitationSigningPrivateKey
   );
   const result = await runAcceptWorkspaceInvitationMutation(
     {
