@@ -83,7 +83,7 @@ export default function RegistrationVerificationScreen(
         );
         return;
       }
-      const signingPrivateKey = decryptWorkspaceInvitationKey({
+      const signingKeyPairSeed = decryptWorkspaceInvitationKey({
         exportKey,
         subkeyId: pendingWorkspaceInvitation.subkeyId!,
         ciphertext: pendingWorkspaceInvitation.ciphertext!,
@@ -94,7 +94,7 @@ export default function RegistrationVerificationScreen(
         await acceptWorkspaceInvitation({
           workspaceInvitationId: pendingWorkspaceInvitation.id!,
           mainDevice,
-          signingPrivateKey,
+          signingKeyPairSeed,
         });
       } catch (error) {
         setGraphqlError(error.message);

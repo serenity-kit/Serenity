@@ -1,4 +1,11 @@
-import sodium from "libsodium-wrappers";
+import sodium from "react-native-libsodium";
+import {
+  getKeyPairA,
+  getKeyPairB,
+  getKeyPairsA,
+  getKeyPairsB,
+  KeyPairs,
+} from "../test/testUtils";
 import {
   addInvitation,
   addMember,
@@ -6,13 +13,6 @@ import {
   InvalidTrustChainError,
   resolveState,
 } from "./index";
-import {
-  getKeyPairA,
-  getKeyPairB,
-  getKeyPairsA,
-  getKeyPairsB,
-  KeyPairs,
-} from "./testUtils";
 import { hashTransaction } from "./utils";
 
 let keyPairA: sodium.KeyPair;
@@ -76,3 +76,5 @@ test("should not be able to add an invitation as editor", async () => {
     "Not allowed to add an invitation."
   );
 });
+
+// TODO should fail in case the invitation can't be verified

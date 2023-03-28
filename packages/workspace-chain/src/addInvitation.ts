@@ -1,5 +1,5 @@
 import canonicalize from "canonicalize";
-import sodium from "libsodium-wrappers";
+import sodium from "react-native-libsodium";
 import {
   AddInvitationTransaction,
   DefaultTrustChainEvent,
@@ -15,16 +15,19 @@ type AddInvitationParams = {
   workspaceId: string;
 };
 
+export type AddInvitationResult = DefaultTrustChainEvent & {
+  invitationSigningKeyPairSeed: string;
+};
+
 export const addInvitation = ({
   prevHash,
   authorKeyPair,
   expiresAt,
   role,
   workspaceId,
-}: AddInvitationParams): DefaultTrustChainEvent & {
-  invitationSigningPrivateKey: string;
-} => {
-  const invitationSigningKeys = sodium.crypto_sign_keypair();
+}: AddInvitationParams): AddInvitationResult => {
+  const seed = sodium.randombytes_buf(sodium.crypto_sign_SEEDBYTES);
+  const invitationSigningKeys = sodium.crypto_sign_seed_keypair(seed);
   const invitationSigningPublicKey = sodium.to_base64(
     invitationSigningKeys.publicKey
   );
@@ -42,6 +45,7 @@ export const addInvitation = ({
     role,
     expiresAt: expiresAt.toISOString(),
   });
+
   const invitationDataSignature = sodium.crypto_sign_detached(
     invitationData!,
     invitationSigningKeys.privateKey
@@ -54,6 +58,7 @@ export const addInvitation = ({
     expiresAt: expiresAt.toISOString(),
     invitationSigningPublicKey,
     invitationDataSignature: sodium.to_base64(invitationDataSignature),
+    workspaceId,
   };
 
   const hash = hashTransaction(transaction);
@@ -71,8 +76,6 @@ export const addInvitation = ({
     ],
     transaction,
     prevHash,
-    invitationSigningPrivateKey: sodium.to_base64(
-      invitationSigningKeys.privateKey
-    ),
+    invitationSigningKeyPairSeed: sodium.to_base64(seed),
   };
 };

@@ -1,4 +1,4 @@
-import sodium from "libsodium-wrappers";
+import sodium from "react-native-libsodium";
 
 export type KeyPairs = {
   sign: { privateKey: string; publicKey: string; keyType: "ed25519" };
@@ -87,4 +87,16 @@ export const getKeyPairsC = (): KeyPairs => {
       keyType: "x25519",
     },
   };
+};
+
+export const getDateIn2Min = (): Date => {
+  const currentTime = new Date();
+  const twoMinMillis = 2 * 60 * 1000;
+  return new Date(currentTime.getTime() + twoMinMillis);
+};
+
+export const getDate2MinAgo = (): Date => {
+  const currentTime = new Date();
+  const twoMinMillis = 2 * 60 * 1000;
+  return new Date(currentTime.getTime() - twoMinMillis);
 };

@@ -1,7 +1,4 @@
-import sodium from "libsodium-wrappers";
-import { addAuthorToEvent } from "./addAuthorToEvent";
-import { InvalidTrustChainError } from "./errors";
-import { addMember, createChain, resolveState } from "./index";
+import sodium from "react-native-libsodium";
 import {
   getKeyPairA,
   getKeyPairB,
@@ -9,7 +6,10 @@ import {
   getKeyPairsB,
   getKeyPairsC,
   KeyPairs,
-} from "./testUtils";
+} from "../test/testUtils";
+import { addAuthorToEvent } from "./addAuthorToEvent";
+import { InvalidTrustChainError } from "./errors";
+import { addMember, createChain, resolveState } from "./index";
 import { hashTransaction } from "./utils";
 
 let keyPairA: sodium.KeyPair;
@@ -158,8 +158,8 @@ test("should not be able to add the same admin twice as author", async () => {
   const addAdminEvent2 = addMember(
     hashTransaction(addAdminEvent.transaction),
     keyPairA,
-    keyPairsC.sign.publicKey,
-    keyPairsC.box.publicKey,
+    keyPairsB.sign.publicKey,
+    keyPairsB.box.publicKey,
     "ADMIN"
   );
   const addAdminEvent3 = addAuthorToEvent(addAdminEvent2, keyPairA);
@@ -168,4 +168,27 @@ test("should not be able to add the same admin twice as author", async () => {
   expect(() => resolveState(chain)).toThrow(
     "An author can sign the event only once."
   );
+});
+
+test("should not be able to add the same member twice", async () => {
+  const createEvent = createChain(keyPairsA.sign, {
+    [keyPairsA.sign.publicKey]: keyPairsA.box.publicKey,
+  });
+  const addAdminEvent = addMember(
+    hashTransaction(createEvent.transaction),
+    keyPairA,
+    keyPairsB.sign.publicKey,
+    keyPairsB.box.publicKey,
+    "ADMIN"
+  );
+  const addAdminEvent2 = addMember(
+    hashTransaction(addAdminEvent.transaction),
+    keyPairA,
+    keyPairsB.sign.publicKey,
+    keyPairsB.box.publicKey,
+    "ADMIN"
+  );
+  const chain = [createEvent, addAdminEvent, addAdminEvent2];
+  expect(() => resolveState(chain)).toThrow(InvalidTrustChainError);
+  expect(() => resolveState(chain)).toThrow("Member already exists.");
 });
