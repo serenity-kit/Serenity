@@ -6,14 +6,14 @@ import { hashTransaction } from "./utils";
 export const addMember = (
   prevHash: string,
   authorKeyPair: sodium.KeyPair,
-  memberSigningPublicKey: string,
-  memberLockboxPublicKey: string,
+  memberMainDeviceSigningPublicKey: string,
+  memberMainDeviceEncryptionPublicKey: string,
   memberRole: Role
 ): DefaultTrustChainEvent => {
   const transaction: AddMemberTransaction = {
     type: "add-member",
-    memberSigningPublicKey,
-    memberLockboxPublicKey,
+    memberMainDeviceSigningPublicKey,
+    memberMainDeviceEncryptionPublicKey,
     role: memberRole,
   };
 

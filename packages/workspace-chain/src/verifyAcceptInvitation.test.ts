@@ -21,7 +21,7 @@ let acceptInvitationSignature: Uint8Array;
 let mainDevice: {
   mainDeviceEncryptionPublicKey: string;
   mainDeviceSigningPublicKey: string;
-  mainDeviceEncryptionPublicKeySignature: string;
+  memberMainDeviceEncryptionPublicKeySignature: string;
 };
 
 beforeAll(async () => {
@@ -43,7 +43,7 @@ beforeAll(async () => {
   mainDevice = {
     mainDeviceEncryptionPublicKey: keyPairsB.box.publicKey,
     mainDeviceSigningPublicKey: keyPairsB.sign.publicKey,
-    mainDeviceEncryptionPublicKeySignature: sodium.to_base64(
+    memberMainDeviceEncryptionPublicKeySignature: sodium.to_base64(
       sodium.crypto_sign_detached(
         keyPairsB.box.publicKey,
         sodium.from_base64(keyPairsB.sign.privateKey)
@@ -124,7 +124,7 @@ test("should fail to verify if mainDeviceSigningPublicKey has been modified", as
   expect(result).toBe(false);
 });
 
-test("should fail to verify if mainDeviceEncryptionPublicKeySignature has been modified", async () => {
+test("should fail to verify if memberMainDeviceEncryptionPublicKeySignature has been modified", async () => {
   if (addInvitationEvent.transaction.type !== "add-invitation") {
     throw new Error("Invalid transaction type");
   }
@@ -133,8 +133,9 @@ test("should fail to verify if mainDeviceEncryptionPublicKeySignature has been m
     ...mainDevice,
     ...addInvitationEvent.transaction,
     expiresAt: new Date(addInvitationEvent.transaction.expiresAt),
-    mainDeviceEncryptionPublicKeySignature:
-      "b" + mainDevice.mainDeviceEncryptionPublicKeySignature.substring(1),
+    memberMainDeviceEncryptionPublicKeySignature:
+      "b" +
+      mainDevice.memberMainDeviceEncryptionPublicKeySignature.substring(1),
   });
 
   expect(result).toBe(false);

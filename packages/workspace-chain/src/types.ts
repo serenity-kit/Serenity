@@ -18,8 +18,8 @@ export type AddInvitationTransaction = {
 
 export type AddMemberTransaction = {
   type: "add-member";
-  memberSigningPublicKey: string;
-  memberLockboxPublicKey: string;
+  memberMainDeviceSigningPublicKey: string;
+  memberMainDeviceEncryptionPublicKey: string;
   role: Role;
 };
 
@@ -29,22 +29,22 @@ export type AddMemberViaInvitationTransaction = {
   acceptInvitationSignature: string;
   invitationSigningPublicKey: string;
   invitationId: string;
-  memberSigningPublicKey: string;
-  memberLockboxPublicKey: string;
-  mainDeviceEncryptionPublicKeySignature: string;
+  memberMainDeviceSigningPublicKey: string;
+  memberMainDeviceEncryptionPublicKey: string;
+  memberMainDeviceEncryptionPublicKeySignature: string;
   workspaceId: string;
   expiresAt: string;
 };
 
 export type UpdateMemberTransaction = {
   type: "update-member";
-  memberSigningPublicKey: string;
+  memberMainDeviceSigningPublicKey: string;
   role: Role;
 };
 
 export type RemoveMemberTransaction = {
   type: "remove-member";
-  memberSigningPublicKey: string;
+  memberMainDeviceSigningPublicKey: string;
 };
 
 export type Author = {

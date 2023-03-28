@@ -6,11 +6,11 @@ import { hashTransaction } from "./utils";
 export const removeMember = (
   prevHash: string,
   authorKeyPair: sodium.KeyPair,
-  memberSigningPublicKey: string
+  memberMainDeviceSigningPublicKey: string
 ): DefaultTrustChainEvent => {
   const transaction: RemoveMemberTransaction = {
     type: "remove-member",
-    memberSigningPublicKey,
+    memberMainDeviceSigningPublicKey,
   };
 
   const hash = hashTransaction(transaction);

@@ -28,7 +28,7 @@ let keyPairsC: KeyPairs;
 let mainDevice: {
   mainDeviceEncryptionPublicKey: string;
   mainDeviceSigningPublicKey: string;
-  mainDeviceEncryptionPublicKeySignature: string;
+  memberMainDeviceEncryptionPublicKeySignature: string;
 };
 
 beforeAll(async () => {
@@ -42,7 +42,7 @@ beforeAll(async () => {
   mainDevice = {
     mainDeviceEncryptionPublicKey: keyPairsB.box.publicKey,
     mainDeviceSigningPublicKey: keyPairsB.sign.publicKey,
-    mainDeviceEncryptionPublicKeySignature: sodium.to_base64(
+    memberMainDeviceEncryptionPublicKeySignature: sodium.to_base64(
       sodium.crypto_sign_detached(
         keyPairsB.box.publicKey,
         sodium.from_base64(keyPairsB.sign.privateKey)

@@ -16,7 +16,7 @@ type AddMemberViaInvitationParams = {
   invitationId: string;
   mainDeviceSigningPublicKey: string;
   mainDeviceEncryptionPublicKey: string;
-  mainDeviceEncryptionPublicKeySignature: string;
+  memberMainDeviceEncryptionPublicKeySignature: string;
   workspaceId: string;
   expiresAt: Date;
 };
@@ -30,16 +30,16 @@ export const addMemberViaInvitation = ({
   invitationId,
   mainDeviceSigningPublicKey,
   mainDeviceEncryptionPublicKey,
-  mainDeviceEncryptionPublicKeySignature,
+  memberMainDeviceEncryptionPublicKeySignature,
   workspaceId,
   expiresAt,
 }: AddMemberViaInvitationParams): DefaultTrustChainEvent => {
   const transaction: AddMemberViaInvitationTransaction = {
     type: "add-member-via-invitation",
-    memberSigningPublicKey: mainDeviceSigningPublicKey,
-    memberLockboxPublicKey: mainDeviceEncryptionPublicKey,
+    memberMainDeviceSigningPublicKey: mainDeviceSigningPublicKey,
+    memberMainDeviceEncryptionPublicKey: mainDeviceEncryptionPublicKey,
     role,
-    mainDeviceEncryptionPublicKeySignature,
+    memberMainDeviceEncryptionPublicKeySignature,
     acceptInvitationSignature,
     invitationSigningPublicKey,
     invitationId,

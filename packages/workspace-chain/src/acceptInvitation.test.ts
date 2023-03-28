@@ -26,7 +26,7 @@ let addInvitationEvent: AddInvitationResult;
 let mainDevice: {
   mainDeviceEncryptionPublicKey: string;
   mainDeviceSigningPublicKey: string;
-  mainDeviceEncryptionPublicKeySignature: string;
+  memberMainDeviceEncryptionPublicKeySignature: string;
 };
 
 beforeAll(async () => {
@@ -48,7 +48,7 @@ beforeAll(async () => {
   mainDevice = {
     mainDeviceEncryptionPublicKey: keyPairsB.box.publicKey,
     mainDeviceSigningPublicKey: keyPairsB.sign.publicKey,
-    mainDeviceEncryptionPublicKeySignature: sodium.to_base64(
+    memberMainDeviceEncryptionPublicKeySignature: sodium.to_base64(
       sodium.crypto_sign_detached(
         keyPairsB.box.publicKey,
         sodium.from_base64(keyPairsB.sign.privateKey)
@@ -83,7 +83,7 @@ test("should throw an error if the mainDevice signature is invalid", async () =>
   const mainDevice = {
     mainDeviceEncryptionPublicKey: keyPairsB.box.publicKey,
     mainDeviceSigningPublicKey: keyPairsB.sign.publicKey,
-    mainDeviceEncryptionPublicKeySignature: "b" + signature.substring(1),
+    memberMainDeviceEncryptionPublicKeySignature: "b" + signature.substring(1),
   };
 
   expect(() => {

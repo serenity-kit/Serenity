@@ -74,12 +74,14 @@ export const applyEvent = (
       throw new InvalidTrustChainError("Not allowed to add a member.");
     }
 
-    if (members.hasOwnProperty(event.transaction.memberSigningPublicKey)) {
+    if (
+      members.hasOwnProperty(event.transaction.memberMainDeviceSigningPublicKey)
+    ) {
       throw new InvalidTrustChainError("Member already exists.");
     }
 
-    members[event.transaction.memberSigningPublicKey] = {
-      lockboxPublicKey: event.transaction.memberLockboxPublicKey,
+    members[event.transaction.memberMainDeviceSigningPublicKey] = {
+      lockboxPublicKey: event.transaction.memberMainDeviceEncryptionPublicKey,
       role: event.transaction.role,
       addedBy: event.authors.map((author) => author.publicKey),
     };
@@ -107,7 +109,9 @@ export const applyEvent = (
       throw new InvalidTrustChainError("Invitation invalid.");
     }
 
-    if (members.hasOwnProperty(event.transaction.memberSigningPublicKey)) {
+    if (
+      members.hasOwnProperty(event.transaction.memberMainDeviceSigningPublicKey)
+    ) {
       throw new InvalidTrustChainError("Member already exists.");
     }
 
@@ -117,10 +121,12 @@ export const applyEvent = (
       invitationId: event.transaction.invitationId,
       workspaceId: event.transaction.workspaceId,
       expiresAt: new Date(event.transaction.expiresAt),
-      mainDeviceEncryptionPublicKey: event.transaction.memberLockboxPublicKey,
-      mainDeviceSigningPublicKey: event.transaction.memberSigningPublicKey,
-      mainDeviceEncryptionPublicKeySignature:
-        event.transaction.mainDeviceEncryptionPublicKeySignature,
+      mainDeviceEncryptionPublicKey:
+        event.transaction.memberMainDeviceEncryptionPublicKey,
+      mainDeviceSigningPublicKey:
+        event.transaction.memberMainDeviceSigningPublicKey,
+      memberMainDeviceEncryptionPublicKeySignature:
+        event.transaction.memberMainDeviceEncryptionPublicKeySignature,
       role: event.transaction.role,
     });
     if (!validInvitation) {
@@ -129,8 +135,8 @@ export const applyEvent = (
       );
     }
 
-    members[event.transaction.memberSigningPublicKey] = {
-      lockboxPublicKey: event.transaction.memberLockboxPublicKey,
+    members[event.transaction.memberMainDeviceSigningPublicKey] = {
+      lockboxPublicKey: event.transaction.memberMainDeviceEncryptionPublicKey,
       role: event.transaction.role,
       addedBy: event.authors.map((author) => author.publicKey),
     };
@@ -138,7 +144,9 @@ export const applyEvent = (
 
   if (event.transaction.type === "update-member") {
     if (
-      !state.members.hasOwnProperty(event.transaction.memberSigningPublicKey)
+      !state.members.hasOwnProperty(
+        event.transaction.memberMainDeviceSigningPublicKey
+      )
     ) {
       throw new InvalidTrustChainError("Failed to update non-existing member.");
     }
@@ -149,29 +157,34 @@ export const applyEvent = (
     if (
       getAdminCount(state) <= 1 &&
       event.transaction.role !== "ADMIN" &&
-      members[event.transaction.memberSigningPublicKey].role === "ADMIN"
+      members[event.transaction.memberMainDeviceSigningPublicKey].role ===
+        "ADMIN"
     ) {
       throw new InvalidTrustChainError("Not allowed to demote the last admin.");
     }
 
     if (
-      members[event.transaction.memberSigningPublicKey].role ===
+      members[event.transaction.memberMainDeviceSigningPublicKey].role ===
       event.transaction.role
     ) {
       throw new InvalidTrustChainError("Not allowed member update.");
     }
 
-    members[event.transaction.memberSigningPublicKey] = {
+    members[event.transaction.memberMainDeviceSigningPublicKey] = {
       lockboxPublicKey:
-        members[event.transaction.memberSigningPublicKey].lockboxPublicKey,
+        members[event.transaction.memberMainDeviceSigningPublicKey]
+          .lockboxPublicKey,
       role: event.transaction.role,
-      addedBy: members[event.transaction.memberSigningPublicKey].addedBy,
+      addedBy:
+        members[event.transaction.memberMainDeviceSigningPublicKey].addedBy,
     };
   }
 
   if (event.transaction.type === "remove-member") {
     if (
-      !state.members.hasOwnProperty(event.transaction.memberSigningPublicKey)
+      !state.members.hasOwnProperty(
+        event.transaction.memberMainDeviceSigningPublicKey
+      )
     ) {
       throw new InvalidTrustChainError("Failed to remove non-existing member.");
     }
@@ -182,13 +195,13 @@ export const applyEvent = (
       throw new InvalidTrustChainError("Not allowed to remove last member.");
     }
     if (
-      state.members[event.transaction.memberSigningPublicKey].role ===
+      state.members[event.transaction.memberMainDeviceSigningPublicKey].role ===
         "ADMIN" &&
       getAdminCount(state) <= 1
     ) {
       throw new InvalidTrustChainError("Not allowed to remove the last admin.");
     }
-    delete members[event.transaction.memberSigningPublicKey];
+    delete members[event.transaction.memberMainDeviceSigningPublicKey];
   }
 
   return {
