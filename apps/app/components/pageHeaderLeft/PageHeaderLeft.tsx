@@ -39,7 +39,7 @@ export function PageHeaderLeft(props: any) {
     <HStack alignItems={"center"}>
       {!isPermanentLeftSidebar ? (
         <View style={isDesktopDevice ? tw`pl-3` : tw`pl-2`}>
-          {isInEditingMode ? (
+          {isInEditingMode && !isDesktopDevice ? (
             <HStack>
               <IconButton
                 size={"xl"}
