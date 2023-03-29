@@ -74,10 +74,12 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
           toggleCommentsDrawer={() => {
             send({ type: "TOGGLE_SIDEBAR" });
           }}
+          isOpenSidebar={commentsState.context.isOpenSidebar}
+          hasNewComment={false} // TODO
         />
       ),
     });
-  }, []);
+  }, [commentsState]);
 
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPath = await getDocumentPath(docId);

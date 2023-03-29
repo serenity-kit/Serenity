@@ -9,9 +9,15 @@ import { useEditorStore } from "../../utils/editorStore/editorStore";
 
 type Props = {
   toggleCommentsDrawer: () => void;
+  isOpenSidebar: boolean;
+  hasNewComment: boolean;
 };
 
-export const PageHeader: React.FC<Props> = ({ toggleCommentsDrawer }) => {
+export const PageHeader: React.FC<Props> = ({
+  toggleCommentsDrawer,
+  isOpenSidebar,
+  hasNewComment,
+}) => {
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
   const isDesktopDevice = useIsDesktopDevice();
 
@@ -30,7 +36,8 @@ export const PageHeader: React.FC<Props> = ({ toggleCommentsDrawer }) => {
             onPress={() => {
               toggleCommentsDrawer();
             }}
-            name="chat-4-line"
+            isActive={isOpenSidebar}
+            name={hasNewComment ? "chat-4-line-dot" : "chat-4-line"}
             size={"lg"}
             testID="open-comments-drawer-button"
           />
