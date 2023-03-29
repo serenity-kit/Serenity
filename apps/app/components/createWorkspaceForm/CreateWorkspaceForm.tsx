@@ -20,7 +20,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { TextInput } from "react-native";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { useAppContext } from "../../context/AppContext";
 import {
   useCreateInitialWorkspaceStructureMutation,
@@ -76,7 +75,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       }
       const workspaceId = generateId();
       const workspaceKeyId = generateId();
-      const folderId = uuidv4();
+      const folderId = generateId();
       const documentId = generateId();
       const folderName = "Getting started";
       const documentName = "Introduction";

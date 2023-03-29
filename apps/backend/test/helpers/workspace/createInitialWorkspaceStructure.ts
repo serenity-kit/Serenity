@@ -11,7 +11,6 @@ import {
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { DeviceWorkspaceKeyBoxParams } from "../../../src/database/workspace/createWorkspace";
 import { Device } from "../../../src/types/device";
 
@@ -113,7 +112,7 @@ export const createInitialWorkspaceStructure = async ({
   // create ids
   const workspaceId = generateId();
   const workspaceKeyId = generateId();
-  const folderId = uuidv4();
+  const folderId = generateId();
   const documentId = generateId();
 
   const folderName = "Getting Started";
