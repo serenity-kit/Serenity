@@ -19,8 +19,6 @@ export type IconButtonProps = PressableProps & {
   isActive?: boolean;
 };
 
-// TODO IconButton active state
-
 export const IconButton = forwardRef((props: IconButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
   const {
