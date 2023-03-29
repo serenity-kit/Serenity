@@ -87,7 +87,7 @@ export default async function createUserWithWorkspace({
 
   const documentId = generateId();
   const folderId = uuidv4();
-  const workspaceKeyId = uuidv4();
+  const workspaceKeyId = generateId();
   const documentName = "Introduction";
   const user = result.user;
   const device = result.device;

@@ -8,10 +8,10 @@ import {
 } from "@serenity-tools/common";
 import {
   Heading,
+  HorizontalDivider,
   Icon,
   IconButton,
   InlineInput,
-  HorizontalDivider,
   SidebarLink,
   Text,
   Tooltip,

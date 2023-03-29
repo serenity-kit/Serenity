@@ -112,7 +112,7 @@ export const createInitialWorkspaceStructure = async ({
 }: Params) => {
   // create ids
   const workspaceId = generateId();
-  const workspaceKeyId = uuidv4();
+  const workspaceKeyId = generateId();
   const folderId = uuidv4();
   const documentId = generateId();
 

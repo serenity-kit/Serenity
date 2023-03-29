@@ -75,7 +75,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         throw new Error("No active device available");
       }
       const workspaceId = generateId();
-      const workspaceKeyId = uuidv4();
+      const workspaceKeyId = generateId();
       const folderId = uuidv4();
       const documentId = generateId();
       const folderName = "Getting started";
