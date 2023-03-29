@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql, {
@@ -19,15 +19,15 @@ const password = "password";
 let device: any;
 let webDevice: any;
 
-// const workspace1Id = uuidv4();
-// const workspace2Id = uuidv4();
+// const workspace1Id = generateId();
+// const workspace2Id = generateId();
 // const workspace1Name = "workspace 1";
 const workspace2Name = "workspace 2";
 let firstWorkspaceCursor = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
+    id: generateId(),
     username,
     password,
   });

@@ -10,8 +10,7 @@
   "dependencies": {
     "@naisho/core": "*",
     "@serenity-tools/libsodium": "*",
-    "date-fns": "^2.29.3",
-    "uuid": "^9.0.0"
+    "date-fns": "^2.29.3"
   },
   "devDependencies": {
     "@babel/preset-flow": "^7.18.6"

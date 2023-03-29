@@ -1,8 +1,8 @@
+import { generateId } from "@naisho/core";
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
 } from "@serenity-tools/common";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocumentShareLink } from "../../../../test/helpers/document/createDocumentShareLink";
@@ -18,8 +18,8 @@ let token = "";
 
 const setup = async () => {
   userData = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
   });
   const getWorkspaceResult = await getWorkspace({
     graphql,

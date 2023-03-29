@@ -1,3 +1,4 @@
+import { generateId } from "@naisho/core";
 import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
 import {
   Avatar,
@@ -21,7 +22,6 @@ import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import MemberMenu from "../../../components/memberMenu/MemberMenu";
 import { VerifyPasswordModal } from "../../../components/verifyPasswordModal/VerifyPasswordModal";
 import { CreateWorkspaceInvitation } from "../../../components/workspace/CreateWorkspaceInvitation";
@@ -161,7 +161,7 @@ export default function WorkspaceSettingsMembersScreen(
       setMemberLookup(memberLookup);
       const workspaceKeyString = sodium.to_base64(sodium.crypto_kdf_keygen());
       const workspaceKey = {
-        id: uuidv4(),
+        id: generateId(),
         workspaceKey: workspaceKeyString,
       };
 

@@ -6,7 +6,6 @@ import {
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import sodium, { KeyPair } from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocumentShareLink } from "../../../../test/helpers/document/createDocumentShareLink";
@@ -23,8 +22,8 @@ let sessionKey = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
   });
   const workspaceKeyBox =
     userData1.workspace.currentWorkspaceKey?.workspaceKeyBox;
@@ -169,7 +168,7 @@ test("Unauthenticated", async () => {
     (async () =>
       await getSnapshot({
         graphql,
-        documentId: uuidv4(),
+        documentId: generateId(),
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

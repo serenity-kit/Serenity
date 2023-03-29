@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -19,8 +19,8 @@ let sessionKey = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   addedWorkspace = userData1.workspace;
@@ -77,7 +77,7 @@ test("Deleting nonexistent document does nothing", async () => {
 test("commenter attempts to delete", async () => {
   const otherUser = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     "password"
   );
   await prisma.usersToWorkspaces.create({
@@ -102,7 +102,7 @@ test("commenter attempts to delete", async () => {
 test("viewer attempts to delete", async () => {
   const otherUser = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     "password"
   );
   await prisma.usersToWorkspaces.create({
@@ -141,7 +141,7 @@ describe("Input errors", () => {
   const authorizationHeaders = {
     authorization: sessionKey,
   };
-  const id = uuidv4();
+  const id = generateId();
   const query = gql`
     mutation deleteDocuments($input: DeleteDocumentsInput!) {
       deleteDocuments(input: $input) {

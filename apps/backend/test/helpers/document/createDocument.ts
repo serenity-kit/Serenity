@@ -16,7 +16,6 @@ import {
 import { gql } from "graphql-request";
 import { KeyPair } from "libsodium-wrappers";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { prisma } from "../../../src/database/prisma";
 import { createFolderKeyDerivationTrace } from "../folder/createFolderKeyDerivationTrace";
 
@@ -171,7 +170,7 @@ export const createDocument = async ({
   };
 
   const publicData: SnapshotPublicData = {
-    snapshotId: uuidv4(),
+    snapshotId: generateId(),
     docId: id,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     subkeyId: snapshotKey.subkeyId,

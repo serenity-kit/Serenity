@@ -1,10 +1,10 @@
+import { generateId } from "@naisho/core";
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocumentShareLink } from "../../../../test/helpers/document/createDocumentShareLink";
@@ -20,8 +20,8 @@ let user1Workspace: any = null;
 const setup = async () => {
   await sodium.ready;
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   const getWorkspaceResult = await getWorkspace({
@@ -170,8 +170,8 @@ test("Invalid ownership", async () => {
 
 test("Invalid ownership", async () => {
   const otherUser = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
@@ -228,8 +228,8 @@ describe("Input errors", () => {
   `;
   test("Invalid documentId", async () => {
     const userData1 = await createUserWithWorkspace({
-      id: uuidv4(),
-      username: `${uuidv4()}@example.com`,
+      id: generateId(),
+      username: `${generateId()}@example.com`,
       password,
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
@@ -256,8 +256,8 @@ describe("Input errors", () => {
   });
   test("Invalid sharing role", async () => {
     const userData1 = await createUserWithWorkspace({
-      id: uuidv4(),
-      username: `${uuidv4()}@example.com`,
+      id: generateId(),
+      username: `${generateId()}@example.com`,
       password,
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
@@ -284,13 +284,13 @@ describe("Input errors", () => {
   });
   test("Invalid creator device", async () => {
     const userData1 = await createUserWithWorkspace({
-      id: uuidv4(),
-      username: `${uuidv4()}@example.com`,
+      id: generateId(),
+      username: `${generateId()}@example.com`,
       password,
     });
     const otherUser = await createUserWithWorkspace({
-      id: uuidv4(),
-      username: `${uuidv4()}@example.com`,
+      id: generateId(),
+      username: `${generateId()}@example.com`,
       password,
     });
     const { encryptionPrivateKey, signingPrivateKey, ...creatorDevice } =
@@ -317,8 +317,8 @@ describe("Input errors", () => {
   });
   test("Invalid input", async () => {
     const userData1 = await createUserWithWorkspace({
-      id: uuidv4(),
-      username: `${uuidv4()}@example.com`,
+      id: generateId(),
+      username: `${generateId()}@example.com`,
       password,
     });
     await expect(
@@ -334,8 +334,8 @@ describe("Input errors", () => {
   });
   test("No input", async () => {
     const userData1 = await createUserWithWorkspace({
-      id: uuidv4(),
-      username: `${uuidv4()}@example.com`,
+      id: generateId(),
+      username: `${generateId()}@example.com`,
       password,
     });
     await expect(

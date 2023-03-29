@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import canonicalize from "canonicalize";
-import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import {
@@ -11,19 +11,19 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 const graphql = setupGraphql();
 let userData1: any = null;
 let userData2: any = null;
-const password1 = uuidv4();
-const password2 = uuidv4();
+const password1 = generateId();
+const password2 = generateId();
 
 beforeAll(async () => {
   await deleteAllRecords();
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: password1,
   });
   userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: password2,
   });
 });

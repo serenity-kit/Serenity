@@ -1,6 +1,6 @@
+import { generateId } from "@naisho/core";
 import { test } from "@playwright/test";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { acceptWorkspaceInvitation } from "../../helpers/e2e/acceptWorkspaceInvitation";
@@ -17,14 +17,14 @@ type UserData = {
   data: any;
 };
 const user1: UserData = {
-  id: uuidv4(),
-  username: `${uuidv4()}@example.com`,
+  id: generateId(),
+  username: `${generateId()}@example.com`,
   password: "password",
   data: undefined,
 };
 const user2: UserData = {
-  id: uuidv4(),
-  username: `${uuidv4()}@example.com`,
+  id: generateId(),
+  username: `${generateId()}@example.com`,
   password: "password",
   data: undefined,
 };

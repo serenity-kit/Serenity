@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -15,8 +15,8 @@ let userData: any = undefined;
 
 const setup = async () => {
   userData = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
 };
@@ -69,7 +69,7 @@ test("initiate file upload", async () => {
 test("Invalid access", async () => {
   const otherUser = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     "password"
   );
   await expect(
@@ -86,7 +86,7 @@ test("Invalid access", async () => {
 test("Commenter tries to upload", async () => {
   const otherUser = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     "password"
   );
   await prisma.usersToWorkspaces.create({
@@ -110,7 +110,7 @@ test("Commenter tries to upload", async () => {
 test("Viewer tries to upload", async () => {
   const otherUser = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     "password"
   );
   await prisma.usersToWorkspaces.create({
@@ -152,11 +152,11 @@ describe("Input errors", () => {
       }
     }
   `;
-  const id = uuidv4();
+  const id = generateId();
   test("Invalid document id", async () => {
     const userData = await createUserWithWorkspace({
-      id: uuidv4(),
-      username: `${uuidv4()}@example.com`,
+      id: generateId(),
+      username: `${generateId()}@example.com`,
       password,
     });
     await expect(
@@ -175,8 +175,8 @@ describe("Input errors", () => {
   });
   test("Invalid document id", async () => {
     const userData = await createUserWithWorkspace({
-      id: uuidv4(),
-      username: `${uuidv4()}@example.com`,
+      id: generateId(),
+      username: `${generateId()}@example.com`,
       password,
     });
     await expect(
@@ -195,8 +195,8 @@ describe("Input errors", () => {
   });
   test("Invalid input", async () => {
     const userData = await createUserWithWorkspace({
-      id: uuidv4(),
-      username: `${uuidv4()}@example.com`,
+      id: generateId(),
+      username: `${generateId()}@example.com`,
       password,
     });
     await expect(

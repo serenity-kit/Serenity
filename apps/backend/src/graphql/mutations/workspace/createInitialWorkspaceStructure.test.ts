@@ -1,3 +1,4 @@
+import { generateId } from "@naisho/core";
 import {
   createDevice,
   decryptFolderName,
@@ -7,7 +8,6 @@ import {
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -20,7 +20,7 @@ let userData1: any = undefined;
 const setup = async () => {
   userData1 = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     "password"
   );
 };
@@ -185,24 +185,24 @@ test("Invalid workspace name", async () => {
         {
           input: {
             workspace: {
-              id: uuidv4(),
+              id: generateId(),
               name: null,
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               keyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
+                workspaceKeyId: generateId(),
                 subkeyId: 0,
                 parentFolders: [],
               },
             },
             document: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -228,19 +228,19 @@ test("Invalid workspace id", async () => {
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               keyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
+                workspaceKeyId: generateId(),
                 subkeyId: 0,
                 parentFolders: [],
               },
             },
             document: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -261,24 +261,24 @@ test("Invalid folder id", async () => {
         {
           input: {
             workspace: {
-              id: uuidv4(),
+              id: generateId(),
               name: "Getting Started",
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
               id: null,
-              idSignature: `TODO+${uuidv4()}`,
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               keyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
+                workspaceKeyId: generateId(),
                 subkeyId: 0,
                 parentFolders: [],
               },
             },
             document: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -299,24 +299,24 @@ test("Invalid folder name", async () => {
         {
           input: {
             workspace: {
-              id: uuidv4(),
+              id: generateId(),
               name: "Getting Started",
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: null,
               nameNonce: "",
               keyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
+                workspaceKeyId: generateId(),
                 subkeyId: 0,
                 parentFolders: [],
               },
             },
             document: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -337,24 +337,24 @@ test("Invalid folder nonce", async () => {
         {
           input: {
             workspace: {
-              id: uuidv4(),
+              id: generateId(),
               name: "Getting Started",
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: null,
               keyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
+                workspaceKeyId: generateId(),
                 subkeyId: 0,
                 parentFolders: [],
               },
             },
             document: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -375,20 +375,20 @@ test("Invalid folder trace", async () => {
         {
           input: {
             workspace: {
-              id: uuidv4(),
+              id: generateId(),
               name: "Getting Started",
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               keyDerivationTrace: null,
             },
             document: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -409,24 +409,24 @@ test("Invalid document id", async () => {
         {
           input: {
             workspace: {
-              id: uuidv4(),
+              id: generateId(),
               name: "Getting Started",
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               keyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
+                workspaceKeyId: generateId(),
                 subkeyId: 0,
                 parentFolders: [],
               },
             },
             document: {
               id: null,
-              idSignature: `TODO+${uuidv4()}`,
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -447,24 +447,24 @@ test("Invalid document name", async () => {
         {
           input: {
             workspace: {
-              id: uuidv4(),
+              id: generateId(),
               name: "Getting Started",
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               keyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
+                workspaceKeyId: generateId(),
                 subkeyId: 0,
                 parentFolders: [],
               },
             },
             document: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: null,
               nameNonce: "",
               subkeyId: 123,
@@ -485,24 +485,24 @@ test("Invalid document nonce", async () => {
         {
           input: {
             workspace: {
-              id: uuidv4(),
+              id: generateId(),
               name: "Getting Started",
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               keyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
+                workspaceKeyId: generateId(),
                 subkeyId: 0,
                 parentFolders: [],
               },
             },
             document: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: null,
               subkeyId: 123,
@@ -523,24 +523,24 @@ test("Invalid subkeyId", async () => {
         {
           input: {
             workspace: {
-              id: uuidv4(),
+              id: generateId(),
               name: "Getting Started",
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               keyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
+                workspaceKeyId: generateId(),
                 subkeyId: 0,
                 parentFolders: [],
               },
             },
             document: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: null,
@@ -561,24 +561,24 @@ test("Invalid creator device", async () => {
         {
           input: {
             workspace: {
-              id: uuidv4(),
+              id: generateId(),
               name: "Getting Started",
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               keyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
+                workspaceKeyId: generateId(),
                 subkeyId: 0,
                 parentFolders: [],
               },
             },
             document: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,
@@ -599,24 +599,24 @@ test("creator device must belong to user", async () => {
         {
           input: {
             workspace: {
-              id: uuidv4(),
+              id: generateId(),
               name: "Getting Started",
               deviceWorkspaceKeyBoxes: [],
             },
             folder: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               keyDerivationTrace: {
-                workspaceKeyId: uuidv4(),
+                workspaceKeyId: generateId(),
                 subkeyId: 0,
                 parentFolders: [],
               },
             },
             document: {
-              id: uuidv4(),
-              idSignature: `TODO+${uuidv4()}`,
+              id: generateId(),
+              idSignature: `TODO+${generateId()}`,
               nameCiphertext: "",
               nameNonce: "",
               subkeyId: 123,

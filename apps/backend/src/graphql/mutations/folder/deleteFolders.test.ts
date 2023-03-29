@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -27,8 +27,8 @@ let workspaceKey2 = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   sessionKey = userData1.sessionKey;
@@ -53,8 +53,8 @@ const setup = async () => {
   addedFolderId = createFolderResult.createFolder.folder.id;
 
   userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   sessionKey2 = userData2.sessionKey;
@@ -315,7 +315,7 @@ test("user can't delete folders that don't exist", async () => {
 test("Commentor tries to delete", async () => {
   const otherUser = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     password
   );
   await prisma.usersToWorkspaces.create({
@@ -341,7 +341,7 @@ test("Commentor tries to delete", async () => {
 test("Viewer tries to delete", async () => {
   const otherUser = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     password
   );
   await prisma.usersToWorkspaces.create({

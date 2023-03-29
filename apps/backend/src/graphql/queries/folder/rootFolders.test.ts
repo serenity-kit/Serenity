@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { generateId } from "@naisho/core";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
@@ -26,8 +26,8 @@ let sessionKey = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   workspace = userData1.workspace;
@@ -38,8 +38,8 @@ const setup = async () => {
   });
 
   userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   workspaceKey2 = getWorkspaceKeyForWorkspaceAndDevice({
@@ -157,7 +157,7 @@ test("retrieving a workspace that doesn't exist throws an error", async () => {
     (async () =>
       await getRootFolders({
         graphql,
-        workspaceId: uuidv4(),
+        workspaceId: generateId(),
         first: 50,
         authorizationHeader: userData1.sessionKey,
       }))()

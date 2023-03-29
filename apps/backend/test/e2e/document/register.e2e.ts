@@ -1,13 +1,13 @@
+import { generateId } from "@naisho/core";
 import { test } from "@playwright/test";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { createDocument } from "../../helpers/e2e/createDocument";
 import { createSubFolder } from "../../helpers/e2e/createSubFolder";
 import { deleteDocument } from "../../helpers/e2e/deleteDocument";
 import { register } from "../../helpers/e2e/register";
 import { renameDocument } from "../../helpers/e2e/renameDocument";
 
-const username = `${uuidv4()}@example.com`;
+const username = `${generateId()}@example.com`;
 const password = "password";
 const workspaceName = "a workspace";
 
@@ -35,7 +35,7 @@ test.describe("After register", () => {
   test("Create, rename, delete document in subfolder", async ({ page }) => {
     const { workspace, folder } = await register({
       page,
-      username: `${uuidv4()}@example.com`,
+      username: `${generateId()}@example.com`,
       password,
       workspaceName,
     });

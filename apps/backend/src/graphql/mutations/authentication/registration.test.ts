@@ -1,17 +1,17 @@
+import { generateId } from "@naisho/core";
 import {
   createAndEncryptDevice,
   encryptWorkspaceInvitationPrivateKey,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { requestRegistrationChallengeResponse } from "../../../../test/helpers/authentication/requestRegistrationChallengeResponse";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
-const username = `${uuidv4()}@example.com`;
+const username = `${generateId()}@example.com`;
 const password = "password";
 let result: any = null;
 
@@ -66,7 +66,7 @@ test("server should register a user with a pending workspace id", async () => {
     password
   );
 
-  const pendingWorkspaceInvitationId = uuidv4();
+  const pendingWorkspaceInvitationId = generateId();
   const message = result.registration.finish(
     password,
     sodium.from_base64(result.data.challengeResponse)
@@ -142,7 +142,7 @@ describe("Input errors", () => {
       username,
       password
     );
-    const pendingWorkspaceInvitationId = uuidv4();
+    const pendingWorkspaceInvitationId = generateId();
     const message = result.registration.finish(
       password,
       sodium.from_base64(result.data.challengeResponse)
@@ -168,7 +168,7 @@ describe("Input errors", () => {
       username,
       password
     );
-    const pendingWorkspaceInvitationId = uuidv4();
+    const pendingWorkspaceInvitationId = generateId();
     const message = result.registration.finish(
       password,
       sodium.from_base64(result.data.challengeResponse)
@@ -180,7 +180,7 @@ describe("Input errors", () => {
       (async () =>
         await graphql.client.request(query, {
           input: {
-            registrationId: uuidv4(),
+            registrationId: generateId(),
             message: sodium.to_base64(message),
             mainDevice,
             pendingWorkspaceInvitationId,
@@ -198,7 +198,7 @@ describe("Input errors", () => {
       username,
       password
     );
-    const pendingWorkspaceInvitationId = uuidv4();
+    const pendingWorkspaceInvitationId = generateId();
     const message = result.registration.finish(
       password,
       sodium.from_base64(result.data.challengeResponse)
@@ -224,7 +224,7 @@ describe("Input errors", () => {
       username,
       password
     );
-    const pendingWorkspaceInvitationId = uuidv4();
+    const pendingWorkspaceInvitationId = generateId();
     const message = result.registration.finish(
       password,
       sodium.from_base64(result.data.challengeResponse)
@@ -250,7 +250,7 @@ describe("Input errors", () => {
       username,
       password
     );
-    const pendingWorkspaceInvitationId = uuidv4();
+    const pendingWorkspaceInvitationId = generateId();
     const message = result.registration.finish(
       password,
       sodium.from_base64(result.data.challengeResponse)
@@ -280,7 +280,7 @@ describe("Input errors", () => {
       username,
       password
     );
-    const pendingWorkspaceInvitationId = uuidv4();
+    const pendingWorkspaceInvitationId = generateId();
     const message = result.registration.finish(
       password,
       sodium.from_base64(result.data.challengeResponse)
@@ -306,7 +306,7 @@ describe("Input errors", () => {
       username,
       password
     );
-    const pendingWorkspaceInvitationId = uuidv4();
+    const pendingWorkspaceInvitationId = generateId();
     const message = result.registration.finish(
       password,
       sodium.from_base64(result.data.challengeResponse)
@@ -336,7 +336,7 @@ describe("Input errors", () => {
       username,
       password
     );
-    const pendingWorkspaceInvitationId = uuidv4();
+    const pendingWorkspaceInvitationId = generateId();
     const message = result.registration.finish(
       password,
       sodium.from_base64(result.data.challengeResponse)
@@ -366,7 +366,7 @@ describe("Input errors", () => {
       username,
       password
     );
-    const pendingWorkspaceInvitationId = uuidv4();
+    const pendingWorkspaceInvitationId = generateId();
     const message = result.registration.finish(
       password,
       sodium.from_base64(result.data.challengeResponse)
@@ -396,7 +396,7 @@ describe("Input errors", () => {
       username,
       password
     );
-    const pendingWorkspaceInvitationId = uuidv4();
+    const pendingWorkspaceInvitationId = generateId();
     const message = result.registration.finish(
       password,
       sodium.from_base64(result.data.challengeResponse)

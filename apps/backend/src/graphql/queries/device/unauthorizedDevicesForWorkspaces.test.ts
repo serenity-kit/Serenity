@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { generateId } from "@naisho/core";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getUnauthorizedDevicesForWorkspaces } from "../../../../test/helpers/device/getUnauthorizedDevicesForWorkspaces";
@@ -9,7 +9,7 @@ import { getUnauthorizedMembers } from "../../../../test/helpers/workspace/getUn
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const username = `${uuidv4}@example.com`;
+const username = `${generateId}@example.com`;
 const password = "password";
 
 let sessionKey = "";
@@ -43,7 +43,7 @@ test("no devices members when workspace created", async () => {
 test("unauthorized devices when workspace added", async () => {
   const otherUserAndDevice = await createUserWithWorkspace({
     id: "workspace_id_2",
-    username: `${uuidv4()}@example.com`,
+    username: `${generateId()}@example.com`,
     password,
   });
   const otherUserId = otherUserAndDevice.user.id;

@@ -87,7 +87,6 @@
     "react-native-webview": "11.23.1",
     "twrnc": "^3.4.0",
     "urql": "^3.0.3",
-    "uuid": "^9.0.0",
     "xstate": "^4.36.0",
     "y-protocols": "^1.0.5",
     "yjs": "^13.5.41",

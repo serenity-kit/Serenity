@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { expect, test } from "@playwright/test";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../prisma/generated/output";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
@@ -14,8 +14,8 @@ test.describe("Workspace Sharing", () => {
 
   test("admin sharing link", async ({ page }) => {
     const role = Role.ADMIN;
-    const userId = uuidv4();
-    const username = `${uuidv4()}@example.com`;
+    const userId = generateId();
+    const username = `${generateId()}@example.com`;
     const password = "password";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
@@ -40,8 +40,8 @@ test.describe("Workspace Sharing", () => {
 
   test("editor sharing link", async ({ page }) => {
     const role = Role.EDITOR;
-    const userId = uuidv4();
-    const username = `${uuidv4()}@example.com`;
+    const userId = generateId();
+    const username = `${generateId()}@example.com`;
     const password = "password";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
@@ -66,8 +66,8 @@ test.describe("Workspace Sharing", () => {
 
   test("commenter sharing link", async ({ page }) => {
     const role = Role.COMMENTER;
-    const userId = uuidv4();
-    const username = `${uuidv4()}@example.com`;
+    const userId = generateId();
+    const username = `${generateId()}@example.com`;
     const password = "password";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
@@ -92,8 +92,8 @@ test.describe("Workspace Sharing", () => {
 
   test("viewer sharing link", async ({ page }) => {
     const role = Role.VIEWER;
-    const userId = uuidv4();
-    const username = `${uuidv4()}@example.com`;
+    const userId = generateId();
+    const username = `${generateId()}@example.com`;
     const password = "password";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
@@ -117,8 +117,8 @@ test.describe("Workspace Sharing", () => {
   });
 
   test("User 1 can create a sharing link", async ({ page }) => {
-    const userId = uuidv4();
-    const username = `${uuidv4()}@example.com`;
+    const userId = generateId();
+    const username = `${generateId()}@example.com`;
     const password = "password";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
@@ -141,8 +141,8 @@ test.describe("Workspace Sharing", () => {
   });
 
   test("Existing other user can accept workspace", async ({ page }) => {
-    const userId = uuidv4();
-    const username = `${uuidv4()}@example.com`;
+    const userId = generateId();
+    const username = `${generateId()}@example.com`;
     const password = "password";
     const { workspace, document } = await createUserWithWorkspace({
       id: userId,
@@ -175,8 +175,8 @@ test.describe("Workspace Sharing", () => {
   });
 
   test("Unauthenticated other user can accept workspace", async ({ page }) => {
-    const userId = uuidv4();
-    const username = `${uuidv4()}@example.com`;
+    const userId = generateId();
+    const username = `${generateId()}@example.com`;
     const password = "password";
     await createUserWithWorkspace({
       id: userId,
@@ -197,7 +197,7 @@ test.describe("Workspace Sharing", () => {
   });
 
   test("Unregistered other user can accept workspace", async ({ page }) => {
-    const username = `${uuidv4()}@example.com`;
+    const username = `${generateId()}@example.com`;
     const password = "password";
     const workspaceName = "my workspace";
     await page.goto(workspaceInvitationUrl);

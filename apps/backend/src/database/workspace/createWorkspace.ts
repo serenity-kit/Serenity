@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { equalArrayContent } from "@serenity-tools/common";
-import { v4 as uuidv4 } from "uuid";
 import {
   Workspace,
   WorkspaceKey,
@@ -71,7 +71,7 @@ export async function createWorkspace({
         },
         workspaceKeys: {
           create: {
-            id: workspaceKeyId || uuidv4(),
+            id: workspaceKeyId || generateId(),
             generation: 0,
           },
         },
@@ -111,7 +111,7 @@ export async function createWorkspace({
     deviceWorkspaceKeyBoxes.forEach(
       (deviceWorkspaceKeyBox: DeviceWorkspaceKeyBoxParams) => {
         workspaceKeyBoxes.push({
-          id: uuidv4(),
+          id: generateId(),
           workspaceKeyId: currentWorkspaceKey.id,
           ...deviceWorkspaceKeyBox,
           creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,

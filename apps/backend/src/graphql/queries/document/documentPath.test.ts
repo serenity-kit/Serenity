@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
@@ -33,8 +33,8 @@ const otherDocumentId = "929ca262-f144-40f7-8fe2-d3147f415f26";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
@@ -93,8 +93,8 @@ const setup = async () => {
   });
 
   userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
 
@@ -227,7 +227,7 @@ test("retrieving a document that doesn't exist should throw an error", async () 
     (async () =>
       await getDocumentPath({
         graphql,
-        documentId: uuidv4(),
+        documentId: generateId(),
         authorizationHeader: userData1.sessionKey,
       }))()
   ).rejects.toThrow(/FORBIDDEN/);

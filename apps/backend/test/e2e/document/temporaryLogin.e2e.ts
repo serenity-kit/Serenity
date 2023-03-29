@@ -1,14 +1,14 @@
+import { generateId } from "@naisho/core";
 import { test } from "@playwright/test";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { createDocument } from "../../helpers/e2e/createDocument";
 import { deleteDocument } from "../../helpers/e2e/deleteDocument";
 import { login } from "../../helpers/e2e/login";
 import { renameDocument } from "../../helpers/e2e/renameDocument";
 
-const userId = uuidv4();
-const username = `${uuidv4()}@example.com`;
+const userId = generateId();
+const username = `${generateId()}@example.com`;
 const password = "password";
 let createdWorkspace: any = null;
 let workspaceId = "";

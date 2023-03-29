@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { expect, test } from "@playwright/test";
-import { v4 as uuidv4 } from "uuid";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { e2eRegisterUser } from "../../helpers/e2e/e2eRegisterUser";
@@ -9,7 +9,7 @@ import { verifyPassword } from "../../helpers/e2e/verifyPassword";
 
 test.describe("Devices", () => {
   test("User can log in from two devices", async ({ browser, page }) => {
-    const username = `${uuidv4()}@example.com`;
+    const username = `${generateId()}@example.com`;
     const password = "password";
     await page.goto("http://localhost:19006/register");
     const { workspace, document } = await e2eRegisterUser({

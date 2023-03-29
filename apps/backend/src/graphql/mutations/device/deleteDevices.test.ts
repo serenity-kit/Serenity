@@ -1,6 +1,6 @@
+import { generateId } from "@naisho/core";
 import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
 import { getDeviceBySigningPublicKey } from "../../../../test/helpers/device/getDeviceBySigningKey";
@@ -20,13 +20,13 @@ let user1Device2: any = undefined;
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   const loginResult = await createDeviceAndLogin({

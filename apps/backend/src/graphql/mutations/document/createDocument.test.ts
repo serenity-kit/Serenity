@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -18,8 +18,8 @@ let sessionKey = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   sessionKey = userData1.sessionKey;
@@ -33,7 +33,7 @@ beforeAll(async () => {
 });
 
 test("user should be able to create a document", async () => {
-  const id = uuidv4();
+  const id = generateId();
   // can be removed in case we don't need the workpaceKeyId
   // const workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
   //   device: userData1.device,
@@ -54,7 +54,7 @@ test("user should be able to create a document", async () => {
 test("commenter tries to create", async () => {
   const otherUser = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     "password"
   );
   await prisma.usersToWorkspaces.create({
@@ -67,7 +67,7 @@ test("commenter tries to create", async () => {
   await expect(
     (async () =>
       await createDocument({
-        id: uuidv4(),
+        id: generateId(),
         graphql,
         authorizationHeader: otherUser.sessionKey,
         parentFolderId: userData1.folder.id,
@@ -80,7 +80,7 @@ test("commenter tries to create", async () => {
 test("viewer attempts to create", async () => {
   const otherUser = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     "password"
   );
   await prisma.usersToWorkspaces.create({
@@ -93,7 +93,7 @@ test("viewer attempts to create", async () => {
   await expect(
     (async () =>
       await createDocument({
-        id: uuidv4(),
+        id: generateId(),
         graphql,
         authorizationHeader: otherUser.sessionKey,
         parentFolderId: userData1.folder.id,
@@ -107,7 +107,7 @@ test("Unauthenticated", async () => {
   await expect(
     (async () =>
       await createDocument({
-        id: uuidv4(),
+        id: generateId(),
         graphql,
         authorizationHeader: "badauthkey",
         parentFolderId: userData1.folder.id,
@@ -121,7 +121,7 @@ describe("Input errors", () => {
   const authorizationHeaders = {
     authorization: sessionKey,
   };
-  const id = uuidv4();
+  const id = generateId();
   const query = gql`
     mutation createDocument($input: CreateDocumentInput!) {
       createDocument(input: $input) {
@@ -152,7 +152,7 @@ describe("Input errors", () => {
           query,
           {
             input: {
-              id: uuidv4,
+              id: generateId,
               parentFolderId: userData1.folder.parentFolderId,
               workspaceId: null,
             },

@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import { v4 as uuidv4 } from "uuid";
 import { Prisma, Role } from "../../../prisma/generated/output";
 import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
 import { WorkspaceDeviceParing } from "../../types/workspaceDevice";
@@ -72,7 +72,7 @@ export const rotateWorkspaceKey = async ({
   }
   const newWorkspaceKey = await prisma.workspaceKey.create({
     data: {
-      id: uuidv4(),
+      id: generateId(),
       workspaceId,
       generation: lastGenerationKey.generation + 1,
     },
@@ -80,7 +80,7 @@ export const rotateWorkspaceKey = async ({
   const workspaceKeyBoxData: WorkspaceKeyBox[] = [];
   deviceWorkspaceKeyBoxes.forEach((keyBoxData) => {
     workspaceKeyBoxData.push({
-      id: uuidv4(),
+      id: generateId(),
       workspaceKeyId: newWorkspaceKey.id,
       creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
       deviceSigningPublicKey: keyBoxData.receiverDeviceSigningPublicKey,

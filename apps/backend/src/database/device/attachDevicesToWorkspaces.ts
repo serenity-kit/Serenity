@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { ForbiddenError } from "apollo-server-express";
-import { v4 as uuidv4 } from "uuid";
 import {
   WorkspaceKey,
   WorkspaceKeyBox as WorkspaceKeyBoxCreateArgs,
@@ -104,7 +104,7 @@ export async function attachDevicesToWorkspaces({
           // const workspaceKeys = workspaceKeyBoxLookup[workspaceId];
           for (let workspaceDevice of member.workspaceDevices) {
             const newKeyBox: WorkspaceKeyBoxCreateArgs = {
-              id: uuidv4(),
+              id: generateId(),
               workspaceKeyId,
               creatorDeviceSigningPublicKey: creatorDevice.signingPublicKey,
               deviceSigningPublicKey:

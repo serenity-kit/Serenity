@@ -1,5 +1,4 @@
 import { generateId } from "@naisho/core";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -146,7 +145,7 @@ let userAndDevice: any = null;
 describe("Input errors", () => {
   beforeAll(async () => {
     const workspaceId = generateId();
-    const username = `${uuidv4()}@example.com`;
+    const username = `${generateId()}@example.com`;
     userAndDevice = await createUserWithWorkspace({
       id: workspaceId,
       username: username,

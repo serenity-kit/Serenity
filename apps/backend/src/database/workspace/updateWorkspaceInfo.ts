@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../prisma/generated/output";
 import { formatWorkspace, WorkspaceKeyBox } from "../../types/workspace";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
@@ -57,7 +57,7 @@ export async function updateWorkspaceInfo({
     if (workspace.infoWorkspaceKey) {
       nextGeneration = workspace.infoWorkspaceKey.generation + 1;
     }
-    const infoWorkspaceKeyId = uuidv4();
+    const infoWorkspaceKeyId = generateId();
     const insertedWorkspaceKey = await prisma.workspaceKey.create({
       data: {
         id: infoWorkspaceKeyId,
@@ -91,7 +91,7 @@ export async function updateWorkspaceInfo({
         isSessionDeviceIncluded = true;
       }
       workspaceKeyBoxesToInsert.push({
-        id: uuidv4(),
+        id: generateId(),
         workspaceKeyId: insertedWorkspaceKey.id,
         deviceSigningPublicKey: workspaceKeyBox.deviceSigningPublicKey,
         ciphertext: workspaceKeyBox.ciphertext,
