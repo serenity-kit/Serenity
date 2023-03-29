@@ -75,9 +75,9 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
         throw new Error("No active device available");
       }
       const workspaceId = generateId();
-      const workspaceKeyId = uuidv4();
+      const workspaceKeyId = generateId();
       const folderId = uuidv4();
-      const documentId = uuidv4();
+      const documentId = generateId();
       const folderName = "Getting started";
       const documentName = "Introduction";
 
@@ -116,7 +116,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const snapshotKey = createSnapshotKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
-      const snapshotId = uuidv4();
+      const snapshotId = generateId();
       const snapshot = createIntroductionDocumentSnapshot({
         documentId,
         snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),

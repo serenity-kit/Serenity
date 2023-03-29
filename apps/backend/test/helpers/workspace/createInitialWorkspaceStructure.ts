@@ -112,9 +112,9 @@ export const createInitialWorkspaceStructure = async ({
 }: Params) => {
   // create ids
   const workspaceId = generateId();
-  const workspaceKeyId = uuidv4();
+  const workspaceKeyId = generateId();
   const folderId = uuidv4();
-  const documentId = uuidv4();
+  const documentId = generateId();
 
   const folderName = "Getting Started";
   const documentName = "Introduction";
@@ -194,7 +194,7 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedDocumentName = encryptedDocumentTitleResult.ciphertext;
   const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;
 
-  const snapshotId = uuidv4();
+  const snapshotId = generateId();
   const snapshot = createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),

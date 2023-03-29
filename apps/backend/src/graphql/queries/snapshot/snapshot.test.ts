@@ -1,4 +1,4 @@
-import { createSnapshot } from "@naisho/core";
+import { createSnapshot, generateId } from "@naisho/core";
 import {
   decryptWorkspaceKey,
   deriveKeysFromKeyDerivationTrace,
@@ -46,7 +46,7 @@ const setup = async () => {
     snapshotKeyTrace.trace[snapshotKeyTrace.trace.length - 1].subkeyId;
   sessionKey = userData1.sessionKey;
 
-  const snapshotId = uuidv4();
+  const snapshotId = generateId();
 
   const keyDerivationTrace = {
     workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,

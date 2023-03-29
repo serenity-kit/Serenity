@@ -1,3 +1,4 @@
+import { generateId } from "@naisho/core";
 import {
   createAndEncryptDevice,
   createAndEncryptWorkspaceKeyForDevice,
@@ -84,9 +85,9 @@ export default async function createUserWithWorkspace({
     };
   });
 
-  const documentId = uuidv4();
+  const documentId = generateId();
   const folderId = uuidv4();
-  const workspaceKeyId = uuidv4();
+  const workspaceKeyId = generateId();
   const documentName = "Introduction";
   const user = result.user;
   const device = result.device;
@@ -118,7 +119,7 @@ export default async function createUserWithWorkspace({
     title: documentName,
     key: documentTitleKey,
   });
-  const snapshotId = uuidv4();
+  const snapshotId = generateId();
   const snapshot = createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),
