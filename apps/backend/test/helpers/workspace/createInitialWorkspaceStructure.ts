@@ -1,3 +1,4 @@
+import { generateId } from "@naisho/core";
 import {
   createDocumentTitleKey,
   createIntroductionDocumentSnapshot,
@@ -110,7 +111,7 @@ export const createInitialWorkspaceStructure = async ({
   authorizationHeader,
 }: Params) => {
   // create ids
-  const workspaceId = uuidv4();
+  const workspaceId = generateId();
   const workspaceKeyId = uuidv4();
   const folderId = uuidv4();
   const documentId = uuidv4();

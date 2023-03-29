@@ -1,3 +1,4 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
 import { v4 as uuidv4 } from "uuid";
@@ -23,7 +24,7 @@ beforeAll(async () => {
 test("accept admin role", async () => {
   const inviterUsername = `invite-${uuidv4()}@example.com`;
   const inviteeUsername = `invitee-${uuidv4()}@example.com`;
-  const workspaceId = uuidv4();
+  const workspaceId = generateId();
   const otherWorkspaceId = uuidv4();
   const role = Role.ADMIN;
   const inviterUserAndDevice = await createUserWithWorkspace({
@@ -124,7 +125,7 @@ test("double-accepting invitation does nothing", async () => {
 test("accept editor role", async () => {
   const inviterUsername = `invite-${uuidv4()}@example.com`;
   const inviteeUsername = `invitee-${uuidv4()}@example.com`;
-  const workspaceId = uuidv4();
+  const workspaceId = generateId();
   const otherWorkspaceId = uuidv4();
   const role = Role.EDITOR;
   const inviterUserAndDevice = await createUserWithWorkspace({
@@ -192,7 +193,7 @@ test("accept editor role", async () => {
 test("accept commenter role", async () => {
   const inviterUsername = `invite-${uuidv4()}@example.com`;
   const inviteeUsername = `invitee-${uuidv4()}@example.com`;
-  const workspaceId = uuidv4();
+  const workspaceId = generateId();
   const otherWorkspaceId = uuidv4();
   const role = Role.COMMENTER;
   const inviterUserAndDevice = await createUserWithWorkspace({
@@ -260,7 +261,7 @@ test("accept commenter role", async () => {
 test("accept viewer role", async () => {
   const inviterUsername = `invite-${uuidv4()}@example.com`;
   const inviteeUsername = `invitee-${uuidv4()}@example.com`;
-  const workspaceId = uuidv4();
+  const workspaceId = generateId();
   const otherWorkspaceId = uuidv4();
   const role = Role.VIEWER;
   const inviterUserAndDevice = await createUserWithWorkspace({
