@@ -116,7 +116,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       const snapshotKey = createSnapshotKey({
         folderKey: encryptedFolderResult.folderSubkey,
       });
-      const snapshotId = uuidv4();
+      const snapshotId = generateId();
       const snapshot = createIntroductionDocumentSnapshot({
         documentId,
         snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),

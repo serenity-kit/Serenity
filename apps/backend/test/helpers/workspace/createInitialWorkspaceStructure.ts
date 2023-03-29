@@ -194,7 +194,7 @@ export const createInitialWorkspaceStructure = async ({
   const encryptedDocumentName = encryptedDocumentTitleResult.ciphertext;
   const encryptedDocumentNameNonce = encryptedDocumentTitleResult.publicNonce;
 
-  const snapshotId = uuidv4();
+  const snapshotId = generateId();
   const snapshot = createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),

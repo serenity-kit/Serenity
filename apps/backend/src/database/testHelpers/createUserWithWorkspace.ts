@@ -119,7 +119,7 @@ export default async function createUserWithWorkspace({
     title: documentName,
     key: documentTitleKey,
   });
-  const snapshotId = uuidv4();
+  const snapshotId = generateId();
   const snapshot = createIntroductionDocumentSnapshot({
     documentId,
     snapshotEncryptionKey: sodium.from_base64(snapshotKey.key),

@@ -258,7 +258,7 @@ export default function SidebarFolder(props: Props) {
 
   const createDocument = async () => {
     const documentId = generateId();
-    const snapshotId = uuidv4();
+    const snapshotId = generateId();
     const documentName = "Untitled";
     const workspace = await getWorkspace({
       deviceSigningPublicKey: activeDevice.signingPublicKey,

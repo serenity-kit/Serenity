@@ -1,8 +1,8 @@
 import sodiumWrappers from "libsodium-wrappers";
 import sodium, { KeyPair } from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
 import { SnapshotPublicData } from "./types";
+import { generateId } from "./utils/generateId";
 
 const snapshotDerivedKeyContext = "snapshot";
 
@@ -23,7 +23,7 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
     keyType: "ed25519",
   };
 
-  const snapshotId = uuidv4();
+  const snapshotId = generateId();
   const publicData: SnapshotPublicData = {
     snapshotId,
     docId: "6e46c006-5541-11ec-bf63-0242ac130002",
@@ -76,9 +76,9 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
     ),
     keyType: "ed25519",
   };
-  const snapshotId = uuidv4();
+  const snapshotId = generateId();
   const publicData: SnapshotPublicData = {
-    snapshotId: uuidv4(),
+    snapshotId: generateId(),
     docId: "6e46c006-5541-11ec-bf63-0242ac130002",
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     subkeyId: 42,
@@ -130,7 +130,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
     ),
     keyType: "ed25519",
   };
-  const snapshotId = uuidv4();
+  const snapshotId = generateId();
   const publicData: SnapshotPublicData = {
     snapshotId,
     docId: "6e46c006-5541-11ec-bf63-0242ac130002",

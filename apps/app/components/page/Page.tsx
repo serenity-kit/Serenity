@@ -1,4 +1,8 @@
-import { KeyDerivationTrace, useYjsSyncMachine } from "@naisho/core";
+import {
+  generateId,
+  KeyDerivationTrace,
+  useYjsSyncMachine,
+} from "@naisho/core";
 import { encryptDocumentTitle, LocalDevice } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { AwarenessUserInfo } from "@serenity-tools/editor";
@@ -8,7 +12,6 @@ import {
 } from "@serenity-tools/ui";
 import { useEffect, useRef, useState } from "react";
 import sodium, { KeyPair } from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { Awareness } from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
@@ -98,7 +101,7 @@ export default function Page({
       if (!document) {
         throw new Error("Document not found");
       }
-      const snapshotId = uuidv4();
+      const snapshotId = generateId();
       // currently we create a new key for every snapshot
       const snapshotKeyData = await createNewSnapshotKey({
         document,

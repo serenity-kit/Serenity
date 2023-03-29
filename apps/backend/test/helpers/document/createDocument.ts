@@ -1,5 +1,6 @@
 import {
   createSnapshot,
+  generateId,
   KeyDerivationTrace,
   Snapshot,
   SnapshotPublicData,
@@ -155,7 +156,7 @@ export const createDocument = async ({
     workspaceKeyId: workspaceKeyBox.workspaceKeyId,
     parentFolderId,
   });
-  const snapshotId = uuidv4();
+  const snapshotId = generateId();
   snapshotKeyDerivationTrace.trace.push({
     entryId: snapshotId,
     parentId: parentFolderId,
