@@ -16,7 +16,10 @@ export type IconButtonProps = PressableProps & {
   size?: "md" | "lg" | "xl";
   transparent?: boolean;
   isLoading?: boolean;
+  isActive?: boolean;
 };
+
+// TODO IconButton active state
 
 export const IconButton = forwardRef((props: IconButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
@@ -27,6 +30,7 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
     transparent,
     label,
     isLoading,
+    isActive,
     ...rest
   } = props;
 
@@ -70,6 +74,9 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
     hover: transparent ? tw`bg-${iconColor}/15` : tw`bg-gray-200`,
     pressed: transparent ? tw`bg-${iconColor}/25` : tw`bg-gray-300`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
+    active: transparent
+      ? tw`border border-${iconColor}/20 bg-${iconColor}/10`
+      : tw`border border-gray-200 bg-gray-150`,
   });
 
   return (
@@ -93,6 +100,7 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
             style={[
               styles.stack,
               isHovered && !isLoading && styles.hover,
+              isActive && styles.active,
               isPressed && !isLoading && styles.pressed,
               isFocusVisible && styles.focusVisible,
             ]}
@@ -114,7 +122,11 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
             ) : (
               <Icon
                 name={name}
-                color={isHovered && !transparent ? "gray-800" : iconColor}
+                color={
+                  (isHovered || isActive) && !transparent
+                    ? "gray-800"
+                    : iconColor
+                }
               />
             )}
 
@@ -122,7 +134,7 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
               <Text
                 variant="xs"
                 style={
-                  isHovered && !transparent
+                  (isHovered || isActive) && !transparent
                     ? tw`text-gray-800`
                     : tw`text-${iconColor}`
                 }
