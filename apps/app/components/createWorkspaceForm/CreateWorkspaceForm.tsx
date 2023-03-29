@@ -1,3 +1,4 @@
+import { generateId } from "@naisho/core";
 import { useNavigation } from "@react-navigation/native";
 import {
   createIntroductionDocumentSnapshot,
@@ -73,7 +74,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       if (!activeDevice) {
         throw new Error("No active device available");
       }
-      const workspaceId = uuidv4();
+      const workspaceId = generateId();
       const workspaceKeyId = uuidv4();
       const folderId = uuidv4();
       const documentId = uuidv4();

@@ -1,3 +1,4 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
@@ -200,7 +201,7 @@ test("user should not be able to invite from a workspace that doesn't exist", as
 });
 
 test("Unauthenticated", async () => {
-  const workspaceId = uuidv4();
+  const workspaceId = generateId();
   const username = "a@a.com";
   await createUserWithWorkspace({
     id: workspaceId,

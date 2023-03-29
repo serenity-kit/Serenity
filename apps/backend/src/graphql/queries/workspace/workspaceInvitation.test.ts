@@ -1,3 +1,4 @@
+import { generateId } from "@naisho/core";
 import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -144,7 +145,7 @@ test("not logged in user should throw an authentication error", async () => {
 let userAndDevice: any = null;
 describe("Input errors", () => {
   beforeAll(async () => {
-    const workspaceId = uuidv4();
+    const workspaceId = generateId();
     const username = `${uuidv4()}@example.com`;
     userAndDevice = await createUserWithWorkspace({
       id: workspaceId,
