@@ -10,22 +10,27 @@ export type ToggleButtonProps = PressableProps & {
   name: IconNames;
   size?: "md" | "lg";
   isActive?: boolean;
+  subtle?: boolean;
 };
 
 export const ToggleButton = forwardRef((props: ToggleButtonProps, ref) => {
   const { isFocusVisible, focusProps: focusRingProps } = useFocusRing();
-  const { name, isActive, size = "md", disabled, ...rest } = props;
+  const { name, isActive, size = "md", disabled, subtle, ...rest } = props;
 
   const dimensions = size === "md" ? "h-6 w-6" : "h-8 w-8";
+  const opacity = subtle ? "60" : "100";
 
   const styles = StyleSheet.create({
     pressable: tw`${dimensions}`,
     hstack: tw`h-full w-full items-center justify-center bg-transparent rounded`,
-    active: tw`bg-primary-100`,
-    hover: isActive ? tw`bg-primary-200` : tw`bg-gray-200`,
-    pressed: tw`bg-primary-200`,
+    active: tw`bg-primary-100/${opacity}`,
+    hover: isActive
+      ? tw`bg-primary-200/${opacity}`
+      : tw`bg-gray-200/${opacity}`,
+    pressed: tw`bg-primary-200/${opacity}`,
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
     disabled: tw`bg-transparent opacity-50`, // TODO opacity tbd
+    subtle: isActive ? tw`border border-primary-100` : tw``,
   });
 
   return (
@@ -54,6 +59,7 @@ export const ToggleButton = forwardRef((props: ToggleButtonProps, ref) => {
             style={[
               styles.hstack,
               isActive && styles.active,
+              subtle && styles.subtle,
               isHovered && styles.hover,
               isPressed && styles.pressed,
               isFocusVisible && styles.focusVisible,
