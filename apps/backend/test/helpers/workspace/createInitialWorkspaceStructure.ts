@@ -114,7 +114,7 @@ export const createInitialWorkspaceStructure = async ({
   const workspaceId = generateId();
   const workspaceKeyId = uuidv4();
   const folderId = uuidv4();
-  const documentId = uuidv4();
+  const documentId = generateId();
 
   const folderName = "Getting Started";
   const documentName = "Introduction";

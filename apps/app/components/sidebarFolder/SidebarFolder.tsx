@@ -1,4 +1,4 @@
-import { createSnapshot, KeyDerivationTrace } from "@naisho/core";
+import { createSnapshot, generateId, KeyDerivationTrace } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -257,7 +257,7 @@ export default function SidebarFolder(props: Props) {
   };
 
   const createDocument = async () => {
-    const documentId = uuidv4();
+    const documentId = generateId();
     const snapshotId = uuidv4();
     const documentName = "Untitled";
     const workspace = await getWorkspace({

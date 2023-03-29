@@ -1,3 +1,4 @@
+import { generateId } from "@naisho/core";
 import {
   createAndEncryptDevice,
   createAndEncryptWorkspaceKeyForDevice,
@@ -84,7 +85,7 @@ export default async function createUserWithWorkspace({
     };
   });
 
-  const documentId = uuidv4();
+  const documentId = generateId();
   const folderId = uuidv4();
   const workspaceKeyId = uuidv4();
   const documentName = "Introduction";
