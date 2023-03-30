@@ -2,9 +2,9 @@ import {
   Avatar,
   hashToCollaboratorColor,
   Pressable,
-  RawInput,
   SubmitButton,
   Text,
+  TextArea,
   tw,
   View,
 } from "@serenity-tools/ui";
@@ -40,8 +40,12 @@ export default function Comment({ comment, meId, meName }: Props) {
   const isActiveComment = comment.id === state.context.highlightedComment?.id;
   const isMyComment = commentCreator?.userId === meId;
 
+  const submitButtonHeight = 7;
+
   const styles = StyleSheet.create({
     wrapper: tw`p-4 border-b border-gray-200`,
+    textarea: tw`pb-${submitButtonHeight}`,
+    submit: tw`absolute h-${submitButtonHeight} w-${submitButtonHeight} bottom-0.5 right-0.5`,
   });
 
   return (
@@ -133,34 +137,34 @@ export default function Comment({ comment, meId, meName }: Props) {
         <Avatar color={hashToCollaboratorColor(meId)} size="xs">
           {meName?.split("@")[0].substring(0, 1)}
         </Avatar>
-        <RawInput
-          multiline
-          value={state.context.replyTexts[comment.id]}
-          onChangeText={(text) =>
-            send({
-              type: "UPDATE_REPLY_TEXT",
-              commentId: comment.id,
-              text,
-            })
-          }
-          _stack={{
-            height: 16,
-            flexShrink: 1,
-          }}
-          testID={`comment-${comment.id}__reply-input`}
-        />
-      </HStack>
 
-      <SubmitButton
-        disabled={
-          state.context.replyTexts[comment.id] === undefined ||
-          state.context.replyTexts[comment.id] === ""
-        }
-        size="sm"
-        onPress={() => send({ type: "CREATE_REPLY", commentId: comment.id })}
-        style={tw`mt-1 self-end`}
-        testID={`comment-${comment.id}__save-reply-button`}
-      />
+        <View style={tw`relative`}>
+          <TextArea
+            value={state.context.replyTexts[comment.id]}
+            onChangeText={(text) =>
+              send({
+                type: "UPDATE_REPLY_TEXT",
+                commentId: comment.id,
+                text,
+              })
+            }
+            style={styles.textarea}
+            testID={`comment-${comment.id}__reply-input`}
+          />
+          <SubmitButton
+            disabled={
+              state.context.replyTexts[comment.id] === undefined ||
+              state.context.replyTexts[comment.id] === ""
+            }
+            size="sm"
+            onPress={() =>
+              send({ type: "CREATE_REPLY", commentId: comment.id })
+            }
+            style={styles.submit}
+            testID={`comment-${comment.id}__save-reply-button`}
+          />
+        </View>
+      </HStack>
     </Pressable>
   );
 }
