@@ -50,6 +50,7 @@ export default function UITestScreen(props: RootStackScreenProps<"UITest">) {
               value={replyText}
               onChangeText={(text) => setReplyText(text)}
               minRows={3}
+              onSubmitPress={() => setReplyText("")}
             />
           </View>
         </DSExampleArea>
