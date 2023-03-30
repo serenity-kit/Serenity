@@ -23,7 +23,7 @@ export const ReplyArea = (props: ReplyAreaProps) => {
   const submitButtonHeight = 7;
 
   const styles = StyleSheet.create({
-    textarea: tw`px-2`,
+    textarea: tw`px-2 pb-0`,
     default: tw`border border-solid border-transparent`,
     hover: tw`bg-gray-200 border border-solid border-gray-200`,
     submit: tw`absolute h-${submitButtonHeight} w-${submitButtonHeight} bottom-0.5 right-0.5`,
@@ -39,6 +39,7 @@ export const ReplyArea = (props: ReplyAreaProps) => {
         }
         minRows={isActive ? minRows : 1}
         unlimited
+        maxLength={500}
         variant={isActive ? "outline" : "unstyled"}
         style={[
           styles.textarea,
