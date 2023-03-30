@@ -1,5 +1,5 @@
 import React from "react";
-import { EmptyMessage, TableOfContentButton } from "@serenity-tools/ui";
+import { EmptyMessage, TableOfContentButton, tw } from "@serenity-tools/ui";
 import { Editor } from "@tiptap/react";
 
 type Props = {
@@ -32,7 +32,7 @@ export default function TableOfContents({ editor }: Props) {
         );
       })}
       {isEmpty ? (
-        <EmptyMessage iconName={"toc-line"}>
+        <EmptyMessage iconName={"toc-line"} style={tw`pt-0`}>
           Add Headers to structure your page and easily access certain parts of
           your document.
         </EmptyMessage>
