@@ -1,10 +1,9 @@
 import {
   VerticalDivider,
   EditorSidebarHeader,
-  Icon,
   Text,
   tw,
-  View,
+  EmptyMessage,
 } from "@serenity-tools/ui";
 import { useActor } from "@xstate/react";
 import { HStack } from "native-base";
@@ -40,15 +39,10 @@ const Header: React.FC = () => {
 
 const EmptyState: React.FC = () => {
   return (
-    <HStack space={3} style={tw`p-4`}>
-      <View style={tw``}>
-        <Icon name="chat-4-line-message" color={"gray-500"} size={5} />
-      </View>
-      <Text variant="xs" muted>
-        Add suggestions, questions or appreciations by marking a text-passage or
-        image and then clicking on the comment icon in the floating menu.
-      </Text>
-    </HStack>
+    <EmptyMessage iconName="chat-4-line-message">
+      Add suggestions, questions or appreciations by marking a text-passage or
+      image and then clicking on the comment icon in the floating menu.
+    </EmptyMessage>
   );
 };
 
