@@ -11,7 +11,7 @@ export type ReplyAreaProps = TextAreaProps & {
 };
 
 export const ReplyArea = (props: ReplyAreaProps) => {
-  const { value, minRows = 2, testPrefix } = props;
+  const { value, minRows = 2, testPrefix = "message" } = props;
 
   const [isFocused, setIsFocused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
