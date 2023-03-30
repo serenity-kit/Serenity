@@ -39,6 +39,13 @@ export default function Comment({ comment, meId, meName }: Props) {
   const isActiveComment = comment.id === state.context.highlightedComment?.id;
   const isMyComment = commentCreator?.userId === meId;
 
+  const replyLength = comment.replies.length;
+  const replyString = {
+    0: "Reply ...",
+    1: "1 Reply",
+  };
+  const replyPlaceholder = replyString[replyLength] || `${replyLength} Replies`;
+
   const submitButtonHeight = 7;
 
   const styles = StyleSheet.create({
@@ -116,47 +123,59 @@ export default function Comment({ comment, meId, meName }: Props) {
           {comment.text}
         </Text>
       </View>
+      {isActiveComment ? (
+        <>
+          <View style={tw`mt-2`}>
+            {comment.replies.map((reply) => {
+              if (!reply) return null;
 
-      <View style={tw`mt-2`}>
-        {comment.replies.map((reply) => {
-          if (!reply) return null;
+              return (
+                <CommentReply
+                  key={reply.id}
+                  reply={reply}
+                  meId={meId}
+                  commentId={comment.id}
+                />
+              );
+            })}
+          </View>
 
-          return (
-            <CommentReply
-              key={reply.id}
-              reply={reply}
-              meId={meId}
-              commentId={comment.id}
-            />
-          );
-        })}
-      </View>
+          <HStack space="1.5">
+            <Avatar color={hashToCollaboratorColor(meId)} size="xs">
+              {meName?.split("@")[0].substring(0, 1)}
+            </Avatar>
 
-      <HStack space="1.5">
-        <Avatar color={hashToCollaboratorColor(meId)} size="xs">
-          {meName?.split("@")[0].substring(0, 1)}
-        </Avatar>
-
-        {/* negative margin to align ReplyArea centered with Avatar on default
+            {/* negative margin to align ReplyArea centered with Avatar on default
             without losing line-connection between replying Avatars */}
-        <View style={tw`relative -mt-1.5`}>
-          <ReplyArea
-            value={state.context.replyTexts[comment.id]}
-            onChangeText={(text) =>
-              send({
-                type: "UPDATE_REPLY_TEXT",
-                commentId: comment.id,
-                text,
-              })
-            }
-            style={styles.textarea}
-            onSubmitPress={() =>
-              send({ type: "CREATE_REPLY", commentId: comment.id })
-            }
-            testPrefix={`comment-${comment.id}`}
-          />
-        </View>
-      </HStack>
+            <View style={tw`relative -mt-1.5`}>
+              <ReplyArea
+                value={state.context.replyTexts[comment.id]}
+                onChangeText={(text) =>
+                  send({
+                    type: "UPDATE_REPLY_TEXT",
+                    commentId: comment.id,
+                    text,
+                  })
+                }
+                style={styles.textarea}
+                onSubmitPress={() =>
+                  send({ type: "CREATE_REPLY", commentId: comment.id })
+                }
+                testPrefix={`comment-${comment.id}`}
+              />
+            </View>
+          </HStack>
+        </>
+      ) : (
+        <Text
+          variant="xxs"
+          style={tw`pt-1 pl-0.5 ${
+            replyLength >= 1 ? "text-primary-400" : "text-gray-600"
+          }`}
+        >
+          {replyPlaceholder}
+        </Text>
+      )}
     </Pressable>
   );
 }
