@@ -95,7 +95,9 @@ export default function Comment({ comment, meId, meName }: Props) {
           <Text
             variant="xxs"
             bold
-            style={tw`max-w-40`}
+            style={tw`max-w-40 ${
+              isActiveComment ? "text-gray-900" : "text-gray-700"
+            }`}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
