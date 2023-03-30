@@ -14,6 +14,7 @@ export * from "./components/editorBottombarButton/EditorBottombarButton";
 export * from "./components/editorContentButton/EditorContentButton";
 export * from "./components/editorSidebarHeader/EditorSidebarHeader";
 export * from "./components/editorSidebarIcon/EditorSidebarIcon";
+export * from "./components/emptyMessage/EmptyMessage";
 export * from "./components/formWrapper/FormWrapper";
 export * from "./components/heading/Heading";
 export * from "./components/horizontalDivider/HorizontalDivider";
