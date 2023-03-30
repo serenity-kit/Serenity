@@ -59,7 +59,7 @@ export default function Comment({ comment, meId, meName }: Props) {
       key={comment.id}
       style={[
         styles.wrapper,
-        isActiveComment ? tw`bg-collaboration-honey/7` : undefined,
+        isHovered && !isActiveComment && tw`bg-gray-150`,
         { cursor: isActiveComment ? "default" : "pointer" },
       ]}
       onPress={() => {
@@ -77,17 +77,17 @@ export default function Comment({ comment, meId, meName }: Props) {
           </View> */}
 
         <HStack alignItems="center" space="1.5">
-          {/* TODO if comment has been read change color to gray-400 */}
           {commentCreator ? (
             <Avatar
               key={commentCreator.userId}
               color={hashToCollaboratorColor(commentCreator.userId)}
               size="xs"
+              muted={!isActiveComment}
             >
               {commentCreator.username?.split("@")[0].substring(0, 1)}
             </Avatar>
           ) : (
-            <Avatar color="arctic" size="xs">
+            <Avatar color="arctic" size="xs" muted={!isActiveComment}>
               E
             </Avatar>
           )}
