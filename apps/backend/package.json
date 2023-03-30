@@ -60,6 +60,9 @@
   "jest": {
     "globalSetup": "<rootDir>/test/config/jestGlobalSetup.ts",
     "setupFilesAfterEnv": [
+      "<rootDir>/test/config/jestTestSetupAfterEnv.ts"
+    ],
+    "setupFiles": [
       "<rootDir>/test/config/jestTestSetup.ts"
     ],
     "transform": {
