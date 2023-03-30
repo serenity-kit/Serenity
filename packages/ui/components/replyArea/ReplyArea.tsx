@@ -38,6 +38,7 @@ export const ReplyArea = (props: ReplyAreaProps) => {
           isHovered || isFocused ? tw.color("gray-600") : tw.color("gray-500")
         }
         minRows={isActive ? minRows : 1}
+        unlimited
         variant={isActive ? "outline" : "unstyled"}
         style={[
           styles.textarea,
