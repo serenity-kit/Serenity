@@ -314,6 +314,7 @@ export const Editor = (props: EditorProps) => {
                     onChangeText={(text) => setCommentText(text)}
                     testID="bubble-menu__create-comment-input"
                     maxRows={3}
+                    maxLength={500}
                   />
                   <HStack
                     style={tw`p-3 border-t border-solid border-gray-200`}
