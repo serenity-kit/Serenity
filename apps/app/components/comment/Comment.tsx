@@ -2,9 +2,8 @@ import {
   Avatar,
   hashToCollaboratorColor,
   Pressable,
-  SubmitButton,
+  ReplyArea,
   Text,
-  TextArea,
   tw,
   View,
 } from "@serenity-tools/ui";
@@ -138,8 +137,10 @@ export default function Comment({ comment, meId, meName }: Props) {
           {meName?.split("@")[0].substring(0, 1)}
         </Avatar>
 
-        <View style={tw`relative`}>
-          <TextArea
+        {/* negative margin to align ReplyArea centered with Avatar on default
+            without losing line-connection between replying Avatars */}
+        <View style={tw`relative -mt-1.5`}>
+          <ReplyArea
             value={state.context.replyTexts[comment.id]}
             onChangeText={(text) =>
               send({
@@ -149,19 +150,10 @@ export default function Comment({ comment, meId, meName }: Props) {
               })
             }
             style={styles.textarea}
-            testID={`comment-${comment.id}__reply-input`}
-          />
-          <SubmitButton
-            disabled={
-              state.context.replyTexts[comment.id] === undefined ||
-              state.context.replyTexts[comment.id] === ""
-            }
-            size="sm"
-            onPress={() =>
+            onSubmitPress={() =>
               send({ type: "CREATE_REPLY", commentId: comment.id })
             }
-            style={styles.submit}
-            testID={`comment-${comment.id}__save-reply-button`}
+            testPrefix={`comment-${comment.id}`}
           />
         </View>
       </HStack>
