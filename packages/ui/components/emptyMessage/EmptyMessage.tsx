@@ -13,7 +13,7 @@ export const EmptyMessage = forwardRef((props: EmptyMessageProps, ref) => {
   const { iconName = "information-line" } = props;
 
   return (
-    <HStack space={3} style={tw`p-4`} {...props}>
+    <HStack {...props} space={3} style={[tw`p-4`, props.style]}>
       <View style={tw``}>
         <Icon name={iconName} color={"gray-500"} size={5} />
       </View>
