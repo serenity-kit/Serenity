@@ -5,6 +5,6 @@ global.setImmediate = jest.useRealTimers;
 
 jest.setTimeout(25000);
 
-(async function () {
+beforeEach(async () => {
   await sodium.ready;
-})();
+});
