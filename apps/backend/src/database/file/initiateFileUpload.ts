@@ -1,7 +1,7 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { generateId } from "@naisho/core";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";
 
@@ -49,7 +49,7 @@ export const initiateFileUpload = async ({
   if (!document) {
     throw new UserInputError("Invalid documentId");
   }
-  const fileId = uuidv4();
+  const fileId = generateId();
   const fileName = `${workspaceId}/${documentId}/${fileId}.blob`;
   const uploadUrl = await getSignedUrl(
     s3Client,

@@ -1,6 +1,5 @@
 import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -17,8 +16,8 @@ beforeAll(async () => {
 });
 
 test("Invite admin", async () => {
-  const workspaceId = `${uuidv4()}`;
-  const username = `${uuidv4()}@example.com`;
+  const workspaceId = `${generateId()}`;
+  const username = `${generateId()}@example.com`;
   const role = Role.ADMIN;
   const userAndDevice = await createUserWithWorkspace({
     id: workspaceId,
@@ -49,8 +48,8 @@ test("Invite admin", async () => {
 });
 
 test("invite editor", async () => {
-  const workspaceId = `${uuidv4()}`;
-  const username = `${uuidv4()}@example.com`;
+  const workspaceId = `${generateId()}`;
+  const username = `${generateId()}@example.com`;
   const role = Role.EDITOR;
   const userAndDevice = await createUserWithWorkspace({
     id: workspaceId,
@@ -81,8 +80,8 @@ test("invite editor", async () => {
 });
 
 test("invite commenter", async () => {
-  const workspaceId = `${uuidv4()}`;
-  const username = `${uuidv4()}@example.com`;
+  const workspaceId = `${generateId()}`;
+  const username = `${generateId()}@example.com`;
   const role = Role.COMMENTER;
   const userAndDevice = await createUserWithWorkspace({
     id: workspaceId,
@@ -113,8 +112,8 @@ test("invite commenter", async () => {
 });
 
 test("invite viewer", async () => {
-  const workspaceId = `${uuidv4()}`;
-  const username = `${uuidv4()}@example.com`;
+  const workspaceId = `${generateId()}`;
+  const username = `${generateId()}@example.com`;
   const role = Role.VIEWER;
   const userAndDevice = await createUserWithWorkspace({
     id: workspaceId,
@@ -145,8 +144,8 @@ test("invite viewer", async () => {
 });
 
 test("fail on unknown role", async () => {
-  const workspaceId = `${uuidv4()}`;
-  const username = `${uuidv4()}@example.com`;
+  const workspaceId = `${generateId()}`;
+  const username = `${generateId()}@example.com`;
   const userAndDevice = await createUserWithWorkspace({
     id: workspaceId,
     username: username,

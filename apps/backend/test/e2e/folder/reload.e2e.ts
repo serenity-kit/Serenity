@@ -1,6 +1,6 @@
+import { generateId } from "@naisho/core";
 import { test } from "@playwright/test";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { createRootFolder } from "../../helpers/e2e/createRootFolder";
 import { createSubFolder } from "../../helpers/e2e/createSubFolder";
@@ -18,8 +18,8 @@ test.beforeAll(async () => {
 test.describe("After reload", () => {
   test("Create, rename, delete root folder", async ({ page }) => {
     const { user, workspace } = await createUserWithWorkspace({
-      id: uuidv4(),
-      username: `${uuidv4()}@example.com`,
+      id: generateId(),
+      username: `${generateId()}@example.com`,
       password,
     });
     const createdWorkspace = workspace;
@@ -41,8 +41,8 @@ test.describe("After reload", () => {
 
   test("Create, rename, delete a subfolder", async ({ page }) => {
     const { user, workspace, folder } = await createUserWithWorkspace({
-      id: uuidv4(),
-      username: `${uuidv4()}@example.com`,
+      id: generateId(),
+      username: `${generateId()}@example.com`,
       password,
     });
     const createdWorkspace = workspace;

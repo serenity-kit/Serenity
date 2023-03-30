@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import { createInitialWorkspaceStructure } from "../../../../test/helpers/workspace/createInitialWorkspaceStructure";
@@ -49,8 +49,8 @@ const meWithWorkspaceLoadingInfoQuery = gql`
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   const createWorkspaceResult = await createInitialWorkspaceStructure({

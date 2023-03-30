@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyByDocumentId } from "../../../../test/helpers/document/getWorkspaceKeyByDocumentId";
@@ -18,8 +18,8 @@ const password = "password";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   sessionKey = userData1.sessionKey;
@@ -76,8 +76,8 @@ test("key for main workspace, main device", async () => {
 test("empty keys on incomplete workspace share", async () => {
   // create new user
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   // invite to workspace
@@ -115,8 +115,8 @@ test("empty keys on incomplete workspace share", async () => {
 
 test("key for shared workspace", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   // share workspace
@@ -155,8 +155,8 @@ test("key for shared workspace", async () => {
 
 test("error on unauthorized workspace", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   await expect(
@@ -184,8 +184,8 @@ test("error on invalid document", async () => {
 
 test("bad deviceSigningPublicKey", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   await expect(

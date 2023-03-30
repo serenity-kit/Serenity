@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { generateId } from "@naisho/core";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
@@ -16,8 +16,8 @@ let workspaceKey = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   workspaceKey = getWorkspaceKeyForWorkspaceAndDevice({
@@ -28,7 +28,7 @@ const setup = async () => {
   const childFolderResult = await createFolder({
     graphql,
     name: "child folder",
-    id: uuidv4(),
+    id: generateId(),
     parentKey: workspaceKey,
     parentFolderId: userData1.folder.id,
     authorizationHeader: userData1.sessionKey,
@@ -39,7 +39,7 @@ const setup = async () => {
   const grandChildFolderResult = await createFolder({
     graphql,
     name: "grandChild folder",
-    id: uuidv4(),
+    id: generateId(),
     parentKey: workspaceKey,
     parentFolderId: childFolder.id,
     authorizationHeader: userData1.sessionKey,
@@ -49,8 +49,8 @@ const setup = async () => {
   grandChildFolder = grandChildFolderResult.createFolder.folder;
 
   userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
 };

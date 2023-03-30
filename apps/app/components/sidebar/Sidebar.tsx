@@ -1,3 +1,4 @@
+import { generateId } from "@naisho/core";
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -22,7 +23,6 @@ import {
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { useWorkspace } from "../../context/WorkspaceContext";
 import {
   runCreateFolderMutation,
@@ -62,7 +62,7 @@ export default function Sidebar(props: DrawerContentComponentProps) {
     useState(false);
 
   const createFolder = async (name: string) => {
-    const id = uuidv4();
+    const id = generateId();
     let workspaceKey: string | undefined = undefined;
     let workspaceKeyId: string | undefined = undefined;
     try {

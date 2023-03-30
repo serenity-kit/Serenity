@@ -1,7 +1,6 @@
 import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -14,7 +13,7 @@ import { getWorkspace } from "../../../database/workspace/getWorkspace";
 const graphql = setupGraphql();
 let workspaceInvitationId = "";
 let invitationSigningPrivateKey = "";
-const inviteeUsername = `invitee-${uuidv4()}@example.com`;
+const inviteeUsername = `invitee-${generateId()}@example.com`;
 let inviteeUserAndDevice: any = null;
 
 beforeAll(async () => {
@@ -22,10 +21,10 @@ beforeAll(async () => {
 });
 
 test("accept admin role", async () => {
-  const inviterUsername = `invite-${uuidv4()}@example.com`;
-  const inviteeUsername = `invitee-${uuidv4()}@example.com`;
+  const inviterUsername = `invite-${generateId()}@example.com`;
+  const inviteeUsername = `invitee-${generateId()}@example.com`;
   const workspaceId = generateId();
-  const otherWorkspaceId = uuidv4();
+  const otherWorkspaceId = generateId();
   const role = Role.ADMIN;
   const inviterUserAndDevice = await createUserWithWorkspace({
     id: workspaceId,
@@ -123,10 +122,10 @@ test("double-accepting invitation does nothing", async () => {
 });
 
 test("accept editor role", async () => {
-  const inviterUsername = `invite-${uuidv4()}@example.com`;
-  const inviteeUsername = `invitee-${uuidv4()}@example.com`;
+  const inviterUsername = `invite-${generateId()}@example.com`;
+  const inviteeUsername = `invitee-${generateId()}@example.com`;
   const workspaceId = generateId();
-  const otherWorkspaceId = uuidv4();
+  const otherWorkspaceId = generateId();
   const role = Role.EDITOR;
   const inviterUserAndDevice = await createUserWithWorkspace({
     id: workspaceId,
@@ -191,10 +190,10 @@ test("accept editor role", async () => {
 });
 
 test("accept commenter role", async () => {
-  const inviterUsername = `invite-${uuidv4()}@example.com`;
-  const inviteeUsername = `invitee-${uuidv4()}@example.com`;
+  const inviterUsername = `invite-${generateId()}@example.com`;
+  const inviteeUsername = `invitee-${generateId()}@example.com`;
   const workspaceId = generateId();
-  const otherWorkspaceId = uuidv4();
+  const otherWorkspaceId = generateId();
   const role = Role.COMMENTER;
   const inviterUserAndDevice = await createUserWithWorkspace({
     id: workspaceId,
@@ -259,10 +258,10 @@ test("accept commenter role", async () => {
 });
 
 test("accept viewer role", async () => {
-  const inviterUsername = `invite-${uuidv4()}@example.com`;
-  const inviteeUsername = `invitee-${uuidv4()}@example.com`;
+  const inviterUsername = `invite-${generateId()}@example.com`;
+  const inviteeUsername = `invitee-${generateId()}@example.com`;
   const workspaceId = generateId();
-  const otherWorkspaceId = uuidv4();
+  const otherWorkspaceId = generateId();
   const role = Role.VIEWER;
   const inviterUserAndDevice = await createUserWithWorkspace({
     id: workspaceId,

@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import test, { expect, Page } from "@playwright/test";
-import { v4 as uuidv4 } from "uuid";
 import { User, Workspace } from "../../../prisma/generated/output";
 import { Document } from "../../../src/types/document";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
@@ -34,7 +34,7 @@ const expectResults = async ({
 };
 
 test("Register and reload before onboarding", async ({ page }) => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
   const workspaceName = "my workspace";
   await page.goto("http://localhost:19006/register");
@@ -67,7 +67,7 @@ test("Register and reload before onboarding", async ({ page }) => {
 });
 
 test("Register and re-login before onboarding", async ({ page }) => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
   const workspaceName = "my workspace";
   await page.goto("http://localhost:19006/register");

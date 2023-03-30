@@ -1,6 +1,6 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { createComment } from "../../../../test/helpers/comment/createComment";
 import { createCommentReply } from "../../../../test/helpers/commentReply/createCommentReply";
@@ -21,8 +21,8 @@ const password = "password";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   documentId1 = userData1.document.id;
@@ -76,8 +76,8 @@ test("commenter responds to comment", async () => {
 
 test("shared editor responds to comment", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
@@ -120,8 +120,8 @@ test("shared editor responds to comment", async () => {
 
 test("shared commenter responds to comment", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
@@ -164,8 +164,8 @@ test("shared commenter responds to comment", async () => {
 
 test("shared viewer cannot respond to comment", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
@@ -335,8 +335,8 @@ test("viewer tries to comment", async () => {
 
 test("unauthorized document", async () => {
   const otherUser = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   await expect(
@@ -356,7 +356,7 @@ test("unauthorized document", async () => {
 });
 
 test("invalid document", async () => {
-  const badSnapshotId = uuidv4();
+  const badSnapshotId = generateId();
   await expect(
     (async () =>
       await createCommentReply({
@@ -375,7 +375,7 @@ test("invalid document", async () => {
 });
 
 test("invalid commentId", async () => {
-  const badCommentId = uuidv4();
+  const badCommentId = generateId();
   await expect(
     (async () =>
       await createCommentReply({
@@ -462,7 +462,7 @@ describe("Input errors", () => {
           query,
           {
             input: {
-              commentId: uuidv4(),
+              commentId: generateId(),
               snapshotId: null,
               subkeyId: 42,
               contentCiphertext: "",
@@ -480,7 +480,7 @@ describe("Input errors", () => {
           query,
           {
             input: {
-              commentId: uuidv4(),
+              commentId: generateId(),
               snapshotId: snapshotId1,
               subkeyId: null,
               contentCiphertext: "",
@@ -499,7 +499,7 @@ describe("Input errors", () => {
           query,
           {
             input: {
-              commentId: uuidv4(),
+              commentId: generateId(),
               snapshotId: snapshotId1,
               subkeyId: 42,
               contentCiphertext: null,
@@ -517,7 +517,7 @@ describe("Input errors", () => {
           query,
           {
             input: {
-              commentId: uuidv4(),
+              commentId: generateId(),
               snapshotId: snapshotId1,
               subkeyId: 42,
               contentCiphertext: "",
@@ -535,7 +535,7 @@ describe("Input errors", () => {
           query,
           {
             input: {
-              commentId: uuidv4(),
+              commentId: generateId(),
               snapshotId: snapshotId1,
               subkeyId: 42,
               contentCiphertext: "",

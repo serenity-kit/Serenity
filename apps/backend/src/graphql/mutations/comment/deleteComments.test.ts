@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { createComment } from "../../../../test/helpers/comment/createComment";
 import { deleteComments } from "../../../../test/helpers/comment/deleteComments";
@@ -16,13 +16,13 @@ let userData2: any;
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   await attachUserToWorkspace({
@@ -264,8 +264,8 @@ test("editor share token", async () => {
   });
   const comment = commentResult.createComment.comment;
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
@@ -309,8 +309,8 @@ test("commenter share token", async () => {
   });
   const comment = commentResult.createComment.comment;
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
@@ -350,8 +350,8 @@ test("viewer share token can't delete", async () => {
   });
   const comment = commentResult.createComment.comment;
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());

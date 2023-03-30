@@ -1,10 +1,10 @@
+import { generateId } from "@naisho/core";
 import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocumentShareLink } from "../../../../test/helpers/document/createDocumentShareLink";
@@ -21,8 +21,8 @@ let user1Workspace: any = null;
 const setup = async () => {
   await sodium.ready;
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   const getWorkspaceResult = await getWorkspace({
@@ -72,8 +72,8 @@ test("list share link", async () => {
 
 test("User has no access to the workspace", async () => {
   const otherUser = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
 

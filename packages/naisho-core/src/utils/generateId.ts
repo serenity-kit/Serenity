@@ -1,4 +1,4 @@
-import sodium from "react-native-libsodium";
+import sodium, { randombytes_buf } from "react-native-libsodium";
 
 // As pointed out in the initial SBA Research instead of using uuidv4() it's
 // recommended to use a cryptographically secure random number generator with
@@ -6,5 +6,5 @@ import sodium from "react-native-libsodium";
 // Using a 24 bytes results in a base64 encoded string of 32 characters which
 // has an identical length to uuids, but an higher entropy.
 export const generateId = () => {
-  return sodium.to_base64(sodium.randombytes_buf(24));
+  return sodium.to_base64(randombytes_buf(24));
 };

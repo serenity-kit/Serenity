@@ -1,15 +1,15 @@
+import { generateId } from "@naisho/core";
 import { expect, test } from "@playwright/test";
-import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { e2eLoginUser } from "../../helpers/e2e/e2eLoginUser";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
 
 test("Bad login then good login", async ({ page }) => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
   const { user, workspace, document } = await createUserWithWorkspace({
-    id: uuidv4(),
+    id: generateId(),
     username,
     password,
   });

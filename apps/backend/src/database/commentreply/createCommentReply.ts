@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../prisma/generated/output";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
@@ -77,7 +77,7 @@ export async function createCommentReply({
   try {
     const commentReply = await prisma.commentReply.create({
       data: {
-        id: uuidv4(),
+        id: generateId(),
         commentId,
         documentId: document.id,
         snapshotId,

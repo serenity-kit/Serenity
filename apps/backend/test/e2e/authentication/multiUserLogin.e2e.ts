@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { expect, Page, test } from "@playwright/test";
-import { v4 as uuidv4 } from "uuid";
 import { User } from "../../../prisma/generated/output";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { Document } from "../../../src/types/document";
@@ -31,9 +31,9 @@ const expectResults = async ({
 test("Register multiple users", async ({ page }) => {
   const registrationResult1 = await register({
     page,
-    username: `${uuidv4()}@example.com`,
+    username: `${generateId()}@example.com`,
     password: "password",
-    workspaceName: uuidv4(),
+    workspaceName: generateId(),
   });
   await expectResults({
     page,
@@ -43,9 +43,9 @@ test("Register multiple users", async ({ page }) => {
   });
   const registrationResult2 = await register({
     page,
-    username: `${uuidv4()}@example.com`,
+    username: `${generateId()}@example.com`,
     password: "password",
-    workspaceName: uuidv4(),
+    workspaceName: generateId(),
   });
   await expectResults({
     page,
@@ -59,13 +59,13 @@ test("Multi reg, multi remember login", async ({ page }) => {
   const password = "password";
   const stayLoggedIn = true;
   const registrationResult1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   const registrationResult2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   await login({
@@ -99,15 +99,15 @@ test("Multi reg, multi forget login", async ({ page }) => {
   const stayLoggedIn = false;
   const registrationResult1 = await register({
     page,
-    username: `${uuidv4()}@example.com`,
+    username: `${generateId()}@example.com`,
     password,
-    workspaceName: uuidv4(),
+    workspaceName: generateId(),
   });
   const registrationResult2 = await register({
     page,
-    username: `${uuidv4()}@example.com`,
+    username: `${generateId()}@example.com`,
     password,
-    workspaceName: uuidv4(),
+    workspaceName: generateId(),
   });
   await login({
     page,
@@ -139,15 +139,15 @@ test("Multi reg, multi mixed login", async ({ page }) => {
   const password = "password";
   const registrationResult1 = await register({
     page,
-    username: `${uuidv4()}@example.com`,
+    username: `${generateId()}@example.com`,
     password,
-    workspaceName: uuidv4(),
+    workspaceName: generateId(),
   });
   const registrationResult2 = await register({
     page,
-    username: `${uuidv4()}@example.com`,
+    username: `${generateId()}@example.com`,
     password,
-    workspaceName: uuidv4(),
+    workspaceName: generateId(),
   });
   await login({
     page,

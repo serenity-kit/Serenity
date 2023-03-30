@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { expect, test } from "@playwright/test";
-import { v4 as uuidv4 } from "uuid";
 import { MAX_UNVERIFIED_USER_CONFIRMATION_ATTEMPTS } from "../../../src/database/authentication/verifyRegistration";
 import { prisma } from "../../../src/database/prisma";
 
@@ -8,7 +8,7 @@ import { fillRegisterForm } from "../../helpers/e2e/fillRegisterForm";
 import { verifyRegistration } from "../../helpers/e2e/verifyRegistration";
 
 test("Register Properly", async ({ page }) => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
   // Go to registration url
   await page.goto("http://localhost:19006/register");
@@ -23,7 +23,7 @@ test("Register Properly", async ({ page }) => {
 });
 
 test("One wrong code", async ({ page }) => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
   await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);
@@ -44,7 +44,7 @@ test("One wrong code", async ({ page }) => {
 });
 
 test("max wrong codes", async ({ page }) => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
   await page.goto("http://localhost:19006/register");
   await delayForSeconds(2);

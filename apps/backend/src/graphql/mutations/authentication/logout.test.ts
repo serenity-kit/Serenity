@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { generateId } from "@naisho/core";
 import { logout } from "../../../../test/helpers/authentication/logout";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -16,8 +16,8 @@ let user1Device3: any = undefined;
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   loginResult1 = await createDeviceAndLogin({

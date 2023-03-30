@@ -1,14 +1,14 @@
+import { generateId } from "@naisho/core";
 import { createDevice as createdDeviceHelper } from "@serenity-tools/common";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import { requestLoginChallengeResponse } from "../../../../test/helpers/authentication/requestLoginChallengeResponse";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 
 const graphql = setupGraphql();
-const username = `${uuidv4()}@example.com`;
+const username = `${generateId()}@example.com`;
 const password = "password";
 
 beforeAll(async () => {

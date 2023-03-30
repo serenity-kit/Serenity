@@ -1,6 +1,6 @@
+import { generateId } from "@naisho/core";
 import { expect, Page, test } from "@playwright/test";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../prisma/generated/output";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
@@ -17,24 +17,9 @@ type UserData = {
   password: string;
   data: any;
 };
-const user1: UserData = {
-  id: uuidv4(),
-  username: `${uuidv4()}@example.com`,
-  password: "password",
-  data: undefined,
-};
-const user2: UserData = {
-  id: uuidv4(),
-  username: `${uuidv4()}@example.com`,
-  password: "password",
-  data: undefined,
-};
-const user3: UserData = {
-  id: uuidv4(),
-  username: `${uuidv4()}@example.com`,
-  password: "password",
-  data: undefined,
-};
+let user1: UserData;
+let user2: UserData;
+let user3: UserData;
 
 type HasFolderAccessProps = {
   page: Page;
@@ -52,6 +37,24 @@ const hasFolderAccess = async ({
 };
 
 const setup = async () => {
+  user1 = {
+    id: generateId(),
+    username: `${generateId()}@example.com`,
+    password: "password",
+    data: undefined,
+  };
+  user2 = {
+    id: generateId(),
+    username: `${generateId()}@example.com`,
+    password: "password",
+    data: undefined,
+  };
+  user3 = {
+    id: generateId(),
+    username: `${generateId()}@example.com`,
+    password: "password",
+    data: undefined,
+  };
   user1.data = await createUserWithWorkspace({ ...user1 });
   user2.data = await createUserWithWorkspace({ ...user2 });
   user3.data = await createUserWithWorkspace({ ...user3 });

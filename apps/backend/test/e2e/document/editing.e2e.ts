@@ -1,6 +1,6 @@
+import { generateId } from "@naisho/core";
 import { expect, test } from "@playwright/test";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { acceptWorkspaceInvitation } from "../../helpers/e2e/acceptWorkspaceInvitation";
@@ -18,21 +18,23 @@ type UserData = {
   password: string;
   data: any;
 };
-const user1: UserData = {
-  id: uuidv4(),
-  username: `${uuidv4()}@example.com`,
-  password: "password",
-  data: undefined,
-};
-const user2: UserData = {
-  id: uuidv4(),
-  username: `${uuidv4()}@example.com`,
-  password: "password",
-  data: undefined,
-};
+let user1: UserData;
+let user2: UserData;
 
 test.beforeAll(async () => {
   await sodium.ready;
+  user1 = {
+    id: generateId(),
+    username: `${generateId()}@example.com`,
+    password: "password",
+    data: undefined,
+  };
+  user2 = {
+    id: generateId(),
+    username: `${generateId()}@example.com`,
+    password: "password",
+    data: undefined,
+  };
   user1.data = await createUserWithWorkspace({
     id: user1.id,
     username: user1.username,

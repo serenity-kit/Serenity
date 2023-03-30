@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { encryptWorkspaceKeyForDevice } from "@serenity-tools/common";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDevicesToWorkspaces } from "../../../../test/helpers/device/attachDevicesToWorkspaces";
@@ -17,12 +17,12 @@ let numStartingDevices = 2;
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
   });
   userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
   });
 };
 

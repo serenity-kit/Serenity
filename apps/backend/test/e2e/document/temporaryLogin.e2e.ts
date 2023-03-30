@@ -1,14 +1,14 @@
+import { generateId } from "@naisho/core";
 import { test } from "@playwright/test";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { createDocument } from "../../helpers/e2e/createDocument";
 import { deleteDocument } from "../../helpers/e2e/deleteDocument";
 import { login } from "../../helpers/e2e/login";
 import { renameDocument } from "../../helpers/e2e/renameDocument";
 
-const userId = uuidv4();
-const username = `${uuidv4()}@example.com`;
+let userId: string;
+let username: string;
 const password = "password";
 let createdWorkspace: any = null;
 let workspaceId = "";
@@ -16,6 +16,8 @@ let firstFolder: any = null;
 
 test.beforeAll(async () => {
   await sodium.ready;
+  userId = generateId();
+  username = `${generateId()}@example.com`;
   const { workspace, folder } = await createUserWithWorkspace({
     id: userId,
     username,

@@ -1,10 +1,10 @@
+import { generateId } from "@naisho/core";
 import {
   encryptFolderName,
   folderDerivedKeyContext,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { registerUser } from "../../../../test/helpers/authentication/registerUser";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -24,8 +24,8 @@ let sessionKey = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   sessionKey = userData1.sessionKey;
@@ -158,7 +158,7 @@ test("user should be able to create a child folder", async () => {
 
 test("duplicate ID throws an error", async () => {
   const authorizationHeader = sessionKey;
-  const id = uuidv4();
+  const id = generateId();
   const parentFolderId = null;
   const name = "Untitled";
   await createFolder({
@@ -253,8 +253,8 @@ test("Throw error when the parent folder doesn't exist", async () => {
 
 test("Throw error when user doesn't have access", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   const otherAddedWorkspace = userData2.workspace;
@@ -277,7 +277,7 @@ test("Throw error when user doesn't have access", async () => {
 test("Commentor tries to create", async () => {
   const otherUser = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     password
   );
   await prisma.usersToWorkspaces.create({
@@ -287,7 +287,7 @@ test("Commentor tries to create", async () => {
       role: Role.COMMENTER,
     },
   });
-  const id = uuidv4();
+  const id = generateId();
   await expect(
     (async () =>
       await createFolder({
@@ -306,7 +306,7 @@ test("Commentor tries to create", async () => {
 test("Viewer tries to create", async () => {
   const otherUser = await registerUser(
     graphql,
-    `${uuidv4()}@example.com`,
+    `${generateId()}@example.com`,
     password
   );
   await prisma.usersToWorkspaces.create({
@@ -316,7 +316,7 @@ test("Viewer tries to create", async () => {
       role: Role.VIEWER,
     },
   });
-  const id = uuidv4();
+  const id = generateId();
   await expect(
     (async () =>
       await createFolder({
@@ -333,7 +333,7 @@ test("Viewer tries to create", async () => {
 });
 
 test("Unauthenticated", async () => {
-  const id = uuidv4();
+  const id = generateId();
   await expect(
     (async () =>
       await createFolder({

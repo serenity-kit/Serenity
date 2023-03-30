@@ -1,13 +1,13 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { requestLoginChallengeResponse } from "../../../../test/helpers/authentication/requestLoginChallengeResponse";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
 import createUserWithWorkspace from "../../../database/testHelpers/createUserWithWorkspace";
 
 const graphql = setupGraphql();
-const username = `${uuidv4()}@example.com`;
+const username = `${generateId()}@example.com`;
 const password = "password";
 let userData: any = undefined;
 
@@ -15,7 +15,7 @@ beforeAll(async () => {
   await deleteAllRecords();
   // await registerUser(graphql, username, password);
   userData = await createUserWithWorkspace({
-    id: uuidv4(),
+    id: generateId(),
     username,
     password,
   });

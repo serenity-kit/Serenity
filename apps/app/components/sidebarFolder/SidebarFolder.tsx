@@ -27,7 +27,6 @@ import { HStack } from "native-base";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, StyleSheet } from "react-native";
 import sodium, { KeyPair } from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import {
   runCreateDocumentMutation,
   runCreateFolderMutation,
@@ -179,7 +178,7 @@ export default function SidebarFolder(props: Props) {
 
   const createFolder = async (name: string) => {
     openFolder();
-    const id = uuidv4();
+    const id = generateId();
     // let workspaceKey = "";
     const workspace = await getWorkspace({
       deviceSigningPublicKey: activeDevice.signingPublicKey,

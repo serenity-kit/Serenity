@@ -1,6 +1,6 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { commentsByDocumentId } from "../../../../test/helpers/comment/commentsByDocumentId";
 import { createComment } from "../../../../test/helpers/comment/createComment";
@@ -19,8 +19,8 @@ const password = "password";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   documentId1 = userData1.document.id;
@@ -105,8 +105,8 @@ test("bad document share token", async () => {
 
 test("no access to workspace", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   await expect(
@@ -122,8 +122,8 @@ test("no access to workspace", async () => {
 
 test("document share token", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());

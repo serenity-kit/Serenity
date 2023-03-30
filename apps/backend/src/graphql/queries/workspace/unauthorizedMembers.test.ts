@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import { generateId } from "@naisho/core";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import setupGraphql from "../../../../test/helpers/setupGraphql";
@@ -17,7 +17,7 @@ let workspace1Id = "";
 
 const setup = async () => {
   const userAndDevice = await createUserWithWorkspace({
-    id: uuidv4(),
+    id: generateId(),
     username,
     password,
   });
@@ -42,8 +42,8 @@ test("no unauthorized members when workspace created", async () => {
 
 test("unauthorized members when workspace added", async () => {
   const otherUserAndDevice = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   const otherUserId = otherUserAndDevice.user.id;

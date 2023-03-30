@@ -1,6 +1,6 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import { createComment } from "../../../../test/helpers/comment/createComment";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
@@ -19,8 +19,8 @@ const password = "password";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   documentId1 = userData1.document.id;
@@ -62,8 +62,8 @@ test("owner comments", async () => {
 
 test("shared editor comments", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
@@ -105,8 +105,8 @@ test("shared editor comments", async () => {
 
 test("shared commentor comments", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
@@ -148,8 +148,8 @@ test("shared commentor comments", async () => {
 
 test("shared viewer cannot comment", async () => {
   const userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   const snapshotKey = sodium.to_base64(sodium.crypto_kdf_keygen());
@@ -310,8 +310,8 @@ test("viewer tries to comment", async () => {
 
 test("unauthorized document", async () => {
   const otherUser = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: "password",
   });
   await expect(
@@ -330,7 +330,7 @@ test("unauthorized document", async () => {
 });
 
 test("invalid document", async () => {
-  const badSnapshotId = uuidv4();
+  const badSnapshotId = generateId();
   await expect(
     (async () =>
       await createComment({

@@ -1,8 +1,8 @@
+import { generateId } from "@naisho/core";
 import {
   decryptWorkspaceKey,
   encryptWorkspaceKeyForDevice,
 } from "@serenity-tools/common";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDevicesToWorkspaces } from "../../../../test/helpers/device/attachDevicesToWorkspaces";
@@ -14,13 +14,13 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { WorkspaceMemberDevices } from "../../../types/workspaceDevice";
 
 const graphql = setupGraphql();
-const username1 = `${uuidv4()}@example.com`;
+const username1 = `${generateId()}@example.com`;
 let userAndDevice1: any;
 
 beforeAll(async () => {
   await deleteAllRecords();
   userAndDevice1 = await createUserWithWorkspace({
-    id: uuidv4(),
+    id: generateId(),
     username: username1,
   });
 });
@@ -29,8 +29,8 @@ test("Existing workspace does nothing", async () => {
   const authorizationHeader = userAndDevice1.sessionKey;
   const workspaceId = userAndDevice1.workspace.id;
   const userAndDevice2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
   });
   const workspaceInvitationResult = await createWorkspaceInvitation({
     graphql,

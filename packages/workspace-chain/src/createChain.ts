@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import {
   CreateChainTransaction,
   CreateChainTrustChainEvent,
@@ -13,7 +13,7 @@ export const createChain = (
 ): CreateChainTrustChainEvent => {
   const transaction: CreateChainTransaction = {
     type: "create",
-    id: uuidv4(),
+    id: generateId(),
     lockboxPublicKeys,
   };
   const hash = hashTransaction(transaction);

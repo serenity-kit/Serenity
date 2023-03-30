@@ -1,8 +1,8 @@
+import { generateId } from "@naisho/core";
 import {
   createAndEncryptWorkspaceKeyForDevice,
   encryptWorkspaceKeyForDevice,
 } from "@serenity-tools/common";
-import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
 import { deleteDevices } from "../../../../test/helpers/device/deleteDevices";
@@ -15,7 +15,7 @@ import createUserWithWorkspace from "../../../database/testHelpers/createUserWit
 import { WorkspaceWithWorkspaceDevicesParing } from "../../../types/workspaceDevice";
 
 const graphql = setupGraphql();
-const username = `${uuidv4()}@example.com`;
+const username = `${generateId()}@example.com`;
 const password = "password";
 
 let userData1: any = undefined;
@@ -23,7 +23,7 @@ let user1Device2: any = undefined;
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
+    id: generateId(),
     username,
     password,
   });

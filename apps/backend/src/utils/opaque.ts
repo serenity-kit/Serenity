@@ -1,6 +1,6 @@
 import sodium from "libsodium-wrappers";
-import { v4 as uuidv4 } from "uuid";
 
+import { generateId } from "@naisho/core";
 import type {
   HandleLogin as HandleLoginType,
   HandleRegistration as HandleRegistrationType,
@@ -48,7 +48,7 @@ export const startRegistration = ({
   username: string;
   challenge: string;
 }) => {
-  const registrationId = uuidv4();
+  const registrationId = generateId();
   const serverRegistration: HandleRegistrationType = new HandleRegistration(
     opaqueServerSetup()
   );
@@ -94,7 +94,7 @@ export const startLogin = ({
   username: string;
   challenge: string;
 }) => {
-  const loginId = uuidv4();
+  const loginId = generateId();
   const serverLogin: HandleLoginType = new HandleLogin(opaqueServerSetup());
   const response = serverLogin.start(
     sodium.from_base64(envelope),

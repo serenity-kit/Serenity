@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { getWorkspaceKeyForWorkspaceAndDevice } from "../../../../test/helpers/device/getWorkspaceKeyForWorkspaceAndDevice";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
@@ -70,8 +70,8 @@ const getFolders = async ({
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   sessionKey = userData1.sessionKey;
@@ -94,8 +94,8 @@ const setup = async () => {
   });
 
   userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password,
   });
   workspaceKey2 = getWorkspaceKeyForWorkspaceAndDevice({

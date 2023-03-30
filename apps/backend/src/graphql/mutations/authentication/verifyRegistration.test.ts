@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import { finalizeRegistration } from "../../../../test/helpers/authentication/finalizeRegistration";
 import { registerUnverifiedUser } from "../../../../test/helpers/authentication/registerUnverifiedUser";
 import { requestRegistrationChallengeResponse } from "../../../../test/helpers/authentication/requestRegistrationChallengeResponse";
@@ -12,7 +12,7 @@ import { prisma } from "../../../database/prisma";
 
 const graphql = setupGraphql();
 
-const username = `${uuidv4()}@example.com`;
+const username = `${generateId()}@example.com`;
 const password = "abc123";
 let unverifiedUser: any;
 let isUserRegistered = false;
@@ -103,7 +103,7 @@ test("verify registration 5 times resets code", async () => {
 });
 
 test("server should verify a user", async () => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
   const pendingWorkspaceInvitationId = undefined;
   const registrationResponse = await registerUnverifiedUser({
@@ -131,9 +131,9 @@ test("server should verify a user", async () => {
 });
 
 test("server should verify a user with a pending workspace id", async () => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
-  const pendingWorkspaceInvitationId = uuidv4();
+  const pendingWorkspaceInvitationId = generateId();
   const registrationResponse = await registerUnverifiedUser({
     graphql,
     username,

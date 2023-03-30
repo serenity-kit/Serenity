@@ -4,7 +4,6 @@ import {
   deriveKeysFromKeyDerivationTrace,
 } from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
-import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createDocument } from "../../../../test/helpers/document/createDocument";
 import { getDocument } from "../../../../test/helpers/document/getDocument";
@@ -21,8 +20,8 @@ let sessionKey = "";
 
 const setup = async () => {
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
   });
   const workspaceKeyBox =
     userData1.workspace.currentWorkspaceKey?.workspaceKeyBox;
@@ -110,7 +109,7 @@ test("Unauthenticated", async () => {
     (async () =>
       await getDocument({
         graphql,
-        id: uuidv4(),
+        id: generateId(),
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

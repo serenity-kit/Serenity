@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { expect, Page, test } from "@playwright/test";
-import { v4 as uuidv4 } from "uuid";
 import { User, Workspace } from "../../../prisma/generated/output";
 import { Document } from "../../../src/types/document";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
@@ -30,7 +30,7 @@ const expectResults = async ({
 };
 
 test("Register and remember login", async ({ page }) => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
   const workspaceName = "my workspace";
   const stayLoggedIn = true;
@@ -54,7 +54,7 @@ test("Register and remember login", async ({ page }) => {
 });
 
 test("Register and don't remember login", async ({ page }) => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
   const workspaceName = "my workspace";
   const stayLoggedIn = false;
@@ -78,7 +78,7 @@ test("Register and don't remember login", async ({ page }) => {
 });
 
 test("Register, logout, remember login", async ({ page }) => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
   const workspaceName = "my workspace";
   const stayLoggedIn = false;
@@ -105,7 +105,7 @@ test("Register, logout, remember login", async ({ page }) => {
 });
 
 test("Register, logout, don't remember login", async ({ page }) => {
-  const username = `${uuidv4()}@example.com`;
+  const username = `${generateId()}@example.com`;
   const password = "password";
   const workspaceName = "my workspace";
   const stayLoggedIn = false;

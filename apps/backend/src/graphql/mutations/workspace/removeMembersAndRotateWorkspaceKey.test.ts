@@ -1,10 +1,10 @@
+import { generateId } from "@naisho/core";
 import {
   decryptFolderName,
   deriveKeysFromKeyDerivationTrace,
   encryptWorkspaceKeyForDevice,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../../prisma/generated/output";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { attachDeviceToWorkspaces } from "../../../../test/helpers/device/attachDeviceToWorkspaces";
@@ -23,19 +23,19 @@ import { WorkspaceDeviceParing } from "../../../types/workspaceDevice";
 const graphql = setupGraphql();
 let userData1: any = null;
 let userData2: any = null;
-const password1 = uuidv4();
-const password2 = uuidv4();
+const password1 = generateId();
+const password2 = generateId();
 
 beforeAll(async () => {
   await deleteAllRecords();
   userData1 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: password1,
   });
   userData2 = await createUserWithWorkspace({
-    id: uuidv4(),
-    username: `${uuidv4()}@example.com`,
+    id: generateId(),
+    username: `${generateId()}@example.com`,
     password: password2,
   });
 });

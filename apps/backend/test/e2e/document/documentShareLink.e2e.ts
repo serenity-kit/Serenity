@@ -1,6 +1,6 @@
+import { generateId } from "@naisho/core";
 import { expect, test } from "@playwright/test";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { Role } from "../../../prisma/generated/output";
 import createUserWithWorkspace from "../../../src/database/testHelpers/createUserWithWorkspace";
 import { createDocumentShareLink } from "../../helpers/e2e/documentShareLink/createDocumentShareLink";
@@ -13,15 +13,16 @@ type UserData = {
   password: string;
   data: any;
 };
-const user1: UserData = {
-  id: uuidv4(),
-  username: `${uuidv4()}@example.com`,
-  password: "password",
-  data: undefined,
-};
+let user1: UserData;
 
 test.beforeAll(async () => {
   await sodium.ready;
+  user1 = {
+    id: generateId(),
+    username: `${generateId()}@example.com`,
+    password: "password",
+    data: undefined,
+  };
   user1.data = await createUserWithWorkspace({
     id: user1.id,
     username: user1.username,

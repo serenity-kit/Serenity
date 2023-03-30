@@ -1,5 +1,5 @@
+import { generateId } from "@naisho/core";
 import { ForbiddenError } from "apollo-server-express";
-import { v4 as uuidv4 } from "uuid";
 import { WorkspaceKey, WorkspaceKeyBox } from "../../types/workspace";
 import { getOrCreateCreatorDevice } from "../../utils/device/getOrCreateCreatorDevice";
 import { prisma } from "../prisma";
@@ -93,7 +93,7 @@ export async function attachDeviceToWorkspaces({
         const workspaceKeys = workspace.workspaceKeys;
         if (workspaceKeys.length === 0) {
           newWorkspaceKeys.push({
-            id: uuidv4(),
+            id: generateId(),
             workspaceId: workspace.id,
             generation: 0,
           });
@@ -145,7 +145,7 @@ export async function attachDeviceToWorkspaces({
             const workspaceKeyId = workspaceKeyDevicePair.workspaceKeyId;
             if (!(workspaceKeyId in existingWorkspaceKeyBoxLookup)) {
               workspaceKeyBoxes.push({
-                id: uuidv4(),
+                id: generateId(),
                 workspaceKeyId: workspaceKeyId,
                 deviceSigningPublicKey: receiverDeviceSigningPublicKey,
                 creatorDeviceSigningPublicKey,

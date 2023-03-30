@@ -1,9 +1,9 @@
+import { generateId } from "@naisho/core";
 import {
   decryptWorkspaceKey,
   folderDerivedKeyContext,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
-import { v4 as uuidv4 } from "uuid";
 import deleteAllRecords from "../../../../test/helpers/deleteAllRecords";
 import { createFolder } from "../../../../test/helpers/folder/createFolder";
 import { getFolder } from "../../../../test/helpers/folder/getFolder";
@@ -50,7 +50,7 @@ beforeAll(async () => {
 
 test("user should be retrieve a folder", async () => {
   const authorizationHeader = sessionKey;
-  const folderId = uuidv4();
+  const folderId = generateId();
   const folderName = "New folder";
   await createFolder({
     graphql,
@@ -78,7 +78,7 @@ test("Unauthenticated", async () => {
     (async () =>
       await getFolder({
         graphql,
-        id: uuidv4(),
+        id: generateId(),
         authorizationHeader: "badauthheader",
       }))()
   ).rejects.toThrowError(/UNAUTHENTICATED/);

@@ -13,7 +13,6 @@ import {
 } from "@serenity-tools/common";
 import { Registration } from "@serenity-tools/opaque-server";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 import { createInitialWorkspaceStructure } from "../../database/workspace/createInitialWorkspaceStructure";
 import { finishRegistration, startRegistration } from "../../utils/opaque";
 import { attachDeviceToWorkspaces } from "../device/attachDeviceToWorkspaces";
@@ -86,7 +85,7 @@ export default async function createUserWithWorkspace({
   });
 
   const documentId = generateId();
-  const folderId = uuidv4();
+  const folderId = generateId();
   const workspaceKeyId = generateId();
   const documentName = "Introduction";
   const user = result.user;

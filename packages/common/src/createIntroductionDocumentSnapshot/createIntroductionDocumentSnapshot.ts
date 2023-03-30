@@ -1,11 +1,11 @@
 import {
   createSignatureKeyPair,
   createSnapshot,
+  generateId,
   KeyDerivationTrace,
   SnapshotPublicData,
 } from "@naisho/core";
 import sodium from "react-native-libsodium";
-import { v4 as uuidv4 } from "uuid";
 
 // created using:
 // const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
@@ -27,7 +27,7 @@ export const createIntroductionDocumentSnapshot = ({
   const signatureKeyPair = createSignatureKeyPair();
 
   const publicData: SnapshotPublicData = {
-    snapshotId: uuidv4(),
+    snapshotId: generateId(),
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     subkeyId,
