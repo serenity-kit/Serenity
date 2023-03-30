@@ -19,6 +19,7 @@ export const ReplyArea = (props: ReplyAreaProps) => {
   const isEmpty = value === "" || value === undefined;
   const isActive = isFocused || !isEmpty;
 
+  // set in tailwind-based multiplier (7 => 7 x 4px = 28px)
   const submitButtonHeight = 7;
 
   const styles = StyleSheet.create({
@@ -26,7 +27,6 @@ export const ReplyArea = (props: ReplyAreaProps) => {
     default: tw`border border-solid border-transparent`,
     hover: tw`bg-gray-200 border border-solid border-gray-200`,
     submit: tw`absolute h-${submitButtonHeight} w-${submitButtonHeight} bottom-0.5 right-0.5`,
-    active: tw`pb-${submitButtonHeight}`,
   });
 
   return (
@@ -44,7 +44,6 @@ export const ReplyArea = (props: ReplyAreaProps) => {
           styles.textarea,
           !isActive && !isHovered && styles.default,
           !isActive && isHovered && styles.hover,
-          isActive && styles.active,
         ]}
         onFocus={() => {
           setIsFocused(true);
@@ -56,6 +55,10 @@ export const ReplyArea = (props: ReplyAreaProps) => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         testID={`${testPrefix}__reply-input`}
+        _stack={{
+          // needed here so text doesn't scroll under submit-button
+          paddingBottom: isActive ? submitButtonHeight : 0,
+        }}
       />
       {isActive ? (
         <SubmitButton
