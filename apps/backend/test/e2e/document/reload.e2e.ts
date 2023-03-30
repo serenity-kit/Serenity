@@ -9,8 +9,8 @@ import { login } from "../../helpers/e2e/login";
 import { reloadPage } from "../../helpers/e2e/reloadPage";
 import { renameDocument } from "../../helpers/e2e/renameDocument";
 
-const userId = generateId();
-const username = `${generateId()}@example.com`;
+let userId: string;
+let username: string;
 const password = "password";
 let createdWorkspace: any = null;
 let workspaceId = "";
@@ -18,6 +18,8 @@ let firstFolder: any = null;
 
 test.beforeAll(async () => {
   await sodium.ready;
+  userId = generateId();
+  username = `${generateId()}@example.com`;
   const { workspace, folder } = await createUserWithWorkspace({
     id: userId,
     username,

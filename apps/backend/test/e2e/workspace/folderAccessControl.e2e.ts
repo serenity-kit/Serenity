@@ -17,24 +17,9 @@ type UserData = {
   password: string;
   data: any;
 };
-const user1: UserData = {
-  id: generateId(),
-  username: `${generateId()}@example.com`,
-  password: "password",
-  data: undefined,
-};
-const user2: UserData = {
-  id: generateId(),
-  username: `${generateId()}@example.com`,
-  password: "password",
-  data: undefined,
-};
-const user3: UserData = {
-  id: generateId(),
-  username: `${generateId()}@example.com`,
-  password: "password",
-  data: undefined,
-};
+let user1: UserData;
+let user2: UserData;
+let user3: UserData;
 
 type HasFolderAccessProps = {
   page: Page;
@@ -52,6 +37,24 @@ const hasFolderAccess = async ({
 };
 
 const setup = async () => {
+  user1 = {
+    id: generateId(),
+    username: `${generateId()}@example.com`,
+    password: "password",
+    data: undefined,
+  };
+  user2 = {
+    id: generateId(),
+    username: `${generateId()}@example.com`,
+    password: "password",
+    data: undefined,
+  };
+  user3 = {
+    id: generateId(),
+    username: `${generateId()}@example.com`,
+    password: "password",
+    data: undefined,
+  };
   user1.data = await createUserWithWorkspace({ ...user1 });
   user2.data = await createUserWithWorkspace({ ...user2 });
   user3.data = await createUserWithWorkspace({ ...user3 });

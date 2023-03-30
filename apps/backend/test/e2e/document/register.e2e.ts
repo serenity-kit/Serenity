@@ -7,11 +7,13 @@ import { deleteDocument } from "../../helpers/e2e/deleteDocument";
 import { register } from "../../helpers/e2e/register";
 import { renameDocument } from "../../helpers/e2e/renameDocument";
 
-const username = `${generateId()}@example.com`;
+let username: string;
 const password = "password";
 const workspaceName = "a workspace";
 
 test.beforeAll(async () => {
+  username = `${generateId()}@example.com`;
+
   await sodium.ready;
 });
 

@@ -17,21 +17,23 @@ type UserData = {
   password: string;
   data: any;
 };
-const user1: UserData = {
-  id: generateId(),
-  username: `${generateId()}@example.com`,
-  password: "password",
-  data: undefined,
-};
-const user2: UserData = {
-  id: generateId(),
-  username: `${generateId()}@example.com`,
-  password: "password",
-  data: undefined,
-};
+let user1: UserData;
+let user2: UserData;
 
 test.beforeAll(async () => {
   await sodium.ready;
+  user1 = {
+    id: generateId(),
+    username: `${generateId()}@example.com`,
+    password: "password",
+    data: undefined,
+  };
+  user2 = {
+    id: generateId(),
+    username: `${generateId()}@example.com`,
+    password: "password",
+    data: undefined,
+  };
   user1.data = await createUserWithWorkspace({
     id: user1.id,
     username: user1.username,

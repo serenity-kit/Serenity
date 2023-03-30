@@ -1,8 +1,13 @@
 import { generateId } from "@naisho/core";
 import { expect, test } from "@playwright/test";
+import sodium from "react-native-libsodium";
 import { prisma } from "../../../src/database/prisma";
 import { delayForSeconds } from "../../helpers/delayForSeconds";
 import { e2eRegisterUser } from "../../helpers/e2e/e2eRegisterUser";
+
+test.beforeAll(async () => {
+  await sodium.ready;
+});
 
 test("Register", async ({ page }) => {
   const username = `${generateId()}@example.com`;
