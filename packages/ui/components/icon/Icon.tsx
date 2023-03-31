@@ -114,6 +114,7 @@ import { StarSFill } from "./icons/StarSFill";
 import { Strikethrough } from "./icons/Strikethrough";
 import { Table2 } from "./icons/Table2";
 import { Text } from "./icons/Text";
+import { TOCLine } from "./icons/TOCLine";
 import { Underline } from "./icons/Underline";
 import { UserLine } from "./icons/UserLine";
 import { UserSettingsLine } from "./icons/UserSettingsLine";
@@ -239,6 +240,7 @@ export type IconNames =
   | "strikethrough"
   | "table-2"
   | "text"
+  | "toc-line"
   | "underline"
   | "user-line"
   | "user-settings-line"
@@ -604,6 +606,9 @@ export const Icon = (props: IconProps) => {
   }
   if (name === "text") {
     icon = <Text color={color} size={iconSize} />;
+  }
+  if (name === "toc-line") {
+    icon = <TOCLine color={color} size={iconSize} />;
   }
   if (name === "underline") {
     icon = <Underline color={color} size={iconSize} />;
