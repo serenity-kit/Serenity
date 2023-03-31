@@ -88,6 +88,10 @@ type UpdateInFlight = {
   changes: any[];
 };
 
+type UpdateClocks = {
+  [snapshotId: string]: { [publicSigningKey: string]: number };
+};
+
 type ProcessQueueData = {
   handledQueue: "incoming" | "pending" | "none";
   activeSnapshotId: string | null;
@@ -97,6 +101,7 @@ type ProcessQueueData = {
   confirmedUpdatesClock: number;
   updatesInFlight: UpdateInFlight[];
   pendingChangesQueue: any[];
+  updateClocks: UpdateClocks;
 };
 
 export type SyncMachineConfig = {
@@ -140,6 +145,7 @@ export type Context = SyncMachineConfig & {
   _updatesInFlight: UpdateInFlight[];
   _confirmedUpdatesClock: number | null;
   _sendingUpdatesClock: number;
+  _updateClocks: UpdateClocks;
 };
 
 const websocketService = (context) => (send, onReceive) => {
@@ -282,9 +288,7 @@ export const syncMachine =
         applyEphemeralUpdates: () => undefined,
         getEphemeralUpdateKey: () => Promise.resolve(new Uint8Array()),
         shouldSendSnapshot: () => false,
-
         sodium: {},
-
         serializeChanges: () => "",
         deserializeChanges: () => [],
         onDocumentLoaded: () => undefined,
@@ -299,6 +303,7 @@ export const syncMachine =
         _updatesInFlight: [],
         _confirmedUpdatesClock: null,
         _sendingUpdatesClock: -1,
+        _updateClocks: {},
       },
       initial: "connecting",
       on: {
@@ -476,6 +481,7 @@ export const syncMachine =
               _sendingUpdatesClock: event.data.sendingUpdatesClock,
               _confirmedUpdatesClock: event.data.confirmedUpdatesClock,
               _updatesInFlight: event.data.updatesInFlight,
+              _updateClocks: event.data.updateClocks,
             };
           } else {
             return {
@@ -486,6 +492,7 @@ export const syncMachine =
               _sendingUpdatesClock: event.data.sendingUpdatesClock,
               _confirmedUpdatesClock: event.data.confirmedUpdatesClock,
               _updatesInFlight: event.data.updatesInFlight,
+              _updateClocks: event.data.updateClocks,
             };
           }
         }),
@@ -515,6 +522,7 @@ export const syncMachine =
           let confirmedUpdatesClock = context._confirmedUpdatesClock;
           let updatesInFlight = context._updatesInFlight;
           let pendingChangesQueue = context._pendingChangesQueue;
+          let updateClocks = context._updateClocks;
 
           const createAndSendSnapshot = async () => {
             const snapshotData = await context.getNewSnapshotData();
@@ -588,6 +596,7 @@ export const syncMachine =
               snapshotKey,
               context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
             );
+            // TODO reset the clocks for the snapshot for the signing key
             context.applySnapshot(decryptedSnapshot);
             activeSnapshotId = snapshot.publicData.snapshotId;
           };
@@ -598,11 +607,27 @@ export const syncMachine =
             for (let update of updates) {
               const key = await context.getUpdateKey(update);
               // console.log("processUpdates key", key);
-              const updateResult = verifyAndDecryptUpdate(
+              if (activeSnapshotId === null) {
+                throw new Error("No active snapshot");
+              }
+              const currentClock =
+                updateClocks[activeSnapshotId] &&
+                Number.isInteger(
+                  updateClocks[activeSnapshotId][update.publicData.pubKey]
+                )
+                  ? updateClocks[activeSnapshotId][update.publicData.pubKey]
+                  : -1;
+              const { content, clock } = verifyAndDecryptUpdate(
                 update,
                 key,
-                context.sodium.from_base64(update.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+                context.sodium.from_base64(update.publicData.pubKey), // TODO check if this pubkey is part of the allowed collaborators
+                currentClock
               );
+              const existingClocks = updateClocks[activeSnapshotId] || {};
+              updateClocks[activeSnapshotId] = {
+                ...existingClocks,
+                [update.publicData.pubKey]: clock,
+              };
 
               latestServerVersion = update.serverData.version;
               if (
@@ -613,7 +638,7 @@ export const syncMachine =
                 sendingUpdatesClock = update.publicData.clock;
               }
               const additionalChanges = context.deserializeChanges(
-                context.sodium.to_string(updateResult)
+                context.sodium.to_string(content)
               );
               changes = changes.concat(additionalChanges);
             }
@@ -804,6 +829,7 @@ export const syncMachine =
             sendingUpdatesClock,
             updatesInFlight,
             pendingChangesQueue,
+            updateClocks,
           };
         },
       },
