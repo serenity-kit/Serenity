@@ -114,6 +114,8 @@ test("comment replies, delete comment", async ({ page }) => {
   await delayForSeconds(1);
   await reloadPage({ page });
   await openCommentsDrawer({ page });
+  await page.locator(`data-testid=comment-${comment1.id}`).click();
+
   const commentReply1Content = await page
     .locator(
       `data-testid=comment-${comment1.id}__comment-reply-${commentReply1.id}--text-content`
@@ -133,6 +135,7 @@ test("comment replies, delete comment", async ({ page }) => {
     commentId: comment1.id,
   });
   // delete a comment with no replies
+  await page.locator(`data-testid=comment-${comment2.id}`).click();
   await deleteComment({
     page,
     commentId: comment2.id,

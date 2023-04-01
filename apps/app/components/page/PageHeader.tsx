@@ -1,6 +1,6 @@
 import {
   Text,
-  ToggleButton,
+  IconButton,
   Tooltip,
   useIsDesktopDevice,
 } from "@serenity-tools/ui";
@@ -37,14 +37,13 @@ export const PageHeader: React.FC<Props> = ({
           offset={8}
           openDelay={1200}
         >
-          <ToggleButton
+          <IconButton
             onPress={() => {
               toggleCommentsDrawer();
             }}
             isActive={isOpenSidebar}
             name={hasNewComment ? "chat-4-line-dot" : "chat-4-line"}
             size={"lg"}
-            subtle
             testID="open-comments-drawer-button"
           />
         </Tooltip>

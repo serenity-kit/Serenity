@@ -11,6 +11,7 @@ type CustomAvatarProps = {
   color?: CollaborationColor;
   size?: AvatarSize;
   status?: AvatarStatus;
+  muted?: boolean;
 };
 
 export type AvatarProps = IAvatarProps & CustomAvatarProps;
@@ -60,7 +61,7 @@ export const Avatar = forwardRef((props: AvatarProps, ref) => {
         fontSize: fontSize[size],
         style: tw`uppercase`,
       }}
-      bg={`collaboration.${color}`}
+      bg={props.muted ? "gray.400" : `collaboration.${color}`}
     >
       {props.children}
     </NbAvatar>

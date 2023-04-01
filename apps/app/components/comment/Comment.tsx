@@ -2,8 +2,7 @@ import {
   Avatar,
   hashToCollaboratorColor,
   Pressable,
-  RawInput,
-  SubmitButton,
+  ReplyArea,
   Text,
   tw,
   View,
@@ -40,8 +39,19 @@ export default function Comment({ comment, meId, meName }: Props) {
   const isActiveComment = comment.id === state.context.highlightedComment?.id;
   const isMyComment = commentCreator?.userId === meId;
 
+  const replyLength = comment.replies.length;
+  const replyString = {
+    0: "Reply ...",
+    1: "1 Reply",
+  };
+  const replyPlaceholder = replyString[replyLength] || `${replyLength} Replies`;
+
+  const submitButtonHeight = 7;
+
   const styles = StyleSheet.create({
     wrapper: tw`p-4 border-b border-gray-200`,
+    textarea: tw`pb-${submitButtonHeight}`,
+    submit: tw`absolute h-${submitButtonHeight} w-${submitButtonHeight} bottom-0.5 right-0.5`,
   });
 
   return (
@@ -49,7 +59,7 @@ export default function Comment({ comment, meId, meName }: Props) {
       key={comment.id}
       style={[
         styles.wrapper,
-        isActiveComment ? tw`bg-collaboration-honey/7` : undefined,
+        isHovered && !isActiveComment && tw`bg-gray-150`,
         { cursor: isActiveComment ? "default" : "pointer" },
       ]}
       onPress={() => {
@@ -67,17 +77,17 @@ export default function Comment({ comment, meId, meName }: Props) {
           </View> */}
 
         <HStack alignItems="center" space="1.5">
-          {/* TODO if comment has been read change color to gray-400 */}
           {commentCreator ? (
             <Avatar
               key={commentCreator.userId}
               color={hashToCollaboratorColor(commentCreator.userId)}
               size="xs"
+              muted={!isActiveComment}
             >
               {commentCreator.username?.split("@")[0].substring(0, 1)}
             </Avatar>
           ) : (
-            <Avatar color="arctic" size="xs">
+            <Avatar color="arctic" size="xs" muted={!isActiveComment}>
               E
             </Avatar>
           )}
@@ -85,7 +95,9 @@ export default function Comment({ comment, meId, meName }: Props) {
           <Text
             variant="xxs"
             bold
-            style={tw`max-w-40`}
+            style={tw`max-w-40 ${
+              isActiveComment ? "text-gray-900" : "text-gray-700"
+            }`}
             numberOfLines={1}
             ellipsizeMode="tail"
           >
@@ -113,54 +125,59 @@ export default function Comment({ comment, meId, meName }: Props) {
           {comment.text}
         </Text>
       </View>
+      {isActiveComment ? (
+        <>
+          <View style={tw`mt-2`}>
+            {comment.replies.map((reply) => {
+              if (!reply) return null;
 
-      <View style={tw`mt-2`}>
-        {comment.replies.map((reply) => {
-          if (!reply) return null;
+              return (
+                <CommentReply
+                  key={reply.id}
+                  reply={reply}
+                  meId={meId}
+                  commentId={comment.id}
+                />
+              );
+            })}
+          </View>
 
-          return (
-            <CommentReply
-              key={reply.id}
-              reply={reply}
-              meId={meId}
-              commentId={comment.id}
-            />
-          );
-        })}
-      </View>
+          <HStack space="1.5">
+            <Avatar color={hashToCollaboratorColor(meId)} size="xs">
+              {meName?.split("@")[0].substring(0, 1)}
+            </Avatar>
 
-      <HStack space="1.5">
-        <Avatar color={hashToCollaboratorColor(meId)} size="xs">
-          {meName?.split("@")[0].substring(0, 1)}
-        </Avatar>
-        <RawInput
-          multiline
-          value={state.context.replyTexts[comment.id]}
-          onChangeText={(text) =>
-            send({
-              type: "UPDATE_REPLY_TEXT",
-              commentId: comment.id,
-              text,
-            })
-          }
-          _stack={{
-            height: 16,
-            flexShrink: 1,
-          }}
-          testID={`comment-${comment.id}__reply-input`}
-        />
-      </HStack>
-
-      <SubmitButton
-        disabled={
-          state.context.replyTexts[comment.id] === undefined ||
-          state.context.replyTexts[comment.id] === ""
-        }
-        size="sm"
-        onPress={() => send({ type: "CREATE_REPLY", commentId: comment.id })}
-        style={tw`mt-1 self-end`}
-        testID={`comment-${comment.id}__save-reply-button`}
-      />
+            {/* negative margin to align ReplyArea centered with Avatar on default
+            without losing line-connection between replying Avatars */}
+            <View style={tw`relative -mt-1.5`}>
+              <ReplyArea
+                value={state.context.replyTexts[comment.id]}
+                onChangeText={(text) =>
+                  send({
+                    type: "UPDATE_REPLY_TEXT",
+                    commentId: comment.id,
+                    text,
+                  })
+                }
+                style={styles.textarea}
+                onSubmitPress={() =>
+                  send({ type: "CREATE_REPLY", commentId: comment.id })
+                }
+                testPrefix={`comment-${comment.id}`}
+              />
+            </View>
+          </HStack>
+        </>
+      ) : (
+        <Text
+          variant="xxs"
+          style={tw`pt-1 pl-0.5 ${
+            replyLength >= 1 ? "text-primary-400" : "text-gray-600"
+          }`}
+        >
+          {replyPlaceholder}
+        </Text>
+      )}
     </Pressable>
   );
 }

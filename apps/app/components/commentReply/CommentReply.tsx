@@ -83,7 +83,7 @@ export default function CommentReply({ reply, meId, commentId }: Props) {
         ) : null}
       </HStack>
       <View
-        style={tw`ml-2.75 pb-2 pl-4.25 border-l-2 border-solid border-gray-200`}
+        style={tw`ml-2.75 pb-4 pl-4.25 border-l-2 border-solid border-gray-200`}
       >
         <Text variant="xxs" muted style={tw`mt-1 mb-1.5`}>
           {formatDistanceToNow(parseJSON(reply.createdAt), {
