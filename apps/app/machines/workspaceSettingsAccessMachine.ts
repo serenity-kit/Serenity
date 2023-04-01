@@ -26,7 +26,7 @@ export const workspaceSettingsAccessMachine =
       states: {
         loadingInitialData: {
           invoke: {
-            src: loadInitialDataMachine,
+            src: "loadInitialDataMachine",
             id: "loadInitialDataMachine",
             data: (context) => {
               return {
@@ -50,5 +50,9 @@ export const workspaceSettingsAccessMachine =
       },
       id: "loadWorkspaceSettings",
     },
-    {}
+    {
+      services: {
+        loadInitialDataMachine,
+      },
+    }
   );

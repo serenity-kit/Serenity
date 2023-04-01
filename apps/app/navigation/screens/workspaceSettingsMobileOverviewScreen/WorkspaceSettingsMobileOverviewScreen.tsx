@@ -13,9 +13,6 @@ export default function WorkspaceSettingsMobileOverviewScreen(
       workspaceId,
       navigation: props.navigation,
     },
-    services: {
-      loadInitialDataMachine: undefined,
-    },
   });
 
   return (
