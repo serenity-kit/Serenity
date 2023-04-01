@@ -16,9 +16,12 @@ export const createCommentReply = async ({
   const numCommentRepliesBefore = await prisma.commentReply.count({
     where: { commentId: commentId },
   });
+  await page.locator(`data-testid=comment-${commentId}`).click();
+
   const commentReplyInput = page.locator(
     `data-testid=comment-${commentId}__reply-input`
   );
+
   await commentReplyInput.selectText();
   await commentReplyInput.press("Backspace");
   await commentReplyInput.type(replyText);
