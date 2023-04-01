@@ -1,16 +1,31 @@
 import canonicalize from "canonicalize";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
-import { Snapshot, SnapshotPublicData } from "./types";
+import { createParentSnapshotProof } from "./snapshot/createParentSnapshotProof";
+import {
+  Snapshot,
+  SnapshotPublicData,
+  SnapshotPublicDataWithParentSnapshotProof,
+} from "./types";
 
 export function createSnapshot(
-  content,
+  content: Uint8Array | string,
   publicData: SnapshotPublicData,
   key: Uint8Array,
-  signatureKeyPair: KeyPair
+  signatureKeyPair: KeyPair,
+  parentSnapshotCiphertext: Uint8Array,
+  grandParentSnapshotProof: Uint8Array
 ) {
+  const extendedPublicData: SnapshotPublicDataWithParentSnapshotProof = {
+    ...publicData,
+    parentSnapshotProof: createParentSnapshotProof({
+      parentSnapshotCiphertext,
+      grandParentSnapshotProof,
+    }),
+  };
+
   const publicDataAsBase64 = sodium.to_base64(
-    canonicalize(publicData) as string
+    canonicalize(extendedPublicData) as string
   );
 
   const { ciphertext, publicNonce } = encryptAead(
@@ -25,10 +40,27 @@ export function createSnapshot(
   const snapshot: Snapshot = {
     nonce: publicNonce,
     ciphertext,
-    publicData,
+    publicData: extendedPublicData,
     signature,
   };
 
+  return snapshot;
+}
+
+export function createInitialSnapshot(
+  content: Uint8Array | string,
+  publicData: SnapshotPublicData,
+  key: Uint8Array,
+  signatureKeyPair: KeyPair
+) {
+  const snapshot = createSnapshot(
+    content,
+    publicData,
+    key,
+    signatureKeyPair,
+    new Uint8Array(),
+    new Uint8Array()
+  );
   return snapshot;
 }
 

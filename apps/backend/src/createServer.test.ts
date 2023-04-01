@@ -1,4 +1,4 @@
-import { createSnapshot, createUpdate } from "@naisho/core";
+import { createInitialSnapshot, createUpdate } from "@naisho/core";
 import {
   createSnapshotKey,
   decryptWorkspaceKey,
@@ -176,7 +176,7 @@ test("successfully creates a snapshot", async () => {
     keyDerivationTrace,
     subkeyId: snapshotKey.subkeyId,
   };
-  const snapshot = createSnapshot(
+  const snapshot = createInitialSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),

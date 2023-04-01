@@ -179,7 +179,7 @@ export default function Page({
     },
     shouldSendSnapshot: ({ latestServerVersion }) => {
       // create a new snapshot if the active snapshot has more than 100 updates
-      return latestServerVersion !== null && latestServerVersion > 100;
+      return latestServerVersion !== null && latestServerVersion > 5;
     },
     getEphemeralUpdateKey: async () => {
       return snapshotKeyRef.current?.key as Uint8Array;

@@ -1,5 +1,9 @@
 import sodium from "react-native-libsodium";
 
+export function hash(message: string | Uint8Array) {
+  return sodium.to_base64(sodium.crypto_generichash(32, message));
+}
+
 export function encryptAead(message, additionalData: string, key: Uint8Array) {
   const publicNonce = sodium.randombytes_buf(
     sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES

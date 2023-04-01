@@ -133,6 +133,7 @@ export async function createSnapshot({
         document: { connect: { id: snapshot.publicData.docId } },
         keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
         clocks: {},
+        parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
       },
     });
   });

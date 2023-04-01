@@ -15,6 +15,7 @@ import {
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
 import {
   SnapshotFailedEvent,
+  SnapshotPublicData,
   SnapshotWithServerData,
   UpdateWithServerData,
 } from "./types";
@@ -528,7 +529,8 @@ export const syncMachine =
             const snapshotData = await context.getNewSnapshotData();
             console.log("createAndSendSnapshot", snapshotData);
             activeSendingSnapshotId = snapshotData.id;
-            const publicData = {
+
+            const publicData: SnapshotPublicData = {
               ...snapshotData.publicData,
               snapshotId: snapshotData.id,
               docId: context.documentId,
@@ -540,7 +542,9 @@ export const syncMachine =
               snapshotData.data,
               publicData,
               snapshotData.key,
-              context.signatureKeyPair
+              context.signatureKeyPair,
+              new Uint8Array(), // TODO FIXME
+              new Uint8Array() // TODO FIXME
             );
 
             pendingChangesQueue = [];
@@ -658,6 +662,7 @@ export const syncMachine =
               case "document":
                 try {
                   activeSnapshotId = event.snapshot.publicData.snapshotId;
+                  console.log(event.snapshot);
                   const snapshot = SnapshotWithServerData.parse(event.snapshot);
                   await processSnapshot(snapshot);
 

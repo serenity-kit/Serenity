@@ -1,6 +1,6 @@
 import {
+  createInitialSnapshot,
   createSignatureKeyPair,
-  createSnapshot,
   generateId,
   KeyDerivationTrace,
   SnapshotPublicData,
@@ -34,7 +34,7 @@ export const createIntroductionDocumentSnapshot = ({
     keyDerivationTrace,
   };
 
-  return createSnapshot(
+  return createInitialSnapshot(
     sodium.from_base64(introductionDocument),
     publicData,
     snapshotEncryptionKey,

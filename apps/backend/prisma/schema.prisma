@@ -45,6 +45,7 @@ model Snapshot {
   createdAt              DateTime         @default(now())
   keyDerivationTrace     Json             @default("{}")
   clocks                 Json
+  parentSnapshotProof    String
   snapshotKeyBoxes       SnapshotKeyBox[] // used for document share link
   comments               Comment[]
   commentReplies         CommentReply[]

@@ -43,6 +43,19 @@ export const SnapshotPublicData = z.object({
 
 export type SnapshotPublicData = z.infer<typeof SnapshotPublicData>;
 
+export const SnapshotPublicDataWithParentSnapshotProof = z.object({
+  docId: z.string(),
+  pubKey: z.string(), // public signing key
+  snapshotId: z.string(),
+  subkeyId: z.number(),
+  keyDerivationTrace: KeyDerivationTrace,
+  parentSnapshotProof: z.string(),
+});
+
+export type SnapshotPublicDataWithParentSnapshotProof = z.infer<
+  typeof SnapshotPublicDataWithParentSnapshotProof
+>;
+
 export const SnapshotServerData = z.object({
   latestVersion: z.number(),
 });
@@ -87,7 +100,7 @@ export const Snapshot = z.object({
   ciphertext: z.string(),
   nonce: z.string(),
   signature: z.string(), // ciphertext + nonce + publicData
-  publicData: SnapshotPublicData,
+  publicData: SnapshotPublicDataWithParentSnapshotProof,
 });
 
 export type Snapshot = z.infer<typeof Snapshot>;
