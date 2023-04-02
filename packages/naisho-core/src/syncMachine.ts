@@ -8,6 +8,7 @@ import {
   spawn,
 } from "xstate";
 import { z } from "zod";
+import { hash } from "./crypto";
 import {
   createEphemeralUpdate,
   verifyAndDecryptEphemeralUpdate,
@@ -54,12 +55,12 @@ import { createUpdate, verifyAndDecryptUpdate } from "./update";
 // -------------------------
 // Once a change is added and the `_pendingChangesQueue` is processed it will collect all changes
 // and depending on `shouldSendSnapshot` either send a snapshot or an update.
-// In case a snapshot is sent `_pendingChangesQueue` is cleared and the `_activeSendingSnapshotId` set to the snapshot ID.
+// In case a snapshot is sent `_pendingChangesQueue` is cleared and the `_activeSendingSnapshotInfo` set to the snapshot ID.
 // In case an update is sent the changes will be added to the `_updatesInFlight` and the `_sendingUpdatesClock` increased by one.
 //
 // If a snapshot saved event is received
-// - the `_activeSnapshotId` is set to the snapshot ID and
-// - the `_activeSendingSnapshotId` is cleared.
+// - the `_activeSnapshotInfo` is set to the snapshot (id, parentSnapshotProof, ciphertextHash)
+// - the `_activeSendingSnapshotInfo` is cleared.
 // Queue processing for sending messages is resumed.
 //
 // If an update saved event is received
@@ -81,7 +82,7 @@ import { createUpdate, verifyAndDecryptUpdate } from "./update";
 // - `_confirmedUpdatesClock`
 // - `_sendingUpdatesClock` (same as `_confirmedUpdatesClock`)
 // - `_latestServerVersion`
-// - `_activeSnapshotId`
+// - `_activeSnapshotInfo`
 // Otherwise you might try to send an update that the server will reject.
 
 type UpdateInFlight = {
@@ -93,11 +94,17 @@ type UpdateClocks = {
   [snapshotId: string]: { [publicSigningKey: string]: number };
 };
 
+type ActiveSnapshotInfo = {
+  id: string;
+  ciphertextHash: string;
+  parentSnapshotProof: string;
+};
+
 type ProcessQueueData = {
   handledQueue: "incoming" | "pending" | "none";
-  activeSnapshotId: string | null;
+  activeSnapshotInfo: ActiveSnapshotInfo | null;
   latestServerVersion: number | null;
-  activeSendingSnapshotId: string | null;
+  activeSendingSnapshotInfo: ActiveSnapshotInfo | null;
   sendingUpdatesClock: number;
   confirmedUpdatesClock: number;
   updatesInFlight: UpdateInFlight[];
@@ -136,11 +143,11 @@ export type SyncMachineConfig = {
 
 export type Context = SyncMachineConfig & {
   _latestServerVersion: null | number;
-  _activeSnapshotId: null | string;
+  _activeSnapshotInfo: null | ActiveSnapshotInfo;
   _websocketActor?: AnyActorRef;
   _incomingQueue: any[];
   _pendingChangesQueue: any[];
-  _activeSendingSnapshotId: string | null;
+  _activeSendingSnapshotInfo: ActiveSnapshotInfo | null;
   _shouldReconnect: boolean;
   _websocketRetries: number;
   _updatesInFlight: UpdateInFlight[];
@@ -294,11 +301,11 @@ export const syncMachine =
         deserializeChanges: () => [],
         onDocumentLoaded: () => undefined,
         onSnapshotSaved: () => undefined,
-        _activeSnapshotId: null,
+        _activeSnapshotInfo: null,
         _latestServerVersion: null,
         _incomingQueue: [],
         _pendingChangesQueue: [],
-        _activeSendingSnapshotId: null,
+        _activeSendingSnapshotInfo: null,
         _shouldReconnect: false,
         _websocketRetries: 0,
         _updatesInFlight: [],
@@ -476,9 +483,9 @@ export const syncMachine =
             return {
               _incomingQueue: context._incomingQueue.slice(1),
               _pendingChangesQueue: event.data.pendingChangesQueue,
-              _activeSnapshotId: event.data.activeSnapshotId,
+              _activeSnapshotInfo: event.data.activeSnapshotInfo,
               _latestServerVersion: event.data.latestServerVersion,
-              _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
+              _activeSendingSnapshotInfo: event.data.activeSendingSnapshotInfo,
               _sendingUpdatesClock: event.data.sendingUpdatesClock,
               _confirmedUpdatesClock: event.data.confirmedUpdatesClock,
               _updatesInFlight: event.data.updatesInFlight,
@@ -487,9 +494,9 @@ export const syncMachine =
           } else {
             return {
               _pendingChangesQueue: event.data.pendingChangesQueue,
-              _activeSnapshotId: event.data.activeSnapshotId,
+              _activeSnapshotInfo: event.data.activeSnapshotInfo,
               _latestServerVersion: event.data.latestServerVersion,
-              _activeSendingSnapshotId: event.data.activeSendingSnapshotId,
+              _activeSendingSnapshotInfo: event.data.activeSendingSnapshotInfo,
               _sendingUpdatesClock: event.data.sendingUpdatesClock,
               _confirmedUpdatesClock: event.data.confirmedUpdatesClock,
               _updatesInFlight: event.data.updatesInFlight,
@@ -515,10 +522,10 @@ export const syncMachine =
             context._pendingChangesQueue.length
           );
 
-          let activeSnapshotId = context._activeSnapshotId;
+          let activeSnapshotInfo = context._activeSnapshotInfo;
           let latestServerVersion = context._latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
-          let activeSendingSnapshotId = context._activeSendingSnapshotId;
+          let activeSendingSnapshotInfo = context._activeSendingSnapshotInfo;
           let sendingUpdatesClock = context._sendingUpdatesClock;
           let confirmedUpdatesClock = context._confirmedUpdatesClock;
           let updatesInFlight = context._updatesInFlight;
@@ -528,7 +535,6 @@ export const syncMachine =
           const createAndSendSnapshot = async () => {
             const snapshotData = await context.getNewSnapshotData();
             console.log("createAndSendSnapshot", snapshotData);
-            activeSendingSnapshotId = snapshotData.id;
 
             const publicData: SnapshotPublicData = {
               ...snapshotData.publicData,
@@ -547,12 +553,18 @@ export const syncMachine =
               new Uint8Array() // TODO FIXME
             );
 
+            activeSendingSnapshotInfo = {
+              id: snapshot.publicData.snapshotId,
+              ciphertextHash: hash(snapshot.ciphertext),
+              parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
+            };
             pendingChangesQueue = [];
+
             send({
               type: "SEND",
               message: JSON.stringify({
                 ...snapshot,
-                lastKnownSnapshotId: context._activeSnapshotId,
+                lastKnownSnapshotId: context._activeSnapshotInfo?.id,
                 latestServerVersion: context._latestServerVersion,
                 additionalServerData: snapshotData.additionalServerData,
               }),
@@ -602,7 +614,11 @@ export const syncMachine =
             );
             // TODO reset the clocks for the snapshot for the signing key
             context.applySnapshot(decryptedSnapshot);
-            activeSnapshotId = snapshot.publicData.snapshotId;
+            activeSnapshotInfo = {
+              id: snapshot.publicData.snapshotId,
+              ciphertextHash: hash(snapshot.ciphertext),
+              parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
+            };
           };
 
           const processUpdates = async (updates: UpdateWithServerData[]) => {
@@ -611,15 +627,17 @@ export const syncMachine =
             for (let update of updates) {
               const key = await context.getUpdateKey(update);
               // console.log("processUpdates key", key);
-              if (activeSnapshotId === null) {
+              if (activeSnapshotInfo === null) {
                 throw new Error("No active snapshot");
               }
               const currentClock =
-                updateClocks[activeSnapshotId] &&
+                updateClocks[activeSnapshotInfo.id] &&
                 Number.isInteger(
-                  updateClocks[activeSnapshotId][update.publicData.pubKey]
+                  updateClocks[activeSnapshotInfo.id][update.publicData.pubKey]
                 )
-                  ? updateClocks[activeSnapshotId][update.publicData.pubKey]
+                  ? updateClocks[activeSnapshotInfo.id][
+                      update.publicData.pubKey
+                    ]
                   : -1;
               const { content, clock } = verifyAndDecryptUpdate(
                 update,
@@ -627,8 +645,8 @@ export const syncMachine =
                 context.sodium.from_base64(update.publicData.pubKey), // TODO check if this pubkey is part of the allowed collaborators
                 currentClock
               );
-              const existingClocks = updateClocks[activeSnapshotId] || {};
-              updateClocks[activeSnapshotId] = {
+              const existingClocks = updateClocks[activeSnapshotInfo.id] || {};
+              updateClocks[activeSnapshotInfo.id] = {
                 ...existingClocks,
                 [update.publicData.pubKey]: clock,
               };
@@ -661,7 +679,12 @@ export const syncMachine =
                 break;
               case "document":
                 try {
-                  activeSnapshotId = event.snapshot.publicData.snapshotId;
+                  activeSnapshotInfo = {
+                    id: event.snapshot.publicData.snapshotId,
+                    ciphertextHash: hash(event.snapshot.ciphertext),
+                    parentSnapshotProof:
+                      event.snapshot.publicData.parentSnapshotProof,
+                  };
                   console.log(event.snapshot);
                   const snapshot = SnapshotWithServerData.parse(event.snapshot);
                   await processSnapshot(snapshot);
@@ -696,10 +719,16 @@ export const syncMachine =
 
               case "snapshotSaved":
                 console.log("snapshot saved", event);
-                activeSnapshotId = event.snapshotId;
-                if (activeSnapshotId === activeSendingSnapshotId) {
-                  activeSendingSnapshotId = null;
+                // in case the event is received for a snapshot that was not active in sending
+                // we remove the activeSendingSnapshotInfo since any activeSendingSnapshotInfo
+                // that is in flight will fail
+                if (event.snapshotId !== activeSendingSnapshotInfo?.id) {
+                  throw new Error(
+                    "Received snapshotSaved for other than the current activeSendingSnapshotInfo"
+                  );
                 }
+                activeSnapshotInfo = activeSendingSnapshotInfo;
+                activeSendingSnapshotInfo = null;
                 latestServerVersion = null;
                 sendingUpdatesClock = -1;
                 confirmedUpdatesClock = null;
@@ -766,7 +795,7 @@ export const syncMachine =
 
                     const key = await context.getUpdateKey(event);
 
-                    if (activeSnapshotId === null) {
+                    if (activeSnapshotInfo === null) {
                       throw new Error("No active snapshot id");
                     }
                     sendingUpdatesClock = confirmedUpdatesClock ?? -1;
@@ -774,7 +803,7 @@ export const syncMachine =
                     createAndSendUpdate(
                       changes,
                       key,
-                      activeSnapshotId,
+                      activeSnapshotInfo.id,
                       sendingUpdatesClock
                     );
                   }
@@ -794,13 +823,13 @@ export const syncMachine =
             }
           } else if (
             context._pendingChangesQueue.length > 0 &&
-            activeSendingSnapshotId === null
+            activeSendingSnapshotInfo === null
           ) {
             handledQueue = "pending";
 
             if (
               context.shouldSendSnapshot({
-                activeSnapshotId,
+                activeSnapshotId: activeSnapshotInfo?.id || null,
                 latestServerVersion,
               })
             ) {
@@ -813,13 +842,13 @@ export const syncMachine =
               pendingChangesQueue = [];
 
               // TODO add a compact changes function to queue and make sure all pending updates are sent as one update
-              if (activeSnapshotId === null) {
+              if (activeSnapshotInfo === null) {
                 throw new Error("No active snapshot id");
               }
               createAndSendUpdate(
                 rawChanges,
                 key,
-                activeSnapshotId,
+                activeSnapshotInfo.id,
                 sendingUpdatesClock
               );
             }
@@ -827,9 +856,9 @@ export const syncMachine =
 
           return {
             handledQueue,
-            activeSnapshotId,
+            activeSnapshotInfo,
             latestServerVersion,
-            activeSendingSnapshotId,
+            activeSendingSnapshotInfo,
             confirmedUpdatesClock,
             sendingUpdatesClock,
             updatesInFlight,
