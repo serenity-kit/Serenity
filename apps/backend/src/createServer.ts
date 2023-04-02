@@ -182,7 +182,6 @@ export default async function createServer() {
         // new snapshot
         if (data?.publicData?.snapshotId) {
           const snapshotMessage = SnapshotWithClientData.parse(data);
-          console.log("snapshotMessage", snapshotMessage);
           try {
             const activeSnapshotInfo =
               snapshotMessage.lastKnownSnapshotId &&
@@ -223,6 +222,7 @@ export default async function createServer() {
               connection
             );
           } catch (error) {
+            console.log("SNAPSHOT FAILED ERROR:", error);
             if (error instanceof NaishoSnapshotBasedOnOutdatedSnapshotError) {
               let doc = await getDocument(documentId);
               if (!doc) return; // should never be the case?

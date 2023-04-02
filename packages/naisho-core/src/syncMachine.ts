@@ -525,6 +525,9 @@ export const syncMachine =
               ciphertextHash: hash(snapshot.ciphertext),
               parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
             };
+            latestServerVersion = snapshot.serverData.latestVersion;
+            confirmedUpdatesClock = null;
+            sendingUpdatesClock = -1;
           };
 
           const processUpdates = async (updates: UpdateWithServerData[]) => {
