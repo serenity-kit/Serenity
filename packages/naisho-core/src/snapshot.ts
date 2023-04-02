@@ -13,8 +13,8 @@ export function createSnapshot(
   publicData: SnapshotPublicData,
   key: Uint8Array,
   signatureKeyPair: KeyPair,
-  parentSnapshotCiphertext: Uint8Array,
-  grandParentSnapshotProof: Uint8Array
+  parentSnapshotCiphertext: string,
+  grandParentSnapshotProof: string
 ) {
   const extendedPublicData: SnapshotPublicDataWithParentSnapshotProof = {
     ...publicData,
@@ -58,8 +58,8 @@ export function createInitialSnapshot(
     publicData,
     key,
     signatureKeyPair,
-    new Uint8Array(),
-    new Uint8Array()
+    "",
+    ""
   );
   return snapshot;
 }

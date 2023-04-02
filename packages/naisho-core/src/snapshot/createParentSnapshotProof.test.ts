@@ -1,7 +1,7 @@
 import { createParentSnapshotProof } from "./createParentSnapshotProof";
 
-const grandParentSnapshotProof = new Uint8Array([1, 2, 3]);
-const parentSnapshotCiphertext = new Uint8Array([4, 5, 6]);
+const grandParentSnapshotProof = "abc";
+const parentSnapshotCiphertext = "cde";
 
 test("it returns a valid proof", () => {
   const parentSnapshotProof = createParentSnapshotProof({
@@ -10,6 +10,6 @@ test("it returns a valid proof", () => {
   });
 
   expect(parentSnapshotProof).toEqual(
-    "IqymLW_N-uB6RSBsmakWUVgMZEwg5EZhd3bSnK59Wq8"
+    "mKrictj1UUr_hkqYpO9cAw_MeZe9IDTi7une4tPjasg"
   );
 });

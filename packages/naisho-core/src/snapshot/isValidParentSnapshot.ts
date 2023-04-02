@@ -3,8 +3,8 @@ import { createParentSnapshotProof } from "./createParentSnapshotProof";
 
 type IsValidParentSnapshotParams = {
   snapshot: Snapshot;
-  parentSnapshotCiphertext: Uint8Array;
-  grandParentSnapshotProof: Uint8Array;
+  parentSnapshotCiphertext: string;
+  grandParentSnapshotProof: string;
 };
 
 export function isValidParentSnapshot({

@@ -47,8 +47,8 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
     publicData,
     key,
     signatureKeyPair,
-    new Uint8Array(),
-    new Uint8Array()
+    "",
+    ""
   );
 
   const result = verifyAndDecryptSnapshot(
@@ -102,8 +102,8 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
     publicData,
     key,
     signatureKeyPair,
-    new Uint8Array(),
-    new Uint8Array()
+    "",
+    ""
   );
 
   expect(() =>
@@ -158,8 +158,8 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
     publicData,
     key,
     signatureKeyPair,
-    new Uint8Array(),
-    new Uint8Array()
+    "",
+    ""
   );
 
   expect(() =>

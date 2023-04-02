@@ -8,7 +8,6 @@ import {
   spawn,
 } from "xstate";
 import { z } from "zod";
-import { hash } from "./crypto";
 import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
 import {
@@ -94,7 +93,7 @@ type UpdateClocks = {
 
 type ActiveSnapshotInfo = {
   id: string;
-  ciphertextHash: string;
+  ciphertext: string;
   parentSnapshotProof: string;
 };
 
@@ -439,6 +438,9 @@ export const syncMachine =
           let updateClocks = context._updateClocks;
 
           const createAndSendSnapshot = async () => {
+            if (activeSnapshotInfo === null) {
+              throw new Error("No active snapshot");
+            }
             const snapshotData = await context.getNewSnapshotData();
             console.log("createAndSendSnapshot", snapshotData);
 
@@ -455,13 +457,13 @@ export const syncMachine =
               publicData,
               snapshotData.key,
               context.signatureKeyPair,
-              new Uint8Array(), // TODO FIXME
-              new Uint8Array() // TODO FIXME
+              context.sodium.from_base64(activeSnapshotInfo.ciphertext),
+              context.sodium.from_base64(activeSnapshotInfo.parentSnapshotProof)
             );
 
             activeSendingSnapshotInfo = {
               id: snapshot.publicData.snapshotId,
-              ciphertextHash: hash(snapshot.ciphertext),
+              ciphertext: snapshot.ciphertext,
               parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
             };
             pendingChangesQueue = [];
@@ -470,8 +472,8 @@ export const syncMachine =
               type: "SEND",
               message: JSON.stringify({
                 ...snapshot,
-                lastKnownSnapshotId: context._activeSnapshotInfo?.id,
-                latestServerVersion: context._latestServerVersion,
+                lastKnownSnapshotId: activeSnapshotInfo.id,
+                latestServerVersion,
                 additionalServerData: snapshotData.additionalServerData,
               }),
             });
@@ -522,7 +524,7 @@ export const syncMachine =
             context.applySnapshot(decryptedSnapshot);
             activeSnapshotInfo = {
               id: snapshot.publicData.snapshotId,
-              ciphertextHash: hash(snapshot.ciphertext),
+              ciphertext: snapshot.ciphertext,
               parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
             };
             latestServerVersion = snapshot.serverData.latestVersion;
@@ -590,7 +592,7 @@ export const syncMachine =
                 try {
                   activeSnapshotInfo = {
                     id: event.snapshot.publicData.snapshotId,
-                    ciphertextHash: hash(event.snapshot.ciphertext),
+                    ciphertext: event.snapshot.ciphertext,
                     parentSnapshotProof:
                       event.snapshot.publicData.parentSnapshotProof,
                   };
@@ -705,7 +707,7 @@ export const syncMachine =
                     const key = await context.getUpdateKey(event);
 
                     if (activeSnapshotInfo === null) {
-                      throw new Error("No active snapshot id");
+                      throw new Error("No active snapshot");
                     }
                     sendingUpdatesClock = confirmedUpdatesClock ?? -1;
                     updatesInFlight = [];
@@ -752,7 +754,7 @@ export const syncMachine =
 
               // TODO add a compact changes function to queue and make sure all pending updates are sent as one update
               if (activeSnapshotInfo === null) {
-                throw new Error("No active snapshot id");
+                throw new Error("No active snapshot");
               }
               createAndSendUpdate(
                 rawChanges,

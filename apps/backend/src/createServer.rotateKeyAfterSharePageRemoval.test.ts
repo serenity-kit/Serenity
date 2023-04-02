@@ -2,6 +2,7 @@ import {
   createInitialSnapshot,
   createSnapshot,
   createUpdate,
+  Snapshot,
 } from "@naisho/core";
 import {
   createSnapshotKey,
@@ -42,6 +43,7 @@ let snapshotId: string = "";
 let latestServerVersion = null;
 let encryptionPrivateKey = "";
 let lastSnapshotKey = "";
+let firstSnapshot: Snapshot;
 
 const setup = async () => {
   const result = await createUserWithWorkspace({
@@ -124,16 +126,16 @@ test("successfully creates a snapshot", async () => {
     keyDerivationTrace,
     subkeyId: snapshotKey.subkeyId,
   };
-  const snapshot = createInitialSnapshot(
+  firstSnapshot = createInitialSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
     signatureKeyPair
   );
-  snapshotId = snapshot.publicData.snapshotId;
+  snapshotId = firstSnapshot.publicData.snapshotId;
   client.send(
     JSON.stringify({
-      ...snapshot,
+      ...firstSnapshot,
       latestServerVersion,
     })
   );
@@ -295,8 +297,8 @@ test("successfully creates a snapshot", async () => {
     publicData,
     sodium.from_base64(snapshotKey.key),
     signatureKeyPair,
-    new Uint8Array(), // TODO FIXME
-    new Uint8Array() // TODO FIXME
+    sodium.from_base64(firstSnapshot.ciphertext),
+    sodium.from_base64(firstSnapshot.publicData.parentSnapshotProof)
   );
   client.send(
     JSON.stringify({

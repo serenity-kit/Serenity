@@ -1,8 +1,8 @@
 import { isValidParentSnapshot } from "./isValidParentSnapshot";
 
-const grandParentSnapshotProof = new Uint8Array([1, 2, 3]);
-const parentSnapshotCiphertext = new Uint8Array([4, 5, 6]);
-const parentSnapshotProof = "IqymLW_N-uB6RSBsmakWUVgMZEwg5EZhd3bSnK59Wq8";
+const grandParentSnapshotProof = "abc";
+const parentSnapshotCiphertext = "cde";
+const parentSnapshotProof = "mKrictj1UUr_hkqYpO9cAw_MeZe9IDTi7une4tPjasg";
 
 test("it returns true for a valid proof", () => {
   const isValid = isValidParentSnapshot({

@@ -2,8 +2,8 @@ import canonicalize from "canonicalize";
 import { hash } from "../crypto";
 
 type CreateParentSnapshotProofParams = {
-  grandParentSnapshotProof: Uint8Array;
-  parentSnapshotCiphertext: Uint8Array;
+  grandParentSnapshotProof: string;
+  parentSnapshotCiphertext: string;
 };
 
 export function createParentSnapshotProof({

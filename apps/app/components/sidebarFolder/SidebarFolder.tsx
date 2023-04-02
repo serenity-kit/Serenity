@@ -321,7 +321,6 @@ export default function SidebarFolder(props: Props) {
       sodium.from_base64(snapshotKey.key),
       signatureKeyPair
     );
-    console.log("snapshot", snapshot);
     const documentNameKey = createDocumentTitleKey({
       snapshotKey: snapshotKey.key,
     });
