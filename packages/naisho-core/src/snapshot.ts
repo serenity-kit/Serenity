@@ -2,7 +2,9 @@ import canonicalize from "canonicalize";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { decryptAead, encryptAead, sign, verifySignature } from "./crypto";
 import { createParentSnapshotProof } from "./snapshot/createParentSnapshotProof";
+import { isValidParentSnapshot } from "./snapshot/isValidParentSnapshot";
 import {
+  ParentSnapshotProofInfo,
   Snapshot,
   SnapshotPublicData,
   SnapshotPublicDataWithParentSnapshotProof,
@@ -67,7 +69,8 @@ export function createInitialSnapshot(
 export function verifyAndDecryptSnapshot(
   snapshot: Snapshot,
   key: Uint8Array,
-  publicKey: Uint8Array
+  publicKey: Uint8Array,
+  parentSnapshotProofInfo?: ParentSnapshotProofInfo
 ) {
   const publicDataAsBase64 = sodium.to_base64(
     canonicalize(snapshot.publicData) as string
@@ -81,6 +84,18 @@ export function verifyAndDecryptSnapshot(
   if (!isValid) {
     throw new Error("Invalid snapshot");
   }
+
+  if (parentSnapshotProofInfo) {
+    const isValid = isValidParentSnapshot({
+      snapshot,
+      parentSnapshotCiphertext: parentSnapshotProofInfo.ciphertext,
+      grandParentSnapshotProof: parentSnapshotProofInfo.parentSnapshotProof,
+    });
+    if (!isValid) {
+      throw new Error("Invalid parent snapshot verification");
+    }
+  }
+
   return decryptAead(
     sodium.from_base64(snapshot.ciphertext),
     publicDataAsBase64,

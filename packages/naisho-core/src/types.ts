@@ -162,3 +162,8 @@ export const SnapshotFailedEvent = z.object({
 });
 
 export type SnapshotFailedEvent = z.infer<typeof SnapshotFailedEvent>;
+
+export type ParentSnapshotProofInfo = {
+  ciphertext: string;
+  parentSnapshotProof: string;
+};

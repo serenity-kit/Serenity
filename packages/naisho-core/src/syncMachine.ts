@@ -11,6 +11,7 @@ import { z } from "zod";
 import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
 import {
+  ParentSnapshotProofInfo,
   SnapshotFailedEvent,
   SnapshotPublicData,
   SnapshotWithServerData,
@@ -427,7 +428,8 @@ export const syncMachine =
             context._pendingChangesQueue.length
           );
 
-          let activeSnapshotInfo = context._activeSnapshotInfo;
+          let activeSnapshotInfo: ActiveSnapshotInfo | null =
+            context._activeSnapshotInfo;
           let latestServerVersion = context._latestServerVersion;
           let handledQueue: "incoming" | "pending" | "none" = "none";
           let activeSendingSnapshotInfo = context._activeSendingSnapshotInfo;
@@ -457,8 +459,8 @@ export const syncMachine =
               publicData,
               snapshotData.key,
               context.signatureKeyPair,
-              context.sodium.from_base64(activeSnapshotInfo.ciphertext),
-              context.sodium.from_base64(activeSnapshotInfo.parentSnapshotProof)
+              activeSnapshotInfo.ciphertext,
+              activeSnapshotInfo.parentSnapshotProof
             );
 
             activeSendingSnapshotInfo = {
@@ -511,14 +513,18 @@ export const syncMachine =
             send({ type: "SEND", message: JSON.stringify(message) });
           };
 
-          const processSnapshot = async (snapshot: SnapshotWithServerData) => {
+          const processSnapshot = async (
+            snapshot: SnapshotWithServerData,
+            parentSnapshotProofInfo?: ParentSnapshotProofInfo
+          ) => {
             console.log("processSnapshot", snapshot);
             const snapshotKey = await context.getSnapshotKey(snapshot);
             // console.log("processSnapshot key", snapshotKey);
             const decryptedSnapshot = verifyAndDecryptSnapshot(
               snapshot,
               snapshotKey,
-              context.sodium.from_base64(snapshot.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+              context.sodium.from_base64(snapshot.publicData.pubKey), // TODO check if this pubkey is part of the allowed collaborators
+              parentSnapshotProofInfo
             );
             // TODO reset the clocks for the snapshot for the signing key
             context.applySnapshot(decryptedSnapshot);
@@ -620,7 +626,10 @@ export const syncMachine =
                 try {
                   const snapshot = SnapshotWithServerData.parse(event.snapshot);
                   console.log("snapshot parsed");
-                  await processSnapshot(snapshot);
+                  await processSnapshot(
+                    snapshot,
+                    activeSnapshotInfo ? activeSnapshotInfo : undefined
+                  );
                 } catch (err) {
                   console.log("Apply snapshot failed. TODO handle error", err);
                   // TODO
@@ -647,7 +656,7 @@ export const syncMachine =
                   context.onSnapshotSaved();
                 }
                 break;
-              case "snapshotFailed":
+              case "snapshotFailed": // TODO rename to snapshotSaveFailed or similar
                 const parsedEvent = SnapshotFailedEvent.parse(event);
                 console.log("snapshot saving failed", event);
                 if (parsedEvent.snapshot) {
