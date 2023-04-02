@@ -1,7 +1,7 @@
+import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 import canonicalize from 'canonicalize';
 import gql from 'graphql-tag';
 import * as Urql from 'urql';
-import { getUrqlClient } from '../utils/urqlClient/urqlClient';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -655,7 +655,6 @@ export type Mutation = {
   updateWorkspaceInfo?: Maybe<UpdateWorkspaceInfoResult>;
   updateWorkspaceMembersRoles?: Maybe<UpdateWorkspaceMembersRolesResult>;
   updateWorkspaceName?: Maybe<UpdateWorkspaceNameResult>;
-  verifyPassword?: Maybe<VerifyLoginResult>;
   verifyRegistration?: Maybe<VerifyRegistrationResult>;
 };
 
@@ -802,11 +801,6 @@ export type MutationUpdateWorkspaceMembersRolesArgs = {
 
 export type MutationUpdateWorkspaceNameArgs = {
   input: UpdateWorkspaceNameInput;
-};
-
-
-export type MutationVerifyPasswordArgs = {
-  input: VerifyPasswordInput;
 };
 
 
@@ -1195,18 +1189,6 @@ export type UserIdFromUsernameResult = {
   id: Scalars['String'];
 };
 
-export type VerifyLoginResult = {
-  __typename?: 'VerifyLoginResult';
-  isValid?: Maybe<Scalars['Boolean']>;
-};
-
-export type VerifyPasswordInput = {
-  deviceSigningPublicKey: Scalars['String'];
-  loginId: Scalars['String'];
-  message: Scalars['String'];
-  sessionTokenSignature: Scalars['String'];
-};
-
 export type VerifyRegistrationInput = {
   username: Scalars['String'];
   verificationCode: Scalars['String'];
@@ -1587,13 +1569,6 @@ export type UpdateWorkspaceNameMutationVariables = Exact<{
 
 
 export type UpdateWorkspaceNameMutation = { __typename?: 'Mutation', updateWorkspaceName?: { __typename?: 'UpdateWorkspaceNameResult', workspace?: { __typename?: 'Workspace', id: string, name?: string | null, members?: Array<{ __typename?: 'WorkspaceMember', userId: string, username?: string | null, role: Role }> | null } | null } | null };
-
-export type VerifyPasswordMutationVariables = Exact<{
-  input: VerifyPasswordInput;
-}>;
-
-
-export type VerifyPasswordMutation = { __typename?: 'Mutation', verifyPassword?: { __typename?: 'VerifyLoginResult', isValid?: boolean | null } | null };
 
 export type VerifyRegistrationMutationVariables = Exact<{
   input: VerifyRegistrationInput;
@@ -2304,17 +2279,6 @@ export const UpdateWorkspaceNameDocument = gql`
 
 export function useUpdateWorkspaceNameMutation() {
   return Urql.useMutation<UpdateWorkspaceNameMutation, UpdateWorkspaceNameMutationVariables>(UpdateWorkspaceNameDocument);
-};
-export const VerifyPasswordDocument = gql`
-    mutation verifyPassword($input: VerifyPasswordInput!) {
-  verifyPassword(input: $input) {
-    isValid
-  }
-}
-    `;
-
-export function useVerifyPasswordMutation() {
-  return Urql.useMutation<VerifyPasswordMutation, VerifyPasswordMutationVariables>(VerifyPasswordDocument);
 };
 export const VerifyRegistrationDocument = gql`
     mutation verifyRegistration($input: VerifyRegistrationInput!) {
@@ -3361,20 +3325,6 @@ export const runUpdateWorkspaceNameMutation = async (variables: UpdateWorkspaceN
   return await getUrqlClient()
     .mutation<UpdateWorkspaceNameMutation, UpdateWorkspaceNameMutationVariables>(
       UpdateWorkspaceNameDocument,
-      variables,
-      {
-        // better to be safe here and always refetch
-        requestPolicy: "network-only",
-        ...options
-      }
-    )
-    .toPromise();
-};
-
-export const runVerifyPasswordMutation = async (variables: VerifyPasswordMutationVariables, options?: any) => {
-  return await getUrqlClient()
-    .mutation<VerifyPasswordMutation, VerifyPasswordMutationVariables>(
-      VerifyPasswordDocument,
       variables,
       {
         // better to be safe here and always refetch
