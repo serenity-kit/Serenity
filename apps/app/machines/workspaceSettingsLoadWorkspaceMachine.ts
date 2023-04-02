@@ -111,7 +111,7 @@ export const workspaceSettingsLoadWorkspaceMachine =
           type: "final",
         },
       },
-      id: "loadWorkspaceSettings",
+      id: "workspaceSettingsLoadWorkspaceMachine",
     },
     {
       guards: {
