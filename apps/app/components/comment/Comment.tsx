@@ -59,7 +59,7 @@ export default function Comment({ comment, meId, meName }: Props) {
       key={comment.id}
       style={[
         styles.wrapper,
-        isHovered && !isActiveComment && tw`bg-gray-150`,
+        isHovered && !isActiveComment && tw`bg-gray-150/70`,
         { cursor: isActiveComment ? "default" : "pointer" },
       ]}
       onPress={() => {
