@@ -8,7 +8,8 @@ const customColors = {
   black: "#000000",
   gray: {
     100: "#FDFDFD",
-    150: "#FAFAFC",
+    120: "#FAFAFC",
+    150: "#F5F5F7",
     200: "#EDEDF0",
     300: "#DCDDE5",
     400: "#CBCBD3",
