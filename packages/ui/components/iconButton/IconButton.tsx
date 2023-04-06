@@ -74,7 +74,7 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
     focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : {},
     active: transparent
       ? tw`border border-${iconColor}/20 bg-${iconColor}/10`
-      : tw`border border-gray-200 bg-gray-150`,
+      : tw`border border-gray-200 bg-gray-120`,
   });
 
   return (
@@ -97,8 +97,8 @@ export const IconButton = forwardRef((props: IconButtonProps, ref) => {
           <HStack
             style={[
               styles.stack,
-              isHovered && !isLoading && styles.hover,
               isActive && styles.active,
+              isHovered && !isLoading && styles.hover,
               isPressed && !isLoading && styles.pressed,
               isFocusVisible && styles.focusVisible,
             ]}

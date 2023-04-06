@@ -18,7 +18,7 @@ export const EditorContentButton = React.forwardRef(
 
     const styles = StyleSheet.create({
       text: tw`text-gray-700`,
-      hover: tw`bg-gray-150`,
+      hover: tw`bg-gray-120`,
       focusVisible: Platform.OS === "web" ? tw`se-inset-focus-mini` : tw``,
     });
 
