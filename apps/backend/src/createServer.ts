@@ -34,6 +34,7 @@ import { retryAsyncFunction } from "./retryAsyncFunction";
 import { schema } from "./schema";
 import { addConnection, addUpdate, removeConnection } from "./store";
 import { ExpectedGraphqlError } from "./utils/expectedGraphqlError/expectedGraphqlError";
+import { getKnownSnapshotIdFromUrl } from "./utils/getKnownSnapshotIdFromUrl/getKnownSnapshotIdFromUrl";
 
 export default async function createServer() {
   const apolloServer = new ApolloServer({
@@ -133,8 +134,9 @@ export default async function createServer() {
       console.log("connected");
 
       const documentId = request.url?.slice(1)?.split("?")[0] || "";
+      const knownSnapshotId = getKnownSnapshotIdFromUrl(request.url);
 
-      let doc = await getDocument(documentId);
+      let doc = await getDocument(documentId, knownSnapshotId);
       if (!doc) {
         // TODO close connection properly
         connection.send(JSON.stringify({ type: "documentNotFound" }));

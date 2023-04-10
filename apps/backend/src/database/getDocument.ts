@@ -2,7 +2,10 @@ import { Folder } from "../../prisma/generated/output";
 import { serializeSnapshot, serializeUpdates } from "../utils/serialize";
 import { prisma } from "./prisma";
 
-export async function getDocument(documentId: string) {
+export async function getDocument(
+  documentId: string,
+  knownSnapshotId?: string
+) {
   const doc = await prisma.document.findUnique({
     where: { id: documentId },
     include: {
@@ -18,6 +21,14 @@ export async function getDocument(documentId: string) {
       where: { id: doc.parentFolderId },
     });
   }
+
+  // const parentSnapshotProofs = await prisma.snapshot.findMany({
+  //   where: { documentId },
+  //   select: {
+  //     id: true,
+  //     parentSnapshotProof: true,
+  //   },
+  // });
 
   const snapshot = doc.activeSnapshot
     ? serializeSnapshot(doc.activeSnapshot)
