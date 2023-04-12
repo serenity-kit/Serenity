@@ -31,7 +31,7 @@ test("it returns true for a valid proof", () => {
 test("it returns false to due a changed parentSnapshotCiphertext", () => {
   const isValid = isValidParentSnapshot({
     grandParentSnapshotProof,
-    parentSnapshotCiphertext: new Uint8Array([4, 5, 7]),
+    parentSnapshotCiphertext: "wrong",
     snapshot: {
       nonce: "nonce",
       ciphertext: "ciphertext",
@@ -54,7 +54,7 @@ test("it returns false to due a changed parentSnapshotCiphertext", () => {
 
 test("it returns false to due a changed grandParentSnapshotProof", () => {
   const isValid = isValidParentSnapshot({
-    grandParentSnapshotProof: new Uint8Array([1, 2, 4]),
+    grandParentSnapshotProof: "wrong",
     parentSnapshotCiphertext,
     snapshot: {
       nonce: "nonce",
@@ -102,7 +102,7 @@ test("it returns false if parentSnapshotCiphertext and grandParentSnapshotProof 
 
 test("it returns false to due a manipulated parentSnapshotProof", () => {
   const isValid = isValidParentSnapshot({
-    grandParentSnapshotProof: new Uint8Array([1, 2, 4]),
+    grandParentSnapshotProof,
     parentSnapshotCiphertext,
     snapshot: {
       nonce: "nonce",
