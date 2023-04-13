@@ -349,19 +349,6 @@
     margin: 0;
   }
 
-  .table-extension .insert-row,
-  .table-extension .insert-column {
-    display: none;
-  }
-
-  .table-extension tr > *:first-child .insert-row {
-    display: block;
-  }
-
-  .table-extension tr:first-child > * .insert-column {
-    display: block;
-  }
-
   .editor-comment {
     position: relative;
     /* display setting needed to properly size background and add border */
