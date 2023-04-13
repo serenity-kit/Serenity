@@ -1,6 +1,12 @@
 import { Icon } from "@serenity-tools/ui";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
-import { TableMap, addColumn, addRow, findCell } from "prosemirror-tables";
+import {
+  CellSelection,
+  TableMap,
+  addColumn,
+  addRow,
+  findCell,
+} from "prosemirror-tables";
 import React from "react";
 
 export const TableCell = (props: any) => {
@@ -40,6 +46,27 @@ export const TableCell = (props: any) => {
         }}
       >
         <Icon name="add-line" />
+      </div>
+
+      <div
+        className="mark-row"
+        onClick={() => {
+          const editor = props.editor.storage.tableCell.currentEditor;
+          const state = editor.view.state;
+          const resolvedPos = state.doc.resolve(props.getPos());
+          const rowSelection = CellSelection.rowSelection(resolvedPos);
+          editor.view.dispatch(state.tr.setSelection(rowSelection));
+        }}
+      >
+        <Icon name="arrow-right-filled" />
+      </div>
+      <div
+        className="mark-column"
+        onClick={() => {
+          return null;
+        }}
+      >
+        <Icon name="arrow-down-filled" />
       </div>
 
       <NodeViewContent className="content" />

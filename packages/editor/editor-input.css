@@ -350,15 +350,19 @@
   }
 
   .table-extension .insert-row,
-  .table-extension .insert-column {
+  .table-extension .insert-column,
+  .table-extension .mark-row,
+  .table-extension .mark-column {
     display: none;
   }
 
-  .table-extension tr > *:first-child .insert-row {
+  .table-extension tr > *:first-child .insert-row,
+  .table-extension tr > *:first-child .mark-row {
     display: block;
   }
 
-  .table-extension tr:first-child > * .insert-column {
+  .table-extension tr:first-child > * .insert-column,
+  .table-extension tr:first-child > * .mark-column {
     display: block;
   }
 
