@@ -1,28 +1,27 @@
 import {
   BubbleMenuContentWrapper,
-  VerticalDivider,
   EditorContentButton,
   ScrollView,
   SubmitButton,
   TextArea,
   ToggleButton,
   Tooltip,
+  VerticalDivider,
+  View,
   tw,
   useHasEditorSidebar,
-  View,
 } from "@serenity-tools/ui";
 import { EditorEvents, isTextSelection } from "@tiptap/core";
 import Collaboration from "@tiptap/extension-collaboration";
 import { Level } from "@tiptap/extension-heading";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
-import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { HStack, VStack } from "native-base";
+import { HStack } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
 import {
   absolutePositionToRelativePosition,
@@ -45,6 +44,7 @@ import { updateCommentsDataAndScrollToHighlighted } from "./extensions/commentsE
 import { AwarnessExtension } from "./extensions/naishoAwarnessExtension/naishoAwarenessExtension";
 import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
+import { TableExtension } from "./extensions/tableExtension/tableExtension";
 import { TableHeaderExtension } from "./extensions/tableHeaderExtension/tableHeaderExtension";
 import { EditorComment } from "./types";
 
@@ -151,7 +151,7 @@ export const Editor = (props: EditorProps) => {
           highlightComment: props.highlightComment,
           highlightedComment: props.highlightedComment,
         }),
-        Table.configure({
+        TableExtension.configure({
           HTMLAttributes: {
             class: "table-extension",
           },

@@ -52,6 +52,9 @@ export const TableCell = (props: any) => {
         className="mark-row"
         onClick={() => {
           const editor = props.editor.storage.tableCell.currentEditor;
+
+          editor.storage.table.setTableActive(true);
+
           const state = editor.view.state;
           const resolvedPos = state.doc.resolve(props.getPos());
           const rowSelection = CellSelection.rowSelection(resolvedPos);
