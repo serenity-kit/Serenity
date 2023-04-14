@@ -170,7 +170,6 @@ export default async function createServer() {
 
       addConnection(documentId, connection);
       // TODO define type and only pass down the relevant data
-      console.log("doc", doc);
       connection.send(JSON.stringify({ type: "document", ...doc }));
 
       connection.on("message", async function message(messageContent) {

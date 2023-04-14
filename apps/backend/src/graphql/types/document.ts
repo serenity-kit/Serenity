@@ -22,10 +22,9 @@ export const DocumentSnapshotPublicDataInput = inputObjectType({
     t.nonNull.string("docId");
     t.nonNull.string("pubKey");
     t.string("snapshotId");
-    // TODO make it nonNull
     t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
     t.int("subkeyId");
-    t.string("parentSnapshotProof");
+    t.nonNull.string("parentSnapshotProof");
   },
 });
 
