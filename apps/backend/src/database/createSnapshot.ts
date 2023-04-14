@@ -4,6 +4,7 @@ import {
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
   Snapshot,
+  hash,
 } from "@naisho/core";
 import { prisma } from "./prisma";
 
@@ -127,6 +128,7 @@ export async function createSnapshot({
         id: snapshot.publicData.snapshotId,
         latestVersion: 0,
         data: JSON.stringify(snapshot),
+        ciphertextHash: hash(snapshot.ciphertext),
         activeSnapshotDocument: {
           connect: { id: snapshot.publicData.docId },
         },

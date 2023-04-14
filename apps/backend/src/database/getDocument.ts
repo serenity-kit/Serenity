@@ -22,13 +22,25 @@ export async function getDocument(
     });
   }
 
-  // const parentSnapshotProofs = await prisma.snapshot.findMany({
-  //   where: { documentId },
-  //   select: {
-  //     id: true,
-  //     parentSnapshotProof: true,
-  //   },
-  // });
+  let snapshotProofChain: {
+    id: string;
+    parentSnapshotProof: string;
+    ciphertextHash: string;
+  }[] = [];
+  if (knownSnapshotId) {
+    snapshotProofChain = await prisma.snapshot.findMany({
+      where: { documentId },
+      cursor: { id: knownSnapshotId },
+      skip: 1,
+      select: {
+        id: true,
+        parentSnapshotProof: true,
+        ciphertextHash: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: "asc" },
+    });
+  }
 
   const snapshot = doc.activeSnapshot
     ? serializeSnapshot(doc.activeSnapshot)
@@ -53,5 +65,12 @@ export async function getDocument(
     },
     snapshot,
     updates,
+    snapshotProofChain: snapshotProofChain.map((snapshotProofChainEntry) => {
+      return {
+        id: snapshotProofChainEntry.id,
+        parentSnapshotProof: snapshotProofChainEntry.parentSnapshotProof,
+        snapshotCiphertextHash: snapshotProofChainEntry.ciphertextHash,
+      };
+    }),
   };
 }

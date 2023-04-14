@@ -297,8 +297,8 @@ test("successfully creates a snapshot", async () => {
     publicData,
     sodium.from_base64(snapshotKey.key),
     signatureKeyPair,
-    sodium.from_base64(firstSnapshot.ciphertext),
-    sodium.from_base64(firstSnapshot.publicData.parentSnapshotProof)
+    firstSnapshot.ciphertext,
+    firstSnapshot.publicData.parentSnapshotProof
   );
   client.send(
     JSON.stringify({

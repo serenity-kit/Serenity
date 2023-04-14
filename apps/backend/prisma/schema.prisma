@@ -38,6 +38,7 @@ model Snapshot {
   id                     String           @id @default(uuid())
   latestVersion          Int
   data                   String
+  ciphertextHash         String
   document               Document         @relation(fields: [documentId], references: [id], onDelete: Cascade)
   documentId             String
   updates                Update[]

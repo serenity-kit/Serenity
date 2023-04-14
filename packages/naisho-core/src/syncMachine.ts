@@ -8,13 +8,16 @@ import {
   spawn,
 } from "xstate";
 import { z } from "zod";
+import { hash } from "./crypto";
 import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
+import { isValidAncestorSnapshot } from "./snapshot/isValidAncestorSnapshot";
 import {
   ParentSnapshotProofInfo,
   SnapshotFailedEvent,
   SnapshotPublicData,
   SnapshotWithServerData,
+  SyncMachineConfig,
   UpdateWithServerData,
 } from "./types";
 import { createUpdate, verifyAndDecryptUpdate } from "./update";
@@ -108,35 +111,6 @@ type ProcessQueueData = {
   updatesInFlight: UpdateInFlight[];
   pendingChangesQueue: any[];
   updateClocks: UpdateClocks;
-};
-
-export type SyncMachineConfig = {
-  documentId: string;
-  signatureKeyPair: KeyPair;
-  websocketHost: string;
-  websocketSessionKey: string;
-  applySnapshot: (decryptedSnapshot: any) => void;
-  getSnapshotKey: (snapshot: any | undefined) => Promise<Uint8Array>;
-  getNewSnapshotData: () => Promise<{
-    readonly id: string;
-    readonly data: Uint8Array | string;
-    readonly key: Uint8Array;
-    readonly publicData: any;
-    readonly additionalServerData?: any;
-  }>;
-  applyChanges: (updates: any[]) => void;
-  getUpdateKey: (update: any) => Promise<Uint8Array>;
-  applyEphemeralUpdates: (ephemeralUpdates: any[]) => void;
-  getEphemeralUpdateKey: () => Promise<Uint8Array>;
-  shouldSendSnapshot: (info: {
-    activeSnapshotId: string | null;
-    latestServerVersion: number | null;
-  }) => boolean;
-  serializeChanges: (changes: unknown[]) => string;
-  deserializeChanges: (string) => unknown[];
-  sodium: any;
-  onDocumentLoaded?: () => void;
-  onSnapshotSaved?: () => void | Promise<void>;
 };
 
 export type Context = SyncMachineConfig & {
@@ -596,6 +570,22 @@ export const syncMachine =
                 break;
               case "document":
                 try {
+                  if (context.knownSnapshotInfo) {
+                    const isValid = isValidAncestorSnapshot({
+                      knownSnapshotProofEntry: {
+                        parentSnapshotProof:
+                          context.knownSnapshotInfo.parentSnapshotProof,
+                        snapshotCiphertextHash:
+                          context.knownSnapshotInfo.snapshotCiphertextHash,
+                      },
+                      snapshotProofChain: event.snapshotProofChain,
+                      currentSnapshot: event.snapshot,
+                    });
+                    if (!isValid) {
+                      throw new Error("Invalid ancestor snapshot");
+                    }
+                  }
+
                   activeSnapshotInfo = {
                     id: event.snapshot.publicData.snapshotId,
                     ciphertext: event.snapshot.ciphertext,
@@ -603,6 +593,7 @@ export const syncMachine =
                       event.snapshot.publicData.parentSnapshotProof,
                   };
                   console.log(event.snapshot);
+
                   const snapshot = SnapshotWithServerData.parse(event.snapshot);
                   await processSnapshot(snapshot);
 
@@ -625,7 +616,6 @@ export const syncMachine =
                 console.log("snapshot", event);
                 try {
                   const snapshot = SnapshotWithServerData.parse(event.snapshot);
-                  console.log("snapshot parsed");
                   await processSnapshot(
                     snapshot,
                     activeSnapshotInfo ? activeSnapshotInfo : undefined
@@ -660,6 +650,25 @@ export const syncMachine =
                 const parsedEvent = SnapshotFailedEvent.parse(event);
                 console.log("snapshot saving failed", event);
                 if (parsedEvent.snapshot) {
+                  if (activeSnapshotInfo) {
+                    const isValid = isValidAncestorSnapshot({
+                      knownSnapshotProofEntry: {
+                        parentSnapshotProof:
+                          activeSnapshotInfo.parentSnapshotProof,
+                        snapshotCiphertextHash: hash(
+                          activeSnapshotInfo.ciphertext
+                        ),
+                      },
+                      snapshotProofChain: event.snapshotProofChain,
+                      currentSnapshot: event.snapshot,
+                    });
+                    if (!isValid) {
+                      throw new Error(
+                        "Invalid ancestor snapshot after snapshotFailed event"
+                      );
+                    }
+                  }
+
                   const snapshot = event.snapshot;
                   await processSnapshot(snapshot);
                 }

@@ -1,9 +1,9 @@
 import { createInitialSnapshot, createUpdate } from "@naisho/core";
 import {
+  LocalDevice,
   createSnapshotKey,
   decryptWorkspaceKey,
   folderDerivedKeyContext,
-  LocalDevice,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
@@ -76,20 +76,20 @@ beforeAll(async () => {
   await setup();
 });
 
-test("document not found if no id is provided", async () => {
+test("unauthorized if no id is provided", async () => {
   const { client, messages } = await createSocketClient(graphql.port, "", 1);
   await waitForClientState(client, client.CLOSED);
   expect(messages).toMatchInlineSnapshot(`
     [
       {
-        "type": "documentNotFound",
+        "type": "unauthorized",
       },
     ]
   `);
   expect(client.readyState).toEqual(client.CLOSED);
 });
 
-test("document not found if the document does not exist", async () => {
+test("unauthorized if the document does not exist", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
     `/id-that-does-not-exist`,
@@ -99,7 +99,7 @@ test("document not found if the document does not exist", async () => {
   expect(messages).toMatchInlineSnapshot(`
     [
       {
-        "type": "documentNotFound",
+        "type": "unauthorized",
       },
     ]
   `);

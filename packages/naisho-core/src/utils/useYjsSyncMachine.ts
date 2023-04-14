@@ -1,13 +1,14 @@
 import { useMachine } from "@xstate/react";
 import { useEffect, useState } from "react";
 import {
-  applyAwarenessUpdate,
   Awareness,
+  applyAwarenessUpdate,
   encodeAwarenessUpdate,
   removeAwarenessStates,
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
-import { syncMachine, SyncMachineConfig } from "../syncMachine";
+import { syncMachine } from "../syncMachine";
+import { SyncMachineConfig } from "../types";
 import { deserializeUint8ArrayUpdates } from "./deserializeUint8ArrayUpdates";
 import { serializeUint8ArrayUpdates } from "./serializeUint8ArrayUpdates";
 

@@ -1,4 +1,6 @@
+import type { KeyPair } from "libsodium-wrappers";
 import { z } from "zod";
+import { SnapshotProofChainEntry } from "./snapshot/isValidAncestorSnapshot";
 
 export const KeyDerivationTraceEntry = z.object({
   entryId: z.string(), // didn't use id because it often GraphQL clients normalize by the id field
@@ -166,4 +168,38 @@ export type SnapshotFailedEvent = z.infer<typeof SnapshotFailedEvent>;
 export type ParentSnapshotProofInfo = {
   ciphertext: string;
   parentSnapshotProof: string;
+};
+
+type KnownSnapshotInfo = SnapshotProofChainEntry & {
+  id: string;
+};
+
+export type SyncMachineConfig = {
+  documentId: string;
+  signatureKeyPair: KeyPair;
+  websocketHost: string;
+  websocketSessionKey: string;
+  applySnapshot: (decryptedSnapshot: any) => void;
+  getSnapshotKey: (snapshot: any | undefined) => Promise<Uint8Array>;
+  getNewSnapshotData: () => Promise<{
+    readonly id: string;
+    readonly data: Uint8Array | string;
+    readonly key: Uint8Array;
+    readonly publicData: any;
+    readonly additionalServerData?: any;
+  }>;
+  applyChanges: (updates: any[]) => void;
+  getUpdateKey: (update: any) => Promise<Uint8Array>;
+  applyEphemeralUpdates: (ephemeralUpdates: any[]) => void;
+  getEphemeralUpdateKey: () => Promise<Uint8Array>;
+  shouldSendSnapshot: (info: {
+    activeSnapshotId: string | null;
+    latestServerVersion: number | null;
+  }) => boolean;
+  serializeChanges: (changes: unknown[]) => string;
+  deserializeChanges: (string) => unknown[];
+  sodium: any;
+  onDocumentLoaded?: () => void;
+  onSnapshotSaved?: () => void | Promise<void>;
+  knownSnapshotInfo?: KnownSnapshotInfo;
 };
