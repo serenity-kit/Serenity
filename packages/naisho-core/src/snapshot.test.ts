@@ -40,6 +40,7 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
         },
       ],
     },
+    parentSnapshotClocks: {},
   };
 
   const snapshot = createSnapshot(
@@ -54,6 +55,7 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
   const result = verifyAndDecryptSnapshot(
     snapshot,
     key,
+    signatureKeyPair.publicKey,
     signatureKeyPair.publicKey
   );
   if (result === null) {
@@ -95,6 +97,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
         },
       ],
     },
+    parentSnapshotClocks: {},
   };
 
   const snapshot = createSnapshot(
@@ -113,6 +116,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
         signature: snapshot.signature.replace(/^./, "a"),
       },
       key,
+      signatureKeyPair.publicKey,
       signatureKeyPair.publicKey
     )
   ).toThrowError();
@@ -151,6 +155,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
         },
       ],
     },
+    parentSnapshotClocks: {},
   };
 
   const snapshot = createSnapshot(
@@ -169,6 +174,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
         ciphertext: snapshot.ciphertext.replace(/^./, "a"),
       },
       key,
+      signatureKeyPair.publicKey,
       signatureKeyPair.publicKey
     )
   ).toThrowError();

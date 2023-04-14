@@ -27,6 +27,7 @@ const createDummySnapshot = (
         workspaceKeyId: "workspaceKeyId",
         trace: [],
       },
+      parentSnapshotClocks: {},
     },
     signature: "signature",
   };

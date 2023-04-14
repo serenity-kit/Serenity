@@ -16,6 +16,14 @@ export const Document = objectType({
   },
 });
 
+export const DocumentSnapshotPublicDataParentSnapshotClocksInput =
+  inputObjectType({
+    name: "DocumentSnapshotPublicDataParentSnapshotClocksInput",
+    definition(t) {
+      t.string("dummy"); // optional
+    },
+  });
+
 export const DocumentSnapshotPublicDataInput = inputObjectType({
   name: "DocumentSnapshotPublicDataInput",
   definition(t) {
@@ -25,6 +33,9 @@ export const DocumentSnapshotPublicDataInput = inputObjectType({
     t.nonNull.field("keyDerivationTrace", { type: KeyDerivationTraceInput });
     t.int("subkeyId");
     t.nonNull.string("parentSnapshotProof");
+    t.nonNull.field("parentSnapshotClocks", {
+      type: DocumentSnapshotPublicDataParentSnapshotClocksInput,
+    });
   },
 });
 

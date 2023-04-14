@@ -35,12 +35,17 @@ export type KeyDerivationTraceWithKeys = z.infer<
   typeof KeyDerivationTraceWithKeys
 >;
 
+export const SnapshotClocks = z.record(z.string(), z.number());
+
+export type SnapshotClocks = z.infer<typeof SnapshotClocks>;
+
 export const SnapshotPublicData = z.object({
   docId: z.string(),
   pubKey: z.string(), // public signing key
   snapshotId: z.string(),
   subkeyId: z.number(),
   keyDerivationTrace: KeyDerivationTrace,
+  parentSnapshotClocks: SnapshotClocks,
 });
 
 export type SnapshotPublicData = z.infer<typeof SnapshotPublicData>;
@@ -52,6 +57,7 @@ export const SnapshotPublicDataWithParentSnapshotProof = z.object({
   subkeyId: z.number(),
   keyDerivationTrace: KeyDerivationTrace,
   parentSnapshotProof: z.string(),
+  parentSnapshotClocks: SnapshotClocks,
 });
 
 export type SnapshotPublicDataWithParentSnapshotProof = z.infer<
@@ -166,6 +172,7 @@ export const SnapshotFailedEvent = z.object({
 export type SnapshotFailedEvent = z.infer<typeof SnapshotFailedEvent>;
 
 export type ParentSnapshotProofInfo = {
+  id: string;
   ciphertext: string;
   parentSnapshotProof: string;
 };

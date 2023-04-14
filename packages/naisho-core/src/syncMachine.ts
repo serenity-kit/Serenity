@@ -427,6 +427,7 @@ export const syncMachine =
               pubKey: context.sodium.to_base64(
                 context.signatureKeyPair.publicKey
               ),
+              parentSnapshotClocks: updateClocks[activeSnapshotInfo.id] || {},
             };
             const snapshot = createSnapshot(
               snapshotData.data,
@@ -492,14 +493,33 @@ export const syncMachine =
             parentSnapshotProofInfo?: ParentSnapshotProofInfo
           ) => {
             console.log("processSnapshot", snapshot);
+
+            let parentSnapshotUpdateClock: number | undefined = undefined;
+
+            if (
+              parentSnapshotProofInfo &&
+              updateClocks[parentSnapshotProofInfo.id]
+            ) {
+              const currentClientPublicKey = context.sodium.to_base64(
+                context.signatureKeyPair.publicKey
+              );
+              parentSnapshotUpdateClock =
+                updateClocks[parentSnapshotProofInfo.id][
+                  currentClientPublicKey
+                ];
+            }
+
             const snapshotKey = await context.getSnapshotKey(snapshot);
             // console.log("processSnapshot key", snapshotKey);
             const decryptedSnapshot = verifyAndDecryptSnapshot(
               snapshot,
               snapshotKey,
               context.sodium.from_base64(snapshot.publicData.pubKey), // TODO check if this pubkey is part of the allowed collaborators
-              parentSnapshotProofInfo
+              context.signatureKeyPair.publicKey,
+              parentSnapshotProofInfo,
+              parentSnapshotUpdateClock
             );
+
             // TODO reset the clocks for the snapshot for the signing key
             context.applySnapshot(decryptedSnapshot);
             activeSnapshotInfo = {
@@ -769,8 +789,6 @@ export const syncMachine =
               const key = await context.getUpdateKey(event);
               const rawChanges = context._pendingChangesQueue;
               pendingChangesQueue = [];
-
-              // TODO add a compact changes function to queue and make sure all pending updates are sent as one update
               if (activeSnapshotInfo === null) {
                 throw new Error("No active snapshot");
               }

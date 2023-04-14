@@ -32,6 +32,7 @@ export const createIntroductionDocumentSnapshot = ({
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     subkeyId,
     keyDerivationTrace,
+    parentSnapshotClocks: {},
   };
 
   return createInitialSnapshot(

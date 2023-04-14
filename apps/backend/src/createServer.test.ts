@@ -175,6 +175,7 @@ test("successfully creates a snapshot", async () => {
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
     subkeyId: snapshotKey.subkeyId,
+    parentSnapshotClocks: {},
   };
   const snapshot = createInitialSnapshot(
     "CONTENT DUMMY",

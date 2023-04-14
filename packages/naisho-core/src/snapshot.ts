@@ -70,7 +70,9 @@ export function verifyAndDecryptSnapshot(
   snapshot: Snapshot,
   key: Uint8Array,
   publicKey: Uint8Array,
-  parentSnapshotProofInfo?: ParentSnapshotProofInfo
+  currentClientPublicKey: Uint8Array,
+  parentSnapshotProofInfo?: ParentSnapshotProofInfo,
+  parentSnapshotUpdateClock?: number
 ) {
   const publicDataAsBase64 = sodium.to_base64(
     canonicalize(snapshot.publicData) as string
@@ -93,6 +95,21 @@ export function verifyAndDecryptSnapshot(
     });
     if (!isValid) {
       throw new Error("Invalid parent snapshot verification");
+    }
+  }
+
+  if (parentSnapshotUpdateClock) {
+    const currentClientPublicKeyString = sodium.to_base64(
+      currentClientPublicKey
+    );
+
+    if (
+      snapshot.publicData.parentSnapshotClocks[currentClientPublicKeyString] !==
+        undefined &&
+      parentSnapshotUpdateClock ===
+        snapshot.publicData.parentSnapshotClocks[currentClientPublicKeyString]
+    ) {
+      throw new Error("Invalid updateClock for the parent snapshot");
     }
   }
 

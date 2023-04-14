@@ -442,6 +442,7 @@ export type DocumentSnapshotInput = {
 export type DocumentSnapshotPublicDataInput = {
   docId: Scalars['String'];
   keyDerivationTrace: KeyDerivationTraceInput;
+  parentSnapshotProof?: InputMaybe<Scalars['String']>;
   pubKey: Scalars['String'];
   snapshotId?: InputMaybe<Scalars['String']>;
   subkeyId?: InputMaybe<Scalars['Int']>;

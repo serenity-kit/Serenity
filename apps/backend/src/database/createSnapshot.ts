@@ -136,6 +136,8 @@ export async function createSnapshot({
         keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
         clocks: {},
         parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
+        // TODO additionally could verify that the parentSnapshotClocks of the saved parent snapshot
+        parentSnapshotClocks: snapshot.publicData.parentSnapshotClocks,
       },
     });
   });

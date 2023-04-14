@@ -307,6 +307,7 @@ export default function SidebarFolder(props: Props) {
       pubKey: sodium.to_base64(signatureKeyPair.publicKey),
       keyDerivationTrace: snapshotKeyDerivationTrace,
       subkeyId: snapshotKey.subkeyId,
+      parentSnapshotClocks: {},
     };
     // created using:
     // const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
