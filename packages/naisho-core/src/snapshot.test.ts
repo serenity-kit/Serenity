@@ -6,6 +6,8 @@ import { generateId } from "./utils/generateId";
 
 const snapshotDerivedKeyContext = "snapshot";
 
+// TODO add tests for parentSnapshotProofInfo and parentSnapshotUpdateClock in verifyAndDecryptSnapshot
+
 test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
   await sodium.ready;
 
