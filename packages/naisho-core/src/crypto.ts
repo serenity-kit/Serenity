@@ -1,3 +1,4 @@
+import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { extractPrefixFromUint8Array } from "./utils/extractPrefixFromUint8Array";
 import { prefixWithUint8Array } from "./utils/prefixWithUint8Array";
@@ -67,15 +68,26 @@ export function createSignatureKeyPair() {
   return sodium.crypto_sign_keypair();
 }
 
-export function sign(message: string, privateKey: Uint8Array) {
+export function sign(
+  content: { [key in string]: string },
+  privateKey: Uint8Array
+) {
+  const message = canonicalize(content);
+  if (typeof message !== "string") {
+    throw new Error("Invalid content");
+  }
   return sodium.to_base64(sodium.crypto_sign_detached(message, privateKey));
 }
 
 export function verifySignature(
-  message,
+  content: { [key in string]: string },
   signature: string,
   publicKey: Uint8Array
 ) {
+  const message = canonicalize(content);
+  if (typeof message !== "string") {
+    return false;
+  }
   return sodium.crypto_sign_verify_detached(
     sodium.from_base64(signature),
     message,

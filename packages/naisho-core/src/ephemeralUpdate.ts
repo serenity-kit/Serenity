@@ -33,7 +33,11 @@ export function createEphemeralUpdate(
     key
   );
   const signature = sign(
-    `${publicNonce}${ciphertext}${publicDataAsBase64}`,
+    {
+      nonce: publicNonce,
+      ciphertext,
+      publicData: publicDataAsBase64,
+    },
     signatureKeyPair.privateKey
   );
   const ephemeralUpdate: EphemeralUpdate = {
@@ -57,7 +61,11 @@ export function verifyAndDecryptEphemeralUpdate(
   );
 
   const isValid = verifySignature(
-    `${ephemeralUpdate.nonce}${ephemeralUpdate.ciphertext}${publicDataAsBase64}`,
+    {
+      nonce: ephemeralUpdate.nonce,
+      ciphertext: ephemeralUpdate.ciphertext,
+      publicData: publicDataAsBase64,
+    },
     ephemeralUpdate.signature,
     publicKey
   );

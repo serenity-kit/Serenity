@@ -24,7 +24,11 @@ export function createUpdate(
     key
   );
   const signature = sign(
-    `${publicNonce}${ciphertext}${publicDataAsBase64}`,
+    {
+      nonce: publicNonce,
+      ciphertext,
+      publicData: publicDataAsBase64,
+    },
     signatureKeyPair.privateKey
   );
 
@@ -49,7 +53,11 @@ export function verifyAndDecryptUpdate(
   );
 
   const isValid = verifySignature(
-    `${update.nonce}${update.ciphertext}${publicDataAsBase64}`,
+    {
+      nonce: update.nonce,
+      ciphertext: update.ciphertext,
+      publicData: publicDataAsBase64,
+    },
     update.signature,
     publicKey
   );

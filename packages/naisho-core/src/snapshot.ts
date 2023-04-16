@@ -36,7 +36,11 @@ export function createSnapshot(
     key
   );
   const signature = sign(
-    `${publicNonce}${ciphertext}${publicDataAsBase64}`,
+    {
+      nonce: publicNonce,
+      ciphertext,
+      publicData: publicDataAsBase64,
+    },
     signatureKeyPair.privateKey
   );
   const snapshot: Snapshot = {
@@ -79,7 +83,11 @@ export function verifyAndDecryptSnapshot(
   );
 
   const isValid = verifySignature(
-    `${snapshot.nonce}${snapshot.ciphertext}${publicDataAsBase64}`,
+    {
+      nonce: snapshot.nonce,
+      ciphertext: snapshot.ciphertext,
+      publicData: publicDataAsBase64,
+    },
     snapshot.signature,
     publicKey
   );
