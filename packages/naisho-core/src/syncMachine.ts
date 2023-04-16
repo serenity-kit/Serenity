@@ -95,6 +95,10 @@ type UpdateClocks = {
   [snapshotId: string]: { [publicSigningKey: string]: number };
 };
 
+type MostRecentEphemeralUpdateDatePerPublicSigningKey = {
+  [publicSigningKey: string]: Date;
+};
+
 type ActiveSnapshotInfo = {
   id: string;
   ciphertext: string;
@@ -111,6 +115,7 @@ type ProcessQueueData = {
   updatesInFlight: UpdateInFlight[];
   pendingChangesQueue: any[];
   updateClocks: UpdateClocks;
+  mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
 };
 
 export type Context = SyncMachineConfig & {
@@ -126,6 +131,7 @@ export type Context = SyncMachineConfig & {
   _confirmedUpdatesClock: number | null;
   _sendingUpdatesClock: number;
   _updateClocks: UpdateClocks;
+  _mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
 };
 
 export const syncMachine =
@@ -192,6 +198,7 @@ export const syncMachine =
         _confirmedUpdatesClock: null,
         _sendingUpdatesClock: -1,
         _updateClocks: {},
+        _mostRecentEphemeralUpdateDatePerPublicSigningKey: {},
       },
       initial: "connecting",
       on: {
@@ -370,6 +377,8 @@ export const syncMachine =
               _confirmedUpdatesClock: event.data.confirmedUpdatesClock,
               _updatesInFlight: event.data.updatesInFlight,
               _updateClocks: event.data.updateClocks,
+              _mostRecentEphemeralUpdateDatePerPublicSigningKey:
+                event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
             };
           } else {
             return {
@@ -381,6 +390,8 @@ export const syncMachine =
               _confirmedUpdatesClock: event.data.confirmedUpdatesClock,
               _updatesInFlight: event.data.updatesInFlight,
               _updateClocks: event.data.updateClocks,
+              _mostRecentEphemeralUpdateDatePerPublicSigningKey:
+                event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
             };
           }
         }),
@@ -412,6 +423,8 @@ export const syncMachine =
           let updatesInFlight = context._updatesInFlight;
           let pendingChangesQueue = context._pendingChangesQueue;
           let updateClocks = context._updateClocks;
+          let mostRecentEphemeralUpdateDatePerPublicSigningKey =
+            context._mostRecentEphemeralUpdateDatePerPublicSigningKey;
 
           const createAndSendSnapshot = async () => {
             if (activeSnapshotInfo === null) {
@@ -762,12 +775,20 @@ export const syncMachine =
               case "ephemeralUpdate":
                 const ephemeralUpdateKey =
                   await context.getEphemeralUpdateKey();
+
                 const ephemeralUpdateResult = verifyAndDecryptEphemeralUpdate(
                   event,
                   ephemeralUpdateKey,
-                  context.sodium.from_base64(event.publicData.pubKey) // TODO check if this pubkey is part of the allowed collaborators
+                  context.sodium.from_base64(event.publicData.pubKey), // TODO check if this pubkey is part of the allowed collaborators
+                  mostRecentEphemeralUpdateDatePerPublicSigningKey[
+                    event.publicData.pubKey
+                  ]
                 );
-                context.applyEphemeralUpdates([ephemeralUpdateResult]);
+                mostRecentEphemeralUpdateDatePerPublicSigningKey[
+                  event.publicData.pubKey
+                ] = ephemeralUpdateResult.date;
+
+                context.applyEphemeralUpdates([ephemeralUpdateResult.content]);
                 break;
             }
           } else if (
@@ -811,6 +832,7 @@ export const syncMachine =
             updatesInFlight,
             pendingChangesQueue,
             updateClocks,
+            mostRecentEphemeralUpdateDatePerPublicSigningKey,
           };
         },
       },
