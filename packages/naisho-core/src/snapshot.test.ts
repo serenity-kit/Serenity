@@ -6,6 +6,8 @@ import { generateId } from "./utils/generateId";
 
 const snapshotDerivedKeyContext = "snapshot";
 
+// TODO add tests for parentSnapshotProofInfo and parentSnapshotUpdateClock in verifyAndDecryptSnapshot
+
 test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
   await sodium.ready;
 
@@ -40,18 +42,22 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
         },
       ],
     },
+    parentSnapshotClocks: {},
   };
 
   const snapshot = createSnapshot(
     "Hello World",
     publicData,
     key,
-    signatureKeyPair
+    signatureKeyPair,
+    "",
+    ""
   );
 
   const result = verifyAndDecryptSnapshot(
     snapshot,
     key,
+    signatureKeyPair.publicKey,
     signatureKeyPair.publicKey
   );
   if (result === null) {
@@ -93,13 +99,16 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
         },
       ],
     },
+    parentSnapshotClocks: {},
   };
 
   const snapshot = createSnapshot(
     "Hello World",
     publicData,
     key,
-    signatureKeyPair
+    signatureKeyPair,
+    "",
+    ""
   );
 
   expect(() =>
@@ -109,6 +118,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
         signature: snapshot.signature.replace(/^./, "a"),
       },
       key,
+      signatureKeyPair.publicKey,
       signatureKeyPair.publicKey
     )
   ).toThrowError();
@@ -147,13 +157,16 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
         },
       ],
     },
+    parentSnapshotClocks: {},
   };
 
   const snapshot = createSnapshot(
     "Hello World",
     publicData,
     key,
-    signatureKeyPair
+    signatureKeyPair,
+    "",
+    ""
   );
 
   expect(() =>
@@ -163,6 +176,7 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
         ciphertext: snapshot.ciphertext.replace(/^./, "a"),
       },
       key,
+      signatureKeyPair.publicKey,
       signatureKeyPair.publicKey
     )
   ).toThrowError();

@@ -1,5 +1,5 @@
 import {
-  createSnapshot,
+  createInitialSnapshot,
   generateId,
   KeyDerivationTrace,
   Snapshot,
@@ -175,10 +175,11 @@ export const createDocument = async ({
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     subkeyId: snapshotKey.subkeyId,
     keyDerivationTrace: snapshotKeyDerivationTrace,
+    parentSnapshotClocks: {},
   };
 
   const initialDocument = "";
-  const snapshot = createSnapshot(
+  const snapshot = createInitialSnapshot(
     sodium.from_base64(initialDocument),
     publicData,
     sodium.from_base64(snapshotKey.key),

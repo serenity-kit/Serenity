@@ -1,4 +1,6 @@
+import type { KeyPair } from "libsodium-wrappers";
 import { z } from "zod";
+import { SnapshotProofChainEntry } from "./snapshot/isValidAncestorSnapshot";
 
 export const KeyDerivationTraceEntry = z.object({
   entryId: z.string(), // didn't use id because it often GraphQL clients normalize by the id field
@@ -33,15 +35,34 @@ export type KeyDerivationTraceWithKeys = z.infer<
   typeof KeyDerivationTraceWithKeys
 >;
 
+export const SnapshotClocks = z.record(z.string(), z.number());
+
+export type SnapshotClocks = z.infer<typeof SnapshotClocks>;
+
 export const SnapshotPublicData = z.object({
   docId: z.string(),
   pubKey: z.string(), // public signing key
   snapshotId: z.string(),
   subkeyId: z.number(),
   keyDerivationTrace: KeyDerivationTrace,
+  parentSnapshotClocks: SnapshotClocks,
 });
 
 export type SnapshotPublicData = z.infer<typeof SnapshotPublicData>;
+
+export const SnapshotPublicDataWithParentSnapshotProof = z.object({
+  docId: z.string(),
+  pubKey: z.string(), // public signing key
+  snapshotId: z.string(),
+  subkeyId: z.number(),
+  keyDerivationTrace: KeyDerivationTrace,
+  parentSnapshotProof: z.string(),
+  parentSnapshotClocks: SnapshotClocks,
+});
+
+export type SnapshotPublicDataWithParentSnapshotProof = z.infer<
+  typeof SnapshotPublicDataWithParentSnapshotProof
+>;
 
 export const SnapshotServerData = z.object({
   latestVersion: z.number(),
@@ -87,7 +108,7 @@ export const Snapshot = z.object({
   ciphertext: z.string(),
   nonce: z.string(),
   signature: z.string(), // ciphertext + nonce + publicData
-  publicData: SnapshotPublicData,
+  publicData: SnapshotPublicDataWithParentSnapshotProof,
 });
 
 export type Snapshot = z.infer<typeof Snapshot>;
@@ -149,3 +170,43 @@ export const SnapshotFailedEvent = z.object({
 });
 
 export type SnapshotFailedEvent = z.infer<typeof SnapshotFailedEvent>;
+
+export type ParentSnapshotProofInfo = {
+  id: string;
+  ciphertext: string;
+  parentSnapshotProof: string;
+};
+
+type KnownSnapshotInfo = SnapshotProofChainEntry & {
+  id: string;
+};
+
+export type SyncMachineConfig = {
+  documentId: string;
+  signatureKeyPair: KeyPair;
+  websocketHost: string;
+  websocketSessionKey: string;
+  applySnapshot: (decryptedSnapshot: any) => void;
+  getSnapshotKey: (snapshot: any | undefined) => Promise<Uint8Array>;
+  getNewSnapshotData: () => Promise<{
+    readonly id: string;
+    readonly data: Uint8Array | string;
+    readonly key: Uint8Array;
+    readonly publicData: any;
+    readonly additionalServerData?: any;
+  }>;
+  applyChanges: (updates: any[]) => void;
+  getUpdateKey: (update: any) => Promise<Uint8Array>;
+  applyEphemeralUpdates: (ephemeralUpdates: any[]) => void;
+  getEphemeralUpdateKey: () => Promise<Uint8Array>;
+  shouldSendSnapshot: (info: {
+    activeSnapshotId: string | null;
+    latestServerVersion: number | null;
+  }) => boolean;
+  serializeChanges: (changes: unknown[]) => string;
+  deserializeChanges: (string) => unknown[];
+  sodium: any;
+  onDocumentLoaded?: () => void;
+  onSnapshotSaved?: () => void | Promise<void>;
+  knownSnapshotInfo?: KnownSnapshotInfo;
+};

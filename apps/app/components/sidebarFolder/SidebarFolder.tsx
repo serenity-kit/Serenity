@@ -1,4 +1,8 @@
-import { createSnapshot, generateId, KeyDerivationTrace } from "@naisho/core";
+import {
+  createInitialSnapshot,
+  generateId,
+  KeyDerivationTrace,
+} from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -303,6 +307,7 @@ export default function SidebarFolder(props: Props) {
       pubKey: sodium.to_base64(signatureKeyPair.publicKey),
       keyDerivationTrace: snapshotKeyDerivationTrace,
       subkeyId: snapshotKey.subkeyId,
+      parentSnapshotClocks: {},
     };
     // created using:
     // const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
@@ -311,7 +316,7 @@ export default function SidebarFolder(props: Props) {
     // to do so create an initial document without any yDoc ref and set the first
     // line to have a H1 header
     const initialDocument = `AQLGkrivDwAHAQRwYWdlAwdoZWFkaW5nKADGkrivDwAFbGV2ZWwBfQEA`;
-    const snapshot = createSnapshot(
+    const snapshot = createInitialSnapshot(
       sodium.from_base64(initialDocument),
       publicData,
       sodium.from_base64(snapshotKey.key),

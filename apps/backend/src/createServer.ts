@@ -34,6 +34,7 @@ import { retryAsyncFunction } from "./retryAsyncFunction";
 import { schema } from "./schema";
 import { addConnection, addUpdate, removeConnection } from "./store";
 import { ExpectedGraphqlError } from "./utils/expectedGraphqlError/expectedGraphqlError";
+import { getKnownSnapshotIdFromUrl } from "./utils/getKnownSnapshotIdFromUrl/getKnownSnapshotIdFromUrl";
 
 export default async function createServer() {
   const apolloServer = new ApolloServer({
@@ -132,19 +133,21 @@ export default async function createServer() {
 
       console.log("connected");
 
-      const documentId = request.url?.slice(1)?.split("?")[0] || "";
-
-      let doc = await getDocument(documentId);
-      if (!doc) {
+      if (!context.user) {
         // TODO close connection properly
-        connection.send(JSON.stringify({ type: "documentNotFound" }));
+        connection.send(JSON.stringify({ type: "unauthorized" }));
         connection.close();
         return;
       }
 
-      if (!context.user) {
+      const documentId = request.url?.slice(1)?.split("?")[0] || "";
+      const knownSnapshotId = getKnownSnapshotIdFromUrl(request.url);
+
+      let doc = await getDocument(documentId, knownSnapshotId);
+
+      if (!doc) {
         // TODO close connection properly
-        connection.send(JSON.stringify({ type: "unauthorized" }));
+        connection.send(JSON.stringify({ type: "documentNotFound" }));
         connection.close();
         return;
       }
@@ -166,6 +169,7 @@ export default async function createServer() {
       }
 
       addConnection(documentId, connection);
+      // TODO define type and only pass down the relevant data
       connection.send(JSON.stringify({ type: "document", ...doc }));
 
       connection.on("message", async function message(messageContent) {
@@ -182,7 +186,6 @@ export default async function createServer() {
         // new snapshot
         if (data?.publicData?.snapshotId) {
           const snapshotMessage = SnapshotWithClientData.parse(data);
-          console.log("snapshotMessage", snapshotMessage);
           try {
             const activeSnapshotInfo =
               snapshotMessage.lastKnownSnapshotId &&
@@ -223,8 +226,9 @@ export default async function createServer() {
               connection
             );
           } catch (error) {
+            console.log("SNAPSHOT FAILED ERROR:", error);
             if (error instanceof NaishoSnapshotBasedOnOutdatedSnapshotError) {
-              let doc = await getDocument(documentId);
+              let doc = await getDocument(documentId, data.lastKnownSnapshotId);
               if (!doc) return; // should never be the case?
               connection.send(
                 JSON.stringify({
@@ -232,6 +236,7 @@ export default async function createServer() {
                   docId: data.publicData.docId,
                   snapshot: doc.snapshot,
                   updates: doc.updates,
+                  snapshotProofChain: doc.snapshotProofChain,
                 })
               );
             } else if (error instanceof NaishoSnapshotMissesUpdatesError) {
