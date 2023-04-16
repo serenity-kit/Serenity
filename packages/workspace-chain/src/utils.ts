@@ -24,13 +24,21 @@ export const isValidCreateChainEvent = (event: TrustChainEvent) => {
   }
   const lockboxPublicKeys = event.transaction.lockboxPublicKeys;
   const hash = hashTransaction(event.transaction);
+  const message = canonicalize({
+    prevHash: null,
+    hash,
+  });
+  if (typeof message !== "string") {
+    throw new Error("Could not canonicalize hashes");
+  }
+
   return event.authors.every((author) => {
     if (!lockboxPublicKeys.hasOwnProperty(author.publicKey)) {
       return false;
     }
     return sodium.crypto_sign_verify_detached(
       sodium.from_base64(author.signature),
-      hash,
+      message,
       sodium.from_base64(author.publicKey)
     );
   });

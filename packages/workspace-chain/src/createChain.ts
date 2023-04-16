@@ -1,4 +1,5 @@
 import { generateId } from "@naisho/core";
+import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
   CreateChainTransaction,
@@ -17,6 +18,14 @@ export const createChain = (
     lockboxPublicKeys,
   };
   const hash = hashTransaction(transaction);
+  const message = canonicalize({
+    prevHash: null,
+    hash,
+  });
+  if (typeof message !== "string") {
+    throw new Error("Could not canonicalize hashes");
+  }
+
   return {
     transaction,
     authors: [
@@ -24,7 +33,7 @@ export const createChain = (
         publicKey: authorKeyPair.publicKey,
         signature: sodium.to_base64(
           sodium.crypto_sign_detached(
-            hash,
+            message,
             sodium.from_base64(authorKeyPair.privateKey)
           )
         ),

@@ -1,3 +1,4 @@
+import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import {
   AddMemberViaInvitationTransaction,
@@ -47,15 +48,20 @@ export const addMemberViaInvitation = ({
   };
 
   const hash = hashTransaction(transaction);
+  const message = canonicalize({
+    prevHash,
+    hash,
+  });
+  if (typeof message !== "string") {
+    throw new Error("Could not canonicalize hashes");
+  }
+
   return {
     authors: [
       {
         publicKey: sodium.to_base64(authorKeyPair.publicKey),
         signature: sodium.to_base64(
-          sodium.crypto_sign_detached(
-            `${prevHash}${hash}`,
-            authorKeyPair.privateKey
-          )
+          sodium.crypto_sign_detached(message, authorKeyPair.privateKey)
         ),
       },
     ],
