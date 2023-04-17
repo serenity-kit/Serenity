@@ -47,7 +47,7 @@ import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExt
 import { TableExtension } from "./extensions/tableExtension/tableExtension";
 import { TableHeaderExtension } from "./extensions/tableHeaderExtension/tableHeaderExtension";
 import { EditorComment } from "./types";
-import { TableWrapper } from "./extensions/tableExtension/tableWrapper";
+import { TableWrapperNodeExtension } from "./extensions/tableWrapperNodeExtension/tableWrapperNodeExtension";
 
 type HighlightedCommentSource = "editor" | "sidebar";
 
@@ -157,7 +157,7 @@ export const Editor = (props: EditorProps) => {
             class: "table-extension",
           },
         }),
-        TableWrapper.configure({
+        TableWrapperNodeExtension.configure({
           HTMLAttributes: {
             class: "table-wrapper",
           },

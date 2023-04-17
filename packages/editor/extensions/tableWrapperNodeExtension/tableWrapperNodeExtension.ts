@@ -1,8 +1,8 @@
 import { mergeAttributes, Node } from "@tiptap/core";
 import { ReactNodeViewRenderer } from "@tiptap/react";
-import { TableWrapperView } from "./TableWrapperView";
+import { TableWrapper } from "./TableWrapper";
 
-export const TableWrapper = Node.create({
+export const TableWrapperNodeExtension = Node.create({
   name: "table-wrapper",
   group: "block",
   content: "table",
@@ -16,6 +16,6 @@ export const TableWrapper = Node.create({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(TableWrapperView);
+    return ReactNodeViewRenderer(TableWrapper);
   },
 });
