@@ -2,7 +2,7 @@ import { Icon } from "@serenity-tools/ui";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import React from "react";
 
-export const Table = (props: any) => {
+export const TableWrapperView = (props: any) => {
   const [active, setActive] = React.useState(false);
 
   props.editor.storage.table.setTableActive = setActive;
@@ -18,7 +18,6 @@ export const Table = (props: any) => {
       </div>
 
       <NodeViewContent
-        as="table"
         className={props.extension.options.HTMLAttributes.class}
       />
     </NodeViewWrapper>
