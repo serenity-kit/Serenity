@@ -9,8 +9,6 @@ export const KeyDerivationTraceEntry = z.object({
   context: z.string(), // kdf context
 });
 
-export type KeyDerivationTraceEntry = z.infer<typeof KeyDerivationTraceEntry>;
-
 export const KeyDerivationTraceEntryWithKey = KeyDerivationTraceEntry.extend({
   key: z.string(),
 });
@@ -19,12 +17,12 @@ export type KeyDerivationTraceEntryWithKey = z.infer<
   typeof KeyDerivationTraceEntryWithKey
 >;
 
+export type KeyDerivationTraceEntry = z.infer<typeof KeyDerivationTraceEntry>;
+
 export const KeyDerivationTrace = z.object({
   workspaceKeyId: z.string(),
   trace: z.array(KeyDerivationTraceEntry),
 });
-
-export type KeyDerivationTrace = z.infer<typeof KeyDerivationTrace>;
 
 export const KeyDerivationTraceWithKeys = z.object({
   workspaceKeyId: z.string(),
@@ -34,6 +32,8 @@ export const KeyDerivationTraceWithKeys = z.object({
 export type KeyDerivationTraceWithKeys = z.infer<
   typeof KeyDerivationTraceWithKeys
 >;
+
+export type KeyDerivationTrace = z.infer<typeof KeyDerivationTrace>;
 
 export const SnapshotClocks = z.record(z.string(), z.number());
 
@@ -163,14 +163,6 @@ export const ServerEvent = z.union([
 
 export type ServerEvent = z.infer<typeof ServerEvent>;
 
-export const SnapshotFailedEvent = z.object({
-  type: z.literal("snapshotFailed"),
-  snapshot: z.optional(SnapshotWithServerData),
-  updates: z.array(UpdateWithServerData).optional(),
-});
-
-export type SnapshotFailedEvent = z.infer<typeof SnapshotFailedEvent>;
-
 export type ParentSnapshotProofInfo = {
   id: string;
   ciphertext: string;
@@ -179,6 +171,12 @@ export type ParentSnapshotProofInfo = {
 
 type KnownSnapshotInfo = SnapshotProofChainEntry & {
   id: string;
+};
+
+type AdditionalAuthenticationDataValidations = {
+  snapshot: z.SomeZodObject;
+  update: z.SomeZodObject;
+  ephemeralUpdate: z.SomeZodObject;
 };
 
 export type SyncMachineConfig = {
@@ -209,4 +207,5 @@ export type SyncMachineConfig = {
   onDocumentLoaded?: () => void;
   onSnapshotSaved?: () => void | Promise<void>;
   knownSnapshotInfo?: KnownSnapshotInfo;
+  additionalAuthenticationDataValidations?: AdditionalAuthenticationDataValidations;
 };
