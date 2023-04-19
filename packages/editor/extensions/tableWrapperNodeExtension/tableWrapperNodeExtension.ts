@@ -8,11 +8,11 @@ export const TableWrapperNodeExtension = Node.create({
   content: "table",
 
   parseHTML() {
-    return [{ tag: "table-wrapper" }];
+    return [{ tag: "div" }];
   },
 
   renderHTML({ HTMLAttributes }) {
-    return ["table-wrapper", mergeAttributes(HTMLAttributes), 0];
+    return ["div", mergeAttributes(HTMLAttributes), 0];
   },
 
   addNodeView() {
