@@ -66,7 +66,14 @@ export const TableCell = (props: any) => {
       <div
         className="mark-column"
         onClick={() => {
-          return null;
+          const editor = props.editor.storage.tableCell.currentEditor;
+
+          editor.storage.table.setTableActive(true);
+
+          const state = editor.view.state;
+          const resolvedPos = state.doc.resolve(props.getPos());
+          const rowSelection = CellSelection.colSelection(resolvedPos);
+          editor.view.dispatch(state.tr.setSelection(rowSelection));
         }}
       >
         <Icon name="arrow-down-filled" />
