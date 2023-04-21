@@ -9,6 +9,9 @@ export const TableWrapper = (props: any) => {
 
   return (
     <NodeViewWrapper>
+      <NodeViewContent
+        className={props.extension.options.HTMLAttributes.class}
+      />
       <div
         onClick={() => {
           return null;
@@ -16,10 +19,11 @@ export const TableWrapper = (props: any) => {
       >
         <Icon name="arrow-down-filled" /> {active ? "Active" : "Not Active"}
       </div>
-
-      <NodeViewContent
-        className={props.extension.options.HTMLAttributes.class}
-      />
+      <div className="add add-column flex-center-center">+</div>
+      <div className="add add-row flex-center-center">+</div>
+      <div className="row-line hidden" id="row-line"></div>
+      <div className="column-line hidden" id="column-line"></div>
+      <div className="table-selection hidden" id="table-selection"></div>
     </NodeViewWrapper>
   );
 };
