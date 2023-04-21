@@ -21,6 +21,7 @@ const customColors = {
   },
   primary: {
     100: "#ECEEFF",
+    150: "#DDE1FE",
     200: "#CDD3FC",
     300: "#9DAAFD",
     400: "#7083FA",

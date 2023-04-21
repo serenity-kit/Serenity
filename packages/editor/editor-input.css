@@ -304,10 +304,10 @@
 
   .table-extension td,
   .table-extension th {
-    border: 2px solid #ced4da;
+    border: 1px solid theme("colors.gray.300");
     box-sizing: border-box;
     min-width: 1em;
-    padding: 3px 5px;
+    padding: 0.6875rem 0.5rem;
     position: relative;
     vertical-align: top;
   }
@@ -318,21 +318,17 @@
   }
 
   .table-extension th {
-    background-color: #f1f3f5;
+    background-color: theme("colors.gray.150");
     font-weight: bold;
     text-align: left;
   }
 
-  .table-extension .selectedCell:after {
-    background: rgba(200, 200, 255, 0.4);
-    content: "";
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    pointer-events: none;
-    position: absolute;
-    z-index: 2;
+  .table-extension th.selectedCell {
+    background-color: theme("colors.primary.150");
+  }
+
+  .table-extension td.selectedCell {
+    background-color: theme("colors.primary.100");
   }
 
   .table-extension .column-resize-handle {
@@ -349,6 +345,7 @@
     margin: 0;
   }
 
+  /* initially hide all elements */
   .table-extension .insert-row,
   .table-extension .insert-column,
   .table-extension .mark-row,
@@ -356,6 +353,9 @@
     display: none;
   }
 
+  /* then only show the ones we need */
+  /* info: we tried doing this is js but had a hard time getting enough information about the table 
+  from within the cell context so decided to do it via css */
   .table-extension tr > *:first-child .insert-row,
   .table-extension tr > *:first-child .mark-row {
     display: block;
@@ -366,6 +366,7 @@
     display: block;
   }
 
+  /* --- comment-extension --- */
   .editor-comment {
     position: relative;
     /* display setting needed to properly size background and add border */
