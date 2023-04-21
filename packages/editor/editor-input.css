@@ -392,6 +392,43 @@
     top: -0.5rem;
   }
 
+  /* --- mark row / columns --- */
+
+  .mark-row,
+  .mark-column {
+    position: absolute;
+  }
+
+  .mark-row [role="button"],
+  .mark-column [role="button"] {
+    box-sizing: content-box; /* needs to be here as there is no native equivalent for that */
+  }
+
+  .mark-row {
+    height: 100%;
+    top: 0px;
+    left: calc((1rem + 1px) * (-1)); /* defined width + border-width */
+  }
+
+  .mark-column {
+    width: 100%;
+    top: calc((1rem + 1px) * (-1)); /* defined height + border-width */
+    left: 0px;
+  }
+
+  /* adjust styling for first table cell--- */
+  tr:first-child th:first-child .mark-column,
+  tr:first-child td:first-child .mark-column {
+    left: -1px;
+    width: calc(100% + 1px);
+  }
+
+  tr:first-child th:first-child .mark-row,
+  tr:first-child td:first-child .mark-row {
+    top: -1px;
+    height: calc(100% + 1px);
+  }
+
   /* ------------- comment-extension ------------- */
   .editor-comment {
     position: relative;

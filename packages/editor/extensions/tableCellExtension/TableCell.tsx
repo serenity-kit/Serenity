@@ -1,4 +1,4 @@
-import { Icon, TableInsert, View } from "@serenity-tools/ui";
+import { TableHandle, TableInsert } from "@serenity-tools/ui";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import {
   CellSelection,
@@ -48,35 +48,36 @@ export const TableCell = (props: any) => {
         />
       </div>
 
-      <div
-        className="mark-row"
-        onClick={() => {
-          const editor = props.editor.storage.tableCell.currentEditor;
+      <div className="mark-row">
+        <TableHandle
+          variant="row"
+          onPress={() => {
+            const editor = props.editor.storage.tableCell.currentEditor;
 
-          editor.storage.table.setTableActive(true);
+            editor.storage.table.setTableActive(true);
 
-          const state = editor.view.state;
-          const resolvedPos = state.doc.resolve(props.getPos());
-          const rowSelection = CellSelection.rowSelection(resolvedPos);
-          editor.view.dispatch(state.tr.setSelection(rowSelection));
-        }}
-      >
-        <Icon name="arrow-right-filled" />
+            const state = editor.view.state;
+            const resolvedPos = state.doc.resolve(props.getPos());
+            const rowSelection = CellSelection.rowSelection(resolvedPos);
+            editor.view.dispatch(state.tr.setSelection(rowSelection));
+          }}
+        />
       </div>
-      <div
-        className="mark-column"
-        onClick={() => {
-          const editor = props.editor.storage.tableCell.currentEditor;
 
-          editor.storage.table.setTableActive(true);
+      <div className="mark-column">
+        <TableHandle
+          variant="column"
+          onPress={() => {
+            const editor = props.editor.storage.tableCell.currentEditor;
 
-          const state = editor.view.state;
-          const resolvedPos = state.doc.resolve(props.getPos());
-          const rowSelection = CellSelection.colSelection(resolvedPos);
-          editor.view.dispatch(state.tr.setSelection(rowSelection));
-        }}
-      >
-        <Icon name="arrow-down-filled" />
+            editor.storage.table.setTableActive(true);
+
+            const state = editor.view.state;
+            const resolvedPos = state.doc.resolve(props.getPos());
+            const rowSelection = CellSelection.colSelection(resolvedPos);
+            editor.view.dispatch(state.tr.setSelection(rowSelection));
+          }}
+        />
       </div>
 
       <NodeViewContent className="content" />
