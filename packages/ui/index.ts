@@ -57,6 +57,7 @@ export * from "./components/sidebarText/SidebarText";
 export * from "./components/spinner/Spinner";
 export * from "./components/submitButton/SubmitButton";
 export * from "./components/tab/Tab";
+export * from "./components/tableInsert/TableInsert";
 export * from "./components/tableOfContentButton/TableOfContentButton";
 export * from "./components/tabList/TabList";
 export * from "./components/tabPanel/TabPanel";
