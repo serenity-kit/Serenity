@@ -45,6 +45,7 @@ import { AwarnessExtension } from "./extensions/naishoAwarnessExtension/naishoAw
 import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
 import { TableExtension } from "./extensions/tableExtension/tableExtension";
+import { isCellSelection } from "./extensions/tableExtension/isCellSelection";
 import { TableHeaderExtension } from "./extensions/tableHeaderExtension/tableHeaderExtension";
 import { EditorComment } from "./types";
 import { TableWrapperNodeExtension } from "./extensions/tableWrapperNodeExtension/tableWrapperNodeExtension";
@@ -228,6 +229,10 @@ export const Editor = (props: EditorProps) => {
     }
   }, [props.comments, props.highlightedComment, editor]);
 
+  const selection = editor?.view.state.selection;
+  const isRowSelection =
+    selection && isCellSelection(selection) && selection.isRowSelection();
+
   return (
     <div className="flex h-full flex-auto flex-row">
       {/* z-index needed so BubbleMenu overlaps with Sidebar */}
@@ -294,7 +299,8 @@ export const Editor = (props: EditorProps) => {
                 empty ||
                 isEmptyTextBlock ||
                 !editor.isEditable ||
-                editor.isActive("file")
+                editor.isActive("file") ||
+                isCellSelection(state.selection)
               ) {
                 // hide the create comment bubble and clear the text when the bubble menu is blured
                 setCommentText("");
@@ -412,6 +418,64 @@ export const Editor = (props: EditorProps) => {
                   </Tooltip>
                 </>
               )}
+            </BubbleMenuContentWrapper>
+          </BubbleMenu>
+
+          <BubbleMenu
+            editor={editor}
+            tippyOptions={{ duration: 100, placement: "bottom" }}
+            shouldShow={({ state, from, to, view, editor }) => {
+              const { doc, selection } = state;
+              const { empty } = selection;
+
+              // When clicking on a element inside the bubble menu the editor "blur" event
+              // is called and the bubble menu item is focussed. In this case we should
+              // consider the menu as part of the editor and keep showing the menu
+              let isChildOfMenu = false;
+              if (bubbleMenuRef.current) {
+                isChildOfMenu = bubbleMenuRef.current.contains(
+                  document.activeElement
+                );
+              }
+
+              const hasEditorFocus = view.hasFocus() || isChildOfMenu;
+              const isColSelection =
+                isCellSelection(selection) && selection.isColSelection();
+              const isRowSelection =
+                isCellSelection(selection) && selection.isRowSelection();
+
+              if (
+                !hasEditorFocus ||
+                empty ||
+                !isCellSelection(state.selection) ||
+                // check if neither row or col-selection, as otherwise will also show on random cell-selection
+                (!isRowSelection && !isColSelection) ||
+                !editor.isEditable
+              ) {
+                return false;
+              }
+
+              return true;
+            }}
+          >
+            <BubbleMenuContentWrapper padded={false}>
+              <Tooltip
+                label={`Delete ${isRowSelection ? "row" : "column"}`}
+                placement={"top"}
+                hasArrow={false}
+              >
+                <ToggleButton
+                  onPress={() => {
+                    if (isRowSelection) {
+                      editor.chain().focus().deleteRow().run();
+                    } else {
+                      editor.chain().focus().deleteColumn().run();
+                    }
+                  }}
+                  name="delete-bin-line"
+                  isActive={false}
+                />
+              </Tooltip>
             </BubbleMenuContentWrapper>
           </BubbleMenu>
 
