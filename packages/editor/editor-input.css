@@ -91,7 +91,7 @@
     @apply my-4 border-l-4 border-solid border-primary-400 pl-4;
   }
 
-  /* --- code --- */
+  /* ------------- code ------------- */
 
   /* used for inline- and blockcode */
   code {
@@ -107,7 +107,7 @@
     @apply my-4 rounded border border-solid border-gray-200 bg-gray-100 p-4;
   }
 
-  /* --- lists --- */
+  /* ------------- lists ------------- */
   .ProseMirror > ol,
   .ProseMirror > ul {
     @apply my-4;
@@ -229,7 +229,7 @@
     position: absolute;
   }
 
-  /* - css checkbox - */
+  /* ------------- css checkbox ------------- */
   .task-item-extension input + span {
     position: relative;
     display: block;
@@ -293,11 +293,15 @@
     /* --- */
   }
 
-  /* --- table-extension --- */
+  /*---------------- table-extension ------------- */
+
+  .table-wrapper {
+    margin: 2.5rem 0 1rem 0; /* needed to avoid overlapping with table-function elements */
+  }
+
   .table-extension {
     border-collapse: collapse;
     margin: 0;
-    overflow: hidden;
     table-layout: fixed;
     width: 100%;
   }
@@ -332,7 +336,7 @@
   }
 
   .table-extension .column-resize-handle {
-    background-color: #adf;
+    background-color: theme("colors.primary.400");
     bottom: -2px;
     position: absolute;
     right: -2px;
@@ -366,7 +370,29 @@
     display: block;
   }
 
-  /* --- comment-extension --- */
+  /* --- insert row / columns --- */
+
+  .insert-row,
+  .insert-column {
+    position: absolute;
+  }
+
+  .insert-row {
+    top: -0.5625rem;
+    left: -2.125rem;
+  }
+
+  .insert-column {
+    top: -2.125rem;
+    left: -0.5rem;
+  }
+
+  /* first child dot needs to be higher to match with line */
+  tr:first-child .insert-row {
+    top: -0.5rem;
+  }
+
+  /* ------------- comment-extension ------------- */
   .editor-comment {
     position: relative;
     /* display setting needed to properly size background and add border */

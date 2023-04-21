@@ -1,4 +1,4 @@
-import { Icon } from "@serenity-tools/ui";
+import { Icon, TableInsert, View } from "@serenity-tools/ui";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import {
   CellSelection,
@@ -26,26 +26,26 @@ export const TableCell = (props: any) => {
 
   return (
     <NodeViewWrapper>
-      <div
-        className="insert-row"
-        onClick={() => {
-          const editor = props.editor.storage.tableCell.currentEditor;
-          const { tr, tableRect, cellPositionInfo } = getTableInsertInfo();
-          editor.view.dispatch(addRow(tr, tableRect, cellPositionInfo.top));
-        }}
-      >
-        <Icon name="add-line" />
+      <div className="insert-row">
+        <TableInsert
+          onPress={() => {
+            const editor = props.editor.storage.tableCell.currentEditor;
+            const { tr, tableRect, cellPositionInfo } = getTableInsertInfo();
+            editor.view.dispatch(addRow(tr, tableRect, cellPositionInfo.top));
+          }}
+        />
       </div>
 
-      <div
-        className="insert-column"
-        onClick={() => {
-          const editor = props.editor.storage.tableCell.currentEditor;
-          const { tr, tableRect, cellPositionInfo } = getTableInsertInfo();
-          editor.view.dispatch(addColumn(tr, tableRect, cellPositionInfo.left));
-        }}
-      >
-        <Icon name="add-line" />
+      <div className="insert-column">
+        <TableInsert
+          onPress={() => {
+            const editor = props.editor.storage.tableCell.currentEditor;
+            const { tr, tableRect, cellPositionInfo } = getTableInsertInfo();
+            editor.view.dispatch(
+              addColumn(tr, tableRect, cellPositionInfo.left)
+            );
+          }}
+        />
       </div>
 
       <div
