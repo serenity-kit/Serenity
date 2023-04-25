@@ -44,11 +44,10 @@ import { updateCommentsDataAndScrollToHighlighted } from "./extensions/commentsE
 import { AwarnessExtension } from "./extensions/naishoAwarnessExtension/naishoAwarenessExtension";
 import { SerenityScrollIntoViewForEditModeExtension } from "./extensions/scrollIntoViewForEditModeExtensions/scrollIntoViewForEditModeExtensions";
 import { TableCellExtension } from "./extensions/tableCellExtension/tableCellExtension";
-import { TableExtension } from "./extensions/tableExtension/tableExtension";
 import { isCellSelection } from "./extensions/tableExtension/isCellSelection";
+import { TableExtension } from "./extensions/tableExtension/tableExtension";
 import { TableHeaderExtension } from "./extensions/tableHeaderExtension/tableHeaderExtension";
 import { EditorComment } from "./types";
-import { TableWrapperNodeExtension } from "./extensions/tableWrapperNodeExtension/tableWrapperNodeExtension";
 
 type HighlightedCommentSource = "editor" | "sidebar";
 
@@ -156,11 +155,6 @@ export const Editor = (props: EditorProps) => {
         TableExtension.configure({
           HTMLAttributes: {
             class: "table-extension",
-          },
-        }),
-        TableWrapperNodeExtension.configure({
-          HTMLAttributes: {
-            class: "table-wrapper",
           },
         }),
         TableRow,

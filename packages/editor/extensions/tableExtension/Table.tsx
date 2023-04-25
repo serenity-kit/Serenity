@@ -2,15 +2,16 @@ import { Icon } from "@serenity-tools/ui";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import React from "react";
 
-export const TableWrapper = (props: any) => {
+export const Table = (props: any) => {
   const [active, setActive] = React.useState(false);
 
   props.editor.storage.table.setTableActive = setActive;
 
   return (
-    <NodeViewWrapper>
+    <NodeViewWrapper className={"table-wrapper"}>
       <NodeViewContent
         className={props.extension.options.HTMLAttributes.class}
+        as="table"
       />
       <div
         onClick={() => {
