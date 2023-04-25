@@ -1,17 +1,15 @@
 import { TableHandle, TableInsert } from "@serenity-tools/ui";
+import { addRow } from "@tiptap/pm/tables";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import {
   CellSelection,
   TableMap,
   addColumn,
-  addRow,
   findCell,
 } from "prosemirror-tables";
 import React from "react";
 
 export const TableCell = (props: any) => {
-  // console.log(props);
-
   const getTableInsertInfo = () => {
     const editor = props.editor.storage.tableCell.currentEditor;
     const state = editor.view.state;
@@ -26,7 +24,30 @@ export const TableCell = (props: any) => {
 
   return (
     <NodeViewWrapper>
-      <div className="insert-row">
+      <div
+        className="insert-row"
+        onMouseEnter={(event) => {
+          let target = event.target;
+          // @ts-expect-error
+          let wrapper = target.closest(".table-wrapper");
+          let row_line = wrapper.querySelector(".row-line");
+          let offset =
+            // @ts-expect-error
+            target.getBoundingClientRect().top -
+            wrapper.getBoundingClientRect().top;
+
+          // offset of dot + half a dot-height (16/2) - 1px as it needs to overlap the border
+          row_line.style.top = `${offset + 7}px`;
+          row_line.classList.remove("hidden");
+        }}
+        onMouseLeave={(event) => {
+          let target = event.target;
+          // @ts-expect-error
+          let wrapper = target.closest(".table-wrapper");
+          let row_line = wrapper.querySelector(".row-line");
+          row_line.classList.add("hidden");
+        }}
+      >
         <TableInsert
           onPress={() => {
             const editor = props.editor.storage.tableCell.currentEditor;

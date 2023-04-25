@@ -1,9 +1,9 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import { View } from "../view/View";
 import { tw } from "../../tailwind";
-import { Pressable, PressableProps } from "../pressable/Pressable";
 import { Icon } from "../icon/Icon";
+import { Pressable, PressableProps } from "../pressable/Pressable";
+import { View } from "../view/View";
 
 export type TableInsertProps = PressableProps & {};
 
@@ -32,7 +32,12 @@ export const TableInsert = React.forwardRef(
                 isPressed && styles.pressed,
               ]}
             >
-              {isHovered ? <Icon name="add-line" color="white" /> : null}
+              {/* needs to be via style instead of removing the whole element
+                  as it otherwise interferes with the hover event of the insert-element 
+                  inside the TableCell */}
+              <View style={!isHovered && tw`hidden`}>
+                <Icon name="add-line" color="white" />
+              </View>
             </View>
           );
         }}

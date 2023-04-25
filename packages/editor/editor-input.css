@@ -296,6 +296,7 @@
   /*---------------- table-extension ------------- */
 
   .table-wrapper {
+    position: relative;
     margin: 2.5rem 0 1rem 0; /* needed to avoid overlapping with table-function elements */
   }
 
@@ -427,6 +428,29 @@
   tr:first-child td:first-child .mark-row {
     top: -1px;
     height: calc(100% + 1px);
+  }
+
+  /* --- lines for insert-row/column element ---- */
+  .row-line,
+  .column-line {
+    position: absolute;
+    background-color: theme("colors.primary.500");
+  }
+
+  .row-line {
+    top: 39px;
+    left: -16px;
+
+    height: 2px;
+    width: calc(100% + 16px);
+  }
+
+  .column-line {
+    top: -16px;
+    left: 0px;
+
+    height: calc(100% + 16px);
+    width: 2px;
   }
 
   /* ------------- comment-extension ------------- */
