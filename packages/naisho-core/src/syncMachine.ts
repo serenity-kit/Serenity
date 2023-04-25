@@ -730,7 +730,7 @@ export const syncMachine =
                 break;
 
               case "update":
-                await processUpdates([event.update]);
+                await processUpdates([event]);
                 break;
               case "updateSaved":
                 console.log("update saved", event);
