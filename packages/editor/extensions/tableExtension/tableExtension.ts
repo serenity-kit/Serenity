@@ -10,6 +10,10 @@ export const TableExtension = TiptapTableExtension.extend({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(Table);
+    return ReactNodeViewRenderer(Table, {
+      // @ts-expect-error
+      contentDOMElementTag: "tbody",
+      className: "table-wrapper",
+    });
   },
 });

@@ -8,7 +8,7 @@ export const Table = (props: any) => {
   props.editor.storage.table.setTableActive = setActive;
 
   return (
-    <NodeViewWrapper className={"table-wrapper"}>
+    <NodeViewWrapper>
       <NodeViewContent
         className={props.extension.options.HTMLAttributes.class}
         as="table"

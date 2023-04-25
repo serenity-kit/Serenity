@@ -31,7 +31,8 @@
     "test": "yarn workspaces run test",
     "lint": "yarn workspaces run lint",
     "prettier:write": "yarn prettier --write '**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css,html,graphql,gql}'",
-    "prettier:check": "yarn prettier --check '**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css,html,graphql,gql}'"
+    "prettier:check": "yarn prettier --check '**/*.{ts,tsx,js,jsx,json,md,yml,yaml,css,html,graphql,gql}'",
+    "postinstall": "patch-package"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
