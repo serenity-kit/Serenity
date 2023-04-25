@@ -1,11 +1,8 @@
-import {
-  createInitialSnapshot,
-  generateId,
-  KeyDerivationTrace,
-} from "@naisho/core";
+import { createInitialSnapshot, generateId } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
+  KeyDerivationTrace,
   createDocumentTitleKey,
   createSnapshotKey,
   decryptFolderName,
@@ -22,10 +19,10 @@ import {
   Pressable,
   SidebarText,
   Tooltip,
-  tw,
-  useIsDesktopDevice,
   View,
   ViewProps,
+  tw,
+  useIsDesktopDevice,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";

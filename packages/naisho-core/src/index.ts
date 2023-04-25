@@ -2,6 +2,7 @@ export * from "./crypto";
 export * from "./ephemeralUpdate";
 export * from "./errors";
 export * from "./snapshot";
+export * from "./snapshot/parseSnapshotWithClientData";
 export * from "./syncMachine";
 export * from "./types";
 export * from "./update";

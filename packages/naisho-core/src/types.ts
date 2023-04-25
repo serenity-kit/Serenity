@@ -2,39 +2,6 @@ import type { KeyPair } from "libsodium-wrappers";
 import { z } from "zod";
 import { SnapshotProofChainEntry } from "./snapshot/isValidAncestorSnapshot";
 
-export const KeyDerivationTraceEntry = z.object({
-  entryId: z.string(), // didn't use id because it often GraphQL clients normalize by the id field
-  subkeyId: z.number(),
-  parentId: z.union([z.string(), z.null(), z.undefined()]), // the first entry has no parent
-  context: z.string(), // kdf context
-});
-
-export const KeyDerivationTraceEntryWithKey = KeyDerivationTraceEntry.extend({
-  key: z.string(),
-});
-
-export type KeyDerivationTraceEntryWithKey = z.infer<
-  typeof KeyDerivationTraceEntryWithKey
->;
-
-export type KeyDerivationTraceEntry = z.infer<typeof KeyDerivationTraceEntry>;
-
-export const KeyDerivationTrace = z.object({
-  workspaceKeyId: z.string(),
-  trace: z.array(KeyDerivationTraceEntry),
-});
-
-export const KeyDerivationTraceWithKeys = z.object({
-  workspaceKeyId: z.string(),
-  trace: z.array(KeyDerivationTraceEntryWithKey),
-});
-
-export type KeyDerivationTraceWithKeys = z.infer<
-  typeof KeyDerivationTraceWithKeys
->;
-
-export type KeyDerivationTrace = z.infer<typeof KeyDerivationTrace>;
-
 export const SnapshotClocks = z.record(z.string(), z.number());
 
 export type SnapshotClocks = z.infer<typeof SnapshotClocks>;
@@ -43,8 +10,6 @@ export const SnapshotPublicData = z.object({
   docId: z.string(),
   pubKey: z.string(), // public signing key
   snapshotId: z.string(),
-  subkeyId: z.number(),
-  keyDerivationTrace: KeyDerivationTrace,
   parentSnapshotClocks: SnapshotClocks,
 });
 
@@ -54,8 +19,6 @@ export const SnapshotPublicDataWithParentSnapshotProof = z.object({
   docId: z.string(),
   pubKey: z.string(), // public signing key
   snapshotId: z.string(),
-  subkeyId: z.number(),
-  keyDerivationTrace: KeyDerivationTrace,
   parentSnapshotProof: z.string(),
   parentSnapshotClocks: SnapshotClocks,
 });
@@ -174,9 +137,9 @@ type KnownSnapshotInfo = SnapshotProofChainEntry & {
 };
 
 type AdditionalAuthenticationDataValidations = {
-  snapshot: z.SomeZodObject;
-  update: z.SomeZodObject;
-  ephemeralUpdate: z.SomeZodObject;
+  snapshot?: z.SomeZodObject;
+  update?: z.SomeZodObject;
+  ephemeralUpdate?: z.SomeZodObject;
 };
 
 export type SyncMachineConfig = {

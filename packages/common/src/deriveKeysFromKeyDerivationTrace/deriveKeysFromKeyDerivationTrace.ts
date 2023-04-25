@@ -1,7 +1,7 @@
-import { KeyDerivationTrace, KeyDerivationTraceWithKeys } from "@naisho/core";
 import { decryptWorkspaceKey } from "../decryptWorkspaceKey/decryptWorkspaceKey";
 import { kdfDeriveFromKey } from "../kdfDeriveFromKey/kdfDeriveFromKey";
 import { Device, LocalDevice } from "../types";
+import { KeyDerivationTrace, KeyDerivationTraceWithKeys } from "../zodTypes";
 
 type Params = {
   keyDerivationTrace: KeyDerivationTrace;

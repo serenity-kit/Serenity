@@ -1,9 +1,10 @@
+import { generateId, useYjsSyncMachine } from "@naisho/core";
 import {
-  generateId,
   KeyDerivationTrace,
-  useYjsSyncMachine,
-} from "@naisho/core";
-import { encryptDocumentTitle, LocalDevice } from "@serenity-tools/common";
+  LocalDevice,
+  SerenitySnapshotPublicData,
+  encryptDocumentTitle,
+} from "@serenity-tools/common";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "@serenity-tools/common/src/decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { AwarenessUserInfo } from "@serenity-tools/editor";
 import {
@@ -179,10 +180,14 @@ export default function Page({
     },
     shouldSendSnapshot: ({ latestServerVersion }) => {
       // create a new snapshot if the active snapshot has more than 100 updates
-      return latestServerVersion !== null && latestServerVersion > 100;
+      return latestServerVersion !== null && latestServerVersion > 5;
     },
     getEphemeralUpdateKey: async () => {
       return snapshotKeyRef.current?.key as Uint8Array;
+    },
+    additionalAuthenticationDataValidations: {
+      // @ts-expect-error should actually match the type?
+      snapshot: SerenitySnapshotPublicData,
     },
     sodium,
   });
