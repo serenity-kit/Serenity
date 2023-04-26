@@ -14,13 +14,8 @@ test("it returns true for a valid proof", () => {
       publicData: {
         parentSnapshotProof,
         docId: "docId",
-        subkeyId: 1,
         snapshotId: "snapshotId",
         pubKey: "pubKey",
-        keyDerivationTrace: {
-          workspaceKeyId: "workspaceKeyId",
-          trace: [],
-        },
         parentSnapshotClocks: {},
       },
       signature: "signature",
@@ -39,13 +34,8 @@ test("it returns false to due a changed parentSnapshotCiphertext", () => {
       publicData: {
         parentSnapshotProof,
         docId: "docId",
-        subkeyId: 1,
         snapshotId: "snapshotId",
         pubKey: "pubKey",
-        keyDerivationTrace: {
-          workspaceKeyId: "workspaceKeyId",
-          trace: [],
-        },
         parentSnapshotClocks: {},
       },
       signature: "signature",
@@ -64,13 +54,8 @@ test("it returns false to due a changed grandParentSnapshotProof", () => {
       publicData: {
         parentSnapshotProof,
         docId: "docId",
-        subkeyId: 1,
         snapshotId: "snapshotId",
         pubKey: "pubKey",
-        keyDerivationTrace: {
-          workspaceKeyId: "workspaceKeyId",
-          trace: [],
-        },
         parentSnapshotClocks: {},
       },
       signature: "signature",
@@ -89,13 +74,8 @@ test("it returns false if parentSnapshotCiphertext and grandParentSnapshotProof 
       publicData: {
         parentSnapshotProof,
         docId: "docId",
-        subkeyId: 1,
         snapshotId: "snapshotId",
         pubKey: "pubKey",
-        keyDerivationTrace: {
-          workspaceKeyId: "workspaceKeyId",
-          trace: [],
-        },
         parentSnapshotClocks: {},
       },
       signature: "signature",
@@ -114,13 +94,8 @@ test("it returns false to due a manipulated parentSnapshotProof", () => {
       publicData: {
         parentSnapshotProof: "WRONG",
         docId: "docId",
-        subkeyId: 1,
         snapshotId: "snapshotId",
         pubKey: "pubKey",
-        keyDerivationTrace: {
-          workspaceKeyId: "workspaceKeyId",
-          trace: [],
-        },
         parentSnapshotClocks: {},
       },
       signature: "signature",
