@@ -3,6 +3,7 @@ import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   KeyDerivationTrace,
+  SerenitySnapshotPublicData,
   createDocumentTitleKey,
   createSnapshotKey,
   decryptFolderName,
@@ -313,7 +314,7 @@ export default function SidebarFolder(props: Props) {
     // to do so create an initial document without any yDoc ref and set the first
     // line to have a H1 header
     const initialDocument = `AQLGkrivDwAHAQRwYWdlAwdoZWFkaW5nKADGkrivDwAFbGV2ZWwBfQEA`;
-    const snapshot = createInitialSnapshot(
+    const snapshot = createInitialSnapshot<SerenitySnapshotPublicData>(
       sodium.from_base64(initialDocument),
       publicData,
       sodium.from_base64(snapshotKey.key),

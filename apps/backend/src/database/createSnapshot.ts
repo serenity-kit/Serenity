@@ -1,11 +1,10 @@
 import {
-  KeyDerivationTrace,
   NaishoNewSnapshotWithKeyRotationRequired,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
-  Snapshot,
   hash,
 } from "@naisho/core";
+import { KeyDerivationTrace, SerenitySnapshot } from "@serenity-tools/common";
 import { prisma } from "./prisma";
 
 type ActiveSnapshotInfo = {
@@ -22,7 +21,7 @@ export type CreateSnapshotDocumentTitleData = {
 };
 
 type CreateSnapshotParams = {
-  snapshot: Snapshot;
+  snapshot: SerenitySnapshot;
   workspaceId: string;
   activeSnapshotInfo?: ActiveSnapshotInfo;
   documentTitle?: CreateSnapshotDocumentTitleData;

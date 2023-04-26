@@ -1,7 +1,7 @@
-import { KeyDerivationTrace } from "@naisho/core";
 import { decryptDocumentTitleBasedOnSnapshotKey } from "../decryptDocumentTitleBasedOnSnapshotKey/decryptDocumentTitleBasedOnSnapshotKey";
 import { deriveKeysFromKeyDerivationTrace } from "../deriveKeysFromKeyDerivationTrace/deriveKeysFromKeyDerivationTrace";
 import { Device, LocalDevice } from "../types";
+import { KeyDerivationTrace } from "../zodTypes";
 
 type Params = {
   ciphertext: string;

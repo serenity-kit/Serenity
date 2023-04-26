@@ -201,6 +201,7 @@ export default async function createServer() {
                   }
                 : undefined;
             const snapshot = await createSnapshot({
+              // @ts-expect-error missing the SerenitySnapshotPublicData type
               snapshot: snapshotMessage,
               activeSnapshotInfo,
               workspaceId: userToWorkspace.workspaceId,

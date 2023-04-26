@@ -1,7 +1,6 @@
 import {
   createInitialSnapshot,
   generateId,
-  KeyDerivationTrace,
   Snapshot,
   SnapshotPublicData,
 } from "@naisho/core";
@@ -10,7 +9,9 @@ import {
   createSnapshotKey,
   deriveKeysFromKeyDerivationTrace,
   encryptDocumentTitleByKey,
+  KeyDerivationTrace,
   LocalDevice,
+  SerenitySnapshotPublicData,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { gql } from "graphql-request";
@@ -169,7 +170,7 @@ export const createDocument = async ({
     keyType: "ed25519",
   };
 
-  const publicData: SnapshotPublicData = {
+  const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
     snapshotId: generateId(),
     docId: id,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),

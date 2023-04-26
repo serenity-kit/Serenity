@@ -1,3 +1,4 @@
+import { Snapshot } from "@naisho/core";
 import { z } from "zod";
 
 export const KeyDerivationTraceEntry = z.object({
@@ -37,3 +38,11 @@ export const SerenitySnapshotPublicData = z.object({
   subkeyId: z.number(),
   keyDerivationTrace: KeyDerivationTrace,
 });
+
+export type SerenitySnapshotPublicData = z.infer<
+  typeof SerenitySnapshotPublicData
+>;
+
+export type SerenitySnapshot = Snapshot & {
+  publicData: Snapshot["publicData"] & SerenitySnapshotPublicData;
+};

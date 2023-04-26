@@ -10,15 +10,16 @@ import {
   SnapshotPublicDataWithParentSnapshotProof,
 } from "./types";
 
-export function createSnapshot(
+export function createSnapshot<AdditionalSnapshotPublicData>(
   content: Uint8Array | string,
-  publicData: SnapshotPublicData,
+  publicData: SnapshotPublicData & AdditionalSnapshotPublicData,
   key: Uint8Array,
   signatureKeyPair: KeyPair,
   parentSnapshotCiphertext: string,
   grandParentSnapshotProof: string
 ) {
-  const extendedPublicData: SnapshotPublicDataWithParentSnapshotProof = {
+  const extendedPublicData: SnapshotPublicDataWithParentSnapshotProof &
+    AdditionalSnapshotPublicData = {
     ...publicData,
     parentSnapshotProof: createParentSnapshotProof({
       parentSnapshotCiphertext,
@@ -43,7 +44,9 @@ export function createSnapshot(
     },
     signatureKeyPair.privateKey
   );
-  const snapshot: Snapshot = {
+  const snapshot: Snapshot & {
+    publicData: AdditionalSnapshotPublicData & Snapshot["publicData"];
+  } = {
     nonce: publicNonce,
     ciphertext,
     publicData: extendedPublicData,
@@ -53,13 +56,13 @@ export function createSnapshot(
   return snapshot;
 }
 
-export function createInitialSnapshot(
+export function createInitialSnapshot<AdditionalSnapshotPublicData>(
   content: Uint8Array | string,
-  publicData: SnapshotPublicData,
+  publicData: SnapshotPublicData & AdditionalSnapshotPublicData,
   key: Uint8Array,
   signatureKeyPair: KeyPair
 ) {
-  const snapshot = createSnapshot(
+  const snapshot = createSnapshot<AdditionalSnapshotPublicData>(
     content,
     publicData,
     key,

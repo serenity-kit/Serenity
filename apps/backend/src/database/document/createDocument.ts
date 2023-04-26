@@ -1,4 +1,4 @@
-import { Snapshot } from "@naisho/core";
+import { SerenitySnapshot } from "@serenity-tools/common";
 import { ForbiddenError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
 import { createSnapshot } from "../createSnapshot";
@@ -13,7 +13,7 @@ type Params = {
   subkeyId: number;
   parentFolderId: string;
   workspaceId: string;
-  snapshot: Snapshot;
+  snapshot: SerenitySnapshot;
 };
 
 export async function createDocument({

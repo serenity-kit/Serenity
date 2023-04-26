@@ -1,8 +1,5 @@
-import {
-  KeyDerivationTrace,
-  NaishoNewSnapshotWithKeyRotationRequired,
-  Update,
-} from "@naisho/core";
+import { NaishoNewSnapshotWithKeyRotationRequired, Update } from "@naisho/core";
+import { KeyDerivationTrace } from "@serenity-tools/common";
 import { Prisma } from "../../prisma/generated/output";
 import { serializeUpdate } from "../utils/serialize";
 import { prisma } from "./prisma";

@@ -1,17 +1,17 @@
-import { KeyDerivationTrace, Snapshot } from "@naisho/core";
+import { KeyDerivationTrace, SerenitySnapshot } from "@serenity-tools/common";
 import { Document } from "../../types/document";
 import { Folder, formatFolder } from "../../types/folder";
 import {
-  formatSnapshot,
   Snapshot as SnapshotModel,
+  formatSnapshot,
 } from "../../types/snapshot";
 import { Workspace } from "../../types/workspace";
 import { createSnapshot } from "../createSnapshot";
 import { createFolder } from "../folder/createFolder";
 import { prisma } from "../prisma";
 import {
-  createWorkspace,
   DeviceWorkspaceKeyBoxParams,
+  createWorkspace,
 } from "./createWorkspace";
 
 export type CreateWorkspaceResult = {
@@ -41,7 +41,7 @@ export type DocumentParams = {
   nameCiphertext: string;
   nameNonce: string;
   subkeyId: number;
-  snapshot: Snapshot;
+  snapshot: SerenitySnapshot;
 };
 
 export type Params = {
