@@ -470,6 +470,31 @@
     z-index: 2;
   }
 
+  .add-row {
+    bottom: -1rem;
+    left: -1rem;
+
+    height: 1rem;
+    width: calc(100% + 2rem); /* + mark-row & add-column width */
+
+    border-radius: 0px 0px 0.5rem 0.5rem;
+  }
+
+  .add-row:after {
+    display: none;
+    content: "";
+    position: absolute;
+    top: -1px;
+    right: 0px;
+
+    width: 1rem;
+    border-top: 1px solid theme("colors.gray.300");
+  }
+
+  .add-row:hover:after {
+    display: block;
+  }
+
   .add-column {
     top: -1rem;
     right: -1rem;
@@ -480,14 +505,19 @@
     border-radius: 0px 0.5rem 0.5rem 0px;
   }
 
-  .add-row {
-    bottom: -1rem;
-    left: -1rem;
+  .add-column:after {
+    display: none;
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: -1px;
 
     height: 1rem;
-    width: calc(100% + 2rem); /* + mark-row & add-column width */
+    border-left: 1px solid theme("colors.gray.300");
+  }
 
-    border-radius: 0px 0px 0.5rem 0.5rem;
+  .add-column:hover:after {
+    display: block;
   }
 
   /* ------------- comment-extension ------------- */
