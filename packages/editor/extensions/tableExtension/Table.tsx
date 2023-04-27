@@ -13,15 +13,19 @@ export const Table = (props: any) => {
         className={props.extension.options.HTMLAttributes.class}
         as="table"
       />
-      <div
+      {/* <div
         onClick={() => {
           return null;
         }}
       >
         <Icon name="arrow-down-filled" /> {active ? "Active" : "Not Active"}
+      </div> */}
+      <div className="add add-column">
+        <Icon name="add-line" color="gray-600" />
       </div>
-      <div className="add add-column flex-center-center">+</div>
-      <div className="add add-row flex-center-center">+</div>
+      <div className="add add-row">
+        <Icon name="add-line" color="gray-600" />
+      </div>
       <div className="row-line hidden"></div>
       <div className="column-line hidden"></div>
       <div className="table-selection hidden"></div>

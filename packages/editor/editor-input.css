@@ -454,6 +454,42 @@
     width: 2px;
   }
 
+  /* --- add rows / columns --- */
+  .add {
+    /* then height / width are implicitly from the table */
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: theme("colors.gray.120");
+  }
+
+  .add:hover {
+    background-color: theme("colors.gray.150");
+    z-index: 2;
+  }
+
+  .add-column {
+    top: -1rem;
+    right: -1rem;
+
+    height: calc(100% + 2rem); /* + mark-column & add-row height */
+    width: 1rem;
+
+    border-radius: 0px 0.5rem 0.5rem 0px;
+  }
+
+  .add-row {
+    bottom: -1rem;
+    left: -1rem;
+
+    height: 1rem;
+    width: calc(100% + 2rem); /* + mark-row & add-column width */
+
+    border-radius: 0px 0px 0.5rem 0.5rem;
+  }
+
   /* ------------- comment-extension ------------- */
   .editor-comment {
     position: relative;
