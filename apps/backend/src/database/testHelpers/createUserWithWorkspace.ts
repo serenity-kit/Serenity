@@ -140,6 +140,7 @@ export default async function createUserWithWorkspace({
         },
       ],
     },
+    device: mainDevice,
   });
 
   const createWorkspaceResult = await createInitialWorkspaceStructure({

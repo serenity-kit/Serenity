@@ -73,6 +73,10 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
       if (!activeDevice) {
         throw new Error("No active device available");
       }
+      const mainDevice = getMainDevice();
+      if (!mainDevice) {
+        throw new Error("No active main device available");
+      }
       const workspaceId = generateId();
       const workspaceKeyId = generateId();
       const folderId = generateId();
@@ -137,6 +141,7 @@ export function CreateWorkspaceForm(props: CreateWorkspaceFormProps) {
             },
           ],
         },
+        device: mainDevice,
       });
 
       const workspaceKeyBox = deviceWorkspaceKeyBoxes.find((device) => {
