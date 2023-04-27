@@ -164,6 +164,9 @@ export async function attachDeviceToWorkspaces({
         include: {
           workspaceKeyBoxes: {
             where: { deviceSigningPublicKey: receiverDeviceSigningPublicKey },
+            include: {
+              creatorDevice: true,
+            },
           },
         },
         orderBy: { generation: "desc" },
