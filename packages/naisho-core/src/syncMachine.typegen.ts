@@ -40,6 +40,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     addToIncomingQueue: "WEBSOCKET_ADD_TO_QUEUE";
     addToPendingUpdatesQueue: "ADD_CHANGE";
+    handleCustomMessage: "WEBSOCKET_UNKNOWN_MESSAGE_TYPE";
     increaseWebsocketRetry: "WEBSOCKET_RETRY";
     removeOldestItemFromQueueAndUpdateContext: "done.invoke.processQueues";
     resetWebsocketRetries: "WEBSOCKET_CONNECTED";

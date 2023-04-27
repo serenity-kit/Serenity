@@ -147,7 +147,7 @@ export const syncMachine =
           | { type: "WEBSOCKET_DOCUMENT_NOT_FOUND" }
           | { type: "WEBSOCKET_UNAUTHORIZED" }
           | { type: "WEBSOCKET_ADD_TO_QUEUE"; data: any }
-          | { type: "WEBSOCKET_KEY_MATERIAL" }
+          | { type: "WEBSOCKET_UNKNOWN_MESSAGE_TYPE" }
           | { type: "WEBSOCKET_RETRY" }
           | { type: "DISCONNECT" }
           | { type: "ADD_CHANGE"; data: any }
@@ -310,7 +310,9 @@ export const syncMachine =
           on: {
             WEBSOCKET_DOCUMENT_NOT_FOUND: { target: "final" },
             WEBSOCKET_UNAUTHORIZED: { target: "final" },
-            WEBSOCKET_KEY_MATERIAL: {},
+            WEBSOCKET_UNKNOWN_MESSAGE_TYPE: {
+              actions: ["handleCustomMessage"],
+            },
           },
 
           initial: "idle",
@@ -399,6 +401,11 @@ export const syncMachine =
             };
           }
         }),
+        handleCustomMessage: (context, event) => {
+          if (context.onCustomMessage) {
+            context.onCustomMessage(event);
+          }
+        },
       },
       services: {
         sheduleRetry: (context) => (callback) => {
@@ -624,12 +631,6 @@ export const syncMachine =
             handledQueue = "incoming";
             const event = context._incomingQueue[0];
             switch (event.type) {
-              case "documentNotFound":
-                // TODO stop reconnecting
-                break;
-              case "unauthorized":
-                // TODO stop reconnecting
-                break;
               case "document":
                 try {
                   if (context.knownSnapshotInfo) {

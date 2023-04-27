@@ -219,6 +219,9 @@ export default function Page({
       );
       return true;
     },
+    onCustomMessage: (message) => {
+      console.log("custom message", message);
+    },
     additionalAuthenticationDataValidations: {
       // @ts-expect-error should actually match the type?
       snapshot: SerenitySnapshotPublicData,

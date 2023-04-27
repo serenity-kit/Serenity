@@ -31,8 +31,18 @@ export const websocketService =
           // TODO stop reconnecting
           send({ type: "UNAUTHORIZED" });
           break;
-        default:
+        case "document":
+        case "snapshot":
+        case "snapshotSaved":
+        case "snapshotFailed":
+        case "update":
+        case "updateSaved":
+        case "updateFailed":
+        case "ephemeralUpdate":
           send({ type: "WEBSOCKET_ADD_TO_QUEUE", data });
+          break;
+        default:
+          send({ type: "WEBSOCKET_UNKNOWN_MESSAGE_TYPE", data });
       }
     };
 

@@ -170,6 +170,7 @@ export type SyncMachineConfig = {
   sodium: any;
   onDocumentLoaded?: () => void;
   onSnapshotSaved?: () => void | Promise<void>;
+  onCustomMessage?: (message: any) => void;
   knownSnapshotInfo?: KnownSnapshotInfo;
   additionalAuthenticationDataValidations?: AdditionalAuthenticationDataValidations;
 };
