@@ -445,6 +445,17 @@
   }
 
   /* --- lines for insert-row/column element ---- */
+  /* --- table-selection */
+
+  .table-selection {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    box-sizing: border-box;
+    border: 2px solid theme("colors.primary.500");
+  }
+
   .row-line,
   .column-line {
     position: absolute;
@@ -468,6 +479,7 @@
   }
 
   /* --- add rows / columns --- */
+
   .add {
     /* then height / width are implicitly from the table */
     position: absolute;
@@ -534,6 +546,7 @@
   }
 
   /* ------------- comment-extension ------------- */
+
   .editor-comment {
     position: relative;
     /* display setting needed to properly size background and add border */
