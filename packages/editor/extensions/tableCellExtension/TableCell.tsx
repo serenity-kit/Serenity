@@ -122,8 +122,8 @@ export const TableCell = (props: any) => {
 
             const state = editor.view.state;
             const resolvedPos = state.doc.resolve(props.getPos());
-            const rowSelection = CellSelection.colSelection(resolvedPos);
-            editor.view.dispatch(state.tr.setSelection(rowSelection));
+            const colSelection = CellSelection.colSelection(resolvedPos);
+            editor.view.dispatch(state.tr.setSelection(colSelection));
           }}
         />
       </div>
