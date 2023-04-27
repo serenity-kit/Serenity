@@ -36,8 +36,10 @@ export const TableCell = (props: any) => {
             target.getBoundingClientRect().top -
             wrapper.getBoundingClientRect().top;
 
+          let targetHeight = event.currentTarget.offsetHeight;
+
           // offset of dot + half a dot-height (16/2) - 1px as it needs to overlap the border
-          row_line.style.top = `${offset + 7}px`;
+          row_line.style.top = `${offset + (targetHeight / 2 - 1)}px`;
           row_line.classList.remove("hidden");
         }}
         onMouseLeave={(event) => {
