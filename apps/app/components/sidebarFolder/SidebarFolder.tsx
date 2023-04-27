@@ -201,7 +201,6 @@ export default function SidebarFolder(props: Props) {
         encryptionPublicKeySignature:
           activeDevice.encryptionPublicKeySignature!,
       },
-      // @ts-expect-error
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
     });
     const parentChainItem =
@@ -271,7 +270,6 @@ export default function SidebarFolder(props: Props) {
     }
     const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
       keyDerivationTrace: props.keyDerivationTrace,
-      // @ts-expect-error
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
       activeDevice: {
         signingPublicKey: activeDevice.signingPublicKey,
@@ -329,7 +327,6 @@ export default function SidebarFolder(props: Props) {
       snapshot: {
         keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
       },
-      // @ts-expect-error
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
     });
     const result = await runCreateDocumentMutation(
@@ -421,7 +418,6 @@ export default function SidebarFolder(props: Props) {
         encryptionPublicKeySignature:
           activeDevice.encryptionPublicKeySignature!,
       },
-      // @ts-expect-error
       workspaceKeyBox: workspace.currentWorkspaceKey!.workspaceKeyBox!,
     });
     // ignore the last chain item as it's the key for the old folder name
