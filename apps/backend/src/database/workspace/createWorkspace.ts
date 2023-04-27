@@ -126,6 +126,9 @@ export async function createWorkspace({
       where: {
         workspaceKeyId: currentWorkspaceKey.id,
       },
+      include: {
+        creatorDevice: true,
+      },
     });
     const usersToWorkspaces = await prisma.usersToWorkspaces.findMany({
       where: {
