@@ -297,7 +297,8 @@
 
   .table-wrapper {
     position: relative;
-    margin: 2.5rem 0 1rem 0; /* needed to avoid overlapping with table-function elements */
+    margin-top: 2.5rem; /* needed to avoid overlapping with table-function elements */
+    margin-bottom: 1rem;
   }
 
   .table-extension {
