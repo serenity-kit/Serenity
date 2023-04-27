@@ -29,6 +29,7 @@ export const Table = (props: any) => {
       <div className="row-line hidden"></div>
       <div className="column-line hidden"></div>
       <div className="table-selection hidden"></div>
+      <div className="mark-table"></div>
     </NodeViewWrapper>
   );
 };

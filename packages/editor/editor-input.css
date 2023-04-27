@@ -394,6 +394,19 @@
     top: -0.5rem;
   }
 
+  /* --- mark table --- */
+
+  .mark-table {
+    position: absolute;
+    top: -1.625rem;
+    left: -1.625rem;
+
+    height: 1rem;
+    width: 1rem;
+    border: 1px solid theme("colors.gray.300");
+    border-radius: 9999px;
+  }
+
   /* --- mark row / columns --- */
 
   .mark-row,
