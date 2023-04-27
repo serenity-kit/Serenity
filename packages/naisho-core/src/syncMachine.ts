@@ -189,6 +189,7 @@ export const syncMachine =
         deserializeChanges: () => [],
         onDocumentLoaded: () => undefined,
         onSnapshotSaved: () => undefined,
+        isValidCollaborator: async () => false,
         additionalAuthenticationDataValidations: undefined,
         _activeSnapshotInfo: null,
         _latestServerVersion: null,
@@ -515,6 +516,13 @@ export const syncMachine =
                 z.object({})
             );
 
+            const isValidCollaborator = await context.isValidCollaborator(
+              snapshot.publicData.pubKey
+            );
+            if (!isValidCollaborator) {
+              throw new Error("Invalid collaborator");
+            }
+
             let parentSnapshotUpdateClock: number | undefined = undefined;
 
             if (
@@ -535,7 +543,7 @@ export const syncMachine =
             const decryptedSnapshot = verifyAndDecryptSnapshot(
               snapshot,
               snapshotKey,
-              context.sodium.from_base64(snapshot.publicData.pubKey), // TODO check if this pubkey is part of the allowed collaborators
+              context.sodium.from_base64(snapshot.publicData.pubKey),
               context.signatureKeyPair.publicKey,
               parentSnapshotProofInfo,
               parentSnapshotUpdateClock
@@ -567,6 +575,14 @@ export const syncMachine =
               if (activeSnapshotInfo === null) {
                 throw new Error("No active snapshot");
               }
+
+              const isValidCollaborator = await context.isValidCollaborator(
+                update.publicData.pubKey
+              );
+              if (!isValidCollaborator) {
+                throw new Error("Invalid collaborator");
+              }
+
               const currentClock =
                 updateClocks[activeSnapshotInfo.id] &&
                 Number.isInteger(
@@ -579,7 +595,7 @@ export const syncMachine =
               const { content, clock } = verifyAndDecryptUpdate(
                 update,
                 key,
-                context.sodium.from_base64(update.publicData.pubKey), // TODO check if this pubkey is part of the allowed collaborators
+                context.sodium.from_base64(update.publicData.pubKey),
                 currentClock
               );
               const existingClocks = updateClocks[activeSnapshotInfo.id] || {};
@@ -794,10 +810,17 @@ export const syncMachine =
                 const ephemeralUpdateKey =
                   await context.getEphemeralUpdateKey();
 
+                const isValidCollaborator = await context.isValidCollaborator(
+                  ephemeralUpdate.publicData.pubKey
+                );
+                if (!isValidCollaborator) {
+                  throw new Error("Invalid collaborator");
+                }
+
                 const ephemeralUpdateResult = verifyAndDecryptEphemeralUpdate(
                   ephemeralUpdate,
                   ephemeralUpdateKey,
-                  context.sodium.from_base64(ephemeralUpdate.publicData.pubKey), // TODO check if this pubkey is part of the allowed collaborators
+                  context.sodium.from_base64(ephemeralUpdate.publicData.pubKey),
                   mostRecentEphemeralUpdateDatePerPublicSigningKey[
                     ephemeralUpdate.publicData.pubKey
                   ]

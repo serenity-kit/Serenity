@@ -17,8 +17,10 @@ import { Awareness } from "y-protocols/awareness";
 import * as Yjs from "yjs";
 import Editor from "../../components/editor/Editor";
 import { usePage } from "../../context/PageContext";
+import { useWorkspace } from "../../context/WorkspaceContext";
 import {
   Document,
+  Workspace,
   runDocumentQuery,
   runMeQuery,
 } from "../../generated/graphql";
@@ -29,6 +31,7 @@ import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey
 import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
+import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
 import {
   getLocalDocument,
   setLocalDocument,
@@ -81,6 +84,7 @@ export default function Page({
   if (process.env.SERENITY_ENV === "e2e") {
     websocketHost = `ws://localhost:4001`;
   }
+  const { workspaceQueryResult } = useWorkspace();
 
   const [state, send] = useYjsSyncMachine({
     yDoc: yDocRef.current,
@@ -124,6 +128,7 @@ export default function Page({
         throw new Error("Workspace or workspaceKeys not found");
       }
 
+      console.log("workspace", workspace);
       const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
         snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
         ciphertext: document.nameCiphertext,
@@ -185,6 +190,31 @@ export default function Page({
     getEphemeralUpdateKey: async () => {
       return snapshotKeyRef.current?.key as Uint8Array;
     },
+    isValidCollaborator: async (signingPublicKey: string) => {
+      let workspace: Workspace | undefined | null;
+      if (workspaceQueryResult.data) {
+        // @ts-expect-error
+        workspace = workspaceQueryResult.data.workspace;
+      } else {
+        workspace = await getWorkspace({
+          workspaceId,
+          deviceSigningPublicKey: activeDevice.signingPublicKey,
+        });
+      }
+
+      if (!workspace) {
+        return false;
+      }
+
+      const creator = getUserFromWorkspaceQueryResultByDeviceInfo(
+        { workspace },
+        { signingPublicKey }
+      );
+      if (creator) {
+        return true;
+      }
+      return false;
+    },
     additionalAuthenticationDataValidations: {
       // @ts-expect-error should actually match the type?
       snapshot: SerenitySnapshotPublicData,
@@ -228,7 +258,7 @@ export default function Page({
         console.error("Document not found");
         return;
       }
-      // communicate to other components e.g. sidebar or topbar
+      // communicate to other components e.g. sidebar or top-bar
       // the currently active document
       setActiveDocumentId({ documentId: docId });
 

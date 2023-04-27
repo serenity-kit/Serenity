@@ -164,6 +164,7 @@ export type SyncMachineConfig = {
     activeSnapshotId: string | null;
     latestServerVersion: number | null;
   }) => boolean;
+  isValidCollaborator: (signingPublicKey: string) => Promise<boolean>;
   serializeChanges: (changes: unknown[]) => string;
   deserializeChanges: (string) => unknown[];
   sodium: any;
