@@ -1,15 +1,15 @@
-import { Snapshot } from "@naisho/core";
 import {
   deriveKeysFromKeyDerivationTrace,
   LocalDevice,
   recreateSnapshotKey,
+  SerenitySnapshot,
 } from "@serenity-tools/common";
 import { getDocument } from "../document/getDocument";
 import { getWorkspace } from "../workspace/getWorkspace";
 
 export const deriveExistingSnapshotKey = async (
   docId: string,
-  snapshot: Snapshot,
+  snapshot: SerenitySnapshot,
   activeDevice: LocalDevice
 ) => {
   // derive existing key if snapshot exists

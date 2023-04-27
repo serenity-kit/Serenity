@@ -12,9 +12,11 @@ import { hash } from "./crypto";
 import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
 import { isValidAncestorSnapshot } from "./snapshot/isValidAncestorSnapshot";
+import { parseEphemeralUpdateWithServerData } from "./snapshot/parseEphemeralUpdateWithServerData";
+import { parseSnapshotWithServerData } from "./snapshot/parseSnapshotWithServerData";
+import { parseUpdatesWithServerData } from "./snapshot/parseUpdatesWithServerData";
 import {
   ParentSnapshotProofInfo,
-  SnapshotFailedEvent,
   SnapshotPublicData,
   SnapshotWithServerData,
   SyncMachineConfig,
@@ -187,6 +189,7 @@ export const syncMachine =
         deserializeChanges: () => [],
         onDocumentLoaded: () => undefined,
         onSnapshotSaved: () => undefined,
+        additionalAuthenticationDataValidations: undefined,
         _activeSnapshotInfo: null,
         _latestServerVersion: null,
         _incomingQueue: [],
@@ -502,10 +505,15 @@ export const syncMachine =
           };
 
           const processSnapshot = async (
-            snapshot: SnapshotWithServerData,
+            rawSnapshot: SnapshotWithServerData,
             parentSnapshotProofInfo?: ParentSnapshotProofInfo
           ) => {
-            console.log("processSnapshot", snapshot);
+            console.log("processSnapshot", rawSnapshot);
+            const snapshot = parseSnapshotWithServerData(
+              rawSnapshot,
+              context.additionalAuthenticationDataValidations?.snapshot ??
+                z.object({})
+            );
 
             let parentSnapshotUpdateClock: number | undefined = undefined;
 
@@ -545,7 +553,12 @@ export const syncMachine =
             sendingUpdatesClock = -1;
           };
 
-          const processUpdates = async (updates: UpdateWithServerData[]) => {
+          const processUpdates = async (rawUpdates: UpdateWithServerData[]) => {
+            const updates = parseUpdatesWithServerData(
+              rawUpdates,
+              context.additionalAuthenticationDataValidations?.update ??
+                z.object({})
+            );
             let changes: unknown[] = [];
 
             for (let update of updates) {
@@ -625,15 +638,12 @@ export const syncMachine =
                     parentSnapshotProof:
                       event.snapshot.publicData.parentSnapshotProof,
                   };
-                  console.log(event.snapshot);
 
-                  const snapshot = SnapshotWithServerData.parse(event.snapshot);
-                  await processSnapshot(snapshot);
+                  await processSnapshot(event.snapshot);
 
-                  const updates = z
-                    .array(UpdateWithServerData)
-                    .parse(event.updates);
-                  await processUpdates(updates);
+                  if (event.updates) {
+                    await processUpdates(event.updates);
+                  }
                   if (context.onDocumentLoaded) {
                     context.onDocumentLoaded();
                   }
@@ -648,9 +658,8 @@ export const syncMachine =
               case "snapshot":
                 console.log("snapshot", event);
                 try {
-                  const snapshot = SnapshotWithServerData.parse(event.snapshot);
                   await processSnapshot(
-                    snapshot,
+                    event.snapshot,
                     activeSnapshotInfo ? activeSnapshotInfo : undefined
                   );
                 } catch (err) {
@@ -680,9 +689,14 @@ export const syncMachine =
                 }
                 break;
               case "snapshotFailed": // TODO rename to snapshotSaveFailed or similar
-                const parsedEvent = SnapshotFailedEvent.parse(event);
                 console.log("snapshot saving failed", event);
-                if (parsedEvent.snapshot) {
+                if (event.snapshot) {
+                  const snapshot = parseSnapshotWithServerData(
+                    event.snapshot,
+                    context.additionalAuthenticationDataValidations?.snapshot ??
+                      z.object({})
+                  );
+
                   if (activeSnapshotInfo) {
                     const isValid = isValidAncestorSnapshot({
                       knownSnapshotProofEntry: {
@@ -693,7 +707,7 @@ export const syncMachine =
                         ),
                       },
                       snapshotProofChain: event.snapshotProofChain,
-                      currentSnapshot: event.snapshot,
+                      currentSnapshot: snapshot,
                     });
                     if (!isValid) {
                       throw new Error(
@@ -702,14 +716,13 @@ export const syncMachine =
                     }
                   }
 
-                  const snapshot = event.snapshot;
                   await processSnapshot(snapshot);
                 }
                 // TODO test-case:
                 // snapshot is sending, but haven’t received confirmation for the updates I already sent
                 // currently this breaks (assumption due the incoming and outgoing clock being the same)
-                if (parsedEvent.updates) {
-                  await processUpdates(parsedEvent.updates);
+                if (event.updates) {
+                  await processUpdates(event.updates);
                 }
 
                 console.log("retry send snapshot");
@@ -717,8 +730,7 @@ export const syncMachine =
                 break;
 
               case "update":
-                const update = UpdateWithServerData.parse(event);
-                await processUpdates([update]);
+                await processUpdates([event]);
                 break;
               case "updateSaved":
                 console.log("update saved", event);
@@ -773,15 +785,21 @@ export const syncMachine =
 
                 break;
               case "ephemeralUpdate":
+                const ephemeralUpdate = parseEphemeralUpdateWithServerData(
+                  event,
+                  context.additionalAuthenticationDataValidations
+                    ?.ephemeralUpdate ?? z.object({})
+                );
+
                 const ephemeralUpdateKey =
                   await context.getEphemeralUpdateKey();
 
                 const ephemeralUpdateResult = verifyAndDecryptEphemeralUpdate(
-                  event,
+                  ephemeralUpdate,
                   ephemeralUpdateKey,
-                  context.sodium.from_base64(event.publicData.pubKey), // TODO check if this pubkey is part of the allowed collaborators
+                  context.sodium.from_base64(ephemeralUpdate.publicData.pubKey), // TODO check if this pubkey is part of the allowed collaborators
                   mostRecentEphemeralUpdateDatePerPublicSigningKey[
-                    event.publicData.pubKey
+                    ephemeralUpdate.publicData.pubKey
                   ]
                 );
                 mostRecentEphemeralUpdateDatePerPublicSigningKey[

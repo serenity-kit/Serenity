@@ -1,4 +1,4 @@
-import { Snapshot } from "@naisho/core";
+import { SerenitySnapshot } from "@serenity-tools/common";
 import { AuthenticationError, UserInputError } from "apollo-server-express";
 import {
   arg,
@@ -46,7 +46,7 @@ export const createDocumentMutation = mutationField("createDocument", {
     if (!args.input.snapshot.publicData.snapshotId) {
       throw new UserInputError("Invalid input: snapshotId cannot be null");
     }
-    const snapshot = args.input.snapshot as Snapshot;
+    const snapshot = args.input.snapshot as SerenitySnapshot;
     const document = await createDocument({
       userId: context.user.id,
       id: args.input.id,

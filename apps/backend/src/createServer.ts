@@ -2,10 +2,11 @@ import {
   NaishoNewSnapshotWithKeyRotationRequired,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
-  SnapshotWithClientData,
   SnapshotWithServerData,
   UpdateWithServerData,
+  parseSnapshotWithClientData,
 } from "@naisho/core";
+import { SerenitySnapshotPublicData } from "@serenity-tools/common";
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
@@ -185,7 +186,11 @@ export default async function createServer() {
 
         // new snapshot
         if (data?.publicData?.snapshotId) {
-          const snapshotMessage = SnapshotWithClientData.parse(data);
+          const snapshotMessage = parseSnapshotWithClientData(
+            data,
+            // @ts-expect-error no idea why the types don't match
+            SerenitySnapshotPublicData
+          );
           try {
             const activeSnapshotInfo =
               snapshotMessage.lastKnownSnapshotId &&
@@ -196,6 +201,7 @@ export default async function createServer() {
                   }
                 : undefined;
             const snapshot = await createSnapshot({
+              // @ts-expect-error missing the SerenitySnapshotPublicData type
               snapshot: snapshotMessage,
               activeSnapshotInfo,
               workspaceId: userToWorkspace.workspaceId,

@@ -30,18 +30,6 @@ test("createSnapshot & verifyAndDecryptSnapshot successfully", async () => {
     snapshotId,
     docId: "6e46c006-5541-11ec-bf63-0242ac130002",
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-    subkeyId: 42,
-    keyDerivationTrace: {
-      workspaceKeyId: "abc",
-      trace: [
-        {
-          entryId: snapshotId,
-          parentId: null,
-          subkeyId: 42,
-          context: snapshotDerivedKeyContext,
-        },
-      ],
-    },
     parentSnapshotClocks: {},
   };
 
@@ -87,18 +75,6 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed signature", as
     snapshotId: generateId(),
     docId: "6e46c006-5541-11ec-bf63-0242ac130002",
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-    subkeyId: 42,
-    keyDerivationTrace: {
-      workspaceKeyId: "abc",
-      trace: [
-        {
-          entryId: snapshotId,
-          parentId: null,
-          subkeyId: 42,
-          context: snapshotDerivedKeyContext,
-        },
-      ],
-    },
     parentSnapshotClocks: {},
   };
 
@@ -145,18 +121,6 @@ test("createSnapshot & verifyAndDecryptSnapshot break due changed ciphertext", a
     snapshotId,
     docId: "6e46c006-5541-11ec-bf63-0242ac130002",
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
-    subkeyId: 42,
-    keyDerivationTrace: {
-      workspaceKeyId: "abc",
-      trace: [
-        {
-          entryId: snapshotId,
-          parentId: null,
-          subkeyId: 42,
-          context: snapshotDerivedKeyContext,
-        },
-      ],
-    },
     parentSnapshotClocks: {},
   };
 

@@ -1,4 +1,4 @@
-import { KeyDerivationTrace } from "@naisho/core";
+import { KeyDerivationTrace } from "@serenity-tools/common";
 import { Folder as PrismaFolder } from "../../prisma/generated/output";
 
 export type Folder = PrismaFolder & {
