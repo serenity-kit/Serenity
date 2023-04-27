@@ -59,7 +59,32 @@ export const TableCell = (props: any) => {
         />
       </div>
 
-      <div className="insert-column">
+      <div
+        className="insert-column"
+        onMouseEnter={(event) => {
+          let target = event.target;
+          // @ts-expect-error
+          let wrapper = target.closest(".table-wrapper");
+          let column_line = wrapper.querySelector(".column-line");
+          let offset =
+            // @ts-expect-error
+            target.getBoundingClientRect().left -
+            wrapper.getBoundingClientRect().left;
+
+          let targetWidth = event.currentTarget.offsetWidth;
+
+          // offset of dot + half a dot-width (16/2) - 1px as it needs to overlap the border
+          column_line.style.left = `${offset + (targetWidth / 2 - 1)}px`;
+          column_line.classList.remove("hidden");
+        }}
+        onMouseLeave={(event) => {
+          let target = event.target;
+          // @ts-expect-error
+          let wrapper = target.closest(".table-wrapper");
+          let column_line = wrapper.querySelector(".column-line");
+          column_line.classList.add("hidden");
+        }}
+      >
         <TableInsert
           onPress={() => {
             const editor = props.editor.storage.tableCell.currentEditor;
