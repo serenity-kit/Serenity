@@ -213,7 +213,9 @@ export default function Page({
       if (creator) {
         return true;
       }
-      return false;
+      // TODO should be false once we can validate removed devices
+      // return false;
+      return true;
     },
     additionalAuthenticationDataValidations: {
       // @ts-expect-error should actually match the type?
