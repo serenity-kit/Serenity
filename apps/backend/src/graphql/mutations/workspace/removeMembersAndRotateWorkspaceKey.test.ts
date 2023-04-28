@@ -356,21 +356,35 @@ test("user can rotate key for multiple devices", async () => {
       workspaceInvitationResult.invitationSigningPrivateKey,
     authorizationHeader: userData2.sessionKey,
   });
-  const user2DeviceKeyBox = encryptWorkspaceKeyForDevice({
-    receiverDeviceEncryptionPublicKey: userData1.device.signingPublicKey,
-    creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
-    workspaceKey,
+
+  const workspaceResult2 = await getWorkspace({
+    graphql,
+    workspaceId: userData1.workspace.id,
+    deviceSigningPublicKey: userData1.webDevice.signingPublicKey,
+    authorizationHeader: userData1.sessionKey,
   });
+
+  const workspace2 = workspaceResult2.workspace;
+  const workspaceKeyDevicePairs = workspace2.workspaceKeys.map(
+    (workspaceKeyData) => {
+      const user2DeviceKeyBox = encryptWorkspaceKeyForDevice({
+        receiverDeviceEncryptionPublicKey: userData2.device.encryptionPublicKey,
+        creatorDeviceEncryptionPrivateKey: userData1.deviceEncryptionPrivateKey,
+        // TODO this is not correct, we should put the correct workspaceKey her based on the workspaceKeyData
+        workspaceKey,
+      });
+      return {
+        workspaceKeyId: workspaceKeyData.id,
+        nonce: user2DeviceKeyBox.nonce,
+        ciphertext: user2DeviceKeyBox.ciphertext,
+      };
+    }
+  );
+
   const user2DeviceKeyBoxes = [
     {
       workspaceId: userData1.workspace.id,
-      workspaceKeyDevicePairs: [
-        {
-          workspaceKeyId: userData1.workspace.currentWorkspaceKey.id,
-          nonce: user2DeviceKeyBox.nonce,
-          ciphertext: user2DeviceKeyBox.nonce,
-        },
-      ],
+      workspaceKeyDevicePairs,
     },
   ];
   await attachDeviceToWorkspaces({

@@ -73,7 +73,7 @@ test("key for main workspace, main device", async () => {
   expect(workspaceKey.workspaceId).toBe(userData1.workspace.id);
 });
 
-test("empty keys on incomplete workspace share", async () => {
+test("throws error on incomplete workspace share", async () => {
   // create new user
   const userData2 = await createUserWithWorkspace({
     id: generateId(),
@@ -100,17 +100,15 @@ test("empty keys on incomplete workspace share", async () => {
     inviteeMainDevice: userData2.mainDevice,
     authorizationHeader: userData2.sessionKey,
   });
-  const workspaceKeyResult = await getWorkspaceKeyByDocumentId({
-    graphql,
-    documentId: userData1.document.id,
-    deviceSigningPublicKey: userData2.webDevice.signingPublicKey,
-    authorizationHeader: userData2.sessionKey,
-  });
-  const workspaceKey =
-    workspaceKeyResult.workspaceKeyByDocumentId.nameWorkspaceKey;
-  expect(workspaceKey.generation).toBe(0);
-  expect(workspaceKey.workspaceKeyBox).toBe(null);
-  expect(workspaceKey.workspaceId).toBe(userData1.workspace.id);
+  await expect(
+    (async () =>
+      await getWorkspaceKeyByDocumentId({
+        graphql,
+        documentId: userData1.document.id,
+        deviceSigningPublicKey: userData2.webDevice.signingPublicKey,
+        authorizationHeader: userData2.sessionKey,
+      }))()
+  ).rejects.toThrowError(/Internal server error/);
 });
 
 test("key for shared workspace", async () => {
