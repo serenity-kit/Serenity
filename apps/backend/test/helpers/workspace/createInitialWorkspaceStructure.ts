@@ -1,5 +1,6 @@
 import { generateId } from "@naisho/core";
 import {
+  LocalDevice,
   createDocumentTitleKey,
   createIntroductionDocumentSnapshot,
   createSnapshotKey,
@@ -87,17 +88,10 @@ const query = gql`
   }
 `;
 
-type CreatorDeviceParams = {
-  signingPublicKey: string;
-  signingPrivateKey: string;
-  encryptionPublicKey: string;
-  encryptionPrivateKey: string;
-};
-
 type Params = {
   graphql: any;
   workspaceName: string;
-  creatorDevice: CreatorDeviceParams;
+  creatorDevice: LocalDevice;
   devices: Device[];
   authorizationHeader: string;
 };
@@ -215,6 +209,7 @@ export const createInitialWorkspaceStructure = async ({
         },
       ],
     },
+    device: creatorDevice,
   });
 
   // prepare the document

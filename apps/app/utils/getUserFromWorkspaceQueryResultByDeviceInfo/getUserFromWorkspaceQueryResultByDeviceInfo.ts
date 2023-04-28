@@ -6,7 +6,7 @@ import {
 
 export const getUserFromWorkspaceQueryResultByDeviceInfo = (
   workspaceQueryResult: WorkspaceQuery,
-  device: MinimalDevice
+  device: { signingPublicKey: MinimalDevice["signingPublicKey"] }
 ) => {
   let user: WorkspaceMember | undefined;
   if (workspaceQueryResult.workspace?.members) {
