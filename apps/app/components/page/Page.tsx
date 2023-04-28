@@ -219,7 +219,7 @@ export default function Page({
       );
       return true;
     },
-    onCustomMessage: (message) => {
+    onCustomMessage: async (message) => {
       console.log("custom message", message);
     },
     additionalAuthenticationDataValidations: {
