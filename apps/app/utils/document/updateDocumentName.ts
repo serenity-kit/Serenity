@@ -35,7 +35,6 @@ export const updateDocumentName = async ({
   const encryptedDocumentTitle = encryptDocumentTitle({
     title: name,
     activeDevice,
-    // @ts-expect-error
     workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox,
     snapshot: snapshotResult.data.snapshot,
   });

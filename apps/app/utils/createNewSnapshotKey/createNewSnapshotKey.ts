@@ -41,7 +41,7 @@ export const createNewSnapshotKey = async ({
       encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
       encryptionPublicKeySignature: activeDevice.encryptionPublicKeySignature!,
     },
-    workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
+    workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox,
   });
 
   const parentFolderChainItem =
