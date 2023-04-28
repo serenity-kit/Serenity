@@ -215,6 +215,9 @@ export default function Page({
       }
       // TODO should be false once we can validate removed devices
       // return false;
+      console.warn(
+        "Snapshot, Update or EphemeralUpdate creator could not be validated. Probably since it is an already removed device."
+      );
       return true;
     },
     additionalAuthenticationDataValidations: {
