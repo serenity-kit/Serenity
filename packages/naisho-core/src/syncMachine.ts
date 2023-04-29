@@ -37,14 +37,16 @@ import { websocketService } from "./websocketService";
 // In general the first thing that happens is that a websocket connection is established.
 // Once that's done the latest snapshot including it's related updates should be received.
 //
-// In order to process incoming and outgoing changes the sync machine uses two queues:
+// In order to process incoming and outgoing changes the sync machine uses three queues:
 // - _incomingQueue: contains all incoming messages from the server
+// - _customMessageQueue: contains all custom incoming messages from the server
 // - _pendingChangesQueue: contains all outgoing messages that are not yet sent to the server
 //
 // How Queue processing works
 // -------------------------
-// 1. first handle all incoming message
-// 2. then handle all pending updates
+// 1. first handle all incoming custom messages
+// 2. first handle all incoming message
+// 3. then handle all pending updates
 // Background: There might be a new snapshot and this way we avoid retries
 //
 // Websockets reconnection logic:
@@ -108,7 +110,7 @@ type ActiveSnapshotInfo = {
 };
 
 type ProcessQueueData = {
-  handledQueue: "incoming" | "pending" | "none";
+  handledQueue: "customMessage" | "incoming" | "pending" | "none";
   activeSnapshotInfo: ActiveSnapshotInfo | null;
   latestServerVersion: number | null;
   activeSendingSnapshotInfo: ActiveSnapshotInfo | null;
@@ -125,6 +127,7 @@ export type Context = SyncMachineConfig & {
   _activeSnapshotInfo: null | ActiveSnapshotInfo;
   _websocketActor?: AnyActorRef;
   _incomingQueue: any[];
+  _customMessageQueue: any[];
   _pendingChangesQueue: any[];
   _activeSendingSnapshotInfo: ActiveSnapshotInfo | null;
   _shouldReconnect: boolean;
@@ -146,8 +149,8 @@ export const syncMachine =
           | { type: "WEBSOCKET_DISCONNECTED" }
           | { type: "WEBSOCKET_DOCUMENT_NOT_FOUND" }
           | { type: "WEBSOCKET_UNAUTHORIZED" }
-          | { type: "WEBSOCKET_ADD_TO_QUEUE"; data: any }
-          | { type: "WEBSOCKET_KEY_MATERIAL" }
+          | { type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE"; data: any }
+          | { type: "WEBSOCKET_ADD_TO_CUSTOM_MESSAGE_QUEUE"; data: any }
           | { type: "WEBSOCKET_RETRY" }
           | { type: "DISCONNECT" }
           | { type: "ADD_CHANGE"; data: any }
@@ -194,6 +197,7 @@ export const syncMachine =
         _activeSnapshotInfo: null,
         _latestServerVersion: null,
         _incomingQueue: [],
+        _customMessageQueue: [],
         _pendingChangesQueue: [],
         _activeSendingSnapshotInfo: null,
         _shouldReconnect: false,
@@ -252,8 +256,12 @@ export const syncMachine =
           states: {
             idle: {
               on: {
-                WEBSOCKET_ADD_TO_QUEUE: {
+                WEBSOCKET_ADD_TO_INCOMING_QUEUE: {
                   actions: ["addToIncomingQueue"],
+                  target: "processingQueues",
+                },
+                WEBSOCKET_ADD_TO_CUSTOM_MESSAGE_QUEUE: {
+                  actions: ["addToCustomMessageQueue"],
                   target: "processingQueues",
                 },
                 ADD_CHANGE: {
@@ -265,8 +273,11 @@ export const syncMachine =
 
             processingQueues: {
               on: {
-                WEBSOCKET_ADD_TO_QUEUE: {
+                WEBSOCKET_ADD_TO_INCOMING_QUEUE: {
                   actions: ["addToIncomingQueue"],
+                },
+                WEBSOCKET_ADD_TO_CUSTOM_MESSAGE_QUEUE: {
+                  actions: ["addToCustomMessageQueue"],
                 },
                 ADD_CHANGE: {
                   actions: ["addToPendingUpdatesQueue"],
@@ -287,10 +298,12 @@ export const syncMachine =
 
             checkingForMoreQueueItems: {
               on: {
-                WEBSOCKET_ADD_TO_QUEUE: {
+                WEBSOCKET_ADD_TO_INCOMING_QUEUE: {
                   actions: ["addToIncomingQueue"],
                 },
-
+                WEBSOCKET_ADD_TO_CUSTOM_MESSAGE_QUEUE: {
+                  actions: ["addToCustomMessageQueue"],
+                },
                 ADD_CHANGE: {
                   actions: ["addToPendingUpdatesQueue"],
                 },
@@ -310,7 +323,6 @@ export const syncMachine =
           on: {
             WEBSOCKET_DOCUMENT_NOT_FOUND: { target: "final" },
             WEBSOCKET_UNAUTHORIZED: { target: "final" },
-            WEBSOCKET_KEY_MATERIAL: {},
           },
 
           initial: "idle",
@@ -364,6 +376,11 @@ export const syncMachine =
             _incomingQueue: [...context._incomingQueue, event.data],
           };
         }),
+        addToCustomMessageQueue: assign((context, event) => {
+          return {
+            _customMessageQueue: [...context._customMessageQueue, event.data],
+          };
+        }),
         addToPendingUpdatesQueue: assign((context, event) => {
           return {
             _pendingChangesQueue: [...context._pendingChangesQueue, event.data],
@@ -373,6 +390,20 @@ export const syncMachine =
           if (event.data.handledQueue === "incoming") {
             return {
               _incomingQueue: context._incomingQueue.slice(1),
+              _pendingChangesQueue: event.data.pendingChangesQueue,
+              _activeSnapshotInfo: event.data.activeSnapshotInfo,
+              _latestServerVersion: event.data.latestServerVersion,
+              _activeSendingSnapshotInfo: event.data.activeSendingSnapshotInfo,
+              _sendingUpdatesClock: event.data.sendingUpdatesClock,
+              _confirmedUpdatesClock: event.data.confirmedUpdatesClock,
+              _updatesInFlight: event.data.updatesInFlight,
+              _updateClocks: event.data.updateClocks,
+              _mostRecentEphemeralUpdateDatePerPublicSigningKey:
+                event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
+            };
+          } else if (event.data.handledQueue === "customMessage") {
+            return {
+              _customMessageQueue: context._customMessageQueue.slice(1),
               _pendingChangesQueue: event.data.pendingChangesQueue,
               _activeSnapshotInfo: event.data.activeSnapshotInfo,
               _latestServerVersion: event.data.latestServerVersion,
@@ -413,6 +444,10 @@ export const syncMachine =
           console.log("processQueues event", event);
           console.log("_incomingQueue", context._incomingQueue.length);
           console.log(
+            "_customMessageQueue",
+            context._customMessageQueue.length
+          );
+          console.log(
             "_pendingChangesQueue",
             context._pendingChangesQueue.length
           );
@@ -420,7 +455,8 @@ export const syncMachine =
           let activeSnapshotInfo: ActiveSnapshotInfo | null =
             context._activeSnapshotInfo;
           let latestServerVersion = context._latestServerVersion;
-          let handledQueue: "incoming" | "pending" | "none" = "none";
+          let handledQueue: "customMessage" | "incoming" | "pending" | "none" =
+            "none";
           let activeSendingSnapshotInfo = context._activeSendingSnapshotInfo;
           let sendingUpdatesClock = context._sendingUpdatesClock;
           let confirmedUpdatesClock = context._confirmedUpdatesClock;
@@ -620,16 +656,16 @@ export const syncMachine =
             context.applyChanges(changes);
           };
 
-          if (context._incomingQueue.length > 0) {
+          if (context._customMessageQueue.length > 0) {
+            handledQueue = "customMessage";
+            const event = context._customMessageQueue[0];
+            if (context.onCustomMessage) {
+              await context.onCustomMessage(event);
+            }
+          } else if (context._incomingQueue.length > 0) {
             handledQueue = "incoming";
             const event = context._incomingQueue[0];
             switch (event.type) {
-              case "documentNotFound":
-                // TODO stop reconnecting
-                break;
-              case "unauthorized":
-                // TODO stop reconnecting
-                break;
               case "document":
                 try {
                   if (context.knownSnapshotInfo) {
@@ -762,10 +798,10 @@ export const syncMachine =
                   "update saving failed",
                   event.snapshotId,
                   event.clock,
-                  event.requiresNewSnapshotWithKeyRotation
+                  event.requiresNewSnapshot
                 );
 
-                if (event.requiresNewSnapshotWithKeyRotation) {
+                if (event.requiresNewSnapshot) {
                   await createAndSendSnapshot();
                 } else {
                   const updateIndex = updatesInFlight.findIndex(
@@ -880,6 +916,7 @@ export const syncMachine =
       guards: {
         hasMoreItemsInQueues: (context) => {
           return (
+            context._customMessageQueue.length > 0 ||
             context._incomingQueue.length > 0 ||
             context._pendingChangesQueue.length > 0
           );
