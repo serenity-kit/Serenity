@@ -660,7 +660,7 @@ export const syncMachine =
             handledQueue = "customMessage";
             const event = context._customMessageQueue[0];
             if (context.onCustomMessage) {
-              await context.onCustomMessage(event.message);
+              await context.onCustomMessage(event);
             }
           } else if (context._incomingQueue.length > 0) {
             handledQueue = "incoming";
@@ -798,10 +798,10 @@ export const syncMachine =
                   "update saving failed",
                   event.snapshotId,
                   event.clock,
-                  event.requiresNewSnapshotWithKeyRotation
+                  event.requiresNewSnapshot
                 );
 
-                if (event.requiresNewSnapshotWithKeyRotation) {
+                if (event.requiresNewSnapshot) {
                   await createAndSendSnapshot();
                 } else {
                   const updateIndex = updatesInFlight.findIndex(

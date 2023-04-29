@@ -22,7 +22,7 @@ export class NaishoSnapshotMissesUpdatesError extends Error {
   }
 }
 
-export class NaishoNewSnapshotWithKeyRotationRequired extends Error {
+export class NaishoNewSnapshotRequired extends Error {
   constructor(message) {
     super(message);
 

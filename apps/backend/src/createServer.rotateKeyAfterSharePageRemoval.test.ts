@@ -224,7 +224,7 @@ test("if document is set to requiresSnapshot updates will fail", async () => {
   await waitForClientState(client, client.CLOSED);
   expect(messages[1].type).toEqual("updateFailed");
   expect(messages[1].clock).toEqual(1);
-  expect(messages[1].requiresNewSnapshotWithKeyRotation).toBe(true);
+  expect(messages[1].requiresNewSnapshot).toBe(true);
   expect(messages[1].docId).toEqual(documentId);
   expect(messages[1].snapshotId).toEqual(snapshotId);
 });

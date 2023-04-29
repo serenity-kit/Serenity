@@ -107,7 +107,7 @@ export default function Page({
         throw new Error("Document not found");
       }
       const snapshotId = generateId();
-      // currently we create a new key for every snapshot
+      // we create a new key for every snapshot
       const snapshotKeyData = await createNewSnapshotKey({
         document,
         snapshotId,
@@ -219,9 +219,9 @@ export default function Page({
       );
       return true;
     },
-    onCustomMessage: async (message) => {
-      console.log("custom message", message);
-    },
+    // onCustomMessage: async (message) => {
+    //   console.log("CUSTOM MESSAGE:", message);
+    // },
     additionalAuthenticationDataValidations: {
       // @ts-expect-error should actually match the type?
       snapshot: SerenitySnapshotPublicData,

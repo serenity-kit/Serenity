@@ -1,5 +1,5 @@
 import {
-  NaishoNewSnapshotWithKeyRotationRequired,
+  NaishoNewSnapshotRequired,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
   SnapshotWithServerData,
@@ -239,6 +239,7 @@ export default async function createServer() {
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
+                  // TODO remove docId - should be irrelevant
                   docId: data.publicData.docId,
                   snapshot: doc.snapshot,
                   updates: doc.updates,
@@ -254,20 +255,27 @@ export default async function createServer() {
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
+                  // TODO remove docId - should be irrelevant
                   docId: data.publicData.docId,
                   updates: result.updates,
                 })
               );
-            } else {
-              // log in case it's an unexpected error
-              if (
-                !(error instanceof NaishoNewSnapshotWithKeyRotationRequired)
-              ) {
-                console.error(error);
-              }
+            } else if (error instanceof NaishoNewSnapshotRequired) {
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
+                  // TODO remove docId - should be irrelevant
+                  docId: data.publicData.docId,
+                })
+              );
+            } else {
+              // log since it's an unexpected error
+              console.error(error);
+              connection.send(
+                JSON.stringify({
+                  type: "snapshotFailed",
+                  // TODO remove docId - should be irrelevant
+                  docId: data.publicData.docId,
                 })
               );
             }
@@ -288,7 +296,7 @@ export default async function createServer() {
                   update: data,
                   workspaceId: userToWorkspace.workspaceId,
                 }),
-              [NaishoNewSnapshotWithKeyRotationRequired]
+              [NaishoNewSnapshotRequired]
             );
             if (savedUpdate === undefined) {
               throw new Error("Update could not be saved.");
@@ -320,8 +328,7 @@ export default async function createServer() {
                   docId: data.publicData.docId,
                   snapshotId: data.publicData.refSnapshotId,
                   clock: data.publicData.clock,
-                  requiresNewSnapshotWithKeyRotation:
-                    err instanceof NaishoNewSnapshotWithKeyRotationRequired,
+                  requiresNewSnapshot: err instanceof NaishoNewSnapshotRequired,
                 })
               );
             }
