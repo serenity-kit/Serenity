@@ -27,7 +27,15 @@ beforeEach(() => {
 
 afterEach(() => {});
 
-const createSnapshotTestHelper = () => {
+type CreateSnapshotTestHelperParams = {
+  parentSnapshotCiphertext: string;
+  grandParentSnapshotProof: string;
+  content: string;
+};
+
+const createSnapshotTestHelper = (params?: CreateSnapshotTestHelperParams) => {
+  const { parentSnapshotCiphertext, grandParentSnapshotProof, content } =
+    params || {};
   key = sodiumWrappers.from_hex(
     "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
   );
@@ -40,12 +48,12 @@ const createSnapshotTestHelper = () => {
   };
 
   const snapshot = createSnapshot(
-    "Hello World",
+    content || "Hello World",
     publicData,
     key,
     signatureKeyPair,
-    "",
-    ""
+    parentSnapshotCiphertext || "",
+    grandParentSnapshotProof || ""
   );
   return {
     snapshot: {
@@ -122,7 +130,7 @@ it("should load a document", (done) => {
           signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
-          docValue = docValue + sodiumWrappers.to_string(snapshot);
+          docValue = sodiumWrappers.to_string(snapshot);
         },
         sodium: sodiumWrappers,
         signatureKeyPair,
@@ -170,7 +178,7 @@ it("should load a document and an additional update", (done) => {
           signingPublicKey,
         getSnapshotKey: () => key,
         applySnapshot: (snapshot) => {
-          docValue = docValue + sodiumWrappers.to_string(snapshot);
+          docValue = sodiumWrappers.to_string(snapshot);
         },
         getUpdateKey: () => key,
         deserializeChanges: (changes) => {
@@ -224,9 +232,85 @@ it("should load a document and an additional update", (done) => {
   });
 });
 
+it.only("should load a document and an additional snapshot", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (docValue === "Hello World again") {
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+    },
+  });
+
+  const { snapshot: snapshot2 } = createSnapshotTestHelper({
+    parentSnapshotCiphertext: snapshot.ciphertext,
+    grandParentSnapshotProof: snapshot.publicData.parentSnapshotProof,
+    content: "Hello World again",
+  });
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "snapshot",
+      snapshot: snapshot2,
+    },
+  });
+});
+
 // should load a document and an two updates
 // should load a document and an additional snapshot
 // should load a document and an additional snapshot and an update
+// should load a document with updates
+// should load a document with updates followed by an updates
 // tests for a broken snapshot key
 // test for a invalid contributor
 
