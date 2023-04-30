@@ -235,7 +235,7 @@ it("should load a document with updates", (done) => {
   });
 });
 
-it("should load a document and an additional update", (done) => {
+it("should load a document and two additional updates", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
@@ -278,7 +278,7 @@ it("should load a document and an additional update", (done) => {
         },
       })
   ).onTransition((state) => {
-    if (docValue === "Hello Worldu") {
+    if (docValue === "Hello Worlduu") {
       done();
     }
   });
@@ -300,6 +300,15 @@ it("should load a document and an additional update", (done) => {
     type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
     data: {
       ...update,
+      type: "update",
+    },
+  });
+
+  const { update: update2 } = createUpdateHelper({ version: 1 });
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      ...update2,
       type: "update",
     },
   });
@@ -379,7 +388,6 @@ it("should load a document and an additional snapshot", (done) => {
   });
 });
 
-// should load a document and an two updates
 // should load a document and an additional snapshot and an update
 // should load a document with updates followed by an updates
 // tests for a broken snapshot key
