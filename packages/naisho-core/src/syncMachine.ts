@@ -650,6 +650,7 @@ export const syncMachine =
                 confirmedUpdatesClock = update.publicData.clock;
                 sendingUpdatesClock = update.publicData.clock;
               }
+
               const additionalChanges = context.deserializeChanges(
                 context.sodium.to_string(content)
               );

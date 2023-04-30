@@ -5,15 +5,17 @@ import { createSnapshot } from "./snapshot";
 import { syncMachine } from "./syncMachine";
 import { SnapshotPublicData, UpdatePublicData } from "./types";
 import { createUpdate } from "./update";
+import { generateId } from "./utils/generateId";
 
 const url = "wss://www.example.com";
 
 let signatureKeyPair: KeyPair;
 let key: Uint8Array;
-const docId = "6e46c006-5541-11ec-bf63-0242ac130002";
-const snapshotId = "c08bbeed-049c-45be-915c-a7206ef55109";
+let docId: string;
+let snapshotId: string;
 
 beforeEach(() => {
+  docId = generateId();
   signatureKeyPair = {
     privateKey: sodiumWrappers.from_base64(
       "g3dtwb9XzhSzZGkxTfg11t1KEIb4D8rO7K54R6dnxArvgg_OzZ2GgREtG7F5LvNp3MS8p9vsio4r6Mq7SZDEgw"
@@ -34,6 +36,7 @@ type CreateSnapshotTestHelperParams = {
 };
 
 const createSnapshotTestHelper = (params?: CreateSnapshotTestHelperParams) => {
+  snapshotId = generateId();
   const { parentSnapshotCiphertext, grandParentSnapshotProof, content } =
     params || {};
   key = sodiumWrappers.from_hex(
@@ -65,16 +68,21 @@ const createSnapshotTestHelper = (params?: CreateSnapshotTestHelperParams) => {
   };
 };
 
-const createUpdateHelper = () => {
+type CreateUpdateTestHelperParams = {
+  version: number;
+};
+
+const createUpdateHelper = (params?: CreateUpdateTestHelperParams) => {
+  const version = params?.version || 0;
   const publicData: UpdatePublicData = {
     refSnapshotId: snapshotId,
     docId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
 
-  const update = createUpdate("u", publicData, key, signatureKeyPair, 0);
+  const update = createUpdate("u", publicData, key, signatureKeyPair, version);
 
-  return { update: { ...update, serverData: { version: 0 } } };
+  return { update: { ...update, serverData: { version } } };
 };
 
 it("should connect to the websocket", (done) => {
@@ -162,6 +170,71 @@ it("should load a document", (done) => {
   });
 });
 
+it("should load a document with updates", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        onDocumentLoaded: () => {
+          expect(docValue).toEqual("Hello Worlduu");
+          done();
+        },
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  );
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+      updates: [
+        createUpdateHelper().update,
+        createUpdateHelper({ version: 1 }).update,
+      ],
+    },
+  });
+});
+
 it("should load a document and an additional update", (done) => {
   const websocketServiceMock = (context) => () => {};
 
@@ -232,7 +305,7 @@ it("should load a document and an additional update", (done) => {
   });
 });
 
-it.only("should load a document and an additional snapshot", (done) => {
+it("should load a document and an additional snapshot", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
@@ -307,9 +380,7 @@ it.only("should load a document and an additional snapshot", (done) => {
 });
 
 // should load a document and an two updates
-// should load a document and an additional snapshot
 // should load a document and an additional snapshot and an update
-// should load a document with updates
 // should load a document with updates followed by an updates
 // tests for a broken snapshot key
 // test for a invalid contributor
