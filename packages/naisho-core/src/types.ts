@@ -148,7 +148,9 @@ export type SyncMachineConfig = {
   websocketHost: string;
   websocketSessionKey: string;
   applySnapshot: (decryptedSnapshot: any) => void;
-  getSnapshotKey: (snapshot: any | undefined) => Promise<Uint8Array>;
+  getSnapshotKey: (
+    snapshot: any | undefined
+  ) => Promise<Uint8Array> | Uint8Array;
   getNewSnapshotData: () => Promise<{
     readonly id: string;
     readonly data: Uint8Array | string;
@@ -164,7 +166,7 @@ export type SyncMachineConfig = {
     activeSnapshotId: string | null;
     latestServerVersion: number | null;
   }) => boolean;
-  isValidCollaborator: (signingPublicKey: string) => Promise<boolean>;
+  isValidCollaborator: (signingPublicKey: string) => boolean | Promise<boolean>;
   serializeChanges: (changes: unknown[]) => string;
   deserializeChanges: (string) => unknown[];
   sodium: any;
