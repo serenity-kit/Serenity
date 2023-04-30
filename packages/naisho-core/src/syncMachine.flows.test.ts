@@ -3,13 +3,15 @@ import sodium, { KeyPair } from "react-native-libsodium";
 import { assign, interpret, spawn } from "xstate";
 import { createSnapshot } from "./snapshot";
 import { syncMachine } from "./syncMachine";
-import { SnapshotPublicData } from "./types";
-import { generateId } from "./utils/generateId";
+import { SnapshotPublicData, UpdatePublicData } from "./types";
+import { createUpdate } from "./update";
 
 const url = "wss://www.example.com";
 
 let signatureKeyPair: KeyPair;
 let key: Uint8Array;
+const docId = "6e46c006-5541-11ec-bf63-0242ac130002";
+const snapshotId = "c08bbeed-049c-45be-915c-a7206ef55109";
 
 beforeEach(() => {
   signatureKeyPair = {
@@ -25,12 +27,11 @@ beforeEach(() => {
 
 afterEach(() => {});
 
-const createSnapshotHelper = () => {
+const createSnapshotTestHelper = () => {
   key = sodiumWrappers.from_hex(
     "724b092810ec86d7e35c9d067702b31ef90bc43a7b598626749914d6a3e033ed"
   );
 
-  const snapshotId = generateId();
   const publicData: SnapshotPublicData = {
     snapshotId,
     docId: "6e46c006-5541-11ec-bf63-0242ac130002",
@@ -56,10 +57,20 @@ const createSnapshotHelper = () => {
   };
 };
 
-it("should connect to the websocket", (done) => {
-  const websocketServiceMock = (context) => (callback, onReceive) => {
-    // callback({ type: 'resolve', data: { message: 'Success' } });
+const createUpdateHelper = () => {
+  const publicData: UpdatePublicData = {
+    refSnapshotId: snapshotId,
+    docId,
+    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
   };
+
+  const update = createUpdate("u", publicData, key, signatureKeyPair, 0);
+
+  return { update: { ...update, serverData: { version: 0 } } };
+};
+
+it("should connect to the websocket", (done) => {
+  const websocketServiceMock = (context) => () => {};
 
   const syncService = interpret(
     syncMachine
@@ -67,6 +78,7 @@ it("should connect to the websocket", (done) => {
         ...syncMachine.context,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
+        signatureKeyPair,
       })
       .withConfig({
         actions: {
@@ -91,9 +103,9 @@ it("should connect to the websocket", (done) => {
 });
 
 it("should load a document", (done) => {
-  const websocketServiceMock = (context) => (callback, onReceive) => {
-    // callback({ type: 'resolve', data: { message: 'Success' } });
-  };
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
 
   const syncService = interpret(
     syncMachine
@@ -102,13 +114,18 @@ it("should load a document", (done) => {
         websocketHost: url,
         websocketSessionKey: "sessionKey",
         onDocumentLoaded: () => {
+          expect(docValue).toEqual("Hello World");
           done();
         },
         isValidCollaborator: (signingPublicKey) =>
           sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
           signingPublicKey,
         getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = docValue + sodiumWrappers.to_string(snapshot);
+        },
         sodium: sodiumWrappers,
+        signatureKeyPair,
       })
       .withConfig({
         actions: {
@@ -127,7 +144,7 @@ it("should load a document", (done) => {
   syncService.start();
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 
-  const { snapshot } = createSnapshotHelper();
+  const { snapshot } = createSnapshotTestHelper();
   syncService.send({
     type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
     data: {
@@ -136,3 +153,83 @@ it("should load a document", (done) => {
     },
   });
 });
+
+it("should load a document and an additional update", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = docValue + sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (docValue === "Hello Worldu") {
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+    },
+  });
+
+  const { update } = createUpdateHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      ...update,
+      type: "update",
+    },
+  });
+});
+
+// should load a document and an two updates
+// should load a document and an additional snapshot
+// should load a document and an additional snapshot and an update
+// tests for a broken snapshot key
+// test for a invalid contributor
+
+// const websocketServiceMock = (context) => (callback, onReceive) => {
+//   // callback({ type: 'resolve', data: { message: 'Success' } });
+// };

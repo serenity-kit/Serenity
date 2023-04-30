@@ -628,12 +628,14 @@ export const syncMachine =
                       update.publicData.pubKey
                     ]
                   : -1;
+
               const { content, clock } = verifyAndDecryptUpdate(
                 update,
                 key,
                 context.sodium.from_base64(update.publicData.pubKey),
                 currentClock
               );
+
               const existingClocks = updateClocks[activeSnapshotInfo.id] || {};
               updateClocks[activeSnapshotInfo.id] = {
                 ...existingClocks,

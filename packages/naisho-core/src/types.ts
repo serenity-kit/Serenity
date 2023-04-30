@@ -159,9 +159,9 @@ export type SyncMachineConfig = {
     readonly additionalServerData?: any;
   }>;
   applyChanges: (updates: any[]) => void;
-  getUpdateKey: (update: any) => Promise<Uint8Array>;
+  getUpdateKey: (update: any) => Promise<Uint8Array> | Uint8Array;
   applyEphemeralUpdates: (ephemeralUpdates: any[]) => void;
-  getEphemeralUpdateKey: () => Promise<Uint8Array>;
+  getEphemeralUpdateKey: () => Promise<Uint8Array> | Uint8Array;
   shouldSendSnapshot: (info: {
     activeSnapshotId: string | null;
     latestServerVersion: number | null;
