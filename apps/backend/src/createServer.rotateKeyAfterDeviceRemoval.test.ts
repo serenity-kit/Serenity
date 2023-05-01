@@ -158,7 +158,6 @@ test("successfully creates a snapshot", async () => {
 
   await waitForClientState(client, client.CLOSED);
   expect(messages[1].type).toEqual("snapshotSaved");
-  expect(messages[1].docId).toEqual(documentId);
   expect(messages[1].snapshotId).toEqual(snapshotId);
 });
 
@@ -195,7 +194,6 @@ test("successfully creates an update", async () => {
   await waitForClientState(client, client.CLOSED);
   expect(messages[1].type).toEqual("updateSaved");
   expect(messages[1].clock).toEqual(0);
-  expect(messages[1].docId).toEqual(documentId);
   expect(messages[1].snapshotId).toEqual(snapshotId);
   expect(messages[1].serverVersion).toEqual(1);
   latestServerVersion = messages[1].serverVersion;
@@ -276,7 +274,6 @@ test("document update will fail", async () => {
   expect(messages[1].type).toEqual("updateFailed");
   expect(messages[1].clock).toEqual(1);
   expect(messages[1].requiresNewSnapshot).toBe(true);
-  expect(messages[1].docId).toEqual(documentId);
   expect(messages[1].snapshotId).toEqual(snapshotId);
 });
 
@@ -426,7 +423,6 @@ test("successfully creates a snapshot", async () => {
   await waitForClientState(client, client.CLOSED);
 
   expect(messages[1].type).toEqual("snapshotSaved");
-  expect(messages[1].docId).toEqual(documentId);
   expect(messages[1].snapshotId).toEqual(snapshotId);
 });
 
@@ -464,7 +460,6 @@ test("successfully creates an update", async () => {
 
   expect(messages[1].type).toEqual("updateSaved");
   expect(messages[1].clock).toEqual(0);
-  expect(messages[1].docId).toEqual(documentId);
   expect(messages[1].snapshotId).toEqual(snapshotId);
   expect(messages[1].serverVersion).toEqual(1);
   latestServerVersion = messages[1].serverVersion;

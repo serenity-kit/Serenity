@@ -214,7 +214,6 @@ export default async function createServer() {
               JSON.stringify({
                 type: "snapshotSaved",
                 snapshotId: snapshot.id,
-                docId: snapshot.documentId,
               })
             );
             const snapshotMsgForOtherClients: SnapshotWithServerData = {
@@ -239,8 +238,6 @@ export default async function createServer() {
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
-                  // TODO remove docId - should be irrelevant
-                  docId: data.publicData.docId,
                   snapshot: doc.snapshot,
                   updates: doc.updates,
                   snapshotProofChain: doc.snapshotProofChain,
@@ -255,8 +252,6 @@ export default async function createServer() {
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
-                  // TODO remove docId - should be irrelevant
-                  docId: data.publicData.docId,
                   updates: result.updates,
                 })
               );
@@ -264,8 +259,6 @@ export default async function createServer() {
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
-                  // TODO remove docId - should be irrelevant
-                  docId: data.publicData.docId,
                 })
               );
             } else {
@@ -274,8 +267,6 @@ export default async function createServer() {
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
-                  // TODO remove docId - should be irrelevant
-                  docId: data.publicData.docId,
                 })
               );
             }
@@ -305,7 +296,6 @@ export default async function createServer() {
             connection.send(
               JSON.stringify({
                 type: "updateSaved",
-                docId: data.publicData.docId,
                 snapshotId: data.publicData.refSnapshotId,
                 clock: data.publicData.clock,
                 // @ts-expect-error not sure why savedUpdate is "never"
@@ -325,7 +315,6 @@ export default async function createServer() {
               connection.send(
                 JSON.stringify({
                   type: "updateFailed",
-                  docId: data.publicData.docId,
                   snapshotId: data.publicData.refSnapshotId,
                   clock: data.publicData.clock,
                   requiresNewSnapshot: err instanceof NaishoNewSnapshotRequired,

@@ -235,7 +235,7 @@ it("should load a document with updates", (done) => {
   });
 });
 
-it("should load a document and an additional update", (done) => {
+it("should load a document and two additional updates", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
@@ -278,7 +278,7 @@ it("should load a document and an additional update", (done) => {
         },
       })
   ).onTransition((state) => {
-    if (docValue === "Hello Worldu") {
+    if (docValue === "Hello Worlduu") {
       done();
     }
   });
@@ -300,6 +300,15 @@ it("should load a document and an additional update", (done) => {
     type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
     data: {
       ...update,
+      type: "update",
+    },
+  });
+
+  const { update: update2 } = createUpdateHelper({ version: 1 });
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      ...update2,
       type: "update",
     },
   });
@@ -379,9 +388,180 @@ it("should load a document and an additional snapshot", (done) => {
   });
 });
 
-// should load a document and an two updates
-// should load a document and an additional snapshot and an update
-// should load a document with updates followed by an updates
+it("should load a document with updates and two additional updates", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (docValue === "Hello Worlduuuu") {
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+      updates: [
+        createUpdateHelper().update,
+        createUpdateHelper({ version: 1 }).update,
+      ],
+    },
+  });
+
+  const { update } = createUpdateHelper({ version: 2 });
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      ...update,
+      type: "update",
+    },
+  });
+
+  const { update: update2 } = createUpdateHelper({ version: 3 });
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      ...update2,
+      type: "update",
+    },
+  });
+});
+
+it("should load a document with updates and two two additional snapshots", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (docValue === "Hello World again and again") {
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+      updates: [
+        createUpdateHelper().update,
+        createUpdateHelper({ version: 1 }).update,
+      ],
+    },
+  });
+
+  const { snapshot: snapshot2 } = createSnapshotTestHelper({
+    parentSnapshotCiphertext: snapshot.ciphertext,
+    grandParentSnapshotProof: snapshot.publicData.parentSnapshotProof,
+    content: "Hello World again",
+  });
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "snapshot",
+      snapshot: snapshot2,
+    },
+  });
+
+  const { snapshot: snapshot3 } = createSnapshotTestHelper({
+    parentSnapshotCiphertext: snapshot2.ciphertext,
+    grandParentSnapshotProof: snapshot2.publicData.parentSnapshotProof,
+    content: "Hello World again and again",
+  });
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "snapshot",
+      snapshot: snapshot3,
+    },
+  });
+});
+
 // tests for a broken snapshot key
 // test for a invalid contributor
 
