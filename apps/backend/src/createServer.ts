@@ -1,5 +1,5 @@
 import {
-  NaishoNewSnapshotRequired,
+  NaishoNewSnapshotRequiredError,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
   SnapshotWithServerData,
@@ -255,7 +255,7 @@ export default async function createServer() {
                   updates: result.updates,
                 })
               );
-            } else if (error instanceof NaishoNewSnapshotRequired) {
+            } else if (error instanceof NaishoNewSnapshotRequiredError) {
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
@@ -287,7 +287,7 @@ export default async function createServer() {
                   update: data,
                   workspaceId: userToWorkspace.workspaceId,
                 }),
-              [NaishoNewSnapshotRequired]
+              [NaishoNewSnapshotRequiredError]
             );
             if (savedUpdate === undefined) {
               throw new Error("Update could not be saved.");
@@ -317,7 +317,8 @@ export default async function createServer() {
                   type: "updateFailed",
                   snapshotId: data.publicData.refSnapshotId,
                   clock: data.publicData.clock,
-                  requiresNewSnapshot: err instanceof NaishoNewSnapshotRequired,
+                  requiresNewSnapshot:
+                    err instanceof NaishoNewSnapshotRequiredError,
                 })
               );
             }

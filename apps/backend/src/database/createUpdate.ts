@@ -1,4 +1,4 @@
-import { NaishoNewSnapshotRequired, Update } from "@naisho/core";
+import { NaishoNewSnapshotRequiredError, Update } from "@naisho/core";
 import { KeyDerivationTrace } from "@serenity-tools/common";
 import { Prisma } from "../../prisma/generated/output";
 import { serializeUpdate } from "../utils/serialize";
@@ -49,7 +49,7 @@ export async function createUpdate({
       // workspaceKey has been rotated
       snapshotKeyDerivationTrace.workspaceKeyId !== currentWorkspaceKey.id
     ) {
-      throw new NaishoNewSnapshotRequired("Key roration is required");
+      throw new NaishoNewSnapshotRequiredError("Key roration is required");
     }
 
     if (
