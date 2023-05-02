@@ -561,10 +561,3 @@ it("should load a document with updates and two two additional snapshots", (done
     },
   });
 });
-
-// tests for a broken snapshot key
-// test for a invalid contributor
-
-// const websocketServiceMock = (context) => (callback, onReceive) => {
-//   // callback({ type: 'resolve', data: { message: 'Success' } });
-// };
