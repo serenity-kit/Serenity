@@ -34,16 +34,14 @@ export class NaishoNewSnapshotRequiredError extends Error {
   }
 }
 
-export type NaishoSyncNotRecoverableErrorType = "snapshot-decryption-failed";
+export class NaishoProcessingEphemeralUpdateError extends Error {
+  originalError: Error;
 
-export class NaishoSyncNotRecoverableError extends Error {
-  type: NaishoSyncNotRecoverableErrorType;
-
-  constructor(message, type: "snapshot-decryption-failed") {
+  constructor(message, originalError: Error) {
     super(message);
 
     this.name = this.constructor.name;
-    this.type = type;
+    this.originalError = originalError;
 
     // capturing the stack trace keeps the reference to your error class
     // https://github.com/microsoft/TypeScript/issues/1168#issuecomment-219296751

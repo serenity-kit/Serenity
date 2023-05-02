@@ -1,9 +1,14 @@
 import sodiumWrappers from "libsodium-wrappers";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { assign, interpret, spawn } from "xstate";
+import { createEphemeralUpdate } from "./ephemeralUpdate";
 import { createSnapshot } from "./snapshot";
 import { syncMachine } from "./syncMachine";
-import { SnapshotPublicData, UpdatePublicData } from "./types";
+import {
+  EphemeralUpdatePublicData,
+  SnapshotPublicData,
+  UpdatePublicData,
+} from "./types";
 import { createUpdate } from "./update";
 import { generateId } from "./utils/generateId";
 
@@ -85,10 +90,26 @@ const createUpdateHelper = (params?: CreateUpdateTestHelperParams) => {
   return { update: { ...update, serverData: { version } } };
 };
 
-it("should load a document with updates and two additional updates", (done) => {
+const createTestEphemeralUpdate = () => {
+  const publicData: EphemeralUpdatePublicData = {
+    docId,
+    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+  };
+
+  const ephemeralUpdate = createEphemeralUpdate(
+    new Uint8Array([42]),
+    publicData,
+    key,
+    signatureKeyPair
+  );
+  return { ephemeralUpdate };
+};
+
+it("should process three additional ephemeral updates where the second one fails", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
+  let ephemeralUpdatesValue = new Uint8Array();
 
   const syncService = interpret(
     syncMachine
@@ -105,12 +126,19 @@ it("should load a document with updates and two additional updates", (done) => {
         },
         getUpdateKey: () => key,
         deserializeChanges: (changes) => {
-          throw new Error("deserializeChanges not implemented");
+          return changes;
         },
         applyChanges: (changes) => {
           changes.forEach((change) => {
             docValue = docValue + change;
           });
+        },
+        getEphemeralUpdateKey: () => key,
+        applyEphemeralUpdates: (ephemeralUpdates) => {
+          ephemeralUpdatesValue = new Uint8Array([
+            ...ephemeralUpdatesValue,
+            ...ephemeralUpdates,
+          ]);
         },
         sodium: sodiumWrappers,
         signatureKeyPair,
@@ -128,8 +156,10 @@ it("should load a document with updates and two additional updates", (done) => {
         },
       })
   ).onTransition((state) => {
-    if (state.matches("failed")) {
-      expect(state.context._errorTrace[0]).toBeInstanceOf(Error);
+    if (ephemeralUpdatesValue.length === 2 && state.matches("connected.idle")) {
+      expect(state.context._ephemeralUpdateErrors.length).toEqual(1);
+      expect(ephemeralUpdatesValue[0]).toEqual(42);
+      expect(ephemeralUpdatesValue[1]).toEqual(42);
       done();
     }
   });
@@ -143,10 +173,42 @@ it("should load a document with updates and two additional updates", (done) => {
     data: {
       type: "document",
       snapshot,
-      updates: [
-        createUpdateHelper().update,
-        createUpdateHelper({ version: 1 }).update,
-      ],
     },
   });
+
+  const { ephemeralUpdate } = createTestEphemeralUpdate();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      ...ephemeralUpdate,
+      type: "ephemeralUpdate",
+    },
+  });
+  setTimeout(() => {
+    const { ephemeralUpdate: ephemeralUpdate2 } = createTestEphemeralUpdate();
+    syncService.send({
+      type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+      data: {
+        ...ephemeralUpdate2,
+        publicData: {
+          ...ephemeralUpdate2.publicData,
+          docId: "wrongDocId",
+        },
+        type: "ephemeralUpdate",
+      },
+    });
+    setTimeout(() => {
+      const { ephemeralUpdate: ephemeralUpdate3 } = createTestEphemeralUpdate();
+      syncService.send({
+        type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+        data: {
+          ...ephemeralUpdate3,
+          type: "ephemeralUpdate",
+        },
+      });
+    }, 1);
+  }, 1);
 });
+
+// test sending the same update twice
+// testing sending the same ephemeral update twice

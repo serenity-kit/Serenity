@@ -10,6 +10,7 @@ import {
 import { z } from "zod";
 import { hash } from "./crypto";
 import { verifyAndDecryptEphemeralUpdate } from "./ephemeralUpdate";
+import { NaishoProcessingEphemeralUpdateError } from "./errors";
 import { createSnapshot, verifyAndDecryptSnapshot } from "./snapshot";
 import { isValidAncestorSnapshot } from "./snapshot/isValidAncestorSnapshot";
 import { parseEphemeralUpdateWithServerData } from "./snapshot/parseEphemeralUpdateWithServerData";
@@ -120,6 +121,7 @@ type ProcessQueueData = {
   pendingChangesQueue: any[];
   updateClocks: UpdateClocks;
   mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
+  ephemeralUpdateErrors: NaishoProcessingEphemeralUpdateError[];
 };
 
 export type Context = SyncMachineConfig & {
@@ -138,6 +140,7 @@ export type Context = SyncMachineConfig & {
   _updateClocks: UpdateClocks;
   _mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
   _errorTrace: Error[];
+  _ephemeralUpdateErrors: Error[];
 };
 
 export const syncMachine =
@@ -209,6 +212,7 @@ export const syncMachine =
         _updateClocks: {},
         _mostRecentEphemeralUpdateDatePerPublicSigningKey: {},
         _errorTrace: [],
+        _ephemeralUpdateErrors: [],
       },
       initial: "connecting",
       on: {
@@ -403,6 +407,7 @@ export const syncMachine =
               _updateClocks: event.data.updateClocks,
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
+              _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
             };
           } else if (event.data.handledQueue === "customMessage") {
             return {
@@ -417,6 +422,7 @@ export const syncMachine =
               _updateClocks: event.data.updateClocks,
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
+              _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
             };
           } else {
             return {
@@ -430,6 +436,7 @@ export const syncMachine =
               _updateClocks: event.data.updateClocks,
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
+              _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
             };
           }
         }),
@@ -450,35 +457,32 @@ export const syncMachine =
           }, delay);
         },
         processQueues: (context, event) => async (send) => {
+          console.log("processQueues event", event);
+          console.log("_incomingQueue", context._incomingQueue.length);
+          console.log(
+            "_customMessageQueue",
+            context._customMessageQueue.length
+          );
+          console.log(
+            "_pendingChangesQueue",
+            context._pendingChangesQueue.length
+          );
+
+          let activeSnapshotInfo: ActiveSnapshotInfo | null =
+            context._activeSnapshotInfo;
+          let latestServerVersion = context._latestServerVersion;
+          let handledQueue: "customMessage" | "incoming" | "pending" | "none" =
+            "none";
+          let activeSendingSnapshotInfo = context._activeSendingSnapshotInfo;
+          let sendingUpdatesClock = context._sendingUpdatesClock;
+          let confirmedUpdatesClock = context._confirmedUpdatesClock;
+          let updatesInFlight = context._updatesInFlight;
+          let pendingChangesQueue = context._pendingChangesQueue;
+          let updateClocks = context._updateClocks;
+          let mostRecentEphemeralUpdateDatePerPublicSigningKey =
+            context._mostRecentEphemeralUpdateDatePerPublicSigningKey;
+
           try {
-            console.log("processQueues event", event);
-            console.log("_incomingQueue", context._incomingQueue.length);
-            console.log(
-              "_customMessageQueue",
-              context._customMessageQueue.length
-            );
-            console.log(
-              "_pendingChangesQueue",
-              context._pendingChangesQueue.length
-            );
-
-            let activeSnapshotInfo: ActiveSnapshotInfo | null =
-              context._activeSnapshotInfo;
-            let latestServerVersion = context._latestServerVersion;
-            let handledQueue:
-              | "customMessage"
-              | "incoming"
-              | "pending"
-              | "none" = "none";
-            let activeSendingSnapshotInfo = context._activeSendingSnapshotInfo;
-            let sendingUpdatesClock = context._sendingUpdatesClock;
-            let confirmedUpdatesClock = context._confirmedUpdatesClock;
-            let updatesInFlight = context._updatesInFlight;
-            let pendingChangesQueue = context._pendingChangesQueue;
-            let updateClocks = context._updateClocks;
-            let mostRecentEphemeralUpdateDatePerPublicSigningKey =
-              context._mostRecentEphemeralUpdateDatePerPublicSigningKey;
-
             const createAndSendSnapshot = async () => {
               if (activeSnapshotInfo === null) {
                 throw new Error("No active snapshot");
@@ -863,39 +867,48 @@ export const syncMachine =
 
                   break;
                 case "ephemeralUpdate":
-                  const ephemeralUpdate = parseEphemeralUpdateWithServerData(
-                    event,
-                    context.additionalAuthenticationDataValidations
-                      ?.ephemeralUpdate ?? z.object({})
-                  );
+                  try {
+                    const ephemeralUpdate = parseEphemeralUpdateWithServerData(
+                      event,
+                      context.additionalAuthenticationDataValidations
+                        ?.ephemeralUpdate ?? z.object({})
+                    );
 
-                  const ephemeralUpdateKey =
-                    await context.getEphemeralUpdateKey();
+                    const ephemeralUpdateKey =
+                      await context.getEphemeralUpdateKey();
 
-                  const isValidCollaborator = await context.isValidCollaborator(
-                    ephemeralUpdate.publicData.pubKey
-                  );
-                  if (!isValidCollaborator) {
-                    throw new Error("Invalid collaborator");
-                  }
+                    const isValidCollaborator =
+                      await context.isValidCollaborator(
+                        ephemeralUpdate.publicData.pubKey
+                      );
+                    if (!isValidCollaborator) {
+                      throw new Error("Invalid collaborator");
+                    }
 
-                  const ephemeralUpdateResult = verifyAndDecryptEphemeralUpdate(
-                    ephemeralUpdate,
-                    ephemeralUpdateKey,
-                    context.sodium.from_base64(
-                      ephemeralUpdate.publicData.pubKey
-                    ),
+                    const ephemeralUpdateResult =
+                      verifyAndDecryptEphemeralUpdate(
+                        ephemeralUpdate,
+                        ephemeralUpdateKey,
+                        context.sodium.from_base64(
+                          ephemeralUpdate.publicData.pubKey
+                        ),
+                        mostRecentEphemeralUpdateDatePerPublicSigningKey[
+                          ephemeralUpdate.publicData.pubKey
+                        ]
+                      );
                     mostRecentEphemeralUpdateDatePerPublicSigningKey[
-                      ephemeralUpdate.publicData.pubKey
-                    ]
-                  );
-                  mostRecentEphemeralUpdateDatePerPublicSigningKey[
-                    event.publicData.pubKey
-                  ] = ephemeralUpdateResult.date;
+                      event.publicData.pubKey
+                    ] = ephemeralUpdateResult.date;
 
-                  context.applyEphemeralUpdates([
-                    ephemeralUpdateResult.content,
-                  ]);
+                    context.applyEphemeralUpdates([
+                      ephemeralUpdateResult.content,
+                    ]);
+                  } catch (err) {
+                    throw new NaishoProcessingEphemeralUpdateError(
+                      "Failed to process ephemeral update",
+                      err
+                    );
+                  }
                   break;
               }
             } else if (
@@ -940,10 +953,29 @@ export const syncMachine =
               pendingChangesQueue,
               updateClocks,
               mostRecentEphemeralUpdateDatePerPublicSigningKey,
+              ephemeralUpdateErrors: context._ephemeralUpdateErrors,
             };
           } catch (error) {
             console.log("error", error);
-            throw error;
+            if (error instanceof NaishoProcessingEphemeralUpdateError) {
+              return {
+                handledQueue,
+                activeSnapshotInfo,
+                latestServerVersion,
+                activeSendingSnapshotInfo,
+                confirmedUpdatesClock,
+                sendingUpdatesClock,
+                updatesInFlight,
+                pendingChangesQueue,
+                updateClocks,
+                mostRecentEphemeralUpdateDatePerPublicSigningKey,
+                ephemeralUpdateErrors: context._ephemeralUpdateErrors
+                  .concat(error)
+                  .slice(0, 20), // avoid a memory leak by storing max 20 errors
+              };
+            } else {
+              throw error;
+            }
           }
         },
       },

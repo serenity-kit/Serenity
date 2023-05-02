@@ -1,9 +1,14 @@
 import sodiumWrappers from "libsodium-wrappers";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { assign, interpret, spawn } from "xstate";
+import { createEphemeralUpdate } from "./ephemeralUpdate";
 import { createSnapshot } from "./snapshot";
 import { syncMachine } from "./syncMachine";
-import { SnapshotPublicData, UpdatePublicData } from "./types";
+import {
+  EphemeralUpdatePublicData,
+  SnapshotPublicData,
+  UpdatePublicData,
+} from "./types";
 import { createUpdate } from "./update";
 import { generateId } from "./utils/generateId";
 
@@ -83,6 +88,21 @@ const createUpdateHelper = (params?: CreateUpdateTestHelperParams) => {
   const update = createUpdate("u", publicData, key, signatureKeyPair, version);
 
   return { update: { ...update, serverData: { version } } };
+};
+
+const createTestEphemeralUpdate = () => {
+  const publicData: EphemeralUpdatePublicData = {
+    docId,
+    pubKey: sodium.to_base64(signatureKeyPair.publicKey),
+  };
+
+  const ephemeralUpdate = createEphemeralUpdate(
+    new Uint8Array([42]),
+    publicData,
+    key,
+    signatureKeyPair
+  );
+  return { ephemeralUpdate };
 };
 
 it("should connect to the websocket", (done) => {
@@ -560,4 +580,105 @@ it("should load a document with updates and two two additional snapshots", (done
       snapshot: snapshot3,
     },
   });
+});
+
+it("should load a document and process three additional ephemeral updates", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+  let ephemeralUpdatesValue = new Uint8Array();
+
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        getEphemeralUpdateKey: () => key,
+        applyEphemeralUpdates: (ephemeralUpdates) => {
+          ephemeralUpdatesValue = new Uint8Array([
+            ...ephemeralUpdatesValue,
+            ...ephemeralUpdates,
+          ]);
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (ephemeralUpdatesValue.length === 3) {
+      expect(ephemeralUpdatesValue[0]).toEqual(42);
+      expect(ephemeralUpdatesValue[1]).toEqual(42);
+      expect(ephemeralUpdatesValue[2]).toEqual(42);
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+    },
+  });
+
+  const { ephemeralUpdate } = createTestEphemeralUpdate();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      ...ephemeralUpdate,
+      type: "ephemeralUpdate",
+    },
+  });
+  setTimeout(() => {
+    const { ephemeralUpdate: ephemeralUpdate2 } = createTestEphemeralUpdate();
+    syncService.send({
+      type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+      data: {
+        ...ephemeralUpdate2,
+        type: "ephemeralUpdate",
+      },
+    });
+    setTimeout(() => {
+      const { ephemeralUpdate: ephemeralUpdate3 } = createTestEphemeralUpdate();
+      syncService.send({
+        type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+        data: {
+          ...ephemeralUpdate3,
+          type: "ephemeralUpdate",
+        },
+      });
+    }, 1);
+  }, 1);
 });
