@@ -25,10 +25,14 @@ export function createEphemeralUpdate(
   const publicDataAsBase64 = sodium.to_base64(
     canonicalize(publicData) as string
   );
+  // Each EphemeralUpdate is prefixed with the date it was created
+  // to allow the recipient to know prevent reply attacks.
+  const prefixedContent = prefixWithUint8Array(
+    content,
+    dateToUint8Array(new Date())
+  );
   const { ciphertext, publicNonce } = encryptAead(
-    // Each EphemeralUpdate is prefixed with the date it was created
-    // to allow the recipient to know prevent reply attacks.
-    prefixWithUint8Array(content, dateToUint8Array(new Date())),
+    prefixedContent,
     publicDataAsBase64,
     key
   );
@@ -86,6 +90,7 @@ export function verifyAndDecryptEphemeralUpdate(
   if (isOlderThanTenMin(date)) {
     throw new Error("Ephemeral update is older than 10 minutes");
   }
+
   if (mostRecentEphemeralUpdateDate && date <= mostRecentEphemeralUpdateDate) {
     throw new Error(
       "Incoming ephemeral update is older or equal than a received one"

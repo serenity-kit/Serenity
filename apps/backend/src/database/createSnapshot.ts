@@ -1,5 +1,5 @@
 import {
-  NaishoNewSnapshotRequired,
+  NaishoNewSnapshotRequiredError,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
   hash,
@@ -58,7 +58,7 @@ export async function createSnapshot({
       // workspaceKey has been rotated
       snapshotKeyDerivationTrace.workspaceKeyId !== currentWorkspaceKey.id
     ) {
-      throw new NaishoNewSnapshotRequired("Key roration is required");
+      throw new NaishoNewSnapshotRequiredError("Key roration is required");
     }
 
     // function sleep(ms) {

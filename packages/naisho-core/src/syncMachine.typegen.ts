@@ -46,6 +46,7 @@ export interface Typegen0 {
     resetWebsocketRetries: "WEBSOCKET_CONNECTED";
     spawnWebsocketActor: "WEBSOCKET_RETRY";
     stopWebsocketActor: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
+    storeErrorInErrorTrace: "error.platform.processQueues";
     updateShouldReconnect: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
   };
   eventsCausingDelays: {};
