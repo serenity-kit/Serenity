@@ -299,12 +299,15 @@ it("should load a document and two additional updates", (done) => {
       })
   ).onTransition((state) => {
     if (docValue === "Hello Worlduu") {
+      expect(state.context._documentWasLoaded).toBe(true);
       done();
     }
   });
 
   syncService.start();
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  expect(syncService.getSnapshot().context._documentWasLoaded).toBe(false);
 
   const { snapshot } = createSnapshotTestHelper();
   syncService.send({

@@ -122,6 +122,7 @@ type ProcessQueueData = {
   updateClocks: UpdateClocks;
   mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
   ephemeralUpdateErrors: NaishoProcessingEphemeralUpdateError[];
+  documentWasLoaded: boolean;
 };
 
 export type Context = SyncMachineConfig & {
@@ -141,6 +142,7 @@ export type Context = SyncMachineConfig & {
   _mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
   _errorTrace: Error[];
   _ephemeralUpdateErrors: Error[];
+  _documentWasLoaded: boolean;
 };
 
 export const syncMachine =
@@ -213,6 +215,7 @@ export const syncMachine =
         _mostRecentEphemeralUpdateDatePerPublicSigningKey: {},
         _errorTrace: [],
         _ephemeralUpdateErrors: [],
+        _documentWasLoaded: false,
       },
       initial: "connecting",
       on: {
@@ -408,6 +411,7 @@ export const syncMachine =
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
+              _documentWasLoaded: event.data.documentWasLoaded,
             };
           } else if (event.data.handledQueue === "customMessage") {
             return {
@@ -423,6 +427,7 @@ export const syncMachine =
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
+              _documentWasLoaded: event.data.documentWasLoaded,
             };
           } else {
             return {
@@ -437,6 +442,7 @@ export const syncMachine =
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
+              _documentWasLoaded: event.data.documentWasLoaded,
             };
           }
         }),
@@ -481,6 +487,7 @@ export const syncMachine =
           let updateClocks = context._updateClocks;
           let mostRecentEphemeralUpdateDatePerPublicSigningKey =
             context._mostRecentEphemeralUpdateDatePerPublicSigningKey;
+          let documentWasLoaded = context._documentWasLoaded;
 
           try {
             const createAndSendSnapshot = async () => {
@@ -692,62 +699,47 @@ export const syncMachine =
               const event = context._incomingQueue[0];
               switch (event.type) {
                 case "document":
-                  try {
-                    if (context.knownSnapshotInfo) {
-                      const isValid = isValidAncestorSnapshot({
-                        knownSnapshotProofEntry: {
-                          parentSnapshotProof:
-                            context.knownSnapshotInfo.parentSnapshotProof,
-                          snapshotCiphertextHash:
-                            context.knownSnapshotInfo.snapshotCiphertextHash,
-                        },
-                        snapshotProofChain: event.snapshotProofChain,
-                        currentSnapshot: event.snapshot,
-                      });
-                      if (!isValid) {
-                        throw new Error("Invalid ancestor snapshot");
-                      }
+                  if (context.knownSnapshotInfo) {
+                    const isValid = isValidAncestorSnapshot({
+                      knownSnapshotProofEntry: {
+                        parentSnapshotProof:
+                          context.knownSnapshotInfo.parentSnapshotProof,
+                        snapshotCiphertextHash:
+                          context.knownSnapshotInfo.snapshotCiphertextHash,
+                      },
+                      snapshotProofChain: event.snapshotProofChain,
+                      currentSnapshot: event.snapshot,
+                    });
+                    if (!isValid) {
+                      throw new Error("Invalid ancestor snapshot");
                     }
+                  }
 
-                    activeSnapshotInfo = {
-                      id: event.snapshot.publicData.snapshotId,
-                      ciphertext: event.snapshot.ciphertext,
-                      parentSnapshotProof:
-                        event.snapshot.publicData.parentSnapshotProof,
-                    };
+                  activeSnapshotInfo = {
+                    id: event.snapshot.publicData.snapshotId,
+                    ciphertext: event.snapshot.ciphertext,
+                    parentSnapshotProof:
+                      event.snapshot.publicData.parentSnapshotProof,
+                  };
 
-                    await processSnapshot(event.snapshot);
+                  await processSnapshot(event.snapshot);
 
-                    if (event.updates) {
-                      await processUpdates(event.updates);
-                    }
-                    if (context.onDocumentLoaded) {
-                      context.onDocumentLoaded();
-                    }
-                  } catch (err) {
-                    // TODO
-                    console.log("Apply document failed. TODO handle error");
-                    console.error(err);
-                    throw err;
+                  if (event.updates) {
+                    await processUpdates(event.updates);
+                  }
+                  documentWasLoaded = true;
+                  if (context.onDocumentLoaded) {
+                    context.onDocumentLoaded();
                   }
 
                   break;
 
                 case "snapshot":
                   console.log("snapshot", event);
-                  try {
-                    await processSnapshot(
-                      event.snapshot,
-                      activeSnapshotInfo ? activeSnapshotInfo : undefined
-                    );
-                  } catch (err) {
-                    console.log(
-                      "Apply snapshot failed. TODO handle error",
-                      err
-                    );
-                    throw err;
-                    // TODO
-                  }
+                  await processSnapshot(
+                    event.snapshot,
+                    activeSnapshotInfo ? activeSnapshotInfo : undefined
+                  );
 
                   break;
 
@@ -954,9 +946,10 @@ export const syncMachine =
               updateClocks,
               mostRecentEphemeralUpdateDatePerPublicSigningKey,
               ephemeralUpdateErrors: context._ephemeralUpdateErrors,
+              documentWasLoaded,
             };
           } catch (error) {
-            console.log("error", error);
+            console.error("Processing queue error:", error);
             if (error instanceof NaishoProcessingEphemeralUpdateError) {
               const newEphemeralUpdateErrors = [
                 ...context._ephemeralUpdateErrors,
@@ -974,6 +967,7 @@ export const syncMachine =
                 updateClocks,
                 mostRecentEphemeralUpdateDatePerPublicSigningKey,
                 ephemeralUpdateErrors: newEphemeralUpdateErrors.slice(0, 20), // avoid a memory leak by storing max 20 errors
+                documentWasLoaded,
               };
             } else {
               throw error;
