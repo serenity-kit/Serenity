@@ -210,5 +210,99 @@ it("should process three additional ephemeral updates where the second one fails
   }, 1);
 });
 
+it("should store not more than 20 failed ephemeral update errors", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+  let ephemeralUpdatesValue = new Uint8Array();
+
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        getEphemeralUpdateKey: () => key,
+        applyEphemeralUpdates: (ephemeralUpdates) => {
+          ephemeralUpdatesValue = new Uint8Array([
+            ...ephemeralUpdatesValue,
+            ...ephemeralUpdates,
+          ]);
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (ephemeralUpdatesValue.length === 2 && state.matches("connected.idle")) {
+      expect(state.context._ephemeralUpdateErrors.length).toEqual(20);
+      expect(ephemeralUpdatesValue[0]).toEqual(42);
+      expect(ephemeralUpdatesValue[1]).toEqual(42);
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+    },
+  });
+
+  const { ephemeralUpdate } = createTestEphemeralUpdate();
+  for (let step = 0; step < 25; step++) {
+    syncService.send({
+      type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+      data: {
+        ...ephemeralUpdate,
+        type: "ephemeralUpdate",
+      },
+    });
+  }
+
+  setTimeout(() => {
+    const { ephemeralUpdate: ephemeralUpdate2 } = createTestEphemeralUpdate();
+    syncService.send({
+      type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+      data: {
+        ...ephemeralUpdate2,
+        type: "ephemeralUpdate",
+      },
+    });
+  }, 1);
+});
+
 // test sending the same update twice
 // testing sending the same ephemeral update twice

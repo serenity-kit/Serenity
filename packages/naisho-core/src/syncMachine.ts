@@ -958,6 +958,10 @@ export const syncMachine =
           } catch (error) {
             console.log("error", error);
             if (error instanceof NaishoProcessingEphemeralUpdateError) {
+              const newEphemeralUpdateErrors = [
+                ...context._ephemeralUpdateErrors,
+              ];
+              newEphemeralUpdateErrors.unshift(error);
               return {
                 handledQueue,
                 activeSnapshotInfo,
@@ -969,9 +973,7 @@ export const syncMachine =
                 pendingChangesQueue,
                 updateClocks,
                 mostRecentEphemeralUpdateDatePerPublicSigningKey,
-                ephemeralUpdateErrors: context._ephemeralUpdateErrors
-                  .concat(error)
-                  .slice(0, 20), // avoid a memory leak by storing max 20 errors
+                ephemeralUpdateErrors: newEphemeralUpdateErrors.slice(0, 20), // avoid a memory leak by storing max 20 errors
               };
             } else {
               throw error;
