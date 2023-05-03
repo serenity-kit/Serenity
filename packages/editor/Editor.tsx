@@ -252,8 +252,9 @@ export const Editor = (props: EditorProps) => {
         // or the other way around
         //
         // grow-0 overrides default of ScrollView to keep the assigned width
+        // shrink-0 needed so Editor doesn't squish the Sidebar and it keeps the fixed width
         <ScrollView
-          style={tw`w-sidebar grow-0 border-l border-gray-200 bg-gray-100`}
+          style={tw`w-sidebar grow-0 shrink-0 border-l border-gray-200 bg-gray-100`}
         >
           <EditorSidebar
             editor={editor}
