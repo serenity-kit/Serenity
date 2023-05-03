@@ -517,6 +517,7 @@
     align-items: center;
     justify-content: center;
 
+    cursor: pointer;
     background-color: theme("colors.gray.120");
   }
 
