@@ -308,6 +308,36 @@
     width: 100%;
   }
 
+  /* works but hides marking elements as they are no longer overflow: visible */
+  @media screen and (max-width: theme("screens[md]")) {
+    .table-wrapper {
+      overflow-x: scroll;
+      border-left: 1px solid theme("colors.gray.300");
+      border-right: 1px solid theme("colors.gray.300");
+    }
+
+    .table-extension td:first-child,
+    .table-extension th:first-child {
+      border-left: none;
+    }
+
+    .table-extension td:last-child,
+    .table-extension th:last-child {
+      border-right: none;
+    }
+
+    .table-extension {
+      @apply min-w-editor-content;
+    }
+
+    .table-wrapper .add,
+    .table-extension .insert-row,
+    .table-extension .insert-column {
+      /* needs to be important as other declarations need to be very specific as we can't add custom classes */
+      display: none !important;
+    }
+  }
+
   .table-extension td,
   .table-extension th {
     border: 1px solid theme("colors.gray.300");
