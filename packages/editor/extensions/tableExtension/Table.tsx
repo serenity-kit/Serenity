@@ -1,10 +1,17 @@
 import { Icon } from "@serenity-tools/ui";
 import { CellSelection, TableMap, addColumn, addRow } from "@tiptap/pm/tables";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
-import React from "react";
+import React, { useRef } from "react";
+import useResizeObserver from "use-resize-observer";
+import {
+  TableCellDimensions,
+  getTableCellDimensions,
+} from "./getTableCellDimensions";
 
 export const Table = (props: any) => {
   const [active, setActive] = React.useState(false);
+  const [tableCellDimension, setTableCellDimension] =
+    React.useState<TableCellDimensions>({ columnWidths: [], rowHeights: [] });
 
   props.editor.storage.table.setTableActive = setActive;
 
@@ -32,12 +39,26 @@ export const Table = (props: any) => {
     return { tr: state.tr, tableRect, cellPositionInfo };
   };
 
+  const tableWrapperRef = useRef<HTMLDivElement>(null);
+  useResizeObserver({
+    onResize: (params) => {
+      if (!tableWrapperRef.current) return;
+      const dimensions = getTableCellDimensions(
+        tableWrapperRef.current.children[0] as HTMLTableElement
+      );
+      setTableCellDimension(dimensions);
+    },
+    ref: tableWrapperRef,
+  });
+
   return (
     <NodeViewWrapper>
-      <NodeViewContent
-        className={props.extension.options.HTMLAttributes.class}
-        as="table"
-      />
+      <div ref={tableWrapperRef}>
+        <NodeViewContent
+          className={props.extension.options.HTMLAttributes.class}
+          as="table"
+        />
+      </div>
       {/* <div
         onClick={() => {
           return null;
@@ -90,6 +111,30 @@ export const Table = (props: any) => {
           editor.view.dispatch(state.tr.setSelection(selection));
         }}
       ></div>
+      {tableCellDimension.columnWidths.map((width, index) => {
+        return (
+          <div
+            style={{ width }}
+            onClick={() => {
+              const editor = props.editor.storage.tableCell.currentEditor;
+              const state = editor.view.state;
+
+              const resolvedPos = state.doc.resolve(props.getPos());
+              const table = props.node;
+              const tableStart = resolvedPos.start(1);
+              const tableMap = TableMap.get(table);
+
+              const cellPos = tableMap.positionAt(0, index, table);
+              const resolvedCellPos = state.doc.resolve(tableStart + cellPos);
+
+              const rowSelection = CellSelection.colSelection(resolvedCellPos);
+              editor.view.dispatch(state.tr.setSelection(rowSelection));
+            }}
+          >
+            column selector: {index}
+          </div>
+        );
+      })}
     </NodeViewWrapper>
   );
 };
