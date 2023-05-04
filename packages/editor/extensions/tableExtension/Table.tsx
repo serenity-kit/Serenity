@@ -78,7 +78,26 @@ export const Table = (props: any) => {
       <div className="row-line hidden"></div>
       <div className="column-line hidden"></div>
       <div className="table-selection hidden"></div>
-      <div className="mark-table"></div>
+      <div
+        className="mark-table"
+        onClick={() => {
+          const editor = props.editor.storage.tableCell.currentEditor;
+          const state = editor.view.state;
+          const resolvedPos = state.doc.resolve(props.getPos());
+          const tableStart = resolvedPos.start(1);
+
+          const anchor = state.doc.resolve(tableStart);
+
+          console.log("resPos: ", resolvedPos);
+          console.log("pos: ", props.getPos());
+          console.log("tablestart: ", tableStart);
+          console.log("anchor ?: ", anchor);
+
+          // we need a selection of the whole table, the rect must select the whole table
+          // maybe we can add our own CellSelection or logic for tableSelection
+          // editor.view.dispatch(state.tr.setSelection(tableSelection));
+        }}
+      ></div>
     </NodeViewWrapper>
   );
 };

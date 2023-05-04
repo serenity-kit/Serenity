@@ -437,10 +437,16 @@
     border-radius: 9999px;
   }
 
+  .mark-table.selected {
+    background-color: theme("colors.primary.500");
+    border-color: theme("colors.primary.500");
+  }
+
   /* --- mark row / columns --- */
 
   .mark-row,
   .mark-column {
+    --mark-size: 1rem;
     position: absolute;
   }
 
@@ -452,12 +458,16 @@
   .mark-row {
     height: 100%;
     top: 0px;
-    left: calc((1rem + 1px) * (-1)); /* defined width + border-width */
+    left: calc(
+      (var(--mark-size) + 1px) * (-1)
+    ); /* defined width + border-width */
   }
 
   .mark-column {
     width: 100%;
-    top: calc((1rem + 1px) * (-1)); /* defined height + border-width */
+    top: calc(
+      (var(--mark-size) + 1px) * (-1)
+    ); /* defined height + border-width */
     left: 0px;
   }
 
@@ -474,7 +484,6 @@
     height: calc(100% + 1px);
   }
 
-  /* --- lines for insert-row/column element ---- */
   /* --- table-selection */
 
   .table-selection {
@@ -485,6 +494,37 @@
     box-sizing: border-box;
     border: 2px solid theme("colors.primary.500");
   }
+
+  .table-selection.selected {
+  }
+
+  /* add border for row, color mark element */
+  .mark-row.selected,
+  .mark-column.selected {
+    background-color: theme("colors.primary.500");
+  }
+
+  .mark-row.selected {
+    top: -1px;
+
+    height: calc(100% + 1px);
+    width: calc(var(--mark-size) + 1px);
+
+    border-radius: 2px 0 0 2px;
+    border-color: theme("colors.primary.500");
+  }
+
+  .mark-column.selected {
+    left: -1px;
+
+    height: calc(var(--mark-size) + 1px);
+    width: calc(100% + 1px);
+
+    border-radius: 2px 2px 0 0;
+    border-color: theme("colors.primary.500");
+  }
+
+  /* --- lines for insert-row/column element ---- */
 
   .row-line,
   .column-line {
