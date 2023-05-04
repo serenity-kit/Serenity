@@ -18,17 +18,6 @@ export const TableCell = (props: any) => {
     const table = resolvedPos.node(-1);
     const tableStart = resolvedPos.start(-1);
     const map = TableMap.get(table);
-
-    // console.log("cell: resPos ", resolvedPos);
-    // console.log("cell: cellInfo ", cellPositionInfo);
-    // console.log("cell: table ", table);
-    // console.log("cell: tableStart ", tableStart);
-    // console.log("cell: rows ", table.content.content.length);
-    // console.log(
-    //   "cell: columns ",
-    //   table.content.content[0].content.content.length
-    // );
-
     const tableRect = { ...cellPositionInfo, table, tableStart, map };
     return { tr: state.tr, tableRect, cellPositionInfo };
   };
@@ -118,8 +107,6 @@ export const TableCell = (props: any) => {
             const state = editor.view.state;
             const resolvedPos = state.doc.resolve(props.getPos());
             const rowSelection = CellSelection.rowSelection(resolvedPos);
-
-            // console.log("row-selection: ", rowSelection);
 
             editor.view.dispatch(state.tr.setSelection(rowSelection));
           }}

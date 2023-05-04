@@ -1,5 +1,5 @@
 import { Icon } from "@serenity-tools/ui";
-import { TableMap, addColumn, addRow } from "@tiptap/pm/tables";
+import { CellSelection, TableMap, addColumn, addRow } from "@tiptap/pm/tables";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import React from "react";
 
@@ -27,14 +27,6 @@ export const Table = (props: any) => {
       right: colCount,
       bottom: rowCount,
     };
-
-    // console.log("table: resPos ", resolvedPos);
-    // console.log("table: cellInfo ", cellPositionInfo);
-    // console.log("table: table ", table);
-    // console.log("table: tableStart ", tableStart);
-    // console.log("table: rows ", rowCount);
-    // console.log("table: columns ", colCount);
-    // console.log("map: ", map);
 
     const tableRect = { ...cellPositionInfo, table, tableStart, map };
     return { tr: state.tr, tableRect, cellPositionInfo };
@@ -83,19 +75,19 @@ export const Table = (props: any) => {
         onClick={() => {
           const editor = props.editor.storage.tableCell.currentEditor;
           const state = editor.view.state;
+
           const resolvedPos = state.doc.resolve(props.getPos());
+          const table = props.node;
           const tableStart = resolvedPos.start(1);
+          const tableMap = TableMap.get(table);
+          const anchorPos = tableMap.map[0];
+          const headPos = tableMap.map[tableMap.map.length - 1];
 
-          const anchor = state.doc.resolve(tableStart);
-
-          console.log("resPos: ", resolvedPos);
-          console.log("pos: ", props.getPos());
-          console.log("tablestart: ", tableStart);
-          console.log("anchor ?: ", anchor);
-
-          // we need a selection of the whole table, the rect must select the whole table
-          // maybe we can add our own CellSelection or logic for tableSelection
-          // editor.view.dispatch(state.tr.setSelection(tableSelection));
+          const selection = new CellSelection(
+            state.doc.resolve(tableStart + anchorPos),
+            state.doc.resolve(tableStart + headPos)
+          );
+          editor.view.dispatch(state.tr.setSelection(selection));
         }}
       ></div>
     </NodeViewWrapper>
