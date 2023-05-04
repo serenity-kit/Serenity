@@ -1,19 +1,43 @@
 import { Icon } from "@serenity-tools/ui";
 import { CellSelection, TableMap, addColumn, addRow } from "@tiptap/pm/tables";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import useResizeObserver from "use-resize-observer";
 import {
   TableCellDimensions,
   getTableCellDimensions,
 } from "./getTableCellDimensions";
+import { isCellSelection } from "./isCellSelection";
+
+function restructureArray(arr: number[], size: number): number[] {
+  const numSubarrays = Math.ceil(arr.length / size);
+  const subarrays = Array.from({ length: numSubarrays }, (_, i) =>
+    arr.slice(i * size, (i + 1) * size)
+  );
+  return subarrays.map((subarray) => subarray[0]);
+}
+
+function extractFirstColumnNumbers(table: number[], width: number) {
+  const firstColumnNumbers: number[] = [];
+  for (let i = 0; i < width; i++) {
+    firstColumnNumbers.push(table[i]);
+  }
+  return firstColumnNumbers;
+}
 
 export const Table = (props: any) => {
   const [active, setActive] = React.useState(false);
+  const [rowSelected, setRowSelected] = React.useState<null | number>(null);
+  const [columnSelected, setColumnSelected] = React.useState<null | number>(
+    null
+  );
   const [tableCellDimension, setTableCellDimension] =
     React.useState<TableCellDimensions>({ columnWidths: [], rowHeights: [] });
 
   props.editor.storage.table.setTableActive = setActive;
+
+  console.log("ROW SELECTED", rowSelected);
+  console.log("COLUMN SELECTED", columnSelected);
 
   const getTableInsertInfo = () => {
     const editor = props.editor.storage.tableCell.currentEditor;
@@ -50,6 +74,82 @@ export const Table = (props: any) => {
     },
     ref: tableWrapperRef,
   });
+
+  useEffect(() => {
+    // props.editor.on('selectionUpdate', ({ editor }) => {
+    //   // The selection has changed.
+    // })
+    // const state = props.editor.view.state;
+    // console.log(isRowSelected(state, 1));
+    // console.log(props.editor);
+    props.editor.on("selectionUpdate", (params: any) => {
+      const updateRowSelection = () => {
+        const selection = params.editor.view.state.selection;
+
+        if (!isCellSelection(selection)) {
+          setRowSelected(null);
+          return;
+        }
+
+        const isRowSelection = selection.isRowSelection();
+        if (!isRowSelection) {
+          setRowSelected(null);
+          return;
+        }
+        const { $anchorCell, $headCell } = selection;
+
+        const tableNode = selection.$anchorCell.node(-1);
+        const tableMap = TableMap.get(tableNode);
+        const tableStart = $anchorCell.start(-1);
+
+        const startingPoints = restructureArray(
+          tableMap.map,
+          tableMap.width
+        ).map((value) => value + tableStart);
+        console.log(startingPoints, $anchorCell);
+        const rowNumber = startingPoints.indexOf($anchorCell.pos);
+        if (rowNumber === -1) {
+          setRowSelected(null);
+        } else {
+          setRowSelected(rowNumber);
+        }
+      };
+      updateRowSelection();
+
+      const updateColumnSelection = () => {
+        const selection = params.editor.view.state.selection;
+
+        if (!isCellSelection(selection)) {
+          setColumnSelected(null);
+          return;
+        }
+
+        const isColSelection = selection.isColSelection();
+        if (!isColSelection) {
+          setColumnSelected(null);
+          return;
+        }
+        const { $anchorCell } = selection;
+
+        const tableNode = selection.$anchorCell.node(-1);
+        const tableMap = TableMap.get(tableNode);
+        const tableStart = $anchorCell.start(-1);
+
+        const startingPoints = extractFirstColumnNumbers(
+          tableMap.map,
+          tableMap.height
+        ).map((value) => value + tableStart);
+        console.log(startingPoints, $anchorCell);
+        const columnNumber = startingPoints.indexOf($anchorCell.pos);
+        if (columnNumber === -1) {
+          setColumnSelected(null);
+        } else {
+          setColumnSelected(columnNumber);
+        }
+      };
+      updateColumnSelection();
+    });
+  }, [props.editor]);
 
   return (
     <NodeViewWrapper>
@@ -114,7 +214,10 @@ export const Table = (props: any) => {
       {tableCellDimension.columnWidths.map((width, index) => {
         return (
           <div
-            style={{ width }}
+            style={{
+              width,
+              background: columnSelected === index ? "green" : "",
+            }}
             onClick={() => {
               const editor = props.editor.storage.tableCell.currentEditor;
               const state = editor.view.state;
