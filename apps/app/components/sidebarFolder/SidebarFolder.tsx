@@ -1,7 +1,9 @@
-import { createSnapshot, generateId, KeyDerivationTrace } from "@naisho/core";
+import { createInitialSnapshot, generateId } from "@naisho/core";
 import { useFocusRing } from "@react-native-aria/focus";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
+  KeyDerivationTrace,
+  SerenitySnapshotPublicData,
   createDocumentTitleKey,
   createSnapshotKey,
   decryptFolderName,
@@ -18,10 +20,10 @@ import {
   Pressable,
   SidebarText,
   Tooltip,
-  tw,
-  useIsDesktopDevice,
   View,
   ViewProps,
+  tw,
+  useIsDesktopDevice,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
 import { useEffect, useState } from "react";
@@ -199,7 +201,6 @@ export default function SidebarFolder(props: Props) {
         encryptionPublicKeySignature:
           activeDevice.encryptionPublicKeySignature!,
       },
-      // @ts-expect-error
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
     });
     const parentChainItem =
@@ -269,7 +270,6 @@ export default function SidebarFolder(props: Props) {
     }
     const folderKeyTrace = deriveKeysFromKeyDerivationTrace({
       keyDerivationTrace: props.keyDerivationTrace,
-      // @ts-expect-error
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
       activeDevice: {
         signingPublicKey: activeDevice.signingPublicKey,
@@ -303,6 +303,7 @@ export default function SidebarFolder(props: Props) {
       pubKey: sodium.to_base64(signatureKeyPair.publicKey),
       keyDerivationTrace: snapshotKeyDerivationTrace,
       subkeyId: snapshotKey.subkeyId,
+      parentSnapshotClocks: {},
     };
     // created using:
     // const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
@@ -311,7 +312,7 @@ export default function SidebarFolder(props: Props) {
     // to do so create an initial document without any yDoc ref and set the first
     // line to have a H1 header
     const initialDocument = `AQLGkrivDwAHAQRwYWdlAwdoZWFkaW5nKADGkrivDwAFbGV2ZWwBfQEA`;
-    const snapshot = createSnapshot(
+    const snapshot = createInitialSnapshot<SerenitySnapshotPublicData>(
       sodium.from_base64(initialDocument),
       publicData,
       sodium.from_base64(snapshotKey.key),
@@ -326,7 +327,6 @@ export default function SidebarFolder(props: Props) {
       snapshot: {
         keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
       },
-      // @ts-expect-error
       workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
     });
     const result = await runCreateDocumentMutation(
@@ -418,7 +418,6 @@ export default function SidebarFolder(props: Props) {
         encryptionPublicKeySignature:
           activeDevice.encryptionPublicKeySignature!,
       },
-      // @ts-expect-error
       workspaceKeyBox: workspace.currentWorkspaceKey!.workspaceKeyBox!,
     });
     // ignore the last chain item as it's the key for the old folder name

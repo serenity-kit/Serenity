@@ -1,10 +1,10 @@
 import {
-  KeyDerivationTrace,
-  NaishoNewSnapshotWithKeyRotationRequired,
+  NaishoNewSnapshotRequiredError,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
-  Snapshot,
+  hash,
 } from "@naisho/core";
+import { KeyDerivationTrace, SerenitySnapshot } from "@serenity-tools/common";
 import { prisma } from "./prisma";
 
 type ActiveSnapshotInfo = {
@@ -21,7 +21,7 @@ export type CreateSnapshotDocumentTitleData = {
 };
 
 type CreateSnapshotParams = {
-  snapshot: Snapshot;
+  snapshot: SerenitySnapshot;
   workspaceId: string;
   activeSnapshotInfo?: ActiveSnapshotInfo;
   documentTitle?: CreateSnapshotDocumentTitleData;
@@ -58,9 +58,7 @@ export async function createSnapshot({
       // workspaceKey has been rotated
       snapshotKeyDerivationTrace.workspaceKeyId !== currentWorkspaceKey.id
     ) {
-      throw new NaishoNewSnapshotWithKeyRotationRequired(
-        "Key roration is required"
-      );
+      throw new NaishoNewSnapshotRequiredError("Key roration is required");
     }
 
     // function sleep(ms) {
@@ -127,12 +125,16 @@ export async function createSnapshot({
         id: snapshot.publicData.snapshotId,
         latestVersion: 0,
         data: JSON.stringify(snapshot),
+        ciphertextHash: hash(snapshot.ciphertext),
         activeSnapshotDocument: {
           connect: { id: snapshot.publicData.docId },
         },
         document: { connect: { id: snapshot.publicData.docId } },
         keyDerivationTrace: snapshot.publicData.keyDerivationTrace,
         clocks: {},
+        parentSnapshotProof: snapshot.publicData.parentSnapshotProof,
+        // TODO additionally could verify that the parentSnapshotClocks of the saved parent snapshot
+        parentSnapshotClocks: snapshot.publicData.parentSnapshotClocks,
       },
     });
   });

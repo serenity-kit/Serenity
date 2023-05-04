@@ -24,7 +24,11 @@ export function createUpdate(
     key
   );
   const signature = sign(
-    `${publicNonce}${ciphertext}${publicDataAsBase64}`,
+    {
+      nonce: publicNonce,
+      ciphertext,
+      publicData: publicDataAsBase64,
+    },
     signatureKeyPair.privateKey
   );
 
@@ -41,14 +45,19 @@ export function createUpdate(
 export function verifyAndDecryptUpdate(
   update: Update,
   key: Uint8Array,
-  publicKey: Uint8Array
+  publicKey: Uint8Array,
+  currentClock: number
 ) {
   const publicDataAsBase64 = sodium.to_base64(
     canonicalize(update.publicData) as string
   );
 
   const isValid = verifySignature(
-    `${update.nonce}${update.ciphertext}${publicDataAsBase64}`,
+    {
+      nonce: update.nonce,
+      ciphertext: update.ciphertext,
+      publicData: publicDataAsBase64,
+    },
     update.signature,
     publicKey
   );
@@ -56,11 +65,20 @@ export function verifyAndDecryptUpdate(
     throw new Error("Invalid signature for update");
   }
 
-  const result = decryptAead(
+  const content = decryptAead(
     sodium.from_base64(update.ciphertext),
     sodium.to_base64(canonicalize(update.publicData) as string),
     key,
     update.nonce
   );
-  return result;
+
+  if (currentClock + 1 !== update.publicData.clock) {
+    throw new Error(
+      `Invalid clock for the update: ${currentClock + 1} ${
+        update.publicData.clock
+      }`
+    );
+  }
+
+  return { content, clock: update.publicData.clock };
 }

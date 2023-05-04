@@ -1,3 +1,4 @@
+import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { InvalidTrustChainError } from "./errors";
 import {
@@ -21,12 +22,19 @@ export const applyEvent = (
     ...state.members,
   };
   const hash = hashTransaction(event.transaction);
+  const message = canonicalize({
+    prevHash: state.lastEventHash,
+    hash,
+  });
+  if (typeof message !== "string") {
+    throw new Error("Could not canonicalize hashes");
+  }
 
   event.authors.forEach((author) => {
     if (
       !sodium.crypto_sign_verify_detached(
         sodium.from_base64(author.signature),
-        `${state.lastEventHash}${hash}`,
+        message,
         sodium.from_base64(author.publicKey)
       )
     ) {

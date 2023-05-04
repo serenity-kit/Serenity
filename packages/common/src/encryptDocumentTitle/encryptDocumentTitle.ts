@@ -1,9 +1,10 @@
-import { encryptAead, KeyDerivationTrace } from "@naisho/core";
+import { encryptAead } from "@naisho/core";
 import canonicalize from "canonicalize";
 import sodium from "react-native-libsodium";
 import { createDocumentTitleKey } from "../createDocumentTitleKey/createDocumentTitleKey";
 import { deriveKeysFromKeyDerivationTrace } from "../deriveKeysFromKeyDerivationTrace/deriveKeysFromKeyDerivationTrace";
 import { Device, LocalDevice } from "../types";
+import { KeyDerivationTrace } from "../zodTypes";
 
 type WorkspaceKeyBox = {
   ciphertext: string;

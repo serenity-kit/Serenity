@@ -1,4 +1,4 @@
-import { KeyDerivationTrace } from "@naisho/core";
+import { KeyDerivationTrace } from "@serenity-tools/common";
 import {
   Snapshot as PrismaSnapshot,
   Update as PrismaUpdate,

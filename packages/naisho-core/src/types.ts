@@ -1,47 +1,31 @@
+import type { KeyPair } from "libsodium-wrappers";
 import { z } from "zod";
+import { SnapshotProofChainEntry } from "./snapshot/isValidAncestorSnapshot";
 
-export const KeyDerivationTraceEntry = z.object({
-  entryId: z.string(), // didn't use id because it often GraphQL clients normalize by the id field
-  subkeyId: z.number(),
-  parentId: z.union([z.string(), z.null(), z.undefined()]), // the first entry has no parent
-  context: z.string(), // kdf context
-});
+export const SnapshotClocks = z.record(z.string(), z.number());
 
-export type KeyDerivationTraceEntry = z.infer<typeof KeyDerivationTraceEntry>;
-
-export const KeyDerivationTraceEntryWithKey = KeyDerivationTraceEntry.extend({
-  key: z.string(),
-});
-
-export type KeyDerivationTraceEntryWithKey = z.infer<
-  typeof KeyDerivationTraceEntryWithKey
->;
-
-export const KeyDerivationTrace = z.object({
-  workspaceKeyId: z.string(),
-  trace: z.array(KeyDerivationTraceEntry),
-});
-
-export type KeyDerivationTrace = z.infer<typeof KeyDerivationTrace>;
-
-export const KeyDerivationTraceWithKeys = z.object({
-  workspaceKeyId: z.string(),
-  trace: z.array(KeyDerivationTraceEntryWithKey),
-});
-
-export type KeyDerivationTraceWithKeys = z.infer<
-  typeof KeyDerivationTraceWithKeys
->;
+export type SnapshotClocks = z.infer<typeof SnapshotClocks>;
 
 export const SnapshotPublicData = z.object({
   docId: z.string(),
   pubKey: z.string(), // public signing key
   snapshotId: z.string(),
-  subkeyId: z.number(),
-  keyDerivationTrace: KeyDerivationTrace,
+  parentSnapshotClocks: SnapshotClocks,
 });
 
 export type SnapshotPublicData = z.infer<typeof SnapshotPublicData>;
+
+export const SnapshotPublicDataWithParentSnapshotProof = z.object({
+  docId: z.string(),
+  pubKey: z.string(), // public signing key
+  snapshotId: z.string(),
+  parentSnapshotProof: z.string(),
+  parentSnapshotClocks: SnapshotClocks,
+});
+
+export type SnapshotPublicDataWithParentSnapshotProof = z.infer<
+  typeof SnapshotPublicDataWithParentSnapshotProof
+>;
 
 export const SnapshotServerData = z.object({
   latestVersion: z.number(),
@@ -87,7 +71,7 @@ export const Snapshot = z.object({
   ciphertext: z.string(),
   nonce: z.string(),
   signature: z.string(), // ciphertext + nonce + publicData
-  publicData: SnapshotPublicData,
+  publicData: SnapshotPublicDataWithParentSnapshotProof,
 });
 
 export type Snapshot = z.infer<typeof Snapshot>;
@@ -142,10 +126,53 @@ export const ServerEvent = z.union([
 
 export type ServerEvent = z.infer<typeof ServerEvent>;
 
-export const SnapshotFailedEvent = z.object({
-  type: z.literal("snapshotFailed"),
-  snapshot: z.optional(SnapshotWithServerData),
-  updates: z.array(UpdateWithServerData).optional(),
-});
+export type ParentSnapshotProofInfo = {
+  id: string;
+  ciphertext: string;
+  parentSnapshotProof: string;
+};
 
-export type SnapshotFailedEvent = z.infer<typeof SnapshotFailedEvent>;
+type KnownSnapshotInfo = SnapshotProofChainEntry & {
+  id: string;
+};
+
+type AdditionalAuthenticationDataValidations = {
+  snapshot?: z.SomeZodObject;
+  update?: z.SomeZodObject;
+  ephemeralUpdate?: z.SomeZodObject;
+};
+
+export type SyncMachineConfig = {
+  documentId: string;
+  signatureKeyPair: KeyPair;
+  websocketHost: string;
+  websocketSessionKey: string;
+  applySnapshot: (decryptedSnapshot: any) => void;
+  getSnapshotKey: (
+    snapshot: any | undefined
+  ) => Promise<Uint8Array> | Uint8Array;
+  getNewSnapshotData: () => Promise<{
+    readonly id: string;
+    readonly data: Uint8Array | string;
+    readonly key: Uint8Array;
+    readonly publicData: any;
+    readonly additionalServerData?: any;
+  }>;
+  applyChanges: (updates: any[]) => void;
+  getUpdateKey: (update: any) => Promise<Uint8Array> | Uint8Array;
+  applyEphemeralUpdates: (ephemeralUpdates: any[]) => void;
+  getEphemeralUpdateKey: () => Promise<Uint8Array> | Uint8Array;
+  shouldSendSnapshot: (info: {
+    activeSnapshotId: string | null;
+    latestServerVersion: number | null;
+  }) => boolean;
+  isValidCollaborator: (signingPublicKey: string) => boolean | Promise<boolean>;
+  serializeChanges: (changes: unknown[]) => string;
+  deserializeChanges: (string) => unknown[];
+  sodium: any;
+  onDocumentLoaded?: () => void;
+  onSnapshotSaved?: () => void | Promise<void>;
+  onCustomMessage?: (message: any) => Promise<void> | void;
+  knownSnapshotInfo?: KnownSnapshotInfo;
+  additionalAuthenticationDataValidations?: AdditionalAuthenticationDataValidations;
+};

@@ -38,13 +38,15 @@ export interface Typegen0 {
     services: never;
   };
   eventsCausingActions: {
-    addToIncomingQueue: "WEBSOCKET_ADD_TO_QUEUE";
+    addToCustomMessageQueue: "WEBSOCKET_ADD_TO_CUSTOM_MESSAGE_QUEUE";
+    addToIncomingQueue: "WEBSOCKET_ADD_TO_INCOMING_QUEUE";
     addToPendingUpdatesQueue: "ADD_CHANGE";
     increaseWebsocketRetry: "WEBSOCKET_RETRY";
     removeOldestItemFromQueueAndUpdateContext: "done.invoke.processQueues";
     resetWebsocketRetries: "WEBSOCKET_CONNECTED";
     spawnWebsocketActor: "WEBSOCKET_RETRY";
     stopWebsocketActor: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
+    storeErrorInErrorTrace: "error.platform.processQueues";
     updateShouldReconnect: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
   };
   eventsCausingDelays: {};
@@ -55,7 +57,8 @@ export interface Typegen0 {
   eventsCausingServices: {
     processQueues:
       | "ADD_CHANGE"
-      | "WEBSOCKET_ADD_TO_QUEUE"
+      | "WEBSOCKET_ADD_TO_CUSTOM_MESSAGE_QUEUE"
+      | "WEBSOCKET_ADD_TO_INCOMING_QUEUE"
       | "xstate.after(0)#syncMachine.connected.checkingForMoreQueueItems";
     sheduleRetry: "" | "DISCONNECT" | "WEBSOCKET_DISCONNECTED" | "xstate.init";
   };

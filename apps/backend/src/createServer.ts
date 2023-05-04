@@ -1,11 +1,12 @@
 import {
-  NaishoNewSnapshotWithKeyRotationRequired,
+  NaishoNewSnapshotRequiredError,
   NaishoSnapshotBasedOnOutdatedSnapshotError,
   NaishoSnapshotMissesUpdatesError,
-  SnapshotWithClientData,
   SnapshotWithServerData,
   UpdateWithServerData,
+  parseSnapshotWithClientData,
 } from "@naisho/core";
+import { SerenitySnapshotPublicData } from "@serenity-tools/common";
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginLandingPageGraphQLPlayground,
@@ -34,6 +35,7 @@ import { retryAsyncFunction } from "./retryAsyncFunction";
 import { schema } from "./schema";
 import { addConnection, addUpdate, removeConnection } from "./store";
 import { ExpectedGraphqlError } from "./utils/expectedGraphqlError/expectedGraphqlError";
+import { getKnownSnapshotIdFromUrl } from "./utils/getKnownSnapshotIdFromUrl/getKnownSnapshotIdFromUrl";
 
 export default async function createServer() {
   const apolloServer = new ApolloServer({
@@ -132,19 +134,21 @@ export default async function createServer() {
 
       console.log("connected");
 
-      const documentId = request.url?.slice(1)?.split("?")[0] || "";
-
-      let doc = await getDocument(documentId);
-      if (!doc) {
+      if (!context.user) {
         // TODO close connection properly
-        connection.send(JSON.stringify({ type: "documentNotFound" }));
+        connection.send(JSON.stringify({ type: "unauthorized" }));
         connection.close();
         return;
       }
 
-      if (!context.user) {
+      const documentId = request.url?.slice(1)?.split("?")[0] || "";
+      const knownSnapshotId = getKnownSnapshotIdFromUrl(request.url);
+
+      let doc = await getDocument(documentId, knownSnapshotId);
+
+      if (!doc) {
         // TODO close connection properly
-        connection.send(JSON.stringify({ type: "unauthorized" }));
+        connection.send(JSON.stringify({ type: "documentNotFound" }));
         connection.close();
         return;
       }
@@ -166,6 +170,7 @@ export default async function createServer() {
       }
 
       addConnection(documentId, connection);
+      // TODO define type and only pass down the relevant data
       connection.send(JSON.stringify({ type: "document", ...doc }));
 
       connection.on("message", async function message(messageContent) {
@@ -181,8 +186,11 @@ export default async function createServer() {
 
         // new snapshot
         if (data?.publicData?.snapshotId) {
-          const snapshotMessage = SnapshotWithClientData.parse(data);
-          console.log("snapshotMessage", snapshotMessage);
+          const snapshotMessage = parseSnapshotWithClientData(
+            data,
+            // @ts-expect-error no idea why the types don't match
+            SerenitySnapshotPublicData
+          );
           try {
             const activeSnapshotInfo =
               snapshotMessage.lastKnownSnapshotId &&
@@ -193,6 +201,7 @@ export default async function createServer() {
                   }
                 : undefined;
             const snapshot = await createSnapshot({
+              // @ts-expect-error missing the SerenitySnapshotPublicData type
               snapshot: snapshotMessage,
               activeSnapshotInfo,
               workspaceId: userToWorkspace.workspaceId,
@@ -205,7 +214,6 @@ export default async function createServer() {
               JSON.stringify({
                 type: "snapshotSaved",
                 snapshotId: snapshot.id,
-                docId: snapshot.documentId,
               })
             );
             const snapshotMsgForOtherClients: SnapshotWithServerData = {
@@ -223,15 +231,16 @@ export default async function createServer() {
               connection
             );
           } catch (error) {
+            console.log("SNAPSHOT FAILED ERROR:", error);
             if (error instanceof NaishoSnapshotBasedOnOutdatedSnapshotError) {
-              let doc = await getDocument(documentId);
+              let doc = await getDocument(documentId, data.lastKnownSnapshotId);
               if (!doc) return; // should never be the case?
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
-                  docId: data.publicData.docId,
                   snapshot: doc.snapshot,
                   updates: doc.updates,
+                  snapshotProofChain: doc.snapshotProofChain,
                 })
               );
             } else if (error instanceof NaishoSnapshotMissesUpdatesError) {
@@ -243,17 +252,18 @@ export default async function createServer() {
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
-                  docId: data.publicData.docId,
                   updates: result.updates,
                 })
               );
+            } else if (error instanceof NaishoNewSnapshotRequiredError) {
+              connection.send(
+                JSON.stringify({
+                  type: "snapshotFailed",
+                })
+              );
             } else {
-              // log in case it's an unexpected error
-              if (
-                !(error instanceof NaishoNewSnapshotWithKeyRotationRequired)
-              ) {
-                console.error(error);
-              }
+              // log since it's an unexpected error
+              console.error(error);
               connection.send(
                 JSON.stringify({
                   type: "snapshotFailed",
@@ -277,7 +287,7 @@ export default async function createServer() {
                   update: data,
                   workspaceId: userToWorkspace.workspaceId,
                 }),
-              [NaishoNewSnapshotWithKeyRotationRequired]
+              [NaishoNewSnapshotRequiredError]
             );
             if (savedUpdate === undefined) {
               throw new Error("Update could not be saved.");
@@ -286,7 +296,6 @@ export default async function createServer() {
             connection.send(
               JSON.stringify({
                 type: "updateSaved",
-                docId: data.publicData.docId,
                 snapshotId: data.publicData.refSnapshotId,
                 clock: data.publicData.clock,
                 // @ts-expect-error not sure why savedUpdate is "never"
@@ -306,11 +315,10 @@ export default async function createServer() {
               connection.send(
                 JSON.stringify({
                   type: "updateFailed",
-                  docId: data.publicData.docId,
                   snapshotId: data.publicData.refSnapshotId,
                   clock: data.publicData.clock,
-                  requiresNewSnapshotWithKeyRotation:
-                    err instanceof NaishoNewSnapshotWithKeyRotationRequired,
+                  requiresNewSnapshot:
+                    err instanceof NaishoNewSnapshotRequiredError,
                 })
               );
             }

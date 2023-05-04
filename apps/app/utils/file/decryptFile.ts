@@ -1,6 +1,6 @@
+import { decryptAead } from "@naisho/core";
 import {
   base64_variants,
-  crypto_aead_xchacha20poly1305_ietf_decrypt,
   from_base64,
   to_base64,
 } from "react-native-libsodium";
@@ -12,12 +12,11 @@ export type Props = {
 };
 export const decryptFile = ({ fileCiphertext, publicNonce, key }: Props) => {
   const additionalData = "";
-  const decodedFileData = crypto_aead_xchacha20poly1305_ietf_decrypt(
-    null,
+  const decodedFileData = decryptAead(
     fileCiphertext,
     additionalData,
-    from_base64(publicNonce),
-    from_base64(key)
+    from_base64(key),
+    publicNonce
   );
   const base64FileData = to_base64(decodedFileData, base64_variants.ORIGINAL);
   return base64FileData;

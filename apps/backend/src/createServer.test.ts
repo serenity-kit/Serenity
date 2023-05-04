@@ -1,9 +1,9 @@
-import { createSnapshot, createUpdate } from "@naisho/core";
+import { createInitialSnapshot, createUpdate } from "@naisho/core";
 import {
+  LocalDevice,
   createSnapshotKey,
   decryptWorkspaceKey,
   folderDerivedKeyContext,
-  LocalDevice,
   snapshotDerivedKeyContext,
 } from "@serenity-tools/common";
 import { kdfDeriveFromKey } from "@serenity-tools/common/src/kdfDeriveFromKey/kdfDeriveFromKey";
@@ -76,20 +76,20 @@ beforeAll(async () => {
   await setup();
 });
 
-test("document not found if no id is provided", async () => {
+test("unauthorized if no id is provided", async () => {
   const { client, messages } = await createSocketClient(graphql.port, "", 1);
   await waitForClientState(client, client.CLOSED);
   expect(messages).toMatchInlineSnapshot(`
     [
       {
-        "type": "documentNotFound",
+        "type": "unauthorized",
       },
     ]
   `);
   expect(client.readyState).toEqual(client.CLOSED);
 });
 
-test("document not found if the document does not exist", async () => {
+test("unauthorized if the document does not exist", async () => {
   const { client, messages } = await createSocketClient(
     graphql.port,
     `/id-that-does-not-exist`,
@@ -99,7 +99,7 @@ test("document not found if the document does not exist", async () => {
   expect(messages).toMatchInlineSnapshot(`
     [
       {
-        "type": "documentNotFound",
+        "type": "unauthorized",
       },
     ]
   `);
@@ -175,8 +175,9 @@ test("successfully creates a snapshot", async () => {
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     keyDerivationTrace,
     subkeyId: snapshotKey.subkeyId,
+    parentSnapshotClocks: {},
   };
-  const snapshot = createSnapshot(
+  const snapshot = createInitialSnapshot(
     "CONTENT DUMMY",
     publicData,
     sodium.from_base64(snapshotKey.key),
@@ -192,7 +193,6 @@ test("successfully creates a snapshot", async () => {
 
   await waitForClientState(client, client.CLOSED);
   expect(messages[1].type).toEqual("snapshotSaved");
-  expect(messages[1].docId).toEqual(documentId);
   expect(messages[1].snapshotId).toEqual(snapshotId);
 });
 
@@ -231,7 +231,6 @@ test("successfully creates an update", async () => {
 
   expect(messages[1].type).toEqual("updateSaved");
   expect(messages[1].clock).toEqual(0);
-  expect(messages[1].docId).toEqual(documentId);
   expect(messages[1].snapshotId).toEqual(snapshotId);
   expect(messages[1].serverVersion).toEqual(1);
   latestServerVersion = messages[1].serverVersion;

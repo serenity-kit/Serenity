@@ -1,11 +1,11 @@
 import {
-  createSignatureKeyPair,
-  createSnapshot,
+  createInitialSnapshot,
   generateId,
-  KeyDerivationTrace,
   SnapshotPublicData,
 } from "@naisho/core";
-import sodium from "react-native-libsodium";
+import sodium, { KeyPair } from "react-native-libsodium";
+import { LocalDevice } from "../types";
+import { KeyDerivationTrace, SerenitySnapshotPublicData } from "../zodTypes";
 
 // created using:
 // const yDocState = Yjs.encodeStateAsUpdate(yDocRef.current);
@@ -17,24 +17,30 @@ export const createIntroductionDocumentSnapshot = ({
   snapshotEncryptionKey,
   subkeyId,
   keyDerivationTrace,
+  device,
 }: {
   documentId: string;
   snapshotEncryptionKey: Uint8Array;
   subkeyId: number;
   keyDerivationTrace: KeyDerivationTrace;
+  device: LocalDevice;
 }) => {
-  // TODO in the future use the main device
-  const signatureKeyPair = createSignatureKeyPair();
+  const signatureKeyPair: KeyPair = {
+    keyType: "ed25519",
+    publicKey: sodium.from_base64(device.signingPublicKey),
+    privateKey: sodium.from_base64(device.signingPrivateKey),
+  };
 
-  const publicData: SnapshotPublicData = {
+  const publicData: SnapshotPublicData & SerenitySnapshotPublicData = {
     snapshotId: generateId(),
     docId: documentId,
     pubKey: sodium.to_base64(signatureKeyPair.publicKey),
     subkeyId,
     keyDerivationTrace,
+    parentSnapshotClocks: {},
   };
 
-  return createSnapshot(
+  return createInitialSnapshot(
     sodium.from_base64(introductionDocument),
     publicData,
     snapshotEncryptionKey,

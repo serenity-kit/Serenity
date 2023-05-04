@@ -1,4 +1,4 @@
-import { KeyDerivationTrace } from "@naisho/core";
+import { KeyDerivationTrace } from "@serenity-tools/common";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { Role } from "../../../prisma/generated/output";
 import { prisma } from "../prisma";

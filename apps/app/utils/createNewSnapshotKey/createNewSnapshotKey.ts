@@ -41,7 +41,6 @@ export const createNewSnapshotKey = async ({
       encryptionPrivateKey: activeDevice.encryptionPrivateKey!,
       encryptionPublicKeySignature: activeDevice.encryptionPublicKeySignature!,
     },
-    // @ts-expect-error
     workspaceKeyBox: workspace.currentWorkspaceKey.workspaceKeyBox!,
   });
 
