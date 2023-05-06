@@ -64,7 +64,8 @@ export default function Page({
     key: Uint8Array;
   } | null>(null);
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
-  const [documentLoaded, setDocumentLoaded] = useState(false);
+  const [documentLoadedFromLocalStorage, setDocumentLoadedFromLocalStorage] =
+    useState(false);
   const [userInfo, setUserInfo] = useState<AwarenessUserInfo>({
     name: "Unknown user",
     color: "#000000",
@@ -93,9 +94,6 @@ export default function Page({
     signatureKeyPair,
     websocketHost,
     websocketSessionKey: sessionKey,
-    onDocumentLoaded: () => {
-      setDocumentLoaded(true);
-    },
     onSnapshotSaved: async () => {
       snapshotKeyRef.current = snapshotInFlightKeyRef.current;
       snapshotInFlightKeyRef.current = null;
@@ -240,7 +238,7 @@ export default function Page({
           localDocument.content,
           "serenity-local-sqlite"
         );
-        setDocumentLoaded(true);
+        setDocumentLoadedFromLocalStorage(true);
       }
 
       const me = await runMeQuery({});
@@ -326,7 +324,10 @@ export default function Page({
       openDrawer={navigation.openDrawer}
       updateTitle={updateTitle}
       isNew={isNew}
-      documentLoaded={documentLoaded}
+      documentLoaded={
+        // matches idle is fine here
+        documentLoadedFromLocalStorage || state.context._documentWasLoaded
+      }
       userInfo={userInfo}
     />
   );

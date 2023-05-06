@@ -25,7 +25,7 @@ export type YjsSyncMachineConfig = Omit<
 };
 
 export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
-  const { yDoc, yAwareness, onDocumentLoaded, ...rest } = config;
+  const { yDoc, yAwareness, ...rest } = config;
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
   const machine = useMachine(syncMachine, {
     context: {
@@ -45,18 +45,13 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
       },
       serializeChanges: serializeUint8ArrayUpdates,
       deserializeChanges: deserializeUint8ArrayUpdates,
-      onDocumentLoaded: () => {
-        setIsDocumentLoaded(true);
-        if (onDocumentLoaded) {
-          onDocumentLoaded();
-        }
-      },
     },
   });
-  const [, send] = machine;
+  const [state, send] = machine;
 
   useEffect(() => {
-    if (!isDocumentLoaded) {
+    // only connect after the document loaded
+    if (!state.matches("connected") || !state.context._documentWasLoaded) {
       return;
     }
 
@@ -84,7 +79,7 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
       yDoc.off("update", onUpdate);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDocumentLoaded]);
+  }, [state.value]);
 
   return machine;
 };

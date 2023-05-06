@@ -66,6 +66,7 @@ export interface Typegen0 {
     | "connected"
     | "connected.checkingForMoreQueueItems"
     | "connected.idle"
+    | "connected.loadingDocument"
     | "connected.processingQueues"
     | "connecting"
     | "connecting.retrying"
@@ -74,7 +75,11 @@ export interface Typegen0 {
     | "failed"
     | "final"
     | {
-        connected?: "checkingForMoreQueueItems" | "idle" | "processingQueues";
+        connected?:
+          | "checkingForMoreQueueItems"
+          | "idle"
+          | "loadingDocument"
+          | "processingQueues";
         connecting?: "retrying" | "waiting";
       };
   tags: never;

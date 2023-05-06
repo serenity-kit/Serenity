@@ -138,7 +138,7 @@ it("should connect to the websocket", (done) => {
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 });
 
-it("should load a document", (done) => {
+it("should initially be in loadingDocument state", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
@@ -149,10 +149,6 @@ it("should load a document", (done) => {
         ...syncMachine.context,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        onDocumentLoaded: () => {
-          expect(docValue).toEqual("Hello World");
-          done();
-        },
         isValidCollaborator: (signingPublicKey) =>
           sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
           signingPublicKey,
@@ -175,7 +171,57 @@ it("should load a document", (done) => {
           }),
         },
       })
-  );
+  ).onTransition((state) => {
+    if (state.matches("connected.loadingDocument")) {
+      expect(state.context._documentWasLoaded).toEqual(false);
+      expect(docValue).toEqual("");
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+});
+
+it("should load a document", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (state.matches("connected.idle")) {
+      expect(docValue).toEqual("Hello World");
+      done();
+    }
+  });
 
   syncService.start();
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
@@ -201,10 +247,6 @@ it("should load a document with updates", (done) => {
         ...syncMachine.context,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        onDocumentLoaded: () => {
-          expect(docValue).toEqual("Hello Worlduu");
-          done();
-        },
         isValidCollaborator: (signingPublicKey) =>
           sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
           signingPublicKey,
@@ -236,7 +278,12 @@ it("should load a document with updates", (done) => {
           }),
         },
       })
-  );
+  ).onTransition((state) => {
+    if (state.matches("connected.idle")) {
+      expect(docValue).toEqual("Hello Worlduu");
+      done();
+    }
+  });
 
   syncService.start();
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
