@@ -30,6 +30,8 @@ import {
   EditorBottombar,
   EditorBottombarProps,
 } from "../editorBottombar/EditorBottombar";
+import { EditorPageLoading } from "./EditorPageLoading";
+import { EditorPageLoadingError } from "./EditorPageLoadingError";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -84,6 +86,7 @@ export default function Editor({
   isNew,
   documentId,
   documentLoaded,
+  passedDocumentLoadingTimeout,
   workspaceId,
   userInfo,
 }: EditorProps) {
@@ -248,12 +251,12 @@ export default function Editor({
     }
   );
 
+  if (passedDocumentLoadingTimeout && !documentLoaded) {
+    return <EditorPageLoadingError />;
+  }
+
   if (!documentLoaded) {
-    return (
-      <CenterContent>
-        <Spinner fadeIn />
-      </CenterContent>
-    );
+    return <EditorPageLoading />;
   }
 
   return (

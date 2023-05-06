@@ -66,6 +66,8 @@ export default function Page({
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
   const [documentLoadedFromLocalStorage, setDocumentLoadedFromLocalStorage] =
     useState(false);
+  const [passedDocumentLoadingTimeout, setPassedDocumentLoadingTimeout] =
+    useState(false);
   const [userInfo, setUserInfo] = useState<AwarenessUserInfo>({
     name: "Unknown user",
     color: "#000000",
@@ -228,6 +230,10 @@ export default function Page({
   });
 
   useEffect(() => {
+    setTimeout(() => {
+      setPassedDocumentLoadingTimeout(true);
+    }, 6000);
+
     async function initDocument() {
       await sodium.ready;
 
@@ -325,9 +331,9 @@ export default function Page({
       updateTitle={updateTitle}
       isNew={isNew}
       documentLoaded={
-        // matches idle is fine here
         documentLoadedFromLocalStorage || state.context._documentWasLoaded
       }
+      passedDocumentLoadingTimeout={passedDocumentLoadingTimeout}
       userInfo={userInfo}
     />
   );

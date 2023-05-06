@@ -1,17 +1,11 @@
 import {
-  Editor as SerenityEditor,
   EditorBottombarState,
+  Editor as SerenityEditor,
+  UpdateEditorParams,
   getEditorBottombarStateFromEditor,
   updateEditor,
-  UpdateEditorParams,
 } from "@serenity-tools/editor";
-import {
-  CenterContent,
-  Spinner,
-  tw,
-  useHasEditorSidebar,
-  View,
-} from "@serenity-tools/ui";
+import { View, tw, useHasEditorSidebar } from "@serenity-tools/ui";
 import { Editor as TipTapEditor } from "@tiptap/core";
 import { useActor } from "@xstate/react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -25,6 +19,8 @@ import {
   EditorBottombar,
   editorBottombarHeight,
 } from "../editorBottombar/EditorBottombar";
+import { EditorPageLoading } from "./EditorPageLoading";
+import { EditorPageLoadingError } from "./EditorPageLoadingError";
 import { initialEditorBottombarState } from "./initialEditorBottombarState";
 import { EditorProps } from "./types";
 
@@ -34,6 +30,7 @@ export default function Editor({
   openDrawer,
   documentId,
   documentLoaded,
+  passedDocumentLoadingTimeout,
   workspaceId,
   isNew,
   updateTitle,
@@ -133,12 +130,12 @@ export default function Editor({
     });
   }, [workspaceId, documentId]);
 
+  if (passedDocumentLoadingTimeout && !documentLoaded) {
+    return <EditorPageLoadingError />;
+  }
+
   if (!documentLoaded) {
-    return (
-      <CenterContent>
-        <Spinner fadeIn />
-      </CenterContent>
-    );
+    return <EditorPageLoading />;
   }
 
   return (
