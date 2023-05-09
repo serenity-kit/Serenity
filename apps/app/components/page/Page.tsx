@@ -68,6 +68,8 @@ export default function Page({
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
   const [documentLoadedFromLocalStorage, setDocumentLoadedFromLocalStorage] =
     useState(false);
+  const [documentLoadedOnceFromRemote, setDocumentLoadedOnceFromRemote] =
+    useState(false);
   const [passedDocumentLoadingTimeout, setPassedDocumentLoadingTimeout] =
     useState(false);
   const [userInfo, setUserInfo] = useState<AwarenessUserInfo>({
@@ -91,7 +93,7 @@ export default function Page({
   }
   const { workspaceQueryResult } = useWorkspace();
 
-  const [state, send] = useYjsSyncMachine({
+  const [state] = useYjsSyncMachine({
     yDoc: yDocRef.current,
     yAwareness: yAwarenessRef.current,
     documentId: docId,
@@ -302,6 +304,12 @@ export default function Page({
     return () => {};
   }, []);
 
+  useEffect(() => {
+    if (state.context._documentWasLoaded) {
+      setDocumentLoadedOnceFromRemote(true);
+    }
+  }, [state.context._documentWasLoaded]);
+
   const updateTitle = async (title: string) => {
     const document = await getDocument({
       documentId: docId,
@@ -334,7 +342,9 @@ export default function Page({
       updateTitle={updateTitle}
       isNew={isNew}
       documentLoaded={
-        documentLoadedFromLocalStorage || state.context._documentWasLoaded
+        documentLoadedFromLocalStorage ||
+        state.context._documentWasLoaded ||
+        documentLoadedOnceFromRemote
       }
       passedDocumentLoadingTimeout={passedDocumentLoadingTimeout}
       userInfo={userInfo}

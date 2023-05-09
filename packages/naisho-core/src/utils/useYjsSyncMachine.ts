@@ -26,7 +26,6 @@ export type YjsSyncMachineConfig = Omit<
 
 export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
   const { yDoc, yAwareness, ...rest } = config;
-  const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
   // necessary to avoid that the same machine context is re-used for different or remounted pages
   // more info here:
   //

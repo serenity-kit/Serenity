@@ -879,7 +879,6 @@ export const createSyncMachine = () =>
 
                   break;
                 case "ephemeralUpdate":
-                  console.log("NEW EPHEMERAL UPDATE", event);
                   try {
                     const ephemeralUpdate = parseEphemeralUpdateWithServerData(
                       event,
