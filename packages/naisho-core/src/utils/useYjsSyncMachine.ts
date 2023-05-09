@@ -65,7 +65,7 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
 
   useEffect(() => {
     // only connect after the document loaded
-    if (!state.matches("connected") || !state.context._documentWasLoaded) {
+    if (!state.context._documentWasLoaded) {
       return;
     }
 
@@ -92,8 +92,9 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
       yAwareness.off("update", onAwarenessUpdate);
       yDoc.off("update", onUpdate);
     };
+    // causes issues if ran multiple times e.g. awareness sharing to not work anymore
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.value]);
+  }, [state.context._documentWasLoaded]);
 
   return machine;
 };
