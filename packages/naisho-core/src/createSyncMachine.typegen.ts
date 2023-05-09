@@ -43,6 +43,7 @@ export interface Typegen0 {
     addToPendingUpdatesQueue: "ADD_CHANGE";
     increaseWebsocketRetry: "WEBSOCKET_RETRY";
     removeOldestItemFromQueueAndUpdateContext: "done.invoke.processQueues";
+    resetContext: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
     resetWebsocketRetries: "WEBSOCKET_CONNECTED";
     spawnWebsocketActor: "WEBSOCKET_RETRY";
     stopWebsocketActor:
@@ -52,7 +53,6 @@ export interface Typegen0 {
       | "WEBSOCKET_UNAUTHORIZED"
       | "error.platform.processQueues";
     storeErrorInErrorTrace: "error.platform.processQueues";
-    updateShouldReconnect: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {

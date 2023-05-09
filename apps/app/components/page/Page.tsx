@@ -130,7 +130,6 @@ export default function Page({
         throw new Error("Workspace or workspaceKeys not found");
       }
 
-      console.log("workspace", workspace);
       const documentTitle = decryptDocumentTitleBasedOnSnapshotKey({
         snapshotKey: sodium.to_base64(snapshotKeyRef.current!.key),
         ciphertext: document.nameCiphertext,
