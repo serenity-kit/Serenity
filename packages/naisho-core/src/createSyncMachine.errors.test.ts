@@ -556,5 +556,8 @@ it("should reconnect and reload the document", (done) => {
   }, 1);
 });
 
+// TODO
 // test sending the same update twice
 // testing sending the same ephemeral update twice
+// tests for a broken snapshot key
+// test for a invalid contributor

@@ -31,6 +31,7 @@ import { deriveExistingSnapshotKey } from "../../utils/deriveExistingSnapshotKey
 import { useDocumentTitleStore } from "../../utils/document/documentTitleStore";
 import { getDocument } from "../../utils/document/getDocument";
 import { updateDocumentName } from "../../utils/document/updateDocumentName";
+import { useEditorStore } from "../../utils/editorStore/editorStore";
 import { getUserFromWorkspaceQueryResultByDeviceInfo } from "../../utils/getUserFromWorkspaceQueryResultByDeviceInfo/getUserFromWorkspaceQueryResultByDeviceInfo";
 import {
   getLocalDocument,
@@ -76,6 +77,7 @@ export default function Page({
     name: "Unknown user",
     color: "#000000",
   });
+  const setIsOffline = useEditorStore((state) => state.setIsOffline);
 
   const setActiveDocumentId = useDocumentTitleStore(
     (state) => state.setActiveDocumentId
@@ -309,6 +311,18 @@ export default function Page({
       setDocumentLoadedOnceFromRemote(true);
     }
   }, [state.context._documentWasLoaded]);
+
+  useEffect(() => {
+    if (
+      state.matches("disconnected") ||
+      (state.matches("connecting") && state.context._websocketRetries > 1)
+    ) {
+      setIsOffline(true);
+    } else {
+      setIsOffline(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.value, state.context._websocketRetries]);
 
   const updateTitle = async (title: string) => {
     const document = await getDocument({

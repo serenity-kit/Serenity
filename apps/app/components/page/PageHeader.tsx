@@ -1,6 +1,6 @@
 import {
-  Text,
   IconButton,
+  Text,
   Tooltip,
   useIsDesktopDevice,
 } from "@serenity-tools/ui";
@@ -19,17 +19,19 @@ export const PageHeader: React.FC<Props> = ({
   hasNewComment,
 }) => {
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
+  const isOffline = useEditorStore((state) => state.isOffline);
   const isDesktopDevice = useIsDesktopDevice();
 
   return (
-    <>
+    <HStack alignItems={"center"}>
       {isInEditingMode && !isDesktopDevice ? (
-        <HStack alignItems={"center"}>
-          <Text variant="xs" muted>
-            Editing mode
-          </Text>
-        </HStack>
+        <Text variant="xs" muted>
+          Editing mode
+        </Text>
       ) : null}
+
+      {isOffline ? <Text variant="xs">Offline </Text> : null}
+
       {isDesktopDevice ? (
         <Tooltip
           label="Toggle Comments"
@@ -48,6 +50,6 @@ export const PageHeader: React.FC<Props> = ({
           />
         </Tooltip>
       ) : null}
-    </>
+    </HStack>
   );
 };
