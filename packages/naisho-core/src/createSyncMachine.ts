@@ -122,6 +122,7 @@ type ProcessQueueData = {
   updateClocks: UpdateClocks;
   mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
   ephemeralUpdateErrors: NaishoProcessingEphemeralUpdateError[];
+  documentWasLoaded: boolean;
 };
 
 export type Context = SyncMachineConfig & {
@@ -141,10 +142,11 @@ export type Context = SyncMachineConfig & {
   _mostRecentEphemeralUpdateDatePerPublicSigningKey: MostRecentEphemeralUpdateDatePerPublicSigningKey;
   _errorTrace: Error[];
   _ephemeralUpdateErrors: Error[];
+  _documentWasLoaded: boolean;
 };
 
-export const syncMachine =
-  /** @xstate-layout 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 */
+export const createSyncMachine = () =>
+  /** @xstate-layout N4IgpgJg5mDOIC5SwJ4DsDGBZAhhgFgJZpgDEAygKIByAIgNoAMAuoqAA4D2shALoZzRsQAD0QBGcY3EA6AMwAOBdPEKAbAoCcjTQBYANCBQSATAF8zh1JlwFiZAIK1aAfUoAFABKUslAEoOADIuAKrutA4AKpRMrEggXDz8gsJiCFImAOwymZoZAKy6CplquiaahsbpJuKa8gr5ebqZDZpyauaWINbYeEQkpADqlABC5ADyAMIA0pSRLrQAkuST49TUlJPRDCzCiXwCQvFp+ZmViCYKJjlymbWZiia6hbq6FlbovXYDSytrG1tYntuAcUsdEKdzggTHJrk8SllNE9GK93t1PrZ+mAZBhBCQMPw0FAhqMJjM5i5VutNtsgfF9skjqA0mozkYJIwFHIZNpWYw1HkauJ8mo0T1MfYcXiwATiFAZAB3HAHIkksZTWbzPxzPwATTpHBBjNSEnEulk7Rq7RRuQecihl25-MyjHyZs0JRRYoxfUluLQ+N4kDVZM1CymIV81Hm1HG8wAYuMQnQDQkjYcTelMrkebokbo1I0ueI5PkoZJ2jItGo5FIFHnGCZRV1xb6SFKAzKgxAQxqKcmHCFIp5xn5FgAtSg7OKGpIZ8FZrS5-OFzTF0vlzlqGS6Z38wWSEXemxt7H+wOQGQAG04OAgctonAwAFcALZgNC8Xvk+ZOVyRcYXEWahViwYCAHEXAARRCShYNTBl52ZRBGChRhjy+LEOwvCBr1ve8iUfF930-b8wz-FwAMpEJyAArAXF8chyAccDKGg2D4N2el0zBZCEFQ9l+IwiV23PLtLxvO8HyfN8Py-CjJk8BxqFYhCeKZUQLg6GRTmkRpGzkaRDLLQS1DUWRajzD1anaWoFGE09sPE3DCAgK8yGGdUfxcCiqOA0CIPYuCYi42dQQ0k58kYGQS2FOQCxhJsPU3WEZDUFFXWafJ8iUPIHO+M9pQJS9XPcsiKV8wDJhouiGMoJiWLYmDgrUudeM0hBsui2L8nijpYQFNkqkkXcq3KWsm3KMpdDkfKsLE4qXLcxxnEpJSVJCmc0zaiLEALfIYtrfITEbDpToUKF83kFpcg0K5SzkTQ5r9IruxkdgACcnzgHgiSg58wAB2BSAgQRsWIAA3TgAGtsU+77YFgf7AbgVrwszKQPR5LlMtKF1tCGxAGm3EUNEyKKFEkYpntE17L3hjAfrlZGgdIMAPq+j73qvHBeAAM04D7X3er7GcRlnUdC7b0YXcQWjqPQVyLWsN0EqRFB5VRHt6vI10YWaWx9AqnMWkWEd+qAJeBzzQwq1a-JA8YwJUoLOK2xD2rSKnZHNXcTCyQt9aKKFlAUHSzOKCmqcyGnCs7U2GaZv6AdZm2+1-e2qpqp26oa1jXc24Edox1QfbNRsA6i+KLsEzRzJybQri5S4TFON5DZPY2FrexPEeZlO4FIBT1tUqWPd2hBcmuQoNDXQstD0GuqnumRORdRhyauTIm1jk23oIGVobleNBawQWwAlxYg1fa3SXTnzM6Ax3ncg5q3aLmXQGXrkciFV4TruAKe0HVVCXFXpccyLpTh12Orvbul4D4YCPkSE+H0z4fQvgPK+YAb7lQzv+LOtEc6MWYvnN+hduLF1lk3cB6g5aulusdEOpZf4jTKBvcQQC4F01wog5BUBUHoMwSjbBuDh7KVHu7dSGNmi6BisKZujZJAlgMKZdQOlS41EjtIB43D4773wIfY+p9z6X2vsDEQsBeC82xDgPmQYPoAApGAAEpSCti7jwnEhikHGLQaYrB5i0bGmoWAxsdCoGMJMJdPIuZSiNk5BvFE+Q9E4W8UYlBJiMFmJwRYqxNiZB2Icc4txHj5peL4X4oROSb70HEFIqhfFQFh3CZAhhMDomCRuqws07DAFtF3veWA8CezBKQh1cydQCyY39g8D0G8HSFh0iUXIbQtCcKKBYLoaBOAQDgMIMp9gP4hL4gAWlUAdLQrc9DmgaLuEyVRTn+1kHXUseZboaGygbD4ndyn6LlMc8ZaQWjbjkIZBoVoRSGUJukRoOlihPByrWNonCUkd0wi9f5RIZAYN4B9FAALKGfxAW83MjoYRdWkA6Zoq9t5IkUJoQo6tmw-IxbTLF8olQqigICz2RN4ryHBcdEsUKFmCSbNFJJSIkWAJLKk5yvKJ7nNuFWaVNyLn3KhMquRzQbpyzBSdO68rTaSQIlAIislPyKszKcpcVzGivA1a6YBVQrp8l3M0PSqJ0UiTjmk0qYBrULnaNuZoTYriaEjQ8Z4KVrh5EUOlVkxQGjGp7qLJOlsB7wCJScjq5NshtFuDlRlWROSdNdTCNKSgBRlEtA8NFrLfV7wQT4-hgiAkiPMUGppCUYowlZCix4BYQ4-23mwgBnCBk+sckMkZ3aOrxVkLkLeNZ-YnTng6LIgrGAb3SnLaZWRd582IDgK8860hWgsjUDex1SjxvLOIMBRRTgnUkHcRl3z0S-MlHzZU7kIDnouBvORpxlCMKUOIFK25WRSGmrWMoHotlmCAA */
   createMachine(
     {
       schema: {
@@ -170,8 +172,9 @@ export const syncMachine =
           processQueues: { data: ProcessQueueData };
         },
       },
-      tsTypes: {} as import("./syncMachine.typegen").Typegen0,
+      tsTypes: {} as import("./createSyncMachine.typegen").Typegen0,
       predictableActionArguments: true,
+      // context: JSON.parse(JSON.stringify(initialContext)),
       context: {
         documentId: "",
         signatureKeyPair: {} as KeyPair,
@@ -194,7 +197,6 @@ export const syncMachine =
         sodium: {},
         serializeChanges: () => "",
         deserializeChanges: () => [],
-        onDocumentLoaded: () => undefined,
         onSnapshotSaved: () => undefined,
         isValidCollaborator: async () => false,
         additionalAuthenticationDataValidations: undefined,
@@ -213,6 +215,7 @@ export const syncMachine =
         _mostRecentEphemeralUpdateDatePerPublicSigningKey: {},
         _errorTrace: [],
         _ephemeralUpdateErrors: [],
+        _documentWasLoaded: false,
       },
       initial: "connecting",
       on: {
@@ -256,7 +259,6 @@ export const syncMachine =
             },
           },
         },
-
         connected: {
           entry: ["resetWebsocketRetries"],
           states: {
@@ -276,7 +278,6 @@ export const syncMachine =
                 },
               },
             },
-
             processingQueues: {
               on: {
                 WEBSOCKET_ADD_TO_INCOMING_QUEUE: {
@@ -343,8 +344,12 @@ export const syncMachine =
           },
         },
 
-        final: { type: "final" },
-        failed: { type: "final" },
+        final: {
+          entry: ["stopWebsocketActor"],
+        },
+        failed: {
+          entry: ["stopWebsocketActor"],
+        },
       },
       id: "syncMachine",
     },
@@ -408,6 +413,7 @@ export const syncMachine =
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
+              _documentWasLoaded: event.data.documentWasLoaded,
             };
           } else if (event.data.handledQueue === "customMessage") {
             return {
@@ -423,6 +429,7 @@ export const syncMachine =
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
+              _documentWasLoaded: event.data.documentWasLoaded,
             };
           } else {
             return {
@@ -437,6 +444,7 @@ export const syncMachine =
               _mostRecentEphemeralUpdateDatePerPublicSigningKey:
                 event.data.mostRecentEphemeralUpdateDatePerPublicSigningKey,
               _ephemeralUpdateErrors: event.data.ephemeralUpdateErrors,
+              _documentWasLoaded: event.data.documentWasLoaded,
             };
           }
         }),
@@ -481,6 +489,7 @@ export const syncMachine =
           let updateClocks = context._updateClocks;
           let mostRecentEphemeralUpdateDatePerPublicSigningKey =
             context._mostRecentEphemeralUpdateDatePerPublicSigningKey;
+          let documentWasLoaded = context._documentWasLoaded;
 
           try {
             const createAndSendSnapshot = async () => {
@@ -692,62 +701,44 @@ export const syncMachine =
               const event = context._incomingQueue[0];
               switch (event.type) {
                 case "document":
-                  try {
-                    if (context.knownSnapshotInfo) {
-                      const isValid = isValidAncestorSnapshot({
-                        knownSnapshotProofEntry: {
-                          parentSnapshotProof:
-                            context.knownSnapshotInfo.parentSnapshotProof,
-                          snapshotCiphertextHash:
-                            context.knownSnapshotInfo.snapshotCiphertextHash,
-                        },
-                        snapshotProofChain: event.snapshotProofChain,
-                        currentSnapshot: event.snapshot,
-                      });
-                      if (!isValid) {
-                        throw new Error("Invalid ancestor snapshot");
-                      }
+                  if (context.knownSnapshotInfo) {
+                    const isValid = isValidAncestorSnapshot({
+                      knownSnapshotProofEntry: {
+                        parentSnapshotProof:
+                          context.knownSnapshotInfo.parentSnapshotProof,
+                        snapshotCiphertextHash:
+                          context.knownSnapshotInfo.snapshotCiphertextHash,
+                      },
+                      snapshotProofChain: event.snapshotProofChain,
+                      currentSnapshot: event.snapshot,
+                    });
+                    if (!isValid) {
+                      throw new Error("Invalid ancestor snapshot");
                     }
-
-                    activeSnapshotInfo = {
-                      id: event.snapshot.publicData.snapshotId,
-                      ciphertext: event.snapshot.ciphertext,
-                      parentSnapshotProof:
-                        event.snapshot.publicData.parentSnapshotProof,
-                    };
-
-                    await processSnapshot(event.snapshot);
-
-                    if (event.updates) {
-                      await processUpdates(event.updates);
-                    }
-                    if (context.onDocumentLoaded) {
-                      context.onDocumentLoaded();
-                    }
-                  } catch (err) {
-                    // TODO
-                    console.log("Apply document failed. TODO handle error");
-                    console.error(err);
-                    throw err;
                   }
+
+                  activeSnapshotInfo = {
+                    id: event.snapshot.publicData.snapshotId,
+                    ciphertext: event.snapshot.ciphertext,
+                    parentSnapshotProof:
+                      event.snapshot.publicData.parentSnapshotProof,
+                  };
+
+                  await processSnapshot(event.snapshot);
+
+                  if (event.updates) {
+                    await processUpdates(event.updates);
+                  }
+                  documentWasLoaded = true;
 
                   break;
 
                 case "snapshot":
                   console.log("snapshot", event);
-                  try {
-                    await processSnapshot(
-                      event.snapshot,
-                      activeSnapshotInfo ? activeSnapshotInfo : undefined
-                    );
-                  } catch (err) {
-                    console.log(
-                      "Apply snapshot failed. TODO handle error",
-                      err
-                    );
-                    throw err;
-                    // TODO
-                  }
+                  await processSnapshot(
+                    event.snapshot,
+                    activeSnapshotInfo ? activeSnapshotInfo : undefined
+                  );
 
                   break;
 
@@ -867,6 +858,7 @@ export const syncMachine =
 
                   break;
                 case "ephemeralUpdate":
+                  console.log("NEW EPHEMERAL UPDATE", event);
                   try {
                     const ephemeralUpdate = parseEphemeralUpdateWithServerData(
                       event,
@@ -954,9 +946,10 @@ export const syncMachine =
               updateClocks,
               mostRecentEphemeralUpdateDatePerPublicSigningKey,
               ephemeralUpdateErrors: context._ephemeralUpdateErrors,
+              documentWasLoaded,
             };
           } catch (error) {
-            console.log("error", error);
+            console.error("Processing queue error:", error);
             if (error instanceof NaishoProcessingEphemeralUpdateError) {
               const newEphemeralUpdateErrors = [
                 ...context._ephemeralUpdateErrors,
@@ -974,6 +967,7 @@ export const syncMachine =
                 updateClocks,
                 mostRecentEphemeralUpdateDatePerPublicSigningKey,
                 ephemeralUpdateErrors: newEphemeralUpdateErrors.slice(0, 20), // avoid a memory leak by storing max 20 errors
+                documentWasLoaded,
               };
             } else {
               throw error;

@@ -41,6 +41,7 @@ import { getWorkspace } from "../../utils/workspace/getWorkspace";
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
   signatureKeyPair: KeyPair;
   workspaceId: string;
+  reloadPage: () => void;
 };
 
 export default function Page({
@@ -48,6 +49,7 @@ export default function Page({
   route,
   signatureKeyPair,
   workspaceId,
+  reloadPage,
 }: Props) {
   const { pageId: docId, setActiveSnapshotAndCommentKeys } = usePage();
   const isNew = route.params?.isNew ?? false;
@@ -64,7 +66,10 @@ export default function Page({
     key: Uint8Array;
   } | null>(null);
   const yAwarenessRef = useRef<Awareness>(new Awareness(yDocRef.current));
-  const [documentLoaded, setDocumentLoaded] = useState(false);
+  const [documentLoadedFromLocalStorage, setDocumentLoadedFromLocalStorage] =
+    useState(false);
+  const [passedDocumentLoadingTimeout, setPassedDocumentLoadingTimeout] =
+    useState(false);
   const [userInfo, setUserInfo] = useState<AwarenessUserInfo>({
     name: "Unknown user",
     color: "#000000",
@@ -93,9 +98,6 @@ export default function Page({
     signatureKeyPair,
     websocketHost,
     websocketSessionKey: sessionKey,
-    onDocumentLoaded: () => {
-      setDocumentLoaded(true);
-    },
     onSnapshotSaved: async () => {
       snapshotKeyRef.current = snapshotInFlightKeyRef.current;
       snapshotInFlightKeyRef.current = null;
@@ -229,7 +231,13 @@ export default function Page({
     sodium,
   });
 
+  // console.log("state", state.value);
+
   useEffect(() => {
+    setTimeout(() => {
+      setPassedDocumentLoadingTimeout(true);
+    }, 6000);
+
     async function initDocument() {
       await sodium.ready;
 
@@ -240,7 +248,7 @@ export default function Page({
           localDocument.content,
           "serenity-local-sqlite"
         );
-        setDocumentLoaded(true);
+        setDocumentLoadedFromLocalStorage(true);
       }
 
       const me = await runMeQuery({});
@@ -326,8 +334,12 @@ export default function Page({
       openDrawer={navigation.openDrawer}
       updateTitle={updateTitle}
       isNew={isNew}
-      documentLoaded={documentLoaded}
+      documentLoaded={
+        documentLoadedFromLocalStorage || state.context._documentWasLoaded
+      }
+      passedDocumentLoadingTimeout={passedDocumentLoadingTimeout}
       userInfo={userInfo}
+      reloadPage={reloadPage}
     />
   );
 }

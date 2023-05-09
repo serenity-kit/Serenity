@@ -170,7 +170,6 @@ export type SyncMachineConfig = {
   serializeChanges: (changes: unknown[]) => string;
   deserializeChanges: (string) => unknown[];
   sodium: any;
-  onDocumentLoaded?: () => void;
   onSnapshotSaved?: () => void | Promise<void>;
   onCustomMessage?: (message: any) => Promise<void> | void;
   knownSnapshotInfo?: KnownSnapshotInfo;

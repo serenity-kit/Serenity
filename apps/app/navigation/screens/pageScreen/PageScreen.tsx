@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useMemo } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useWindowDimensions } from "react-native";
 import Page from "../../../components/page/Page";
 import { useWorkspace } from "../../../context/WorkspaceContext";
@@ -32,7 +38,11 @@ import { loadPageMachine } from "./loadPageMachine";
 
 const drawerWidth = 240;
 
-const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
+const ActualPageScreen = (
+  props: WorkspaceDrawerScreenProps<"Page"> & {
+    reloadPage: () => void;
+  }
+) => {
   useWindowDimensions(); // needed to ensure tw-breakpoints are triggered when resizing
   const pageId = props.route.params.pageId;
   const { activeDevice } = useAuthenticatedAppContext();
@@ -187,6 +197,16 @@ const ActualPageScreen = (props: WorkspaceDrawerScreenProps<"Page">) => {
 // As an alternative we could also have an action that resets the state machine,
 // but with all the side-effects remounting seemed to be the stabler choice for now.
 export default function PageScreen(props: WorkspaceDrawerScreenProps<"Page">) {
+  const [reloadCounter, setReloadCounter] = useState(0);
+  const reloadPage = useCallback(() => {
+    setReloadCounter((counter) => counter + 1);
+  }, [setReloadCounter]);
   const pageId = props.route.params.pageId;
-  return <ActualPageScreen key={pageId} {...props} />;
+  return (
+    <ActualPageScreen
+      key={`${pageId}-${reloadCounter}`}
+      {...props}
+      reloadPage={reloadPage}
+    />
+  );
 }

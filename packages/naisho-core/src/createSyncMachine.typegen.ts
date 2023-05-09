@@ -45,7 +45,12 @@ export interface Typegen0 {
     removeOldestItemFromQueueAndUpdateContext: "done.invoke.processQueues";
     resetWebsocketRetries: "WEBSOCKET_CONNECTED";
     spawnWebsocketActor: "WEBSOCKET_RETRY";
-    stopWebsocketActor: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
+    stopWebsocketActor:
+      | "DISCONNECT"
+      | "WEBSOCKET_DISCONNECTED"
+      | "WEBSOCKET_DOCUMENT_NOT_FOUND"
+      | "WEBSOCKET_UNAUTHORIZED"
+      | "error.platform.processQueues";
     storeErrorInErrorTrace: "error.platform.processQueues";
     updateShouldReconnect: "DISCONNECT" | "WEBSOCKET_DISCONNECTED";
   };

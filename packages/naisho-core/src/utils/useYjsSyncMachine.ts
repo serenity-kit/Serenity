@@ -7,7 +7,7 @@ import {
   removeAwarenessStates,
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
-import { syncMachine } from "../syncMachine";
+import { createSyncMachine } from "../createSyncMachine";
 import { SyncMachineConfig } from "../types";
 import { deserializeUint8ArrayUpdates } from "./deserializeUint8ArrayUpdates";
 import { serializeUint8ArrayUpdates } from "./serializeUint8ArrayUpdates";
@@ -25,9 +25,23 @@ export type YjsSyncMachineConfig = Omit<
 };
 
 export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
-  const { yDoc, yAwareness, onDocumentLoaded, ...rest } = config;
+  const { yDoc, yAwareness, ...rest } = config;
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
-  const machine = useMachine(syncMachine, {
+  // necessary to avoid that the same machine context is re-used for different or remounted pages
+  // more info here:
+  //
+  // How to reproduce A:
+  // 1. Open a Document a
+  // 2. Open a Document b
+  // 3. Open Document a again
+  // How to reproduce B:
+  // 1. Open a Document a
+  // 2. During timeout click the Reload button
+  //
+  // more info: https://github.com/statelyai/xstate/issues/1101
+  // related: https://github.com/statelyai/xstate/discussions/1825
+  const [syncMachine1] = useState(() => createSyncMachine());
+  const machine = useMachine(syncMachine1, {
     context: {
       ...rest,
       applySnapshot: (decryptedSnapshotData) => {
@@ -45,18 +59,13 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
       },
       serializeChanges: serializeUint8ArrayUpdates,
       deserializeChanges: deserializeUint8ArrayUpdates,
-      onDocumentLoaded: () => {
-        setIsDocumentLoaded(true);
-        if (onDocumentLoaded) {
-          onDocumentLoaded();
-        }
-      },
     },
   });
-  const [, send] = machine;
+  const [state, send] = machine;
 
   useEffect(() => {
-    if (!isDocumentLoaded) {
+    // only connect after the document loaded
+    if (!state.context._documentWasLoaded) {
       return;
     }
 
@@ -83,8 +92,9 @@ export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
       yAwareness.off("update", onAwarenessUpdate);
       yDoc.off("update", onUpdate);
     };
+    // causes issues if ran multiple times e.g. awareness sharing to not work anymore
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDocumentLoaded]);
+  }, [state.context._documentWasLoaded]);
 
   return machine;
 };

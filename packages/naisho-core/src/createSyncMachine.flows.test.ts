@@ -1,9 +1,9 @@
 import sodiumWrappers from "libsodium-wrappers";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { assign, interpret, spawn } from "xstate";
+import { createSyncMachine } from "./createSyncMachine";
 import { createEphemeralUpdate } from "./ephemeralUpdate";
 import { createSnapshot } from "./snapshot";
-import { syncMachine } from "./syncMachine";
 import {
   EphemeralUpdatePublicData,
   SnapshotPublicData,
@@ -108,6 +108,7 @@ const createTestEphemeralUpdate = () => {
 it("should connect to the websocket", (done) => {
   const websocketServiceMock = (context) => () => {};
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
@@ -138,21 +139,18 @@ it("should connect to the websocket", (done) => {
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
 });
 
-it("should load a document", (done) => {
+it("should initially have _documentWasLoaded state", (done) => {
   const websocketServiceMock = (context) => () => {};
 
   let docValue = "";
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
         ...syncMachine.context,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        onDocumentLoaded: () => {
-          expect(docValue).toEqual("Hello World");
-          done();
-        },
         isValidCollaborator: (signingPublicKey) =>
           sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
           signingPublicKey,
@@ -175,7 +173,58 @@ it("should load a document", (done) => {
           }),
         },
       })
-  );
+  ).onTransition((state) => {
+    if (state.matches("connected.idle")) {
+      expect(state.context._documentWasLoaded).toEqual(false);
+      expect(docValue).toEqual("");
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+});
+
+it("should load a document", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+
+  const syncMachine = createSyncMachine();
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (state.matches("connected.idle") && state.context._documentWasLoaded) {
+      expect(docValue).toEqual("Hello World");
+      done();
+    }
+  });
 
   syncService.start();
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
@@ -195,16 +244,13 @@ it("should load a document with updates", (done) => {
 
   let docValue = "";
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
         ...syncMachine.context,
         websocketHost: url,
         websocketSessionKey: "sessionKey",
-        onDocumentLoaded: () => {
-          expect(docValue).toEqual("Hello Worlduu");
-          done();
-        },
         isValidCollaborator: (signingPublicKey) =>
           sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
           signingPublicKey,
@@ -236,7 +282,12 @@ it("should load a document with updates", (done) => {
           }),
         },
       })
-  );
+  ).onTransition((state) => {
+    if (state.matches("connected.idle") && state.context._documentWasLoaded) {
+      expect(docValue).toEqual("Hello Worlduu");
+      done();
+    }
+  });
 
   syncService.start();
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
@@ -260,6 +311,7 @@ it("should load a document and two additional updates", (done) => {
 
   let docValue = "";
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
@@ -299,12 +351,15 @@ it("should load a document and two additional updates", (done) => {
       })
   ).onTransition((state) => {
     if (docValue === "Hello Worlduu") {
+      expect(state.context._documentWasLoaded).toBe(true);
       done();
     }
   });
 
   syncService.start();
   syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  expect(syncService.getSnapshot().context._documentWasLoaded).toBe(false);
 
   const { snapshot } = createSnapshotTestHelper();
   syncService.send({
@@ -339,6 +394,7 @@ it("should load a document and an additional snapshot", (done) => {
 
   let docValue = "";
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
@@ -413,6 +469,7 @@ it("should load a document with updates and two additional updates", (done) => {
 
   let docValue = "";
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
@@ -496,6 +553,7 @@ it("should load a document with updates and two two additional snapshots", (done
 
   let docValue = "";
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
@@ -588,6 +646,7 @@ it("should load a document and process three additional ephemeral updates", (don
   let docValue = "";
   let ephemeralUpdatesValue = new Uint8Array();
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
