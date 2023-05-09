@@ -863,6 +863,7 @@ export const createSyncMachine = () =>
 
                   break;
                 case "ephemeralUpdate":
+                  console.log("NEW EPHEMERAL UPDATE", event);
                   try {
                     const ephemeralUpdate = parseEphemeralUpdateWithServerData(
                       event,
@@ -938,7 +939,6 @@ export const createSyncMachine = () =>
               }
             }
 
-            console.log("FINISH PROCESSING A");
             return {
               handledQueue,
               activeSnapshotInfo,
@@ -960,7 +960,6 @@ export const createSyncMachine = () =>
                 ...context._ephemeralUpdateErrors,
               ];
               newEphemeralUpdateErrors.unshift(error);
-              console.log("FINISH PROCESSING B");
               return {
                 handledQueue,
                 activeSnapshotInfo,
@@ -976,7 +975,6 @@ export const createSyncMachine = () =>
                 documentWasLoaded,
               };
             } else {
-              console.log("FINISH PROCESSING C");
               throw error;
             }
           }

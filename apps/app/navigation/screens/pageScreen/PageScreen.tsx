@@ -91,12 +91,6 @@ const ActualPageScreen = (
     });
   }, [commentsState]);
 
-  useLayoutEffect(() => {
-    return () => {
-      console.log("UNMOUNT");
-    };
-  }, []);
-
   const updateDocumentFolderPath = async (docId: string) => {
     const documentPath = await getDocumentPath(docId);
     const openFolderIds = folderStore.folderIds;
