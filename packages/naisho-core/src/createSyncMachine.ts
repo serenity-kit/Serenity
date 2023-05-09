@@ -243,8 +243,8 @@ export const createSyncMachine = () =>
             },
             waiting: {
               invoke: {
-                id: "sheduleRetry",
-                src: "sheduleRetry",
+                id: "scheduleRetry",
+                src: "scheduleRetry",
               },
               on: {
                 WEBSOCKET_RETRY: {
@@ -456,12 +456,12 @@ export const createSyncMachine = () =>
         }),
       },
       services: {
-        sheduleRetry: (context) => (callback) => {
+        scheduleRetry: (context) => (callback) => {
           const delay = 100 * 1.8 ** context._websocketRetries;
           console.log("schedule websocket connection in ", delay);
           setTimeout(() => {
             callback("WEBSOCKET_RETRY");
-            // calculating slow exponential backoff
+            // calculating slow exponential back-off
           }, delay);
         },
         processQueues: (context, event) => async (send) => {
