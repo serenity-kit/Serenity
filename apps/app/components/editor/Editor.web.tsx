@@ -35,6 +35,7 @@ export default function Editor({
   isNew,
   updateTitle,
   userInfo,
+  reloadPage,
 }: EditorProps) {
   const [editorBottombarState, setEditorBottombarState] =
     useState<EditorBottombarState>(initialEditorBottombarState);
@@ -131,7 +132,7 @@ export default function Editor({
   }, [workspaceId, documentId]);
 
   if (passedDocumentLoadingTimeout && !documentLoaded) {
-    return <EditorPageLoadingError />;
+    return <EditorPageLoadingError reloadPage={reloadPage} />;
   }
 
   if (!documentLoaded) {

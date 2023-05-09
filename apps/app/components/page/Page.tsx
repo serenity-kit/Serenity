@@ -41,6 +41,7 @@ import { getWorkspace } from "../../utils/workspace/getWorkspace";
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
   signatureKeyPair: KeyPair;
   workspaceId: string;
+  reloadPage: () => void;
 };
 
 export default function Page({
@@ -48,6 +49,7 @@ export default function Page({
   route,
   signatureKeyPair,
   workspaceId,
+  reloadPage,
 }: Props) {
   const { pageId: docId, setActiveSnapshotAndCommentKeys } = usePage();
   const isNew = route.params?.isNew ?? false;
@@ -229,6 +231,8 @@ export default function Page({
     sodium,
   });
 
+  // console.log("state", state.value);
+
   useEffect(() => {
     setTimeout(() => {
       setPassedDocumentLoadingTimeout(true);
@@ -335,6 +339,7 @@ export default function Page({
       }
       passedDocumentLoadingTimeout={passedDocumentLoadingTimeout}
       userInfo={userInfo}
+      reloadPage={reloadPage}
     />
   );
 }

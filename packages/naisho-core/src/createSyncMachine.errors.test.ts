@@ -1,9 +1,9 @@
 import sodiumWrappers from "libsodium-wrappers";
 import sodium, { KeyPair } from "react-native-libsodium";
 import { assign, interpret, spawn } from "xstate";
+import { createSyncMachine } from "./createSyncMachine";
 import { createEphemeralUpdate } from "./ephemeralUpdate";
 import { createSnapshot } from "./snapshot";
-import { syncMachine } from "./syncMachine";
 import {
   EphemeralUpdatePublicData,
   SnapshotPublicData,
@@ -110,6 +110,7 @@ it("should keep _documentWasLoaded at false in document loading fails", (done) =
 
   let docValue = "";
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
@@ -175,6 +176,7 @@ it("should process three additional ephemeral updates where the second one fails
   let docValue = "";
   let ephemeralUpdatesValue = new Uint8Array();
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({
@@ -280,6 +282,7 @@ it("should store not more than 20 failed ephemeral update errors", (done) => {
   let docValue = "";
   let ephemeralUpdatesValue = new Uint8Array();
 
+  const syncMachine = createSyncMachine();
   const syncService = interpret(
     syncMachine
       .withContext({

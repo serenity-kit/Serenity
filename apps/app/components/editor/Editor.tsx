@@ -89,6 +89,7 @@ export default function Editor({
   passedDocumentLoadingTimeout,
   workspaceId,
   userInfo,
+  reloadPage,
 }: EditorProps) {
   const webViewRef = useRef<WebView>(null);
   // leveraging a ref here since the injectedJavaScriptBeforeContentLoaded
@@ -252,7 +253,7 @@ export default function Editor({
   );
 
   if (passedDocumentLoadingTimeout && !documentLoaded) {
-    return <EditorPageLoadingError />;
+    return <EditorPageLoadingError reloadPage={reloadPage} />;
   }
 
   if (!documentLoaded) {

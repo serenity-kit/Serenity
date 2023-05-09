@@ -145,7 +145,7 @@ export type Context = SyncMachineConfig & {
   _documentWasLoaded: boolean;
 };
 
-export const syncMachine =
+export const createSyncMachine = () =>
   /** @xstate-layout N4IgpgJg5mDOIC5SwJ4DsDGBZAhhgFgJZpgDEAygKIByAIgNoAMAuoqAA4D2shALoZzRsQAD0QBGcY3EA6AMwAOBdPEKAbAoCcjTQBYANCBQSATAF8zh1JlwFiZAIK1aAfUoAFABKUslAEoOADIuAKrutA4AKpRMrEggXDz8gsJiCFImAOwymZoZAKy6CplquiaahsbpJuKa8gr5ebqZDZpyauaWINbYeEQkpADqlABC5ADyAMIA0pSRLrQAkuST49TUlJPRDCzCiXwCQvFp+ZmViCYKJjlymbWZiia6hbq6FlbovXYDSytrG1tYntuAcUsdEKdzggTHJrk8SllNE9GK93t1PrZ+mAZBhBCQMPw0FAhqMJjM5i5VutNtsgfF9skjqA0mozkYJIwFHIZNpWYw1HkauJ8mo0T1MfYcXiwATiFAZAB3HAHIkksZTWbzPxzPwATTpHBBjNSEnEulk7Rq7RRuQecihl25-MyjHyZs0JRRYoxfUluLQ+N4kDVZM1CymIV81Hm1HG8wAYuMQnQDQkjYcTelMrkebokbo1I0ueI5PkoZJ2jItGo5FIFHnGCZRV1xb6SFKAzKgxAQxqKcmHCFIp5xn5FgAtSg7OKGpIZ8FZrS5-OFzTF0vlzlqGS6Z38wWSEXemxt7H+wOQGQAG04OAgctonAwAFcALZgNC8Xvk+ZOVyRcYXEWahViwYCAHEXAARRCShYNTBl52ZRBGChRhjy+LEOwvCBr1ve8iUfF930-b8wz-FwAMpEJyAArAXF8chyAccDKGg2D4N2el0zBZCEFQ9l+IwiV23PLtLxvO8HyfN8Py-CjJk8BxqFYhCeKZUQLg6GRTmkRpGzkaRDLLQS1DUWRajzD1anaWoFGE09sPE3DCAgK8yGGdUfxcCiqOA0CIPYuCYi42dQQ0k58kYGQS2FOQCxhJsPU3WEZDUFFXWafJ8iUPIHO+M9pQJS9XPcsiKV8wDJhouiGMoJiWLYmDgrUudeM0hBsui2L8nijpYQFNkqkkXcq3KWsm3KMpdDkfKsLE4qXLcxxnEpJSVJCmc0zaiLEALfIYtrfITEbDpToUKF83kFpcg0K5SzkTQ5r9IruxkdgACcnzgHgiSg58wAB2BSAgQRsWIAA3TgAGtsU+77YFgf7AbgVrwszKQPR5LlMtKF1tCGxAGm3EUNEyKKFEkYpntE17L3hjAfrlZGgdIMAPq+j73qvHBeAAM04D7X3er7GcRlnUdC7b0YXcQWjqPQVyLWsN0EqRFB5VRHt6vI10YWaWx9AqnMWkWEd+qAJeBzzQwq1a-JA8YwJUoLOK2xD2rSKnZHNXcTCyQt9aKKFlAUHSzOKCmqcyGnCs7U2GaZv6AdZm2+1-e2qpqp26oa1jXc24Edox1QfbNRsA6i+KLsEzRzJybQri5S4TFON5DZPY2FrexPEeZlO4FIBT1tUqWPd2hBcmuQoNDXQstD0GuqnumRORdRhyauTIm1jk23oIGVobleNBawQWwAlxYg1fa3SXTnzM6Ax3ncg5q3aLmXQGXrkciFV4TruAKe0HVVCXFXpccyLpTh12Orvbul4D4YCPkSE+H0z4fQvgPK+YAb7lQzv+LOtEc6MWYvnN+hduLF1lk3cB6g5aulusdEOpZf4jTKBvcQQC4F01wog5BUBUHoMwSjbBuDh7KVHu7dSGNmi6BisKZujZJAlgMKZdQOlS41EjtIB43D4773wIfY+p9z6X2vsDEQsBeC82xDgPmQYPoAApGAAEpSCti7jwnEhikHGLQaYrB5i0bGmoWAxsdCoGMJMJdPIuZSiNk5BvFE+Q9E4W8UYlBJiMFmJwRYqxNiZB2Icc4txHj5peL4X4oROSb70HEFIqhfFQFh3CZAhhMDomCRuqws07DAFtF3veWA8CezBKQh1cydQCyY39g8D0G8HSFh0iUXIbQtCcKKBYLoaBOAQDgMIMp9gP4hL4gAWlUAdLQrc9DmgaLuEyVRTn+1kHXUseZboaGygbD4ndyn6LlMc8ZaQWjbjkIZBoVoRSGUJukRoOlihPByrWNonCUkd0wi9f5RIZAYN4B9FAALKGfxAW83MjoYRdWkA6Zoq9t5IkUJoQo6tmw-IxbTLF8olQqigICz2RN4ryHBcdEsUKFmCSbNFJJSIkWAJLKk5yvKJ7nNuFWaVNyLn3KhMquRzQbpyzBSdO68rTaSQIlAIislPyKszKcpcVzGivA1a6YBVQrp8l3M0PSqJ0UiTjmk0qYBrULnaNuZoTYriaEjQ8Z4KVrh5EUOlVkxQGjGp7qLJOlsB7wCJScjq5NshtFuDlRlWROSdNdTCNKSgBRlEtA8NFrLfV7wQT4-hgiAkiPMUGppCUYowlZCix4BYQ4-23mwgBnCBk+sckMkZ3aOrxVkLkLeNZ-YnTng6LIgrGAb3SnLaZWRd582IDgK8860hWgsjUDex1SjxvLOIMBRRTgnUkHcRl3z0S-MlHzZU7kIDnouBvORpxlCMKUOIFK25WRSGmrWMoHotlmCAA */
   createMachine(
     {
@@ -172,8 +172,9 @@ export const syncMachine =
           processQueues: { data: ProcessQueueData };
         },
       },
-      tsTypes: {} as import("./syncMachine.typegen").Typegen0,
+      tsTypes: {} as import("./createSyncMachine.typegen").Typegen0,
       predictableActionArguments: true,
+      // context: JSON.parse(JSON.stringify(initialContext)),
       context: {
         documentId: "",
         signatureKeyPair: {} as KeyPair,
@@ -261,22 +262,6 @@ export const syncMachine =
         connected: {
           entry: ["resetWebsocketRetries"],
           states: {
-            loadingDocument: {
-              on: {
-                WEBSOCKET_ADD_TO_INCOMING_QUEUE: {
-                  actions: ["addToIncomingQueue"],
-                  target: "processingQueues",
-                },
-                WEBSOCKET_ADD_TO_CUSTOM_MESSAGE_QUEUE: {
-                  actions: ["addToCustomMessageQueue"],
-                  target: "processingQueues",
-                },
-                ADD_CHANGE: {
-                  actions: ["addToPendingUpdatesQueue"],
-                  target: "processingQueues",
-                },
-              },
-            },
             idle: {
               on: {
                 WEBSOCKET_ADD_TO_INCOMING_QUEUE: {
@@ -348,7 +333,7 @@ export const syncMachine =
             WEBSOCKET_UNAUTHORIZED: { target: "final" },
           },
 
-          initial: "loadingDocument",
+          initial: "idle",
         },
 
         disconnected: {
@@ -359,8 +344,12 @@ export const syncMachine =
           },
         },
 
-        final: { type: "final" },
-        failed: { type: "final" },
+        final: {
+          entry: ["stopWebsocketActor"],
+        },
+        failed: {
+          entry: ["stopWebsocketActor"],
+        },
       },
       id: "syncMachine",
     },
@@ -658,6 +647,11 @@ export const syncMachine =
                   throw new Error("Invalid collaborator");
                 }
 
+                console.log(
+                  "updateClocks",
+                  updateClocks[activeSnapshotInfo.id]
+                );
+
                 const currentClock =
                   updateClocks[activeSnapshotInfo.id] &&
                   Number.isInteger(
@@ -944,6 +938,7 @@ export const syncMachine =
               }
             }
 
+            console.log("FINISH PROCESSING A");
             return {
               handledQueue,
               activeSnapshotInfo,
@@ -965,6 +960,7 @@ export const syncMachine =
                 ...context._ephemeralUpdateErrors,
               ];
               newEphemeralUpdateErrors.unshift(error);
+              console.log("FINISH PROCESSING B");
               return {
                 handledQueue,
                 activeSnapshotInfo,
@@ -980,6 +976,7 @@ export const syncMachine =
                 documentWasLoaded,
               };
             } else {
+              console.log("FINISH PROCESSING C");
               throw error;
             }
           }

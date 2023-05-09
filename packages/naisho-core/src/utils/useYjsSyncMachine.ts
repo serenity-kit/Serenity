@@ -7,7 +7,7 @@ import {
   removeAwarenessStates,
 } from "y-protocols/awareness";
 import * as Yjs from "yjs";
-import { syncMachine } from "../syncMachine";
+import { createSyncMachine } from "../createSyncMachine";
 import { SyncMachineConfig } from "../types";
 import { deserializeUint8ArrayUpdates } from "./deserializeUint8ArrayUpdates";
 import { serializeUint8ArrayUpdates } from "./serializeUint8ArrayUpdates";
@@ -27,7 +27,21 @@ export type YjsSyncMachineConfig = Omit<
 export const useYjsSyncMachine = (config: YjsSyncMachineConfig) => {
   const { yDoc, yAwareness, ...rest } = config;
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
-  const machine = useMachine(syncMachine, {
+  // necessary to avoid that the same machine context is re-used for different or remounted pages
+  // more info here:
+  //
+  // How to reproduce A:
+  // 1. Open a Document a
+  // 2. Open a Document b
+  // 3. Open Document a again
+  // How to reproduce B:
+  // 1. Open a Document a
+  // 2. During timeout click the Reload button
+  //
+  // more info: https://github.com/statelyai/xstate/issues/1101
+  // related: https://github.com/statelyai/xstate/discussions/1825
+  const [syncMachine1] = useState(() => createSyncMachine());
+  const machine = useMachine(syncMachine1, {
     context: {
       ...rest,
       applySnapshot: (decryptedSnapshotData) => {
