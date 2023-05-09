@@ -371,5 +371,190 @@ it("should store not more than 20 failed ephemeral update errors", (done) => {
   }, 1);
 });
 
+it("should reset the context entries after websocket disconnect", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+  let ephemeralUpdatesValue = new Uint8Array();
+
+  const syncMachine = createSyncMachine();
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        getEphemeralUpdateKey: () => key,
+        applyEphemeralUpdates: (ephemeralUpdates) => {
+          ephemeralUpdatesValue = new Uint8Array([
+            ...ephemeralUpdatesValue,
+            ...ephemeralUpdates,
+          ]);
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (state.matches("connecting.retrying")) {
+      expect(state.context._documentWasLoaded).toEqual(false);
+      expect(state.context._activeSnapshotInfo).toEqual(null);
+      expect(state.context._latestServerVersion).toEqual(null);
+      expect(state.context._incomingQueue).toEqual([]);
+      expect(state.context._customMessageQueue).toEqual([]);
+      expect(state.context._activeSendingSnapshotInfo).toEqual(null);
+      expect(state.context._updatesInFlight).toEqual([]);
+      expect(state.context._confirmedUpdatesClock).toEqual(null);
+      expect(state.context._sendingUpdatesClock).toEqual(-1);
+      expect(state.context._updateClocks).toEqual({});
+      expect(
+        state.context._mostRecentEphemeralUpdateDatePerPublicSigningKey
+      ).toEqual({});
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: {
+      type: "document",
+      snapshot,
+      updates: [
+        createUpdateHelper().update,
+        createUpdateHelper({ version: 1 }).update,
+      ],
+    },
+  });
+
+  syncService.send({
+    type: "WEBSOCKET_DISCONNECTED",
+  });
+});
+
+it("should reconnect and reload the document", (done) => {
+  const websocketServiceMock = (context) => () => {};
+
+  let docValue = "";
+  let ephemeralUpdatesValue = new Uint8Array();
+  let reconnected = false;
+
+  const syncMachine = createSyncMachine();
+  const syncService = interpret(
+    syncMachine
+      .withContext({
+        ...syncMachine.context,
+        websocketHost: url,
+        websocketSessionKey: "sessionKey",
+        isValidCollaborator: (signingPublicKey) =>
+          sodiumWrappers.to_base64(signatureKeyPair.publicKey) ===
+          signingPublicKey,
+        getSnapshotKey: () => key,
+        applySnapshot: (snapshot) => {
+          docValue = sodiumWrappers.to_string(snapshot);
+        },
+        getUpdateKey: () => key,
+        deserializeChanges: (changes) => {
+          return changes;
+        },
+        applyChanges: (changes) => {
+          changes.forEach((change) => {
+            docValue = docValue + change;
+          });
+        },
+        getEphemeralUpdateKey: () => key,
+        applyEphemeralUpdates: (ephemeralUpdates) => {
+          ephemeralUpdatesValue = new Uint8Array([
+            ...ephemeralUpdatesValue,
+            ...ephemeralUpdates,
+          ]);
+        },
+        sodium: sodiumWrappers,
+        signatureKeyPair,
+      })
+      .withConfig({
+        actions: {
+          spawnWebsocketActor: assign((context) => {
+            return {
+              _websocketActor: spawn(
+                websocketServiceMock(context),
+                "websocketActor"
+              ),
+            };
+          }),
+        },
+      })
+  ).onTransition((state) => {
+    if (
+      reconnected &&
+      state.matches("connected.idle") &&
+      state.context._documentWasLoaded
+    ) {
+      expect(docValue).toEqual("Hello Worlduu");
+      expect(state.context._documentWasLoaded).toEqual(true);
+      done();
+    }
+  });
+
+  syncService.start();
+  syncService.send({ type: "WEBSOCKET_CONNECTED" });
+
+  const { snapshot } = createSnapshotTestHelper();
+  const document = {
+    type: "document",
+    snapshot,
+    updates: [
+      createUpdateHelper().update,
+      createUpdateHelper({ version: 1 }).update,
+    ],
+  };
+  syncService.send({
+    type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+    data: document,
+  });
+
+  syncService.send({
+    type: "WEBSOCKET_DISCONNECTED",
+  });
+  setTimeout(() => {
+    syncService.send({ type: "WEBSOCKET_CONNECTED" });
+    syncService.send({
+      type: "WEBSOCKET_ADD_TO_INCOMING_QUEUE",
+      data: document,
+    });
+    reconnected = true;
+  }, 1);
+});
+
 // test sending the same update twice
 // testing sending the same ephemeral update twice
