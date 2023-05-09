@@ -1,15 +1,15 @@
 import {
   BubbleMenuContentWrapper,
-  VerticalDivider,
   EditorContentButton,
   ScrollView,
   SubmitButton,
   TextArea,
   ToggleButton,
   Tooltip,
+  VerticalDivider,
+  View,
   tw,
   useHasEditorSidebar,
-  View,
 } from "@serenity-tools/ui";
 import { EditorEvents, isTextSelection } from "@tiptap/core";
 import Collaboration from "@tiptap/extension-collaboration";
@@ -22,7 +22,7 @@ import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { HStack, VStack } from "native-base";
+import { HStack } from "native-base";
 import React, { useEffect, useRef, useState } from "react";
 import {
   absolutePositionToRelativePosition,

@@ -647,11 +647,6 @@ export const createSyncMachine = () =>
                   throw new Error("Invalid collaborator");
                 }
 
-                console.log(
-                  "updateClocks",
-                  updateClocks[activeSnapshotInfo.id]
-                );
-
                 const currentClock =
                   updateClocks[activeSnapshotInfo.id] &&
                   Number.isInteger(
