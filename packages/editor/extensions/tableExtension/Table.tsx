@@ -9,14 +9,38 @@ import {
 } from "./getTableCellDimensions";
 import { isCellSelection } from "./isCellSelection";
 
+/*
+ * get the cell-positions (relative to the parent-table) of every first cell of each row
+ *
+ * input:
+ *   [1, 5, 9, 15, 19, 23],
+ *    3
+ *
+ * output:
+ *   [1, 15]
+ */
 function restructureArray(arr: number[], size: number): number[] {
   const numSubarrays = Math.ceil(arr.length / size);
+  // rearrange array to look like rows with the cellstarts when given the width of the table
+  // (as the width is equal to the length of each row => 2 rows with 3 cells => width: 3)
+  // [1, 5, 9, 15, 19, 23] => [[1, 5, 9], [15, 19, 23]]
   const subarrays = Array.from({ length: numSubarrays }, (_, i) =>
     arr.slice(i * size, (i + 1) * size)
   );
+  // only return positions of first cell of each row => [1, 15]
   return subarrays.map((subarray) => subarray[0]);
 }
 
+/*
+ * get the cell-positions (relative to the parent-table) of every first cell of each column
+ *
+ * input:
+ *   [1, 5, 9, 15, 19, 23],
+ *    3
+ *
+ * output:
+ *   [1, 5, 9]
+ */
 function extractFirstColumnNumbers(table: number[], width: number) {
   const firstColumnNumbers: number[] = [];
   for (let i = 0; i < width; i++) {
@@ -84,29 +108,51 @@ export const Table = (props: any) => {
     // console.log(props.editor);
     props.editor.on("selectionUpdate", (params: any) => {
       const updateRowSelection = () => {
+        // get the current selection
         const selection = params.editor.view.state.selection;
 
+        // check if it is a CellSelection, otherwise return
         if (!isCellSelection(selection)) {
           setRowSelected(null);
           return;
         }
 
+        // check if it is a RowSelection, otherwise return
         const isRowSelection = selection.isRowSelection();
         if (!isRowSelection) {
           setRowSelected(null);
           return;
         }
+
+        // get the anchorCell out of the selection (as we now know there definitely is one)
         const { $anchorCell, $headCell } = selection;
 
         const tableNode = selection.$anchorCell.node(-1);
         const tableMap = TableMap.get(tableNode);
-        const tableStart = $anchorCell.start(-1);
+        const tableStart = $anchorCell.start(-1); // tableStart is one lvl higher than Cell => -1
 
+        // e.g. 121
+        console.log("row test start: ", tableStart);
+        // map: [1, 5, 11, 15], height: 2, witdh: 2 (positions relative to table not in page context)
+        console.log("row test map: ", tableMap);
+        // [1, 11] - relative position of first cells of each row
+        console.log(
+          "row test restruct: ",
+          restructureArray(tableMap.map, tableMap.width)
+        );
+
+        // get all startingPoints of each row inside the table but relative to the document
         const startingPoints = restructureArray(
           tableMap.map,
           tableMap.width
         ).map((value) => value + tableStart);
-        console.log(startingPoints, $anchorCell);
+
+        // [122, 132] => because 1 and 11 where the first cells of each row
+        console.log("row test points: ", startingPoints);
+        // resolved pos of the anchorCell, e.g. {pos: 122, path: Array(9), parentOffset: 0, depth: 2}
+        console.log("row test anchorCell: ", $anchorCell);
+
+        // check if the position of the anchorCell matches one of the row-starting points
         const rowNumber = startingPoints.indexOf($anchorCell.pos);
         if (rowNumber === -1) {
           setRowSelected(null);
@@ -117,29 +163,50 @@ export const Table = (props: any) => {
       updateRowSelection();
 
       const updateColumnSelection = () => {
+        // get the current selection
         const selection = params.editor.view.state.selection;
 
+        // check if it is a CellSelection, otherwise return
         if (!isCellSelection(selection)) {
           setColumnSelected(null);
           return;
         }
 
+        // check if it is a ColSelection, otherwise return
         const isColSelection = selection.isColSelection();
         if (!isColSelection) {
           setColumnSelected(null);
           return;
         }
+
+        // get the anchorCell out of the selection (as we now know there definitely is one)
         const { $anchorCell } = selection;
 
         const tableNode = selection.$anchorCell.node(-1);
         const tableMap = TableMap.get(tableNode);
         const tableStart = $anchorCell.start(-1);
 
+        // e.g. 121
+        console.log("col test start: ", tableStart);
+        // map: [1, 5, 11, 15], height: 2, witdh: 2 (positions relative to table not in page context)
+        console.log("col test map: ", tableMap);
+        // [1, 5] - relative position of first cells of each column
+        console.log(
+          "col test extract: ",
+          extractFirstColumnNumbers(tableMap.map, tableMap.height)
+        );
+
+        // get all startingPoints of each row inside the table but relative to the document
         const startingPoints = extractFirstColumnNumbers(
           tableMap.map,
           tableMap.height
         ).map((value) => value + tableStart);
-        console.log(startingPoints, $anchorCell);
+
+        // [122, 126] => because 1 and 5 where the first cells of each col
+        console.log("col test points: ", startingPoints);
+        // resolved pos of the anchorCell, e.g. {pos: 126, path: Array(9), parentOffset: 4, depth: 2}
+        console.log("col test anchorCell: ", $anchorCell);
+
         const columnNumber = startingPoints.indexOf($anchorCell.pos);
         if (columnNumber === -1) {
           setColumnSelected(null);
