@@ -79,7 +79,7 @@ export default function Page({
     name: "Unknown user",
     color: "#000000",
   });
-  const setIsOffline = useEditorStore((state) => state.setIsOffline);
+  const setOfflineState = useEditorStore((state) => state.setOfflineState);
 
   const setActiveDocumentId = useDocumentTitleStore(
     (state) => state.setActiveDocumentId
@@ -319,12 +319,18 @@ export default function Page({
       state.matches("disconnected") ||
       (state.matches("connecting") && state.context._websocketRetries > 1)
     ) {
-      setIsOffline(true);
+      setOfflineState({
+        pendingChanges: state.context._pendingChangesQueue.length,
+      });
     } else {
-      setIsOffline(false);
+      setOfflineState(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.value, state.context._websocketRetries]);
+  }, [
+    state.value,
+    state.context._websocketRetries,
+    state.context._pendingChangesQueue.length,
+  ]);
 
   const updateTitle = async (title: string) => {
     const document = await getDocument({

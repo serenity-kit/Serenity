@@ -1,18 +1,20 @@
 import create from "zustand";
 
+type OfflineState = false | { pendingChanges: number };
+
 interface EditorState {
   isInEditingMode: boolean;
-  isOffline: boolean;
+  offlineState: OfflineState;
   subscriptions: (() => void)[];
   setIsInEditingMode: (isInEditingMode: boolean) => void;
-  setIsOffline: (isOffline: boolean) => void;
+  setOfflineState: (offlineState: OfflineState) => void;
   triggerBlur: () => void;
   subscribeToBlurTrigger: (callback: () => void) => void;
   removeAllSubscribers: () => void;
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
-  isOffline: false,
+  offlineState: false,
   subscriptions: [],
   subscribeToBlurTrigger: (callback) =>
     set((state) => ({
@@ -33,8 +35,8 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     set((state) => ({
       isInEditingMode,
     })),
-  setIsOffline: (isOffline) =>
+  setOfflineState: (offlineState) =>
     set((state) => ({
-      isOffline,
+      offlineState,
     })),
 }));

@@ -1,7 +1,10 @@
 import {
+  Badge,
   IconButton,
   Text,
   Tooltip,
+  View,
+  tw,
   useIsDesktopDevice,
 } from "@serenity-tools/ui";
 import { HStack } from "native-base";
@@ -19,7 +22,7 @@ export const PageHeader: React.FC<Props> = ({
   hasNewComment,
 }) => {
   const isInEditingMode = useEditorStore((state) => state.isInEditingMode);
-  const isOffline = useEditorStore((state) => state.isOffline);
+  const offlineState = useEditorStore((state) => state.offlineState);
   const isDesktopDevice = useIsDesktopDevice();
 
   return (
@@ -30,7 +33,21 @@ export const PageHeader: React.FC<Props> = ({
         </Text>
       ) : null}
 
-      {isOffline ? <Text variant="xs">Offline </Text> : null}
+      {offlineState ? (
+        <Tooltip
+          label={`${offlineState.pendingChanges} edits will be synced the next time you are online`}
+          placement="bottom"
+          offset={8}
+          openDelay={200}
+        >
+          {/* needs a view since the tooltip placement needs a block element */}
+          <View>
+            <Badge variant="xs" style={tw`mr-4`}>
+              Offline
+            </Badge>
+          </View>
+        </Tooltip>
+      ) : null}
 
       {isDesktopDevice ? (
         <Tooltip

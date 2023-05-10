@@ -1,5 +1,6 @@
 export * from "./components/avatar/Avatar";
 export * from "./components/avatarGroup/AvatarGroup";
+export * from "./components/badge/Badge";
 export * from "./components/box/Box";
 export * from "./components/boxShadow/BoxShadow";
 export * from "./components/bubbleMenuContentWrapper/BubbleMenuContentWrapper";
@@ -57,9 +58,9 @@ export * from "./components/sidebarText/SidebarText";
 export * from "./components/spinner/Spinner";
 export * from "./components/submitButton/SubmitButton";
 export * from "./components/tab/Tab";
-export * from "./components/tableOfContentButton/TableOfContentButton";
 export * from "./components/tabList/TabList";
 export * from "./components/tabPanel/TabPanel";
+export * from "./components/tableOfContentButton/TableOfContentButton";
 export * from "./components/text/Text";
 export * from "./components/textArea/TextArea";
 export * from "./components/toggleButton/ToggleButton";

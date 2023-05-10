@@ -1,21 +1,19 @@
-import React from "react";
 import {
   Avatar,
   AvatarGroup,
+  Badge,
   Box,
   BoxShadow,
   BoxShadowLevels,
   Button,
   CenterContent,
   Checkbox,
-  colors,
-  Description,
   DesignSystemExampleArea as DSExampleArea,
-  DesignSystemHeading as Heading,
   DesignSystemMono as DSMono,
+  Description,
   EditorBottombarButton,
   EditorSidebarIcon,
-  Heading as UIHeading,
+  DesignSystemHeading as Heading,
   HorizontalDivider,
   Icon,
   IconButton,
@@ -34,6 +32,7 @@ import {
   ScrollSafeAreaView,
   Select,
   SelectItem,
+  SharetextBox,
   Shortcut,
   SidebarButton,
   SidebarIconLeft,
@@ -41,19 +40,20 @@ import {
   SidebarText,
   Spinner,
   Text,
-  SharetextBox,
+  TextArea,
   ToggleButton,
   Tooltip,
-  tw,
-  useIsDesktopDevice,
+  Heading as UIHeading,
   VerticalDivider,
   View,
   WorkspaceAvatar,
-  TextArea,
+  colors,
+  tw,
+  useIsDesktopDevice,
 } from "@serenity-tools/ui";
 import * as Clipboard from "expo-clipboard";
 import { HStack, VStack } from "native-base";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useWindowDimensions } from "react-native";
 import { RootStackScreenProps } from "../../../types/navigationProps";
 import { showToast } from "../../../utils/toast/showToast";
@@ -268,6 +268,19 @@ export default function DesignSystemScreen(
           {collaborationColors.map((color) => {
             return <WorkspaceAvatar key={color} color={color} />;
           })}
+        </DSExampleArea>
+
+        <Heading lvl={1}>Badge</Heading>
+        <Text>
+          The{" "}
+          <DSMono variant="component" size="md">
+            Badge
+          </DSMono>{" "}
+          component can be used to indicate a state e.g. offline/online.
+        </Text>
+        <Heading lvl={3}>Basic</Heading>
+        <DSExampleArea>
+          <Badge>Badge</Badge>
         </DSExampleArea>
 
         <Heading lvl={1}>BoxShadow</Heading>
