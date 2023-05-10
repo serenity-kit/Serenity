@@ -63,14 +63,24 @@ export const Table = (props: any) => {
   console.log("ROW SELECTED", rowSelected);
   console.log("COLUMN SELECTED", columnSelected);
 
-  const getTableInsertInfo = () => {
+  const getTableInfo = () => {
     const editor = props.editor.storage.tableCell.currentEditor;
     const state = editor.view.state;
     const resolvedPos = state.doc.resolve(props.getPos());
 
     const table = props.node;
     const tableStart = resolvedPos.start(1);
-    const map = TableMap.get(table);
+    const tableMap = TableMap.get(table);
+
+    return { table, tableMap, tableStart };
+  };
+
+  const getTableInsertInfo = () => {
+    const editor = props.editor.storage.tableCell.currentEditor;
+    const state = editor.view.state;
+
+    // needs to be named map for TableRect
+    const { table, tableMap: map, tableStart } = getTableInfo();
 
     const rowCount = map.height;
     const colCount = map.width;
@@ -125,8 +135,9 @@ export const Table = (props: any) => {
         }
 
         // get the anchorCell out of the selection (as we now know there definitely is one)
-        const { $anchorCell, $headCell } = selection;
+        const { $anchorCell } = selection;
 
+        // as we are on cell-level here we need to get the tableInfo manually
         const tableNode = selection.$anchorCell.node(-1);
         const tableMap = TableMap.get(tableNode);
         const tableStart = $anchorCell.start(-1); // tableStart is one lvl higher than Cell => -1
@@ -182,6 +193,7 @@ export const Table = (props: any) => {
         // get the anchorCell out of the selection (as we now know there definitely is one)
         const { $anchorCell } = selection;
 
+        // as we are on cell-level here we need to get the tableInfo manually
         const tableNode = selection.$anchorCell.node(-1);
         const tableMap = TableMap.get(tableNode);
         const tableStart = $anchorCell.start(-1);
@@ -264,10 +276,8 @@ export const Table = (props: any) => {
           const editor = props.editor.storage.tableCell.currentEditor;
           const state = editor.view.state;
 
-          const resolvedPos = state.doc.resolve(props.getPos());
-          const table = props.node;
-          const tableStart = resolvedPos.start(1);
-          const tableMap = TableMap.get(table);
+          const { tableMap, tableStart } = getTableInfo();
+
           const anchorPos = tableMap.map[0];
           const headPos = tableMap.map[tableMap.map.length - 1];
 
@@ -290,10 +300,7 @@ export const Table = (props: any) => {
               const editor = props.editor.storage.tableCell.currentEditor;
               const state = editor.view.state;
 
-              const resolvedPos = state.doc.resolve(props.getPos());
-              const table = props.node;
-              const tableStart = resolvedPos.start(1);
-              const tableMap = TableMap.get(table);
+              const { table, tableMap, tableStart } = getTableInfo();
 
               const cellPos = tableMap.positionAt(index, 0, table);
               const resolvedCellPos = state.doc.resolve(tableStart + cellPos);
@@ -317,10 +324,7 @@ export const Table = (props: any) => {
               const editor = props.editor.storage.tableCell.currentEditor;
               const state = editor.view.state;
 
-              const resolvedPos = state.doc.resolve(props.getPos());
-              const table = props.node;
-              const tableStart = resolvedPos.start(1);
-              const tableMap = TableMap.get(table);
+              const { table, tableMap, tableStart } = getTableInfo();
 
               const cellPos = tableMap.positionAt(0, index, table);
               const resolvedCellPos = state.doc.resolve(tableStart + cellPos);
