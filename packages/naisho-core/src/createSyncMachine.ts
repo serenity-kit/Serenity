@@ -347,8 +347,8 @@ export const createSyncMachine = () =>
             },
           },
           on: {
-            WEBSOCKET_DOCUMENT_NOT_FOUND: { target: "final" },
-            WEBSOCKET_UNAUTHORIZED: { target: "final" },
+            WEBSOCKET_DOCUMENT_NOT_FOUND: { target: "noAccess" },
+            WEBSOCKET_UNAUTHORIZED: { target: "noAccess" },
           },
 
           initial: "idle",
@@ -361,8 +361,7 @@ export const createSyncMachine = () =>
             cond: "shouldReconnect",
           },
         },
-
-        final: {
+        noAccess: {
           entry: ["stopWebsocketActor"],
         },
         failed: {

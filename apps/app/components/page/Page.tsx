@@ -38,6 +38,8 @@ import {
   setLocalDocument,
 } from "../../utils/localSqliteApi/localSqliteApi";
 import { getWorkspace } from "../../utils/workspace/getWorkspace";
+import { PageDecryptError } from "./PageDecryptError";
+import { PageNoAccessError } from "./PageNoAccessError";
 
 type Props = WorkspaceDrawerScreenProps<"Page"> & {
   signatureKeyPair: KeyPair;
@@ -346,6 +348,19 @@ export default function Page({
     }
   };
 
+  const documentLoaded =
+    documentLoadedFromLocalStorage ||
+    state.context._documentWasLoaded ||
+    documentLoadedOnceFromRemote;
+
+  if (state.matches("noAccess")) {
+    return <PageNoAccessError />;
+  }
+
+  if (!documentLoaded && state.matches("failed")) {
+    return <PageDecryptError reloadPage={reloadPage} />;
+  }
+
   return (
     <Editor
       documentId={docId}
@@ -355,11 +370,7 @@ export default function Page({
       openDrawer={navigation.openDrawer}
       updateTitle={updateTitle}
       isNew={isNew}
-      documentLoaded={
-        documentLoadedFromLocalStorage ||
-        state.context._documentWasLoaded ||
-        documentLoadedOnceFromRemote
-      }
+      documentLoaded={documentLoaded}
       passedDocumentLoadingTimeout={passedDocumentLoadingTimeout}
       userInfo={userInfo}
       reloadPage={reloadPage}

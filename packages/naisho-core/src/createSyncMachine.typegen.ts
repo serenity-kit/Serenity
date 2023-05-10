@@ -77,7 +77,7 @@ export interface Typegen0 {
     | "connecting.waiting"
     | "disconnected"
     | "failed"
-    | "final"
+    | "noAccess"
     | {
         connected?: "checkingForMoreQueueItems" | "idle" | "processingQueues";
         connecting?: "retrying" | "waiting";
