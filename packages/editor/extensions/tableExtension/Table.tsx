@@ -193,13 +193,13 @@ export const Table = (props: any) => {
         // [1, 5] - relative position of first cells of each column
         console.log(
           "col test extract: ",
-          extractFirstColumnNumbers(tableMap.map, tableMap.height)
+          extractFirstColumnNumbers(tableMap.map, tableMap.width)
         );
 
         // get all startingPoints of each row inside the table but relative to the document
         const startingPoints = extractFirstColumnNumbers(
           tableMap.map,
-          tableMap.height
+          tableMap.width
         ).map((value) => value + tableStart);
 
         // [122, 126] => because 1 and 5 where the first cells of each col
