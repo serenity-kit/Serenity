@@ -19,16 +19,16 @@ import { isCellSelection } from "./isCellSelection";
  * output:
  *   [1, 15]
  */
-function restructureArray(arr: number[], size: number): number[] {
-  const numSubarrays = Math.ceil(arr.length / size);
+function extractRowStartPoints(tableMap: number[], width: number): number[] {
+  const rowCount = Math.ceil(tableMap.length / width);
   // rearrange array to look like rows with the cellstarts when given the width of the table
   // (as the width is equal to the length of each row => 2 rows with 3 cells => width: 3)
   // [1, 5, 9, 15, 19, 23] => [[1, 5, 9], [15, 19, 23]]
-  const subarrays = Array.from({ length: numSubarrays }, (_, i) =>
-    arr.slice(i * size, (i + 1) * size)
+  const rows = Array.from({ length: rowCount }, (_, i) =>
+    tableMap.slice(i * width, (i + 1) * width)
   );
   // only return positions of first cell of each row => [1, 15]
-  return subarrays.map((subarray) => subarray[0]);
+  return rows.map((row) => row[0]);
 }
 
 /*
@@ -41,12 +41,12 @@ function restructureArray(arr: number[], size: number): number[] {
  * output:
  *   [1, 5, 9]
  */
-function extractFirstColumnNumbers(table: number[], width: number) {
-  const firstColumnNumbers: number[] = [];
+function extractColumnStartPoints(tableMap: number[], width: number) {
+  const columnStartPoints: number[] = [];
   for (let i = 0; i < width; i++) {
-    firstColumnNumbers.push(table[i]);
+    columnStartPoints.push(tableMap[i]);
   }
-  return firstColumnNumbers;
+  return columnStartPoints;
 }
 
 export const Table = (props: any) => {
@@ -138,11 +138,11 @@ export const Table = (props: any) => {
         // [1, 11] - relative position of first cells of each row
         console.log(
           "row test restruct: ",
-          restructureArray(tableMap.map, tableMap.width)
+          extractRowStartPoints(tableMap.map, tableMap.width)
         );
 
         // get all startingPoints of each row inside the table but relative to the document
-        const startingPoints = restructureArray(
+        const startingPoints = extractRowStartPoints(
           tableMap.map,
           tableMap.width
         ).map((value) => value + tableStart);
@@ -193,11 +193,11 @@ export const Table = (props: any) => {
         // [1, 5] - relative position of first cells of each column
         console.log(
           "col test extract: ",
-          extractFirstColumnNumbers(tableMap.map, tableMap.width)
+          extractColumnStartPoints(tableMap.map, tableMap.width)
         );
 
         // get all startingPoints of each row inside the table but relative to the document
-        const startingPoints = extractFirstColumnNumbers(
+        const startingPoints = extractColumnStartPoints(
           tableMap.map,
           tableMap.width
         ).map((value) => value + tableStart);
