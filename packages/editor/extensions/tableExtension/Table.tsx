@@ -325,8 +325,8 @@ export const Table = (props: any) => {
               const cellPos = tableMap.positionAt(0, index, table);
               const resolvedCellPos = state.doc.resolve(tableStart + cellPos);
 
-              const rowSelection = CellSelection.colSelection(resolvedCellPos);
-              editor.view.dispatch(state.tr.setSelection(rowSelection));
+              const colSelection = CellSelection.colSelection(resolvedCellPos);
+              editor.view.dispatch(state.tr.setSelection(colSelection));
             }}
           >
             column selector: {index}
